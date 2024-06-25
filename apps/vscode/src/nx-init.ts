@@ -1,8 +1,4 @@
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
-import {
-  getShellExecutionForConfig,
-  getTelemetry,
-} from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/utils';
 import {
   commands,
   ExtensionContext,
@@ -30,6 +26,7 @@ export function initNxInit(context: ExtensionContext) {
           cwd: workspacePath,
         })
       );
+      task.presentationOptions.focus = true;
 
       tasks.executeTask(task);
     })

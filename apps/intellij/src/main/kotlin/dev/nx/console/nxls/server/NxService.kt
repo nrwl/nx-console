@@ -112,4 +112,9 @@ interface NxService {
     fun stopDaemon(): CompletableFuture<Unit> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun cloudStatus(): CompletableFuture<NxCloudStatus> {
+        throw UnsupportedOperationException()
+    }
 }

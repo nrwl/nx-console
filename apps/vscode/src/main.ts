@@ -57,6 +57,7 @@ import {
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -208,6 +209,7 @@ async function setWorkspace(workspacePath: string) {
     initGenerateUiWebview(context);
 
     initNxCommandsView(context);
+    initNxCloudView(context);
     initNvmTip(context);
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);

@@ -13,3 +13,4 @@ export * from './lib/get-project-folder-tree';
 export * from './lib/nx-console-plugin-requests';
 export * from './lib/has-affected-projects';
 export * from './lib/get-source-map';
+export * from './lib/get-nx-cloud-status';

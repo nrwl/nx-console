@@ -1,13 +1,11 @@
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
-import {
-  getNxWorkspacePathFromNxls,
-  getNxWorkspaceProjects,
-} from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { Uri, commands } from 'vscode';
+import { commands, ShellExecution, Task, tasks, TaskScope, Uri } from 'vscode';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 
 export async function handleGraphInteractionEventBase(event: {
   type: string;
@@ -40,6 +38,41 @@ export async function handleGraphInteractionEventBase(event: {
       positional: event.payload.taskId,
       flags: [],
     });
+    return true;
+  }
+
+  if (event.type === 'run-help') {
+    getTelemetry().featureUsed('nx.graph.runHelp');
+    const workspacePath = getNxWorkspacePath();
+    const projectName = event.payload.projectName;
+    const cmd = event.payload.helpCommand;
+
+    getNxWorkspaceProjects().then((projects) => {
+      const project = projects[projectName];
+      if (!project) return;
+      importNxPackagePath<typeof import('nx/src/devkit-exports')>(
+        workspacePath,
+        'src/devkit-exports'
+      ).then(({ detectPackageManager }) => {
+        const pkgManager = detectPackageManager(workspacePath);
+        tasks.executeTask(
+          new Task(
+            {
+              type: 'nxconsole-run-help',
+            },
+            TaskScope.Workspace,
+            cmd,
+            pkgManager,
+            new ShellExecution(cmd, { cwd: join(workspacePath, project.root) })
+          )
+        );
+      });
+    });
+    return true;
+  }
+
+  if (event.type === 'nx-connect') {
+    commands.executeCommand('nx.connectToCloud');
     return true;
   }
 
