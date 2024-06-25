@@ -1,3 +1,10 @@
+## 1.27.0 (2024-06-25)
+
+### Features
+
+* add nx connect action & vscode cloud pane ([#2186](https://github.com/nrwl/nx-console/issues/2186)) ([2326197](https://github.com/nrwl/nx-console/commit/232619729b1e4fa9c767fa7404449352f1fcff7d))
+* **misc:** add support for run-help event ([#2183](https://github.com/nrwl/nx-console/issues/2183)) ([7beb868](https://github.com/nrwl/nx-console/commit/7beb868b043c9fc6552e5b6505d6e99afcafba8a))
+
 ## <small>1.26.1 (2024-06-24)</small>
 
 ### Bug Fixes
