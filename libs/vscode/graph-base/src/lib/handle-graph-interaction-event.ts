@@ -71,5 +71,10 @@ export async function handleGraphInteractionEventBase(event: {
     return true;
   }
 
+  if (event.type === 'nx-connect') {
+    commands.executeCommand('nx.connectToCloud');
+    return true;
+  }
+
   return false;
 }

@@ -30,7 +30,7 @@ class NxConnectAction : AnAction() {
 }
 
 @Service(Service.Level.PROJECT)
-class NxConnectService(val project: Project, val cs: CoroutineScope) {
+class NxConnectService(private val project: Project, private val cs: CoroutineScope) {
     fun connectToCloud() {
         cs.launch {
             val cloudStatus = NxlsService.getInstance(project).cloudStatus()

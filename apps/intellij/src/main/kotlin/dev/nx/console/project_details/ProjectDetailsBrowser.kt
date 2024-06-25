@@ -97,7 +97,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 if (handled) return@addHandler null
                 when (messageParsed.type) {
                     "open-project-graph" -> {
-                        messageParsed.payload.projectName?.also {
+                        messageParsed.payload?.projectName?.also {
                             coroutineScope.launch {
                                 val nxGraphService = getNxGraphService(project) ?: return@launch
                                 withContext(Dispatchers.EDT) { nxGraphService.focusProject(it) }
@@ -105,7 +105,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         }
                     }
                     "open-task-graph" -> {
-                        messageParsed.payload.projectName?.also { projectName ->
+                        messageParsed.payload?.projectName?.also { projectName ->
                             messageParsed.payload.targetName?.also { targetName ->
                                 coroutineScope.launch {
                                     val nxGraphService = getNxGraphService(project) ?: return@launch
@@ -117,7 +117,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         }
                     }
                     "override-target" -> {
-                        messageParsed.payload.projectName?.also { projectName ->
+                        messageParsed.payload?.projectName?.also { projectName ->
                             messageParsed.payload.targetName?.also { targetName ->
                                 messageParsed.payload.targetConfigString?.also { targetConfigString
                                     ->
