@@ -1,0 +1,8 @@
+{
+  "name": "vscode-nx-cloud-view",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/nx-cloud-view/src",
+  "projectType": "library",
+  "tags": ["type:vscode"],
+  "targets": {}
+}
