@@ -342,7 +342,7 @@
         },
         {
           "command": "nx.init",
-          "when": "false"
+          "when": "!isNxWorkspace"
         },
         {
           "command": "nx.graph.showAll",
@@ -350,6 +350,26 @@
         },
         {
           "command": "nxConsole.refreshWorkspace",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nxConsole.showProjectConfiguration",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.project-details.openToSide",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nxConsole.showNxlsLogs",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.connectToCloud",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.graph.showAffected",
           "when": "isNxWorkspace"
         }
       ]
@@ -360,6 +380,12 @@
         "title": "Refresh Workspace",
         "category": "Nx",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "nxConsole.selectWorkspaceManually",
+        "title": "Select Nx Workspace Location",
+        "category": "Nx",
+        "icon": "$(folder-opened)"
       },
       {
         "command": "nxConsole.editCommonCommands",
@@ -562,8 +588,13 @@
       },
       {
         "category": "Nx",
-        "title": "Nx Init",
+        "title": "Add Nx to workspace",
         "command": "nx.init"
+      },
+      {
+        "category": "Nx",
+        "title": "Connect to Nx Cloud",
+        "command": "nx.connectToCloud"
       }
     ],
     "configuration": {
@@ -741,6 +772,16 @@
         "view": "nxProjects",
         "contents": "Nx caught one or more errors while computing your project graph. \n [View Errors](command:workbench.actions.view.problems)\n If the problems persist, you can try running `nx reset` to clear all caches and then [refresh the workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs) and refer to the [Nx Troubleshooting Guide](https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole) and the [Nx Console Troubleshooting Guide](https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole).",
         "when": "nxConsole.hasWorkspaceErrors"
+      },
+      {
+        "view": "nxCloud",
+        "contents": "You're connected to Nx Cloud! \n [View Nx Cloud App](command:nxConsole.openCloudApp) ",
+        "when": "nxConsole.connectedToCloud"
+      },
+      {
+        "view": "nxCloud",
+        "contents": "Looks like you're not connected to Nx Cloud. \n [Connect to Nx Cloud](command:nx.connectToCloud) \n To learn more about Nx Cloud, check out [Why Nx Cloud?](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nxconsole) or get an overview of [Nx Cloud features](https://nx.dev/ci/features?utm_source=nxconsole).",
+        "when": "!nxConsole.connectedToCloud"
       }
     ],
     "walkthroughs": [
@@ -813,6 +854,11 @@
         {
           "id": "nxProjects",
           "name": "Projects",
+          "when": "isNxWorkspace"
+        },
+        {
+          "id": "nxCloud",
+          "name": "Nx Cloud",
           "when": "isNxWorkspace"
         },
         {

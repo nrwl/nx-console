@@ -23,6 +23,7 @@ import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.run.NxHelpCommandService
 import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.run.actions.NxConnectService
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
@@ -242,7 +243,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected fun handleGraphInteractionEventBase(event: NxGraphInteractionEvent): Boolean {
         when (event.type) {
             "file-click" -> {
-                event.payload.url?.also {
+                event.payload?.url?.also {
                     val fullPath = Paths.get(project.nxBasePath, it).toString()
                     val file = LocalFileSystem.getInstance().findFileByPath(fullPath)
                     if (file == null) {
@@ -265,7 +266,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                     TelemetryService.getInstance(project)
                         .featureUsed("Nx Graph Open Project Config File")
 
-                    event.payload.projectName?.also {
+                    event.payload?.projectName?.also {
                         project.nxWorkspace()?.workspace?.projects?.get(it)?.apply {
                             val path = nxProjectConfigurationPath(project, root) ?: return@apply
                             val file =
@@ -279,18 +280,22 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 return true
             }
             "run-task" -> {
-                event.payload.taskId?.also {
+                event.payload?.taskId?.also {
                     val (projectName, targetName) = it.split(":")
                     NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)
                 }
                 return true
             }
             "run-help" -> {
-                event.payload.let { (projectName, _, _, _, _, helpCommand) ->
+                event.payload?.let { (projectName, _, _, _, _, helpCommand) ->
                     if (projectName != null && helpCommand != null) {
                         NxHelpCommandService.getInstance(project).execute(projectName, helpCommand)
                     }
                 }
+                return true
+            }
+            "nx-connect" -> {
+                NxConnectService.getInstance(project).connectToCloud()
                 return true
             }
             else -> {
@@ -449,7 +454,10 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 }
 
 @Serializable
-data class NxGraphInteractionEvent(val type: String, val payload: NxGraphInteractionPayload)
+data class NxGraphInteractionEvent(
+    val type: String,
+    val payload: NxGraphInteractionPayload? = null
+)
 
 @Serializable
 data class NxGraphInteractionPayload(

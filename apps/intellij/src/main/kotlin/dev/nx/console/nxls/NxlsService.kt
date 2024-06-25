@@ -183,6 +183,12 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
             ?: emptyMap()
     }
 
+    suspend fun cloudStatus(): NxCloudStatus? {
+        return withMessageIssueCatch("nx/cloudStatus") {
+            server()?.getNxService()?.cloudStatus()?.await()
+        }()
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }
