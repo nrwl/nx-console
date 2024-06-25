@@ -3,13 +3,13 @@ import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
   e2eCwd,
+  modifyJsonFile,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
 } from '../utils';
 import { NxCloudStatusRequest } from '@nx-console/language-server/types';
 import { readFileSync, writeFileSync } from 'fs';
-import { execSync } from 'child_process';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -87,13 +87,19 @@ describe('nx cloud - nx 16', () => {
     afterEach(() => {
       writeFileSync(nxJsonPath, oldNxJsonContents);
     });
-    it('should return true & default cloud url after running nx connect', async () => {
-      const echoCommand = process.platform === 'win32' ? 'echo.' : 'echo';
-
-      execSync(`${echoCommand}  | npx nx@16 connect --verbose`, {
-        cwd: join(e2eCwd, workspaceName),
-      });
-
+    it('should return true & default cloud url when taskRunnerOptions have cloud', async () => {
+      modifyJsonFile(nxJsonPath, (json) => ({
+        ...json,
+        tasksRunnerOptions: {
+          default: {
+            runner: 'nx-cloud',
+            options: {
+              cacheableOperations: ['build', 'lint', 'test', 'e2e'],
+              accessToken: 'fake-token',
+            },
+          },
+        },
+      }));
       const cloudStatusResponse = await nxlsWrapper.sendRequest({
         ...NxCloudStatusRequest,
         params: {},
@@ -104,17 +110,20 @@ describe('nx cloud - nx 16', () => {
       );
     });
 
-    it('should return true & custom cloud url after running nx connect with env', async () => {
-      const echoCommand = process.platform === 'win32' ? 'echo.' : 'echo';
-
-      execSync(`${echoCommand}  | npx nx@16 connect --verbose`, {
-        cwd: join(e2eCwd, workspaceName),
-        env: {
-          ...process.env,
-          NX_CLOUD_API: 'https://staging.nx.app',
+    it('should return true & custom cloud url when taskRunnerOptions have cloud & url', async () => {
+      modifyJsonFile(nxJsonPath, (json) => ({
+        ...json,
+        tasksRunnerOptions: {
+          default: {
+            runner: 'nx-cloud',
+            options: {
+              cacheableOperations: ['build', 'lint', 'test', 'e2e'],
+              accessToken: 'fake-token',
+              url: 'https://staging.nx.app',
+            },
+          },
         },
-      });
-
+      }));
       const cloudStatusResponse = await nxlsWrapper.sendRequest({
         ...NxCloudStatusRequest,
         params: {},
