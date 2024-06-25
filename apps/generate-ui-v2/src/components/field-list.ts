@@ -44,14 +44,14 @@ export class FieldList extends GeneratorContextContext(
         <div
           class="border-separator ${this.editor === 'intellij'
             ? 'hidden md:block'
-            : 'max-sm:hidden md:w-64'} fixed h-full w-52 overflow-y-auto border-r-2  p-6"
+            : 'max-sm:hidden md:w-64'} h-full w-72 overflow-y-auto border-r-2 p-6"
         >
           ${this.renderOptionNav(optionsWithMetadata, shouldShowMoreOptions)}
         </div>
         <div
           class="${this.editor === 'intellij'
-            ? 'md:ml-52 md:p-6'
-            : 'sm:ml-52 sm:p-6 md:ml-64'} w-full pt-6"
+            ? 'md:p-6'
+            : 'sm:p-6'} w-full overflow-y-auto pt-6"
         >
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
