@@ -8,23 +8,22 @@ import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxBasePath
 import java.io.File
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Service(Service.Level.PROJECT)
-class NxHelpCommandService(val project: Project) {
-    fun execute(projectName: String, helpCommand: String) {
-        val nxlsService = project.service<NxlsService>()
+class NxHelpCommandService(val project: Project, private val cs: CoroutineScope) {
+    private val nxlsService = NxlsService.getInstance(project)
 
-        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+    fun execute(projectName: String, helpCommand: String) {
+        cs.launch {
             val nxProject =
                 nxlsService
                     .workspace()
