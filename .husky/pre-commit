@@ -1,0 +1,1 @@
+node ./tools/scripts/check-formatting.js
