@@ -112,7 +112,7 @@
         ],
         "thirdParty": true,
         "minify": true,
-        "sourcemap": true,
+        "sourcemap": false,
         "outputPath": "dist/apps/vscode",
         "outputFileName": "main.js",
         "format": ["cjs"],
@@ -171,8 +171,12 @@
         },
         "production": {
           "skipTypeCheck": true,
-          "minify": false,
+          "minify": true,
           "sourcemap": false
+        },
+        "debug": {
+          "minify": false,
+          "sourcemap": true
         }
       },
       "dependsOn": [
@@ -185,7 +189,8 @@
           "params": "forward"
         }
       ],
-      "outputs": ["{options.outputPath}"]
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production"
     },
     "extract-dependencies": {
       "executor": "nx:run-commands",
