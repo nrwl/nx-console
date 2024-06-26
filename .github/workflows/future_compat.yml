@@ -18,7 +18,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: npx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
+      - name: Create .env file
+        run: echo "NXLS_E2E_DEFAULT_VERSION=next" > .env.local
       - run: |
           npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
       - name: Use Node.js ${{ env.node_version }}
@@ -29,11 +30,6 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - run: npx nx run nxls-e2e:e2e
-        env:
-          NXLS_E2E_DEFAULT_VERSION: latest
-      - run: npx nx run nxls-e2e:e2e
-        env:
-          NXLS_E2E_DEFAULT_VERSION: next
 
   main-windows:
     name: Main Windows
@@ -48,6 +44,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Create .env file
+        run: echo "NXLS_E2E_DEFAULT_VERSION=next" > .env.local
       - run: |
           npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
       - name: Use Node.js ${{ env.node_version }}
@@ -58,8 +56,3 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - run: npx nx run nxls-e2e:e2e
-        env:
-          NXLS_E2E_DEFAULT_VERSION: latest
-      - run: npx nx run nxls-e2e:e2e
-        env:
-          NXLS_E2E_DEFAULT_VERSION: next
