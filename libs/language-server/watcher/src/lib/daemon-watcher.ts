@@ -96,7 +96,8 @@ export class DaemonWatcher {
                   const normalized = normalize(f.path);
                   return !(
                     normalized.includes(normalize('.yarn/cache')) ||
-                    normalized.includes(normalize('.nx/cache'))
+                    normalized.includes(normalize('.nx/cache')) ||
+                    normalized.includes(normalize('.nx/workspace-data'))
                   );
                 }) ?? [];
               if (filteredChangedFiles.length === 0) {
