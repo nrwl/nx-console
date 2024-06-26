@@ -3,7 +3,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-export const defaultVersion = '19.3.0';
+export const defaultVersion =
+  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '19.3.0';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
