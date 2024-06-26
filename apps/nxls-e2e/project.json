@@ -6,15 +6,22 @@
   "targets": {
     "test": {
       "executor": "nx:noop"
-    },
-    "e2e": {
-      "inputs": [
-        {
-          "env": "NXLS_E2E_DEFAULT_VERSION"
-        }
-      ]
     }
   },
-  "tags": ["type:lsp"],
-  "implicitDependencies": ["nxls"]
+  "tags": [
+    "type:lsp"
+  ],
+  "implicitDependencies": [
+    "nxls"
+  ],
+  "namedInputs": {
+    "sharedGlobals": [
+      {
+        "runtime": "node -p '`${process.platform}_${process.arch}`'"
+      },
+      {
+        "env": "NXLS_E2E_DEFAULT_VERSION"
+      }
+    ]
+  }
 }
