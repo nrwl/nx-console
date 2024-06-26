@@ -34,11 +34,15 @@ export async function getShellExecutionForConfig(
     command = `${pmc.exec} ${command}`;
   }
 
-  const isPowershell = platform() === "win32" && workspace.getConfiguration("terminal").get("integrated.defaultProfile.windows") === "PowerShell"
+  const isPowershell =
+    platform() === 'win32' &&
+    workspace
+      .getConfiguration('terminal')
+      .get('integrated.defaultProfile.windows') === 'PowerShell';
 
- if(isPowershell) {
-  command = command.replace(/"/g, '\\"')
- }
+  if (isPowershell) {
+    command = command.replace(/"/g, '\\"');
+  }
 
   return new ShellExecution(command, {
     cwd: config.cwd,
