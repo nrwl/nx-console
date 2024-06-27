@@ -28,7 +28,7 @@ export const simpleReactWorkspaceOptions: NewWorkspaceOptions = {
 
 export function newWorkspace({
   name = uniq('workspace'),
-  packageManager = 'npm',
+  packageManager = 'pnpm',
   version,
   options,
   verbose,
