@@ -10,6 +10,10 @@
       },
       "dependsOn": ["^build"]
     },
+    "runIde": {
+      "command": "yarn nx run intellij:runIde",
+      "dependsOn": ["^build"]
+    },
     "test": {
       "command": "yarn nx run intellij:check"
     },
@@ -23,12 +27,6 @@
         "command": "node ./apps/intellij/run-gradle.js :apps:intellij:runInspections"
       }
     },
-    "install-nxls-deps": {
-      "command": "node ./tools/scripts/install-nxls-deps-intellij.js",
-      "outputs": [
-        "{workspaceRoot}/dist/apps/intellij/idea-sandbox/plugins/nx-console/nxls"
-      ]
-    },
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
@@ -41,5 +39,5 @@
     }
   },
   "tags": ["type:intellij"],
-  "implicitDependencies": ["generate-ui", "nxls"]
+  "implicitDependencies": ["generate-ui", "nxls", "generate-ui-v2"]
 }

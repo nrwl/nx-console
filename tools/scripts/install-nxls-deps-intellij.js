@@ -4,7 +4,7 @@ const { join } = require('path');
 
 const nxlsPath = join(
   process.cwd(),
-  'dist/apps/intellij/idea-sandbox/plugins/nx-console/nxls'
+  '../../dist/apps/intellij/idea-sandbox/plugins/nx-console/nxls'
 );
 
 execSync(`npm i -f`, { stdio: 'inherit', cwd: nxlsPath });
