@@ -2,7 +2,7 @@ import { importNxPackagePath } from '@nx-console/shared/npm';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 
-import { ShellExecution } from 'vscode';
+import { ShellExecution, workspace } from 'vscode';
 
 export interface ShellConfig {
   cwd: string;
@@ -32,6 +32,16 @@ export async function getShellExecutionForConfig(
       packageManagerCommands ??
       getPackageManagerCommand(detectPackageManager(config.cwd));
     command = `${pmc.exec} ${command}`;
+  }
+
+  const isPowershell =
+    platform() === 'win32' &&
+    workspace
+      .getConfiguration('terminal')
+      .get('integrated.defaultProfile.windows') === 'PowerShell';
+
+  if (isPowershell) {
+    command = command.replace(/"/g, '\\"');
   }
 
   return new ShellExecution(command, {

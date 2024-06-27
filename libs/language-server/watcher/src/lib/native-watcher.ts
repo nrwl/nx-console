@@ -62,7 +62,8 @@ export class NativeWatcher {
                 NativeWatcher.openDocuments.has(path)) &&
               !path.startsWith('node_modules') &&
               !path.startsWith(normalize('.nx/cache')) &&
-              !path.startsWith(normalize('.yarn/cache'))
+              !path.startsWith(normalize('.yarn/cache')) &&
+              !path.startsWith(normalize('.nx/workspace-data'))
           )
       ) {
         if (this.stopped) {
