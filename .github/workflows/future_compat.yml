@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: |
-          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV, NXLS_E2E_DEFAULT_VERSION"
+          npx nx-cloud start-ci-run --distribute-on="1 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV, NXLS_E2E_DEFAULT_VERSION"
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:
@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
 
       - run: |
-          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NXLS_E2E_DEFAULT_VERSION"
+          npx nx-cloud start-ci-run --distribute-on="1 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NXLS_E2E_DEFAULT_VERSION"
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:

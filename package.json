@@ -12,7 +12,8 @@
     "nx": "NODE_OPTIONS=--max-old-space-size=4096 && nx",
     "watch": "nx watch-all vscode",
     "e2e": "nx e2e vscode-e2e",
-    "update": "nx migrate latest"
+    "update": "nx migrate latest",
+    "prepare": "husky"
   },
   "dependencies": {
     "@lit-labs/context": "^0.3.1",
