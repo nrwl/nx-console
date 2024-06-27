@@ -121,7 +121,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       projectName = (await getGeneratorContextV2(uri.fsPath))?.project;
     }
     commands.executeCommand(
-      'nx.generate',
+      'nx.generate.quickpick',
       generator,
       projectName ? { projectName } : undefined
     );
