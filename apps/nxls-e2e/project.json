@@ -9,5 +9,15 @@
     }
   },
   "tags": ["type:lsp"],
-  "implicitDependencies": ["nxls"]
+  "implicitDependencies": ["nxls"],
+  "namedInputs": {
+    "sharedGlobals": [
+      {
+        "runtime": "node -p '`${process.platform}_${process.arch}`'"
+      },
+      {
+        "env": "NXLS_E2E_DEFAULT_VERSION"
+      }
+    ]
+  }
 }
