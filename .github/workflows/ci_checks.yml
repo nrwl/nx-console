@@ -81,7 +81,7 @@ jobs:
           java-version: 17
           cache: gradle
       # there's no need to check formatting & linting again on windows, sometimes there's a timing issue with intellij:build so run it up front
-      - run: npx nx run intellij:build --info
+      - run: npx nx run intellij:build --info --verbose
       - run: npx nx affected --targets="build,test" --configuration=ci --exclude=nx-console --parallel=1
       - run: npx nx affected --targets="e2e,e2e-local" --configuration=ci --exclude=nx-console --parallel=1
         timeout-minutes: 60
