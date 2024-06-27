@@ -117,6 +117,7 @@ tasks {
                 logger.warn("Working dir: $workingDir")
                 commandLine = buildCommands() + "npx nx run intellij:install-nxls-deps"
             }
+            exec { commandLine = buildCommands() + "npx nx daemon --stop" }
         }
     }
 
@@ -211,16 +212,20 @@ tasks.register<Exec>("buildNxls") {
             buildCommands() + "npx nx run nxls:build"
         }
     workingDir = rootDir
+    outputs.file(File("dist/apps/nxls"))
+    doLast { exec { commandLine = buildCommands() + "npx nx daemon --stop" } }
 }
 
 tasks.register<Exec>("buildGenerateUi") {
     commandLine = buildCommands() + "npx nx run generate-ui:build:production-intellij"
     workingDir = rootDir
+    doLast { exec { commandLine = buildCommands() + "npx nx daemon --stop" } }
 }
 
 tasks.register<Exec>("buildGenerateUiV2") {
     commandLine = buildCommands() + "npx nx run generate-ui-v2:build"
     workingDir = rootDir
+    doLast { exec { commandLine = buildCommands() + "npx nx daemon --stop" } }
 }
 
 tasks.register<Copy>("copyGenerateUiArtifacts") {
