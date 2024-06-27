@@ -1,3 +1,12 @@
+## [18.24.1](https://github.com/nrwl/nx-console/compare/vscode-v18.24.0...vscode-v18.24.1) (2024-06-27)
+
+
+### Bug Fixes
+
+* **nxls:** ignore .nx/workspace-data paths as a precaution ([#2190](https://github.com/nrwl/nx-console/issues/2190)) ([60c91ff](https://github.com/nrwl/nx-console/commit/60c91ff525807f992c53d036057fcd93996f0aa5))
+* **vscode:** escape quotes in windows powershell ([#2189](https://github.com/nrwl/nx-console/issues/2189)) ([bb73bdf](https://github.com/nrwl/nx-console/commit/bb73bdf4f95e0f4b5cd7a71c7242719f5a618ba6))
+* **vscode:** repair re/move commands ([#2193](https://github.com/nrwl/nx-console/issues/2193)) ([9d36a69](https://github.com/nrwl/nx-console/commit/9d36a69a6085911e61eebe17e9b4635770d2e6ba))
+
 # [18.24.0](https://github.com/nrwl/nx-console/compare/vscode-v18.23.0...vscode-v18.24.0) (2024-06-25)
 
 
