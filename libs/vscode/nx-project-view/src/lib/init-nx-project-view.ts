@@ -45,7 +45,10 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   }
 
   const { project, root } = viewItem.nxProject;
-  if (viewItem.contextValue === 'project') {
+  if (
+    viewItem.contextValue === 'project' ||
+    viewItem.contextValue === 'targetGroup'
+  ) {
     return revealNxProject(project, root);
   }
   const target = viewItem.nxTarget;
