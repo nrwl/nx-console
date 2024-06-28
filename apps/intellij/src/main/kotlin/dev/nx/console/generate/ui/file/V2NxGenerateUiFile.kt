@@ -12,6 +12,7 @@ import dev.nx.console.generate.ui.*
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
+import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
@@ -26,7 +27,7 @@ class V2NxGenerateUiFile(
     name: String,
     private val project: Project,
     private val runGeneratorManager: RunGeneratorManager
-) : NxGenerateUiFile(name, true) {
+) : NxGenerateUiFile(name) {
     private val cs = V2NxGenerateUiFileCoroutineHolder.getInstance(project).cs
 
     private var generatorToDisplay: GeneratorSchema? = null
@@ -51,12 +52,13 @@ class V2NxGenerateUiFile(
             }
             val js =
                 """
+            console.log('registering post to ide callback');
             window.intellijApi.registerPostToIdeCallback((message) => {
                     ${query.inject("message")}
             })
         """
             cs.launch {
-                browser.executeJavaScript(js)
+                browser.executeJavascriptWithCatch(js)
 
                 postMessageToBrowser(GenerateUiStylesInputMessage(extractIntellijStyles()))
                 postMessageToBrowser(
@@ -85,7 +87,7 @@ class V2NxGenerateUiFile(
     }
 
     private fun handleMessageFromBrowser(message: String) {
-        val logger = logger<DefaultNxGenerateUiFile>()
+        val logger = logger<V2NxGenerateUiFile>()
         val messageParsed = json.decodeFromString<GenerateUiOutputMessage>(message)
         logger.info("received message $messageParsed")
         if (messageParsed.payloadType == "output-init") {

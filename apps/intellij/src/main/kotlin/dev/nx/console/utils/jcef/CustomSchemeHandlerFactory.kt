@@ -6,13 +6,13 @@ import org.cef.callback.CefSchemeHandlerFactory
 import org.cef.handler.CefResourceHandler
 import org.cef.network.CefRequest
 
-class CustomSchemeHandlerFactory(private val v2: Boolean = false) : CefSchemeHandlerFactory {
+class CustomSchemeHandlerFactory() : CefSchemeHandlerFactory {
     override fun create(
         browser: CefBrowser?,
         frame: CefFrame?,
         schemeName: String?,
         request: CefRequest?
     ): CefResourceHandler {
-        return CustomResourceHandler(v2)
+        return CustomResourceHandler()
     }
 }
