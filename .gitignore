@@ -53,7 +53,7 @@ testem.log
 Thumbs.db
 
 #Environment
-.env
+.env.local
 
 # Intellij
 .gradle
