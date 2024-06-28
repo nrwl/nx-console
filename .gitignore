@@ -68,4 +68,5 @@ apps/vscode-e2e/.screenshots
 .angular
 
 .nx/cache
+.nx/workspace-data
 **/cypress/downloads

@@ -103,7 +103,6 @@ tasks {
     runInspections { mount("${rootDir}/gradle.properties", "/data/project/gradle.properties") }
 
     prepareSandbox() {
-        dependsOn("buildNxls")
         from(nxlsRoot) {
             include("**/*.js")
             include("**/package.json")
@@ -115,7 +114,14 @@ tasks {
             exec {
                 logger.warn("rootproject ${rootProject.name}")
                 logger.warn("Working dir: $workingDir")
-                commandLine = buildCommands() + "npx nx run intellij:install-nxls-deps"
+                logger.warn("Working dir: $destinationDir")
+
+                workingDir =
+                    File(
+                        destinationDir,
+                        rootProject.name + "/nxls",
+                    )
+                commandLine = buildCommands() + "npm install --force"
             }
         }
     }
@@ -203,37 +209,13 @@ tasks {
     }
 }
 
-tasks.register<Exec>("buildNxls") {
-    commandLine =
-        if (System.getenv("IDEA_DEBUG") == "true") {
-            buildCommands() + "npx nx run nxls:build:debug"
-        } else {
-            buildCommands() + "npx nx run nxls:build"
-        }
-    workingDir = rootDir
-}
-
-tasks.register<Exec>("buildGenerateUi") {
-    commandLine = buildCommands() + "npx nx run generate-ui:build:production-intellij"
-    workingDir = rootDir
-}
-
-tasks.register<Exec>("buildGenerateUiV2") {
-    commandLine = buildCommands() + "npx nx run generate-ui-v2:build"
-    workingDir = rootDir
-}
-
 tasks.register<Copy>("copyGenerateUiArtifacts") {
-    dependsOn("buildGenerateUi")
-
     from("${rootDir}/dist/apps/generate-ui")
     include("*.js", "*.css")
     into("${buildDir}/resources/main/generate_ui")
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
-    dependsOn("buildGenerateUiV2")
-
     from("${rootDir}/dist/apps/generate-ui-v2")
     include("*.js", "*.css")
     into("${buildDir}/resources/main/generate_ui_v2")
