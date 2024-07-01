@@ -36,6 +36,9 @@ export class NxTreeItem extends TreeItem {
     if (this.contextValue === 'project') {
       this.iconPath = new ThemeIcon('package');
     }
+    if (this.contextValue === 'targetGroup') {
+      this.iconPath = new ThemeIcon('layers');
+    }
     if (this.contextValue === 'target') {
       this.iconPath = new ThemeIcon('symbol-property');
     }

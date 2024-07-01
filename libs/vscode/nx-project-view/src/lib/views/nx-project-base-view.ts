@@ -103,7 +103,7 @@ export abstract class BaseView {
     }
 
     const targetGroupMap = new Map<string, string[]>();
-    const nonGroupedTargets: Set<string> = new Set(...Object.keys(targets));
+    const nonGroupedTargets: Set<string> = new Set(Object.keys(targets));
 
     for (const [targetGroupName, targets] of Object.entries(
       projectDef.metadata.targetGroups

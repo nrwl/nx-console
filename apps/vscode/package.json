@@ -139,7 +139,7 @@
         },
         {
           "command": "nxConsole.revealInExplorer",
-          "when": "view == nxProjects && viewItem != target",
+          "when": "view == nxProjects && (viewItem == project || viewItem == folder)",
           "group": "inline"
         },
         {
