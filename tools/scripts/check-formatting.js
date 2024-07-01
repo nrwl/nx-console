@@ -17,7 +17,7 @@ const ktFiles = changedFiles.filter((file) => file.endsWith('.kt'));
 if (ktFiles.length > 0) {
   console.log('Detected .kt files, running ktfmtCheck...');
   try {
-    execSync('node ./apps/intellij/run-gradle.js :apps:intellij:ktfmtCheck', {
+    execSync('npx nx run intellij:ktfmtCheck', {
       stdio: 'ignore',
     });
   } catch (e) {
