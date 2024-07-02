@@ -25,7 +25,10 @@ class NxFolderTreeBuilder(
         }
         if (node is NxSimpleNode.Folder) {
             val children = nxFolderTreeData.treeMap[node.path]?.children ?: return emptyArray()
-            return children.map { createFolderOrProjectNode(it, node) }.toTypedArray()
+            return children
+                .mapNotNull { nxFolderTreeData.treeMap[it] }
+                .map { createFolderOrProjectNode(it, node) }
+                .toTypedArray()
         }
         if (node is NxSimpleNode.Project) {
             val targetChildren = getTargetsAndTargetGroupsForProject(node)
@@ -33,6 +36,7 @@ class NxFolderTreeBuilder(
                 node.nxProject
                     ?.root
                     ?.let { nxFolderTreeData.treeMap[it]?.children }
+                    ?.mapNotNull { nxFolderTreeData.treeMap[it] }
                     ?.map { createFolderOrProjectNode(it, node) }
                     ?.toTypedArray()
                     ?: return targetChildren

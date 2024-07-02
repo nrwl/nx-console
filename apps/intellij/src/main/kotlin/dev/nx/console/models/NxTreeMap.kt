@@ -4,7 +4,7 @@ data class NxTreeNode(
     val dir: String,
     val projectName: String?,
     val projectConfiguration: NxProject?,
-    val children: Array<NxTreeNode>
+    val children: Array<String>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -33,7 +33,7 @@ typealias NxTreeMap = Map<String, NxTreeNode>
 
 typealias SerializedTreeMap = Array<SerializedTreeMapItem>
 
-data class SerializedTreeMapItem(val name: String, val node: NxTreeNode)
+data class SerializedTreeMapItem(val dir: String, val node: NxTreeNode)
 
 data class SerializedNxFolderTreeData(
     val serializedTreeMap: SerializedTreeMap,
@@ -41,7 +41,7 @@ data class SerializedNxFolderTreeData(
 ) {
     fun toFolderTreeData(): NxFolderTreeData {
         return NxFolderTreeData(
-            treeMap = this.serializedTreeMap.associate { Pair(it.name, it.node) },
+            treeMap = this.serializedTreeMap.associate { Pair(it.dir, it.node) },
             roots = this.roots
         )
     }
