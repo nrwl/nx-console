@@ -74,8 +74,10 @@ class TreeView extends BaseView {
       if (element.nxProject && this.treeMap.has(element.nxProject.root)) {
         folderAndProjectChildren = this.treeMap
           .get(element.nxProject.root)!
-          .children.map((folderOrProjectNode) =>
-            this.createFolderOrProjectTreeItemFromNode(folderOrProjectNode)
+          .children.map((folderOrProjectNodeDir) =>
+            this.createFolderOrProjectTreeItemFromNode(
+              this.treeMap.get(folderOrProjectNodeDir)!
+            )
           );
       }
       return [...targetChildren, ...folderAndProjectChildren];
@@ -85,8 +87,10 @@ class TreeView extends BaseView {
       if (this.treeMap.has(element.path)) {
         return this.treeMap
           .get(element.path)!
-          .children.map((folderOrProjectNode) =>
-            this.createFolderOrProjectTreeItemFromNode(folderOrProjectNode)
+          .children.map((folderOrProjectNodeDir) =>
+            this.createFolderOrProjectTreeItemFromNode(
+              this.treeMap.get(folderOrProjectNodeDir)!
+            )
           );
       }
     }

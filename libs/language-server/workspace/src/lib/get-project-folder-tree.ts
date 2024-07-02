@@ -10,7 +10,7 @@ import { nxWorkspace } from './workspace';
  */
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- dealing with maps is hard */
 export async function getProjectFolderTree(workspacePath: string): Promise<{
-  serializedTreeMap: { name: string; node: TreeNode }[];
+  serializedTreeMap: { dir: string; node: TreeNode }[];
   roots: TreeNode[];
 }> {
   const {
@@ -21,7 +21,7 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
   const roots = new Set<TreeNode>();
 
   function connectNodeToParent(node: TreeNode, parent: TreeNode) {
-    parent.children.push(node);
+    parent.children.push(node.dir);
   }
 
   function addProjectOrFolderTreeNode(
@@ -82,14 +82,14 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
       if (root.projectConfiguration?.root === '.') {
         return;
       }
-      workspaceRootProjectNode?.children.push(root);
+      workspaceRootProjectNode?.children.push(root.dir);
     });
     roots.clear();
     roots.add(workspaceRootProjectNode!);
   }
   const serializedTreeMap = Array.from(treeMap.entries()).map(
-    ([name, node]) => ({
-      name,
+    ([dir, node]) => ({
+      dir,
       node,
     })
   );
