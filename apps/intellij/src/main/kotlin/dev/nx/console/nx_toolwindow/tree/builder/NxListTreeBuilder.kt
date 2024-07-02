@@ -9,10 +9,10 @@ class NxListTreeBuilder(private val nxWorkspace: NxWorkspace?) : NxTreeBuilderBa
             return getProjectsAndTargetsSections(node)
         }
         if (node is NxSimpleNode.TargetsSection) {
-            return getTargetGroups(node)
+            return getTargetsList(node)
         }
-        if (node is NxSimpleNode.TargetGroup) {
-            return getTargetListForTargetGroup(node)
+        if (node is NxSimpleNode.TargetsList) {
+            return getTargetsForTargetsList(node)
         }
         if (node is NxSimpleNode.Target) {
             return getTargetConfigurations(node)
@@ -20,8 +20,11 @@ class NxListTreeBuilder(private val nxWorkspace: NxWorkspace?) : NxTreeBuilderBa
         if (node is NxSimpleNode.ProjectsSection) {
             return getProjectList(node)
         }
+        if (node is NxSimpleNode.TargetGroup) {
+            return getTargetsForTargetGroup(node)
+        }
         if (node is NxSimpleNode.Project) {
-            return getTargetListForProject(node)
+            return getTargetsAndTargetGroupsForProject(node)
         }
 
         return emptyArray()

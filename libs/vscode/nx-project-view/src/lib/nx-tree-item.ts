@@ -1,6 +1,5 @@
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import { ThemeIcon, TreeItem, Uri } from 'vscode';
 import { ViewItem } from './nx-project-tree-provider';
-import { getStoredCollapsibleState } from './tree-item-collapsible-store';
 import {
   NxProject,
   NxTarget,
@@ -12,13 +11,7 @@ export class NxTreeItem extends TreeItem {
   id: string;
 
   constructor(public readonly item: ViewItem) {
-    let collapsibleState: TreeItemCollapsibleState;
-    if (item.collapsible === TreeItemCollapsibleState.None) {
-      collapsibleState = TreeItemCollapsibleState.None;
-    } else {
-      collapsibleState = getStoredCollapsibleState(item.id) ?? item.collapsible;
-    }
-    super(item.label, collapsibleState);
+    super(item.label, item.collapsible);
 
     this.id = item.id;
     this.contextValue = item.contextValue;
@@ -35,6 +28,9 @@ export class NxTreeItem extends TreeItem {
     }
     if (this.contextValue === 'project') {
       this.iconPath = new ThemeIcon('package');
+    }
+    if (this.contextValue === 'targetGroup') {
+      this.iconPath = new ThemeIcon('layers');
     }
     if (this.contextValue === 'target') {
       this.iconPath = new ThemeIcon('symbol-property');
