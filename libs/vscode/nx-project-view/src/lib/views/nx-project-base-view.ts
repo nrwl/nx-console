@@ -8,6 +8,8 @@ import { join } from 'node:path';
 import { TreeItemCollapsibleState } from 'vscode';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 
+let counter = 0;
+
 export interface ProjectViewStrategy<T> {
   getChildren(element?: T): Promise<T[] | undefined>;
 }
@@ -72,7 +74,7 @@ export abstract class BaseView {
     }
 
     return {
-      id: projectName,
+      id: `${projectName}_${counter++}`,
       contextValue: 'project',
       nxProject,
       label: projectName,
@@ -138,7 +140,7 @@ export abstract class BaseView {
     const hasChildren =
       configurations && Object.keys(configurations).length > 0;
     return {
-      id: `${nxProject.project}:${targetName}`,
+      id: `${nxProject.project}:${targetName}_${counter++}`,
       contextValue: 'target',
       nxProject,
       nxTarget: { name: targetName },
@@ -155,7 +157,7 @@ export abstract class BaseView {
     targetNames: string[]
   ): TargetGroupViewItem {
     return {
-      id: `${nxProject.project}:${targetGroupName}`,
+      id: `${nxProject.project}:${targetGroupName}_${counter++}`,
       contextValue: 'targetGroup',
       nxProject,
       nxTargets: targetNames.map((name) => ({ name })),
@@ -191,7 +193,7 @@ export abstract class BaseView {
     }
 
     return Object.keys(configurations).map((configuration) => ({
-      id: `${nxProject.project}:${nxTarget.name}:${configuration}`,
+      id: `${nxProject.project}:${nxTarget.name}:${configuration}_${counter++}`,
       contextValue: 'target',
       nxProject,
       nxTarget: { name: nxTarget.name, configuration },
