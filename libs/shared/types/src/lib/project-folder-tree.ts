@@ -4,6 +4,6 @@ export type TreeNode = {
   dir: string;
   projectName?: string;
   projectConfiguration?: ProjectConfiguration;
-  children: TreeNode[];
+  children: string[];
 };
 export type TreeMap = Map<string, TreeNode>;

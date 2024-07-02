@@ -14,7 +14,7 @@ export async function getProjectFolderTree(): Promise<
     return undefined;
   }
   return {
-    treeMap: new Map(res.serializedTreeMap.map((n) => [n.name, n.node])),
+    treeMap: new Map(res.serializedTreeMap.map((n) => [n.dir, n.node])),
     roots: res.roots,
   };
 }
