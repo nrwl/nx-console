@@ -22,17 +22,8 @@ import kotlinx.coroutines.withContext
 class NxHelpCommandService(val project: Project, private val cs: CoroutineScope) {
     private val nxlsService = NxlsService.getInstance(project)
 
-    fun execute(projectName: String, helpCommand: String) {
+    fun execute(projectName: String, helpCommand: String, helpCwd: String?) {
         cs.launch {
-            val nxProject =
-                nxlsService
-                    .workspace()
-                    ?.workspace
-                    ?.projects
-                    ?.entries
-                    ?.find { it.key == projectName }
-                    ?.value
-
             val commandLine =
                 GeneralCommandLine().apply {
                     val (cmd, args) = helpCommand.split(" ", limit = 2)
@@ -40,8 +31,23 @@ class NxHelpCommandService(val project: Project, private val cs: CoroutineScope)
                     addParameters(args.split(" "))
                     withCharset(Charsets.UTF_8)
 
-                    nxProject?.root?.also {
-                        withWorkDirectory(File(project.nxBasePath).resolve(it))
+                    if (helpCwd != null) {
+                        // CWD should be passed to match command CWD.
+                        withWorkDirectory(File(project.nxBasePath).resolve(helpCwd))
+                    } else {
+                        // If CWD is not passed from Nx 19.4.0.
+                        val nxProject =
+                            nxlsService
+                                .workspace()
+                                ?.workspace
+                                ?.projects
+                                ?.entries
+                                ?.find { it.key == projectName }
+                                ?.value
+
+                        nxProject?.root?.also {
+                            withWorkDirectory(File(project.nxBasePath).resolve(it))
+                        }
                     }
                 }
 
