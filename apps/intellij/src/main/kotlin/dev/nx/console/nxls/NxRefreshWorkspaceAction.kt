@@ -57,7 +57,7 @@ class NxRefreshWorkspaceAction :
 }
 
 @Service(Service.Level.PROJECT)
-class NxRefreshWorkspaceService(val project: Project) {
+class NxRefreshWorkspaceService(private val project: Project) {
     private var refreshing = false
 
     fun refreshWorkspace() {
