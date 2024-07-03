@@ -287,9 +287,10 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 return true
             }
             "run-help" -> {
-                event.payload?.let { (projectName, _, _, _, _, helpCommand) ->
+                event.payload?.let { (projectName, _, _, _, _, helpCommand, helpCwd) ->
                     if (projectName != null && helpCommand != null) {
-                        NxHelpCommandService.getInstance(project).execute(projectName, helpCommand)
+                        NxHelpCommandService.getInstance(project)
+                            .execute(projectName, helpCommand, helpCwd)
                     }
                 }
                 return true
@@ -467,6 +468,7 @@ data class NxGraphInteractionPayload(
     val taskId: String? = null,
     val targetConfigString: String? = null,
     val helpCommand: String? = null,
+    val helpCwd: String? = null,
 )
 
 @Serializable
