@@ -1,38 +1,40 @@
 package dev.nx.console.nx_toolwindow
 
 import com.intellij.icons.AllIcons
+import com.intellij.icons.ExpUiIcons
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.OnePixelDivider
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.ui.JBSplitter
+import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
-import com.intellij.ui.SideBorder
-import com.intellij.ui.dsl.builder.Align
-import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.messages.Topic
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.run.actions.NxConnectAction
+import dev.nx.console.run.actions.NxConnectService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
-import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.Desktop
-import java.awt.Dimension
+import java.awt.*
+import java.awt.event.ActionEvent
 import javax.swing.*
+import javax.swing.border.CompoundBorder
+import javax.swing.border.EmptyBorder
 import javax.swing.event.HyperlinkEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(true, true) {
 
@@ -40,40 +42,72 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     private val projectStructure = NxTreeStructure(projectTree, project)
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
-    private val noProjectsComponent = getNoProjectsComponent()
-    private val errorContent = getErrorComponent()
+    private val noProjectsComponent = createNoProjectsComponent()
+    private val errorContent = createErrorComponent()
+    private val toolBar = createToolbar()
 
     init {
-        installListeners()
-        setupToolbar()
-        createToolwindowContent()
+        setToolwindowContent()
+        with(project.messageBus.connect()) {
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener { invokeLater { setToolwindowContent() } }
+            )
+            subscribe(
+                NX_TOOLWINDOW_STYLE_SETTING_TOPIC,
+                object : NxToolWindowStyleSettingListener {
+                    override fun onNxToolWindowStyleChange() {
+                        invokeLater { setToolwindowContent() }
+                    }
+                }
+            )
+            subscribe(
+                ToggleNxCloudViewAction.NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC,
+                object : ToggleNxCloudViewAction.NxToolwindowCloudViewCollapsedListener {
+                    override fun onCloudViewCollapsed() {
+                        invokeLater { setToolwindowContent() }
+                    }
+                }
+            )
+        }
     }
 
-    private fun createToolwindowContent() {
+    private fun setToolwindowContent() {
         if (project.isDisposed) return
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxlsService = NxlsService.getInstance(project)
             val workspace = nxlsService.workspace()
-            val mainContent =
-                if (workspace != null && !workspace.errors.isNullOrEmpty()) {
-                    errorContent
-                } else if (workspace == null || workspace.workspace.projects.isEmpty()) {
-                    noProjectsComponent
-                } else {
-                    projectTreeComponent
-                }
-
             val cloudStatus = nxlsService.cloudStatus()
 
-            setContent(createContentWithCloud(cloudStatus?.isConnected, mainContent))
+            withContext(Dispatchers.EDT) {
+                val mainContent =
+                    if (workspace != null && !workspace.errors.isNullOrEmpty()) {
+                        errorContent
+                    } else if (workspace == null || workspace.workspace.projects.isEmpty()) {
+                        noProjectsComponent
+                    } else {
+                        projectTreeComponent
+                    }
 
-            if (workspace != null && mainContent == projectTreeComponent) {
-                projectStructure.updateNxProjects(workspace)
+                setContent(
+                    createContentWithCloud(
+                        mainContent,
+                        cloudStatus?.isConnected,
+                        cloudStatus?.nxCloudUrl
+                    )
+                )
+
+                toolBar.targetComponent = this@NxToolWindowPanel
+                toolbar = toolBar.component
+
+                if (workspace != null && mainContent == projectTreeComponent) {
+                    projectStructure.updateNxProjects(workspace)
+                }
             }
         }
     }
 
-    private fun getNoProjectsComponent(): JComponent {
+    private fun createNoProjectsComponent(): JComponent {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
@@ -138,7 +172,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         }
     }
 
-    private fun getErrorComponent(): JComponent {
+    private fun createErrorComponent(): JComponent {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
@@ -173,43 +207,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         }
     }
 
-    private fun createContentWithCloud(
-        isConnectedToCloud: Boolean?,
-        mainContent: JComponent
-    ): JComponent {
-        if (isConnectedToCloud == true || isConnectedToCloud == null) {
-            return JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(JPanel().apply { add(mainContent) })
-                add(Box.createVerticalGlue()) // This will push the footer panel to the bottom
-                add(
-                    JPanel().apply {
-                        layout = BoxLayout(this, BoxLayout.X_AXIS)
-                        if (isConnectedToCloud != null) {
-                            add(JLabel("Connected to Nx Cloud"))
-                        }
-                    }
-                )
-            }
-        } else {
-            val notConnectedToCloudPanel = panel {
-                layout = BorderLayout()
-                setBorder(SideBorder(OnePixelDivider.BACKGROUND, SideBorder.TOP))
-                indent {
-                    row { text("<h3>You're not connected to Nx Cloud.</h3> ") }
-                    row { button("Connect to Nx Cloud", NxConnectAction()).align(Align.CENTER) }
-                    row { text(NX_CLOUD_LEARN_MORE_TEXT) }
-                }
-            }
-            val splitter = JBSplitter(true, "NxConsole.Toolwindow.Splitter", 0.7f)
-            splitter.firstComponent = mainContent
-            splitter.secondComponent = notConnectedToCloudPanel
-            return splitter
-        }
-    }
-
-    private fun setupToolbar() {
-        val tb = run {
+    private fun createToolbar(): ActionToolbar {
+        return run {
             val actionManager = ActionManager.getInstance()
             val actionGroup =
                 object : DefaultActionGroup() {
@@ -274,30 +273,164 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
             actionManager.createActionToolbar(NX_TOOLBAR_PLACE, actionGroup, true)
         }
-        tb.targetComponent = this
-        toolbar = tb.component
     }
 
-    private fun installListeners() {
-        with(project.messageBus.connect()) {
-            subscribe(
-                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener { invokeLater { createToolwindowContent() } }
-            )
-            subscribe(
-                NX_TOOLWINDOW_STYLE_SETTING_TOPIC,
-                object : NxToolWindowStyleSettingListener {
-                    override fun onNxToolWindowStyleChange() {
-                        invokeLater { createToolwindowContent() }
-                    }
+    private val nxConnectActionListener =
+        object : AbstractAction() {
+            override fun actionPerformed(e: ActionEvent?) {
+                NxConnectService.getInstance(project).connectToCloud()
+            }
+        }
+
+    private fun createContentWithCloud(
+        mainContent: JComponent,
+        isConnectedToCloud: Boolean?,
+        nxCloudUrl: String? = "https://cloud.nx.app"
+    ): JComponent {
+        val cloudPanelCollapsed = getCloudPanelCollapsed(project)
+        if (cloudPanelCollapsed) {
+            return mainContent
+        } else {
+            return JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                add(mainContent)
+                add(Box.createVerticalGlue())
+                if (isConnectedToCloud == true || isConnectedToCloud == null) {
+                    add(
+                        JPanel().apply {
+                            layout = BoxLayout(this, BoxLayout.X_AXIS)
+                            if (isConnectedToCloud != null) {
+                                border =
+                                    CompoundBorder(
+                                        EmptyBorder(0, 10, 0, 10),
+                                        BorderFactory.createMatteBorder(
+                                            1,
+                                            0,
+                                            0,
+                                            0,
+                                            JBColor.border()
+                                        )
+                                    )
+
+                                add(JLabel().apply { icon = ExpUiIcons.Run.TestPassed })
+                                add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
+                                add(
+                                    JLabel("Connected to Nx Cloud").apply {
+                                        font = Font(font.name, Font.BOLD, font.size)
+                                        alignmentX = Component.LEFT_ALIGNMENT
+                                    }
+                                )
+                                add(Box.createHorizontalGlue())
+                                add(
+                                    JButton().apply {
+                                        icon = ExpUiIcons.General.Export
+                                        toolTipText = "Open Nx Cloud"
+
+                                        isContentAreaFilled = false
+                                        isBorderPainted = false
+                                        isFocusPainted = false
+                                        cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                                    }
+                                )
+                            }
+                        }
+                    )
+                } else {
+                    add(
+                        JPanel().apply {
+                            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                            border =
+                                CompoundBorder(
+                                    BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()),
+                                    EmptyBorder(0, 10, 0, 10)
+                                )
+
+                            add(
+                                JLabel("You're not connected to Nx Cloud.").apply {
+                                    alignmentX = Component.CENTER_ALIGNMENT
+                                    font = Font(font.name, Font.BOLD, font.size)
+                                    verticalAlignment = SwingConstants.CENTER
+                                }
+                            )
+
+                            add(Box.createVerticalStrut(5))
+
+                            add(
+                                JButton("Connect to Nx Cloud").apply {
+                                    addActionListener(nxConnectActionListener)
+                                    alignmentX = Component.CENTER_ALIGNMENT
+                                }
+                            )
+
+                            add(Box.createVerticalStrut(5))
+
+                            add(
+                                JLabel(NX_CLOUD_LEARN_MORE_TEXT).apply {
+                                    alignmentX = Component.CENTER_ALIGNMENT
+                                }
+                            )
+                        }
+                    )
                 }
-            )
+            }
         }
     }
 
     companion object {
         const val NX_TOOLBAR_PLACE = "Nx Toolbar"
         private const val NX_CLOUD_LEARN_MORE_TEXT =
-            "To learn more about Nx Cloud, check out <a href='https://nx.dev/ci/intro/why-nx-cloud?utm_source=nxconsole'> Why Nx Cloud?</a> or get an overview of <a href='https://nx.dev/ci/features?utm_source=nxconsole'> Nx Cloud features </a>. "
+            "<html>To learn more about Nx Cloud, check out <a href='https://nx.dev/ci/intro/why-nx-cloud?utm_source=nxconsole'> Why Nx Cloud?</a> or get an overview of <a href='https://nx.dev/ci/features?utm_source=nxconsole'> Nx Cloud features </a>. </html>"
+        private const val CLOUD_PANEL_COLLAPSED_PROPERTY_KEY =
+            "dev.nx.console.toolwindow.cloud_panel_collapse"
+
+        fun getCloudPanelCollapsed(project: Project): Boolean {
+            return PropertiesComponent.getInstance(project)
+                .getBoolean(CLOUD_PANEL_COLLAPSED_PROPERTY_KEY)
+        }
+
+        fun setCloudPanelCollapsed(project: Project, collapsed: Boolean) {
+            PropertiesComponent.getInstance(project)
+                .setValue(CLOUD_PANEL_COLLAPSED_PROPERTY_KEY, collapsed)
+        }
+    }
+}
+
+class ToggleNxCloudViewAction : ToggleAction("Show Nx Cloud Panel") {
+
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
+        NxToolWindowPanel.setCloudPanelCollapsed(
+            project,
+            !NxToolWindowPanel.getCloudPanelCollapsed(project)
+        )
+        project.messageBus
+            .syncPublisher(NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC)
+            .onCloudViewCollapsed()
+    }
+
+    override fun isSelected(e: AnActionEvent): Boolean {
+        val project = e.project ?: return true
+        return !NxToolWindowPanel.getCloudPanelCollapsed(project)
+    }
+
+    override fun setSelected(e: AnActionEvent, state: Boolean) {
+        val project = e.project ?: return
+        NxToolWindowPanel.setCloudPanelCollapsed(project, !state)
+    }
+
+    companion object {
+
+        val NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC:
+            Topic<NxToolwindowCloudViewCollapsedListener> =
+            Topic(
+                "NxToolwindowCloudViewCollapsedTopic",
+                NxToolwindowCloudViewCollapsedListener::class.java
+            )
+    }
+
+    interface NxToolwindowCloudViewCollapsedListener {
+        fun onCloudViewCollapsed()
     }
 }
