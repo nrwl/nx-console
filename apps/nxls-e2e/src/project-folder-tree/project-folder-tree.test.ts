@@ -6,6 +6,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
+  waitFor,
 } from '../utils';
 import {
   NxProjectFolderTreeRequest,
@@ -45,9 +46,7 @@ describe('project folder tree', () => {
     mkdirSync(projectFolder, { recursive: true });
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
-    );
+    await waitFor(1000);
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -91,9 +90,7 @@ describe('project folder tree', () => {
       '{ "name": "nested" }'
     );
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
-    );
+    await waitFor(1000);
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -143,9 +140,7 @@ describe('project folder tree', () => {
       '{ "name": "deeplynested" }'
     );
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
-    );
+    await waitFor(1000);
 
     const projectFolderTree = await getProjectFolderTree();
 

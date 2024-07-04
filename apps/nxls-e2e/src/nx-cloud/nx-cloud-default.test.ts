@@ -11,7 +11,6 @@ import {
 } from '../utils';
 import { NxCloudStatusRequest } from '@nx-console/language-server/types';
 import { readFileSync, writeFileSync } from 'fs';
-import { execSync } from 'child_process';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -122,6 +121,7 @@ describe('nx cloud', () => {
       );
     });
   });
+
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });
