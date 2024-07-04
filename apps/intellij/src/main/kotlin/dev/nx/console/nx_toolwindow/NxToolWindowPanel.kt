@@ -363,10 +363,18 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             )
 
                             add(Box.createVerticalStrut(5))
-
                             add(
-                                JLabel(NX_CLOUD_LEARN_MORE_TEXT).apply {
+                                JEditorPane("text/html", NX_CLOUD_LEARN_MORE_TEXT).apply {
                                     alignmentX = Component.CENTER_ALIGNMENT
+                                    isEditable = false
+                                    isOpaque = false
+
+                                    addHyperlinkListener { e ->
+                                        if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
+                                            Desktop.getDesktop()
+                                                .browse(java.net.URI(e.url.toString()))
+                                        }
+                                    }
                                 }
                             )
                         }
