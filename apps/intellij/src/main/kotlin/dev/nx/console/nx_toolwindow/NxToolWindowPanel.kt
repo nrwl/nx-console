@@ -12,8 +12,10 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.util.maximumHeight
 import com.intellij.util.messages.Topic
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
@@ -342,41 +344,76 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             border =
                                 CompoundBorder(
                                     BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()),
-                                    EmptyBorder(0, 10, 0, 10)
+                                    EmptyBorder(5, 10, 0, 10)
                                 )
 
                             add(
                                 JLabel("You're not connected to Nx Cloud.").apply {
                                     alignmentX = Component.CENTER_ALIGNMENT
                                     font = Font(font.name, Font.BOLD, font.size)
-                                    verticalAlignment = SwingConstants.CENTER
                                 }
                             )
 
                             add(Box.createVerticalStrut(5))
 
                             add(
-                                JButton("Connect to Nx Cloud").apply {
-                                    addActionListener(nxConnectActionListener)
-                                    alignmentX = Component.CENTER_ALIGNMENT
-                                }
-                            )
-
-                            add(Box.createVerticalStrut(5))
-                            add(
-                                JEditorPane("text/html", NX_CLOUD_LEARN_MORE_TEXT).apply {
-                                    alignmentX = Component.CENTER_ALIGNMENT
-                                    isEditable = false
-                                    isOpaque = false
-
-                                    addHyperlinkListener { e ->
-                                        if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
-                                            Desktop.getDesktop()
-                                                .browse(java.net.URI(e.url.toString()))
+                                JPanel().apply {
+                                    maximumHeight = 100
+                                    layout = FlowLayout(FlowLayout.CENTER, 5, 5)
+                                    add(
+                                        JButton("Connect to Nx Cloud").apply {
+                                            addActionListener(nxConnectActionListener)
+                                            alignmentX = Component.CENTER_ALIGNMENT
                                         }
-                                    }
+                                    )
+
+                                    add(
+                                        HyperlinkLabel("Learn more about Nx Cloud").apply {
+                                            icon = null
+                                            maximumSize = getPreferredSize()
+                                            setHyperlinkTarget(
+                                                "https://nx.app?utm_source=nxconsole"
+                                            )
+                                            alignmentX = Component.CENTER_ALIGNMENT
+                                        }
+                                    )
                                 }
                             )
+
+                            //                            add(
+                            //                                JPanel().apply { layout =
+                            // BorderLayout() }
+                            //
+                            //                                //
+                            // JEditorPane("text/html",
+                            //                                // NX_CLOUD_LEARN_MORE_TEXT).apply {
+                            //                                //
+                            // alignmentX =
+                            //                                // Component.CENTER_ALIGNMENT
+                            //                                //
+                            // isEditable = false
+                            //                                //
+                            // isOpaque = false
+                            //                                //
+                            // preferredHeight = 30
+                            //                                //
+                            //                                //
+                            // addHyperlinkListener { e ->
+                            //                                //
+                            //    if (e.eventType ==
+                            //                                // HyperlinkEvent.EventType.ACTIVATED)
+                            // {
+                            //                                //
+                            //        Desktop.getDesktop()
+                            //                                //
+                            //                                //
+                            // .browse(java.net.URI(e.url.toString()))
+                            //                                //
+                            //    }
+                            //                                //
+                            // }
+                            //                                //                                }
+                            //                            )
                         }
                     )
                 }
