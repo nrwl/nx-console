@@ -422,9 +422,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                             if (response.error != null) {
                                 thisLogger()
                                     .debug("Error handling graph request: ${response.error}")
-                                setErrorsAndRefresh(
-                                    arrayOf(NxError(response.error, null, null, null))
-                                )
+                                setErrorsAndRefresh(arrayOf(NxError(response.error)))
                                 return@launch
                             }
                             try {

@@ -1,5 +1,6 @@
 package dev.nx.console.nx_toolwindow
 
+import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.icons.AllIcons
 import com.intellij.icons.ExpUiIcons
 import com.intellij.ide.DefaultTreeExpander
@@ -7,6 +8,7 @@ import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -15,6 +17,8 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.util.maximumHeight
 import com.intellij.util.messages.Topic
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
@@ -30,10 +34,10 @@ import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.*
 import java.awt.event.ActionEvent
+import java.net.URI
 import javax.swing.*
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
-import javax.swing.event.HyperlinkEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,8 +49,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val noProjectsComponent = createNoProjectsComponent()
-    private val errorContent = createErrorComponent()
     private val toolBar = createToolbar()
+    private var errorCountAndComponent: Pair<Int, JComponent>? = null
 
     init {
         setToolwindowContent()
@@ -82,9 +86,23 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             val cloudStatus = nxlsService.cloudStatus()
 
             withContext(Dispatchers.EDT) {
-                val mainContent =
-                    if (workspace != null && !workspace.errors.isNullOrEmpty()) {
-                        errorContent
+                val hasProjects = workspace?.workspace?.projects?.isNotEmpty() == true
+                val mainContent: JComponent =
+                    if (
+                        workspace?.let {
+                            !it.errors.isNullOrEmpty() && (it.isPartial != true || !hasProjects)
+                        } == true
+                    ) {
+                        val errorCount = workspace.errors!!.size
+                        errorCountAndComponent.let {
+                            if (it == null || it.first != errorCount) {
+                                val newPair = Pair(errorCount, createErrorComponent(errorCount))
+                                errorCountAndComponent = newPair
+                                newPair.second
+                            } else {
+                                it.second
+                            }
+                        }
                     } else if (workspace == null || workspace.workspace.projects.isEmpty()) {
                         noProjectsComponent
                     } else {
@@ -143,69 +161,66 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     add(Box.createRigidArea(Dimension(0, 10)))
 
                     add(
-                        JEditorPane(
-                                "text/html",
-                                "If you're just getting started with Nx, you can <a href='https://nx.dev/plugin-features/use-code-generators'>use generators</a> to quickly scaffold new projects or <a href='https://nx.dev/reference/project-configuration'>add them manually</a>.<br/> If your Nx workspace is not at the root of the opened project, make sure to set the <a href='open-setting'>workspace path setting</a>."
-                            )
-                            .apply {
-                                alignmentX = Component.CENTER_ALIGNMENT
-                                isEditable = false
-                                isOpaque = false
-                                addHyperlinkListener { e ->
-                                    if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
-                                        if (e.description == "open-setting") {
+                        panel {
+                            row {
+                                text(
+                                        " If you're just getting started with Nx, you can <a href='https://nx.dev/plugin-features/use-code-generators'>use generators</a> to quickly scaffold new projects or <a href='https://nx.dev/reference/project-configuration'>add them manually</a>.<br/> If your Nx workspace is not at the root of the opened project, make sure to set the <a href='open-setting'>workspace path setting</a>."
+                                    ) {
+                                        if (it.description == "open-setting") {
                                             ShowSettingsUtil.getInstance()
                                                 .showSettingsDialog(
                                                     project,
                                                     NxConsoleSettingsConfigurable::class.java
                                                 )
-                                            println("Settings dialog opened")
                                         } else {
-                                            // Open URL in default browser
-                                            Desktop.getDesktop()
-                                                .browse(java.net.URI(e.url.toString()))
+                                            Desktop.getDesktop().browse(URI.create(it.description))
                                         }
                                     }
-                                }
+                                    .align(Align.CENTER)
                             }
+                        }
                     )
                 }
             )
         }
     }
 
-    private fun createErrorComponent(): JComponent {
-        return JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-
-            add(
-                JPanel().apply {
-                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                    border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
-
-                    add(
-                        JLabel(
-                                "<html><h3>There was an error loading the Nx workspace.</h3> Please try again.</html>"
-                            )
-                            .apply { alignmentX = Component.CENTER_ALIGNMENT }
-                    )
-
-                    add(Box.createRigidArea(Dimension(0, 10)))
-
-                    add(
-                        JButton("Refresh Workspace").apply {
-                            action =
-                                object : AbstractAction("Refresh Workspace") {
-                                    override fun actionPerformed(e: java.awt.event.ActionEvent?) {
-                                        NxRefreshWorkspaceService.getInstance(project)
-                                            .refreshWorkspace()
-                                    }
-                                }
-                            alignmentX = Component.CENTER_ALIGNMENT
-                        }
+    private fun createErrorComponent(errorCount: Int): JComponent {
+        return panel {
+            indent {
+                row {
+                    text(
+                        "<h3> Nx caught ${if(errorCount == 1) "an error" else "$errorCount errors"} while computing the project graph.</h3>"
                     )
                 }
-            )
+                row {
+                    button("View Errors") { ProblemsView.getToolWindow(project)?.show() }
+                        .align(Align.CENTER)
+                }
+                row {
+                    text(
+                        "If the problems persist, you can try running <code>nx reset</code> to clear all caches and then <a href='refresh'>refresh the workspace</a><br /> For more information, look for errors in <a href='open-idea-log'>idea.log</a> and refer to the <a href='https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole'>Nx Troubleshooting Guide </a> and the <a href='https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole'>Nx Console Troubleshooting Guide</a>."
+                    ) {
+                        if (it.description == "refresh") {
+                            NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+                        } else if (it.description == "open-idea-log") {
+                            val action = ActionManager.getInstance().getAction("OpenLog")
+
+                            val dataContext =
+                                SimpleDataContext.getSimpleContext(CommonDataKeys.PROJECT, project)
+                            val actionEvent =
+                                AnActionEvent.createFromDataContext(
+                                    NX_TOOLBAR_PLACE,
+                                    null,
+                                    dataContext
+                                )
+                            action.actionPerformed(actionEvent)
+                        } else {
+                            Desktop.getDesktop().browse(URI.create(it.description))
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -287,7 +302,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     private fun createContentWithCloud(
         mainContent: JComponent,
         isConnectedToCloud: Boolean?,
-        nxCloudUrl: String? = "https://cloud.nx.app"
+        nxCloudUrl: String?
     ): JComponent {
         val cloudPanelCollapsed = getCloudPanelCollapsed(project)
         if (cloudPanelCollapsed) {
@@ -332,6 +347,12 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                         isBorderPainted = false
                                         isFocusPainted = false
                                         cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                                        addActionListener {
+                                            Desktop.getDesktop()
+                                                .browse(
+                                                    URI.create(nxCloudUrl ?: "https://cloud.nx.app")
+                                                )
+                                        }
                                     }
                                 )
                             }
@@ -379,41 +400,6 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                     )
                                 }
                             )
-
-                            //                            add(
-                            //                                JPanel().apply { layout =
-                            // BorderLayout() }
-                            //
-                            //                                //
-                            // JEditorPane("text/html",
-                            //                                // NX_CLOUD_LEARN_MORE_TEXT).apply {
-                            //                                //
-                            // alignmentX =
-                            //                                // Component.CENTER_ALIGNMENT
-                            //                                //
-                            // isEditable = false
-                            //                                //
-                            // isOpaque = false
-                            //                                //
-                            // preferredHeight = 30
-                            //                                //
-                            //                                //
-                            // addHyperlinkListener { e ->
-                            //                                //
-                            //    if (e.eventType ==
-                            //                                // HyperlinkEvent.EventType.ACTIVATED)
-                            // {
-                            //                                //
-                            //        Desktop.getDesktop()
-                            //                                //
-                            //                                //
-                            // .browse(java.net.URI(e.url.toString()))
-                            //                                //
-                            //    }
-                            //                                //
-                            // }
-                            //                                //                                }
-                            //                            )
                         }
                     )
                 }
