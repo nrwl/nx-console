@@ -46,7 +46,9 @@ describe('project folder tree', () => {
     mkdirSync(projectFolder, { recursive: true });
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
-    await waitFor(1000);
+    await nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -90,7 +92,9 @@ describe('project folder tree', () => {
       '{ "name": "nested" }'
     );
 
-    await waitFor(1000);
+    await nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -140,7 +144,9 @@ describe('project folder tree', () => {
       '{ "name": "deeplynested" }'
     );
 
-    await waitFor(1000);
+    await nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
 
     const projectFolderTree = await getProjectFolderTree();
 
