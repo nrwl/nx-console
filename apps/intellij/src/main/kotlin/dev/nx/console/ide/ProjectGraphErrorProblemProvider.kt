@@ -23,17 +23,18 @@ import kotlinx.coroutines.launch
 class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineScope) {
     private val nxProblemsProvider = NxProblemsProvider(project)
     private val nxlsService = NxlsService.getInstance(project)
+    private val problemsCollector = ProblemsCollector.getInstance(project)
 
     private val problems = mutableListOf<Problem>()
 
     fun init() {
         setNxProblems()
-        with(project.messageBus.connect()) {
-            subscribe(
+        project.messageBus
+            .connect()
+            .subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                 NxWorkspaceRefreshListener { setNxProblems() }
             )
-        }
     }
 
     private fun setNxProblems() {
@@ -44,8 +45,8 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
                     nxWorkspace.errors.mapNotNull { error -> nxErrorToFileProblem(error) }
                 }
 
-            problems.forEach { ProblemsCollector.getInstance(project).problemDisappeared(it) }
-            newProblems?.forEach { ProblemsCollector.getInstance(project).problemAppeared(it) }
+            problems.forEach { problemsCollector.problemDisappeared(it) }
+            newProblems?.forEach { problemsCollector.problemAppeared(it) }
             problems.clear()
             problems.addAll(newProblems ?: emptyList())
         }
