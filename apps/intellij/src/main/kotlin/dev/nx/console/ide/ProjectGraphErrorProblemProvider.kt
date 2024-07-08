@@ -94,4 +94,5 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
     }
 }
 
+// empty class because ProblemsCollector needs ProblemsProvider instance
 class NxProblemsProvider(override val project: Project) : ProblemsProvider {}
