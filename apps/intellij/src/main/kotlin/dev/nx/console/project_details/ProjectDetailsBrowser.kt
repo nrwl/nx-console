@@ -190,10 +190,12 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         errors =
                             arrayOf(
                                 NxError(
-                                    "Unable to find Nx project for file: ${file.path}",
+                                    message = "Unable to find Nx project for file: ${file.path}",
                                     null,
-                                    file.path,
-                                    null
+                                    null,
+                                    file = file.path,
+                                    null,
+                                    null,
                                 )
                             )
                     }
@@ -250,10 +252,12 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         if (browser.isDisposed) return@withContext
                         val error =
                             NxError(
-                                e.message
-                                    ?: "Nx Console encountered an error while loading. Please reset to try again.",
-                                e.stackTraceToString(),
-                                file.path,
+                                message = e.message
+                                        ?: "Nx Console encountered an error while loading. Please reset to try again.",
+                                null,
+                                stack = e.stackTraceToString(),
+                                file = file.path,
+                                null,
                                 null
                             )
                         wrappedBrowserLoadHtml(getErrorHtml(arrayOf(error)))

@@ -3,6 +3,7 @@ package dev.nx.console
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryService
@@ -23,7 +24,10 @@ class ProjectPostStartup : ProjectActivity {
             if (filesToScanFor.any { currentDir.resolve(it).exists() }) {
                 val service = NxlsService.getInstance(project)
                 service.start()
-                service.runAfterStarted { NxProjectJsonToProjectMap.getInstance(project).init() }
+                service.runAfterStarted {
+                    NxProjectJsonToProjectMap.getInstance(project).init()
+                    ProjectGraphErrorProblemProvider.getInstance(project).init()
+                }
                 break
             }
             if (currentDir.parentFile == null) {
