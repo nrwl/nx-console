@@ -150,8 +150,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             action =
                                 object : AbstractAction("Refresh Workspace") {
                                     override fun actionPerformed(e: java.awt.event.ActionEvent?) {
-                                        // Implement your NxRefreshWorkspaceAction logic here
-                                        println("Workspace refreshed")
+                                        NxRefreshWorkspaceService.getInstance(project)
+                                            .refreshWorkspace()
                                     }
                                 }
                             alignmentX = Component.CENTER_ALIGNMENT
