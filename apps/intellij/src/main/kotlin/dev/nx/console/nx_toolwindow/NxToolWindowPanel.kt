@@ -44,7 +44,7 @@ import kotlinx.coroutines.withContext
 
 class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(true, true) {
 
-    private val projectTree = NxProjectsTree()
+    private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)

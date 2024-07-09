@@ -60,6 +60,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                         displayName = it.key,
                         nxTargetName = it.key,
                         nxProjectName = projectNode.nxProjectName,
+                        nonAtomizedTarget = it.value.metadata?.nonAtomizedTarget,
                         parent = projectNode
                     )
                 }
@@ -116,6 +117,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                     displayName = it.key,
                     nxTargetName = it.key,
                     nxProjectName = targetGroupNode.nxProjectName,
+                    nonAtomizedTarget = it.value.metadata?.nonAtomizedTarget,
                     parent = targetGroupNode
                 )
             }

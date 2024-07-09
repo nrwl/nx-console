@@ -1,4 +1,4 @@
-package dev.nx.console.utils
+package dev.nx.console.utils.sync_services
 
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.components.Service
@@ -7,6 +7,7 @@ import com.intellij.psi.PsiFile
 import dev.nx.console.models.NxProject
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.utils.findNxConfigurationFiles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

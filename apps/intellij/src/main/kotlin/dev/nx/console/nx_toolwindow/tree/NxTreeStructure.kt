@@ -6,6 +6,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
+import com.intellij.icons.ExpUiIcons
 import com.intellij.lang.javascript.JavaScriptBundle
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
@@ -35,7 +36,9 @@ import dev.nx.console.run.*
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import java.awt.Desktop
 import java.awt.event.MouseEvent
+import java.net.URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -94,11 +97,15 @@ class NxTreeStructure(
 
     // Tree Node Actions
     private fun installPopupActions() {
+        val nxConnectAction =
+            ActionManager.getInstance().getAction("dev.nx.console.run.actions.NxConnectAction")
         val actionList: MutableList<AnAction> =
             mutableListOf(
                 RunAction(),
                 RunWithDebugAction(),
                 EditRunSettingsAction(),
+                LearnMoreAboutAtomizerAction(),
+                nxConnectAction,
                 Separator(),
                 ShowNxProjectConfigurationAction(),
                 NxGraphFocusProjectAction(),
@@ -152,6 +159,8 @@ class NxTreeStructure(
         }
 
         override fun update(e: AnActionEvent) {
+            super.update(e)
+
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             e.presentation.isEnabledAndVisible = taskSet != null
             if (taskSet != null) {
@@ -160,6 +169,11 @@ class NxTreeStructure(
                         "buildTools.EditRunSettingsAction.text",
                         *arrayOf<Any>(taskSet.suggestedName)
                     )
+            }
+
+            val targetNode = tree.selectedNode as? NxSimpleNode.Target ?: return
+            if (targetNode.nonAtomizedTarget != null) {
+                e.presentation.isVisible = false
             }
         }
 
@@ -209,10 +223,16 @@ class NxTreeStructure(
         }
 
         override fun update(e: AnActionEvent) {
+            super.update(e)
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             e.presentation.isEnabledAndVisible = taskSet != null
             if (taskSet != null) {
                 e.presentation.text = executor.getStartActionText(taskSet.suggestedName)
+            }
+
+            val targetNode = tree.selectedNode as? NxSimpleNode.Target
+            if (targetNode?.nonAtomizedTarget != null) {
+                e.presentation.isEnabledAndVisible = false
             }
         }
 
@@ -227,6 +247,19 @@ class NxTreeStructure(
                     executor
                 )
             }
+        }
+    }
+
+    private inner class LearnMoreAboutAtomizerAction : AnAction(ExpUiIcons.Toolwindow.Web) {
+        override fun actionPerformed(e: AnActionEvent) {
+            val url = "https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx-console"
+            Desktop.getDesktop().browse(URI.create(url))
+        }
+
+        override fun update(e: AnActionEvent) {
+            val targetNode = tree.selectedNode as? NxSimpleNode.Target
+            e.presentation.text = "Learn More About Atomizer"
+            e.presentation.isEnabledAndVisible = targetNode?.nonAtomizedTarget != null
         }
     }
 
