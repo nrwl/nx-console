@@ -69,13 +69,20 @@ export function newWorkspace({
     );
   }
 
+  const env = {
+    CI: 'true',
+    ...process.env,
+  } as NodeJS.ProcessEnv;
+
+  // we need to make sure to not enable plugin isolation for nx 18 because it causes issues
+  if (version.startsWith('18')) {
+    delete env['NX_ISOLATE_PLUGINS'];
+  }
+
   const create = execSync(command, {
     cwd: e2eCwd,
     stdio: verbose ? 'inherit' : 'pipe',
-    env: {
-      CI: 'true',
-      ...process.env,
-    },
+    env,
     encoding: 'utf-8',
   });
 
