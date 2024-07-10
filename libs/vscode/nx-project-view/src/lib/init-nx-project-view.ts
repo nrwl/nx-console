@@ -5,6 +5,7 @@ import { getTelemetry } from '@nx-console/vscode/utils';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
+import { AtomizerDecorationProvider } from './atomizer-decorations';
 
 export function initNxProjectView(
   context: ExtensionContext
@@ -21,6 +22,8 @@ export function initNxProjectView(
     'nxConsole.showProjectConfiguration',
     showProjectConfiguration
   );
+
+  AtomizerDecorationProvider.register(context);
 
   return nxProjectsTreeProvider;
 }

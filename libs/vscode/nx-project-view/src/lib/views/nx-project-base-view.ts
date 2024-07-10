@@ -32,6 +32,7 @@ export interface ProjectViewItem extends BaseViewItem<'project'> {
 export interface TargetViewItem extends BaseViewItem<'target'> {
   nxProject: NxProject;
   nxTarget: NxTarget;
+  nonAtomizedTarget?: string;
 }
 
 export interface TargetGroupViewItem extends BaseViewItem<'targetGroup'> {
@@ -130,7 +131,7 @@ export abstract class BaseView {
 
   createTargetTreeItem(
     nxProject: NxProject,
-    [targetName, { configurations }]: [
+    [targetName, { configurations, metadata }]: [
       targetName: string,
       targetDefinition: TargetConfiguration
     ]
@@ -143,6 +144,7 @@ export abstract class BaseView {
       nxProject,
       nxTarget: { name: targetName },
       label: targetName,
+      nonAtomizedTarget: metadata?.nonAtomizedTarget,
       collapsible: hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None,
@@ -215,8 +217,13 @@ export abstract class BaseView {
       return;
     }
 
-    return parent.nxTargets.map((target) =>
-      this.createTargetTreeItem(nxProject, [target.name, targets[target.name]])
-    );
+    return parent.nxTargets
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((target) =>
+        this.createTargetTreeItem(nxProject, [
+          target.name,
+          targets[target.name],
+        ])
+      );
   }
 }

@@ -6,6 +6,7 @@ import {
   ProjectViewItem,
   TargetViewItem,
 } from './views/nx-project-base-view';
+import { ATOMIZED_SCHEME } from './atomizer-decorations';
 
 export class NxTreeItem extends TreeItem {
   id: string;
@@ -15,8 +16,15 @@ export class NxTreeItem extends TreeItem {
 
     this.id = item.id;
     this.contextValue = item.contextValue;
+
     if (item.contextValue === 'folder' || item.contextValue === 'project') {
       this.resourceUri = Uri.file(item.resource);
+    } else if (item.contextValue === 'target' && !!item.nonAtomizedTarget) {
+      this.resourceUri = Uri.from({
+        scheme: ATOMIZED_SCHEME,
+        path: item.nxTarget.name,
+      });
+      this.contextValue = 'target-atomized';
     }
 
     this.setIcons();
@@ -32,7 +40,10 @@ export class NxTreeItem extends TreeItem {
     if (this.contextValue === 'targetGroup') {
       this.iconPath = new ThemeIcon('layers');
     }
-    if (this.contextValue === 'target') {
+    if (
+      this.contextValue === 'target' ||
+      this.contextValue === 'target-atomized'
+    ) {
       this.iconPath = new ThemeIcon('symbol-property');
     }
   }
@@ -40,13 +51,19 @@ export class NxTreeItem extends TreeItem {
   public getProject(): NxProject | undefined {
     if (this.contextValue === 'project') {
       return (this.item as ProjectViewItem).nxProject as NxProject;
-    } else if (this.contextValue === 'target') {
+    } else if (
+      this.contextValue === 'target' ||
+      this.contextValue === 'target-atomized'
+    ) {
       return (this.item as TargetViewItem).nxProject as NxProject;
     }
   }
 
   public getTarget(): NxTarget | undefined {
-    if (this.contextValue === 'target') {
+    if (
+      this.contextValue === 'target' ||
+      this.contextValue === 'target-atomized'
+    ) {
       return (this.item as TargetViewItem).nxTarget as NxTarget;
     }
   }
