@@ -1,4 +1,4 @@
-package dev.nx.console.utils
+package dev.nx.console.utils.sync_services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project

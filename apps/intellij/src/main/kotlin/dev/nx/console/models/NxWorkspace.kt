@@ -11,6 +11,7 @@ data class NxWorkspace(
     val isEncapsulatedNx: Boolean,
     val isPartial: Boolean?,
     val workspaceLayout: WorkspaceLayout?,
+    val cloudStatus: NxCloudStatus?
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

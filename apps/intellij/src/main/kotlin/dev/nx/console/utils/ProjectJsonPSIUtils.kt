@@ -13,6 +13,7 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
+import dev.nx.console.utils.sync_services.NxProjectJsonToProjectMap
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

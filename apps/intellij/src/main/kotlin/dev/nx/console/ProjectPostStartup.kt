@@ -8,8 +8,8 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
-import dev.nx.console.utils.NxProjectJsonToProjectMap
 import dev.nx.console.utils.nxBasePath
+import dev.nx.console.utils.sync_services.NxProjectJsonToProjectMap
 import java.io.File
 
 private val logger = logger<ProjectPostStartup>()

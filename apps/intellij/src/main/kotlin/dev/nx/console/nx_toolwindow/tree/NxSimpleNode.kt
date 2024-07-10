@@ -93,6 +93,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         private val displayName: String,
         val nxTargetName: String,
         val nxProjectName: String,
+        val nonAtomizedTarget: String? = null,
         parent: NxSimpleNode
     ) : NxSimpleNode(parent) {
         override val id: String = "target_${nxProjectName}_$nxTargetName"

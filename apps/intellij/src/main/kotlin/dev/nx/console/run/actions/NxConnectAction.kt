@@ -13,16 +13,33 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
+import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.NxGeneralCommandLine
+import dev.nx.console.utils.sync_services.NxCloudStatusSyncAccessService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class NxConnectAction : AnAction() {
+
+    override fun update(e: AnActionEvent) {
+        val project = e.project ?: return
+        val nxCloudStatusSyncAccessService = NxCloudStatusSyncAccessService.getInstance(project)
+        if (nxCloudStatusSyncAccessService.cloudStatus?.isConnected == true) {
+            e.presentation.isEnabledAndVisible = false
+            return
+        }
+        val nxTreeNode = e.getData(NxTreeNodeKey) ?: return
+        if (nxTreeNode !is NxSimpleNode.Target || nxTreeNode.nonAtomizedTarget == null) {
+            e.presentation.isEnabledAndVisible = false
+        }
+    }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         NxConnectService.getInstance(project).connectToCloud()
