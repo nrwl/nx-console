@@ -51,13 +51,19 @@ export class NxTreeItem extends TreeItem {
   public getProject(): NxProject | undefined {
     if (this.contextValue === 'project') {
       return (this.item as ProjectViewItem).nxProject as NxProject;
-    } else if (this.contextValue === 'target') {
+    } else if (
+      this.contextValue === 'target' ||
+      this.contextValue === 'target-atomized'
+    ) {
       return (this.item as TargetViewItem).nxProject as NxProject;
     }
   }
 
   public getTarget(): NxTarget | undefined {
-    if (this.contextValue === 'target') {
+    if (
+      this.contextValue === 'target' ||
+      this.contextValue === 'target-atomized'
+    ) {
       return (this.item as TargetViewItem).nxTarget as NxTarget;
     }
   }
