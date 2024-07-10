@@ -80,6 +80,7 @@
     }
   },
   "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "kotlin": [
       "{projectRoot}/build.gradle.kts",
       "{projectRoot}/**/*.kt",
@@ -102,7 +103,8 @@
     "sharedGlobals": [
       {
         "runtime": "node -p '`${process.platform}_${process.arch}`'"
-      }
+      },
+      "{workspaceRoot}/.env"
     ]
   },
   "plugins": [
