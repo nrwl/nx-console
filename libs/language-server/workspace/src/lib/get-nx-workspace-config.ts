@@ -1,12 +1,5 @@
-import {
-  canReadNxJson,
-  lspLogger,
-  readNxJson,
-} from '@nx-console/language-server/utils';
-import {
-  readAndCacheJsonFile,
-  readAndParseJson,
-} from '@nx-console/shared/file-system';
+import { lspLogger, readNxJson } from '@nx-console/language-server/utils';
+import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
 import {
   NxError,
@@ -79,7 +72,7 @@ export async function getNxWorkspaceConfig(
 
     // things tend to break if nx.json is broken so let's abort in this case
     try {
-      readNxJson(workspacePath);
+      await readNxJson(workspacePath);
     } catch (e) {
       const newError = new Error(`Unable to read nx.json: ${e.message}`);
       newError.stack = e.stack;

@@ -25,7 +25,7 @@ export class DaemonWatcher {
     this.disposeEverything();
     if (this.stopped) return;
 
-    if (!canReadNxJson(this.workspacePath)) {
+    if (!(await canReadNxJson(this.workspacePath))) {
       lspLogger.log('Unable to read nx.json, using native watcher');
       this.useNativeWatcher();
       return;

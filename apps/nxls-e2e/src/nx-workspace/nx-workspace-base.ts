@@ -9,6 +9,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from '../utils';
+import { readFileSync, writeFileSync } from 'fs';
 
 export function testNxWorkspace(
   version: string,
@@ -60,6 +61,33 @@ export function testNxWorkspace(
         }))
       ).toEqual(expectedTargets);
     });
+
+    it('should work with comments in nx.json', async () => {
+      const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
+      const oldContents = readFileSync(nxJsonPath, 'utf-8');
+      writeFileSync(
+        nxJsonPath,
+        oldContents.replace('{', '{ // test comment \n'),
+        {
+          encoding: 'utf-8',
+        }
+      );
+
+      const workspaceResponse = await nxlsWrapper.sendRequest({
+        ...NxWorkspaceRequest,
+        params: {
+          reset: false,
+        },
+      });
+      expect(
+        Object.entries(
+          (workspaceResponse.result as NxWorkspace).workspace.projects
+        ).map(([projectName, project]) => ({
+          [projectName]: Object.keys(project.targets ?? {}).sort(),
+        }))
+      ).toEqual(expectedTargets);
+    });
+
     afterAll(async () => {
       return await nxlsWrapper.stopNxls();
     });
