@@ -1,15 +1,9 @@
 import { NxWorkspaceRequest } from '@nx-console/language-server/types';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import {
-  e2eCwd,
-  newWorkspace,
-  NewWorkspaceOptions,
-  simpleReactWorkspaceOptions,
-  uniq,
-} from '../utils';
-import { readFileSync, writeFileSync } from 'fs';
+import { e2eCwd, newWorkspace, NewWorkspaceOptions } from '../utils';
 
 export function testNxWorkspace(
   version: string,

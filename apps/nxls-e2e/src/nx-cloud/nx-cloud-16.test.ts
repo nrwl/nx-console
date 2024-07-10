@@ -134,6 +134,7 @@ describe('nx cloud - nx 16', () => {
       );
     });
   });
+
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });

@@ -123,7 +123,7 @@ export const NxCreateProjectGraphRequest: RequestType<
 export const NxProjectFolderTreeRequest: RequestType<
   undefined,
   {
-    serializedTreeMap: { name: string; node: TreeNode }[];
+    serializedTreeMap: { dir: string; node: TreeNode }[];
     roots: TreeNode[];
   },
   unknown
