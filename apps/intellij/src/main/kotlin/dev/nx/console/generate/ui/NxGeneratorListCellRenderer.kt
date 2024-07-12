@@ -33,7 +33,7 @@ class NxGeneratorListCellRenderer(
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             true
         )
-        if (value.data.description != null) {
+        if (value.data.description != null && value.name.length < 80) {
             append(
                 " " +
                     StringUtil.shortenTextWithEllipsis(
