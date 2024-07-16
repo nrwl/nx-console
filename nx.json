@@ -126,7 +126,8 @@
       "plugin": "@nx/jest/plugin",
       "include": ["apps/nxls-e2e/**/*"],
       "options": {
-        "ciTargetName": "e2e"
+        "targetName": "e2e-local",
+        "ciTargetName": "e2e-ci"
       }
     },
     {

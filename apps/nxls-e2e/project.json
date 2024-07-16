@@ -3,11 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/nxls-e2e/src",
   "projectType": "application",
-  "targets": {
-    "test": {
-      "executor": "nx:noop"
-    }
-  },
+  "targets": {},
   "tags": ["type:lsp"],
   "implicitDependencies": ["nxls"],
   "namedInputs": {
