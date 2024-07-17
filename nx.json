@@ -44,6 +44,12 @@
       "inputs": ["default", "^production"],
       "cache": true
     },
+    "e2e-ci--**/**": {
+      "inputs": ["default", "^production"],
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build"]
+    },
     "build-storybook": {
       "inputs": [
         "production",
