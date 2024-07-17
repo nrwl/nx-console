@@ -70,3 +70,4 @@ apps/vscode-e2e/.screenshots
 .nx/cache
 .nx/workspace-data
 **/cypress/downloads
+migrations.json
