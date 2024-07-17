@@ -44,6 +44,12 @@
       "inputs": ["default", "^production"],
       "cache": true
     },
+    "e2e-ci--**/**": {
+      "inputs": ["default", "^production"],
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build"]
+    },
     "build-storybook": {
       "inputs": [
         "production",
@@ -126,7 +132,8 @@
       "plugin": "@nx/jest/plugin",
       "include": ["apps/nxls-e2e/**/*"],
       "options": {
-        "ciTargetName": "e2e"
+        "targetName": "e2e-local",
+        "ciTargetName": "e2e-ci"
       }
     },
     {
