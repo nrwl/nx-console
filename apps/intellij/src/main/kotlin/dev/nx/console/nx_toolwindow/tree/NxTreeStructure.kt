@@ -250,7 +250,11 @@ class NxTreeStructure(
         }
     }
 
-    private inner class LearnMoreAboutAtomizerAction : AnAction(ExpUiIcons.Toolwindow.Web) {
+    private inner class LearnMoreAboutAtomizerAction :
+        AnAction(ExpUiIcons.Toolwindow.Web), DumbAware {
+
+        override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
         override fun actionPerformed(e: AnActionEvent) {
             val url = "https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx-console"
             Desktop.getDesktop().browse(URI.create(url))

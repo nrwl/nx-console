@@ -90,6 +90,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                 }
                 .toTypedArray() +
                 nonGroupedTargets
+                    .sorted()
                     .map<String, NxSimpleNode> {
                         NxSimpleNode.Target(
                             displayName = it,
@@ -121,6 +122,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                     parent = targetGroupNode
                 )
             }
+            .sortedBy { it.displayName }
             .toTypedArray()
     }
 
