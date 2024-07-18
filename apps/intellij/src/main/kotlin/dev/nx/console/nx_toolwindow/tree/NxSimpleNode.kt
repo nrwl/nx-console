@@ -90,7 +90,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
     }
 
     class Target(
-        private val displayName: String,
+        val displayName: String,
         val nxTargetName: String,
         val nxProjectName: String,
         val nonAtomizedTarget: String? = null,
