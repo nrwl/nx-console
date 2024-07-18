@@ -1,3 +1,23 @@
+## 1.28.0 (2024-07-18)
+
+### Bug Fixes
+
+* **intellij:** don't start nxls in angular.json workspaces ([#2212](https://github.com/nrwl/nx-console/issues/2212)) ([40c40e6](https://github.com/nrwl/nx-console/commit/40c40e66685ccf8d66a07fe2c110f43132b9411c))
+* **intellij:** only add description for short generators ([#2210](https://github.com/nrwl/nx-console/issues/2210)) ([9fa2862](https://github.com/nrwl/nx-console/commit/9fa286215a02264ed09f269653f0fb0aa8a819a3))
+* **nxls:** add project folder tree e2e test & only track children by dir ([#2199](https://github.com/nrwl/nx-console/issues/2199)) ([cdadda6](https://github.com/nrwl/nx-console/commit/cdadda67293ac3f87ca7d9cf762d433d01dcafb2))
+* **nxls:** handle comments when parsing nx.json ([#2201](https://github.com/nrwl/nx-console/issues/2201)) ([261f208](https://github.com/nrwl/nx-console/commit/261f20897b66a99f74e49580ee52db0a9b3f7bfa))
+* **nxls:** ignore .nx/workspace-data paths as a precaution ([#2190](https://github.com/nrwl/nx-console/issues/2190)) ([60c91ff](https://github.com/nrwl/nx-console/commit/60c91ff525807f992c53d036057fcd93996f0aa5))
+* repair workspace-18 e2e & make sure .env is in sharedGlobals ([#2204](https://github.com/nrwl/nx-console/issues/2204)) ([a883e25](https://github.com/nrwl/nx-console/commit/a883e25af190bfb46b100a85b2980e154d50b940))
+* use command cwd when running help command rather than project root ([#2200](https://github.com/nrwl/nx-console/issues/2200)) ([44b3c02](https://github.com/nrwl/nx-console/commit/44b3c024b0ccc70136d90ddacac9f1c3180cd45b))
+
+
+### Features
+
+* add @nx/gradle ([#2154](https://github.com/nrwl/nx-console/issues/2154)) ([bbbc0bc](https://github.com/nrwl/nx-console/commit/bbbc0bcd927312ff6ee03dab893035b86f579891))
+* group targets by target group in sidebar ([#2198](https://github.com/nrwl/nx-console/issues/2198)) ([c681f21](https://github.com/nrwl/nx-console/commit/c681f2128838f6fd131dd5cf801d96c9a750a8f8))
+* **intellij:** add atomizer label to toolwindow ([#2203](https://github.com/nrwl/nx-console/issues/2203)) ([f6a5616](https://github.com/nrwl/nx-console/commit/f6a56162ce18f593451a90a00f8750d6887329d7))
+* **intellij:** add cloud view & add project graph errors to problems pane  ([#2175](https://github.com/nrwl/nx-console/issues/2175)) ([088f51b](https://github.com/nrwl/nx-console/commit/088f51b2e19cd26b4cc6492122a09bb48f93754c))
+
 ## 1.27.0 (2024-06-25)
 
 ### Features
