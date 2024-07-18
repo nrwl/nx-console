@@ -18,7 +18,7 @@ class ProjectPostStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
 
         var currentDir = File(project.nxBasePath)
-        val filesToScanFor = listOf("nx.json", "workspace.json", "angular.json", "lerna.json")
+        val filesToScanFor = listOf("nx.json", "workspace.json", "lerna.json")
 
         while (true) {
             if (filesToScanFor.any { currentDir.resolve(it).exists() }) {
