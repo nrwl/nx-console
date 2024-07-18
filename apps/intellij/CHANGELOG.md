@@ -1,3 +1,9 @@
+## <small>1.28.1 (2024-07-18)</small>
+
+### Bug Fixes
+
+* **intellij:** misc toolwindow fixes ([#2215](https://github.com/nrwl/nx-console/issues/2215)) ([e98b03b](https://github.com/nrwl/nx-console/commit/e98b03b0527b43cc9d157030e37d77495b2b9cb8))
+
 ## 1.28.0 (2024-07-18)
 
 ### Bug Fixes
