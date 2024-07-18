@@ -98,6 +98,20 @@ export class NxlsWrapper {
     });
     this.sendNotification({ method: 'exit' });
 
+    this.pendingNotificationMap.forEach(([res]) =>
+      res(new Error('nxls stopped'))
+    );
+    this.pendingRequestMap.forEach((res, key) =>
+      res({
+        jsonrpc: '2.0',
+        id: key,
+        error: {
+          code: -32000,
+          message: 'nxls stopped',
+        },
+      })
+    );
+
     this.readerDisposable?.dispose();
     this.readerErrorDisposable?.dispose();
     this.messageReader?.dispose();

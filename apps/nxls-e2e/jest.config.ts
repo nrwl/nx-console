@@ -8,5 +8,4 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   testTimeout: 600000,
-  globalSetup: './global-setup.ts',
 };

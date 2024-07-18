@@ -8,11 +8,16 @@ import {
   FolderViewItem,
   ProjectViewItem,
   ProjectViewStrategy,
+  TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
 import { TreeItemCollapsibleState } from 'vscode';
 
-export type TreeViewItem = FolderViewItem | ProjectViewItem | TargetViewItem;
+export type TreeViewItem =
+  | FolderViewItem
+  | ProjectViewItem
+  | TargetViewItem
+  | TargetGroupViewItem;
 export type TreeViewStrategy = ProjectViewStrategy<TreeViewItem>;
 
 export type ProjectInfo = {
@@ -64,13 +69,15 @@ class TreeView extends BaseView {
 
     if (element.contextValue === 'project') {
       const targetChildren =
-        (await this.createTargetsFromProject(element)) ?? [];
+        (await this.createTargetsAndGroupsFromProject(element)) ?? [];
       let folderAndProjectChildren: (ProjectViewItem | FolderViewItem)[] = [];
       if (element.nxProject && this.treeMap.has(element.nxProject.root)) {
         folderAndProjectChildren = this.treeMap
           .get(element.nxProject.root)!
-          .children.map((folderOrProjectNode) =>
-            this.createFolderOrProjectTreeItemFromNode(folderOrProjectNode)
+          .children.map((folderOrProjectNodeDir) =>
+            this.createFolderOrProjectTreeItemFromNode(
+              this.treeMap.get(folderOrProjectNodeDir)!
+            )
           );
       }
       return [...targetChildren, ...folderAndProjectChildren];
@@ -80,10 +87,16 @@ class TreeView extends BaseView {
       if (this.treeMap.has(element.path)) {
         return this.treeMap
           .get(element.path)!
-          .children.map((folderOrProjectNode) =>
-            this.createFolderOrProjectTreeItemFromNode(folderOrProjectNode)
+          .children.map((folderOrProjectNodeDir) =>
+            this.createFolderOrProjectTreeItemFromNode(
+              this.treeMap.get(folderOrProjectNodeDir)!
+            )
           );
       }
+    }
+
+    if (element.contextValue === 'targetGroup') {
+      return this.createTargetsFromTargetGroup(element);
     }
 
     if (element.contextValue === 'target') {

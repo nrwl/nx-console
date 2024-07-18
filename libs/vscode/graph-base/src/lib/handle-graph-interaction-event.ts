@@ -46,6 +46,7 @@ export async function handleGraphInteractionEventBase(event: {
     const workspacePath = getNxWorkspacePath();
     const projectName = event.payload.projectName;
     const cmd = event.payload.helpCommand;
+    const cwd = event.payload.helpCwd;
 
     getNxWorkspaceProjects().then((projects) => {
       const project = projects[projectName];
@@ -63,7 +64,13 @@ export async function handleGraphInteractionEventBase(event: {
             TaskScope.Workspace,
             cmd,
             pkgManager,
-            new ShellExecution(cmd, { cwd: join(workspacePath, project.root) })
+            new ShellExecution(cmd, {
+              cwd: cwd
+                ? // CWD should be passed to match command CWD.
+                  join(workspacePath, cwd)
+                : // If CWD is not passed from Nx 19.4.0.
+                  join(workspacePath, project.root),
+            })
           )
         );
       });

@@ -23,6 +23,9 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         if (node is NxSimpleNode.TargetConfiguration) {
             return nxWorkspace.workspace.projects[node.nxProjectName]
         }
+        if (node is NxSimpleNode.TargetGroup) {
+            return nxWorkspace.workspace.projects[node.nxProjectName]
+        }
         if (node is NxSimpleNode.Project) {
             return nxWorkspace.workspace.projects[node.nxProjectName]
         }
@@ -39,31 +42,82 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         return projectsSection + targetsSection
     }
 
-    fun getTargetGroups(targetsSectionNode: NxSimpleNode.TargetsSection): Array<NxSimpleNode> {
+    protected fun getTargetsAndTargetGroupsForProject(
+        projectNode: NxSimpleNode.Project
+    ): Array<NxSimpleNode> {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.workspace.projects.values
-            .flatMap { p -> p.targets.keys.map { it to p.name } }
-            .groupBy { it.first }
-            .toSortedMap()
-            .map { NxSimpleNode.TargetGroup(it.key, targetsSectionNode) }
-            .toTypedArray()
+        val nxProject =
+            nxWorkspace.workspace.projects[projectNode.nxProjectName] ?: return emptyArray()
+
+        val targetGroups = nxProject.metadata?.targetGroups
+
+        if (targetGroups == null) {
+            return nxProject.targets
+                .map {
+                    NxSimpleNode.Target(
+                        displayName = it.key,
+                        nxTargetName = it.key,
+                        nxProjectName = projectNode.nxProjectName,
+                        nonAtomizedTarget = it.value.metadata?.nonAtomizedTarget,
+                        parent = projectNode
+                    )
+                }
+                .toTypedArray()
+        } else {
+            val targetGroupMap = mutableMapOf<String, MutableList<String>>()
+            val nonGroupedTargets: MutableSet<String> = nxProject.targets.keys.toMutableSet()
+
+            for ((targetGroupName, targets) in targetGroups) {
+                if (!targetGroupMap.containsKey(targetGroupName)) {
+                    targetGroupMap[targetGroupName] = mutableListOf()
+                }
+                for (target in targets) {
+                    targetGroupMap[targetGroupName]?.add(target)
+                    nonGroupedTargets.remove(target)
+                }
+            }
+
+            return targetGroupMap
+                .map<String, MutableList<String>, NxSimpleNode> {
+                    NxSimpleNode.TargetGroup(
+                        targetGroupName = it.key,
+                        nxProjectName = projectNode.nxProjectName,
+                        targets = it.value.toTypedArray(),
+                        parent = projectNode
+                    )
+                }
+                .toTypedArray() +
+                nonGroupedTargets
+                    .map<String, NxSimpleNode> {
+                        NxSimpleNode.Target(
+                            displayName = it,
+                            nxTargetName = it,
+                            nxProjectName = projectNode.nxProjectName,
+                            parent = projectNode
+                        )
+                    }
+                    .toTypedArray()
+        }
     }
 
-    fun getTargetListForTargetGroup(
+    protected fun getTargetsForTargetGroup(
         targetGroupNode: NxSimpleNode.TargetGroup
     ): Array<NxSimpleNode> {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.workspace.projects
-            .filter { it.value.targets.contains(targetGroupNode.targetName) }
+        val nxProject =
+            nxWorkspace.workspace.projects[targetGroupNode.nxProjectName] ?: return emptyArray()
+        return nxProject.targets
+            .filter { targetGroupNode.targets.contains(it.key) }
             .map {
                 NxSimpleNode.Target(
                     displayName = it.key,
-                    nxTargetName = targetGroupNode.targetName,
-                    nxProjectName = it.value.name,
+                    nxTargetName = it.key,
+                    nxProjectName = targetGroupNode.nxProjectName,
+                    nonAtomizedTarget = it.value.metadata?.nonAtomizedTarget,
                     parent = targetGroupNode
                 )
             }
@@ -91,19 +145,34 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             ?: emptyArray()
     }
 
-    protected fun getTargetListForProject(projectNode: NxSimpleNode.Project): Array<NxSimpleNode> {
+    protected fun getTargetsList(
+        targetsSectionNode: NxSimpleNode.TargetsSection
+    ): Array<NxSimpleNode> {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        val nxProject =
-            nxWorkspace.workspace.projects[projectNode.nxProjectName] ?: return emptyArray()
-        return nxProject.targets
+        return nxWorkspace.workspace.projects.values
+            .flatMap { p -> p.targets.keys.map { it to p.name } }
+            .groupBy { it.first }
+            .toSortedMap()
+            .map { NxSimpleNode.TargetsList(it.key, targetsSectionNode) }
+            .toTypedArray()
+    }
+
+    protected fun getTargetsForTargetsList(
+        targetsListNode: NxSimpleNode.TargetsList
+    ): Array<NxSimpleNode> {
+        if (nxWorkspace == null) {
+            return emptyArray()
+        }
+        return nxWorkspace.workspace.projects
+            .filter { it.value.targets.contains(targetsListNode.targetName) }
             .map {
                 NxSimpleNode.Target(
                     displayName = it.key,
-                    nxTargetName = it.key,
-                    nxProjectName = projectNode.nxProjectName,
-                    parent = projectNode
+                    nxTargetName = targetsListNode.targetName,
+                    nxProjectName = it.value.name,
+                    parent = targetsListNode
                 )
             }
             .toTypedArray()

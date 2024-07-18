@@ -6,7 +6,6 @@ import {
   readAndCacheJsonFile,
 } from '@nx-console/shared/file-system';
 import {
-  CollectionInfo,
   GeneratorCollectionInfo,
   GeneratorType,
 } from '@nx-console/shared/schema';
@@ -65,7 +64,7 @@ async function readWorkspaceGeneratorsCollection(
   workspaceGeneratorsPath: string,
   workspaceGeneratorType: 'generators' | 'schematics',
   options: NxGeneratorsRequestOptions
-): Promise<CollectionInfo[]> {
+): Promise<GeneratorCollectionInfo[]> {
   const collectionDir = join(basedir, workspaceGeneratorsPath);
   const collectionName = `workspace-${
     workspaceGeneratorType === 'generators' ? 'generator' : 'schematic'
@@ -86,7 +85,7 @@ async function readWorkspaceGeneratorsCollection(
       },
       collection.json,
       options
-    );
+    ) as Promise<GeneratorCollectionInfo[]>;
   } else {
     return await Promise.all(
       listFiles(collectionDir)
@@ -107,7 +106,7 @@ async function readWorkspaceGeneratorsCollection(
               description: schemaJson.json.description ?? '',
               type,
             },
-          } as CollectionInfo;
+          } as GeneratorCollectionInfo;
         })
     );
   }

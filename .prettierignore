@@ -3,3 +3,4 @@ apps/intellij/*
 !apps/intellij/project.json
 
 /.nx/cache
+/.nx/workspace-data

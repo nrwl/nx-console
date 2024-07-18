@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { parse } from 'dotenv';
+import { readNxJson } from '@nx-console/language-server/utils';
 
 export async function getNxCloudStatus(
   workspaceRoot: string
@@ -10,7 +11,7 @@ export async function getNxCloudStatus(
     return { isConnected: false };
   }
   try {
-    const nxJson = JSON.parse(readFileSync(nxJsonPath, 'utf-8'));
+    const nxJson = await readNxJson(workspaceRoot);
     if (
       nxJson.nxCloudAccessToken ||
       checkForCloudInTaskRunnerOptions(nxJson) ||

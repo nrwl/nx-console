@@ -134,12 +134,12 @@
       "view/item/context": [
         {
           "command": "nxConsole.showProjectConfiguration",
-          "when": "view == nxProjects && (viewItem == project || viewItem == target)",
+          "when": "view == nxProjects && (viewItem == project || viewItem == target || viewItem == target-atomized)",
           "group": "inline"
         },
         {
           "command": "nxConsole.revealInExplorer",
-          "when": "view == nxProjects && viewItem != target",
+          "when": "view == nxProjects && (viewItem == project || viewItem == folder)",
           "group": "inline"
         },
         {
@@ -161,6 +161,11 @@
           "command": "nxConsole.copyTaskToClipboard",
           "when": "view == nxProjects && viewItem == target",
           "group": "navigation@3"
+        },
+        {
+          "command": "nxConsole.showAtomizerInfo",
+          "when": "view == nxProjects && viewItem == target-atomized",
+          "group": "inline@5"
         },
         {
           "command": "nx.graph.focus.button",
@@ -189,12 +194,7 @@
         },
         {
           "command": "nx.graph.task.button",
-          "when": "view == nxProjects && viewItem == target && isNxWorkspace",
-          "group": "inline@1"
-        },
-        {
-          "command": "nx.graph.task.button",
-          "when": "view == nxCommands && viewItem == target && isNxWorkspace",
+          "when": "view == nxProjects && (viewItem == target || viewItem == target-atomized) && isNxWorkspace",
           "group": "inline@1"
         },
         {
@@ -242,6 +242,10 @@
         },
         {
           "command": "nxConsole.revealInExplorer",
+          "when": "false"
+        },
+        {
+          "command": "nxConsole.showAtomizerInfo",
           "when": "false"
         },
         {
@@ -595,6 +599,11 @@
         "category": "Nx",
         "title": "Connect to Nx Cloud",
         "command": "nx.connectToCloud"
+      },
+      {
+        "title": "What is 'Atomizer'?",
+        "command": "nxConsole.showAtomizerInfo",
+        "icon": "$(question)"
       }
     ],
     "configuration": {

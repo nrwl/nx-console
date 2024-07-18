@@ -1,11 +1,11 @@
 import { ExtensionContext, commands, window } from 'vscode';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
-import { listenForAndStoreCollapsibleChanges } from './tree-item-collapsible-store';
 import { NxTreeItem } from './nx-tree-item';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
+import { AtomizerDecorationProvider } from './atomizer-decorations';
 
 export function initNxProjectView(
   context: ExtensionContext
@@ -18,12 +18,12 @@ export function initNxProjectView(
 
   context.subscriptions.push(nxProjectTreeView);
 
-  listenForAndStoreCollapsibleChanges(nxProjectTreeView, context);
-
   commands.registerCommand(
     'nxConsole.showProjectConfiguration',
     showProjectConfiguration
   );
+
+  AtomizerDecorationProvider.register(context);
 
   return nxProjectsTreeProvider;
 }
@@ -45,7 +45,10 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   }
 
   const { project, root } = viewItem.nxProject;
-  if (viewItem.contextValue === 'project') {
+  if (
+    viewItem.contextValue === 'project' ||
+    viewItem.contextValue === 'targetGroup'
+  ) {
     return revealNxProject(project, root);
   }
   const target = viewItem.nxTarget;

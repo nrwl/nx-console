@@ -32,6 +32,13 @@ export interface ProjectViewItem extends BaseViewItem<'project'> {
 export interface TargetViewItem extends BaseViewItem<'target'> {
   nxProject: NxProject;
   nxTarget: NxTarget;
+  nonAtomizedTarget?: string;
+}
+
+export interface TargetGroupViewItem extends BaseViewItem<'targetGroup'> {
+  nxProject: NxProject;
+  nxTargets: NxTarget[];
+  targetGroupName: string;
 }
 
 export interface NxProject {
@@ -66,7 +73,7 @@ export abstract class BaseView {
     }
 
     return {
-      id: projectName,
+      id: `${projectName}`,
       contextValue: 'project',
       nxProject,
       label: projectName,
@@ -75,7 +82,9 @@ export abstract class BaseView {
     };
   }
 
-  async createTargetsFromProject(parent: ProjectViewItem) {
+  async createTargetsAndGroupsFromProject(
+    parent: ProjectViewItem
+  ): Promise<(TargetViewItem | TargetGroupViewItem)[] | undefined> {
     const { nxProject } = parent;
 
     const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
@@ -88,14 +97,41 @@ export abstract class BaseView {
       return;
     }
 
-    return Object.entries(targets).map((target) =>
-      this.createTargetTreeItem(nxProject, target)
-    );
+    if (!projectDef.metadata?.targetGroups) {
+      return Object.entries(targets).map((target) =>
+        this.createTargetTreeItem(nxProject, target)
+      );
+    }
+
+    const targetGroupMap = new Map<string, string[]>();
+    const nonGroupedTargets: Set<string> = new Set(Object.keys(targets));
+
+    for (const [targetGroupName, targets] of Object.entries(
+      projectDef.metadata.targetGroups
+    )) {
+      if (!targetGroupMap.has(targetGroupName)) {
+        targetGroupMap.set(targetGroupName, []);
+      }
+      for (const target of targets) {
+        targetGroupMap.get(targetGroupName)?.push(target);
+        nonGroupedTargets.delete(target);
+      }
+    }
+
+    return [
+      ...Array.from(targetGroupMap.entries()).map(
+        ([targetGroupName, targets]) =>
+          this.createTargetGroupTreeItem(nxProject, targetGroupName, targets)
+      ),
+      ...Array.from(nonGroupedTargets).map((targetName) =>
+        this.createTargetTreeItem(nxProject, [targetName, targets[targetName]])
+      ),
+    ];
   }
 
   createTargetTreeItem(
     nxProject: NxProject,
-    [targetName, { configurations }]: [
+    [targetName, { configurations, metadata }]: [
       targetName: string,
       targetDefinition: TargetConfiguration
     ]
@@ -108,9 +144,26 @@ export abstract class BaseView {
       nxProject,
       nxTarget: { name: targetName },
       label: targetName,
+      nonAtomizedTarget: metadata?.nonAtomizedTarget,
       collapsible: hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None,
+    };
+  }
+
+  createTargetGroupTreeItem(
+    nxProject: NxProject,
+    targetGroupName: string,
+    targetNames: string[]
+  ): TargetGroupViewItem {
+    return {
+      id: `${nxProject.project}:${targetGroupName}`,
+      contextValue: 'targetGroup',
+      nxProject,
+      nxTargets: [...new Set(targetNames)].map((name) => ({ name })),
+      targetGroupName,
+      label: targetGroupName,
+      collapsible: TreeItemCollapsibleState.Collapsed,
     };
   }
 
@@ -147,5 +200,30 @@ export abstract class BaseView {
       label: configuration,
       collapsible: TreeItemCollapsibleState.None,
     }));
+  }
+
+  async createTargetsFromTargetGroup(
+    parent: TargetGroupViewItem
+  ): Promise<TargetViewItem[] | undefined> {
+    const { nxProject } = parent;
+
+    const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
+    if (!projectDef) {
+      return;
+    }
+
+    const { targets } = projectDef;
+    if (!targets) {
+      return;
+    }
+
+    return parent.nxTargets
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((target) =>
+        this.createTargetTreeItem(nxProject, [
+          target.name,
+          targets[target.name],
+        ])
+      );
   }
 }

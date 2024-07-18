@@ -287,9 +287,10 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 return true
             }
             "run-help" -> {
-                event.payload?.let { (projectName, _, _, _, _, helpCommand) ->
+                event.payload?.let { (projectName, _, _, _, _, helpCommand, helpCwd) ->
                     if (projectName != null && helpCommand != null) {
-                        NxHelpCommandService.getInstance(project).execute(projectName, helpCommand)
+                        NxHelpCommandService.getInstance(project)
+                            .execute(projectName, helpCommand, helpCwd)
                     }
                 }
                 return true
@@ -422,9 +423,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                             if (response.error != null) {
                                 thisLogger()
                                     .debug("Error handling graph request: ${response.error}")
-                                setErrorsAndRefresh(
-                                    arrayOf(NxError(response.error, null, null, null))
-                                )
+                                setErrorsAndRefresh(arrayOf(NxError(response.error)))
                                 return@launch
                             }
                             try {
@@ -467,6 +466,7 @@ data class NxGraphInteractionPayload(
     val taskId: String? = null,
     val targetConfigString: String? = null,
     val helpCommand: String? = null,
+    val helpCwd: String? = null,
 )
 
 @Serializable

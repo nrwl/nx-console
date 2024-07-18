@@ -20,13 +20,13 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
 
     override fun update(e: AnActionEvent) {
         useKeyMapShortcutSetOrDefault()
-        val targetGroup: NxSimpleNode.TargetGroup? =
-            e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup }
+        val targetsList: NxSimpleNode.TargetsList? =
+            e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetsList }
 
-        if (targetGroup == null) {
+        if (targetsList == null) {
             e.presentation.isEnabledAndVisible = false
         } else {
-            e.presentation.text = "Nx Graph: Focus ${targetGroup.name} targets"
+            e.presentation.text = "Nx Graph: Focus ${targetsList.name} targets"
             e.presentation.icon = NxIcons.Action
         }
     }
@@ -36,12 +36,12 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task Group")
-        val targetGroup: NxSimpleNode.TargetGroup =
-            e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
+        val targetsList: NxSimpleNode.TargetsList =
+            e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetsList } ?: return
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxGraphService = getNxGraphService(project) ?: return@launch
-            withContext(Dispatchers.EDT) { nxGraphService.focusTaskGroup(targetGroup.name) }
+            withContext(Dispatchers.EDT) { nxGraphService.focusTaskGroup(targetsList.name) }
         }
     }
 

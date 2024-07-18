@@ -3,10 +3,14 @@ import {
   BaseView,
   ProjectViewItem,
   ProjectViewStrategy,
+  TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
 
-export type ListViewItem = ProjectViewItem | TargetViewItem;
+export type ListViewItem =
+  | ProjectViewItem
+  | TargetViewItem
+  | TargetGroupViewItem;
 
 export type ListViewStrategy = ProjectViewStrategy<ListViewItem>;
 
@@ -24,7 +28,10 @@ class ListView extends BaseView {
       return this.createProjects();
     }
     if (element.contextValue === 'project') {
-      return this.createTargetsFromProject(element);
+      return this.createTargetsAndGroupsFromProject(element);
+    }
+    if (element.contextValue === 'targetGroup') {
+      return this.createTargetsFromTargetGroup(element);
     }
     return this.createConfigurationsFromTarget(element);
   }

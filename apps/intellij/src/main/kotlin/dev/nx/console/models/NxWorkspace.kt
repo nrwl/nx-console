@@ -11,6 +11,7 @@ data class NxWorkspace(
     val isEncapsulatedNx: Boolean,
     val isPartial: Boolean?,
     val workspaceLayout: WorkspaceLayout?,
+    val cloudStatus: NxCloudStatus?
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -54,10 +55,12 @@ data class NxWorkspaceConfiguration(val projects: Map<String, NxProject>) {}
 
 data class NxError(
     val message: String?,
+    val name: String?,
     val stack: String?,
     val file: String?,
-    val pluginName: String?
+    val pluginName: String?,
+    val cause: Any?
 ) {
 
-    constructor(message: String) : this(message, null, null, null)
+    constructor(message: String) : this(message, null, null, null, null, null)
 }

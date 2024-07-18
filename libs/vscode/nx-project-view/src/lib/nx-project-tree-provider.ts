@@ -18,7 +18,6 @@ import {
   TreeViewItem,
   TreeViewStrategy,
 } from './views/nx-project-tree-view';
-import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
@@ -104,9 +103,10 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     const viewItem = selection.item;
     if (
       viewItem.contextValue === 'project' ||
-      viewItem.contextValue === 'folder'
+      viewItem.contextValue === 'folder' ||
+      viewItem.contextValue === 'targetGroup'
     ) {
-      // can not run a task on a project
+      // can not run a task on a project, folder or target group
       return;
     }
     const { project } = viewItem.nxProject;

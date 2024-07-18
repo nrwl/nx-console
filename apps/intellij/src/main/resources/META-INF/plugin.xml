@@ -107,6 +107,8 @@
             text="Nx: Analyze Nx Configuration Files"
             description="Makes sure project.json and nx.json files conform to the schema"/>
 
+    <action id="dev.nx.console.run.actions.NxConnectAction" class="dev.nx.console.run.actions.NxConnectAction"
+            text="Nx: Connect to Nx Cloud" icon="dev.nx.console.NxIcons.Action"/>
     <!-- Generate -->
     <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
             class="dev.nx.console.generate.actions.NxGenerateUiAction"

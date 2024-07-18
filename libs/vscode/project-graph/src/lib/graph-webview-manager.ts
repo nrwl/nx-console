@@ -10,6 +10,7 @@ import {
   commands,
   ExtensionContext,
   ViewColumn,
+  Webview,
   WebviewPanel,
   window,
 } from 'vscode';
@@ -22,22 +23,24 @@ export class GraphWebviewManager implements Disposable {
   private lastGraphCommand: GraphCommand | undefined;
 
   constructor(private context: ExtensionContext) {
-    onWorkspaceRefreshed(() => {
+    onWorkspaceRefreshed(async () => {
       if (this.webviewPanel) {
-        this.loadGraphWebview(this.currentPanelIsAffected);
+        this.webviewPanel.webview.html = await this.loadGraphHtml(
+          this.webviewPanel.webview
+        );
         this.rerunLastGraphCommand();
       }
     });
   }
 
-  async showAllProjects() {
-    await this.openGraphWebview();
+  async showAllProjects(focusWebview?: boolean) {
+    await this.openGraphWebview({ focusWebview });
     this.webviewPanel?.webview.postMessage({ type: 'show-all' });
     this.lastGraphCommand = { type: 'show-all' };
   }
 
-  async focusProject(projectName: string) {
-    await this.openGraphWebview();
+  async focusProject(projectName: string, focusWebview?: boolean) {
+    await this.openGraphWebview({ focusWebview });
     this.webviewPanel?.webview.postMessage({
       type: 'focus-project',
       payload: { projectName },
@@ -45,8 +48,8 @@ export class GraphWebviewManager implements Disposable {
     this.lastGraphCommand = { type: 'focus-project', projectName };
   }
 
-  async selectProject(projectName: string) {
-    await this.openGraphWebview();
+  async selectProject(projectName: string, focusWebview?: boolean) {
+    await this.openGraphWebview({ focusWebview });
     this.webviewPanel?.webview.postMessage({
       type: 'select-project',
       payload: { projectName },
@@ -54,8 +57,12 @@ export class GraphWebviewManager implements Disposable {
     this.lastGraphCommand = { type: 'select-project', projectName };
   }
 
-  async focusTarget(projectName: string, targetName: string) {
-    await this.openGraphWebview();
+  async focusTarget(
+    projectName: string,
+    targetName: string,
+    focusWebview?: boolean
+  ) {
+    await this.openGraphWebview({ focusWebview });
     this.webviewPanel?.webview.postMessage({
       type: 'focus-target',
       payload: { projectName, targetName },
@@ -63,8 +70,8 @@ export class GraphWebviewManager implements Disposable {
     this.lastGraphCommand = { type: 'focus-target', projectName, targetName };
   }
 
-  async showAllTargetsByName(targetName: string) {
-    await this.openGraphWebview();
+  async showAllTargetsByName(targetName: string, focusWebview?: boolean) {
+    await this.openGraphWebview({ focusWebview });
     this.webviewPanel?.webview.postMessage({
       type: 'show-all-targets-by-name',
       payload: { targetName },
@@ -72,31 +79,39 @@ export class GraphWebviewManager implements Disposable {
     this.lastGraphCommand = { type: 'show-all-targets-by-name', targetName };
   }
 
-  async showAffectedProjects() {
-    await this.openGraphWebview(true);
+  async showAffectedProjects(focusWebview?: boolean) {
+    await this.openGraphWebview({ affected: true, focusWebview });
     this.webviewPanel?.webview.postMessage({ type: 'show-affected-projects' });
     this.lastGraphCommand = { type: 'show-affected-projects' };
   }
 
-  async openGraphWebview(affected = false) {
+  async openGraphWebview({
+    affected = false,
+    focusWebview = true,
+  }: {
+    affected?: boolean;
+    focusWebview?: boolean;
+  }) {
     // if we want to display affected projects, we need a separate graph server
     // so we rebuild the webview with that in mind
     const currentPanelMatchesAffectedState =
       this.currentPanelIsAffected === affected;
 
     if (this.webviewPanel && currentPanelMatchesAffectedState) {
-      this.webviewPanel.reveal();
+      if (focusWebview) {
+        this.webviewPanel.reveal();
+      }
       return;
     }
 
     this.currentPanelIsAffected = affected;
 
-    await this.loadGraphWebview(affected);
+    await this.createGraphWebview(affected);
 
     this.webviewPanel?.reveal();
   }
 
-  private async loadGraphWebview(affected: boolean) {
+  private async createGraphWebview(affected: boolean) {
     const graphServer = getNxGraphServer(this.context, affected);
 
     const viewColumn = this.webviewPanel?.viewColumn || ViewColumn.Active;
@@ -113,6 +128,42 @@ export class GraphWebviewManager implements Disposable {
       }
     );
 
+    const messageListener = this.webviewPanel.webview.onDidReceiveMessage(
+      async (event) => {
+        const handled = await handleGraphInteractionEventBase(event);
+        if (handled) return;
+        if (event.type.startsWith('request')) {
+          const response = await graphServer.handleWebviewRequest(event);
+          this.webviewPanel?.webview.postMessage(response);
+          return;
+        }
+      }
+    );
+
+    const viewStateListener = this.webviewPanel.onDidChangeViewState(
+      ({ webviewPanel }) => {
+        commands.executeCommand(
+          'setContext',
+          'graphWebviewVisible',
+          webviewPanel.visible
+        );
+      }
+    );
+
+    this.webviewPanel.onDidDispose(() => {
+      console.log('setting context', false);
+      viewStateListener.dispose();
+      messageListener.dispose();
+
+      this.webviewPanel = undefined;
+    });
+
+    this.webviewPanel.webview.html = await this.loadGraphHtml(
+      this.webviewPanel.webview
+    );
+  }
+
+  private async loadGraphHtml(webview: Webview) {
     const nxWorkspace = await getNxWorkspace();
     const workspaceErrors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
@@ -134,7 +185,7 @@ export class GraphWebviewManager implements Disposable {
     ) {
       html = loadGraphErrorHtml(workspaceErrors);
     } else {
-      html = await loadGraphBaseHtml(this.webviewPanel.webview);
+      html = await loadGraphBaseHtml(webview);
 
       html = html.replace(
         '</head>',
@@ -163,37 +214,7 @@ export class GraphWebviewManager implements Disposable {
          `
       );
     }
-
-    this.webviewPanel.webview.html = html;
-    const messageListener = this.webviewPanel.webview.onDidReceiveMessage(
-      async (event) => {
-        const handled = await handleGraphInteractionEventBase(event);
-        if (handled) return;
-        if (event.type.startsWith('request')) {
-          const response = await graphServer.handleWebviewRequest(event);
-          this.webviewPanel?.webview.postMessage(response);
-          return;
-        }
-      }
-    );
-
-    const viewStateListener = this.webviewPanel.onDidChangeViewState(
-      ({ webviewPanel }) => {
-        commands.executeCommand(
-          'setContext',
-          'graphWebviewVisible',
-          webviewPanel.visible
-        );
-      }
-    );
-
-    this.webviewPanel.onDidDispose(() => {
-      commands.executeCommand('setContext', 'graphWebviewVisible', false);
-      viewStateListener.dispose();
-      messageListener.dispose();
-
-      this.webviewPanel = undefined;
-    });
+    return html;
   }
 
   private rerunLastGraphCommand() {
@@ -201,25 +222,26 @@ export class GraphWebviewManager implements Disposable {
 
     switch (this.lastGraphCommand.type) {
       case 'show-all':
-        this.showAllProjects();
+        this.showAllProjects(false);
         break;
       case 'focus-project':
-        this.focusProject(this.lastGraphCommand.projectName);
+        this.focusProject(this.lastGraphCommand.projectName, false);
         break;
       case 'select-project':
-        this.selectProject(this.lastGraphCommand.projectName);
+        this.selectProject(this.lastGraphCommand.projectName, false);
         break;
       case 'focus-target':
         this.focusTarget(
           this.lastGraphCommand.projectName,
-          this.lastGraphCommand.targetName
+          this.lastGraphCommand.targetName,
+          false
         );
         break;
       case 'show-all-targets-by-name':
-        this.showAllTargetsByName(this.lastGraphCommand.targetName);
+        this.showAllTargetsByName(this.lastGraphCommand.targetName, false);
         break;
       case 'show-affected-projects':
-        this.showAffectedProjects();
+        this.showAffectedProjects(false);
         break;
     }
   }

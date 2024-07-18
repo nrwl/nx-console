@@ -1,14 +1,9 @@
 import { NxWorkspaceRequest } from '@nx-console/language-server/types';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import {
-  e2eCwd,
-  newWorkspace,
-  NewWorkspaceOptions,
-  simpleReactWorkspaceOptions,
-  uniq,
-} from '../utils';
+import { e2eCwd, newWorkspace, NewWorkspaceOptions } from '../utils';
 
 export function testNxWorkspace(
   version: string,
@@ -60,6 +55,33 @@ export function testNxWorkspace(
         }))
       ).toEqual(expectedTargets);
     });
+
+    it('should work with comments in nx.json', async () => {
+      const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
+      const oldContents = readFileSync(nxJsonPath, 'utf-8');
+      writeFileSync(
+        nxJsonPath,
+        oldContents.replace('{', '{ // test comment \n'),
+        {
+          encoding: 'utf-8',
+        }
+      );
+
+      const workspaceResponse = await nxlsWrapper.sendRequest({
+        ...NxWorkspaceRequest,
+        params: {
+          reset: false,
+        },
+      });
+      expect(
+        Object.entries(
+          (workspaceResponse.result as NxWorkspace).workspace.projects
+        ).map(([projectName, project]) => ({
+          [projectName]: Object.keys(project.targets ?? {}).sort(),
+        }))
+      ).toEqual(expectedTargets);
+    });
+
     afterAll(async () => {
       return await nxlsWrapper.stopNxls();
     });
