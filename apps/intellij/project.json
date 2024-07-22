@@ -42,5 +42,5 @@
     }
   },
   "tags": ["type:intellij"],
-  "implicitDependencies": ["generate-ui", "nxls", "generate-ui-v2"]
+  "implicitDependencies": ["nxls", "generate-ui-v2"]
 }
