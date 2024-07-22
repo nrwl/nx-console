@@ -1,3 +1,9 @@
+## <small>1.28.2 (2024-07-22)</small>
+
+### Bug Fixes
+
+* **intellij:** remove old genui option & catch error ([#2172](https://github.com/nrwl/nx-console/issues/2172)) ([7ca5aab](https://github.com/nrwl/nx-console/commit/7ca5aab0e5412451a7edef72491ae5d83a9c4980))
+
 ## <small>1.28.1 (2024-07-18)</small>
 
 ### Bug Fixes
