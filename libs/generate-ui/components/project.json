@@ -1,8 +1,0 @@
-{
-  "name": "generate-ui-components",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "library",
-  "sourceRoot": "libs/generate-ui/components/src",
-  "targets": {},
-  "tags": ["type:generate-ui"]
-}

@@ -197,22 +197,14 @@ tasks {
     }
 
     jar {
-        dependsOn("copyGenerateUiArtifacts")
         dependsOn("copyGenerateUiV2Artifacts")
 
         archiveBaseName.set("nx-console")
     }
 
     instrumentedJar {
-        dependsOn("copyGenerateUiArtifacts")
         dependsOn("copyGenerateUiV2Artifacts")
     }
-}
-
-tasks.register<Copy>("copyGenerateUiArtifacts") {
-    from("${rootDir}/dist/apps/generate-ui")
-    include("*.js", "*.css")
-    into("${buildDir}/resources/main/generate_ui")
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
