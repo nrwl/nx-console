@@ -5,7 +5,7 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["generate-ui", "generate-ui-v2", "nxls"],
+  "implicitDependencies": ["generate-ui-v2", "nxls"],
   "targets": {
     "watch-all": {
       "executor": "nx:run-commands",
@@ -17,19 +17,9 @@
             "color": "blue"
           },
           {
-            "command": "yarn nx run generate-ui:watch",
-            "prefix": "generate-ui",
-            "color": "green"
-          },
-          {
             "command": "yarn nx run nxls:watch",
             "prefix": "lsp",
             "color": "magenta"
-          },
-          {
-            "command": "yarn nx run vscode-nx-cloud-view:watch-webview-files",
-            "prefix": "cloud-view",
-            "color": "yellow"
           }
         ],
         "parallel": true
