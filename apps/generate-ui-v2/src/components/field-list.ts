@@ -197,7 +197,7 @@ export class FieldList extends GeneratorContextContext(
     this.dispatchEvent(event);
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

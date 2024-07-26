@@ -1,4 +1,4 @@
-import { ContextConsumer, createContext } from '@lit-labs/context';
+import { ContextConsumer, createContext } from '@lit/context';
 import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
 import { LitElement } from 'lit';
 import { state } from 'lit/decorators.js';

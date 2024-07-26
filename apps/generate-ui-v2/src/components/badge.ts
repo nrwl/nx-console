@@ -48,7 +48,7 @@ export class Banner extends EditorContext(LitElement) {
     this.dispatchEvent(new CustomEvent('remove'));
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

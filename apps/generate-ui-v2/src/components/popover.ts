@@ -39,7 +39,7 @@ export class Popover extends LitElement {
     `;
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

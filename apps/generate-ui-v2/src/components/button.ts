@@ -62,7 +62,7 @@ export class Button extends EditorContext(LitElement) {
     </button>`;
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

@@ -1,7 +1,7 @@
-import { createContext } from '@lit-labs/context';
+import { createContext } from '@lit/context';
 import { LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { ContextConsumer } from '@lit-labs/context';
+import { ContextConsumer } from '@lit/context';
 
 export const editorContext = createContext<'vscode' | 'intellij'>(
   Symbol('editor')
