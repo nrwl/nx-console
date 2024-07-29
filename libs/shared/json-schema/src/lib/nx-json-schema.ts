@@ -2,28 +2,34 @@ import { CollectionInfo } from '@nx-console/shared/schema';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import type { JSONSchema } from 'vscode-json-languageservice';
 import { targets } from './common-json-schema';
-import { CompletionType, EnhancedJsonSchema } from './completion-type';
+import { CompletionType } from './completion-type';
 import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
 import { NxVersion } from '@nx-console/shared/types';
+import { workspaceDependencyPath } from '@nx-console/shared/npm';
+import { join } from 'path';
+import { readFileSync } from 'fs';
 
 type JSONSchemaMap = NonNullable<JSONSchema['properties']>;
 
-export function getNxJsonSchema(
+export async function getNxJsonSchema(
   collections: CollectionInfo[],
   projects: Record<string, ProjectConfiguration>,
-  nxVersion: NxVersion
-) {
+  nxVersion: NxVersion,
+  workspacePath: string
+): Promise<JSONSchema> {
   const [, executors] = createBuildersAndExecutorsSchema(collections);
   const targets = getTargets(projects);
   const contents = createJsonSchema(executors, targets, nxVersion);
-  return contents;
+  return {
+    allOf: [contents, await getStaticNxJsonSchema(workspacePath)],
+  };
 }
 
 function createJsonSchema(
   executors: JSONSchema[],
   projectTargets: string[],
   nxVersion: NxVersion
-): EnhancedJsonSchema {
+): JSONSchema {
   const targetsSchema =
     (targets(nxVersion, executors).additionalProperties as object) ?? {};
   return {
@@ -106,4 +112,14 @@ function getTargets(projects: Record<string, ProjectConfiguration>): string[] {
   }
 
   return Array.from(tags);
+}
+
+export async function getStaticNxJsonSchema(workspacePath: string) {
+  const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
+  if (!nxPath) {
+    return;
+  }
+  const schema = readFileSync(join(nxPath, 'schemas', 'nx-schema.json'));
+  const parsedSchema = JSON.parse(schema.toString());
+  return parsedSchema;
 }
