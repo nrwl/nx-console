@@ -42,8 +42,7 @@ jobs:
           npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: npx nx affected --targets=lint,test,build --configuration=ci --exclude=nx-console --parallel=1
-      - run: npx nx affected --targets=e2e-ci --exclude=nx-console --parallel=1
+      - run: npx nx affected --targets=lint,test,build,e2e-ci --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 45
 
   main-windows:
@@ -83,7 +82,5 @@ jobs:
           java-version: 17
           cache: gradle
       # there's no need to check formatting & linting again on windows, sometimes there's a timing issue with intellij:build so run it up front
-      - run: npx nx run intellij:build --info --verbose
-      - run: npx nx affected --targets="build,test" --configuration=ci --exclude=nx-console --parallel=1
-      - run: npx nx affected --targets="e2e-ci" --exclude=nx-console --parallel=1
+      - run: npx nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 45

@@ -49,6 +49,11 @@
       "parallelism": false,
       "dependsOn": ["^build"]
     },
+    "e2e-local": {
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build"]
+    },
     "build-storybook": {
       "inputs": [
         "production",
