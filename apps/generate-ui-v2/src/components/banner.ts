@@ -40,7 +40,7 @@ export class Banner extends EditorContext(LitElement) {
     `;
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

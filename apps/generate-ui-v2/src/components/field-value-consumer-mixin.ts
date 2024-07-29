@@ -1,4 +1,4 @@
-import { ContextConsumer } from '@lit-labs/context';
+import { ContextConsumer } from '@lit/context';
 import { LitElement } from 'lit';
 import { formValuesServiceContext } from '../form-values.service';
 import { submittedContext } from '../contexts/submitted-context';
@@ -85,7 +85,7 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
       return this.touched && !this.isDefaultValue;
     }
 
-    protected createRenderRoot(): Element | ShadowRoot {
+    protected createRenderRoot() {
       return this;
     }
   }

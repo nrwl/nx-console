@@ -180,7 +180,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     );
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

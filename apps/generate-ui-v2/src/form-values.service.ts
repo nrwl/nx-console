@@ -1,4 +1,4 @@
-import { ContextProvider, createContext } from '@lit-labs/context';
+import { ContextProvider, createContext } from '@lit/context';
 import { IdeCommunicationController } from './ide-communication.controller';
 
 import {

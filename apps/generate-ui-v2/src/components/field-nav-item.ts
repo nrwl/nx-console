@@ -37,7 +37,7 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
     this.dispatchEvent(event);
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

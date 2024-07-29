@@ -55,7 +55,7 @@ export class Icon extends EditorContext(LitElement) {
     this.appendChild(parsedSvg.documentElement);
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }
