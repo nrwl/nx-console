@@ -1,8 +1,9 @@
-import { directoryExists } from '@nx-console/shared/file-system';
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
-import { nxWorkspace } from './workspace';
+
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import { directoryExists } from '@nx-console/shared/file-system';
 import { lspLogger } from '@nx-console/language-server/utils';
+import { nxWorkspace } from './workspace';
 import { platform } from 'os';
 
 let _rootProjectMap: Record<string, ProjectConfiguration> | undefined;
