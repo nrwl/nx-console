@@ -3,10 +3,11 @@ import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { dirname, join } from 'path';
+import { dirname, join, relative } from 'path';
 import * as vscode from 'vscode';
 import {
   clearJsonCache,
+  listFiles,
   readAndCacheJsonFile,
 } from '@nx-console/shared/file-system';
 import { watchFile } from '@nx-console/vscode/utils';
@@ -133,14 +134,23 @@ async function getExternalFiles(
 
   for (const [, value] of Object.entries<string[]>(paths)) {
     const mainFile = join(workspaceRoot, value[0]);
+
     const configFilePath = await findConfig(mainFile, TSCONFIG_LIB);
 
     if (!configFilePath) {
       continue;
     }
 
-    const directory = dirname(configFilePath);
-    externals.push({ mainFile, directory });
+    if (mainFile.endsWith('/*')) {
+      const files = listFiles(dirname(mainFile));
+      for (const file of files) {
+        const directory = dirname(file);
+        externals.push({ mainFile: file, directory });
+      }
+    } else {
+      const directory = dirname(configFilePath);
+      externals.push({ mainFile, directory });
+    }
   }
 
   return externals;

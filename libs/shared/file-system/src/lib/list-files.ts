@@ -6,16 +6,17 @@ export function listFiles(dirName: string): string[] {
   if (dirName.indexOf('node_modules') > -1) return [];
   if (dirName.indexOf('dist') > -1) return [];
 
-  const res = [dirName];
+  const res: string[] = [];
   // the try-catch here is intentional. It's only used in auto-completion.
   // If it doesn't work, we don't want the process to exit
   try {
     readdirSync(dirName).forEach((c) => {
       const child = path.join(dirName, c);
+      const isDirectory = statSync(child).isDirectory();
       try {
-        if (!statSync(child).isDirectory()) {
+        if (!isDirectory) {
           res.push(child);
-        } else if (statSync(child).isDirectory()) {
+        } else {
           res.push(...listFiles(child));
         }
       } catch {
