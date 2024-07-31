@@ -71,6 +71,7 @@ export function newWorkspace({
 
   const env = {
     CI: 'true',
+    NX_CLOUD_API: 'https://staging.nx.app',
     ...process.env,
   } as NodeJS.ProcessEnv;
 

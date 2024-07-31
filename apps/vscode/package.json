@@ -124,6 +124,11 @@
           "command": "nxConsole.editCommonCommands",
           "when": "view == nxCommands",
           "group": "navigation"
+        },
+        {
+          "command": "nxCloud.refresh",
+          "when": "view == nxCloudOnboarding",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -599,6 +604,11 @@
         "title": "What is 'Atomizer'?",
         "command": "nxConsole.showAtomizerInfo",
         "icon": "$(question)"
+      },
+      {
+        "title": "Refresh Nx Cloud View",
+        "command": "nxCloud.refresh",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -776,16 +786,6 @@
         "view": "nxProjects",
         "contents": "Nx caught one or more errors while computing your project graph. \n [View Errors](command:workbench.actions.view.problems)\n If the problems persist, you can try running `nx reset` to clear all caches and then [refresh the workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs) and refer to the [Nx Troubleshooting Guide](https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole) and the [Nx Console Troubleshooting Guide](https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole).",
         "when": "nxConsole.hasWorkspaceErrors"
-      },
-      {
-        "view": "nxCloud",
-        "contents": "You're connected to Nx Cloud! \n [View Nx Cloud App](command:nxConsole.openCloudApp) ",
-        "when": "nxConsole.connectedToCloud"
-      },
-      {
-        "view": "nxCloud",
-        "contents": "Looks like you're not connected to Nx Cloud. \n [Connect to Nx Cloud](command:nxConsole.connectToCloud.welcomeView) \n To learn more about Nx Cloud, check out [Why Nx Cloud?](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nxconsole) or get an overview of [Nx Cloud features](https://nx.dev/ci/features?utm_source=nxconsole).",
-        "when": "!nxConsole.connectedToCloud"
       }
     ],
     "walkthroughs": [
@@ -861,8 +861,9 @@
           "when": "isNxWorkspace"
         },
         {
-          "id": "nxCloud",
-          "name": "Nx Cloud",
+          "type": "webview",
+          "id": "nxCloudOnboarding",
+          "name": "Nx Cloud :: CI Optimizations",
           "when": "isNxWorkspace"
         },
         {

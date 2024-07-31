@@ -1,8 +1,9 @@
 import { getNxDaemonClient } from '@nx-console/language-server/workspace';
-import { canReadNxJson, lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server/utils';
 import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
+import { canReadNxJson } from '@nx-console/shared/npm';
 
 export class DaemonWatcher {
   private stopped = false;

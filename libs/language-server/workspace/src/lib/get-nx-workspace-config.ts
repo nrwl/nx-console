@@ -1,4 +1,4 @@
-import { lspLogger, readNxJson } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server/utils';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
 import {
@@ -24,6 +24,7 @@ import {
 } from './get-nx-workspace-package';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import { readNxJson } from '@nx-console/shared/npm';
 
 let _defaultProcessExit: typeof process.exit;
 
