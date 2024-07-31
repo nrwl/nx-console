@@ -79,6 +79,9 @@
       "@nx-console/vscode/nx-cli-quickpicks": [
         "libs/vscode/nx-cli-quickpicks/src/index.ts"
       ],
+      "@nx-console/vscode/nx-cloud-onboarding-webview": [
+        "libs/vscode/nx-cloud-onboarding-webview/src/index.ts"
+      ],
       "@nx-console/vscode/nx-cloud-view": [
         "libs/vscode/nx-cloud-view/src/index.ts"
       ],

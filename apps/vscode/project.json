@@ -187,6 +187,12 @@
       "options": {
         "command": "node ./tools/scripts/copy-to-vscode.js"
       },
+      "inputs": [
+        {
+          "dependentTasksOutputFiles": "**/*",
+          "transitive": true
+        }
+      ],
       "dependsOn": ["^build"]
     },
     "package": {

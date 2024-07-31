@@ -31,7 +31,6 @@ describe('nx cloud', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
   });
 
   it('should return false & no cloud url if not connected to cloud', async () => {

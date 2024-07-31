@@ -33,6 +33,7 @@ import {
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
+  NxCloudOnboardingInfoRequest,
 } from '@nx-console/language-server/types';
 import {
   getJsonLanguageService,
@@ -47,6 +48,7 @@ import {
 } from '@nx-console/language-server/watcher';
 import {
   createProjectGraph,
+  getCloudOnboardingInfo,
   getGeneratorContextFromPath,
   getGeneratorContextV2,
   getGeneratorOptions,
@@ -584,6 +586,13 @@ connection.onRequest(NxCloudStatusRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return getNxCloudStatus(WORKING_PATH);
+});
+
+connection.onRequest(NxCloudOnboardingInfoRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return getCloudOnboardingInfo(WORKING_PATH);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
