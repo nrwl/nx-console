@@ -1,16 +1,10 @@
-import { findConfig } from '@nx-console/shared/utils';
+import { clearJsonCache } from '@nx-console/shared/file-system';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { dirname, join, relative } from 'path';
-import * as vscode from 'vscode';
-import {
-  clearJsonCache,
-  listFiles,
-  readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
 import { watchFile } from '@nx-console/vscode/utils';
+import * as vscode from 'vscode';
 import { getExternalFiles, TSCONFIG_BASE } from './get-external-files';
 
 export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {

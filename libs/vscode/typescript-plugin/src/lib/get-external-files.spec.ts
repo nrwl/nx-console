@@ -4,7 +4,7 @@ import {
   listFiles,
 } from '@nx-console/shared/file-system';
 import { findConfig } from '@nx-console/shared/utils';
-import { dirname, join } from 'node:path';
+import { dirname, join, posix, sep } from 'node:path';
 
 jest.mock('@nx-console/shared/file-system', () => ({
   readAndCacheJsonFile: jest.fn(),
@@ -75,7 +75,7 @@ describe('getExternalFiles', () => {
 
     const result = await getExternalFiles(workspaceRoot);
 
-    expect(result).toEqual([
+    expect(pathNormalize(result)).toEqual([
       {
         mainFile: '/path/to/workspace/libs/lib1/index.ts',
         directory: '/path/to/workspace/libs/lib1',
@@ -110,7 +110,7 @@ describe('getExternalFiles', () => {
 
     const result = await getExternalFiles(workspaceRoot);
 
-    expect(result).toEqual([
+    expect(pathNormalize(result)).toEqual([
       {
         mainFile: '/path/to/workspace/libs/lib1/index.ts',
         directory: '/path/to/workspace/libs/lib1',
@@ -152,7 +152,7 @@ describe('getExternalFiles', () => {
 
     const result = await getExternalFiles(workspaceRoot);
 
-    expect(result).toMatchInlineSnapshot(`
+    expect(pathNormalize(result)).toMatchInlineSnapshot(`
       Array [
         Object {
           "directory": "/path/to/workspace/libs/lib1",
@@ -212,7 +212,7 @@ describe('getExternalFiles', () => {
 
     const result = await getExternalFiles(workspaceRoot);
 
-    expect(result).toMatchInlineSnapshot(`
+    expect(pathNormalize(result)).toMatchInlineSnapshot(`
       Array [
         Object {
           "directory": "/path/to/workspace/libs/lib1",
@@ -250,3 +250,12 @@ describe('getExternalFiles', () => {
     `);
   });
 });
+
+function pathNormalize(
+  externalFiles: { directory: string; mainFile: string }[]
+): { directory: string; mainFile: string }[] {
+  return externalFiles.map(({ directory, mainFile }) => ({
+    directory: directory.split(sep).join(posix.sep),
+    mainFile: mainFile.split(sep).join(posix.sep),
+  }));
+}
