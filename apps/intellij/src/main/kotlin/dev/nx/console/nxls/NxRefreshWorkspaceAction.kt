@@ -15,6 +15,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
 import dev.nx.console.graph.ui.NxGraphFileType
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -65,6 +66,8 @@ class NxRefreshWorkspaceService(private val project: Project) {
             return
         }
         refreshing = true
+
+        TelemetryService.getInstance(project).featureUsed("nx.refreshWorkspace")
 
         ProgressManager.getInstance()
             .run(
