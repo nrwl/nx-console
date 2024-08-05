@@ -4,7 +4,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 
 export const defaultVersion =
-  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '19.5.3';
+  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '19.5.4';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),

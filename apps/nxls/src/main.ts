@@ -10,6 +10,7 @@ import { getDocumentLinks } from '@nx-console/language-server/capabilities/docum
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
   NxChangeWorkspace,
+  NxCloudStatusRequest,
   NxCreateProjectGraphRequest,
   NxGeneratorContextFromPathRequest,
   NxGeneratorContextV2Request,
@@ -23,16 +24,15 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
-  NxStopDaemonRequest,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
+  NxStopDaemonRequest,
   NxTargetsForConfigFileRequest,
   NxTransformedGeneratorSchemaRequest,
   NxVersionRequest,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
-  NxCloudStatusRequest,
 } from '@nx-console/language-server/types';
 import {
   getJsonLanguageService,
@@ -42,8 +42,8 @@ import {
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import {
-  languageServerWatcher,
   NativeWatcher,
+  languageServerWatcher,
 } from '@nx-console/language-server/watcher';
 import {
   createProjectGraph,
@@ -75,6 +75,7 @@ import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { formatError } from '@nx-console/shared/utils';
 import { dirname, relative } from 'node:path';
+import treeKill from 'tree-kill';
 import {
   ClientCapabilities,
   CompletionList,
@@ -92,7 +93,6 @@ import {
   createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import treeKill from 'tree-kill';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
 
@@ -240,6 +240,7 @@ connection.onCompletion(async (completionParams) => {
       );
     }
   }
+
   const completionResults =
     (await getJsonLanguageService()?.doComplete(
       document,
@@ -267,6 +268,7 @@ connection.onCompletion(async (completionParams) => {
     completionParams.position,
     lspLogger
   );
+
   mergeArrays(completionResults.items, pathItems);
 
   return completionResults;

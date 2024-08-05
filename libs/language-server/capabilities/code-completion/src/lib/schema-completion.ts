@@ -55,10 +55,11 @@ export async function configureSchemas(
   );
   const packageJsonSchema = getPackageJsonSchema(nxVersion);
 
-  const nxSchema = getNxJsonSchema(
+  const nxSchema = await getNxJsonSchema(
     currentExecutors,
     workspace.projects,
-    nxVersion
+    nxVersion,
+    workingPath
   );
 
   currentBaseSchemas = [

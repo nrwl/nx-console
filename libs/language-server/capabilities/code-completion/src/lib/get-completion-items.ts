@@ -1,15 +1,16 @@
 import {
+  getDefaultCompletionType,
+  isArrayNode,
+} from '@nx-console/language-server/utils';
+import {
   CompletionType,
   hasCompletionGlob,
   hasCompletionType,
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
 } from '@nx-console/shared/json-schema';
-import {
-  getDefaultCompletionType,
-  isArrayNode,
-  lspLogger,
-} from '@nx-console/language-server/utils';
+import { Logger } from '@nx-console/shared/schema';
+import { NxVersion } from '@nx-console/shared/types';
 import {
   ASTNode,
   CompletionItem,
@@ -18,15 +19,13 @@ import {
   Position,
   TextDocument,
 } from 'vscode-json-languageservice';
+import { inferencePluginsCompletion } from './inference-plugins-completion';
 import { inputNameCompletion } from './input-name-completion';
 import { pathCompletion } from './path-completion';
 import { projectCompletion } from './project-completion';
 import { projectTargetCompletion } from './project-target-completion';
 import { tagsCompletion } from './tags-completion';
 import { targetsCompletion } from './targets-completion';
-import { NxVersion } from '@nx-console/shared/types';
-import { Logger } from '@nx-console/shared/schema';
-import { inferencePluginsCompletion } from './inference-plugins-completion';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
