@@ -7,9 +7,10 @@ import {
   simpleReactWorkspaceOptions,
   modifyJsonFile,
 } from '../utils';
-import { readFileSync } from 'fs';
+import { readFileSync, rmSync } from 'fs';
 import { URI } from 'vscode-uri';
 import { CompletionList, Position } from 'vscode-languageserver';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -41,7 +42,7 @@ describe('nx.json completion - 16', () => {
     });
   });
 
-  it('root autocomplete should contain correct items for nx 16', async () => {
+  it('should contain proper root keys', async () => {
     // delete all json properties so we can see all possible completions
     modifyJsonFile(nxJsonPath, (data) => ({}));
 
@@ -92,7 +93,8 @@ describe('nx.json completion - 16', () => {
       ]
     `);
   });
-  it('root autocomplete should not contain newer items', async () => {
+
+  it('should not contain newer root keys', async () => {
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -109,6 +111,50 @@ describe('nx.json completion - 16', () => {
     expect(labels).not.toContain('nxCloudUrl');
     expect(labels).not.toContain('nxCloudAccessToken');
     expect(labels).not.toContain('release');
+  });
+
+  it('should not error when nx-schema.json is missing', async () => {
+    rmSync(
+      join(
+        e2eCwd,
+        workspaceName,
+        'node_modules',
+        'nx',
+        'schemas',
+        'nx-schema.json'
+      )
+    );
+
+    nxlsWrapper.sendNotification({
+      ...NxWorkspaceRefreshNotification,
+    });
+    await nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
+
+    const autocompleteResponse = await nxlsWrapper.sendRequest({
+      method: 'textDocument/completion',
+      params: {
+        textDocument: {
+          uri: URI.file(nxJsonPath).toString(),
+        },
+        position: Position.create(0, 1),
+      },
+    });
+
+    expect(autocompleteResponse.error).toBeUndefined();
+
+    // results should only include non-static completions
+    const completionItemStrings = (
+      (autocompleteResponse?.result as any).items as any[]
+    ).map((item) => item.label);
+
+    expect(completionItemStrings).toContain('tasksRunnerOptions');
+    expect(completionItemStrings).toContain('targetDefaults');
+    expect(completionItemStrings).toContain('targetDependencyConfig');
+    expect(completionItemStrings).toContain('plugins');
+
+    expect(completionItemStrings).not.toContain('nxCloudAccessToken');
   });
 
   afterAll(async () => {

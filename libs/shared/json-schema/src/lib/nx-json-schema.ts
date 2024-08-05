@@ -20,8 +20,12 @@ export async function getNxJsonSchema(
   const [, executors] = createBuildersAndExecutorsSchema(collections);
   const targets = getTargets(projects);
   const contents = createJsonSchema(executors, targets, nxVersion);
+  const staticNxJsonSchema = await getStaticNxJsonSchema(workspacePath);
+  if (!staticNxJsonSchema) {
+    return contents;
+  }
   return {
-    allOf: [contents, await getStaticNxJsonSchema(workspacePath)],
+    allOf: [contents, staticNxJsonSchema],
   };
 }
 
@@ -119,7 +123,11 @@ export async function getStaticNxJsonSchema(workspacePath: string) {
   if (!nxPath) {
     return;
   }
-  const schema = readFileSync(join(nxPath, 'schemas', 'nx-schema.json'));
-  const parsedSchema = JSON.parse(schema.toString());
-  return parsedSchema;
+  try {
+    const schema = readFileSync(join(nxPath, 'schemas', 'nx-schema.json'));
+    const parsedSchema = JSON.parse(schema.toString());
+    return parsedSchema;
+  } catch (e) {
+    return;
+  }
 }
