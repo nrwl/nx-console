@@ -36,7 +36,7 @@ export async function getExternalFiles(
         continue;
       }
 
-      if (mainFile.endsWith('/*')) {
+      if (mainFile.endsWith('/*') || mainFile.endsWith('\\*')) {
         const files = listFiles(dirname(mainFile));
         for (const file of files) {
           const directory = dirname(configFilePath);
