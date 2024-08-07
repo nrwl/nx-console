@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NX_CI_EXECUTION_ENV: 'linux'
-      NXLS_E2E_DEFAULT_VERSION: 'next'
+      NXLS_E2E_DEFAULT_VERSION: 'canary'
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
       GIT_COMMITTER_EMAIL: test@test.com
       GIT_COMMITTER_NAME: Test
       NX_CI_EXECUTION_ENV: 'windows'
-      NXLS_E2E_DEFAULT_VERSION: 'next'
+      NXLS_E2E_DEFAULT_VERSION: 'canary'
     steps:
       - uses: actions/checkout@v4
         with:
