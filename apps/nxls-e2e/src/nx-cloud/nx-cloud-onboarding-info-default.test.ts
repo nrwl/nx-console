@@ -87,7 +87,7 @@ describe('nx cloud onboarding - default', () => {
   });
 
   it('should return connected true after connecting to staging', async () => {
-    execSync(`npx nx g nx:connect-to-nx-cloud`, {
+    execSync(`npx nx g nx:connect-to-nx-cloud --no-interactive`, {
       env: {
         ...process.env,
         NX_CLOUD_API: 'https://staging.nx.app',
