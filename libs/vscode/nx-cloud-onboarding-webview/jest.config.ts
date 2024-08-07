@@ -9,4 +9,5 @@ export default {
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory:
     '../../../coverage/libs/vscode/nx-cloud-onboarding-webview',
+  passWithNoTests: true,
 };
