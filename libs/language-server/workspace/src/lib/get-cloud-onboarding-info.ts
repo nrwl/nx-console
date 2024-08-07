@@ -11,7 +11,6 @@ import {
 import { CloudOnboardingInfo } from '@nx-console/shared/types';
 import { parse } from 'ini';
 import { xhr } from 'request-light';
-import path = require('path');
 
 export async function getCloudOnboardingInfo(
   workspacePath: string
@@ -120,12 +119,12 @@ For Unix-based systems, we check to see if the user has configured a config eith
 */
 function findExistingNxCloudConfigFile() {
   if (process.platform === 'win32') {
-    const homePath = path.join(os.homedir(), DOT_NX_CLOUD_CONFIG_FILE_NAME);
+    const homePath = join(os.homedir(), DOT_NX_CLOUD_CONFIG_FILE_NAME);
     if (existsSync(homePath)) {
       return homePath;
     }
     if (process.env.LOCALAPPDATA) {
-      const localAppDataPath = path.join(
+      const localAppDataPath = join(
         process.env.LOCALAPPDATA,
         NX_CLOUD_CONFIG_DIR_NAME,
         NX_CLOUD_CONFIG_FILE_NAME
@@ -136,7 +135,7 @@ function findExistingNxCloudConfigFile() {
     }
   } else {
     if (process.env.XDG_CONFIG_HOME) {
-      const xdgPath = path.join(
+      const xdgPath = join(
         process.env.XDG_CONFIG_HOME,
         NX_CLOUD_CONFIG_DIR_NAME,
         NX_CLOUD_CONFIG_FILE_NAME
@@ -146,11 +145,11 @@ function findExistingNxCloudConfigFile() {
       }
     }
     const homeDir = os.homedir();
-    const homeDotPath = path.join(homeDir, DOT_NX_CLOUD_CONFIG_FILE_NAME);
+    const homeDotPath = join(homeDir, DOT_NX_CLOUD_CONFIG_FILE_NAME);
     if (existsSync(homeDotPath)) {
       return homeDotPath;
     }
-    const homeConfigPath = path.join(
+    const homeConfigPath = join(
       homeDir,
       '.config',
       NX_CLOUD_CONFIG_DIR_NAME,

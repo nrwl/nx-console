@@ -7471,6 +7471,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/ini@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "@types/ini@npm:4.1.1"
+  checksum: 5d17a4af098bcf0263c767515a3856ebdd61a84ba78bd132e1cf7d05ed29a928af4ea80657a1226b39a4c9b3d5e1349a2bbaaa0c5c7ec068034ba7ae768f63cf
+  languageName: node
+  linkType: hard
+
 "@types/inquirer@npm:^8.1.2":
   version: 8.2.10
   resolution: "@types/inquirer@npm:8.2.10"
@@ -21059,6 +21066,7 @@ __metadata:
     "@tailwindcss/forms": 0.5.3
     "@theunderscorer/nx-semantic-release": 2.4.0
     "@types/find-cache-dir": ^3.2.1
+    "@types/ini": ^4.1.1
     "@types/jest": 29.4.0
     "@types/mocha": ^9.1.1
     "@types/node": 18.16.9

@@ -1,19 +1,8 @@
-import {
-  findNxPackagePath,
-  getNxAccessToken,
-  getNxCloudUrl,
-  importWorkspaceDependency,
-} from '@nx-console/shared/npm';
+import { getNxAccessToken, getNxCloudUrl } from '@nx-console/shared/npm';
 import { CloudOnboardingInfo } from '@nx-console/shared/types';
-import {
-  getNxWorkspacePath,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getCloudOnboardingInfo } from '@nx-console/vscode/nx-workspace';
-import { config as loadDotEnvFile } from 'dotenv';
-import { expand } from 'dotenv-expand';
-import { join } from 'path';
 
 import {
   CancellationToken,
@@ -30,7 +19,6 @@ import {
 import { withTimeout } from '@nx-console/shared/utils';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/utils';
-import * as UrlShorten from 'nx/src/nx-cloud/utilities/url-shorten';
 import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
