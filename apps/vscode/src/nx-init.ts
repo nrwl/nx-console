@@ -24,6 +24,9 @@ export function initNxInit(context: ExtensionContext) {
         // execution
         new ShellExecution(`npx ${command}`, {
           cwd: workspacePath,
+          env: {
+            NX_CONSOLE: 'true',
+          },
         })
       );
       task.presentationOptions.focus = true;

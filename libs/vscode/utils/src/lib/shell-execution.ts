@@ -9,6 +9,7 @@ export interface ShellConfig {
   displayCommand: string;
   encapsulatedNx: boolean;
   workspacePath: string;
+  env?: { [key: string]: string };
 }
 
 export async function getShellExecutionForConfig(
@@ -46,5 +47,9 @@ export async function getShellExecutionForConfig(
 
   return new ShellExecution(command, {
     cwd: config.cwd,
+    env: {
+      ...config.env,
+      NX_CONSOLE: 'true',
+    },
   });
 }

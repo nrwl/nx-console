@@ -43,6 +43,7 @@ export class CliTask extends Task {
             : workspacePath,
           encapsulatedNx: isEncapsulatedNx,
           workspacePath,
+          env: definition.env,
         },
         packageManagerCommands
       )

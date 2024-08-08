@@ -30,17 +30,18 @@ describe('nx cloud - nx 16', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
   });
 
-  it('should return false & no cloud url if not connected to cloud', async () => {
+  it('should return false & default cloud url if not connected to cloud', async () => {
     const cloudStatusResponse = await nxlsWrapper.sendRequest({
       ...NxCloudStatusRequest,
       params: {},
     });
 
     expect((cloudStatusResponse.result as any).isConnected).toEqual(false);
-    expect((cloudStatusResponse.result as any).nxCloudUrl).toBeUndefined();
+    expect((cloudStatusResponse.result as any).nxCloudUrl).toEqual(
+      'https://cloud.nx.app'
+    );
   });
 
   describe('connected via nx-cloud.env', () => {

@@ -7471,6 +7471,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/ini@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "@types/ini@npm:4.1.1"
+  checksum: 5d17a4af098bcf0263c767515a3856ebdd61a84ba78bd132e1cf7d05ed29a928af4ea80657a1226b39a4c9b3d5e1349a2bbaaa0c5c7ec068034ba7ae768f63cf
+  languageName: node
+  linkType: hard
+
 "@types/inquirer@npm:^8.1.2":
   version: 8.2.10
   resolution: "@types/inquirer@npm:8.2.10"
@@ -16234,6 +16241,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ini@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "ini@npm:4.1.3"
+  checksum: 004b2be42388877c58add606149f1a0c7985c90a0ba5dbf45a4738fdc70b0798d922caecaa54617029626505898ac451ff0537a08b949836b49d3267f66542c9
+  languageName: node
+  linkType: hard
+
 "init-package-json@npm:^3.0.2":
   version: 3.0.2
   resolution: "init-package-json@npm:3.0.2"
@@ -21052,6 +21066,7 @@ __metadata:
     "@tailwindcss/forms": 0.5.3
     "@theunderscorer/nx-semantic-release": 2.4.0
     "@types/find-cache-dir": ^3.2.1
+    "@types/ini": ^4.1.1
     "@types/jest": 29.4.0
     "@types/mocha": ^9.1.1
     "@types/node": 18.16.9
@@ -21091,6 +21106,7 @@ __metadata:
     graphql-request: ^5.0.0
     html-webpack-plugin: ^5.5.0
     husky: ^9.0.11
+    ini: ^4.1.3
     jest: 29.4.3
     jest-environment-jsdom: 29.4.3
     jest-environment-node: ^29.4.1
