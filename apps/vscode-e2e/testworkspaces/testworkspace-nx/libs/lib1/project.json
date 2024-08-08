@@ -1,9 +1,0 @@
-{
-  "name": "vscode-e2e-testworkspaces-testworkspace-nx-libs-lib1",
-  "$schema": "../../../../../../node_modules/nx/schemas/project-schema.json",
-  "targets": {
-    "test": {
-      "executor": "@nrwl/jest:jest"
-    }
-  }
-}
