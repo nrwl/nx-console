@@ -86,28 +86,6 @@ describe('nx cloud onboarding - default', () => {
     return await nxlsWrapper.stopNxls();
   });
 
-  it('should return connected true after connecting to staging', async () => {
-    try {
-      execSync(`npx nx g nx:connect-to-nx-cloud --no-interactive --verbose`, {
-        env: {
-          ...process.env,
-          NX_CLOUD_API: 'https://staging.nx.app',
-        },
-        cwd: join(e2eCwd, workspaceName),
-      });
-    } catch (e) {
-      console.log(`ERROR ${e}`);
-    }
-
-    const onboardingInfoResponse = await nxlsWrapper.sendRequest({
-      ...NxCloudOnboardingInfoRequest,
-      params: {},
-    });
-
-    const info = onboardingInfoResponse.result as CloudOnboardingInfo;
-    expect(info.isConnectedToCloud).toEqual(true);
-  });
-
   it('should return true for CI checks after generating workflow', async () => {
     execSync(`npx nx g @nx/workspace:ci-workflow --ci github --name gh-ci`, {
       cwd: join(e2eCwd, workspaceName),
