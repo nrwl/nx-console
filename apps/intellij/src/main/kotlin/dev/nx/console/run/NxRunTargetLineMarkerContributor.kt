@@ -9,7 +9,7 @@ import dev.nx.console.utils.getPropertyNodeFromLeafNode
 import dev.nx.console.utils.isTargetConfigurationNodeInsideProjectJson
 import dev.nx.console.utils.isTargetNodeInsideProjectJson
 
-class NxRunTargetLineMarkerContributor : RunLineMarkerContributor() {
+internal class NxRunTargetLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         val propertyFromLeafNode = getPropertyNodeFromLeafNode(element) ?: return null
         if (

@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.NotNullLazyValue
 import dev.nx.console.NxIcons
 
-class NxCommandConfigurationType :
+internal class NxCommandConfigurationType :
     SimpleConfigurationType(
         "NxRunConfigurationType",
         "Nx",

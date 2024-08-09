@@ -120,7 +120,7 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
     }
 }
 
-class NxAngularConfigProvider : AngularConfigProvider {
+internal class NxAngularConfigProvider : AngularConfigProvider {
 
     override fun findAngularConfig(project: Project, context: VirtualFile): AngularConfig? =
         project.service<NxAngularConfigService>().config

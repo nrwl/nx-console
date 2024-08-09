@@ -6,7 +6,8 @@ import com.intellij.openapi.project.DumbAware
 import dev.nx.console.NxIcons
 import javax.swing.Icon
 
-class ProjectDetailsFileType : LanguageFileType(Language.findLanguageByID("JSON")!!), DumbAware {
+private class ProjectDetailsFileType :
+    LanguageFileType(Language.findLanguageByID("JSON")!!), DumbAware {
     override fun getName(): String {
         return "Project Details"
     }

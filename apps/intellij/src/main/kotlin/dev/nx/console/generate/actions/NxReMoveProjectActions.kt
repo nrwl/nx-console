@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.EDT
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.generate.NxGenerateService
 import dev.nx.console.generate.NxReMoveProjectDialog
@@ -41,7 +40,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     }
 
     private suspend fun selectOptionsAndRun(path: String?, project: Project) {
-        val nxlsService = project.service<NxlsService>()
+        val nxlsService = NxlsService.getInstance(project)
 
         val projectsWithType =
             nxlsService

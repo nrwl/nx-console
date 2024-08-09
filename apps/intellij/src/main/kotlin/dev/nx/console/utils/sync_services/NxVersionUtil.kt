@@ -12,9 +12,8 @@ import kotlinx.coroutines.launch
 class NxVersionUtil(project: Project, private val cs: CoroutineScope) {
     var nxVersion: NxVersion? = null
 
-    private val nxlsService = NxlsService.getInstance(project)
-
     init {
+        val nxlsService = NxlsService.getInstance(project)
         nxlsService.runAfterStarted { cs.launch { nxVersion = nxlsService.nxVersion() } }
 
         with(project.messageBus.connect()) {

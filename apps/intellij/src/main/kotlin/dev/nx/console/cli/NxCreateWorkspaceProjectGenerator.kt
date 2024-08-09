@@ -12,7 +12,7 @@ import dev.nx.console.NxConsoleBundle
 import dev.nx.console.NxIcons
 import javax.swing.Icon
 
-class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() {
+internal class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() {
 
     private val PACKAGE_NAME = "create-nx-workspace@latest"
     private val CREATE_COMMAND = "create-nx-workspace@latest"
@@ -38,6 +38,7 @@ class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() {
     override fun getNpxCommands(): List<NpxPackageDescriptor.NpxCommand> {
         return listOf(NpxPackageDescriptor.NpxCommand(PACKAGE_NAME, CREATE_COMMAND))
     }
+
     override fun packageName(): String = PACKAGE_NAME
 
     override fun presentablePackageName(): String = "Command:"

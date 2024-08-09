@@ -20,7 +20,6 @@ import kotlinx.coroutines.withContext
 
 @Service(Service.Level.PROJECT)
 class NxHelpCommandService(val project: Project, private val cs: CoroutineScope) {
-    private val nxlsService = NxlsService.getInstance(project)
 
     fun execute(projectName: String, helpCommand: String, helpCwd: String?) {
         cs.launch {
@@ -37,7 +36,7 @@ class NxHelpCommandService(val project: Project, private val cs: CoroutineScope)
                     } else {
                         // If CWD is not passed from Nx 19.4.0.
                         val nxProject =
-                            nxlsService
+                            NxlsService.getInstance(project)
                                 .workspace()
                                 ?.workspace
                                 ?.projects

@@ -21,6 +21,7 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.util.maximumHeight
 import com.intellij.util.messages.Topic
+import com.intellij.util.ui.JBUI
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
@@ -37,7 +38,6 @@ import java.awt.event.ActionEvent
 import java.net.URI
 import javax.swing.*
 import javax.swing.border.CompoundBorder
-import javax.swing.border.EmptyBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -319,7 +319,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             if (isConnectedToCloud != null) {
                                 border =
                                     CompoundBorder(
-                                        EmptyBorder(0, 10, 0, 10),
+                                        JBUI.Borders.empty(0, 10),
                                         BorderFactory.createMatteBorder(
                                             1,
                                             0,
@@ -365,7 +365,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             border =
                                 CompoundBorder(
                                     BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()),
-                                    EmptyBorder(5, 10, 0, 10)
+                                    JBUI.Borders.empty(5, 10, 0, 10)
                                 )
 
                             add(
