@@ -36,7 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
+internal class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
     companion object {
         internal const val ID: String = "dev.nx.console.config-file-code-vision"
     }
@@ -75,7 +75,6 @@ class ProjectLevelConfigFileCodeVisionManager(
     private val project: Project,
     private val cs: CoroutineScope
 ) {
-    private val nxlsService = NxlsService.getInstance(project)
 
     private val partialPathToTargetsMap = mutableMapOf<String, List<String>>()
     private var nxWorkspaceCache: NxWorkspace? = null
@@ -271,7 +270,8 @@ class ProjectLevelConfigFileCodeVisionManager(
         nxProjectName: String,
         project: Project
     ) {
-        val targets = nxlsService.targetsForConfigFile(nxProjectName, path).keys.toList()
+        val targets =
+            NxlsService.getInstance(project).targetsForConfigFile(nxProjectName, path).keys.toList()
 
         partialPathToTargetsMap[path] = targets
         refreshCodeVision(project)
@@ -279,7 +279,7 @@ class ProjectLevelConfigFileCodeVisionManager(
 
     private suspend fun loadWorkspaceAndRefresh(project: Project) {
         nxWorkspaceCache = null
-        nxWorkspaceCache = nxlsService.workspace()
+        nxWorkspaceCache = NxlsService.getInstance(project).workspace()
         refreshCodeVision(project)
     }
 
@@ -346,7 +346,7 @@ class ProjectLevelConfigFileCodeVisionManager(
     }
 }
 
-class ConfigFileCodeVisionGroupSettingProvider : CodeVisionGroupSettingProvider {
+internal class ConfigFileCodeVisionGroupSettingProvider : CodeVisionGroupSettingProvider {
     override val groupId: String
         get() = ConfigFileCodeVisionProvider.ID
 

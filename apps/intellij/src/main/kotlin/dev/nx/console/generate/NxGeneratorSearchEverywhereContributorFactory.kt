@@ -19,7 +19,7 @@ import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import javax.swing.ListCellRenderer
 import kotlinx.coroutines.launch
 
-class NxGeneratorSearchEverywhereContributorFactory :
+internal class NxGeneratorSearchEverywhereContributorFactory :
     SearchEverywhereContributorFactory<NxGenerator> {
     override fun createContributor(
         initEvent: AnActionEvent

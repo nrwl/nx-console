@@ -57,7 +57,7 @@ open class NxGraphServer(
     private var isStarting = false
 
     init {
-        with(project.messageBus.connect(this)) {
+        with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                 NxWorkspaceRefreshListener {

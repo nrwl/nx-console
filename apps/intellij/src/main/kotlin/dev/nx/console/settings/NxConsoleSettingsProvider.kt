@@ -6,7 +6,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 
 @State(name = "NxConsoleSettingsProvider", storages = [Storage("nx-console.xml")])
-class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsState> {
+internal class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsState> {
 
     private var state = NxConsoleSettingsState()
 

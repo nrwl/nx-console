@@ -11,7 +11,7 @@ import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.utils.DocumentUtils
 import kotlinx.coroutines.runBlocking
 
-class NxlsDocumentationProvider : DocumentationProvider {
+internal class NxlsDocumentationProvider : DocumentationProvider {
 
     var editor: Editor? = null
 

@@ -11,7 +11,7 @@ import dev.nx.console.utils.DocumentUtils
 
 private val log = logger<NxEditorListener>()
 
-class NxEditorListener : EditorFactoryListener {
+internal class NxEditorListener : EditorFactoryListener {
 
     override fun editorReleased(event: EditorFactoryEvent) {
         val project = event.editor.project ?: return super.editorReleased(event)

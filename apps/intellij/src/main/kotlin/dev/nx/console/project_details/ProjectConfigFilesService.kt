@@ -22,8 +22,6 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
     private var projectConfigFilesPaths: List<String> = emptyList()
     private val pathsToProjectsMap: MutableMap<String, NxProject> = mutableMapOf()
 
-    private val nxlsService = NxlsService.getInstance(project)
-
     init {
         projectConfigFilesPaths =
             PropertiesComponent.getInstance(project).getList("dev.nx.console.project_details_files")
@@ -54,6 +52,7 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
     }
 
     private fun setProjectConfigFilesInfo() {
+        val nxlsService = NxlsService.getInstance(project)
         cs.launch {
             val sourceMapFilesToProjectMap = nxlsService.sourceMapFilesToProjectMap()
 

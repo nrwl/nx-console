@@ -12,7 +12,7 @@ import dev.nx.console.nxls.NxlsService
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
 
-class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
+internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun getIcon(value: String): Icon = NxIcons.Action
 

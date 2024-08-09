@@ -18,7 +18,7 @@ import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
 
-class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
+internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     private var generators: List<NxGenerator> = emptyList()
     private val generatorOptions: MutableMap<String, List<NxGeneratorOption>> = mutableMapOf()

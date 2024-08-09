@@ -13,7 +13,7 @@ import dev.nx.console.utils.DocumentUtils
 
 private val log = logger<NxCompletionContributor>()
 
-class NxCompletionContributor : CompletionContributor() {
+internal class NxCompletionContributor : CompletionContributor() {
     init {
         extend(
             CompletionType.BASIC,

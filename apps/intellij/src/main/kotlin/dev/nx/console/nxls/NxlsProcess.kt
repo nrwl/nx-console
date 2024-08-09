@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
+import com.intellij.util.io.awaitExit
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
@@ -17,7 +18,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -45,8 +45,8 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                 }
                 exitJob =
                     cs.launch {
-                        val e = it.onExit().await()
-                        e.errorStream.readAllBytes().decodeToString().run {
+                        it.awaitExit()
+                        it.errorStream.readAllBytes().decodeToString().run {
                             if (this.isEmpty()) {
                                 return@run
                             }
@@ -73,7 +73,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
             } else {
                 withTimeoutOrNull(1000L) {
                     thisLogger().info("waiting for process to exit")
-                    process?.onExit()?.await()
+                    process?.awaitExit()
                     true
                 }
                     ?: false
