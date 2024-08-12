@@ -1,3 +1,12 @@
+## [18.25.1](https://github.com/nrwl/nx-console/compare/vscode-v18.25.0...vscode-v18.25.1) (2024-08-12)
+
+
+### Bug Fixes
+
+* enable telemetry for workspace refreshes ([#2226](https://github.com/nrwl/nx-console/issues/2226)) ([b2eb5cd](https://github.com/nrwl/nx-console/commit/b2eb5cd133871f15d6d9a1cd31316334c416174b))
+* **nxls:** dynamically read nx.json schema during schema setup ([#2221](https://github.com/nrwl/nx-console/issues/2221)) ([913e1ce](https://github.com/nrwl/nx-console/commit/913e1ce2e32e74c05c4ee3d5b1d8ee346a4831cf))
+* pass expanded externalFiles to ts plugin for wildcard pattern paths ([#2224](https://github.com/nrwl/nx-console/issues/2224)) ([f0010fc](https://github.com/nrwl/nx-console/commit/f0010fc12b4a664d883ef027cde2ef9b2072cf86))
+
 # [18.25.0](https://github.com/nrwl/nx-console/compare/vscode-v18.24.1...vscode-v18.25.0) (2024-07-18)
 
 
