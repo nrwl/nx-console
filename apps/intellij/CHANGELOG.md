@@ -1,3 +1,12 @@
+## <small>1.28.3 (2024-08-12)</small>
+
+### Bug Fixes
+
+* enable telemetry for workspace refreshes ([#2226](https://github.com/nrwl/nx-console/issues/2226)) ([b2eb5cd](https://github.com/nrwl/nx-console/commit/b2eb5cd133871f15d6d9a1cd31316334c416174b))
+* **intellij:** fix various plugin devkit inspections ([#2232](https://github.com/nrwl/nx-console/issues/2232)) ([cecaa09](https://github.com/nrwl/nx-console/commit/cecaa09c3e8b2a22e57e7ad08a411c9682be3029))
+* **nxls:** dynamically read nx.json schema during schema setup ([#2221](https://github.com/nrwl/nx-console/issues/2221)) ([913e1ce](https://github.com/nrwl/nx-console/commit/913e1ce2e32e74c05c4ee3d5b1d8ee346a4831cf))
+* pass expanded externalFiles to ts plugin for wildcard pattern paths ([#2224](https://github.com/nrwl/nx-console/issues/2224)) ([f0010fc](https://github.com/nrwl/nx-console/commit/f0010fc12b4a664d883ef027cde2ef9b2072cf86))
+
 ## <small>1.28.2 (2024-07-22)</small>
 
 ### Bug Fixes
