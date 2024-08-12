@@ -25,7 +25,6 @@
       "style": "scss"
     }
   },
-  "defaultProject": "generate-ui",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
@@ -46,6 +45,11 @@
     },
     "e2e-ci--**/**": {
       "inputs": ["default", "^production"],
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build"]
+    },
+    "e2e-local": {
       "cache": true,
       "parallelism": false,
       "dependsOn": ["^build"]

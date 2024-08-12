@@ -7,7 +7,7 @@ import com.intellij.ui.dsl.builder.panel
 import dev.nx.console.settings.options.*
 import javax.swing.JComponent
 
-class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurable {
+internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurable {
 
     private val id = "nx-console"
     private val settingsProvider = NxConsoleSettingsProvider.getInstance()

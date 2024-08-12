@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
-class NxGraphFileEditorProvider : FileEditorProvider, DumbAware {
+internal class NxGraphFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean = file is NxGraphFile
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
@@ -15,6 +15,7 @@ class NxGraphFileEditorProvider : FileEditorProvider, DumbAware {
     }
 
     override fun getEditorTypeId(): String = NxGraphFileEditorProvider.editorTypeId
+
     override fun getPolicy(): FileEditorPolicy = FileEditorPolicy.HIDE_DEFAULT_EDITOR
 
     companion object {

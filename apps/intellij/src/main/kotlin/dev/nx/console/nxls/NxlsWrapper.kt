@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.models.NxGeneratorOptionDeserializer
@@ -171,7 +172,11 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
             initializeFuture?.cancel(true)
             withTimeoutOrNull(1000L) { languageServer?.shutdown()?.await() }
         } catch (e: Throwable) {
-            log.info("error while shutting down $e")
+            if (e is ProcessCanceledException) {
+                throw e
+            } else {
+                log.info("error while shutting down $e")
+            }
         } finally {
             languageServer?.exit()
             startedFuture.completeExceptionally(Exception("Nxls stopped"))

@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import dev.nx.console.settings.NxConsoleSettingsProvider
 
-class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
+internal class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
         if (!NxConsoleSettingsProvider.getInstance().showProjectDetailsView) return false
         if (file.name.endsWith("project.json")) {

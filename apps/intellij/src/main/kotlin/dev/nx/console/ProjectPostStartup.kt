@@ -1,6 +1,5 @@
 package dev.nx.console
 
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
@@ -12,9 +11,7 @@ import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.sync_services.NxProjectJsonToProjectMap
 import java.io.File
 
-private val logger = logger<ProjectPostStartup>()
-
-class ProjectPostStartup : ProjectActivity {
+internal class ProjectPostStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
 
         var currentDir = File(project.nxBasePath)

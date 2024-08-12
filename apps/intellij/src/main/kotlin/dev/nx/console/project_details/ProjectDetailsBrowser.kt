@@ -44,7 +44,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     private val interactionEventQuery: JBCefJSQuery = createInteractionEventQuery()
 
     private val messageBusConnection = project.messageBus.connect(this)
-    private val nxlsService = NxlsService.getInstance(project)
 
     init {
         try {
@@ -59,7 +58,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 NxWorkspaceRefreshListener {
                     coroutineScope.launch {
                         try {
-                            val errors = nxlsService.workspace()?.errors
+                            val errors = NxlsService.getInstance(project).workspace()?.errors
                             setErrorsAndRefresh(errors)
                         } catch (e: Throwable) {
                             logger<ProjectDetailsBrowser>().debug(e.message)
@@ -166,6 +165,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         currentLoadHtmlJob =
             coroutineScope.launch {
                 thisLogger().trace("loading PDV view ${file.path}")
+                val nxlsService = NxlsService.getInstance(project)
                 try {
                     nxlsService.awaitStarted()
 

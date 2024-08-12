@@ -881,12 +881,6 @@
           "visibility": "collapsed"
         }
       ]
-    },
-    "jsonValidation": [
-      {
-        "fileMatch": "nx.json",
-        "url": "./nx-schema.json"
-      }
-    ]
+    }
   }
 }

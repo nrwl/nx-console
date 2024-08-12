@@ -8,13 +8,11 @@ import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
 import com.intellij.icons.ExpUiIcons
 import com.intellij.lang.javascript.JavaScriptBundle
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.ui.ClickListener
 import com.intellij.ui.PopupHandler
 import com.intellij.ui.tree.AsyncTreeModel
@@ -35,6 +33,7 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.*
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
+import dev.nx.console.utils.NxConsolePluginDisposable
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.Desktop
 import java.awt.event.MouseEvent
@@ -46,9 +45,9 @@ import kotlinx.coroutines.withContext
 class NxTreeStructure(
     val tree: NxProjectsTree,
     val project: Project,
-) : SimpleTreeStructure(), Disposable {
+) : SimpleTreeStructure() {
 
-    private val treeModel = StructureTreeModel(this, this)
+    private val treeModel = StructureTreeModel(this, NxConsolePluginDisposable.getInstance(project))
     private lateinit var nxTreeBuilder: NxTreeBuilderBase
     private var root: SimpleNode = NullNode()
 
@@ -56,11 +55,10 @@ class NxTreeStructure(
     private var nxTaskExecutionManager = NxTaskExecutionManager.getInstance(project)
 
     init {
-        tree.model = AsyncTreeModel(treeModel, this)
+        tree.model = AsyncTreeModel(treeModel, NxConsolePluginDisposable.getInstance(project))
         TreeUtil.installActions(tree)
         installPopupActions()
         treePersistenceManager.installPersistenceListeners()
-        Disposer.register(project, this)
     }
 
     override fun getRootElement(): Any = root
@@ -289,8 +287,6 @@ class NxTreeStructure(
 
         return null
     }
-
-    override fun dispose() {}
 }
 
 data class NxTaskSet(

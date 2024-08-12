@@ -53,8 +53,6 @@ interface INxGraphService {
 class OldNxGraphService(override val project: Project, private val cs: CoroutineScope) :
     INxGraphService {
 
-    private val nxlsService = NxlsService.getInstance(project)
-
     private val state: MutableStateFlow<NxGraphStates> = MutableStateFlow(NxGraphStates.Init)
 
     private lateinit var graphBrowser: OldNxGraphBrowser
@@ -63,7 +61,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
 
     init {
         cs.launch {
-            projectGraphOutput = nxlsService.projectGraphOutput()
+            projectGraphOutput = NxlsService.getInstance(project).projectGraphOutput()
 
             with(project.messageBus.connect(cs)) {
                 subscribe(
@@ -87,7 +85,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
             return
         }
 
-        val nxVersion = cs.async { nxlsService.workspace()?.nxVersion }
+        val nxVersion = cs.async { NxlsService.getInstance(project).workspace()?.nxVersion }
 
         graphBrowser = OldNxGraphBrowser(project, state.asStateFlow(), nxVersion)
         val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
@@ -123,7 +121,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
 
     private suspend fun loadProjectGraph(reload: Boolean = false) {
         state.emit(NxGraphStates.Loading)
-        nxlsService.createProjectGraph().apply {
+        NxlsService.getInstance(project).createProjectGraph().apply {
             if (this == null) {
                 state.emit(
                     projectGraphOutput.let {

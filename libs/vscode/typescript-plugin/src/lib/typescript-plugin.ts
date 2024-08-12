@@ -1,18 +1,11 @@
-import { findConfig } from '@nx-console/shared/utils';
+import { clearJsonCache } from '@nx-console/shared/file-system';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { dirname, join } from 'path';
-import * as vscode from 'vscode';
-import {
-  clearJsonCache,
-  readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
 import { watchFile } from '@nx-console/vscode/utils';
-
-const TSCONFIG_BASE = 'tsconfig.base.json';
-const TSCONFIG_LIB = 'tsconfig.lib.json';
+import * as vscode from 'vscode';
+import { getExternalFiles, TSCONFIG_BASE } from './get-external-files';
 
 export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
   const tsExtension = vscode.extensions.getExtension(
@@ -111,37 +104,4 @@ async function configurePlugin(workspaceRoot: string, api: any) {
       externalFiles,
     });
   }
-}
-
-async function getExternalFiles(
-  workspaceRoot: string
-): Promise<{ mainFile: string; directory: string }[]> {
-  let tsconfig = (await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot))
-    .json;
-
-  if (!('compilerOptions' in tsconfig)) {
-    tsconfig = (await readAndCacheJsonFile('tsconfig.json', workspaceRoot))
-      .json;
-    if (!('compilerOptions' in tsconfig)) {
-      return [];
-    }
-  }
-
-  const paths = tsconfig.compilerOptions.paths ?? {};
-
-  const externals: { mainFile: string; directory: string }[] = [];
-
-  for (const [, value] of Object.entries<string[]>(paths)) {
-    const mainFile = join(workspaceRoot, value[0]);
-    const configFilePath = await findConfig(mainFile, TSCONFIG_LIB);
-
-    if (!configFilePath) {
-      continue;
-    }
-
-    const directory = dirname(configFilePath);
-    externals.push({ mainFile, directory });
-  }
-
-  return externals;
 }

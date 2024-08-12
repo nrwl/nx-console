@@ -17,7 +17,7 @@ data class NxRunSettings(
     var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
 )
 
-class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfiguration>() {
+internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfiguration>() {
     override fun getConfigurationFactory(): ConfigurationFactory =
         NxCommandConfigurationType.Util.getInstance()
 
