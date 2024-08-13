@@ -1,12 +1,4 @@
-import {
-  CodeLens,
-  CodeLensProvider,
-  Command,
-  Position,
-  Range,
-  TextDocument,
-  Uri,
-} from 'vscode';
+import { CodeLens, Command, Range, TextDocument, Uri } from 'vscode';
 
 import { buildProjectPath } from '@nx-console/shared/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
@@ -14,13 +6,8 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import {
-  ProjectLocations,
-  ProjectTargetLocation,
-  getProjectLocations,
-  getTargetsPropertyLocation,
-} from './get-project-locations';
 import { NxCodeLensProvider } from '@nx-console/vscode/utils';
+import { ProjectLocations, getProjectLocations } from './get-project-locations';
 
 export class TargetCodeLens extends CodeLens {
   constructor(

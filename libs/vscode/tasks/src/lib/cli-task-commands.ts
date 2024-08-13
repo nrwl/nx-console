@@ -16,14 +16,18 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
         configuration?: string,
         askForFlags?: boolean
       ) => {
-        getTelemetry().logUsage('nx.run', { target });
+        getTelemetry().logUsage('tasks.run', {
+          source: target ? 'nx-commands-panel' : 'command',
+        });
         selectRunInformationAndRun(project, target, configuration, askForFlags);
       }
     ),
     commands.registerCommand(
       `nx.run.fileexplorer`,
       async (uri: Uri | undefined) => {
-        getTelemetry().logUsage('nx.run.fileexplorer');
+        getTelemetry().logUsage('tasks.run', {
+          source: uri ? 'explorer-context-menu' : 'command',
+        });
         if (!uri) {
           uri = window.activeTextEditor?.document.uri;
         }
@@ -36,14 +40,14 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
       }
     ),
     commands.registerCommand(`nx.run.target`, async () => {
-      getTelemetry().logUsage('nx.run.target');
+      getTelemetry().logUsage('tasks.run');
 
       selectRunInformationAndRun(undefined, undefined, undefined, true, true);
     })
   );
 }
 
-async function selectRunInformationAndRun(
+export async function selectRunInformationAndRun(
   projectName?: string,
   targetName?: string,
   configuration?: string,

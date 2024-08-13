@@ -1,5 +1,8 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import {
+  CliTaskProvider,
+  selectRunInformationAndRun,
+} from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { commands, env, ExtensionContext, ProviderResult } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
@@ -42,10 +45,10 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     (
       [
         ['revealInExplorer', this.revealInExplorer],
-        ['runTask', this.runTask],
-        ['runTaskSkipNxCache', this.runTaskSkipNxCache],
+        ['run-task-projects-view', this.runTask],
+        ['run-task-projects-view-skip-cache', this.runTaskSkipNxCache],
         ['copyTaskToClipboard', this.copyTaskToClipboard],
-        ['runTaskWithOptions', this.runTaskWithOptions],
+        ['run-task-projects-view-options', this.runTaskWithOptions],
       ] as const
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
@@ -100,7 +103,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     selection: NxTreeItem,
     optionalFlags?: NxOptionalFlags
   ) {
-    getTelemetry().logUsage('runTask');
+    getTelemetry().logUsage('tasks.run', {
+      source: 'projects-view',
+    });
     const viewItem = selection.item;
     if (
       viewItem.contextValue === 'project' ||
@@ -130,26 +135,27 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   }
 
   private async runTaskSkipNxCache(selection: NxTreeItem) {
-    getTelemetry().logUsage('runTask');
     this.runTask(selection, { skipNxCache: true });
   }
   private async runTaskWithOptions(selection: NxTreeItem) {
-    getTelemetry().logUsage('runTask');
+    getTelemetry().logUsage('tasks.run', {
+      source: 'projects-view',
+    });
     const item = selection.item as TargetViewItem;
     const project = item.nxProject.project;
     const target = item.nxTarget.name;
     const configuration = item.nxTarget.configuration;
-    commands.executeCommand('nx.run', project, target, configuration, true);
+    selectRunInformationAndRun(project, target, configuration, true);
   }
 
   private async copyTaskToClipboard(selection: NxTreeItem) {
-    getTelemetry().logUsage('copyTaskToClipboard');
+    getTelemetry().logUsage('tasks.copy-to-clipboard');
     env.clipboard.writeText(`nx run ${selection.id}`);
   }
 
   private async revealInExplorer(selection: NxTreeItem) {
     if (selection.resourceUri) {
-      getTelemetry().logUsage('revealInExplorer');
+      getTelemetry().logUsage('misc.show-project-configuration');
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }

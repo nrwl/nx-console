@@ -146,7 +146,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
 }
 
 function showProjectDetailsQuickpick(project: ProjectConfiguration) {
-  getTelemetry().logUsage('nx.open-project-details-codelens');
+  getTelemetry().logUsage('misc.open-project-details-codelens');
   const quickPick = window.createQuickPick();
   const targetItems: QuickPickItem[] = Object.entries(
     project.targets ?? {}

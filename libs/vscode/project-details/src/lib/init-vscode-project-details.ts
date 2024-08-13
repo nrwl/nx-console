@@ -64,7 +64,7 @@ function registerCommand(context: ExtensionContext) {
         );
         if (!isEnabled) return;
         const nxVersion = await getNxVersion();
-        getTelemetry().logUsage('nx.open-pdv');
+        getTelemetry().logUsage('misc.open-pdv');
 
         if (!nxVersion) {
           showNoNxVersionMessage();

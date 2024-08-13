@@ -24,7 +24,7 @@ import { getTelemetry } from '@nx-console/vscode/telemetry';
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(`nx.affected`, async () => {
-      getTelemetry().logUsage('nx.affected');
+      getTelemetry().logUsage('cli.affected');
       const target = await promptForTarget();
       if (!target) {
         return;
@@ -33,7 +33,7 @@ export function registerNxCommands(context: ExtensionContext) {
     }),
     ...['build', 'e2e', 'lint', 'test'].map((target) =>
       commands.registerCommand(`nx.affected.${target}`, () => {
-        getTelemetry().logUsage(`nx.affected.${target}`);
+        getTelemetry().logUsage(`cli.affected`);
         promptForAffectedFlags(target);
       })
     )
@@ -41,21 +41,21 @@ export function registerNxCommands(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand('nx.run-many', () => {
-      getTelemetry().logUsage('nx.run-many');
+      getTelemetry().logUsage('tasks.run-many');
       promptForRunMany();
     })
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.list', () => {
-      getTelemetry().logUsage('nx.list');
+      getTelemetry().logUsage('cli.list');
       promptForList();
     })
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.migrate', () => {
-      getTelemetry().logUsage('nx.migrate');
+      getTelemetry().logUsage('cli.migrate');
       promptForMigrate();
     })
   );
@@ -147,8 +147,6 @@ async function promptForList() {
 }
 
 async function promptForMigrate() {
-  getTelemetry().logUsage('migrate command');
-
   const workspacePath = getNxWorkspacePath();
 
   if (!workspacePath) {

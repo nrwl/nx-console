@@ -34,7 +34,9 @@ export async function initNxConversion(
   const command = commands.registerCommand(
     'nxConsole.migrateAngularCliToNx',
     () => {
-      getTelemetry().logUsage('nxConversion');
+      getTelemetry().logUsage('cli.init', {
+        source: 'migrate-angular-prompt',
+      });
       commands.executeCommand(EXECUTE_ARBITRARY_COMMAND, 'nx init');
     }
   );

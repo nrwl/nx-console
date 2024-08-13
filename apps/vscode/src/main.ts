@@ -98,7 +98,7 @@ export async function activate(c: ExtensionContext) {
     await enableTypeScriptPlugin(context);
     watchCodeLensConfigChange(context);
 
-    getTelemetry().logUsage('extension-activated', {
+    getTelemetry().logUsage('extension-activate', {
       timing: (Date.now() - startTime) / 1000,
     });
   } catch (e) {
@@ -116,7 +116,7 @@ export async function deactivate() {
   await stopDaemon();
   await getNxlsClient()?.stop();
   workspaceFileWatcher?.dispose();
-  getTelemetry().logUsage('extension-deactivated');
+  getTelemetry().logUsage('extension-deactivate');
 }
 
 // -----------------------------------------------------------------------------

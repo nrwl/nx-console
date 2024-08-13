@@ -2,7 +2,10 @@ import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
 import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import {
+  getTelemetry,
+  TelemetryEventSource,
+} from '@nx-console/vscode/telemetry';
 import { commands, ExtensionContext, window } from 'vscode';
 
 export function initNxCloudView(context: ExtensionContext) {
@@ -19,17 +22,19 @@ export function initNxCloudView(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand('nx.connectToCloud', async () => {
-      getTelemetry().logUsage('nx.connectToCloud');
-      CliTaskProvider.instance.executeTask({
-        command: 'connect',
-        flags: [],
-      });
+      runNxConnect('command');
     }),
+    commands.registerCommand(
+      'nxConsole.connectToCloud.welcomeView',
+      async () => {
+        runNxConnect('welcome-view');
+      }
+    ),
     commands.registerCommand('nxConsole.openCloudApp', async () => {
       const cloudUrl = (await getNxCloudStatus())?.nxCloudUrl;
 
       if (cloudUrl) {
-        getTelemetry().logUsage('nx.openCloudApp');
+        getTelemetry().logUsage('cloud.open-app');
         const cloudUrlWithTracking = `${cloudUrl}?utm_campaign=open-cloud-app&utm_medium=cloud-promo&utm_source=nxconsole`;
         commands.executeCommand('vscode.open', cloudUrlWithTracking);
       } else {
@@ -47,4 +52,14 @@ export function initNxCloudView(context: ExtensionContext) {
       }
     })
   );
+}
+
+export function runNxConnect(source: TelemetryEventSource = 'command') {
+  getTelemetry().logUsage('cloud.connect', {
+    source,
+  });
+  CliTaskProvider.instance.executeTask({
+    command: 'connect',
+    flags: [],
+  });
 }

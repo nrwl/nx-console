@@ -103,14 +103,16 @@ export class GraphWebView implements Disposable {
         commands.executeCommand('nxConsole.refreshWorkspace');
       }
       if (event.command === 'fileClick') {
-        getTelemetry().logUsage('nx.graph.openProjectEdgeFile');
+        getTelemetry().logUsage('graph.interaction-open-project-edge-file');
         commands.executeCommand(
           'vscode.open',
           Uri.file(join(workspacePath, event.data))
         );
       }
       if (event.command === 'openProject') {
-        getTelemetry().logUsage('nx.graph.openProjectConfigFile');
+        getTelemetry().logUsage('misc.show-project-configuration', {
+          source: 'graph-interaction',
+        });
         getNxWorkspaceProjects().then((projects) => {
           const root = projects[event.data]?.root;
           if (!root) return;
@@ -118,7 +120,9 @@ export class GraphWebView implements Disposable {
         });
       }
       if (event.command === 'runTask') {
-        getTelemetry().logUsage('nx.graph.runTask');
+        getTelemetry().logUsage('tasks.run', {
+          source: 'graph-interaction',
+        });
         CliTaskProvider.instance.executeTask({
           command: 'run',
           positional: event.data,
