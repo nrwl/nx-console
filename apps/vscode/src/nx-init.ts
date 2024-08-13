@@ -1,4 +1,4 @@
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   commands,
   ExtensionContext,

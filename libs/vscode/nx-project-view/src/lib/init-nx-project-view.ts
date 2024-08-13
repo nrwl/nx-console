@@ -1,7 +1,7 @@
 import { ExtensionContext, commands, window } from 'vscode';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import { NxTreeItem } from './nx-tree-item';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';

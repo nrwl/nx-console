@@ -7,9 +7,9 @@ import {
   getTargetsForConfigFile,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   NxCodeLensProvider,
-  getTelemetry,
   registerCodeLensProvider,
 } from '@nx-console/vscode/utils';
 import { relative } from 'path';

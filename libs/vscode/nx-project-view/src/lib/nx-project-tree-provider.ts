@@ -1,6 +1,6 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { AbstractTreeProvider, getTelemetry } from '@nx-console/vscode/utils';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { commands, env, ExtensionContext, ProviderResult } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import {
@@ -20,6 +20,7 @@ import {
 } from './views/nx-project-tree-view';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 

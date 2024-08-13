@@ -2,7 +2,7 @@ import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
 import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { commands, ExtensionContext, window } from 'vscode';
 
 export function initNxCloudView(context: ExtensionContext) {

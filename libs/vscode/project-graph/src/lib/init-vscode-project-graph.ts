@@ -8,10 +8,7 @@ import {
   getNxWorkspaceProjects,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import {
-  getTelemetry,
-  showNoProjectAtPathMessage,
-} from '@nx-console/vscode/utils';
+import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { gte } from 'semver';
 import { ExtensionContext, Uri, commands, window } from 'vscode';
@@ -29,6 +26,7 @@ import {
 } from './legacy-implementation/project-graph';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 let _graphWebviewManager: GraphWebviewManager | undefined;
 

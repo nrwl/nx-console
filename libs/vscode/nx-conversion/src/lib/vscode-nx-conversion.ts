@@ -1,6 +1,6 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode/nx-commands-view';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { commands, ExtensionContext, window } from 'vscode';
 
 let run = false;

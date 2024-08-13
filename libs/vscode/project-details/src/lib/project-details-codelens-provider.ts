@@ -11,7 +11,6 @@ import {
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import {
   NxCodeLensProvider,
-  getTelemetry,
   registerCodeLensProvider,
 } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
