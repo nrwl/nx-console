@@ -36,19 +36,10 @@ class TelemetryService(private val cs: CoroutineScope) {
                                 }
                             }
                     }
-                }
-            )
+                })
         }
 
-    fun featureUsed(feature: String) {
-        cs.launch { service.featureUsed(feature) }
-    }
-
-    fun extensionActivated(time: Int) {
-        cs.launch { service.extensionActivated(time) }
-    }
-
-    fun extensionDeactivated(time: Int) {
-        cs.launch { service.extensionDeactivated(time) }
+    fun featureUsed(feature: String, data: Map<String, Any>? = null) {
+        cs.launch { service.featureUsed(feature.toString()) }
     }
 }
