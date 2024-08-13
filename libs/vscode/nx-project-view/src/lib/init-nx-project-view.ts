@@ -29,7 +29,7 @@ export function initNxProjectView(
 }
 
 export async function showProjectConfiguration(selection: NxTreeItem) {
-  getTelemetry().featureUsed('editWorkspaceJson');
+  getTelemetry().logUsage('editWorkspaceJson');
   if (!selection) {
     const projects = await getNxWorkspaceProjects();
     const project = await selectProject(Object.keys(projects), {

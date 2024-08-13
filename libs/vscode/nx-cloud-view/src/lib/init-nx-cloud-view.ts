@@ -19,7 +19,7 @@ export function initNxCloudView(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand('nx.connectToCloud', async () => {
-      getTelemetry().featureUsed('nx.connectToCloud');
+      getTelemetry().logUsage('nx.connectToCloud');
       CliTaskProvider.instance.executeTask({
         command: 'connect',
         flags: [],
@@ -29,7 +29,7 @@ export function initNxCloudView(context: ExtensionContext) {
       const cloudUrl = (await getNxCloudStatus())?.nxCloudUrl;
 
       if (cloudUrl) {
-        getTelemetry().featureUsed('nx.openCloudApp');
+        getTelemetry().logUsage('nx.openCloudApp');
         const cloudUrlWithTracking = `${cloudUrl}?utm_campaign=open-cloud-app&utm_medium=cloud-promo&utm_source=nxconsole`;
         commands.executeCommand('vscode.open', cloudUrlWithTracking);
       } else {

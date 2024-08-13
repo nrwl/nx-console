@@ -100,7 +100,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     selection: NxTreeItem,
     optionalFlags?: NxOptionalFlags
   ) {
-    getTelemetry().featureUsed('runTask');
+    getTelemetry().logUsage('runTask');
     const viewItem = selection.item;
     if (
       viewItem.contextValue === 'project' ||
@@ -130,11 +130,11 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   }
 
   private async runTaskSkipNxCache(selection: NxTreeItem) {
-    getTelemetry().featureUsed('runTask');
+    getTelemetry().logUsage('runTask');
     this.runTask(selection, { skipNxCache: true });
   }
   private async runTaskWithOptions(selection: NxTreeItem) {
-    getTelemetry().featureUsed('runTask');
+    getTelemetry().logUsage('runTask');
     const item = selection.item as TargetViewItem;
     const project = item.nxProject.project;
     const target = item.nxTarget.name;
@@ -143,13 +143,13 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   }
 
   private async copyTaskToClipboard(selection: NxTreeItem) {
-    getTelemetry().featureUsed('copyTaskToClipboard');
+    getTelemetry().logUsage('copyTaskToClipboard');
     env.clipboard.writeText(`nx run ${selection.id}`);
   }
 
   private async revealInExplorer(selection: NxTreeItem) {
     if (selection.resourceUri) {
-      getTelemetry().featureUsed('revealInExplorer');
+      getTelemetry().logUsage('revealInExplorer');
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }

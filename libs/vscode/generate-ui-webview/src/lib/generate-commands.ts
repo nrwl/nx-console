@@ -25,7 +25,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
           preselectedGenerator = undefined;
           preselectedFlags = undefined;
         }
-        getTelemetry().featureUsed('nx.generate.quickpick');
+        getTelemetry().logUsage('nx.generate.quickpick');
         const result = await selectGeneratorAndPromptForFlags(
           preselectedGenerator,
           preselectedFlags
@@ -44,17 +44,17 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       }
     ),
     commands.registerCommand(`nx.generate.ui`, () => {
-      getTelemetry().featureUsed('nx.generate.ui');
+      getTelemetry().logUsage('nx.generate.ui');
       openGenerateUi();
     }),
     commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
-      getTelemetry().featureUsed('nx.generate.fileexplorer');
+      getTelemetry().logUsage('nx.generate.fileexplorer');
       openGenerateUi(uri);
     }),
     commands.registerCommand(
       'nx.generate.ui.projectView',
       (treeItem: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.generate.fileexplorer.projectView');
+        getTelemetry().logUsage('nx.generate.fileexplorer.projectView');
         openGenerateUi(
           undefined,
           undefined,
@@ -63,7 +63,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       }
     ),
     commands.registerCommand(`nx.move`, async (uri?: Uri) => {
-      getTelemetry().featureUsed('nx.move');
+      getTelemetry().logUsage('nx.move');
       const generator = await selectReMoveGenerator(uri?.toString(), 'move');
       if (!generator) {
         return;
@@ -72,7 +72,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       openReMoveGenerator(generator, uri, undefined);
     }),
     commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
-      getTelemetry().featureUsed('nx.remove');
+      getTelemetry().logUsage('nx.remove');
       const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
       if (!generator) {
         return;
@@ -83,7 +83,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     commands.registerCommand(
       `nx.move.projectView`,
       async (treeItem?: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.move.projectView');
+        getTelemetry().logUsage('nx.move.projectView');
         const generator = await selectReMoveGenerator(undefined, 'move');
         if (!generator) {
           return;
@@ -98,7 +98,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     commands.registerCommand(
       `nx.remove.projectView`,
       async (treeItem?: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.remove.projectView');
+        getTelemetry().logUsage('nx.remove.projectView');
         const generator = await selectReMoveGenerator(undefined, 'remove');
         if (!generator) {
           return;

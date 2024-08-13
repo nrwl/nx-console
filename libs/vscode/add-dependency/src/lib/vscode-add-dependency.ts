@@ -70,7 +70,7 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
 
     if (dep) {
       const quickInput = showLoadingQuickInput(dep);
-      getTelemetry().featureUsed('add-dependency');
+      getTelemetry().logUsage('add-dependency');
       await addDependency(dep, version, installAsDevDependency, workspacePath);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (

@@ -98,7 +98,9 @@ export async function activate(c: ExtensionContext) {
     await enableTypeScriptPlugin(context);
     watchCodeLensConfigChange(context);
 
-    getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
+    getTelemetry().logUsage('extension-activated', {
+      timing: (Date.now() - startTime) / 1000,
+    });
   } catch (e) {
     window.showErrorMessage(
       'Nx Console encountered an error when activating (see output panel)'
@@ -114,7 +116,7 @@ export async function deactivate() {
   await stopDaemon();
   await getNxlsClient()?.stop();
   workspaceFileWatcher?.dispose();
-  getTelemetry().extensionDeactivated();
+  getTelemetry().logUsage('extension-deactivated');
 }
 
 // -----------------------------------------------------------------------------

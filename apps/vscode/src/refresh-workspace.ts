@@ -21,7 +21,7 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
 
       isRefreshing = true;
 
-      getTelemetry().featureUsed('nx.refreshWorkspace');
+      getTelemetry().logUsage('nx.refreshWorkspace');
 
       window.withProgress(
         {

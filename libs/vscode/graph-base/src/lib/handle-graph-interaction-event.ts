@@ -12,7 +12,7 @@ export async function handleGraphInteractionEventBase(event: {
   payload: any;
 }): Promise<boolean> {
   if (event.type === 'file-click') {
-    getTelemetry().featureUsed('nx.graph.openProjectEdgeFile');
+    getTelemetry().logUsage('nx.graph.openProjectEdgeFile');
     const workspacePath = getNxWorkspacePath();
 
     commands.executeCommand(
@@ -23,7 +23,7 @@ export async function handleGraphInteractionEventBase(event: {
   }
   if (event.type === 'open-project-config') {
     const projectName = event.payload.projectName;
-    getTelemetry().featureUsed('nx.graph.openProjectConfigFile');
+    getTelemetry().logUsage('nx.graph.openProjectConfigFile');
     getNxWorkspaceProjects().then((projects) => {
       const root = projects[projectName]?.root;
       if (!root) return;
@@ -32,7 +32,7 @@ export async function handleGraphInteractionEventBase(event: {
     return true;
   }
   if (event.type === 'run-task') {
-    getTelemetry().featureUsed('nx.graph.runTask');
+    getTelemetry().logUsage('nx.graph.runTask');
     CliTaskProvider.instance.executeTask({
       command: 'run',
       positional: event.payload.taskId,
@@ -42,7 +42,7 @@ export async function handleGraphInteractionEventBase(event: {
   }
 
   if (event.type === 'run-help') {
-    getTelemetry().featureUsed('nx.graph.runHelp');
+    getTelemetry().logUsage('nx.graph.runHelp');
     const workspacePath = getNxWorkspacePath();
     const projectName = event.payload.projectName;
     const cmd = event.payload.helpCommand;

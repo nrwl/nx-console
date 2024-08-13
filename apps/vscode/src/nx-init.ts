@@ -12,7 +12,7 @@ import {
 export function initNxInit(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand('nx.init', async () => {
-      getTelemetry().featureUsed('nx.init');
+      getTelemetry().logUsage('nx.init');
       const workspacePath =
         workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
       const command = 'nx@latest init';
