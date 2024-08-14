@@ -14,6 +14,7 @@ export type TelemetryEvents =
   | 'misc.show-project-configuration'
   | 'misc.open-pdv'
   | 'misc.open-project-details-codelens'
+  | 'misc.exception'
   // cloud
   | 'cloud.connect'
   | 'cloud.open-app'
@@ -22,6 +23,7 @@ export type TelemetryEvents =
   | 'graph.show-affected'
   | 'graph.focus-project'
   | 'graph.show-task'
+  | 'graph.show-task-group'
   | 'graph.select-project'
   | 'graph.interaction-open-project-edge-file'
   | 'graph.interaction-run-help'
@@ -54,4 +56,5 @@ export type TelemetryEventSource =
   | 'codelens'
   | 'nx-commands-panel'
   | 'welcome-view'
-  | 'migrate-angular-prompt';
+  | 'migrate-angular-prompt'
+  | 'editor-toolbar';

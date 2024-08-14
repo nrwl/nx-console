@@ -15,6 +15,8 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
 import dev.nx.console.graph.ui.NxGraphFileType
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +48,20 @@ class NxRefreshWorkspaceAction :
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                mapOf(
+                    "source" to
+                        if (
+                            e.place == ActionPlaces.getPopupPlace(ActionPlaces.TABS_MORE_TOOLBAR) ||
+                                e.place == ActionPlaces.EDITOR_TAB_POPUP
+                        )
+                            TelemetryEventSource.EDITOR_TOOLBAR
+                        else TelemetryEventSource.COMMAND
+                )
+            )
+
         try {
             Notification.get(e).expire()
         } catch (e: Throwable) {
@@ -66,8 +82,6 @@ class NxRefreshWorkspaceService(private val project: Project) {
             return
         }
         refreshing = true
-
-        TelemetryService.getInstance(project).featureUsed("nx.refreshWorkspace")
 
         ProgressManager.getInstance()
             .run(

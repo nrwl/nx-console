@@ -24,6 +24,8 @@ import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.run.NxHelpCommandService
 import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.run.actions.NxConnectService
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
@@ -264,7 +266,10 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             "open-project-config" -> {
                 coroutineScope.launch {
                     TelemetryService.getInstance(project)
-                        .featureUsed("Nx Graph Open Project Config File")
+                        .featureUsed(
+                            TelemetryEvent.MISC_SHOW_PROJECT_CONFIGURATION,
+                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                        )
 
                     event.payload?.projectName?.also {
                         project.nxWorkspace()?.workspace?.projects?.get(it)?.apply {
@@ -349,6 +354,11 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     private fun createResetQuery(): JBCefJSQuery {
         val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
         query.addHandler {
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                    mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                )
             NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
             null
         }

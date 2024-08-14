@@ -17,6 +17,8 @@ import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import dev.nx.console.utils.Notifier
@@ -393,7 +395,8 @@ class OldNxGraphBrowser(
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
-                TelemetryService.getInstance(project).featureUsed("Nx Graph Open Project Edge File")
+                TelemetryService.getInstance(project)
+                    .featureUsed(TelemetryEvent.GRAPH_INTERACTION_OPEN_PROJECT_EDGE_FILE)
 
                 val path = Paths.get(project.nxBasePath, msg).toString()
                 val file = LocalFileSystem.getInstance().findFileByPath(path)
@@ -426,7 +429,10 @@ class OldNxGraphBrowser(
             query.addHandler { msg ->
                 cs.launch {
                     TelemetryService.getInstance(project)
-                        .featureUsed("Nx Graph Open Project Config File")
+                        .featureUsed(
+                            TelemetryEvent.MISC_SHOW_PROJECT_CONFIGURATION,
+                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                        )
 
                     project.nxWorkspace()?.workspace?.projects?.get(msg)?.apply {
                         val path = nxProjectConfigurationPath(project, root) ?: return@apply
@@ -455,7 +461,11 @@ class OldNxGraphBrowser(
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
                 cs.launch {
-                    TelemetryService.getInstance(project).featureUsed("Nx Graph Run Task")
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.TASKS_RUN,
+                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                        )
 
                     val (projectName, targetName) = msg.split(":")
                     NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)

@@ -1,7 +1,6 @@
-package dev.nx.console.telemetry.logging
+package dev.nx.console.telemetry
 
 import com.intellij.openapi.diagnostic.logger
-import dev.nx.console.telemetry.Telemetry
 
 class LoggerTelemetryService : Telemetry {
     val logger = logger<LoggerTelemetryService>()

@@ -8,6 +8,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.application
 import dev.nx.console.generate.NxGenerateService
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.launch
@@ -18,7 +20,16 @@ class NxGenerateUiAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Nx Generate UI")
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                TelemetryEvent.GENERATE_UI,
+                mapOf(
+                    "source" to
+                        if (ActionPlaces.isPopupPlace(e.place))
+                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        else TelemetryEventSource.COMMAND
+                )
+            )
 
         val generateService = project.service<NxGenerateService>()
 

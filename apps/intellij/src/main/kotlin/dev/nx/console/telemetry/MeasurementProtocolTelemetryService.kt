@@ -1,4 +1,4 @@
-package dev.nx.console.telemetry.measurementProtocol
+package dev.nx.console.telemetry
 
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.application.ApplicationInfo
@@ -7,9 +7,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.application
 import dev.nx.console.settings.NxConsoleSettingsProvider
-import dev.nx.console.telemetry.Telemetry
-import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.telemetry.TelemetryValues
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -71,7 +68,8 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                     put(
                         "value",
                         PluginManager.getPluginByClass(TelemetryService::class.java)?.version
-                            ?: "0.0.0")
+                            ?: "0.0.0"
+                    )
                 }
             }
             putJsonArray("events") {

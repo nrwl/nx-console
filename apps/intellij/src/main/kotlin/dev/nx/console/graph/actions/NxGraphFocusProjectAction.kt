@@ -9,6 +9,8 @@ import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
@@ -37,7 +39,17 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                TelemetryEvent.GRAPH_FOCUS_PROJECT,
+                mapOf(
+                    "source" to
+                        if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
+                        else if (ActionPlaces.isPopupPlace(e.place))
+                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        else TelemetryEventSource.COMMAND
+                )
+            )
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {

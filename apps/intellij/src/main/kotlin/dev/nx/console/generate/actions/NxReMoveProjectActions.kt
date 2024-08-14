@@ -11,6 +11,7 @@ import dev.nx.console.generate.NxReMoveProjectDialog
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,16 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Nx $mode")
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                if (mode == "move") TelemetryEvent.GENERATE_MOVE
+                else TelemetryEvent.GENERATE_REMOVE,
+                mapOf(
+                    "source" to
+                        if (ActionPlaces.isPopupPlace(e.place)) "explorer-context-menu"
+                        else "command"
+                )
+            )
 
         val path =
             if (ActionPlaces.isPopupPlace(e.place)) {
