@@ -10,14 +10,12 @@ export function getTelemetry() {
   return telemetry;
 }
 
-// using shared memory here is a shortcut, this should be an api call
 export function initTelemetry(production: boolean) {
   const telemetrySender: TelemetrySender = production
     ? new GoogleAnalyticsSender(production)
     : new LoggerSender();
 
   telemetry = env.createTelemetryLogger(telemetrySender, {
-    ignoreUnhandledErrors: true,
     ignoreBuiltInCommonProperties: true,
   });
 

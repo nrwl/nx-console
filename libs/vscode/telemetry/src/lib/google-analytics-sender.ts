@@ -28,7 +28,10 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     );
   }
   sendErrorData(error: Error, data?: Record<string, any>): void {
-    throw new Error('Method not implemented.');
+    this.sendEventData('misc.exception', {
+      ...data,
+      name: error.name,
+    });
   }
 
   private _eventParams() {

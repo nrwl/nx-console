@@ -13,6 +13,6 @@ export class LoggerSender implements TelemetrySender {
     console.log(header(eventName), data);
   }
   sendErrorData(error: Error, data?: Record<string, any>): void {
-    console.log(errorHeader(error.message), data);
+    console.log(errorHeader(error.name), data);
   }
 }
