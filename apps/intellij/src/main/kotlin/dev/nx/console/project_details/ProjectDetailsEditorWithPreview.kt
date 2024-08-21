@@ -12,6 +12,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.sync_services.NxVersionUtil
 import java.util.function.Supplier
@@ -50,7 +52,11 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
                 }
 
                 override fun actionPerformed(e: AnActionEvent) {
-                    TelemetryService.getInstance(project).featureUsed("nx.pdv.refresh")
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                            mapOf("source" to TelemetryEventSource.EDITOR_TOOLBAR)
+                        )
                     NxRefreshWorkspaceAction().actionPerformed(e)
                 }
             }
@@ -64,9 +70,9 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
     override fun onLayoutChange(oldValue: Layout?, newValue: Layout?) {
         super.onLayoutChange(oldValue, newValue)
 
-        // only trigger when user changes the layout, not on first render
-        if (oldValue !== null) {
-            TelemetryService.getInstance(project).featureUsed("nx.pdv.layout.$newValue")
+        // only trigger when user changes to a PDV layout
+        if (oldValue === Layout.SHOW_EDITOR) {
+            TelemetryService.getInstance(project).featureUsed(TelemetryEvent.MISC_OPEN_PDV)
         }
     }
 
