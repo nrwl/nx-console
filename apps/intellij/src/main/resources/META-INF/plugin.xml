@@ -28,6 +28,8 @@
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
+    <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
+
     <!-- Nxls -->
     <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
 
