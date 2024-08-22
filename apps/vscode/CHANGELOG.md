@@ -1,3 +1,10 @@
+# [18.26.0](https://github.com/nrwl/nx-console/compare/vscode-v18.25.1...vscode-v18.26.0) (2024-08-22)
+
+
+### Features
+
+* restructure telemetry and record errors ([#2236](https://github.com/nrwl/nx-console/issues/2236)) ([4dd6761](https://github.com/nrwl/nx-console/commit/4dd67616195cb3b12fc5fe7de3cf3dcd6fe879f0))
+
 ## [18.25.1](https://github.com/nrwl/nx-console/compare/vscode-v18.25.0...vscode-v18.25.1) (2024-08-12)
 
 
