@@ -17,6 +17,7 @@ import dev.nx.console.NxIcons
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.NxGeneralCommandLine
@@ -63,7 +64,7 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                     )
                     return@withContext
                 }
-                TelemetryService.getInstance(project).featureUsed("nx.connectToCloud")
+                TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_CONNECT)
 
                 val commandLine = NxGeneralCommandLine(project, listOf("connect"))
 

@@ -5,7 +5,7 @@ import {
 import { getNxGraphServer } from '@nx-console/vscode/graph-base';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { logAndShowError } from '@nx-console/vscode/output-channels';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { commands, ExtensionContext, ProgressLocation, window } from 'vscode';
 
 const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
@@ -21,7 +21,7 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
 
       isRefreshing = true;
 
-      getTelemetry().featureUsed('nx.refreshWorkspace');
+      getTelemetry().logUsage('misc.refresh-workspace');
 
       window.withProgress(
         {

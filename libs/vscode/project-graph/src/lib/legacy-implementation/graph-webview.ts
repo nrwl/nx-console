@@ -5,7 +5,7 @@ import {
   getProjectGraphOutput,
   hasAffectedProjects,
 } from '@nx-console/vscode/nx-workspace';
-import { getTelemetry, showNoProjectsMessage } from '@nx-console/vscode/utils';
+import { showNoProjectsMessage } from '@nx-console/vscode/utils';
 import {
   commands,
   Disposable,
@@ -22,6 +22,7 @@ import { join } from 'node:path';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
@@ -102,14 +103,16 @@ export class GraphWebView implements Disposable {
         commands.executeCommand('nxConsole.refreshWorkspace');
       }
       if (event.command === 'fileClick') {
-        getTelemetry().featureUsed('nx.graph.openProjectEdgeFile');
+        getTelemetry().logUsage('graph.interaction-open-project-edge-file');
         commands.executeCommand(
           'vscode.open',
           Uri.file(join(workspacePath, event.data))
         );
       }
       if (event.command === 'openProject') {
-        getTelemetry().featureUsed('nx.graph.openProjectConfigFile');
+        getTelemetry().logUsage('misc.show-project-configuration', {
+          source: 'graph-interaction',
+        });
         getNxWorkspaceProjects().then((projects) => {
           const root = projects[event.data]?.root;
           if (!root) return;
@@ -117,7 +120,9 @@ export class GraphWebView implements Disposable {
         });
       }
       if (event.command === 'runTask') {
-        getTelemetry().featureUsed('nx.graph.runTask');
+        getTelemetry().logUsage('tasks.run', {
+          source: 'graph-interaction',
+        });
         CliTaskProvider.instance.executeTask({
           command: 'run',
           positional: event.data,

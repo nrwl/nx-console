@@ -17,6 +17,8 @@ import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeProjectKey
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +54,17 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Show Project Configuration")
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                TelemetryEvent.MISC_SHOW_PROJECT_CONFIGURATION,
+                mapOf(
+                    "source" to
+                        if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
+                        else if (ActionPlaces.isPopupPlace(e.place))
+                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        else TelemetryEventSource.COMMAND
+                )
+            )
 
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 

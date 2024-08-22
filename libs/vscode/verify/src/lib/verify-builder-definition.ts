@@ -2,7 +2,7 @@ import { fileExists } from '@nx-console/shared/file-system';
 import { Option, OptionType } from '@nx-console/shared/schema';
 import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { getTelemetry, readBuilderSchema } from '@nx-console/vscode/utils';
+import { readBuilderSchema } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { window } from 'vscode';
 

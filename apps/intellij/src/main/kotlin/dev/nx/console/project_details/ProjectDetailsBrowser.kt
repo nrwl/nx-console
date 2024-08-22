@@ -26,6 +26,8 @@ import dev.nx.console.models.NxError
 import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.getHexColor
@@ -250,6 +252,11 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         )
                     withContext(Dispatchers.EDT) {
                         if (browser.isDisposed) return@withContext
+                        TelemetryService.getInstance(project)
+                            .featureUsed(
+                                TelemetryEvent.MISC_EXCEPTION,
+                                mapOf("kind" to "PDV_LOAD", "name" to e.javaClass.name)
+                            )
                         val error =
                             NxError(
                                 message = e.message

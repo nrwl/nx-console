@@ -22,12 +22,7 @@ import {
   initNxProjectView,
 } from '@nx-console/vscode/nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
-import {
-  getTelemetry,
-  initTelemetry,
-  watchCodeLensConfigChange,
-  watchFile,
-} from '@nx-console/vscode/utils';
+import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode/utils';
 
 import { fileExists } from '@nx-console/shared/file-system';
 import {
@@ -58,6 +53,7 @@ import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
 import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
+import { initTelemetry, getTelemetry } from '@nx-console/vscode/telemetry';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -102,7 +98,9 @@ export async function activate(c: ExtensionContext) {
     await enableTypeScriptPlugin(context);
     watchCodeLensConfigChange(context);
 
-    getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
+    getTelemetry().logUsage('extension-activate', {
+      timing: (Date.now() - startTime) / 1000,
+    });
   } catch (e) {
     window.showErrorMessage(
       'Nx Console encountered an error when activating (see output panel)'
@@ -118,7 +116,7 @@ export async function deactivate() {
   await stopDaemon();
   await getNxlsClient()?.stop();
   workspaceFileWatcher?.dispose();
-  getTelemetry().extensionDeactivated();
+  getTelemetry().logUsage('extension-deactivate');
 }
 
 // -----------------------------------------------------------------------------

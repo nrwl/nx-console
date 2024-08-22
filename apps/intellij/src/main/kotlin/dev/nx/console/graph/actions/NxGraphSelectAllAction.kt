@@ -3,13 +3,18 @@ package dev.nx.console.graph.actions
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.NxToolWindowPanel
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import javax.swing.Icon
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 open class NxGraphSelectAllAction(
     text: String? = null,
@@ -28,11 +33,20 @@ open class NxGraphSelectAllAction(
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        TelemetryService.getInstance(project).featureUsed("Nx Graph Select All")
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                TelemetryEvent.GRAPH_SHOW_ALL,
+                mapOf(
+                    "source" to
+                        if (e.place == NxToolWindowPanel.NX_TOOLBAR_PLACE)
+                            TelemetryEventSource.PROJECTS_VIEW
+                        else TelemetryEventSource.COMMAND
+                )
+            )
 
-        runWithModalProgressBlocking(project, "Opening Nx Graph") {
-            val nxGraphService = getNxGraphService(project) ?: return@runWithModalProgressBlocking
-            ApplicationManager.getApplication().invokeLater { nxGraphService.selectAllProjects() }
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            val nxGraphService = getNxGraphService(project) ?: return@launch
+            withContext(Dispatchers.EDT) { nxGraphService.selectAllProjects() }
         }
     }
 }

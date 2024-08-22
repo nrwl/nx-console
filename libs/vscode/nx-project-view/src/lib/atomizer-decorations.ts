@@ -1,4 +1,5 @@
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { runNxConnect } from '@nx-console/vscode/nx-cloud-view';
 import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
 import {
   commands,
@@ -11,11 +12,8 @@ import {
   Uri,
   window,
 } from 'vscode';
-import {
-  TargetGroupViewItem,
-  TargetViewItem,
-} from './views/nx-project-base-view';
 import { NxTreeItem } from './nx-tree-item';
+import { TargetViewItem } from './views/nx-project-base-view';
 
 export const ATOMIZED_SCHEME = 'nx-project-view-atomized';
 
@@ -98,7 +96,7 @@ export class AtomizerDecorationProvider implements FileDecorationProvider {
               )
               .then((selection) => {
                 if (selection === 'Connect to Nx Cloud') {
-                  commands.executeCommand('nx.connectToCloud');
+                  runNxConnect('projects-view');
                 }
                 if (selection === 'Learn More') {
                   commands.executeCommand(

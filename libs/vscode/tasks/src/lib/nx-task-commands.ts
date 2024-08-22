@@ -10,10 +10,7 @@ import {
 
 import { readAndParseJson } from '@nx-console/shared/file-system';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import {
-  getTelemetry,
-  resolveDependencyVersioning,
-} from '@nx-console/vscode/utils';
+import { resolveDependencyVersioning } from '@nx-console/vscode/utils';
 
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import {
@@ -22,11 +19,12 @@ import {
 } from '@nx-console/vscode/nx-cli-quickpicks';
 import { logAndShowError } from '@nx-console/vscode/output-channels';
 import { NxTask } from './nx-task';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(`nx.affected`, async () => {
-      getTelemetry().featureUsed('nx.affected');
+      getTelemetry().logUsage('cli.affected');
       const target = await promptForTarget();
       if (!target) {
         return;
@@ -35,7 +33,7 @@ export function registerNxCommands(context: ExtensionContext) {
     }),
     ...['build', 'e2e', 'lint', 'test'].map((target) =>
       commands.registerCommand(`nx.affected.${target}`, () => {
-        getTelemetry().featureUsed(`nx.affected.${target}`);
+        getTelemetry().logUsage(`cli.affected`);
         promptForAffectedFlags(target);
       })
     )
@@ -43,21 +41,21 @@ export function registerNxCommands(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand('nx.run-many', () => {
-      getTelemetry().featureUsed('nx.run-many');
+      getTelemetry().logUsage('tasks.run-many');
       promptForRunMany();
     })
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.list', () => {
-      getTelemetry().featureUsed('nx.list');
+      getTelemetry().logUsage('cli.list');
       promptForList();
     })
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.migrate', () => {
-      getTelemetry().featureUsed('nx.migrate');
+      getTelemetry().logUsage('cli.migrate');
       promptForMigrate();
     })
   );
@@ -149,9 +147,6 @@ async function promptForList() {
 }
 
 async function promptForMigrate() {
-  const telemetry = getTelemetry();
-  telemetry.featureUsed('migrate command');
-
   const workspacePath = getNxWorkspacePath();
 
   if (!workspacePath) {

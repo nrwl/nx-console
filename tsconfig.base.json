@@ -110,6 +110,7 @@
         "libs/vscode/project-graph/src/index.ts"
       ],
       "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
+      "@nx-console/vscode/telemetry": ["libs/vscode/telemetry/src/index.ts"],
       "@nx-console/vscode/typescript-plugin": [
         "libs/vscode/typescript-plugin/src/index.ts"
       ],

@@ -32,6 +32,9 @@ import dev.nx.console.run.actions.NxConnectService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.*
 import java.awt.event.ActionEvent
@@ -150,6 +153,11 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             action =
                                 object : AbstractAction("Refresh Workspace") {
                                     override fun actionPerformed(e: java.awt.event.ActionEvent?) {
+                                        TelemetryService.getInstance(project)
+                                            .featureUsed(
+                                                TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                                                mapOf("source" to TelemetryEventSource.WELCOME_VIEW)
+                                            )
                                         NxRefreshWorkspaceService.getInstance(project)
                                             .refreshWorkspace()
                                     }
@@ -348,6 +356,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                         isFocusPainted = false
                                         cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
                                         addActionListener {
+                                            TelemetryService.getInstance(project)
+                                                .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
                                             Desktop.getDesktop()
                                                 .browse(
                                                     URI.create(nxCloudUrl ?: "https://cloud.nx.app")

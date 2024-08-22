@@ -1,15 +1,14 @@
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
-  getNxWorkspace,
   getProjectByRoot,
   getSourceMapFilesToProjectMap,
   getTargetsForConfigFile,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   NxCodeLensProvider,
-  getTelemetry,
   registerCodeLensProvider,
 } from '@nx-console/vscode/utils';
 import { relative } from 'path';
@@ -24,16 +23,13 @@ import {
 import {
   CancellationToken,
   CodeLens,
-  CodeLensProvider,
+  Event,
+  EventEmitter,
   ExtensionContext,
   Range,
   TextDocument,
   commands,
-  languages,
   window,
-  Event,
-  EventEmitter,
-  DocumentSelector,
 } from 'vscode';
 
 const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
@@ -223,7 +219,9 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
       commands.registerCommand(
         CODELENS_RUN_TARGET_COMMAND,
         (project: string, target: string) => {
-          getTelemetry().featureUsed('nx.config-file-codelens.run-target');
+          getTelemetry().logUsage('tasks.run', {
+            source: 'codelens',
+          });
           CliTaskProvider.instance.executeTask({
             command: 'run',
             positional: `${project}:${target}`,
@@ -240,10 +238,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
         projectName: string,
         fileName: string
       ) => {
-        getTelemetry().featureUsed(
-          'nx.config-file-codelens.run-target-quickpick',
-          { fileName }
-        );
+        getTelemetry().logUsage('misc.open-project-details-codelens');
 
         if (targets.length === 0) {
           window

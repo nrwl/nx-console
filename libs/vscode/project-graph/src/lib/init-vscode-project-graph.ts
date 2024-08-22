@@ -8,10 +8,7 @@ import {
   getNxWorkspaceProjects,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import {
-  getTelemetry,
-  showNoProjectAtPathMessage,
-} from '@nx-console/vscode/utils';
+import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { gte } from 'semver';
 import { ExtensionContext, Uri, commands, window } from 'vscode';
@@ -29,6 +26,7 @@ import {
 } from './legacy-implementation/project-graph';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 let _graphWebviewManager: GraphWebviewManager | undefined;
 
@@ -47,7 +45,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
     graphWebviewManager,
     legacyGrapyWebView,
     commands.registerCommand('nx.graph.showAll', async () => {
-      getTelemetry().featureUsed('nx.graph.showAll');
+      getTelemetry().logUsage('graph.show-all');
       const nxVersion = await getNxVersion();
       if (!nxVersion) {
         showNoNxVersionMessage();
@@ -60,7 +58,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
       }
     }),
     commands.registerCommand('nx.graph.showAffected', async () => {
-      getTelemetry().featureUsed('nx.graph.showAffected');
+      getTelemetry().logUsage('graph.show-affected');
       const nxVersion = await getNxVersion();
       if (!nxVersion) {
         showNoNxVersionMessage();
@@ -73,7 +71,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
       }
     }),
     commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
-      getTelemetry().featureUsed('nx.graph.focus');
+      getTelemetry().logUsage('graph.focus-project', {
+        source: uri ? 'explorer-context-menu' : 'command',
+      });
       const nxVersion = await getNxVersion();
       if (!nxVersion) {
         showNoNxVersionMessage();
@@ -90,7 +90,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
       }
     }),
     commands.registerCommand('nx.graph.select', async (uri: Uri) => {
-      getTelemetry().featureUsed('nx.graph.select');
+      getTelemetry().logUsage('graph.select-project', {
+        source: uri ? 'explorer-context-menu' : 'command',
+      });
       const nxVersion = await getNxVersion();
       if (!nxVersion) {
         showNoNxVersionMessage();
@@ -109,7 +111,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
     commands.registerCommand(
       'nx.graph.focus.button',
       async (treeItem: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.graph.focus.button');
+        getTelemetry().logUsage('graph.focus-project', {
+          source: 'projects-view',
+        });
         const nxVersion = await getNxVersion();
         if (!nxVersion) {
           showNoNxVersionMessage();
@@ -128,7 +132,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
     commands.registerCommand(
       'nx.graph.select.button',
       async (treeItem: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.graph.focus.button');
+        getTelemetry().logUsage('graph.select-project', {
+          source: 'projects-view',
+        });
         const nxVersion = await getNxVersion();
         if (!nxVersion) {
           showNoNxVersionMessage();
@@ -145,7 +151,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
       }
     ),
     commands.registerCommand('nx.graph.task', async (uri: Uri | undefined) => {
-      getTelemetry().featureUsed('nx.graph.task');
+      getTelemetry().logUsage('graph.show-task', {
+        source: uri ? 'explorer-context-menu' : 'command',
+      });
       const nxVersion = await getNxVersion();
       if (!nxVersion) {
         showNoNxVersionMessage();
@@ -177,7 +185,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
       async (
         item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
       ) => {
-        getTelemetry().featureUsed('nx.graph.task.button');
+        getTelemetry().logUsage('graph.show-task', {
+          source: 'projects-view',
+        });
         const nxVersion = await getNxVersion();
         if (!nxVersion) {
           showNoNxVersionMessage();

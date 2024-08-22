@@ -4,13 +4,15 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
-import dev.nx.console.telemetry.logging.LoggerTelemetryService
-import dev.nx.console.telemetry.measurementProtocol.MeasurementProtocolService
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+interface Telemetry {
+    suspend fun featureUsed(feature: String, data: Map<String, Any>? = null)
+}
 
 @Service(Service.Level.PROJECT)
 class TelemetryService(private val cs: CoroutineScope) {
@@ -40,15 +42,17 @@ class TelemetryService(private val cs: CoroutineScope) {
             )
         }
 
-    fun featureUsed(feature: String) {
-        cs.launch { service.featureUsed(feature) }
-    }
-
-    fun extensionActivated(time: Int) {
-        cs.launch { service.extensionActivated(time) }
-    }
-
-    fun extensionDeactivated(time: Int) {
-        cs.launch { service.extensionDeactivated(time) }
+    fun featureUsed(feature: TelemetryEvent, data: Map<String, Any>? = null) {
+        val source = data?.get("source")
+        if (
+            source != null &&
+                source is String &&
+                TelemetryEventSource.isValidSource(source) &&
+                application.isInternal
+        ) {
+            logger.error("source has to be of type TelemetryEventSource")
+            return
+        }
+        cs.launch { service.featureUsed(feature.eventName, data) }
     }
 }

@@ -9,9 +9,9 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   NxCodeLensProvider,
-  getTelemetry,
   registerCodeLensProvider,
 } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
@@ -146,7 +146,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
 }
 
 function showProjectDetailsQuickpick(project: ProjectConfiguration) {
-  getTelemetry().featureUsed('nx.open-project-details-codelens');
+  getTelemetry().logUsage('misc.open-project-details-codelens');
   const quickPick = window.createQuickPick();
   const targetItems: QuickPickItem[] = Object.entries(
     project.targets ?? {}

@@ -1,5 +1,4 @@
 export * from './lib/abstract-tree-provider';
-export * from './lib/telemetry';
 export * from './lib/read-projects';
 export * from './lib/empty-state-messages';
 export { watchFile } from './lib/watch-file';

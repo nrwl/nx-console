@@ -2,7 +2,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { join } from 'path';
 import { commands, ShellExecution, Task, tasks, TaskScope, Uri } from 'vscode';
 import { importNxPackagePath } from '@nx-console/shared/npm';
@@ -12,7 +12,7 @@ export async function handleGraphInteractionEventBase(event: {
   payload: any;
 }): Promise<boolean> {
   if (event.type === 'file-click') {
-    getTelemetry().featureUsed('nx.graph.openProjectEdgeFile');
+    getTelemetry().logUsage('graph.interaction-open-project-edge-file');
     const workspacePath = getNxWorkspacePath();
 
     commands.executeCommand(
@@ -23,7 +23,9 @@ export async function handleGraphInteractionEventBase(event: {
   }
   if (event.type === 'open-project-config') {
     const projectName = event.payload.projectName;
-    getTelemetry().featureUsed('nx.graph.openProjectConfigFile');
+    getTelemetry().logUsage('misc.show-project-configuration', {
+      source: 'graph-interaction',
+    });
     getNxWorkspaceProjects().then((projects) => {
       const root = projects[projectName]?.root;
       if (!root) return;
@@ -32,7 +34,9 @@ export async function handleGraphInteractionEventBase(event: {
     return true;
   }
   if (event.type === 'run-task') {
-    getTelemetry().featureUsed('nx.graph.runTask');
+    getTelemetry().logUsage('tasks.run', {
+      source: 'graph-interaction',
+    });
     CliTaskProvider.instance.executeTask({
       command: 'run',
       positional: event.payload.taskId,
@@ -42,7 +46,7 @@ export async function handleGraphInteractionEventBase(event: {
   }
 
   if (event.type === 'run-help') {
-    getTelemetry().featureUsed('nx.graph.runHelp');
+    getTelemetry().logUsage('graph.interaction-run-help');
     const workspacePath = getNxWorkspacePath();
     const projectName = event.payload.projectName;
     const cmd = event.payload.helpCommand;
@@ -79,6 +83,9 @@ export async function handleGraphInteractionEventBase(event: {
   }
 
   if (event.type === 'nx-connect') {
+    getTelemetry().logUsage('cloud.connect', {
+      source: 'graph-interaction',
+    });
     commands.executeCommand('nx.connectToCloud');
     return true;
   }
