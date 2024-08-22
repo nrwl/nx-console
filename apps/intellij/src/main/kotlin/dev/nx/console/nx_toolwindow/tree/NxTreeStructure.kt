@@ -21,10 +21,6 @@ import com.intellij.ui.treeStructure.NullNode
 import com.intellij.ui.treeStructure.SimpleNode
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
-import dev.nx.console.graph.actions.NxGraphFocusProjectAction
-import dev.nx.console.graph.actions.NxGraphFocusTaskAction
-import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
-import dev.nx.console.ide.ShowNxProjectConfigurationAction
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nx_toolwindow.tree.builder.NxFolderTreeBuilder
 import dev.nx.console.nx_toolwindow.tree.builder.NxListTreeBuilder
@@ -95,8 +91,9 @@ class NxTreeStructure(
 
     // Tree Node Actions
     private fun installPopupActions() {
-        val nxConnectAction =
-            ActionManager.getInstance().getAction("dev.nx.console.run.actions.NxConnectAction")
+        val actionManager = ActionManager.getInstance()
+
+        val nxConnectAction = actionManager.getAction("dev.nx.console.run.actions.NxConnectAction")
         val actionList: MutableList<AnAction> =
             mutableListOf(
                 RunAction(),
@@ -105,15 +102,17 @@ class NxTreeStructure(
                 LearnMoreAboutAtomizerAction(),
                 nxConnectAction,
                 Separator(),
-                ShowNxProjectConfigurationAction(),
-                NxGraphFocusProjectAction(),
-                NxGraphFocusTaskGroupAction(),
-                NxGraphFocusTaskAction()
+                actionManager.getAction("dev.nx.console.ide.ShowNxProjectConfigurationAction"),
+                actionManager.getAction("dev.nx.console.graph.actions.NxGraphFocusProjectAction"),
+                actionManager.getAction("dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"),
+                actionManager.getAction("dev.nx.console.graph.actions.NxGraphFocusTaskAction"),
+                actionManager.getAction("dev.nx.console.generate.actions.NxMoveProjectAction"),
+                actionManager.getAction("dev.nx.console.generate.actions.NxRemoveProjectAction")
             )
 
-        val copyAction = ActionManager.getInstance().getAction("\$Copy")
+        val copyAction = actionManager.getAction("\$Copy")
         copyAction?.registerCustomShortcutSet(copyAction.shortcutSet, this.tree)
-        val copyPathsAction = ActionManager.getInstance().getAction("CopyPaths")
+        val copyPathsAction = actionManager.getAction("CopyPaths")
         if (copyPathsAction != null) {
             actionList.add(copyPathsAction)
         }
