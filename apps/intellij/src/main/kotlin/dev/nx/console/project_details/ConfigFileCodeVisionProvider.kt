@@ -6,7 +6,6 @@ import com.intellij.codeInsight.codeVision.*
 import com.intellij.codeInsight.codeVision.settings.CodeVisionGroupSettingProvider
 import com.intellij.codeInsight.codeVision.ui.model.ClickableTextCodeVisionEntry
 import com.intellij.icons.AllIcons
-import com.intellij.icons.ExpUiIcons
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonProperty
 import com.intellij.lang.ecmascript6.psi.JSExportAssignment
@@ -132,7 +131,7 @@ class ProjectLevelConfigFileCodeVisionManager(
                             ClickableTextCodeVisionEntry(
                                 "Run $nxProjectName targets via Nx",
                                 providerId = ConfigFileCodeVisionProvider.ID,
-                                icon = ExpUiIcons.Run.Run,
+                                icon = AllIcons.Actions.Execute,
                                 onClick = { _, _ ->
                                     val popup =
                                         createSelectTargetPopup(
@@ -156,7 +155,7 @@ class ProjectLevelConfigFileCodeVisionManager(
                             ClickableTextCodeVisionEntry(
                                 "Run ${nxProjectName}:${targets[0]} via Nx",
                                 providerId = ConfigFileCodeVisionProvider.ID,
-                                icon = ExpUiIcons.Run.Run,
+                                icon = AllIcons.Actions.Execute,
                                 onClick = { _, _ ->
                                     NxTaskExecutionManager.getInstance(project)
                                         .execute(nxProjectName, targets[0])
@@ -237,7 +236,7 @@ class ProjectLevelConfigFileCodeVisionManager(
                     ClickableTextCodeVisionEntry(
                         targetsString,
                         providerId = ConfigFileCodeVisionProvider.ID,
-                        icon = ExpUiIcons.Run.Run,
+                        icon = AllIcons.Actions.Execute,
                         onClick = { _, _ ->
                             val popup =
                                 createSelectTargetPopup(
