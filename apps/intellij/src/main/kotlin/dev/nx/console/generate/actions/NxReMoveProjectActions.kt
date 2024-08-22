@@ -1,5 +1,6 @@
 package dev.nx.console.generate.actions
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -10,7 +11,10 @@ import dev.nx.console.generate.NxGenerateService
 import dev.nx.console.generate.NxReMoveProjectDialog
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
+import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
@@ -22,10 +26,38 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
         require(mode == "move" || mode == "remove")
     }
 
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+
+        // if we are in the toolwindow tree but not on a project node, hide the action
+        val nxTreeNode = e.getData(NxTreeNodeKey) ?: return
+        if (nxTreeNode !is NxSimpleNode.Project) {
+            e.presentation.isEnabledAndVisible = false
+        }
+    }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Nx $mode")
+        TelemetryService.getInstance(project)
+            .featureUsed(
+                if (mode == "move") TelemetryEvent.GENERATE_MOVE
+                else TelemetryEvent.GENERATE_REMOVE,
+                mapOf(
+                    "source" to
+                        if (ActionPlaces.isPopupPlace(e.place)) "explorer-context-menu"
+                        else "command"
+                )
+            )
+
+        val nxProjectNameFromEventData =
+            e.getData(NxTreeNodeKey)?.let {
+                if (it is NxSimpleNode.Project) {
+                    it.nxProjectName
+                } else {
+                    null
+                }
+            }
 
         val path =
             if (ActionPlaces.isPopupPlace(e.place)) {
@@ -35,11 +67,15 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
             }
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            selectOptionsAndRun(path, project)
+            val projectName =
+                nxProjectNameFromEventData
+                    ?: path?.let { NxlsService.getInstance(project).projectByPath(path)?.name }
+
+            selectOptionsAndRun(projectName, project)
         }
     }
 
-    private suspend fun selectOptionsAndRun(path: String?, project: Project) {
+    private suspend fun selectOptionsAndRun(preselectedProjectName: String?, project: Project) {
         val nxlsService = NxlsService.getInstance(project)
 
         val projectsWithType =
@@ -65,8 +101,6 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
             )
         }
 
-        val moveGeneratorContext = path?.let { nxlsService.generatorContextFromPath(path = path) }
-
         val runGeneratorManager = RunGeneratorManager(project)
 
         withContext(Dispatchers.EDT) {
@@ -75,7 +109,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                     project,
                     mode,
                     moveGenerators,
-                    moveGeneratorContext,
+                    preselectedProjectName,
                     projectsWithType,
                     workspaceLayoutPair
                 ) {
@@ -107,6 +141,20 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     }
 }
 
-class NxMoveProjectAction() : NxReMoveProjectActionBase("move") {}
+class NxMoveProjectAction() : NxReMoveProjectActionBase("move") {
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+        if (ActionPlaces.isPopupPlace(e.place) || e.place == "NxToolWindow") {
+            e.presentation.icon = null
+        }
+    }
+}
 
-class NxRemoveProjectAction() : NxReMoveProjectActionBase("remove") {}
+class NxRemoveProjectAction() : NxReMoveProjectActionBase("remove") {
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+        if (ActionPlaces.isPopupPlace(e.place) || e.place == "NxToolWindow") {
+            e.presentation.icon = AllIcons.Actions.GC
+        }
+    }
+}

@@ -12,10 +12,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.sync_services.NxVersionUtil
 import java.util.function.Supplier
 
-class ProjectDetailsEditorWithPreview(project: Project, file: VirtualFile) :
+class ProjectDetailsEditorWithPreview(private val project: Project, file: VirtualFile) :
     TextEditorWithPreview(createEditor(project, file), createPreviewComponent(project, file)),
     DumbAware {
     init {
@@ -49,6 +52,11 @@ class ProjectDetailsEditorWithPreview(project: Project, file: VirtualFile) :
                 }
 
                 override fun actionPerformed(e: AnActionEvent) {
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                            mapOf("source" to TelemetryEventSource.EDITOR_TOOLBAR)
+                        )
                     NxRefreshWorkspaceAction().actionPerformed(e)
                 }
             }
@@ -57,6 +65,15 @@ class ProjectDetailsEditorWithPreview(project: Project, file: VirtualFile) :
             HalfConditionalActionGroup(viewActions, arrayOf(refreshAction)) { !isShowActionsInTabs }
         return ActionManager.getInstance()
             .createActionToolbar(ActionPlaces.TEXT_EDITOR_WITH_PREVIEW, viewActionsGroup, true)
+    }
+
+    override fun onLayoutChange(oldValue: Layout?, newValue: Layout?) {
+        super.onLayoutChange(oldValue, newValue)
+
+        // only trigger when user changes to a PDV layout
+        if (oldValue === Layout.SHOW_EDITOR) {
+            TelemetryService.getInstance(project).featureUsed(TelemetryEvent.MISC_OPEN_PDV)
+        }
     }
 
     companion object {

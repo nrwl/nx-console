@@ -13,7 +13,6 @@ import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.util.applyIf
-import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.WorkspaceLayout
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
@@ -23,11 +22,11 @@ import javax.swing.JEditorPane
 
 class NxReMoveProjectDialog(
     val project: Project,
-    val mode: String,
-    val reMoveGenerators: List<String>,
-    val reMoveGeneratorContext: NxGeneratorContext?,
-    val projectOptions: Map<String, String>?,
-    val workspaceLayout: WorkspaceLayout?,
+    private val mode: String,
+    private val reMoveGenerators: List<String>,
+    private val preselectedProjectName: String?,
+    private val projectOptions: Map<String, String>?,
+    private val workspaceLayout: WorkspaceLayout?,
     val dryRunCallback: (dialog: NxReMoveProjectDialog) -> Unit
 ) : DialogWrapper(project) {
 
@@ -58,7 +57,7 @@ class NxReMoveProjectDialog(
     override fun createCenterPanel(): JComponent {
         val model =
             ReMoveProjectDialogModel(
-                reMoveGeneratorContext?.project ?: "",
+                preselectedProjectName ?: "",
                 reMoveGenerators.find {
                     it.contains("@nx/workspace") || it.contains("@nrwl/workspace")
                 }
@@ -74,7 +73,7 @@ class NxReMoveProjectDialog(
                                         project,
                                         projectOptions?.keys ?: emptyList(),
                                         false,
-                                        reMoveGeneratorContext?.project
+                                        preselectedProjectName
                                     )
                                     .apply {
                                         cell(this)
@@ -85,9 +84,7 @@ class NxReMoveProjectDialog(
                                             )
                                             .comment(getShortcutHint())
                                             .align(AlignX.FILL)
-                                            .applyIf(
-                                                reMoveGeneratorContext?.project.isNullOrEmpty()
-                                            ) {
+                                            .applyIf(preselectedProjectName.isNullOrEmpty()) {
                                                 focused()
                                             }
 
@@ -124,9 +121,7 @@ class NxReMoveProjectDialog(
                                 textField()
                                     .bindText(model::directory)
                                     .align(AlignX.FILL)
-                                    .applyIf(!reMoveGeneratorContext?.project.isNullOrEmpty()) {
-                                        focused()
-                                    }
+                                    .applyIf(!preselectedProjectName.isNullOrEmpty()) { focused() }
                                     .component
                         }
                         .visible(mode == "move")

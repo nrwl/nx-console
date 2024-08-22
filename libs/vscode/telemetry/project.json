@@ -1,0 +1,9 @@
+{
+  "name": "telemetry",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/telemetry/src",
+  "projectType": "library",
+  "tags": ["type:vscode"],
+  "// targets": "to see all targets run: nx show project telemetry --web",
+  "targets": {}
+}

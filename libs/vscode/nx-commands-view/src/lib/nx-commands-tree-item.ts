@@ -87,7 +87,7 @@ export class NxCommandsTreeItem extends TreeItem {
       case 'generate':
         return {
           title: 'Generate',
-          command: 'nx.generate.ui',
+          command: 'nx.generate.ui.nx-commands-view',
           tooltip: 'Generate (UI)',
         };
       case 'add-dependency':

@@ -8,10 +8,7 @@ import {
   getProjectByPath,
   getSourceMapFilesToProjectMap,
 } from '@nx-console/vscode/nx-workspace';
-import {
-  getTelemetry,
-  showNoProjectAtPathMessage,
-} from '@nx-console/vscode/utils';
+import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { dirname, join } from 'path';
 import { gte } from 'semver';
 import {
@@ -28,6 +25,7 @@ import { ProjectDetailsCodelensProvider } from './project-details-codelens-provi
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -66,7 +64,7 @@ function registerCommand(context: ExtensionContext) {
         );
         if (!isEnabled) return;
         const nxVersion = await getNxVersion();
-        getTelemetry().featureUsed('nx.open-pdv');
+        getTelemetry().logUsage('misc.open-pdv');
 
         if (!nxVersion) {
           showNoNxVersionMessage();

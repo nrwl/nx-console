@@ -8,13 +8,14 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { getTelemetry, showNoProjectsMessage } from '@nx-console/vscode/utils';
+import { showNoProjectsMessage } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export function legacyShowAll(graphWebView: GraphWebView) {
   graphWebView.showAllProjects();
@@ -91,25 +92,29 @@ export function projectGraph() {
   return Disposable.from(
     graphWebView,
     commands.registerCommand('nx.graph.showAll', () => {
-      getTelemetry().featureUsed('nx.graph.showAll');
+      getTelemetry().logUsage('graph.show-all');
       graphWebView.showAllProjects();
     }),
     commands.registerCommand('nx.graph.showAffected', () => {
-      getTelemetry().featureUsed('nx.graph.showAffected');
+      getTelemetry().logUsage('graph.show-affected');
       graphWebView.showAffectedProjects();
     }),
     commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
-      getTelemetry().featureUsed('nx.graph.focus');
+      getTelemetry().logUsage('graph.focus-project', {
+        source: uri ? 'explorer-context-menu' : 'command',
+      });
       await openProjectWithFile(graphWebView, uri, MessageType.focus);
     }),
     commands.registerCommand('nx.graph.select', async (uri: Uri) => {
-      getTelemetry().featureUsed('nx.graph.select');
+      getTelemetry().logUsage('graph.select-project');
       await openProjectWithFile(graphWebView, uri, MessageType.select);
     }),
     commands.registerCommand(
       'nx.graph.focus.button',
       async (treeItem: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.graph.focus.button');
+        getTelemetry().logUsage('graph.focus-project', {
+          source: 'projects-view',
+        });
         const project = getProjectItem(treeItem);
         if (project) {
           graphWebView.projectInWebview(
@@ -123,7 +128,9 @@ export function projectGraph() {
     commands.registerCommand(
       'nx.graph.select.button',
       async (treeItem: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.graph.focus.button');
+        getTelemetry().logUsage('graph.select-project', {
+          source: 'projects-view',
+        });
         const project = getProjectItem(treeItem);
         if (project) {
           graphWebView.projectInWebview(
@@ -135,7 +142,7 @@ export function projectGraph() {
       }
     ),
     commands.registerCommand('nx.graph.task', async (uri: Uri | undefined) => {
-      getTelemetry().featureUsed('nx.graph.task');
+      getTelemetry().logUsage('graph.show-task');
       await openProjectWithFile(graphWebView, uri, MessageType.task);
     }),
     commands.registerCommand(
@@ -143,7 +150,9 @@ export function projectGraph() {
       async (
         item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
       ) => {
-        getTelemetry().featureUsed('nx.graph.task.button');
+        getTelemetry().logUsage('graph.show-task', {
+          source: 'projects-view',
+        });
 
         if (item instanceof NxTreeItem) {
           const project = getTaskItem(item);

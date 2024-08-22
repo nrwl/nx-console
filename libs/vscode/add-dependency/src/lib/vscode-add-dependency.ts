@@ -6,7 +6,6 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import {
   getShellExecutionForConfig,
-  getTelemetry,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 import { existsSync } from 'fs';
@@ -28,6 +27,7 @@ import { major } from 'semver';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { importNxPackagePath } from '@nx-console/shared/npm';
 import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -70,7 +70,7 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
 
     if (dep) {
       const quickInput = showLoadingQuickInput(dep);
-      getTelemetry().featureUsed('add-dependency');
+      getTelemetry().logUsage('misc.add-dependency');
       await addDependency(dep, version, installAsDevDependency, workspacePath);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (

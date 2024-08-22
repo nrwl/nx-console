@@ -23,6 +23,7 @@ import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.xdebugger.impl.XDebuggerManagerImpl
+import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 
@@ -115,10 +116,10 @@ class NxCommandLineState(
             }
 
             TelemetryService.getInstance(project)
-                .featureUsed("Nx Run - from context menu/target list/codelens - debug")
+                .featureUsed(TelemetryEvent.TASKS_RUN, mapOf("debug" to true))
         } else {
             TelemetryService.getInstance(project)
-                .featureUsed("Nx Run - from context menu/target list/codelens")
+                .featureUsed(TelemetryEvent.TASKS_RUN, mapOf("debug" to false))
         }
 
         val targetRun =
