@@ -1,3 +1,16 @@
+## 1.29.0 (2024-08-22)
+
+### Bug Fixes
+
+* **intellij:** add telemetry to open & refresh PDV actions ([#2234](https://github.com/nrwl/nx-console/issues/2234)) ([5d417c0](https://github.com/nrwl/nx-console/commit/5d417c00b9857ac6355e126d14ec94e1c3978b1a))
+
+
+### Features
+
+* **intellij:** enable error report submissions via jetbrains exception analyzer ([#2237](https://github.com/nrwl/nx-console/issues/2237)) ([b817174](https://github.com/nrwl/nx-console/commit/b817174fdc7c8751a6038992c90954bc60e3abd8))
+* **intellij:** make (re)move project actions available in toolwindow context menu ([#2238](https://github.com/nrwl/nx-console/issues/2238)) ([443ff4c](https://github.com/nrwl/nx-console/commit/443ff4c965735c31d8c1cc9db468cd2d196fe2e5))
+* restructure telemetry and record errors ([#2236](https://github.com/nrwl/nx-console/issues/2236)) ([4dd6761](https://github.com/nrwl/nx-console/commit/4dd67616195cb3b12fc5fe7de3cf3dcd6fe879f0))
+
 ## <small>1.28.3 (2024-08-12)</small>
 
 ### Bug Fixes
