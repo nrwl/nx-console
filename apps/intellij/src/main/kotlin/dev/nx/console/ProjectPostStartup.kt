@@ -5,6 +5,7 @@ import com.intellij.openapi.startup.ProjectActivity
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
+import dev.nx.console.telemetry.ExtensionLevelErrorTelemetry
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
@@ -40,5 +41,7 @@ internal class ProjectPostStartup : ProjectActivity {
 
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.EXTENSION_ACTIVATE, mapOf("timing" to 0))
+
+        ExtensionLevelErrorTelemetry.getInstance(project).listen()
     }
 }
