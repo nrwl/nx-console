@@ -79,24 +79,22 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                     }
                         ?: false
 
-                withContext(Dispatchers.EDT) {
-                    if (
-                        !errorsToShow.isNullOrEmpty() &&
-                            (nxWorkspace?.isPartial != true ||
-                                !hasProjects ||
-                                nxWorkspace.nxVersion.major < 19 ||
-                                needsNonExistentProject)
-                    ) {
-                        wrappedBrowserLoadHtml(getErrorHtml(errorsToShow))
-                        registerResetHandler()
-                    } else {
-                        wrappedBrowserLoadHtml(
-                            loadGraphHtmlBase(),
-                        )
-                        registerInteractionEventHandler()
-                        if (lastGraphCommand != null) {
-                            replayLastCommand()
-                        }
+                if (
+                    !errorsToShow.isNullOrEmpty() &&
+                        (nxWorkspace?.isPartial != true ||
+                            !hasProjects ||
+                            nxWorkspace.nxVersion.major < 19 ||
+                            needsNonExistentProject)
+                ) {
+                    val errorHtml = getErrorHtml(errorsToShow)
+                    withContext(Dispatchers.EDT) { wrappedBrowserLoadHtml(errorHtml) }
+                    registerResetHandler()
+                } else {
+                    val graphHtml = loadGraphHtmlBase()
+                    withContext(Dispatchers.EDT) { wrappedBrowserLoadHtml(graphHtml) }
+                    registerInteractionEventHandler()
+                    if (lastGraphCommand != null) {
+                        replayLastCommand()
                     }
                 }
             }
