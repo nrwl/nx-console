@@ -11,7 +11,7 @@ export async function selectReMoveGenerator(
 
   if (!generators || !generators.length) {
     window.showWarningMessage(
-      `No ${target} generator found. Did you run npm/pnpm/yarn install?`
+      `No generators found in your workspace. Did you run npm/pnpm/yarn install?`
     );
     return;
   }
@@ -19,6 +19,13 @@ export async function selectReMoveGenerator(
   const reMoveGenerators = generators.filter(
     (generator) => generator.data?.name === target
   );
+
+  if (!reMoveGenerators.length) {
+    window.showWarningMessage(
+      `No ${target} generator found. Did you run npm/pnpm/yarn install?`
+    );
+    return;
+  }
 
   if (reMoveGenerators.length === 1) {
     return reMoveGenerators[0].name;

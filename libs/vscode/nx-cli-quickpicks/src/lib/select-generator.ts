@@ -1,7 +1,7 @@
+import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import {
-  Generator,
+  GeneratorCollectionInfo,
   GeneratorType,
-  TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { matchWithWildcards } from '@nx-console/shared/utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
@@ -10,97 +10,9 @@ import {
   getGenerators,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
+import { showNoGeneratorsMessage } from '@nx-console/vscode/utils';
 import { QuickPickItem, window } from 'vscode';
 import { selectFlags } from './select-flags';
-import { showNoGeneratorsMessage } from '@nx-console/vscode/utils';
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-
-export async function selectGenerator(
-  generatorType?: GeneratorType,
-  generator?: { collection: string; name: string }
-): Promise<TaskExecutionSchema | undefined> {
-  interface GenerateQuickPickItem extends QuickPickItem {
-    collectionName: string;
-    generator: Generator;
-    generatorName: string;
-    collectionPath: string;
-  }
-  const generators = (await getGenerators()) ?? [];
-  let generatorsQuickPicks = generators
-    .filter((collection) => !!collection.data)
-    .map((collection): GenerateQuickPickItem => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const generatorData = collection.data!;
-      return {
-        description: generatorData.description,
-        label: `${generatorData.collection} - ${generatorData.name}`,
-        generatorName: `${generatorData.collection}:${generatorData.name}`,
-        collectionName: generatorData.collection,
-        collectionPath: collection.schemaPath,
-        generator: generatorData,
-      };
-    });
-
-  if (GlobalConfigurationStore.instance.get('enableGeneratorFilters') ?? true) {
-    const allowlist: string[] =
-      GlobalConfigurationStore.instance.get('generatorAllowlist') ?? [];
-    const blocklist: string[] =
-      GlobalConfigurationStore.instance.get('generatorBlocklist') ?? [];
-
-    if (allowlist.length > 0) {
-      generatorsQuickPicks = generatorsQuickPicks.filter((item) =>
-        allowlist.find((rule) => matchWithWildcards(item.generatorName, rule))
-      );
-    }
-
-    if (blocklist.length > 0) {
-      generatorsQuickPicks = generatorsQuickPicks.filter(
-        (item) =>
-          !blocklist.find((rule) =>
-            matchWithWildcards(item.generatorName, rule)
-          )
-      );
-    }
-  }
-
-  if (generatorType) {
-    generatorsQuickPicks = generatorsQuickPicks.filter((generator) => {
-      return generator.generator.type === generatorType;
-    });
-  }
-
-  if (!generators || !generators.length) {
-    showNoGeneratorsMessage();
-    return;
-  }
-  const selection = generator
-    ? generatorsQuickPicks.find(
-        (quickPick) =>
-          quickPick.generator.collection === generator.collection &&
-          quickPick.generator.name === generator.name
-      )
-    : generatorsQuickPicks.length > 1
-    ? await window.showQuickPick(generatorsQuickPicks)
-    : generatorsQuickPicks[0];
-  if (selection) {
-    const options =
-      selection.generator.options ||
-      ((await getGeneratorOptions({
-        collection: selection.collectionName,
-        name: selection.generator.name,
-        path: selection.collectionPath,
-      })) ??
-        []);
-    const positional = selection.generatorName;
-    return {
-      ...selection.generator,
-      options,
-      command: 'generate',
-      positional,
-    };
-  }
-  return;
-}
 
 export async function selectGeneratorAndPromptForFlags(
   preselectedGenerator?: string,
@@ -118,13 +30,10 @@ export async function selectGeneratorAndPromptForFlags(
     return;
   }
 
-  let selection: GeneratorSchema | undefined;
-  if (preselectedGenerator) {
-    selection = await getGenerator(preselectedGenerator);
-  } else {
-    const g = await selectGenerator();
-    selection = g ? toGeneratorSchema(g) : undefined;
-  }
+  const selection: GeneratorSchema | undefined = await getOrSelectGenerator(
+    preselectedGenerator
+  );
+
   if (!selection) {
     return;
   }
@@ -145,7 +54,7 @@ export async function selectGeneratorAndPromptForFlags(
   };
 }
 
-export async function getGenerator(
+export async function getOrSelectGenerator(
   generatorName?: string
 ): Promise<GeneratorSchema | undefined> {
   if (generatorName) {
@@ -173,19 +82,80 @@ export async function getGenerator(
     }
   }
 
-  const deprecatedTaskExecutionSchema = await selectGenerator();
-  if (!deprecatedTaskExecutionSchema) {
-    return;
-  }
-
-  return toGeneratorSchema(deprecatedTaskExecutionSchema);
+  return await selectGenerator();
 }
 
-function toGeneratorSchema(deprecatedTaskExecutionSchema: TaskExecutionSchema) {
-  return {
-    collectionName: deprecatedTaskExecutionSchema.collection ?? '',
-    generatorName: deprecatedTaskExecutionSchema.name,
-    description: deprecatedTaskExecutionSchema.description,
-    options: deprecatedTaskExecutionSchema.options,
-  };
+async function selectGenerator(): Promise<GeneratorSchema | undefined> {
+  interface GenerateQuickPickItem extends QuickPickItem {
+    generator: GeneratorCollectionInfo;
+  }
+
+  const generators = (await getGenerators()) ?? [];
+  let generatorsQuickPicks = generators
+    .filter((collection) => !!collection.data)
+    .map((collection): GenerateQuickPickItem => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const generatorData = collection.data!;
+      return {
+        description: generatorData.description,
+        label: `${generatorData.collection} - ${generatorData.name}`,
+        generator: collection,
+      };
+    });
+
+  if (GlobalConfigurationStore.instance.get('enableGeneratorFilters') ?? true) {
+    const allowlist: string[] =
+      GlobalConfigurationStore.instance.get('generatorAllowlist') ?? [];
+    const blocklist: string[] =
+      GlobalConfigurationStore.instance.get('generatorBlocklist') ?? [];
+
+    if (allowlist.length > 0) {
+      generatorsQuickPicks = generatorsQuickPicks.filter((item) =>
+        allowlist.find((rule) =>
+          matchWithWildcards(
+            `${item.generator.data?.collection}:${item.generator.data?.name}`,
+            rule
+          )
+        )
+      );
+    }
+
+    if (blocklist.length > 0) {
+      generatorsQuickPicks = generatorsQuickPicks.filter(
+        (item) =>
+          !blocklist.find((rule) =>
+            matchWithWildcards(
+              `${item.generator.data?.collection}:${item.generator.data?.name}`,
+              rule
+            )
+          )
+      );
+    }
+  }
+
+  if (!generators || !generators.length) {
+    showNoGeneratorsMessage();
+    return;
+  }
+  const selection = await window.showQuickPick(generatorsQuickPicks, {
+    placeHolder: 'Select a generator',
+  });
+
+  if (selection && selection.generator.data) {
+    const options =
+      (selection.generator.data?.options ||
+        (await getGeneratorOptions({
+          collection: selection.generator.data.collection,
+          name: selection.generator.name,
+          path: selection.generator.schemaPath,
+        }))) ??
+      [];
+    return {
+      generatorName: selection.generator.data.name,
+      collectionName: selection.generator.data.collection,
+      description: selection.generator.data.description,
+      options,
+    };
+  }
+  return;
 }

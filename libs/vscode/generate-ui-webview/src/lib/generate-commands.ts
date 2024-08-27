@@ -63,7 +63,6 @@ export async function registerGenerateCommands(context: ExtensionContext) {
         getTelemetry().logUsage('generate.ui', { source: 'projects-view' });
         openGenerateUi(
           undefined,
-          undefined,
           (treeItem.item as ProjectViewItem).nxProject.project
         );
       }
