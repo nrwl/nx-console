@@ -1,3 +1,14 @@
+## 1.30.0 (2024-08-27)
+
+### Bug Fixes
+
+* **intellij:** avoid slow operations on EDT when loading graph ([#2241](https://github.com/nrwl/nx-console/issues/2241)) ([40f96d0](https://github.com/nrwl/nx-console/commit/40f96d01956fea6b7eb4ef415b0650656ac72461))
+
+
+### Features
+
+* **intellij:** collect opt-in telemetry on exceptions ([#2240](https://github.com/nrwl/nx-console/issues/2240)) ([a073956](https://github.com/nrwl/nx-console/commit/a073956e8b50c904455935323da029c058a9dbe7))
+
 ## 1.29.0 (2024-08-22)
 
 ### Bug Fixes
