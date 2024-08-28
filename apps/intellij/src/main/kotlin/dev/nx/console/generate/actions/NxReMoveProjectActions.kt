@@ -1,10 +1,7 @@
 package dev.nx.console.generate.actions
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
 import dev.nx.console.generate.NxGenerateService
@@ -25,6 +22,8 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     init {
         require(mode == "move" || mode == "remove")
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         super.update(e)
@@ -47,7 +46,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                     "source" to
                         if (ActionPlaces.isPopupPlace(e.place)) "explorer-context-menu"
                         else "command"
-                )
+                ),
             )
 
         val nxProjectNameFromEventData =
@@ -111,7 +110,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                     moveGenerators,
                     preselectedProjectName,
                     projectsWithType,
-                    workspaceLayoutPair
+                    workspaceLayoutPair,
                 ) {
                     runReMoveGenerator(it, runGeneratorManager, dryRun = true)
                 }
@@ -124,13 +123,10 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     private fun runReMoveGenerator(
         dialog: NxReMoveProjectDialog,
         runGeneratorManager: RunGeneratorManager,
-        dryRun: Boolean = false
+        dryRun: Boolean = false,
     ) {
         val result = dialog.getResult()
-        val args =
-            mutableListOf<String>(
-                "--projectName=${result.project}",
-            )
+        val args = mutableListOf<String>("--projectName=${result.project}")
         if (mode == "move") {
             args.add("--destination=${result.directory}")
         }

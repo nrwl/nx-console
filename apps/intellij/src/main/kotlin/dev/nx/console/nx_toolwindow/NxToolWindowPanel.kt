@@ -265,7 +265,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             actionGroup.addAction(refreshAction)
             actionGroup.addSeparator()
             actionGroup.add(
-                actionManager.getAction("dev.nx.console.run.actions.NxRunAnythingAction")
+                actionManager.getAction("dev.nx.console.generate.actions.NxGenerateUiAction")
             )
             actionGroup.add(
                 actionManager.getAction("dev.nx.console.graph.actions.NxGraphSelectAllAction")
