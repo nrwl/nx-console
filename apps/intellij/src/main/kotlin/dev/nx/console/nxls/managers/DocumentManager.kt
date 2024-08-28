@@ -105,9 +105,9 @@ class DocumentManager(val editor: Editor) {
     }
 
     suspend fun hover(startOffset: Int): String? {
-        val pos = DocumentUtils.offsetToLSPPos(editor, startOffset) ?: return null
-        val request = textDocumentService?.hover(HoverParams(identifier, pos))
         return try {
+            val pos = DocumentUtils.offsetToLSPPos(editor, startOffset) ?: return null
+            val request = textDocumentService?.hover(HoverParams(identifier, pos))
             val contents: String? =
                 request?.await()?.contents.let {
                     it?.left?.joinToString { l -> l.left } ?: it?.right?.value

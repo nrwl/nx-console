@@ -23,8 +23,12 @@ internal class NxlsDocumentationProvider : DocumentationProvider {
 
         val doc =
             runBlocking {
-                DocumentManager.getInstance(editor ?: return@runBlocking null)
-                    .hover(element.startOffset)
+                try {
+                    DocumentManager.getInstance(editor ?: return@runBlocking null)
+                        .hover(element.startOffset)
+                } catch (e: Throwable) {
+                    null
+                }
             }
                 ?: return null
 
