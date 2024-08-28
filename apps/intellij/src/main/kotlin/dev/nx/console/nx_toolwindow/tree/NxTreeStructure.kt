@@ -6,7 +6,6 @@ import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
-import com.intellij.icons.ExpUiIcons
 import com.intellij.lang.javascript.JavaScriptBundle
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
@@ -247,8 +246,7 @@ class NxTreeStructure(
         }
     }
 
-    private inner class LearnMoreAboutAtomizerAction :
-        AnAction(ExpUiIcons.Toolwindow.Web), DumbAware {
+    private inner class LearnMoreAboutAtomizerAction : AnAction(AllIcons.General.Web), DumbAware {
 
         override fun getActionUpdateThread() = ActionUpdateThread.EDT
 

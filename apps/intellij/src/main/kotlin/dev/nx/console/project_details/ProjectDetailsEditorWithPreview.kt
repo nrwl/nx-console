@@ -37,7 +37,8 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
     }
 
     override fun createRightToolbar(): ActionToolbar {
-        val viewActions = createViewActionGroup().getChildren(null)
+        val viewActions: Array<AnAction> =
+            arrayOf(showEditorAction, showEditorAndPreviewAction, showPreviewAction)
         val refreshAction =
             object :
                 RefreshAction(
