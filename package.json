@@ -23,7 +23,7 @@
     "@monodon/typescript-nx-imports-plugin": "0.2.0",
     "@open-wc/lit-helpers": "^0.6.0",
     "@parcel/watcher": "^2.4.1",
-    "@vscode/codicons": "^0.0.32",
+    "@vscode/codicons": "^0.0.36",
     "@vscode/webview-ui-toolkit": "^1.2.0",
     "@yarnpkg/fslib": "^3.0.0-rc.48",
     "@yarnpkg/libzip": "^3.0.0-rc.48",

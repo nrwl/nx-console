@@ -6,6 +6,10 @@
   "tags": ["type:vscode"],
   "targets": {
     "build": {
+      "command": "node ./tools/scripts/copy-generate-ui-deps.mjs dist/libs/vscode/nx-cloud-onboarding-webview",
+      "dependsOn": ["_build"]
+    },
+    "_build": {
       "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
       "options": {

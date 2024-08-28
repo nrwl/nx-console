@@ -8204,10 +8204,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vscode/codicons@npm:^0.0.32":
-  version: 0.0.32
-  resolution: "@vscode/codicons@npm:0.0.32"
-  checksum: 712f423becae23591397ccc44ca9056eb413d1e00e6b2cad88895b3d97368ecee0a73da51dc40c0c65e7bc5fef2b3db5544a809c21806c6db85c9308c782814e
+"@vscode/codicons@npm:^0.0.36":
+  version: 0.0.36
+  resolution: "@vscode/codicons@npm:0.0.36"
+  checksum: 1aab9c7974c12d13909ca8f9c3289f55dfadddeec3e8ae0ec333cf2e0f034aaca95810f44da3c4a7375d8823835b320aa69126ef335bd91409e2c6056e8587c4
   languageName: node
   linkType: hard
 
@@ -21078,7 +21078,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 7.16.1
     "@typescript-eslint/parser": 7.16.1
     "@typescript-eslint/utils": 7.16.1
-    "@vscode/codicons": ^0.0.32
+    "@vscode/codicons": ^0.0.36
     "@vscode/test-electron": ^2.1.5
     "@vscode/vsce": ^2.15.0
     "@vscode/webview-ui-toolkit": ^1.2.0

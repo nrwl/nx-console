@@ -65,7 +65,7 @@ export class Root extends LitElement {
     (this.cloudOnboardingInfo?.hasAffectedCommandsInCI
       ? completed
       : notCompleted
-    ).push('Use Nx affected commands in your CI configuration');
+    ).push('Use affected commands in your CI configuration');
 
     (this.cloudOnboardingInfo?.isConnectedToCloud
       ? completed
