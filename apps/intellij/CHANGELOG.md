@@ -1,3 +1,11 @@
+## <small>1.30.1 (2024-08-28)</small>
+
+### Bug Fixes
+
+* **intellij:** catch more errors during completion ([#2245](https://github.com/nrwl/nx-console/issues/2245)) ([25db991](https://github.com/nrwl/nx-console/commit/25db9910a86a23ad36229ccb5666f154dbeceef0))
+* **intellij:** fix compatibility issues ([#2244](https://github.com/nrwl/nx-console/issues/2244)) ([7e6c140](https://github.com/nrwl/nx-console/commit/7e6c14046bfff041e5d260a47b938a84ae2afa24))
+* **intellij:** use generate ui button in toolbar instead of run anything ([#2239](https://github.com/nrwl/nx-console/issues/2239)) ([29235e4](https://github.com/nrwl/nx-console/commit/29235e4d00ce496bc268737715ff21c706147a20))
+
 ## 1.30.0 (2024-08-27)
 
 ### Bug Fixes
