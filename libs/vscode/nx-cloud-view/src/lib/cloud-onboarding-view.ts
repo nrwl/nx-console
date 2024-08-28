@@ -18,7 +18,6 @@ import {
 
 import { withTimeout } from '@nx-console/shared/utils';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
 import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
@@ -189,7 +188,7 @@ async function finishCloudSetup() {
 }
 
 function generateCI() {
-  getTelemetry().featureUsed('nx.generateCI');
+  // getTelemetry().featureUsed('nx.generateCI');
 
   CliTaskProvider.instance.executeTask({
     command: 'generate',

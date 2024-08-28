@@ -1,18 +1,18 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import type { CloudOnboardingInfo } from '@nx-console/shared/types';
 import {
-  Checkbox,
   provideVSCodeDesignSystem,
   vsCodeButton,
-  vsCodeCheckbox,
   vsCodeLink,
   vsCodeTag,
 } from '@vscode/webview-ui-toolkit';
 
-import { html, LitElement, PropertyValues, TemplateResult } from 'lit';
+import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { WebviewApi } from 'vscode-webview';
+
+import './list-entry';
 
 provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeLink(), vsCodeTag());
 
@@ -24,59 +24,17 @@ export class Root extends LitElement {
   private vscodeApi: WebviewApi<undefined> = acquireVsCodeApi();
 
   override render() {
+    const { completed, notCompleted } = this.getElements();
     return html`
       <div style="font-size: var(--vscode-font-size)">
-        <div
-          style="display: flex; justify-content: space-between; padding-top: 0.5rem"
-        >
-          <span>Remote caching</span>
-          <span style="text-align: end;"
-            >${this.cloudOnboardingInfo?.isConnectedToCloud
-              ? 'Ready'
-              : 'Action Required'}</span
-          >
-        </div>
-        <div
-          style="display: flex; justify-content: space-between; padding-top: 0.5rem"
-        >
-          <span>Task distribution</span>
-          <span style="text-align: end;"
-            >${this.cloudOnboardingInfo?.isConnectedToCloud
-              ? 'Ready'
-              : 'Action Required'}</span
-          >
-        </div>
-        <div
-          style="display: flex; justify-content: space-between; padding-top: 0.5rem"
-        >
-          <span>Repository connected</span>
-          <span style="text-align: end;"
-            >${this.cloudOnboardingInfo?.isConnectedToCloud &&
-            this.cloudOnboardingInfo?.isWorkspaceClaimed
-              ? 'Done'
-              : 'Action Required'}</span
-          >
-        </div>
-        <div
-          style="display: flex; justify-content: space-between; padding-top: 0.5rem"
-        >
-          <span>Nx is used in CI</span>
-          <span style="text-align: end;"
-            >${this.cloudOnboardingInfo?.hasNxInCI
-              ? 'Done'
-              : 'Action Required'}</span
-          >
-        </div>
-        <div
-          style="display: flex; justify-content: space-between; padding-top: 0.5rem"
-        >
-          <span>Affected commands are used</span>
-          <span style="text-align: end;"
-            >${this.cloudOnboardingInfo?.hasAffectedCommandsInCI
-              ? 'Done'
-              : 'Action Required'}</span
-          >
-        </div>
+        ${completed.map(
+          (text) =>
+            html`<list-entry .text=${text} .completed=${true}></list-entry>`
+        )}
+        ${notCompleted.map(
+          (text) =>
+            html`<list-entry .text=${text} .completed=${false}></list-entry>`
+        )}
       </div>
 
       <div style="height: 16px"></div>
@@ -94,6 +52,41 @@ export class Root extends LitElement {
         ${this.getMoreInfoText()}
       </div>
     `;
+  }
+
+  private getElements(): { completed: string[]; notCompleted: string[] } {
+    const completed: string[] = [];
+    const notCompleted: string[] = [];
+
+    (this.cloudOnboardingInfo?.hasNxInCI ? completed : notCompleted).push(
+      'Use Nx in your CI configuration'
+    );
+
+    (this.cloudOnboardingInfo?.hasAffectedCommandsInCI
+      ? completed
+      : notCompleted
+    ).push('Use Nx affected commands in your CI configuration');
+
+    (this.cloudOnboardingInfo?.isConnectedToCloud
+      ? completed
+      : notCompleted
+    ).push('Enable remote caching with Nx Cloud');
+
+    (this.cloudOnboardingInfo?.isConnectedToCloud
+      ? completed
+      : notCompleted
+    ).push('Enable task distribution with Nx Cloud');
+
+    (this.cloudOnboardingInfo?.isConnectedToCloud &&
+    this.cloudOnboardingInfo?.isWorkspaceClaimed
+      ? completed
+      : notCompleted
+    ).push('Finish connecting your repository to Nx Cloud');
+
+    return {
+      completed,
+      notCompleted,
+    };
   }
 
   private getButtonText(): string | undefined {
