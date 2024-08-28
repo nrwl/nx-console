@@ -1,6 +1,7 @@
 package dev.nx.console.utils
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.util.TextRange
@@ -21,18 +22,23 @@ class DocumentUtils {
         }
 
         fun offsetToLSPPos(editor: Editor, offset: Int): Position? {
+            if (editor.isDisposed) {
+                return null
+            }
             return computableReadAction {
-                if (editor.isDisposed) {
-                    return@computableReadAction null
+                try {
+                    val doc = editor.document
+                    val line = doc.getLineNumber(offset)
+                    val lineStart = doc.getLineStartOffset(line)
+                    val lineTextBeforeOffset = doc.getText(TextRange.create(lineStart, offset))
+                    val tabs = StringUtil.countChars(lineTextBeforeOffset, '\t')
+                    val tabSize: Int = getTabSize(editor)
+                    val column = lineTextBeforeOffset.length - tabs * (tabSize - 1)
+                    Position(line, column)
+                } catch (e: Throwable) {
+                    thisLogger().info(e)
+                    null
                 }
-                val doc = editor.document
-                val line = doc.getLineNumber(offset)
-                val lineStart = doc.getLineStartOffset(line)
-                val lineTextBeforeOffset = doc.getText(TextRange.create(lineStart, offset))
-                val tabs = StringUtil.countChars(lineTextBeforeOffset, '\t')
-                val tabSize: Int = getTabSize(editor)
-                val column = lineTextBeforeOffset.length - tabs * (tabSize - 1)
-                Position(line, column)
             }
         }
 
