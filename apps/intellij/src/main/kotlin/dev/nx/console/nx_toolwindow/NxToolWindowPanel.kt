@@ -2,7 +2,6 @@ package dev.nx.console.nx_toolwindow
 
 import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.icons.AllIcons
-import com.intellij.icons.ExpUiIcons
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
@@ -265,7 +264,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             actionGroup.addAction(refreshAction)
             actionGroup.addSeparator()
             actionGroup.add(
-                actionManager.getAction("dev.nx.console.run.actions.NxRunAnythingAction")
+                actionManager.getAction("dev.nx.console.generate.actions.NxGenerateUiAction")
             )
             actionGroup.add(
                 actionManager.getAction("dev.nx.console.graph.actions.NxGraphSelectAllAction")
@@ -337,7 +336,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                         )
                                     )
 
-                                add(JLabel().apply { icon = ExpUiIcons.Run.TestPassed })
+                                add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
                                 add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
                                 add(
                                     JLabel("Connected to Nx Cloud").apply {
@@ -348,7 +347,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                 add(Box.createHorizontalGlue())
                                 add(
                                     JButton().apply {
-                                        icon = ExpUiIcons.General.Export
+                                        icon = AllIcons.ToolbarDecorator.Export
                                         toolTipText = "Open Nx Cloud"
 
                                         isContentAreaFilled = false

@@ -1,10 +1,12 @@
 package dev.nx.console.nx_toolwindow.tree
 
-import com.intellij.icons.ExpUiIcons
+import com.intellij.icons.AllIcons
+import com.intellij.tasks.Task
 import com.intellij.ui.treeStructure.CachingSimpleNode
 import dev.nx.console.NxIcons
 import dev.nx.console.models.NxProject
 import dev.nx.console.nx_toolwindow.tree.builder.NxTreeBuilderBase
+import icons.ExternalSystemIcons
 
 sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
     abstract val id: String?
@@ -48,7 +50,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "_projects"
 
         init {
-            icon = ExpUiIcons.Nodes.ModuleGroup
+            icon = AllIcons.Nodes.ModuleGroup
         }
 
         override fun getName(): String = "Projects"
@@ -58,7 +60,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "_targets"
 
         init {
-            icon = ExpUiIcons.Build.TaskGroup
+            icon = AllIcons.Nodes.ConfigFolder
         }
 
         override fun getName(): String = "Targets"
@@ -68,7 +70,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "targetsList_${targetName}"
 
         init {
-            icon = ExpUiIcons.Build.TaskGroup
+            icon = AllIcons.Nodes.ConfigFolder
         }
 
         override fun getName(): String = targetName
@@ -83,7 +85,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "targetGroup_${targetGroupName}"
 
         init {
-            icon = ExpUiIcons.Toolwindow.Dependencies
+            icon = NxIcons.TargetGroup
         }
 
         override fun getName(): String = targetGroupName
@@ -99,7 +101,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "target_${nxProjectName}_$nxTargetName"
 
         init {
-            icon = ExpUiIcons.Build.Task
+            icon = ExternalSystemIcons.Task
             presentation.tooltip = "Target"
         }
 
@@ -110,7 +112,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "project_${nxProjectName}"
 
         init {
-            icon = ExpUiIcons.Nodes.Module
+            icon = AllIcons.Nodes.Module
             presentation.tooltip = "Project"
         }
 
@@ -127,7 +129,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
             "config_${nxProjectName}_${nxTargetName}_$nxTargetConfigurationName"
 
         init {
-            icon = ExpUiIcons.Build.Task
+            icon = ExternalSystemIcons.Task
             presentation.tooltip = "Target Configuration"
         }
 
@@ -138,7 +140,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "folder_${path}"
 
         init {
-            icon = ExpUiIcons.Nodes.Folder
+            icon = AllIcons.Nodes.Folder
         }
 
         override fun getName(): String {
