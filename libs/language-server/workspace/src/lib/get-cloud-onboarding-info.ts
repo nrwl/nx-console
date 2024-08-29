@@ -195,7 +195,7 @@ async function getNxCloudWorkspaceClaimed(
     });
     return JSON.parse(response.responseText);
   } catch (e) {
-    lspLogger.log(JSON.stringify(e, null, 2));
+    lspLogger.log(JSON.stringify(e.responseText, null, 2));
     return undefined;
   }
 }

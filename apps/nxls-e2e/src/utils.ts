@@ -41,7 +41,7 @@ export function newWorkspace({
   verbose?: boolean;
 }) {
   if (verbose === undefined) {
-    verbose = !!process.env['CI'];
+    verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
   }
   if (!version) {
     version = defaultVersion;

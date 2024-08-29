@@ -72,7 +72,7 @@ export async function getNxCloudId(
 ): Promise<string | undefined> {
   const nxJson = await readNxJson(workspacePath);
   // TODO(maxkless): remove once console version has nxCloudId in schema
-  return (nxJson as any).nxCloudId;
+  return (nxJson as any).nxCloudId ?? getCloudIdFromTaskRunnerOptions(nxJson);
 }
 // helpers
 
@@ -89,6 +89,25 @@ function getAccessTokenFromTaskRunnerOptions(nxJson: any): string | undefined {
       taskRunnerOption.options?.accessToken
     ) {
       return taskRunnerOption.options.accessToken;
+    }
+  }
+
+  return undefined;
+}
+
+function getCloudIdFromTaskRunnerOptions(nxJson: any): string | undefined {
+  if (!nxJson.tasksRunnerOptions) {
+    return undefined;
+  }
+  for (const key in nxJson.tasksRunnerOptions) {
+    const taskRunnerOption = nxJson.tasksRunnerOptions?.[key];
+
+    if (
+      taskRunnerOption &&
+      taskRunnerOption.runner === 'nx-cloud' &&
+      taskRunnerOption.options?.nxCloudId
+    ) {
+      return taskRunnerOption.options.nxCloudId;
     }
   }
 

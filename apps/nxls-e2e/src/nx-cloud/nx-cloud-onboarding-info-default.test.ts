@@ -82,6 +82,28 @@ describe('nx cloud onboarding - default', () => {
     expect(info.isConnectedToCloud).toEqual(true);
   });
 
+  it('should return connected true with nxCloudId in taskRunnerOptions', async () => {
+    modifyJsonFile(nxJsonPath, (data) => ({
+      ...data,
+      tasksRunnerOptions: {
+        default: {
+          runner: 'nx-cloud',
+          options: {
+            nxCloudId: 'DUMMY_ID',
+          },
+        },
+      },
+    }));
+
+    const onboardingInfoResponse = await nxlsWrapper.sendRequest({
+      ...NxCloudOnboardingInfoRequest,
+      params: {},
+    });
+
+    const info = onboardingInfoResponse.result as CloudOnboardingInfo;
+    expect(info.isConnectedToCloud).toEqual(true);
+  });
+
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });
