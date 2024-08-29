@@ -195,7 +195,9 @@ async function getNxCloudWorkspaceClaimed(
     });
     return JSON.parse(response.responseText);
   } catch (e) {
-    lspLogger.log(JSON.stringify(e.responseText, null, 2));
+    lspLogger.log(
+      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${e}`
+    );
     return undefined;
   }
 }

@@ -1,4 +1,9 @@
-import { getNxAccessToken, getNxCloudUrl } from '@nx-console/shared/npm';
+import {
+  findNxPackagePath,
+  getNxAccessToken,
+  getNxCloudUrl,
+  importWorkspaceDependency,
+} from '@nx-console/shared/npm';
 import { CloudOnboardingInfo } from '@nx-console/shared/types';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
@@ -19,6 +24,7 @@ import {
 import { withTimeout } from '@nx-console/shared/utils';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
+import { join } from 'path';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -173,7 +179,25 @@ async function finishCloudSetup() {
   let url: string | undefined;
 
   await withTimeout(async () => {
-    url = await createNxCloudOnboardingURL(accessToken);
+    const importPath = await findNxPackagePath(
+      workspacePath,
+      join('src', 'nx-cloud', 'utilities', 'url-shorten.js')
+    );
+    if (!importPath) {
+      return;
+    }
+
+    const nxPackage = await importWorkspaceDependency<any>(importPath);
+
+    // for newer versions of nx, we can simply load the logic from the local installations
+    if (nxPackage && nxPackage.createNxCloudOnboardingURL) {
+      url = await nxPackage.createNxCloudOnboardingURL(
+        'nx-console',
+        accessToken
+      );
+    } else {
+      url = await createNxCloudOnboardingURL(accessToken);
+    }
   }, 5000);
 
   if (nxCloudUrl) {
