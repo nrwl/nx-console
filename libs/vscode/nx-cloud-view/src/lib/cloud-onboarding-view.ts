@@ -183,11 +183,10 @@ async function finishCloudSetup() {
       workspacePath,
       join('src', 'nx-cloud', 'utilities', 'url-shorten.js')
     );
-    if (!importPath) {
-      return;
-    }
 
-    const nxPackage = await importWorkspaceDependency<any>(importPath);
+    const nxPackage = importPath
+      ? await importWorkspaceDependency<any>(importPath)
+      : undefined;
 
     // for newer versions of nx, we can simply load the logic from the local installations
     if (nxPackage && nxPackage.createNxCloudOnboardingURL) {
