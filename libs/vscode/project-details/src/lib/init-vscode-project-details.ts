@@ -26,6 +26,7 @@ import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { ProjectDetailsPreview2 } from './project-details-preview-2';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -97,7 +98,10 @@ function registerCommand(context: ExtensionContext) {
           });
         }
       }
-    )
+    ),
+    commands.registerCommand('nx.pdv-test', () => {
+      new ProjectDetailsPreview2();
+    })
   );
 }
 

@@ -380,6 +380,10 @@
     },
     "commands": [
       {
+        "command": "nx.pdv-test",
+        "title": "Test PDV"
+      },
+      {
         "command": "nxConsole.refreshWorkspace",
         "title": "Refresh Workspace",
         "category": "Nx",
