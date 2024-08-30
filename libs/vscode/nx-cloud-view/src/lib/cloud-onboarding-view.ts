@@ -7,7 +7,10 @@ import {
 import { CloudOnboardingInfo } from '@nx-console/shared/types';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { getCloudOnboardingInfo } from '@nx-console/vscode/nx-workspace';
+import {
+  getCloudOnboardingInfo,
+  getNxCloudStatus,
+} from '@nx-console/vscode/nx-workspace';
 
 import {
   CancellationToken,
@@ -25,6 +28,8 @@ import { withTimeout } from '@nx-console/shared/utils';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
 import { join } from 'path';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -112,6 +117,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         break;
       }
       case 'show-affected-docs': {
+        getTelemetry().logUsage('cloud.show-affected-docs');
         commands.executeCommand(
           'vscode.open',
           Uri.parse('https://nx.dev/ci/features/affected?utm_source=nxconsole')
@@ -119,7 +125,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         break;
       }
       case 'open-cloud-app': {
-        commands.executeCommand('nxConsole.openCloudApp');
+        openCloudApp();
         break;
       }
       default: {
@@ -166,6 +172,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 }
 
 async function finishCloudSetup() {
+  getTelemetry().logUsage('cloud.finish-setup');
   const workspacePath = getNxWorkspacePath();
 
   const accessToken = await getNxAccessToken(workspacePath);
@@ -211,11 +218,33 @@ async function finishCloudSetup() {
 }
 
 function generateCI() {
-  // getTelemetry().featureUsed('nx.generateCI');
+  getTelemetry().logUsage('cloud.generate-ci-workflow');
 
   CliTaskProvider.instance.executeTask({
     command: 'generate',
     positional: '@nx/workspace:ci-workflow',
     flags: [],
   });
+}
+
+async function openCloudApp() {
+  const cloudUrl = (await getNxCloudStatus())?.nxCloudUrl;
+
+  if (cloudUrl) {
+    getTelemetry().logUsage('cloud.open-app');
+    const cloudUrlWithTracking = `${cloudUrl}?utm_campaign=open-cloud-app&utm_medium=cloud-promo&utm_source=nxconsole`;
+    commands.executeCommand('vscode.open', cloudUrlWithTracking);
+  } else {
+    window
+      .showErrorMessage(
+        'Something went wrong while retrieving the Nx Cloud URL.',
+        'Open Logs',
+        'OK'
+      )
+      .then((selection) => {
+        if (selection === 'Open Logs') {
+          getNxlsOutputChannel().show();
+        }
+      });
+  }
 }

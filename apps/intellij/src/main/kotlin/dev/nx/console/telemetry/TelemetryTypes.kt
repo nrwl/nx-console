@@ -18,6 +18,9 @@ enum class TelemetryEvent(val eventName: String) {
     // Cloud
     CLOUD_CONNECT("cloud.connect"),
     CLOUD_OPEN_APP("cloud.open-app"),
+    CLOUD_GENERATE_CI_WORKFLOW("cloud.generate-ci-workflow"),
+    CLOUD_FINISH_SETUP("cloud.finish-setup"),
+    CLOUD_SHOW_AFFECTED_DOCS("cloud.show-affected-docs"),
 
     // Graph
     GRAPH_SHOW_ALL("graph.show-all"),
@@ -44,7 +47,7 @@ enum class TelemetryEvent(val eventName: String) {
     CLI_LIST("cli.list"),
     CLI_MIGRATE("cli.migrate"),
     CLI_AFFECTED("cli.affected"),
-    CLI_INIT("cli.init")
+    CLI_INIT("cli.init"),
 }
 
 class TelemetryEventSource(val source: String) {
