@@ -393,7 +393,7 @@
       },
       {
         "command": "nxConsole.showProjectConfiguration",
-        "title": "Show project configuration",
+        "title": "Show Project Configuration",
         "category": "Nx",
         "icon": "$(go-to-file)"
       },
@@ -409,15 +409,15 @@
       },
       {
         "command": "nxConsole.run-task-projects-view-skip-cache",
-        "title": "Execute task without Nx cache"
+        "title": "Execute Task Without Nx Cache"
       },
       {
         "command": "nxConsole.run-task-projects-view-options",
-        "title": "Execute task with options"
+        "title": "Execute Task With Options"
       },
       {
         "command": "nxConsole.copyTaskToClipboard",
-        "title": "Copy task to clipboard"
+        "title": "Copy Task to Clipboard"
       },
       {
         "category": "Nx",
@@ -426,7 +426,7 @@
       },
       {
         "category": "Nx",
-        "title": "Generate (quickpick)",
+        "title": "Generate (Quickpick)",
         "command": "nx.generate.quickpick",
         "icon": "$(terminal)"
       },
@@ -442,12 +442,12 @@
       },
       {
         "category": "Nx",
-        "title": "Focus task in Nx Graph",
+        "title": "Focus Task in Nx Graph",
         "command": "nx.graph.task"
       },
       {
         "category": "Nx",
-        "title": "Focus task in Nx Graph",
+        "title": "Focus Task in Nx Graph",
         "command": "nx.graph.task.button",
         "icon": "$(target)"
       },
@@ -465,13 +465,13 @@
       },
       {
         "category": "Nx",
-        "title": "Show full project graph",
+        "title": "Show Full Project Graph",
         "command": "nx.graph.showAll",
         "icon": "$(source-control)"
       },
       {
         "category": "Nx",
-        "title": "Show affected project graph",
+        "title": "Show Affected Project Graph",
         "command": "nx.graph.showAffected",
         "icon": "$(source-control)"
       },
@@ -528,7 +528,7 @@
       },
       {
         "category": "Nx",
-        "title": "Generate (ui)",
+        "title": "Generate (UI)",
         "command": "nx.generate.ui",
         "icon": "$(browser)"
       },
@@ -564,12 +564,12 @@
       },
       {
         "category": "Nx",
-        "title": "Run Target from selected file",
+        "title": "Run Target From Selected File",
         "command": "nx.run.fileexplorer"
       },
       {
         "category": "Nx",
-        "title": "Convert Angular CLI to Nx workspace",
+        "title": "Convert Angular CLI to Nx Workspace",
         "command": "nxConsole.migrateAngularCliToNx"
       },
       {
@@ -578,16 +578,16 @@
         "command": "nxConsole.showNxlsLogs"
       },
       {
-        "title": "Add dependency to workspace",
+        "title": "Add Dependency to Workspace",
         "command": "nxConsole.addDependency"
       },
       {
-        "title": "Add dev dependency to workspace",
+        "title": "Add Dev Dependency to Workspace",
         "command": "nxConsole.addDevDependency"
       },
       {
         "category": "Nx",
-        "title": "Add Nx to workspace",
+        "title": "Add Nx to Workspace",
         "command": "nx.init"
       },
       {
