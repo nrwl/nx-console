@@ -10,8 +10,8 @@ export const addProjectItemsToOptionProcessor: SchemaProcessor = (
   return {
     ...schema,
     options: (schema.options ?? []).map((option) => {
-      if (isProjectOption(option)) {
-        const projects = Object.keys(workspace.workspace.projects);
+      const projects = Object.keys(workspace.workspace.projects);
+      if (isProjectOption(option) && projects.length > 0) {
         option.items = projects.sort();
       }
       return option;
