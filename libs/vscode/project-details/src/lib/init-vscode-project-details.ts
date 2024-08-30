@@ -5,6 +5,7 @@ import {
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxVersion,
+  getNxWorkspaceProjects,
   getProjectByPath,
   getSourceMapFilesToProjectMap,
 } from '@nx-console/vscode/nx-workspace';
@@ -27,6 +28,7 @@ import { ProjectDetailsProvider } from './project-details-provider';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { ProjectDetailsPreview2 } from './project-details-preview-2';
+import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -99,8 +101,14 @@ function registerCommand(context: ExtensionContext) {
         }
       }
     ),
-    commands.registerCommand('nx.pdv-test', () => {
-      new ProjectDetailsPreview2();
+    commands.registerCommand('nx.pdv-test', async () => {
+      const projects = await getNxWorkspaceProjects();
+      const project = await selectProject(Object.keys(projects));
+
+      if (!project) {
+        return;
+      }
+      new ProjectDetailsPreview2(projects[project].root);
     })
   );
 }
