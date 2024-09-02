@@ -1,15 +1,18 @@
 package dev.nx.console.models
 
+import kotlinx.serialization.Serializable
+
 data class NxTarget(
     val executor: String,
     val configurations: Map<String, Any>?,
-    val metadata: NxTargetMetadata?
+    val metadata: NxTargetMetadata?,
 ) {}
 
+@Serializable()
 data class NxTargetMetadata(
     val description: String?,
     val technologies: Array<String>?,
-    val nonAtomizedTarget: String?
+    val nonAtomizedTarget: String?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

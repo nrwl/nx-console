@@ -20,6 +20,13 @@ interface NxService {
     }
 
     @JsonRequest
+    fun workspaceSerialized(
+        workspaceRequest: NxWorkspaceRequest = NxWorkspaceRequest()
+    ): CompletableFuture<String> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun generators(
         generatorsRequest: NxGeneratorsRequest = NxGeneratorsRequest()
     ): CompletableFuture<List<NxGenerator>> {

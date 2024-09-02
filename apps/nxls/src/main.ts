@@ -34,6 +34,7 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
   NxCloudOnboardingInfoRequest,
+  NxWorkspaceSerializedRequest,
 } from '@nx-console/language-server/types';
 import {
   getJsonLanguageService,
@@ -385,6 +386,15 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
   }
 
   return nxWorkspace(WORKING_PATH, lspLogger, reset);
+});
+
+connection.onRequest(NxWorkspaceSerializedRequest, async ({ reset }) => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  const workspace = await nxWorkspace(WORKING_PATH, lspLogger, reset);
+  return JSON.stringify(workspace);
 });
 
 connection.onRequest(NxWorkspacePathRequest, () => {

@@ -37,6 +37,12 @@ export const NxWorkspaceRequest: RequestType<
   unknown
 > = new RequestType('nx/workspace');
 
+export const NxWorkspaceSerializedRequest: RequestType<
+  { reset: boolean },
+  string,
+  unknown
+> = new RequestType('nx/workspaceSerialized');
+
 export const NxWorkspacePathRequest: RequestType<undefined, string, unknown> =
   new RequestType('nx/workspacePath');
 

@@ -9,7 +9,7 @@ import com.intellij.ui.jcef.*
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.project_details.ProjectDetailsBrowser
+import dev.nx.console.project_details.browsers.OldProjectDetailsBrowser
 import dev.nx.console.utils.executeJavascriptWithCatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -41,10 +41,10 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                         try {
                             refresh()
                         } catch (e: Throwable) {
-                            logger<ProjectDetailsBrowser>().debug(e.message)
+                            logger<OldProjectDetailsBrowser>().debug(e.message)
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -76,8 +76,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
                         projectName != null &&
                             nxWorkspace?.workspace?.projects?.contains(projectName) != true
-                    }
-                        ?: false
+                    } ?: false
 
                 if (
                     !errorsToShow.isNullOrEmpty() &&
