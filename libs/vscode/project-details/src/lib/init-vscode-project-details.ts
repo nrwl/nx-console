@@ -27,7 +27,7 @@ import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { ProjectDetailsPreview2 } from './project-details-preview-2';
+import { NewProjectDetailsPreview } from './new-project-details-preview';
 import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
@@ -108,7 +108,7 @@ function registerCommand(context: ExtensionContext) {
       if (!project) {
         return;
       }
-      new ProjectDetailsPreview2(projects[project].root);
+      new NewProjectDetailsPreview(projects[project].root);
     })
   );
 }

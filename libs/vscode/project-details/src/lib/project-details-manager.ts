@@ -1,6 +1,15 @@
-import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxVersion,
+  getProjectByPath,
+} from '@nx-console/vscode/nx-workspace';
+import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
+import { gte } from 'semver';
 import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
-import { ProjectDetailsPreview } from './project-details-preview';
+import { NewProjectDetailsPreview } from './new-project-details-preview';
+import {
+  OldProjectDetailsPreview,
+  ProjectDetailsPreview,
+} from './project-details-preview';
 
 export class ProjectDetailsManager {
   private previews: Map<string, ProjectDetailsPreview> = new Map();
@@ -15,7 +24,20 @@ export class ProjectDetailsManager {
     let preview = await this.findMatchingPreview(path);
 
     if (!preview) {
-      preview = new ProjectDetailsPreview(path, this.context, expandedTarget);
+      const nxVersion = await getNxVersion();
+      if (!nxVersion) {
+        showNoNxVersionMessage();
+        return;
+      }
+      if (gte(nxVersion.full, '20.0.0')) {
+        preview = new NewProjectDetailsPreview(path);
+      } else {
+        preview = new OldProjectDetailsPreview(
+          path,
+          this.context,
+          expandedTarget
+        );
+      }
       preview.onDispose(() => {
         this.previews.delete(path);
       });
@@ -28,14 +50,6 @@ export class ProjectDetailsManager {
   private async findMatchingPreview(
     path: string
   ): Promise<ProjectDetailsPreview | undefined> {
-    console.log(
-      'getting preview for',
-      path,
-      Array.from(this.previews.entries()).map((p) => ({
-        path: p[0],
-        root: p[1].projectRoot,
-      }))
-    );
     const directMatch = this.previews.get(path);
     if (directMatch) return directMatch;
 
