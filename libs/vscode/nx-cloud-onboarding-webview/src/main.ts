@@ -98,8 +98,6 @@ export class Root extends LitElement {
       return 'Generate CI configuration';
     } else if (!this.cloudOnboardingInfo.hasAffectedCommandsInCI) {
       return 'Learn about affected commands';
-    } else if (!this.cloudOnboardingInfo.personalAccessToken) {
-      return 'Login to Nx Cloud';
     } else {
       return 'Open Nx Cloud App';
     }
@@ -153,8 +151,6 @@ export class Root extends LitElement {
       this.vscodeApi.postMessage({ type: 'generate-ci' });
     } else if (!this.cloudOnboardingInfo.hasAffectedCommandsInCI) {
       this.vscodeApi.postMessage({ type: 'show-affected-docs' });
-    } else if (!this.cloudOnboardingInfo.personalAccessToken) {
-      this.vscodeApi.postMessage({ type: 'login' });
     } else {
       this.vscodeApi.postMessage({ type: 'open-cloud-app' });
     }
