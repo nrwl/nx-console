@@ -1,26 +1,43 @@
 package dev.nx.console.project_details.browsers
 
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefBrowserBase
+import com.intellij.ui.jcef.JBCefJSQuery
+import dev.nx.console.graph.NxGraphInteractionEvent
+import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.utils.ProjectLevelCoroutineHolderService
-import dev.nx.console.utils.getNxPackagePath
-import dev.nx.console.utils.nxBasePath
+import dev.nx.console.run.NxHelpCommandService
+import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.run.actions.NxConnectService
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryEventSource
+import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.*
 import java.nio.file.Paths
 import java.util.regex.Matcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import ru.nsk.kstatemachine.event.DataEvent
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
 import ru.nsk.kstatemachine.statemachine.processEventByLaunch
+import ru.nsk.kstatemachine.statemachine.stop
 
 object States {
     const val Loading = "Loading"
@@ -40,6 +57,8 @@ sealed interface Events {
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
     private val browser: JBCefBrowser = JBCefBrowser()
+    private val interactionEventQuery: JBCefJSQuery = createInteractionEventQuery()
+
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     private val stateMachine =
@@ -116,17 +135,16 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
       <script>
       const data = ${data.pdvData}
 
+      const sendMessage = (message) => {
+         ${interactionEventQuery.inject("JSON.stringify(message)")}
+      }
+
       const root = ReactDOM.createRoot(document.getElementById('root'));
 
       const pdvelement = React.createElement(PDV.default, {
         project: data.project,
         sourceMap: data.sourceMap,
-        onViewInProjectGraph: (data) => vscodeApi.postMessage({
-          type: 'open-project-graph',
-          payload: {
-            projectName: data.projectName,
-          }
-        })
+        onViewInProjectGraph: (data) => sendMessage({ type: 'open-project-graph', payload: data }),
         }
       )
       root.render(React.createElement(PDV.ExpandedTargetsProvider, null, pdvelement));
@@ -262,7 +280,112 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         )
     }
 
+    private fun createInteractionEventQuery(): JBCefJSQuery {
+        val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+
+        query.addHandler { msg ->
+            try {
+                val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+
+                when (messageParsed.type) {
+                    "file-click" -> {
+                        messageParsed.payload?.url?.also {
+                            val fullPath = Paths.get(project.nxBasePath, it).toString()
+                            LocalFileSystem.getInstance().findFileByPath(fullPath).also {
+                                clickedFile ->
+                                if (clickedFile == null) {
+                                    Notifier.notifyAnything(
+                                        project,
+                                        "Couldn't find file at path $fullPath",
+                                        NotificationType.ERROR,
+                                    )
+                                } else {
+                                    val fileEditorManager = FileEditorManager.getInstance(project)
+                                    ApplicationManager.getApplication().invokeLater {
+                                        fileEditorManager.openFile(clickedFile, true)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    "open-project-config" -> {
+                        scope.launch {
+                            TelemetryService.getInstance(project)
+                                .featureUsed(
+                                    TelemetryEvent.MISC_SHOW_PROJECT_CONFIGURATION,
+                                    mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
+                                )
+
+                            messageParsed.payload?.projectName?.also {
+                                project.nxWorkspace()?.workspace?.projects?.get(it)?.apply {
+                                    val path =
+                                        nxProjectConfigurationPath(project, root) ?: return@apply
+                                    val file =
+                                        LocalFileSystem.getInstance().findFileByPath(path)
+                                            ?: return@apply
+                                    ApplicationManager.getApplication().invokeLater {
+                                        FileEditorManager.getInstance(project).openFile(file, true)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    "run-task" -> {
+                        messageParsed.payload?.taskId?.also {
+                            val (projectName, targetName) = it.split(":")
+                            NxTaskExecutionManager.getInstance(project)
+                                .execute(projectName, targetName)
+                        }
+                    }
+                    "run-help" -> {
+                        messageParsed.payload?.let { (projectName, _, _, _, _, helpCommand, helpCwd)
+                            ->
+                            if (projectName != null && helpCommand != null) {
+                                NxHelpCommandService.getInstance(project)
+                                    .execute(projectName, helpCommand, helpCwd)
+                            }
+                        }
+                    }
+                    "nx-connect" -> {
+                        NxConnectService.getInstance(project).connectToCloud()
+                    }
+                    "open-project-graph" -> {
+                        messageParsed.payload?.projectName?.also {
+                            scope.launch {
+                                val nxGraphService = getNxGraphService(project) ?: return@launch
+                                withContext(Dispatchers.EDT) { nxGraphService.focusProject(it) }
+                            }
+                        }
+                    }
+                    "open-task-graph" -> {
+                        messageParsed.payload?.projectName?.also { projectName ->
+                            messageParsed.payload.targetName?.also { targetName ->
+                                scope.launch {
+                                    val nxGraphService = getNxGraphService(project) ?: return@launch
+                                    ApplicationManager.getApplication().invokeLater {
+                                        nxGraphService.focusTask(projectName, targetName)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        logger<OldProjectDetailsBrowser>()
+                            .warn("Unhandled graph interaction event: $messageParsed")
+                    }
+                }
+            } catch (e: SerializationException) {
+                logger<OldProjectDetailsBrowser>()
+                    .error("Error parsing graph interaction event: ${e.message}")
+            }
+            null
+        }
+
+        return query
+    }
+
     override fun dispose() {
+        scope.launch { stateMachine.stop() }
         Disposer.dispose(browser)
     }
 }
