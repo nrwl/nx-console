@@ -34,7 +34,7 @@ export class NxlsWrapper {
 
   constructor(private verbose?: boolean) {
     if (verbose === undefined) {
-      this.verbose = !!process.env['CI'];
+      this.verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
     }
   }
 

@@ -1,0 +1,27 @@
+{
+  "name": "nx-cloud-onboarding-webview",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/nx-cloud-onboarding-webview/src",
+  "projectType": "library",
+  "tags": ["type:vscode"],
+  "targets": {
+    "build": {
+      "command": "node ./tools/scripts/copy-generate-ui-deps.mjs dist/libs/vscode/nx-cloud-onboarding-webview",
+      "dependsOn": ["_build"]
+    },
+    "_build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/vscode/nx-cloud-onboarding-webview",
+        "main": "libs/vscode/nx-cloud-onboarding-webview/src/main.ts",
+        "tsConfig": "libs/vscode/nx-cloud-onboarding-webview/tsconfig.webview.json",
+        "assets": [],
+        "format": ["esm"],
+        "declaration": false,
+        "deleteOutputPath": true,
+        "thirdParty": true
+      }
+    }
+  }
+}

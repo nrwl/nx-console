@@ -9,7 +9,7 @@
       "dependsOn": ["extract-dependencies"]
     },
     "extract-dependencies": {
-      "command": "node ./tools/scripts/copy-generate-ui-deps.mjs",
+      "command": "node ./tools/scripts/copy-generate-ui-deps.mjs dist/apps/generate-ui-v2",
       "dependsOn": ["_build"]
     },
     "_build": {
