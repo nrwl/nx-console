@@ -1,45 +1,103 @@
 package dev.nx.console.project_details.browsers
 
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefBrowser
 import dev.nx.console.models.NxError
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.getNxPackagePath
 import dev.nx.console.utils.nxBasePath
 import java.nio.file.Paths
 import java.util.regex.Matcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
+import ru.nsk.kstatemachine.event.DataEvent
+import ru.nsk.kstatemachine.state.*
+import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
+import ru.nsk.kstatemachine.statemachine.processEventByLaunch
+
+object States {
+    const val Loading = "Loading"
+    const val ShowingPDV = "ShowingPDV"
+    const val ShowingError = "ShowingError"
+}
+
+class LoadSuccessData(val graphBasePath: String, val pdvData: String)
+
+sealed interface Events {
+
+    class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
+
+    class LoadError(override val data: String) : DataEvent<String>
+}
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
     private val browser: JBCefBrowser = JBCefBrowser()
+    private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
-    init {
-        loadAndShowPDV()
-    }
+    private val stateMachine =
+        createStateMachineBlocking(scope) {
+            val showingPDVState = dataState(States.ShowingPDV) { onEntry { showPDV(data) } }
+
+            val showingErrorState = dataState(States.ShowingError) { onEntry { showError(data) } }
+
+            showingPDVState.apply {
+                dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                    targetState = showingPDVState
+                }
+                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+            }
+
+            showingErrorState.apply {
+                dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                    targetState = showingPDVState
+                }
+                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+            }
+
+            initialState(States.Loading) {
+                dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                    targetState = showingPDVState
+                }
+                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+
+                onEntry {
+                    showLoading()
+                    tryLoadPDV()
+                }
+            }
+        }
 
     val component = browser.component
 
-    private fun loadAndShowPDV() {
-        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
-            val graphBasePath = Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
+    init {
+        with(project.messageBus.connect(this)) {
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener {
+                    if (project.isDisposed) {
+                        return@NxWorkspaceRefreshListener
+                    }
+                    tryLoadPDV()
+                },
+            )
+        }
+    }
 
-            val pdvData = loadPDVDataSerialized()
-            val html =
-                """
+    private fun showPDV(data: LoadSuccessData) {
+        val html =
+            """
            `
     <html>
     <head>
-    <base href="${Matcher.quoteReplacement(graphBasePath)}">
+    <base href="${Matcher.quoteReplacement(data.graphBasePath)}">
     <script src="environment.js"></script>
   <link rel="stylesheet" href="styles.css">
 
@@ -56,7 +114,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     <script src="pdv.umd.js"></script>
 
       <script>
-      const data = ${pdvData}
+      const data = ${data.pdvData}
 
       const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -79,25 +137,77 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     </html>
     `
        """
-                    .trimIndent()
+                .trimIndent()
 
-            withContext(Dispatchers.EDT) { browser.loadHTML(html) }
+        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+    }
+
+    private fun showError(data: String) {
+        val html =
+            """
+            <html>
+            <body>
+            ERROR: $data
+            </body>
+            </html>
+        """
+                .trimIndent()
+
+        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+    }
+
+    private fun showLoading() {
+        val html =
+            """
+            <html>
+            <body>
+            LOADING
+            </body>
+            </html>
+        """
+                .trimIndent()
+
+        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+    }
+
+    private fun tryLoadPDV() {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
+            val graphBasePath =
+                try {
+                    Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
+                } catch (e: Throwable) {
+                    null
+                }
+
+            val pdvData = loadPDVDataSerialized()
+
+            if (graphBasePath != null && pdvData.second) {
+                stateMachine.processEventByLaunch(
+                    Events.LoadSuccess(LoadSuccessData(graphBasePath, pdvData.first))
+                )
+            } else {
+                stateMachine.processEventByLaunch(Events.LoadError(pdvData.first))
+            }
         }
     }
 
-    private suspend fun loadPDVDataSerialized(): String {
+    private suspend fun loadPDVDataSerialized(): Pair<String, Boolean> {
         val nxlsService = NxlsService.getInstance(project)
 
         val workspace = nxlsService.workspace()
         val workspaceString = nxlsService.workspaceSerialized()
 
         if (workspace == null || workspaceString == null) {
-            return buildJsonObject {
-                    putJsonArray("errors") {
-                        add(buildJsonObject { put("message", "Workspace not found") })
+            return Pair(
+                buildJsonObject {
+                        putJsonArray("errors") {
+                            add(buildJsonObject { put("message", "Workspace not found") })
+                        }
                     }
-                }
-                .toString()
+                    .toString(),
+                false,
+            )
         }
 
         val project = nxlsService.projectByPath(file.path)
@@ -109,7 +219,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         }
 
         if (project == null) {
-            return buildJsonObject { put("errors", errorsJson) }.toString()
+            return Pair(buildJsonObject { put("errors", errorsJson) }.toString(), false)
         }
 
         val workspaceJson = Json.parseToJsonElement(workspaceString)
@@ -127,26 +237,29 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 ?.jsonObject
                 ?.get(project.root) ?: JsonNull
 
-        return buildJsonObject {
-                putJsonObject("project") {
-                    put("name", project.name)
-                    put(
-                        "type",
-                        project.projectType.let {
-                            when (it) {
-                                "application" -> "app"
-                                "library" -> "lib"
-                                else -> "e2e"
-                            }
-                        },
-                    )
-                    put("data", projectElement ?: buildJsonObject {})
-                }
+        return Pair(
+            buildJsonObject {
+                    putJsonObject("project") {
+                        put("name", project.name)
+                        put(
+                            "type",
+                            project.projectType.let {
+                                when (it) {
+                                    "application" -> "app"
+                                    "library" -> "lib"
+                                    else -> "e2e"
+                                }
+                            },
+                        )
+                        put("data", projectElement ?: buildJsonObject {})
+                    }
 
-                put("sourceMap", sourceMapsElement)
-                put("errors", errorsJson)
-            }
-            .toString()
+                    put("sourceMap", sourceMapsElement)
+                    put("errors", errorsJson)
+                }
+                .toString(),
+            true,
+        )
     }
 
     override fun dispose() {

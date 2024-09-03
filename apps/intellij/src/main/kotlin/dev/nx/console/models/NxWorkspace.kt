@@ -54,9 +54,8 @@ data class NxWorkspace(
 
 data class WorkspaceLayout(val appsDir: String?, val libsDir: String?)
 
-data class NxWorkspaceConfiguration(
-    val projects: Map<String, NxProject>
-    //    val sourceMaps: Map<String, Map<String, SourceInformation>>?,
+data class NxWorkspaceConfiguration(val projects: Map<String, NxProject>
+//    val sourceMaps: Map<String, Map<String, SourceInformation>>?,
 ) {}
 
 @Serializable()

@@ -76,7 +76,8 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
                         projectName != null &&
                             nxWorkspace?.workspace?.projects?.contains(projectName) != true
-                    } ?: false
+                    }
+                        ?: false
 
                 if (
                     !errorsToShow.isNullOrEmpty() &&

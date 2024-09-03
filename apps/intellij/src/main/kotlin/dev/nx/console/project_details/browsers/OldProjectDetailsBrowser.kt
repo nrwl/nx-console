@@ -260,8 +260,7 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
                             )
                         val error =
                             NxError(
-                                message =
-                                    e.message
+                                message = e.message
                                         ?: "Nx Console encountered an error while loading. Please reset to try again.",
                                 null,
                                 stack = e.stackTraceToString(),

@@ -64,6 +64,9 @@ dependencies {
 
     implementation("io.github.z4kn4fein:semver:2.0.0")
 
+    implementation("io.github.nsk90:kstatemachine:0.31.0")
+    implementation("io.github.nsk90:kstatemachine-coroutines:0.31.0")
+
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
 

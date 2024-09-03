@@ -242,7 +242,11 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     private fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
         initParams.workspaceFolders =
+<<<<<<< HEAD
             listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath), "nx-workspace"))
+=======
+            listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath), "Nx Workspace"))
+>>>>>>> 8709e9cd (intellij pdv browser w/ state machine)
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true
