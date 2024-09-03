@@ -2,6 +2,7 @@ package dev.nx.console.nxls
 
 import StandardNxGraphServer
 import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -59,7 +60,7 @@ class NxRefreshWorkspaceAction :
                         )
                             TelemetryEventSource.EDITOR_TOOLBAR
                         else TelemetryEventSource.COMMAND
-                )
+                ),
             )
 
         try {
@@ -83,6 +84,8 @@ class NxRefreshWorkspaceService(private val project: Project) {
         }
         refreshing = true
 
+        val notification = Notifier.notifyNxRefresh(project)
+
         ProgressManager.getInstance()
             .run(
                 object : Task.Backgroundable(project, "Refreshing Workspace", false) {
@@ -90,11 +93,28 @@ class NxRefreshWorkspaceService(private val project: Project) {
                         runBlocking {
                             try {
                                 withContext(Dispatchers.EDT) {
+                                    indicator.isIndeterminate = false
+                                    indicator.fraction = 0.1
                                     NxlsService.getInstance(project).restart()
+                                    indicator.fraction = 0.5
                                     StandardNxGraphServer.getInstance(project).restart()
+                                    indicator.fraction = 0.8
                                     NxlsService.getInstance(project).refreshWorkspace()
+                                    indicator.fraction = 1.0
+
+                                    if (notification?.isExpired == false) {
+                                        notification.expire()
+                                        Notifier.notifyAnything(
+                                            project,
+                                            "Successfully refreshed Nx workspace",
+                                            NotificationType.INFORMATION,
+                                        )
+                                    }
                                 }
                             } catch (ex: Exception) {
+                                if (notification?.isExpired == false) {
+                                    notification.expire()
+                                }
                                 Notifier.notifyAnything(project, "Error refreshing workspace")
                             } finally {
                                 refreshing = false

@@ -1,6 +1,7 @@
 package dev.nx.console.utils
 
 import com.intellij.ide.BrowserUtil
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
@@ -25,7 +26,7 @@ class Notifier {
             group
                 .createNotification(
                     NxConsoleBundle.message("nxls.not.started"),
-                    NotificationType.ERROR
+                    NotificationType.ERROR,
                 )
                 .setTitle("Nx Console")
                 .setSuggestionType(true)
@@ -37,7 +38,7 @@ class Notifier {
             group
                 .createNotification(
                     NxConsoleBundle.message("nx.telemetry.permission"),
-                    NotificationType.INFORMATION
+                    NotificationType.INFORMATION,
                 )
                 .setTitle("Nx Console")
                 .addActions(
@@ -50,7 +51,7 @@ class Notifier {
                                     "https://nx.dev/recipes/nx-console/console-telemetry#collected-data"
                                 )
                             }
-                        }
+                        },
                     )
                         as Collection<AnAction>
                 )
@@ -64,7 +65,7 @@ class Notifier {
                 notifyAnything(
                     project,
                     "Couldn't find a project at $path. Are you sure this path belongs to an Nx project?",
-                    NotificationType.ERROR
+                    NotificationType.ERROR,
                 )
             }
         }
@@ -75,7 +76,7 @@ class Notifier {
         fun notifyLspMessageIssueExceptionThrottled(
             project: Project,
             requestName: String,
-            e: MessageIssueException
+            e: MessageIssueException,
         ) =
             lspIssueExceptionThrottler.throttle {
                 notifyLSPMessageIssueException(project, requestName, e)
@@ -84,7 +85,7 @@ class Notifier {
         fun notifyLSPMessageIssueException(
             project: Project,
             requestName: String,
-            e: MessageIssueException
+            e: MessageIssueException,
         ) {
             group
                 .createNotification(
@@ -96,7 +97,7 @@ class Notifier {
                         "<pre>${e.issues.first().cause.message}</pre><br>" +
                         "Make sure to double-check your project.json & nx.json files for syntax errors below." +
                         "</html>",
-                    NotificationType.ERROR
+                    NotificationType.ERROR,
                 )
                 .setTitle("Nx Console")
                 .addAction(AnalyzeNxConfigurationFilesNotificationAction())
@@ -123,10 +124,44 @@ class Notifier {
                 .notify(project)
         }
 
+        fun notifyNxRefresh(project: Project): Notification? {
+            val hideNotificationPropertyKey = "dev.nx.console.hide_nx_refresh_notification"
+
+            val shouldHideNotification =
+                PropertiesComponent.getInstance(project).getBoolean(hideNotificationPropertyKey)
+
+            if (shouldHideNotification) {
+                return null
+            }
+
+            val notification =
+                group
+                    .createNotification(
+                        "Refreshing Nx Workspace. You can check the progress in the status bar.",
+                        NotificationType.INFORMATION,
+                    )
+                    .setTitle("Nx Console")
+
+            notification.addActions(
+                setOf(
+                    NotificationAction.createSimpleExpiring("OK") { notification.expire() },
+                    NotificationAction.createSimpleExpiring("Don't show again") {
+                        notification.expire()
+                        PropertiesComponent.getInstance(project)
+                            .setValue(hideNotificationPropertyKey, true)
+                    },
+                )
+            )
+
+            notification.notify(project)
+
+            return notification
+        }
+
         fun notifyAnything(
             project: Project,
             message: String,
-            type: NotificationType = NotificationType.INFORMATION
+            type: NotificationType = NotificationType.INFORMATION,
         ) {
             group.createNotification(message, type).setTitle("Nx Console").notify(project)
         }
