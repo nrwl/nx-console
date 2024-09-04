@@ -183,34 +183,28 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
     </head>
     <body>
-        <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem" id="root"></div>
+        <script>
+            window.__NX_RENDER_GRAPH__ = false;
+        </script>
+        <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem" id="app"></div>
 
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+        <script src="runtime.js"></script>
+        <script src="styles.js"></script>
+        <script src="main.js"></script>
 
+        <script>
+          const data = ${data.pdvData}
 
-    <script src="runtime.js"></script>
-    <script src="styles.js"></script>
-    <script src="pdv.umd.js"></script>
-
-      <script>
-      const data = ${data.pdvData}
-
-      const sendMessage = (message) => {
-         ${interactionEventQuery.inject("JSON.stringify(message)")}
-      }
-
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-
-      const pdvelement = React.createElement(PDV.default, {
-        project: data.project,
-        sourceMap: data.sourceMap,
-        onViewInProjectGraph: (data) => sendMessage({ type: 'open-project-graph', payload: data }),
-        }
-      )
-      root.render(React.createElement(PDV.ExpandedTargetsProvider, null, pdvelement));
-
-    </script>
+          const sendMessage = (message) => {
+             ${interactionEventQuery.inject("JSON.stringify(message)")}
+          }
+          window.renderPDV({
+            project: data.project,
+            sourceMap: data.sourceMap,
+            onViewInProjectGraph: (data) => sendMessage({ type: 'open-project-graph', payload: data }),
+            }
+          )
+        </script>
 
     </body>
     </html>
@@ -321,8 +315,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 ?.jsonObject
                 ?.get("sourceMaps")
                 ?.jsonObject
-                ?.get(project.root)
-                ?: JsonNull
+                ?.get(project.root) ?: JsonNull
 
         return Pair(
             buildJsonObject {
