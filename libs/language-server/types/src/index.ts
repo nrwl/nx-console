@@ -17,7 +17,6 @@ import type {
   ProjectConfiguration,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { SemVer } from 'semver';
 import { StartupMessageDefinition } from 'shared/nx-console-plugins';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
@@ -27,6 +26,9 @@ export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
 
 export const NxWorkspaceRefreshNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspace');
+
+export const NxWorkspaceRefreshStartedNotification: NotificationType<void> =
+  new NotificationType('nx/refreshWorkspaceStarted');
 
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');

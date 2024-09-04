@@ -32,6 +32,7 @@ import {
   NxVersionRequest,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
+  NxWorkspaceRefreshStartedNotification,
   NxWorkspaceRequest,
   NxCloudOnboardingInfoRequest,
   NxWorkspaceSerializedRequest,
@@ -657,6 +658,9 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 });
 
 async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
+  if (reconfigureAttempts === 0) {
+    connection.sendNotification(NxWorkspaceRefreshStartedNotification.method);
+  }
   const workspace = await reconfigure(workingPath);
   await connection.sendNotification(NxWorkspaceRefreshNotification.method);
 

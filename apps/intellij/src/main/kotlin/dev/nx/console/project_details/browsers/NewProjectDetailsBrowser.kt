@@ -1,5 +1,6 @@
 package dev.nx.console.project_details.browsers
 
+import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -13,10 +14,12 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphInteractionEvent
 import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
+import dev.nx.console.nxls.NxWorkspaceRefreshStartedListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.NxHelpCommandService
 import dev.nx.console.run.NxTaskExecutionManager
@@ -25,8 +28,12 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
+import java.awt.BorderLayout
+import java.awt.Color
 import java.nio.file.Paths
 import java.util.regex.Matcher
+import javax.swing.JPanel
+import javax.swing.JProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +41,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import ru.nsk.kstatemachine.event.DataEvent
+import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
 import ru.nsk.kstatemachine.statemachine.processEventByLaunch
@@ -43,11 +51,14 @@ object States {
     const val Loading = "Loading"
     const val ShowingPDV = "ShowingPDV"
     const val ShowingError = "ShowingError"
+    const val ShowingPDVLoading = "ShowingPDVLoading"
+    const val ShowingErrorLoading = "ShowingErrorLoading"
 }
 
 class LoadSuccessData(val graphBasePath: String, val pdvData: String)
 
 sealed interface Events {
+    class RefreshStarted : Event
 
     class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
 
@@ -56,6 +67,9 @@ sealed interface Events {
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
+    private val panel: JPanel = JPanel(BorderLayout())
+    private val progressBar: JProgressBar = JProgressBar()
+
     private val browser: JBCefBrowser = JBCefBrowser()
     private val interactionEventQuery: JBCefJSQuery = createInteractionEventQuery()
 
@@ -63,15 +77,29 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
     private val stateMachine =
         createStateMachineBlocking(scope) {
+            val loadingState = initialState(States.Loading)
             val showingPDVState = dataState(States.ShowingPDV) { onEntry { showPDV(data) } }
 
             val showingErrorState = dataState(States.ShowingError) { onEntry { showError(data) } }
+
+            val showingPDVLoadingState =
+                state(States.ShowingPDVLoading) {
+                    onEntry { showProgressBarLoading() }
+                    onExit { hideProgressBarLoading() }
+                }
+
+            val showingErrorLoadingState =
+                state(States.ShowingErrorLoading) {
+                    onEntry { showProgressBarLoading() }
+                    onExit { hideProgressBarLoading() }
+                }
 
             showingPDVState.apply {
                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                     targetState = showingPDVState
                 }
                 dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+                transition<Events.RefreshStarted> { targetState = showingPDVLoadingState }
             }
 
             showingErrorState.apply {
@@ -79,24 +107,50 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     targetState = showingPDVState
                 }
                 dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+                transition<Events.RefreshStarted> { targetState = showingPDVLoadingState }
             }
 
-            initialState(States.Loading) {
+            showingPDVLoadingState.apply {
                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                     targetState = showingPDVState
                 }
                 dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+            }
+
+            showingErrorLoadingState.apply {
+                dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                    targetState = showingPDVState
+                }
+                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+            }
+
+            loadingState.apply {
+                dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                    targetState = showingPDVState
+                }
+                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+                transition<Events.RefreshStarted> { targetState = loadingState }
 
                 onEntry {
+                    hideProgressBarLoading()
                     showLoading()
                     tryLoadPDV()
                 }
             }
         }
 
-    val component = browser.component
-
     init {
+        progressBar.setUI(
+            object : DarculaProgressBarUI() {
+                override fun getRemainderColor(): Color {
+                    return UIUtil.getPanelBackground()
+                }
+            }
+        )
+
+        panel.add(progressBar, BorderLayout.NORTH)
+        panel.add(browser.component, BorderLayout.CENTER)
+
         with(project.messageBus.connect(this)) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
@@ -107,13 +161,20 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     tryLoadPDV()
                 },
             )
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
+                NxWorkspaceRefreshStartedListener {
+                    stateMachine.processEventByLaunch(Events.RefreshStarted())
+                },
+            )
         }
     }
+
+    val component = panel
 
     private fun showPDV(data: LoadSuccessData) {
         val html =
             """
-           `
     <html>
     <head>
     <base href="${Matcher.quoteReplacement(data.graphBasePath)}">
@@ -153,7 +214,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
     </body>
     </html>
-    `
        """
                 .trimIndent()
 
@@ -186,6 +246,14 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 .trimIndent()
 
         ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+    }
+
+    private fun showProgressBarLoading() {
+        ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = true }
+    }
+
+    private fun hideProgressBarLoading() {
+        ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = false }
     }
 
     private fun tryLoadPDV() {
@@ -253,7 +321,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 ?.jsonObject
                 ?.get("sourceMaps")
                 ?.jsonObject
-                ?.get(project.root) ?: JsonNull
+                ?.get(project.root)
+                ?: JsonNull
 
         return Pair(
             buildJsonObject {

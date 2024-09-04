@@ -50,6 +50,13 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
                 project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
         }
+        client()?.registerRefreshStartedCallback {
+            cs.launch {
+                project.messageBus
+                    .syncPublisher(NX_WORKSPACE_REFRESH_STARTED_TOPIC)
+                    .onWorkspaceRefreshStarted()
+            }
+        }
     }
 
     suspend fun close() {
@@ -240,9 +247,16 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
 
         val NX_WORKSPACE_REFRESH_TOPIC: Topic<NxWorkspaceRefreshListener> =
             Topic("NxWorkspaceRefresh", NxWorkspaceRefreshListener::class.java)
+
+        val NX_WORKSPACE_REFRESH_STARTED_TOPIC: Topic<NxWorkspaceRefreshStartedListener> =
+            Topic("NxWorkspaceRefreshStarted", NxWorkspaceRefreshStartedListener::class.java)
     }
 }
 
 fun interface NxWorkspaceRefreshListener {
     fun onNxWorkspaceRefresh()
+}
+
+fun interface NxWorkspaceRefreshStartedListener {
+    fun onWorkspaceRefreshStarted()
 }

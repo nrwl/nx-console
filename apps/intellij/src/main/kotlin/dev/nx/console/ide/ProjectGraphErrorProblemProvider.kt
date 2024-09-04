@@ -17,11 +17,15 @@ import dev.nx.console.utils.nxBasePath
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Service(Service.Level.PROJECT)
 class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineScope) {
     private val nxProblemsProvider = NxProblemsProvider(project)
     private val problemsCollector = ProblemsCollector.getInstance(project)
+
+    val mutex = Mutex()
 
     private val problems = mutableListOf<Problem>()
 
@@ -45,8 +49,11 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
 
             problems.forEach { problemsCollector.problemDisappeared(it) }
             newProblems?.forEach { problemsCollector.problemAppeared(it) }
-            problems.clear()
-            problems.addAll(newProblems ?: emptyList())
+
+            mutex.withLock {
+                problems.clear()
+                problems.addAll(newProblems ?: emptyList())
+            }
         }
     }
 
