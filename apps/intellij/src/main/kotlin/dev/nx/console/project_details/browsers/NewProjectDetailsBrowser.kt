@@ -44,25 +44,36 @@ import ru.nsk.kstatemachine.event.DataEvent
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
+import ru.nsk.kstatemachine.statemachine.onTransitionTriggered
 import ru.nsk.kstatemachine.statemachine.processEventByLaunch
 import ru.nsk.kstatemachine.statemachine.stop
+import ru.nsk.kstatemachine.transition.onTriggered
 
 object States {
     const val Loading = "Loading"
     const val ShowingPDV = "ShowingPDV"
     const val ShowingError = "ShowingError"
+    const val ShowingErrorNoGraph = "ShowingErrorNoGraph"
     const val ShowingPDVLoading = "ShowingPDVLoading"
     const val ShowingErrorLoading = "ShowingErrorLoading"
 }
 
 class LoadSuccessData(val graphBasePath: String, val pdvData: String)
 
+class LoadErrorData(
+    val graphBasePath: String,
+    val errorsSerialized: String,
+    val errorMessage: String,
+)
+
 sealed interface Events {
     class RefreshStarted : Event
 
     class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
 
-    class LoadError(override val data: String) : DataEvent<String>
+    class LoadError(override val data: LoadErrorData) : DataEvent<LoadErrorData>
+
+    class LoadErrorNoGraph(override val data: String) : DataEvent<String>
 }
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
@@ -78,58 +89,63 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private val stateMachine =
         createStateMachineBlocking(scope) {
             val loadingState = initialState(States.Loading)
-            val showingPDVState = dataState(States.ShowingPDV) { onEntry { showPDV(data) } }
+            val showingPDVState =
+                dataState<LoadSuccessData>(States.ShowingPDV) { onEntry { showPDV(data) } }
 
-            val showingErrorState = dataState(States.ShowingError) { onEntry { showError(data) } }
+            val showingErrorState =
+                dataState<LoadErrorData>(States.ShowingError) { onEntry { showError(data) } }
 
-            val showingPDVLoadingState =
-                state(States.ShowingPDVLoading) {
-                    onEntry { showProgressBarLoading() }
-                    onExit { hideProgressBarLoading() }
+            val showingErrorNoGraphState =
+                dataState<String>(States.ShowingErrorNoGraph) { onEntry { showErrorNoGraph(data) } }
+
+            onTransitionTriggered {
+                if (it.event !is Events.RefreshStarted) {
+                    hideProgressBarLoading()
                 }
-
-            val showingErrorLoadingState =
-                state(States.ShowingErrorLoading) {
-                    onEntry { showProgressBarLoading() }
-                    onExit { hideProgressBarLoading() }
-                }
+            }
 
             showingPDVState.apply {
                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                     targetState = showingPDVState
                 }
-                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
-                transition<Events.RefreshStarted> { targetState = showingPDVLoadingState }
+                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
+                dataTransition<Events.LoadErrorNoGraph, String> {
+                    targetState = showingErrorNoGraphState
+                }
+                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
             }
 
             showingErrorState.apply {
                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                     targetState = showingPDVState
                 }
-                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
-                transition<Events.RefreshStarted> { targetState = showingPDVLoadingState }
+                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
+                dataTransition<Events.LoadErrorNoGraph, String> {
+                    targetState = showingErrorNoGraphState
+                }
+                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
             }
 
-            showingPDVLoadingState.apply {
+            showingErrorNoGraphState.apply {
                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                     targetState = showingPDVState
                 }
-                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
-            }
-
-            showingErrorLoadingState.apply {
-                dataTransition<Events.LoadSuccess, LoadSuccessData> {
-                    targetState = showingPDVState
+                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
+                dataTransition<Events.LoadErrorNoGraph, String> {
+                    targetState = showingErrorNoGraphState
                 }
-                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
+                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
             }
 
             loadingState.apply {
                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                     targetState = showingPDVState
                 }
-                dataTransition<Events.LoadError, String> { targetState = showingErrorState }
-                transition<Events.RefreshStarted> { targetState = loadingState }
+                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
+                dataTransition<Events.LoadErrorNoGraph, String> {
+                    targetState = showingErrorNoGraphState
+                }
+                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
 
                 onEntry {
                     hideProgressBarLoading()
@@ -172,6 +188,35 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
     val component = panel
 
+    private fun tryLoadPDV() {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
+            val graphBasePath =
+                try {
+                    Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
+                } catch (e: Throwable) {
+                    null
+                }
+
+            if (graphBasePath == null) {
+                stateMachine.processEventByLaunch(Events.LoadErrorNoGraph("Graph not found"))
+                return@launch
+            }
+
+            val pdvData = loadPDVDataSerialized()
+
+            if (pdvData.second == null) {
+                stateMachine.processEventByLaunch(
+                    Events.LoadSuccess(LoadSuccessData(graphBasePath, pdvData.first))
+                )
+            } else {
+                stateMachine.processEventByLaunch(
+                    Events.LoadError(LoadErrorData(graphBasePath, pdvData.first, pdvData.second!!))
+                )
+            }
+        }
+    }
+
     private fun showPDV(data: LoadSuccessData) {
         val html =
             """
@@ -202,6 +247,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             project: data.project,
             sourceMap: data.sourceMap,
             onViewInProjectGraph: (data) => sendMessage({ type: 'open-project-graph', payload: data }),
+            errors: data.errors
             }
           )
         </script>
@@ -214,7 +260,48 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
     }
 
-    private fun showError(data: String) {
+    private fun showError(data: LoadErrorData) {
+        val html =
+            """
+    <html>
+    <head>
+    <base href="${Matcher.quoteReplacement(data.graphBasePath)}">
+    <script src="environment.js"></script>
+  <link rel="stylesheet" href="styles.css">
+
+    </head>
+    <body>
+        <script>
+            window.__NX_RENDER_GRAPH__ = false;
+        </script>
+        <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem" id="app"></div>
+
+        <script src="runtime.js"></script>
+        <script src="styles.js"></script>
+        <script src="main.js"></script>
+
+        <script>
+          const data = ${data.errorsSerialized}
+
+          const sendMessage = (message) => {
+             ${interactionEventQuery.inject("JSON.stringify(message)")}
+          }
+          window.renderError({
+            message: "${data.errorMessage}",
+            errors: data.errors
+            }
+          )
+        </script>
+
+    </body>
+    </html>
+       """
+                .trimIndent()
+
+        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+    }
+
+    private fun showErrorNoGraph(data: String) {
         val html =
             """
             <html>
@@ -250,29 +337,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = false }
     }
 
-    private fun tryLoadPDV() {
-        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
-            val graphBasePath =
-                try {
-                    Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
-                } catch (e: Throwable) {
-                    null
-                }
-
-            val pdvData = loadPDVDataSerialized()
-
-            if (graphBasePath != null && pdvData.second) {
-                stateMachine.processEventByLaunch(
-                    Events.LoadSuccess(LoadSuccessData(graphBasePath, pdvData.first))
-                )
-            } else {
-                stateMachine.processEventByLaunch(Events.LoadError(pdvData.first))
-            }
-        }
-    }
-
-    private suspend fun loadPDVDataSerialized(): Pair<String, Boolean> {
+    // right now this is: Pair<Serialized Data, Optional Error Message>
+    private suspend fun loadPDVDataSerialized(): Pair<String, String?> {
         val nxlsService = NxlsService.getInstance(project)
 
         val workspace = nxlsService.workspace()
@@ -280,13 +346,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
         if (workspace == null || workspaceString == null) {
             return Pair(
-                buildJsonObject {
-                        putJsonArray("errors") {
-                            add(buildJsonObject { put("message", "Workspace not found") })
-                        }
-                    }
-                    .toString(),
-                false,
+                buildJsonObject { putJsonArray("errors") {} }.toString(),
+                "Workspace not found",
             )
         }
 
@@ -299,7 +360,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         }
 
         if (project == null) {
-            return Pair(buildJsonObject { put("errors", errorsJson) }.toString(), false)
+            return Pair(
+                buildJsonObject { put("errors", errorsJson) }.toString(),
+                "Couldn't find project at ${file.path}",
+            )
         }
 
         val workspaceJson = Json.parseToJsonElement(workspaceString)
@@ -338,7 +402,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     put("errors", errorsJson)
                 }
                 .toString(),
-            true,
+            null,
         )
     }
 
