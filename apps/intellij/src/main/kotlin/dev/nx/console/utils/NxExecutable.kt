@@ -60,11 +60,15 @@ class NxExecutable {
     }
 }
 
-fun getNxPackagePath(project: Project, basePath: String): String {
+fun isDotNxInstallation(basePath: String): Boolean {
     val nxExecutableName =
         if (SystemInfo.isWindows && !WslPath.isWslUncPath(basePath)) "nx.bat" else "nx"
     val nxExecutable = File(Paths.get(basePath, nxExecutableName).toString())
-    if (nxExecutable.exists()) {
+    return nxExecutable.exists() && !nxExecutable.isDirectory()
+}
+
+fun getNxPackagePath(project: Project, basePath: String): String {
+    if (isDotNxInstallation(basePath)) {
         return Paths.get(basePath, ".nx", "installation", "node_modules", "nx").toString()
     }
 

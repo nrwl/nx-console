@@ -69,6 +69,8 @@ class LoadErrorData(
 sealed interface Events {
     class RefreshStarted : Event
 
+    class Refresh : Event
+
     class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
 
     class LoadError(override val data: LoadErrorData) : DataEvent<LoadErrorData>
@@ -191,14 +193,12 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private fun tryLoadPDV() {
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
-            val graphBasePath =
-                try {
-                    Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
-                } catch (e: Throwable) {
-                    null
-                }
+            val graphBasePath = Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
 
-            if (graphBasePath == null) {
+            val graphPathExists =
+                LocalFileSystem.getInstance().findFileByPath(graphBasePath) != null
+
+            if (!graphPathExists) {
                 stateMachine.processEventByLaunch(Events.LoadErrorNoGraph("Graph not found"))
                 return@launch
             }

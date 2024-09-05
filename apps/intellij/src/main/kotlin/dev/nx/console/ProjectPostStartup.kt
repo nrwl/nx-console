@@ -11,6 +11,7 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.sync_services.NxProjectJsonToProjectMap
+import dev.nx.console.utils.sync_services.NxVersionUtil
 import java.io.File
 
 internal class ProjectPostStartup : ProjectActivity {
@@ -26,6 +27,7 @@ internal class ProjectPostStartup : ProjectActivity {
                 service.runAfterStarted {
                     NxProjectJsonToProjectMap.getInstance(project).init()
                     ProjectGraphErrorProblemProvider.getInstance(project).init()
+                    NxVersionUtil.getInstance(project).listen()
                 }
                 break
             }

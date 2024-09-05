@@ -12,4 +12,8 @@ data class NxVersion(val minor: Int, val major: Int, val full: String) {
         }
         return false
     }
+
+    fun equals(other: NxVersion): Boolean {
+        return this.major == other.major && this.minor == other.minor && this.full == other.full
+    }
 }

@@ -22,8 +22,8 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
     TextEditorWithPreview(createEditor(project, file), createPreviewComponent(project, file)),
     DumbAware {
     init {
-        setLayout(
-            NxVersionUtil.getInstance(project).nxVersion.let {
+        layout =
+            NxVersionUtil.getInstance(project).getNxVersionSynchronously().let {
                 if (it == null || !it.gte(NxVersion(major = 17, minor = 13, full = "17.13.0"))) {
                     Layout.SHOW_EDITOR
                 } else {

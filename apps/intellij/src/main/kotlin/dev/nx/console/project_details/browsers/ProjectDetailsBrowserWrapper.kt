@@ -15,7 +15,7 @@ class ProjectDetailsBrowserWrapper(private val project: Project, private val fil
     private var oldBrowser: OldProjectDetailsBrowser? = null
 
     fun getComponent(): JComponent {
-        val version = NxVersionUtil.getInstance(project).nxVersion
+        val version = NxVersionUtil.getInstance(project).getNxVersionSynchronously()
         if (version != null && version.gte(NxVersion(major = 20, minor = 0, full = "20.0.0"))) {
             return getOrCreateNewBrowser().component
         } else {
