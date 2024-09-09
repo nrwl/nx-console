@@ -202,6 +202,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         }()
     }
 
+    suspend fun pdvData(filePath: String): NxPDVData? {
+        return withMessageIssueCatch("nx/pdvData") {
+            server()?.getNxService()?.pdvData(PDVDataRequest(filePath))?.await()
+        }()
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }

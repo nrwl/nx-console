@@ -19,6 +19,7 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
+  NxPDVDataRequest,
   NxProjectByPathRequest,
   NxProjectByRootRequest,
   NxProjectFolderTreeRequest,
@@ -58,6 +59,7 @@ import {
   getNxCloudStatus,
   getNxDaemonClient,
   getNxVersion,
+  getPDVData,
   getProjectByPath,
   getProjectByRoot,
   getProjectFolderTree,
@@ -604,6 +606,13 @@ connection.onRequest(NxCloudOnboardingInfoRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return getCloudOnboardingInfo(WORKING_PATH);
+});
+
+connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return getPDVData(WORKING_PATH, args.filePath);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {

@@ -124,4 +124,9 @@ interface NxService {
     fun cloudStatus(): CompletableFuture<NxCloudStatus> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun pdvData(pdvDataRequest: PDVDataRequest): CompletableFuture<NxPDVData> {
+        throw UnsupportedOperationException()
+    }
 }

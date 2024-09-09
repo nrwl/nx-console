@@ -11,6 +11,7 @@ import {
   CloudOnboardingInfo,
   NxVersion,
   NxWorkspace,
+  PDVData,
   TreeNode,
 } from '@nx-console/shared/types';
 import type {
@@ -186,3 +187,9 @@ export const NxCloudOnboardingInfoRequest: RequestType<
   CloudOnboardingInfo,
   unknown
 > = new RequestType('nx/cloudOnboardingInfo');
+
+export const NxPDVDataRequest: RequestType<
+  { filePath: string },
+  PDVData,
+  unknown
+> = new RequestType('nx/pdvData');

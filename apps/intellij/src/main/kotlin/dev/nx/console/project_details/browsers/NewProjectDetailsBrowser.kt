@@ -14,10 +14,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.util.messages.SimpleMessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphInteractionEvent
 import dev.nx.console.graph.getNxGraphService
-import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxWorkspaceRefreshStartedListener
 import dev.nx.console.nxls.NxlsService
@@ -34,28 +34,21 @@ import java.nio.file.Paths
 import java.util.regex.Matcher
 import javax.swing.JPanel
 import javax.swing.JProgressBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import ru.nsk.kstatemachine.event.DataEvent
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
-import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
-import ru.nsk.kstatemachine.statemachine.onTransitionTriggered
-import ru.nsk.kstatemachine.statemachine.processEventByLaunch
-import ru.nsk.kstatemachine.statemachine.stop
+import ru.nsk.kstatemachine.statemachine.*
 import ru.nsk.kstatemachine.transition.onTriggered
 
 object States {
-    const val Loading = "Loading"
+    const val InitialLoading = "InitialLoading"
     const val ShowingPDV = "ShowingPDV"
     const val ShowingError = "ShowingError"
     const val ShowingErrorNoGraph = "ShowingErrorNoGraph"
-    const val ShowingPDVLoading = "ShowingPDVLoading"
-    const val ShowingErrorLoading = "ShowingErrorLoading"
+    const val Loading = "Loading"
 }
 
 class LoadSuccessData(val graphBasePath: String, val pdvData: String)
@@ -69,7 +62,7 @@ class LoadErrorData(
 sealed interface Events {
     class RefreshStarted : Event
 
-    class Refresh : Event
+    class TryLoadPDV : Event
 
     class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
 
@@ -86,76 +79,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private val browser: JBCefBrowser = JBCefBrowser()
     private val interactionEventQuery: JBCefJSQuery = createInteractionEventQuery()
 
+    private lateinit var stateMachine: StateMachine
+    private lateinit var messageBusConnection: SimpleMessageBusConnection
+
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
-
-    private val stateMachine =
-        createStateMachineBlocking(scope) {
-            val loadingState = initialState(States.Loading)
-            val showingPDVState =
-                dataState<LoadSuccessData>(States.ShowingPDV) { onEntry { showPDV(data) } }
-
-            val showingErrorState =
-                dataState<LoadErrorData>(States.ShowingError) { onEntry { showError(data) } }
-
-            val showingErrorNoGraphState =
-                dataState<String>(States.ShowingErrorNoGraph) { onEntry { showErrorNoGraph(data) } }
-
-            onTransitionTriggered {
-                if (it.event !is Events.RefreshStarted) {
-                    hideProgressBarLoading()
-                }
-            }
-
-            showingPDVState.apply {
-                dataTransition<Events.LoadSuccess, LoadSuccessData> {
-                    targetState = showingPDVState
-                }
-                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
-                dataTransition<Events.LoadErrorNoGraph, String> {
-                    targetState = showingErrorNoGraphState
-                }
-                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
-            }
-
-            showingErrorState.apply {
-                dataTransition<Events.LoadSuccess, LoadSuccessData> {
-                    targetState = showingPDVState
-                }
-                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
-                dataTransition<Events.LoadErrorNoGraph, String> {
-                    targetState = showingErrorNoGraphState
-                }
-                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
-            }
-
-            showingErrorNoGraphState.apply {
-                dataTransition<Events.LoadSuccess, LoadSuccessData> {
-                    targetState = showingPDVState
-                }
-                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
-                dataTransition<Events.LoadErrorNoGraph, String> {
-                    targetState = showingErrorNoGraphState
-                }
-                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
-            }
-
-            loadingState.apply {
-                dataTransition<Events.LoadSuccess, LoadSuccessData> {
-                    targetState = showingPDVState
-                }
-                dataTransition<Events.LoadError, LoadErrorData> { targetState = showingErrorState }
-                dataTransition<Events.LoadErrorNoGraph, String> {
-                    targetState = showingErrorNoGraphState
-                }
-                transition<Events.RefreshStarted> { onTriggered { showProgressBarLoading() } }
-
-                onEntry {
-                    hideProgressBarLoading()
-                    showLoading()
-                    tryLoadPDV()
-                }
-            }
-        }
 
     init {
         progressBar.setUI(
@@ -169,60 +96,140 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         panel.add(progressBar, BorderLayout.NORTH)
         panel.add(browser.component, BorderLayout.CENTER)
 
-        with(project.messageBus.connect(this)) {
-            subscribe(
-                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener {
-                    if (project.isDisposed) {
-                        return@NxWorkspaceRefreshListener
-                    }
-                    tryLoadPDV()
-                },
-            )
-            subscribe(
-                NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
-                NxWorkspaceRefreshStartedListener {
-                    stateMachine.processEventByLaunch(Events.RefreshStarted())
-                },
-            )
-        }
+        init()
     }
 
     val component = panel
 
-    private fun tryLoadPDV() {
-        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
-            val graphBasePath = Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
+    private fun init() {
+        scope.launch {
+            stateMachine =
+                createStateMachine(scope) {
+                    val initialLoadingState = initialState(States.InitialLoading)
+                    val showingPDVState =
+                        dataState<LoadSuccessData>(States.ShowingPDV) { onEntry { showPDV(data) } }
 
-            val graphPathExists =
-                LocalFileSystem.getInstance().findFileByPath(graphBasePath) != null
+                    val showingErrorState =
+                        dataState<LoadErrorData>(States.ShowingError) {
+                            onEntry { showError(data) }
+                        }
 
-            if (!graphPathExists) {
-                stateMachine.processEventByLaunch(Events.LoadErrorNoGraph("Graph not found"))
-                return@launch
-            }
+                    val showingErrorNoGraphState =
+                        dataState<String>(States.ShowingErrorNoGraph) {
+                            onEntry { showErrorNoGraph(data) }
+                        }
 
-            val pdvData = loadPDVDataSerialized()
+                    val loadingState =
+                        state(States.Loading).apply {
+                            onEntry { showProgressBarLoading() }
+                            onExit { hideProgressBarLoading() }
+                        }
 
-            if (pdvData.second == null) {
-                stateMachine.processEventByLaunch(
-                    Events.LoadSuccess(LoadSuccessData(graphBasePath, pdvData.first))
+                    listOf(
+                            showingPDVState,
+                            showingErrorState,
+                            showingErrorNoGraphState,
+                            initialLoadingState,
+                            loadingState,
+                        )
+                        .forEach {
+                            it.apply {
+                                transition<Events.TryLoadPDV> {
+                                    targetState = loadingState
+                                    onTriggered {
+                                        if (browser.isDisposed) {
+                                            return@onTriggered
+                                        }
+                                        val pdvData =
+                                            NxlsService.getInstance(project).pdvData(file.path)
+
+                                        if (
+                                            pdvData == null ||
+                                                pdvData.resultType === "NO_GRAPH_ERROR" ||
+                                                pdvData.graphBasePath == null
+                                        ) {
+                                            this@createStateMachine.processEvent(
+                                                Events.LoadErrorNoGraph("Graph not found")
+                                            )
+                                            return@onTriggered
+                                        }
+
+                                        if (
+                                            pdvData.errorMessage == null &&
+                                                pdvData.errorsSerialized == null &&
+                                                pdvData.pdvDataSerialized != null
+                                        ) {
+                                            this@createStateMachine.processEvent(
+                                                Events.LoadSuccess(
+                                                    LoadSuccessData(
+                                                        pdvData.graphBasePath,
+                                                        pdvData.pdvDataSerialized,
+                                                    )
+                                                )
+                                            )
+                                        } else {
+                                            this@createStateMachine.processEvent(
+                                                Events.LoadError(
+                                                    LoadErrorData(
+                                                        pdvData.graphBasePath,
+                                                        pdvData.errorsSerialized ?: "",
+                                                        pdvData.errorMessage ?: "",
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                                dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                                    targetState = showingPDVState
+                                }
+                                dataTransition<Events.LoadError, LoadErrorData> {
+                                    targetState = showingErrorState
+                                }
+                                dataTransition<Events.LoadErrorNoGraph, String> {
+                                    targetState = showingErrorNoGraphState
+                                }
+                                transition<Events.RefreshStarted> { targetState = loadingState }
+                            }
+                        }
+
+                    initialLoadingState.apply {
+                        onEntry {
+                            hideProgressBarLoading()
+                            showLoading()
+                            this@createStateMachine.processEvent(Events.TryLoadPDV())
+                        }
+                    }
+                }
+
+            messageBusConnection = project.messageBus.connect(scope)
+            with(messageBusConnection) {
+                subscribe(
+                    NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                    NxWorkspaceRefreshListener {
+                        if (project.isDisposed) {
+                            return@NxWorkspaceRefreshListener
+                        }
+                        stateMachine.processEventByLaunch(Events.TryLoadPDV())
+                    },
                 )
-            } else {
-                stateMachine.processEventByLaunch(
-                    Events.LoadError(LoadErrorData(graphBasePath, pdvData.first, pdvData.second!!))
+                subscribe(
+                    NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
+                    NxWorkspaceRefreshStartedListener {
+                        stateMachine.processEventByLaunch(Events.RefreshStarted())
+                    },
                 )
             }
         }
     }
 
     private fun showPDV(data: LoadSuccessData) {
+        logger<NewProjectDetailsBrowser>().info("SHOWING PDV METHOD $data")
         val html =
             """
     <html>
     <head>
-    <base href="${Matcher.quoteReplacement(data.graphBasePath)}">
+    <base href="${Matcher.quoteReplacement(data.graphBasePath)}${if(data.graphBasePath.endsWith("/")) "" else "/"}">
     <script src="environment.js"></script>
   <link rel="stylesheet" href="styles.css">
 
@@ -265,7 +272,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             """
     <html>
     <head>
-    <base href="${Matcher.quoteReplacement(data.graphBasePath)}">
+    <base href="${Matcher.quoteReplacement(data.graphBasePath)}${if(data.graphBasePath.endsWith("/")) "" else "/"}">
     <script src="environment.js"></script>
   <link rel="stylesheet" href="styles.css">
 
@@ -281,14 +288,12 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script src="main.js"></script>
 
         <script>
-          const data = ${data.errorsSerialized}
-
           const sendMessage = (message) => {
              ${interactionEventQuery.inject("JSON.stringify(message)")}
           }
           window.renderError({
             message: "${data.errorMessage}",
-            errors: data.errors
+            errors: ${data.errorsSerialized}
             }
           )
         </script>
@@ -335,75 +340,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
     private fun hideProgressBarLoading() {
         ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = false }
-    }
-
-    // right now this is: Pair<Serialized Data, Optional Error Message>
-    private suspend fun loadPDVDataSerialized(): Pair<String, String?> {
-        val nxlsService = NxlsService.getInstance(project)
-
-        val workspace = nxlsService.workspace()
-        val workspaceString = nxlsService.workspaceSerialized()
-
-        if (workspace == null || workspaceString == null) {
-            return Pair(
-                buildJsonObject { putJsonArray("errors") {} }.toString(),
-                "Workspace not found",
-            )
-        }
-
-        val project = nxlsService.projectByPath(file.path)
-
-        val errorsJson = buildJsonArray {
-            workspace.errors?.forEach { error ->
-                add(Json.encodeToJsonElement(NxError.serializer(), error))
-            }
-        }
-
-        if (project == null) {
-            return Pair(
-                buildJsonObject { put("errors", errorsJson) }.toString(),
-                "Couldn't find project at ${file.path}",
-            )
-        }
-
-        val workspaceJson = Json.parseToJsonElement(workspaceString)
-        val projectElement =
-            workspaceJson.jsonObject["workspace"]
-                ?.jsonObject
-                ?.get("projects")
-                ?.jsonObject
-                ?.get(project.name)
-
-        val sourceMapsElement =
-            workspaceJson.jsonObject["workspace"]
-                ?.jsonObject
-                ?.get("sourceMaps")
-                ?.jsonObject
-                ?.get(project.root) ?: JsonNull
-
-        return Pair(
-            buildJsonObject {
-                    putJsonObject("project") {
-                        put("name", project.name)
-                        put(
-                            "type",
-                            project.projectType.let {
-                                when (it) {
-                                    "application" -> "app"
-                                    "library" -> "lib"
-                                    else -> "e2e"
-                                }
-                            },
-                        )
-                        put("data", projectElement ?: buildJsonObject {})
-                    }
-
-                    put("sourceMap", sourceMapsElement)
-                    put("errors", errorsJson)
-                }
-                .toString(),
-            null,
-        )
     }
 
     private fun createInteractionEventQuery(): JBCefJSQuery {
@@ -511,7 +447,13 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     override fun dispose() {
-        scope.launch { stateMachine.stop() }
+        if (::stateMachine.isInitialized) {
+            scope.launch { stateMachine.stop() }
+        }
+        if (::messageBusConnection.isInitialized) {
+            messageBusConnection.disconnect()
+        }
+        Disposer.dispose(interactionEventQuery)
         Disposer.dispose(browser)
     }
 }

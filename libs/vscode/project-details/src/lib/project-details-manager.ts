@@ -29,15 +29,15 @@ export class ProjectDetailsManager {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion.full, '20.0.0')) {
-        preview = new NewProjectDetailsPreview(path);
-      } else {
-        preview = new OldProjectDetailsPreview(
-          path,
-          this.context,
-          expandedTarget
-        );
-      }
+      // if (gte(nxVersion.full, '20.0.0')) {
+      //   preview = new NewProjectDetailsPreview(path);
+      // } else {
+      preview = new OldProjectDetailsPreview(
+        path,
+        this.context,
+        expandedTarget
+      );
+      // }
       preview.onDispose(() => {
         this.previews.delete(path);
       });
