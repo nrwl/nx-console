@@ -18,6 +18,9 @@ export type TelemetryEvents =
   // cloud
   | 'cloud.connect'
   | 'cloud.open-app'
+  | 'cloud.generate-ci-workflow'
+  | 'cloud.finish-setup'
+  | 'cloud.show-affected-docs'
   // graph
   | 'graph.show-all'
   | 'graph.show-affected'

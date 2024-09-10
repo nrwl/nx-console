@@ -74,6 +74,9 @@ export async function handleGraphInteractionEventBase(event: {
                   join(workspacePath, cwd)
                 : // If CWD is not passed from Nx 19.4.0.
                   join(workspacePath, project.root),
+              env: {
+                NX_CONSOLE: 'true',
+              },
             })
           )
         );

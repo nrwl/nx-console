@@ -4,5 +4,6 @@
   "sourceRoot": "libs/vscode/nx-cloud-view/src",
   "projectType": "library",
   "tags": ["type:vscode"],
+  "implicitDependencies": ["nx-cloud-onboarding-webview"],
   "targets": {}
 }

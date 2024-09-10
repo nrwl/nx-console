@@ -1,6 +1,7 @@
 package dev.nx.console.generate.actions
 
 import com.intellij.icons.AllIcons
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
@@ -13,6 +14,7 @@ import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -95,9 +97,12 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
         val moveGenerators = generators.map { it.name }.filter { it.contains(Regex(":${mode}$")) }
 
         if (moveGenerators.isEmpty()) {
-            throw Exception(
-                "No $mode generators found. Make sure that node_modules are installed, or set the root of Nx Console to point to a Nx workspace in editor settings."
+            Notifier.notifyAnything(
+                project,
+                "No $mode generators found. Did you run npm/yarn/pnpm install?",
+                NotificationType.ERROR,
             )
+            return
         }
 
         val runGeneratorManager = RunGeneratorManager(project)

@@ -76,6 +76,9 @@ export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   workspace: NxWorkspace,
   lspLogger: Logger
 ) => {
+  if (workspace.nxVersion.major > 17) {
+    return undefined;
+  }
   if (
     !schema?.options?.find(
       (option) => option.name === 'projectNameAndRootFormat'
@@ -83,7 +86,6 @@ export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   ) {
     return undefined;
   }
-  // TODO: remove any after update
   if ((workspace.workspace.workspaceLayout as any)?.projectNameAndRootFormat) {
     return undefined;
   }

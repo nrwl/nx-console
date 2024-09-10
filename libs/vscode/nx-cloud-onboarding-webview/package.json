@@ -1,0 +1,10 @@
+{
+  "name": "@nx-console/vscode/nx-cloud-onboarding-webview",
+  "version": "0.0.1",
+  "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.2.0",
+    "@microsoft/fast-foundation": "^2.49.0",
+    "lit": "^2.4.1"
+  },
+  "private": true
+}

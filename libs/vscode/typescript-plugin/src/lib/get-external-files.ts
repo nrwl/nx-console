@@ -37,11 +37,7 @@ export async function getExternalFiles(
       }
 
       if (mainFile.endsWith('/*') || mainFile.endsWith('\\*')) {
-        const files = listFiles(dirname(mainFile));
-        for (const file of files) {
-          const directory = dirname(configFilePath);
-          externals.push({ mainFile: file, directory });
-        }
+        // do nothing, we don't support wildcard paths in the plugin
       } else {
         const directory = dirname(configFilePath);
         externals.push({ mainFile, directory });

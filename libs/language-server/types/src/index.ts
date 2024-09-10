@@ -7,7 +7,12 @@ import {
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { NxVersion, NxWorkspace, TreeNode } from '@nx-console/shared/types';
+import {
+  CloudOnboardingInfo,
+  NxVersion,
+  NxWorkspace,
+  TreeNode,
+} from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
   TargetConfiguration,
@@ -167,3 +172,9 @@ export const NxCloudStatusRequest: RequestType<
   },
   unknown
 > = new RequestType('nx/cloudStatus');
+
+export const NxCloudOnboardingInfoRequest: RequestType<
+  undefined,
+  CloudOnboardingInfo,
+  unknown
+> = new RequestType('nx/cloudOnboardingInfo');

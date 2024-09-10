@@ -62,3 +62,21 @@ export function debounce(callback: (...args: any[]) => any, wait: number) {
     }, wait);
   };
 }
+
+export function withTimeout<T>(asyncFn: () => Promise<T>, timeoutMs: number) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Function timed out after ${timeoutMs} milliseconds`));
+    }, timeoutMs);
+
+    asyncFn()
+      .then((result) => {
+        clearTimeout(timer);
+        resolve(result);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}

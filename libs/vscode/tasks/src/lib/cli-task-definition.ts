@@ -3,4 +3,5 @@ export interface CliTaskDefinition {
   command: string;
   flags: Array<string>;
   cwd?: string;
+  env?: { [key: string]: string };
 }
