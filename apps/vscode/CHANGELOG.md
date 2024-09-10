@@ -1,3 +1,17 @@
+# [18.27.0](https://github.com/nrwl/nx-console/compare/vscode-v18.26.0...vscode-v18.27.0) (2024-09-10)
+
+
+### Bug Fixes
+
+* **vscode:** disable ts server plugin expansion of wildcard paths ([#2248](https://github.com/nrwl/nx-console/issues/2248)) ([f31cbbe](https://github.com/nrwl/nx-console/commit/f31cbbe076bf515e3234eedbff8263104aff52a2))
+* **vscode:** make command titles consistently title case ([#2247](https://github.com/nrwl/nx-console/issues/2247)) ([d77bbbe](https://github.com/nrwl/nx-console/commit/d77bbbea740edc0641dae37bddbfbcc4140edec2))
+* **vscode:** only show banner message until nx 17 & don't show project dropdown if no projects ([#2249](https://github.com/nrwl/nx-console/issues/2249)) ([5839d82](https://github.com/nrwl/nx-console/commit/5839d8289132cd8da3413b48d8476dd5ceb8106f))
+
+
+### Features
+
+* **vscode:** create nx cloud onboarding view  ([#2229](https://github.com/nrwl/nx-console/issues/2229)) ([3d75f0f](https://github.com/nrwl/nx-console/commit/3d75f0fc0d5e1e02653726ae0e76c95f3765776e))
+
 # [18.26.0](https://github.com/nrwl/nx-console/compare/vscode-v18.25.1...vscode-v18.26.0) (2024-08-22)
 
 
