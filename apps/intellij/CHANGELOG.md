@@ -1,3 +1,16 @@
+## 1.31.0 (2024-09-10)
+
+### Bug Fixes
+
+* **intellij:** add refresh notification for better feedback when refreshing workspace ([#2252](https://github.com/nrwl/nx-console/issues/2252)) ([6c97180](https://github.com/nrwl/nx-console/commit/6c97180f97a5375cd90eb8ab874bbf7824443700))
+* **intellij:** show notification instead of error when no (re)move generators are found ([#2250](https://github.com/nrwl/nx-console/issues/2250)) ([841d9d6](https://github.com/nrwl/nx-console/commit/841d9d683e5f8dfeb7cc6163e48996a6c1af88dc))
+* **vscode:** only show banner message until nx 17 & don't show project dropdown if no projects ([#2249](https://github.com/nrwl/nx-console/issues/2249)) ([5839d82](https://github.com/nrwl/nx-console/commit/5839d8289132cd8da3413b48d8476dd5ceb8106f))
+
+
+### Features
+
+* **vscode:** create nx cloud onboarding view  ([#2229](https://github.com/nrwl/nx-console/issues/2229)) ([3d75f0f](https://github.com/nrwl/nx-console/commit/3d75f0fc0d5e1e02653726ae0e76c95f3765776e))
+
 ## <small>1.30.1 (2024-08-28)</small>
 
 ### Bug Fixes
