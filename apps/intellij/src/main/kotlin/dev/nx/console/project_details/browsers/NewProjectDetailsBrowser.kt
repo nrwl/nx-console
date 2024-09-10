@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
@@ -32,7 +33,6 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.nio.file.Paths
 import java.util.regex.Matcher
-import javax.swing.JPanel
 import javax.swing.JProgressBar
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerializationException
@@ -73,7 +73,7 @@ sealed interface Events {
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
-    private val panel: JPanel = JPanel(BorderLayout())
+    private val panel: JBLoadingPanel = JBLoadingPanel(BorderLayout(), this)
     private val progressBar: JProgressBar = JProgressBar()
 
     private val browser: JBCefBrowser = JBCefBrowser()
@@ -105,7 +105,15 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         scope.launch {
             stateMachine =
                 createStateMachine(scope) {
-                    val initialLoadingState = initialState(States.InitialLoading)
+                    val initialLoadingState =
+                        initialState(States.InitialLoading) {
+                            onEntry {
+                                hideProgressBarLoading()
+                                panel.startLoading()
+                                this@createStateMachine.processEvent(Events.TryLoadPDV())
+                            }
+                            onExit { panel.stopLoading() }
+                        }
                     val showingPDVState =
                         dataState<LoadSuccessData>(States.ShowingPDV) { onEntry { showPDV(data) } }
 
@@ -140,8 +148,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                         if (browser.isDisposed) {
                                             return@onTriggered
                                         }
-                                        val pdvData =
-                                            NxlsService.getInstance(project).pdvData(file.path)
+                                        val nxlsService = NxlsService.getInstance(project)
+                                        nxlsService.awaitStarted()
+                                        val pdvData = nxlsService.pdvData(file.path)
 
                                         if (
                                             pdvData == null ||
@@ -192,14 +201,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                 transition<Events.RefreshStarted> { targetState = loadingState }
                             }
                         }
-
-                    initialLoadingState.apply {
-                        onEntry {
-                            hideProgressBarLoading()
-                            showLoading()
-                            this@createStateMachine.processEvent(Events.TryLoadPDV())
-                        }
-                    }
                 }
 
             messageBusConnection = project.messageBus.connect(scope)
@@ -312,20 +313,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             <html>
             <body>
             ERROR: $data
-            </body>
-            </html>
-        """
-                .trimIndent()
-
-        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
-    }
-
-    private fun showLoading() {
-        val html =
-            """
-            <html>
-            <body>
-            LOADING
             </body>
             </html>
         """

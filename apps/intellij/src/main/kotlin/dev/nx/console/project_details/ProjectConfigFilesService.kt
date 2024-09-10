@@ -30,7 +30,7 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener { setProjectConfigFilesInfo() }
+                NxWorkspaceRefreshListener { setProjectConfigFilesInfo() },
             )
         }
     }
@@ -98,6 +98,8 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
         }
     }
 
+    // TODO: CHANGE THIS TO SHOW CLICKABLE BALLOON NOTIFICATION OR SOMETHING PROMPTING USERS TO
+    // REOPEN AND SEE THE PDV THEMSELVES
     private fun ensurePDVPreviewFileEditors() {
         if (project.isDisposed) return
         // because ProjectDetailsFileEditorProvider triggers only when the file is opened, we

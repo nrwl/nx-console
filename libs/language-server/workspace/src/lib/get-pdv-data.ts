@@ -69,7 +69,7 @@ export async function getPDVData(
     graphBasePath,
     pdvDataSerialized: JSON.stringify({
       project: projectNode,
-      sourceMap: workspace.workspace.sourceMaps,
+      sourceMap: workspace.workspace.sourceMaps?.[project.root],
       errors: workspace.errors,
     }),
     errorsSerialized: undefined,

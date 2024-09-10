@@ -76,39 +76,43 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
     }
 
     private fun tryGetNxVersionFromPackageJson(): NxVersion? {
-        val packageJsonFilePath =
-            if (isDotNxInstallation(project.nxBasePath)) {
-                Paths.get(project.nxBasePath, ".nx", "installation", "node_modules", "nx")
-                    .toString()
-            } else {
-                Paths.get(project.nxBasePath, "package.json").toString()
+        try {
+            val packageJsonFilePath =
+                if (isDotNxInstallation(project.nxBasePath)) {
+                    Paths.get(project.nxBasePath, ".nx", "installation", "node_modules", "nx")
+                        .toString()
+                } else {
+                    Paths.get(project.nxBasePath, "package.json").toString()
+                }
+
+            val packageJsonFile: VirtualFile =
+                LocalFileSystem.getInstance().findFileByPath(packageJsonFilePath) ?: return null
+
+            if (packageJsonFile.isDirectory) {
+                return null
             }
 
-        val packageJsonFile: VirtualFile =
-            LocalFileSystem.getInstance().findFileByPath(packageJsonFilePath) ?: return null
+            val psiFile: PsiFile =
+                PsiManager.getInstance(project).findFile(packageJsonFile) ?: return null
 
-        if (packageJsonFile.isDirectory) {
-            return null
-        }
+            if (psiFile !is JsonFile) {
+                return null
+            }
 
-        val psiFile: PsiFile =
-            PsiManager.getInstance(project).findFile(packageJsonFile) ?: return null
+            val jsonObject = psiFile.topLevelValue as? JsonObject ?: return null
 
-        if (psiFile !is JsonFile) {
-            return null
-        }
+            val dependenciesProperty = jsonObject.findProperty("dependencies")
+            val devDependenciesProperty = jsonObject.findProperty("devDependencies")
 
-        val jsonObject = psiFile.topLevelValue as? JsonObject ?: return null
-
-        val dependenciesProperty = jsonObject.findProperty("dependencies")
-        val devDependenciesProperty = jsonObject.findProperty("devDependencies")
-
-        val version =
-            dependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
-                ?: devDependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
+            val version =
+                dependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
+                    ?: devDependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
                     ?: return null
 
-        return SemVer.parseFromText(version)?.let { NxVersion(it.major, it.minor, version) }
+            return SemVer.parseFromText(version)?.let { NxVersion(it.major, it.minor, version) }
+        } catch (e: Throwable) {
+            return null
+        }
     }
 
     private fun getDependencyVersionFromProperty(
