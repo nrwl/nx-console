@@ -57,18 +57,12 @@ export async function getPDVData(
     const project = await getProjectByPath(filePath, workspacePath);
 
     if (!isCompleteProjectConfiguration(project)) {
-      let errorMessage = '';
-      if (!hasProjects) {
-        errorMessage = 'No projects found in the workspace.';
-      } else if (!project) {
-        errorMessage = `No project found at ${filePath}`;
-      }
       return {
         resultType: 'ERROR',
         graphBasePath,
         pdvDataSerialized: undefined,
         errorsSerialized: JSON.stringify(workspace.errors),
-        errorMessage,
+        errorMessage: `No project found at ${filePath}`,
       };
     }
 
