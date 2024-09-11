@@ -94,7 +94,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun sourceMapFilesToProjectMap(): CompletableFuture<Map<String, String>> {
+    fun sourceMapFilesToProjectsMap(): CompletableFuture<Map<String, Array<String>>> {
         throw UnsupportedOperationException()
     }
 

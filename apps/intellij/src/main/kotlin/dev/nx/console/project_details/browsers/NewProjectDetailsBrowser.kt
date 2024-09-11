@@ -225,7 +225,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private fun showPDV(data: LoadSuccessData) {
-        logger<NewProjectDetailsBrowser>().info("SHOWING PDV METHOD $data")
         val html =
             """
     <html>
@@ -252,10 +251,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
              ${interactionEventQuery.inject("JSON.stringify(message)")}
           }
           window.renderPDV({
-            project: data.project,
-            sourceMap: data.sourceMap,
+           ...data,
             onViewInProjectGraph: (data) => sendMessage({ type: 'open-project-graph', payload: data }),
-            errors: data.errors
             }
           )
         </script>
@@ -289,9 +286,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script src="main.js"></script>
 
         <script>
-          const sendMessage = (message) => {
-             ${interactionEventQuery.inject("JSON.stringify(message)")}
-          }
           window.renderError({
             message: "${data.errorMessage}",
             errors: ${data.errorsSerialized}

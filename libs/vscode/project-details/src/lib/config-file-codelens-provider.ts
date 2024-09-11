@@ -2,7 +2,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getProjectByRoot,
-  getSourceMapFilesToProjectMap,
+  getSourceMapFilesToProjectsMap,
   getTargetsForConfigFile,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
@@ -42,7 +42,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
   };
   constructor(
     public workspaceRoot: string,
-    public sourceMapFilesToProjectMap: Record<string, string>
+    public sourceMapFilesToProjectsMap: Record<string, string[]>
   ) {}
 
   private changeEvent = new EventEmitter<void>();
@@ -66,7 +66,8 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
     ) {
       return [];
     }
-    const projectRoot = this.sourceMapFilesToProjectMap[relativePath];
+    // TODO: UPDATE TO HANDLE MULTIPLE PROJECTS
+    const projectRoot = this.sourceMapFilesToProjectsMap[relativePath][0];
     if (!projectRoot) {
       return [];
     }
@@ -193,21 +194,21 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
 
   static async register(context: ExtensionContext) {
     const workspaceRoot = getNxWorkspacePath();
-    const initialSourceMapFilesToProjectMap =
-      (await getSourceMapFilesToProjectMap()) ?? {};
+    const initialSourceMapFilesToProjectsMap =
+      (await getSourceMapFilesToProjectsMap()) ?? {};
 
     const codeLensProvider = new ConfigFileCodelensProvider(
       workspaceRoot,
-      initialSourceMapFilesToProjectMap
+      initialSourceMapFilesToProjectsMap
     );
 
     onWorkspaceRefreshed(async () => {
       const updatedWorkspaceRoot = getNxWorkspacePath();
       const updatedSourceMapFilesToProjectMap =
-        (await getSourceMapFilesToProjectMap()) ?? {};
+        (await getSourceMapFilesToProjectsMap()) ?? {};
 
       codeLensProvider.workspaceRoot = updatedWorkspaceRoot;
-      codeLensProvider.sourceMapFilesToProjectMap =
+      codeLensProvider.sourceMapFilesToProjectsMap =
         updatedSourceMapFilesToProjectMap;
 
       codeLensProvider.refresh();

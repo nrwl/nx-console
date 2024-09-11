@@ -161,11 +161,11 @@ export const NxHasAffectedProjectsRequest: RequestType<
   unknown
 > = new RequestType('nx/hasAffectedProjects');
 
-export const NxSourceMapFilesToProjectMapRequest: RequestType<
+export const NxSourceMapFilesToProjectsMapRequest: RequestType<
   undefined,
-  Record<string, string>,
+  Record<string, string[]>,
   unknown
-> = new RequestType('nx/sourceMapFilesToProjectMap');
+> = new RequestType('nx/sourceMapFilesToProjectsMap');
 
 export const NxTargetsForConfigFileRequest: RequestType<
   { projectName: string; configFilePath: string },
