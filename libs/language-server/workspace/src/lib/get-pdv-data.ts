@@ -11,6 +11,7 @@ import { join, relative } from 'path';
 import { directoryExists } from '@nx-console/shared/file-system';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
 import { lspLogger } from '@nx-console/language-server/utils';
+import { getNxCloudStatus } from './get-nx-cloud-status';
 
 export async function getPDVData(
   workspacePath: string,
@@ -57,8 +58,9 @@ export async function getPDVData(
   const sourceMapsFilesToProjectsMap = await getSourceMapFilesToProjectsMap(
     workspacePath
   );
-
   const projectRootsForConfigFile = sourceMapsFilesToProjectsMap[relativePath];
+
+  const nxCloudStatus = await getNxCloudStatus(workspacePath);
 
   if (!projectRootsForConfigFile || projectRootsForConfigFile.length <= 1) {
     const project = await getProjectByPath(filePath, workspacePath);
@@ -83,6 +85,7 @@ export async function getPDVData(
         project: projectNode,
         sourceMap: workspace.workspace.sourceMaps?.[project.root],
         errors: workspace.errors,
+        connectedToCloud: nxCloudStatus.isConnected,
       }),
       pdvDataSerializedMulti: undefined,
       errorsSerialized: undefined,
@@ -105,6 +108,7 @@ export async function getPDVData(
         project,
         sourceMap: workspace.workspace.sourceMaps?.[project.data.root],
         errors: workspace.errors,
+        connectedToCloud: nxCloudStatus.isConnected,
       });
     }
 

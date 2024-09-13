@@ -55,7 +55,6 @@ import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.*
 import ru.nsk.kstatemachine.transition.onTriggered
 import ru.nsk.kstatemachine.transition.targetState
-import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
     const val InitialLoading = "InitialLoading"
@@ -154,11 +153,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         scope.launch {
             stateMachine =
                 createStateMachine(scope, start = false) {
-                    //                    onTransitionComplete { activeStates, transitionParams ->
-                    //                        logger<NewProjectDetailsBrowser>()
-                    //                            .debug("Transition ${transitionParams.transition}
-                    // State $activeStates")
-                    //                    }
+                    onTransitionComplete { activeStates, transitionParams ->
+                        logger<NewProjectDetailsBrowser>()
+                            .debug("Event ${transitionParams.event} State $activeStates")
+                    }
                     val initialLoadingState =
                         initialState(States.InitialLoading) {
                             onEntry {
@@ -218,8 +216,12 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
                     val loadingState =
                         state(States.Loading).apply {
-                            onEntry { showProgressBarLoading() }
-                            onExit { hideProgressBarLoading() }
+                            onEntry {
+                                showProgressBarLoading()
+                            }
+                            onExit {
+                                hideProgressBarLoading()
+                            }
                         }
 
                     // when (pre-)loading is triggered on any state, we go to loading
@@ -363,16 +365,12 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script src="main.js"></script>
 
         <script>
-          const data = ${pdvData}
+          const data = $pdvData
 
-          const sendMessage = (message) => {
-             ${interactionEventQuery.inject("JSON.stringify(message)")}
-          }
-          window.renderPDV({
-           ...data,
-            onViewInProjectGraph: (data) => sendMessage({ type: 'open-project-graph', payload: data }),
-            }
-          )
+           window.externalApi.graphInteractionEventListener = (message) => {
+                    ${interactionEventQuery.inject("JSON.stringify(message)")}
+                }
+          const service = window.renderPDV(data)
         </script>
 
     </body>
@@ -407,7 +405,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script src="main.js"></script>
 
         <script>
-          window.renderError({
+          const service = window.renderError({
             message: "${data.errorMessage}",
             errors: ${data.errorsSerialized}
             }
@@ -439,12 +437,12 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
     }
 
-    private fun showProgressBarLoading() {
-        ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = true }
+    private suspend fun showProgressBarLoading() {
+        withContext(Dispatchers.EDT) { progressBar.isIndeterminate = true }
     }
 
-    private fun hideProgressBarLoading() {
-        ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = false }
+    private suspend fun hideProgressBarLoading() {
+        withContext(Dispatchers.EDT) { progressBar.isIndeterminate = false }
     }
 
     private fun showMultiDisclaimer() {
@@ -609,8 +607,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             )
         }
 
-        val plantUML = stateMachine.exportToPlantUml()
-        logger<NewProjectDetailsBrowser>().debug(plantUML)
+        //        val plantUML = stateMachine.exportToPlantUml()
+        //        logger<NewProjectDetailsBrowser>().debug(plantUML)
     }
 
     override fun dispose() {
