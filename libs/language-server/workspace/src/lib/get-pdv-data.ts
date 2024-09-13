@@ -7,9 +7,10 @@ import type {
   ProjectGraphProjectNode,
 } from 'nx/src/devkit-exports';
 import { PDVData } from '@nx-console/shared/types';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { directoryExists } from '@nx-console/shared/file-system';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
+import { lspLogger } from '@nx-console/language-server/utils';
 
 export async function getPDVData(
   workspacePath: string,
@@ -22,6 +23,7 @@ export async function getPDVData(
       resultType: 'NO_GRAPH_ERROR',
       graphBasePath: undefined,
       pdvDataSerialized: undefined,
+      pdvDataSerializedMulti: undefined,
       errorsSerialized: undefined,
       errorMessage: undefined,
     };
@@ -44,16 +46,21 @@ export async function getPDVData(
       resultType: 'ERROR',
       graphBasePath,
       pdvDataSerialized: undefined,
+      pdvDataSerializedMulti: undefined,
       errorsSerialized: JSON.stringify(workspace.errors),
       errorMessage,
     };
   }
 
-  const projectsForConfigFile = (
-    await getSourceMapFilesToProjectsMap(workspacePath)
-  )[filePath];
+  const relativePath = relative(workspacePath, filePath);
 
-  if (!projectsForConfigFile || projectsForConfigFile.length === 0) {
+  const sourceMapsFilesToProjectsMap = await getSourceMapFilesToProjectsMap(
+    workspacePath
+  );
+
+  const projectRootsForConfigFile = sourceMapsFilesToProjectsMap[relativePath];
+
+  if (!projectRootsForConfigFile || projectRootsForConfigFile.length <= 1) {
     const project = await getProjectByPath(filePath, workspacePath);
 
     if (!isCompleteProjectConfiguration(project)) {
@@ -61,6 +68,7 @@ export async function getPDVData(
         resultType: 'ERROR',
         graphBasePath,
         pdvDataSerialized: undefined,
+        pdvDataSerializedMulti: undefined,
         errorsSerialized: JSON.stringify(workspace.errors),
         errorMessage: `No project found at ${filePath}`,
       };
@@ -76,33 +84,35 @@ export async function getPDVData(
         sourceMap: workspace.workspace.sourceMaps?.[project.root],
         errors: workspace.errors,
       }),
+      pdvDataSerializedMulti: undefined,
       errorsSerialized: undefined,
       errorMessage: undefined,
     };
   } else {
-    const projectNodes = projectsForConfigFile
-      .map((projectName) => workspace.workspace.projects[projectName])
-      .filter(isCompleteProjectConfiguration)
-      .map(projectGraphNodeFromProject);
+    const projectNodes: ProjectGraphProjectNode[] = [];
+    for (const project of Object.values(workspace.workspace.projects)) {
+      if (
+        projectRootsForConfigFile.includes(project.root) &&
+        isCompleteProjectConfiguration(project)
+      ) {
+        projectNodes.push(projectGraphNodeFromProject(project));
+      }
+    }
 
-    const sourceMaps = projectsForConfigFile
-      .map((projectName) => workspace.workspace.projects[projectName]?.root)
-      .filter((p) => !!p)
-      .reduce((acc, projectRoot) => {
-        return {
-          ...acc,
-          ...workspace.workspace.sourceMaps?.[projectRoot],
-        };
-      }, {});
+    const pdvDataSerializedMulti: Record<string, string> = {};
+    for (const project of projectNodes) {
+      pdvDataSerializedMulti[project.name] = JSON.stringify({
+        project,
+        sourceMap: workspace.workspace.sourceMaps?.[project.data.root],
+        errors: workspace.errors,
+      });
+    }
 
     return {
-      resultType: 'SUCCESS',
+      resultType: 'SUCCESS_MULTI',
       graphBasePath,
-      pdvDataSerialized: JSON.stringify({
-        projects: projectNodes,
-        sourceMaps,
-        errors: workspace.errors,
-      }),
+      pdvDataSerializedMulti,
+      pdvDataSerialized: undefined,
       errorsSerialized: undefined,
       errorMessage: undefined,
     };

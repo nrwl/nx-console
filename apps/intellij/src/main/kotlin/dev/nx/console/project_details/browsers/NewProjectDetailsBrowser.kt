@@ -1,5 +1,6 @@
 package dev.nx.console.project_details.browsers
 
+import com.intellij.ide.ui.UISettingsListener
 import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
@@ -8,12 +9,16 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
+import com.intellij.ui.jcef.JBCefClient
 import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.util.messages.SimpleMessageBusConnection
 import com.intellij.util.ui.UIUtil
@@ -29,10 +34,16 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
+import dev.nx.console.utils.jcef.awaitLoad
+import dev.nx.console.utils.jcef.getHexColor
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.FlowLayout
+import java.awt.event.ItemEvent
+import java.awt.event.ItemListener
 import java.nio.file.Paths
 import java.util.regex.Matcher
+import javax.swing.JPanel
 import javax.swing.JProgressBar
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerializationException
@@ -42,16 +53,20 @@ import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.*
 import ru.nsk.kstatemachine.transition.onTriggered
+import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
     const val InitialLoading = "InitialLoading"
     const val ShowingPDV = "ShowingPDV"
+    const val ShowingPDVMulti = "ShowingPDVMulti"
     const val ShowingError = "ShowingError"
     const val ShowingErrorNoGraph = "ShowingErrorNoGraph"
     const val Loading = "Loading"
 }
 
 class LoadSuccessData(val graphBasePath: String, val pdvData: String)
+
+class LoadSuccessMultiData(val graphBasePath: String, val pdvData: Map<String, String>)
 
 class LoadErrorData(
     val graphBasePath: String,
@@ -64,7 +79,14 @@ sealed interface Events {
 
     class TryLoadPDV : Event
 
+    class ChangeUISettings : Event
+
+    class SelectMultiProject(override val data: String) : DataEvent<String>
+
     class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
+
+    class LoadSuccessMulti(override val data: LoadSuccessMultiData) :
+        DataEvent<LoadSuccessMultiData>
 
     class LoadError(override val data: LoadErrorData) : DataEvent<LoadErrorData>
 
@@ -73,11 +95,13 @@ sealed interface Events {
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
-    private val panel: JBLoadingPanel = JBLoadingPanel(BorderLayout(), this)
+    private val loadingPanel: JBLoadingPanel = JBLoadingPanel(BorderLayout(), this)
     private val progressBar: JProgressBar = JProgressBar()
+    private val multiDisclaimerPanel: JPanel
+    private val projectsComboBox: ComboBox<String> = ComboBox<String>()
 
     private val browser: JBCefBrowser = JBCefBrowser()
-    private val interactionEventQuery: JBCefJSQuery = createInteractionEventQuery()
+    private val interactionEventQuery: JBCefJSQuery
 
     private lateinit var stateMachine: StateMachine
     private lateinit var messageBusConnection: SimpleMessageBusConnection
@@ -93,38 +117,81 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             }
         )
 
-        panel.add(progressBar, BorderLayout.NORTH)
-        panel.add(browser.component, BorderLayout.CENTER)
+        multiDisclaimerPanel =
+            JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT, 5, 5)
+                add(JBLabel("Select project"), BorderLayout.NORTH)
+                add(projectsComboBox, BorderLayout.CENTER)
+                isVisible = false
+            }
+
+        loadingPanel.add(progressBar, BorderLayout.NORTH)
+        loadingPanel.add(multiDisclaimerPanel, BorderLayout.NORTH)
+        loadingPanel.add(browser.component, BorderLayout.CENTER)
+
+        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
+        interactionEventQuery = createInteractionEventQuery()
 
         init()
     }
 
-    val component = panel
+    val component = loadingPanel
 
     private fun init() {
         scope.launch {
             stateMachine =
                 createStateMachine(scope) {
+                    onTransitionComplete { activeStates, transitionParams ->
+                        logger<NewProjectDetailsBrowser>()
+                            .debug("Transition ${transitionParams.transition} State $activeStates")
+                    }
                     val initialLoadingState =
                         initialState(States.InitialLoading) {
                             onEntry {
+                                hideMultiDisclaimer()
                                 hideProgressBarLoading()
-                                panel.startLoading()
+                                loadingPanel.startLoading()
                                 this@createStateMachine.processEvent(Events.TryLoadPDV())
                             }
-                            onExit { panel.stopLoading() }
+                            onExit { loadingPanel.stopLoading() }
                         }
                     val showingPDVState =
-                        dataState<LoadSuccessData>(States.ShowingPDV) { onEntry { showPDV(data) } }
+                        dataState<LoadSuccessData>(States.ShowingPDV) {
+                            onEntry {
+                                hideMultiDisclaimer()
+                                showPDV(data.graphBasePath, data.pdvData)
+                                setColors()
+                            }
+                        }
+
+                    val showingPDVMultiState =
+                        dataState<LoadSuccessMultiData>(States.ShowingPDVMulti) {
+                            onEntry {
+                                val projects = data.pdvData.keys.toTypedArray()
+                                val selectedProject = "ng-org2-app16530648"
+                                projectsComboBox.removeAllItems()
+                                projects.forEach { projectsComboBox.addItem(it) }
+                                showMultiDisclaimer(projects)
+                                showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
+                                setColors()
+                            }
+                        }
 
                     val showingErrorState =
                         dataState<LoadErrorData>(States.ShowingError) {
-                            onEntry { showError(data) }
+                            onEntry {
+                                hideMultiDisclaimer()
+                                showError(data)
+                                setColors()
+                            }
                         }
 
                     val showingErrorNoGraphState =
                         dataState<String>(States.ShowingErrorNoGraph) {
-                            onEntry { showErrorNoGraph(data) }
+                            onEntry {
+                                hideMultiDisclaimer()
+                                showErrorNoGraph(data)
+                            }
                         }
 
                     val loadingState =
@@ -139,6 +206,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             showingErrorNoGraphState,
                             initialLoadingState,
                             loadingState,
+                            showingPDVMultiState,
                         )
                         .forEach {
                             it.apply {
@@ -163,20 +231,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                             return@onTriggered
                                         }
 
-                                        if (
-                                            pdvData.errorMessage == null &&
-                                                pdvData.errorsSerialized == null &&
-                                                pdvData.pdvDataSerialized != null
-                                        ) {
-                                            this@createStateMachine.processEvent(
-                                                Events.LoadSuccess(
-                                                    LoadSuccessData(
-                                                        pdvData.graphBasePath,
-                                                        pdvData.pdvDataSerialized,
-                                                    )
-                                                )
-                                            )
-                                        } else {
+                                        if (pdvData.resultType == "ERROR") {
                                             this@createStateMachine.processEvent(
                                                 Events.LoadError(
                                                     LoadErrorData(
@@ -187,10 +242,37 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                                 )
                                             )
                                         }
+
+                                        if (pdvData.resultType == "SUCCESS_MULTI") {
+                                            if (pdvData.pdvDataSerializedMulti != null) {
+                                                this@createStateMachine.processEvent(
+                                                    Events.LoadSuccessMulti(
+                                                        LoadSuccessMultiData(
+                                                            pdvData.graphBasePath,
+                                                            pdvData.pdvDataSerializedMulti,
+                                                        )
+                                                    )
+                                                )
+                                            } else {
+                                                if (pdvData.pdvDataSerialized != null) {
+                                                    this@createStateMachine.processEvent(
+                                                        Events.LoadSuccess(
+                                                            LoadSuccessData(
+                                                                pdvData.graphBasePath,
+                                                                pdvData.pdvDataSerialized,
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                                 dataTransition<Events.LoadSuccess, LoadSuccessData> {
                                     targetState = showingPDVState
+                                }
+                                dataTransition<Events.LoadSuccessMulti, LoadSuccessMultiData> {
+                                    targetState = showingPDVMultiState
                                 }
                                 dataTransition<Events.LoadError, LoadErrorData> {
                                     targetState = showingErrorState
@@ -199,6 +281,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                     targetState = showingErrorNoGraphState
                                 }
                                 transition<Events.RefreshStarted> { targetState = loadingState }
+                                transition<Events.ChangeUISettings> { onTriggered { setColors() } }
                             }
                         }
                 }
@@ -220,18 +303,53 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         stateMachine.processEventByLaunch(Events.RefreshStarted())
                     },
                 )
+                subscribe(
+                    UISettingsListener.TOPIC,
+                    UISettingsListener {
+                        stateMachine.processEventByLaunch(Events.ChangeUISettings())
+                    },
+                )
             }
+
+            val itemListener = ItemListener { e ->
+                if (e != null && e.stateChange == ItemEvent.SELECTED) {
+                    stateMachine.processEventByLaunch(Events.SelectMultiProject(e.item as String))
+                }
+            }
+
+            projectsComboBox.addItemListener(itemListener)
+
+            Disposer.register(this@NewProjectDetailsBrowser) {
+                projectsComboBox.removeItemListener(itemListener)
+            }
+
+            val plantUML = stateMachine.exportToPlantUml()
+            logger<NewProjectDetailsBrowser>().debug(plantUML)
         }
     }
 
-    private fun showPDV(data: LoadSuccessData) {
+    private suspend fun showPDV(graphBasePath: String, pdvData: String) {
         val html =
             """
     <html>
     <head>
-    <base href="${Matcher.quoteReplacement(data.graphBasePath)}${if(data.graphBasePath.endsWith("/")) "" else "/"}">
+    <base href="${Matcher.quoteReplacement(graphBasePath)}${if(graphBasePath.endsWith("/")) "" else "/"}">
     <script src="environment.js"></script>
-  <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: ${getHexColor(UIUtil.getPanelBackground())} !important;
+            font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
+            font-size: ${UIUtil.getLabelFont().size}px;
+             color: ${
+                        getHexColor(
+                            when (!JBColor.isBright()) {
+                                true -> UIUtil.getActiveTextColor()
+                                false -> UIUtil.getLabelForeground()
+                            }
+                        )
+        }
+    </style>
 
     </head>
     <body>
@@ -245,7 +363,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script src="main.js"></script>
 
         <script>
-          const data = ${data.pdvData}
+          const data = ${pdvData}
 
           const sendMessage = (message) => {
              ${interactionEventQuery.inject("JSON.stringify(message)")}
@@ -262,10 +380,13 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
        """
                 .trimIndent()
 
-        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+        withContext(Dispatchers.EDT) {
+            browser.loadHTML(html)
+            browser.awaitLoad()
+        }
     }
 
-    private fun showError(data: LoadErrorData) {
+    private suspend fun showError(data: LoadErrorData) {
         val html =
             """
     <html>
@@ -298,7 +419,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
        """
                 .trimIndent()
 
-        ApplicationManager.getApplication().invokeLater { browser.loadHTML(html) }
+        withContext(Dispatchers.EDT) {
+            browser.loadHTML(html)
+            browser.awaitLoad()
+        }
     }
 
     private fun showErrorNoGraph(data: String) {
@@ -321,6 +445,41 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
     private fun hideProgressBarLoading() {
         ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = false }
+    }
+
+    private fun showMultiDisclaimer(projects: Array<String>) {
+        multiDisclaimerPanel.toolTipText = projects.joinToString(" ")
+        multiDisclaimerPanel.isVisible = true
+    }
+
+    private fun hideMultiDisclaimer() {
+        multiDisclaimerPanel.isVisible = false
+    }
+
+    private suspend fun setColors() {
+        val backgroundColor = getHexColor(UIUtil.getPanelBackground())
+        if (browser.isDisposed) return
+        browser.executeJavascriptWithCatch(
+            """
+                const isDark = ${!JBColor.isBright()};
+              const body = document.body;
+              if(!body) return;
+
+              const darkClass = 'vscode-dark';
+              const lightClass = 'vscode-light';
+
+              body.classList?.remove(darkClass, lightClass);
+
+              if (isDark) {
+                  body.classList?.add(darkClass);
+              } else {
+                  body.classList?.add(lightClass);
+              }
+              console.log("$backgroundColor")
+              body.style?.setProperty('background-color', '$backgroundColor', 'important');
+                """
+                .trimIndent()
+        )
     }
 
     private fun createInteractionEventQuery(): JBCefJSQuery {
