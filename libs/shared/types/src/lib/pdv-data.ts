@@ -1,5 +1,10 @@
 export type PDVData = {
-  resultType: 'NO_GRAPH_ERROR' | 'ERROR' | 'SUCCESS' | 'SUCCESS_MULTI';
+  resultType:
+    | 'NO_GRAPH_ERROR'
+    | 'OLD_NX_VERSION'
+    | 'ERROR'
+    | 'SUCCESS'
+    | 'SUCCESS_MULTI';
   graphBasePath: string | undefined;
   pdvDataSerialized: string | undefined;
   pdvDataSerializedMulti: Record<string, string> | undefined;

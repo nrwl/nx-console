@@ -3,6 +3,7 @@ package dev.nx.console.utils.sync_services
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonProperty
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -45,7 +46,11 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
     }
 
     fun getNxVersionSynchronously(): NxVersion? {
-        return nxVersion ?: tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+        if (ApplicationManager.getApplication().isDispatchThread) {
+            return nxVersion
+        } else {
+            return nxVersion ?: tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+        }
     }
 
     private fun tryGetNxVersionFromNodeModules(): NxVersion? {

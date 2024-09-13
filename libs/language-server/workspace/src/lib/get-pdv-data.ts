@@ -12,6 +12,7 @@ import { directoryExists } from '@nx-console/shared/file-system';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
 import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxCloudStatus } from './get-nx-cloud-status';
+import { gte } from 'semver';
 
 export async function getPDVData(
   workspacePath: string,
@@ -31,14 +32,22 @@ export async function getPDVData(
   }
 
   const nxVersion = await getNxVersion(workspacePath);
+
+  if (!gte(nxVersion.full, '19.8.0')) {
+    return {
+      resultType: 'OLD_NX_VERSION',
+      graphBasePath,
+      pdvDataSerialized: undefined,
+      pdvDataSerializedMulti: undefined,
+      errorsSerialized: undefined,
+      errorMessage: undefined,
+    };
+  }
   const workspace = await nxWorkspace(workspacePath);
 
   const hasProjects = Object.keys(workspace.workspace.projects).length > 0;
 
-  if (
-    !hasProjects ||
-    (workspace.errors && (nxVersion.major < 19 || workspace.isPartial != true))
-  ) {
+  if (!hasProjects || (workspace.errors && workspace.isPartial != true)) {
     let errorMessage = '';
     if (!hasProjects) {
       errorMessage = 'No projects found in the workspace.';

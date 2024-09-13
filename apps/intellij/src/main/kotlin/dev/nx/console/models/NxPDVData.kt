@@ -11,9 +11,10 @@ data class NxPDVData(
     init {
         require(
             resultType == "SUCCESS" ||
+                resultType == "SUCCESS_MULTI" ||
                 resultType == "ERROR" ||
                 resultType == "NO_GRAPH_ERROR" ||
-                resultType == "SUCCESS_MULTI"
+                resultType == "OLD_NX_VERSION"
         ) {
             "resultType must be of known type"
         }

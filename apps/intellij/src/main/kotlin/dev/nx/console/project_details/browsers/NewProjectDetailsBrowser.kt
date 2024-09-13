@@ -25,6 +25,7 @@ import com.intellij.util.messages.SimpleMessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphInteractionEvent
 import dev.nx.console.graph.getNxGraphService
+import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxWorkspaceRefreshStartedListener
 import dev.nx.console.nxls.NxlsService
@@ -54,7 +55,9 @@ import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.*
 import ru.nsk.kstatemachine.transition.onTriggered
+import ru.nsk.kstatemachine.transition.stay
 import ru.nsk.kstatemachine.transition.targetState
+import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
     const val InitialLoading = "InitialLoading"
@@ -62,6 +65,7 @@ object States {
     const val ShowingPDVMulti = "ShowingPDVMulti"
     const val ShowingError = "ShowingError"
     const val ShowingErrorNoGraph = "ShowingErrorNoGraph"
+    const val ShowingOldBrowser = "ShowingOldBrowser"
     const val Loading = "Loading"
 }
 
@@ -92,21 +96,27 @@ sealed interface Events {
     class LoadError(override val data: LoadErrorData) : DataEvent<LoadErrorData>
 
     class LoadErrorNoGraph(override val data: String) : DataEvent<String>
+
+    class LoadOldBrowser : Event
 }
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
-    private val loadingPanel: JBLoadingPanel = JBLoadingPanel(BorderLayout(), this)
-    private val progressBar: JProgressBar = JProgressBar()
+    private val rootPanel = JPanel(BorderLayout())
+
+    private val loadingPanel = JBLoadingPanel(BorderLayout(), this)
+    private val progressBar = JProgressBar()
     private val multiDisclaimerPanel: JPanel
-    private val projectsComboBox: ComboBox<String> = ComboBox<String>()
-    private val projectsComboBoxListener: ItemListener = ItemListener { e ->
+    private val projectsComboBox = ComboBox<String>()
+    private val projectsComboBoxListener = ItemListener { e ->
         if (e != null && e.stateChange == ItemEvent.SELECTED) {
             if (::stateMachine.isInitialized) {
                 stateMachine.processEventByLaunch(Events.SelectMultiProject())
             }
         }
     }
+
+    private var oldBrowser: OldProjectDetailsBrowser? = null
 
     private val browser: JBCefBrowser = JBCefBrowser()
     private val interactionEventQuery: JBCefJSQuery
@@ -141,13 +151,15 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         loadingPanel.add(multiDisclaimerPanel, BorderLayout.NORTH)
         loadingPanel.add(browser.component, BorderLayout.CENTER)
 
+        rootPanel.add(loadingPanel, BorderLayout.CENTER)
+
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         interactionEventQuery = createInteractionEventQuery()
 
         init()
     }
 
-    val component = loadingPanel
+    val component = rootPanel
 
     private fun init() {
         scope.launch {
@@ -155,7 +167,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 createStateMachine(scope, start = false) {
                     onTransitionComplete { activeStates, transitionParams ->
                         logger<NewProjectDetailsBrowser>()
-                            .debug("Event ${transitionParams.event} State $activeStates")
+                            .debug(
+                                "Event ${transitionParams.event::javaClass.name} State $activeStates"
+                            )
                     }
                     val initialLoadingState =
                         initialState(States.InitialLoading) {
@@ -214,17 +228,39 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             }
                         }
 
-                    val loadingState =
-                        state(States.Loading).apply {
+                    val showingOldBrowserState =
+                        state(States.ShowingOldBrowser) {
                             onEntry {
-                                showProgressBarLoading()
+                                hideMultiDisclaimer()
+
+                                val oldBrowser = OldProjectDetailsBrowser(project, file)
+                                if (this@NewProjectDetailsBrowser.oldBrowser == null) {
+                                    this@NewProjectDetailsBrowser.oldBrowser = oldBrowser
+                                }
+                                rootPanel.remove(loadingPanel)
+                                rootPanel.add(oldBrowser.component, BorderLayout.CENTER)
+                                rootPanel.revalidate()
+                                rootPanel.repaint()
                             }
                             onExit {
-                                hideProgressBarLoading()
+                                oldBrowser?.let {
+                                    rootPanel.remove(it.component)
+                                    Disposer.dispose(it)
+                                }
+                                oldBrowser = null
+                                rootPanel.add(loadingPanel, BorderLayout.CENTER)
+                                rootPanel.revalidate()
+                                rootPanel.repaint()
                             }
                         }
 
-                    // when (pre-)loading is triggered on any state, we go to loading
+                    val loadingState =
+                        state(States.Loading).apply {
+                            onEntry { showProgressBarLoading() }
+                            onExit { hideProgressBarLoading() }
+                        }
+
+                    // when (pre-)loading is triggered on any non-old state, we go to loading
                     listOf(
                             initialLoadingState,
                             showingPDVState,
@@ -258,6 +294,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         dataTransition<Events.LoadErrorNoGraph, String> {
                             targetState = showingErrorNoGraphState
                         }
+                        transition<Events.LoadOldBrowser> { targetState = showingOldBrowserState }
                     }
 
                     // showingPDVMultiState goes back to itself
@@ -278,9 +315,29 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         }
                     }
 
+                    // showingOldBrowserState can only leave if the version changes
+                    showingOldBrowserState.apply {
+                        transitionConditionally<Events.TryLoadPDV> {
+                            direction = {
+                                val nxVersion = NxlsService.getInstance(project).nxVersion()
+
+                                if (
+                                    nxVersion != null && nxVersion.gte(NxVersion(19, 8, "19.8.0"))
+                                ) {
+                                    targetState(initialLoadingState)
+                                } else {
+                                    stay()
+                                }
+                            }
+                        }
+                    }
+
                     registerListeners(this@createStateMachine)
                 }
             stateMachine.start()
+
+            val plantUML = stateMachine.exportToPlantUml()
+            logger<NewProjectDetailsBrowser>().debug(plantUML)
         }
     }
 
@@ -298,6 +355,11 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 pdvData.graphBasePath == null
         ) {
             stateMachine.processEvent(Events.LoadErrorNoGraph("Graph not found"))
+            return
+        }
+
+        if (pdvData.resultType == "OLD_NX_VERSION") {
+            stateMachine.processEvent(Events.LoadOldBrowser())
             return
         }
 
@@ -606,9 +668,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 UISettingsListener { stateMachine.processEventByLaunch(Events.ChangeUISettings()) },
             )
         }
-
-        //        val plantUML = stateMachine.exportToPlantUml()
-        //        logger<NewProjectDetailsBrowser>().debug(plantUML)
     }
 
     override fun dispose() {
