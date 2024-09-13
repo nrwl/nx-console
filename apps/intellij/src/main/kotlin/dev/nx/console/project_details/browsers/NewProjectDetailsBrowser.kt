@@ -8,6 +8,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.observable.util.addItemListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Disposer
@@ -53,6 +54,7 @@ import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.*
 import ru.nsk.kstatemachine.transition.onTriggered
+import ru.nsk.kstatemachine.transition.targetState
 import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
@@ -81,7 +83,7 @@ sealed interface Events {
 
     class ChangeUISettings : Event
 
-    class SelectMultiProject(override val data: String) : DataEvent<String>
+    class SelectMultiProject : Event
 
     class LoadSuccess(override val data: LoadSuccessData) : DataEvent<LoadSuccessData>
 
@@ -99,6 +101,13 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private val progressBar: JProgressBar = JProgressBar()
     private val multiDisclaimerPanel: JPanel
     private val projectsComboBox: ComboBox<String> = ComboBox<String>()
+    private val projectsComboBoxListener: ItemListener = ItemListener { e ->
+        if (e != null && e.stateChange == ItemEvent.SELECTED) {
+            if (::stateMachine.isInitialized) {
+                stateMachine.processEventByLaunch(Events.SelectMultiProject())
+            }
+        }
+    }
 
     private val browser: JBCefBrowser = JBCefBrowser()
     private val interactionEventQuery: JBCefJSQuery
@@ -106,7 +115,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private lateinit var stateMachine: StateMachine
     private lateinit var messageBusConnection: SimpleMessageBusConnection
 
-    private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val scope: CoroutineScope =
+        ProjectLevelCoroutineHolderService.getInstance(project).cs +
+            newSingleThreadContext("single thread")
 
     init {
         progressBar.setUI(
@@ -119,7 +131,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
         multiDisclaimerPanel =
             JPanel().apply {
-                layout = FlowLayout(FlowLayout.LEFT, 5, 5)
+                val flowLayout = FlowLayout(FlowLayout.LEFT, 5, 5)
+                layout = flowLayout
                 add(JBLabel("Select project"), BorderLayout.NORTH)
                 add(projectsComboBox, BorderLayout.CENTER)
                 isVisible = false
@@ -140,11 +153,12 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private fun init() {
         scope.launch {
             stateMachine =
-                createStateMachine(scope) {
-                    onTransitionComplete { activeStates, transitionParams ->
-                        logger<NewProjectDetailsBrowser>()
-                            .debug("Transition ${transitionParams.transition} State $activeStates")
-                    }
+                createStateMachine(scope, start = false) {
+                    //                    onTransitionComplete { activeStates, transitionParams ->
+                    //                        logger<NewProjectDetailsBrowser>()
+                    //                            .debug("Transition ${transitionParams.transition}
+                    // State $activeStates")
+                    //                    }
                     val initialLoadingState =
                         initialState(States.InitialLoading) {
                             onEntry {
@@ -168,10 +182,18 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         dataState<LoadSuccessMultiData>(States.ShowingPDVMulti) {
                             onEntry {
                                 val projects = data.pdvData.keys.toTypedArray()
-                                val selectedProject = "ng-org2-app16530648"
+                                val selectedProject = projectsComboBox.item ?: projects.first()
+
+                                projectsComboBox.removeItemListener(projectsComboBoxListener)
                                 projectsComboBox.removeAllItems()
                                 projects.forEach { projectsComboBox.addItem(it) }
-                                showMultiDisclaimer(projects)
+                                projectsComboBox.item = selectedProject
+                                projectsComboBox.addItemListener(
+                                    this@NewProjectDetailsBrowser,
+                                    projectsComboBoxListener,
+                                )
+
+                                showMultiDisclaimer()
                                 showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
                                 setColors()
                             }
@@ -200,131 +222,109 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             onExit { hideProgressBarLoading() }
                         }
 
+                    // when (pre-)loading is triggered on any state, we go to loading
                     listOf(
+                            initialLoadingState,
                             showingPDVState,
                             showingErrorState,
                             showingErrorNoGraphState,
-                            initialLoadingState,
-                            loadingState,
                             showingPDVMultiState,
+                            loadingState,
                         )
                         .forEach {
                             it.apply {
                                 transition<Events.TryLoadPDV> {
                                     targetState = loadingState
-                                    onTriggered {
-                                        if (browser.isDisposed) {
-                                            return@onTriggered
-                                        }
-                                        val nxlsService = NxlsService.getInstance(project)
-                                        nxlsService.awaitStarted()
-                                        val pdvData = nxlsService.pdvData(file.path)
-
-                                        if (
-                                            pdvData == null ||
-                                                pdvData.resultType === "NO_GRAPH_ERROR" ||
-                                                pdvData.graphBasePath == null
-                                        ) {
-                                            this@createStateMachine.processEvent(
-                                                Events.LoadErrorNoGraph("Graph not found")
-                                            )
-                                            return@onTriggered
-                                        }
-
-                                        if (pdvData.resultType == "ERROR") {
-                                            this@createStateMachine.processEvent(
-                                                Events.LoadError(
-                                                    LoadErrorData(
-                                                        pdvData.graphBasePath,
-                                                        pdvData.errorsSerialized ?: "",
-                                                        pdvData.errorMessage ?: "",
-                                                    )
-                                                )
-                                            )
-                                        }
-
-                                        if (pdvData.resultType == "SUCCESS_MULTI") {
-                                            if (pdvData.pdvDataSerializedMulti != null) {
-                                                this@createStateMachine.processEvent(
-                                                    Events.LoadSuccessMulti(
-                                                        LoadSuccessMultiData(
-                                                            pdvData.graphBasePath,
-                                                            pdvData.pdvDataSerializedMulti,
-                                                        )
-                                                    )
-                                                )
-                                            } else {
-                                                if (pdvData.pdvDataSerialized != null) {
-                                                    this@createStateMachine.processEvent(
-                                                        Events.LoadSuccess(
-                                                            LoadSuccessData(
-                                                                pdvData.graphBasePath,
-                                                                pdvData.pdvDataSerialized,
-                                                            )
-                                                        )
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                dataTransition<Events.LoadSuccess, LoadSuccessData> {
-                                    targetState = showingPDVState
-                                }
-                                dataTransition<Events.LoadSuccessMulti, LoadSuccessMultiData> {
-                                    targetState = showingPDVMultiState
-                                }
-                                dataTransition<Events.LoadError, LoadErrorData> {
-                                    targetState = showingErrorState
-                                }
-                                dataTransition<Events.LoadErrorNoGraph, String> {
-                                    targetState = showingErrorNoGraphState
+                                    onTriggered { tryLoadPDV(this@createStateMachine) }
                                 }
                                 transition<Events.RefreshStarted> { targetState = loadingState }
                                 transition<Events.ChangeUISettings> { onTriggered { setColors() } }
                             }
                         }
-                }
 
-            messageBusConnection = project.messageBus.connect(scope)
-            with(messageBusConnection) {
-                subscribe(
-                    NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                    NxWorkspaceRefreshListener {
-                        if (project.isDisposed) {
-                            return@NxWorkspaceRefreshListener
+                    // from loading we can go to result states
+                    listOf(initialLoadingState, loadingState).apply {
+                        dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                            targetState = showingPDVState
                         }
-                        stateMachine.processEventByLaunch(Events.TryLoadPDV())
-                    },
-                )
-                subscribe(
-                    NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
-                    NxWorkspaceRefreshStartedListener {
-                        stateMachine.processEventByLaunch(Events.RefreshStarted())
-                    },
-                )
-                subscribe(
-                    UISettingsListener.TOPIC,
-                    UISettingsListener {
-                        stateMachine.processEventByLaunch(Events.ChangeUISettings())
-                    },
-                )
-            }
+                        dataTransition<Events.LoadSuccessMulti, LoadSuccessMultiData> {
+                            targetState = showingPDVMultiState
+                        }
+                        dataTransition<Events.LoadError, LoadErrorData> {
+                            targetState = showingErrorState
+                        }
+                        dataTransition<Events.LoadErrorNoGraph, String> {
+                            targetState = showingErrorNoGraphState
+                        }
+                    }
 
-            val itemListener = ItemListener { e ->
-                if (e != null && e.stateChange == ItemEvent.SELECTED) {
-                    stateMachine.processEventByLaunch(Events.SelectMultiProject(e.item as String))
+                    // showingPDVMultiState goes back to itself
+                    showingPDVMultiState.apply {
+                        transition<Events.SelectMultiProject> {
+                            targetState = loadingState
+                            onTriggered {
+                                val sourceState = it.transition.sourceState
+                                if (sourceState is DefaultDataState<*>) {
+                                    val lastData = sourceState.lastData
+                                    if (lastData is LoadSuccessMultiData) {
+                                        this@createStateMachine.processEvent(
+                                            Events.LoadSuccessMulti(lastData)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    registerListeners(this@createStateMachine)
                 }
+            stateMachine.start()
+        }
+    }
+
+    private suspend fun tryLoadPDV(stateMachine: StateMachine) {
+        if (browser.isDisposed) {
+            return
+        }
+        val nxlsService = NxlsService.getInstance(project)
+        nxlsService.awaitStarted()
+        val pdvData = nxlsService.pdvData(file.path)
+
+        if (
+            pdvData == null ||
+                pdvData.resultType === "NO_GRAPH_ERROR" ||
+                pdvData.graphBasePath == null
+        ) {
+            stateMachine.processEvent(Events.LoadErrorNoGraph("Graph not found"))
+            return
+        }
+
+        if (pdvData.resultType == "ERROR") {
+            stateMachine.processEvent(
+                Events.LoadError(
+                    LoadErrorData(
+                        pdvData.graphBasePath,
+                        pdvData.errorsSerialized ?: "",
+                        pdvData.errorMessage ?: "",
+                    )
+                )
+            )
+        } else if (pdvData.resultType == "SUCCESS_MULTI") {
+            if (pdvData.pdvDataSerializedMulti != null) {
+                stateMachine.processEvent(
+                    Events.LoadSuccessMulti(
+                        LoadSuccessMultiData(pdvData.graphBasePath, pdvData.pdvDataSerializedMulti)
+                    )
+                )
             }
-
-            projectsComboBox.addItemListener(itemListener)
-
-            Disposer.register(this@NewProjectDetailsBrowser) {
-                projectsComboBox.removeItemListener(itemListener)
+        } else if (pdvData.resultType == "SUCCESS") {
+            if (pdvData.pdvDataSerialized != null) {
+                stateMachine.processEvent(
+                    Events.LoadSuccess(
+                        LoadSuccessData(pdvData.graphBasePath, pdvData.pdvDataSerialized)
+                    )
+                )
             }
-
-            val plantUML = stateMachine.exportToPlantUml()
-            logger<NewProjectDetailsBrowser>().debug(plantUML)
         }
     }
 
@@ -447,8 +447,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         ApplicationManager.getApplication().invokeLater { progressBar.isIndeterminate = false }
     }
 
-    private fun showMultiDisclaimer(projects: Array<String>) {
-        multiDisclaimerPanel.toolTipText = projects.joinToString(" ")
+    private fun showMultiDisclaimer() {
         multiDisclaimerPanel.isVisible = true
     }
 
@@ -586,6 +585,34 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         return query
     }
 
+    private suspend fun registerListeners(stateMachine: StateMachine) {
+        messageBusConnection = project.messageBus.connect(scope)
+        with(messageBusConnection) {
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener {
+                    if (project.isDisposed) {
+                        return@NxWorkspaceRefreshListener
+                    }
+                    stateMachine.processEventByLaunch(Events.TryLoadPDV())
+                },
+            )
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
+                NxWorkspaceRefreshStartedListener {
+                    stateMachine.processEventByLaunch(Events.RefreshStarted())
+                },
+            )
+            subscribe(
+                UISettingsListener.TOPIC,
+                UISettingsListener { stateMachine.processEventByLaunch(Events.ChangeUISettings()) },
+            )
+        }
+
+        val plantUML = stateMachine.exportToPlantUml()
+        logger<NewProjectDetailsBrowser>().debug(plantUML)
+    }
+
     override fun dispose() {
         if (::stateMachine.isInitialized) {
             scope.launch { stateMachine.stop() }
@@ -593,6 +620,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         if (::messageBusConnection.isInitialized) {
             messageBusConnection.disconnect()
         }
+
+        projectsComboBox.removeItemListener(projectsComboBoxListener)
         Disposer.dispose(interactionEventQuery)
         Disposer.dispose(browser)
     }
