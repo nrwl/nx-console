@@ -6,6 +6,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
+import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.lang.javascript.JavaScriptBundle
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
@@ -30,17 +31,13 @@ import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
 import dev.nx.console.utils.NxConsolePluginDisposable
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
-import java.awt.Desktop
 import java.awt.event.MouseEvent
 import java.net.URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class NxTreeStructure(
-    val tree: NxProjectsTree,
-    val project: Project,
-) : SimpleTreeStructure() {
+class NxTreeStructure(val tree: NxProjectsTree, val project: Project) : SimpleTreeStructure() {
 
     private val treeModel = StructureTreeModel(this, NxConsolePluginDisposable.getInstance(project))
     private lateinit var nxTreeBuilder: NxTreeBuilderBase
@@ -66,7 +63,7 @@ class NxTreeStructure(
                 treeModel.invalidateAsync().thenRun {
                     TreeUtil.promiseExpand(
                         tree,
-                        treePersistenceManager.NxProjectsTreePersistenceVisitor()
+                        treePersistenceManager.NxProjectsTreePersistenceVisitor(),
                     )
                 }
             }
@@ -106,7 +103,7 @@ class NxTreeStructure(
                 actionManager.getAction("dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"),
                 actionManager.getAction("dev.nx.console.graph.actions.NxGraphFocusTaskAction"),
                 actionManager.getAction("dev.nx.console.generate.actions.NxMoveProjectAction"),
-                actionManager.getAction("dev.nx.console.generate.actions.NxRemoveProjectAction")
+                actionManager.getAction("dev.nx.console.generate.actions.NxRemoveProjectAction"),
             )
 
         val copyAction = actionManager.getAction("\$Copy")
@@ -125,7 +122,7 @@ class NxTreeStructure(
                         nxTaskExecutionManager.execute(
                             taskSet.nxProject,
                             taskSet.nxTarget,
-                            taskSet.nxTargetConfiguration
+                            taskSet.nxTargetConfiguration,
                         )
                         return true
                     }
@@ -163,7 +160,7 @@ class NxTreeStructure(
                 e.presentation.text =
                     JavaScriptBundle.message(
                         "buildTools.EditRunSettingsAction.text",
-                        *arrayOf<Any>(taskSet.suggestedName)
+                        *arrayOf<Any>(taskSet.suggestedName),
                     )
             }
 
@@ -186,7 +183,7 @@ class NxTreeStructure(
                         project,
                         nxProject,
                         nxTarget,
-                        nxTargetConfiguration
+                        nxTargetConfiguration,
                     )
 
                 val ok =
@@ -195,8 +192,8 @@ class NxTreeStructure(
                         runnerAndConfigurationSettings,
                         JavaScriptBundle.message(
                             "dialog.title.edit.run.debug.configuration",
-                            *arrayOf<Any>(runnerAndConfigurationSettings.name)
-                        )
+                            *arrayOf<Any>(runnerAndConfigurationSettings.name),
+                        ),
                     )
 
                 if (ok) {
@@ -240,7 +237,7 @@ class NxTreeStructure(
                     taskSet.nxTarget,
                     taskSet.nxTargetConfiguration,
                     emptyList(),
-                    executor
+                    executor,
                 )
             }
         }
@@ -252,7 +249,7 @@ class NxTreeStructure(
 
         override fun actionPerformed(e: AnActionEvent) {
             val url = "https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx-console"
-            Desktop.getDesktop().browse(URI.create(url))
+            BrowserLauncher.instance.browse(URI.create(url))
         }
 
         override fun update(e: AnActionEvent) {
@@ -268,7 +265,7 @@ class NxTreeStructure(
         if (targetNode != null) {
             return NxTaskSet(
                 nxProject = targetNode.nxProjectName,
-                nxTarget = targetNode.nxTargetName
+                nxTarget = targetNode.nxTargetName,
             )
         }
 
@@ -278,7 +275,7 @@ class NxTreeStructure(
             return NxTaskSet(
                 nxProject = targetConfigurationNode.nxProjectName,
                 nxTarget = targetConfigurationNode.nxTargetName,
-                nxTargetConfiguration = targetConfigurationNode.nxTargetConfigurationName
+                nxTargetConfiguration = targetConfigurationNode.nxTargetConfigurationName,
             )
         }
 
@@ -289,7 +286,7 @@ class NxTreeStructure(
 data class NxTaskSet(
     val nxProject: String,
     val nxTarget: String,
-    val nxTargetConfiguration: String
+    val nxTargetConfiguration: String,
 ) {
     constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, "") {}
 

@@ -5,6 +5,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
+import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
 import com.intellij.openapi.actionSystem.*
@@ -194,7 +195,9 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                                     NxConsoleSettingsConfigurable::class.java,
                                                 )
                                         } else {
-                                            Desktop.getDesktop().browse(URI.create(it.description))
+                                            BrowserLauncher.instance.browse(
+                                                URI.create(it.description)
+                                            )
                                         }
                                     }
                                     .align(Align.CENTER)
@@ -237,7 +240,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                 )
                             action.actionPerformed(actionEvent)
                         } else {
-                            Desktop.getDesktop().browse(URI.create(it.description))
+                            BrowserLauncher.instance.browse(URI.create(it.description))
                         }
                     }
                 }
@@ -425,10 +428,9 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                         addActionListener {
                                             TelemetryService.getInstance(project)
                                                 .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                                            Desktop.getDesktop()
-                                                .browse(
-                                                    URI.create(nxCloudUrl ?: "https://cloud.nx.app")
-                                                )
+                                            BrowserLauncher.instance.browse(
+                                                URI.create(nxCloudUrl ?: "https://cloud.nx.app")
+                                            )
                                         }
                                     }
                                 )
