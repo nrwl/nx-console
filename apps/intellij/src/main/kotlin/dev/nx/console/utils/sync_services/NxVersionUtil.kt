@@ -112,7 +112,7 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
             val version =
                 dependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
                     ?: devDependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
-                    ?: return null
+                        ?: return null
 
             return SemVer.parseFromText(version)?.let { NxVersion(it.major, it.minor, version) }
         } catch (e: Throwable) {
