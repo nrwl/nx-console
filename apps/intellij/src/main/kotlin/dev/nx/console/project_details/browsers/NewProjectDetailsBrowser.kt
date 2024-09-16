@@ -121,10 +121,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private lateinit var stateMachine: StateMachine
     private lateinit var messageBusConnection: SimpleMessageBusConnection
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val scope: CoroutineScope =
-        ProjectLevelCoroutineHolderService.getInstance(project).cs +
-            newSingleThreadContext("single thread")
+    private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     init {
         progressBar.setUI(
@@ -423,6 +420,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private suspend fun showPDV(graphBasePath: String, pdvData: String) {
+        if (browser.isDisposed || interactionEventQuery.isDisposed) {
+            return
+        }
         val html =
             """
     <html>
@@ -477,6 +477,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private suspend fun updatePDVData(pdvData: String) {
+        if (browser.isDisposed) {
+            return
+        }
         browser.executeJavascriptWithCatch(
             """
                     window.pdvService.send({
@@ -489,7 +492,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private suspend fun updateMultiDropdown(projects: Array<String>, selectedProject: String) {
-
+        if (browser.isDisposed) {
+            return
+        }
         projectsComboBox.removeItemListener(projectsComboBoxListener)
         projectsComboBox.removeAllItems()
         projects.forEach { projectsComboBox.addItem(it) }
@@ -498,6 +503,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private suspend fun showError(data: LoadErrorData) {
+        if (browser.isDisposed) {
+            return
+        }
         val html =
             """
     <html>
@@ -537,7 +545,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private fun showErrorNoGraph(data: String) {
-
+        if (browser.isDisposed) {
+            return
+        }
         val html =
             """
             <html>
@@ -748,7 +758,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         }
 
         projectsComboBox.removeItemListener(projectsComboBoxListener)
-        Disposer.dispose(interactionEventQuery)
         Disposer.dispose(browser)
+        Disposer.dispose(interactionEventQuery)
     }
 }

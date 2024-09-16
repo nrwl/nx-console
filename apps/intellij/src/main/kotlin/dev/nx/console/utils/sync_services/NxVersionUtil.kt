@@ -46,10 +46,10 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
     }
 
     fun getNxVersionSynchronously(): NxVersion? {
-        if (ApplicationManager.getApplication().isDispatchThread) {
-            return nxVersion
+        return if (ApplicationManager.getApplication().isDispatchThread) {
+            nxVersion
         } else {
-            return nxVersion ?: tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+            nxVersion ?: tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
         }
     }
 
@@ -112,7 +112,7 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
             val version =
                 dependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
                     ?: devDependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
-                        ?: return null
+                    ?: return null
 
             return SemVer.parseFromText(version)?.let { NxVersion(it.major, it.minor, version) }
         } catch (e: Throwable) {
