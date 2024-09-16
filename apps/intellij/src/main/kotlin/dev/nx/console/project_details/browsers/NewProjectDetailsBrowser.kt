@@ -156,6 +156,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
         rootPanel.add(loadingPanel, BorderLayout.CENTER)
 
+        browser.setOpenLinksInExternalBrowser(true)
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         interactionEventQuery = createInteractionEventQuery()
 
@@ -536,11 +537,29 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private fun showErrorNoGraph(data: String) {
+
         val html =
             """
             <html>
+            <head>
+             <style>
+        body {
+            background-color: ${getHexColor(UIUtil.getPanelBackground())} !important;
+            font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
+            font-size: ${UIUtil.getLabelFont().size}px;
+             color: ${
+                getHexColor(
+                    when (!JBColor.isBright()) {
+                        true -> UIUtil.getActiveTextColor()
+                        false -> UIUtil.getLabelForeground()
+                    }
+                )
+            }
+    </style>
+            </head>
             <body>
-            ERROR: $data
+            <h2>Nx Console could not load the Project Details View. </h2>
+            This is most likely because local dependencies are not installed. Make sure to run npm/yarn/pnpm/bun install and refresh the workspace using the button on the top right.
             </body>
             </html>
         """
