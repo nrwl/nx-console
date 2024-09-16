@@ -51,10 +51,10 @@ import ru.nsk.kstatemachine.event.DataEvent
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.*
+import ru.nsk.kstatemachine.transition.TransitionType
 import ru.nsk.kstatemachine.transition.onTriggered
 import ru.nsk.kstatemachine.transition.stay
 import ru.nsk.kstatemachine.transition.targetState
-import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
     const val InitialLoading = "InitialLoading"
@@ -144,8 +144,14 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 isVisible = false
             }
 
-        loadingPanel.add(progressBar, BorderLayout.NORTH)
-        loadingPanel.add(multiDisclaimerPanel, BorderLayout.NORTH)
+        loadingPanel.add(
+            JPanel(BorderLayout()).apply {
+                add(progressBar, BorderLayout.NORTH)
+                add(multiDisclaimerPanel, BorderLayout.SOUTH)
+            },
+            BorderLayout.NORTH,
+        )
+
         loadingPanel.add(browser.component, BorderLayout.CENTER)
 
         rootPanel.add(loadingPanel, BorderLayout.CENTER)
@@ -165,7 +171,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     onTransitionComplete { activeStates, transitionParams ->
                         logger<NewProjectDetailsBrowser>()
                             .debug(
-                                "Event ${transitionParams.event::javaClass.name} State $activeStates"
+                                "Event ${transitionParams.event::class.simpleName} State $activeStates"
                             )
                     }
                     val initialLoadingState =
@@ -184,14 +190,18 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             onEntry {
                                 hideProgressBarLoading()
                                 hideMultiDisclaimer()
-                                showPDV(data.graphBasePath, data.pdvData)
-                                setColors()
-                            }
-                            transition<Events.LoadSuccess> {
-                                onTriggered {
-                                    hideProgressBarLoading()
-                                    updatePDVData(it.event.data.pdvData)
+
+                                if (it.transition.sourceState == this@dataState) {
+                                    updatePDVData(data.pdvData)
+                                } else {
+                                    showPDV(data.graphBasePath, data.pdvData)
+                                    setColors()
                                 }
+                            }
+                            dataTransition<Events.LoadSuccess, LoadSuccessData> {
+                                // this makes sure that the data is updated & onEntry called again
+                                type = TransitionType.EXTERNAL
+                                targetState = this@dataState
                             }
                             transition<Events.TryLoadPDV> {
                                 onTriggered { tryLoadPDV(this@createStateMachine) }
@@ -205,15 +215,50 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     val showingPDVMultiState =
                         dataState<LoadSuccessMultiData>(States.ShowingPDVMulti) {
                             onEntry {
+                                hideProgressBarLoading()
+
                                 val projects = data.pdvData.keys.toTypedArray()
                                 val selectedProject = projectsComboBox.item ?: projects.first()
+                                if (it.transition.sourceState == this@dataState) {
+                                    updatePDVData(data.pdvData[selectedProject]!!)
+                                } else {
+                                    updateMultiDropdown(projects, selectedProject)
+                                    showMultiDisclaimer()
 
-                                updateMultiDropdown(projects, selectedProject)
-
-                                showMultiDisclaimer()
-                                showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
-                                setColors()
+                                    showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
+                                    setColors()
+                                }
                             }
+                            dataTransition<Events.LoadSuccessMulti, LoadSuccessMultiData> {
+                                // this makes sure that the data is updated & onEntry called again
+                                type = TransitionType.EXTERNAL
+                                targetState = this@dataState
+                            }
+                            transition<Events.SelectMultiProject> {
+                                onTriggered {
+                                    val sourceState = it.transition.sourceState
+                                    if (sourceState is DefaultDataState<*>) {
+                                        val lastData = sourceState.lastData
+                                        if (lastData is LoadSuccessMultiData) {
+                                            val projects = lastData.pdvData.keys.toTypedArray()
+                                            val selectedProject =
+                                                projectsComboBox.item ?: projects.first()
+
+                                            updateMultiDropdown(projects, selectedProject)
+                                            this@createStateMachine.processEvent(
+                                                Events.LoadSuccessMulti(lastData)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            transition<Events.TryLoadPDV> {
+                                onTriggered { tryLoadPDV(this@createStateMachine) }
+                            }
+                            transition<Events.RefreshStarted> {
+                                onTriggered { showProgressBarLoading() }
+                            }
+                            transition<Events.ChangeUISettings> { onTriggered { setColors() } }
                         }
 
                     val showingErrorState =
@@ -269,7 +314,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             initialLoadingState,
                             showingErrorState,
                             showingErrorNoGraphState,
-                            showingPDVMultiState,
                             loadingState,
                         )
                         .forEach {
@@ -300,24 +344,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         transition<Events.LoadOldBrowser> { targetState = showingOldBrowserState }
                     }
 
-                    // showingPDVMultiState goes back to itself
-                    showingPDVMultiState.apply {
-                        transition<Events.SelectMultiProject> {
-                            targetState = loadingState
-                            onTriggered {
-                                val sourceState = it.transition.sourceState
-                                if (sourceState is DefaultDataState<*>) {
-                                    val lastData = sourceState.lastData
-                                    if (lastData is LoadSuccessMultiData) {
-                                        this@createStateMachine.processEvent(
-                                            Events.LoadSuccessMulti(lastData)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                     // showingOldBrowserState can only leave if the version changes
                     showingOldBrowserState.apply {
                         transitionConditionally<Events.TryLoadPDV> {
@@ -339,8 +365,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 }
             stateMachine.start()
 
-            val plantUML = stateMachine.exportToPlantUml()
-            logger<NewProjectDetailsBrowser>().debug(plantUML)
+            //            val plantUML = stateMachine.exportToPlantUml()
+            //            logger<NewProjectDetailsBrowser>().debug(plantUML)
         }
     }
 
