@@ -7,10 +7,10 @@ import org.intellij.lang.annotations.Language
 suspend fun JBCefBrowser.executeJavascriptWithCatch(
     @Language("JavaScript") javaScriptExpression: String
 ): String? {
-    try {
-        return executeJavaScript(javaScriptExpression)
+    return try {
+        executeJavaScript(javaScriptExpression)
     } catch (e: JBCefBrowserJsCallError) {
         thisLogger().debug(e)
+        null
     }
-    return null
 }

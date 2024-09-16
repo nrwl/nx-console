@@ -17,10 +17,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBLoadingPanel
-import com.intellij.ui.jcef.JBCefBrowser
-import com.intellij.ui.jcef.JBCefBrowserBase
-import com.intellij.ui.jcef.JBCefClient
-import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.ui.jcef.*
 import com.intellij.util.messages.SimpleMessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphInteractionEvent
@@ -181,13 +178,28 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             }
                             onExit { loadingPanel.stopLoading() }
                         }
+
                     val showingPDVState =
                         dataState<LoadSuccessData>(States.ShowingPDV) {
                             onEntry {
+                                hideProgressBarLoading()
                                 hideMultiDisclaimer()
                                 showPDV(data.graphBasePath, data.pdvData)
                                 setColors()
                             }
+                            transition<Events.LoadSuccess> {
+                                onTriggered {
+                                    hideProgressBarLoading()
+                                    updatePDVData(it.event.data.pdvData)
+                                }
+                            }
+                            transition<Events.TryLoadPDV> {
+                                onTriggered { tryLoadPDV(this@createStateMachine) }
+                            }
+                            transition<Events.RefreshStarted> {
+                                onTriggered { showProgressBarLoading() }
+                            }
+                            transition<Events.ChangeUISettings> { onTriggered { setColors() } }
                         }
 
                     val showingPDVMultiState =
@@ -196,14 +208,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                 val projects = data.pdvData.keys.toTypedArray()
                                 val selectedProject = projectsComboBox.item ?: projects.first()
 
-                                projectsComboBox.removeItemListener(projectsComboBoxListener)
-                                projectsComboBox.removeAllItems()
-                                projects.forEach { projectsComboBox.addItem(it) }
-                                projectsComboBox.item = selectedProject
-                                projectsComboBox.addItemListener(
-                                    this@NewProjectDetailsBrowser,
-                                    projectsComboBoxListener,
-                                )
+                                updateMultiDropdown(projects, selectedProject)
 
                                 showMultiDisclaimer()
                                 showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
@@ -260,10 +265,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             onExit { hideProgressBarLoading() }
                         }
 
-                    // when (pre-)loading is triggered on any non-old state, we go to loading
                     listOf(
                             initialLoadingState,
-                            showingPDVState,
                             showingErrorState,
                             showingErrorNoGraphState,
                             showingPDVMultiState,
@@ -432,7 +435,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
            window.externalApi.graphInteractionEventListener = (message) => {
                     ${interactionEventQuery.inject("JSON.stringify(message)")}
                 }
-          const service = window.renderPDV(data)
+          window.pdvService = window.renderPDV(data)
         </script>
 
     </body>
@@ -444,6 +447,27 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             browser.loadHTML(html)
             browser.awaitLoad()
         }
+    }
+
+    private suspend fun updatePDVData(pdvData: String) {
+        browser.executeJavascriptWithCatch(
+            """
+                    window.pdvService.send({
+                      type: 'loadData',
+                      ...$pdvData,
+                    });
+                """
+                .trimIndent()
+        )
+    }
+
+    private suspend fun updateMultiDropdown(projects: Array<String>, selectedProject: String) {
+
+        projectsComboBox.removeItemListener(projectsComboBoxListener)
+        projectsComboBox.removeAllItems()
+        projects.forEach { projectsComboBox.addItem(it) }
+        projectsComboBox.item = selectedProject
+        projectsComboBox.addItemListener(this@NewProjectDetailsBrowser, projectsComboBoxListener)
     }
 
     private suspend fun showError(data: LoadErrorData) {
