@@ -18,6 +18,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.ui.jcef.*
+import com.intellij.util.application
 import com.intellij.util.messages.SimpleMessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphInteractionEvent
@@ -55,6 +56,7 @@ import ru.nsk.kstatemachine.transition.TransitionType
 import ru.nsk.kstatemachine.transition.onTriggered
 import ru.nsk.kstatemachine.transition.stay
 import ru.nsk.kstatemachine.transition.targetState
+import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
     const val InitialLoading = "InitialLoading"
@@ -363,8 +365,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                 }
             stateMachine.start()
 
-            //            val plantUML = stateMachine.exportToPlantUml()
-            //            logger<NewProjectDetailsBrowser>().debug(plantUML)
+            if (application.isInternal) {
+                val plantUML = stateMachine.exportToPlantUml()
+                logger<NewProjectDetailsBrowser>().debug(plantUML)
+            }
         }
     }
 
