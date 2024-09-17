@@ -1,5 +1,4 @@
 import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
-import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
 import { ProjectDetailsPreview } from './project-details-preview';
 
