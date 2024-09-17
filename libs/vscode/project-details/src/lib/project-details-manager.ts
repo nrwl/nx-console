@@ -3,9 +3,7 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
-import { gte } from 'semver';
 import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
-import { NewProjectDetailsPreview } from './new-project-details-preview';
 import {
   OldProjectDetailsPreview,
   ProjectDetailsPreview,
@@ -29,9 +27,7 @@ export class ProjectDetailsManager {
         showNoNxVersionMessage();
         return;
       }
-      // if (gte(nxVersion.full, '20.0.0')) {
-      //   preview = new NewProjectDetailsPreview(path);
-      // } else {
+
       preview = new OldProjectDetailsPreview(
         path,
         this.context,
