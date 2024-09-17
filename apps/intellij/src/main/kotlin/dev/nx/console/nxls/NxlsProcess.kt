@@ -103,8 +103,8 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
     }
 
     private fun createCommandLine(): GeneralCommandLine {
-        val lsp = JSLanguageServiceUtil.getPluginDirectory(javaClass, "nxls/main.js")
-        //        val nxlsPath = PathEnvironmentVariableUtil.findInPath("nxls")
+        val lsp =
+            JSLanguageServiceUtil.getPluginDirectory(this@NxlsProcess.javaClass, "nxls/main.js")
         if (lsp == null || !lsp.exists()) {
             throw ExecutionException(NxConsoleBundle.message("language.server.not.found"))
         }

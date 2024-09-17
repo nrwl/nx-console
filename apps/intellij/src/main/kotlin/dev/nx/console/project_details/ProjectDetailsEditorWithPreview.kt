@@ -22,7 +22,7 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
     TextEditorWithPreview(createEditor(project, file), createPreviewComponent(project, file)),
     DumbAware {
     init {
-        layout =
+        setLayout(
             NxVersionUtil.getInstance(project).nxVersion.let {
                 if (it == null || !it.gte(NxVersion(major = 17, minor = 13, full = "17.13.0"))) {
                     Layout.SHOW_EDITOR
@@ -30,10 +30,11 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
                     Layout.SHOW_EDITOR_AND_PREVIEW
                 }
             }
+        )
     }
 
     fun showWithPreview() {
-        this.layout = Layout.SHOW_EDITOR_AND_PREVIEW
+        setLayout(Layout.SHOW_EDITOR_AND_PREVIEW)
     }
 
     override fun createRightToolbar(): ActionToolbar {
@@ -44,7 +45,7 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
                 RefreshAction(
                     "Refresh Nx Workspace",
                     "Refresh Nx Workspace",
-                    AllIcons.Actions.Refresh
+                    AllIcons.Actions.Refresh,
                 ) {
                 override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
@@ -56,7 +57,7 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
                     TelemetryService.getInstance(project)
                         .featureUsed(
                             TelemetryEvent.MISC_REFRESH_WORKSPACE,
-                            mapOf("source" to TelemetryEventSource.EDITOR_TOOLBAR)
+                            mapOf("source" to TelemetryEventSource.EDITOR_TOOLBAR),
                         )
                     NxRefreshWorkspaceAction().actionPerformed(e)
                 }
@@ -90,7 +91,7 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
     private class HalfConditionalActionGroup(
         private val conditionalActions: Array<AnAction>,
         private val alwaysActions: Array<AnAction>,
-        private val condition: Supplier<Boolean>
+        private val condition: Supplier<Boolean>,
     ) : ActionGroup() {
         override fun getChildren(e: AnActionEvent?): Array<AnAction> {
             return if (condition.get()) conditionalActions + alwaysActions else alwaysActions
