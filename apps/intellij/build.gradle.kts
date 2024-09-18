@@ -10,8 +10,6 @@ val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
-fun properties(key: String) = project.findProperty(key).toString()
-
 plugins {
     // Java support
     id("java")
@@ -32,7 +30,9 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.11.0"
 }
 
-group = properties("pluginGroup")
+group = providers.gradleProperty("pluginGroup").get()
+
+version = providers.gradleProperty("version").get()
 
 // Configure project's dependencies
 repositories {
@@ -65,10 +65,12 @@ dependencies {
     implementation("io.github.z4kn4fein:semver:2.0.0")
 
     intellijPlatform {
-        intellijIdeaUltimate(properties("platformVersion"))
+        intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
 
         bundledPlugins(
-            properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty)
+            providers.gradleProperty("platformPlugins").map { plugins ->
+                plugins.split(',').map(String::trim).filter(String::isNotEmpty)
+            }
         )
         pluginVerifier()
         zipSigner()
@@ -81,40 +83,44 @@ ktfmt { kotlinLangStyle() }
 kotlin { jvmToolchain(17) }
 
 intellijPlatform {
-    pluginConfiguration {
-        name.set(properties("pluginName"))
-        version.set(properties("pluginVersion"))
-        ideaVersion.sinceBuild.set(properties("pluginSinceBuild"))
-        ideaVersion.untilBuild.set(properties("pluginUntilBuild"))
-        description.set(
-            file("README.md")
-                .readText()
-                .lines()
-                .run {
-                    val start = "<!-- Plugin description -->"
-                    val end = "<!-- Plugin description end -->"
+    projectName = providers.gradleProperty("pluginName").get()
 
+    pluginConfiguration {
+        version = providers.gradleProperty("version").get()
+        ideaVersion {
+            sinceBuild = providers.gradleProperty("pluginSinceBuild").get()
+            untilBuild = providers.gradleProperty("pluginUntilBuild").get()
+        }
+        description =
+            providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+                val start = "<!-- Plugin description -->"
+                val end = "<!-- Plugin description end -->"
+
+                with(it.lines()) {
                     if (!containsAll(listOf(start, end))) {
                         throw GradleException(
                             "Plugin description section not found in README.md:\n$start ... $end"
                         )
                     }
                     subList(indexOf(start) + 1, indexOf(end))
+                        .joinToString("\n")
+                        .let(::markdownToHTML)
                 }
-                .joinToString("\n")
-                .let { markdownToHTML(it) }
-        )
+            }
 
-        changeNotes.set(
-            provider {
+        val changelog = project.changelog // local variable for configuration cache compatibility
+        // Get the latest available change notes from the changelog file
+        changeNotes =
+            providers.gradleProperty("version").map { pluginVersion ->
                 with(changelog) {
                     renderItem(
-                        getOrNull(properties("version")) ?: getLatest(),
+                        (getOrNull(pluginVersion) ?: getUnreleased())
+                            .withHeader(false)
+                            .withEmptySections(false),
                         Changelog.OutputType.HTML,
                     )
                 }
             }
-        )
     }
     signing {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
@@ -145,11 +151,15 @@ intellijPlatformTesting {
                     include("**/*.js")
                     include("**/package.json")
                     include("**/*.map")
-                    into("intellij/nxls")
+                    into(intellijPlatform.projectName.map { "$it/nxls" }.get())
                 }
                 doLast {
                     exec {
-                        workingDir = File(destinationDir, "intellij/nxls")
+                        workingDir =
+                            File(
+                                destinationDir,
+                                intellijPlatform.projectName.map { "$it/nxls" }.get(),
+                            )
                         commandLine = buildCommands() + "npm install --force"
                     }
                 }
@@ -162,7 +172,7 @@ intellijPlatformTesting {
 // https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.set(emptyList())
-    repositoryUrl.set(properties("pluginRepositoryUrl"))
+    repositoryUrl.set(providers.gradleProperty("pluginRepositoryUrl").get())
 }
 
 // Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
@@ -188,11 +198,12 @@ tasks {
             include("**/*.js")
             include("**/package.json")
             include("**/*.map")
-            into("intellij/nxls")
+            into(intellijPlatform.projectName.map { "$it/nxls" }.get())
         }
         doLast {
             exec {
-                workingDir = File(destinationDir, "intellij/nxls")
+                workingDir =
+                    File(destinationDir, intellijPlatform.projectName.map { "$it/nxls" }.get())
                 commandLine = buildCommands() + "npm install --force"
             }
         }
