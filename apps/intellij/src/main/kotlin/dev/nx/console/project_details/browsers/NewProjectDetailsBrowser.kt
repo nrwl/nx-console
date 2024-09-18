@@ -94,7 +94,9 @@ sealed interface Events {
 
     class LoadError(override val data: LoadErrorData) : DataEvent<LoadErrorData>
 
-    class LoadErrorNoGraph(override val data: String) : DataEvent<String>
+    class LoadErrorNoGraph(data: String? = null) : DataEvent<String> {
+        override val data = data ?: ""
+    }
 
     class LoadOldBrowser : Event
 }
@@ -376,50 +378,59 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         if (browser.isDisposed) {
             return
         }
-        val nxlsService = NxlsService.getInstance(project)
-        nxlsService.awaitStarted()
-        val pdvData = nxlsService.pdvData(file.path)
+        try {
 
-        if (
-            pdvData == null ||
-                pdvData.resultType === "NO_GRAPH_ERROR" ||
-                pdvData.graphBasePath == null
-        ) {
-            stateMachine.processEvent(Events.LoadErrorNoGraph("Graph not found"))
-            return
-        }
+            val nxlsService = NxlsService.getInstance(project)
+            nxlsService.awaitStarted()
+            val pdvData = nxlsService.pdvData(file.path)
 
-        if (pdvData.resultType == "OLD_NX_VERSION") {
-            stateMachine.processEvent(Events.LoadOldBrowser())
-            return
-        }
-
-        if (pdvData.resultType == "ERROR") {
-            stateMachine.processEvent(
-                Events.LoadError(
-                    LoadErrorData(
-                        pdvData.graphBasePath,
-                        pdvData.errorsSerialized ?: "",
-                        pdvData.errorMessage ?: "",
-                    )
-                )
-            )
-        } else if (pdvData.resultType == "SUCCESS_MULTI") {
-            if (pdvData.pdvDataSerializedMulti != null) {
-                stateMachine.processEvent(
-                    Events.LoadSuccessMulti(
-                        LoadSuccessMultiData(pdvData.graphBasePath, pdvData.pdvDataSerializedMulti)
-                    )
-                )
+            if (
+                pdvData == null ||
+                    pdvData.resultType === "NO_GRAPH_ERROR" ||
+                    pdvData.graphBasePath == null
+            ) {
+                stateMachine.processEvent(Events.LoadErrorNoGraph())
+                return
             }
-        } else if (pdvData.resultType == "SUCCESS") {
-            if (pdvData.pdvDataSerialized != null) {
+
+            if (pdvData.resultType == "OLD_NX_VERSION") {
+                stateMachine.processEvent(Events.LoadOldBrowser())
+                return
+            }
+
+            if (pdvData.resultType == "ERROR") {
                 stateMachine.processEvent(
-                    Events.LoadSuccess(
-                        LoadSuccessData(pdvData.graphBasePath, pdvData.pdvDataSerialized)
+                    Events.LoadError(
+                        LoadErrorData(
+                            pdvData.graphBasePath,
+                            pdvData.errorsSerialized ?: "",
+                            pdvData.errorMessage ?: "",
+                        )
                     )
                 )
+            } else if (pdvData.resultType == "SUCCESS_MULTI") {
+                if (pdvData.pdvDataSerializedMulti != null) {
+                    stateMachine.processEvent(
+                        Events.LoadSuccessMulti(
+                            LoadSuccessMultiData(
+                                pdvData.graphBasePath,
+                                pdvData.pdvDataSerializedMulti,
+                            )
+                        )
+                    )
+                }
+            } else if (pdvData.resultType == "SUCCESS") {
+                if (pdvData.pdvDataSerialized != null) {
+                    stateMachine.processEvent(
+                        Events.LoadSuccess(
+                            LoadSuccessData(pdvData.graphBasePath, pdvData.pdvDataSerialized)
+                        )
+                    )
+                }
             }
+        } catch (e: Throwable) {
+            logger<NewProjectDetailsBrowser>().warn("Error loading PDV: ${e.message}")
+            stateMachine.processEvent(Events.LoadErrorNoGraph(e.message))
         }
     }
 
@@ -573,7 +584,21 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             </head>
             <body>
             <h2>Nx Console could not load the Project Details View. </h2>
-            This is most likely because local dependencies are not installed. Make sure to run npm/yarn/pnpm/bun install and refresh the workspace using the button on the top right.
+            <h4>
+            This is most likely because local dependencies are not installed. <br/>
+            Make sure to run npm/yarn/pnpm/bun install and refresh the workspace using the button on the top right.
+            </h4>
+
+            ${if(data.isNotEmpty()) """
+             <h4>
+                The following error occurred: <br/>
+                <pre>${data}</pre>
+                See idea.log for more details.
+            </h4>
+            """.trimIndent() else ""}
+
+
+
             </body>
             </html>
         """
