@@ -30,7 +30,6 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
                     Layout.SHOW_EDITOR_AND_PREVIEW
                 }
             }
-        )
     }
 
     fun showWithPreview() {
