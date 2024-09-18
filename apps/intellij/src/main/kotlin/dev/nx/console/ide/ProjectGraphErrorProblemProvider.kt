@@ -10,7 +10,6 @@ import com.intellij.codeInsight.daemon.impl.HighlightInfoType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.workspaceModel.ide.getInstance
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
@@ -32,7 +31,7 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
             .connect()
             .subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener { setNxProblems() }
+                NxWorkspaceRefreshListener { setNxProblems() },
             )
     }
 

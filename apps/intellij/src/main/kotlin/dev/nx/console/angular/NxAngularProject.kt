@@ -11,7 +11,7 @@ import org.angular2.cli.config.AngularProject
 class NxAngularProject(
     override val name: String,
     private val ngProject: AngularJsonProject,
-    private val workspaceFolder: VirtualFile
+    private val workspaceFolder: VirtualFile,
 ) : AngularProject(workspaceFolder) {
 
     override val rootDir
@@ -72,7 +72,7 @@ class NxAngularProject(
         }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    /*override*/ fun resolveFile(filePath: String?): VirtualFile? {
+    fun resolveFile(filePath: String?): VirtualFile? {
         return filePath?.let { path ->
             rootDir.takeIf { it.isValid }?.findFileByRelativePath(path)
                 ?: workspaceFolder.takeIf { it.isValid }?.findFileByRelativePath(path)

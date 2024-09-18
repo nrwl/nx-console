@@ -4,8 +4,10 @@
   <name>Nx Console</name>
   <vendor>NxDev</vendor>
 
-  <depends>com.intellij.modules.platform</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.json</depends>
+
   <depends>JavaScript</depends>
   <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>
 
