@@ -1,4 +1,4 @@
-package dev.nx.console.project_details
+package dev.nx.console.project_details.browsers
 
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
@@ -11,6 +11,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
@@ -37,7 +38,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
-class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
+class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     NxGraphBrowserBase(project), DumbAware {
 
     private var nxProjectName: String? = null
@@ -51,7 +52,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         try {
             loadHtml()
         } catch (e: Throwable) {
-            logger<ProjectDetailsBrowser>().debug(e.message)
+            logger<OldProjectDetailsBrowser>().debug(e.message)
         }
 
         with(messageBusConnection) {
@@ -63,10 +64,10 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                             val errors = NxlsService.getInstance(project).workspace()?.errors
                             setErrorsAndRefresh(errors)
                         } catch (e: Throwable) {
-                            logger<ProjectDetailsBrowser>().debug(e.message)
+                            logger<OldProjectDetailsBrowser>().debug(e.message)
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -125,19 +126,19 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                                     addTargetToProjectConfig(
                                         projectName,
                                         targetName,
-                                        targetConfigString
+                                        targetConfigString,
                                     )
                                 }
                             }
                         }
                     }
                     else -> {
-                        logger<ProjectDetailsBrowser>()
+                        logger<OldProjectDetailsBrowser>()
                             .error("Unhandled graph interaction event: $messageParsed")
                     }
                 }
             } catch (e: SerializationException) {
-                logger<ProjectDetailsBrowser>()
+                logger<OldProjectDetailsBrowser>()
                     .error("Error parsing graph interaction event: ${e.message}")
             }
             null
@@ -185,9 +186,9 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     }
 
                     val nxWorkspace = nxlsService.workspace()
-                    var errors = this@ProjectDetailsBrowser.errors ?: nxWorkspace?.errors
+                    var errors = this@OldProjectDetailsBrowser.errors ?: nxWorkspace?.errors
                     val nxProjectName = nxlsService.projectByPath(file.path)?.name
-                    this@ProjectDetailsBrowser.nxProjectName = nxProjectName
+                    this@OldProjectDetailsBrowser.nxProjectName = nxProjectName
                     if (nxProjectName == null && errors == null) {
                         errors =
                             arrayOf(
@@ -235,7 +236,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     </style>
                     </head>
                   """
-                                .trimIndent()
+                                .trimIndent(),
                         )
                     withContext(Dispatchers.EDT) {
                         thisLogger().trace("Loading actual PDV html ${file.path}")
@@ -246,7 +247,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         nxProjectName?.also { loadProjectDetails(it) }
                     }
                 } catch (e: Throwable) {
-                    logger<ProjectDetailsBrowser>()
+                    logger<OldProjectDetailsBrowser>()
                         .debug(
                             "error while loading PDV, loading error html ${file.path}: /n ${e.message}"
                         )
@@ -255,7 +256,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         TelemetryService.getInstance(project)
                             .featureUsed(
                                 TelemetryEvent.MISC_EXCEPTION,
-                                mapOf("kind" to "PDV_LOAD", "name" to e.javaClass.name)
+                                mapOf("kind" to "PDV_LOAD", "name" to e.javaClass.name),
                             )
                         val error =
                             NxError(
@@ -265,7 +266,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                                 stack = e.stackTraceToString(),
                                 file = file.path,
                                 null,
-                                null
+                                null,
                             )
                         wrappedBrowserLoadHtml(getErrorHtml(arrayOf(error)))
 
@@ -287,7 +288,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     private fun addTargetToProjectConfig(
         projectName: String,
         targetName: String,
-        targetConfigString: String
+        targetConfigString: String,
     ) {
         coroutineScope.launch {
             project.nxWorkspace()?.workspace?.projects?.get(projectName)?.apply {
@@ -314,7 +315,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         Notifier.notifyAnything(
                             project,
                             "Error parsing json: ${e.message}",
-                            NotificationType.ERROR
+                            NotificationType.ERROR,
                         )
                     }
                 }
@@ -324,8 +325,8 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
 
     override fun dispose() {
         super.dispose()
-        messageBusConnection.dispose()
+        Disposer.dispose(messageBusConnection)
+        Disposer.dispose(interactionEventQuery)
         currentLoadHtmlJob?.cancel()
-        interactionEventQuery.dispose()
     }
 }

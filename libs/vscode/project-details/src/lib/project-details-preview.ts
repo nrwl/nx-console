@@ -22,7 +22,13 @@ import {
   window,
 } from 'vscode';
 
-export class ProjectDetailsPreview {
+export interface ProjectDetailsPreview {
+  projectRoot: string | undefined;
+  reveal(column?: ViewColumn): void;
+  onDispose(callback: () => void): void;
+}
+
+export class OldProjectDetailsPreview implements ProjectDetailsPreview {
   public projectRoot: string | undefined;
   private webviewPanel: WebviewPanel;
   private graphServer: NxGraphServer;

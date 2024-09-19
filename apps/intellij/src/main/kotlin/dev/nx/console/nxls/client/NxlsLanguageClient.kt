@@ -14,6 +14,7 @@ private val log = logger<NxlsLanguageClient>()
 class NxlsLanguageClient : LanguageClient {
 
     val refreshCallbacks: MutableList<() -> Unit> = mutableListOf()
+    val refreshStartedCallback: MutableList<() -> Unit> = mutableListOf()
 
     override fun telemetryEvent(`object`: Any?) {
         TODO("Not yet implemented")
@@ -41,9 +42,19 @@ class NxlsLanguageClient : LanguageClient {
         refreshCallbacks.add(block)
     }
 
+    fun registerRefreshStartedCallback(block: () -> Unit) {
+        refreshStartedCallback.add(block)
+    }
+
     @JsonNotification("nx/refreshWorkspace")
     fun refreshWorkspace() {
         log.info("Refresh workspace called from nxls")
         refreshCallbacks.forEach { it() }
+    }
+
+    @JsonNotification("nx/refreshWorkspaceStarted")
+    fun refreshWorkspaceStarted() {
+        log.info("Refresh workspace started called from nxls")
+        refreshStartedCallback.forEach { it() }
     }
 }

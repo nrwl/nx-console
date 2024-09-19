@@ -5,8 +5,9 @@ import {
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxVersion,
+  getNxWorkspaceProjects,
   getProjectByPath,
-  getSourceMapFilesToProjectMap,
+  getSourceMapFilesToProjectsMap,
 } from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { dirname, join } from 'path';
@@ -103,7 +104,7 @@ function registerCommand(context: ExtensionContext) {
 
 async function setProjectDetailsFileContext() {
   const setContext = async () => {
-    const sourceMapFilesToProjectMap = await getSourceMapFilesToProjectMap();
+    const sourceMapFilesToProjectMap = await getSourceMapFilesToProjectsMap();
     const nxWorkspacePath = getNxWorkspacePath();
     const pdvPaths = [
       ...new Set(

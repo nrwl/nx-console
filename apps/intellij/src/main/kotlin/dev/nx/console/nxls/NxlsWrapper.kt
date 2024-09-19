@@ -125,6 +125,10 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                 NxGeneratorOption::class.java,
                                 NxGeneratorOptionDeserializer(),
                             )
+                            //                            gson.registerTypeAdapter(
+                            //                                SourceInformation::class.java,
+                            //                                SourceInformationDeserializer(),
+                            //                            )
                         },
                     )
                     .also {

@@ -20,7 +20,7 @@ import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
 @Service(Service.Level.PROJECT)
-class NxlsService(val project: Project, private val cs: CoroutineScope) {
+class NxlsService(private val project: Project, private val cs: CoroutineScope) {
     private var wrapper: NxlsWrapper = NxlsWrapper(project, cs)
 
     private fun client(): NxlsLanguageClient? {
@@ -48,6 +48,13 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         client()?.registerRefreshCallback {
             cs.launch {
                 project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
+            }
+        }
+        client()?.registerRefreshStartedCallback {
+            cs.launch {
+                project.messageBus
+                    .syncPublisher(NX_WORKSPACE_REFRESH_STARTED_TOPIC)
+                    .onWorkspaceRefreshStarted()
             }
         }
     }
@@ -78,6 +85,12 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         }()
     }
 
+    suspend fun workspaceSerialized(): String? {
+        return withMessageIssueCatch("nx/workspaceSerialized") {
+            server()?.getNxService()?.workspaceSerialized()?.await()
+        }()
+    }
+
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
             server()?.getNxService()?.generators()?.await()
@@ -97,7 +110,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
 
     suspend fun generatorContextFromPath(
         generator: NxGenerator? = null,
-        path: String?
+        path: String?,
     ): NxGeneratorContext? {
         return withMessageIssueCatch("nx/generatorContextV2") {
             val request = NxGetGeneratorContextFromPathRequest(path)
@@ -165,16 +178,16 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         }()
     }
 
-    suspend fun sourceMapFilesToProjectMap(): Map<String, String> {
+    suspend fun sourceMapFilesToProjectsMap(): Map<String, Array<String>> {
         return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
-            server()?.getNxService()?.sourceMapFilesToProjectMap()?.await()
+            server()?.getNxService()?.sourceMapFilesToProjectsMap()?.await()
         }()
             ?: emptyMap()
     }
 
     suspend fun targetsForConfigFile(
         projectName: String,
-        configFilePath: String
+        configFilePath: String,
     ): Map<String, NxTarget> {
         return withMessageIssueCatch("nx/targetsForConfigFile") {
             val request = NxTargetsForConfigFileRequest(projectName, configFilePath)
@@ -186,6 +199,12 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
     suspend fun cloudStatus(): NxCloudStatus? {
         return withMessageIssueCatch("nx/cloudStatus") {
             server()?.getNxService()?.cloudStatus()?.await()
+        }()
+    }
+
+    suspend fun pdvData(filePath: String): NxPDVData? {
+        return withMessageIssueCatch("nx/pdvData") {
+            server()?.getNxService()?.pdvData(PDVDataRequest(filePath))?.await()
         }()
     }
 
@@ -215,7 +234,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
 
     private fun <T> withMessageIssueCatch(
         requestName: String,
-        block: suspend () -> T
+        block: suspend () -> T,
     ): suspend () -> T? {
         return {
             try {
@@ -234,9 +253,16 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
 
         val NX_WORKSPACE_REFRESH_TOPIC: Topic<NxWorkspaceRefreshListener> =
             Topic("NxWorkspaceRefresh", NxWorkspaceRefreshListener::class.java)
+
+        val NX_WORKSPACE_REFRESH_STARTED_TOPIC: Topic<NxWorkspaceRefreshStartedListener> =
+            Topic("NxWorkspaceRefreshStarted", NxWorkspaceRefreshStartedListener::class.java)
     }
 }
 
 fun interface NxWorkspaceRefreshListener {
     fun onNxWorkspaceRefresh()
+}
+
+fun interface NxWorkspaceRefreshStartedListener {
+    fun onWorkspaceRefreshStarted()
 }

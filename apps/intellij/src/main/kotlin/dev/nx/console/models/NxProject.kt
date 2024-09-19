@@ -6,7 +6,7 @@ data class NxProject(
     val targets: Map<String, NxTarget>,
     val sourceRoot: String?,
     val projectType: String,
-    val metadata: NxProjectMetadata?
+    val metadata: NxProjectMetadata?,
 ) {
     init {
         require(projectType == "application" || projectType == "library")
