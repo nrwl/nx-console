@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 fun isWindows(): Boolean {
@@ -215,6 +216,8 @@ tasks {
     }
 
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts") }
+
+    withType<RunIdeTask> { maxHeapSize = "6g" }
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
