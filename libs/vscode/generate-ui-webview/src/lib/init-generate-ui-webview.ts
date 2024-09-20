@@ -1,4 +1,4 @@
-import { getGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
+import { getOrSelectGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getGeneratorContextV2 } from '@nx-console/vscode/nx-workspace';
 import { ExtensionContext, Uri } from 'vscode';
 import { registerGenerateCommands } from './generate-commands';
@@ -12,12 +12,8 @@ export async function initGenerateUiWebview(context: ExtensionContext) {
   registerGenerateCommands(context);
 }
 
-export async function openGenerateUi(
-  contextUri?: Uri,
-  generatorName?: string,
-  projectName?: string
-) {
-  const generator = await getGenerator(generatorName);
+export async function openGenerateUi(contextUri?: Uri, projectName?: string) {
+  const generator = await getOrSelectGenerator();
   if (!generator) {
     return;
   }
