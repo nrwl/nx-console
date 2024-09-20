@@ -1,3 +1,17 @@
+## 1.32.0 (2024-09-20)
+
+### Bug Fixes
+
+* **intellij:** get notification group on demand instead of at class creation ([#2258](https://github.com/nrwl/nx-console/issues/2258)) ([25d2c79](https://github.com/nrwl/nx-console/commit/25d2c791121086e174b4658df85d4e9f72510d5b))
+* **intellij:** show better warning & help when no node interpreter is selected ([#2255](https://github.com/nrwl/nx-console/issues/2255)) ([77ae998](https://github.com/nrwl/nx-console/commit/77ae9985e961676a5e439e6ea6e6fc4b79ff5329))
+* **intellij:** use BrowserLauncher instead of Desktop.browse to open external browsers ([#2256](https://github.com/nrwl/nx-console/issues/2256)) ([5da13ef](https://github.com/nrwl/nx-console/commit/5da13efe3da5ab1dde92f58e6aefb2b5ddcd805f))
+
+
+### Features
+
+* **intellij:** add Mark Directory As Nx Workspace Root action ([#2260](https://github.com/nrwl/nx-console/issues/2260)) ([6c8f74a](https://github.com/nrwl/nx-console/commit/6c8f74a8a53fb51f89ca7bdb748828a668581f6f))
+* refactor PDV to get data directly from nxls & apply in intellij ([#2254](https://github.com/nrwl/nx-console/issues/2254)) ([bf2ad34](https://github.com/nrwl/nx-console/commit/bf2ad340352391a937164ef011b754a647840368))
+
 ## 1.31.0 (2024-09-10)
 
 ### Bug Fixes
