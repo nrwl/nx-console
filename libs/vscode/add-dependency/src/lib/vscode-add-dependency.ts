@@ -277,7 +277,14 @@ async function getWorkspaceAddFlag(
     private?: boolean;
   }>(join(workspacePath, 'package.json'));
   if (pkgManager === 'yarn') {
-    const isYarnV1 = major(execSync('yarn --version').toString().trim()) === 1;
+    const isYarnV1 =
+      major(
+        execSync('yarn --version', {
+          windowsHide: true,
+        })
+          .toString()
+          .trim()
+      ) === 1;
     const isWorkspace =
       !!pkgJson.private &&
       !!pkgJson.workspaces &&

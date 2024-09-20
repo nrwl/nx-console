@@ -16,5 +16,6 @@ export async function nxStopDaemon(workspacePath: string, logger: Logger) {
   );
   execSync(`${packageManagerCommands.exec} nx daemon --stop`, {
     cwd: workspacePath,
+    windowsHide: true,
   });
 }

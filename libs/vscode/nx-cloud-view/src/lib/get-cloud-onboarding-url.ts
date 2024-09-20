@@ -110,6 +110,7 @@ export function getGithubSlugOrNull(): string | null {
   try {
     const gitRemote = execSync('git remote -v', {
       stdio: 'pipe',
+      windowsHide: true,
     }).toString();
     // If there are no remotes, we default to github
     if (!gitRemote || gitRemote.length === 0) {
