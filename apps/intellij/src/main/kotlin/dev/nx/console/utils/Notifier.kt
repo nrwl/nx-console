@@ -2,10 +2,7 @@ package dev.nx.console.utils
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationAction
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
+import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
@@ -20,10 +17,12 @@ import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 
 class Notifier {
     companion object {
-        val group = NotificationGroupManager.getInstance().getNotificationGroup("Nx Console")
+        private fun getGroup(): NotificationGroup {
+            return NotificationGroupManager.getInstance().getNotificationGroup("Nx Console")
+        }
 
         fun notifyNxlsError(project: Project) {
-            group
+            getGroup()
                 .createNotification(
                     NxConsoleBundle.message("nxls.not.started"),
                     NotificationType.ERROR,
@@ -35,7 +34,7 @@ class Notifier {
         }
 
         fun notifyTelemetry(project: Project) {
-            group
+            getGroup()
                 .createNotification(
                     NxConsoleBundle.message("nx.telemetry.permission"),
                     NotificationType.INFORMATION,
@@ -87,7 +86,7 @@ class Notifier {
             requestName: String,
             e: MessageIssueException,
         ) {
-            group
+            getGroup()
                 .createNotification(
                     "<html>" +
                         "Nx Console ran into problems reading your workspace files during the following request:" +
@@ -105,7 +104,7 @@ class Notifier {
         }
 
         fun notifyJCEFNotEnabled(project: Project) {
-            group
+            getGroup()
                 .createNotification(
                     "Can't open the Generate UI - Your IDE doesn't support JCEF.",
                     NotificationType.ERROR,
@@ -135,7 +134,7 @@ class Notifier {
             }
 
             val notification =
-                group
+                getGroup()
                     .createNotification(
                         "Refreshing Nx Workspace. You can check the progress in the status bar.",
                         NotificationType.INFORMATION,
@@ -163,7 +162,7 @@ class Notifier {
             message: String,
             type: NotificationType = NotificationType.INFORMATION,
         ) {
-            group.createNotification(message, type).setTitle("Nx Console").notify(project)
+            getGroup().createNotification(message, type).setTitle("Nx Console").notify(project)
         }
     }
 }

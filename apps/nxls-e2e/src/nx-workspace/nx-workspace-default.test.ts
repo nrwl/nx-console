@@ -25,6 +25,7 @@ testNxWorkspace(
         'serve',
         'serve-static',
         'test',
+        'typecheck',
       ],
     },
   ]

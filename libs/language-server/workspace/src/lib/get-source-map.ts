@@ -2,25 +2,32 @@ import type { TargetConfiguration } from 'nx/src/devkit-exports';
 import { nxWorkspace } from './workspace';
 import { normalize, relative } from 'path';
 
-let _sourceMapFilesToProjectMap: Record<string, string> | undefined = undefined;
+let _sourceMapFilesToProjectMap: Record<string, string[]> | undefined =
+  undefined;
 
 /**
  * iterate over sourcemaps and return all files that were involved in creating a project along with the project name
  */
-export async function getSourceMapFilesToProjectMap(
+export async function getSourceMapFilesToProjectsMap(
   workingPath: string
-): Promise<Record<string, string>> {
+): Promise<Record<string, string[]>> {
   if (_sourceMapFilesToProjectMap) {
     return _sourceMapFilesToProjectMap;
   }
   const { workspace } = await nxWorkspace(workingPath);
-  const sourceMapFilesToProjectMap: Record<string, string> = {};
+  const sourceMapFilesToProjectMap: Record<string, string[]> = {};
 
   Object.entries(workspace.sourceMaps ?? {}).forEach(
     ([projectRoot, sourceMap]) => {
       Object.values(sourceMap).forEach(([file]) => {
-        if (file && !sourceMapFilesToProjectMap[file] && file !== 'nx.json') {
-          sourceMapFilesToProjectMap[file] = projectRoot;
+        if (!file || file === 'nx.json') {
+          return;
+        }
+        if (!sourceMapFilesToProjectMap[file]) {
+          sourceMapFilesToProjectMap[file] = [];
+        }
+        if (!sourceMapFilesToProjectMap[file].includes(projectRoot)) {
+          sourceMapFilesToProjectMap[file].push(projectRoot);
         }
       });
     }

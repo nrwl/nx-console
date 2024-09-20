@@ -10,13 +10,14 @@ import dev.nx.console.settings.NxConsoleSettingsProvider
 
 internal class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
-        if (!NxConsoleSettingsProvider.getInstance().showProjectDetailsView) return false
         if (file.name.endsWith("project.json")) {
             return true
         }
         if (ProjectConfigFilesService.getInstance(project).isProjectDetailsFile(file)) {
             return true
         }
+        if (!NxConsoleSettingsProvider.getInstance().showProjectDetailsView) return false
+
         return false
     }
 

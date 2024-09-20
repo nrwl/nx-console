@@ -33,7 +33,7 @@ enum class NxlsState {
     STOPPING,
     STARTING,
     STARTED,
-    FAILED
+    FAILED,
 }
 
 private val log = logger<NxlsWrapper>()
@@ -123,9 +123,13 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                         fun(gson) {
                             gson.registerTypeAdapter(
                                 NxGeneratorOption::class.java,
-                                NxGeneratorOptionDeserializer()
+                                NxGeneratorOptionDeserializer(),
                             )
-                        }
+                            //                            gson.registerTypeAdapter(
+                            //                                SourceInformation::class.java,
+                            //                                SourceInformationDeserializer(),
+                            //                            )
+                        },
                     )
                     .also {
                         languageServer = it.remoteProxy
@@ -237,7 +241,8 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
     private fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
-        initParams.workspaceFolders = listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath)))
+        initParams.workspaceFolders =
+            listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath), "nx-workspace"))
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true

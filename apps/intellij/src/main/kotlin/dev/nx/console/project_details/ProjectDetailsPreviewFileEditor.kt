@@ -6,20 +6,21 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
+import dev.nx.console.project_details.browsers.NewProjectDetailsBrowser
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 
-class ProjectDetailsPreviewFileEditor(project: Project, file: VirtualFile) :
+class ProjectDetailsPreviewFileEditor(private val project: Project, file: VirtualFile) :
     UserDataHolderBase(), FileEditor {
-    private val browser = ProjectDetailsBrowser(project, file)
+    private val wrapper = NewProjectDetailsBrowser(project, file)
 
     override fun dispose() {
-        Disposer.dispose(browser)
+        Disposer.dispose(wrapper)
     }
 
-    override fun getComponent(): JComponent = browser.component
+    override fun getComponent(): JComponent = wrapper.component
 
-    override fun getPreferredFocusedComponent(): JComponent = browser.component
+    override fun getPreferredFocusedComponent(): JComponent = wrapper.component
 
     override fun getName(): String = "Preview"
 

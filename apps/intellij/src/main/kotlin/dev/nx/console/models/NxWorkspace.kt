@@ -1,5 +1,8 @@
 package dev.nx.console.models
 
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.*
+
 data class NxWorkspace(
     val validWorkspaceJson: Boolean,
     val workspace: NxWorkspaceConfiguration,
@@ -11,7 +14,7 @@ data class NxWorkspace(
     val isEncapsulatedNx: Boolean,
     val isPartial: Boolean?,
     val workspaceLayout: WorkspaceLayout?,
-    val cloudStatus: NxCloudStatus?
+    val cloudStatus: NxCloudStatus?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -51,15 +54,18 @@ data class NxWorkspace(
 
 data class WorkspaceLayout(val appsDir: String?, val libsDir: String?)
 
-data class NxWorkspaceConfiguration(val projects: Map<String, NxProject>) {}
+data class NxWorkspaceConfiguration(val projects: Map<String, NxProject>
+//    val sourceMaps: Map<String, Map<String, SourceInformation>>?,
+) {}
 
+@Serializable()
 data class NxError(
     val message: String?,
     val name: String?,
     val stack: String?,
     val file: String?,
     val pluginName: String?,
-    val cause: Any?
+    @Transient() val cause: Any? = null,
 ) {
 
     constructor(message: String) : this(message, null, null, null, null, null)

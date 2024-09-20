@@ -20,6 +20,13 @@ interface NxService {
     }
 
     @JsonRequest
+    fun workspaceSerialized(
+        workspaceRequest: NxWorkspaceRequest = NxWorkspaceRequest()
+    ): CompletableFuture<String> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun generators(
         generatorsRequest: NxGeneratorsRequest = NxGeneratorsRequest()
     ): CompletableFuture<List<NxGenerator>> {
@@ -87,7 +94,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun sourceMapFilesToProjectMap(): CompletableFuture<Map<String, String>> {
+    fun sourceMapFilesToProjectsMap(): CompletableFuture<Map<String, Array<String>>> {
         throw UnsupportedOperationException()
     }
 
@@ -115,6 +122,11 @@ interface NxService {
 
     @JsonRequest
     fun cloudStatus(): CompletableFuture<NxCloudStatus> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
+    fun pdvData(pdvDataRequest: PDVDataRequest): CompletableFuture<NxPDVData> {
         throw UnsupportedOperationException()
     }
 }

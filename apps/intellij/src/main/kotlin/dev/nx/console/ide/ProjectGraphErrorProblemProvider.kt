@@ -10,7 +10,6 @@ import com.intellij.codeInsight.daemon.impl.HighlightInfoType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.workspaceModel.ide.getInstance
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
@@ -18,11 +17,15 @@ import dev.nx.console.utils.nxBasePath
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Service(Service.Level.PROJECT)
 class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineScope) {
     private val nxProblemsProvider = NxProblemsProvider(project)
     private val problemsCollector = ProblemsCollector.getInstance(project)
+
+    val mutex = Mutex()
 
     private val problems = mutableListOf<Problem>()
 
@@ -32,7 +35,7 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
             .connect()
             .subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener { setNxProblems() }
+                NxWorkspaceRefreshListener { setNxProblems() },
             )
     }
 
@@ -46,8 +49,11 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
 
             problems.forEach { problemsCollector.problemDisappeared(it) }
             newProblems?.forEach { problemsCollector.problemAppeared(it) }
-            problems.clear()
-            problems.addAll(newProblems ?: emptyList())
+
+            mutex.withLock {
+                problems.clear()
+                problems.addAll(newProblems ?: emptyList())
+            }
         }
     }
 

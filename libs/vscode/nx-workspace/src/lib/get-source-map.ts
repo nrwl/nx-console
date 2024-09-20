@@ -1,14 +1,14 @@
 import {
-  NxSourceMapFilesToProjectMapRequest,
+  NxSourceMapFilesToProjectsMapRequest,
   NxTargetsForConfigFileRequest,
 } from '@nx-console/language-server/types';
 import { sendRequest } from '@nx-console/vscode/lsp-client';
 import type { TargetConfiguration } from 'nx/src/devkit-exports';
 
-export async function getSourceMapFilesToProjectMap(): Promise<
-  Record<string, string> | undefined
+export async function getSourceMapFilesToProjectsMap(): Promise<
+  Record<string, string[]> | undefined
 > {
-  return sendRequest(NxSourceMapFilesToProjectMapRequest, undefined);
+  return sendRequest(NxSourceMapFilesToProjectsMapRequest, undefined);
 }
 
 export async function getTargetsForConfigFile(

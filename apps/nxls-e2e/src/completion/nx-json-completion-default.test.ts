@@ -135,6 +135,7 @@ describe('nx.json completion - default', () => {
         "parallel",
         "plugins",
         "release",
+        "sync",
         "targetDefaults",
         "targetDependencyConfig",
         "tasksRunnerOptions",

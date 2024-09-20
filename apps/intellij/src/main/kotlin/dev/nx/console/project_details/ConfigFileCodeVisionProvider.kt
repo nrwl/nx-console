@@ -22,7 +22,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.testFramework.utils.vfs.getPsiFile
 import dev.nx.console.models.NxProject
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
@@ -72,7 +71,7 @@ internal class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
 @Service(Service.Level.PROJECT)
 class ProjectLevelConfigFileCodeVisionManager(
     private val project: Project,
-    private val cs: CoroutineScope
+    private val cs: CoroutineScope,
 ) {
 
     private val partialPathToTargetsMap = mutableMapOf<String, List<String>>()
@@ -89,7 +88,7 @@ class ProjectLevelConfigFileCodeVisionManager(
                     partialPathToTargetsMap.clear()
                     nxWorkspaceCache = null
                     cs.launch { refreshCodeVision(project) }
-                }
+                },
             )
         }
     }
@@ -104,10 +103,7 @@ class ProjectLevelConfigFileCodeVisionManager(
             ProjectConfigFilesService.getInstance(project).getProjectForFile(file)
 
         if (file.path.endsWith("project.json") || file.path.endsWith("package.json")) {
-            return getCodeVisionForProjectOrPackageJson(
-                editor,
-                nxProjectForFile,
-            )
+            return getCodeVisionForProjectOrPackageJson(editor, nxProjectForFile)
         }
 
         if (nxProjectForFile == null) {
@@ -136,14 +132,14 @@ class ProjectLevelConfigFileCodeVisionManager(
                                     val popup =
                                         createSelectTargetPopup(
                                             "Select target of $nxProjectName to run",
-                                            targets
+                                            targets,
                                         ) {
                                             NxTaskExecutionManager.getInstance(project)
                                                 .execute(nxProjectName, it)
                                         }
                                     popup.showInBestPositionFor(editor)
-                                }
-                            )
+                                },
+                            ),
                         )
                     )
                 )
@@ -159,8 +155,8 @@ class ProjectLevelConfigFileCodeVisionManager(
                                 onClick = { _, _ ->
                                     NxTaskExecutionManager.getInstance(project)
                                         .execute(nxProjectName, targets[0])
-                                }
-                            )
+                                },
+                            ),
                         )
                     )
                 )
@@ -211,8 +207,8 @@ class ProjectLevelConfigFileCodeVisionManager(
 
                                         textEditorWithPreview?.apply { showWithPreview() }
                                     }
-                                }
-                            )
+                                },
+                            ),
                         )
                     )
                 )
@@ -241,14 +237,14 @@ class ProjectLevelConfigFileCodeVisionManager(
                             val popup =
                                 createSelectTargetPopup(
                                     "Select target of ${nxProject.name} to run",
-                                    nxProject.targets.keys.toList()
+                                    nxProject.targets.keys.toList(),
                                 ) {
                                     NxTaskExecutionManager.getInstance(project)
                                         .execute(nxProject.name, it)
                                 }
                             popup.showInBestPositionFor(editor)
-                        }
-                    )
+                        },
+                    ),
                 )
             )
         )
@@ -267,7 +263,7 @@ class ProjectLevelConfigFileCodeVisionManager(
     private suspend fun loadTargetsAndRefresh(
         path: String,
         nxProjectName: String,
-        project: Project
+        project: Project,
     ) {
         val targets =
             NxlsService.getInstance(project).targetsForConfigFile(nxProjectName, path).keys.toList()
@@ -289,7 +285,7 @@ class ProjectLevelConfigFileCodeVisionManager(
                 .invalidateProvider(
                     CodeVisionHost.LensInvalidateSignal(
                         null,
-                        listOf(ConfigFileCodeVisionProvider.ID)
+                        listOf(ConfigFileCodeVisionProvider.ID),
                     )
                 )
         }

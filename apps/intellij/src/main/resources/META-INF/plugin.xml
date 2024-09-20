@@ -4,8 +4,10 @@
   <name>Nx Console</name>
   <vendor>NxDev</vendor>
 
-  <depends>com.intellij.modules.platform</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.json</depends>
+
   <depends>JavaScript</depends>
   <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>
 
@@ -171,6 +173,10 @@
             class="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
             text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
+    </action>
+    <action id="dev.nx.console.settings.MarkDirectoryAsNxWorkspace"
+            class="dev.nx.console.settings.MarkDirectoryAsNxWorkspace" text="MarkDirectoryAsNxWorkspace">
+      <add-to-group group-id="MarkRootGroup" anchor="first"/>
     </action>
   </actions>
 

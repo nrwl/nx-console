@@ -1,19 +1,13 @@
 group = "dev.nx.console"
-buildDir = File("dist")
 
-tasks {
-    wrapper {
-        gradleVersion = project.findProperty("gradleVersion").toString()
-    }
-}
+layout.buildDirectory = File("dist")
 
-
-allprojects {
+tasks { wrapper { gradleVersion = project.findProperty("gradleVersion").toString() } }
+allprojects {
   apply {
       plugin("project-report")
   }
 }
-
 tasks.register("projectReportAll") {
     // All project reports of subprojects
     allprojects.forEach {

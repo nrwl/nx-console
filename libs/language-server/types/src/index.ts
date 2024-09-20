@@ -11,13 +11,13 @@ import {
   CloudOnboardingInfo,
   NxVersion,
   NxWorkspace,
+  PDVData,
   TreeNode,
 } from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { SemVer } from 'semver';
 import { StartupMessageDefinition } from 'shared/nx-console-plugins';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
@@ -28,6 +28,9 @@ export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
 export const NxWorkspaceRefreshNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspace');
 
+export const NxWorkspaceRefreshStartedNotification: NotificationType<void> =
+  new NotificationType('nx/refreshWorkspaceStarted');
+
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');
 
@@ -36,6 +39,12 @@ export const NxWorkspaceRequest: RequestType<
   NxWorkspace,
   unknown
 > = new RequestType('nx/workspace');
+
+export const NxWorkspaceSerializedRequest: RequestType<
+  { reset: boolean },
+  string,
+  unknown
+> = new RequestType('nx/workspaceSerialized');
 
 export const NxWorkspacePathRequest: RequestType<undefined, string, unknown> =
   new RequestType('nx/workspacePath');
@@ -152,11 +161,11 @@ export const NxHasAffectedProjectsRequest: RequestType<
   unknown
 > = new RequestType('nx/hasAffectedProjects');
 
-export const NxSourceMapFilesToProjectMapRequest: RequestType<
+export const NxSourceMapFilesToProjectsMapRequest: RequestType<
   undefined,
-  Record<string, string>,
+  Record<string, string[]>,
   unknown
-> = new RequestType('nx/sourceMapFilesToProjectMap');
+> = new RequestType('nx/sourceMapFilesToProjectsMap');
 
 export const NxTargetsForConfigFileRequest: RequestType<
   { projectName: string; configFilePath: string },
@@ -178,3 +187,9 @@ export const NxCloudOnboardingInfoRequest: RequestType<
   CloudOnboardingInfo,
   unknown
 > = new RequestType('nx/cloudOnboardingInfo');
+
+export const NxPDVDataRequest: RequestType<
+  { filePath: string },
+  PDVData,
+  unknown
+> = new RequestType('nx/pdvData');

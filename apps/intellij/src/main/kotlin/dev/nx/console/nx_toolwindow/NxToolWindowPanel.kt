@@ -5,7 +5,9 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
+import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.EDT
@@ -35,6 +37,7 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import dev.nx.console.utils.nodeInterpreter
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.net.URI
@@ -51,6 +54,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val noProjectsComponent = createNoProjectsComponent()
+    private val noNodeInterpreterComponent = createNoNodeInterpreterComponent()
     private val toolBar = createToolbar()
     private var errorCountAndComponent: Pair<Int, JComponent>? = null
 
@@ -59,7 +63,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener { invokeLater { setToolwindowContent() } }
+                NxWorkspaceRefreshListener { invokeLater { setToolwindowContent() } },
             )
             subscribe(
                 NX_TOOLWINDOW_STYLE_SETTING_TOPIC,
@@ -67,7 +71,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     override fun onNxToolWindowStyleChange() {
                         invokeLater { setToolwindowContent() }
                     }
-                }
+                },
             )
             subscribe(
                 ToggleNxCloudViewAction.NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC,
@@ -75,7 +79,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     override fun onCloudViewCollapsed() {
                         invokeLater { setToolwindowContent() }
                     }
-                }
+                },
             )
         }
     }
@@ -89,8 +93,17 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
             withContext(Dispatchers.EDT) {
                 val hasProjects = workspace?.workspace?.projects?.isNotEmpty() == true
+                val hasNodeInterpreter =
+                    try {
+                        project.nodeInterpreter
+                        true
+                    } catch (e: Exception) {
+                        false
+                    }
                 val mainContent: JComponent =
-                    if (
+                    if (!hasNodeInterpreter) {
+                        noNodeInterpreterComponent
+                    } else if (
                         workspace?.let {
                             !it.errors.isNullOrEmpty() && (it.isPartial != true || !hasProjects)
                         } == true
@@ -115,7 +128,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     createContentWithCloud(
                         mainContent,
                         cloudStatus?.isConnected,
-                        cloudStatus?.nxCloudUrl
+                        cloudStatus?.nxCloudUrl,
                     )
                 )
 
@@ -155,7 +168,9 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                         TelemetryService.getInstance(project)
                                             .featureUsed(
                                                 TelemetryEvent.MISC_REFRESH_WORKSPACE,
-                                                mapOf("source" to TelemetryEventSource.WELCOME_VIEW)
+                                                mapOf(
+                                                    "source" to TelemetryEventSource.WELCOME_VIEW
+                                                ),
                                             )
                                         NxRefreshWorkspaceService.getInstance(project)
                                             .refreshWorkspace()
@@ -177,10 +192,12 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                             ShowSettingsUtil.getInstance()
                                                 .showSettingsDialog(
                                                     project,
-                                                    NxConsoleSettingsConfigurable::class.java
+                                                    NxConsoleSettingsConfigurable::class.java,
                                                 )
                                         } else {
-                                            Desktop.getDesktop().browse(URI.create(it.description))
+                                            BrowserLauncher.instance.browse(
+                                                URI.create(it.description)
+                                            )
                                         }
                                     }
                                     .align(Align.CENTER)
@@ -219,15 +236,69 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                 AnActionEvent.createFromDataContext(
                                     NX_TOOLBAR_PLACE,
                                     null,
-                                    dataContext
+                                    dataContext,
                                 )
                             action.actionPerformed(actionEvent)
                         } else {
-                            Desktop.getDesktop().browse(URI.create(it.description))
+                            BrowserLauncher.instance.browse(URI.create(it.description))
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun createNoNodeInterpreterComponent(): JComponent {
+        return JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+
+            add(
+                JPanel().apply {
+                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                    border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
+
+                    add(
+                        JLabel(
+                                "<html><h3>Node.js interpreter not configured.</h3> Nx Console needs this setting to start the Nx language server and run Nx processes.</html>"
+                            )
+                            .apply { alignmentX = Component.CENTER_ALIGNMENT }
+                    )
+
+                    add(Box.createRigidArea(Dimension(0, 10)))
+
+                    add(
+                        JButton("Configure Node interpreter").apply {
+                            action =
+                                object : AbstractAction("Configure Node interpreter") {
+                                    override fun actionPerformed(e: java.awt.event.ActionEvent?) {
+                                        ShowSettingsUtil.getInstance()
+                                            .showSettingsDialog(
+                                                project,
+                                                NodeSettingsConfigurable::class.java,
+                                            )
+                                    }
+                                }
+                            alignmentX = Component.CENTER_ALIGNMENT
+                        }
+                    )
+                    add(Box.createRigidArea(Dimension(0, 10)))
+
+                    add(
+                        panel {
+                            row {
+                                text(
+                                    "Please configure the Node interpreter and then <a href='refresh'>refresh the workspace</a>"
+                                ) {
+                                    if (it.description == "refresh") {
+                                        NxRefreshWorkspaceService.getInstance(project)
+                                            .refreshWorkspace()
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+            )
         }
     }
 
@@ -245,7 +316,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     RefreshAction(
                         "Reload Nx Projects",
                         "Reload Nx projects",
-                        AllIcons.Actions.Refresh
+                        AllIcons.Actions.Refresh,
                     ) {
                     override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
@@ -309,7 +380,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     private fun createContentWithCloud(
         mainContent: JComponent,
         isConnectedToCloud: Boolean?,
-        nxCloudUrl: String?
+        nxCloudUrl: String?,
     ): JComponent {
         val cloudPanelCollapsed = getCloudPanelCollapsed(project)
         if (cloudPanelCollapsed) {
@@ -332,8 +403,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                             0,
                                             0,
                                             0,
-                                            JBColor.border()
-                                        )
+                                            JBColor.border(),
+                                        ),
                                     )
 
                                 add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
@@ -357,10 +428,9 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                         addActionListener {
                                             TelemetryService.getInstance(project)
                                                 .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                                            Desktop.getDesktop()
-                                                .browse(
-                                                    URI.create(nxCloudUrl ?: "https://cloud.nx.app")
-                                                )
+                                            BrowserLauncher.instance.browse(
+                                                URI.create(nxCloudUrl ?: "https://cloud.nx.app")
+                                            )
                                         }
                                     }
                                 )
@@ -374,7 +444,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                             border =
                                 CompoundBorder(
                                     BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border()),
-                                    JBUI.Borders.empty(5, 10, 0, 10)
+                                    JBUI.Borders.empty(5, 10, 0, 10),
                                 )
 
                             add(
@@ -443,7 +513,7 @@ class ToggleNxCloudViewAction : ToggleAction("Show Nx Cloud Panel") {
         val project = e.project ?: return
         NxToolWindowPanel.setCloudPanelCollapsed(
             project,
-            !NxToolWindowPanel.getCloudPanelCollapsed(project)
+            !NxToolWindowPanel.getCloudPanelCollapsed(project),
         )
         project.messageBus
             .syncPublisher(NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC)
@@ -466,7 +536,7 @@ class ToggleNxCloudViewAction : ToggleAction("Show Nx Cloud Panel") {
             Topic<NxToolwindowCloudViewCollapsedListener> =
             Topic(
                 "NxToolwindowCloudViewCollapsedTopic",
-                NxToolwindowCloudViewCollapsedListener::class.java
+                NxToolwindowCloudViewCollapsedListener::class.java,
             )
     }
 
