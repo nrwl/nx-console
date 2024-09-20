@@ -1,3 +1,15 @@
+# [18.28.0](https://github.com/nrwl/nx-console/compare/vscode-v18.27.0...vscode-v18.28.0) (2024-09-20)
+
+
+### Bug Fixes
+
+* **vscode:** fix behaviour when only 1 generator is available & refactor old code ([#2242](https://github.com/nrwl/nx-console/issues/2242)) ([df7922e](https://github.com/nrwl/nx-console/commit/df7922e36d02145044ad005f7e6ed1fccdc2d9c9))
+
+
+### Features
+
+* refactor PDV to get data directly from nxls & apply in intellij ([#2254](https://github.com/nrwl/nx-console/issues/2254)) ([bf2ad34](https://github.com/nrwl/nx-console/commit/bf2ad340352391a937164ef011b754a647840368))
+
 # [18.27.0](https://github.com/nrwl/nx-console/compare/vscode-v18.26.0...vscode-v18.27.0) (2024-09-10)
 
 
