@@ -39,9 +39,9 @@ describe('pdv data', () => {
       version: defaultVersion,
     });
 
-    nxlsWrapper = new NxlsWrapper(true);
+    nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
+    nxlsWrapper.setVerbose(false);
   });
 
   afterAll(async () => {
@@ -128,6 +128,9 @@ describe('pdv data', () => {
   });
 
   it('should return error if nx.json is broken', async () => {
+    console.log('---- set verbose ---');
+    nxlsWrapper.setVerbose(true);
+
     writeFileSync(projectJsonPath, projectJsonContents);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
@@ -157,6 +160,10 @@ describe('pdv data', () => {
   });
 
   it('should return graph error if graph file cant be found', async () => {
+    console.log('---- unset verbose ---');
+
+    nxlsWrapper.setVerbose(false);
+
     rmSync(join(e2eCwd, workspaceName, 'node_modules'), {
       recursive: true,
       force: true,
