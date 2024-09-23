@@ -142,6 +142,7 @@ describe('pdv data', () => {
 
     writeFileSync(nxJsonPath, '{');
 
+    console.log('waiting for refresh');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );

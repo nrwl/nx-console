@@ -194,7 +194,7 @@ export class NxlsWrapper {
     method: string
   ): Promise<object | any[] | undefined> {
     let timeout: NodeJS.Timeout;
-
+    console.log(`waiting for ${method}`, this.pendingNotificationMap);
     return await new Promise<any>((resolve, reject) => {
       timeout = setTimeout(() => {
         this.pendingNotificationMap.delete(method);
