@@ -6,6 +6,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
+  waitFor,
 } from '../utils';
 import {
   NxPDVDataRequest,
@@ -129,11 +130,16 @@ describe('pdv data', () => {
 
   it('should return error if nx.json is broken', async () => {
     console.log('---- set verbose ---');
+    await waitFor(1000);
+
     nxlsWrapper.setVerbose(true);
 
+    console.log('reverting project.json');
     writeFileSync(projectJsonPath, projectJsonContents);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
+    console.log('writing nx.json');
+
     writeFileSync(nxJsonPath, '{');
 
     await nxlsWrapper.waitForNotification(
