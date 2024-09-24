@@ -71,6 +71,7 @@ describe('pdv data', () => {
   });
 
   it('should contain pdv data & error for partial errors', async () => {
+    await waitFor(1000);
     viteFileContents = readFileSync(viteFilePath, 'utf-8');
 
     appendFileSync(viteFilePath, '{');
@@ -101,6 +102,8 @@ describe('pdv data', () => {
   });
 
   it('should return error if root project.json is broken', async () => {
+    await waitFor(1000);
+
     writeFileSync(viteFilePath, viteFileContents);
 
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');

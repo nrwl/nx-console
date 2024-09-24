@@ -18,6 +18,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
+  waitFor,
 } from '../utils';
 import { Position } from 'vscode-json-languageservice';
 import { CompletionList } from 'vscode-languageserver';
@@ -38,6 +39,7 @@ describe('nx.json completion - default', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    nxlsWrapper.setVerbose(false);
   });
 
   it('should contain contain preinstalled plugins', async () => {
@@ -197,6 +199,11 @@ describe('nx.json completion - default', () => {
   });
 
   it('should not error when nx-schema.json is missing', async () => {
+    console.log('---- set verbose ---');
+    nxlsWrapper.setVerbose(true);
+
+    await waitFor(1000);
+
     rmSync(
       join(
         e2eCwd,
@@ -210,6 +217,7 @@ describe('nx.json completion - default', () => {
 
     nxlsWrapper.sendNotification({
       ...NxWorkspaceRefreshNotification,
+      params: {},
     });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
