@@ -198,12 +198,12 @@ export class NxlsWrapper {
       console.log(`waiting for ${method}`, this.pendingNotificationMap);
     }
     return await new Promise<any>((resolve, reject) => {
-      this.pendingNotificationMap.set(method, [resolve, timeout]);
-
       timeout = setTimeout(() => {
         this.pendingNotificationMap.delete(method);
         reject(new Error(`Timed out while waiting for ${method}`));
       }, 3 * 60 * 1000);
+
+      this.pendingNotificationMap.set(method, [resolve, timeout]);
     }).finally(() => {
       clearTimeout(timeout);
     });
