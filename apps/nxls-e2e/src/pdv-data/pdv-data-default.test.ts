@@ -1,3 +1,9 @@
+import {
+  NxPDVDataRequest,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
+import { PDVData } from '@nx-console/shared/types';
+import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
@@ -8,20 +14,6 @@ import {
   uniq,
   waitFor,
 } from '../utils';
-import {
-  NxPDVDataRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
-import { PDVData } from '@nx-console/shared/types';
-import {
-  appendFile,
-  appendFileSync,
-  readFileSync,
-  rmdirSync,
-  rmSync,
-  unlinkSync,
-  writeFileSync,
-} from 'fs';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -42,7 +34,6 @@ describe('pdv data', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(false);
   });
 
   afterAll(async () => {
@@ -132,20 +123,13 @@ describe('pdv data', () => {
   });
 
   it('should return error if nx.json is broken', async () => {
-    console.log('---- set verbose ---');
     await waitFor(1000);
 
-    nxlsWrapper.setVerbose(true);
-
-    console.log('reverting project.json');
     writeFileSync(projectJsonPath, projectJsonContents);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
-    console.log('writing nx.json');
-
     writeFileSync(nxJsonPath, '{');
 
-    console.log('waiting for refresh');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
@@ -170,10 +154,6 @@ describe('pdv data', () => {
   });
 
   it('should return graph error if graph file cant be found', async () => {
-    console.log('---- unset verbose ---');
-
-    nxlsWrapper.setVerbose(false);
-
     rmSync(join(e2eCwd, workspaceName, 'node_modules'), {
       recursive: true,
       force: true,
