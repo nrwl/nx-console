@@ -24,14 +24,17 @@ export async function getShellExecutionForConfig(
       command = command.replace(/^nx/, './nx');
     }
   } else {
-    const { detectPackageManager, getPackageManagerCommand } =
-      await importNxPackagePath<typeof import('nx/src/utils/package-manager')>(
-        config.workspacePath,
-        'src/utils/package-manager'
-      );
-    const pmc =
-      packageManagerCommands ??
-      getPackageManagerCommand(detectPackageManager(config.cwd));
+    let pmc: PackageManagerCommands;
+    if (packageManagerCommands) {
+      pmc = packageManagerCommands;
+    } else {
+      const { detectPackageManager, getPackageManagerCommand } =
+        await importNxPackagePath<
+          typeof import('nx/src/utils/package-manager')
+        >(config.workspacePath, 'src/utils/package-manager');
+      pmc = getPackageManagerCommand(detectPackageManager(config.cwd));
+    }
+
     command = `${pmc.exec} ${command}`;
   }
 

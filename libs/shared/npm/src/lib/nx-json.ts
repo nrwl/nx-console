@@ -70,9 +70,12 @@ export async function getNxCloudUrl(workspacePath: string): Promise<string> {
 export async function getNxCloudId(
   workspacePath: string
 ): Promise<string | undefined> {
-  const nxJson = await readNxJson(workspacePath);
-  // TODO(maxkless): remove once console version has nxCloudId in schema
-  return (nxJson as any).nxCloudId ?? getCloudIdFromTaskRunnerOptions(nxJson);
+  try {
+    const nxJson = await readNxJson(workspacePath);
+    return nxJson.nxCloudId ?? getCloudIdFromTaskRunnerOptions(nxJson);
+  } catch (e) {
+    return undefined;
+  }
 }
 // helpers
 

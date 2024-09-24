@@ -98,9 +98,10 @@ export class NxlsWrapper {
     });
     this.sendNotification({ method: 'exit' });
 
-    this.pendingNotificationMap.forEach(([res]) =>
-      res(new Error('nxls stopped'))
-    );
+    this.pendingNotificationMap.forEach(([res, timeout]) => {
+      res(new Error('nxls stopped'));
+      clearTimeout(timeout);
+    });
     this.pendingRequestMap.forEach((res, key) =>
       res({
         jsonrpc: '2.0',
@@ -250,6 +251,7 @@ export class NxlsWrapper {
           this.pendingNotificationMap.get(method) ?? [];
         if (resolve) {
           resolve(message.params);
+          this.pendingNotificationMap.delete(method);
         }
         if (timeout) {
           clearTimeout(timeout);
