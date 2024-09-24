@@ -67,7 +67,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
       return [];
     }
     // TODO: UPDATE TO HANDLE MULTIPLE PROJECTS
-    const projectRoot = this.sourceMapFilesToProjectsMap[relativePath][0];
+    const projectRoot = this.sourceMapFilesToProjectsMap[relativePath]?.[0];
     if (!projectRoot) {
       return [];
     }
