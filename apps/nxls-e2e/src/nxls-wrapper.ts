@@ -240,8 +240,10 @@ export class NxlsWrapper {
         }
       } else if (isNotificationMessage(message)) {
         const method = message.method;
-        console.log('received notification', method);
-        console.log('pending notifications', this.pendingNotificationMap);
+        if (this.verbose) {
+          console.log('received notification', method);
+          console.log('pending notifications', this.pendingNotificationMap);
+        }
         const [resolve, timeout] =
           this.pendingNotificationMap.get(method) ?? [];
         if (resolve) {
