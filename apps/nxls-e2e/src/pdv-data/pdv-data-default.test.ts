@@ -1,3 +1,9 @@
+import {
+  NxPDVDataRequest,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
+import { PDVData } from '@nx-console/shared/types';
+import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
@@ -6,21 +12,8 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
+  waitFor,
 } from '../utils';
-import {
-  NxPDVDataRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
-import { PDVData } from '@nx-console/shared/types';
-import {
-  appendFile,
-  appendFileSync,
-  readFileSync,
-  rmdirSync,
-  rmSync,
-  unlinkSync,
-  writeFileSync,
-} from 'fs';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -39,9 +32,8 @@ describe('pdv data', () => {
       version: defaultVersion,
     });
 
-    nxlsWrapper = new NxlsWrapper(true);
+    nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
   });
 
   afterAll(async () => {
@@ -70,6 +62,7 @@ describe('pdv data', () => {
   });
 
   it('should contain pdv data & error for partial errors', async () => {
+    await waitFor(1000);
     viteFileContents = readFileSync(viteFilePath, 'utf-8');
 
     appendFileSync(viteFilePath, '{');
@@ -100,6 +93,8 @@ describe('pdv data', () => {
   });
 
   it('should return error if root project.json is broken', async () => {
+    await waitFor(1000);
+
     writeFileSync(viteFilePath, viteFileContents);
 
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');
@@ -128,6 +123,8 @@ describe('pdv data', () => {
   });
 
   it('should return error if nx.json is broken', async () => {
+    await waitFor(1000);
+
     writeFileSync(projectJsonPath, projectJsonContents);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
