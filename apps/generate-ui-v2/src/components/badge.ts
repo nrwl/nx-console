@@ -1,8 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { EditorContext } from '../contexts/editor-context';
-import { when } from 'lit/directives/when.js';
-import { t } from 'xstate';
 
 @customElement('badge-element')
 export class Banner extends EditorContext(LitElement) {
