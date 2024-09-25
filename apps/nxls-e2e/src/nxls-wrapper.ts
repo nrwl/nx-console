@@ -21,7 +21,7 @@ export class NxlsWrapper {
   private readerErrorDisposable?: { dispose: () => void };
   private pendingRequestMap = new Map<
     number,
-    (message: ResponseMessage) => void
+    [(message: ResponseMessage) => void, NodeJS.Timeout]
   >();
   private pendingNotificationMap = new Map<
     string,
@@ -102,7 +102,7 @@ export class NxlsWrapper {
       res(new Error('nxls stopped'));
       clearTimeout(timeout);
     });
-    this.pendingRequestMap.forEach((res, key) =>
+    this.pendingRequestMap.forEach(([res, timeout], key) => {
       res({
         jsonrpc: '2.0',
         id: key,
@@ -110,8 +110,9 @@ export class NxlsWrapper {
           code: -32000,
           message: 'nxls stopped',
         },
-      })
-    );
+      });
+      clearTimeout(timeout);
+    });
 
     this.readerDisposable?.dispose();
     this.readerErrorDisposable?.dispose();
@@ -158,7 +159,7 @@ export class NxlsWrapper {
       }, (customTimeoutMinutes ?? 3) * 60 * 1000);
 
       const id = this.idCounter++;
-      this.pendingRequestMap.set(id, resolve);
+      this.pendingRequestMap.set(id, [resolve, timeout]);
 
       const fullRequest = {
         jsonrpc: '2.0',
@@ -236,9 +237,11 @@ export class NxlsWrapper {
       }
 
       if (isResponseMessage(message) && typeof message.id === 'number') {
-        const resolve = this.pendingRequestMap.get(message.id);
-        if (resolve) {
+        const requestAndTimeout = this.pendingRequestMap.get(message.id);
+        if (requestAndTimeout) {
+          const [resolve, timeout] = requestAndTimeout;
           resolve(message);
+          clearTimeout(timeout);
           this.pendingRequestMap.delete(message.id);
         }
       } else if (isNotificationMessage(message)) {
