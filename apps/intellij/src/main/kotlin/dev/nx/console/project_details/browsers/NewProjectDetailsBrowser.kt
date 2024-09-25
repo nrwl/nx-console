@@ -18,7 +18,6 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.ui.jcef.*
-import com.intellij.util.application
 import com.intellij.util.messages.SimpleMessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphInteractionEvent
@@ -56,7 +55,6 @@ import ru.nsk.kstatemachine.transition.TransitionType
 import ru.nsk.kstatemachine.transition.onTriggered
 import ru.nsk.kstatemachine.transition.stay
 import ru.nsk.kstatemachine.transition.targetState
-import ru.nsk.kstatemachine.visitors.export.exportToPlantUml
 
 object States {
     const val InitialLoading = "InitialLoading"
@@ -185,6 +183,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                 this@createStateMachine.processEvent(Events.TryLoadPDV())
                             }
                             onExit { loadingPanel.stopLoading() }
+                            transition<Events.TryLoadPDV> {
+                                onTriggered { tryLoadPDV(this@createStateMachine) }
+                            }
+                            transition<Events.ChangeUISettings> { onTriggered { setColors() } }
                         }
 
                     val showingPDVState =
@@ -312,22 +314,16 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                             onExit { hideProgressBarLoading() }
                         }
 
-                    listOf(
-                            initialLoadingState,
-                            showingErrorState,
-                            showingErrorNoGraphState,
-                            loadingState,
-                        )
-                        .forEach {
-                            it.apply {
-                                transition<Events.TryLoadPDV> {
-                                    targetState = loadingState
-                                    onTriggered { tryLoadPDV(this@createStateMachine) }
-                                }
-                                transition<Events.RefreshStarted> { targetState = loadingState }
-                                transition<Events.ChangeUISettings> { onTriggered { setColors() } }
+                    listOf(showingErrorState, showingErrorNoGraphState, loadingState).forEach {
+                        it.apply {
+                            transition<Events.TryLoadPDV> {
+                                targetState = loadingState
+                                onTriggered { tryLoadPDV(this@createStateMachine) }
                             }
+                            transition<Events.RefreshStarted> { targetState = loadingState }
+                            transition<Events.ChangeUISettings> { onTriggered { setColors() } }
                         }
+                    }
 
                     // from loading we can go to result states
                     listOf(initialLoadingState, loadingState).apply {
@@ -366,11 +362,6 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     registerListeners(this@createStateMachine)
                 }
             stateMachine.start()
-
-            if (application.isInternal) {
-                val plantUML = stateMachine.exportToPlantUml()
-                logger<NewProjectDetailsBrowser>().debug(plantUML)
-            }
         }
     }
 
@@ -381,7 +372,11 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         try {
 
             val nxlsService = NxlsService.getInstance(project)
-            nxlsService.awaitStarted()
+
+            if (!nxlsService.isStarted()) {
+                return
+            }
+
             val pdvData = nxlsService.pdvData(file.path)
 
             if (
