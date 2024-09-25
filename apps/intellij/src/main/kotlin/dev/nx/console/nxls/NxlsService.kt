@@ -57,6 +57,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
                     .onWorkspaceRefreshStarted()
             }
         }
+
+        cs.launch {
+            project.messageBus
+                .syncPublisher(NX_WORKSPACE_REFRESH_STARTED_TOPIC)
+                .onWorkspaceRefreshStarted()
+        }
     }
 
     suspend fun close() {
@@ -226,6 +232,10 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
 
     fun runAfterStarted(block: Runnable) {
         wrapper.awaitStarted().thenRun(block)
+    }
+
+    fun isStarted(): Boolean {
+        return wrapper.isStarted()
     }
 
     suspend fun awaitStarted() {
