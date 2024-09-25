@@ -1,3 +1,11 @@
+## <small>1.32.1 (2024-09-25)</small>
+
+### Bug Fixes
+
+* add windowsHide: true in more places ([#2262](https://github.com/nrwl/nx-console/issues/2262)) ([1731bc9](https://github.com/nrwl/nx-console/commit/1731bc907c7cada061a0815e448571868643e292))
+* **intellij:** update version & fix pdv error ([#2267](https://github.com/nrwl/nx-console/issues/2267)) ([1f13b8b](https://github.com/nrwl/nx-console/commit/1f13b8b1654c3cf91b78a5d86e737c9862528e62))
+* reduce number of exceptions & optimize package imports ([#2266](https://github.com/nrwl/nx-console/issues/2266)) ([67a4721](https://github.com/nrwl/nx-console/commit/67a4721a1b1cfca9f111bc72833460672ba67294))
+
 ## 1.32.0 (2024-09-20)
 
 ### Bug Fixes
