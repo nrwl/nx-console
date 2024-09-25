@@ -8,6 +8,8 @@ import {
   OldProjectDetailsPreview,
   ProjectDetailsPreview,
 } from './project-details-preview';
+import { gte } from 'semver';
+import { NewProjectDetailsPreview } from './new-project-details-preview';
 
 export class ProjectDetailsManager {
   private previews: Map<string, ProjectDetailsPreview> = new Map();
@@ -19,7 +21,8 @@ export class ProjectDetailsManager {
     expandedTarget?: string
   ) {
     const path = document.uri.path;
-    let preview = await this.findMatchingPreview(path);
+    let preview: ProjectDetailsPreview | undefined =
+      await this.findMatchingPreview(path);
 
     if (!preview) {
       const nxVersion = await getNxVersion();
@@ -28,12 +31,15 @@ export class ProjectDetailsManager {
         return;
       }
 
-      preview = new OldProjectDetailsPreview(
-        path,
-        this.context,
-        expandedTarget
-      );
-      // }
+      if (gte(nxVersion.full, '20.0.0')) {
+        preview = new NewProjectDetailsPreview(path);
+      } else {
+        preview = new OldProjectDetailsPreview(
+          path,
+          this.context,
+          expandedTarget
+        );
+      }
       preview.onDispose(() => {
         this.previews.delete(path);
       });
