@@ -1,4 +1,4 @@
-import { createMachine } from 'xstate';
+import { actions, createMachine, setup } from 'xstate';
 import { ProjectDetailsPreview } from './project-details-preview';
 import { ViewColumn, WebviewPanel, window } from 'vscode';
 
@@ -15,15 +15,25 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
   projectRoot: string | undefined;
 
   constructor(private path: string) {
-    const machine = createMachine({
+    const machine = setup({
+      actions: {
+        renderLoading: () => this.renderLoading(),
+      },
+    }).createMachine({
       id: 'projectDetails',
       initial: 'loading',
       states: {
         loading: {},
         showingPDV: {},
         showingPDVMulti: {},
+        showingError: {},
+        showingNoGraphError: {},
       },
     });
+  }
+
+  private renderLoading() {
+    this.webviewPanel.webview.html = `<html><body>Loading...</body></html>`;
   }
 
   onDispose(callback: () => void): void {
