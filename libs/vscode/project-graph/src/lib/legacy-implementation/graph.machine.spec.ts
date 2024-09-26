@@ -1,5 +1,11 @@
-import { interpret, StateValue } from 'xstate';
-import { waitFor } from 'xstate/lib/waitFor';
+import {
+  createActor,
+  fromPromise,
+  getNextSnapshot,
+  interpret,
+  StateValue,
+  waitFor,
+} from 'xstate';
 import { graphMachine } from './graph.machine';
 import { PartialDeep } from 'type-fest';
 import type { OutputChannel } from 'vscode';
@@ -36,20 +42,20 @@ jest.mock(
   }
 );
 
-const mockMachine = graphMachine.withConfig({
-  services: {
-    generateContent: async () => {
+const mockMachine = graphMachine.provide({
+  actors: {
+    generateContent: fromPromise(async () => {
       return;
-    },
+    }),
   },
 });
 
 xdescribe('graph state machine', () => {
-  it('should go to the correct states with the interpreter', (done) => {
-    const interpreter = interpret(mockMachine);
+  it('should go to the correct states with the actor', (done) => {
+    const actor = createActor(mockMachine);
 
     const states: StateValue[] = [];
-    interpreter.onTransition((state) => {
+    actor.subscribe((state) => {
       states.push(state.value);
 
       if (state.matches('viewReady')) {
@@ -65,19 +71,23 @@ xdescribe('graph state machine', () => {
       }
     });
 
-    interpreter.start();
-    interpreter.send({
+    actor.start();
+    actor.send({
       type: 'PROJECT_SELECTED',
       data: { type: MessageType.all, projectName: '', taskName: undefined },
     });
-    interpreter.send('GET_CONTENT');
-    waitFor(interpreter, (state) => state.matches('content')).then(() => {
-      interpreter.send('VIEW_READY');
+    actor.send({ type: 'GET_CONTENT' });
+    waitFor(actor, (state) => state.matches('content')).then(() => {
+      actor.send({ type: 'VIEW_READY' });
     });
   });
 
   it('should go to loading when refreshing', () => {
-    const nextState = mockMachine.transition('viewReady', 'REFRESH');
+    const nextState = getNextSnapshot(
+      mockMachine,
+      mockMachine.resolveState({ value: 'viewReady', context: {} as any }),
+      { type: 'REFRESH' }
+    );
     expect(nextState.value).toMatchInlineSnapshot(`"loading"`);
     expect(nextState.context).toMatchInlineSnapshot(`
       Object {

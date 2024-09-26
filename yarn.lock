@@ -19035,7 +19035,7 @@ __metadata:
     wdio-vscode-service: ^4.2.1
     webdriverio: ^7.26.0
     webpack: 5.88.2
-    xstate: ^4.32.1
+    xstate: ^5.18.2
     zone.js: 0.14.3
   languageName: unknown
   linkType: soft
@@ -25757,10 +25757,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xstate@npm:^4.32.1":
-  version: 4.38.3
-  resolution: "xstate@npm:4.38.3"
-  checksum: b52e5bf349834ede65b1eadf9b160b818341739b1306e882c35dd6c4ddb92f18342f534d5080c5218f935254230721faca3d34b66cbb3b6f19d8496516f23eca
+"xstate@npm:^5.18.2":
+  version: 5.18.2
+  resolution: "xstate@npm:5.18.2"
+  checksum: cf131c38986bcb27ebd9467615e0a7b68ee1334fab2aa092917cae6041e604e5ef93ada41fb289094e7533513b3e5663f3595295d9a9b39251027382d6594cc3
   languageName: node
   linkType: hard
 
