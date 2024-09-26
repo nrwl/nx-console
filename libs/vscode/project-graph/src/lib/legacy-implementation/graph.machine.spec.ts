@@ -1,18 +1,17 @@
+import { PartialDeep } from 'type-fest';
+import type { OutputChannel } from 'vscode';
 import {
   createActor,
   fromPromise,
   getNextSnapshot,
-  interpret,
   StateValue,
   waitFor,
 } from 'xstate';
 import { graphMachine } from './graph.machine';
-import { PartialDeep } from 'type-fest';
-import type { OutputChannel } from 'vscode';
 
+import { NxWorkspace } from '@nx-console/shared/types';
 import type * as nxWorkspace from '@nx-console/vscode/nx-workspace';
 import * as outputChannels from '@nx-console/vscode/output-channels';
-import { NxWorkspace } from '@nx-console/shared/types';
 import { MessageType } from './graph-message-type';
 
 jest.mock(
@@ -50,7 +49,7 @@ const mockMachine = graphMachine.provide({
   },
 });
 
-xdescribe('graph state machine', () => {
+describe('graph state machine', () => {
   it('should go to the correct states with the actor', (done) => {
     const actor = createActor(mockMachine);
 
@@ -62,6 +61,7 @@ xdescribe('graph state machine', () => {
         expect(states).toMatchInlineSnapshot(`
           Array [
             "init",
+            "loading",
             "loading",
             "content",
             "viewReady",
@@ -91,8 +91,6 @@ xdescribe('graph state machine', () => {
     expect(nextState.value).toMatchInlineSnapshot(`"loading"`);
     expect(nextState.context).toMatchInlineSnapshot(`
       Object {
-        "error": null,
-        "project": null,
         "state": "loading",
       }
     `);
