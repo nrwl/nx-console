@@ -53,10 +53,6 @@ export class GraphWebView implements Disposable {
         const project = state.context.project;
         this.panel?.webview.postMessage(project);
       }
-
-      setTimeout(() => {
-        graphService.execute(state);
-      });
     });
     graphService.start();
   }
@@ -221,7 +217,7 @@ export class GraphWebView implements Disposable {
       workspace: { projects },
     } = nxWorkspace;
 
-    if (!projects || !projects.length) {
+    if (!projects || !Object.keys(projects).length) {
       showNoProjectsMessage();
       return;
     }
