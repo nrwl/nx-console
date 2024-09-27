@@ -144,6 +144,16 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         },
         showingPDVMulti: {
           entry: 'renderMultiPDV',
+          on: {
+            MULTI_PROJECT_SELECTED: {
+              actions: [
+                assign({
+                  multiSelectedProject: ({ event }) => event['project'],
+                }),
+                'renderMultiPDV',
+              ],
+            },
+          },
         },
         showingError: {
           entry: 'renderError',
@@ -184,6 +194,14 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     });
 
     const actor = createActor(machine);
+    this.webviewPanel.webview.onDidReceiveMessage((message) => {
+      if (message.type === 'projectSelected') {
+        actor.send({
+          type: 'MULTI_PROJECT_SELECTED',
+          project: message.project,
+        });
+      }
+    });
     actor.start();
 
     this.workspaceRefreshListener = onWorkspaceRefreshed(() => {
@@ -302,36 +320,46 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       `
       <body>
        <div> 
-        <vscode-single-select id="project-select">
-          ${projects.map(
-            (p) => `<vscode-option value="${p}">${p}</vscode-option>`
-          )}
-        </vscode-single-select>
+      <vscode-single-select id="project-select">
+        ${[
+          selectedProject,
+          ...projects.filter((p) => p !== selectedProject),
+        ].map((p) => `<vscode-option value="${p}">${p}</vscode-option>`)}
+      </vscode-single-select>
       </div>`
     );
     html = html.replace(
       '</body>',
-      `
+      /*html*/ `
      
       <script>
-        // document.getElementById('vscode-single-select').value = '${selectedProject}';
-
         const vscode = acquireVsCodeApi();
-        window.__pdvData = ${stringifiedData}
 
-        console.log(window.__pdvData)
+        const selectBox = document.getElementById('project-select')
+        selectBox.addEventListener('change', (event) => {
+          const selectedValue = event.target.value;
+          vscode.postMessage({
+            type: 'projectSelected',
+            project: selectedValue
+          })
+        });
+
+        window.__pdvData = ${stringifiedData}
 
         const pdvService = window.renderPDV(window.__pdvData['${selectedProject}'])
             
-        // // messages from the extension
-        //   window.addEventListener('message', event => {
-        //   const message = event.data; 
-        //   if(message.type === 'reload') {
-        //     pdvService.send({
-        //       type: 'loadData',
-        //       ...message.data,
-        //     });
-        //   }
+        // messages from the extension
+          // window.addEventListener('message', event => {
+          // const message = event.data; 
+          // if(message.type === 'projectSelected') {
+
+          // }
+          // if(message.type === 'reload') {
+          //   pdvService.send({
+          //     type: 'loadData',
+          //     ...message.data,
+          //   });
+          // }
         // });
 
       </script>
