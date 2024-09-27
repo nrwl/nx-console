@@ -32,7 +32,7 @@ export class ProjectDetailsManager {
       }
 
       if (gte(nxVersion.full, '19.8.0')) {
-        preview = new NewProjectDetailsPreview(path);
+        preview = new NewProjectDetailsPreview(path, this.context);
       } else {
         preview = new OldProjectDetailsPreview(
           path,
