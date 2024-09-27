@@ -62,7 +62,8 @@
     "@nx/nx-linux-x64-gnu": "19.0.3",
     "@nx/nx-linux-x64-musl": "19.0.3",
     "@nx/nx-win32-arm64-msvc": "19.0.3",
-    "@nx/nx-win32-x64-msvc": "19.0.3"
+    "@nx/nx-win32-x64-msvc": "19.0.3",
+    "@vscode-elements/elements": "^1.6.1"
   },
   "contributes": {
     "typescriptServerPlugins": [

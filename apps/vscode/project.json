@@ -91,6 +91,10 @@
       }
     },
     "build": {
+      "command": "node ./tools/scripts/install-vscode-deps.js",
+      "dependsOn": ["_build"]
+    },
+    "_build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "external": [
@@ -203,10 +207,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["build", "^build"],
       "options": {
-        "commands": [
-          "node ./tools/scripts/vscode-yarn.js",
-          "node ./tools/scripts/vscode-vsce.js"
-        ],
+        "commands": ["node ./tools/scripts/vscode-vsce.js"],
         "parallel": false
       },
       "outputs": ["{workspaceRoot}/dist/apps/vscode"]

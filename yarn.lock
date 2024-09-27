@@ -2956,12 +2956,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lit-labs/ssr-dom-shim@npm:^1.2.0":
+  version: 1.2.1
+  resolution: "@lit-labs/ssr-dom-shim@npm:1.2.1"
+  checksum: 5667c44f58e16edaa257fc3ae7f752250d5250d4eb1d071b65df0f1fce0b90b42e8528787cc2673998d76d993440143a2a20c3358ce125c62df4cd193784de8d
+  languageName: node
+  linkType: hard
+
 "@lit/reactive-element@npm:^1.3.0, @lit/reactive-element@npm:^1.5.0, @lit/reactive-element@npm:^1.6.0":
   version: 1.6.3
   resolution: "@lit/reactive-element@npm:1.6.3"
   dependencies:
     "@lit-labs/ssr-dom-shim": ^1.0.0
   checksum: 79b58631c38effeabad090070324431da8a22cf0ff665f5e4de35e4d791f984742b3d340c9c7fce996d1124a8da95febc582471b4c237236c770b1300b56ef6e
+  languageName: node
+  linkType: hard
+
+"@lit/reactive-element@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "@lit/reactive-element@npm:2.0.4"
+  dependencies:
+    "@lit-labs/ssr-dom-shim": ^1.2.0
+  checksum: 368d788d9eefdde74e77721e38c78de222dc5ec87d543e0638d0d28f7a8cf530c3d7b49aa8606efeec3f3485abbb22a43b58c2f20c1e6e7f0de266d4c6d125c4
   languageName: node
   linkType: hard
 
@@ -6545,6 +6561,15 @@ __metadata:
     loupe: ^3.1.1
     tinyrainbow: ^1.2.0
   checksum: 13ffb30e17fcdcb8bc0c3c64db5eca9b670da4f80fd6bab4a9d387f6a534886fb447e45274db44375703d909aab9ebe123accd8d7159f90a8c9852e7f758e420
+  languageName: node
+  linkType: hard
+
+"@vscode-elements/elements@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@vscode-elements/elements@npm:1.6.1"
+  dependencies:
+    lit: ^3.1.2
+  checksum: f90c7227431b66aaf1742367212b492fd901958b35e9894d30472b23d570af9c8eea2f857662a3df4b2373fa7fe0affbd63d25b32869a3734df506e201e10ceb
   languageName: node
   linkType: hard
 
@@ -16548,12 +16573,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lit-element@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "lit-element@npm:4.1.0"
+  dependencies:
+    "@lit-labs/ssr-dom-shim": ^1.2.0
+    "@lit/reactive-element": ^2.0.4
+    lit-html: ^3.2.0
+  checksum: 16cc7e343fc7f872a0f6a468bb9d7f3697cd9c3c020fd66e1f29f81e15300dc8d091559a1fd2d4cb6f2eb99b76e3fbeea1991f74dd5ca77bfaadb5b6af3d85b3
+  languageName: node
+  linkType: hard
+
 "lit-html@npm:^2.8.0":
   version: 2.8.0
   resolution: "lit-html@npm:2.8.0"
   dependencies:
     "@types/trusted-types": ^2.0.2
   checksum: 2d70df07248bcb2f502a3afb1e91d260735024fa669669ffb1417575aa39c3092779725ac1b90f5f39e4ce78c63f431f51176bc67f532389f0285a6991573255
+  languageName: node
+  linkType: hard
+
+"lit-html@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "lit-html@npm:3.2.0"
+  dependencies:
+    "@types/trusted-types": ^2.0.2
+  checksum: fa566878efab2492f2dc359216bc5ccd5164466f6760984b9f9b7122c4932be19891ddf10a611bc88718e59c49f83f18e9b9e32fe193dcdc37df28f9fe05630c
   languageName: node
   linkType: hard
 
@@ -16565,6 +16610,17 @@ __metadata:
     lit-element: ^3.3.0
     lit-html: ^2.8.0
   checksum: 2480e733f7d022d3ecba91abc58a20968f0ca8f5fa30b3341ecf4bcf4845e674ad27b721a5ae53529cafc6ca603c015b80d0979ceb7a711e268ef20bb6bc7527
+  languageName: node
+  linkType: hard
+
+"lit@npm:^3.1.2":
+  version: 3.2.0
+  resolution: "lit@npm:3.2.0"
+  dependencies:
+    "@lit/reactive-element": ^2.0.4
+    lit-element: ^4.1.0
+    lit-html: ^3.2.0
+  checksum: b34e667481e1360f9d99a939e00238c1aff5ba9ffc43ebcb0e9f24db6c8226cf6f5c3e2b0e7c1a8de70e28e4697059c25742d0744377f0d5037b876b25266898
   languageName: node
   linkType: hard
 
@@ -18970,6 +19026,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 7.16.1
     "@typescript-eslint/parser": 7.16.1
     "@typescript-eslint/utils": 7.16.1
+    "@vscode-elements/elements": ^1.6.1
     "@vscode/codicons": ^0.0.36
     "@vscode/test-electron": ^2.1.5
     "@vscode/vsce": ^2.15.0

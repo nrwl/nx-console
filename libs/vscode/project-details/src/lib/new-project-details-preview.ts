@@ -1,7 +1,15 @@
 import { PDVData } from '@nx-console/shared/types';
 import { getPDVData } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
-import { Disposable, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
+import {
+  Disposable,
+  ExtensionContext,
+  Uri,
+  ViewColumn,
+  WebviewPanel,
+  window,
+  workspace,
+} from 'vscode';
 import {
   assign,
   createActor,
@@ -14,19 +22,20 @@ import { ProjectDetailsPreview } from './project-details-preview';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export class NewProjectDetailsPreview implements ProjectDetailsPreview {
-  private webviewPanel: WebviewPanel = window.createWebviewPanel(
-    'nx-console-project-details',
-    `Project Details`,
-    ViewColumn.Beside,
-    {
-      enableScripts: true,
-    }
-  );
+  private webviewPanel: WebviewPanel;
 
   projectRoot: string | undefined;
   workspaceRefreshListener: Disposable | undefined;
 
-  constructor(private path: string) {
+  constructor(private path: string, private context: ExtensionContext) {
+    this.webviewPanel = window.createWebviewPanel(
+      'nx-console-project-details',
+      `Project Details`,
+      ViewColumn.Beside,
+      {
+        enableScripts: true,
+      }
+    );
     const machine = setup({
       types: {
         context: {} as Partial<PDVData> & {
@@ -53,6 +62,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         renderMultiPDV: ({ context }) =>
           this.renderMultiPDV(
             context.pdvDataSerializedMulti,
+            context.multiSelectedProject,
             context.graphBasePath
           ),
         renderNoGraphError: ({ context }) => this.renderNoGraphError(),
@@ -81,7 +91,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         }),
       },
     }).createMachine({
-      /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwBEw8BDASwBtYBiABQIDUB9AgQQBVWmAZAeVYJMAygFUAwmICiQoQG0ADAF1EKdLDJ4y6AHYqQAD0QBWAOwAaEAE9EJgGwAmAHS2ALCYDMADiPvbRgIz2XgC+wRZoWLiExORUdIwsHFx8AkySAErpvOkKykggyGoaWrr5hgimFtYI-v5ejvLytp7utc1GRp6h4RjY+ESklDT0zGycPPyCALIi3OwAksLiUjK5eoXqmjp65ZVWiC6Hjp4ube4d9gCcJ0Yu3QW9UQOxNAByvEwA4umstAASaUy2TW+Q2xW2ZUQVyctRM9nknk8-kabncVUQgXuET60UGVEcZG0xRIFG46BIEEJUGoEB0YAJ2gAbugANb07FPGJDBnE0nkynaKAIQnMnAkLbaXIg1SbEo7DEueTHBFGVyXeT2ZGHdE1TyXZxeeS+dXyQKXc5Yx79Ln42AAC3QAHcqSNqOlJAAxd1CP7SgpFCXyhDnfyOQLIy6a+QmIxBS62HUmGNh1HeXwBIJdMIPSLWvGwRz2p0uxiOVBgABm5ftVJpdIZzLZjg5eZehYdzsFIzLlerdqpwqZ6DFEqlSnWAblkIQLkuof8bn8ATcDls8g6Otc7gafk8ms8fgRvktudxbaLnagklQGFQbs93t949Bk4hoHK7iujln53klxc3h+F4Oq1EYSpgc0rT+O0nQnjizzcheVLXrePZVnA-aCnW2j0iKrLslaZ6IR2yE3ugqBoX2A54SOJRjnkMrgqU74HLY251GuRjXEEtgmJ4IGmp4372Mu9j2J4CL2HCoTZto6AQHA6yEQhVATrKb4GIglw6i4Ti2EuC4tHxXGmqqcGcvmPKaCSZIUlSalMUGDg6q026xmuMYHrprjyHc2YtkRtokV2jAOYG07uEaYZRpGyIxnGCb7BUCKOHO7guO4-52NGVzma2xHFiFDAEhAFBgGFU4scGJihrY+kuLc-6fv41wuIm0HOKYManGJum6XlgUFkhRWURh9kvupzGaTOEnHGudXhuqSYLomdWpT4SKmnOiItQNKlDcFUAjFMACuFCaBVGnlKcQnpQE7gmOq5yQS5saOHxMb-uajSmLYe02gdhVXmRqCXVN5TiaGP5gf+gEbTqiIuI4UniUaVyxm4lz-ZZw3A6hZCleVE2ORFYENO4Xhws16WXOYSURk4ppwi4tj-g4ulGNj56HSh5GjTWgpg0GDX6kEkXGbT8ImOuIELk4rm9a4LTmu4XMFZerzoJ8qAkMgdq86DxPhVVmVOCcbGdJ0kX2LpIFfuaElcb4rRsXVMnBEAA */
+      /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwBEw8BDASwBtYBiABQIDUB9AgQQBVWmAZAeVYJMAygFUAwmICiQoQG0ADAF1EKdLDJ4y6AHYqQAD0QBWAOwAaEAE9EADnkBOAHQAWEwDYTDowCZnN+zYAjAC+wRZoWLiExORUdIwsHFx8AkySAErpvOkKykggyGoaWrr5hgimFtYIgYE2zo42AMxutU32TU0mNiah4RjY+ESklDT0zGycPPyCALIi3OwAksLiUjK5eoXqmjp65ZVWiM72gY4e8kYntSa3gb1hBQNRw7E0AHK8TADi6ay0AAk0plspt8ttinsyohvPZvI4bt5Lk0bD1vLUqohAt4+k9IkMYqNHGRtMUSBRuOgSBASVBqBAdGBidoAG7oADWTIig2iIyozLJFKpNO0UAQJLZOBIu20uTBqh2JX2WOc8ka8hsplVbjhmrcmIQ3haLg8zhabnaJi6uO5L0J-NgAAt0AB3WnjajpSQAMS9QgB8oKRRlyoQTSMZ2xgQ19069nkJnsBps6Mc9ncnnsPj8ARtzwJfNgjidrvdjEcqDAADNK07afTGcy2ZzHLaC29i863aLxhXq7XHbTxaz0FKZXKlFtg0roQhrgjXIEmicTIFTs4jAa3P5GlmlxH5E0jYEjHn8byOyXu1BJKgMKhPT6-QHJ+Dp1DQOUj04Tsv1+jnFaLMDVqdNHE6Volw6LobA8M8eVeIkr1pW97z7Gs4EHUUG20JkJQ5Ll8wvJCuxQu90FQdCByHfCxxKCc8gVSFSk-Y4LQRFpozXAJEwjED5DcIxHG8K4jHaCN0RxXFtHQCA4C2IjEKoKdFQ-AxECTI45yaRoRJ8dEelMETfHgu1CwFTRyUpalaRU5jQzcbwDRaNVw1EkxYSMIyWlM9sSNLHtGDskNZyaQ8EXRGMrXaBNNOqLyhJMZxvDsTUjDcRzLl84iHVIwKGGJCAKDAYKZ1YsNV3OVozThIw7BMdKDXcHS-FXdEgOXDdsqUotkPyqjMNst9VJY9S5zsRo3AEuqU3sVxAKaZMl0cbomnuIwOkRU9HjbHLeryqBxlmABXChNFKtSvyS8CdStWCMu3BNNy0wCbBcI0gjqDKTiuZxuvtfaApvcjUAu0byhSs5f2uZLAkAtdnuqTaEXkSSErCiMQh2xSAc7IHUIowrirB0NwzVQ8URzDdHPsNxnBApc3vqQSrQcOnEwefpzx6vHrwJyjKwwutRRJ2cNycI0wu3CNPBS8wtNqHc4ZEuxl3kATsX+8y+qgd50G+VASGQR1+dF8rDmqJdIz8Gq5tpxW3FCUIgA */
       id: 'projectDetails',
       initial: 'initialLoading',
       context: {
@@ -252,17 +262,80 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
   private renderMultiPDV(
     data: Record<string, string> | undefined,
+    selectedProject: string | undefined,
     graphBasePath: string | undefined
   ) {
     if (data === undefined || graphBasePath === undefined) {
       return;
     }
+
+    const projects = Object.keys(data);
+    selectedProject ??= projects[0];
+
+    const stringifiedData = JSON.stringify(
+      Object.entries(data).reduce(
+        (acc, [key, value]) => ({ ...acc, [key]: JSON.parse(value) }),
+        {}
+      )
+    );
+
     let html = this.loadPDVHtmlBase(graphBasePath);
     html = html.replace(
-      '<div',
+      '</head>',
       `
-      <div> MULTI </div>
-      <div
+      <script
+        src="${this.webviewPanel.webview
+          .asWebviewUri(
+            Uri.joinPath(
+              this.context.extensionUri,
+              'node_modules/@vscode-elements/elements/dist/bundled.js'
+            )
+          )
+          .toString()}"
+        type="module"
+      ></script>
+      </head>
+      `
+    );
+    html = html.replace(
+      '<body>',
+      `
+      <body>
+       <div> 
+        <vscode-single-select id="project-select">
+          ${projects.map(
+            (p) => `<vscode-option value="${p}">${p}</vscode-option>`
+          )}
+        </vscode-single-select>
+      </div>`
+    );
+    html = html.replace(
+      '</body>',
+      `
+     
+      <script>
+        // document.getElementById('vscode-single-select').value = '${selectedProject}';
+
+        const vscode = acquireVsCodeApi();
+        window.__pdvData = ${stringifiedData}
+
+        console.log(window.__pdvData)
+
+        const pdvService = window.renderPDV(window.__pdvData['${selectedProject}'])
+            
+        // // messages from the extension
+        //   window.addEventListener('message', event => {
+        //   const message = event.data; 
+        //   if(message.type === 'reload') {
+        //     pdvService.send({
+        //       type: 'loadData',
+        //       ...message.data,
+        //     });
+        //   }
+        // });
+
+      </script>
+      </body>
       `
     );
     this.webviewPanel.webview.html = html;
