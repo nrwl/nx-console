@@ -27,7 +27,7 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": {
     "gitPullAndYarnInstall": "git pull && yarn install --immutable",
-    "nxGlobalInstall": "yarn global add nx@latest"
+    "nxGlobalInstall": "bun install -g nx@latest"
   },
   // Configure tool-specific properties.
   "customizations": {
