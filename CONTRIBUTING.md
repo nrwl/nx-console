@@ -13,6 +13,8 @@ We are trying to keep GitHub issues for bug reports and feature requests. Stack 
 
 - Install yarn: https://classic.yarnpkg.com/en/docs/install
 - Run yarn install in the root directory
+- Install java: https://www.java.com/en/download/help/download_options.html
+- Install gradle: https://docs.gradle.org/current/userguide/installation.html
 
 ## Running the Extension locally
 
