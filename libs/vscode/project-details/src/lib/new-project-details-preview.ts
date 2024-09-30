@@ -3,6 +3,7 @@ import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getPDVData } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import {
+  commands,
   Disposable,
   ExtensionContext,
   Uri,
@@ -18,12 +19,13 @@ import {
   setup,
 } from 'xstate';
 import { ProjectDetailsPreview } from './project-details-preview';
+import { handleGraphInteractionEventBase } from '@nx-console/vscode/graph-base';
+import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 
 export class NewProjectDetailsPreview implements ProjectDetailsPreview {
   private webviewPanel: WebviewPanel;
 
   projectRoot: string | undefined;
-  workspaceRefreshListener: Disposable | undefined;
 
   constructor(private path: string, private context: ExtensionContext) {
     this.webviewPanel = window.createWebviewPanel(
@@ -63,15 +65,15 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
             context.multiSelectedProject,
             context.graphBasePath
           ),
-        renderNoGraphError: ({ context }) => this.renderNoGraphError(),
+        renderNoGraphError: ({ context }) =>
+          this.renderNoGraphError(context.errorMessage),
         assignLoadPDVData: assign(({ context, event }) => {
           const multiProjects = Object.keys(
             event['output'].pdvDataSerializedMulti ?? {}
           );
           const multiSelectedProject =
-            context.multiSelectedProject ?? multiProjects.length > 0
-              ? multiProjects[0]
-              : undefined;
+            context.multiSelectedProject ??
+            (multiProjects.length > 0 ? multiProjects[0] : undefined);
           return {
             ...event['output'],
             multiSelectedProject,
@@ -101,7 +103,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         }),
       },
     }).createMachine({
-      /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwBEw8BDASwBtYBiABQIDUB9AgQQBVWmAZAeVYJMAygFUAwmICiQoQG0ADAF1EKdLDJ4y6AHYqQAD0QBWAOwAaEAE9EATgAcdgHQ2AjK4DMAFiM2TLgEwAbCYAviEWaFi4hMTkVHSMLBxcfAJMkgBKGbwZCspIIMhqGlq6BYYIphbWCC7ugZ6O-iZ2nvJB8jbyJjb+YREY2PhEpJQ09MxsnDz8ggCyItzsAJLC4lIyeXpF6po6ehVVVoiero7B8kZGdv7NdoFeoeGFg9EjcTQAcrxMAOIZrFoAAl0lkclsCjsSvtyoh3PDHCZPC4jO5uoEbDYjG5qogAv0XlFhrExo4yNoSiQKNx0CQIOSoNQIDowGTtAA3dAAa1ZkSGMVGVDZlOptPp2igCHJnJwJD22jyENUu1KB0QAFoWudTPJvEF3H4XC5cQh-HVHPJ3C4bhjPO4bJ4MX1nny3iShbAABboADuDIm1AykgAYkGhEClYVivK1QhkTZnP54ZaXD0TP4HSaXPIAo5WoF7kbOp4WkYCa7iYLYI4vb7-YxHKgwAAzJtehlMllszk8xwVgUfGvev0SiaNlttz0MqUc9Cy+WKpTbaOq2GVHzOU5oh4BQJGW4mhzyRF7245wIX+3l16Vwe1kdQCZzACuFE01AWS1WtGyAClJGI7DCJI3AAewkgEJGUIxmunh2O45znvIdguKc+6WiagRJk0WJdO4qL2A4ZYujeA6kve9YMC+b5kIGIZhhGS6QiuMKgBUyKNPUvg3CYVr+EYwQmkYuqOKmlxtLcknyME15EmRHrDpR1GaOOrZwFOEqdtorLStyvKke85GKaOjDKWQqmTtOunzqUi75Mq0JlGxxhGJxWJ2KYDjBMJ7gmga-gWg4vRefIyGhcRAxyYZCl1hKkioBgqB0aG0iMfZUYqqxBgnG4ibuM0SYBB4xrHLUnjNM4di6vCATSb0zqRfy0XVhRcUJegqAWepHbMtp3Z6X2Bnui1xlQPFiVde2EozjKcq2UoUEsU52XrghAk+Kh9jIdcWYZkYeaEQWlx2CYJgCWEzzaOgEBwNsQ1VsumXLRU6ouFhzjpmaup2qidj2Camr7flGYonBep-XYslNcNwqaFSNJ0gyj2ObGr2oR9tzZp4P3uBDfmok0dX+eVVz5Z4UNulWQ6xY+jDIzBzkIAaLh5WiVpphmngmkigTnAEf3XHaHlBBTt5GTTY5kBAFBgPTq6M9jx6Olx-geQE9rYyaWKcaYqaBNJHlnTYovySNEsNk2alTVActZYcpznFhXR-SY0kPOYpXZiJe7JrqlzwmaJvNdTD5Pq+mi289cIXo4XEtM0fECR7NRJiYzj1Pr3j+TY9QNYS0NU61tNUeH5lSzLkexnajSuDm6YSSYF7Jyc3jnFVmJtChmJu0HMNF2HNGTRpNvMU9sauY02Y50RmOuCaaEfa7nSdCdvG94Xo3jR1ldrszeUFXxxVZm9LM8+V4l1H9gTr3em-tZ15ey6PKOwW0jjKxirlJiW9pGFmXHv2dvcLajpbg33Fg+LenVLaWQlDvRmrkEwXlVi0bMuMSyBCzPGRE9wqokyTEEa+JEop91Gp8dAvxUAkGQJ6KB8CVr1E4m0XwrkfBwVcr5T2lx37SVVsJDaDR2gXRCEAA */
+      /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwBEw8BDASwBtYBiABQIDUB9AgQQBVWmAZAeVYJMAygFUAwmICiQoQG0ADAF1EKdLDJ4y6AHYqQAD0QBWAGwA6ABxGAnNaPyT8gIwAmRxesAaEAE9EAdicnM2t5IwAWFyD-cKCLAGYAX0TvNCxcQmJyKjpGFg4uPgEmSQAlUt5ShWUkEGQ1DS1dWsMEeJczI3sg+VCjeOsLcP9vPwQneSGzfxdQl3mLBIcTZNSMbHwiUkoaemY2Th5+QQBZEW52AElhcSkZar169U0dPVaAWhMjMyd-f3twuEjC5whYnNYRr5EE5hhYzJFXNEEl8Vik6usMltsjQAHK8JgAcVKrFoAAkSuVKg9ak9Gq8WtCgfCor94v1-PE-otRoh2nCwiYLPIXPI2YKTP5Vuj0pssjszGRtI0SBRuOgSBBFVBqBAdGAFdoAG7oADW+rSG0y2yoBuVqvVmu0UAQiuNOBIL201WpqmeTTeiHeTiMcP6VnioqGQRcFh5CA8ZhcM2sJhc9lFEdMUotmLlNtgAAt0AB3LV7ailSQAMUrQlJPrqDU9AbaNh+i0WdhiLK8UIQM3kZhMKaT9hmHPm2YxsutsDMhZLZcYZlQYAAZqvC1qdXqDcazWYczPsfOi6WnXsV+vNwWtS6jeh3Z7vUpHk3-QyEOFbImYdZ4iYTjDhYgpGHGIZwoB4TDiKIbWGmU4ylaJ4LueUB7CcACuFCaNQZwXNctAVAAUpIYjsMIkjcGR7CSAQDa0s2n6AtYibAhCHGLPIfwmHGvxGMEAEQu0-hhPI8jDIhlpYvKqFLgwWE4WQFbVrW9avjS770qArRsqxTidgZUYIrxfbBsCZi9BMXT+AkLIuFJuazqei4XowimaFeG5wLeTo7to+quqa5rTshslnvJHlkF5N53kFT5NC+NS+nSzQ6Yg36sVE34OHMXwgeEfGRIO4nWNB8QWG4JhApKaJHmF+YRU6kioBgqAqTW0jqcljZ+tpBi8m2RmdkY3bRJCYxBJy8JWMMjgSWJSR1aFMmNa5UAtW1MU+duuoBXuwWHiteZznJzWtegqDbVuTr3m6HqJUoDFaWlA1fvBljxDCbL+BK8QVU4fHid84Siv+wJfBMDnLUhq2nU1UA4ugBKoCQyAFptl0dWpz19a9ulDR2tjtLYoLDHGX0dPYAGcr0v0mBK4SOce4XrUjKNoxjF1Xau3k3dqe2BQ+B71XDLloezqPo5jPPXjtt3xQ9OhJW+eMtt+HQJDCDjpq4CR8UKzIitVXxpjES1oto6AQHAjzHbOqupS27wuF9llfLEbhBBMEJxu8sSWf0BnhBVkyAlmMPSSdtqaCqaoalqjtMelCBBgk7sRK4gE9L7fZRP4Q7OBGbKjiBlXMw18PrXsScfinX3BMNHijQi4JxkC4TwqmIemLYlUSqiayw9HZ3ocuZAQBQYC1-1un+KxyZVQZgRsvEcYMx0xt-K7MLzzGFdi6Pl687FToz-jGWLCEMagjEHixAMcaBFTwrAbMzhAktQ9R85R-udhmhz4tgbu2DwRlYgmT4jGb4VgV7WF+ByeB0Nv5ORQgjDCADooTynkAz8nIF6zFmLZf8SZ4FFX-IXGEHhAKzASNYA+I90H-yUtdXyUBcEp1BHCeCQwQzzHmBJPiER4iWAhMMYGtkGYMN-gjGWHC3ogKbl2Vufw4wWECGxICxCHDiQqtItB60ZYKkntPTSas8Hz2mIQhmy8nAlyBrZEIdghgDH7s4fRrM0JGJPvLdhZinbMSvjw2+oIyp2NjGZVwWV4FhO-CYdoUQPFrQlsjKWXM2ryN0kEUBHgSGkyGBNDK5g3DCRjMQgRMIklVxSRzaW3NjE4P8cnBRljF7QQlKYVMcY0ydw-txXoSYQ52CqeLLUktObeLlvzTJl9uE3wqoEbiEZ-gUwkmYL64lRKLHwdBZIyQgA */
       id: 'projectDetails',
       initial: 'initialLoading',
       context: {
@@ -162,9 +164,10 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
           on: {
             MULTI_PROJECT_SELECTED: {
               actions: [
-                assign({
-                  multiSelectedProject: ({ event }) => event['project'],
-                }),
+                assign(({ context, event }) => ({
+                  ...context,
+                  multiSelectedProject: event['project'],
+                })),
                 'renderMultiPDV',
               ],
             },
@@ -181,18 +184,24 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
                 onDone: {
                   actions: [
                     'assignLoadPDVData',
-                    {
-                      type: 'reRenderPDV',
-                      params: ({ context }) => ({
-                        pdvData:
-                          context.multiSelectedProject &&
-                          context.pdvDataSerializedMulti
-                            ? context.pdvDataSerializedMulti[
-                                context.multiSelectedProject
-                              ]
-                            : undefined,
-                      }),
-                    },
+                    enqueueActions(({ context, enqueue }) => {
+                      if (context.resultType === 'SUCCESS_MULTI') {
+                        enqueue({
+                          type: 'reRenderPDV',
+                          params: {
+                            pdvData:
+                              context.multiSelectedProject &&
+                              context.pdvDataSerializedMulti
+                                ? context.pdvDataSerializedMulti[
+                                    context.multiSelectedProject
+                                  ]
+                                : undefined,
+                          },
+                        });
+                      } else {
+                        enqueue('transitionConditionally');
+                      }
+                    }),
                   ],
                 },
               },
@@ -221,6 +230,23 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         },
         showingNoGraphError: {
           entry: 'renderNoGraphError',
+          on: {
+            REFRESH: {
+              target: '.refreshing',
+            },
+          },
+          initial: 'idle',
+          states: {
+            idle: {},
+            refreshing: {
+              invoke: {
+                src: 'loadPDVData',
+                onDone: {
+                  actions: ['assignLoadPDVData', 'transitionConditionally'],
+                },
+              },
+            },
+          },
         },
       },
       on: {
@@ -240,18 +266,53 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     });
 
     const actor = createActor(machine);
-    this.webviewPanel.webview.onDidReceiveMessage((message) => {
-      if (message.type === 'projectSelected') {
-        actor.send({
-          type: 'MULTI_PROJECT_SELECTED',
-          project: message.project,
-        });
-      }
-    });
+
+    const interactionEventListener =
+      this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
+        if (event.type === 'projectSelected') {
+          actor.send({
+            type: 'MULTI_PROJECT_SELECTED',
+            project: event.project,
+          });
+          return;
+        }
+        const handled = await handleGraphInteractionEventBase(event);
+        if (handled) return;
+
+        if (event.type === 'open-project-graph') {
+          getGraphWebviewManager().focusProject(event.payload.projectName);
+          return;
+        }
+
+        if (event.type === 'open-task-graph') {
+          getGraphWebviewManager().focusTarget(
+            event.payload.projectName,
+            event.payload.targetName
+          );
+          return;
+        }
+      });
     actor.start();
 
-    this.workspaceRefreshListener = onWorkspaceRefreshed(() => {
+    const workspaceRefreshListener = onWorkspaceRefreshed(() => {
       actor.send({ type: 'REFRESH' });
+    });
+
+    const viewStateListener = this.webviewPanel.onDidChangeViewState(
+      ({ webviewPanel }) => {
+        commands.executeCommand(
+          'setContext',
+          'projectDetailsViewVisible',
+          webviewPanel.visible
+        );
+      }
+    );
+
+    this.webviewPanel.onDidDispose(() => {
+      interactionEventListener.dispose();
+      viewStateListener.dispose();
+      workspaceRefreshListener?.dispose();
+      commands.executeCommand('setContext', 'projectDetailsViewVisible', false);
     });
   }
 
@@ -273,6 +334,11 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
           <script>
             const data = ${pdvData}
             const pdvService = window.renderPDV(data)
+
+            const vscode = acquireVsCodeApi()
+            window.externalApi.graphInteractionEventListener = (message) => {
+              vscode.postMessage(message);
+            }
             
             // messages from the extension
              window.addEventListener('message', event => {
@@ -390,6 +456,10 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       <script>
         const vscode = acquireVsCodeApi();
 
+        window.externalApi.graphInteractionEventListener = (message) => {
+            vscode.postMessage(message);
+        }
+
         const selectBox = document.getElementById('project-select')
         selectBox.addEventListener('change', (event) => {
           const selectedValue = event.target.value;
@@ -406,7 +476,6 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         window.addEventListener('message', event => {
         const message = event.data; 
         
-        console.log('reload received', message)
         if(message.type === 'reload') {
           pdvService.send({
             type: 'loadData',
@@ -423,12 +492,29 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
   }
 
   private renderNoGraphError(error?: string) {
-    this.webviewPanel.webview.html = `<html><body>ERROR: ${error}</body></html>`;
+    this.webviewPanel.webview.html = `<html><body>
+      <h2>Nx Console could not load the Project Details View. </h2>
+              <h4>
+              This is most likely because local dependencies are not installed. <br/>
+              Make sure to run npm/yarn/pnpm/bun install and refresh the workspace using the button in the editor toolbar.
+              </h4>
+
+              ${
+                error
+                  ? `
+              <h4>
+                  The following error occurred: <br/>
+                  <pre>${error}</pre>
+                  See idea.log for more details.
+              </h4>
+              `
+                  : ''
+              }
+    </body></html>`;
   }
 
   onDispose(callback: () => void): void {
     this.webviewPanel.onDidDispose(() => {
-      this.workspaceRefreshListener?.dispose();
       callback();
     });
   }
