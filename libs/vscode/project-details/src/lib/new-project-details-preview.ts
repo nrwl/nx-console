@@ -49,7 +49,8 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         renderLoading: () => this.renderLoading(),
         renderPDV: ({ context }) =>
           this.renderPDV(context.pdvDataSerialized, context.graphBasePath),
-        reRenderPDV: this.reRenderPDV,
+        reRenderPDV: (_: unknown, params: { pdvData: string | undefined }) =>
+          this.reRenderPDV(params.pdvData),
         renderError: ({ context }) =>
           this.renderError(
             context.errorsSerialized,
@@ -63,7 +64,19 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
             context.graphBasePath
           ),
         renderNoGraphError: ({ context }) => this.renderNoGraphError(),
-        assignLoadPDVData: assign(({ event }) => ({ ...event['output'] })),
+        assignLoadPDVData: assign(({ context, event }) => {
+          const multiProjects = Object.keys(
+            event['output'].pdvDataSerializedMulti ?? {}
+          );
+          const multiSelectedProject =
+            context.multiSelectedProject ?? multiProjects.length > 0
+              ? multiProjects[0]
+              : undefined;
+          return {
+            ...event['output'],
+            multiSelectedProject,
+          };
+        }),
         transitionConditionally: enqueueActions(({ context, enqueue }) => {
           if (
             !context.resultType ||
@@ -277,13 +290,13 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     this.webviewPanel.webview.html = html;
   }
 
-  private reRenderPDV(_: unknown, params: { pdvData: string | undefined }) {
-    if (params.pdvData === undefined) {
+  private reRenderPDV(pdvData: string | undefined) {
+    if (pdvData === undefined) {
       return;
     }
     this.webviewPanel.webview.postMessage({
       type: 'reload',
-      data: JSON.parse(params.pdvData),
+      data: JSON.parse(pdvData),
     });
   }
 
@@ -316,12 +329,15 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     selectedProject: string | undefined,
     graphBasePath: string | undefined
   ) {
-    if (data === undefined || graphBasePath === undefined) {
+    if (
+      data === undefined ||
+      graphBasePath === undefined ||
+      selectedProject === undefined
+    ) {
       return;
     }
 
     const projects = Object.keys(data);
-    selectedProject ??= projects[0];
 
     const stringifiedData = JSON.stringify(
       Object.entries(data).reduce(
@@ -352,14 +368,20 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       '<body>',
       `
       <body>
-       <div> 
+       <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;"> 
+       <p>
+      Project: 
+       </p>
       <vscode-single-select id="project-select">
         ${[
           selectedProject,
           ...projects.filter((p) => p !== selectedProject),
         ].map((p) => `<vscode-option value="${p}">${p}</vscode-option>`)}
       </vscode-single-select>
-      </div>`
+      </div>
+      <vscode-divider></vscode-divider>
+      
+      `
     );
     html = html.replace(
       '</body>',
@@ -381,16 +403,16 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
         const pdvService = window.renderPDV(window.__pdvData['${selectedProject}'])
             
-        messages from the extension
-          window.addEventListener('message', event => {
-          const message = event.data; 
-          
-          if(message.type === 'reload') {
-            pdvService.send({
-              type: 'loadData',
-              ...message.data,
-            });
-          }
+        window.addEventListener('message', event => {
+        const message = event.data; 
+        
+        console.log('reload received', message)
+        if(message.type === 'reload') {
+          pdvService.send({
+            type: 'loadData',
+            ...message.data,
+          });
+        }
         });
 
       </script>
