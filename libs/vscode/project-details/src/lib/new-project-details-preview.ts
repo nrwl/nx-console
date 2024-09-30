@@ -1,4 +1,5 @@
 import { PDVData } from '@nx-console/shared/types';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getPDVData } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import {
@@ -8,7 +9,6 @@ import {
   ViewColumn,
   WebviewPanel,
   window,
-  workspace,
 } from 'vscode';
 import {
   assign,
@@ -16,10 +16,8 @@ import {
   enqueueActions,
   fromPromise,
   setup,
-  spawnChild,
 } from 'xstate';
 import { ProjectDetailsPreview } from './project-details-preview';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export class NewProjectDetailsPreview implements ProjectDetailsPreview {
   private webviewPanel: WebviewPanel;
@@ -51,8 +49,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         renderLoading: () => this.renderLoading(),
         renderPDV: ({ context }) =>
           this.renderPDV(context.pdvDataSerialized, context.graphBasePath),
-        reRenderPDV: ({ context }) =>
-          this.reRenderPDV(context.pdvDataSerialized),
+        reRenderPDV: this.reRenderPDV,
         renderError: ({ context }) =>
           this.renderError(
             context.errorsSerialized,
@@ -91,7 +88,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         }),
       },
     }).createMachine({
-      /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwBEw8BDASwBtYBiABQIDUB9AgQQBVWmAZAeVYJMAygFUAwmICiQoQG0ADAF1EKdLDJ4y6AHYqQAD0QBWAOwAaEAE9EADnkBOAHQAWEwDYTDowCZnN+zYAjAC+wRZoWLiExORUdIwsHFx8AkySAErpvOkKykggyGoaWrr5hgimFtYIgYE2zo42AMxutU32TU0mNiah4RjY+ESklDT0zGycPPyCALIi3OwAksLiUjK5eoXqmjp65ZVWiM72gY4e8kYntSa3gb1hBQNRw7E0AHK8TADi6ay0AAk0plspt8ttinsyohvPZvI4bt5Lk0bD1vLUqohAt4+k9IkMYqNHGRtMUSBRuOgSBASVBqBAdGBidoAG7oADWTIig2iIyozLJFKpNO0UAQJLZOBIu20uTBqh2JX2WOc8ka8hsplVbjhmrcmIQ3haLg8zhabnaJi6uO5L0J-NgAAt0AB3WnjajpSQAMS9QgB8oKRRlyoQTSMZ2xgQ19069nkJnsBps6Mc9ncnnsPj8ARtzwJfNgjidrvdjEcqDAADNK07afTGcy2ZzHLaC29i863aLxhXq7XHbTxaz0FKZXKlFtg0roQhrgjXIEmicTIFTs4jAa3P5GlmlxH5E0jYEjHn8byOyXu1BJKgMKhPT6-QHJ+Dp1DQOUj04Tsv1+jnFaLMDVqdNHE6Volw6LobA8M8eVeIkr1pW97z7Gs4EHUUG20JkJQ5Ll8wvJCuxQu90FQdCByHfCxxKCc8gVSFSk-Y4LQRFpozXAJEwjED5DcIxHG8K4jHaCN0RxXFtHQCA4C2IjEKoKdFQ-AxECTI45yaRoRJ8dEelMETfHgu1CwFTRyUpalaRU5jQzcbwDRaNVw1EkxYSMIyWlM9sSNLHtGDskNZyaQ8EXRGMrXaBNNOqLyhJMZxvDsTUjDcRzLl84iHVIwKGGJCAKDAYKZ1YsNV3OVozThIw7BMdKDXcHS-FXdEgOXDdsqUotkPyqjMNst9VJY9S5zsRo3AEuqU3sVxAKaZMl0cbomnuIwOkRU9HjbHLeryqBxlmABXChNFKtSvyS8CdStWCMu3BNNy0wCbBcI0gjqDKTiuZxuvtfaApvcjUAu0byhSs5f2uZLAkAtdnuqTaEXkSSErCiMQh2xSAc7IHUIowrirB0NwzVQ8URzDdHPsNxnBApc3vqQSrQcOnEwefpzx6vHrwJyjKwwutRRJ2cNycI0wu3CNPBS8wtNqHc4ZEuxl3kATsX+8y+qgd50G+VASGQR1+dF8rDmqJdIz8Gq5tpxW3FCUIgA */
+      /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwBEw8BDASwBtYBiABQIDUB9AgQQBVWmAZAeVYJMAygFUAwmICiQoQG0ADAF1EKdLDJ4y6AHYqQAD0QBWAOwAaEAE9EATgAcdgHQ2AjK4DMAFiM2TLgEwAbCYAviEWaFi4hMTkVHSMLBxcfAJMkgBKGbwZCspIIMhqGlq6BYYIphbWCC7ugZ6O-iZ2nvJB8jbyJjb+YREY2PhEpJQ09MxsnDz8ggCyItzsAJLC4lIyeXpF6po6ehVVVoiero7B8kZGdv7NdoFeoeGFg9EjcTQAcrxMAOIZrFoAAl0lkclsCjsSvtyoh3PDHCZPC4jO5uoEbDYjG5qogAv0XlFhrExo4yNoSiQKNx0CQIOSoNQIDowGTtAA3dAAa1ZkSGMVGVDZlOptPp2igCHJnJwJD22jyENUu1KB0QAFoWudTPJvEF3H4XC5cQh-HVHPJ3C4bhjPO4bJ4MX1nny3iShbAABboADuDIm1AykgAYkGhEClYVivK1QhkTZnP54ZaXD0TP4HSaXPIAo5WoF7kbOp4WkYCa7iYLYI4vb7-YxHKgwAAzJtehlMllszk8xwVgUfGvev0SiaNlttz0MqUc9Cy+WKpTbaOq2GVHzOU5oh4BQJGW4mhzyRF7245wIX+3l16Vwe1kdQCZzACuFE01AWS1WtGyAClJGI7DCJI3AAewkgEJGUIxmunh2O45znvIdguKc+6WiagRJk0WJdO4qL2A4ZYujeA6kve9YMC+b5kIGIZhhGS6QiuMKgBUyKNPUvg3CYVr+EYwQmkYuqOKmlxtLcknyME15EmRHrDpR1GaOOrZwFOEqdtorLStyvKke85GKaOjDKWQqmTtOunzqUi75Mq0JlGxxhGJxWJ2KYDjBMJ7gmga-gWg4vRefIyGhcRAxyYZCl1hKkioBgqB0aG0iMfZUYqqxBgnG4ibuM0SYBB4xrHLUnjNM4di6vCATSb0zqRfy0XVhRcUJegqAWepHbMtp3Z6X2Bnui1xlQPFiVde2EozjKcq2UoUEsU52XrghAk+Kh9jIdcWYZkYeaEQWlx2CYJgCWEzzaOgEBwNsQ1VsumXLRU6ouFhzjpmaup2qidj2Camr7flGYonBep-XYslNcNwqaFSNJ0gyj2ObGr2oR9tzZp4P3uBDfmok0dX+eVVz5Z4UNulWQ6xY+jDIzBzkIAaLh5WiVpphmngmkigTnAEf3XHaHlBBTt5GTTY5kBAFBgPTq6M9jx6Olx-geQE9rYyaWKcaYqaBNJHlnTYovySNEsNk2alTVActZYcpznFhXR-SY0kPOYpXZiJe7JrqlzwmaJvNdTD5Pq+mi289cIXo4XEtM0fECR7NRJiYzj1Pr3j+TY9QNYS0NU61tNUeH5lSzLkexnajSuDm6YSSYF7Jyc3jnFVmJtChmJu0HMNF2HNGTRpNvMU9sauY02Y50RmOuCaaEfa7nSdCdvG94Xo3jR1ldrszeUFXxxVZm9LM8+V4l1H9gTr3em-tZ15ey6PKOwW0jjKxirlJiW9pGFmXHv2dvcLajpbg33Fg+LenVLaWQlDvRmrkEwXlVi0bMuMSyBCzPGRE9wqokyTEEa+JEop91Gp8dAvxUAkGQJ6KB8CVr1E4m0XwrkfBwVcr5T2lx37SVVsJDaDR2gXRCEAA */
       id: 'projectDetails',
       initial: 'initialLoading',
       context: {
@@ -131,7 +128,12 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
                     'assignLoadPDVData',
                     enqueueActions(({ context, enqueue }) => {
                       if (context.resultType === 'SUCCESS') {
-                        enqueue('reRenderPDV');
+                        enqueue({
+                          type: 'reRenderPDV',
+                          params: {
+                            pdvData: context.pdvDataSerialized,
+                          },
+                        });
                       } else {
                         enqueue('transitionConditionally');
                       }
@@ -152,6 +154,35 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
                 }),
                 'renderMultiPDV',
               ],
+            },
+            REFRESH: {
+              target: '.refreshing',
+            },
+          },
+          initial: 'idle',
+          states: {
+            idle: {},
+            refreshing: {
+              invoke: {
+                src: 'loadPDVData',
+                onDone: {
+                  actions: [
+                    'assignLoadPDVData',
+                    {
+                      type: 'reRenderPDV',
+                      params: ({ context }) => ({
+                        pdvData:
+                          context.multiSelectedProject &&
+                          context.pdvDataSerializedMulti
+                            ? context.pdvDataSerializedMulti[
+                                context.multiSelectedProject
+                              ]
+                            : undefined,
+                      }),
+                    },
+                  ],
+                },
+              },
             },
           },
         },
@@ -189,7 +220,9 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         PDV_DATA_LOAD_MULTI_SUCCESS: {
           target: '.showingPDVMulti',
         },
-        NO_GRAPH_ERROR: {},
+        NO_GRAPH_ERROR: {
+          target: '.showingNoGraphError',
+        },
       },
     });
 
@@ -244,13 +277,13 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     this.webviewPanel.webview.html = html;
   }
 
-  private reRenderPDV(pdvData: string | undefined) {
-    if (pdvData === undefined) {
+  private reRenderPDV(_: unknown, params: { pdvData: string | undefined }) {
+    if (params.pdvData === undefined) {
       return;
     }
     this.webviewPanel.webview.postMessage({
       type: 'reload',
-      data: JSON.parse(pdvData),
+      data: JSON.parse(params.pdvData),
     });
   }
 
@@ -348,19 +381,17 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
         const pdvService = window.renderPDV(window.__pdvData['${selectedProject}'])
             
-        // messages from the extension
-          // window.addEventListener('message', event => {
-          // const message = event.data; 
-          // if(message.type === 'projectSelected') {
-
-          // }
-          // if(message.type === 'reload') {
-          //   pdvService.send({
-          //     type: 'loadData',
-          //     ...message.data,
-          //   });
-          // }
-        // });
+        messages from the extension
+          window.addEventListener('message', event => {
+          const message = event.data; 
+          
+          if(message.type === 'reload') {
+            pdvService.send({
+              type: 'loadData',
+              ...message.data,
+            });
+          }
+        });
 
       </script>
       </body>
