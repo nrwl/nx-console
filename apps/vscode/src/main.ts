@@ -148,9 +148,13 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
 
   const { root } = parse(vscodeWorkspacePath);
 
-  const workspacePathFromSettings = GlobalConfigurationStore.instance.config.get<string>('nxWorkspacePath');
+  const workspacePathFromSettings =
+    GlobalConfigurationStore.instance.config.get<string>('nxWorkspacePath');
   if (workspacePathFromSettings) {
-    currentDirectory = resolve(workspace.workspaceFolders?.[0].uri.fsPath || '', workspacePathFromSettings);
+    currentDirectory = resolve(
+      workspace.workspaceFolders?.[0].uri.fsPath || '',
+      workspacePathFromSettings
+    );
   } else {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
       'nxWorkspacePath',
