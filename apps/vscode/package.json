@@ -709,7 +709,7 @@
         },
         "nxConsole.nxWorkspacePath": {
           "type": "string",
-          "description": "Specifies the relative path to the root directory of the Nx workspace."
+          "description": "Specifies the path to the root directory of the Nx workspace."
         }
       }
     },
