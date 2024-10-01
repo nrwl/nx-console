@@ -1,8 +1,10 @@
 import type { PnpApi } from '@yarnpkg/pnp';
 import { join } from 'path';
 import { fileExists } from '@nx-console/shared/file-system';
+import { statSync } from 'fs';
 
 let PNP_API: PnpApi;
+let lastPnpFileTimestamp: number;
 
 async function getPnpFile(workspacePath: string) {
   const extensions = ['.cjs', '.js'];
@@ -24,12 +26,14 @@ async function pnpApi(workspacePath: string) {
   if (!pnpFile) {
     return;
   }
+  const currentPnpFileTimestamp = statSync(pnpFile)?.mtimeMs;
 
-  if (!PNP_API) {
+  if (!PNP_API || currentPnpFileTimestamp !== lastPnpFileTimestamp) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const pnp = require(pnpFile);
     pnp.setup();
     PNP_API = pnp;
+    lastPnpFileTimestamp = statSync(pnpFile)?.mtimeMs;
   }
 
   return PNP_API;
