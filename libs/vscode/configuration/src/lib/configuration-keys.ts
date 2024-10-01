@@ -12,6 +12,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'useNewGenerateUiPreview',
   'showProjectDetailsView',
   'showNodeVersionOnStartup',
+  'nxWorkspacePath'
 ] as const;
 
 export type GlobalConfig = {
@@ -28,6 +29,7 @@ export type GlobalConfig = {
   useNewGenerateUiPreview: boolean;
   showProjectDetailsView: boolean;
   showNodeVersionOnStartup: boolean;
+  nxWorkspacePath: string;
 };
 
 /**

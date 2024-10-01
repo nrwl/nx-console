@@ -706,6 +706,10 @@
           "scope": "application",
           "default": false,
           "description": "Show a notification with the current Node version on startup - useful for debugging nvm issues."
+        },
+        "nxConsole.nxWorkspacePath": {
+          "type": "string",
+          "description": "Specifies the relative path to the root directory of the Nx workspace."
         }
       }
     },
