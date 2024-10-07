@@ -1,31 +1,13 @@
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
-import type * as NxFileUtils from 'nx/src/utils/fileutils';
-import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
-import { findNxPackagePath } from './find-nx-package-path';
-import { importWorkspaceDependency } from './workspace-dependencies';
 import { parse } from 'dotenv';
+import { existsSync, readFileSync } from 'fs';
+import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
+import { join } from 'path';
+import { readJsonFile } from './read-json';
 
 export async function readNxJson(
   workspacePath: string
 ): Promise<NxJsonConfiguration> {
-  const importPath = await findNxPackagePath(
-    workspacePath,
-    join('src', 'utils', 'fileutils.js')
-  );
-  if (importPath) {
-    const fileUtils = await importWorkspaceDependency<typeof NxFileUtils>(
-      importPath
-    );
-    return fileUtils.readJsonFile(join(workspacePath, 'nx.json'), {
-      allowTrailingComma: true,
-      expectComments: true,
-    });
-  } else {
-    const filePath = join(workspacePath, 'nx.json');
-    const content = readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
-  }
+  return await readJsonFile<NxJsonConfiguration>('nx.json', workspacePath);
 }
 
 export async function canReadNxJson(workspacePath: string): Promise<boolean> {

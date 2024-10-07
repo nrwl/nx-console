@@ -24,7 +24,7 @@ import {
 } from './get-nx-workspace-package';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
-import { readNxJson } from '@nx-console/shared/npm';
+import { readJsonFile, readNxJson } from '@nx-console/shared/npm';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -75,9 +75,12 @@ export async function getNxWorkspaceConfig(
     try {
       await readNxJson(workspacePath);
     } catch (e) {
-      const newError = new Error(`Unable to read nx.json: ${e.message}`);
-      newError.stack = e.stack;
-      throw newError;
+      const canReadLerna = await canReadLernaJson(workspacePath);
+      if (!canReadLerna) {
+        const newError = new Error(`Unable to read nx.json: ${e.message}`);
+        newError.stack = e.stack;
+        throw newError;
+      }
     }
 
     let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
@@ -297,4 +300,13 @@ function createNxWorkspaceConfiguration(
 
 function isProjectGraphError(e: any): e is ProjectGraphError {
   return e.name === 'ProjectGraphError';
+}
+
+async function canReadLernaJson(workspacePath: string): Promise<boolean> {
+  try {
+    await readJsonFile('lerna.json', workspacePath);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
