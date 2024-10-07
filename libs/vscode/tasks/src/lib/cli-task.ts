@@ -46,7 +46,8 @@ export class CliTask extends Task {
           env: definition.env,
         },
         packageManagerCommands
-      )
+      ),
+      definition.problemMatchers
     );
 
     return task;

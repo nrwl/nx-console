@@ -17,11 +17,20 @@ export async function selectAffectedFlags(target: string): Promise<{
       };
     }
     default: {
+      let customOptions: string | undefined;
+      if (target === 'lint') {
+        customOptions = '--output-style=stream';
+      }
       return {
         command: 'affected',
-        flags: await selectFlags(`affected`, AFFECTED_OPTIONS, {
-          target,
-        }),
+        flags: await selectFlags(
+          `affected`,
+          AFFECTED_OPTIONS,
+          {
+            target,
+          },
+          customOptions
+        ),
       };
     }
   }

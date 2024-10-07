@@ -21,7 +21,12 @@ export async function selectRunManyFlags(
     ];
   }
 
-  return await selectFlags('run-many', options, { target });
+  let customOptions: string | undefined;
+  if (target === 'lint') {
+    customOptions = '--output-style=stream';
+  }
+
+  return await selectFlags('run-many', options, { target }, customOptions);
 }
 
 const RUN_MANY_OPTIONS: Option[] = [
