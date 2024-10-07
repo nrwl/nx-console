@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import { dirname, join, parse } from 'path';
+import { dirname, join, parse, relative, resolve } from 'path';
 import {
   Disposable,
   ExtensionContext,
@@ -94,6 +94,7 @@ export async function activate(c: ExtensionContext) {
     }
 
     context.subscriptions.push(manuallySelectWorkspaceDefinitionCommand);
+    await registerSettingsNxWorkspacePathWatcher();
 
     await enableTypeScriptPlugin(context);
     watchCodeLensConfigChange(context);
@@ -133,6 +134,16 @@ function manuallySelectWorkspaceDefinition() {
       .then((value) => {
         if (value && value[0]) {
           const selectedDirectory = value[0].fsPath;
+          const workspaceRoot =
+            workspace.workspaceFolders?.[0].uri.fsPath || '';
+          const selectedDirectoryRelativePath = relative(
+            workspaceRoot,
+            selectedDirectory
+          );
+          GlobalConfigurationStore.instance.set(
+            'nxWorkspacePath',
+            selectedDirectoryRelativePath
+          );
           setWorkspace(selectedDirectory);
         }
       });
@@ -148,13 +159,21 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
 
   const { root } = parse(vscodeWorkspacePath);
 
-  const workspacePath = WorkspaceConfigurationStore.instance.get(
-    'nxWorkspacePath',
-    ''
-  );
-
-  if (workspacePath) {
-    currentDirectory = workspacePath;
+  const workspacePathFromSettings =
+    GlobalConfigurationStore.instance.config.get<string>('nxWorkspacePath');
+  if (workspacePathFromSettings) {
+    currentDirectory = resolve(
+      workspace.workspaceFolders?.[0].uri.fsPath || '',
+      workspacePathFromSettings
+    );
+  } else {
+    const workspacePath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspacePath',
+      ''
+    );
+    if (workspacePath) {
+      currentDirectory = workspacePath;
+    }
   }
 
   while (currentDirectory !== root) {
@@ -304,4 +323,26 @@ async function registerWorkspaceFileWatcher(
       refreshWorkspaceWithBackoff(iteration + 1);
     }
   }
+}
+
+async function registerSettingsNxWorkspacePathWatcher() {
+  const settingsNxWorkspacePathWatcher = workspace.onDidChangeConfiguration(
+    async (event) => {
+      if (event.affectsConfiguration('nxConsole.nxWorkspacePath')) {
+        const newWorkspacePath =
+          GlobalConfigurationStore.instance.config.get<string>(
+            'nxWorkspacePath'
+          );
+        if (newWorkspacePath) {
+          const nxWorkspacePath = resolve(
+            workspace.workspaceFolders?.[0].uri.fsPath || '',
+            newWorkspacePath
+          );
+          await setWorkspace(nxWorkspacePath);
+        }
+      }
+    }
+  );
+
+  context.subscriptions.push(settingsNxWorkspacePathWatcher);
 }
