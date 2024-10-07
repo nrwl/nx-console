@@ -17,7 +17,13 @@ internal class NxlsDocumentationProvider : DocumentationProvider {
 
     override fun generateDoc(element: PsiElement?, originalElement: PsiElement?): String? {
         if (element == null) return null
-        if (!DocumentUtils.isNxFile(element.containingFile.name)) {
+        val isNxFile: Boolean =
+            try {
+                DocumentUtils.isNxFile(element.containingFile.name)
+            } catch (e: Throwable) {
+                false
+            }
+        if (!isNxFile) {
             return null
         }
 
@@ -54,12 +60,16 @@ internal class NxlsDocumentationProvider : DocumentationProvider {
         editor: Editor,
         file: PsiFile,
         contextElement: PsiElement?,
-        targetOffset: Int
+        targetOffset: Int,
     ): PsiElement? {
-        return if (DocumentUtils.isNxFile(file.name)) {
-            this.editor = editor
-            contextElement
-        } else {
+        return try {
+            if (DocumentUtils.isNxFile(file.name)) {
+                this.editor = editor
+                contextElement
+            } else {
+                null
+            }
+        } catch (e: Throwable) {
             null
         }
     }
