@@ -95,6 +95,12 @@ export class CliTaskProvider implements TaskProvider {
           cwd: definition.cwd,
         });
       } else {
+        if (
+          definition.command === 'run' &&
+          definition.positional?.endsWith(':lint')
+        ) {
+          definition.problemMatchers = ['$eslint-stylish'];
+        }
         task = await CliTask.create(definition);
       }
     } catch (e) {
