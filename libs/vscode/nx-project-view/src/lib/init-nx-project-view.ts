@@ -6,6 +6,7 @@ import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { AtomizerDecorationProvider } from './atomizer-decorations';
+import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 
 export function initNxProjectView(
   context: ExtensionContext
@@ -24,6 +25,8 @@ export function initNxProjectView(
   );
 
   AtomizerDecorationProvider.register(context);
+
+  listenToLoadingEventsAndShowBar();
 
   return nxProjectsTreeProvider;
 }
@@ -53,4 +56,8 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   }
   const target = viewItem.nxTarget;
   return revealNxProject(project, root, target);
+}
+
+function listenToLoadingEventsAndShowBar() {
+  getNxlsClient()?.showRefreshLoadingAtLocation({ viewId: 'nxProjects' });
 }

@@ -1,13 +1,20 @@
 import {
   NxChangeWorkspace,
   NxWorkspaceRefreshNotification,
+  NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
 } from '@nx-console/vscode/output-channels';
 import { join } from 'path';
-import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
+import {
+  Disposable,
+  EventEmitter,
+  ExtensionContext,
+  ProgressLocation,
+  window,
+} from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -64,9 +71,13 @@ class NxlsClient {
 
   private workspacePath: string | undefined;
   private client: LanguageClient | undefined;
-  private onNotificationDisposable: Disposable | undefined;
+  private onRefreshNotificationDisposable: Disposable | undefined;
+  private onRefreshStartedNotificationDisposable: Disposable | undefined;
 
   private refreshedEventEmitter = new EventEmitter<void>();
+  private refreshStartedEventEmitter = new EventEmitter<void>();
+
+  private disposables: Disposable[] = [];
 
   constructor(private extensionContext: ExtensionContext) {}
 
@@ -139,12 +150,21 @@ class NxlsClient {
 
     await this.client.start();
 
-    this.onNotificationDisposable = this.client.onNotification(
+    this.onRefreshNotificationDisposable = this.client.onNotification(
       NxWorkspaceRefreshNotification,
       () => {
         this.refreshedEventEmitter.fire();
       }
     );
+
+    this.onRefreshStartedNotificationDisposable = this.client.onNotification(
+      NxWorkspaceRefreshStartedNotification,
+      () => {
+        this.refreshStartedEventEmitter.fire();
+      }
+    );
+
+    this.showRefreshLoadingAtLocation(ProgressLocation.Window);
 
     this.state = 'running';
   }
@@ -159,7 +179,9 @@ class NxlsClient {
       return;
     }
     await this.client.stop(2000);
-    this.onNotificationDisposable?.dispose();
+    this.onRefreshNotificationDisposable?.dispose();
+    this.onRefreshStartedNotificationDisposable?.dispose();
+    this.disposables.forEach((d) => d.dispose());
     this.state = 'idle';
   }
 
@@ -177,5 +199,34 @@ class NxlsClient {
 
     await this.stop();
     await this.start(this.workspacePath);
+  }
+
+  public showRefreshLoadingAtLocation(
+    location:
+      | ProgressLocation
+      | {
+          viewId: string;
+        }
+  ) {
+    const disposable = this.refreshStartedEventEmitter.event(() => {
+      const refreshPromise = new Promise<void>((resolve) => {
+        const disposable = getNxlsClient()?.subscribeToRefresh(() => {
+          disposable?.dispose();
+          resolve();
+        });
+      });
+
+      window.withProgress(
+        {
+          location,
+          cancellable: false,
+          title: 'Refreshing Nx workspace',
+        },
+        async () => {
+          await refreshPromise;
+        }
+      );
+    });
+    this.disposables.push(disposable);
   }
 }
