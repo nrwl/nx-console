@@ -1,3 +1,16 @@
+# [18.29.0](https://github.com/nrwl/nx-console/compare/vscode-v18.28.1...vscode-v18.29.0) (2024-10-07)
+
+
+### Bug Fixes
+
+* **nxls:** repair support for repos with only lerna.json ([#2278](https://github.com/nrwl/nx-console/issues/2278)) ([7917879](https://github.com/nrwl/nx-console/commit/79178798d0578b349d133906113ff4a04585857a))
+
+
+### Features
+
+* **vscode:** add nxWorkspacePath configuration option ([#2274](https://github.com/nrwl/nx-console/issues/2274)) ([a69e8ed](https://github.com/nrwl/nx-console/commit/a69e8edd14b56812a1c29a277d5491700a0b4364))
+* **vscode:** show refresh loading state in project view & footer ([#2280](https://github.com/nrwl/nx-console/issues/2280)) ([35432ea](https://github.com/nrwl/nx-console/commit/35432eac005398d1b2d1beaea988dccb22dc7091))
+
 ## [18.28.1](https://github.com/nrwl/nx-console/compare/vscode-v18.28.0...vscode-v18.28.1) (2024-09-25)
 
 
