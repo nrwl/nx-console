@@ -1,3 +1,10 @@
+## <small>1.32.2 (2024-10-08)</small>
+
+### Bug Fixes
+
+* **intellij:** catch containingFile null error ([#2279](https://github.com/nrwl/nx-console/issues/2279)) ([9183cc4](https://github.com/nrwl/nx-console/commit/9183cc43620fa297022253c9aea63cdbd58de56f))
+* **nxls:** repair support for repos with only lerna.json ([#2278](https://github.com/nrwl/nx-console/issues/2278)) ([7917879](https://github.com/nrwl/nx-console/commit/79178798d0578b349d133906113ff4a04585857a))
+
 ## <small>1.32.1 (2024-09-25)</small>
 
 ### Bug Fixes
