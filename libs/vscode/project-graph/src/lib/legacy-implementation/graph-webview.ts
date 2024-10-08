@@ -14,7 +14,6 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
@@ -23,18 +22,20 @@ import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { waitFor } from 'xstate';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
 
   constructor() {
-    graphService.start();
-    graphService.onTransition(async (state) => {
+    let previousValue = graphService.getSnapshot().value;
+    graphService.subscribe(async (state) => {
       getOutputChannel().appendLine(`Graph - ${state.value}`);
 
-      if (!state.changed) {
+      if (state.value === previousValue) {
         return;
       }
+      previousValue = state.value;
 
       if (!this.panel) {
         return;
@@ -52,11 +53,8 @@ export class GraphWebView implements Disposable {
         const project = state.context.project;
         this.panel?.webview.postMessage(project);
       }
-
-      setTimeout(() => {
-        graphService.execute(state);
-      });
     });
+    graphService.start();
   }
 
   dispose() {
@@ -90,14 +88,14 @@ export class GraphWebView implements Disposable {
 
     this.panel.onDidDispose(() => {
       this.panel = undefined;
-      graphService.send('VIEW_DESTROYED');
+      graphService.send({ type: 'VIEW_DESTROYED' });
       commands.executeCommand('setContext', 'graphWebviewVisible', false);
     });
 
     this.panel.webview.onDidReceiveMessage(async (event) => {
       if (event.command === 'ready') {
         await waitFor(graphService, (state) => state.matches('content'));
-        graphService.send('VIEW_READY');
+        graphService.send({ type: 'VIEW_READY' });
       }
       if (event.command === 'refresh') {
         commands.executeCommand('nxConsole.refreshWorkspace');
@@ -139,7 +137,7 @@ export class GraphWebView implements Disposable {
       );
     });
 
-    graphService.send('GET_CONTENT');
+    graphService.send({ type: 'GET_CONTENT' });
   }
 
   async projectInWebview(
@@ -153,13 +151,14 @@ export class GraphWebView implements Disposable {
     }
 
     if (!projectName) {
-      graphService.send('NO_PROJECT');
+      graphService.send({ type: 'NO_PROJECT' });
       return;
     }
 
     this.panel?.reveal();
 
-    graphService.send('PROJECT_SELECTED', {
+    graphService.send({
+      type: 'PROJECT_SELECTED',
       data: {
         type,
         projectName,
@@ -177,10 +176,12 @@ export class GraphWebView implements Disposable {
 
     this.panel?.reveal();
 
-    graphService.send('PROJECT_SELECTED', {
+    graphService.send({
+      type: 'PROJECT_SELECTED',
       data: {
         type: MessageType.all,
         projectName: '',
+        taskName: undefined,
       },
     });
   }
@@ -194,7 +195,8 @@ export class GraphWebView implements Disposable {
 
     this.panel?.reveal();
 
-    graphService.send('PROJECT_SELECTED', {
+    graphService.send({
+      type: 'PROJECT_SELECTED',
       data: {
         type: MessageType.allTasks,
         taskName,
@@ -215,7 +217,7 @@ export class GraphWebView implements Disposable {
       workspace: { projects },
     } = nxWorkspace;
 
-    if (!projects || !projects.length) {
+    if (!projects || !Object.keys(projects).length) {
       showNoProjectsMessage();
       return;
     }
@@ -234,15 +236,17 @@ export class GraphWebView implements Disposable {
 
     this.panel?.reveal();
 
-    graphService.send('PROJECT_SELECTED', {
+    graphService.send({
+      type: 'PROJECT_SELECTED',
       data: {
         type: MessageType.affectedProjects,
         projectName: '',
+        taskName: undefined,
       },
     });
   }
 
   refresh() {
-    graphService.send('REFRESH');
+    graphService.send({ type: 'REFRESH' });
   }
 }
