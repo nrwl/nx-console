@@ -27,6 +27,10 @@ Use the `F5` key or the debug menu option `Launch Client + Server` to start the 
 
 > :warning: Even though builds will be generated automatically, the Extension Development Host needs to be restarted in order to apply a new set of changes.
 
+> :warning: Set `window.openFilesInNewWindow` to "off" to prevent VSCode to reopen a new window
+
+> :warning: Make a copy of this project-folder and open the copy in VSCode when debugging locally. This as otherwise VSCode will switch to the original VSCode window.
+
 ### IntelliJ
 
 The `runIde` gradle task takes care of building Nx Console and starting a development instance of IntelliJ. Run the `nx-console [runIde]` gradle config in your IDE or use `nx run intellij:runIde` (which executes `./gradlew :apps:intellij:runIde` under the hood).

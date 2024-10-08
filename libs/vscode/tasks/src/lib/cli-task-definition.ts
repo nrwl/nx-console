@@ -4,4 +4,5 @@ export interface CliTaskDefinition {
   flags: Array<string>;
   cwd?: string;
   env?: { [key: string]: string };
+  problemMatchers?: string | string[] | undefined;
 }

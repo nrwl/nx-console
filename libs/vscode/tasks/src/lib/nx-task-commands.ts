@@ -94,11 +94,19 @@ async function promptForAffectedFlags(target: string) {
   const { positional, command, flags } = await selectAffectedFlags(target);
 
   if (flags !== undefined) {
+    let problemMatchers: string[] | undefined;
+    if (target === 'lint') {
+      problemMatchers = ['$eslint-stylish'];
+    }
+
     const task = await NxTask.create({
       command,
       flags,
       positional,
     });
+    if (task && problemMatchers) {
+      task.problemMatchers = problemMatchers;
+    }
     if (!task) {
       logAndShowError(
         'Error while creating task. Please see the logs for more information.'
@@ -118,10 +126,18 @@ async function promptForRunMany() {
   const flags = await selectRunManyFlags(target);
 
   if (flags !== undefined) {
+    let problemMatchers: string[] | undefined;
+    if (target === 'lint') {
+      problemMatchers = ['$eslint-stylish'];
+    }
+
     const task = await NxTask.create({
       command: 'run-many',
       flags,
     });
+    if (task && problemMatchers) {
+      task.problemMatchers = problemMatchers;
+    }
     if (!task) {
       logAndShowError(
         'Error while creating task. Please see the logs for more information.'
