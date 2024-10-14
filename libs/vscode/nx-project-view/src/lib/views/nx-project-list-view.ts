@@ -2,7 +2,6 @@ import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import {
   BaseView,
   ProjectViewItem,
-  ProjectViewStrategy,
   TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
@@ -12,16 +11,7 @@ export type ListViewItem =
   | TargetViewItem
   | TargetGroupViewItem;
 
-export type ListViewStrategy = ProjectViewStrategy<ListViewItem>;
-
-export function createListViewStrategy(): ListViewStrategy {
-  const listView = new ListView();
-  return {
-    getChildren: listView.getChildren.bind(listView),
-  };
-}
-
-class ListView extends BaseView {
+export class ListView extends BaseView {
   async getChildren(element?: ListViewItem) {
     if (!element) {
       // should return root elements if no element was passed
@@ -37,7 +27,10 @@ class ListView extends BaseView {
   }
 
   private async createProjects() {
-    const projectDefs = await getNxWorkspaceProjects();
+    const projectDefs = this.workspaceData?.workspace.projects;
+    if (!projectDefs) {
+      return [];
+    }
     return Object.entries(projectDefs).map((project) =>
       this.createProjectViewItem(project)
     );

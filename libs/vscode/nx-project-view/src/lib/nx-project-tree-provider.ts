@@ -1,31 +1,23 @@
+import { NxWorkspace } from '@nx-console/shared/types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import {
+  getNxWorkspace,
+  getProjectFolderTree,
+} from '@nx-console/vscode/nx-workspace';
 import {
   CliTaskProvider,
   selectRunInformationAndRun,
 } from '@nx-console/vscode/tasks';
-import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import { commands, env, ExtensionContext, ProviderResult } from 'vscode';
-import { NxTreeItem } from './nx-tree-item';
-import {
-  AutomaticViewItem,
-  AutomaticViewStrategy,
-  createAutomaticViewStrategy,
-} from './views/nx-project-automatic-view';
-import {
-  ListViewItem,
-  ListViewStrategy,
-  createListViewStrategy,
-} from './views/nx-project-list-view';
-import {
-  createTreeViewStrategy,
-  TreeViewItem,
-  TreeViewStrategy,
-} from './views/nx-project-tree-view';
-import { TargetViewItem } from './views/nx-project-base-view';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+import { commands, env, ExtensionContext } from 'vscode';
+import { NxTreeItem } from './nx-tree-item';
+import { TargetViewItem } from './views/nx-project-base-view';
+import { ListView, ListViewItem } from './views/nx-project-list-view';
+import { TreeView, TreeViewItem } from './views/nx-project-tree-view';
 
-export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
+export type ViewItem = ListViewItem | TreeViewItem;
 
 interface NxOptionalFlags {
   skipNxCache: boolean;
@@ -35,9 +27,10 @@ interface NxOptionalFlags {
  * Provides data for the "Projects" tree view
  */
 export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
-  private readonly listView: ListViewStrategy;
-  private readonly treeView: TreeViewStrategy;
-  private readonly automaticView: AutomaticViewStrategy;
+  private readonly listView: ListView = new ListView();
+  private readonly treeView: TreeView = new TreeView();
+
+  private workspaceData: NxWorkspace | undefined = undefined;
 
   constructor(context: ExtensionContext) {
     super();
@@ -56,10 +49,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       );
     });
 
-    this.listView = createListViewStrategy();
-    this.treeView = createTreeViewStrategy();
-    this.automaticView = createAutomaticViewStrategy();
-
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
       this.refresh()
     );
@@ -72,21 +61,56 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     return null;
   }
 
-  getChildren(element?: NxTreeItem): ProviderResult<NxTreeItem[]> {
-    return this.getViewChildren(element?.item).then((items) => {
-      if (!items) return [];
-      return items.map((item) => new NxTreeItem(item));
-    });
+  async getChildren(element?: NxTreeItem): Promise<NxTreeItem[] | undefined> {
+    if (!element) {
+      this.workspaceData = await getNxWorkspace();
+      this.treeView.workspaceData = this.workspaceData;
+      this.listView.workspaceData = this.workspaceData;
+    }
+
+    let items: (TreeViewItem | ListViewItem)[] | undefined;
+
+    if (this.shouldUseTreeView()) {
+      if (!element) {
+        const projectFolderTree = await getProjectFolderTree();
+        if (!projectFolderTree) {
+          return;
+        }
+        const { treeMap, roots } = projectFolderTree;
+        this.treeView.treeMap = treeMap;
+        this.treeView.roots = roots;
+      }
+      items = await this.treeView.getChildren(element?.item as TreeViewItem);
+    } else {
+      items = await this.listView.getChildren(element?.item as ListViewItem);
+    }
+    if (!items) return;
+    return items.map((item) => new NxTreeItem(item));
   }
 
-  private async getViewChildren(viewItem?: ViewItem) {
-    if (this.isListViewElement(viewItem)) {
-      return this.listView.getChildren(viewItem);
+  // private async getViewChildren(viewItem?: ViewItem) {
+  //   if (this.isListViewElement(viewItem)) {
+  //     return this.listView.getChildren(viewItem);
+  //   }
+  //   if (this.isTreeViewElement(viewItem)) {
+  //     return this.treeView.getChildren(viewItem);
+  //   }
+  //   return this.automaticView.getChildren(viewItem);
+  // }
+
+  private shouldUseTreeView() {
+    const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
+
+    if (config === 'tree') {
+      return true;
     }
-    if (this.isTreeViewElement(viewItem)) {
-      return this.treeView.getChildren(viewItem);
+    if (config === 'list') {
+      return false;
     }
-    return this.automaticView.getChildren(viewItem);
+    if (!this.workspaceData) {
+      return true;
+    }
+    return Object.keys(this.workspaceData.workspace.projects).length > 10;
   }
 
   private isListViewElement(_?: ViewItem): _ is ListViewItem {

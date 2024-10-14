@@ -1,16 +1,12 @@
+import { NxWorkspace } from '@nx-console/shared/types';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { join } from 'node:path';
 import type {
   ProjectConfiguration,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
-import { join } from 'node:path';
 import { TreeItemCollapsibleState } from 'vscode';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
-
-export interface ProjectViewStrategy<T> {
-  getChildren(element?: T): Promise<T[] | undefined>;
-}
 
 interface BaseViewItem<Context extends string> {
   id: string;
@@ -52,6 +48,8 @@ export interface NxTarget {
 }
 
 export abstract class BaseView {
+  workspaceData: NxWorkspace | undefined = undefined;
+
   createProjectViewItem(
     [projectName, { root, name, targets }]: [
       projectName: string,
@@ -87,7 +85,8 @@ export abstract class BaseView {
   ): Promise<(TargetViewItem | TargetGroupViewItem)[] | undefined> {
     const { nxProject } = parent;
 
-    const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
+    const projectDef =
+      this.workspaceData?.workspace.projects?.[nxProject.project];
     if (!projectDef) {
       return;
     }
@@ -138,6 +137,7 @@ export abstract class BaseView {
   ): TargetViewItem {
     const hasChildren =
       configurations && Object.keys(configurations).length > 0;
+
     return {
       id: `${nxProject.project}:${targetName}`,
       contextValue: 'target',
@@ -172,7 +172,9 @@ export abstract class BaseView {
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject, nxTarget } = parent;
 
-    const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
+    const projectDef =
+      this.workspaceData?.workspace.projects?.[nxProject.project];
+
     if (!projectDef) {
       return;
     }
@@ -207,7 +209,9 @@ export abstract class BaseView {
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject } = parent;
 
-    const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
+    const projectDef =
+      this.workspaceData?.workspace.projects?.[nxProject.project];
+
     if (!projectDef) {
       return;
     }
