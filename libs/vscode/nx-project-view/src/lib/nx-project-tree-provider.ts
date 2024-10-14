@@ -88,16 +88,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     return items.map((item) => new NxTreeItem(item));
   }
 
-  // private async getViewChildren(viewItem?: ViewItem) {
-  //   if (this.isListViewElement(viewItem)) {
-  //     return this.listView.getChildren(viewItem);
-  //   }
-  //   if (this.isTreeViewElement(viewItem)) {
-  //     return this.treeView.getChildren(viewItem);
-  //   }
-  //   return this.automaticView.getChildren(viewItem);
-  // }
-
   private shouldUseTreeView() {
     const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
 
@@ -111,16 +101,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       return true;
     }
     return Object.keys(this.workspaceData.workspace.projects).length > 10;
-  }
-
-  private isListViewElement(_?: ViewItem): _ is ListViewItem {
-    const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
-    return config === 'list' || config === null;
-  }
-
-  private isTreeViewElement(_?: ViewItem): _ is TreeViewItem {
-    const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
-    return config === 'tree';
   }
 
   private async runTask(
