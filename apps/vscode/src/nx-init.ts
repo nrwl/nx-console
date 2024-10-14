@@ -11,27 +11,36 @@ import {
 
 export function initNxInit(context: ExtensionContext) {
   context.subscriptions.push(
-    commands.registerCommand('nx.init', async () => {
-      getTelemetry().logUsage('cli.init');
-      const workspacePath =
-        workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-      const command = 'nx@latest init';
-      const task = new Task(
-        { type: 'nx' }, // definition
-        TaskScope.Workspace, // scope
-        command, // name
-        'nx',
-        // execution
-        new ShellExecution(`npx ${command}`, {
-          cwd: workspacePath,
-          env: {
-            NX_CONSOLE: 'true',
-          },
-        })
-      );
-      task.presentationOptions.focus = true;
+    commands.registerCommand(
+      'nx.init',
+      async (triggeredFromAngularMigrate?: boolean) => {
+        getTelemetry().logUsage('cli.init', {
+          source:
+            triggeredFromAngularMigrate === true
+              ? 'migrate-angular-prompt'
+              : undefined,
+        });
+        const workspacePath =
+          workspace.workspaceFolders &&
+          workspace.workspaceFolders[0].uri.fsPath;
+        const command = 'nx@latest init';
+        const task = new Task(
+          { type: 'nx' }, // definition
+          TaskScope.Workspace, // scope
+          command, // name
+          'nx',
+          // execution
+          new ShellExecution(`npx ${command}`, {
+            cwd: workspacePath,
+            env: {
+              NX_CONSOLE: 'true',
+            },
+          })
+        );
+        task.presentationOptions.focus = true;
 
-      tasks.executeTask(task);
-    })
+        tasks.executeTask(task);
+      }
+    )
   );
 }
