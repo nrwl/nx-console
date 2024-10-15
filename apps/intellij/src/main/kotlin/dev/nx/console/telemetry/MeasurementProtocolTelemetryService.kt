@@ -5,8 +5,8 @@ import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.PermanentInstallationID
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.SystemInfo
-import com.intellij.util.application
 import dev.nx.console.settings.NxConsoleSettingsProvider
+import dev.nx.console.utils.isDevelopmentInstance
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -18,6 +18,7 @@ val SESSION_ID = UUID.randomUUID().toString()
 private val logger = logger<MeasurementProtocolService>()
 
 class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
+    private val isDevelopmentInstance = isDevelopmentInstance()
 
     override suspend fun featureUsed(feature: String, data: Map<String, Any>?) {
         val payload = this.buildPayload(feature, data)
@@ -68,7 +69,7 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                     put(
                         "value",
                         PluginManager.getPluginByClass(TelemetryService::class.java)?.version
-                            ?: "0.0.0"
+                            ?: "0.0.0",
                     )
                 }
             }
@@ -78,7 +79,7 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                     putJsonObject("params") {
                         put("engagement_time_msec", "1")
                         put("session_id", SESSION_ID)
-                        put("debug_mode", if (application.isInternal) 1 else null)
+                        put("debug_mode", if (isDevelopmentInstance) 1 else null)
 
                         put("action_type", eventName)
 

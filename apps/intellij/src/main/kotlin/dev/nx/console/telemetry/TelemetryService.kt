@@ -3,7 +3,7 @@ package dev.nx.console.telemetry
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
-import com.intellij.util.application
+import dev.nx.console.utils.isDevelopmentInstance
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
@@ -16,6 +16,7 @@ interface Telemetry {
 
 @Service(Service.Level.PROJECT)
 class TelemetryService(private val cs: CoroutineScope) {
+    private val isDevelopmentInstance = isDevelopmentInstance()
     val logger = logger<TelemetryService>()
 
     companion object {
@@ -24,7 +25,7 @@ class TelemetryService(private val cs: CoroutineScope) {
     }
 
     private val service: Telemetry =
-        if (application.isInternal) {
+        if (isDevelopmentInstance) {
             LoggerTelemetryService()
         } else {
             MeasurementProtocolService(
@@ -48,7 +49,7 @@ class TelemetryService(private val cs: CoroutineScope) {
             source != null &&
                 source is String &&
                 TelemetryEventSource.isValidSource(source) &&
-                application.isInternal
+                isDevelopmentInstance
         ) {
             logger.error("source has to be of type TelemetryEventSource")
             return
