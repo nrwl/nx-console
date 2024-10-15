@@ -47,7 +47,7 @@
       "inputs": ["default", "^production"],
       "cache": true,
       "parallelism": false,
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "setup-lit-dir"]
     },
     "e2e-local": {
       "cache": true,
@@ -92,9 +92,6 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
-    },
-    "e2e-ci--**/*": {
-      "dependsOn": ["setup-lit-dir"]
     }
   },
   "namedInputs": {
