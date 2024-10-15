@@ -1,4 +1,5 @@
 import { NxWorkspace } from '@nx-console/shared/types';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';
@@ -85,8 +86,7 @@ export abstract class BaseView {
   ): Promise<(TargetViewItem | TargetGroupViewItem)[] | undefined> {
     const { nxProject } = parent;
 
-    const projectDef =
-      this.workspaceData?.workspace.projects?.[nxProject.project];
+    const projectDef = (await this.getProjectData())?.[nxProject.project];
     if (!projectDef) {
       return;
     }
@@ -172,8 +172,7 @@ export abstract class BaseView {
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject, nxTarget } = parent;
 
-    const projectDef =
-      this.workspaceData?.workspace.projects?.[nxProject.project];
+    const projectDef = (await this.getProjectData())?.[nxProject.project];
 
     if (!projectDef) {
       return;
@@ -209,8 +208,7 @@ export abstract class BaseView {
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject } = parent;
 
-    const projectDef =
-      this.workspaceData?.workspace.projects?.[nxProject.project];
+    const projectDef = (await this.getProjectData())?.[nxProject.project];
 
     if (!projectDef) {
       return;
@@ -229,5 +227,13 @@ export abstract class BaseView {
           targets[target.name],
         ])
       );
+  }
+
+  protected async getProjectData() {
+    if (this.workspaceData?.workspace.projects) {
+      return this.workspaceData.workspace.projects;
+    } else {
+      return await getNxWorkspaceProjects();
+    }
   }
 }

@@ -27,7 +27,7 @@ export class ListView extends BaseView {
   }
 
   private async createProjects() {
-    const projectDefs = this.workspaceData?.workspace.projects;
+    const projectDefs = await this.getProjectData();
     if (!projectDefs) {
       return [];
     }
