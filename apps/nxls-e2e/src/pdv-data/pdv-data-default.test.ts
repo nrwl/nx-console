@@ -9,6 +9,7 @@ import { NxlsWrapper } from '../nxls-wrapper';
 import {
   defaultVersion,
   e2eCwd,
+  modifyJsonFile,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
@@ -58,6 +59,34 @@ describe('pdv data', () => {
     expect(pdvDataParsed.project.name).toEqual(workspaceName);
     expect(Object.keys(pdvDataParsed.sourceMap ?? {}).length).toBeGreaterThan(
       0
+    );
+  });
+
+  it('should contain disabledTaskSyncGenerators if set in nx.json', async () => {
+    await waitFor(1000);
+
+    const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
+    modifyJsonFile(nxJsonPath, (json) => {
+      json.sync ??= {};
+      json.sync.disabledTaskSyncGenerators = ['@nx/foo:bar'];
+      return json;
+    });
+
+    await nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
+
+    const pdvData = (
+      await nxlsWrapper.sendRequest({
+        ...NxPDVDataRequest,
+        params: {
+          filePath: join(e2eCwd, workspaceName, 'project.json'),
+        },
+      })
+    ).result as PDVData;
+
+    expect(pdvData.pdvDataSerialized).toContain(
+      '"disabledTaskSyncGenerators":["@nx/foo:bar"]'
     );
   });
 
