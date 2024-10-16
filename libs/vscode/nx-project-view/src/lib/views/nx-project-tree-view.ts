@@ -1,54 +1,39 @@
 import { TreeMap, TreeNode } from '@nx-console/shared/types';
-import { getProjectFolderTree } from '@nx-console/vscode/nx-workspace';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { join, parse } from 'path';
+import { TreeItemCollapsibleState } from 'vscode';
 import {
   BaseView,
   FolderViewItem,
   ProjectViewItem,
-  ProjectViewStrategy,
   TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
-import { TreeItemCollapsibleState } from 'vscode';
 
 export type TreeViewItem =
   | FolderViewItem
   | ProjectViewItem
   | TargetViewItem
   | TargetGroupViewItem;
-export type TreeViewStrategy = ProjectViewStrategy<TreeViewItem>;
 
 export type ProjectInfo = {
   dir: string;
   configuration: ProjectConfiguration;
 };
 
-export function createTreeViewStrategy(): TreeViewStrategy {
-  const listView = new TreeView();
-  return {
-    getChildren: listView.getChildren.bind(listView),
-  };
-}
-
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- dealing with maps is hard */
-class TreeView extends BaseView {
+export class TreeView extends BaseView {
   treeMap: TreeMap;
+  roots: TreeNode[];
 
   async getChildren(
     element?: TreeViewItem
   ): Promise<TreeViewItem[] | undefined> {
     if (!element) {
-      const projectFolderTree = await getProjectFolderTree();
-      if (!projectFolderTree) {
-        return;
-      }
-      const { treeMap, roots } = projectFolderTree;
-      this.treeMap = treeMap;
       // if there's only a single root, start with it expanded
-      const isSingleProject = roots.length === 1;
-      return roots
+      const isSingleProject = this.roots.length === 1;
+      return this.roots
         .sort((a, b) => {
           // the VSCode tree view looks chaotic when folders and projects are on the same level
           // so we sort the nodes to have folders first and projects after
