@@ -1,3 +1,10 @@
+## <small>1.32.3 (2024-10-17)</small>
+
+### Bug Fixes
+
+* **intellij:** use configPath to determine runIde vs production mode ([#2286](https://github.com/nrwl/nx-console/issues/2286)) ([27d0239](https://github.com/nrwl/nx-console/commit/27d02390cabe9240f7cc10e7f8bc3fd90a9a3237))
+* **nxls:** pass disabledTaskSyncGenerators when getting pdv data ([#2287](https://github.com/nrwl/nx-console/issues/2287)) ([36da921](https://github.com/nrwl/nx-console/commit/36da921bcecd930adff54f2647f418fcffd8b154))
+
 ## <small>1.32.2 (2024-10-08)</small>
 
 ### Bug Fixes
