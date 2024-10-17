@@ -3,6 +3,7 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
+import { killProcessTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -23,6 +24,7 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
+
 
 let client: NxlsClient | undefined;
 
@@ -178,7 +180,14 @@ class NxlsClient {
       this.state = 'idle';
       return;
     }
-    await this.client.stop(2000);
+    try {
+      await this.client.stop(2000);
+    } catch(e) {
+     const nxlsPid = this.getNxlsPid()
+     if(nxlsPid) {
+      killProcessTree(nxlsPid)
+     }
+    }
     this.onRefreshNotificationDisposable?.dispose();
     this.onRefreshStartedNotificationDisposable?.dispose();
     this.disposables.forEach((d) => d.dispose());
@@ -228,5 +237,9 @@ class NxlsClient {
       );
     });
     this.disposables.push(disposable);
+  }
+
+  public getNxlsPid(): number | undefined {
+    return this.client?.initializeResult?.['pid']
   }
 }

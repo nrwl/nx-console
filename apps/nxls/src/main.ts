@@ -10,6 +10,7 @@ import { getDocumentLinks } from '@nx-console/language-server/capabilities/docum
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
   NxChangeWorkspace,
+  NxCloudOnboardingInfoRequest,
   NxCloudStatusRequest,
   NxCreateProjectGraphRequest,
   NxGeneratorContextFromPathRequest,
@@ -35,7 +36,6 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
   NxWorkspaceRequest,
-  NxCloudOnboardingInfoRequest,
   NxWorkspaceSerializedRequest,
 } from '@nx-console/language-server/types';
 import {
@@ -79,9 +79,8 @@ import {
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { formatError } from '@nx-console/shared/utils';
+import { formatError, killProcessTree } from '@nx-console/shared/utils';
 import { dirname, relative } from 'node:path';
-import treeKill from 'tree-kill';
 import {
   ClientCapabilities,
   CompletionList,
@@ -111,7 +110,6 @@ process.on('uncaughtException', (e) => {
 });
 
 let WORKING_PATH: string | undefined = undefined;
-let PID: number | null = null;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
@@ -138,8 +136,6 @@ documents.listen(connection);
 connection.onInitialize(async (params) => {
   setLspLogger(connection);
   lspLogger.log('Initializing Nx Language Server');
-
-  PID = params.processId;
 
   const { workspacePath } = params.initializationOptions ?? {};
   try {
@@ -210,6 +206,7 @@ connection.onInitialize(async (params) => {
         },
       },
     },
+    pid: process.pid
   };
 
   return result;
@@ -372,7 +369,8 @@ connection.onShutdown(async () => {
 
 connection.onExit(() => {
   connection.dispose();
-  treeKill(process.pid, 'SIGTERM');
+  killProcessTree(process.pid)
+
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {
