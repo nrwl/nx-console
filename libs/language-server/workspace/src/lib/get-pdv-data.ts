@@ -1,18 +1,17 @@
-import { workspaceDependencyPath } from '@nx-console/shared/npm';
-import { nxWorkspace } from './workspace';
-import { getProjectByPath } from './get-project-by-path';
-import { getNxVersion } from './get-nx-version';
+import { directoryExists } from '@nx-console/shared/file-system';
+import { readNxJson, workspaceDependencyPath } from '@nx-console/shared/npm';
+import { PDVData } from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
   ProjectGraphProjectNode,
 } from 'nx/src/devkit-exports';
-import { PDVData } from '@nx-console/shared/types';
 import { join, relative } from 'path';
-import { directoryExists } from '@nx-console/shared/file-system';
-import { getSourceMapFilesToProjectsMap } from './get-source-map';
-import { lspLogger } from '@nx-console/language-server/utils';
-import { getNxCloudStatus } from './get-nx-cloud-status';
 import { gte } from 'semver';
+import { getNxCloudStatus } from './get-nx-cloud-status';
+import { getNxVersion } from './get-nx-version';
+import { getProjectByPath } from './get-project-by-path';
+import { getSourceMapFilesToProjectsMap } from './get-source-map';
+import { nxWorkspace } from './workspace';
 
 export async function getPDVData(
   workspacePath: string,
@@ -70,6 +69,9 @@ export async function getPDVData(
   const projectRootsForConfigFile = sourceMapsFilesToProjectsMap[relativePath];
 
   const nxCloudStatus = await getNxCloudStatus(workspacePath);
+  const disabledTaskSyncGenerators = await getDisabledTaskSyncGenerators(
+    workspacePath
+  );
 
   if (!projectRootsForConfigFile || projectRootsForConfigFile.length <= 1) {
     const project = await getProjectByPath(filePath, workspacePath);
@@ -95,6 +97,7 @@ export async function getPDVData(
         sourceMap: workspace.workspace.sourceMaps?.[project.root],
         errors: workspace.errors,
         connectedToCloud: nxCloudStatus.isConnected,
+        disabledTaskSyncGenerators,
       }),
       pdvDataSerializedMulti: undefined,
       errorsSerialized: undefined,
@@ -118,6 +121,7 @@ export async function getPDVData(
         sourceMap: workspace.workspace.sourceMaps?.[project.data.root],
         errors: workspace.errors,
         connectedToCloud: nxCloudStatus.isConnected,
+        disabledTaskSyncGenerators,
       });
     }
 
@@ -169,4 +173,15 @@ function isCompleteProjectConfiguration(
   project: ProjectConfiguration | undefined
 ): project is ProjectConfiguration & { name: string } {
   return !!project && !!project.name;
+}
+
+async function getDisabledTaskSyncGenerators(
+  workspacePath: string
+): Promise<string[] | undefined> {
+  try {
+    const nxJson = await readNxJson(workspacePath);
+    return nxJson.sync?.disabledTaskSyncGenerators;
+  } catch (e) {
+    return undefined;
+  }
 }
