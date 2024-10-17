@@ -11,7 +11,11 @@ import {
   workspace,
 } from 'vscode';
 
-import { checkIsNxWorkspace, killProcessTree } from '@nx-console/shared/utils';
+import {
+  checkIsNxWorkspace,
+  killProcessTree,
+  withTimeout,
+} from '@nx-console/shared/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -45,6 +49,7 @@ import {
 import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
+import { stopDaemon } from '@nx-console/vscode/nx-workspace';
 import {
   getOutputChannel,
   initOutputChannels,
@@ -113,12 +118,21 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
+  getTelemetry().logUsage('extension-deactivate');
+
   const nxlsPid = getNxlsClient()?.getNxlsPid();
   if (nxlsPid) {
     killProcessTree(nxlsPid);
   }
+
   workspaceFileWatcher?.dispose();
-  getTelemetry().logUsage('extension-deactivate');
+
+  try {
+    await withTimeout(async () => await stopDaemon(), 2000);
+  } catch (e) {
+    // do nothing, we have to deactivate before the process is killed
+  }
+
   killProcessTree(process.pid);
 }
 

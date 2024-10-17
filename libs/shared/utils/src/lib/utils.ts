@@ -1,6 +1,6 @@
 import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { execSync } from 'child_process';
-import treeKill = require('tree-kill');
+import * as treeKill from 'tree-kill';
 
 export function getPrimitiveValue(value: any): string | undefined {
   if (
