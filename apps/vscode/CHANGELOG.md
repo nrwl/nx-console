@@ -1,3 +1,11 @@
+## [18.29.1](https://github.com/nrwl/nx-console/compare/vscode-v18.29.0...vscode-v18.29.1) (2024-10-17)
+
+
+### Bug Fixes
+
+* **nxls:** pass disabledTaskSyncGenerators when getting pdv data ([#2287](https://github.com/nrwl/nx-console/issues/2287)) ([36da921](https://github.com/nrwl/nx-console/commit/36da921bcecd930adff54f2647f418fcffd8b154))
+* **vscode:** repair nx init from the angular cli screen ([#2284](https://github.com/nrwl/nx-console/issues/2284)) ([75ad581](https://github.com/nrwl/nx-console/commit/75ad58150685389644c5e9deddbdaee6641ac3a1))
+
 # [18.29.0](https://github.com/nrwl/nx-console/compare/vscode-v18.28.1...vscode-v18.29.0) (2024-10-07)
 
 
