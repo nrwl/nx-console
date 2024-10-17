@@ -20,6 +20,7 @@
     },
     "setup-lit-dir": {
       "command": "node ./setup-lit-dir.mjs",
+      "cache": true,
       "options": {
         "cwd": "apps/generate-ui-v2-e2e"
       },
