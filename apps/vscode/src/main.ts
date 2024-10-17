@@ -113,14 +113,13 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
-  const nxlsPid = getNxlsClient()?.getNxlsPid()
-  if(nxlsPid) {
-    killProcessTree(nxlsPid)
-  } 
+  const nxlsPid = getNxlsClient()?.getNxlsPid();
+  if (nxlsPid) {
+    killProcessTree(nxlsPid);
+  }
   workspaceFileWatcher?.dispose();
   getTelemetry().logUsage('extension-deactivate');
-  killProcessTree(process.pid)
-  
+  killProcessTree(process.pid);
 }
 
 // -----------------------------------------------------------------------------

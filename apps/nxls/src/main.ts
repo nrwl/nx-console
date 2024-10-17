@@ -206,7 +206,7 @@ connection.onInitialize(async (params) => {
         },
       },
     },
-    pid: process.pid
+    pid: process.pid,
   };
 
   return result;
@@ -369,8 +369,7 @@ connection.onShutdown(async () => {
 
 connection.onExit(() => {
   connection.dispose();
-  killProcessTree(process.pid)
-
+  killProcessTree(process.pid);
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {

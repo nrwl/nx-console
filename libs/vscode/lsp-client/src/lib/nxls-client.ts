@@ -25,7 +25,6 @@ import {
   TransportKind,
 } from 'vscode-languageclient/node';
 
-
 let client: NxlsClient | undefined;
 
 export function createNxlsClient(context: ExtensionContext) {
@@ -182,11 +181,11 @@ class NxlsClient {
     }
     try {
       await this.client.stop(2000);
-    } catch(e) {
-     const nxlsPid = this.getNxlsPid()
-     if(nxlsPid) {
-      killProcessTree(nxlsPid)
-     }
+    } catch (e) {
+      const nxlsPid = this.getNxlsPid();
+      if (nxlsPid) {
+        killProcessTree(nxlsPid);
+      }
     }
     this.onRefreshNotificationDisposable?.dispose();
     this.onRefreshStartedNotificationDisposable?.dispose();
@@ -240,6 +239,6 @@ class NxlsClient {
   }
 
   public getNxlsPid(): number | undefined {
-    return this.client?.initializeResult?.['pid']
+    return this.client?.initializeResult?.['pid'];
   }
 }

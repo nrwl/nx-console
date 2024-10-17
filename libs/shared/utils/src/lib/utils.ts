@@ -84,10 +84,11 @@ export function withTimeout<T>(asyncFn: () => Promise<T>, timeoutMs: number) {
 }
 
 export function killProcessTree(pid: number) {
-  if(process.platform !== 'win32') {
+  if (process.platform !== 'win32') {
     treeKill(pid, 'SIGTERM');
   } else {
     execSync('taskkill /pid ' + pid + ' /T /F', {
       windowsHide: true,
-  })
-}}
+    });
+  }
+}
