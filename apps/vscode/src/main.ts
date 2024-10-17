@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { appendFileSync, existsSync } from 'fs';
 import { dirname, join, parse, relative, resolve } from 'path';
 import {
   Disposable,
@@ -49,7 +49,6 @@ import {
 import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
-import { stopDaemon } from '@nx-console/vscode/nx-workspace';
 import {
   getOutputChannel,
   initOutputChannels,
@@ -58,6 +57,7 @@ import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { getTelemetry, initTelemetry } from '@nx-console/vscode/telemetry';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import { RequestType, ShutdownRequest } from 'vscode-languageserver';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -120,17 +120,25 @@ export async function activate(c: ExtensionContext) {
 export async function deactivate() {
   getTelemetry().logUsage('extension-deactivate');
 
-  const nxlsPid = getNxlsClient()?.getNxlsPid();
-  if (nxlsPid) {
-    killProcessTree(nxlsPid);
+  try {
+    await withTimeout(
+      async () =>
+        await getNxlsClient()?.sendRequest(
+          new RequestType('shutdown'),
+          undefined
+        ),
+
+      2000
+    );
+  } catch (e) {
+    // do nothing, we have to deactivate before the process is killed
   }
 
   workspaceFileWatcher?.dispose();
 
-  try {
-    await withTimeout(async () => await stopDaemon(), 2000);
-  } catch (e) {
-    // do nothing, we have to deactivate before the process is killed
+  const nxlsPid = getNxlsClient()?.getNxlsPid();
+  if (nxlsPid) {
+    killProcessTree(nxlsPid, 'SIGINT');
   }
 
   killProcessTree(process.pid);
