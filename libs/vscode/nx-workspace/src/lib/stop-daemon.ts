@@ -1,6 +1,5 @@
 import { importNxPackagePath } from '@nx-console/shared/npm';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
-import { appendFileSync } from 'fs';
 
 export async function stopDaemon() {
   const workspacePath = getWorkspacePath();

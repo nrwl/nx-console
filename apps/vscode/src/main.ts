@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { dirname, join, parse, relative, resolve } from 'path';
 import {
   Disposable,
@@ -55,9 +55,9 @@ import {
 } from '@nx-console/vscode/output-channels';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { getTelemetry, initTelemetry } from '@nx-console/vscode/telemetry';
+import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
-import { RequestType, ShutdownRequest } from 'vscode-languageserver';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -118,8 +118,6 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
-  getTelemetry().logUsage('extension-deactivate');
-
   try {
     await withTimeout(
       async () =>
@@ -140,6 +138,8 @@ export async function deactivate() {
   if (nxlsPid) {
     killProcessTree(nxlsPid, 'SIGINT');
   }
+
+  getTelemetry().logUsage('extension-deactivate');
 
   killProcessTree(process.pid);
 }
