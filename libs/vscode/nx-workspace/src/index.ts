@@ -1,4 +1,3 @@
-export * from './lib/stop-daemon';
 export * from './lib/get-nx-workspace';
 export * from './lib/get-nx-workspace-path';
 export * from './lib/get-project-by-path';
