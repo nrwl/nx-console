@@ -1,0 +1,9 @@
+error stopping daemon Error: Function timed out after 2000 milliseconds 
+killing exthost 75776 
+killing nxls 76599 
+killing exthost 76279 
+killing nxls 76833 
+killing exthost 76763 
+killing nxls 77525 
+killing exthost 77454 
+killing exthost 87821 
