@@ -4,14 +4,14 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 
 export const defaultVersion =
-  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '19.8.0-canary.20240917-5b34ea5';
+  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '20.0.3';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
   'nxls-e2e'
 );
 export type NewWorkspaceOptions = {
-  preset: string;
+  preset?: string;
   bundler?: string;
   e2eTestRunner?: string;
   style?: string;

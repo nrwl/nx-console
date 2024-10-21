@@ -5,7 +5,10 @@ import {
   isStringNode,
   lspLogger,
 } from '@nx-console/language-server/utils';
-import { nxWorkspace } from '@nx-console/language-server/workspace';
+import {
+  getNxVersion,
+  nxWorkspace,
+} from '@nx-console/language-server/workspace';
 import { join } from 'path';
 import {
   ASTNode,
@@ -19,6 +22,8 @@ import {
   importWorkspaceDependency,
   workspaceDependencyPath,
 } from '@nx-console/shared/npm';
+import { gte } from 'semver';
+import type { ProjectGraph, Target } from 'nx/src/devkit-exports';
 
 const tempDocumentCounter = new Map<string, number>();
 
@@ -29,6 +34,8 @@ export async function targetLink(
   if (!isStringNode(node)) {
     return;
   }
+
+  const { workspace } = await nxWorkspace(workingPath, lspLogger);
 
   const targetString = node.value;
   let project, target, configuration;
@@ -41,19 +48,38 @@ export async function targetLink(
       throw 'local @nx/devkit dependency not found';
     }
 
+    const nxVersion = await getNxVersion(workingPath);
+
     const importPath = join(devkitPath, 'src/executors/parse-target-string');
     const { parseTargetString } = await importWorkspaceDependency<
       typeof import('@nx/devkit/src/executors/parse-target-string')
     >(importPath, lspLogger);
-    const parsedTargets = parseTargetString(targetString);
-    project = parsedTargets.project;
-    target = parsedTargets.target;
-    configuration = parsedTargets.configuration;
+    let parsedTarget: Target;
+    if (gte(nxVersion.full, '17.0.6')) {
+      // the nx console data structure to handle projects is not the same as ProjectGraph
+      // we create a partial project graph to pass to the parseTargetString function
+      // we only need a single project in it so we don't have to map over the entire workspace data
+      // TODO: refactor nx console to use the ProjectGraph directly?
+      const projectString = targetString.split(':')[0];
+      const partialProjectGraph = {
+        nodes: {
+          [projectString]: {
+            data: {
+              targets: workspace.projects[projectString]?.targets,
+            },
+          },
+        },
+      } as ProjectGraph;
+      parsedTarget = parseTargetString(targetString, partialProjectGraph);
+    } else {
+      parsedTarget = (parseTargetString as any)(targetString);
+    }
+    project = parsedTarget.project;
+    target = parsedTarget.target;
+    configuration = parsedTarget.configuration;
   } catch (e) {
     return;
   }
-
-  const { workspace } = await nxWorkspace(workingPath, lspLogger);
 
   const workspaceProject = workspace.projects[project];
 
@@ -92,7 +118,9 @@ export async function targetLink(
   );
   languageModelCache.dispose();
 
-  const range = findTargetRange(document, jsonAst, target, configuration);
+  const range =
+    findLinkedTargetRange(document, jsonAst, target, configuration) ??
+    findTargetsRange(document, jsonAst);
 
   if (!range) {
     return;
@@ -105,7 +133,7 @@ export async function targetLink(
   }).toString();
 }
 
-function findTargetRange(
+function findLinkedTargetRange(
   document: TextDocument,
   jsonAst: JSONDocument,
   target: string,
@@ -137,4 +165,21 @@ function findTargetRange(
   } else {
     return createRange(document, targetProperty);
   }
+}
+
+function findTargetsRange(
+  document: TextDocument,
+  jsonAst: JSONDocument
+): Range | undefined {
+  if (!jsonAst.root) {
+    return;
+  }
+
+  const targetNode = findProperty(jsonAst.root, 'targets');
+
+  if (!targetNode) {
+    return;
+  }
+
+  return createRange(document, targetNode);
 }
