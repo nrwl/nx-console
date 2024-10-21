@@ -35,7 +35,7 @@ class TelemetryService(private val cs: CoroutineScope) {
                         logger =
                             object : Logger {
                                 override fun log(message: String) {
-                                    this@TelemetryService.logger.info(message)
+                                    this@TelemetryService.logger.trace(message)
                                 }
                             }
                     }
