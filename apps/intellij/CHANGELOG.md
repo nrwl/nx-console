@@ -1,3 +1,10 @@
+## <small>1.32.4 (2024-10-22)</small>
+
+### Bug Fixes
+
+* **intellij:** make sure telemetry logs are set to trace ([#2289](https://github.com/nrwl/nx-console/issues/2289)) ([35c048d](https://github.com/nrwl/nx-console/commit/35c048de35222d98cc322301a8db528ab5156a2c))
+* **intellij:** repair telemetry request ([#2290](https://github.com/nrwl/nx-console/issues/2290)) ([42fa2d1](https://github.com/nrwl/nx-console/commit/42fa2d14c021df24ce133c277e4676d361fed0fb))
+
 ## <small>1.32.3 (2024-10-17)</small>
 
 ### Bug Fixes
