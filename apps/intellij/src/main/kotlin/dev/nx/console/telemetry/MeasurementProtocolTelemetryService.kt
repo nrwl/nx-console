@@ -6,7 +6,6 @@ import com.intellij.openapi.application.PermanentInstallationID
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.SystemInfo
 import dev.nx.console.settings.NxConsoleSettingsProvider
-import dev.nx.console.utils.isDevelopmentInstance
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -18,7 +17,6 @@ val SESSION_ID = UUID.randomUUID().toString()
 private val logger = logger<MeasurementProtocolService>()
 
 class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
-    private val isDevelopmentInstance = isDevelopmentInstance()
 
     override suspend fun featureUsed(feature: String, data: Map<String, Any>?) {
         val payload = this.buildPayload(feature, data)
@@ -81,6 +79,8 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                         put("session_id", SESSION_ID)
                         put("action_type", eventName)
 
+                        // only here to facilitate easy debugging, if you want to track events in
+                        // the GA DebugView set this to true
                         if (false) {
                             put("debug_mode", 1)
                         }
