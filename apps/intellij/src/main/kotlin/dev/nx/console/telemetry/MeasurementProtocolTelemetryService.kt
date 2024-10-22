@@ -79,9 +79,11 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                     putJsonObject("params") {
                         put("engagement_time_msec", "1")
                         put("session_id", SESSION_ID)
-                        put("debug_mode", if (isDevelopmentInstance) 1 else null)
-
                         put("action_type", eventName)
+
+                        if (false) {
+                            put("debug_mode", 1)
+                        }
 
                         data?.forEach { put(it.key, it.value.toString()) }
                     }
