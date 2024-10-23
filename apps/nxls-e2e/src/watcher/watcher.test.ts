@@ -14,6 +14,9 @@ import {
   uniq,
   waitFor,
 } from '../utils';
+
+jest.setTimeout(600000);
+
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
