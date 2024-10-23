@@ -3216,17 +3216,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/wasm-runtime@npm:^0.2.4":
-  version: 0.2.5
-  resolution: "@napi-rs/wasm-runtime@npm:0.2.5"
-  dependencies:
-    "@emnapi/core": ^1.1.0
-    "@emnapi/runtime": ^1.1.0
-    "@tybys/wasm-util": ^0.9.0
-  checksum: eefece41cfd4990660e06fff69f22ebaac15f5bea5b0f2ef936ee0ee69ff229618f05054472669676079eb1d4d404c8358a6b6c832fd9ae62658add4eefa1531
-  languageName: node
-  linkType: hard
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -3511,15 +3500,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nrwl/devkit@npm:19.8.6":
-  version: 19.8.6
-  resolution: "@nrwl/devkit@npm:19.8.6"
-  dependencies:
-    "@nx/devkit": 19.8.6
-  checksum: ae3a0e3b43556669ac6208ab0b701e92a1ce76bdc6d66cf6a66e287573671fee81691795c3682ca4c645cbffb918ed6a9390f5503dec509add3c1d2cc04a669a
-  languageName: node
-  linkType: hard
-
 "@nrwl/esbuild@npm:19.8.0":
   version: 19.8.0
   resolution: "@nrwl/esbuild@npm:19.8.0"
@@ -3665,25 +3645,6 @@ __metadata:
   peerDependencies:
     nx: ">= 17 <= 20"
   checksum: c9e6cb184dbb127e83c32a40702c799f752e9543ac3acc6c0576e48a75f7803bdca9bf794232b1730d5162571222265fd1f57b154182998d2e939275fd6e2564
-  languageName: node
-  linkType: hard
-
-"@nx/devkit@npm:19.8.6, @nx/devkit@npm:>= 19 < 20":
-  version: 19.8.6
-  resolution: "@nx/devkit@npm:19.8.6"
-  dependencies:
-    "@nrwl/devkit": 19.8.6
-    ejs: ^3.1.7
-    enquirer: ~2.3.6
-    ignore: ^5.0.4
-    minimatch: 9.0.3
-    semver: ^7.5.3
-    tmp: ~0.2.1
-    tslib: ^2.3.0
-    yargs-parser: 21.1.1
-  peerDependencies:
-    nx: ">= 19 <= 21"
-  checksum: 0831980d1e2aa57f05702ff38869b3cda77793eb4af45a1d1bae6d68f36f5992569c3e2897e60d2e8d9bbf08b4098182ab224d4507b01ee5174709f0403583c0
   languageName: node
   linkType: hard
 
@@ -3919,116 +3880,6 @@ __metadata:
   version: 19.8.0
   resolution: "@nx/nx-win32-x64-msvc@npm:19.8.0"
   conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-enterprise-cloud@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-enterprise-cloud@npm:1.0.8"
-  dependencies:
-    "@nx/devkit": ">= 19 < 20"
-    "@nx/powerpack-license": 1.0.8
-  checksum: ea3f757c94c211f0c06521172984ea8fb332bba4544f99897f04418061237ba345b051bb33abeffc9bf6589b86fb7d693bb0d2fdd412818fe1c62251d2ed0cbb
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-darwin-arm64@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-darwin-arm64@npm:1.0.8"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-darwin-x64@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-darwin-x64@npm:1.0.8"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-linux-arm-gnueabihf@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-linux-arm-gnueabihf@npm:1.0.8"
-  conditions: os=linux & cpu=arm
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-linux-arm64-gnu@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-linux-arm64-gnu@npm:1.0.8"
-  conditions: os=linux & cpu=arm64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-linux-arm64-musl@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-linux-arm64-musl@npm:1.0.8"
-  conditions: os=linux & cpu=arm64 & libc=musl
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-linux-x64-gnu@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-linux-x64-gnu@npm:1.0.8"
-  conditions: os=linux & cpu=x64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-linux-x64-musl@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-linux-x64-musl@npm:1.0.8"
-  conditions: os=linux & cpu=x64 & libc=musl
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-win32-arm64-msvc@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-win32-arm64-msvc@npm:1.0.8"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license-win32-x64-msvc@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license-win32-x64-msvc@npm:1.0.8"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-license@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@nx/powerpack-license@npm:1.0.8"
-  dependencies:
-    "@napi-rs/wasm-runtime": ^0.2.4
-    "@nx/powerpack-license-darwin-arm64": 1.0.8
-    "@nx/powerpack-license-darwin-x64": 1.0.8
-    "@nx/powerpack-license-linux-arm-gnueabihf": 1.0.8
-    "@nx/powerpack-license-linux-arm64-gnu": 1.0.8
-    "@nx/powerpack-license-linux-arm64-musl": 1.0.8
-    "@nx/powerpack-license-linux-x64-gnu": 1.0.8
-    "@nx/powerpack-license-linux-x64-musl": 1.0.8
-    "@nx/powerpack-license-win32-arm64-msvc": 1.0.8
-    "@nx/powerpack-license-win32-x64-msvc": 1.0.8
-  dependenciesMeta:
-    "@nx/powerpack-license-darwin-arm64":
-      optional: true
-    "@nx/powerpack-license-darwin-x64":
-      optional: true
-    "@nx/powerpack-license-linux-arm-gnueabihf":
-      optional: true
-    "@nx/powerpack-license-linux-arm64-gnu":
-      optional: true
-    "@nx/powerpack-license-linux-arm64-musl":
-      optional: true
-    "@nx/powerpack-license-linux-x64-gnu":
-      optional: true
-    "@nx/powerpack-license-linux-x64-musl":
-      optional: true
-    "@nx/powerpack-license-win32-arm64-msvc":
-      optional: true
-    "@nx/powerpack-license-win32-x64-msvc":
-      optional: true
-  checksum: ffab72c08eae48484d52dbe28aa1cdd80da0a8c379fb92db506276256aff206061227be2b28128ecf75a4ef84fb703b67d6239b77e7296f7ad03abb5eb35cba8
   languageName: node
   linkType: hard
 
@@ -19104,7 +18955,6 @@ __metadata:
     "@nx/jest": 19.8.0
     "@nx/js": 19.8.0
     "@nx/node": 19.8.0
-    "@nx/powerpack-enterprise-cloud": 1.0.8
     "@nx/storybook": 19.8.0
     "@nx/web": 19.8.0
     "@nx/webpack": 19.8.0

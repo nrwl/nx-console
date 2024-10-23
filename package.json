@@ -60,7 +60,6 @@
     "@nx/jest": "19.8.0",
     "@nx/js": "19.8.0",
     "@nx/node": "19.8.0",
-    "@nx/powerpack-enterprise-cloud": "1.0.8",
     "@nx/storybook": "19.8.0",
     "@nx/web": "19.8.0",
     "@nx/webpack": "19.8.0",
