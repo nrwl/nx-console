@@ -8,7 +8,7 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
-import { assign, createActor, fromPromise, sendTo, setup } from 'xstate';
+import { assign, createActor, emit, fromPromise, sendTo, setup } from 'xstate';
 
 export class NewNxlsClient {
   private client: LanguageClient | undefined;
@@ -78,10 +78,23 @@ export class NewNxlsClient {
               throw new Error('Client is not initialized');
             }
 
-            return await this.client.sendRequest(
-              input.requestType,
-              input.params
-            );
+            try {
+              const requestResult = await this.client.sendRequest(
+                input.requestType,
+                input.params
+              );
+              emit({
+                type: 'requestResult',
+                result: requestResult,
+                number: input.number,
+              });
+            } catch (e) {
+              return {
+                type: 'requestResult',
+                error: e,
+                number: input.number,
+              };
+            }
           }
         ),
       },
@@ -89,7 +102,7 @@ export class NewNxlsClient {
         hasPendingRequests: ({ context }) => context.requests.length > 0,
       },
     }).createMachine({
-      /** @xstate-layout N4IgpgJg5mDOIC5QDsAeAbWBhdBLMyALgMQDKAogHIAiA+gErkCKAquaQCoDaADALqJQABwD2sXIVwjkgkKkQBWABwB2AHQBOJRoBsAZh0qFKjQEZTegDQgAnolMAmAL5PraTDnxE1uCOjBkHACC9Nz8sqLiktKy8ggKpjpqCjwJGgoaPKZKDg5K1nYIehoALGoOeqYqKiUOKoYVPDoubhjYeASEarCEAIYATpLIUMQQ0mA+yABuIgDWE+7tXl09A0NQCLjTIgDGvdHIvHxHEWISUjJIcogaxeUOOgolNXr1PNUFiCWpau96SiUUqk8jpDC0QItPJ1un1BlsRmB+v0RP01EJ0PsAGYogC2akhHW8qzhw022z2ByOJyukXOMSucWMpnK2RUejqmWKPCstkQeiymgBehKehS+iUynBBOWan6AFdkMh4aNxpMZvN8W0od55Yr4WSZhSLlTwjSzgdYvZHElvuZhQ4FAodFoeYU9JVfg5ssKdFUlIYqlKtYSurqlcNAgB5AAK1OE5ouloQph4PA0ahMpW+CWyFg0n2TSmZxiLPH9zu5uhKQY8IdlCvDIzjIFpFoZVuyamF1WeTpK+luBbyCgzWUdDh4-Z4DmeNaW0J6IiEQmVY2QEy26oWwZli+X+s3u32xv4zdbifbCAdSTy-ye+n7GkHvKKpU00+z2S0KnMzVcEJ3BdCCXFcI0RZFUXRLFcU1Wtd2A-dSUPI1pBNAQzSiC9QDia9yiUO9+x9J9XT5ac1EeEoNBqEpTHSd0NBcf9kBECA4FkaVOlOTD6WwxAAFpTALN8HQUXJEluGdKIUOdtS6Xx-C4ulLl4hBanUCVbhUJRUyqEoAQLb5025fkdAeRIvWqGS62JdZFLbFSXjUWitN0JRtBFHR8hff4eC7B4EndZ1HmyKyZTDeE7Kw65k3MBxkkfTzTNZEiihyNQcmCwLdASJRQqAkCIowpSk2eAtXl8-lTCdGdPKogFGKcIA */
+      /** @xstate-layout N4IgpgJg5mDOIC5QDsAeAbWBhdBLMyALgMQDKAogHIAiA+gErkCKAquaQCoDaADALqJQABwD2sXIVwjkgkKkQBWABwB2AHQBOJRoBsARgBMAZhWmFBvQBoQAT0SGAvg+tpMOfETW4I6MGQ4AgvTc-LKi4pLSsvIICnrqRgAsBgo8BomJSnpGBjrWdrE5ahkGBlk6Ktk6BhpOLhjYeASEarCEAIYATpLIUMQQ0mBeyABuIgDWQ66NHi1tXT1QCLijIgDG7ZHIvHw7YWISUjJIcogaRhpqpTrVBqY8eqoG+YiJRkpqOok8CokqFZVVLVnCBpu5mq0Ot0Vn0wJ1OiJOmohOhNgAzREAWzUYKannm0N6y1WGy2Oz2J3ChyiJxiCn0xR4SRUSiZWi+SheCCMRj0ah+WVUFyM+lUdVBDXBnk6AFdkMgYf1BsMxpMcZK8S1ZfKYcSxqSjuTQpSDltovZDDpGXo9NUKra7okubzLnpEgoVHEFLzLSpxbjZmptQresQ4QikSj0Vj1W5NUG5SGlit9ZtDfwKcJTUdzQgbbliio7qK7baudc1NolBc9BpEjcbiz-RrA8HFZwAPIABUzICpZtp9h4PEuKg0Gnp6R42gnVlsiAsCjUbsyCnpiQ0xkyfpBAYhbdDvf7OcHeZtH2ZKiMDwed03XMefI9rI0ZnO52SzbjgbaIiEQkVAZkCGFMJimFsIV-f9dVAg1pCNAQTQiE9QBiFIrTKd5vhqP4ahULlkg+esND0Hg3jSFQ0hFL8Zkgwg-wA0Nw0RZFUUIDFOmxPd8Xo6CiVgtN4IzY0s2QmlUIXekrmrJRsLrItX2dEUrgsCpFx5VkdCcXcRAgOBZG4wh9jE44JIQABaOcCjrK41wMMj3VMG0JxoqUWm8XxjOpUzTgQZJ1CUBQP2qJRqjreICOSNQgtfUotFyHQeB3epvzohYYS8gczJUN5l1fXQgt+EwvgI7JK3OG1KrXUKdCMVz4wPKBMpQ3zKoMaLiIqfQyKUXJSqtYVKptaqbjq3cIJ4hiMqQ7zcz+AimUrHQsjicdeWW91tIcIA */
       id: 'nxlsClient',
       initial: 'idle',
       context: {
@@ -129,6 +142,13 @@ export class NewNxlsClient {
             }),
             onDone: {
               target: 'running',
+              actions: ['deleteFirstRequest'],
+              reenter: true,
+            },
+            onError: {
+              target: 'running',
+              actions: ['deleteFirstRequest'],
+              reenter: true,
             },
           },
           on: {
@@ -221,13 +241,25 @@ export class NewNxlsClient {
     requestType: RequestType<P, R, E>,
     params: P
   ): Promise<R | undefined> {
+    const number = this.requestsNumber++;
     this.actor.send({
       type: 'SEND_REQUEST',
-      number: this.requestsNumber++,
+      number: number,
       requestType,
       params,
     });
-    this.actor.subscribe();
-    return;
+    return new Promise((resolve, reject) => {
+      const subscription = this.actor.on('requestResult', (event: any) => {
+        if (event.number !== number) {
+          return;
+        }
+        subscription.unsubscribe();
+
+        if (event.error) {
+          reject(event.error);
+        }
+        resolve(event.result);
+      });
+    });
   }
 }
