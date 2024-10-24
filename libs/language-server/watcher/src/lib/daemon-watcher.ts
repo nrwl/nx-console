@@ -102,7 +102,11 @@ export class DaemonWatcher {
                   );
                 }) ?? [];
               if (filteredChangedFiles.length === 0) {
-                lspLogger.log(`filtered out files: ${data?.changedFiles}`);
+                lspLogger.log(
+                  `filtered out files: ${data?.changedFiles
+                    .map((f) => f.path)
+                    .join(', ')}`
+                );
                 return;
               }
               if (filteredChangedFiles.length) {

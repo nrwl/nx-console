@@ -15,3 +15,4 @@ export * from './lib/has-affected-projects';
 export * from './lib/get-source-map';
 export * from './lib/get-nx-cloud-status';
 export * from './lib/get-cloud-onboarding-info';
+export * from './lib/get-pdv-data';
