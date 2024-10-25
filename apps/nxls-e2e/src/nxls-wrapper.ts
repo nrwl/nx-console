@@ -32,6 +32,8 @@ export class NxlsWrapper {
     console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
   };
   private testTimeout = setTimeout(() => {
+    this.process?.removeListener('exit', this.earlyExitListener);
+
     if (this.process?.pid) {
       treeKill(this.process.pid, 'SIGKILL');
     }
