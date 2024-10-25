@@ -34,7 +34,12 @@ import {
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
 import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
-import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
+import {
+  createNewNxlsClient,
+  createNxlsClient,
+  getNewNxlsClient,
+  getNxlsClient,
+} from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
@@ -75,6 +80,8 @@ export async function activate(c: ExtensionContext) {
 
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
+
+    createNewNxlsClient(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
     initNxInit(context);
@@ -225,10 +232,11 @@ async function setWorkspace(workspacePath: string) {
     workspacePath = workspacePath.replace(/\//g, '\\');
   }
 
+  getNewNxlsClient().setWorkspacePath(workspacePath);
+
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  createNxlsClient(context).start(workspacePath);
-
+  // TODO(maxkless): I don't think this is necessary anymore, remove?
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
@@ -240,6 +248,8 @@ async function setWorkspace(workspacePath: string) {
     !hasInitializedExtensionPoints
   ) {
     hasInitializedExtensionPoints = true;
+    getNewNxlsClient().start(workspacePath);
+
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     initTasks(context);
     registerVscodeAddDependency(context);

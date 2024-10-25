@@ -26,6 +26,7 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
+import { getNewNxlsClient } from './new-nxls-client';
 
 let client: NxlsClient | undefined;
 
@@ -39,12 +40,13 @@ export function createNxlsClient(context: ExtensionContext) {
 }
 
 export function getNxlsClient() {
-  if (!client) {
-    getOutputChannel().appendLine(
-      'Nxls client not initialized. Make sure to initialize it via createNxlsClient first'
-    );
-  }
-  return client;
+  // if (!client) {
+  //   getOutputChannel().appendLine(
+  //     'Nxls client not initialized. Make sure to initialize it via createNxlsClient first'
+  //   );
+  // }
+  // return client;
+  return getNewNxlsClient();
 }
 
 export function onWorkspaceRefreshed(
