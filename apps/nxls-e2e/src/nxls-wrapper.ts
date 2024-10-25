@@ -31,6 +31,11 @@ export class NxlsWrapper {
     console.log(`nxls exited with code ${code}`);
     console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
   };
+  private testTimeout = setTimeout(() => {
+    if (this.process?.pid) {
+      treeKill(this.process.pid, 'SIGKILL');
+    }
+  }, 600000);
 
   constructor(private verbose?: boolean, private env?: NodeJS.ProcessEnv) {
     if (verbose === undefined) {
@@ -133,6 +138,8 @@ export class NxlsWrapper {
     this.process?.stdin?.destroy();
 
     this.process?.removeListener('exit', this.earlyExitListener);
+
+    clearTimeout(this.testTimeout);
 
     if (this.process?.pid) {
       try {
@@ -280,4 +287,7 @@ function isResponseMessage(message: Message): message is ResponseMessage {
 
 function isRequestMessage(message: Message): message is RequestMessage {
   return !isNotificationMessage(message) && !isResponseMessage(message);
+}
+function treeKill(pid: number, arg1: string) {
+  throw new Error('Function not implemented.');
 }
