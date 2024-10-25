@@ -35,7 +35,6 @@ export function getNewNxlsClient(): NewNxlsClient {
 
 export class NewNxlsClient {
   private client: LanguageClient | undefined;
-  private requestsNumber = 0;
 
   constructor(private extensionContext: ExtensionContext) {}
 
@@ -154,7 +153,18 @@ export class NewNxlsClient {
     this.actor.send({ type: 'START', value: workspacePath });
   }
 
-  public setWorkspacePath(workspacePath: string) {}
+  public setWorkspacePath(workspacePath: string) {
+    this.actor.send({ type: 'SET_WORKSPACE_PATH', value: workspacePath });
+  }
+
+  public onNotification(type: NotificationType<any>, callback: () => void) {
+    waitFor(this.actor, (snapshot) => snapshot.matches('running')).then(() => {
+      if (!this.client) {
+        throw new NxlsClientNotInitializedError();
+      }
+      this.client.onNotification(type, () => callback());
+    });
+  }
 
   private async _start(workspacePath: string | undefined) {
     if (!workspacePath) {
