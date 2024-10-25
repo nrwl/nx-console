@@ -3,7 +3,7 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
-import { killProcessTree } from '@nx-console/shared/utils';
+import { killTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -184,7 +184,7 @@ class NxlsClient {
     } catch (e) {
       const nxlsPid = this.getNxlsPid();
       if (nxlsPid) {
-        killProcessTree(nxlsPid);
+        killTree(nxlsPid);
       }
     }
     this.onRefreshNotificationDisposable?.dispose();

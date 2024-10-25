@@ -79,7 +79,7 @@ import {
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { formatError, killProcessTree } from '@nx-console/shared/utils';
+import { formatError, killTree } from '@nx-console/shared/utils';
 import { dirname, relative } from 'node:path';
 import {
   ClientCapabilities,
@@ -100,6 +100,7 @@ import {
 import { URI, Utils } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
+import { kill } from 'node:process';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -369,7 +370,7 @@ connection.onShutdown(async () => {
 
 connection.onExit(() => {
   connection.dispose();
-  killProcessTree(process.pid);
+  kill(process.pid);
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {

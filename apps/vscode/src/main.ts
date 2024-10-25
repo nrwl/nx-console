@@ -13,7 +13,7 @@ import {
 
 import {
   checkIsNxWorkspace,
-  killProcessTree,
+  killTree,
   withTimeout,
 } from '@nx-console/shared/utils';
 import {
@@ -136,12 +136,12 @@ export async function deactivate() {
 
   const nxlsPid = getNxlsClient()?.getNxlsPid();
   if (nxlsPid) {
-    killProcessTree(nxlsPid, 'SIGINT');
+    killTree(nxlsPid, 'SIGINT');
   }
 
   getTelemetry().logUsage('extension-deactivate');
 
-  killProcessTree(process.pid);
+  killTree(process.pid);
 }
 
 // -----------------------------------------------------------------------------

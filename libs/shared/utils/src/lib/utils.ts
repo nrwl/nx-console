@@ -1,6 +1,4 @@
 import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
-import { execSync } from 'child_process';
-import { appendFileSync } from 'fs';
 
 export function getPrimitiveValue(value: any): string | undefined {
   if (
@@ -81,19 +79,4 @@ export function withTimeout<T>(asyncFn: () => Promise<T>, timeoutMs: number) {
         reject(err);
       });
   });
-}
-
-export function killProcessTree(pid: number, signal = 'SIGTERM') {
-  if (process.platform !== 'win32') {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('tree-kill')(pid, signal);
-    } catch (e) {
-      // do nothing
-    }
-  } else {
-    execSync('taskkill /pid ' + pid + ' /T /F', {
-      windowsHide: true,
-    });
-  }
 }

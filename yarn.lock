@@ -19034,7 +19034,6 @@ __metadata:
     semver: ^7.3.7
     storybook: ^8.3.1
     tailwindcss: ^3.3.2
-    tree-kill: ^1.2.2
     ts-jest: 29.1.0
     ts-node: 10.9.1
     tslib: ^2.3.0
@@ -23882,15 +23881,6 @@ __metadata:
   peerDependencies:
     tslib: 2
   checksum: 3b0cae6cd74c208da77dac1c65e6a212f5678fe181f1dfffbe05752be188aa88e56d5d5c33f5701d1f603ffcf33403763f722c9e8e398085cde0c0994323cb8d
-  languageName: node
-  linkType: hard
-
-"tree-kill@npm:^1.2.2":
-  version: 1.2.2
-  resolution: "tree-kill@npm:1.2.2"
-  bin:
-    tree-kill: cli.js
-  checksum: 49117f5f410d19c84b0464d29afb9642c863bc5ba40fcb9a245d474c6d5cc64d1b177a6e6713129eb346b40aebb9d4631d967517f9fbe8251c35b21b13cd96c7
   languageName: node
   linkType: hard
 
