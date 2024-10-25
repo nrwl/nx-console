@@ -100,7 +100,6 @@ import {
 import { URI, Utils } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
-import { kill } from 'node:process';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -370,7 +369,7 @@ connection.onShutdown(async () => {
 
 connection.onExit(() => {
   connection.dispose();
-  kill(process.pid);
+  killTree(process.pid);
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {
