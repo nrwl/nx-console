@@ -1,7 +1,6 @@
-// Adapted from https://raw.githubusercontent.com/pkrumins/node-tree-kill/deee138/index.js
+// Adapted from https://raw.githubusercontent.com/pkrumins/node-tree-kill/deee138/index.jss
 import { spawn, exec, ExecException, ChildProcess } from 'child_process';
 
-// Type definitions
 type ProcessTree = Record<number, number[]>;
 type ProcessMap = Record<number, number>;
 type SpawnFunction = (parentPid: number) => ChildProcess;
