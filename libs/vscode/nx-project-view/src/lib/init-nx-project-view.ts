@@ -59,5 +59,5 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
 }
 
 function listenToLoadingEventsAndShowBar() {
-  getNxlsClient()?.showRefreshLoadingAtLocation({ viewId: 'nxProjects' });
+  // getNxlsClient()?.showRefreshLoadingAtLocation({ viewId: 'nxProjects' });
 }

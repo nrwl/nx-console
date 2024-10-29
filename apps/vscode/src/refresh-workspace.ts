@@ -54,10 +54,13 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
                 resolve();
                 return;
               }
-              const disposable = nxlsClient.subscribeToRefresh(() => {
-                disposable.dispose();
-                resolve();
-              });
+              const disposable = nxlsClient.onNotification(
+                NxWorkspaceRefreshNotification,
+                () => {
+                  disposable.dispose();
+                  resolve();
+                }
+              );
             });
           } catch (error) {
             logAndShowError(
