@@ -171,6 +171,6 @@
     "@nx/powerpack-enterprise-cloud"
   ],
   "defaultBase": "master",
-  "nxCloudAccessToken": "NzA4Y2E2M2QtOTc2Ny00MzEwLWE1ODMtYTRhYjRkNjY0NWUwfHJlYWQ=",
+  "nxCloudAccessToken": "OGQ4ZGI1ZmMtMmFkMy00NGM1LThlMDMtZjFlNGZiMWRmZTQ1fHJlYWQ=",
   "nxCloudUrl": "https://staging.nx.app"
 }
