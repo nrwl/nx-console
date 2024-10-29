@@ -1,103 +1,92 @@
-// Adapted from https://raw.githubusercontent.com/pkrumins/node-tree-kill/deee138/index.jss
-import { spawn, exec, ExecException, ChildProcess } from 'child_process';
-
-type ProcessTree = Record<number, number[]>;
-type ProcessMap = Record<number, number>;
-type SpawnFunction = (parentPid: number) => ChildProcess;
-type CallbackFunction = (error?: ExecException | null) => void;
+// adapted from https://raw.githubusercontent.com/pkrumins/node-tree-kill/deee138/index.js
+import { exec, spawn } from 'child_process';
 
 export async function killTree(
   pid: number,
-  signal: NodeJS.Signals = 'SIGTERM'
-): Promise<void> {
-  const tree: ProcessTree = {};
-  const pidsToProcess: ProcessMap = {};
+  signal?: NodeJS.Signals,
+  callback?: (...args: any[]) => void
+) {
+  if (typeof signal === 'function' && callback === undefined) {
+    callback = signal;
+    signal = undefined;
+  }
+
+  pid = parseInt(pid as any);
+  if (Number.isNaN(pid)) {
+    if (callback) {
+      return callback(new Error('pid must be a number'));
+    } else {
+      throw new Error('pid must be a number');
+    }
+  }
+
+  const tree: any = {};
+  const pidsToProcess: any = {};
   tree[pid] = [];
   pidsToProcess[pid] = 1;
 
-  return new Promise<void>((resolve, reject) => {
-    const callback: CallbackFunction = (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    };
-
-    switch (process.platform) {
-      case 'win32':
-        exec(
-          'taskkill /pid ' + pid + ' /T /F',
-          {
-            windowsHide: true,
-          },
-          (error) => {
-            // Ignore Fatal errors (128) because it might be due to the process already being killed.
-            // On Linux/Mac we can check ESRCH (no such process), but on Windows we can't.
-            callback(error?.code !== 128 ? error : null);
-          }
-        );
-        break;
-      case 'darwin':
-        buildProcessTree(
-          pid,
-          tree,
-          pidsToProcess,
-          function (parentPid: number): ChildProcess {
-            return spawn('pgrep', ['-P', `${parentPid}`], {
-              windowsHide: false,
-            });
-          },
-          function (): void {
-            killAll(tree, signal, callback);
-          }
-        );
-        break;
-      default: // Linux
-        buildProcessTree(
-          pid,
-          tree,
-          pidsToProcess,
-          function (parentPid: number): ChildProcess {
-            return spawn(
-              'ps',
-              ['-o', 'pid', '--no-headers', '--ppid', `${parentPid}`],
-              {
-                windowsHide: false,
-              }
-            );
-          },
-          function (): void {
-            killAll(tree, signal, callback);
-          }
-        );
-        break;
-    }
-  });
+  switch (process.platform) {
+    case 'win32':
+      exec('taskkill /pid ' + pid + ' /T /F', callback);
+      break;
+    case 'darwin':
+      buildProcessTree(
+        pid,
+        tree,
+        pidsToProcess,
+        function (parentPid: any) {
+          return spawn('pgrep', ['-P', parentPid]);
+        },
+        function () {
+          killAll(tree, signal, callback);
+        }
+      );
+      break;
+    // case 'sunos':
+    //     buildProcessTreeSunOS(pid, tree, pidsToProcess, function () {
+    //         killAll(tree, signal, callback);
+    //     });
+    //     break;
+    default: // Linux
+      buildProcessTree(
+        pid,
+        tree,
+        pidsToProcess,
+        function (parentPid: any) {
+          return spawn('ps', [
+            '-o',
+            'pid',
+            '--no-headers',
+            '--ppid',
+            parentPid,
+          ]);
+        },
+        function () {
+          killAll(tree, signal, callback);
+        }
+      );
+      break;
+  }
 }
 
-function killAll(
-  tree: ProcessTree,
-  signal: NodeJS.Signals,
-  callback?: CallbackFunction
-): void {
-  const killed: ProcessMap = {};
+function killAll(tree: any, signal: any, callback: any) {
+  const killed: any = {};
   try {
     Object.keys(tree).forEach(function (pid) {
-      tree[parseInt(pid, 10)].forEach(function (pidpid) {
+      tree[pid].forEach(function (pidpid: any) {
         if (!killed[pidpid]) {
           killPid(pidpid, signal);
           killed[pidpid] = 1;
         }
       });
-      if (!killed[parseInt(pid, 10)]) {
-        killPid(parseInt(pid, 10), signal);
-        killed[parseInt(pid, 10)] = 1;
+      if (!killed[pid]) {
+        killPid(pid, signal);
+        killed[pid] = 1;
       }
     });
   } catch (err) {
     if (callback) {
-      return callback(err as ExecException);
+      return callback(err);
     } else {
       throw err;
     }
@@ -107,30 +96,29 @@ function killAll(
   }
 }
 
-function killPid(pid: number, signal: NodeJS.Signals): void {
+function killPid(pid: any, signal: any) {
   try {
-    process.kill(pid, signal);
-  } catch (err) {
-    const error = err as NodeJS.ErrnoException;
-    if (error.code !== 'ESRCH') throw err;
+    process.kill(parseInt(pid, 10), signal);
+  } catch (err: any) {
+    if (err.code !== 'ESRCH') throw err;
   }
 }
 
 function buildProcessTree(
-  parentPid: number,
-  tree: ProcessTree,
-  pidsToProcess: ProcessMap,
-  spawnChildProcessesList: SpawnFunction,
-  cb: () => void
-): void {
+  parentPid: any,
+  tree: any,
+  pidsToProcess: any,
+  spawnChildProcessesList: any,
+  cb: any
+) {
   const ps = spawnChildProcessesList(parentPid);
   let allData = '';
-  ps.stdout?.on('data', (data: Buffer | string) => {
-    const strData = data.toString('ascii');
-    allData += strData;
+  ps.stdout.on('data', function (_data: any) {
+    const data = _data.toString('ascii');
+    allData += data;
   });
 
-  const onClose = function (code: number): void {
+  const onClose = function (code: any) {
     delete pidsToProcess[parentPid];
 
     if (code != 0) {
@@ -141,16 +129,13 @@ function buildProcessTree(
       return;
     }
 
-    const pids = allData.match(/\d+/g);
-    if (pids) {
-      pids.forEach((_pid) => {
-        const pid = parseInt(_pid, 10);
-        tree[parentPid].push(pid);
-        tree[pid] = [];
-        pidsToProcess[pid] = 1;
-        buildProcessTree(pid, tree, pidsToProcess, spawnChildProcessesList, cb);
-      });
-    }
+    allData.match(/\d+/g)?.forEach(function (pid: any) {
+      pid = parseInt(pid, 10);
+      tree[parentPid].push(pid);
+      tree[pid] = [];
+      pidsToProcess[pid] = 1;
+      buildProcessTree(pid, tree, pidsToProcess, spawnChildProcessesList, cb);
+    });
   };
 
   ps.on('close', onClose);
