@@ -44,7 +44,7 @@ export class NewNxlsClient {
       actions: {
         assignWorkspacePath: assign(({ context, event }) => ({
           ...context,
-          workspacePath: event.value,
+          workspacePath: event.value ?? context.workspacePath,
         })),
         assignError: assign(({ context, event }) => ({
           ...context,
