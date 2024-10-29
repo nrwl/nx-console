@@ -1,8 +1,5 @@
 {
   "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "types": ["jest", "node"]
-  },
   "files": [],
   "include": [],
   "references": [

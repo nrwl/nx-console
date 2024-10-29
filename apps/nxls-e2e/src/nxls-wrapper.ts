@@ -11,7 +11,7 @@ import {
   StreamMessageWriter,
 } from 'vscode-languageserver/node';
 
-import treeKill from 'tree-kill';
+import { killTree } from '@nx-console/shared/utils';
 
 export class NxlsWrapper {
   private messageReader?: StreamMessageReader;
@@ -134,13 +134,9 @@ export class NxlsWrapper {
 
     this.process?.removeListener('exit', this.earlyExitListener);
 
-    await new Promise<void>((resolve) => {
-      if (this.process?.pid) {
-        treeKill(this.process.pid, 'SIGKILL', () => resolve());
-      } else {
-        resolve();
-      }
-    });
+    if (this.process?.pid) {
+      await killTree(this.process.pid, 'SIGKILL');
+    }
   }
 
   async sendRequest(

@@ -20,4 +20,5 @@ export async function buildProjectPath(
   } else if (await fileExists(packageJsonPath)) {
     return packageJsonPath;
   }
+  return;
 }
