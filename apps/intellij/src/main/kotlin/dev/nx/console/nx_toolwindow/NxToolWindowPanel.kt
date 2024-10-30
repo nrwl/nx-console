@@ -9,6 +9,7 @@ import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.invokeLater
@@ -20,7 +21,6 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.util.maximumHeight
 import com.intellij.util.messages.Topic
 import com.intellij.util.ui.JBUI
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
@@ -232,13 +232,14 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
                             val dataContext =
                                 SimpleDataContext.getSimpleContext(CommonDataKeys.PROJECT, project)
-                            val actionEvent =
-                                AnActionEvent.createFromDataContext(
-                                    NX_TOOLBAR_PLACE,
-                                    null,
-                                    dataContext,
-                                )
-                            action.actionPerformed(actionEvent)
+
+                            ActionUtil.invokeAction(
+                                action,
+                                dataContext,
+                                NX_TOOLBAR_PLACE,
+                                null,
+                                null,
+                            )
                         } else {
                             BrowserLauncher.instance.browse(URI.create(it.description))
                         }
@@ -458,7 +459,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
                             add(
                                 JPanel().apply {
-                                    maximumHeight = 100
+                                    maximumSize = Dimension(Short.MAX_VALUE.toInt(), 100)
                                     layout = FlowLayout(FlowLayout.CENTER, 5, 5)
                                     add(
                                         JButton("Connect to Nx Cloud").apply {
