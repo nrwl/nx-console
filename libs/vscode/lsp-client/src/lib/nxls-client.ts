@@ -3,6 +3,7 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
+import { getPnpFile, isWorkspaceInPnp } from '@nx-console/shared/npm';
 import { killTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
@@ -17,6 +18,7 @@ import {
   window,
 } from 'vscode';
 import {
+  ForkOptions,
   LanguageClient,
   LanguageClientOptions,
   NotificationType,
@@ -112,11 +114,25 @@ class NxlsClient {
       join('nxls', 'main.js')
     );
 
-    const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
+    const defaultOptions: ForkOptions = {
+      env: {},
+    };
+    const debugOptions: ForkOptions = {
+      execArgv: ['--nolazy', '--inspect=6009'],
+      env: {},
+    };
+
+    if (await isWorkspaceInPnp(workspacePath)) {
+      const pnpArg = `--require ${await getPnpFile(workspacePath)}`;
+      defaultOptions.env.NODE_OPTIONS = pnpArg;
+      debugOptions.env.NODE_OPTIONS = pnpArg;
+    }
+
     const serverOptions: ServerOptions = {
       run: {
         module: serverModule,
         transport: TransportKind.ipc,
+        options: defaultOptions,
       },
       debug: {
         module: serverModule,

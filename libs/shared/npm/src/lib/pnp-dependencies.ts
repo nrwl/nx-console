@@ -4,7 +4,7 @@ import { fileExists } from '@nx-console/shared/file-system';
 
 let PNP_API: PnpApi;
 
-async function getPnpFile(workspacePath: string) {
+export async function getPnpFile(workspacePath: string) {
   const extensions = ['.cjs', '.js'];
   for (const ext of extensions) {
     try {
