@@ -21,7 +21,6 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.util.maximumHeight
 import com.intellij.util.messages.Topic
 import com.intellij.util.ui.JBUI
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
@@ -460,7 +459,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
                             add(
                                 JPanel().apply {
-                                    maximumHeight = 100
+                                    maximumSize = Dimension(Short.MAX_VALUE.toInt(), 100)
                                     layout = FlowLayout(FlowLayout.CENTER, 5, 5)
                                     add(
                                         JButton("Connect to Nx Cloud").apply {
