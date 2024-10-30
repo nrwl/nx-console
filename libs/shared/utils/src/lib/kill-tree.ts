@@ -1,23 +1,10 @@
 // adapted from https://raw.githubusercontent.com/pkrumins/node-tree-kill/deee138/index.js
-import { exec, spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 
-export async function killTree(
-  pid: number,
-  signal?: NodeJS.Signals,
-  callback?: (...args: any[]) => void
-) {
-  if (typeof signal === 'function' && callback === undefined) {
-    callback = signal;
-    signal = undefined;
-  }
-
+export function killTree(pid: number, signal?: NodeJS.Signals) {
   pid = parseInt(pid as any);
   if (Number.isNaN(pid)) {
-    if (callback) {
-      return callback(new Error('pid must be a number'));
-    } else {
-      throw new Error('pid must be a number');
-    }
+    throw new Error('pid must be a number');
   }
 
   const tree: any = {};
@@ -27,7 +14,9 @@ export async function killTree(
 
   switch (process.platform) {
     case 'win32':
-      exec('taskkill /pid ' + pid + ' /T /F', callback);
+      execSync('taskkill /pid ' + pid + ' /T /F', {
+        windowsHide: true,
+      });
       break;
     case 'darwin':
       buildProcessTree(
@@ -38,15 +27,10 @@ export async function killTree(
           return spawn('pgrep', ['-P', parentPid]);
         },
         function () {
-          killAll(tree, signal, callback);
+          killAll(tree, signal);
         }
       );
       break;
-    // case 'sunos':
-    //     buildProcessTreeSunOS(pid, tree, pidsToProcess, function () {
-    //         killAll(tree, signal, callback);
-    //     });
-    //     break;
     default: // Linux
       buildProcessTree(
         pid,
@@ -62,38 +46,28 @@ export async function killTree(
           ]);
         },
         function () {
-          killAll(tree, signal, callback);
+          killAll(tree, signal);
         }
       );
       break;
   }
 }
 
-function killAll(tree: any, signal: any, callback: any) {
+function killAll(tree: any, signal: any) {
   const killed: any = {};
-  try {
-    Object.keys(tree).forEach(function (pid) {
-      tree[pid].forEach(function (pidpid: any) {
-        if (!killed[pidpid]) {
-          killPid(pidpid, signal);
-          killed[pidpid] = 1;
-        }
-      });
-      if (!killed[pid]) {
-        killPid(pid, signal);
-        killed[pid] = 1;
+
+  Object.keys(tree).forEach(function (pid) {
+    tree[pid].forEach(function (pidpid: any) {
+      if (!killed[pidpid]) {
+        killPid(pidpid, signal);
+        killed[pidpid] = 1;
       }
     });
-  } catch (err) {
-    if (callback) {
-      return callback(err);
-    } else {
-      throw err;
+    if (!killed[pid]) {
+      killPid(pid, signal);
+      killed[pid] = 1;
     }
-  }
-  if (callback) {
-    return callback();
-  }
+  });
 }
 
 function killPid(pid: any, signal: any) {
