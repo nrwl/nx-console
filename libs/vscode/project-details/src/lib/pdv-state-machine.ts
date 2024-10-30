@@ -1,6 +1,7 @@
 import type { PDVData } from '@nx-console/shared/types';
 import { assign, enqueueActions, fromPromise, setup } from 'xstate';
 
+// actions & actor definitions will be provided by the consumer of this machine, using placeholders here
 export const machine = setup({
   types: {
     context: {} as Partial<PDVData> & {

@@ -57,40 +57,6 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
             ),
           renderNoGraphError: ({ context }) =>
             this.renderNoGraphError(context.errorMessage),
-          assignLoadPDVData: assign(({ context, event }) => {
-            const multiProjects = Object.keys(
-              event['output'].pdvDataSerializedMulti ?? {}
-            );
-            const multiSelectedProject =
-              context.multiSelectedProject ??
-              (multiProjects.length > 0 ? multiProjects[0] : undefined);
-            return {
-              ...event['output'],
-              multiSelectedProject,
-            };
-          }),
-          transitionConditionally: enqueueActions(({ context, enqueue }) => {
-            if (
-              !context.resultType ||
-              context.resultType === 'NO_GRAPH_ERROR' ||
-              !context.graphBasePath
-            ) {
-              enqueue.raise({ type: 'NO_GRAPH_ERROR' });
-              return;
-            }
-            if (context.resultType === 'SUCCESS') {
-              enqueue.raise({ type: 'PDV_DATA_LOAD_SUCCESS' });
-              return;
-            }
-            if (context.resultType === 'SUCCESS_MULTI') {
-              enqueue.raise({ type: 'PDV_DATA_LOAD_MULTI_SUCCESS' });
-              return;
-            }
-            if (context.resultType === 'ERROR') {
-              enqueue.raise({ type: 'PDV_DATA_LOAD_ERROR' });
-              return;
-            }
-          }),
         },
       })
     );
