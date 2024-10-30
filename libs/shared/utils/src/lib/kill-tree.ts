@@ -14,9 +14,15 @@ export function killTree(pid: number, signal?: NodeJS.Signals) {
 
   switch (process.platform) {
     case 'win32':
-      execSync('taskkill /pid ' + pid + ' /T /F', {
-        windowsHide: true,
-      });
+      try {
+        execSync('taskkill /pid ' + pid + ' /T /F', {
+          windowsHide: true,
+        });
+      } catch (err: any) {
+        if (err?.code !== 128) {
+          throw err;
+        }
+      }
       break;
     case 'darwin':
       buildProcessTree(
