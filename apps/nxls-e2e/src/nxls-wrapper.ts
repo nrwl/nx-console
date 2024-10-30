@@ -135,7 +135,7 @@ export class NxlsWrapper {
     this.process?.removeListener('exit', this.earlyExitListener);
 
     if (this.process?.pid) {
-      await killTree(this.process.pid, 'SIGKILL');
+      killTree(this.process.pid, 'SIGKILL');
     }
   }
 

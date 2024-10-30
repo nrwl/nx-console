@@ -19,6 +19,7 @@ export function killTree(pid: number, signal?: NodeJS.Signals) {
           windowsHide: true,
         });
       } catch (err: any) {
+        console.log(JSON.stringify(err));
         if (err?.code !== 128) {
           throw err;
         }
