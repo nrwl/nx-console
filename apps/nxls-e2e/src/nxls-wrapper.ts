@@ -32,7 +32,7 @@ export class NxlsWrapper {
     console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
   };
 
-  constructor(private verbose?: boolean) {
+  constructor(private verbose?: boolean, private env?: NodeJS.ProcessEnv) {
     if (verbose === undefined) {
       this.verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
     }
@@ -54,7 +54,7 @@ export class NxlsWrapper {
       );
 
       const p = spawn('node', [nxlsPath, '--stdio'], {
-        env: process.env,
+        env: this.env ?? process.env,
         cwd,
         windowsHide: true,
       });
@@ -135,7 +135,11 @@ export class NxlsWrapper {
     this.process?.removeListener('exit', this.earlyExitListener);
 
     if (this.process?.pid) {
-      await killTree(this.process.pid, 'SIGKILL');
+      try {
+        killTree(this.process.pid, 'SIGKILL');
+      } catch (e) {
+        console.log(`NXLS WRAPPER: ${e}`);
+      }
     }
   }
 

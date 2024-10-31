@@ -27,8 +27,11 @@ describe('nx cloud - nx 16', () => {
       packageManager: 'npm',
       version: '16',
     });
+    const env = process.env;
+    delete env['NX_CLOUD_ACCESS_TOKEN'];
+    delete env['NX_CLOUD_API'];
 
-    nxlsWrapper = new NxlsWrapper();
+    nxlsWrapper = new NxlsWrapper(undefined, env);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 

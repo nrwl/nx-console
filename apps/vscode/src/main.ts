@@ -125,7 +125,6 @@ export async function deactivate() {
           new RequestType('shutdown'),
           undefined
         ),
-
       2000
     );
   } catch (e) {
@@ -141,7 +140,7 @@ export async function deactivate() {
 
   getTelemetry().logUsage('extension-deactivate');
 
-  killTree(process.pid);
+  killTree(process.pid, 'SIGTERM');
 }
 
 // -----------------------------------------------------------------------------
