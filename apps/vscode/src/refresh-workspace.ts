@@ -42,12 +42,12 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
 
             progress.report({ message: 'Restarting language server' });
             await Promise.all([
-              nxlsClient?.restart(),
+              nxlsClient.restart(),
               getNxGraphServer(context).restart(),
             ]);
             progress.report({ message: 'Refreshing workspace', increment: 30 });
 
-            nxlsClient?.sendNotification(NxWorkspaceRefreshNotification);
+            nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
             await new Promise<void>((resolve) => {
               if (!nxlsClient) {

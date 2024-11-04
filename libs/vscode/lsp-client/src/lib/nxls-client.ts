@@ -3,22 +3,11 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
-import { getPnpFile, isWorkspaceInPnp } from '@nx-console/shared/npm';
-import { killTree } from '@nx-console/shared/utils';
-import {
-  getNxlsOutputChannel,
-  getOutputChannel,
-} from '@nx-console/vscode/output-channels';
+import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
+import { randomUUID } from 'crypto';
 import { join } from 'path';
+import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
 import {
-  Disposable,
-  EventEmitter,
-  ExtensionContext,
-  ProgressLocation,
-  window,
-} from 'vscode';
-import {
-  ForkOptions,
   LanguageClient,
   LanguageClientOptions,
   NotificationType,
@@ -26,114 +15,182 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
+import { createActor, fromPromise, waitFor } from 'xstate';
+import { nxlsClientStateMachine } from './nxls-client-state-machine';
 
-let client: NxlsClient | undefined;
+let _nxlsClient: NxlsClient | undefined;
 
-// export function createNxlsClient(context: ExtensionContext) {
-//   if (client) {
-//     return client;
-//   }
+export function createNxlsClient(extensionContext: ExtensionContext) {
+  _nxlsClient = new NxlsClient(extensionContext);
+}
 
-//   client = new NxlsClient(context);
-//   return client;
-// }
+export function getNxlsClient(): NxlsClient {
+  if (!_nxlsClient) {
+    throw new Error('NxlsClient is not initialized');
+  }
+  return _nxlsClient;
+}
 
-// export function getNxlsClient() {
-//   // if (!client) {
-//   //   getOutputChannel().appendLine(
-//   //     'Nxls client not initialized. Make sure to initialize it via createNxlsClient first'
-//   //   );
-//   // }
-//   // return client;
-//   return getNewNxlsClient();
-// }
+export function onWorkspaceRefreshed(callback: () => void): Disposable {
+  return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
+    callback()
+  );
+}
 
-// export function onWorkspaceRefreshed(callback: () => void): Disposable {
-//   return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
-//     callback()
-//   );
-// }
-
-// export function sendNotification<P>(
-//   notificationType: NotificationType<P>,
-//   params?: P
-// ) {
-//   getNxlsClient()?.sendNotification(notificationType, params);
-// }
-
-// export async function sendRequest<P, R, E>(
-//   requestType: RequestType<P, R, E>,
-//   params: P
-// ): Promise<R | undefined> {
-//   return await getNxlsClient()?.sendRequest(requestType, params);
-// }
-
-type LspClientStates = 'idle' | 'starting' | 'running' | 'stopping';
-
-class NxlsClient {
-  private state: LspClientStates = 'idle';
-
-  private workspacePath: string | undefined;
+export class NxlsClient {
   private client: LanguageClient | undefined;
-  private onRefreshNotificationDisposable: Disposable | undefined;
-  private onRefreshStartedNotificationDisposable: Disposable | undefined;
 
-  private refreshedEventEmitter = new EventEmitter<void>();
-  private refreshStartedEventEmitter = new EventEmitter<void>();
+  private notificationListeners: Map<string, Map<string, () => void>> =
+    new Map();
+  private notificationListenerDisposables: Disposable[] = [];
 
-  private disposables: Disposable[] = [];
-
-  constructor(private extensionContext: ExtensionContext) {}
-
-  public sendNotification<P>(
-    notificationType: NotificationType<P>,
-    params?: P
-  ) {
-    this.client?.sendNotification(notificationType, params);
+  constructor(private extensionContext: ExtensionContext) {
+    this.actor.start();
+    extensionContext.subscriptions.push(
+      this.showRefreshLoadingAtLocation(ProgressLocation.Window)
+    );
   }
 
+  private actor = createActor(
+    nxlsClientStateMachine.provide({
+      actions: {
+        sendRefreshNotification: ({ context }) =>
+          this.sendNotification(NxChangeWorkspace, context.workspacePath),
+      },
+      actors: {
+        startClient: fromPromise(
+          async ({
+            input,
+          }: {
+            input: { workspacePath: string | undefined };
+          }) => {
+            return await this._start(input.workspacePath);
+          }
+        ),
+        stopClient: fromPromise(async () => {
+          return await this._stop();
+        }),
+      },
+    })
+  );
+
+  public start(workspacePath: string) {
+    this.actor.send({ type: 'START', value: workspacePath });
+  }
+
+  public stop() {
+    this.actor.send({ type: 'STOP' });
+  }
+
+  public async restart() {
+    this.stop();
+    await waitFor(this.actor, (snapshot) => snapshot.matches('idle'));
+    const workspacePath = this.actor.getSnapshot().context.workspacePath;
+    if (!workspacePath) {
+      throw new Error('Workspace path is required to start the client');
+    }
+    this.start(workspacePath);
+  }
   public async sendRequest<P, R, E>(
     requestType: RequestType<P, R, E>,
     params: P
   ): Promise<R | undefined> {
-    return await this.client?.sendRequest(requestType, params);
+    await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
+    if (!this.client) {
+      throw new NxlsClientNotInitializedError();
+    }
+    return await this.client.sendRequest(requestType, params);
+  }
+  public sendNotification<P>(
+    notificationType: NotificationType<P>,
+    params?: P
+  ) {
+    if (!this.client) {
+      throw new NxlsClientNotInitializedError();
+    }
+    this.client.sendNotification(notificationType, params);
   }
 
-  public async start(workspacePath: string) {
-    if (this.state !== 'idle') {
-      if (this.workspacePath !== workspacePath) {
-        this.workspacePath = workspacePath;
-        this.sendNotification(NxChangeWorkspace, workspacePath);
+  public getNxlsPid() {
+    return this.actor.getSnapshot().context.nxlsPid;
+  }
+
+  public setWorkspacePath(workspacePath: string) {
+    this.actor.send({ type: 'SET_WORKSPACE_PATH', value: workspacePath });
+  }
+
+  public onNotification(type: NotificationType<any>, callback: () => void) {
+    const id = randomUUID();
+
+    if (!this.notificationListeners.has(type.method)) {
+      this.notificationListeners.set(type.method, new Map());
+
+      // if we add a new type of listener while the client is running, we need to reconfigure the listeners
+      if (this.actor.getSnapshot().matches('running')) {
+        this.unregisterNotificationListeners();
+        this.registerNotificationListeners();
       }
-      return;
     }
-    this.workspacePath = workspacePath;
 
-    this.state = 'starting';
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- type safe maps are tricky
+    const callbacks = this.notificationListeners.get(type.method)!;
+    callbacks.set(id, callback);
 
+    return new Disposable(() => {
+      const typeCallbacks = this.notificationListeners.get(type.method);
+      if (typeCallbacks) {
+        typeCallbacks.delete(id);
+        if (typeCallbacks.size === 0) {
+          this.notificationListeners.delete(type.method);
+        }
+      }
+    });
+  }
+
+  public showRefreshLoadingAtLocation(
+    location:
+      | ProgressLocation
+      | {
+          viewId: string;
+        }
+  ): Disposable {
+    return this.onNotification(NxWorkspaceRefreshStartedNotification, () => {
+      const refreshPromise = new Promise<void>((resolve) => {
+        const disposable = this.onNotification(
+          NxWorkspaceRefreshNotification,
+          () => {
+            disposable?.dispose();
+            resolve();
+          }
+        );
+      });
+
+      window.withProgress(
+        {
+          location,
+          cancellable: false,
+          title: 'Refreshing Nx workspace',
+        },
+        async () => {
+          await refreshPromise;
+        }
+      );
+    });
+  }
+
+  private async _start(workspacePath: string | undefined) {
+    if (!workspacePath) {
+      throw new Error('Workspace path is required to start the client');
+    }
     const serverModule = this.extensionContext.asAbsolutePath(
       join('nxls', 'main.js')
     );
 
-    const defaultOptions: ForkOptions = {
-      env: {},
-    };
-    const debugOptions: ForkOptions = {
-      execArgv: ['--nolazy', '--inspect=6009'],
-      env: {},
-    };
-
-    if (await isWorkspaceInPnp(workspacePath)) {
-      const pnpArg = `--require ${await getPnpFile(workspacePath)}`;
-      defaultOptions.env.NODE_OPTIONS = pnpArg;
-      debugOptions.env.NODE_OPTIONS = pnpArg;
-    }
-
+    const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
     const serverOptions: ServerOptions = {
       run: {
         module: serverModule,
         transport: TransportKind.ipc,
-        options: defaultOptions,
       },
       debug: {
         module: serverModule,
@@ -168,97 +225,45 @@ class NxlsClient {
 
     await this.client.start();
 
-    this.onRefreshNotificationDisposable = this.client.onNotification(
-      NxWorkspaceRefreshNotification,
-      () => {
-        this.refreshedEventEmitter.fire();
-      }
-    );
+    this.registerNotificationListeners();
 
-    this.onRefreshStartedNotificationDisposable = this.client.onNotification(
-      NxWorkspaceRefreshStartedNotification,
-      () => {
-        this.refreshStartedEventEmitter.fire();
-      }
-    );
-
-    // this.showRefreshLoadingAtLocation(ProgressLocation.Window);
-
-    this.state = 'running';
+    return this.client.initializeResult?.['pid'];
   }
 
-  public async stop() {
-    if (this.state === 'stopping') {
-      return;
-    }
-    this.state = 'stopping';
-    if (!this.client) {
-      this.state = 'idle';
-      return;
-    }
-    try {
+  private async _stop() {
+    if (this.client) {
       await this.client.stop(2000);
-    } catch (e) {
-      const nxlsPid = this.getNxlsPid();
-      if (nxlsPid) {
-        killTree(nxlsPid);
-      }
     }
-    this.onRefreshNotificationDisposable?.dispose();
-    this.onRefreshStartedNotificationDisposable?.dispose();
-    this.disposables.forEach((d) => d.dispose());
-    this.state = 'idle';
+
+    this.unregisterNotificationListeners();
   }
 
-  public subscribeToRefresh(callback: () => void) {
-    return this.refreshedEventEmitter.event(callback);
-  }
+  private async registerNotificationListeners() {
+    if (!this.client) {
+      throw new NxlsClientNotInitializedError();
+    }
 
-  public async restart() {
-    if (!this.workspacePath) {
-      getOutputChannel().appendLine(
-        "Can't refresh workspace without a workspace path. Make sure to start the LSP client first."
+    for (const listener of this.notificationListeners) {
+      const [method, callbacks] = listener;
+      this.notificationListenerDisposables.push(
+        this.client.onNotification(new NotificationType(method), () => {
+          for (const callback of callbacks.values()) {
+            callback();
+          }
+        })
       );
-      return;
     }
-
-    await this.stop();
-    await this.start(this.workspacePath);
   }
 
-  // public showRefreshLoadingAtLocation(
-  //   location:
-  //     | ProgressLocation
-  //     | {
-  //         viewId: string;
-  //       }
-  // ) {
-  //   const disposable = this.refreshStartedEventEmitter.event(() => {
-  //     const refreshPromise = new Promise<void>((resolve) => {
-  //       const disposable = getNxlsClient()?.onNotification(
-  //         NxWorkspaceRefreshNotification,
-  //         () => {
-  //           disposable?.dispose();
-  //           resolve();
-  //         }
-  //       );
-  //     });
+  private async unregisterNotificationListeners() {
+    this.notificationListenerDisposables.forEach((d) => d.dispose());
+    this.notificationListenerDisposables = [];
+  }
+}
 
-  //     window.withProgress(
-  //       {
-  //         location,
-  //         cancellable: false,
-  //         title: 'Refreshing Nx workspace',
-  //       },
-  //       async () => {
-  //         await refreshPromise;
-  //       }
-  //     );
-  //   });
-  //   this.disposables.push(disposable);
-  // }
-
-  public getNxlsPid(): number | undefined {
-    return this.client?.initializeResult?.['pid'];
+export class NxlsClientNotInitializedError extends Error {
+  constructor() {
+    super('Nxls Client not initialized. This should not happen.');
+    this.name = 'NxlsClientNotInitializedError';
   }
 }
