@@ -125,7 +125,6 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
-<<<<<<< HEAD
   try {
     await withTimeout(
       async () =>
@@ -139,10 +138,6 @@ export async function deactivate() {
     // do nothing, we have to deactivate before the process is killed
   }
 
-=======
-  await stopDaemon();
-  getNxlsClient()?.stop();
->>>>>>> 446fbaa9 (wire things up to work)
   workspaceFileWatcher?.dispose();
 
   const nxlsPid = getNxlsClient()?.getNxlsPid();
