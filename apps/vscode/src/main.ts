@@ -34,12 +34,7 @@ import {
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
 import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
-import {
-  createNewNxlsClient,
-  createNxlsClient,
-  getNewNxlsClient,
-  getNxlsClient,
-} from '@nx-console/vscode/lsp-client';
+import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
@@ -81,7 +76,7 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
-    createNewNxlsClient(context);
+    createNxlsClient(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
     initNxInit(context);
@@ -232,7 +227,7 @@ async function setWorkspace(workspacePath: string) {
     workspacePath = workspacePath.replace(/\//g, '\\');
   }
 
-  getNewNxlsClient().setWorkspacePath(workspacePath);
+  getNxlsClient().setWorkspacePath(workspacePath);
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
@@ -248,7 +243,7 @@ async function setWorkspace(workspacePath: string) {
     !hasInitializedExtensionPoints
   ) {
     hasInitializedExtensionPoints = true;
-    getNewNxlsClient().start(workspacePath);
+    getNxlsClient().start(workspacePath);
 
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     initTasks(context);

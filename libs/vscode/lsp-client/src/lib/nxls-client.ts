@@ -26,50 +26,47 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
-import { getNewNxlsClient } from './new-nxls-client';
 
 let client: NxlsClient | undefined;
 
-export function createNxlsClient(context: ExtensionContext) {
-  if (client) {
-    return client;
-  }
+// export function createNxlsClient(context: ExtensionContext) {
+//   if (client) {
+//     return client;
+//   }
 
-  client = new NxlsClient(context);
-  return client;
-}
+//   client = new NxlsClient(context);
+//   return client;
+// }
 
-export function getNxlsClient() {
-  // if (!client) {
-  //   getOutputChannel().appendLine(
-  //     'Nxls client not initialized. Make sure to initialize it via createNxlsClient first'
-  //   );
-  // }
-  // return client;
-  return getNewNxlsClient();
-}
+// export function getNxlsClient() {
+//   // if (!client) {
+//   //   getOutputChannel().appendLine(
+//   //     'Nxls client not initialized. Make sure to initialize it via createNxlsClient first'
+//   //   );
+//   // }
+//   // return client;
+//   return getNewNxlsClient();
+// }
 
-export function onWorkspaceRefreshed(
-  callback: () => void
-): Disposable | undefined {
-  return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
-    callback()
-  );
-}
+// export function onWorkspaceRefreshed(callback: () => void): Disposable {
+//   return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
+//     callback()
+//   );
+// }
 
-export function sendNotification<P>(
-  notificationType: NotificationType<P>,
-  params?: P
-) {
-  getNxlsClient()?.sendNotification(notificationType, params);
-}
+// export function sendNotification<P>(
+//   notificationType: NotificationType<P>,
+//   params?: P
+// ) {
+//   getNxlsClient()?.sendNotification(notificationType, params);
+// }
 
-export async function sendRequest<P, R, E>(
-  requestType: RequestType<P, R, E>,
-  params: P
-): Promise<R | undefined> {
-  return await getNxlsClient()?.sendRequest(requestType, params);
-}
+// export async function sendRequest<P, R, E>(
+//   requestType: RequestType<P, R, E>,
+//   params: P
+// ): Promise<R | undefined> {
+//   return await getNxlsClient()?.sendRequest(requestType, params);
+// }
 
 type LspClientStates = 'idle' | 'starting' | 'running' | 'stopping';
 
@@ -185,7 +182,7 @@ class NxlsClient {
       }
     );
 
-    this.showRefreshLoadingAtLocation(ProgressLocation.Window);
+    // this.showRefreshLoadingAtLocation(ProgressLocation.Window);
 
     this.state = 'running';
   }
@@ -229,37 +226,37 @@ class NxlsClient {
     await this.start(this.workspacePath);
   }
 
-  public showRefreshLoadingAtLocation(
-    location:
-      | ProgressLocation
-      | {
-          viewId: string;
-        }
-  ) {
-    const disposable = this.refreshStartedEventEmitter.event(() => {
-      const refreshPromise = new Promise<void>((resolve) => {
-        const disposable = getNxlsClient()?.onNotification(
-          NxWorkspaceRefreshNotification,
-          () => {
-            disposable?.dispose();
-            resolve();
-          }
-        );
-      });
+  // public showRefreshLoadingAtLocation(
+  //   location:
+  //     | ProgressLocation
+  //     | {
+  //         viewId: string;
+  //       }
+  // ) {
+  //   const disposable = this.refreshStartedEventEmitter.event(() => {
+  //     const refreshPromise = new Promise<void>((resolve) => {
+  //       const disposable = getNxlsClient()?.onNotification(
+  //         NxWorkspaceRefreshNotification,
+  //         () => {
+  //           disposable?.dispose();
+  //           resolve();
+  //         }
+  //       );
+  //     });
 
-      window.withProgress(
-        {
-          location,
-          cancellable: false,
-          title: 'Refreshing Nx workspace',
-        },
-        async () => {
-          await refreshPromise;
-        }
-      );
-    });
-    this.disposables.push(disposable);
-  }
+  //     window.withProgress(
+  //       {
+  //         location,
+  //         cancellable: false,
+  //         title: 'Refreshing Nx workspace',
+  //       },
+  //       async () => {
+  //         await refreshPromise;
+  //       }
+  //     );
+  //   });
+  //   this.disposables.push(disposable);
+  // }
 
   public getNxlsPid(): number | undefined {
     return this.client?.initializeResult?.['pid'];

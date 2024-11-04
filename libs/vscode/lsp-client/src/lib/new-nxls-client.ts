@@ -1,4 +1,7 @@
-import { NxChangeWorkspace } from '@nx-console/language-server/types';
+import {
+  NxChangeWorkspace,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
 import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
 import { join } from 'path';
 import { Disposable, ExtensionContext } from 'vscode';
@@ -11,49 +14,58 @@ import {
   TransportKind,
 } from 'vscode-languageclient/node';
 import { assign, createActor, fromPromise, setup, waitFor } from 'xstate';
+import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { randomUUID } from 'crypto';
 
 let _nxlsClient: NewNxlsClient | undefined;
 
-export function createNewNxlsClient(extensionContext: ExtensionContext) {
+export function createNxlsClient(extensionContext: ExtensionContext) {
   _nxlsClient = new NewNxlsClient(extensionContext);
 }
 
-export function getNewNxlsClient(): NewNxlsClient {
+export function getNxlsClient(): NewNxlsClient {
   if (!_nxlsClient) {
     throw new Error('NxlsClient is not initialized');
   }
   return _nxlsClient;
 }
 
+export function sendNotification<P>(
+  notificationType: NotificationType<P>,
+  params?: P
+) {
+  getNxlsClient().sendNotification(notificationType, params);
+}
+
+export async function sendRequest<P, R, E>(
+  requestType: RequestType<P, R, E>,
+  params: P
+): Promise<R | undefined> {
+  return await getNxlsClient().sendRequest(requestType, params);
+}
+
+export function onWorkspaceRefreshed(callback: () => void): Disposable {
+  return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
+    callback()
+  );
+}
+
 export class NewNxlsClient {
   private client: LanguageClient | undefined;
+
+  private notificationListeners: Map<string, Map<string, () => void>> =
+    new Map();
+  private disposables: Disposable[] = [];
 
   constructor(private extensionContext: ExtensionContext) {
     this.actor.start();
   }
 
   private actor = createActor(
-    setup({
-      types: {
-        context: {} as {
-          workspacePath: string | undefined;
-          error: string | undefined;
-          nxlsPid: number | undefined;
-        },
-      },
+    nxlsClientStateMachine.provide({
       actions: {
-        assignWorkspacePath: assign(({ context, event }) => ({
-          ...context,
-          workspacePath: event.value ?? context.workspacePath,
-        })),
-        assignError: assign(({ context, event }) => ({
-          ...context,
-          error: event.error,
-        })),
-        assignNxlsPid: assign(({ context, event }) => ({
-          ...context,
-          nxlsPid: event.output,
-        })),
+        sendRefreshNotification: ({ context }) =>
+          this.sendNotification(NxChangeWorkspace, context.workspacePath),
       },
       actors: {
         startClient: fromPromise(
@@ -68,81 +80,6 @@ export class NewNxlsClient {
         stopClient: fromPromise(async () => {
           return await this._stop();
         }),
-      },
-    }).createMachine({
-      /** @xstate-layout N4IgpgJg5mDOIC5QDsAeAbWBhdBLMyALgHS4TpgDEAygCoCCASrQNoAMAuoqAA4D2sXIVx9k3EKkQA2AKxtiATgAsMgEwK2UgMwyFU1TIA0IAJ6ItbeTJlL1WgBwXbqnQF9XxtJhz4ipclTUAKK0APoA6gDyjADS1AAK9FhBoYm0ABLsXEgg-ILCouKSCEoAjADsxPa6WmU2CqVKWqrGZiWl8lqNzVpasqpSSkPunhjYeAQksIQAhgBOwshQlBCiYKTIAG58ANbrXuO+U7MLuEsIZ9sAxjMFyFlZ4nlCImI5xR32UsRKbB2lgzYMik9i+rXMqkqkIUwNqDVKFjYWhGIAOPkmxGm80WyzAczmfDmxB46FuADNCQBbYhoiZ+LGnc6XPg3O4PThPAQvQrvaRfYi9GoyLTlJHlcrghCqNj2AWaBr2GGlBT2JQo2lHTEnHE0EIRaJxRLJVL0DKPHLPO5FRDVLQC0oyDoKDSO+ylUqSsqdbouPpqQZqjyosbovxzACuyGQZ2WdEi8XNvC5Vt5CHdwMU5QcUksWeVSklboFqnUJfsqk+MnK9nVIbpJAjUZjurCUViCSSKTSmQ5FuTr2taYMSmI5QrkMGoJzqnsno69qaMlBwuq4tr3nrWr4PB4zdWyHWzL2NLrmum293TK2LNur3Z2ST+QHqYMpWIM4ctikk90SikkrsTNvzYIYuhVGVkSDDUMXPHdmzxAkiRJckqRPDcz0IC8Ywua9WTvThE1yfseVAYpX3fRxVQGH9lH-UxEGlN8xwVKQ9DHCwpHXQ4YMwuClhbfV2yNLtTR7B8iKfEiJAY1RiF0RUVy+LN7HKBE529JolHLNgx3KBRyhkdwoL4CA4HEaCiE5SS3lIxAAFoDB+P4QKkd1mlcmcJXohA7O+Sx-ICgLGi40MSDICgrO5GzpJKBRZKrZQOlcpQ4rHSUuhkAVrBShEVKGVUQs3BkcUilNbIQFS31VEUbFKAx9LYBR0rYeLmjq-prFYwrNUbaMllK59yoRAEBTdLREuqbQvLaZpZSaUUGhsL4VT0bqeKw-q+2swdbAA1iBQM1SxtYlxDKMoA */
-      id: 'nxlsClient',
-      initial: 'idle',
-      context: {
-        workspacePath: undefined,
-        error: undefined,
-        nxlsPid: undefined,
-      },
-      states: {
-        idle: {
-          on: {
-            START: {
-              target: 'starting',
-              actions: ['assignWorkspacePath'],
-            },
-            SET_WORKSPACE_PATH: {
-              actions: ['assignWorkspacePath'],
-            },
-          },
-        },
-        starting: {
-          invoke: {
-            src: 'startClient',
-            input: ({ context }) => ({ workspacePath: context.workspacePath }),
-            onDone: {
-              target: 'running',
-              actions: ['assignNxlsPid'],
-            },
-            onError: {
-              target: 'idle',
-              actions: ['assignError'],
-            },
-          },
-          on: {
-            SET_WORKSPACE_PATH: {
-              actions: ['assignWorkspacePath'],
-            },
-          },
-        },
-        running: {
-          on: {
-            STOP: {
-              target: 'stopping',
-            },
-            SET_WORKSPACE_PATH: {
-              actions: [
-                ({ context }) =>
-                  this.sendNotification(
-                    NxChangeWorkspace,
-                    context.workspacePath
-                  ),
-              ],
-            },
-          },
-        },
-        stopping: {
-          invoke: {
-            src: 'stopClient',
-            onDone: {
-              target: 'idle',
-              actions: ['assignError'],
-            },
-            onError: {
-              target: 'idle',
-              actions: ['assignError'],
-            },
-          },
-          on: {
-            SET_WORKSPACE_PATH: {
-              actions: ['assignWorkspacePath'],
-            },
-          },
-        },
       },
     })
   );
@@ -164,6 +101,25 @@ export class NewNxlsClient {
     }
     this.start(workspacePath);
   }
+  public async sendRequest<P, R, E>(
+    requestType: RequestType<P, R, E>,
+    params: P
+  ): Promise<R | undefined> {
+    await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
+    if (!this.client) {
+      throw new NxlsClientNotInitializedError();
+    }
+    return await this.client.sendRequest(requestType, params);
+  }
+  public sendNotification<P>(
+    notificationType: NotificationType<P>,
+    params?: P
+  ) {
+    if (!this.client) {
+      throw new NxlsClientNotInitializedError();
+    }
+    this.client.sendNotification(notificationType, params);
+  }
 
   public getNxlsPid() {
     return this.actor.getSnapshot().context.nxlsPid;
@@ -174,21 +130,23 @@ export class NewNxlsClient {
   }
 
   public onNotification(type: NotificationType<any>, callback: () => void) {
-    let innerDisposable: Disposable | undefined;
-    let isDisposed = false;
-    waitFor(this.actor, (snapshot) => snapshot.matches('running')).then(() => {
-      if (isDisposed) {
-        return;
-      }
-      if (!this.client) {
-        throw new NxlsClientNotInitializedError();
-      }
-      innerDisposable = this.client.onNotification(type, () => callback());
-    });
+    const id = randomUUID();
+
+    if (!this.notificationListeners.has(type.method)) {
+      this.notificationListeners.set(type.method, new Map());
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- type safe maps are tricky
+    const callbacks = this.notificationListeners.get(type.method)!;
+    callbacks.set(id, callback);
+
     return new Disposable(() => {
-      isDisposed = true;
-      if (innerDisposable) {
-        innerDisposable.dispose();
+      const typeCallbacks = this.notificationListeners.get(type.method);
+      if (typeCallbacks) {
+        typeCallbacks.delete(id);
+        if (typeCallbacks.size === 0) {
+          this.notificationListeners.delete(type.method);
+        }
       }
     });
   }
@@ -240,6 +198,8 @@ export class NewNxlsClient {
 
     await this.client.start();
 
+    this.registerNotificationListeners();
+
     return this.client.initializeResult?.['pid'];
   }
 
@@ -247,25 +207,26 @@ export class NewNxlsClient {
     if (this.client) {
       await this.client.stop(2000);
     }
+
+    this.disposables.forEach((d) => d.dispose());
+    this.disposables = [];
   }
-  public async sendRequest<P, R, E>(
-    requestType: RequestType<P, R, E>,
-    params: P
-  ): Promise<R | undefined> {
-    await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
+
+  private async registerNotificationListeners() {
     if (!this.client) {
       throw new NxlsClientNotInitializedError();
     }
-    return await this.client.sendRequest(requestType, params);
-  }
-  public sendNotification<P>(
-    notificationType: NotificationType<P>,
-    params?: P
-  ) {
-    if (!this.client) {
-      throw new NxlsClientNotInitializedError();
+
+    for (const listener of this.notificationListeners) {
+      const [method, callbacks] = listener;
+      this.disposables.push(
+        this.client.onNotification(new NotificationType(method), () => {
+          for (const callback of callbacks.values()) {
+            callback();
+          }
+        })
+      );
     }
-    this.client.sendNotification(notificationType, params);
   }
 }
 
