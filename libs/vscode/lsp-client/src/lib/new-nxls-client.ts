@@ -37,13 +37,6 @@ export function sendNotification<P>(
   getNxlsClient().sendNotification(notificationType, params);
 }
 
-export async function sendRequest<P, R, E>(
-  requestType: RequestType<P, R, E>,
-  params: P
-): Promise<R | undefined> {
-  return await getNxlsClient().sendRequest(requestType, params);
-}
-
 export function onWorkspaceRefreshed(callback: () => void): Disposable {
   return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
     callback()
