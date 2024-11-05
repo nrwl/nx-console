@@ -21,7 +21,7 @@ export const nxlsClientStateMachine = setup({
       ...context,
       nxlsPid: event.output,
     })),
-    sendRefreshNotification: ({ context }) => {
+    sendRefreshNotification: () => {
       throw Error('Not implemented - should be overridden.');
     },
   },
@@ -85,7 +85,7 @@ export const nxlsClientStateMachine = setup({
           target: 'stopping',
         },
         SET_WORKSPACE_PATH: {
-          actions: ['sendRefreshNotification'],
+          actions: ['assignWorkspacePath', 'sendRefreshNotification'],
         },
       },
     },
