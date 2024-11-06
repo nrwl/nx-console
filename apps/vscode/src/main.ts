@@ -76,6 +76,8 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
+    createNxlsClient(context);
+
     initTelemetry(context.extensionMode === ExtensionMode.Production);
     initNxInit(context);
 
@@ -225,10 +227,11 @@ async function setWorkspace(workspacePath: string) {
     workspacePath = workspacePath.replace(/\//g, '\\');
   }
 
+  getNxlsClient().setWorkspacePath(workspacePath);
+
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  createNxlsClient(context).start(workspacePath);
-
+  // TODO(maxkless): I don't think this is necessary anymore, remove?
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
@@ -240,6 +243,8 @@ async function setWorkspace(workspacePath: string) {
     !hasInitializedExtensionPoints
   ) {
     hasInitializedExtensionPoints = true;
+    getNxlsClient().start(workspacePath);
+
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     initTasks(context);
     registerVscodeAddDependency(context);
@@ -314,9 +319,6 @@ async function registerWorkspaceFileWatcher(
     await new Promise((resolve) => setTimeout(resolve, 1000 * iteration));
 
     const nxlsClient = getNxlsClient();
-    if (!nxlsClient) {
-      return;
-    }
 
     const workspace = await nxlsClient.sendRequest(NxWorkspaceRequest, {
       reset: false,
@@ -335,13 +337,16 @@ async function registerWorkspaceFileWatcher(
         // errors while stopping the daemon aren't critical
       }
 
-      nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+      await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
       await new Promise<void>((resolve) => {
-        const disposable = nxlsClient.subscribeToRefresh(() => {
-          disposable.dispose();
-          resolve();
-        });
+        const disposable = nxlsClient.onNotification(
+          NxWorkspaceRefreshNotification,
+          () => {
+            disposable.dispose();
+            resolve();
+          }
+        );
       });
       refreshWorkspaceWithBackoff(iteration + 1);
     }

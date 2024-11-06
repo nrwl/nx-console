@@ -7,6 +7,10 @@ import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { AtomizerDecorationProvider } from './atomizer-decorations';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+import {
+  NxWorkspaceRefreshNotification,
+  NxWorkspaceRefreshStartedNotification,
+} from '@nx-console/language-server/types';
 
 export function initNxProjectView(
   context: ExtensionContext
@@ -26,7 +30,7 @@ export function initNxProjectView(
 
   AtomizerDecorationProvider.register(context);
 
-  listenToLoadingEventsAndShowBar();
+  listenToLoadingEventsAndShowBar(context);
 
   return nxProjectsTreeProvider;
 }
@@ -58,6 +62,30 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   return revealNxProject(project, root, target);
 }
 
-function listenToLoadingEventsAndShowBar() {
-  getNxlsClient()?.showRefreshLoadingAtLocation({ viewId: 'nxProjects' });
+function listenToLoadingEventsAndShowBar(context: ExtensionContext) {
+  const client = getNxlsClient();
+  context.subscriptions.push(
+    client.onNotification(NxWorkspaceRefreshStartedNotification, () => {
+      const refreshPromise = new Promise<void>((resolve) => {
+        const disposable = client.onNotification(
+          NxWorkspaceRefreshNotification,
+          () => {
+            disposable?.dispose();
+            resolve();
+          }
+        );
+      });
+
+      window.withProgress(
+        {
+          location: { viewId: 'nxProjects' },
+          cancellable: false,
+          title: 'Refreshing Nx workspace',
+        },
+        async () => {
+          await refreshPromise;
+        }
+      );
+    })
+  );
 }
