@@ -47,7 +47,7 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
             ]);
             progress.report({ message: 'Refreshing workspace', increment: 30 });
 
-            nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+            await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
             await new Promise<void>((resolve) => {
               if (!nxlsClient) {

@@ -101,10 +101,12 @@ export class NxlsClient {
     }
     return await this.client.sendRequest(requestType, params);
   }
-  public sendNotification<P>(
+  public async sendNotification<P>(
     notificationType: NotificationType<P>,
     params?: P
   ) {
+    await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
+
     if (!this.client) {
       throw new NxlsClientNotInitializedError();
     }

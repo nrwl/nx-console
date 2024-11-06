@@ -319,9 +319,6 @@ async function registerWorkspaceFileWatcher(
     await new Promise((resolve) => setTimeout(resolve, 1000 * iteration));
 
     const nxlsClient = getNxlsClient();
-    if (!nxlsClient) {
-      return;
-    }
 
     const workspace = await nxlsClient.sendRequest(NxWorkspaceRequest, {
       reset: false,
@@ -340,7 +337,7 @@ async function registerWorkspaceFileWatcher(
         // errors while stopping the daemon aren't critical
       }
 
-      nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+      await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
       await new Promise<void>((resolve) => {
         const disposable = nxlsClient.onNotification(
