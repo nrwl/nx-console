@@ -4,11 +4,19 @@ import { env, extensions, TelemetrySender } from 'vscode';
 
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
+// @ts-expect-error -- Browser Rollbar is not typed
+import Rollbar = require('rollbar/src/browser/rollbar');
 export class GoogleAnalyticsSender implements TelemetrySender {
   MEASUREMENT_ID = 'G-TNJ97NGX40';
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
 
   private _version: string;
+  private rollbar = new Rollbar({
+    accessToken: 'd7f75cfc52e745b697be89ef23dbe436',
+    captureUncaught: false,
+    captureUnhandledRejections: false,
+  });
+
   constructor(private production: boolean) {
     this._version =
       extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
@@ -28,6 +36,14 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     );
   }
   sendErrorData(error: Error, data?: Record<string, any>): void {
+    getOutputChannel().appendLine(`Uncaught Exception: ${error}`);
+
+    const shouldLogToRollbar = this.production
+      ? Math.floor(Math.random() * 75) === 0
+      : true;
+    if (shouldLogToRollbar) {
+      this.rollbar.error(error);
+    }
     this.sendEventData('misc.exception', {
       ...data,
       name: error.name,
@@ -73,8 +89,10 @@ export class GoogleAnalyticsSender implements TelemetrySender {
       type: 'POST',
     })
       .then((response) => {
-        if (response.responseText.length > 0) {
-          getOutputChannel().append(response.responseText);
+        if (this.production === false && response.responseText.length > 0) {
+          getOutputChannel().append(
+            `Telemetry Response: ${response.responseText}`
+          );
         }
       })
       .catch((reason: XHRResponse) => {
