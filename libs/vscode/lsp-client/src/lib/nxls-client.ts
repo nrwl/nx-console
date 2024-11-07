@@ -1,15 +1,23 @@
 import {
   NxChangeWorkspace,
+  NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
+  logAndShowError,
 } from '@nx-console/vscode/output-channels';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
-import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
+import {
+  Disposable,
+  ExtensionContext,
+  Progress,
+  ProgressLocation,
+  window,
+} from 'vscode';
 import {
   CloseAction,
   ErrorAction,
@@ -22,6 +30,7 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { killTree } from '@nx-console/shared/utils';
 
 let _nxlsClient: NxlsClient | undefined;
 
@@ -48,6 +57,7 @@ export class NxlsClient {
   private notificationListeners: Map<string, Map<string, () => void>> =
     new Map();
   private notificationListenerDisposables: Disposable[] = [];
+  private processExitListener: Disposable | undefined;
 
   constructor(private extensionContext: ExtensionContext) {
     this.actor.start();
@@ -72,14 +82,24 @@ export class NxlsClient {
             return await this._start(input.workspacePath);
           }
         ),
-        stopClient: fromPromise(async () => {
-          return await this._stop();
-        }),
+        stopClient: fromPromise(
+          async ({ input }: { input: { isNxlsProcessAlive?: boolean } }) => {
+            return await this._stop(input.isNxlsProcessAlive);
+          }
+        ),
       },
-    })
+    }),
+    {
+      inspect: (event) => {
+        const snapshot = event.actorRef.getSnapshot();
+        if (event.type === '@xstate.snapshot' && snapshot.value) {
+          getOutputChannel().appendLine(`Nxls Client - ${snapshot.value}`);
+        }
+      },
+    }
   );
 
-  public start(workspacePath: string) {
+  public start(workspacePath?: string) {
     this.actor.send({ type: 'START', value: workspacePath });
   }
 
@@ -87,21 +107,62 @@ export class NxlsClient {
     this.actor.send({ type: 'STOP' });
   }
 
-  public async restart() {
-    this.stop();
-    await waitFor(this.actor, (snapshot) => snapshot.matches('idle'));
-    const workspacePath = this.actor.getSnapshot().context.workspacePath;
-    if (!workspacePath) {
-      throw new Error('Workspace path is required to start the client');
-    }
-    this.start(workspacePath);
+  public async refreshWorkspace() {
+    window.withProgress(
+      {
+        location: ProgressLocation.Notification,
+        title: 'Refreshing Workspace',
+        cancellable: false,
+      },
+      async (progress) => {
+        try {
+          if (this.actor.getSnapshot().matches('running')) {
+            progress.report({ message: 'Stopping nx daemon', increment: 10 });
+            try {
+              await this.sendRequest(NxStopDaemonRequest, undefined);
+            } catch (e) {
+              // errors while stopping the daemon aren't critical
+            }
+
+            this.stop();
+          }
+          progress.report({ increment: 30 });
+
+          progress.report({ message: 'Restarting language server' });
+          await waitFor(this.actor, (snapshot) => snapshot.matches('idle'));
+          this.start();
+          progress.report({ message: 'Refreshing workspace', increment: 30 });
+
+          await this.sendNotification(NxWorkspaceRefreshNotification);
+
+          await new Promise<void>((resolve) => {
+            const disposable = this.onNotification(
+              NxWorkspaceRefreshNotification,
+              () => {
+                disposable.dispose();
+                resolve();
+              }
+            );
+          });
+        } catch (error) {
+          logAndShowError(
+            "Couldn't refresh workspace. Please view the logs for more information.",
+            error
+          );
+        }
+      }
+    );
   }
+
   public async sendRequest<P, R, E>(
     requestType: RequestType<P, R, E>,
     params: P,
     retry = 0
   ): Promise<R | undefined> {
     try {
+      if (this.actor.getSnapshot().matches('idle')) {
+        this.actor.send({ type: 'START' });
+      }
       await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
       if (!this.client) {
         throw new NxlsClientNotInitializedError();
@@ -120,10 +181,14 @@ export class NxlsClient {
       }
     }
   }
+
   public async sendNotification<P>(
     notificationType: NotificationType<P>,
     params?: P
   ) {
+    if (this.actor.getSnapshot().matches('idle')) {
+      this.actor.send({ type: 'START' });
+    }
     await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
 
     if (!this.client) {
@@ -203,69 +268,42 @@ export class NxlsClient {
     if (!workspacePath) {
       throw new Error('Workspace path is required to start the client');
     }
-    const serverModule = this.extensionContext.asAbsolutePath(
-      join('nxls', 'main.js')
-    );
 
-    const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
-    const serverOptions: ServerOptions = {
-      run: {
-        module: serverModule,
-        transport: TransportKind.ipc,
-      },
-      debug: {
-        module: serverModule,
-        transport: TransportKind.ipc,
-        options: debugOptions,
-      },
-    };
-
-    // Options to control the language client
-    const clientOptions: LanguageClientOptions = {
-      // Register the server for plain text documents
-      initializationOptions: {
-        workspacePath,
-      },
-      documentSelector: [
-        { scheme: 'file', language: 'json', pattern: '**/nx.json' },
-        { scheme: 'file', language: 'json', pattern: '**/project.json' },
-        { scheme: 'file', language: 'json', pattern: '**/workspace.json' },
-        { scheme: 'file', language: 'json', pattern: '**/package.json' },
-      ],
-      synchronize: {},
-      outputChannel: getNxlsOutputChannel(),
-      outputChannelName: 'Nx Language Server',
-      errorHandler: {
-        closed: () => ({
-          action: CloseAction.DoNotRestart,
-          handled: true,
-        }),
-        error: () => ({
-          action: ErrorAction.Continue,
-          handled: true,
-        }),
-      },
-    };
-
-    this.client = new LanguageClient(
-      'NxConsoleClient',
-      getNxlsOutputChannel().name,
-      serverOptions,
-      clientOptions
+    this.client = await createLanguageClient(
+      this.extensionContext,
+      workspacePath
     );
 
     await this.client.start();
+
+    const onNxlsExit = () => {
+      getOutputChannel().appendLine('Nxls process exited, stopping client.');
+      this.actor.send({ type: 'STOP', isNxlsProcessAlive: false });
+    };
+    const serverProcess = this.client['_serverProcess'];
+    serverProcess.on('exit', onNxlsExit);
+    this.processExitListener = new Disposable(() => {
+      serverProcess.off('exit', onNxlsExit);
+    });
 
     this.registerNotificationListeners();
 
     return this.client.initializeResult?.['pid'];
   }
 
-  private async _stop() {
-    if (this.client) {
-      await this.client.stop(2000);
+  private async _stop(nxlsProcessAlive = true) {
+    if (this.client && nxlsProcessAlive) {
+      try {
+        await this.client.stop(2000);
+      } catch (e) {
+        // timeout, kill the process forcefully instead
+        const pid = this.actor.getSnapshot().context.nxlsPid;
+        if (pid) {
+          killTree(pid, 'SIGTERM');
+        }
+      }
     }
-
+    this.processExitListener?.dispose();
     this.unregisterNotificationListeners();
   }
 
@@ -297,4 +335,58 @@ export class NxlsClientNotInitializedError extends Error {
     super('Nxls Client not initialized. This should not happen.');
     this.name = 'NxlsClientNotInitializedError';
   }
+}
+
+async function createLanguageClient(
+  extensionContext: ExtensionContext,
+  workspacePath: string
+): Promise<LanguageClient> {
+  const serverModule = extensionContext.asAbsolutePath(join('nxls', 'main.js'));
+
+  const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
+  const serverOptions: ServerOptions = {
+    run: {
+      module: serverModule,
+      transport: TransportKind.ipc,
+    },
+    debug: {
+      module: serverModule,
+      transport: TransportKind.ipc,
+      options: debugOptions,
+    },
+  };
+
+  // Options to control the language client
+  const clientOptions: LanguageClientOptions = {
+    // Register the server for plain text documents
+    initializationOptions: {
+      workspacePath,
+    },
+    documentSelector: [
+      { scheme: 'file', language: 'json', pattern: '**/nx.json' },
+      { scheme: 'file', language: 'json', pattern: '**/project.json' },
+      { scheme: 'file', language: 'json', pattern: '**/workspace.json' },
+      { scheme: 'file', language: 'json', pattern: '**/package.json' },
+    ],
+    synchronize: {},
+    outputChannel: getNxlsOutputChannel(),
+    outputChannelName: 'Nx Language Server',
+    errorHandler: {
+      closed: () => ({
+        action: CloseAction.DoNotRestart,
+        handled: true,
+      }),
+      error: () => ({
+        action: ErrorAction.Continue,
+        handled: true,
+      }),
+    },
+  };
+
+  return new LanguageClient(
+    'NxConsoleClient',
+    getNxlsOutputChannel().name,
+    serverOptions,
+    clientOptions
+  );
 }
