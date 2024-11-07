@@ -361,6 +361,7 @@ async function createLanguageClient(
     // Register the server for plain text documents
     initializationOptions: {
       workspacePath,
+      nxlsTimeout: true,
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },

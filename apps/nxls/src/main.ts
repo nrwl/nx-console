@@ -111,6 +111,7 @@ process.on('uncaughtException', (e) => {
 
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
+let NXLS_TIMEOUT = false;
 let unregisterFileWatcher: () => void = () => {
   //noop
 };
@@ -138,7 +139,7 @@ connection.onInitialize(async (params) => {
   setLspLogger(connection);
   lspLogger.log('Initializing Nx Language Server');
 
-  const { workspacePath } = params.initializationOptions ?? {};
+  const { workspacePath, nxlsTimeout } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
       workspacePath ||
@@ -149,6 +150,8 @@ connection.onInitialize(async (params) => {
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
     }
+
+    NXLS_TIMEOUT = nxlsTimeout || false;
 
     loadRootEnvFiles(WORKING_PATH);
 
@@ -752,5 +755,7 @@ function keepAlive() {
   if (timeout) {
     clearTimeout(timeout);
   }
-  timeout = setTimeout(exitHandler, 1000 * 60 * 60 * 3 /* 3 hours */);
+  if (NXLS_TIMEOUT) {
+    timeout = setTimeout(exitHandler, 1000 * 60 /* 3 hours */);
+  }
 }
