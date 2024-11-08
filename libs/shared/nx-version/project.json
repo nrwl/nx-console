@@ -1,0 +1,9 @@
+{
+  "name": "nx-version",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/nx-version/src",
+  "projectType": "library",
+  "tags": ["type:shared"],
+  "// targets": "to see all targets run: nx show project nx-version --web",
+  "targets": {}
+}

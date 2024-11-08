@@ -4,7 +4,7 @@ import {
   StartupMessageFactory,
 } from '../nx-console-plugin-types';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 export const nameAndDirectoryProcessor: SchemaProcessor = (
   schema: GeneratorSchema,

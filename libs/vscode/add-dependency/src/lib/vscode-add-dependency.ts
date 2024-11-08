@@ -28,7 +28,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { importNxPackagePath } from '@nx-console/shared/npm';
 import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';

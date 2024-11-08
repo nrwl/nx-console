@@ -9,7 +9,7 @@ import {
   ProjectDetailsPreview,
 } from './project-details-preview';
 import { NewProjectDetailsPreview } from './new-project-details-preview';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 export class ProjectDetailsManager {
   private previews: Map<string, ProjectDetailsPreview> = new Map();

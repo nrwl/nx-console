@@ -11,7 +11,7 @@ import { getNxVersion } from './get-nx-version';
 import { getProjectByPath } from './get-project-by-path';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
 import { nxWorkspace } from './workspace';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 export async function getPDVData(
   workspacePath: string,

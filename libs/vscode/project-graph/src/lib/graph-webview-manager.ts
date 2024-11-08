@@ -1,4 +1,4 @@
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 import {
   getNxGraphServer,
   handleGraphInteractionEventBase,

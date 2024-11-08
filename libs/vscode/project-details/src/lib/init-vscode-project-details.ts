@@ -25,7 +25,7 @@ import { ConfigFileCodelensProvider } from './config-file-codelens-provider';
 import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();

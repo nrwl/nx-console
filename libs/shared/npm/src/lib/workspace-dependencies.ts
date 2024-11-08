@@ -11,7 +11,7 @@ import {
   pnpDependencyPath,
 } from './pnp-dependencies';
 import { platform } from 'os';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 /**
  * Get dependencies for the current workspace.

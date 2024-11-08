@@ -23,7 +23,7 @@ import {
   workspaceDependencyPath,
 } from '@nx-console/shared/npm';
 import type { ProjectGraph, Target } from 'nx/src/devkit-exports';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 const tempDocumentCounter = new Map<string, number>();
 

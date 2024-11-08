@@ -5,7 +5,7 @@ import {
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 const html = String.raw;
 

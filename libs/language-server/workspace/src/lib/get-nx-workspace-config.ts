@@ -24,7 +24,7 @@ import {
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 import { readJsonFile, readNxJson } from '@nx-console/shared/npm';
-import { gte } from '@nx-console/shared/utils';
+import { gte } from '@nx-console/shared/nx-version';
 
 let _defaultProcessExit: typeof process.exit;
 
