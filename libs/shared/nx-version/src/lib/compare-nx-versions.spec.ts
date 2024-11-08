@@ -51,4 +51,8 @@ describe('gte', () => {
   it('should return false if string version b starts with 0.0.0-pr-', () => {
     expect(gte('1.0.0', '0.0.0-pr-123')).toBe(false);
   });
+
+  it('should return true if string version a starts with 0.0.0-pr- and string version b starts with 0.0.0-pr- ', () => {
+    expect(gte('0.0.0-pr-412', '0.0.0-pr-123')).toBe(true);
+  });
 });
