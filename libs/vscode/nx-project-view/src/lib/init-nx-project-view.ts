@@ -30,7 +30,9 @@ export function initNxProjectView(
 
   AtomizerDecorationProvider.register(context);
 
-  listenToLoadingEventsAndShowBar(context);
+  context.subscriptions.push(
+    getNxlsClient().showRefreshLoadingAtLocation({ viewId: 'nxProjects' })
+  );
 
   return nxProjectsTreeProvider;
 }
@@ -60,32 +62,4 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   }
   const target = viewItem.nxTarget;
   return revealNxProject(project, root, target);
-}
-
-function listenToLoadingEventsAndShowBar(context: ExtensionContext) {
-  const client = getNxlsClient();
-  context.subscriptions.push(
-    client.onNotification(NxWorkspaceRefreshStartedNotification, () => {
-      const refreshPromise = new Promise<void>((resolve) => {
-        const disposable = client.onNotification(
-          NxWorkspaceRefreshNotification,
-          () => {
-            disposable?.dispose();
-            resolve();
-          }
-        );
-      });
-
-      window.withProgress(
-        {
-          location: { viewId: 'nxProjects' },
-          cancellable: false,
-          title: 'Refreshing Nx workspace',
-        },
-        async () => {
-          await refreshPromise;
-        }
-      );
-    })
-  );
 }
