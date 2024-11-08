@@ -10,7 +10,7 @@ import {
   X_COMPLETION_TYPE,
 } from '@nx-console/shared/json-schema';
 import { Logger } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/types';
+import { NxVersion } from '@nx-console/shared/nx-version';
 import {
   ASTNode,
   CompletionItem,

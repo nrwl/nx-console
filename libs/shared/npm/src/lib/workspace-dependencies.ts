@@ -1,6 +1,6 @@
 import { directoryExists, fileExists } from '@nx-console/shared/file-system';
 import type { Logger, WorkspaceProjects } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/types';
+import { NxVersion } from '@nx-console/shared/nx-version';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';

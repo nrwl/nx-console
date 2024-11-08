@@ -1,3 +1,4 @@
+import { NxVersion } from '@nx-console/shared/nx-version';
 import type {
   NxJsonConfiguration,
   ProjectConfiguration,
@@ -14,12 +15,6 @@ export type NxProjectsConfiguration = {
     [projectName: string]: NxProjectConfiguration;
   };
   sourceMaps?: ConfigurationSourceMaps;
-};
-
-export type NxVersion = {
-  major: number;
-  minor: number;
-  full: string;
 };
 
 export type NxWorkspaceConfiguration = NxProjectsConfiguration &

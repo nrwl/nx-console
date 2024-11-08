@@ -2,6 +2,7 @@ import {
   GeneratorContext,
   GeneratorSchema,
 } from '@nx-console/shared/generate-ui-types';
+import { NxVersion } from '@nx-console/shared/nx-version';
 import {
   GeneratorCollectionInfo,
   Option,
@@ -9,7 +10,6 @@ import {
 } from '@nx-console/shared/schema';
 import {
   CloudOnboardingInfo,
-  NxVersion,
   NxWorkspace,
   PDVData,
   TreeNode,
