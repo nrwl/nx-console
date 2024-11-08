@@ -1,5 +1,5 @@
-import { NxVersion } from '@nx-console/shared/nx-version';
 import { gte as semverGte } from 'semver';
+import { NxVersion } from './nx-version';
 
 export function gte(a: NxVersion, b: string): boolean;
 export function gte(a: string, b: NxVersion): boolean;
