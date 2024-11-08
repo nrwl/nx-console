@@ -1,6 +1,7 @@
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { SchemaProcessor } from '../nx-console-plugin-types';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { gte } from '@nx-console/shared/utils';
 
 export const prefillProjectAndDirProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
@@ -11,7 +12,7 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
 
   // before nx 17, path/directory options are inconsistent so we don't prefill project & directory simultaneously
   // keep in mind that we normalize directory by appsDir & libsDir
-  if (workspace.nxVersion.major < 17) {
+  if (!gte(workspace.nxVersion, '17.0.0')) {
     if (schema.context?.project) {
       schema.context.prefillValues = {
         ...(schema.context.prefillValues ?? {}),
@@ -29,7 +30,7 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
 
   // after nx 18 the format options will be removed.
   // That means we should prefill cwd unless there's still a project / projectName option
-  if (workspace.nxVersion.major >= 18) {
+  if (gte(workspace.nxVersion, '18.0.0')) {
     if (
       schema.options.find(
         (o) => o.name === 'project' || o.name === 'projectName'

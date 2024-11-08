@@ -1,5 +1,5 @@
 import { NxError } from '@nx-console/shared/types';
-import { debounce } from '@nx-console/shared/utils';
+import { debounce, gte } from '@nx-console/shared/utils';
 import {
   NxGraphServer,
   getNxGraphServer,
@@ -127,7 +127,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
       (!isPartial ||
         !hasProjects ||
         !hasProject ||
-        nxWorkspace.nxVersion.major < 19)
+        !gte(nxWorkspace.nxVersion, '19.0.0'))
     ) {
       this.loadErrorHtml(workspaceErrors);
       return;

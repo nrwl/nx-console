@@ -14,7 +14,6 @@ import type {
 } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { performance } from 'perf_hooks';
-import { gte } from 'semver';
 import {
   getNxDaemonClient,
   getNxOutput,
@@ -25,6 +24,7 @@ import {
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 import { readJsonFile, readNxJson } from '@nx-console/shared/npm';
+import { gte } from '@nx-console/shared/utils';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -47,7 +47,10 @@ export async function getNxWorkspaceConfig(
   const start = performance.now();
   logger.log('Retrieving workspace configuration');
 
-  if (nxVersion.major < 12) {
+  lspLogger.log(
+    `${JSON.stringify(nxVersion)}, gte: ${gte(nxVersion, '12.0.0')}`
+  );
+  if (!gte(nxVersion, '12.0.0')) {
     lspLogger.log('Major version is less than 12');
     return readWorkspaceConfigs(workspacePath);
   }
@@ -85,7 +88,7 @@ export async function getNxWorkspaceConfig(
 
     let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
       undefined;
-    if (!gte(nxVersion.full, '17.3.0')) {
+    if (!gte(nxVersion, '17.3.0')) {
       try {
         workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
           format: 'nx',
@@ -120,9 +123,9 @@ export async function getNxWorkspaceConfig(
         };
       }
 
-      if (nxVersion.major < 13) {
+      if (!gte(nxVersion, '13.0.0')) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
-      } else if (gte(nxVersion.full, '17.2.0')) {
+      } else if (gte(nxVersion, '17.2.0')) {
         lspLogger.log('createProjectGraphAndSourceMapsAsync');
         try {
           const projectGraphAndSourceMaps = await (
@@ -167,7 +170,7 @@ export async function getNxWorkspaceConfig(
     }
 
     let projectFileMap: ProjectFileMap = {};
-    if (gte(nxVersion.full, '16.3.1') && projectGraph) {
+    if (gte(nxVersion, '16.3.1') && projectGraph) {
       projectFileMap =
         (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
           projectGraph

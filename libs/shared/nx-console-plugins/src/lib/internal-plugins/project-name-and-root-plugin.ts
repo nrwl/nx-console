@@ -5,6 +5,7 @@ import {
 } from '../nx-console-plugin-types';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { Logger } from '@nx-console/shared/schema';
+import { gte } from '@nx-console/shared/utils';
 
 export const projectNameAndRootProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
@@ -76,7 +77,7 @@ export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   workspace: NxWorkspace,
   lspLogger: Logger
 ) => {
-  if (workspace.nxVersion.major > 17) {
+  if (gte(workspace.nxVersion, '18.0.0')) {
     return undefined;
   }
   if (

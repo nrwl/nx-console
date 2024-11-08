@@ -1,3 +1,4 @@
+import { gte } from '@nx-console/shared/utils';
 import {
   getNxGraphServer,
   handleGraphInteractionEventBase,
@@ -181,7 +182,7 @@ export class GraphWebviewManager implements Disposable {
       (!isPartial ||
         !hasProjects ||
         !hasProject ||
-        nxWorkspace.nxVersion.major < 19)
+        !gte(nxWorkspace.nxVersion, '19.0.0'))
     ) {
       html = loadGraphErrorHtml(workspaceErrors);
     } else {

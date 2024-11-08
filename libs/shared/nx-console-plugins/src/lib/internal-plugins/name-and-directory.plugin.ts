@@ -4,6 +4,7 @@ import {
   StartupMessageFactory,
 } from '../nx-console-plugin-types';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { gte } from '@nx-console/shared/utils';
 
 export const nameAndDirectoryProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
@@ -66,7 +67,7 @@ export const nameAndDirectoryStartupMessage: StartupMessageFactory = (
     return undefined;
   }
 
-  if (workspace.nxVersion.major > 17) {
+  if (gte(workspace.nxVersion, '18.0.0')) {
     return undefined;
   }
   return {

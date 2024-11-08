@@ -31,7 +31,9 @@ export async function getNxVersion(workspacePath: string): Promise<NxVersion> {
       full: defaultSemver.version,
     };
   }
-  const nxVersion = coerce(nxWorkspacePackageJson.version);
+  const nxVersion = coerce(nxWorkspacePackageJson.version, {
+    includePrerelease: true,
+  });
   if (!nxVersion) {
     return {
       major: defaultSemver.major,

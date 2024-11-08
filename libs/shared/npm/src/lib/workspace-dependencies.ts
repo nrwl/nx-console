@@ -11,6 +11,7 @@ import {
   pnpDependencyPath,
 } from './pnp-dependencies';
 import { platform } from 'os';
+import { gte } from '@nx-console/shared/utils';
 
 /**
  * Get dependencies for the current workspace.
@@ -144,7 +145,7 @@ async function localDependencies(
   }
 
   // Local plugins do not work with nxVersion less than 13
-  if (version.major < 13) {
+  if (!gte(version, '13.0.0')) {
     return [];
   }
 

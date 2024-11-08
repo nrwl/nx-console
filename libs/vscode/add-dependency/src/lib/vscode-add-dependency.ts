@@ -28,6 +28,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { importNxPackagePath } from '@nx-console/shared/npm';
 import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { gte } from '@nx-console/shared/utils';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -245,10 +246,20 @@ async function getDependencySuggestions(): Promise<
             pkg.name !== 'make-angular-cli-faster' &&
             pkg.name !== 'tao'
         )
-        .map((pkg) => ({
-          name: `@${(version?.major ?? 16) <= 15 ? 'nrwl' : 'nx'}/${pkg.name}`,
-          description: pkg.description,
-        }));
+        .map((pkg) => {
+          let prefix: string;
+          if (!version) {
+            prefix = '@nx';
+          } else if (gte(version, '16.0.0')) {
+            prefix = '@nx';
+          } else {
+            prefix = '@nrwl';
+          }
+          return {
+            name: `@${prefix}/${pkg.name}`,
+            description: pkg.description,
+          };
+        });
     }),
     xhr({
       url: 'https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json',
