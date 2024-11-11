@@ -25,41 +25,44 @@ export class AddDependencyCodelensProvider implements NxCodeLensProvider {
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
-    const workspacePath = getWorkspacePath();
-    if (document.uri.path !== join(workspacePath, 'package.json')) {
-      return;
+    try {
+      const workspacePath = getWorkspacePath();
+      if (document.uri.path !== join(workspacePath, 'package.json')) {
+        return;
+      }
+      const packageJson = parseJsonText('package.json', document.getText());
+      const packageJsonObject = packageJson.statements[0]
+        .expression as ObjectLiteralExpression;
+
+      const depProperty = packageJsonObject.properties.find(
+        (property) => getPropertyName(property) === 'dependencies'
+      );
+      const devDepProperty = packageJsonObject.properties.find(
+        (property) => getPropertyName(property) === 'devDependencies'
+      );
+
+      const lenses: CodeLens[] = [];
+      if (depProperty) {
+        const pos = document.positionAt(depProperty.getStart(packageJson));
+        const command: Command = {
+          title: 'Add Dependency',
+          command: ADD_DEPENDENCY_COMMAND,
+        };
+        lenses.push(new CodeLens(new Range(pos, pos), command));
+      }
+      if (devDepProperty) {
+        const pos = document.positionAt(devDepProperty.getStart(packageJson));
+        const command: Command = {
+          title: 'Add Dev Dependency',
+          command: ADD_DEV_DEPENDENCY_COMMAND,
+        };
+        lenses.push(new CodeLens(new Range(pos, pos), command));
+      }
+
+      return lenses;
+    } catch (e) {
+      return [];
     }
-
-    const packageJson = parseJsonText('package.json', document.getText());
-    const packageJsonObject = packageJson.statements[0]
-      .expression as ObjectLiteralExpression;
-
-    const depProperty = packageJsonObject.properties.find(
-      (property) => getPropertyName(property) === 'dependencies'
-    );
-    const devDepProperty = packageJsonObject.properties.find(
-      (property) => getPropertyName(property) === 'devDependencies'
-    );
-
-    const lenses: CodeLens[] = [];
-    if (depProperty) {
-      const pos = document.positionAt(depProperty.getStart(packageJson));
-      const command: Command = {
-        title: 'Add Dependency',
-        command: ADD_DEPENDENCY_COMMAND,
-      };
-      lenses.push(new CodeLens(new Range(pos, pos), command));
-    }
-    if (devDepProperty) {
-      const pos = document.positionAt(devDepProperty.getStart(packageJson));
-      const command: Command = {
-        title: 'Add Dev Dependency',
-        command: ADD_DEV_DEPENDENCY_COMMAND,
-      };
-      lenses.push(new CodeLens(new Range(pos, pos), command));
-    }
-
-    return lenses;
   }
 }
 
