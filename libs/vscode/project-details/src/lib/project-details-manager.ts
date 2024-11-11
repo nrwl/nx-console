@@ -8,8 +8,8 @@ import {
   OldProjectDetailsPreview,
   ProjectDetailsPreview,
 } from './project-details-preview';
-import { gte } from 'semver';
 import { NewProjectDetailsPreview } from './new-project-details-preview';
+import { gte } from '@nx-console/shared/nx-version';
 
 export class ProjectDetailsManager {
   private previews: Map<string, ProjectDetailsPreview> = new Map();
@@ -31,7 +31,7 @@ export class ProjectDetailsManager {
         return;
       }
 
-      if (gte(nxVersion.full, '19.8.0')) {
+      if (gte(nxVersion, '19.8.0')) {
         preview = new NewProjectDetailsPreview(path, this.context);
       } else {
         preview = new OldProjectDetailsPreview(

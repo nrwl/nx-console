@@ -10,7 +10,7 @@ import {
 } from './common-json-schema';
 import { CompletionType, EnhancedJsonSchema } from './completion-type';
 import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
-import { NxVersion } from '@nx-console/shared/types';
+import { NxVersion } from '@nx-console/shared/nx-version';
 
 type JSONSchemaMap = NonNullable<JSONSchema['properties']>;
 

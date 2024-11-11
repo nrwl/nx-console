@@ -6,12 +6,12 @@ import type {
   ProjectGraphProjectNode,
 } from 'nx/src/devkit-exports';
 import { join, relative } from 'path';
-import { gte } from 'semver';
 import { getNxCloudStatus } from './get-nx-cloud-status';
 import { getNxVersion } from './get-nx-version';
 import { getProjectByPath } from './get-project-by-path';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
 import { nxWorkspace } from './workspace';
+import { gte } from '@nx-console/shared/nx-version';
 
 export async function getPDVData(
   workspacePath: string,
@@ -32,7 +32,7 @@ export async function getPDVData(
 
   const nxVersion = await getNxVersion(workspacePath);
 
-  if (!gte(nxVersion.full, '19.8.0')) {
+  if (!gte(nxVersion, '19.8.0')) {
     return {
       resultType: 'OLD_NX_VERSION',
       graphBasePath,

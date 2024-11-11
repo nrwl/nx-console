@@ -55,6 +55,7 @@
         "libs/shared/json-schema/src/index.ts"
       ],
       "@nx-console/shared/npm": ["libs/shared/npm/src/index.ts"],
+      "@nx-console/shared/nx-version": ["libs/shared/nx-version/src/index.ts"],
       "@nx-console/shared/schema": ["libs/shared/schema/src/index.ts"],
       "@nx-console/shared/schema/normalize": [
         "libs/shared/schema/src/normalize-schema.ts"

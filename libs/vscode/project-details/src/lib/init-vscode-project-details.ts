@@ -5,13 +5,13 @@ import {
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxVersion,
-  getNxWorkspaceProjects,
   getProjectByPath,
   getSourceMapFilesToProjectsMap,
 } from '@nx-console/vscode/nx-workspace';
+import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { dirname, join } from 'path';
-import { gte } from 'semver';
 import {
   commands,
   ExtensionContext,
@@ -25,8 +25,7 @@ import { ConfigFileCodelensProvider } from './config-file-codelens-provider';
 import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
-import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { gte } from '@nx-console/shared/nx-version';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -71,7 +70,7 @@ function registerCommand(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion.full, '17.3.0-beta.3')) {
+        if (gte(nxVersion, '17.3.0-beta.3')) {
           let document = config?.document;
           if (!document) {
             document = window.activeTextEditor?.document;

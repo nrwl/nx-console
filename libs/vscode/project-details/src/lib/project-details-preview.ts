@@ -1,3 +1,4 @@
+import { gte } from '@nx-console/shared/nx-version';
 import { NxError } from '@nx-console/shared/types';
 import { debounce } from '@nx-console/shared/utils';
 import {
@@ -127,7 +128,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
       (!isPartial ||
         !hasProjects ||
         !hasProject ||
-        nxWorkspace.nxVersion.major < 19)
+        !gte(nxWorkspace.nxVersion, '19.0.0'))
     ) {
       this.loadErrorHtml(workspaceErrors);
       return;

@@ -1,6 +1,7 @@
 import { JSONSchema } from 'vscode-json-languageservice';
 import { CompletionType } from './completion-type';
-import { NxVersion } from '@nx-console/shared/types';
+import { NxVersion } from '@nx-console/shared/nx-version';
+import { gte } from '@nx-console/shared/nx-version';
 
 export const implicitDependencies: JSONSchema = {
   type: 'array',
@@ -72,7 +73,7 @@ export const tags: JSONSchema = {
 };
 
 const projects = (nxVersion: NxVersion): JSONSchema => {
-  if (nxVersion.major < 16) {
+  if (!gte(nxVersion, '16.0.0')) {
     return {
       type: 'string',
       enum: ['self', 'dependencies'],

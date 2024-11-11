@@ -1,6 +1,6 @@
 import { directoryExists, fileExists } from '@nx-console/shared/file-system';
 import type { Logger, WorkspaceProjects } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/types';
+import { NxVersion } from '@nx-console/shared/nx-version';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';
@@ -11,6 +11,7 @@ import {
   pnpDependencyPath,
 } from './pnp-dependencies';
 import { platform } from 'os';
+import { gte } from '@nx-console/shared/nx-version';
 
 /**
  * Get dependencies for the current workspace.
@@ -144,7 +145,7 @@ async function localDependencies(
   }
 
   // Local plugins do not work with nxVersion less than 13
-  if (version.major < 13) {
+  if (!gte(version, '13.0.0')) {
     return [];
   }
 

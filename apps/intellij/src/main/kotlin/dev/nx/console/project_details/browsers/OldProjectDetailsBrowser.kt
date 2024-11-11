@@ -211,7 +211,7 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
                             (!hasProjects ||
                                 nxWorkspace?.isPartial != true ||
                                 !hasProject ||
-                                version.major < 19)
+                                !version.gte(19))
                     ) {
                         withContext(Dispatchers.EDT) {
                             if (browser.isDisposed) return@withContext

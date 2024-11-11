@@ -1,4 +1,4 @@
-import { NxVersion } from '@nx-console/shared/types';
+import { NxVersion } from '@nx-console/shared/nx-version';
 import {
   implicitDependencies,
   namedInputs,
