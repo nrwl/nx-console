@@ -19,7 +19,7 @@ plugins {
     // Kotlin serialization
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
     // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.0.1"
+    id("org.jetbrains.intellij.platform") version "2.1.0"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
@@ -84,7 +84,7 @@ dependencies {
 
 ktfmt { kotlinLangStyle() }
 
-kotlin { jvmToolchain(17) }
+kotlin { jvmToolchain(21) }
 
 intellijPlatform {
     projectName = providers.gradleProperty("pluginName").get()
@@ -191,7 +191,7 @@ qodana {
 kover.xmlReport { onCheck.set(true) }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
 }
 
 tasks {

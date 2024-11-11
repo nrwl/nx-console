@@ -11,7 +11,11 @@ import {
   workspace,
 } from 'vscode';
 
-import { checkIsNxWorkspace } from '@nx-console/shared/utils';
+import {
+  checkIsNxWorkspace,
+  killTree,
+  withTimeout,
+} from '@nx-console/shared/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -34,7 +38,6 @@ import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
-import { stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
@@ -45,15 +48,16 @@ import {
 } from '@nx-console/language-server/types';
 import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
+import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
 import {
   getOutputChannel,
   initOutputChannels,
 } from '@nx-console/vscode/output-channels';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
+import { getTelemetry, initTelemetry } from '@nx-console/vscode/telemetry';
+import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
-import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
-import { initTelemetry, getTelemetry } from '@nx-console/vscode/telemetry';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -71,6 +75,8 @@ export async function activate(c: ExtensionContext) {
 
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
+
+    createNxlsClient(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
     initNxInit(context);
@@ -114,10 +120,29 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
-  await stopDaemon();
-  await getNxlsClient()?.stop();
+  try {
+    await withTimeout(
+      async () =>
+        await getNxlsClient()?.sendRequest(
+          new RequestType('shutdown'),
+          undefined
+        ),
+      2000
+    );
+  } catch (e) {
+    // do nothing, we have to deactivate before the process is killed
+  }
+
   workspaceFileWatcher?.dispose();
+
+  const nxlsPid = getNxlsClient()?.getNxlsPid();
+  if (nxlsPid) {
+    killTree(nxlsPid, 'SIGINT');
+  }
+
   getTelemetry().logUsage('extension-deactivate');
+
+  killTree(process.pid, 'SIGTERM');
 }
 
 // -----------------------------------------------------------------------------
@@ -202,10 +227,11 @@ async function setWorkspace(workspacePath: string) {
     workspacePath = workspacePath.replace(/\//g, '\\');
   }
 
+  getNxlsClient().setWorkspacePath(workspacePath);
+
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  createNxlsClient(context).start(workspacePath);
-
+  // TODO(maxkless): I don't think this is necessary anymore, remove?
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
@@ -217,6 +243,8 @@ async function setWorkspace(workspacePath: string) {
     !hasInitializedExtensionPoints
   ) {
     hasInitializedExtensionPoints = true;
+    getNxlsClient().start(workspacePath);
+
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     initTasks(context);
     registerVscodeAddDependency(context);
@@ -291,9 +319,6 @@ async function registerWorkspaceFileWatcher(
     await new Promise((resolve) => setTimeout(resolve, 1000 * iteration));
 
     const nxlsClient = getNxlsClient();
-    if (!nxlsClient) {
-      return;
-    }
 
     const workspace = await nxlsClient.sendRequest(NxWorkspaceRequest, {
       reset: false,
@@ -312,13 +337,16 @@ async function registerWorkspaceFileWatcher(
         // errors while stopping the daemon aren't critical
       }
 
-      nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+      await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
       await new Promise<void>((resolve) => {
-        const disposable = nxlsClient.subscribeToRefresh(() => {
-          disposable.dispose();
-          resolve();
-        });
+        const disposable = nxlsClient.onNotification(
+          NxWorkspaceRefreshNotification,
+          () => {
+            disposable.dispose();
+            resolve();
+          }
+        );
       });
       refreshWorkspaceWithBackoff(iteration + 1);
     }

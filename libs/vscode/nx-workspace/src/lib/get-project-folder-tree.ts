@@ -1,6 +1,6 @@
 import { NxProjectFolderTreeRequest } from '@nx-console/language-server/types';
 import { TreeMap, TreeNode } from '@nx-console/shared/types';
-import { sendRequest } from '@nx-console/vscode/lsp-client';
+import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 
 export async function getProjectFolderTree(): Promise<
   | {
@@ -9,7 +9,7 @@ export async function getProjectFolderTree(): Promise<
     }
   | undefined
 > {
-  const res = await sendRequest(NxProjectFolderTreeRequest, {});
+  const res = await getNxlsClient().sendRequest(NxProjectFolderTreeRequest, {});
   if (!res) {
     return undefined;
   }

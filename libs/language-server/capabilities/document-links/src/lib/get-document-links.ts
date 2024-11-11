@@ -1,15 +1,15 @@
-import { fileExists } from '@nx-console/shared/file-system';
-import {
-  CompletionType,
-  hasCompletionType,
-  X_COMPLETION_TYPE,
-} from '@nx-console/shared/json-schema';
 import {
   findProjectRoot,
   getDefaultCompletionType,
   hasDefaultCompletionType,
   isStringNode,
 } from '@nx-console/language-server/utils';
+import { fileExists } from '@nx-console/shared/file-system';
+import {
+  CompletionType,
+  hasCompletionType,
+  X_COMPLETION_TYPE,
+} from '@nx-console/shared/json-schema';
 import { join } from 'path';
 import {
   DocumentLink,

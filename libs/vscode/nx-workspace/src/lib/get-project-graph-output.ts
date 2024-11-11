@@ -1,5 +1,5 @@
 import { NxProjectGraphOutputRequest } from '@nx-console/language-server/types';
-import { sendRequest } from '@nx-console/vscode/lsp-client';
+import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 
 export async function getProjectGraphOutput(): Promise<
   | {
@@ -9,5 +9,5 @@ export async function getProjectGraphOutput(): Promise<
     }
   | undefined
 > {
-  return sendRequest(NxProjectGraphOutputRequest, undefined);
+  return getNxlsClient().sendRequest(NxProjectGraphOutputRequest, undefined);
 }

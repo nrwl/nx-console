@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 17
+          java-version: 21
           cache: gradle
       - name: Workspace Lint
         run: |
@@ -89,7 +89,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 17
+          java-version: 21
           cache: gradle
       # there's no need to check formatting & linting again on windows, sometimes there's a timing issue with intellij:build so run it up front
       - run: npx nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3

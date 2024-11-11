@@ -1,5 +1,6 @@
+import { gte } from '@nx-console/shared/nx-version';
 import { xhr } from 'request-light';
-import { gte, rcompare } from 'semver';
+import { rcompare } from 'semver';
 import { QuickPickItem, QuickPickItemKind, window } from 'vscode';
 
 type VersionMap = Record<string, { latest: string; all: string[] }>;

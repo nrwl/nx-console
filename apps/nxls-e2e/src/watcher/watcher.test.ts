@@ -144,7 +144,7 @@ describe('watcher', () => {
 
       try {
         execSync(
-          'npx nx g @nx/react:app --name react-app1 --no-interactive --verbose',
+          'npx nx g @nx/react:app --directory react-app1 --no-interactive --verbose',
           {
             cwd: join(e2eCwd, workspaceName),
             env: process.env,

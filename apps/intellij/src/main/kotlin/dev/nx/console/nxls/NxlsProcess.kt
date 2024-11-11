@@ -3,10 +3,13 @@ package dev.nx.console.nxls
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.javascript.nodejs.interpreter.NodeCommandLineConfigurator
+import com.intellij.javascript.nodejs.library.yarn.pnp.YarnPnpManager
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.util.io.awaitExit
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.utils.isDevelopmentInstance
@@ -16,10 +19,8 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
+import java.nio.file.Paths
+import kotlinx.coroutines.*
 
 private val logger = logger<NxlsProcess>()
 
@@ -33,7 +34,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
 
     private var exitJob: Job? = null
 
-    fun start() {
+    suspend fun start() {
         logger.info("Staring the nxls process in workingDir $basePath")
         createCommandLine().apply {
             process = createProcess()
@@ -102,7 +103,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
         this.onExit = callback
     }
 
-    private fun createCommandLine(): GeneralCommandLine {
+    private suspend fun createCommandLine(): GeneralCommandLine {
         val lsp =
             JSLanguageServiceUtil.getPluginDirectory(this@NxlsProcess.javaClass, "nxls/main.js")
         if (lsp == null || !lsp.exists()) {
@@ -112,8 +113,24 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
         logger.info("nxls found via ${lsp.path}")
         return GeneralCommandLine().apply {
             withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+
+            val pnpArg = readAction {
+                val yarnPnpManager = YarnPnpManager.getInstance(project)
+                val virtualBaseFile =
+                    VirtualFileManager.getInstance()
+                        .findFileByNioPath(Paths.get(project.nxBasePath))
+                if (virtualBaseFile != null && yarnPnpManager.isUnderPnp(virtualBaseFile)) {
+                    val pnpFile = yarnPnpManager.pnpFiles.first()
+                    return@readAction "--require ${pnpFile.pnpFile.path}"
+                } else {
+                    return@readAction ""
+                }
+            }
+
             if (isDevelopmentInstance()) {
-                withEnvironment("NODE_OPTIONS", "--inspect=6009 --enable-source-maps")
+                withEnvironment("NODE_OPTIONS", "--inspect=6009 --enable-source-maps $pnpArg")
+            } else {
+                withEnvironment("NODE_OPTIONS", pnpArg)
             }
             withCharset(Charsets.UTF_8)
             workDirectory = File(basePath)

@@ -1,0 +1,6 @@
+{
+  "name": "@nx-console/shared/nx-version",
+  "version": "0.0.1",
+  "dependencies": {},
+  "private": true
+}

@@ -142,7 +142,7 @@ class NxTreeStructure(val tree: NxProjectsTree, val project: Project) : SimpleTr
     private inner class RunWithDebugAction :
         ExecuteAction(DefaultDebugExecutor.getDebugExecutorInstance()) {
         init {
-            registerCustomShortcutSet(CommonShortcuts.CTRL_ENTER, null)
+            registerCustomShortcutSet(CommonShortcuts.getCtrlEnter(), null)
         }
     }
 

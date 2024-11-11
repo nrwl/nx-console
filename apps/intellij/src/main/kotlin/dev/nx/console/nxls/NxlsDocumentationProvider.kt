@@ -6,7 +6,7 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.utils.DocumentUtils
 import kotlinx.coroutines.runBlocking

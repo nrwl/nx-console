@@ -101,8 +101,12 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
     return {
       ...codeLens,
       command: {
-        command: OPEN_QUICKPICK_COMMAND,
-        title: `$(play) Nx Targets: ${targetsString}`,
+        command: targetsString
+          ? OPEN_QUICKPICK_COMMAND
+          : 'nx.project-details.openToSide',
+        title: targetsString
+          ? `$(play) Nx Targets: ${targetsString}`
+          : '$(open-preview) Open Project Details View',
         arguments: [project],
       },
     };
@@ -155,6 +159,7 @@ function showProjectDetailsQuickpick(project: ProjectConfiguration) {
     description: target.command ?? target.options?.command ?? target.executor,
     iconPath: new ThemeIcon('play'),
   }));
+
   const openProjectDetailsItem: QuickPickItem = {
     label: 'Open Project Details',
     iconPath: new ThemeIcon('open-preview'),

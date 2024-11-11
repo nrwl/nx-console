@@ -4,14 +4,14 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 
 export const defaultVersion =
-  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '19.8.0-canary.20240917-5b34ea5';
+  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '20.0.3';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
   'nxls-e2e'
 );
 export type NewWorkspaceOptions = {
-  preset: string;
+  preset?: string;
   bundler?: string;
   e2eTestRunner?: string;
   style?: string;
@@ -32,6 +32,7 @@ export function newWorkspace({
   version,
   options,
   verbose,
+  env,
 }: {
   name?: string;
   packageManager?: 'npm' | 'pnpm' | 'yarn';
@@ -39,6 +40,7 @@ export function newWorkspace({
   version?: string;
   options: NewWorkspaceOptions;
   verbose?: boolean;
+  env?: NodeJS.ProcessEnv;
 }) {
   if (verbose === undefined) {
     verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
@@ -69,21 +71,21 @@ export function newWorkspace({
     );
   }
 
-  const env = {
+  const _env = {
     CI: 'true',
-    NX_CLOUD_API: 'https://staging.nx.app',
-    ...process.env,
+    NX_CLOUD_API: 'https://staging.nx.app', // create-nx-workspace invocations are tracked and we don't want to skew the stats through e2es
+    ...(env ?? process.env),
   } as NodeJS.ProcessEnv;
 
   // we need to make sure to not enable plugin isolation for nx 18 because it causes issues
   if (version.startsWith('18')) {
-    delete env['NX_ISOLATE_PLUGINS'];
+    delete _env['NX_ISOLATE_PLUGINS'];
   }
 
   const create = execSync(command, {
     cwd: e2eCwd,
     stdio: verbose ? 'inherit' : 'pipe',
-    env,
+    env: _env,
     encoding: 'utf-8',
   });
 

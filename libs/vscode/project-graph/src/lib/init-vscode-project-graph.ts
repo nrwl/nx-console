@@ -10,7 +10,6 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
-import { gte } from 'semver';
 import { ExtensionContext, Uri, commands, window } from 'vscode';
 import { GraphWebviewManager } from './graph-webview-manager';
 import { GraphWebView } from './legacy-implementation/graph-webview';
@@ -27,6 +26,7 @@ import {
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { gte } from '@nx-console/shared/nx-version';
 
 let _graphWebviewManager: GraphWebviewManager | undefined;
 
@@ -51,7 +51,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion.full, '17.3.0-beta.3')) {
+      if (gte(nxVersion, '17.3.0-beta.3')) {
         graphWebviewManager.showAllProjects();
       } else {
         legacyShowAll(legacyGrapyWebView);
@@ -64,7 +64,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion.full, '17.3.0-beta.3')) {
+      if (gte(nxVersion, '17.3.0-beta.3')) {
         graphWebviewManager.showAffectedProjects();
       } else {
         legacyShowAffected(legacyGrapyWebView);
@@ -79,7 +79,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion.full, '17.3.0-beta.3')) {
+      if (gte(nxVersion, '17.3.0-beta.3')) {
         const project = await getProjectForContext(uri);
 
         if (project && project.name) {
@@ -98,7 +98,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion.full, '17.3.0-beta.3')) {
+      if (gte(nxVersion, '17.3.0-beta.3')) {
         const project = await getProjectForContext(uri);
 
         if (project && project.name) {
@@ -119,7 +119,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion.full, '17.3.0-beta.3')) {
+        if (gte(nxVersion, '17.3.0-beta.3')) {
           const project = treeItem.getProject();
           if (project?.project) {
             graphWebviewManager.focusProject(project.project);
@@ -140,7 +140,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion.full, '17.3.0-beta.3')) {
+        if (gte(nxVersion, '17.3.0-beta.3')) {
           const project = treeItem.getProject();
           if (project?.project) {
             graphWebviewManager.selectProject(project.project);
@@ -159,7 +159,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion.full, '17.3.0-beta.3')) {
+      if (gte(nxVersion, '17.3.0-beta.3')) {
         const project = await getProjectForContext(uri);
         if (!project) return;
 
@@ -193,7 +193,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion.full, '17.3.0-beta.3')) {
+        if (gte(nxVersion, '17.3.0-beta.3')) {
           if (item instanceof NxTreeItem) {
             const project = item.getProject();
             const target = item.getTarget();

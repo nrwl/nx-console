@@ -130,6 +130,7 @@ describe('nx.json completion - default', () => {
         "generators",
         "implicitDependencies",
         "namedInputs",
+        "neverConnectToCloud",
         "nxCloudAccessToken",
         "nxCloudEncryptionKey",
         "nxCloudUrl",

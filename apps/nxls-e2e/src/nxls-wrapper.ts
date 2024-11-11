@@ -11,7 +11,7 @@ import {
   StreamMessageWriter,
 } from 'vscode-languageserver/node';
 
-import treeKill from 'tree-kill';
+import { killTree } from '@nx-console/shared/utils';
 
 export class NxlsWrapper {
   private messageReader?: StreamMessageReader;
@@ -32,7 +32,7 @@ export class NxlsWrapper {
     console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
   };
 
-  constructor(private verbose?: boolean) {
+  constructor(private verbose?: boolean, private env?: NodeJS.ProcessEnv) {
     if (verbose === undefined) {
       this.verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
     }
@@ -54,7 +54,7 @@ export class NxlsWrapper {
       );
 
       const p = spawn('node', [nxlsPath, '--stdio'], {
-        env: process.env,
+        env: this.env ?? process.env,
         cwd,
         windowsHide: true,
       });
@@ -134,13 +134,13 @@ export class NxlsWrapper {
 
     this.process?.removeListener('exit', this.earlyExitListener);
 
-    await new Promise<void>((resolve) => {
-      if (this.process?.pid) {
-        treeKill(this.process.pid, 'SIGKILL', () => resolve());
-      } else {
-        resolve();
+    if (this.process?.pid) {
+      try {
+        killTree(this.process.pid, 'SIGKILL');
+      } catch (e) {
+        console.log(`NXLS WRAPPER: ${e}`);
       }
-    });
+    }
   }
 
   async sendRequest(

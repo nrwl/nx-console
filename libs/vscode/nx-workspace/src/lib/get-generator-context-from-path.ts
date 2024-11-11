@@ -1,6 +1,6 @@
 import { NxGeneratorContextFromPathRequest } from '@nx-console/language-server/types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
-import { sendRequest } from '@nx-console/vscode/lsp-client';
+import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 
 export async function getGeneratorContextFromPath(
   generator: TaskExecutionSchema,
@@ -14,5 +14,8 @@ export async function getGeneratorContextFromPath(
     }
   | undefined
 > {
-  return sendRequest(NxGeneratorContextFromPathRequest, { generator, path });
+  return getNxlsClient().sendRequest(NxGeneratorContextFromPathRequest, {
+    generator,
+    path,
+  });
 }

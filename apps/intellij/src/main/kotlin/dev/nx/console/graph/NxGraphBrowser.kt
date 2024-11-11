@@ -83,7 +83,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                     !errorsToShow.isNullOrEmpty() &&
                         (nxWorkspace?.isPartial != true ||
                             !hasProjects ||
-                            nxWorkspace.nxVersion.major < 19 ||
+                            !nxWorkspace.nxVersion.gte(19) ||
                             needsNonExistentProject)
                 ) {
                     val errorHtml = getErrorHtml(errorsToShow)

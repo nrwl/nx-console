@@ -38,7 +38,7 @@ private val logger = logger<OldNxGraphService>()
 class OldNxGraphBrowser(
     project: Project,
     private val state: StateFlow<NxGraphStates>,
-    private val nxVersion: Deferred<NxVersion?>
+    private val nxVersion: Deferred<NxVersion?>,
 ) : NxGraphBrowserBase(project) {
     private val cs = OldNxGraphBrowserCoroutineHolder.getInstance(project).cs
 
@@ -57,10 +57,10 @@ class OldNxGraphBrowser(
     fun selectAllProjects() {
         executeWhenLoaded {
             lastCommand = Command.SelectAll
-            val major = nxVersion.await()?.major
-            if (major == null || major.toInt() > 14) {
+            val nxVersion = nxVersion.await()
+            if (nxVersion == null || nxVersion.gte(15)) {
                 browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
-            } else if (major.toInt() == 14) {
+            } else if (nxVersion.major == 14) {
                 browser.executeJavaScriptAsync(
                     "window.externalApi.depGraphService.send({type: 'selectAll'})"
                 )
@@ -73,10 +73,10 @@ class OldNxGraphBrowser(
     fun focusProject(projectName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusProject(projectName)
-            val major = nxVersion.await()?.major
-            if (major == null || major.toInt() > 14) {
+            val nxVersion = nxVersion.await()
+            if (nxVersion == null || nxVersion.gte(15)) {
                 browser.executeJavaScriptAsync("window.externalApi.focusProject('$projectName')")
-            } else if (major.toInt() == 14) {
+            } else if (nxVersion.major == 14) {
                 browser.executeJavaScriptAsync(
                     "window.externalApi.depGraphService.send({type: 'focusProject', projectName: '$projectName'})"
                 )
@@ -185,19 +185,22 @@ class OldNxGraphBrowser(
               padding: 12px;
             }
           </style>
-          """
+          """,
                 )
                 .replace(
                     "</head>",
                     """
                      $nxConsoleEnvironmentScriptTag
                      </head>
-                    """
+                    """,
                 )
-                .replace(Regex("</body>"), """
+                .replace(
+                    Regex("</body>"),
+                    """
 
           </body>
-            """)
+            """,
+                )
 
         browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
@@ -404,7 +407,7 @@ class OldNxGraphBrowser(
                     Notifier.notifyAnything(
                         project,
                         "Couldn't find file at path $path",
-                        NotificationType.ERROR
+                        NotificationType.ERROR,
                     )
                     return@addHandler null
                 }
@@ -431,7 +434,7 @@ class OldNxGraphBrowser(
                     TelemetryService.getInstance(project)
                         .featureUsed(
                             TelemetryEvent.MISC_SHOW_PROJECT_CONFIGURATION,
-                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
                         )
 
                     project.nxWorkspace()?.workspace?.projects?.get(msg)?.apply {
@@ -464,7 +467,7 @@ class OldNxGraphBrowser(
                     TelemetryService.getInstance(project)
                         .featureUsed(
                             TelemetryEvent.TASKS_RUN,
-                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
                         )
 
                     val (projectName, targetName) = msg.split(":")
