@@ -46,42 +46,46 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
   async provideCodeLenses(
     document: TextDocument
   ): Promise<CodeLens[] | undefined> {
-    const lens: CodeLens[] = [];
+    try {
+      const lens: CodeLens[] = [];
 
-    let projectName = '';
+      let projectName = '';
 
-    const documentPath = document.uri.path;
+      const documentPath = document.uri.path;
 
-    if (documentPath.endsWith('project.json')) {
-      const project = await getProjectByPath(documentPath);
-      if (!project) {
-        return;
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        projectName = project.name!;
+      if (documentPath.endsWith('project.json')) {
+        const project = await getProjectByPath(documentPath);
+        if (!project) {
+          return;
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          projectName = project.name!;
+        }
       }
+
+      const projectLocations = getProjectLocations(document, projectName);
+      const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
+      if (!validWorkspaceJson) {
+        return;
+      }
+
+      for (const projectName in projectLocations) {
+        const project = projectLocations[projectName];
+
+        await this.buildProjectLenses(
+          project,
+          document,
+          lens,
+          projectName,
+          WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
+        );
+
+        this.buildTargetLenses(project, document, lens, projectName);
+      }
+      return lens;
+    } catch (e) {
+      return [];
     }
-
-    const projectLocations = getProjectLocations(document, projectName);
-    const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
-    if (!validWorkspaceJson) {
-      return;
-    }
-
-    for (const projectName in projectLocations) {
-      const project = projectLocations[projectName];
-
-      await this.buildProjectLenses(
-        project,
-        document,
-        lens,
-        projectName,
-        WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
-      );
-
-      this.buildTargetLenses(project, document, lens, projectName);
-    }
-    return lens;
   }
   async buildProjectLenses(
     project: ProjectLocations[string],

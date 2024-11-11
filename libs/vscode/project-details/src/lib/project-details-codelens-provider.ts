@@ -54,14 +54,17 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
     document: TextDocument,
     token: CancellationToken
   ): ProviderResult<ProjectDetailsCodeLens[]> {
-    const codelensLocation = this.getCodelensLocation(document);
-
-    return [
-      new ProjectDetailsCodeLens(
-        new Range(codelensLocation, codelensLocation),
-        document.fileName
-      ),
-    ];
+    try {
+      const codelensLocation = this.getCodelensLocation(document);
+      return [
+        new ProjectDetailsCodeLens(
+          new Range(codelensLocation, codelensLocation),
+          document.fileName
+        ),
+      ];
+    } catch (e) {
+      return [];
+    }
   }
   async resolveCodeLens?(
     codeLens: ProjectDetailsCodeLens,
