@@ -1,3 +1,10 @@
+## [18.30.2](https://github.com/nrwl/nx-console/compare/vscode-v18.30.1...vscode-v18.30.2) (2024-11-11)
+
+
+### Bug Fixes
+
+* **vscode:** catch errors during codelens creation ([#2311](https://github.com/nrwl/nx-console/issues/2311)) ([65da0d2](https://github.com/nrwl/nx-console/commit/65da0d2644b296e6088a2a8f828932bf2f1f1fc6))
+
 ## [18.30.1](https://github.com/nrwl/nx-console/compare/vscode-v18.30.0...vscode-v18.30.1) (2024-11-11)
 
 
