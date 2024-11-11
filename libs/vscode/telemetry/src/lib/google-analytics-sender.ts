@@ -15,6 +15,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     accessToken: 'd7f75cfc52e745b697be89ef23dbe436',
     captureUncaught: false,
     captureUnhandledRejections: false,
+    captureIp: false,
   });
 
   constructor(private production: boolean) {
