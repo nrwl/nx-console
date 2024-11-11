@@ -1,3 +1,22 @@
+# [18.30.0](https://github.com/nrwl/nx-console/compare/vscode-v18.29.1...vscode-v18.30.0) (2024-11-11)
+
+
+### Bug Fixes
+
+* handle 0.0.0-pr- releases when comparing versions ([#2309](https://github.com/nrwl/nx-console/issues/2309)) ([134c2b7](https://github.com/nrwl/nx-console/commit/134c2b7b6ee8f835365d36a5cf0546fe7a2b32b1))
+* kill entire process tree when shutting down nxls & vscode ([#2288](https://github.com/nrwl/nx-console/issues/2288)) ([b174106](https://github.com/nrwl/nx-console/commit/b17410640226bb58af7f005e225483c1521d1b0d))
+* **nxls:** adjust parseTargetString invocation to always pass a project graph ([#2291](https://github.com/nrwl/nx-console/issues/2291)) ([68c0b0d](https://github.com/nrwl/nx-console/commit/68c0b0d04f1e7186f14c155167e6347689e1398b))
+* run nxls in a way that works with yarn pnp ([#2301](https://github.com/nrwl/nx-console/issues/2301)) ([3a38499](https://github.com/nrwl/nx-console/commit/3a38499f5fc606526a5089f06a18bd7215b22bbd))
+* **vscode:** improve codelens if no  targets exist for project ([#2303](https://github.com/nrwl/nx-console/issues/2303)) ([9183dce](https://github.com/nrwl/nx-console/commit/9183dce783d3803f14740e2b3c0c9313e2132127))
+* **vscode:** refactor new pdv to separate webview & state machine ([#2300](https://github.com/nrwl/nx-console/issues/2300)) ([cea04fc](https://github.com/nrwl/nx-console/commit/cea04fc3374f55be14569116d5d49e306f74ee4d))
+* **vscode:** repair inlined tree-kill implementation ([#2298](https://github.com/nrwl/nx-console/issues/2298)) ([f6a9e5d](https://github.com/nrwl/nx-console/commit/f6a9e5dc29f4752bbd928e66742808bd533441a0))
+
+
+### Features
+
+* **vscode:** log anonymized errors to rollbar ([#2305](https://github.com/nrwl/nx-console/issues/2305)) ([7255d56](https://github.com/nrwl/nx-console/commit/7255d56c251b87563bd80feca5a980532d064e16))
+* **vscode:** rework PDV integration to use new apis & state machine ([#2272](https://github.com/nrwl/nx-console/issues/2272)) ([990e2df](https://github.com/nrwl/nx-console/commit/990e2dfb2cdc928d4041654d40d8e8c4c5cb45a6))
+
 ## [18.29.1](https://github.com/nrwl/nx-console/compare/vscode-v18.29.0...vscode-v18.29.1) (2024-10-17)
 
 
