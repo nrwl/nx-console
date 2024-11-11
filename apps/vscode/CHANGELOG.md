@@ -1,3 +1,10 @@
+## [18.30.1](https://github.com/nrwl/nx-console/compare/vscode-v18.30.0...vscode-v18.30.1) (2024-11-11)
+
+
+### Bug Fixes
+
+* **vscode:** rollbar adjustment ([#2310](https://github.com/nrwl/nx-console/issues/2310)) ([ee519ac](https://github.com/nrwl/nx-console/commit/ee519accc50e410ede152e91895a7feabd1ab417))
+
 # [18.30.0](https://github.com/nrwl/nx-console/compare/vscode-v18.29.1...vscode-v18.30.0) (2024-11-11)
 
 
