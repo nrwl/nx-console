@@ -11,11 +11,11 @@ import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getNxVersion } from '@nx-console/vscode/nx-workspace';
 import { watchFile } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { gte } from 'semver';
 import * as vscode from 'vscode';
 import { Actor, createActor, fromPromise, setup } from 'xstate';
 import { getExternalFiles, TSCONFIG_BASE } from './get-external-files';
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { gte } from '@nx-console/shared/nx-version';
 
 let disposables: vscode.Disposable[] = [];
 
@@ -51,10 +51,8 @@ export async function initTypeScriptServerPlugin(
             const tsExtension = vscode.extensions.getExtension(
               'vscode.typescript-language-features'
             );
-            getOutputChannel().appendLine(`guard: ${!!tsExtension}`);
             return !!tsExtension;
           } catch (e) {
-            getOutputChannel().appendLine(`guard: ${e}`);
             return false;
           }
         },
@@ -98,10 +96,7 @@ export async function initTypeScriptServerPlugin(
           },
         },
       },
-    }),
-    {
-      inspect: (event) => getOutputChannel().appendLine(JSON.stringify(event)),
-    }
+    })
   ).start();
 
   handleServerPluginEnablement(machine);
@@ -139,8 +134,6 @@ async function handleServerPluginEnablement(machine: Actor<any>) {
   const usingTsSolutionSetup = await isUsingTsSolutionSetup(
     machine.getSnapshot().context.workspaceRoot
   );
-
-  console.log('usingTsSolutionSetup', usingTsSolutionSetup);
 
   if (enableLibraryImports && !usingTsSolutionSetup) {
     machine.send({ type: 'ENABLE' });
@@ -213,6 +206,7 @@ async function enableTypescriptServerPlugin(
 }
 
 async function disableTypescriptServerPlugin() {
+  getOutputChannel().appendLine(`Disabling TypeScript plugin`);
   disposables.forEach((d) => d.dispose());
   disposables = [];
   vscode.window.withProgress(
@@ -236,26 +230,30 @@ async function configurePlugin(workspaceRoot: string, api: any) {
 
 async function isUsingTsSolutionSetup(workspaceRoot: string): Promise<boolean> {
   const nxVersion = await getNxVersion();
-  if (nxVersion && gte(nxVersion.full, '20.0.0')) {
-    const nxJsPath = await workspaceDependencyPath(
-      workspaceRoot,
-      join('@nx', 'js')
-    );
-    if (!nxJsPath) {
+  if (nxVersion && gte(nxVersion.full, '20.1.0')) {
+    try {
+      const nxJsPath = await workspaceDependencyPath(
+        workspaceRoot,
+        join('@nx', 'js')
+      );
+      if (!nxJsPath) {
+        return false;
+      }
+      const tsSolutionSetupPath = join(
+        nxJsPath,
+        'src',
+        'utils',
+        'typescript',
+        'ts-solution-setup.js'
+      );
+
+      const { isUsingTsSolutionSetup } = await importWorkspaceDependency<
+        typeof import('@nx/js/src/utils/typescript/ts-solution-setup')
+      >(tsSolutionSetupPath);
+      return isUsingTsSolutionSetup();
+    } catch (e) {
       return false;
     }
-    const tsSolutionSetupPath = join(
-      nxJsPath,
-      'src',
-      'utils',
-      'typescript',
-      'ts-solution-setup.js'
-    );
-
-    const { isUsingTsSolutionSetup } = await importWorkspaceDependency<
-      typeof import('@nx/js/src/utils/typescript/ts-solution-setup')
-    >(tsSolutionSetupPath);
-    return isUsingTsSolutionSetup(undefined);
   }
   return false;
 }
