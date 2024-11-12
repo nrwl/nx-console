@@ -41,11 +41,8 @@ export async function getNxWorkspaceConfig(
   let errors: NxError[] | undefined;
 
   const start = performance.now();
-  logger.log('Retrieving workspace configuration');
+  logger.log(`Retrieving workspace configuration for nx ${nxVersion.full}`);
 
-  lspLogger.log(
-    `${JSON.stringify(nxVersion)}, gte: ${gte(nxVersion, '12.0.0')}`
-  );
   if (!gte(nxVersion, '12.0.0')) {
     lspLogger.log('Major version is less than 12');
     return readWorkspaceConfigs(workspacePath);
