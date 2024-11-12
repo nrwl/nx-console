@@ -1,3 +1,10 @@
+## [18.30.3](https://github.com/nrwl/nx-console/compare/vscode-v18.30.2...vscode-v18.30.3) (2024-11-12)
+
+
+### Bug Fixes
+
+* **vscode:** retry nxls request if connection is disposed during request ([#2312](https://github.com/nrwl/nx-console/issues/2312)) ([6709217](https://github.com/nrwl/nx-console/commit/6709217372fff92359bd56e462c8c3141aa2944a))
+
 ## [18.30.2](https://github.com/nrwl/nx-console/compare/vscode-v18.30.1...vscode-v18.30.2) (2024-11-11)
 
 
