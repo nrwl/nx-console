@@ -3,11 +3,16 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
-import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
+import {
+  getNxlsOutputChannel,
+  getOutputChannel,
+} from '@nx-console/vscode/output-channels';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
 import {
+  CloseAction,
+  ErrorAction,
   LanguageClient,
   LanguageClientOptions,
   NotificationType,
@@ -93,13 +98,27 @@ export class NxlsClient {
   }
   public async sendRequest<P, R, E>(
     requestType: RequestType<P, R, E>,
-    params: P
+    params: P,
+    retry = 0
   ): Promise<R | undefined> {
-    await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
-    if (!this.client) {
-      throw new NxlsClientNotInitializedError();
+    try {
+      await waitFor(this.actor, (snapshot) => snapshot.matches('running'));
+      if (!this.client) {
+        throw new NxlsClientNotInitializedError();
+      }
+      return await this.client.sendRequest(requestType, params);
+    } catch (e) {
+      if (e.code === -32097) {
+        if (retry < 3) {
+          return this.sendRequest(requestType, params, retry + 1);
+        }
+      } else {
+        getOutputChannel().appendLine(
+          `Error sending request to Nx Language Server: ${e}`
+        );
+        return undefined;
+      }
     }
-    return await this.client.sendRequest(requestType, params);
   }
   public async sendNotification<P>(
     notificationType: NotificationType<P>,
@@ -216,6 +235,16 @@ export class NxlsClient {
       synchronize: {},
       outputChannel: getNxlsOutputChannel(),
       outputChannelName: 'Nx Language Server',
+      errorHandler: {
+        closed: () => ({
+          action: CloseAction.DoNotRestart,
+          handled: true,
+        }),
+        error: () => ({
+          action: ErrorAction.Continue,
+          handled: true,
+        }),
+      },
     };
 
     this.client = new LanguageClient(
