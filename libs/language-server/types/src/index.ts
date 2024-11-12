@@ -9,6 +9,8 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import {
+  CIPEInfo,
+  CIPEInfoError,
   CloudOnboardingInfo,
   NxWorkspace,
   PDVData,
@@ -178,6 +180,7 @@ export const NxCloudStatusRequest: RequestType<
   {
     isConnected: boolean;
     nxCloudUrl?: string;
+    nxCloudId?: string;
   },
   unknown
 > = new RequestType('nx/cloudStatus');
@@ -193,3 +196,9 @@ export const NxPDVDataRequest: RequestType<
   PDVData,
   unknown
 > = new RequestType('nx/pdvData');
+
+export const NxRecentCIPEDataRequest: RequestType<
+  undefined,
+  { info?: CIPEInfo[]; error?: CIPEInfoError; workspaceUrl?: string },
+  unknown
+> = new RequestType('nx/recentCIPEData');

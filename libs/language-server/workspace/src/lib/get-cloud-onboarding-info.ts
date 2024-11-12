@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'fs';
 import * as os from 'node:os';
 import { join } from 'path';
 
+import { lspLogger } from '@nx-console/language-server/utils';
 import {
   getNxAccessToken,
   getNxCloudId,
@@ -11,7 +12,6 @@ import {
 import { CloudOnboardingInfo } from '@nx-console/shared/types';
 import { parse } from 'ini';
 import { xhr } from 'request-light';
-import { lspLogger } from '@nx-console/language-server/utils';
 
 export async function getCloudOnboardingInfo(
   workspacePath: string
@@ -91,7 +91,7 @@ function getCommonCIFileContents(workspacePath: string): string[] {
   return fileContents;
 }
 
-function getNxCloudConfigIni(): any | undefined {
+export function getNxCloudConfigIni(): any | undefined {
   const iniLocation = findExistingNxCloudConfigFile();
 
   if (iniLocation && existsSync(iniLocation)) {
@@ -195,6 +195,7 @@ async function getNxCloudWorkspaceClaimed(
     });
     return JSON.parse(response.responseText);
   } catch (e) {
+    e;
     lspLogger.log(
       `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${e.responseText}`
     );

@@ -6,11 +6,7 @@ import {
 } from '@nx-console/shared/npm';
 import { CloudOnboardingInfo } from '@nx-console/shared/types';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import {
-  getCloudOnboardingInfo,
-  getNxCloudStatus,
-} from '@nx-console/vscode/nx-workspace';
+import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
 
 import {
   CancellationToken,
@@ -26,11 +22,13 @@ import {
 } from 'vscode';
 
 import { withTimeout } from '@nx-console/shared/utils';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
-import { join } from 'path';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { join } from 'path';
+import { isDeepStrictEqual } from 'util';
+import { ActorRef, EventObject } from 'xstate';
+import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -38,18 +36,20 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
   private _view: WebviewView | undefined;
   private _webviewSourceUri: Uri;
 
-  private _refreshSubscription: Disposable;
+  private _refreshSubscription: Disposable | undefined;
 
-  constructor(private extensionContext: ExtensionContext) {
+  private onboardingInfo: CloudOnboardingInfo | undefined;
+
+  constructor(
+    private extensionContext: ExtensionContext,
+    private actor: ActorRef<any, EventObject>
+  ) {
     this._webviewSourceUri = Uri.joinPath(
       this.extensionContext.extensionUri,
       'nx-cloud-onboarding-webview'
     );
 
-    this._refreshSubscription = onWorkspaceRefreshed(async () => {
-      await this.refresh();
-    });
-    extensionContext.subscriptions.push(this._refreshSubscription);
+    this.ensureStateSubscription();
   }
 
   async resolveWebviewView(
@@ -57,6 +57,8 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
     context: WebviewViewResolveContext,
     token: CancellationToken
   ): Promise<void> {
+    this.ensureStateSubscription();
+
     this._view = webviewView;
 
     webviewView.webview.options = {
@@ -64,11 +66,9 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
       localResourceRoots: [this._webviewSourceUri],
     };
 
-    const cloudOnboardingInfo = await getCloudOnboardingInfo();
-
     webviewView.webview.html = this.getWebviewContent(
       webviewView,
-      cloudOnboardingInfo
+      this.onboardingInfo
     );
 
     webviewView.webview.onDidReceiveMessage((event) => {
@@ -76,24 +76,17 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
     });
 
     webviewView.onDidDispose(() => {
-      this._refreshSubscription.dispose();
+      if (this._refreshSubscription) {
+        this._refreshSubscription.dispose();
+      }
     });
   }
 
   async refresh() {
     if (this._view) {
-      const cloudOnboardingInfo = await window.withProgress(
-        {
-          location: { viewId: CloudOnboardingViewProvider.viewId },
-        },
-        async () => {
-          return await getCloudOnboardingInfo();
-        }
-      );
-
       this._view.webview.html = this.getWebviewContent(
         this._view,
-        cloudOnboardingInfo
+        this.onboardingInfo
       );
     }
   }
@@ -130,7 +123,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         break;
       }
       case 'open-cloud-app': {
-        openCloudApp();
+        commands.executeCommand('nxCloud.openApp');
         break;
       }
       default: {
@@ -173,6 +166,45 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         )}'></root-element>
 			</body>
 			</html>`;
+  }
+
+  private ensureStateSubscription() {
+    if (this._refreshSubscription) {
+      return;
+    }
+
+    this.onboardingInfo = this.actor.getSnapshot().context.onboardingInfo;
+    const sub = this.actor.subscribe((state) => {
+      const newState = state.context.onboardingInfo as
+        | CloudOnboardingInfo
+        | undefined;
+
+      if (newState && !isDeepStrictEqual(this.onboardingInfo, newState)) {
+        this.onboardingInfo = newState;
+        this.refresh();
+      }
+    });
+    this._refreshSubscription = new Disposable(() => {
+      sub.unsubscribe();
+      this._refreshSubscription = undefined;
+    });
+    this.extensionContext.subscriptions.push(this._refreshSubscription);
+  }
+
+  static create(
+    extensionContext: ExtensionContext,
+    actor: ActorRef<any, EventObject>
+  ) {
+    const onboardingProvider = new CloudOnboardingViewProvider(
+      extensionContext,
+      actor
+    );
+    extensionContext.subscriptions.push(
+      window.registerWebviewViewProvider(
+        CloudOnboardingViewProvider.viewId,
+        onboardingProvider
+      )
+    );
   }
 }
 
@@ -230,26 +262,4 @@ function generateCI() {
     positional: '@nx/workspace:ci-workflow',
     flags: [],
   });
-}
-
-async function openCloudApp() {
-  const cloudUrl = (await getNxCloudStatus())?.nxCloudUrl;
-
-  if (cloudUrl) {
-    getTelemetry().logUsage('cloud.open-app');
-    const cloudUrlWithTracking = `${cloudUrl}?utm_campaign=open-cloud-app&utm_medium=cloud-promo&utm_source=nxconsole`;
-    commands.executeCommand('vscode.open', cloudUrlWithTracking);
-  } else {
-    window
-      .showErrorMessage(
-        'Something went wrong while retrieving the Nx Cloud URL.',
-        'Open Logs',
-        'OK'
-      )
-      .then((selection) => {
-        if (selection === 'Open Logs') {
-          getNxlsOutputChannel().show();
-        }
-      });
-  }
 }
