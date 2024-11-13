@@ -1,3 +1,11 @@
+## [18.30.4](https://github.com/nrwl/nx-console/compare/vscode-v18.30.3...vscode-v18.30.4) (2024-11-13)
+
+
+### Bug Fixes
+
+* **vscode:** also show loading bar in Common Nx Commands view ([#2308](https://github.com/nrwl/nx-console/issues/2308)) ([7141dbc](https://github.com/nrwl/nx-console/commit/7141dbc3d1da51348d5f62e0bb3a1d23f636c0f4))
+* **vscode:** unregister listener if cloud onboarding webview is disposed ([#2316](https://github.com/nrwl/nx-console/issues/2316)) ([30d621c](https://github.com/nrwl/nx-console/commit/30d621c046071bd2cc141501719dc3145b35aeb0))
+
 ## [18.30.3](https://github.com/nrwl/nx-console/compare/vscode-v18.30.2...vscode-v18.30.3) (2024-11-12)
 
 
