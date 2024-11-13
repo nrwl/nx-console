@@ -15,6 +15,7 @@ import {
 import {
   CancellationToken,
   commands,
+  Disposable,
   ExtensionContext,
   tasks,
   Uri,
@@ -37,18 +38,18 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
   private _view: WebviewView | undefined;
   private _webviewSourceUri: Uri;
 
+  private _refreshSubscription: Disposable;
+
   constructor(private extensionContext: ExtensionContext) {
     this._webviewSourceUri = Uri.joinPath(
       this.extensionContext.extensionUri,
       'nx-cloud-onboarding-webview'
     );
 
-    const sub = onWorkspaceRefreshed(async () => {
+    this._refreshSubscription = onWorkspaceRefreshed(async () => {
       await this.refresh();
     });
-    if (sub) {
-      extensionContext.subscriptions.push(sub);
-    }
+    extensionContext.subscriptions.push(this._refreshSubscription);
   }
 
   async resolveWebviewView(
@@ -72,6 +73,10 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage((event) => {
       this.handleWebviewMessage(event);
+    });
+
+    webviewView.onDidDispose(() => {
+      this._refreshSubscription.dispose();
     });
   }
 
