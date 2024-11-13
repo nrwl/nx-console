@@ -1,5 +1,6 @@
 import { getNxGraphServer } from '@nx-console/vscode/graph-base';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { commands, ExtensionContext } from 'vscode';
 
@@ -18,8 +19,14 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
 
       getTelemetry().logUsage('misc.refresh-workspace');
 
-      await getNxlsClient().refreshWorkspace();
-      await getNxGraphServer(context).restart();
+      try {
+        await getNxlsClient().refreshWorkspace();
+        await getNxGraphServer(context).restart();
+      } catch (e) {
+        getOutputChannel().appendLine(
+          `Error refreshing workspace: ${e.message}`
+        );
+      }
 
       isRefreshing = false;
     })
