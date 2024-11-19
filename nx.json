@@ -161,8 +161,16 @@
     "format": "github",
     "patterns": [
       {
-        "files": ["*"],
+        "projects": ["*"],
         "owners": ["@MaxKless"]
+      }
+    ]
+  },
+  "conformance": {
+    "rules": [
+      {
+        "rule": "@nx/powerpack-conformance/ensure-owners",
+        "status": "enforced"
       }
     ]
   },
