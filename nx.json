@@ -151,21 +151,8 @@
         "buildTargetName": "build"
       }
     },
-    "@nx/powerpack-enterprise-cloud",
-    "@nx/powerpack-owners"
+    "@nx/powerpack-enterprise-cloud"
   ],
-  "sync": {
-    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"]
-  },
-  "owners": {
-    "format": "github",
-    "patterns": [
-      {
-        "files": ["*"],
-        "owners": ["@MaxKless"]
-      }
-    ]
-  },
   "defaultBase": "master",
   "nxCloudAccessToken": "OGQ4ZGI1ZmMtMmFkMy00NGM1LThlMDMtZjFlNGZiMWRmZTQ1fHJlYWQ=",
   "nxCloudUrl": "https://staging.nx.app"
