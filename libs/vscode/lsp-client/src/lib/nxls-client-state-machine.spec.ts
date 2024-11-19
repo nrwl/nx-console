@@ -10,12 +10,17 @@ const defaultImplementation = {
         return await defaultStart(input.workspacePath);
       }
     ),
-    stopClient: fromPromise(async () => {
-      return defaultStop();
-    }),
+    stopClient: fromPromise(
+      async ({ input }: { input: { isNxlsProcessAlive?: boolean } }) => {
+        return defaultStop(input.isNxlsProcessAlive);
+      }
+    ),
   },
 };
 describe('Nxls Client State Machine', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   it('should render idle initially', () => {
     const actor = createActor(
       nxlsClientStateMachine.provide(defaultImplementation)
@@ -87,5 +92,19 @@ describe('Nxls Client State Machine', () => {
 
     expect(actor.getSnapshot().context.workspacePath).toBe('newPath');
     expect(sendFn).toHaveBeenCalledWith('newPath');
+  });
+
+  it('should pass isNxlsProcessAlive to stop function when event is called with it', async () => {
+    const actor = createActor(
+      nxlsClientStateMachine.provide(defaultImplementation)
+    );
+    actor.start();
+    actor.send({ type: 'START', value: 'workspacePath' });
+
+    await waitFor(actor, (snapshot) => snapshot.matches('running'));
+
+    actor.send({ type: 'STOP', isNxlsProcessAlive: false });
+
+    expect(defaultStop).toHaveBeenCalledWith(false);
   });
 });
