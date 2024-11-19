@@ -756,6 +756,6 @@ function keepAlive() {
     clearTimeout(timeout);
   }
   if (NXLS_TIMEOUT) {
-    timeout = setTimeout(exitHandler, 1000 * 60 /* 3 hours */);
+    timeout = setTimeout(exitHandler, 1000 * 60 * 60 * 3 /* 3 hours */);
   }
 }
