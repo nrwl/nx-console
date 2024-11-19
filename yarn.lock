@@ -3800,93 +3800,106 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/powerpack-enterprise-cloud@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-enterprise-cloud@npm:1.0.9"
+"@nx/powerpack-conformance@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-conformance@npm:1.1.0-beta.2"
   dependencies:
     "@nx/devkit": ">= 19 < 21"
-    "@nx/powerpack-license": 1.0.9
-  checksum: 71a56d835abb472e87fdbb8fcfb9935af050825b69e2864085a3a69c68c8be1862d76c7af8151cf6e69842b3114415c5f2c21366735eefd87480bccb1572a9d3
+    "@nx/powerpack-license": 1.1.0-beta.2
+    ajv: ^8.12.0
+    esbuild: ^0.21.5
+    tsx: ^4.16.5
+  checksum: 9a2b34cc69643fc7bc0e3f401a9368ed8670610098cce46607fa5d1122b468dc994c4d6a0fc1b241c8c2fb5744c660a1cc03cf672da10baa24191553d71b61ed
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-darwin-arm64@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-darwin-arm64@npm:1.0.9"
+"@nx/powerpack-enterprise-cloud@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-enterprise-cloud@npm:1.1.0-beta.2"
+  dependencies:
+    "@nx/devkit": ">= 19 < 21"
+    "@nx/powerpack-license": 1.1.0-beta.2
+  checksum: 4f6f5f3f115c716fb7e091d1aee669bc8aff0dc545cb20185a0ee8042e33b2963529515bbaef2b5a5639e069c25b2f91260834d9d037e9511755da9a74f4f0a3
+  languageName: node
+  linkType: hard
+
+"@nx/powerpack-license-darwin-arm64@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-darwin-arm64@npm:1.1.0-beta.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-darwin-x64@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-darwin-x64@npm:1.0.9"
+"@nx/powerpack-license-darwin-x64@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-darwin-x64@npm:1.1.0-beta.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-arm-gnueabihf@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-linux-arm-gnueabihf@npm:1.0.9"
+"@nx/powerpack-license-linux-arm-gnueabihf@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-linux-arm-gnueabihf@npm:1.1.0-beta.2"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-arm64-gnu@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-linux-arm64-gnu@npm:1.0.9"
+"@nx/powerpack-license-linux-arm64-gnu@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-linux-arm64-gnu@npm:1.1.0-beta.2"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-arm64-musl@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-linux-arm64-musl@npm:1.0.9"
+"@nx/powerpack-license-linux-arm64-musl@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-linux-arm64-musl@npm:1.1.0-beta.2"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-x64-gnu@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-linux-x64-gnu@npm:1.0.9"
+"@nx/powerpack-license-linux-x64-gnu@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-linux-x64-gnu@npm:1.1.0-beta.2"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-x64-musl@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-linux-x64-musl@npm:1.0.9"
+"@nx/powerpack-license-linux-x64-musl@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-linux-x64-musl@npm:1.1.0-beta.2"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-win32-arm64-msvc@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-win32-arm64-msvc@npm:1.0.9"
+"@nx/powerpack-license-win32-arm64-msvc@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-win32-arm64-msvc@npm:1.1.0-beta.2"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-win32-x64-msvc@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license-win32-x64-msvc@npm:1.0.9"
+"@nx/powerpack-license-win32-x64-msvc@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license-win32-x64-msvc@npm:1.1.0-beta.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license@npm:1.0.9":
-  version: 1.0.9
-  resolution: "@nx/powerpack-license@npm:1.0.9"
+"@nx/powerpack-license@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-license@npm:1.1.0-beta.2"
   dependencies:
     "@napi-rs/wasm-runtime": ^0.2.4
-    "@nx/powerpack-license-darwin-arm64": 1.0.9
-    "@nx/powerpack-license-darwin-x64": 1.0.9
-    "@nx/powerpack-license-linux-arm-gnueabihf": 1.0.9
-    "@nx/powerpack-license-linux-arm64-gnu": 1.0.9
-    "@nx/powerpack-license-linux-arm64-musl": 1.0.9
-    "@nx/powerpack-license-linux-x64-gnu": 1.0.9
-    "@nx/powerpack-license-linux-x64-musl": 1.0.9
-    "@nx/powerpack-license-win32-arm64-msvc": 1.0.9
-    "@nx/powerpack-license-win32-x64-msvc": 1.0.9
+    "@nx/powerpack-license-darwin-arm64": 1.1.0-beta.2
+    "@nx/powerpack-license-darwin-x64": 1.1.0-beta.2
+    "@nx/powerpack-license-linux-arm-gnueabihf": 1.1.0-beta.2
+    "@nx/powerpack-license-linux-arm64-gnu": 1.1.0-beta.2
+    "@nx/powerpack-license-linux-arm64-musl": 1.1.0-beta.2
+    "@nx/powerpack-license-linux-x64-gnu": 1.1.0-beta.2
+    "@nx/powerpack-license-linux-x64-musl": 1.1.0-beta.2
+    "@nx/powerpack-license-win32-arm64-msvc": 1.1.0-beta.2
+    "@nx/powerpack-license-win32-x64-msvc": 1.1.0-beta.2
   dependenciesMeta:
     "@nx/powerpack-license-darwin-arm64":
       optional: true
@@ -3906,7 +3919,18 @@ __metadata:
       optional: true
     "@nx/powerpack-license-win32-x64-msvc":
       optional: true
-  checksum: b46576fdb62e6a8d3a91aa3c761f883b57914f9aae3674d1e473700bdd58243b2fded7d69ffb5eed3afc12dc40787ab0e63baadffcd9fa82d93b2e1158631d06
+  checksum: 0225de9e4815507061d35dd4ceacc9b7dc57db80af7657ea986c495df52e92c9a104739433b08090e7a67e655c128ae044d91e87f6de1d3b5bd675b5a5bccdba
+  languageName: node
+  linkType: hard
+
+"@nx/powerpack-owners@npm:1.1.0-beta.2":
+  version: 1.1.0-beta.2
+  resolution: "@nx/powerpack-owners@npm:1.1.0-beta.2"
+  dependencies:
+    "@nx/devkit": ">= 19 < 21"
+    "@nx/powerpack-license": 1.1.0-beta.2
+    minimatch: 9.0.3
+  checksum: 6a68811632756cebd32f04f649f8c206a172a147660688c26588c1b93dfe19ab6095050c3f98f3f59ae2c1fa15d3697e9d9ff6ab892700a7ef8a01d48e52d749
   languageName: node
   linkType: hard
 
@@ -11570,7 +11594,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:>=0.15.13, esbuild@npm:^0.21.3":
+"esbuild@npm:>=0.15.13, esbuild@npm:^0.21.3, esbuild@npm:^0.21.5":
   version: 0.21.5
   resolution: "esbuild@npm:0.21.5"
   dependencies:
@@ -11650,7 +11674,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0":
+"esbuild@npm:^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0, esbuild@npm:~0.23.0":
   version: 0.23.1
   resolution: "esbuild@npm:0.23.1"
   dependencies:
@@ -13154,6 +13178,15 @@ __metadata:
     es-errors: ^1.3.0
     get-intrinsic: ^1.2.4
   checksum: e1cb53bc211f9dbe9691a4f97a46837a553c4e7caadd0488dc24ac694db8a390b93edd412b48dcdd0b4bbb4c595de1709effc75fc87c0839deedc6968f5bd973
+  languageName: node
+  linkType: hard
+
+"get-tsconfig@npm:^4.7.5":
+  version: 4.8.1
+  resolution: "get-tsconfig@npm:4.8.1"
+  dependencies:
+    resolve-pkg-maps: ^1.0.0
+  checksum: 12df01672e691d2ff6db8cf7fed1ddfef90ed94a5f3d822c63c147a26742026d582acd86afcd6f65db67d809625d17dd7f9d34f4d3f38f69bc2f48e19b2bdd5b
   languageName: node
   linkType: hard
 
@@ -19106,7 +19139,9 @@ __metadata:
     "@nx/jest": 20.1.1
     "@nx/js": 20.1.1
     "@nx/node": 20.1.1
-    "@nx/powerpack-enterprise-cloud": 1.0.9
+    "@nx/powerpack-conformance": 1.1.0-beta.2
+    "@nx/powerpack-enterprise-cloud": 1.1.0-beta.2
+    "@nx/powerpack-owners": 1.1.0-beta.2
     "@nx/storybook": 20.1.1
     "@nx/web": 20.1.1
     "@nx/webpack": 20.1.1
@@ -21884,6 +21919,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"resolve-pkg-maps@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "resolve-pkg-maps@npm:1.0.0"
+  checksum: 1012afc566b3fdb190a6309cc37ef3b2dcc35dff5fa6683a9d00cd25c3247edfbc4691b91078c97adc82a29b77a2660c30d791d65dab4fc78bfc473f60289977
+  languageName: node
+  linkType: hard
+
 "resolve.exports@npm:1.1.0":
   version: 1.1.0
   resolution: "resolve.exports@npm:1.1.0"
@@ -24298,6 +24340,22 @@ __metadata:
   peerDependencies:
     typescript: ">=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta"
   checksum: 1843f4c1b2e0f975e08c4c21caa4af4f7f65a12ac1b81b3b8489366826259323feb3fc7a243123453d2d1a02314205a7634e048d4a8009921da19f99755cdc48
+  languageName: node
+  linkType: hard
+
+"tsx@npm:^4.16.5":
+  version: 4.19.2
+  resolution: "tsx@npm:4.19.2"
+  dependencies:
+    esbuild: ~0.23.0
+    fsevents: ~2.3.3
+    get-tsconfig: ^4.7.5
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    tsx: dist/cli.mjs
+  checksum: 7f9f1b338a73297725a9217cedaaad862f7c81d5264093c74b98a71491ad5413b11248d604c0e650f4f7da6f365249f1426fdb58a1325ab9e15448156b1edff6
   languageName: node
   linkType: hard
 
