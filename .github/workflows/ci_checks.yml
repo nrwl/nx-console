@@ -17,6 +17,7 @@ jobs:
     env:
       NX_CI_EXECUTION_ENV: 'linux'
       NX_VERBOSE_LOGGING: true
+      NX_POWERPACK_LOGGING: 'trace'
     steps:
       - uses: actions/checkout@v4
         with:
