@@ -61,9 +61,9 @@
     "@nx/jest": "20.1.1",
     "@nx/js": "20.1.1",
     "@nx/node": "20.1.1",
-    "@nx/powerpack-conformance": "1.1.0-beta.2",
-    "@nx/powerpack-enterprise-cloud": "1.1.0-beta.2",
-    "@nx/powerpack-owners": "1.1.0-beta.2",
+    "@nx/powerpack-conformance": "1.1.0-beta.3",
+    "@nx/powerpack-enterprise-cloud": "1.1.0-beta.3",
+    "@nx/powerpack-owners": "1.1.0-beta.3",
     "@nx/storybook": "20.1.1",
     "@nx/web": "20.1.1",
     "@nx/webpack": "20.1.1",
@@ -141,9 +141,5 @@
   "nx": {
     "includedScripts": []
   },
-  "packageManager": "yarn@4.3.1+sha512.af78262d7d125afbfeed740602ace8c5e4405cd7f4735c08feb327286b2fdb2390fbca01589bfd1f50b1240548b74806767f5a063c94b67e431aabd0d86f7774",
-  "resolutions": {
-    "@nx/powerpack-license-darwin-arm64": "file:powerpack-license-darwin-arm64",
-    "@nx/powerpack-license-linux-x64-gnu": "file:powerpack-license-linux-x64-gnu"
-  }
+  "packageManager": "yarn@4.3.1+sha512.af78262d7d125afbfeed740602ace8c5e4405cd7f4735c08feb327286b2fdb2390fbca01589bfd1f50b1240548b74806767f5a063c94b67e431aabd0d86f7774"
 }

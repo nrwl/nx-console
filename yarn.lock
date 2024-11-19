@@ -3800,106 +3800,106 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/powerpack-conformance@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-conformance@npm:1.1.0-beta.2"
+"@nx/powerpack-conformance@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-conformance@npm:1.1.0-beta.3"
   dependencies:
     "@nx/devkit": ">= 19 < 21"
-    "@nx/powerpack-license": 1.1.0-beta.2
+    "@nx/powerpack-license": 1.1.0-beta.3
     ajv: ^8.12.0
     esbuild: ^0.21.5
     tsx: ^4.16.5
-  checksum: 9a2b34cc69643fc7bc0e3f401a9368ed8670610098cce46607fa5d1122b468dc994c4d6a0fc1b241c8c2fb5744c660a1cc03cf672da10baa24191553d71b61ed
+  checksum: 5bf4232c58afe186aef31bd9e0198fb246635c56fc92b63f5c3ab577092af296d42ca0c05e17f70a50e3583a57f7001d8606c7f809dcd0a013a09b8200388feb
   languageName: node
   linkType: hard
 
-"@nx/powerpack-enterprise-cloud@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-enterprise-cloud@npm:1.1.0-beta.2"
+"@nx/powerpack-enterprise-cloud@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-enterprise-cloud@npm:1.1.0-beta.3"
   dependencies:
     "@nx/devkit": ">= 19 < 21"
-    "@nx/powerpack-license": 1.1.0-beta.2
-  checksum: 4f6f5f3f115c716fb7e091d1aee669bc8aff0dc545cb20185a0ee8042e33b2963529515bbaef2b5a5639e069c25b2f91260834d9d037e9511755da9a74f4f0a3
+    "@nx/powerpack-license": 1.1.0-beta.3
+  checksum: afc018543e1d7ec85f353fc5a416a9d97904d07de5aa430c96eb4888516c8c645fda43834394f9a411843473f3ecdae75c3aa5e6cf261ab1f7b5f71cedafd7fb
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-darwin-arm64@file:powerpack-license-darwin-arm64::locator=nx-console%40workspace%3A.":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-darwin-arm64@file:powerpack-license-darwin-arm64#powerpack-license-darwin-arm64::hash=a33579&locator=nx-console%40workspace%3A."
+"@nx/powerpack-license-darwin-arm64@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-darwin-arm64@npm:1.1.0-beta.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-darwin-x64@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-darwin-x64@npm:1.1.0-beta.2"
+"@nx/powerpack-license-darwin-x64@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-darwin-x64@npm:1.1.0-beta.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-arm-gnueabihf@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-linux-arm-gnueabihf@npm:1.1.0-beta.2"
+"@nx/powerpack-license-linux-arm-gnueabihf@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-linux-arm-gnueabihf@npm:1.1.0-beta.3"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-arm64-gnu@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-linux-arm64-gnu@npm:1.1.0-beta.2"
+"@nx/powerpack-license-linux-arm64-gnu@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-linux-arm64-gnu@npm:1.1.0-beta.3"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-arm64-musl@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-linux-arm64-musl@npm:1.1.0-beta.2"
+"@nx/powerpack-license-linux-arm64-musl@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-linux-arm64-musl@npm:1.1.0-beta.3"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-x64-gnu@file:powerpack-license-linux-x64-gnu::locator=nx-console%40workspace%3A.":
-  version: 0.0.0-replaced-in-pipeline
-  resolution: "@nx/powerpack-license-linux-x64-gnu@file:powerpack-license-linux-x64-gnu#powerpack-license-linux-x64-gnu::hash=8ea5f3&locator=nx-console%40workspace%3A."
+"@nx/powerpack-license-linux-x64-gnu@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-linux-x64-gnu@npm:1.1.0-beta.3"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-linux-x64-musl@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-linux-x64-musl@npm:1.1.0-beta.2"
+"@nx/powerpack-license-linux-x64-musl@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-linux-x64-musl@npm:1.1.0-beta.3"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-win32-arm64-msvc@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-win32-arm64-msvc@npm:1.1.0-beta.2"
+"@nx/powerpack-license-win32-arm64-msvc@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-win32-arm64-msvc@npm:1.1.0-beta.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license-win32-x64-msvc@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license-win32-x64-msvc@npm:1.1.0-beta.2"
+"@nx/powerpack-license-win32-x64-msvc@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license-win32-x64-msvc@npm:1.1.0-beta.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/powerpack-license@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-license@npm:1.1.0-beta.2"
+"@nx/powerpack-license@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-license@npm:1.1.0-beta.3"
   dependencies:
     "@napi-rs/wasm-runtime": ^0.2.4
-    "@nx/powerpack-license-darwin-arm64": 1.1.0-beta.2
-    "@nx/powerpack-license-darwin-x64": 1.1.0-beta.2
-    "@nx/powerpack-license-linux-arm-gnueabihf": 1.1.0-beta.2
-    "@nx/powerpack-license-linux-arm64-gnu": 1.1.0-beta.2
-    "@nx/powerpack-license-linux-arm64-musl": 1.1.0-beta.2
-    "@nx/powerpack-license-linux-x64-gnu": 1.1.0-beta.2
-    "@nx/powerpack-license-linux-x64-musl": 1.1.0-beta.2
-    "@nx/powerpack-license-win32-arm64-msvc": 1.1.0-beta.2
-    "@nx/powerpack-license-win32-x64-msvc": 1.1.0-beta.2
+    "@nx/powerpack-license-darwin-arm64": 1.1.0-beta.3
+    "@nx/powerpack-license-darwin-x64": 1.1.0-beta.3
+    "@nx/powerpack-license-linux-arm-gnueabihf": 1.1.0-beta.3
+    "@nx/powerpack-license-linux-arm64-gnu": 1.1.0-beta.3
+    "@nx/powerpack-license-linux-arm64-musl": 1.1.0-beta.3
+    "@nx/powerpack-license-linux-x64-gnu": 1.1.0-beta.3
+    "@nx/powerpack-license-linux-x64-musl": 1.1.0-beta.3
+    "@nx/powerpack-license-win32-arm64-msvc": 1.1.0-beta.3
+    "@nx/powerpack-license-win32-x64-msvc": 1.1.0-beta.3
   dependenciesMeta:
     "@nx/powerpack-license-darwin-arm64":
       optional: true
@@ -3919,18 +3919,18 @@ __metadata:
       optional: true
     "@nx/powerpack-license-win32-x64-msvc":
       optional: true
-  checksum: 0225de9e4815507061d35dd4ceacc9b7dc57db80af7657ea986c495df52e92c9a104739433b08090e7a67e655c128ae044d91e87f6de1d3b5bd675b5a5bccdba
+  checksum: 577251583bb603c13d6dc7cb29a5af5b5d9805ace1a2bde815fcd891ab9ab5e59c503a4018ca2ab1da1ac8d80fe388e23ce75491afda86088ebc2dfbe1e6bd47
   languageName: node
   linkType: hard
 
-"@nx/powerpack-owners@npm:1.1.0-beta.2":
-  version: 1.1.0-beta.2
-  resolution: "@nx/powerpack-owners@npm:1.1.0-beta.2"
+"@nx/powerpack-owners@npm:1.1.0-beta.3":
+  version: 1.1.0-beta.3
+  resolution: "@nx/powerpack-owners@npm:1.1.0-beta.3"
   dependencies:
     "@nx/devkit": ">= 19 < 21"
-    "@nx/powerpack-license": 1.1.0-beta.2
+    "@nx/powerpack-license": 1.1.0-beta.3
     minimatch: 9.0.3
-  checksum: 6a68811632756cebd32f04f649f8c206a172a147660688c26588c1b93dfe19ab6095050c3f98f3f59ae2c1fa15d3697e9d9ff6ab892700a7ef8a01d48e52d749
+  checksum: cff523edc15b427167b11841fbb096d061750eb5084e7a04acf27f27870379fbf53d7960421a085e9f0cd96efe307d32ae064a8025d5f74d29d1ea5e0e9b6588
   languageName: node
   linkType: hard
 
@@ -19139,9 +19139,9 @@ __metadata:
     "@nx/jest": 20.1.1
     "@nx/js": 20.1.1
     "@nx/node": 20.1.1
-    "@nx/powerpack-conformance": 1.1.0-beta.2
-    "@nx/powerpack-enterprise-cloud": 1.1.0-beta.2
-    "@nx/powerpack-owners": 1.1.0-beta.2
+    "@nx/powerpack-conformance": 1.1.0-beta.3
+    "@nx/powerpack-enterprise-cloud": 1.1.0-beta.3
+    "@nx/powerpack-owners": 1.1.0-beta.3
     "@nx/storybook": 20.1.1
     "@nx/web": 20.1.1
     "@nx/webpack": 20.1.1
