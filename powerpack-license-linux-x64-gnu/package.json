@@ -1,0 +1,25 @@
+{
+  "name": "@nx/powerpack-license-linux-x64-gnu",
+  "description": "This package contains a native binary for @nx/powerpack-license.",
+  "version": "0.0.0-replaced-in-pipeline",
+  "cpu": [
+    "x64"
+  ],
+  "license": "Commercial",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "powerpack_license.linux-x64-gnu.node",
+  "files": [
+    "powerpack_license.linux-x64-gnu.node"
+  ],
+  "engines": {
+    "node": ">= 10"
+  },
+  "os": [
+    "linux"
+  ],
+  "libc": [
+    "glibc"
+  ]
+}
