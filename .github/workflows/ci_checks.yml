@@ -60,12 +60,14 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           cache: gradle
 
-      - name: Gradle Formatting and Linting
+      # We intentionally put the gradle tasks first because their artifacts are needed for project graph construction
+      # and we do not want to give the false impression that the artifact download time is part of nx commands.
+      - name: Gradle artifacts and formatting
         run: |
           yarn nx-cloud record -- ./gradlew projectReportAll
           yarn nx-cloud record -- ./gradlew ktfmtCheck
 
-      - name: Check other formatting
+      - name: Check formatting of other files
         run: yarn nx format:check --verbose --skip-nx-cache
 
       - name: Ensure the workspace configuration is in sync
