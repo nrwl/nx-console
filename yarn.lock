@@ -3860,7 +3860,7 @@ __metadata:
 
 "@nx/powerpack-license-linux-x64-gnu@file:powerpack-license-linux-x64-gnu::locator=nx-console%40workspace%3A.":
   version: 0.0.0-replaced-in-pipeline
-  resolution: "@nx/powerpack-license-linux-x64-gnu@file:powerpack-license-linux-x64-gnu#powerpack-license-linux-x64-gnu::hash=ba9b57&locator=nx-console%40workspace%3A."
+  resolution: "@nx/powerpack-license-linux-x64-gnu@file:powerpack-license-linux-x64-gnu#powerpack-license-linux-x64-gnu::hash=ceffcd&locator=nx-console%40workspace%3A."
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
