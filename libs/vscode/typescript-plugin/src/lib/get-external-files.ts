@@ -1,7 +1,4 @@
-import {
-  listFiles,
-  readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
+import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { findConfig } from '@nx-console/shared/utils';
 import { dirname, join } from 'path';
 
@@ -13,6 +10,10 @@ export async function getExternalFiles(
 ): Promise<{ mainFile: string; directory: string }[]> {
   let tsconfig = (await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot))
     .json;
+
+  if (!tsconfig) {
+    return [];
+  }
 
   if (!('compilerOptions' in tsconfig)) {
     tsconfig = (await readAndCacheJsonFile('tsconfig.json', workspaceRoot))
