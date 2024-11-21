@@ -1,5 +1,8 @@
 import { CollectionInfo } from '@nx-console/shared/schema';
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type {
+  ProjectConfiguration,
+  ProjectGraphProjectNode,
+} from 'nx/src/devkit-exports';
 import type { JSONSchema } from 'vscode-json-languageservice';
 import { targets } from './common-json-schema';
 import { CompletionType } from './completion-type';
@@ -13,7 +16,7 @@ type JSONSchemaMap = NonNullable<JSONSchema['properties']>;
 
 export async function getNxJsonSchema(
   collections: CollectionInfo[],
-  projects: Record<string, ProjectConfiguration>,
+  projects: Record<string, ProjectGraphProjectNode>,
   nxVersion: NxVersion,
   workspacePath: string
 ): Promise<JSONSchema> {
@@ -106,11 +109,13 @@ function createJsonSchema(
   };
 }
 
-function getTargets(projects: Record<string, ProjectConfiguration>): string[] {
+function getTargets(
+  projects: Record<string, ProjectGraphProjectNode>
+): string[] {
   const tags = new Set<string>();
 
   for (const projectConfiguration of Object.values(projects)) {
-    for (const target of Object.keys(projectConfiguration.targets ?? {})) {
+    for (const target of Object.keys(projectConfiguration.data.targets ?? {})) {
       tags.add(target);
     }
   }

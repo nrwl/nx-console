@@ -19,9 +19,9 @@ export async function inputNameCompletion(
 
   const inputNameCompletion: CompletionItem[] = [];
 
-  const { workspace } = await nxWorkspace(workingPath);
+  const { nxJson } = await nxWorkspace(workingPath);
 
-  for (const inputName of Object.keys(workspace.namedInputs ?? {})) {
+  for (const inputName of Object.keys(nxJson.namedInputs ?? {})) {
     if (hasDependencyHat) {
       inputNameCompletion.push(
         createCompletionItem(

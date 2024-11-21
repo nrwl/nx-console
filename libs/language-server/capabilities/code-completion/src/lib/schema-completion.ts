@@ -44,20 +44,20 @@ export async function configureSchemas(
   }
 
   currentNxWorkspace = await nxWorkspace(workingPath, lspLogger);
-  const { nxVersion, workspace } = currentNxWorkspace;
+  const { nxVersion, nxJson, projectGraph } = currentNxWorkspace;
 
   currentExecutors = await getExecutors(workingPath);
   const workspaceJsonSchema = getWorkspaceJsonSchema(currentExecutors);
   const projectJsonSchema = getProjectJsonSchema(
     currentExecutors,
-    workspace.targetDefaults,
+    nxJson.targetDefaults,
     nxVersion
   );
   const packageJsonSchema = getPackageJsonSchema(nxVersion);
 
   const nxSchema = await getNxJsonSchema(
     currentExecutors,
-    workspace.projects,
+    projectGraph.nodes,
     nxVersion,
     workingPath
   );

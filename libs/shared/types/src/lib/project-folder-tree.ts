@@ -1,9 +1,9 @@
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 export type TreeNode = {
   dir: string;
   projectName?: string;
-  projectConfiguration?: ProjectConfiguration;
+  projectConfiguration?: ProjectGraphProjectNode;
   children: string[];
 };
 export type TreeMap = Map<string, TreeNode>;

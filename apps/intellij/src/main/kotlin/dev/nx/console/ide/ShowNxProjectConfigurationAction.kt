@@ -29,7 +29,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
     init {
         registerCustomShortcutSet(
             ActionManager.getInstance().getAction(IdeActions.ACTION_EDIT_SOURCE).shortcutSet,
-            null
+            null,
         )
     }
 
@@ -63,7 +63,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                         else if (ActionPlaces.isPopupPlace(e.place))
                             TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
-                )
+                ),
             )
 
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
@@ -88,9 +88,10 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
 
                         NxlsService.getInstance(project)
                             .workspace()
-                            ?.workspace
-                            ?.projects
+                            ?.projectGraph
+                            ?.nodes
                             ?.get(selectedNxProject)
+                            ?.data
                     }
                         ?: return@launch
 
@@ -117,7 +118,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                         findLineNumberForTargetAndConfiguration(
                             psiFile,
                             nxTarget,
-                            nxTargetConfiguration
+                            nxTargetConfiguration,
                         )
                             ?: return@withContext
 

@@ -64,7 +64,7 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
       };
     } else if (schema.context?.project && schema.context?.prefillValues) {
       const projectRoot =
-        workspace.workspace.projects[schema.context.project].root;
+        workspace.projectGraph.nodes[schema.context.project].data.root;
       schema.context.prefillValues = {
         ...schema.context.prefillValues,
         cwd: projectRoot,

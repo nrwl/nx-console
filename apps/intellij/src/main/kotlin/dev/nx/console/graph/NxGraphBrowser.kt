@@ -64,7 +64,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
                 val errorsToShow = this@NxGraphBrowser.errors ?: nxWorkspace?.errors
 
-                val hasProjects = nxWorkspace?.workspace?.projects?.isNotEmpty() == true
+                val hasProjects = nxWorkspace?.projectGraph?.nodes?.isNotEmpty() == true
                 val needsNonExistentProject =
                     lastGraphCommand?.let {
                         val projectName =
@@ -75,7 +75,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                             }
 
                         projectName != null &&
-                            nxWorkspace?.workspace?.projects?.contains(projectName) != true
+                            nxWorkspace?.projectGraph?.nodes?.contains(projectName) != true
                     }
                         ?: false
 
@@ -118,7 +118,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
             val nxWorkspace = NxlsService.getInstance(project).workspace()
-            if (nxWorkspace?.workspace?.projects?.contains(projectName) != true) {
+            if (nxWorkspace?.projectGraph?.nodes?.contains(projectName) != true) {
                 logger<NxGraphBrowser>().warn("Project $projectName not found in workspace")
                 setErrorsAndRefresh(arrayOf(NxError("Project $projectName not found in workspace")))
                 return@executeWhenLoaded
@@ -144,7 +144,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
             val nxWorkspace = NxlsService.getInstance(project).workspace()
-            if (nxWorkspace?.workspace?.projects?.contains(projectName) != true) {
+            if (nxWorkspace?.projectGraph?.nodes?.contains(projectName) != true) {
                 logger<NxGraphBrowser>().warn("Project $projectName not found in workspace")
                 setErrorsAndRefresh(arrayOf(NxError("Project $projectName not found in workspace")))
                 return@executeWhenLoaded

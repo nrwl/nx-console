@@ -5,7 +5,7 @@ import kotlinx.serialization.descriptors.*
 
 data class NxWorkspace(
     val validWorkspaceJson: Boolean,
-    val workspace: NxWorkspaceConfiguration,
+    val projectGraph: NxProjectGraph,
     val daemonEnabled: Boolean?,
     val workspacePath: String,
     val errors: Array<NxError>?,
@@ -23,7 +23,7 @@ data class NxWorkspace(
         other as NxWorkspace
 
         if (validWorkspaceJson != other.validWorkspaceJson) return false
-        if (workspace != other.workspace) return false
+        if (projectGraph != other.projectGraph) return false
         if (daemonEnabled != other.daemonEnabled) return false
         if (workspacePath != other.workspacePath) return false
         if (errors != null) {
@@ -40,7 +40,7 @@ data class NxWorkspace(
 
     override fun hashCode(): Int {
         var result = validWorkspaceJson.hashCode()
-        result = 31 * result + workspace.hashCode()
+        result = 31 * result + projectGraph.hashCode()
         result = 31 * result + (daemonEnabled?.hashCode() ?: 0)
         result = 31 * result + workspacePath.hashCode()
         result = 31 * result + (errors?.contentHashCode() ?: 0)
@@ -54,9 +54,9 @@ data class NxWorkspace(
 
 data class WorkspaceLayout(val appsDir: String?, val libsDir: String?)
 
-data class NxWorkspaceConfiguration(val projects: Map<String, NxProject>
-//    val sourceMaps: Map<String, Map<String, SourceInformation>>?,
-) {}
+data class NxProjectGraph(val nodes: Map<String, NxProjectGraphProjectNode>)
+
+data class NxProjectGraphProjectNode(val name: String, val type: String, val data: NxProject)
 
 @Serializable()
 data class NxError(

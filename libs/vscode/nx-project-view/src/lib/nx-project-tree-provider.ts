@@ -100,7 +100,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     if (!this.workspaceData) {
       return true;
     }
-    return Object.keys(this.workspaceData.workspace.projects).length > 10;
+    return Object.keys(this.workspaceData.projectGraph.nodes).length > 10;
   }
 
   private async runTask(

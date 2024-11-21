@@ -693,7 +693,7 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
     !workspace?.errors ||
     (workspace.errors &&
       workspace.isPartial &&
-      Object.keys(workspace.workspace.projects ?? {}).length > 0)
+      Object.keys(workspace.projectGraph.nodes ?? {}).length > 0)
   ) {
     reconfigureAttempts = 0;
     return;

@@ -56,7 +56,7 @@ internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun suggestCompletionVariants(
         dataContext: DataContext,
-        commandLine: CommandLine
+        commandLine: CommandLine,
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
 
@@ -64,10 +64,10 @@ internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
             project
                 .service<NxlsService>()
                 .workspace()
-                ?.workspace
-                ?.projects
+                ?.projectGraph
+                ?.nodes
                 ?.entries
-                ?.map { entry -> entry.key to (entry.value.targets.keys) }
+                ?.map { entry -> entry.key to (entry.value.data.targets.keys) }
                 ?.associate { it }
                 ?: emptyMap()
         }

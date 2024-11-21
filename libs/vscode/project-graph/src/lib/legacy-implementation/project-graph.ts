@@ -197,14 +197,12 @@ async function openProjectWithFile(
       showNoProjectsMessage();
       return;
     }
-    const {
-      workspace: { projects },
-    } = nxWorkspace;
+    const { projectGraph } = nxWorkspace;
 
-    const projectNames = Object.keys(projects);
+    const projectNames = Object.keys(projectGraph.nodes);
 
     if (projectNames.length === 0) {
-      showNoProjectsMessage();
+      showNoProjectsMessage(true);
       return;
     }
 
@@ -212,7 +210,7 @@ async function openProjectWithFile(
     if (!selectedProjectName) {
       return;
     }
-    project = projects[selectedProjectName];
+    project = projectGraph.nodes[selectedProjectName].data;
   }
 
   if (messageType === MessageType.task) {

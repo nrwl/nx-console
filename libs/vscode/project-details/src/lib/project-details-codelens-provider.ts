@@ -85,7 +85,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
     const errors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
-      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+      Object.keys(nxWorkspace?.projectGraph.nodes ?? {}).length > 0;
 
     const projectGraphFailed =
       errors && errors.length > 0 && (!isPartial || !hasProjects);

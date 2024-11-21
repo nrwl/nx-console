@@ -92,7 +92,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             val cloudStatus = nxlsService.cloudStatus()
 
             withContext(Dispatchers.EDT) {
-                val hasProjects = workspace?.workspace?.projects?.isNotEmpty() == true
+                val hasProjects = workspace?.projectGraph?.nodes?.isNotEmpty() == true
                 val hasNodeInterpreter =
                     try {
                         project.nodeInterpreter
@@ -118,7 +118,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                 it.second
                             }
                         }
-                    } else if (workspace == null || workspace.workspace.projects.isEmpty()) {
+                    } else if (workspace == null || workspace.projectGraph.nodes.isEmpty()) {
                         noProjectsComponent
                     } else {
                         projectTreeComponent

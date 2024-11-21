@@ -38,13 +38,13 @@ class NxHelpCommandService(val project: Project, private val cs: CoroutineScope)
                         val nxProject =
                             NxlsService.getInstance(project)
                                 .workspace()
-                                ?.workspace
-                                ?.projects
+                                ?.projectGraph
+                                ?.nodes
                                 ?.entries
                                 ?.find { it.key == projectName }
                                 ?.value
 
-                        nxProject?.root?.also {
+                        nxProject?.data?.root?.also {
                             withWorkDirectory(File(project.nxBasePath).resolve(it))
                         }
                     }
@@ -62,12 +62,12 @@ class NxHelpCommandService(val project: Project, private val cs: CoroutineScope)
                         processHandler,
                         console.component,
                         "Help",
-                        NxIcons.Action
+                        NxIcons.Action,
                     )
                 val runContentManager = RunContentManager.getInstance(project)
                 runContentManager.showRunContent(
                     DefaultRunExecutor.getRunExecutorInstance(),
-                    contentDescriptor
+                    contentDescriptor,
                 )
                 processHandler.startNotify()
             }

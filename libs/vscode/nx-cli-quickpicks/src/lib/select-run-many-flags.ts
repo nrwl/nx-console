@@ -90,16 +90,18 @@ async function validProjectsForTarget(
   if (!nxWorkspace) {
     return;
   }
-  const { validWorkspaceJson, workspace } = nxWorkspace;
+  const { validWorkspaceJson, projectGraph } = nxWorkspace;
 
-  if (!validWorkspaceJson || !workspace) {
+  if (!validWorkspaceJson) {
     return;
   }
 
   return Array.from(
     new Set(
-      Object.entries(workspace.projects)
-        .filter(([, project]) => project.targets && project.targets[target])
+      Object.entries(projectGraph.nodes)
+        .filter(
+          ([, project]) => project.data.targets && project.data.targets[target]
+        )
         .map(([project]) => project)
     )
   ).sort();

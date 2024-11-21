@@ -169,11 +169,11 @@ export class GraphWebviewManager implements Disposable {
     const workspaceErrors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
-      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+      Object.keys(nxWorkspace?.projectGraph.nodes ?? {}).length > 0;
     const hasProject =
       this.lastGraphCommand &&
       isCommandWithProjectName(this.lastGraphCommand) &&
-      nxWorkspace?.workspace.projects[this.lastGraphCommand.projectName] !==
+      nxWorkspace?.projectGraph.nodes[this.lastGraphCommand.projectName] !==
         undefined;
 
     let html: string;

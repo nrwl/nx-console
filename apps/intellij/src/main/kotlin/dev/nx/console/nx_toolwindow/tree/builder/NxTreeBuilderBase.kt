@@ -18,16 +18,16 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             return null
         }
         if (node is NxSimpleNode.Target) {
-            return nxWorkspace.workspace.projects[node.nxProjectName]
+            return nxWorkspace.projectGraph?.nodes?.get(node.nxProjectName)?.data
         }
         if (node is NxSimpleNode.TargetConfiguration) {
-            return nxWorkspace.workspace.projects[node.nxProjectName]
+            return nxWorkspace.projectGraph?.nodes?.get(node.nxProjectName)?.data
         }
         if (node is NxSimpleNode.TargetGroup) {
-            return nxWorkspace.workspace.projects[node.nxProjectName]
+            return nxWorkspace.projectGraph?.nodes?.get(node.nxProjectName)?.data
         }
         if (node is NxSimpleNode.Project) {
-            return nxWorkspace.workspace.projects[node.nxProjectName]
+            return nxWorkspace.projectGraph?.nodes?.get(node.nxProjectName)?.data
         }
         return null
     }
@@ -49,7 +49,8 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             return emptyArray()
         }
         val nxProject =
-            nxWorkspace.workspace.projects[projectNode.nxProjectName] ?: return emptyArray()
+            nxWorkspace.projectGraph?.nodes?.get(projectNode.nxProjectName)?.data
+                ?: return emptyArray()
 
         val targetGroups = nxProject.metadata?.targetGroups
 
@@ -61,7 +62,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                         nxTargetName = it.key,
                         nxProjectName = projectNode.nxProjectName,
                         nonAtomizedTarget = it.value.metadata?.nonAtomizedTarget,
-                        parent = projectNode
+                        parent = projectNode,
                     )
                 }
                 .toTypedArray()
@@ -85,7 +86,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                         targetGroupName = it.key,
                         nxProjectName = projectNode.nxProjectName,
                         targets = it.value.toTypedArray(),
-                        parent = projectNode
+                        parent = projectNode,
                     )
                 }
                 .toTypedArray() +
@@ -96,7 +97,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                             displayName = it,
                             nxTargetName = it,
                             nxProjectName = projectNode.nxProjectName,
-                            parent = projectNode
+                            parent = projectNode,
                         )
                     }
                     .toTypedArray()
@@ -110,7 +111,8 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             return emptyArray()
         }
         val nxProject =
-            nxWorkspace.workspace.projects[targetGroupNode.nxProjectName] ?: return emptyArray()
+            nxWorkspace.projectGraph?.nodes?.get(targetGroupNode.nxProjectName)?.data
+                ?: return emptyArray()
         return nxProject.targets
             .filter { targetGroupNode.targets.contains(it.key) }
             .map {
@@ -119,7 +121,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                     nxTargetName = it.key,
                     nxProjectName = targetGroupNode.nxProjectName,
                     nonAtomizedTarget = it.value.metadata?.nonAtomizedTarget,
-                    parent = targetGroupNode
+                    parent = targetGroupNode,
                 )
             }
             .sortedBy { it.displayName }
@@ -130,7 +132,10 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.workspace.projects[targetNode.nxProjectName]
+        return nxWorkspace.projectGraph
+            ?.nodes
+            ?.get(targetNode.nxProjectName)
+            ?.data
             ?.targets
             ?.get(targetNode.nxTargetName)
             ?.configurations
@@ -140,7 +145,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                     nxTargetConfigurationName = it,
                     nxTargetName = targetNode.nxTargetName,
                     nxProjectName = targetNode.nxProjectName,
-                    parent = targetNode
+                    parent = targetNode,
                 )
             }
             ?.toTypedArray()
@@ -153,12 +158,15 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.workspace.projects.values
-            .flatMap { p -> p.targets.keys.map { it to p.name } }
-            .groupBy { it.first }
-            .toSortedMap()
-            .map { NxSimpleNode.TargetsList(it.key, targetsSectionNode) }
-            .toTypedArray()
+        return nxWorkspace.projectGraph
+            ?.nodes
+            ?.values
+            ?.flatMap { p -> p.data.targets.keys.map { it to p.name } }
+            ?.groupBy { it.first }
+            ?.toSortedMap()
+            ?.map { NxSimpleNode.TargetsList(it.key, targetsSectionNode) }
+            ?.toTypedArray()
+            ?: emptyArray()
     }
 
     protected fun getTargetsForTargetsList(
@@ -167,14 +175,14 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.workspace.projects
-            .filter { it.value.targets.contains(targetsListNode.targetName) }
+        return nxWorkspace.projectGraph.nodes
+            .filter { it.value.data.targets.contains(targetsListNode.targetName) }
             .map {
                 NxSimpleNode.Target(
                     displayName = it.key,
                     nxTargetName = targetsListNode.targetName,
                     nxProjectName = it.value.name,
-                    parent = targetsListNode
+                    parent = targetsListNode,
                 )
             }
             .toTypedArray()

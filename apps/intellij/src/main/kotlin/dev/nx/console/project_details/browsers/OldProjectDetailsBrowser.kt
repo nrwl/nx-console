@@ -202,10 +202,10 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
                                 )
                             )
                     }
-                    val hasProjects = nxWorkspace?.workspace?.projects?.isNotEmpty() == true
+                    val hasProjects = nxWorkspace?.projectGraph?.nodes?.isNotEmpty() == true
                     val hasProject =
                         nxProjectName != null &&
-                            nxWorkspace?.workspace?.projects?.get(nxProjectName) != null
+                            nxWorkspace?.projectGraph?.nodes?.get(nxProjectName) != null
                     if (
                         errors != null &&
                             (!hasProjects ||
@@ -291,8 +291,8 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
         targetConfigString: String,
     ) {
         coroutineScope.launch {
-            project.nxWorkspace()?.workspace?.projects?.get(projectName)?.apply {
-                val path = nxProjectConfigurationPath(project, root) ?: return@apply
+            project.nxWorkspace()?.projectGraph?.nodes?.get(projectName)?.apply {
+                val path = nxProjectConfigurationPath(project, data.root) ?: return@apply
                 ApplicationManager.getApplication().invokeLater {
                     val file =
                         LocalFileSystem.getInstance().findFileByPath(path) ?: return@invokeLater

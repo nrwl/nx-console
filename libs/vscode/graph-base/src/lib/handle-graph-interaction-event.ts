@@ -27,7 +27,7 @@ export async function handleGraphInteractionEventBase(event: {
       source: 'graph-interaction',
     });
     getNxWorkspaceProjects().then((projects) => {
-      const root = projects[projectName]?.root;
+      const root = projects[projectName]?.data.root;
       if (!root) return;
       revealNxProject(projectName, root);
     });
@@ -73,7 +73,7 @@ export async function handleGraphInteractionEventBase(event: {
                 ? // CWD should be passed to match command CWD.
                   join(workspacePath, cwd)
                 : // If CWD is not passed from Nx 19.4.0.
-                  join(workspacePath, project.root),
+                  join(workspacePath, project.data.root),
               env: {
                 NX_CONSOLE: 'true',
               },

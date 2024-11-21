@@ -2,6 +2,8 @@ import { NxVersion } from '@nx-console/shared/nx-version';
 import type {
   NxJsonConfiguration,
   ProjectConfiguration,
+  ProjectFileMap,
+  ProjectGraph,
 } from 'nx/src/devkit-exports';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 
@@ -9,21 +11,12 @@ export type NxProjectConfiguration = ProjectConfiguration & {
   files?: { file: string }[];
 };
 
-export type NxProjectsConfiguration = {
-  version: number;
-  projects: {
-    [projectName: string]: NxProjectConfiguration;
-  };
-  sourceMaps?: ConfigurationSourceMaps;
-};
-
-export type NxWorkspaceConfiguration = NxProjectsConfiguration &
-  NxJsonConfiguration;
 export interface NxWorkspace {
   validWorkspaceJson: boolean;
-  workspace: NxWorkspaceConfiguration;
-  daemonEnabled?: boolean;
-  workspacePath: string;
+  nxJson: NxJsonConfiguration;
+  projectGraph: ProjectGraph;
+  sourceMaps?: ConfigurationSourceMaps;
+  projectFileMap?: ProjectFileMap;
   isLerna: boolean;
   nxVersion: NxVersion;
   isEncapsulatedNx: boolean;
@@ -34,6 +27,7 @@ export interface NxWorkspace {
     libsDir?: string;
     projectNameAndRootFormat?: 'as-provided' | 'derived';
   };
+  workspacePath: string;
 }
 
 export type NxError = {

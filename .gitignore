@@ -60,6 +60,7 @@ Thumbs.db
 .qodana
 apps/intellij/bin/
 .intellijPlatform
+.kotlin/
 
 
 # WDIO

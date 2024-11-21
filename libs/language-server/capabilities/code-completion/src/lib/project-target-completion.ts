@@ -16,17 +16,17 @@ export async function projectTargetCompletion(
     return [];
   }
 
-  const { workspace } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath);
 
   const projectTargetCompletion: CompletionItem[] = [];
 
   const completionItemKind = CompletionItemKind.Field;
 
   for (const [projectName, configuration] of Object.entries(
-    workspace.projects
+    projectGraph.nodes
   )) {
     for (const [targetName, target] of Object.entries(
-      configuration.targets ?? {}
+      configuration.data.targets ?? {}
     )) {
       const targetLabel = `${projectName}:${targetName}`;
       projectTargetCompletion.push(

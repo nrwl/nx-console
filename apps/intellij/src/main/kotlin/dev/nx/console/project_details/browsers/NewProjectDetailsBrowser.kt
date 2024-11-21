@@ -681,9 +681,10 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                 )
 
                             messageParsed.payload?.projectName?.also {
-                                project.nxWorkspace()?.workspace?.projects?.get(it)?.apply {
+                                project.nxWorkspace()?.projectGraph?.nodes?.get(it)?.apply {
                                     val path =
-                                        nxProjectConfigurationPath(project, root) ?: return@apply
+                                        nxProjectConfigurationPath(project, data.root)
+                                            ?: return@apply
                                     val file =
                                         LocalFileSystem.getInstance().findFileByPath(path)
                                             ?: return@apply

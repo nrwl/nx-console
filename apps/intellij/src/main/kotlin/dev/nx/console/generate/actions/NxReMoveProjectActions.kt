@@ -82,10 +82,10 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
         val projectsWithType =
             nxlsService
                 .workspace()
-                ?.workspace
-                ?.projects
+                ?.projectGraph
+                ?.nodes
                 ?.entries
-                ?.map { entry -> entry.key to (entry.value.projectType) }
+                ?.map { entry -> entry.key to (entry.value.data.projectType) }
                 ?.associate { it }
 
         val workspaceLayoutPair =
