@@ -1,3 +1,21 @@
+# [18.31.0](https://github.com/nrwl/nx-console/compare/vscode-v18.30.4...vscode-v18.31.0) (2024-11-21)
+
+
+### Bug Fixes
+
+* **vscode:** don't enable typescript server plugin in new solution-style workspaces ([#2313](https://github.com/nrwl/nx-console/issues/2313)) ([3b909e9](https://github.com/nrwl/nx-console/commit/3b909e972919d9476dd678d42ab4d8b9de46d0bc))
+* **vsode:** dont try to look for compilerOptions in nonexistant tsconfig ([#2324](https://github.com/nrwl/nx-console/issues/2324)) ([9a33598](https://github.com/nrwl/nx-console/commit/9a33598aff2df82a8784bceb3bc580cec7dfe3d4))
+
+
+### Features
+
+* **nxls:** allow nxls to kill itself after 3h of inactivity to prevent background resource usage ([#2307](https://github.com/nrwl/nx-console/issues/2307)) ([babaf0e](https://github.com/nrwl/nx-console/commit/babaf0ef9f922a14d29da7db8cdfc07fabdad265))
+
+
+### Reverts
+
+* Revert "chore: leverage Nx Powerpack" (#2320) ([49669d7](https://github.com/nrwl/nx-console/commit/49669d787b314a86af9c7dd68b1437f69b496873)), closes [#2320](https://github.com/nrwl/nx-console/issues/2320)
+
 ## [18.30.4](https://github.com/nrwl/nx-console/compare/vscode-v18.30.3...vscode-v18.30.4) (2024-11-13)
 
 
