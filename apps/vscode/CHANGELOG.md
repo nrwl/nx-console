@@ -1,3 +1,10 @@
+## [18.31.1](https://github.com/nrwl/nx-console/compare/vscode-v18.31.0...vscode-v18.31.1) (2024-11-25)
+
+
+### Bug Fixes
+
+* **vscode:** remove extra @ from add dependency logic ([#2327](https://github.com/nrwl/nx-console/issues/2327)) ([efbb344](https://github.com/nrwl/nx-console/commit/efbb344f8c3146ebab0dca9f49f3f4e42a4cdac8))
+
 # [18.31.0](https://github.com/nrwl/nx-console/compare/vscode-v18.30.4...vscode-v18.31.0) (2024-11-21)
 
 
