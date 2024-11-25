@@ -71,5 +71,6 @@ apps/vscode-e2e/.screenshots
 
 .nx/cache
 .nx/workspace-data
+.nx/powerpack
 **/cypress/downloads
 migrations.json
