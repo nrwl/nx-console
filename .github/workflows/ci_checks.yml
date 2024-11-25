@@ -67,7 +67,7 @@ jobs:
           yarn nx-cloud record -- ./gradlew ktfmtCheck
 
       - name: Check formatting of other files
-        run: yarn nx format:check --verbose --skip-nx-cache
+        run: yarn nx format:check --verbose
 
       - name: Ensure the workspace configuration is in sync
         run: yarn nx-cloud record -- yarn nx sync:check
