@@ -256,7 +256,7 @@ async function getDependencySuggestions(): Promise<
             prefix = '@nrwl';
           }
           return {
-            name: `@${prefix}/${pkg.name}`,
+            name: `${prefix}/${pkg.name}`,
             description: pkg.description,
           };
         });
