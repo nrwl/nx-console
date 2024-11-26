@@ -32,8 +32,10 @@ jobs:
         run: yarn dlx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
 
       - name: Start the Nx Cloud CI Run
+        env:
+          DEBUG: cypress:server:util:process_profiler
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING"
+          yarn dlx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,DEBUG"
 
       - uses: browser-actions/setup-chrome@v1
 
@@ -100,8 +102,10 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
 
       - name: Start the Nx Cloud CI Run
+        env:
+          DEBUG: cypress:server:util:process_profiler
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
+          yarn dlx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,DEBUG"
 
       - uses: browser-actions/setup-chrome@v1
 
