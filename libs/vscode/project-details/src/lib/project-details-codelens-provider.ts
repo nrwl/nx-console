@@ -55,17 +55,23 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
     token: CancellationToken
   ): ProviderResult<(NxTargetsCodelens | ViewProjectDetailsCodelens)[]> {
     try {
+      const codelenses = [];
       const codelensLocation = this.getCodelensLocation(document);
-      return [
-        new ViewProjectDetailsCodelens(
-          new Range(codelensLocation, codelensLocation),
-          document.fileName
-        ),
+      if (document.fileName.endsWith('project.json')) {
+        codelenses.push(
+          new ViewProjectDetailsCodelens(
+            new Range(codelensLocation, codelensLocation),
+            document.fileName
+          )
+        );
+      }
+      codelenses.push(
         new NxTargetsCodelens(
           new Range(codelensLocation, codelensLocation),
           document.fileName
-        ),
-      ];
+        )
+      );
+      return codelenses;
     } catch (e) {
       return [];
     }
@@ -170,11 +176,12 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
 
     registerCodeLensProvider(codeLensProvider);
 
-    commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
-      showProjectDetailsQuickpick(project);
-    });
-
-    onWorkspaceRefreshed(() => codeLensProvider.refresh());
+    context.subscriptions.push(
+      commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
+        showProjectDetailsQuickpick(project);
+      }),
+      onWorkspaceRefreshed(() => codeLensProvider.refresh())
+    );
   }
 }
 
