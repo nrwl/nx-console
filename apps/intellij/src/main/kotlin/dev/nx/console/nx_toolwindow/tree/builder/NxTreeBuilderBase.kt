@@ -56,7 +56,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
 
         if (targetGroups == null) {
             return nxProject.targets
-                .map {
+                ?.map {
                     NxSimpleNode.Target(
                         displayName = it.key,
                         nxTargetName = it.key,
@@ -65,10 +65,12 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                         parent = projectNode,
                     )
                 }
-                .toTypedArray()
+                ?.toTypedArray()
+                ?: emptyArray()
         } else {
             val targetGroupMap = mutableMapOf<String, MutableList<String>>()
-            val nonGroupedTargets: MutableSet<String> = nxProject.targets.keys.toMutableSet()
+            val nonGroupedTargets: MutableSet<String> =
+                nxProject.targets?.keys?.toMutableSet() ?: mutableSetOf()
 
             for ((targetGroupName, targets) in targetGroups) {
                 if (!targetGroupMap.containsKey(targetGroupName)) {
@@ -114,8 +116,8 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             nxWorkspace.projectGraph?.nodes?.get(targetGroupNode.nxProjectName)?.data
                 ?: return emptyArray()
         return nxProject.targets
-            .filter { targetGroupNode.targets.contains(it.key) }
-            .map {
+            ?.filter { targetGroupNode.targets.contains(it.key) }
+            ?.map {
                 NxSimpleNode.Target(
                     displayName = it.key,
                     nxTargetName = it.key,
@@ -124,8 +126,9 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                     parent = targetGroupNode,
                 )
             }
-            .sortedBy { it.displayName }
-            .toTypedArray()
+            ?.sortedBy { it.displayName }
+            ?.toTypedArray()
+            ?: emptyArray()
     }
 
     protected fun getTargetConfigurations(targetNode: NxSimpleNode.Target): Array<NxSimpleNode> {
@@ -161,7 +164,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         return nxWorkspace.projectGraph
             ?.nodes
             ?.values
-            ?.flatMap { p -> p.data.targets.keys.map { it to p.name } }
+            ?.flatMap { p -> p.data.targets?.keys?.map { it to p.name } ?: emptyList() }
             ?.groupBy { it.first }
             ?.toSortedMap()
             ?.map { NxSimpleNode.TargetsList(it.key, targetsSectionNode) }
@@ -176,7 +179,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             return emptyArray()
         }
         return nxWorkspace.projectGraph.nodes
-            .filter { it.value.data.targets.contains(targetsListNode.targetName) }
+            .filter { it.value.data.targets?.contains(targetsListNode.targetName) ?: false }
             .map {
                 NxSimpleNode.Target(
                     displayName = it.key,

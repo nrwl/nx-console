@@ -67,7 +67,7 @@ internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                 ?.projectGraph
                 ?.nodes
                 ?.entries
-                ?.map { entry -> entry.key to (entry.value.data.targets.keys) }
+                ?.map { entry -> entry.key to (entry.value.data.targets?.keys ?: emptySet()) }
                 ?.associate { it }
                 ?: emptyMap()
         }
