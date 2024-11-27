@@ -10,16 +10,6 @@ export function getPrimitiveValue(value: any): string | undefined {
   }
 }
 
-// export function sortWorkspaceProjects(
-//   w: NxWorkspaceConfiguration
-// ): NxWorkspaceConfiguration {
-//   const sortedProjects = Object.entries(w.projects || {}).sort(
-//     (projectA, projectB) => projectA[0].localeCompare(projectB[0])
-//   );
-//   w.projects = Object.fromEntries(sortedProjects);
-//   return w;
-// }
-
 export function hasKey<T extends object>(
   obj: T,
   key: PropertyKey
