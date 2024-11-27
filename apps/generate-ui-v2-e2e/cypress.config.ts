@@ -11,5 +11,6 @@ export default defineConfig({
       ciWebServerCommand: 'nx run generate-ui-v2-e2e:serve',
     }),
     baseUrl: 'http://localhost:4200',
+    experimentalMemoryManagement: true,
   },
 });
