@@ -8,6 +8,10 @@ jest.mock('@nx-console/vscode/nx-workspace', () => ({
   getRecentCIPEData: jest.fn(),
 }));
 
+jest.mock('@nx-console/vscode/lsp-client', () => ({
+  onWorkspaceRefreshed: jest.fn(),
+}));
+
 const compareCIPEDataAndSendNotificationMock = jest.fn();
 const setViewVisibleMock = jest.fn();
 const setErrorContextMock = jest.fn();
