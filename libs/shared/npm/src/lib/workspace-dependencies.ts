@@ -80,11 +80,7 @@ export async function workspaceDependencyPath(
 
 export function importWorkspaceDependency<T>(
   importPath: string,
-  logger: Logger = {
-    log(message) {
-      console.log(message);
-    },
-  }
+  logger?: Logger
 ): Promise<T> {
   if (platform() === 'win32') {
     importPath = importPath.replace(/\\/g, '/');

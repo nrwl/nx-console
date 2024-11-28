@@ -1,4 +1,3 @@
-import { fileExists, readFile } from '@nx-console/shared/file-system';
 import {
   findProperty,
   getLanguageModelCache,
@@ -9,6 +8,8 @@ import {
   getNxVersion,
   nxWorkspace,
 } from '@nx-console/language-server/workspace';
+import { fileExists, readFile } from '@nx-console/shared/file-system';
+import { parseTargetString } from '@nx-console/shared/utils';
 import { join } from 'path';
 import {
   ASTNode,
@@ -18,12 +19,6 @@ import {
 } from 'vscode-json-languageservice';
 import { URI } from 'vscode-uri';
 import { createRange } from './create-range';
-import {
-  importWorkspaceDependency,
-  workspaceDependencyPath,
-} from '@nx-console/shared/npm';
-import type { ProjectGraph, Target } from 'nx/src/devkit-exports';
-import { gte } from '@nx-console/shared/nx-version';
 
 const tempDocumentCounter = new Map<string, number>();
 
@@ -40,40 +35,15 @@ export async function targetLink(
   const targetString = node.value;
   let project, target, configuration;
   try {
-    const devkitPath = await workspaceDependencyPath(workingPath, '@nx/devkit');
-    if (!devkitPath) {
-      lspLogger.log(
-        `Unable to load the "@nx/devkit" package from the workspace. Please ensure that the proper dependencies are installed locally.`
-      );
-      throw 'local @nx/devkit dependency not found';
-    }
-
     const nxVersion = await getNxVersion(workingPath);
 
-    const importPath = join(devkitPath, 'src/executors/parse-target-string');
-    const { parseTargetString } = await importWorkspaceDependency<
-      typeof import('@nx/devkit/src/executors/parse-target-string')
-    >(importPath, lspLogger);
-    let parsedTarget: Target;
-    if (gte(nxVersion, '17.0.6')) {
-      // the nx console data structure to handle projects is not the same as ProjectGraph
-      // we create a partial project graph to pass to the parseTargetString function
-      // we only need a single project in it so we don't have to map over the entire workspace data
-      // TODO: refactor nx console to use the ProjectGraph directly?
-      const projectString = targetString.split(':')[0];
-      const partialProjectGraph = {
-        nodes: {
-          [projectString]: {
-            data: {
-              targets: projectGraph.nodes[projectString]?.data.targets,
-            },
-          },
-        },
-      } as ProjectGraph;
-      parsedTarget = parseTargetString(targetString, partialProjectGraph);
-    } else {
-      parsedTarget = (parseTargetString as any)(targetString);
-    }
+    const parsedTarget = await parseTargetString(
+      targetString,
+      projectGraph,
+      workingPath,
+      nxVersion
+    );
+
     project = parsedTarget.project;
     target = parsedTarget.target;
     configuration = parsedTarget.configuration;
