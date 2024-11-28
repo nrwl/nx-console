@@ -12,6 +12,7 @@ import {
 } from './pnp-dependencies';
 import { platform } from 'os';
 import { gte } from '@nx-console/shared/nx-version';
+import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 /**
  * Get dependencies for the current workspace.
@@ -22,7 +23,7 @@ import { gte } from '@nx-console/shared/nx-version';
 export async function workspaceDependencies(
   workspacePath: string,
   nxVersion: NxVersion,
-  projects?: WorkspaceProjects
+  projects?: Record<string, ProjectGraphProjectNode>
 ): Promise<string[]> {
   const dependencies: string[] = [];
 
@@ -124,10 +125,10 @@ export async function importNxPackagePath<T>(
 export async function localDependencyPath(
   workspacePath: string,
   workspaceDependencyName: string,
-  projects: WorkspaceProjects
+  projects: Record<string, ProjectGraphProjectNode>
 ): Promise<string | undefined> {
   for (const project of Object.values(projects)) {
-    const projectPath = join(workspacePath, project.root);
+    const projectPath = join(workspacePath, project.data.root);
     const pkgDetails = await packageDetails(projectPath);
     if (pkgDetails.packageName === workspaceDependencyName) {
       return pkgDetails.packagePath;
@@ -138,7 +139,7 @@ export async function localDependencyPath(
 async function localDependencies(
   workspacePath: string,
   version: NxVersion,
-  projects?: WorkspaceProjects
+  projects?: Record<string, ProjectGraphProjectNode>
 ): Promise<string[]> {
   if (!projects) {
     return [];
@@ -150,7 +151,7 @@ async function localDependencies(
   }
 
   const packages = Object.values(projects).map(
-    (project) => `${workspacePath}/${project.root}/package.json`
+    (project) => `${workspacePath}/${project.data.root}/package.json`
   );
 
   const existingPackages: string[] = [];

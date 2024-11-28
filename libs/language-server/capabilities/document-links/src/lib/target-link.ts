@@ -35,7 +35,7 @@ export async function targetLink(
     return;
   }
 
-  const { workspace } = await nxWorkspace(workingPath, lspLogger);
+  const { projectGraph } = await nxWorkspace(workingPath, lspLogger);
 
   const targetString = node.value;
   let project, target, configuration;
@@ -65,7 +65,7 @@ export async function targetLink(
         nodes: {
           [projectString]: {
             data: {
-              targets: workspace.projects[projectString]?.targets,
+              targets: projectGraph.nodes[projectString]?.data.targets,
             },
           },
         },
@@ -81,14 +81,14 @@ export async function targetLink(
     return;
   }
 
-  const workspaceProject = workspace.projects[project];
+  const workspaceProject = projectGraph.nodes[project];
 
   if (!workspaceProject) {
     lspLogger.log(`Could not find project ${project}`);
     return;
   }
 
-  const baseTargetPath = join(workingPath, workspaceProject.root);
+  const baseTargetPath = join(workingPath, workspaceProject.data.root);
   const baseTargetProjectPath = join(baseTargetPath, 'project.json');
 
   if (!(await fileExists(baseTargetProjectPath))) {

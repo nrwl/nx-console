@@ -64,7 +64,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         browser.jbCefClient.addDownloadHandler(NxGraphDownloadHandler(), browser.cefBrowser)
         browser.jbCefClient.addContextMenuHandler(
             OpenDevToolsContextMenuHandler(),
-            browser.cefBrowser
+            browser.cefBrowser,
         )
         browser.setOpenLinksInExternalBrowser(true)
 
@@ -113,14 +113,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected fun loadGraphHtmlBase(): String {
 
         val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
-        val graphBasePath =
-            Paths.get(
-                    nxPackagePath,
-                    "src",
-                    "core",
-                    "graph",
-                )
-                .toString() + "/"
+        val graphBasePath = Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
 
         val graphIndexHtmlPath = Paths.get(graphBasePath, "index.html").toString()
 
@@ -134,13 +127,13 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 "<base\\b[^>]*>".toRegex(),
                 """
                   <base href="${Matcher.quoteReplacement(graphBasePath)}">
-                  """
+                  """,
             )
 
         htmlText =
             htmlText.replace(
                 "<script(\\s[^>]*?)\\stype=\"module\"([^>]*?)>".toRegex(),
-                "<script$1$2>"
+                "<script$1$2>",
             )
 
         htmlText =
@@ -228,7 +221,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 
                  </script>
                 </head>"""
-                )
+                ),
             )
 
         setColors()
@@ -252,7 +245,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                         Notifier.notifyAnything(
                             project,
                             "Couldn't find file at path $fullPath",
-                            NotificationType.ERROR
+                            NotificationType.ERROR,
                         )
                         return true
                     }
@@ -268,12 +261,13 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                     TelemetryService.getInstance(project)
                         .featureUsed(
                             TelemetryEvent.MISC_SHOW_PROJECT_CONFIGURATION,
-                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                            mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
                         )
 
                     event.payload?.projectName?.also {
-                        project.nxWorkspace()?.workspace?.projects?.get(it)?.apply {
-                            val path = nxProjectConfigurationPath(project, root) ?: return@apply
+                        project.nxWorkspace()?.projectGraph?.nodes?.get(it)?.apply {
+                            val path =
+                                nxProjectConfigurationPath(project, data.root) ?: return@apply
                             val file =
                                 LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
                             ApplicationManager.getApplication().invokeLater {
@@ -357,7 +351,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             TelemetryService.getInstance(project)
                 .featureUsed(
                     TelemetryEvent.MISC_REFRESH_WORKSPACE,
-                    mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION)
+                    mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
                 )
             NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
             null
@@ -465,7 +459,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 @Serializable
 data class NxGraphInteractionEvent(
     val type: String,
-    val payload: NxGraphInteractionPayload? = null
+    val payload: NxGraphInteractionPayload? = null,
 )
 
 @Serializable
@@ -484,7 +478,7 @@ data class NxGraphRequest(
     val type: String,
     val id: String,
     val payload: String? = null,
-    val error: String? = null
+    val error: String? = null,
 )
 
 @Service(Service.Level.PROJECT)

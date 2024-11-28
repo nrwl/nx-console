@@ -20,11 +20,7 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
     return schema;
   }
 
-  // TODO: remove any after update
-  if (
-    (workspace.workspace.workspaceLayout as any)?.projectNameAndRootFormat ===
-    'derived'
-  ) {
+  if (workspace.workspaceLayout?.projectNameAndRootFormat === 'derived') {
     return {
       ...schema,
       context: {
@@ -87,7 +83,7 @@ export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   ) {
     return undefined;
   }
-  if ((workspace.workspace.workspaceLayout as any)?.projectNameAndRootFormat) {
+  if ((workspace.workspaceLayout as any)?.projectNameAndRootFormat) {
     return undefined;
   }
   return {

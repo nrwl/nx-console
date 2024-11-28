@@ -437,8 +437,8 @@ class OldNxGraphBrowser(
                             mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
                         )
 
-                    project.nxWorkspace()?.workspace?.projects?.get(msg)?.apply {
-                        val path = nxProjectConfigurationPath(project, root) ?: return@apply
+                    project.nxWorkspace()?.projectGraph?.nodes?.get(msg)?.apply {
+                        val path = nxProjectConfigurationPath(project, data.root) ?: return@apply
                         val file =
                             LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
                         ApplicationManager.getApplication().invokeLater {

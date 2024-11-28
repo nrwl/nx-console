@@ -71,13 +71,16 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
   }
 
   async getTargets(): Promise<NxCommandConfig[]> {
-    const workspace = (await getNxWorkspace())?.workspace ?? { projects: {} };
-    const targets = Object.values(workspace.projects).reduce((acc, project) => {
-      for (const target of Object.keys(project.targets ?? {})) {
-        acc.add(target);
-      }
-      return acc;
-    }, new Set<string>());
+    const workspace = await getNxWorkspace();
+    const targets = Object.values(workspace?.projectGraph.nodes ?? {}).reduce(
+      (acc, project) => {
+        for (const target of Object.keys(project.data.targets ?? {})) {
+          acc.add(target);
+        }
+        return acc;
+      },
+      new Set<string>()
+    );
     return Array.from(targets)
       .sort()
       .map((target) => ({

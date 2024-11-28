@@ -1,8 +1,8 @@
 import { fileExists } from '@nx-console/shared/file-system';
 import { Option, OptionType } from '@nx-console/shared/schema';
-import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { readBuilderSchema } from '@nx-console/vscode/utils';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { window } from 'vscode';
 
@@ -55,16 +55,16 @@ const RUN_ONE_OPTIONS = [
 export async function verifyBuilderDefinition(
   project: string,
   command: string,
-  workspaceJson: NxWorkspaceConfiguration
+  projectGraph: ProjectGraph
 ): Promise<{
   validBuilder: boolean;
   builderName: string | undefined;
   configurations: string[];
   options: Array<Option>;
 }> {
-  const projects = workspaceJson.projects || {};
+  const projects = projectGraph.nodes || {};
   const projectDef = projects[project] || {};
-  const targetDef = projectDef.targets || {};
+  const targetDef = projectDef.data.targets || {};
   const commandDef = targetDef[command] || {};
   const configurations = Object.keys(commandDef.configurations || {});
   const executorName = commandDef.executor;

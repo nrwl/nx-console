@@ -242,5 +242,5 @@ async function getProjectForContext(
     highlightedProject,
   });
   if (!selectedProjectName) return;
-  return projects[selectedProjectName];
+  return projects[selectedProjectName].data;
 }

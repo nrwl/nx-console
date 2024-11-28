@@ -29,7 +29,7 @@ const defaultSchema: GeneratorSchema = {
 describe('useGeneratorDefaultsProcessor', () => {
   it('should update options with default values from nx.json - nested', () => {
     const workspace = {
-      workspace: {
+      nxJson: {
         generators: {
           'my-collection': {
             'my-generator': {
@@ -65,7 +65,7 @@ describe('useGeneratorDefaultsProcessor', () => {
 
   it('should update options with default values from nx.json - flat', () => {
     const workspace = {
-      workspace: {
+      nxJson: {
         generators: {
           'my-collection:my-generator': {
             option1: 'updated-default1',
@@ -99,7 +99,7 @@ describe('useGeneratorDefaultsProcessor', () => {
 
   it('should return the original schema if nx.json entry is not found', () => {
     const workspace = {
-      workspace: {
+      nxJson: {
         generators: {},
       },
     };

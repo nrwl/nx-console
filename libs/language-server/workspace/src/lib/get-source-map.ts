@@ -14,24 +14,22 @@ export async function getSourceMapFilesToProjectsMap(
   if (_sourceMapFilesToProjectMap) {
     return _sourceMapFilesToProjectMap;
   }
-  const { workspace } = await nxWorkspace(workingPath);
+  const { sourceMaps } = await nxWorkspace(workingPath);
   const sourceMapFilesToProjectMap: Record<string, string[]> = {};
 
-  Object.entries(workspace.sourceMaps ?? {}).forEach(
-    ([projectRoot, sourceMap]) => {
-      Object.values(sourceMap).forEach(([file]) => {
-        if (!file || file === 'nx.json') {
-          return;
-        }
-        if (!sourceMapFilesToProjectMap[file]) {
-          sourceMapFilesToProjectMap[file] = [];
-        }
-        if (!sourceMapFilesToProjectMap[file].includes(projectRoot)) {
-          sourceMapFilesToProjectMap[file].push(projectRoot);
-        }
-      });
-    }
-  );
+  Object.entries(sourceMaps ?? {}).forEach(([projectRoot, sourceMap]) => {
+    Object.values(sourceMap).forEach(([file]) => {
+      if (!file || file === 'nx.json') {
+        return;
+      }
+      if (!sourceMapFilesToProjectMap[file]) {
+        sourceMapFilesToProjectMap[file] = [];
+      }
+      if (!sourceMapFilesToProjectMap[file].includes(projectRoot)) {
+        sourceMapFilesToProjectMap[file].push(projectRoot);
+      }
+    });
+  });
 
   _sourceMapFilesToProjectMap = sourceMapFilesToProjectMap;
   return sourceMapFilesToProjectMap;
@@ -42,9 +40,7 @@ export async function getTargetsForConfigFile(
   configFilePath: string,
   workingPath: string
 ): Promise<Record<string, TargetConfiguration> | undefined> {
-  const {
-    workspace: { sourceMaps, projects },
-  } = await nxWorkspace(workingPath);
+  const { sourceMaps, projectGraph } = await nxWorkspace(workingPath);
 
   configFilePath = normalize(configFilePath);
 
@@ -52,13 +48,13 @@ export async function getTargetsForConfigFile(
     configFilePath = relative(workingPath, configFilePath);
   }
 
-  const project = projects[projectName];
+  const project = projectGraph.nodes[projectName];
 
   if (!project || !sourceMaps) {
     return;
   }
 
-  const sourceMap = sourceMaps[project.root];
+  const sourceMap = sourceMaps[project.data.root];
 
   const targets: Record<string, TargetConfiguration> = {};
   Object.entries(sourceMap)
@@ -66,7 +62,7 @@ export async function getTargetsForConfigFile(
     .forEach(([key, [file]]: [string, [string, string]]) => {
       if (normalize(file) === configFilePath) {
         const targetName = key.split('.')[1];
-        const target = project.targets?.[targetName];
+        const target = project.data.targets?.[targetName];
         if (target) {
           targets[targetName] = target;
         }

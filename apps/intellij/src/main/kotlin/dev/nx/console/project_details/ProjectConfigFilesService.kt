@@ -88,7 +88,7 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
                 if (
                     !workspace?.errors.isNullOrEmpty() &&
                         workspace?.isPartial != true &&
-                        !workspace?.workspace?.projects.isNullOrEmpty()
+                        !workspace?.projectGraph?.nodes.isNullOrEmpty()
                 ) {
                     pathsToProjectsMap.clear()
                 }

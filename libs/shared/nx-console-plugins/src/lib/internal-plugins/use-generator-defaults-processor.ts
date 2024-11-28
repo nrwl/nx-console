@@ -7,10 +7,10 @@ export const useGeneratorDefaultsProcessor: SchemaProcessor = (
   workspace: NxWorkspace
 ) => {
   const nxJsonGeneratorsEntry =
-    workspace.workspace?.generators?.[schema.collectionName]?.[
+    workspace.nxJson?.generators?.[schema.collectionName]?.[
       schema.generatorName
     ] ??
-    workspace.workspace?.generators?.[
+    workspace.nxJson?.generators?.[
       `${schema.collectionName}:${schema.generatorName}`
     ];
 

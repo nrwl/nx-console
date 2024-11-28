@@ -112,7 +112,7 @@ export class GraphWebView implements Disposable {
           source: 'graph-interaction',
         });
         getNxWorkspaceProjects().then((projects) => {
-          const root = projects[event.data]?.root;
+          const root = projects[event.data]?.data.root;
           if (!root) return;
           revealNxProject(event.data, root);
         });
@@ -213,12 +213,10 @@ export class GraphWebView implements Disposable {
       return;
     }
 
-    const {
-      workspace: { projects },
-    } = nxWorkspace;
+    const { projectGraph } = nxWorkspace;
 
-    if (!projects || !Object.keys(projects).length) {
-      showNoProjectsMessage();
+    if (!projectGraph.nodes || !Object.keys(projectGraph.nodes).length) {
+      showNoProjectsMessage(true);
       return;
     }
     const hasAffected = await hasAffectedProjects();

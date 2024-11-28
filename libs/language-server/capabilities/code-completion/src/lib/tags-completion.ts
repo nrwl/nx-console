@@ -19,10 +19,10 @@ export async function tagsCompletion(
 
   const tagCompletion: CompletionItem[] = [];
 
-  const { workspace } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath);
   const tags = new Set<string>();
-  for (const projectConfiguration of Object.values(workspace.projects)) {
-    for (const tag of projectConfiguration.tags ?? []) {
+  for (const projectConfiguration of Object.values(projectGraph.nodes)) {
+    for (const tag of projectConfiguration.data.tags ?? []) {
       tags.add(tag);
     }
   }

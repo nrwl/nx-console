@@ -73,7 +73,7 @@ class NxTreeStructure(val tree: NxProjectsTree, val project: Project) : SimpleTr
     private suspend fun getTreeBuilder(nxWorkspace: NxWorkspace?): NxTreeBuilderBase {
         val toolWindowStyle: ToolWindowStyles =
             NxConsoleProjectSettingsProvider.getInstance(project).toolwindowStyle
-        val numProjects = nxWorkspace?.workspace?.projects?.size ?: 1
+        val numProjects = nxWorkspace?.projectGraph?.nodes?.size ?: 1
         return if (
             toolWindowStyle == ToolWindowStyles.LIST ||
                 (toolWindowStyle == ToolWindowStyles.AUTOMATIC && numProjects < 10)

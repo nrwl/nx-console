@@ -1,5 +1,3 @@
-import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
-
 export function getPrimitiveValue(value: any): string | undefined {
   if (
     typeof value === 'string' ||
@@ -10,16 +8,6 @@ export function getPrimitiveValue(value: any): string | undefined {
   } else {
     return undefined;
   }
-}
-
-export function sortWorkspaceProjects(
-  w: NxWorkspaceConfiguration
-): NxWorkspaceConfiguration {
-  const sortedProjects = Object.entries(w.projects || {}).sort(
-    (projectA, projectB) => projectA[0].localeCompare(projectB[0])
-  );
-  w.projects = Object.fromEntries(sortedProjects);
-  return w;
 }
 
 export function hasKey<T extends object>(

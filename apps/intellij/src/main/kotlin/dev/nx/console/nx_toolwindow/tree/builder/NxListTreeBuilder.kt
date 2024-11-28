@@ -36,8 +36,11 @@ class NxListTreeBuilder(private val nxWorkspace: NxWorkspace?) : NxTreeBuilderBa
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.workspace.projects.values
-            .map { NxSimpleNode.Project(it.name, projectsSectionNode) }
-            .toTypedArray()
+        return nxWorkspace.projectGraph
+            ?.nodes
+            ?.values
+            ?.map { NxSimpleNode.Project(it.name, projectsSectionNode) }
+            ?.toTypedArray()
+            ?: emptyArray()
     }
 }

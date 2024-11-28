@@ -66,16 +66,16 @@ async function promptForTarget(): Promise<string | undefined> {
   if (!nxWorkspace) {
     return;
   }
-  const { validWorkspaceJson, workspace } = nxWorkspace;
+  const { validWorkspaceJson, projectGraph } = nxWorkspace;
 
-  if (!validWorkspaceJson || !workspace) {
+  if (!validWorkspaceJson) {
     return;
   }
 
   const validTargets = Array.from(
     new Set(
-      Object.entries(workspace.projects)
-        .map(([, project]) => Object.keys(project.targets || {}))
+      Object.entries(projectGraph.nodes)
+        .map(([, project]) => Object.keys(project.data.targets || {}))
         .flat()
     )
   ).sort();

@@ -76,7 +76,7 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
             return
         }
         val projectFiles =
-            workspace.workspace.projects.values
+            workspace.projectGraph.nodes.values
                 .asSequence()
                 // TODO: use framework metadata in the future, for now just register all projects
                 //                .filter { project ->
@@ -84,7 +84,7 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
                 //                }
                 .mapNotNull { project ->
                     workspaceRoot
-                        .findFileByRelativePath(project.root)
+                        .findFileByRelativePath(project.data.root)
                         ?.findFileByRelativePath("project.json")
                         ?.let { Pair(project.name, it) }
                 }
@@ -100,7 +100,7 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
                     ProjectRootManagerEx.getInstanceEx(project)
                         .makeRootsChange(
                             EmptyRunnable.getInstance(),
-                            RootsChangeRescanningInfo.RESCAN_DEPENDENCIES_IF_NEEDED
+                            RootsChangeRescanningInfo.RESCAN_DEPENDENCIES_IF_NEEDED,
                         )
                 }
             }
@@ -114,7 +114,7 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
             propertyElementName = "projects",
             entryTagName = "project",
             keyAttributeName = "name",
-            valueAttributeName = "file"
+            valueAttributeName = "file",
         )
         var projects: MutableMap<String, String> = mutableMapOf()
     }

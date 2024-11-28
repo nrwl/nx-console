@@ -67,7 +67,7 @@ describe('nx/workspace - lerna.json only repo', () => {
     });
 
     expect(
-      Object.keys((workspaceResponse.result as NxWorkspace).workspace.projects)
+      Object.keys((workspaceResponse.result as NxWorkspace).projectGraph.nodes)
     ).toEqual(['project-1', 'project-2', 'project-3']);
   });
   it('should return correct targets for lerna workspace', async () => {
@@ -78,24 +78,24 @@ describe('nx/workspace - lerna.json only repo', () => {
       },
     });
 
-    const projects = (workspaceResponse.result as NxWorkspace).workspace
-      .projects;
+    const projects = (workspaceResponse.result as NxWorkspace).projectGraph
+      .nodes;
 
-    expect(Object.keys(projects['project-1']?.targets ?? {}))
+    expect(Object.keys(projects['project-1']?.data.targets ?? {}))
       .toMatchInlineSnapshot(`
       Array [
         "echo-1",
         "nx-release-publish",
       ]
     `);
-    expect(Object.keys(projects['project-2']?.targets ?? {}))
+    expect(Object.keys(projects['project-2']?.data.targets ?? {}))
       .toMatchInlineSnapshot(`
       Array [
         "echo-2",
         "nx-release-publish",
       ]
     `);
-    expect(Object.keys(projects['project-3']?.targets ?? {}))
+    expect(Object.keys(projects['project-3']?.data.targets ?? {}))
       .toMatchInlineSnapshot(`
       Array [
         "echo-3",

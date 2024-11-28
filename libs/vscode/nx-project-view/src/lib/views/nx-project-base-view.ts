@@ -5,6 +5,7 @@ import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';
 import type {
   ProjectConfiguration,
+  ProjectGraphProjectNode,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
 import { TreeItemCollapsibleState } from 'vscode';
@@ -52,12 +53,15 @@ export abstract class BaseView {
   workspaceData: NxWorkspace | undefined = undefined;
 
   createProjectViewItem(
-    [projectName, { root, name, targets }]: [
+    [projectName, projectGraphNode]: [
       projectName: string,
-      projectDefinition: ProjectConfiguration
+      projectDefinition: ProjectGraphProjectNode
     ],
     collapsible = TreeItemCollapsibleState.Collapsed
   ): ProjectViewItem {
+    const {
+      data: { root, name, targets },
+    } = projectGraphNode;
     const hasChildren =
       !targets ||
       Object.keys(targets).length !== 0 ||
@@ -91,12 +95,12 @@ export abstract class BaseView {
       return;
     }
 
-    const { targets } = projectDef;
+    const { targets } = projectDef.data;
     if (!targets) {
       return;
     }
 
-    if (!projectDef.metadata?.targetGroups) {
+    if (!projectDef.data.metadata?.targetGroups) {
       return Object.entries(targets).map((target) =>
         this.createTargetTreeItem(nxProject, target)
       );
@@ -106,7 +110,7 @@ export abstract class BaseView {
     const nonGroupedTargets: Set<string> = new Set(Object.keys(targets));
 
     for (const [targetGroupName, targets] of Object.entries(
-      projectDef.metadata.targetGroups
+      projectDef.data.metadata.targetGroups
     )) {
       if (!targetGroupMap.has(targetGroupName)) {
         targetGroupMap.set(targetGroupName, []);
@@ -178,7 +182,7 @@ export abstract class BaseView {
       return;
     }
 
-    const { targets } = projectDef;
+    const { targets } = projectDef.data;
     if (!targets) {
       return;
     }
@@ -214,7 +218,7 @@ export abstract class BaseView {
       return;
     }
 
-    const { targets } = projectDef;
+    const { targets } = projectDef.data;
     if (!targets) {
       return;
     }
@@ -230,8 +234,8 @@ export abstract class BaseView {
   }
 
   protected async getProjectData() {
-    if (this.workspaceData?.workspace.projects) {
-      return this.workspaceData.workspace.projects;
+    if (this.workspaceData?.projectGraph.nodes) {
+      return this.workspaceData.projectGraph.nodes;
     } else {
       return await getNxWorkspaceProjects();
     }

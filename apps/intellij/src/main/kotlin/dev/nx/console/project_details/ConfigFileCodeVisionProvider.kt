@@ -217,7 +217,7 @@ class ProjectLevelConfigFileCodeVisionManager(
             }
         }
 
-        if (nxProject.targets.isEmpty()) {
+        if (nxProject.targets.isNullOrEmpty()) {
             return CodeVisionState.READY_EMPTY
         }
 

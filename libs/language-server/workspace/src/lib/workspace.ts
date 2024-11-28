@@ -1,7 +1,8 @@
-import { formatError, sortWorkspaceProjects } from '@nx-console/shared/utils';
+import { formatError } from '@nx-console/shared/utils';
 
 import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
+import { NxWorkspace } from '@nx-console/shared/types';
 import { join } from 'path';
 import {
   firstValueFrom,
@@ -12,10 +13,8 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { getNxWorkspaceConfig } from './get-nx-workspace-config';
-import { NxWorkspace } from '@nx-console/shared/types';
 import { getNxVersion } from './get-nx-version';
-import { lspLogger } from '@nx-console/language-server/utils';
+import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 
 const enum Status {
   not_started,
@@ -71,22 +70,31 @@ async function _workspace(
 ): Promise<NxWorkspace> {
   try {
     const nxVersion = await getNxVersion(workspacePath);
-    const config = await getNxWorkspaceConfig(workspacePath, nxVersion, logger);
+    const {
+      projectGraph,
+      sourceMaps,
+      nxJson,
+      projectFileMap,
+      errors,
+      isPartial,
+    } = await getNxWorkspaceConfig(workspacePath, nxVersion, logger);
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
     return {
+      projectGraph,
+      sourceMaps,
+      nxJson,
+      projectFileMap,
       validWorkspaceJson: true,
-      workspace: sortWorkspaceProjects(config.workspaceConfiguration),
-      daemonEnabled: config.daemonEnabled,
-      isPartial: config.isPartial,
+      isPartial: isPartial,
       isLerna,
-      isEncapsulatedNx: !!config.workspaceConfiguration.installation,
+      isEncapsulatedNx: !!nxJson?.installation,
       workspaceLayout: {
-        appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
-        libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
+        appsDir: nxJson.workspaceLayout?.appsDir,
+        libsDir: nxJson.workspaceLayout?.libsDir,
       },
-      errors: config.errors,
+      errors,
       nxVersion,
       workspacePath,
     };
@@ -96,10 +104,13 @@ async function _workspace(
     // Default to nx workspace
     return {
       validWorkspaceJson: false,
-      workspace: {
-        projects: {},
-        version: 2,
+      projectGraph: {
+        nodes: {},
+        dependencies: {},
       },
+      sourceMaps: undefined,
+      projectFileMap: undefined,
+      nxJson: {},
       workspacePath,
       isEncapsulatedNx: false,
       nxVersion: {

@@ -36,9 +36,9 @@ export class CliTaskProvider implements TaskProvider {
 
     const projectTargetCombinations: [string, string][] = [];
 
-    Object.entries(nxWorkspace?.workspace.projects ?? {}).forEach(
+    Object.entries(nxWorkspace?.projectGraph.nodes ?? {}).forEach(
       ([projectName, project]) => {
-        Object.keys(project.targets ?? {}).forEach((targetName) => {
+        Object.keys(project.data.targets ?? {}).forEach((targetName) => {
           projectTargetCombinations.push([projectName, targetName]);
         });
       }

@@ -31,11 +31,11 @@ export async function getProjectByRoot(
     return _rootProjectMap[rootPath];
   }
 
-  const { workspace } = await nxWorkspace(workspacePath);
+  const { projectGraph } = await nxWorkspace(workspacePath);
   const rootProjectMap: Record<string, ProjectConfiguration> = {};
-  const projectEntries = Object.entries(workspace.projects);
+  const projectEntries = Object.entries(projectGraph.nodes);
   for (const [, projectConfig] of projectEntries) {
-    rootProjectMap[projectConfig.root] = projectConfig;
+    rootProjectMap[projectConfig.data.root] = projectConfig.data;
   }
   _rootProjectMap = rootProjectMap;
 
@@ -61,7 +61,7 @@ export async function getProjectsByPaths(
       ? workspacePath.substring(1)
       : workspacePath;
 
-  const { workspace } = await nxWorkspace(workspacePath);
+  const { projectGraph, projectFileMap } = await nxWorkspace(workspacePath);
   const pathsMap = new Map<
     string,
     { relativePath: string; isDirectory: boolean }
@@ -79,16 +79,16 @@ export async function getProjectsByPaths(
     });
   }
 
-  const projectEntries = Object.entries(workspace.projects);
+  const projectEntries = Object.entries(projectGraph.nodes);
 
   const foundProjects: Map<string, ProjectConfiguration> = new Map();
 
   for (const [projectName, projectConfig] of projectEntries) {
     // If there is no files array, it's an old version of Nx and we need backwards compatibility
-    if (!projectConfig.files) {
+    if (!projectFileMap?.[projectName]) {
       new Map(pathsMap).forEach((_, path) => {
         const foundProject = findByFilePath(
-          [projectName, projectConfig],
+          [projectName, projectConfig.data],
           workspacePath,
           path
         );
@@ -104,15 +104,18 @@ export async function getProjectsByPaths(
     new Map(pathsMap).forEach(({ relativePath, isDirectory }, path) => {
       if (!isDirectory) return;
 
-      const isChildOfRoot = isChildOrEqual(projectConfig.root, relativePath);
-      const relativeRootConfig = projectConfig.sourceRoot
-        ? relative(workspacePath, projectConfig.sourceRoot)
+      const isChildOfRoot = isChildOrEqual(
+        projectConfig.data.root,
+        relativePath
+      );
+      const relativeRootConfig = projectConfig.data.sourceRoot
+        ? relative(workspacePath, projectConfig.data.sourceRoot)
         : undefined;
       const isChildOfRootConfig =
         relativeRootConfig && isChildOrEqual(relativeRootConfig, relativePath);
 
       if (isChildOfRoot || isChildOfRootConfig) {
-        foundProjects.set(path, projectConfig);
+        foundProjects.set(path, projectConfig.data);
         pathsMap.delete(path);
       }
     });
@@ -121,10 +124,10 @@ export async function getProjectsByPaths(
     const nonDirectoryPaths = [...pathsMap.entries()].filter(
       ([_, { isDirectory }]) => !isDirectory
     );
-    projectConfig.files?.forEach(({ file }) => {
+    projectFileMap?.[projectName]?.forEach(({ file }) => {
       for (const [path, { relativePath }] of nonDirectoryPaths) {
         if (normalize(file) === normalize(relativePath)) {
-          foundProjects.set(path, projectConfig);
+          foundProjects.set(path, projectConfig.data);
           pathsMap.delete(path);
         }
       }
@@ -138,14 +141,14 @@ export async function getProjectsByPaths(
   // if a directory is not found in any projects & there's a root project, use that
   if (pathsMap.size > 0) {
     const rootProject = projectEntries.find(
-      ([, projectConfig]) => projectConfig.root === '.'
+      ([, projectConfig]) => projectConfig.data.root === '.'
     );
     if (rootProject) {
       new Map(pathsMap).forEach(({ isDirectory }, path) => {
         if (!isDirectory) {
           return;
         }
-        foundProjects.set(path, rootProject[1]);
+        foundProjects.set(path, rootProject[1].data);
         pathsMap.delete(path);
       });
     }
