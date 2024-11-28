@@ -19,6 +19,7 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
+  NxParseTargetStringRequest,
   NxPDVDataRequest,
   NxProjectByPathRequest,
   NxProjectByRootRequest,
@@ -72,6 +73,7 @@ import {
   hasAffectedProjects,
   nxStopDaemon,
   nxWorkspace,
+  parseTargetString,
   resetNxVersionCache,
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
@@ -607,6 +609,20 @@ connection.onRequest(NxRecentCIPEDataRequest, async () => {
 
   return getRecentCIPEData(WORKING_PATH);
 });
+
+connection.onRequest(
+  NxParseTargetStringRequest,
+  async (targetString: string) => {
+    keepAlive();
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return parseTargetString(targetString, WORKING_PATH);
+  }
+);
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {

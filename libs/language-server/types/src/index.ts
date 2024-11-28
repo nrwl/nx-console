@@ -18,6 +18,7 @@ import {
 } from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
+  Target,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
 import { StartupMessageDefinition } from 'shared/nx-console-plugins';
@@ -202,3 +203,9 @@ export const NxRecentCIPEDataRequest: RequestType<
   { info?: CIPEInfo[]; error?: CIPEInfoError; workspaceUrl?: string },
   unknown
 > = new RequestType('nx/recentCIPEData');
+
+export const NxParseTargetStringRequest: RequestType<
+  string,
+  Target | undefined,
+  unknown
+> = new RequestType('nx/parseTargetString');

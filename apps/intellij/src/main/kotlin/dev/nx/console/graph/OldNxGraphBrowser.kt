@@ -470,8 +470,7 @@ class OldNxGraphBrowser(
                             mapOf("source" to TelemetryEventSource.GRAPH_INTERACTION),
                         )
 
-                    val (projectName, targetName) = msg.split(":")
-                    NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)
+                    NxTaskExecutionManager.getInstance(project).execute(msg)
                 }
 
                 null

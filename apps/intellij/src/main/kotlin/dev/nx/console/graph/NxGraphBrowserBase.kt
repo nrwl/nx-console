@@ -280,8 +280,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             }
             "run-task" -> {
                 event.payload?.taskId?.also {
-                    val (projectName, targetName) = it.split(":")
-                    NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)
+                    NxTaskExecutionManager.getInstance(project).execute(it)
                 }
                 return true
             }

@@ -697,9 +697,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     }
                     "run-task" -> {
                         messageParsed.payload?.taskId?.also {
-                            val (projectName, targetName) = it.split(":")
-                            NxTaskExecutionManager.getInstance(project)
-                                .execute(projectName, targetName)
+                            NxTaskExecutionManager.getInstance(project).execute(it)
                         }
                     }
                     "run-help" -> {
