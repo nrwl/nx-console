@@ -13,6 +13,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'showProjectDetailsView',
   'showNodeVersionOnStartup',
   'nxWorkspacePath',
+  'nxCloudNotifications',
 ] as const;
 
 export type GlobalConfig = {
@@ -30,6 +31,7 @@ export type GlobalConfig = {
   showProjectDetailsView: boolean;
   showNodeVersionOnStartup: boolean;
   nxWorkspacePath: string;
+  nxCloudNotifications: 'all' | 'errors' | 'none';
 };
 
 /**

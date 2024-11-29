@@ -222,7 +222,6 @@ async function disableTypescriptServerPlugin() {
 
 async function configurePlugin(workspaceRoot: string, api: any) {
   const externalFiles = await getExternalFiles(workspaceRoot);
-  getOutputChannel().appendLine(`Configuring TypeScript plugin `);
   api.configurePlugin('@monodon/typescript-nx-imports-plugin', {
     externalFiles,
   });

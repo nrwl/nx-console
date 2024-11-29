@@ -26,6 +26,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxRecentCIPEDataRequest,
   NxSourceMapFilesToProjectsMapRequest,
   NxStartupMessageRequest,
   NxStopDaemonRequest,
@@ -65,6 +66,7 @@ import {
   getProjectFolderTree,
   getProjectGraphOutput,
   getProjectsByPaths,
+  getRecentCIPEData,
   getSourceMapFilesToProjectsMap,
   getStartupMessage,
   getTargetsForConfigFile,
@@ -625,6 +627,15 @@ connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return getPDVData(WORKING_PATH, args.filePath);
+});
+
+connection.onRequest(NxRecentCIPEDataRequest, async () => {
+  keepAlive();
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  return getRecentCIPEData(WORKING_PATH);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {

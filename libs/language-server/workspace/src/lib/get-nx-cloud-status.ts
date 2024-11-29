@@ -10,18 +10,17 @@ import {
 
 export async function getNxCloudStatus(
   workspaceRoot: string
-): Promise<{ isConnected: boolean; nxCloudUrl: string }> {
+): Promise<{ isConnected: boolean; nxCloudUrl: string; nxCloudId?: string }> {
   const nxJsonPath = join(workspaceRoot, 'nx.json');
   if (!existsSync(nxJsonPath)) {
     return { isConnected: false, nxCloudUrl: defaultCloudUrl };
   }
-  if (
-    (await getNxAccessToken(workspaceRoot)) ||
-    (await getNxCloudId(workspaceRoot))
-  ) {
+  const nxCloudId = await getNxCloudId(workspaceRoot);
+  if ((await getNxAccessToken(workspaceRoot)) || nxCloudId) {
     return {
       isConnected: true,
       nxCloudUrl: await getNxCloudUrl(workspaceRoot),
+      nxCloudId,
     };
   }
 
