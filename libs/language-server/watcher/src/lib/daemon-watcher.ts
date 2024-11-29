@@ -4,6 +4,7 @@ import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import { canReadNxJson } from '@nx-console/shared/npm';
+import { gte, NxVersion } from '@nx-console/shared/nx-version';
 
 export class DaemonWatcher {
   private stopped = false;
@@ -11,7 +12,11 @@ export class DaemonWatcher {
 
   private disposables: Set<() => void> = new Set();
 
-  constructor(private workspacePath: string, private callback: () => unknown) {}
+  constructor(
+    private workspacePath: string,
+    private nxVersion: NxVersion,
+    private callback: () => unknown
+  ) {}
 
   async start() {
     await this.initWatcher();
@@ -52,9 +57,13 @@ export class DaemonWatcher {
 
       let projectGraphErrors = false;
       try {
-        await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
+        if (gte(this.nxVersion, '17.2.0')) {
+          await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
+        } else {
+          await (daemonClientModule?.daemonClient as any).getProjectGraph();
+        }
       } catch (e) {
-        lspLogger.log(`caught error, ${JSON.stringify(e)}`);
+        lspLogger.log(`caught error,${e}, ${JSON.stringify(e)}`);
         if (!isProjectGraphError(e)) {
           projectGraphErrors = true;
         }
@@ -62,7 +71,7 @@ export class DaemonWatcher {
 
       if (!daemonClientModule || projectGraphErrors) {
         lspLogger.log(
-          'project graph computation error during daemon watcher initialization, using native watcher.'
+          `project graph computation error during daemon watcher initialization, using native watcher.`
         );
         this.retryCount = 0;
         this.useNativeWatcher();
