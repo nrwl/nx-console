@@ -35,6 +35,8 @@ describe('parse target string - default', () => {
       workspaceName,
       'project.json'
     );
+
+    console.log('modifying project.json');
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {
