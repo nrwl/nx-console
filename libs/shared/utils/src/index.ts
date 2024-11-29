@@ -5,3 +5,4 @@ export { getNxExecutionCommand } from './lib/get-nx-execution-command';
 export * from './lib/utils';
 export * from './lib/kill-tree';
 export * from './lib/cipe';
+export * from './lib/package-manager-command';

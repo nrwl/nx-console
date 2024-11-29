@@ -1,16 +1,25 @@
-import type { PackageManager } from 'nx/src/devkit-exports';
+import { importNxPackagePath } from '@nx-console/shared/npm';
+import { gte } from '@nx-console/shared/nx-version';
+import { getPackageManagerCommand } from '@nx-console/shared/utils';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
+import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
 import {
   getGeneratorOptions,
   getGenerators,
   getNxVersion,
 } from '@nx-console/vscode/nx-workspace';
+import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
+import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   getShellExecutionForConfig,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
+import { execSync } from 'child_process';
 import { existsSync } from 'fs';
+import type { PackageManager } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { xhr, XHRResponse } from 'request-light';
+import { major } from 'semver';
 import {
   commands,
   ExtensionContext,
@@ -21,14 +30,6 @@ import {
   TaskScope,
   window,
 } from 'vscode';
-import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
-import { execSync } from 'child_process';
-import { major } from 'semver';
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
-import { importNxPackagePath } from '@nx-console/shared/npm';
-import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { gte } from '@nx-console/shared/nx-version';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -139,10 +140,7 @@ async function addDependency(
   workspacePath: string
 ) {
   try {
-    const { getPackageManagerCommand } = await importNxPackagePath<
-      typeof import('nx/src/devkit-exports')
-    >(workspacePath, 'src/devkit-exports');
-    const pkgManagerCommands = getPackageManagerCommand(pkgManager);
+    const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
     const pkgManagerWorkspaceFlag = await getWorkspaceAddFlag(
       pkgManager,
       workspacePath
