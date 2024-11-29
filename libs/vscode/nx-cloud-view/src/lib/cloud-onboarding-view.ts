@@ -76,9 +76,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
     });
 
     webviewView.onDidDispose(() => {
-      if (this._refreshSubscription) {
-        this._refreshSubscription.dispose();
-      }
+      this._refreshSubscription?.dispose();
     });
   }
 

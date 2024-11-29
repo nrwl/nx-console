@@ -114,24 +114,33 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
     if (isCompleteStatus(this.cipe.status)) {
       let totalTasks = 0;
       let failedTasks = 0;
+      let hasFailedRuns = false;
       for (const runGroup of this.cipe.runGroups) {
         for (const run of runGroup.runs) {
           totalTasks += run.numTasks ?? 0;
           failedTasks += run.numFailedTasks ?? 0;
+          hasFailedRuns =
+            hasFailedRuns || (!!run.status && isFailedStatus(run.status));
         }
       }
-      const label =
-        failedTasks > 0
-          ? `${failedTasks}/${totalTasks} tasks failed. Failed Runs:`
-          : 'Failed Runs:';
-      return [
-        new LabelTreeItem(label),
-        ...this.cipe.runGroups.flatMap((runGroup) =>
-          runGroup.runs
-            .filter((run) => run.status && isFailedStatus(run.status))
-            .map((run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId))
-        ),
-      ];
+
+      if (hasFailedRuns) {
+        const label =
+          failedTasks > 0
+            ? `${failedTasks}/${totalTasks} tasks failed. Failed Runs:`
+            : 'Failed Runs:';
+
+        return [
+          new LabelTreeItem(label),
+          ...this.cipe.runGroups.flatMap((runGroup) =>
+            runGroup.runs
+              .filter((run) => run.status && isFailedStatus(run.status))
+              .map(
+                (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId)
+              )
+          ),
+        ];
+      }
     }
 
     // In Progress CIPE

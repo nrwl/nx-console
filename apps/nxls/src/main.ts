@@ -630,6 +630,7 @@ connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
 });
 
 connection.onRequest(NxRecentCIPEDataRequest, async () => {
+  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
