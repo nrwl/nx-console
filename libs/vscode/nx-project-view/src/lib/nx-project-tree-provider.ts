@@ -104,14 +104,16 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   }
 
   private async runTask(
-    selection: NxTreeItem,
+    selection: NxTreeItem | undefined,
     optionalFlags?: NxOptionalFlags
   ) {
     getTelemetry().logUsage('tasks.run', {
       source: 'projects-view',
     });
-    const viewItem = selection.item;
+
+    const viewItem = selection?.item;
     if (
+      !viewItem ||
       viewItem.contextValue === 'project' ||
       viewItem.contextValue === 'folder' ||
       viewItem.contextValue === 'targetGroup'
@@ -138,26 +140,32 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     });
   }
 
-  private async runTaskSkipNxCache(selection: NxTreeItem) {
+  private async runTaskSkipNxCache(selection: NxTreeItem | undefined) {
     this.runTask(selection, { skipNxCache: true });
   }
-  private async runTaskWithOptions(selection: NxTreeItem) {
+  private async runTaskWithOptions(selection: NxTreeItem | undefined) {
     getTelemetry().logUsage('tasks.run', {
       source: 'projects-view',
     });
-    const item = selection.item as TargetViewItem;
-    const project = item.nxProject.project;
-    const target = item.nxTarget.name;
-    const configuration = item.nxTarget.configuration;
+    const item = selection?.item as TargetViewItem;
+    const project = item?.nxProject.project;
+    const target = item?.nxTarget.name;
+    const configuration = item?.nxTarget.configuration;
     selectRunInformationAndRun(project, target, configuration, true);
   }
 
-  private async copyTaskToClipboard(selection: NxTreeItem) {
+  private async copyTaskToClipboard(selection: NxTreeItem | undefined) {
     getTelemetry().logUsage('tasks.copy-to-clipboard');
+    if (!selection) {
+      return;
+    }
     env.clipboard.writeText(`nx run ${selection.id}`);
   }
 
-  private async revealInExplorer(selection: NxTreeItem) {
+  private async revealInExplorer(selection: NxTreeItem | undefined) {
+    if (!selection) {
+      return;
+    }
     if (selection.resourceUri) {
       getTelemetry().logUsage('misc.show-project-configuration');
       commands.executeCommand('revealInExplorer', selection.resourceUri);
