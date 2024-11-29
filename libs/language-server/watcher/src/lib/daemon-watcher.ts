@@ -38,6 +38,12 @@ export class DaemonWatcher {
         lspLogger
       );
 
+      if (!daemonClientModule?.daemonClient.enabled()) {
+        lspLogger.log('Daemon is disabled, using native watcher');
+        this.useNativeWatcher();
+        return;
+      }
+
       lspLogger.log(
         `Initializing daemon watcher ${
           this.retryCount > 0 ? `, retries ${this.retryCount}` : ''
