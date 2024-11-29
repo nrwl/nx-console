@@ -35,13 +35,10 @@ export async function targetLink(
   const targetString = node.value;
   let project, target, configuration;
   try {
-    const nxVersion = await getNxVersion(workingPath);
-
     const parsedTarget = await parseTargetString(
       targetString,
       projectGraph,
-      workingPath,
-      nxVersion
+      workingPath
     );
 
     project = parsedTarget.project;

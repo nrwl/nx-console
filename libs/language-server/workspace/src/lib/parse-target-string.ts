@@ -9,14 +9,12 @@ export async function parseTargetString(
   workspacePath: string
 ): Promise<Target | undefined> {
   const { projectGraph } = await nxWorkspace(workspacePath);
-  const nxVersion = await getNxVersion(workspacePath);
 
   try {
     return await parseTargetStringUtil(
       targetString,
       projectGraph,
-      workspacePath,
-      nxVersion
+      workspacePath
     );
   } catch (e) {
     lspLogger.log(`Error parsing target string: ${e}`);

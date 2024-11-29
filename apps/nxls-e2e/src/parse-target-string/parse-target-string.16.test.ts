@@ -5,13 +5,7 @@ import {
 import type { Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import {
-  defaultVersion,
-  e2eCwd,
-  modifyJsonFile,
-  newWorkspace,
-  uniq,
-} from '../utils';
+import { e2eCwd, modifyJsonFile, newWorkspace, uniq } from '../utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -22,11 +16,12 @@ describe('parse target string - default', () => {
       name: workspaceName,
       options: {
         preset: 'react-monorepo',
+        appName: workspaceName,
         bundler: 'vite',
         e2eTestRunner: 'cypress',
         style: 'css',
       },
-      version: defaultVersion,
+      version: '16',
     });
 
     nxlsWrapper = new NxlsWrapper();
