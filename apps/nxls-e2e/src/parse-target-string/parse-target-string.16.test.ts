@@ -5,7 +5,7 @@ import {
 import type { Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, modifyJsonFile, newWorkspace, uniq } from '../utils';
+import { e2eCwd, modifyJsonFile, newWorkspace, uniq, waitFor } from '../utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -36,7 +36,7 @@ describe('parse target string - default', () => {
       'project.json'
     );
 
-    console.log('modifying project.json');
+    waitFor(1000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {

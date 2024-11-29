@@ -11,6 +11,7 @@ import {
   modifyJsonFile,
   newWorkspace,
   uniq,
+  waitFor,
 } from '../utils';
 
 let nxlsWrapper: NxlsWrapper;
@@ -41,7 +42,7 @@ describe('parse target string - default', () => {
       'project.json'
     );
 
-    console.log('modifying project.json');
+    waitFor(1000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {
