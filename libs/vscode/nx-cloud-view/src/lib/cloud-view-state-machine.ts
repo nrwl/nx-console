@@ -99,10 +99,10 @@ const pollingMachine = setup({
 export const machine = setup({
   types: {
     context: {} as {
-      onboardingInfo?: CloudOnboardingInfo;
-      recentCIPEs?: CIPEInfo[];
-      cipeError?: CIPEInfoError;
       pollingTime: number;
+      recentCIPEs: CIPEInfo[] | null;
+      onboardingInfo?: CloudOnboardingInfo;
+      cipeError?: CIPEInfoError;
       workspaceUrl?: string;
     },
   },
@@ -190,6 +190,7 @@ export const machine = setup({
   initial: 'loading',
   context: {
     pollingTime: COLD_POLLING_TIME,
+    recentCIPEs: null,
   },
   states: {
     loading: {

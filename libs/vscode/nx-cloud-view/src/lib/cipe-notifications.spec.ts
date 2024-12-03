@@ -46,100 +46,110 @@ describe('CIPE Notifications', () => {
       | 'success'
       | 'fail'
       | 'progress'
-      | 'progressFailedRun';
-    const pipelineExamples: Record<PipelineExamples, CIPEInfo> = {
-      success: {
-        ciPipelineExecutionId: '1',
-        branch: 'feature',
-        status: 'SUCCEEDED',
-        createdAt: 100000,
-        completedAt: 100001,
-        commitTitle: 'fix: fix fix',
-        commitUrl: 'https://github.com/commit/123',
-        cipeUrl: 'https://cloud.nx.app/cipes/123',
-        runGroups: [
-          {
-            createdAt: 10000,
-            completedAt: 10001,
-            runGroup: 'rungroup-123123',
-            ciExecutionEnv: '123123',
-            status: 'SUCCEEDED',
-            runs: [
-              {
-                linkId: '123123',
-                status: 'SUCCEEDED',
-                command: 'nx test',
-                runUrl: 'http://test.url',
-              },
-            ],
-          },
-        ],
-      },
-      fail: {
-        ciPipelineExecutionId: '1',
-        branch: 'feature',
-        status: 'FAILED',
-        createdAt: 100000,
-        completedAt: 100001,
-        commitTitle: 'fix: fix fix',
-        commitUrl: 'https://github.com/commit/123',
-        cipeUrl: 'https://cloud.nx.app/cipes/123',
-        runGroups: [
-          {
-            createdAt: 10000,
-            completedAt: 10001,
-            runGroup: 'rungroup-123123',
-            ciExecutionEnv: '123123',
-            status: 'FAILED',
-            runs: [
-              {
-                linkId: '123123',
-                status: 'FAILED',
-                command: 'nx test',
-                runUrl: 'http://test.url',
-              },
-            ],
-          },
-        ],
-      },
-      progress: {
-        ciPipelineExecutionId: '1',
-        branch: 'feature',
-        status: 'IN_PROGRESS',
-        createdAt: 100000,
-        completedAt: null,
-        commitTitle: 'fix: fix fix',
-        runGroups: [],
-        commitUrl: 'https://github.com/commit/123',
-        cipeUrl: 'https://cloud.nx.app/cipes/123',
-      },
-      progressFailedRun: {
-        ciPipelineExecutionId: '1',
-        branch: 'feature',
-        status: 'IN_PROGRESS',
-        createdAt: 100000,
-        completedAt: null,
-        commitTitle: 'fix: fix fix',
-        runGroups: [
-          {
-            createdAt: 10000,
-            completedAt: null,
-            runGroup: 'rungroup-123123',
-            ciExecutionEnv: '123123',
-            status: 'IN_PROGRESS',
-            runs: [
-              {
-                linkId: '123123',
-                status: 'FAILED',
-                command: 'nx test',
-                runUrl: 'http://test.url',
-              },
-            ],
-          },
-        ],
-        commitUrl: 'https://github.com/commit/123',
-        cipeUrl: 'https://cloud.nx.app/cipes/123',
-      },
+      | 'progressFailedRun'
+      | 'empty';
+    const pipelineExamples: Record<PipelineExamples, CIPEInfo[]> = {
+      success: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'SUCCEEDED',
+          createdAt: 100000,
+          completedAt: 100001,
+          commitTitle: 'fix: fix fix',
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+          runGroups: [
+            {
+              createdAt: 10000,
+              completedAt: 10001,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'SUCCEEDED',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'SUCCEEDED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      fail: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'FAILED',
+          createdAt: 100000,
+          completedAt: 100001,
+          commitTitle: 'fix: fix fix',
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+          runGroups: [
+            {
+              createdAt: 10000,
+              completedAt: 10001,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'FAILED',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'FAILED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      progress: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'IN_PROGRESS',
+          createdAt: 100000,
+          completedAt: null,
+          commitTitle: 'fix: fix fix',
+          runGroups: [],
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+        },
+      ],
+      progressFailedRun: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'IN_PROGRESS',
+          createdAt: 100000,
+          completedAt: null,
+          commitTitle: 'fix: fix fix',
+          runGroups: [
+            {
+              createdAt: 10000,
+              completedAt: null,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'IN_PROGRESS',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'FAILED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+            },
+          ],
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+        },
+      ],
+      empty: [],
     } as const;
 
     type NotificationResults = 'info' | 'error' | 'no';
@@ -147,22 +157,29 @@ describe('CIPE Notifications', () => {
     it('should not show any notifications when setting is "none"', () => {
       globalConfigMock.mockReturnValue('none');
 
-      compareCIPEDataAndSendNotification(undefined, [pipelineExamples.success]);
-      compareCIPEDataAndSendNotification(undefined, [pipelineExamples.fail]);
-      compareCIPEDataAndSendNotification(undefined, [
-        pipelineExamples.progressFailedRun,
-      ]);
       compareCIPEDataAndSendNotification(
-        [pipelineExamples.progress],
-        [pipelineExamples.success]
+        pipelineExamples.empty,
+        pipelineExamples.success
       );
       compareCIPEDataAndSendNotification(
-        [pipelineExamples.progress],
-        [pipelineExamples.fail]
+        pipelineExamples.empty,
+        pipelineExamples.fail
       );
       compareCIPEDataAndSendNotification(
-        [pipelineExamples.progress],
-        [pipelineExamples.progressFailedRun]
+        pipelineExamples.empty,
+        pipelineExamples.progressFailedRun
+      );
+      compareCIPEDataAndSendNotification(
+        pipelineExamples.empty,
+        pipelineExamples.success
+      );
+      compareCIPEDataAndSendNotification(
+        pipelineExamples.empty,
+        pipelineExamples.fail
+      );
+      compareCIPEDataAndSendNotification(
+        pipelineExamples.empty,
+        pipelineExamples.progressFailedRun
       );
 
       expect(window.showInformationMessage).not.toHaveBeenCalled();
@@ -171,26 +188,26 @@ describe('CIPE Notifications', () => {
     it('should not show any notifications for default branch', () => {
       globalConfigMock.mockReturnValue('all');
 
-      compareCIPEDataAndSendNotification(undefined, [
-        { ...pipelineExamples.success, branch: 'main' },
+      compareCIPEDataAndSendNotification(pipelineExamples.empty, [
+        { ...pipelineExamples.success[0], branch: 'main' },
       ]);
-      compareCIPEDataAndSendNotification(undefined, [
-        { ...pipelineExamples.fail, branch: 'main' },
+      compareCIPEDataAndSendNotification(pipelineExamples.empty, [
+        { ...pipelineExamples.fail[0], branch: 'main' },
       ]);
-      compareCIPEDataAndSendNotification(undefined, [
-        { ...pipelineExamples.progressFailedRun, branch: 'main' },
+      compareCIPEDataAndSendNotification(pipelineExamples.empty, [
+        { ...pipelineExamples.progressFailedRun[0], branch: 'main' },
       ]);
       compareCIPEDataAndSendNotification(
-        [{ ...pipelineExamples.progress, branch: 'main' }],
-        [{ ...pipelineExamples.success, branch: 'main' }]
+        [{ ...pipelineExamples.progress[0], branch: 'main' }],
+        [{ ...pipelineExamples.success[0], branch: 'main' }]
       );
       compareCIPEDataAndSendNotification(
-        [{ ...pipelineExamples.progress, branch: 'main' }],
-        [{ ...pipelineExamples.fail, branch: 'main' }]
+        [{ ...pipelineExamples.progress[0], branch: 'main' }],
+        [{ ...pipelineExamples.fail[0], branch: 'main' }]
       );
       compareCIPEDataAndSendNotification(
-        [{ ...pipelineExamples.progress, branch: 'main' }],
-        [{ ...pipelineExamples.progressFailedRun, branch: 'main' }]
+        [{ ...pipelineExamples.progress[0], branch: 'main' }],
+        [{ ...pipelineExamples.progressFailedRun[0], branch: 'main' }]
       );
 
       expect(window.showInformationMessage).not.toHaveBeenCalled();
@@ -198,14 +215,18 @@ describe('CIPE Notifications', () => {
     });
 
     const cases: [
-      PipelineExamples | undefined,
+      PipelineExamples | null,
       PipelineExamples,
       NotificationResults
     ][] = [
-      [undefined, 'progress', 'no'],
-      [undefined, 'success', 'info'],
-      [undefined, 'fail', 'error'],
-      [undefined, 'progressFailedRun', 'error'],
+      [null, 'progress', 'no'],
+      [null, 'success', 'no'],
+      [null, 'fail', 'no'],
+      [null, 'progressFailedRun', 'no'],
+      ['empty', 'progress', 'no'],
+      ['empty', 'success', 'info'],
+      ['empty', 'fail', 'error'],
+      ['empty', 'progressFailedRun', 'error'],
       ['progress', 'progress', 'no'],
       ['progress', 'success', 'info'],
       ['progress', 'fail', 'error'],
@@ -228,13 +249,13 @@ describe('CIPE Notifications', () => {
     test.each(cases)(
       'when comparing %p with %p, should show %p notification',
       (
-        oldInfo: PipelineExamples | undefined,
+        oldInfo: PipelineExamples | null,
         newInfo: PipelineExamples,
         result: NotificationResults
       ) => {
-        const oldPipeline = oldInfo ? [pipelineExamples[oldInfo]] : undefined;
+        const oldPipeline = oldInfo ? pipelineExamples[oldInfo] : null;
         const newPipeline = pipelineExamples[newInfo];
-        compareCIPEDataAndSendNotification(oldPipeline, [newPipeline]);
+        compareCIPEDataAndSendNotification(oldPipeline, newPipeline);
         if (result === 'info') {
           expect(window.showInformationMessage).toHaveBeenCalled();
           expect(window.showErrorMessage).not.toHaveBeenCalled();
@@ -250,10 +271,13 @@ describe('CIPE Notifications', () => {
 
     it('should not show success notifications when setting is "error"', () => {
       globalConfigMock.mockReturnValue('error');
-      compareCIPEDataAndSendNotification(undefined, [pipelineExamples.success]);
       compareCIPEDataAndSendNotification(
-        [pipelineExamples.progress],
-        [pipelineExamples.success]
+        pipelineExamples.empty,
+        pipelineExamples.success
+      );
+      compareCIPEDataAndSendNotification(
+        pipelineExamples.progress,
+        pipelineExamples.success
       );
       expect(window.showInformationMessage).not.toHaveBeenCalled();
       expect(window.showErrorMessage).not.toHaveBeenCalled();

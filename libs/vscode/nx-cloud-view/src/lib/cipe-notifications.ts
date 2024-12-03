@@ -9,7 +9,7 @@ import { execSync } from 'child_process';
 import { commands, window } from 'vscode';
 
 export function compareCIPEDataAndSendNotification(
-  oldInfo: CIPEInfo[] | undefined,
+  oldInfo: CIPEInfo[] | null,
   newInfo: CIPEInfo[]
 ) {
   const nxCloudNotificationsSetting = GlobalConfigurationStore.instance.get(
@@ -20,12 +20,19 @@ export function compareCIPEDataAndSendNotification(
     return;
   }
 
+  // oldInfo is only null on the initial load
+  // we don't know whether a cipe was actually just completed or if it's just being loaded for the first time
+  // so we don't show any notifications on the initial load
+  if (oldInfo === null) {
+    return;
+  }
+
   // Completed & Task Failed Notifications
   newInfo.forEach((newCIPE) => {
     if (newCIPE.branch === getDefaultBranch()) {
       return;
     }
-    const oldCIPE = oldInfo?.find(
+    const oldCIPE = oldInfo.find(
       (oldCIPE) =>
         newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId
     );

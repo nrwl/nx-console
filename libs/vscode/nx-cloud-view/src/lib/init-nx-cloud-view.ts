@@ -43,7 +43,7 @@ export function initNxCloudView(context: ExtensionContext) {
         compareCIPEDataAndSendNotification: (
           _,
           params: {
-            oldData: CIPEInfo[] | undefined;
+            oldData: CIPEInfo[] | null;
             newData: CIPEInfo[];
           }
         ) => {
