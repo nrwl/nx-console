@@ -91,6 +91,7 @@ export async function getNxWorkspaceConfig(
 
     if (
       nxDaemonClientModule &&
+      nxDaemonClientModule.daemonClient?.enabled() &&
       !(await nxDaemonClientModule.daemonClient?.isServerAvailable())
     ) {
       const pm = await getPackageManagerCommand(workspacePath, logger);
