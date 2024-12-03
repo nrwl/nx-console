@@ -15,6 +15,7 @@ import {
 } from 'rxjs';
 import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
+import { lspLogger } from '@nx-console/language-server/utils';
 
 const enum Status {
   not_started,
@@ -35,11 +36,7 @@ function resetStatus(workspacePath: string) {
 
 export async function nxWorkspace(
   workspacePath: string,
-  logger: Logger = {
-    log(message) {
-      console.log(message);
-    },
-  },
+
   reset?: boolean
 ): Promise<NxWorkspace> {
   if (reset) {
@@ -53,7 +50,7 @@ export async function nxWorkspace(
         tap(() => {
           status = Status.in_progress;
         }),
-        switchMap(() => from(_workspace(workspacePath, logger))),
+        switchMap(() => from(_workspace(workspacePath, lspLogger))),
         tap((workspace) => {
           cachedReplay.next(workspace);
           status = Status.cached;

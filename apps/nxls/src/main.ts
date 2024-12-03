@@ -19,6 +19,7 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
+  NxParseTargetStringRequest,
   NxPDVDataRequest,
   NxProjectByPathRequest,
   NxProjectByRootRequest,
@@ -72,6 +73,7 @@ import {
   hasAffectedProjects,
   nxStopDaemon,
   nxWorkspace,
+  parseTargetString,
   resetNxVersionCache,
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
@@ -259,7 +261,7 @@ connection.onCompletion(async (completionParams) => {
     return completionResults;
   }
 
-  const { nxVersion } = await nxWorkspace(WORKING_PATH, lspLogger);
+  const { nxVersion } = await nxWorkspace(WORKING_PATH);
 
   const pathItems = await getCompletionItems(
     WORKING_PATH,
@@ -387,7 +389,7 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  return nxWorkspace(WORKING_PATH, lspLogger, reset);
+  return nxWorkspace(WORKING_PATH, reset);
 });
 
 connection.onRequest(NxWorkspaceSerializedRequest, async ({ reset }) => {
@@ -395,7 +397,7 @@ connection.onRequest(NxWorkspaceSerializedRequest, async ({ reset }) => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  const workspace = await nxWorkspace(WORKING_PATH, lspLogger, reset);
+  const workspace = await nxWorkspace(WORKING_PATH, reset);
   return JSON.stringify(workspace);
 });
 
@@ -508,7 +510,7 @@ connection.onRequest(NxCreateProjectGraphRequest, async ({ showAffected }) => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   try {
-    await createProjectGraph(WORKING_PATH, showAffected, lspLogger);
+    await createProjectGraph(WORKING_PATH, showAffected);
   } catch (e) {
     lspLogger.log('Error creating project graph: ' + e.toString());
     return e;
@@ -608,6 +610,19 @@ connection.onRequest(NxRecentCIPEDataRequest, async () => {
   return getRecentCIPEData(WORKING_PATH);
 });
 
+connection.onRequest(
+  NxParseTargetStringRequest,
+  async (targetString: string) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return parseTargetString(targetString, WORKING_PATH);
+  }
+);
+
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
@@ -702,7 +717,7 @@ async function reconfigure(
   resetSourceMapFilesToProjectCache();
   resetInferencePluginsCompletionCache();
 
-  const workspace = await nxWorkspace(workingPath, lspLogger, true);
+  const workspace = await nxWorkspace(workingPath, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 
   unregisterFileWatcher();

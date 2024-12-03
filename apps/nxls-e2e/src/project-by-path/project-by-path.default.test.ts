@@ -28,7 +28,6 @@ describe('project by path', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
   });
 
   it('should return default project for files in it', async () => {

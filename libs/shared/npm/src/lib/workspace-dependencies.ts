@@ -80,11 +80,7 @@ export async function workspaceDependencyPath(
 
 export function importWorkspaceDependency<T>(
   importPath: string,
-  logger: Logger = {
-    log(message) {
-      console.log(message);
-    },
-  }
+  logger?: Logger
 ): Promise<T> {
   if (platform() === 'win32') {
     importPath = importPath.replace(/\\/g, '/');
@@ -101,11 +97,7 @@ export function importWorkspaceDependency<T>(
 export async function importNxPackagePath<T>(
   workspacePath: string,
   nestedPath: string,
-  logger: Logger = {
-    log(message) {
-      console.log(message);
-    },
-  }
+  logger?: Logger
 ): Promise<T> {
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
 

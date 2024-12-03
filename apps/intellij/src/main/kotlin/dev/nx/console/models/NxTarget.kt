@@ -2,6 +2,8 @@ package dev.nx.console.models
 
 import kotlinx.serialization.Serializable
 
+data class TargetInfo(val project: String, val target: String, val configuration: String?)
+
 data class NxTarget(
     val executor: String,
     val configurations: Map<String, Any>?,

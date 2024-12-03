@@ -4,15 +4,11 @@ import { getNxExecutionCommand } from '@nx-console/shared/utils';
 import { execSync } from 'child_process';
 import { getProjectGraphOutput } from './get-project-graph-output';
 import { nxWorkspace } from './workspace';
+import { lspLogger } from '@nx-console/language-server/utils';
 
 export async function createProjectGraph(
   workspacePath: string,
-  showAffected: boolean,
-  logger: Logger = {
-    log(message) {
-      console.log(message);
-    },
-  }
+  showAffected: boolean
 ): Promise<string | undefined> {
   const { isEncapsulatedNx } = await nxWorkspace(workspacePath);
   const projectGraphOutput = await getProjectGraphOutput(workspacePath);
@@ -24,7 +20,7 @@ export async function createProjectGraph(
       projectGraphOutput.relativePath,
     encapsulatedNx: isEncapsulatedNx,
   }).then((command) => {
-    logger.log(`Generating graph with command: \`${command}\``);
+    lspLogger.log(`Generating graph with command: \`${command}\``);
     try {
       execSync(command, {
         cwd: workspacePath,

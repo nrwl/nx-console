@@ -33,7 +33,11 @@ export async function languageServerWatcher(
         _daemonWatcher.stop();
         _daemonWatcher = undefined;
       }
-      const daemonWatcher = new DaemonWatcher(workspacePath, debouncedCallback);
+      const daemonWatcher = new DaemonWatcher(
+        workspacePath,
+        version,
+        debouncedCallback
+      );
       _daemonWatcher = daemonWatcher;
 
       await daemonWatcher.start();
