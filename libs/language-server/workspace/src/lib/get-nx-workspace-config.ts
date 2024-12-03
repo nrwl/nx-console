@@ -91,6 +91,15 @@ export async function getNxWorkspaceConfig(
       lspLogger.log(
         `daemon enabled: ${nxDaemonClientModule.daemonClient?.enabled()}`
       );
+      lspLogger.log(
+        `server available: ${await nxDaemonClientModule.daemonClient?.isServerAvailable()}`
+      );
+    }
+
+    if (
+      nxDaemonClientModule &&
+      !(await nxDaemonClientModule.daemonClient?.isServerAvailable())
+    ) {
     }
 
     try {
