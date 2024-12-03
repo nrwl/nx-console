@@ -613,7 +613,6 @@ connection.onRequest(NxRecentCIPEDataRequest, async () => {
 connection.onRequest(
   NxParseTargetStringRequest,
   async (targetString: string) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
