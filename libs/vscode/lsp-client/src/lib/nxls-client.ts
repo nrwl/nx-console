@@ -4,6 +4,7 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
+import { killTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -11,13 +12,7 @@ import {
 } from '@nx-console/vscode/output-channels';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
-import {
-  Disposable,
-  ExtensionContext,
-  Progress,
-  ProgressLocation,
-  window,
-} from 'vscode';
+import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
 import {
   CloseAction,
   ErrorAction,
@@ -30,7 +25,6 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
-import { killTree } from '@nx-console/shared/utils';
 
 let _nxlsClient: NxlsClient | undefined;
 
@@ -361,7 +355,6 @@ async function createLanguageClient(
     // Register the server for plain text documents
     initializationOptions: {
       workspacePath,
-      nxlsTimeout: true,
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
