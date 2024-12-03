@@ -282,6 +282,9 @@ export class NxlsClient {
 
     this.registerNotificationListeners();
 
+    getOutputChannel().appendLine(
+      `Nxls process started with pid: ${this.client.initializeResult?.['pid']}`
+    );
     return this.client.initializeResult?.['pid'];
   }
 

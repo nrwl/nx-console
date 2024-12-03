@@ -97,11 +97,7 @@ export function importWorkspaceDependency<T>(
 export async function importNxPackagePath<T>(
   workspacePath: string,
   nestedPath: string,
-  logger: Logger = {
-    log(message) {
-      console.log(message);
-    },
-  }
+  logger?: Logger
 ): Promise<T> {
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
 
