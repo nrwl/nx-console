@@ -34,6 +34,7 @@ import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
+import { getPackageManagerCommand } from '@nx-console/shared/utils';
 
 export function initNxCloudView(context: ExtensionContext) {
   // set up state machine & listeners
@@ -127,10 +128,8 @@ export function initNxCloudView(context: ExtensionContext) {
     }),
     commands.registerCommand('nxCloud.login', async () => {
       const workspacePath = getWorkspacePath();
-      const { getPackageManagerCommand } = await importNxPackagePath<
-        typeof import('nx/src/devkit-exports')
-      >(workspacePath, 'src/devkit-exports');
-      const pkgManagerCommands = getPackageManagerCommand();
+
+      const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
 
       const command = 'nx-cloud login';
       const task = new Task(
