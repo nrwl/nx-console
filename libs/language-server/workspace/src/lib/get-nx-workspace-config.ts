@@ -87,6 +87,12 @@ export async function getNxWorkspaceConfig(
       }
     }
 
+    if (nxDaemonClientModule) {
+      lspLogger.log(
+        `daemon enabled: ${nxDaemonClientModule.daemonClient?.enabled()}`
+      );
+    }
+
     try {
       _defaultProcessExit = process.exit;
       process.exit = function (code?: number) {
