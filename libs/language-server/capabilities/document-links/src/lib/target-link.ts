@@ -30,7 +30,7 @@ export async function targetLink(
     return;
   }
 
-  const { projectGraph } = await nxWorkspace(workingPath, lspLogger);
+  const { projectGraph } = await nxWorkspace(workingPath);
 
   const targetString = node.value;
   let project, target, configuration;
