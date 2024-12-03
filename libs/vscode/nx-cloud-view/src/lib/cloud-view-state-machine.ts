@@ -3,7 +3,6 @@ import type {
   CIPEInfoError,
   CloudOnboardingInfo,
 } from '@nx-console/shared/types';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getRecentCIPEData } from '@nx-console/vscode/nx-workspace';
 import {
   and,
@@ -11,7 +10,6 @@ import {
   assign,
   emit,
   enqueueActions,
-  fromCallback,
   fromPromise,
   not,
   or,
@@ -22,7 +20,6 @@ import {
 
 const COLD_POLLING_TIME = 180_000;
 const HOT_POLLING_TIME = 10_000;
-const EMPTY_POLL_SLEEP_AMOUNT = 20;
 
 const pollingMachine = setup({
   types: {
@@ -61,40 +58,11 @@ const pollingMachine = setup({
         };
       }
     }),
-    updateEmptyCounter: assign(({ context, event }) => {
-      const recentCIPEData = event['output'] as
-        | {
-            info?: CIPEInfo[];
-            error?: CIPEInfoError;
-          }
-        | undefined;
-      if (!recentCIPEData?.info || recentCIPEData.info.length === 0) {
-        return {
-          ...context,
-          emptyCounter: context.emptyCounter + 1,
-        };
-      } else {
-        return {
-          ...context,
-          emptyCounter: 0,
-        };
-      }
-    }),
   },
   actors: {
     getRecentCIPEData: fromPromise(async () => {
       return await getRecentCIPEData();
     }),
-    workspaceRefreshedListener: fromCallback(({ sendBack }) => {
-      onWorkspaceRefreshed(() => {
-        sendBack({ type: 'WAKE_UP' });
-      });
-    }),
-  },
-  guards: {
-    shouldSleep: ({ context }) => {
-      return context.emptyCounter > EMPTY_POLL_SLEEP_AMOUNT;
-    },
   },
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdLOmGMrlAMQDqAggNICiA+gKoAKA2gAwC6iKqWFgAuWVDn4gAHogDMAdnwAmABwBGAGzy1StQE4lAVg1KjAGhABPOXpX4ALFz2yNGw7JUr5p2QF9fFmiY5PgA7gCGIuQU3HxIIGhCouKSMghKTvgaHnryhup6XCqySvIW1ghq9oqGerYaxUqO1cX+gRjYeGGRongUUrDC4cJg+OEAZiMATgAUQZ1QAGJTYACOAK5gOADGlgCUFPMhEVF4sZKJUSnxaRr2GvjqOp5Keg2GhvbliPam+IbyLhqNTyeT2Wx1LiGNoJDohI59CDiUa4ABuqAA1qMEQQcQg0ahtsMxDhYud4pdkhIboglNl8FwXCpVB5HK81N90iDHvZ3LztMymnoYTj8DiKGAplNUFMxehhuMZQBbMVwrp4glEqlk3gXQRXamgNLgh7yBT2e62UxqLhKTmqJQOV5ve72EFQt7+AIgHCoCBwPXBPB6pIk1KIAC0NvwApKXhUXDBCjynIBWQMr3B9gTsl+ahFaoIRBIZGDFP1VPDCEBjwauU87jquU5VUMDLUhiUsjUsjenYUSgLQYIJ16UBDBqrsmMMa03fs840XEchhbvPb-Z7fa73iHC1Vw4nlZplQaWTNsiKS6XzIBnPNWRM+VcWi4rnsXt8QA */
@@ -105,38 +73,18 @@ const pollingMachine = setup({
   id: 'polling',
   initial: 'polling',
   states: {
-    sleeping: {
-      on: {
-        WAKE_UP: {
-          target: 'polling',
-          actions: [
-            assign({
-              emptyCounter: 0,
-            }),
-          ],
-        },
-      },
-    },
     waiting: {
       after: {
         pollingFrequency: {
           target: 'polling',
         },
       },
-      always: {
-        target: 'sleeping',
-        guard: 'shouldSleep',
-      },
     },
     polling: {
       invoke: {
         src: 'getRecentCIPEData',
         onDone: {
-          actions: [
-            'sendCIPEUpdate',
-            'setPollingFrequency',
-            'updateEmptyCounter',
-          ],
+          actions: ['sendCIPEUpdate', 'setPollingFrequency'],
           target: 'waiting',
         },
         onError: {
@@ -146,7 +94,6 @@ const pollingMachine = setup({
       },
     },
   },
-  entry: [spawnChild('workspaceRefreshedListener')],
 });
 
 export const machine = setup({
@@ -179,7 +126,7 @@ export const machine = setup({
       }
       enqueue.assign({
         ...context,
-        recentCIPEs: newCIPEData?.info,
+        recentCIPEs: newCIPEData?.info ?? [],
         cipeError: newCIPEData?.error,
         workspaceUrl: newCIPEData?.workspaceUrl,
       });

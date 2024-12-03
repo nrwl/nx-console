@@ -1,13 +1,12 @@
 import { CIPEInfo } from '@nx-console/shared/types';
-import { isCompleteStatus, isFailedStatus } from '@nx-console/shared/utils';
+import { isFailedStatus } from '@nx-console/shared/utils';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { commands } from 'vscode';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { execSync } from 'child_process';
-import { window } from 'vscode';
+import { commands, window } from 'vscode';
 
 export function compareCIPEDataAndSendNotification(
   oldInfo: CIPEInfo[] | undefined,
