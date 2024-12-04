@@ -12,6 +12,7 @@ import {
 } from 'vscode-languageserver/node';
 
 import { killTree } from '@nx-console/shared/utils';
+import { defaultVersion } from './utils';
 
 export class NxlsWrapper {
   private cwd?: string;
@@ -94,7 +95,7 @@ export class NxlsWrapper {
     }
   }
 
-  async stopNxls() {
+  async stopNxls(version?: string) {
     await this.sendRequest({
       method: 'shutdown',
     });
@@ -136,7 +137,7 @@ export class NxlsWrapper {
 
     this.process?.removeListener('exit', this.earlyExitListener);
 
-    execSync(`npx nx daemon --stop`, {
+    execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
       cwd: this.cwd,
     });
 

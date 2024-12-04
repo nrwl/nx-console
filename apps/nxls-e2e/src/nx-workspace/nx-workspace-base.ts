@@ -83,7 +83,7 @@ export function testNxWorkspace(
     });
 
     afterAll(async () => {
-      return await nxlsWrapper.stopNxls();
+      return await nxlsWrapper.stopNxls(version);
     });
   });
 }
