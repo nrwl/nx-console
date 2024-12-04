@@ -1,3 +1,20 @@
+# [18.32.0](https://github.com/nrwl/nx-console/compare/vscode-v18.31.1...vscode-v18.32.0) (2024-12-04)
+
+
+### Bug Fixes
+
+* check daemonClient.enabled() before using it ([#2331](https://github.com/nrwl/nx-console/issues/2331)) ([167497f](https://github.com/nrwl/nx-console/commit/167497f1730498655b95a0c14450a56362d7c9b3))
+* disable nxls auto-shutdown & tweak cloud notifications ([#2338](https://github.com/nrwl/nx-console/issues/2338)) ([aa26053](https://github.com/nrwl/nx-console/commit/aa260531668652a131e185f9055e39bd1b55fa07))
+* use project graph-aware devkit util when splitting targets ([#2330](https://github.com/nrwl/nx-console/issues/2330)) ([0cd1313](https://github.com/nrwl/nx-console/commit/0cd13139102ac14a81f425a493e5e4a5a3c802ad))
+* **vscode:** handle tree items being undefined due to timing issue ([#2333](https://github.com/nrwl/nx-console/issues/2333)) ([1f6b549](https://github.com/nrwl/nx-console/commit/1f6b549abe6803820e6d89176bc36458ab3a61dc))
+
+
+### Features
+
+* add recent cipe view & notifications ([#2322](https://github.com/nrwl/nx-console/issues/2322)) ([fef23e3](https://github.com/nrwl/nx-console/commit/fef23e31e3abc95b4ae4c2783d47901f6175f8da))
+* also track current nx console version in rollbar ([#2332](https://github.com/nrwl/nx-console/issues/2332)) ([f26c254](https://github.com/nrwl/nx-console/commit/f26c254755ac52f6e85fdc17d169cdf5f8e9b2e4))
+* **vscode:** add standalone project details codelens ([#2329](https://github.com/nrwl/nx-console/issues/2329)) ([b3cc9c5](https://github.com/nrwl/nx-console/commit/b3cc9c547772ac62e6726e1564f4a9f3fc2ff29a))
+
 ## [18.31.1](https://github.com/nrwl/nx-console/compare/vscode-v18.31.0...vscode-v18.31.1) (2024-11-25)
 
 
