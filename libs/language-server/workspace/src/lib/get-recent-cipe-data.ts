@@ -85,7 +85,9 @@ function getRecentlyCommittedGitBranches(
 ): { name: string; time: string }[] {
   try {
     const localUserEmail = execSync('git config user.email').toString().trim();
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 24 * 1000).toISOString();
+    const oneWeekAgo = new Date(
+      Date.now() - 60 * 60 * 24 * 7 * 1000
+    ).toISOString();
 
     const res = execSync(
       'git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname) - %(committerdate:iso-strict) - %(authoremail)"',
@@ -108,7 +110,7 @@ function getRecentlyCommittedGitBranches(
         };
       })
       .filter((item) => {
-        return item.email.includes(localUserEmail) && item.time >= oneHourAgo;
+        return item.email.includes(localUserEmail) && item.time >= oneWeekAgo;
       });
 
     return branches;
