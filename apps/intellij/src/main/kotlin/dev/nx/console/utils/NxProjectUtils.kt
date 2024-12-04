@@ -21,11 +21,11 @@ import kotlinx.coroutines.withContext
 suspend fun selectNxProject(
     project: Project,
     dataContext: DataContext?,
-    preferredProject: String? = null
+    preferredProject: String? = null,
 ): String? = suspendCoroutine {
     ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val projects =
-            NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toMutableList()
+            NxlsService.getInstance(project).workspace()?.projectGraph?.nodes?.keys?.toMutableList()
                 ?: mutableListOf()
 
         if (preferredProject != null) {
@@ -51,7 +51,7 @@ suspend fun selectNxProject(
                                 value: String?,
                                 index: Int,
                                 selected: Boolean,
-                                hasFocus: Boolean
+                                hasFocus: Boolean,
                             ) {
                                 if (value == null) return
                                 icon = AllIcons.Nodes.Module
@@ -60,7 +60,7 @@ suspend fun selectNxProject(
                                     append(
                                         "  - currently open",
                                         SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES,
-                                        false
+                                        false,
                                     )
                                     icon = AllIcons.Nodes.Favorite
                                 }
@@ -89,9 +89,10 @@ suspend fun selectTargetForNxProject(
         val targets =
             NxlsService.getInstance(project)
                 .workspace()
-                ?.workspace
-                ?.projects
+                ?.projectGraph
+                ?.nodes
                 ?.get(nxProject)
+                ?.data
                 ?.targets
                 ?.keys
                 ?.toList()
@@ -111,7 +112,7 @@ suspend fun selectTargetForNxProject(
 fun createSelectTargetPopup(
     title: String,
     targets: List<String>,
-    callback: Consumer<String>
+    callback: Consumer<String>,
 ): JBPopup {
     return JBPopupFactory.getInstance()
         .createPopupChooserBuilder(targets)
@@ -130,7 +131,7 @@ fun createSelectTargetPopup(
                     value: String?,
                     index: Int,
                     selected: Boolean,
-                    hasFocus: Boolean
+                    hasFocus: Boolean,
                 ) {
                     if (value == null) return
                     icon = AllIcons.General.Gear

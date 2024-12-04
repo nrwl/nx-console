@@ -21,6 +21,10 @@ export type TelemetryEvents =
   | 'cloud.generate-ci-workflow'
   | 'cloud.finish-setup'
   | 'cloud.show-affected-docs'
+  | 'cloud.show-cipe-notification'
+  | 'cloud.view-cipe'
+  | 'cloud.view-cipe-commit'
+  | 'cloud.view-run'
   // graph
   | 'graph.show-all'
   | 'graph.show-affected'
@@ -60,4 +64,6 @@ export type TelemetryEventSource =
   | 'nx-commands-panel'
   | 'welcome-view'
   | 'migrate-angular-prompt'
-  | 'editor-toolbar';
+  | 'editor-toolbar'
+  | 'notification'
+  | 'cloud-view';

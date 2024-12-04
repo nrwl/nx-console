@@ -19,11 +19,11 @@ export async function targetsCompletion(
   }
 
   const targetsCompletion: CompletionItem[] = [];
-  const { workspace } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath);
 
   const targetNames = new Set<string>();
-  for (const project of Object.values(workspace.projects)) {
-    for (const targetName of Object.keys(project.targets ?? {})) {
+  for (const project of Object.values(projectGraph.nodes)) {
+    for (const targetName of Object.keys(project.data.targets ?? {})) {
       targetNames.add(targetName);
     }
   }

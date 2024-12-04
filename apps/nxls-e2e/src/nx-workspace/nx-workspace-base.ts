@@ -35,7 +35,7 @@ export function testNxWorkspace(
 
       expect(
         Object.keys(
-          (workspaceResponse.result as NxWorkspace).workspace.projects
+          (workspaceResponse.result as NxWorkspace).projectGraph.nodes
         )
       ).toEqual(expectedProjects);
     });
@@ -49,9 +49,9 @@ export function testNxWorkspace(
       });
       expect(
         Object.entries(
-          (workspaceResponse.result as NxWorkspace).workspace.projects
+          (workspaceResponse.result as NxWorkspace).projectGraph.nodes
         ).map(([projectName, project]) => ({
-          [projectName]: Object.keys(project.targets ?? {}).sort(),
+          [projectName]: Object.keys(project.data.targets ?? {}).sort(),
         }))
       ).toEqual(expectedTargets);
     });
@@ -75,9 +75,9 @@ export function testNxWorkspace(
       });
       expect(
         Object.entries(
-          (workspaceResponse.result as NxWorkspace).workspace.projects
+          (workspaceResponse.result as NxWorkspace).projectGraph.nodes
         ).map(([projectName, project]) => ({
-          [projectName]: Object.keys(project.targets ?? {}).sort(),
+          [projectName]: Object.keys(project.data.targets ?? {}).sort(),
         }))
       ).toEqual(expectedTargets);
     });

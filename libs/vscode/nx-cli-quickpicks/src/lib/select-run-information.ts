@@ -3,7 +3,10 @@ import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { ThemeIcon, window } from 'vscode';
 import { selectFlags } from './select-flags';
-import { showNoProjectsMessage } from '@nx-console/vscode/utils';
+import {
+  showNoProjectsMessage,
+  showNoTargetsMessage,
+} from '@nx-console/vscode/utils';
 
 export async function selectRunInformation(
   projectName?: string,
@@ -33,8 +36,8 @@ export async function selectRunInformation(
   if (!nxWorkspace) {
     return;
   }
-  const { validWorkspaceJson, workspace } = nxWorkspace;
-  if (!validWorkspaceJson || !workspace) {
+  const { validWorkspaceJson, projectGraph } = nxWorkspace;
+  if (!validWorkspaceJson) {
     return;
   }
 
@@ -55,7 +58,7 @@ export async function selectRunInformation(
   const builderDefinition = await verifyBuilderDefinition(
     projectName,
     targetName,
-    workspace
+    projectGraph
   );
   const {
     validBuilder,
@@ -104,7 +107,7 @@ async function selectProjectAndThenTarget(
   if (!p) {
     const projects = await getProjects(t);
     if (!projects || !projects.length) {
-      showNoProjectsMessage();
+      showNoProjectsMessage(!!projects);
       return;
     }
     p = await selectProject(projects);
@@ -133,7 +136,15 @@ async function selectTargetAndThenProject(
   if (!t) {
     const targets = await getTargets(p);
     if (!targets || !targets.length) {
-      showNoProjectsMessage();
+      const nxWorkspace = await getNxWorkspace();
+      if (
+        !nxWorkspace ||
+        Object.keys(nxWorkspace.projectGraph.nodes).length === 0
+      ) {
+        showNoProjectsMessage(!!nxWorkspace);
+      } else {
+        showNoTargetsMessage(!!nxWorkspace);
+      }
       return;
     }
     t = (await selectTarget(targets)) as string;
@@ -144,6 +155,10 @@ async function selectTargetAndThenProject(
 
   if (!p) {
     const projects = await getProjects(t);
+    if (!projects || !projects.length) {
+      showNoProjectsMessage(!!projects);
+      return;
+    }
     p = (await selectProject(projects)) as string;
     if (!p) {
       return;
@@ -154,15 +169,21 @@ async function selectTargetAndThenProject(
 }
 
 async function getTargets(projectName?: string): Promise<string[]> {
-  const workspace = (await getNxWorkspace())?.workspace;
+  const nxWorkspace = await getNxWorkspace();
+  if (!nxWorkspace) {
+    return [];
+  }
+  const { projectGraph } = nxWorkspace;
 
   if (projectName) {
-    return Object.keys(workspace?.projects[projectName].targets || {}).sort();
+    return Object.keys(
+      projectGraph.nodes[projectName].data.targets || {}
+    ).sort();
   }
 
   return Array.from(
-    Object.values(workspace?.projects ?? {}).reduce((acc, project) => {
-      for (const target of Object.keys(project.targets ?? {})) {
+    Object.values(projectGraph.nodes ?? {}).reduce((acc, project) => {
+      for (const target of Object.keys(project.data.targets ?? {})) {
         acc.add(target);
       }
       return acc;
@@ -170,26 +191,35 @@ async function getTargets(projectName?: string): Promise<string[]> {
   ).sort();
 }
 
-async function getProjects(targetName?: string): Promise<string[]> {
+async function getProjects(targetName?: string): Promise<string[] | undefined> {
   const nxWorkspace = await getNxWorkspace();
   if (!nxWorkspace) {
-    return [];
+    return undefined;
   }
-  const {
-    workspace: { projects },
-  } = nxWorkspace;
-  const projectEntries = Object.entries(projects);
+  const { projectGraph } = nxWorkspace;
+  const projectEntries = Object.entries(projectGraph.nodes);
 
   if (targetName) {
     return projectEntries
       .filter(
-        ([, { targets }]) =>
-          targets && Object.keys(targets).includes(targetName)
+        ([
+          ,
+          {
+            data: { targets },
+          },
+        ]) => targets && Object.keys(targets).includes(targetName)
       )
       .map(([project]) => project);
   }
   return projectEntries
-    .filter(([, { targets }]) => Boolean(targets))
+    .filter(
+      ([
+        ,
+        {
+          data: { targets },
+        },
+      ]) => Boolean(targets)
+    )
     .map(([project]) => project);
 }
 

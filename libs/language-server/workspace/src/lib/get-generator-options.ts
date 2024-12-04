@@ -19,9 +19,9 @@ export async function getGeneratorOptions(
 }
 
 async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
-  const { workspace } = await nxWorkspace(workspacePath);
+  const { nxJson } = await nxWorkspace(workspacePath);
 
-  let defaults = workspace.generators;
+  let defaults = nxJson.generators;
 
   if (!defaults) {
     try {
@@ -29,7 +29,7 @@ async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
        * This could potentially fail if we're in an Angular CLI project without schematics being part of angular.json
        * Default the default to {} on the catch
        */
-      defaults = workspace.generators || {};
+      defaults = nxJson.generators || {};
     } catch (e) {
       defaults = {};
     }

@@ -43,21 +43,21 @@ export async function configureSchemas(
     return;
   }
 
-  currentNxWorkspace = await nxWorkspace(workingPath, lspLogger);
-  const { nxVersion, workspace } = currentNxWorkspace;
+  currentNxWorkspace = await nxWorkspace(workingPath);
+  const { nxVersion, nxJson, projectGraph } = currentNxWorkspace;
 
   currentExecutors = await getExecutors(workingPath);
   const workspaceJsonSchema = getWorkspaceJsonSchema(currentExecutors);
   const projectJsonSchema = getProjectJsonSchema(
     currentExecutors,
-    workspace.targetDefaults,
+    nxJson.targetDefaults,
     nxVersion
   );
   const packageJsonSchema = getPackageJsonSchema(nxVersion);
 
   const nxSchema = await getNxJsonSchema(
     currentExecutors,
-    workspace.projects,
+    projectGraph.nodes,
     nxVersion,
     workingPath
   );
@@ -149,7 +149,7 @@ async function getProjectSchema(
     return;
   }
   if (!currentNxWorkspace) {
-    currentNxWorkspace = await nxWorkspace(workingPath, lspLogger);
+    currentNxWorkspace = await nxWorkspace(workingPath);
   }
   if (!currentExecutors) {
     currentExecutors = await getExecutors(workingPath);

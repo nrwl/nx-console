@@ -1,4 +1,5 @@
 import { importNxPackagePath } from '@nx-console/shared/npm';
+import { getPackageManagerCommand } from '@nx-console/shared/utils';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 
@@ -28,11 +29,7 @@ export async function getShellExecutionForConfig(
     if (packageManagerCommands) {
       pmc = packageManagerCommands;
     } else {
-      const { detectPackageManager, getPackageManagerCommand } =
-        await importNxPackagePath<
-          typeof import('nx/src/utils/package-manager')
-        >(config.workspacePath, 'src/utils/package-manager');
-      pmc = getPackageManagerCommand(detectPackageManager(config.cwd));
+      pmc = await getPackageManagerCommand(config.cwd);
     }
 
     command = `${pmc.exec} ${command}`;

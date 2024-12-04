@@ -10,19 +10,20 @@ export class GoogleAnalyticsSender implements TelemetrySender {
   MEASUREMENT_ID = 'G-TNJ97NGX40';
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
 
-  private _version: string;
+  private _version: string =
+    extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
+    '0.0.0';
+
   private rollbar = new Rollbar({
     accessToken: 'd7f75cfc52e745b697be89ef23dbe436',
     captureUncaught: false,
     captureUnhandledRejections: false,
     captureIp: false,
+    environment: this._version,
   });
 
-  constructor(private production: boolean) {
-    this._version =
-      extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
-      '0.0.0';
-  }
+  constructor(private production: boolean) {}
+
   sendEventData(eventName: string, data?: Record<string, any>): void {
     eventName = eventName.replace('nrwl.angular-console/', '');
     this._post(

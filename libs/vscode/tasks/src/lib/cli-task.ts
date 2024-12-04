@@ -6,6 +6,7 @@ import { NxWorkspace } from '@nx-console/shared/types';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
 import { importNxPackagePath } from '@nx-console/shared/npm';
+import { getPackageManagerCommand } from '@nx-console/shared/utils';
 
 export class CliTask extends Task {
   /**
@@ -62,15 +63,9 @@ export class CliTask extends Task {
       return [];
     }
 
-    const { detectPackageManager, getPackageManagerCommand } =
-      await importNxPackagePath<typeof import('nx/src/utils/package-manager')>(
-        w.workspacePath,
-        'src/utils/package-manager'
-      );
-    const packageManagerCommands = getPackageManagerCommand(
-      detectPackageManager(w?.workspacePath)
+    const packageManagerCommands = await getPackageManagerCommand(
+      w.workspacePath
     );
-
     const tasks = await Promise.all(
       definitions.map((definition) =>
         this.create(definition, w, packageManagerCommands)

@@ -53,66 +53,98 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
   provideCodeLenses(
     document: TextDocument,
     token: CancellationToken
-  ): ProviderResult<ProjectDetailsCodeLens[]> {
+  ): ProviderResult<(NxTargetsCodelens | ViewProjectDetailsCodelens)[]> {
     try {
+      const codelenses = [];
       const codelensLocation = this.getCodelensLocation(document);
-      return [
-        new ProjectDetailsCodeLens(
+      if (document.fileName.endsWith('project.json')) {
+        codelenses.push(
+          new ViewProjectDetailsCodelens(
+            new Range(codelensLocation, codelensLocation),
+            document.fileName
+          )
+        );
+      }
+      codelenses.push(
+        new NxTargetsCodelens(
           new Range(codelensLocation, codelensLocation),
           document.fileName
-        ),
-      ];
+        )
+      );
+      return codelenses;
     } catch (e) {
       return [];
     }
   }
   async resolveCodeLens?(
-    codeLens: ProjectDetailsCodeLens,
+    codeLens: NxTargetsCodelens | ViewProjectDetailsCodelens,
     token: CancellationToken
-  ): Promise<ProjectDetailsCodeLens | undefined> {
+  ): Promise<NxTargetsCodelens | ViewProjectDetailsCodelens | undefined> {
     const project = await getProjectByPath(codeLens.filePath);
-    if (!project) {
-      const nxWorkspace = await getNxWorkspace();
-      const errors = nxWorkspace?.errors;
-      const isPartial = nxWorkspace?.isPartial;
-      const hasProjects =
-        Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
-      if (errors && errors.length > 0 && (!isPartial || !hasProjects)) {
+    const nxWorkspace = await getNxWorkspace();
+    const errors = nxWorkspace?.errors;
+    const isPartial = nxWorkspace?.isPartial;
+    const hasProjects =
+      Object.keys(nxWorkspace?.projectGraph.nodes ?? {}).length > 0;
+
+    const projectGraphFailed =
+      errors && errors.length > 0 && (!isPartial || !hasProjects);
+    if (isNxTargetsCodelens(codeLens)) {
+      if (!project) {
+        if (projectGraphFailed) {
+          return {
+            ...codeLens,
+            command: {
+              command: 'nx.project-details.openToSide',
+              title: `Project graph computation failed. Click to see Details.`,
+            },
+          };
+        } else {
+          return {
+            ...codeLens,
+            command: {
+              command: 'nx.run.target',
+              title: `$(play) Run Nx Targets`,
+            },
+          };
+        }
+      }
+
+      let targetsString = Object.keys(project?.targets ?? {}).join(', ');
+      if (targetsString.length > 50) {
+        targetsString = targetsString.slice(0, 50 - 3) + '...';
+      }
+
+      return {
+        ...codeLens,
+        command: {
+          command: targetsString
+            ? OPEN_QUICKPICK_COMMAND
+            : 'nx.project-details.openToSide',
+          title: targetsString
+            ? `$(play) Nx Targets: ${targetsString}`
+            : '$(open-preview) Open Project Details View',
+          arguments: [project],
+        },
+      };
+    } else {
+      if (!project && projectGraphFailed) {
         return {
           ...codeLens,
           command: {
             command: 'nx.project-details.openToSide',
-            title: `$(error) Project graph computation failed. Click to see Details.`,
-          },
-        };
-      } else {
-        return {
-          ...codeLens,
-          command: {
-            command: 'nx.run.target',
-            title: `$(play) Run Nx Targets`,
+            title: `$(error)`,
           },
         };
       }
+      return {
+        ...codeLens,
+        command: {
+          command: 'nx.project-details.openToSide',
+          title: `$(open-preview) View Project Details`,
+        },
+      };
     }
-
-    let targetsString = Object.keys(project?.targets ?? {}).join(', ');
-    if (targetsString.length > 50) {
-      targetsString = targetsString.slice(0, 50 - 3) + '...';
-    }
-
-    return {
-      ...codeLens,
-      command: {
-        command: targetsString
-          ? OPEN_QUICKPICK_COMMAND
-          : 'nx.project-details.openToSide',
-        title: targetsString
-          ? `$(play) Nx Targets: ${targetsString}`
-          : '$(open-preview) Open Project Details View',
-        arguments: [project],
-      },
-    };
   }
 
   getCodelensLocation(document: TextDocument): Position {
@@ -144,11 +176,12 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
 
     registerCodeLensProvider(codeLensProvider);
 
-    commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
-      showProjectDetailsQuickpick(project);
-    });
-
-    onWorkspaceRefreshed(() => codeLensProvider.refresh());
+    context.subscriptions.push(
+      commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
+        showProjectDetailsQuickpick(project);
+      }),
+      onWorkspaceRefreshed(() => codeLensProvider.refresh())
+    );
   }
 }
 
@@ -164,7 +197,7 @@ function showProjectDetailsQuickpick(project: ProjectConfiguration) {
   }));
 
   const openProjectDetailsItem: QuickPickItem = {
-    label: 'Open Project Details',
+    label: 'View Project Details',
     iconPath: new ThemeIcon('open-preview'),
   };
   quickPick.items = [
@@ -190,8 +223,22 @@ function showProjectDetailsQuickpick(project: ProjectConfiguration) {
   });
 }
 
-class ProjectDetailsCodeLens extends CodeLens {
+class NxTargetsCodelens extends CodeLens {
+  type = 'nx-targets-codelens' as const;
   constructor(range: Range, public filePath: string) {
     super(range);
   }
+}
+
+class ViewProjectDetailsCodelens extends CodeLens {
+  type = 'view-project-details-codelens' as const;
+  constructor(range: Range, public filePath: string) {
+    super(range);
+  }
+}
+
+function isNxTargetsCodelens(
+  codelens: NxTargetsCodelens | ViewProjectDetailsCodelens
+): codelens is NxTargetsCodelens {
+  return codelens.type === 'nx-targets-codelens';
 }

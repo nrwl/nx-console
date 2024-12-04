@@ -1,7 +1,7 @@
 import { NxWorkspaceRequest } from '@nx-console/language-server/types';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 export function getNxWorkspace(
   reset?: boolean
@@ -10,15 +10,13 @@ export function getNxWorkspace(
 }
 
 // shortcuts to reduce repeated destructuring all over the codebase
-export async function getNxWorkspaceProjects(reset?: boolean): Promise<{
-  [projectName: string]: ProjectConfiguration;
-}> {
+export async function getNxWorkspaceProjects(
+  reset?: boolean
+): Promise<Record<string, ProjectGraphProjectNode>> {
   const nxWorkspace = await getNxWorkspace(reset);
   if (!nxWorkspace) {
     return {};
   }
-  const {
-    workspace: { projects },
-  } = nxWorkspace;
-  return projects;
+  const { projectGraph } = nxWorkspace;
+  return projectGraph.nodes;
 }

@@ -16,11 +16,11 @@ export async function projectCompletion(
     return [];
   }
 
-  const { workspace } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath);
 
   const projectCompletion: CompletionItem[] = [];
 
-  for (const projectName of Object.keys(workspace.projects)) {
+  for (const projectName of Object.keys(projectGraph.nodes)) {
     projectCompletion.push(
       createCompletionItem(
         projectName,

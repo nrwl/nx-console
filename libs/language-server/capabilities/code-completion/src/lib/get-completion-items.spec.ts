@@ -35,41 +35,50 @@ jest.mock(
           minor: 0,
           full: '0.0.0',
         },
-        workspace: {
-          version: 2,
-          projects: {
+        projectGraph: {
+          nodes: {
             project1: {
-              root: 'apps/project1',
-              tags: ['tag1'],
-              targets: {
-                build: {
-                  executor: 'noop',
-                },
-                test: {
-                  executor: 'noop',
+              name: 'project1',
+              type: 'app',
+              data: {
+                root: 'apps/project1',
+                tags: ['tag1'],
+                targets: {
+                  build: {
+                    executor: 'noop',
+                  },
+                  test: {
+                    executor: 'noop',
+                  },
                 },
               },
             },
             project2: {
-              root: 'apps/project2',
-              tags: ['tag2', 'tag3'],
-              targets: {
-                build: {
-                  executor: 'noop',
-                  configurations: {
-                    production: {},
+              name: 'project2',
+              type: 'app',
+              data: {
+                root: 'apps/project2',
+                tags: ['tag2', 'tag3'],
+                targets: {
+                  build: {
+                    executor: 'noop',
+                    configurations: {
+                      production: {},
+                    },
                   },
-                },
-                test: {
-                  executor: 'noop',
-                },
-                lint: {
-                  executor: 'noop',
+                  test: {
+                    executor: 'noop',
+                  },
+                  lint: {
+                    executor: 'noop',
+                  },
                 },
               },
             },
           },
+          dependencies: {},
         },
+        nxJson: {},
       })
     ),
   })

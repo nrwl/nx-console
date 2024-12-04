@@ -9,6 +9,8 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import {
+  CIPEInfo,
+  CIPEInfoError,
   CloudOnboardingInfo,
   NxWorkspace,
   PDVData,
@@ -16,6 +18,7 @@ import {
 } from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
+  Target,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
 import { StartupMessageDefinition } from 'shared/nx-console-plugins';
@@ -178,6 +181,7 @@ export const NxCloudStatusRequest: RequestType<
   {
     isConnected: boolean;
     nxCloudUrl?: string;
+    nxCloudId?: string;
   },
   unknown
 > = new RequestType('nx/cloudStatus');
@@ -193,3 +197,15 @@ export const NxPDVDataRequest: RequestType<
   PDVData,
   unknown
 > = new RequestType('nx/pdvData');
+
+export const NxRecentCIPEDataRequest: RequestType<
+  undefined,
+  { info?: CIPEInfo[]; error?: CIPEInfoError; workspaceUrl?: string },
+  unknown
+> = new RequestType('nx/recentCIPEData');
+
+export const NxParseTargetStringRequest: RequestType<
+  string,
+  Target | undefined,
+  unknown
+> = new RequestType('nx/parseTargetString');

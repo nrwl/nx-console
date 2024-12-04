@@ -13,19 +13,20 @@ import {
   NxCloudOnboardingInfoRequest,
   NxCloudStatusRequest,
   NxCreateProjectGraphRequest,
-  NxGeneratorContextFromPathRequest,
   NxGeneratorContextV2Request,
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
+  NxParseTargetStringRequest,
   NxPDVDataRequest,
   NxProjectByPathRequest,
   NxProjectByRootRequest,
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxRecentCIPEDataRequest,
   NxSourceMapFilesToProjectsMapRequest,
   NxStartupMessageRequest,
   NxStopDaemonRequest,
@@ -52,7 +53,6 @@ import {
 import {
   createProjectGraph,
   getCloudOnboardingInfo,
-  getGeneratorContextFromPath,
   getGeneratorContextV2,
   getGeneratorOptions,
   getGenerators,
@@ -65,6 +65,7 @@ import {
   getProjectFolderTree,
   getProjectGraphOutput,
   getProjectsByPaths,
+  getRecentCIPEData,
   getSourceMapFilesToProjectsMap,
   getStartupMessage,
   getTargetsForConfigFile,
@@ -72,12 +73,12 @@ import {
   hasAffectedProjects,
   nxStopDaemon,
   nxWorkspace,
+  parseTargetString,
   resetNxVersionCache,
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { formatError, killTree } from '@nx-console/shared/utils';
 import { dirname, relative } from 'node:path';
@@ -111,7 +112,6 @@ process.on('uncaughtException', (e) => {
 
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
-let NXLS_TIMEOUT = false;
 let unregisterFileWatcher: () => void = () => {
   //noop
 };
@@ -135,11 +135,10 @@ const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
 
 connection.onInitialize(async (params) => {
-  keepAlive();
   setLspLogger(connection);
   lspLogger.log('Initializing Nx Language Server');
 
-  const { workspacePath, nxlsTimeout } = params.initializationOptions ?? {};
+  const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
       workspacePath ||
@@ -150,8 +149,6 @@ connection.onInitialize(async (params) => {
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
     }
-
-    NXLS_TIMEOUT = nxlsTimeout || false;
 
     loadRootEnvFiles(WORKING_PATH);
 
@@ -217,7 +214,6 @@ connection.onInitialize(async (params) => {
 });
 
 connection.onCompletion(async (completionParams) => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -265,7 +261,7 @@ connection.onCompletion(async (completionParams) => {
     return completionResults;
   }
 
-  const { nxVersion } = await nxWorkspace(WORKING_PATH, lspLogger);
+  const { nxVersion } = await nxWorkspace(WORKING_PATH);
 
   const pathItems = await getCompletionItems(
     WORKING_PATH,
@@ -283,7 +279,6 @@ connection.onCompletion(async (completionParams) => {
 });
 
 connection.onHover(async (hoverParams) => {
-  keepAlive();
   const hoverDocument = documents.get(hoverParams.textDocument.uri);
 
   if (!hoverDocument) {
@@ -295,7 +290,6 @@ connection.onHover(async (hoverParams) => {
 });
 
 connection.onDefinition((definitionParams) => {
-  keepAlive();
   const definitionDocument = documents.get(definitionParams.textDocument.uri);
 
   if (!definitionDocument || !WORKING_PATH) {
@@ -308,7 +302,6 @@ connection.onDefinition((definitionParams) => {
 });
 
 connection.onDocumentLinks(async (params) => {
-  keepAlive();
   const linkDocument = documents.get(params.textDocument.uri);
 
   if (!linkDocument) {
@@ -332,20 +325,21 @@ connection.onDocumentLinks(async (params) => {
 const jsonDocumentMapper = getLanguageModelCache();
 
 documents.onDidClose((e) => {
-  keepAlive();
   NativeWatcher.onCloseDocument(e.document.uri);
   jsonDocumentMapper.onDocumentRemoved(e.document);
 });
 
 documents.onDidOpen(async (e) => {
-  keepAlive();
   NativeWatcher.onOpenDocument(e.document.uri);
   if (!e.document.uri.endsWith('project.json')) {
     return;
   }
+  if (!WORKING_PATH) {
+    return;
+  }
   const project = await getProjectByPath(
     URI.parse(e.document.uri).fsPath,
-    WORKING_PATH!
+    WORKING_PATH
   );
 
   if (!project || !project.name) {
@@ -377,10 +371,12 @@ connection.onShutdown(async () => {
   }
 });
 
-connection.onExit(exitHandler);
+connection.onExit(() => {
+  connection.dispose();
+  killTree(process.pid);
+});
 
 connection.onRequest(NxStopDaemonRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -389,33 +385,29 @@ connection.onRequest(NxStopDaemonRequest, async () => {
 });
 
 connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  return nxWorkspace(WORKING_PATH, lspLogger, reset);
+  return nxWorkspace(WORKING_PATH, reset);
 });
 
 connection.onRequest(NxWorkspaceSerializedRequest, async ({ reset }) => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  const workspace = await nxWorkspace(WORKING_PATH, lspLogger, reset);
+  const workspace = await nxWorkspace(WORKING_PATH, reset);
   return JSON.stringify(workspace);
 });
 
 connection.onRequest(NxWorkspacePathRequest, () => {
-  keepAlive();
   return WORKING_PATH;
 });
 
 connection.onRequest(
   NxGeneratorsRequest,
   async (args: { options?: NxGeneratorsRequestOptions }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -430,7 +422,6 @@ connection.onRequest(
 connection.onRequest(
   NxGeneratorOptionsRequest,
   async (args: { options: NxGeneratorOptionsRequestOptions }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -450,7 +441,6 @@ connection.onRequest(
 connection.onRequest(
   NxProjectByPathRequest,
   async (args: { projectPath: string }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -464,7 +454,6 @@ connection.onRequest(
 connection.onRequest(
   NxProjectsByPathsRequest,
   async (args: { paths: string[] }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -478,7 +467,6 @@ connection.onRequest(
 connection.onRequest(
   NxProjectByRootRequest,
   async (args: { projectRoot: string }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -492,7 +480,6 @@ connection.onRequest(
 connection.onRequest(
   NxGeneratorContextV2Request,
   async (args: { path: string | undefined }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -504,7 +491,6 @@ connection.onRequest(
 );
 
 connection.onRequest(NxVersionRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -513,7 +499,6 @@ connection.onRequest(NxVersionRequest, async () => {
 });
 
 connection.onRequest(NxProjectGraphOutputRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -521,12 +506,11 @@ connection.onRequest(NxProjectGraphOutputRequest, async () => {
 });
 
 connection.onRequest(NxCreateProjectGraphRequest, async ({ showAffected }) => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   try {
-    await createProjectGraph(WORKING_PATH, showAffected, lspLogger);
+    await createProjectGraph(WORKING_PATH, showAffected);
   } catch (e) {
     lspLogger.log('Error creating project graph: ' + e.toString());
     return e;
@@ -534,7 +518,6 @@ connection.onRequest(NxCreateProjectGraphRequest, async ({ showAffected }) => {
 });
 
 connection.onRequest(NxProjectFolderTreeRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -544,7 +527,6 @@ connection.onRequest(NxProjectFolderTreeRequest, async () => {
 connection.onRequest(
   NxTransformedGeneratorSchemaRequest,
   async (schema: GeneratorSchema) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -558,7 +540,6 @@ connection.onRequest(
 connection.onRequest(
   NxStartupMessageRequest,
   async (schema: GeneratorSchema) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -570,7 +551,6 @@ connection.onRequest(
 );
 
 connection.onRequest(NxHasAffectedProjectsRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -578,7 +558,6 @@ connection.onRequest(NxHasAffectedProjectsRequest, async () => {
 });
 
 connection.onRequest(NxSourceMapFilesToProjectsMapRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -588,7 +567,6 @@ connection.onRequest(NxSourceMapFilesToProjectsMapRequest, async () => {
 connection.onRequest(
   NxTargetsForConfigFileRequest,
   async (args: { projectName: string; configFilePath: string }) => {
-    keepAlive();
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -604,7 +582,6 @@ connection.onRequest(
 );
 
 connection.onRequest(NxCloudStatusRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -612,7 +589,6 @@ connection.onRequest(NxCloudStatusRequest, async () => {
 });
 
 connection.onRequest(NxCloudOnboardingInfoRequest, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -620,15 +596,34 @@ connection.onRequest(NxCloudOnboardingInfoRequest, async () => {
 });
 
 connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return getPDVData(WORKING_PATH, args.filePath);
 });
 
+connection.onRequest(NxRecentCIPEDataRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  return getRecentCIPEData(WORKING_PATH);
+});
+
+connection.onRequest(
+  NxParseTargetStringRequest,
+  async (targetString: string) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return parseTargetString(targetString, WORKING_PATH);
+  }
+);
+
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
-  keepAlive();
   if (!WORKING_PATH) {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
@@ -639,7 +634,6 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
 connection.onNotification(
   'workspace/didCreateFiles',
   async (createdFiles: CreateFilesParams) => {
-    keepAlive();
     if (!createdFiles.files.some((f) => f.uri.endsWith('project.json'))) {
       return;
     }
@@ -658,7 +652,6 @@ connection.onNotification(
 connection.onNotification(
   'workspace/didDeleteFiles',
   async (deletedFiles: DeleteFilesParams) => {
-    keepAlive();
     if (!deletedFiles.files.some((f) => f.uri.endsWith('project.json'))) {
       return;
     }
@@ -675,7 +668,6 @@ connection.onNotification(
 );
 
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
-  keepAlive();
   WORKING_PATH = workspacePath;
   loadRootEnvFiles(WORKING_PATH);
 
@@ -693,7 +685,7 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
     !workspace?.errors ||
     (workspace.errors &&
       workspace.isPartial &&
-      Object.keys(workspace.workspace.projects ?? {}).length > 0)
+      Object.keys(workspace.projectGraph.nodes ?? {}).length > 0)
   ) {
     reconfigureAttempts = 0;
     return;
@@ -725,7 +717,7 @@ async function reconfigure(
   resetSourceMapFilesToProjectCache();
   resetInferencePluginsCompletionCache();
 
-  const workspace = await nxWorkspace(workingPath, lspLogger, true);
+  const workspace = await nxWorkspace(workingPath, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 
   unregisterFileWatcher();
@@ -743,19 +735,3 @@ function getJsonDocument(document: TextDocument) {
 
 ensureOnlyJsonRpcStdout();
 connection.listen();
-
-function exitHandler() {
-  connection.dispose();
-  killTree(process.pid);
-}
-
-let timeout: NodeJS.Timeout | undefined;
-
-function keepAlive() {
-  if (timeout) {
-    clearTimeout(timeout);
-  }
-  if (NXLS_TIMEOUT) {
-    timeout = setTimeout(exitHandler, 1000 * 60 * 60 * 3 /* 3 hours */);
-  }
-}

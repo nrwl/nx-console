@@ -324,7 +324,7 @@ async function registerWorkspaceFileWatcher(
       reset: false,
     });
 
-    const projects = workspace?.workspace.projects;
+    const projects = workspace?.projectGraph.nodes;
     if (projects && Object.keys(projects).length > 0) {
       return;
     } else {

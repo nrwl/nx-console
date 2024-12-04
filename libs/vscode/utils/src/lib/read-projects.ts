@@ -6,7 +6,10 @@ import {
   WorkspaceProjects,
 } from '@nx-console/shared/schema';
 import * as path from 'path';
-import type { TargetConfiguration as NxTargetConfiguration } from 'nx/src/devkit-exports';
+import type {
+  TargetConfiguration as NxTargetConfiguration,
+  ProjectGraphProjectNode,
+} from 'nx/src/devkit-exports';
 
 import {
   localDependencyPath,
@@ -59,7 +62,7 @@ function readDefaultValues(configurations: any, name: string): DefaultValue[] {
 export async function readBuilderSchema(
   basedir: string,
   builder: string,
-  projects: WorkspaceProjects,
+  projects: Record<string, ProjectGraphProjectNode>,
   projectDefaults?: { [name: string]: string }
 ): Promise<Option[] | undefined> {
   try {

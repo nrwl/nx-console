@@ -1,6 +1,7 @@
-import { NxProjectConfiguration, TreeNode } from '@nx-console/shared/types';
+import { TreeNode } from '@nx-console/shared/types';
 import { parse } from 'path';
 import { nxWorkspace } from './workspace';
+import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 /*
  * Construct a tree (all nodes are saved in a map) from the project definitions by doing the following:
@@ -13,9 +14,7 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
   serializedTreeMap: { dir: string; node: TreeNode }[];
   roots: TreeNode[];
 }> {
-  const {
-    workspace: { projects },
-  } = await nxWorkspace(workspacePath);
+  const { projectGraph } = await nxWorkspace(workspacePath);
 
   const treeMap = new Map<string, TreeNode>();
   const roots = new Set<TreeNode>();
@@ -27,7 +26,7 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
   function addProjectOrFolderTreeNode(
     dir: string,
     projectName?: string,
-    projectConfiguration?: NxProjectConfiguration
+    projectConfiguration?: ProjectGraphProjectNode
   ) {
     // if a node is only a folder and exists already, we don't need to add it again
     if (!projectConfiguration && !projectName && treeMap.has(dir)) {
@@ -71,15 +70,15 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
     }
   }
 
-  for (const [projectName, projectDef] of Object.entries(projects)) {
-    addProjectOrFolderTreeNode(projectDef.root, projectName, projectDef);
+  for (const [projectName, projectDef] of Object.entries(projectGraph.nodes)) {
+    addProjectOrFolderTreeNode(projectDef.data.root, projectName, projectDef);
   }
 
   // special case: if there is a '.' project, it will be the singular root
   if (treeMap.has('.')) {
     const workspaceRootProjectNode = treeMap.get('.');
     roots.forEach((root) => {
-      if (root.projectConfiguration?.root === '.') {
+      if (root.projectConfiguration?.data.root === '.') {
         return;
       }
       workspaceRootProjectNode?.children.push(root.dir);

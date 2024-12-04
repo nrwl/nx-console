@@ -40,7 +40,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     const errors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
-      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+      Object.keys(nxWorkspace?.projectGraph.nodes ?? {}).length > 0;
     if (this.isShowingErrorHtml || (errors && (!isPartial || !hasProjects))) {
       this.refresh();
     } else {
@@ -119,10 +119,10 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     const workspaceErrors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
-      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+      Object.keys(nxWorkspace?.projectGraph.nodes ?? {}).length > 0;
     const hasProject =
       project?.name &&
-      nxWorkspace?.workspace.projects[project?.name] !== undefined;
+      nxWorkspace?.projectGraph.nodes[project?.name] !== undefined;
     if (
       workspaceErrors &&
       (!isPartial ||

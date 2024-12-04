@@ -1,5 +1,6 @@
 import { directoryExists } from '@nx-console/shared/file-system';
 import { readNxJson, workspaceDependencyPath } from '@nx-console/shared/npm';
+import { gte } from '@nx-console/shared/nx-version';
 import { PDVData } from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
@@ -11,7 +12,6 @@ import { getNxVersion } from './get-nx-version';
 import { getProjectByPath } from './get-project-by-path';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
 import { nxWorkspace } from './workspace';
-import { gte } from '@nx-console/shared/nx-version';
 
 export async function getPDVData(
   workspacePath: string,
@@ -44,7 +44,7 @@ export async function getPDVData(
   }
   const workspace = await nxWorkspace(workspacePath);
 
-  const hasProjects = Object.keys(workspace.workspace.projects).length > 0;
+  const hasProjects = Object.keys(workspace.projectGraph.nodes).length > 0;
 
   if (!hasProjects || (workspace.errors && workspace.isPartial != true)) {
     let errorMessage = '';
@@ -94,7 +94,7 @@ export async function getPDVData(
       graphBasePath,
       pdvDataSerialized: JSON.stringify({
         project: projectNode,
-        sourceMap: workspace.workspace.sourceMaps?.[project.root],
+        sourceMap: workspace.sourceMaps?.[project.root],
         errors: workspace.errors,
         connectedToCloud: nxCloudStatus.isConnected,
         disabledTaskSyncGenerators,
@@ -105,12 +105,12 @@ export async function getPDVData(
     };
   } else {
     const projectNodes: ProjectGraphProjectNode[] = [];
-    for (const project of Object.values(workspace.workspace.projects)) {
+    for (const project of Object.values(workspace.projectGraph.nodes)) {
       if (
-        projectRootsForConfigFile.includes(project.root) &&
-        isCompleteProjectConfiguration(project)
+        projectRootsForConfigFile.includes(project.data.root) &&
+        isCompleteProjectConfiguration(project.data)
       ) {
-        projectNodes.push(projectGraphNodeFromProject(project));
+        projectNodes.push(projectGraphNodeFromProject(project.data));
       }
     }
 
@@ -118,7 +118,7 @@ export async function getPDVData(
     for (const project of projectNodes) {
       pdvDataSerializedMulti[project.name] = JSON.stringify({
         project,
-        sourceMap: workspace.workspace.sourceMaps?.[project.data.root],
+        sourceMap: workspace.sourceMaps?.[project.data.root],
         errors: workspace.errors,
         connectedToCloud: nxCloudStatus.isConnected,
         disabledTaskSyncGenerators,

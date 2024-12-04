@@ -1,5 +1,6 @@
 import { importNxPackagePath } from '@nx-console/shared/npm';
 import { platform } from 'os';
+import { getPackageManagerCommand } from './package-manager-command';
 
 /**
  * see `getShellExecutionForConfig` for a vscode-specific implementation of this
@@ -17,13 +18,7 @@ export async function getNxExecutionCommand(config: {
       command = command.replace(/^nx/, './nx');
     }
   } else {
-    const { detectPackageManager, getPackageManagerCommand } =
-      await importNxPackagePath<typeof import('nx/src/devkit-exports')>(
-        config.cwd,
-        'src/devkit-exports'
-      );
-    const packageManager = detectPackageManager(config.cwd);
-    const packageManagerCommand = getPackageManagerCommand(packageManager);
+    const packageManagerCommand = await getPackageManagerCommand(config.cwd);
     command = `${packageManagerCommand.exec} ${command}`;
   }
 

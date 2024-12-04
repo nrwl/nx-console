@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.project.DumbAware
 import com.intellij.util.application
 import dev.nx.console.generate.NxGenerateService
 import dev.nx.console.nx_toolwindow.NxToolWindowPanel
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 
 private val logger = logger<NxGenerateUiAction>()
 
-class NxGenerateUiAction : AnAction() {
+class NxGenerateUiAction : AnAction(), DumbAware {
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
@@ -36,7 +37,7 @@ class NxGenerateUiAction : AnAction() {
                         if (ActionPlaces.isPopupPlace(e.place))
                             TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
-                )
+                ),
             )
 
         val generateService = project.service<NxGenerateService>()

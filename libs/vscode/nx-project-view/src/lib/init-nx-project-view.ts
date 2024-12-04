@@ -45,7 +45,7 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
       placeholderText: 'Select project to show',
     });
     if (!project) return;
-    await revealNxProject(project, projects[project].root);
+    await revealNxProject(project, projects[project].data.root);
     return;
   }
   const viewItem = selection.item;

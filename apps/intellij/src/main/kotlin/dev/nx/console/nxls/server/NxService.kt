@@ -129,4 +129,9 @@ interface NxService {
     fun pdvData(pdvDataRequest: PDVDataRequest): CompletableFuture<NxPDVData> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun parseTargetString(targetString: String): CompletableFuture<TargetInfo> {
+        throw UnsupportedOperationException()
+    }
 }
