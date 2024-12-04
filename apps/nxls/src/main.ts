@@ -1,4 +1,5 @@
 import {
+  completionHandler,
   configureSchemaForProject,
   configureSchemas,
   getCompletionItems,
@@ -19,8 +20,8 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
-  NxParseTargetStringRequest,
   NxPDVDataRequest,
+  NxParseTargetStringRequest,
   NxProjectByPathRequest,
   NxProjectByRootRequest,
   NxProjectFolderTreeRequest,
@@ -98,7 +99,7 @@ import {
   TextDocuments,
   createConnection,
 } from 'vscode-languageserver/node';
-import { URI, Utils } from 'vscode-uri';
+import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
 
@@ -117,13 +118,6 @@ let unregisterFileWatcher: () => void = () => {
 };
 
 let reconfigureAttempts = 0;
-
-const workspaceContext = {
-  resolveRelativePath: (relativePath: string, resource: string) => {
-    const base = resource.substring(0, resource.lastIndexOf('/') + 1);
-    return Utils.resolvePath(URI.parse(base), relativePath).toString();
-  },
-};
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -154,7 +148,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    await configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
+    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
 
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
@@ -218,64 +212,13 @@ connection.onCompletion(async (completionParams) => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  const changedDocument = documents.get(completionParams.textDocument.uri);
-  if (!changedDocument) {
-    return null;
-  }
-
-  const { jsonAst, document } = getJsonDocument(changedDocument);
-
-  // get the project name from either the json AST (fast) or via the file path (slow)
-  // if the project is not yet registered with the json language service, register it
-  const uri = URI.parse(changedDocument.uri).fsPath;
-  if (uri.endsWith('project.json')) {
-    let relativeRootPath = relative(WORKING_PATH, dirname(uri));
-    // the root project will have a path of '' while nx thinks of the path as '.'
-    if (relativeRootPath === '') {
-      relativeRootPath = '.';
-    }
-
-    if (relativeRootPath && !projectSchemaIsRegistered(relativeRootPath)) {
-      await configureSchemaForProject(
-        relativeRootPath,
-        WORKING_PATH,
-        workspaceContext,
-        CLIENT_CAPABILITIES
-      );
-    }
-  }
-
-  const completionResults =
-    (await getJsonLanguageService()?.doComplete(
-      document,
-      completionParams.position,
-      jsonAst
-    )) ?? CompletionList.create([]);
-
-  const schemas = await getJsonLanguageService()?.getMatchingSchemas(
-    document,
-    jsonAst
-  );
-
-  if (!schemas) {
-    return completionResults;
-  }
-
-  const { nxVersion } = await nxWorkspace(WORKING_PATH);
-
-  const pathItems = await getCompletionItems(
+  return await completionHandler(
     WORKING_PATH,
-    nxVersion,
-    jsonAst,
-    document,
-    schemas,
-    completionParams.position,
-    lspLogger
+    documents,
+    completionParams,
+    jsonDocumentMapper,
+    CLIENT_CAPABILITIES
   );
-
-  mergeArrays(completionResults.items, pathItems);
-
-  return completionResults;
 });
 
 connection.onHover(async (hoverParams) => {
@@ -350,12 +293,7 @@ documents.onDidOpen(async (e) => {
     return;
   }
 
-  configureSchemaForProject(
-    project.name,
-    WORKING_PATH,
-    workspaceContext,
-    CLIENT_CAPABILITIES
-  );
+  configureSchemaForProject(project.name, WORKING_PATH, CLIENT_CAPABILITIES);
 });
 
 connection.onShutdown(async () => {
@@ -718,7 +656,7 @@ async function reconfigure(
   resetInferencePluginsCompletionCache();
 
   const workspace = await nxWorkspace(workingPath, true);
-  await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
+  await configureSchemas(workingPath, CLIENT_CAPABILITIES);
 
   unregisterFileWatcher();
 
