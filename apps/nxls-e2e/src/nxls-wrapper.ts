@@ -137,9 +137,13 @@ export class NxlsWrapper {
 
     this.process?.removeListener('exit', this.earlyExitListener);
 
-    execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
-      cwd: this.cwd,
-    });
+    try {
+      execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
+        cwd: this.cwd,
+      });
+    } catch (e) {
+      console.error(e);
+    }
 
     if (this.process?.pid) {
       try {
