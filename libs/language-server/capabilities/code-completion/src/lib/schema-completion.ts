@@ -1,5 +1,6 @@
 import {
   configureJsonLanguageService,
+  getJsonLanguageService,
   getSchemaRequestService,
   lspLogger,
 } from '@nx-console/language-server/utils';
@@ -11,21 +12,23 @@ import {
 import {
   CompletionType,
   getNxJsonSchema,
-  getPackageJsonSchema,
   getProjectJsonSchema,
-  getWorkspaceJsonSchema,
   implicitDependencies,
   namedInputs,
   tags,
 } from '@nx-console/shared/json-schema';
+import { findNxPackagePath } from '@nx-console/shared/npm';
 import { CollectionInfo } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { readFile } from 'fs/promises';
 import { platform } from 'os';
 import { join } from 'path';
 import {
   ClientCapabilities,
+  JSONSchema,
   SchemaConfiguration,
 } from 'vscode-json-languageservice';
+import { URI, Utils } from 'vscode-uri';
 
 let currentBaseSchemas: SchemaConfiguration[] = [];
 let currentExecutors: CollectionInfo[] | undefined;
@@ -33,9 +36,6 @@ let currentNxWorkspace: NxWorkspace | undefined;
 
 export async function configureSchemas(
   workingPath: string | undefined,
-  workspaceContext: {
-    resolveRelativePath: (relativePath: string, resource: string) => string;
-  },
   capabilities: ClientCapabilities | undefined
 ) {
   if (!workingPath) {
@@ -47,13 +47,16 @@ export async function configureSchemas(
   const { nxVersion, nxJson, projectGraph } = currentNxWorkspace;
 
   currentExecutors = await getExecutors(workingPath);
-  const workspaceJsonSchema = getWorkspaceJsonSchema(currentExecutors);
   const projectJsonSchema = getProjectJsonSchema(
     currentExecutors,
     nxJson.targetDefaults,
     nxVersion
   );
-  const packageJsonSchema = getPackageJsonSchema(nxVersion);
+
+  const packageJsonSchema = await getPackageJsonSchema(
+    workingPath,
+    projectJsonSchema
+  );
 
   const nxSchema = await getNxJsonSchema(
     currentExecutors,
@@ -63,11 +66,6 @@ export async function configureSchemas(
   );
 
   currentBaseSchemas = [
-    {
-      uri: 'nx://schemas/workspace',
-      fileMatch: ['**/workspace.json'],
-      schema: workspaceJsonSchema,
-    },
     {
       uri: 'nx://schemas/project',
       fileMatch: ['**/project.json'],
@@ -94,7 +92,6 @@ export async function configureSchemas(
     projectSchemas.set(key, projectSchema);
   }
   _configureJsonLanguageService(
-    workspaceContext,
     capabilities,
     getProjectSchemas(),
     currentBaseSchemas
@@ -118,9 +115,6 @@ function getProjectSchemas(): SchemaConfiguration[] {
 export async function configureSchemaForProject(
   projectRootPath: string,
   workingPath: string | undefined,
-  workspaceContext: {
-    resolveRelativePath: (relativePath: string, resource: string) => string;
-  },
   capabilities: ClientCapabilities | undefined
 ) {
   const projectSchema = await getProjectSchema(projectRootPath, workingPath);
@@ -131,7 +125,6 @@ export async function configureSchemaForProject(
   projectSchemas.set(projectRootPath, projectSchema);
 
   _configureJsonLanguageService(
-    workspaceContext,
     capabilities,
     getProjectSchemas(),
     currentBaseSchemas
@@ -213,10 +206,48 @@ async function getProjectSchema(
   };
 }
 
+async function getPackageJsonSchema(
+  workspacePath: string,
+  projectJsonSchema: JSONSchema
+) {
+  try {
+    const projectJsonSchemaPath = await findNxPackagePath(
+      workspacePath,
+      join('schemas', 'project-schema.json')
+    );
+    if (projectJsonSchemaPath) {
+      const nxProjectSchema = JSON.parse(
+        await readFile(projectJsonSchemaPath, 'utf-8')
+      );
+      return {
+        type: 'object',
+        properties: {
+          nx: {
+            ...nxProjectSchema,
+            ...projectJsonSchema,
+            properties: {
+              ...nxProjectSchema?.properties,
+              ...projectJsonSchema?.properties,
+            },
+          },
+        },
+      };
+    }
+  } catch (e) {
+    // fall through to default return
+  }
+
+  return {
+    type: 'object',
+    properties: {
+      nx: {
+        ...projectJsonSchema,
+      },
+    },
+  };
+}
+
 function _configureJsonLanguageService(
-  workspaceContext: {
-    resolveRelativePath: (relativePath: string, resource: string) => string;
-  },
   capabilities: ClientCapabilities | undefined,
   projectSchemas: SchemaConfiguration[],
   baseSchemas: SchemaConfiguration[]
@@ -224,7 +255,7 @@ function _configureJsonLanguageService(
   configureJsonLanguageService(
     {
       schemaRequestService: getSchemaRequestService(['file']),
-      workspaceContext,
+      workspaceContext: workspaceContextService,
       contributions: [],
       clientCapabilities: capabilities,
     },
@@ -233,3 +264,9 @@ function _configureJsonLanguageService(
     }
   );
 }
+const workspaceContextService = {
+  resolveRelativePath: (relativePath: string, resource: string) => {
+    const base = resource.substring(0, resource.lastIndexOf('/') + 1);
+    return Utils.resolvePath(URI.parse(base), relativePath).toString();
+  },
+};

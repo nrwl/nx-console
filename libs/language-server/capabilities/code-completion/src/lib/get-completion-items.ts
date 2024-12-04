@@ -33,8 +33,7 @@ export async function getCompletionItems(
   jsonAst: JSONDocument,
   document: TextDocument,
   schemas: MatchingSchema[],
-  position: Position,
-  lspLogger?: Logger
+  position: Position
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
