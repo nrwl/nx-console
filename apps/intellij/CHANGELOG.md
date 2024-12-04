@@ -1,3 +1,24 @@
+## 1.34.0 (2024-12-04)
+
+### Bug Fixes
+
+* check daemonClient.enabled() before using it ([#2331](https://github.com/nrwl/nx-console/issues/2331)) ([167497f](https://github.com/nrwl/nx-console/commit/167497f1730498655b95a0c14450a56362d7c9b3))
+* disable nxls auto-shutdown & tweak cloud notifications ([#2338](https://github.com/nrwl/nx-console/issues/2338)) ([aa26053](https://github.com/nrwl/nx-console/commit/aa260531668652a131e185f9055e39bd1b55fa07))
+* use project graph-aware devkit util when splitting targets ([#2330](https://github.com/nrwl/nx-console/issues/2330)) ([0cd1313](https://github.com/nrwl/nx-console/commit/0cd13139102ac14a81f425a493e5e4a5a3c802ad))
+* **vscode:** don't enable typescript server plugin in new solution-style workspaces ([#2313](https://github.com/nrwl/nx-console/issues/2313)) ([3b909e9](https://github.com/nrwl/nx-console/commit/3b909e972919d9476dd678d42ab4d8b9de46d0bc))
+* **vscode:** retry nxls request if connection is disposed during request ([#2312](https://github.com/nrwl/nx-console/issues/2312)) ([6709217](https://github.com/nrwl/nx-console/commit/6709217372fff92359bd56e462c8c3141aa2944a))
+
+
+### Features
+
+* add recent cipe view & notifications ([#2322](https://github.com/nrwl/nx-console/issues/2322)) ([fef23e3](https://github.com/nrwl/nx-console/commit/fef23e31e3abc95b4ae4c2783d47901f6175f8da))
+* **nxls:** allow nxls to kill itself after 3h of inactivity to prevent background resource usage ([#2307](https://github.com/nrwl/nx-console/issues/2307)) ([babaf0e](https://github.com/nrwl/nx-console/commit/babaf0ef9f922a14d29da7db8cdfc07fabdad265))
+
+
+### Reverts
+
+* Revert "chore: leverage Nx Powerpack" (#2320) ([49669d7](https://github.com/nrwl/nx-console/commit/49669d787b314a86af9c7dd68b1437f69b496873)), closes [#2320](https://github.com/nrwl/nx-console/issues/2320)
+
 ## 1.33.0 (2024-11-11)
 
 ### Bug Fixes
