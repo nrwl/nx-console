@@ -88,6 +88,7 @@ function getRecentlyCommittedGitBranches(
     const oneWeekAgo = new Date(
       Date.now() - 60 * 60 * 24 * 7 * 1000
     ).toISOString();
+    const defaultBranch = getDefaultBranch(workspacePath);
 
     const res = execSync(
       'git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname) - %(committerdate:iso-strict) - %(authoremail)"',
@@ -110,11 +111,31 @@ function getRecentlyCommittedGitBranches(
         };
       })
       .filter((item) => {
-        return item.email.includes(localUserEmail) && item.time >= oneWeekAgo;
+        return (
+          item.email.includes(localUserEmail) &&
+          item.time >= oneWeekAgo &&
+          item.name !== defaultBranch
+        );
       });
 
     return branches;
   } catch (e) {
     return [];
+  }
+}
+
+export function getDefaultBranch(workspacePath: string) {
+  try {
+    const remoteHeadRef = execSync(
+      'git symbolic-ref refs/remotes/origin/HEAD',
+      {
+        cwd: workspacePath,
+      }
+    )
+      .toString()
+      .trim();
+    return remoteHeadRef.replace('refs/remotes/origin/', '');
+  } catch (e) {
+    return 'main';
   }
 }
