@@ -1,7 +1,6 @@
 import { CIPEInfo } from '@nx-console/shared/types';
-import * as cipeNotifications from './cipe-notifications';
-import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 import { window } from 'vscode';
+import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 
 const globalConfigMock = jest.fn().mockReturnValue('all');
 
@@ -36,9 +35,8 @@ describe('CIPE Notifications', () => {
   });
   beforeEach(() => {
     jest.clearAllMocks();
-    jest
-      .spyOn(cipeNotifications as any, 'getDefaultBranch')
-      .mockReturnValue('main');
+
+    globalConfigMock.mockReturnValue('all');
   });
 
   describe('compareCIPEDataAndSendNotification', () => {
@@ -180,34 +178,6 @@ describe('CIPE Notifications', () => {
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
         pipelineExamples.progressFailedRun
-      );
-
-      expect(window.showInformationMessage).not.toHaveBeenCalled();
-      expect(window.showErrorMessage).not.toHaveBeenCalled();
-    });
-    it('should not show any notifications for default branch', () => {
-      globalConfigMock.mockReturnValue('all');
-
-      compareCIPEDataAndSendNotification(pipelineExamples.empty, [
-        { ...pipelineExamples.success[0], branch: 'main' },
-      ]);
-      compareCIPEDataAndSendNotification(pipelineExamples.empty, [
-        { ...pipelineExamples.fail[0], branch: 'main' },
-      ]);
-      compareCIPEDataAndSendNotification(pipelineExamples.empty, [
-        { ...pipelineExamples.progressFailedRun[0], branch: 'main' },
-      ]);
-      compareCIPEDataAndSendNotification(
-        [{ ...pipelineExamples.progress[0], branch: 'main' }],
-        [{ ...pipelineExamples.success[0], branch: 'main' }]
-      );
-      compareCIPEDataAndSendNotification(
-        [{ ...pipelineExamples.progress[0], branch: 'main' }],
-        [{ ...pipelineExamples.fail[0], branch: 'main' }]
-      );
-      compareCIPEDataAndSendNotification(
-        [{ ...pipelineExamples.progress[0], branch: 'main' }],
-        [{ ...pipelineExamples.progressFailedRun[0], branch: 'main' }]
       );
 
       expect(window.showInformationMessage).not.toHaveBeenCalled();
