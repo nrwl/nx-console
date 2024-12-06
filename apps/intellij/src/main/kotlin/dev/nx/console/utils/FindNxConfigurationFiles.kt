@@ -15,11 +15,11 @@ suspend fun findNxConfigurationFiles(
     readAction {
         val startDirectory = LocalFileSystem.getInstance().findFileByPath(project.nxBasePath)
         if (startDirectory != null) {
-            ProjectFileIndex.getInstance(project).iterateContentUnderDirectory(startDirectory) { file ->
+            ProjectFileIndex.getInstance(project).iterateContentUnderDirectory(startDirectory) {
+                file ->
                 if (
                     !file.isDirectory &&
-                    (file.name == "project.json" ||
-                        (includeNxJson && file.name == "nx.json"))
+                        (file.name == "project.json" || (includeNxJson && file.name == "nx.json"))
                 ) {
                     paths.add(file)
                 }
