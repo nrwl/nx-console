@@ -130,6 +130,7 @@ export function getDefaultBranch(workspacePath: string) {
       'git symbolic-ref refs/remotes/origin/HEAD',
       {
         cwd: workspacePath,
+        stdio: 'pipe',
       }
     )
       .toString()
