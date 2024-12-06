@@ -1,4 +1,4 @@
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess, execSync, spawn } from 'child_process';
 import { join } from 'path';
 import {
   Message,
@@ -12,8 +12,10 @@ import {
 } from 'vscode-languageserver/node';
 
 import { killTree } from '@nx-console/shared/utils';
+import { defaultVersion } from './utils';
 
 export class NxlsWrapper {
+  private cwd?: string;
   private messageReader?: StreamMessageReader;
   private messageWriter?: StreamMessageWriter;
   private process?: ChildProcess;
@@ -41,6 +43,7 @@ export class NxlsWrapper {
   private idCounter = 1;
 
   async startNxls(cwd: string) {
+    this.cwd = cwd;
     try {
       const nxlsPath = join(
         __dirname,
@@ -92,7 +95,7 @@ export class NxlsWrapper {
     }
   }
 
-  async stopNxls() {
+  async stopNxls(version?: string) {
     await this.sendRequest({
       method: 'shutdown',
     });
@@ -133,6 +136,14 @@ export class NxlsWrapper {
     this.process?.stdin?.destroy();
 
     this.process?.removeListener('exit', this.earlyExitListener);
+
+    try {
+      execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
+        cwd: this.cwd,
+      });
+    } catch (e) {
+      console.error(e);
+    }
 
     if (this.process?.pid) {
       try {

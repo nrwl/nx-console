@@ -1,5 +1,4 @@
 {
-  "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
       "options": {

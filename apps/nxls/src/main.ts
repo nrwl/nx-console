@@ -58,7 +58,6 @@ import {
   getGeneratorOptions,
   getGenerators,
   getNxCloudStatus,
-  getNxDaemonClient,
   getNxVersion,
   getPDVData,
   getProjectByPath,
@@ -299,14 +298,6 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
-
-  if (WORKING_PATH) {
-    const nxDaemonClientModule = await getNxDaemonClient(
-      WORKING_PATH,
-      lspLogger
-    );
-    await nxDaemonClientModule?.daemonClient?.stop();
-  }
 });
 
 connection.onExit(() => {

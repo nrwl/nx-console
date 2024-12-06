@@ -102,7 +102,7 @@ export class NxlsClient {
   }
 
   public async refreshWorkspace() {
-    window.withProgress(
+    await window.withProgress(
       {
         location: ProgressLocation.Notification,
         title: 'Refreshing Workspace',

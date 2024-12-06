@@ -17,6 +17,8 @@ import {
   getNxProjectGraph,
   getNxProjectGraphUtils,
 } from './get-nx-workspace-package';
+import { getPackageManagerCommand } from '@nx-console/shared/utils';
+import { execSync } from 'child_process';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -85,6 +87,18 @@ export async function getNxWorkspaceConfig(
         newError.stack = e.stack;
         throw newError;
       }
+    }
+
+    if (
+      nxDaemonClientModule &&
+      nxDaemonClientModule.daemonClient?.enabled() &&
+      !(await nxDaemonClientModule.daemonClient?.isServerAvailable())
+    ) {
+      const pm = await getPackageManagerCommand(workspacePath, logger);
+      execSync(`${pm.exec} nx daemon --start`, {
+        cwd: workspacePath,
+        windowsHide: true,
+      });
     }
 
     try {
