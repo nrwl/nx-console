@@ -1,11 +1,7 @@
 import { CIPEInfo } from '@nx-console/shared/types';
 import { isFailedStatus } from '@nx-console/shared/utils';
-import {
-  getNxWorkspacePath,
-  GlobalConfigurationStore,
-} from '@nx-console/vscode/configuration';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { execSync } from 'child_process';
 import { commands, window } from 'vscode';
 
 export function compareCIPEDataAndSendNotification(
@@ -29,9 +25,6 @@ export function compareCIPEDataAndSendNotification(
 
   // Completed & Task Failed Notifications
   newInfo.forEach((newCIPE) => {
-    if (newCIPE.branch === getDefaultBranch()) {
-      return;
-    }
     const oldCIPE = oldInfo.find(
       (oldCIPE) =>
         newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId
@@ -121,21 +114,5 @@ function showMessageWithResultAndCommit(
     show(message, 'View Results', 'View Commit').then(handleResults);
   } else {
     show(message, 'View Results').then(handleResults);
-  }
-}
-
-export function getDefaultBranch() {
-  try {
-    const remoteHeadRef = execSync(
-      'git symbolic-ref refs/remotes/origin/HEAD',
-      {
-        cwd: getNxWorkspacePath(),
-      }
-    )
-      .toString()
-      .trim();
-    return remoteHeadRef.replace('refs/remotes/origin/', '');
-  } catch (e) {
-    return 'main';
   }
 }

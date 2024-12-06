@@ -644,7 +644,7 @@
         "icon": "$(refresh)"
       },
       {
-        "title": "Show CI Pipeline Execution in Nx Cloud",
+        "title": "Open CI Pipeline Execution in Browser",
         "command": "nxCloud.showCIPEInApp",
         "icon": "$(link-external)"
       },
@@ -654,12 +654,12 @@
         "icon": "$(git-commit)"
       },
       {
-        "title": "Show Run in Nx Cloud",
+        "title": "Open Run in Browser",
         "command": "nxCloud.showRunInApp",
         "icon": "$(link-external)"
       },
       {
-        "title": "Open Nx Cloud App",
+        "title": "Open Workspace in Browser",
         "command": "nxCloud.openApp",
         "icon": "$(cloud)"
       }

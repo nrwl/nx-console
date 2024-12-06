@@ -95,8 +95,6 @@ export class DaemonWatcher {
               if (!this.stopped) {
                 lspLogger.log('Daemon watcher connection closed, restarting');
                 this.tryRestartWatcher();
-              } else {
-                lspLogger.log('Daemon watcher connection closed');
               }
             } else if (error) {
               lspLogger.log('Error watching files: ' + error);

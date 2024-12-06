@@ -158,6 +158,6 @@ describe('nx.json completion - 16', () => {
   });
 
   afterAll(async () => {
-    return await nxlsWrapper.stopNxls();
+    return await nxlsWrapper.stopNxls('16');
   });
 });
