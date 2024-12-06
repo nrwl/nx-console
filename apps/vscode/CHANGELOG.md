@@ -1,3 +1,18 @@
+# [18.33.0](https://github.com/nrwl/nx-console/compare/vscode-v18.32.0...vscode-v18.33.0) (2024-12-06)
+
+
+### Bug Fixes
+
+* increase window for finding recent commits to a week instead of a day ([#2342](https://github.com/nrwl/nx-console/issues/2342)) ([c0b5d60](https://github.com/nrwl/nx-console/commit/c0b5d60aff1bd713acfd7ec0806bb7ce084d1f3b))
+* make sure default branch is always filtered out when getting recent cipes ([#2346](https://github.com/nrwl/nx-console/issues/2346)) ([3de7f68](https://github.com/nrwl/nx-console/commit/3de7f68e6e489190590074f0641ceb539ef7fecd))
+* **nxls:** enable project.json completion for properties in package.json#nx ([#2340](https://github.com/nrwl/nx-console/issues/2340)) ([8d01db3](https://github.com/nrwl/nx-console/commit/8d01db3dcb37b19dd2ce1f7559e81630d288ac1a))
+* **vscode:** adjust wording of cloud view actions ([#2344](https://github.com/nrwl/nx-console/issues/2344)) ([b574554](https://github.com/nrwl/nx-console/commit/b574554fa21045c7c65cef9f4e3a2562c1372899))
+
+
+### Features
+
+* **nxls:** decouple daemon lifecycle from nxls lifecycle ([#2339](https://github.com/nrwl/nx-console/issues/2339)) ([8ed9385](https://github.com/nrwl/nx-console/commit/8ed9385b02acd865d309fd12c6e28833e81bb477))
+
 # [18.32.0](https://github.com/nrwl/nx-console/compare/vscode-v18.31.1...vscode-v18.32.0) (2024-12-04)
 
 
