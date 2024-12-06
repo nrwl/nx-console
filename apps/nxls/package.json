@@ -23,16 +23,6 @@
     "@parcel/watcher-linux-x64-glibc": "2.4.1",
     "@parcel/watcher-linux-x64-musl": "2.4.1",
     "@parcel/watcher-win32-arm64": "2.4.1",
-    "@parcel/watcher-win32-x64": "2.4.1",
-    "@nx/nx-darwin-arm64": "19.0.3",
-    "@nx/nx-darwin-x64": "19.0.3",
-    "@nx/nx-freebsd-x64": "19.0.3",
-    "@nx/nx-linux-arm-gnueabihf": "19.0.3",
-    "@nx/nx-linux-arm64-gnu": "19.0.3",
-    "@nx/nx-linux-arm64-musl": "19.0.3",
-    "@nx/nx-linux-x64-gnu": "19.0.3",
-    "@nx/nx-linux-x64-musl": "19.0.3",
-    "@nx/nx-win32-arm64-msvc": "19.0.3",
-    "@nx/nx-win32-x64-msvc": "19.0.3"
+    "@parcel/watcher-win32-x64": "2.4.1"
   }
 }
