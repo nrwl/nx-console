@@ -94,7 +94,7 @@ export class DaemonWatcher {
             if (error === 'closed') {
               if (!this.stopped) {
                 lspLogger.log('Daemon watcher connection closed, restarting');
-                this.tryRestartWatcher();
+                this.useNativeWatcher();
               }
             } else if (error) {
               lspLogger.log('Error watching files: ' + error);
@@ -142,24 +142,8 @@ export class DaemonWatcher {
       lspLogger.log(
         `Error initializing daemon watcher, check daemon logs. ${e}`
       );
-      this.tryRestartWatcher();
-    }
-  }
-
-  private async tryRestartWatcher() {
-    this.disposeEverything();
-    if (this.retryCount > 0) {
-      lspLogger.log('Daemon watcher failed to restart, using native watcher');
       this.useNativeWatcher();
-      return;
     }
-    this.retryCount++;
-    await new Promise((resolve) => {
-      const timeout = setTimeout(resolve, 100);
-      this.disposables.add(() => clearTimeout(timeout));
-    });
-
-    await this.initWatcher();
   }
 
   private useNativeWatcher() {
