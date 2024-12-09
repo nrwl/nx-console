@@ -4,7 +4,6 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
-import { killTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -296,7 +295,7 @@ export class NxlsClient {
         // timeout, kill the process forcefully instead
         const pid = this.actor.getSnapshot().context.nxlsPid;
         if (pid) {
-          killTree(pid, 'SIGTERM');
+          process.kill(-pid, 'SIGTERM');
         }
       }
     }

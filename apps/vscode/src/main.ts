@@ -11,11 +11,7 @@ import {
   workspace,
 } from 'vscode';
 
-import {
-  checkIsNxWorkspace,
-  killTree,
-  withTimeout,
-} from '@nx-console/shared/utils';
+import { checkIsNxWorkspace, withTimeout } from '@nx-console/shared/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -137,12 +133,12 @@ export async function deactivate() {
 
   const nxlsPid = getNxlsClient()?.getNxlsPid();
   if (nxlsPid) {
-    killTree(nxlsPid, 'SIGINT');
+    process.kill(-nxlsPid, 'SIGTERM');
   }
 
   getTelemetry().logUsage('extension-deactivate');
 
-  killTree(process.pid, 'SIGTERM');
+  process.kill(-process.pid, 'SIGTERM');
 }
 
 // -----------------------------------------------------------------------------

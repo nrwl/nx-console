@@ -4,6 +4,5 @@ export { checkIsNxWorkspace } from './lib/check-is-nx-workspace';
 export { getNxExecutionCommand } from './lib/get-nx-execution-command';
 export * from './lib/parse-target-string';
 export * from './lib/utils';
-export * from './lib/kill-tree';
 export * from './lib/cipe';
 export * from './lib/package-manager-command';

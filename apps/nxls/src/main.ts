@@ -2,7 +2,6 @@ import {
   completionHandler,
   configureSchemaForProject,
   configureSchemas,
-  getCompletionItems,
   projectSchemaIsRegistered,
   resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server/capabilities/code-completion';
@@ -44,7 +43,6 @@ import {
   getJsonLanguageService,
   getLanguageModelCache,
   lspLogger,
-  mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import {
@@ -80,13 +78,8 @@ import {
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { formatError, killTree } from '@nx-console/shared/utils';
-import { dirname, relative } from 'node:path';
-import {
-  ClientCapabilities,
-  CompletionList,
-  TextDocument,
-} from 'vscode-json-languageservice';
+import { formatError } from '@nx-console/shared/utils';
+import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,
   DeleteFilesParams,
@@ -148,7 +141,6 @@ connection.onInitialize(async (params) => {
     CLIENT_CAPABILITIES = params.capabilities;
 
     await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
-
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
@@ -298,11 +290,6 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
-});
-
-connection.onExit(() => {
-  connection.dispose();
-  killTree(process.pid);
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {
@@ -663,4 +650,23 @@ function getJsonDocument(document: TextDocument) {
 }
 
 ensureOnlyJsonRpcStdout();
+
+const exitHandler = () => {
+  process.off('SIGTERM', exitHandler);
+
+  try {
+    connection.dispose();
+  } catch (e) {
+    // noop
+  }
+
+  if (process.connected) {
+    process.disconnect();
+  }
+
+  process.kill(-process.pid, 'SIGTERM');
+};
+process.on('SIGTERM', exitHandler);
+
+connection.onExit(exitHandler);
 connection.listen();
