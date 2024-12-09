@@ -41,7 +41,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     getOutputChannel().appendLine(`Uncaught Exception: ${error}`);
 
     const shouldLogToRollbar = this.production
-      ? Math.floor(Math.random() * 75) === 0
+      ? Math.floor(Math.random() * 25) === 0
       : true;
     if (shouldLogToRollbar) {
       this.rollbar.error(error);
