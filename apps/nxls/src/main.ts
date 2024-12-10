@@ -78,7 +78,7 @@ import {
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { formatError } from '@nx-console/shared/utils';
+import { formatError, killGroup } from '@nx-console/shared/utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,
@@ -664,7 +664,7 @@ const exitHandler = () => {
     process.disconnect();
   }
 
-  process.kill(-process.pid, 'SIGTERM');
+  killGroup(process.pid);
 };
 process.on('SIGTERM', exitHandler);
 

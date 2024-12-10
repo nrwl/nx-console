@@ -12,6 +12,7 @@ import {
 } from 'vscode-languageserver/node';
 
 import { defaultVersion } from './utils';
+import { killGroup } from '@nx-console/shared/utils';
 
 export class NxlsWrapper {
   private cwd?: string;
@@ -146,7 +147,7 @@ export class NxlsWrapper {
 
     if (this.process?.pid) {
       try {
-        process.kill(-this.process.pid, 'SIGTERM');
+        killGroup(this.process.pid);
       } catch (e) {
         console.log(`NXLS WRAPPER: ${e}`);
       }

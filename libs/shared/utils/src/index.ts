@@ -6,3 +6,4 @@ export * from './lib/parse-target-string';
 export * from './lib/utils';
 export * from './lib/cipe';
 export * from './lib/package-manager-command';
+export * from './lib/kill-group';
