@@ -1,3 +1,13 @@
+## [18.33.1](https://github.com/nrwl/nx-console/compare/vscode-v18.33.0...vscode-v18.33.1) (2024-12-10)
+
+
+### Bug Fixes
+
+* drop dependency on @nx/native packages in favor of loading from local node_modules ([#2349](https://github.com/nrwl/nx-console/issues/2349)) ([368401c](https://github.com/nrwl/nx-console/commit/368401c4d8552a520bcab7e57f9bdd1cf2e36e51))
+* **nxls:** ignore git logs when getting default branch ([#2350](https://github.com/nrwl/nx-console/issues/2350)) ([cdf9c46](https://github.com/nrwl/nx-console/commit/cdf9c46adf13420f784297df54ede3fb4dd4b3f6))
+* **nxls:** only make nx cloud requests if in an nx cloud workspace ([#2356](https://github.com/nrwl/nx-console/issues/2356)) ([c7bc53d](https://github.com/nrwl/nx-console/commit/c7bc53df0e7937f3454f5cb00709d41aa428ecf6))
+* **nxls:** use native watcher right away when daemon dies during watch process ([#2351](https://github.com/nrwl/nx-console/issues/2351)) ([ab5537c](https://github.com/nrwl/nx-console/commit/ab5537cdca09461d6f2be1def5877780c06438d8))
+
 # [18.33.0](https://github.com/nrwl/nx-console/compare/vscode-v18.32.0...vscode-v18.33.0) (2024-12-06)
 
 
