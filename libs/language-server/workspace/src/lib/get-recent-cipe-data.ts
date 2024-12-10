@@ -1,4 +1,4 @@
-import { lspLogger } from '@nx-console/language-server/utils';
+import { isNxCloudUsed, lspLogger } from '@nx-console/language-server/utils';
 import {
   getNxAccessToken,
   getNxCloudId,
@@ -14,6 +14,15 @@ export async function getRecentCIPEData(workspacePath: string): Promise<{
   error?: CIPEInfoError;
   workspaceUrl?: string;
 }> {
+  if (!(await isNxCloudUsed(workspacePath))) {
+    return {
+      error: {
+        type: 'other',
+        message: 'Nx Cloud is not used in this workspace',
+      },
+    };
+  }
+
   const branches = getRecentlyCommittedGitBranches(workspacePath);
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
@@ -44,6 +53,7 @@ export async function getRecentCIPEData(workspacePath: string): Promise<{
     headers['Authorization'] = accessToken;
   }
 
+  lspLogger.log(`Making recent CIPE request`);
   try {
     const response = await xhr({
       type: 'POST',
