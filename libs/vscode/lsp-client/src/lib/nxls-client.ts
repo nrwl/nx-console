@@ -4,7 +4,6 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
-import { killTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -25,6 +24,7 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { killGroup } from '@nx-console/shared/utils';
 
 let _nxlsClient: NxlsClient | undefined;
 
@@ -296,7 +296,7 @@ export class NxlsClient {
         // timeout, kill the process forcefully instead
         const pid = this.actor.getSnapshot().context.nxlsPid;
         if (pid) {
-          killTree(pid, 'SIGTERM');
+          killGroup(pid);
         }
       }
     }
