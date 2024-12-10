@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'fs';
 import * as os from 'node:os';
 import { join } from 'path';
 
-import { lspLogger } from '@nx-console/language-server/utils';
+import { isNxCloudUsed, lspLogger } from '@nx-console/language-server/utils';
 import {
   getNxAccessToken,
   getNxCloudId,
@@ -23,6 +23,16 @@ export async function getCloudOnboardingInfo(
   const hasAffectedCommandsInCI = commonCIFileContents.some((content) =>
     content.includes('nx affected')
   );
+
+  if (!(await isNxCloudUsed(workspacePath))) {
+    return {
+      hasNxInCI,
+      hasAffectedCommandsInCI,
+      isConnectedToCloud: false,
+      isWorkspaceClaimed: false,
+      personalAccessToken: undefined,
+    };
+  }
 
   const accessToken = await getNxAccessToken(workspacePath);
   const nxCloudId = await getNxCloudId(workspacePath);
@@ -185,6 +195,7 @@ async function getNxCloudWorkspaceClaimed(
     headers['Nx-Cloud-Personal-Access-Token'] = pat;
   }
 
+  lspLogger.log(`Making claimed request`);
   try {
     const response = await xhr({
       type: 'POST',
