@@ -160,6 +160,12 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
       }
       return new Position(1, 1);
     } else {
+      const nxProperty = properties?.find(
+        (prop) => getPropertyName(prop) === 'nx'
+      );
+      if (nxProperty) {
+        return document.positionAt(nxProperty.getStart(jsonFile));
+      }
       const scriptsProperty = properties?.find(
         (prop) => getPropertyName(prop) === 'scripts'
       );
