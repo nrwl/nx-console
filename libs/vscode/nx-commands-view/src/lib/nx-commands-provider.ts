@@ -2,6 +2,7 @@ import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getNxlsClient,
   onWorkspaceRefreshed,
+  showRefreshLoadingAtLocation,
 } from '@nx-console/vscode/lsp-client';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
@@ -18,7 +19,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
 
     onWorkspaceRefreshed(() => this.refresh());
 
-    getNxlsClient().showRefreshLoadingAtLocation({ viewId: 'nxCommands' });
+    showRefreshLoadingAtLocation({ viewId: 'nxCommands' });
   }
 
   getParent(_: NxCommandsTreeItem) {

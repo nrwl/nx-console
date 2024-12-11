@@ -2,7 +2,6 @@ import {
   NxChangeWorkspace,
   NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
-  NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
 import {
   getNxlsOutputChannel,
@@ -55,9 +54,6 @@ export class NxlsClient {
 
   constructor(private extensionContext: ExtensionContext) {
     this.actor.start();
-    extensionContext.subscriptions.push(
-      this.showRefreshLoadingAtLocation(ProgressLocation.Window)
-    );
   }
 
   private actor = createActor(
@@ -224,37 +220,6 @@ export class NxlsClient {
           this.notificationListeners.delete(type.method);
         }
       }
-    });
-  }
-
-  public showRefreshLoadingAtLocation(
-    location:
-      | ProgressLocation
-      | {
-          viewId: string;
-        }
-  ): Disposable {
-    return this.onNotification(NxWorkspaceRefreshStartedNotification, () => {
-      const refreshPromise = new Promise<void>((resolve) => {
-        const disposable = this.onNotification(
-          NxWorkspaceRefreshNotification,
-          () => {
-            disposable?.dispose();
-            resolve();
-          }
-        );
-      });
-
-      window.withProgress(
-        {
-          location,
-          cancellable: false,
-          title: 'Refreshing Nx workspace',
-        },
-        async () => {
-          await refreshPromise;
-        }
-      );
     });
   }
 
