@@ -4,6 +4,7 @@ import type {
   CloudOnboardingInfo,
 } from '@nx-console/shared/types';
 import { getRecentCIPEData } from '@nx-console/vscode/nx-workspace';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import {
   and,
   AnyEventObject,
@@ -25,13 +26,40 @@ const pollingMachine = setup({
   types: {
     context: {} as {
       pollingFrequency: number;
-      emptyCounter: number;
+      authErrorCounter: number;
     },
   },
   delays: {
     pollingFrequency: ({ context }) => context.pollingFrequency,
   },
   actions: {
+    adjustAuthErrorCounter: assign(({ context, event }) => {
+      const recentCIPEData = event['output'] as
+        | {
+            info?: CIPEInfo[];
+            error?: CIPEInfoError;
+          }
+        | undefined;
+
+      if (
+        recentCIPEData?.error &&
+        recentCIPEData.error.type === 'authentication'
+      ) {
+        return {
+          ...context,
+          authErrorCounter: context.authErrorCounter + 1,
+        };
+      } else {
+        return {
+          ...context,
+          authErrorCounter: 0,
+        };
+      }
+    }),
+    resetAuthErrorCounter: assign(({ context }) => ({
+      ...context,
+      authErrorCounter: 0,
+    })),
     sendCIPEUpdate: sendTo(
       ({ system }) => system.get('cloud-view'),
       ({ event }) => ({
@@ -64,11 +92,16 @@ const pollingMachine = setup({
       return await getRecentCIPEData();
     }),
   },
+  guards: {
+    isAuthErrorCounterTooHigh: ({ context }) => {
+      return context.authErrorCounter > 4;
+    },
+  },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdLOmGMrlAMQDqAggNICiA+gKoAKA2gAwC6iKqWFgAuWVDn4gAHogDMAdnwAmABwBGAGzy1StQE4lAVg1KjAGhABPOXpX4ALFz2yNGw7JUr5p2QF9fFmiY5PgA7gCGIuQU3HxIIGhCouKSMghKTvgaHnryhup6XCqySvIW1ghq9oqGerYaxUqO1cX+gRjYeGGRongUUrDC4cJg+OEAZiMATgAUQZ1QAGJTYACOAK5gOADGlgCUFPMhEVF4sZKJUSnxaRr2GvjqOp5Keg2GhvbliPam+IbyLhqNTyeT2Wx1LiGNoJDohI59CDiUa4ABuqAA1qMEQQcQg0ahtsMxDhYud4pdkhIboglNl8FwXCpVB5HK81N90iDHvZ3LztMymnoYTj8DiKGAplNUFMxehhuMZQBbMVwrp4glEqlk3gXQRXamgNLgh7yBT2e62UxqLhKTmqJQOV5ve72EFQt7+AIgHCoCBwPXBPB6pIk1KIAC0NvwApKXhUXDBCjynIBWQMr3B9gTsl+ahFaoIRBIZGDFP1VPDCEBjwauU87jquU5VUMDLUhiUsjUsjenYUSgLQYIJ16UBDBqrsmMMa03fs840XEchhbvPb-Z7fa73iHC1Vw4nlZplQaWTNsiKS6XzIBnPNWRM+VcWi4rnsXt8QA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdAO4CGWALrlAMQDaADALqIqqzlao7MgAeiATAHZ8ATjoBmEQBY6-AGwi5guVKkAaEAE8BQ-BMFSArCKEBGEcqEBfKxrSZKRUhTxUesMsTJh8xAGbeAE4AFPbYeABigWAAjgCuYDgAxpoAlFRhjiTsePRMSCBobBSc3HwI4qZS+IZ0MqamhlIiAByqchraFXTCzYL84got-XLiLTZ2GOEEsOhgYMiUVADqAIIA0gCiAPoAqgAKedxF7KUF5eJGeopGTS0KgiKmnYiPeoISpvx00lLidD0JoUpo5Mq4IJwfLgAG6oADWPjBBCRCBhqCSXg4ODyRwKJxKXHOAkUoik-FMKmMLTGhmpLwQUhaLXwA0M-VMlwMbNMQKR+CRVDAgUCqEC-PQXj8ooAtvyQXg5Q48KicLCMQScYxjqxToTQOV+BZ8HIfoz2S1yYZDPS-oY9A0-o0pIJBoY5DZbCAcKgIHBtUqoNriliyogALTfa4m4wuiSsjpacPM2lSOT8e4DS6mQSNXnygjZFyBvE6gmhhCmAF6Ywm0wtET-esu+niQTMtpiRlyK2PQx5gP4WbzRZ4IO68sNET4ST8fjO9PyHoGelt-Aui31+SCQwDHmevlIsdlokIK3ifDZnP-KpMkR3+lCOjGy8cuQmuRMqQeqxAA */
   context: {
     pollingFrequency: COLD_POLLING_TIME,
-    emptyCounter: 0,
+    authErrorCounter: 0,
   },
   id: 'polling',
   initial: 'polling',
@@ -79,12 +112,40 @@ const pollingMachine = setup({
           target: 'polling',
         },
       },
+      always: {
+        guard: 'isAuthErrorCounterTooHigh',
+        target: 'sleeping',
+      },
+    },
+    sleeping: {
+      on: {
+        WAKE_UP: {
+          target: 'polling',
+          actions: ['resetAuthErrorCounter'],
+        },
+      },
+      entry: [
+        () => {
+          getOutputChannel().appendLine(
+            'Stopping cloud polling after 5 failed authentication attempts'
+          );
+        },
+      ],
+      exit: [
+        () => {
+          getOutputChannel().appendLine('Restarting cloud polling');
+        },
+      ],
     },
     polling: {
       invoke: {
         src: 'getRecentCIPEData',
         onDone: {
-          actions: ['sendCIPEUpdate', 'setPollingFrequency'],
+          actions: [
+            'sendCIPEUpdate',
+            'setPollingFrequency',
+            'adjustAuthErrorCounter',
+          ],
           target: 'waiting',
         },
         onError: {

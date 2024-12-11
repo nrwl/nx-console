@@ -152,6 +152,7 @@ export function initNxCloudView(context: ExtensionContext) {
       const subscription = tasks.onDidEndTaskProcess(
         (e: TaskProcessEndEvent) => {
           if (e.execution.task.name === command) {
+            actor.system.get('polling').send({ type: 'WAKE_UP' });
             updateRecentCIPE();
             subscription.dispose();
           }
