@@ -6,7 +6,10 @@ import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { AtomizerDecorationProvider } from './atomizer-decorations';
-import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+import {
+  getNxlsClient,
+  showRefreshLoadingAtLocation,
+} from '@nx-console/vscode/lsp-client';
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
@@ -31,7 +34,7 @@ export function initNxProjectView(
   AtomizerDecorationProvider.register(context);
 
   context.subscriptions.push(
-    getNxlsClient().showRefreshLoadingAtLocation({ viewId: 'nxProjects' })
+    showRefreshLoadingAtLocation({ viewId: 'nxProjects' })
   );
 
   return nxProjectsTreeProvider;

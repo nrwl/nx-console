@@ -3,6 +3,7 @@ import { CIPEInfo, CIPEInfoError } from '@nx-console/shared/types';
 import {
   getNxlsClient,
   onWorkspaceRefreshed,
+  showRefreshLoadingAtLocation,
 } from '@nx-console/vscode/lsp-client';
 import {
   getCloudOnboardingInfo,
@@ -89,11 +90,10 @@ export function initNxCloudView(context: ExtensionContext) {
     });
   }
 
-  const nxlsClient = getNxlsClient();
   context.subscriptions.push(
-    nxlsClient.showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
-    nxlsClient.showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
-    nxlsClient.showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' })
+    showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
+    showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
+    showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' })
   );
 
   // register commands
