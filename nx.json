@@ -147,7 +147,8 @@
       "options": {
         "testTargetName": "test",
         "classesTargetName": "classes",
-        "buildTargetName": "build"
+        "buildTargetName": "build",
+        "includeSubprojectsTasks": true
       }
     },
     "@nx/powerpack-enterprise-cloud",
