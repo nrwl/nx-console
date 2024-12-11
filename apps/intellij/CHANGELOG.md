@@ -1,3 +1,21 @@
+## 1.35.0 (2024-12-11)
+
+### Bug Fixes
+
+* drop dependency on @nx/native packages in favor of loading from local node_modules ([#2349](https://github.com/nrwl/nx-console/issues/2349)) ([368401c](https://github.com/nrwl/nx-console/commit/368401c4d8552a520bcab7e57f9bdd1cf2e36e51))
+* increase window for finding recent commits to a week instead of a day ([#2342](https://github.com/nrwl/nx-console/issues/2342)) ([c0b5d60](https://github.com/nrwl/nx-console/commit/c0b5d60aff1bd713acfd7ec0806bb7ce084d1f3b))
+* **intellij:** improve finding Nx configuration files ([#2352](https://github.com/nrwl/nx-console/issues/2352)) ([bb2b028](https://github.com/nrwl/nx-console/commit/bb2b028c5700a763dc5de76f95f7ab023a5d72c5))
+* make sure default branch is always filtered out when getting recent cipes ([#2346](https://github.com/nrwl/nx-console/issues/2346)) ([3de7f68](https://github.com/nrwl/nx-console/commit/3de7f68e6e489190590074f0641ceb539ef7fecd))
+* **nxls:** enable project.json completion for properties in package.json#nx ([#2340](https://github.com/nrwl/nx-console/issues/2340)) ([8d01db3](https://github.com/nrwl/nx-console/commit/8d01db3dcb37b19dd2ce1f7559e81630d288ac1a))
+* **nxls:** ignore git logs when getting default branch ([#2350](https://github.com/nrwl/nx-console/issues/2350)) ([cdf9c46](https://github.com/nrwl/nx-console/commit/cdf9c46adf13420f784297df54ede3fb4dd4b3f6))
+* **nxls:** only make nx cloud requests if in an nx cloud workspace ([#2356](https://github.com/nrwl/nx-console/issues/2356)) ([c7bc53d](https://github.com/nrwl/nx-console/commit/c7bc53df0e7937f3454f5cb00709d41aa428ecf6))
+* **nxls:** use native watcher right away when daemon dies during watch process ([#2351](https://github.com/nrwl/nx-console/issues/2351)) ([ab5537c](https://github.com/nrwl/nx-console/commit/ab5537cdca09461d6f2be1def5877780c06438d8))
+
+
+### Features
+
+* **nxls:** decouple daemon lifecycle from nxls lifecycle ([#2339](https://github.com/nrwl/nx-console/issues/2339)) ([8ed9385](https://github.com/nrwl/nx-console/commit/8ed9385b02acd865d309fd12c6e28833e81bb477))
+
 ## 1.34.0 (2024-12-04)
 
 ### Bug Fixes
