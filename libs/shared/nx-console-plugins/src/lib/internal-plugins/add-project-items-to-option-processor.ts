@@ -1,7 +1,7 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { SchemaProcessor } from '../nx-console-plugin-types';
-import { NxWorkspace } from '@nx-console/shared/types';
-import { isProjectOption } from '@nx-console/shared/schema';
+import { NxWorkspace } from '@nx-console/shared-types';
+import { isProjectOption } from '@nx-console/shared-schema';
 
 export const addProjectItemsToOptionProcessor: SchemaProcessor = (
   schema: GeneratorSchema,

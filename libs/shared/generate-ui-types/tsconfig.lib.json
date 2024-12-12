@@ -1,8 +1,7 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
+    "outDir": "out-tsc/shared-generate-ui-types",
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
@@ -10,6 +9,9 @@
   "references": [
     {
       "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../schema/tsconfig.lib.json"
     }
   ]
 }

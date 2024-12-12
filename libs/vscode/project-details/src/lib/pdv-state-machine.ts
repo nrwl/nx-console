@@ -1,4 +1,4 @@
-import type { PDVData } from '@nx-console/shared/types';
+import type { PDVData } from '@nx-console/shared-types';
 import { assign, enqueueActions, fromPromise, setup } from 'xstate';
 
 // actions & actor definitions will be provided by the consumer of this machine, using placeholders here

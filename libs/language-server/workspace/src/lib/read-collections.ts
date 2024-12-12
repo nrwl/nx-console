@@ -13,7 +13,7 @@ import {
   Generator,
   GeneratorCollectionInfo,
   GeneratorType,
-} from '@nx-console/shared/schema';
+} from '@nx-console/shared-schema';
 import { platform } from 'os';
 import { dirname, resolve } from 'path';
 import { nxWorkspace } from './workspace';

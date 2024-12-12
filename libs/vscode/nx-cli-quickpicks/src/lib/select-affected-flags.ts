@@ -1,4 +1,4 @@
-import { OptionType, Option } from '@nx-console/shared/schema';
+import { OptionType, Option } from '@nx-console/shared-schema';
 import { selectFlags } from './select-flags';
 
 // TODO: REMOVE HARD CODED LIST OF FLAGS

@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/types"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

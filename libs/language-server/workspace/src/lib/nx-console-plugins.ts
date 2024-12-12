@@ -1,4 +1,4 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { existsSync } from 'fs';
 import { nxWorkspace } from './workspace';
 import { lspLogger } from '@nx-console/language-server/utils';

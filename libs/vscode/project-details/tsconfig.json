@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/types"
+    },
+    {
       "path": "../../shared/nx-version"
     },
     {

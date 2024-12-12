@@ -3,8 +3,8 @@ import { LitElement } from 'lit';
 import { formValuesServiceContext } from '../form-values.service';
 import { submittedContext } from '../contexts/submitted-context';
 import { state } from 'lit/decorators.js';
-import { Option } from '@nx-console/shared/schema';
-import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
+import { Option } from '@nx-console/shared-schema';
+import { GeneratorContext } from '@nx-console/shared-generate-ui-types';
 import { generatorContextContext } from '../contexts/generator-context-context';
 
 type Constructor<T> = new (...args: any[]) => T;

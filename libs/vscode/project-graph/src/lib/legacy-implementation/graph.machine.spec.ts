@@ -9,7 +9,7 @@ import {
 } from 'xstate';
 import { graphMachine } from './graph.machine';
 
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import type * as nxWorkspace from '@nx-console/vscode/nx-workspace';
 import * as outputChannels from '@nx-console/vscode/output-channels';
 import { MessageType } from './graph-message-type';

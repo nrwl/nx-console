@@ -1,4 +1,4 @@
-import { CIPEInfo, CIPEInfoError } from '@nx-console/shared/types';
+import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { getPackageManagerCommand } from '@nx-console/shared/utils';
 import {
   onWorkspaceRefreshed,

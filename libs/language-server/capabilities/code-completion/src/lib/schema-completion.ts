@@ -18,8 +18,8 @@ import {
   tags,
 } from '@nx-console/shared/json-schema';
 import { findNxPackagePath } from '@nx-console/shared/npm';
-import { CollectionInfo } from '@nx-console/shared/schema';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { CollectionInfo } from '@nx-console/shared-schema';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
 import { platform } from 'os';
 import { join } from 'path';

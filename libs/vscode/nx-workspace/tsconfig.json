@@ -4,7 +4,16 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
       "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/types"
     },
     {
       "path": "./tsconfig.lib.json"

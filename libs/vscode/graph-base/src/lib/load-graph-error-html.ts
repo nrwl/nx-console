@@ -1,4 +1,4 @@
-import { NxError } from '@nx-console/shared/types';
+import { NxError } from '@nx-console/shared-types';
 
 export function loadGraphErrorHtml(errors: NxError[]) {
   return /*html*/ `

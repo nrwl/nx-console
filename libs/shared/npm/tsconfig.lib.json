@@ -11,6 +11,9 @@
   "references": [
     {
       "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../schema/tsconfig.lib.json"
     }
   ]
 }

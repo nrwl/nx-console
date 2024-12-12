@@ -12,5 +12,18 @@
     "cypress.config.ts",
     "src/support/test-schema.ts"
   ],
-  "references": [{ "path": "../generate-ui-v2" }]
+  "references": [
+    {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types"
+    },
+    {
+      "path": "../../libs/shared/schema"
+    },
+    {
+      "path": "../generate-ui-v2"
+    }
+  ]
 }

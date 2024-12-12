@@ -1,5 +1,5 @@
 import type { TargetConfiguration } from 'nx/src/devkit-exports';
-import { CollectionInfo } from '@nx-console/shared/schema';
+import { CollectionInfo } from '@nx-console/shared-schema';
 import type { TargetDefaults } from 'nx/src/config/nx-json';
 import type { JSONSchema } from 'vscode-json-languageservice';
 import {

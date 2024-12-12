@@ -76,8 +76,8 @@ import {
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server/workspace';
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { formatError, killGroup } from '@nx-console/shared/utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import {

@@ -1,5 +1,5 @@
 import { directoryExists, fileExists } from '@nx-console/shared/file-system';
-import type { Logger, WorkspaceProjects } from '@nx-console/shared/schema';
+import type { Logger, WorkspaceProjects } from '@nx-console/shared-schema';
 import { NxVersion } from '@nx-console/nx-version';
 import { stat } from 'fs/promises';
 import { join } from 'path';

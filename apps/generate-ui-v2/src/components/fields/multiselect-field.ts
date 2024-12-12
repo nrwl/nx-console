@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/shared/schema';
+import { Option } from '@nx-console/shared-schema';
 import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';

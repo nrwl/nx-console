@@ -7,6 +7,9 @@
       "path": "../nx-version"
     },
     {
+      "path": "../schema"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {
