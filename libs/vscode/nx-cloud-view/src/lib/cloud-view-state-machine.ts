@@ -2,7 +2,7 @@ import type {
   CIPEInfo,
   CIPEInfoError,
   CloudOnboardingInfo,
-} from '@nx-console/shared/types';
+} from '@nx-console/shared-types';
 import { getRecentCIPEData } from '@nx-console/vscode/nx-workspace';
 import {
   and,

@@ -12,8 +12,20 @@
   "files": [],
   "include": [],
   "references": [
-    { "path": "../nx-cloud-onboarding-webview" },
-    { "path": "./tsconfig.lib.json" },
-    { "path": "./tsconfig.spec.json" }
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
   ]
 }

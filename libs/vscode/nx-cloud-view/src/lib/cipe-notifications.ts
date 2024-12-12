@@ -1,4 +1,4 @@
-import { CIPEInfo } from '@nx-console/shared/types';
+import { CIPEInfo } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared/utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { getTelemetry } from '@nx-console/vscode/telemetry';

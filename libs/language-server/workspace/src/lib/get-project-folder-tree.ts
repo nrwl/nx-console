@@ -1,4 +1,4 @@
-import { TreeNode } from '@nx-console/shared/types';
+import { TreeNode } from '@nx-console/shared-types';
 import { parse } from 'path';
 import { nxWorkspace } from './workspace';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';

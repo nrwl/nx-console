@@ -9,7 +9,7 @@ import {
   modifyJsonFile,
 } from '../utils';
 import { NxCloudOnboardingInfoRequest } from '@nx-console/language-server/types';
-import { CloudOnboardingInfo } from '@nx-console/shared/types';
+import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { readFileSync, writeFileSync } from 'fs';
 import { exec, execSync } from 'child_process';
 

@@ -3361,6 +3361,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-generate-ui-types@workspace:libs/shared/generate-ui-types":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-generate-ui-types@workspace:libs/shared/generate-ui-types"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-schema@workspace:libs/shared/schema":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-schema@workspace:libs/shared/schema"

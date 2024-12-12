@@ -1,4 +1,4 @@
-import { Option, OptionType } from '@nx-console/shared/schema';
+import { Option, OptionType } from '@nx-console/shared-schema';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { ThemeIcon, window } from 'vscode';

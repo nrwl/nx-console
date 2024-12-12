@@ -4,7 +4,13 @@
   "include": [],
   "references": [
     {
+      "path": "../../../shared/schema"
+    },
+    {
       "path": "../../../shared/nx-version"
+    },
+    {
+      "path": "../../../shared/types"
     },
     {
       "path": "./tsconfig.lib.json"

@@ -7,5 +7,15 @@
   },
   "include": ["src/**/*.ts"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "references": [{ "path": "../nx-cloud-onboarding-webview" }]
+  "references": [
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    }
+  ]
 }

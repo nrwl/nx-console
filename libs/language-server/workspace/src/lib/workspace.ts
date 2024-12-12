@@ -1,8 +1,8 @@
 import { formatError } from '@nx-console/shared/utils';
 
 import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
-import { Logger } from '@nx-console/shared/schema';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { Logger } from '@nx-console/shared-schema';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { join } from 'path';
 import {
   firstValueFrom,

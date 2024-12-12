@@ -7,7 +7,7 @@ import {
   GenerateUiValidationResultsInputMessage,
   GeneratorSchema,
   ValidationResults,
-} from '@nx-console/shared/generate-ui-types';
+} from '@nx-console/shared-generate-ui-types';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,

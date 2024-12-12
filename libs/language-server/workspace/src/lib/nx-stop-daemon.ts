@@ -1,4 +1,4 @@
-import { Logger } from '@nx-console/shared/schema';
+import { Logger } from '@nx-console/shared-schema';
 import { getPackageManagerCommand } from '@nx-console/shared/utils';
 import { execSync } from 'node:child_process';
 

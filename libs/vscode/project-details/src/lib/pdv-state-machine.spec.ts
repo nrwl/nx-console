@@ -1,6 +1,6 @@
 import { createActor, fromPromise } from 'xstate';
 import { machine } from './pdv-state-machine';
-import type { PDVData } from '@nx-console/shared/types';
+import type { PDVData } from '@nx-console/shared-types';
 
 describe('PdvStateMachine', () => {
   it('should render loading initially', () => {

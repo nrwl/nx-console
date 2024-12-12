@@ -1,5 +1,5 @@
 import { importNxPackagePath } from '@nx-console/shared/npm';
-import { CIPEInfo, CIPEInfoError } from '@nx-console/shared/types';
+import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import {
   getNxlsClient,
   onWorkspaceRefreshed,

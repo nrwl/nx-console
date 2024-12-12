@@ -1,9 +1,9 @@
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import {
   SchemaProcessor,
   StartupMessageFactory,
 } from '../nx-console-plugin-types';
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { gte } from '@nx-console/nx-version';
 
 export const nameAndDirectoryProcessor: SchemaProcessor = (

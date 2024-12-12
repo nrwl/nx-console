@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/shared/schema';
+import { Option } from '@nx-console/shared-schema';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { FieldValueConsumer } from './field-value-consumer-mixin';

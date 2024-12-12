@@ -10,5 +10,18 @@
   },
   "files": [],
   "include": [],
-  "references": [{ "path": "../nxls" }, { "path": "./tsconfig.spec.json" }]
+  "references": [
+    {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/types"
+    },
+    {
+      "path": "../nxls"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
 }

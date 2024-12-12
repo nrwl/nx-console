@@ -1,4 +1,4 @@
-import { CollectionInfo } from '@nx-console/shared/schema';
+import { CollectionInfo } from '@nx-console/shared-schema';
 import type {
   ProjectConfiguration,
   ProjectGraphProjectNode,

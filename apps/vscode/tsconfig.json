@@ -3,10 +3,32 @@
   "files": [],
   "include": [],
   "references": [
-    { "path": "../../libs/vscode/nx-cloud-onboarding-webview" },
-    { "path": "../nxls" },
-    { "path": "../generate-ui-v2" },
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.spec.json" }
+    {
+      "path": "../../libs/vscode/nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../../libs/shared/types"
+    },
+    {
+      "path": "../nxls"
+    },
+    {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types"
+    },
+    {
+      "path": "../../libs/shared/schema"
+    },
+    {
+      "path": "../generate-ui-v2"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
   ]
 }

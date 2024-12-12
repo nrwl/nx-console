@@ -1,5 +1,5 @@
 import { NxWorkspaceRequest } from '@nx-console/language-server/types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
