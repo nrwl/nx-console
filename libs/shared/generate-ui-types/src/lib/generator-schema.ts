@@ -1,5 +1,5 @@
-import { Option } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { Option } from '@nx-console/shared-schema';
+import { NxVersion } from '@nx-console/nx-version';
 
 export type GeneratorSchema = {
   collectionName: string;

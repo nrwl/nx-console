@@ -1,14 +1,13 @@
 import {
   configureJsonLanguageService,
-  getJsonLanguageService,
   getSchemaRequestService,
   lspLogger,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   getExecutors,
   getProjectByRoot,
   nxWorkspace,
-} from '@nx-console/language-server/workspace';
+} from '@nx-console/language-server-workspace';
 import {
   CompletionType,
   getNxJsonSchema,
@@ -16,10 +15,10 @@ import {
   implicitDependencies,
   namedInputs,
   tags,
-} from '@nx-console/shared/json-schema';
-import { findNxPackagePath } from '@nx-console/shared/npm';
-import { CollectionInfo } from '@nx-console/shared/schema';
-import { NxWorkspace } from '@nx-console/shared/types';
+} from '@nx-console/shared-json-schema';
+import { findNxPackagePath } from '@nx-console/shared-npm';
+import { CollectionInfo } from '@nx-console/shared-schema';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
 import { platform } from 'os';
 import { join } from 'path';

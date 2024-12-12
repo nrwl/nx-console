@@ -1,12 +1,12 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { existsSync } from 'fs';
 import { nxWorkspace } from './workspace';
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 import {
   NxConsolePluginsDefinition,
   StartupMessageDefinition,
   internalPlugins,
-} from 'shared/nx-console-plugins';
+} from '@nx-console/shared-nx-console-plugins';
 
 export async function getTransformedGeneratorSchema(
   workspacePath: string,

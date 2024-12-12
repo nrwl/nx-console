@@ -1,7 +1,7 @@
-import { fileExists } from '@nx-console/shared/file-system';
-import { Option, OptionType } from '@nx-console/shared/schema';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { readBuilderSchema } from '@nx-console/vscode/utils';
+import { fileExists } from '@nx-console/shared-file-system';
+import { Option, OptionType } from '@nx-console/shared-schema';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
+import { readBuilderSchema } from '@nx-console/vscode-utils';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { window } from 'vscode';

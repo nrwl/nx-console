@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/shared/schema';
+import { Option } from '@nx-console/shared-schema';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { FieldValueConsumer } from './field-value-consumer-mixin';
@@ -6,7 +6,7 @@ import { FieldValueConsumer } from './field-value-consumer-mixin';
 @customElement('field-nav-item')
 export class FieldNavItem extends FieldValueConsumer(LitElement) {
   @property()
-  protected option: Option;
+  option: Option;
 
   @property()
   greyedOut = false;

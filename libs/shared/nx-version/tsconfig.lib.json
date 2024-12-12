@@ -1,8 +1,7 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
+    "outDir": "out-tsc/nx-version",
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],

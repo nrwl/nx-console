@@ -1,1 +1,1 @@
-export * from './lib/init-nx-cloud-view';
+export * from './init-nx-cloud-view';

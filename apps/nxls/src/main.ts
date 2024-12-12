@@ -4,10 +4,10 @@ import {
   configureSchemas,
   projectSchemaIsRegistered,
   resetInferencePluginsCompletionCache,
-} from '@nx-console/language-server/capabilities/code-completion';
-import { getDefinition } from '@nx-console/language-server/capabilities/definition';
-import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
-import { getHover } from '@nx-console/language-server/capabilities/hover';
+} from '@nx-console/language-server-capabilities-code-completion';
+import { getDefinition } from '@nx-console/language-server-capabilities-definition';
+import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
+import { getHover } from '@nx-console/language-server-capabilities-hover';
 import {
   NxChangeWorkspace,
   NxCloudOnboardingInfoRequest,
@@ -38,17 +38,17 @@ import {
   NxWorkspaceRefreshStartedNotification,
   NxWorkspaceRequest,
   NxWorkspaceSerializedRequest,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import {
   getJsonLanguageService,
   getLanguageModelCache,
   lspLogger,
   setLspLogger,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   NativeWatcher,
   languageServerWatcher,
-} from '@nx-console/language-server/watcher';
+} from '@nx-console/language-server-watcher';
 import {
   createProjectGraph,
   getCloudOnboardingInfo,
@@ -75,10 +75,10 @@ import {
   resetNxVersionCache,
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
-} from '@nx-console/language-server/workspace';
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { NxWorkspace } from '@nx-console/shared/types';
-import { formatError, killGroup } from '@nx-console/shared/utils';
+} from '@nx-console/language-server-workspace';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
+import { NxWorkspace } from '@nx-console/shared-types';
+import { formatError, killGroup } from '@nx-console/shared-utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,

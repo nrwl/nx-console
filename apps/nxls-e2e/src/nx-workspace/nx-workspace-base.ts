@@ -1,5 +1,5 @@
-import { NxWorkspaceRequest } from '@nx-console/language-server/types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspaceRequest } from '@nx-console/language-server-types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';

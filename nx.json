@@ -107,6 +107,10 @@
   },
   "plugins": [
     {
+      "plugin": "@nx/js/typescript",
+      "options": {}
+    },
+    {
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
@@ -147,14 +151,16 @@
       "options": {
         "testTargetName": "test",
         "classesTargetName": "classes",
-        "buildTargetName": "build"
+        "buildTargetName": "build",
+        "includeSubprojectsTasks": true
       }
     },
     "@nx/powerpack-enterprise-cloud",
     "@nx/powerpack-owners"
   ],
   "sync": {
-    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"]
+    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],
+    "applyChanges": true
   },
   "owners": {
     "format": "github",

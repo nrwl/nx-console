@@ -2,12 +2,12 @@ import {
   NxChangeWorkspace,
   NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
   logAndShowError,
-} from '@nx-console/vscode/output-channels';
+} from '@nx-console/vscode-output-channels';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
@@ -23,7 +23,7 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
-import { killGroup } from '@nx-console/shared/utils';
+import { killGroup } from '@nx-console/shared-utils';
 
 let _nxlsClient: NxlsClient | undefined;
 

@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { fileExists } from '@nx-console/shared/file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 import { workspaceDependencyPath } from './workspace-dependencies';
 
 /**

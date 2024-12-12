@@ -1,8 +1,0 @@
-{
-  "name": "vscode-verify",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/verify/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

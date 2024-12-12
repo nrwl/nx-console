@@ -1,14 +1,13 @@
-import { showRefreshLoadingAtLocation } from '@nx-console/vscode/lsp-client';
-import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
-import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
-import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { showRefreshLoadingAtLocation } from '@nx-console/vscode-lsp-client';
+import { selectProject } from '@nx-console/vscode-nx-cli-quickpicks';
+import { revealNxProject } from '@nx-console/vscode-nx-config-decoration';
+import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { ExtensionContext, commands, window } from 'vscode';
 import { AtomizerDecorationProvider } from './atomizer-decorations';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import { NxTreeItem } from './nx-tree-item';
 import { ProjectGraphErrorDecorationProvider } from './project-graph-error-decorations';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
 export function initNxProjectView(
   context: ExtensionContext

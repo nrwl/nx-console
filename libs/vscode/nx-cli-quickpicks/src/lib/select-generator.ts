@@ -1,16 +1,13 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import {
-  GeneratorCollectionInfo,
-  GeneratorType,
-} from '@nx-console/shared/schema';
-import { matchWithWildcards } from '@nx-console/shared/utils';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
+import { matchWithWildcards } from '@nx-console/shared-utils';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getGeneratorOptions,
   getGenerators,
   getNxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
-import { showNoGeneratorsMessage } from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-nx-workspace';
+import { showNoGeneratorsMessage } from '@nx-console/vscode-utils';
 import { QuickPickItem, window } from 'vscode';
 import { selectFlags } from './select-flags';
 

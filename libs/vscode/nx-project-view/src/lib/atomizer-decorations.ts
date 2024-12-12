@@ -1,6 +1,6 @@
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { runNxConnect } from '@nx-console/vscode/nx-cloud-view';
-import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
+import { runNxConnect } from '@nx-console/vscode-nx-cloud-view';
+import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import {
   commands,
   EventEmitter,

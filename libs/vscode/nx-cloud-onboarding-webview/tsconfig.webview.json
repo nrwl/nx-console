@@ -1,11 +1,18 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "declaration": false,
+    "outDir": "out-tsc/nx-cloud-onboarding-webview",
     "module": "ESNext",
-    "useDefineForClassFields": false
+    "moduleResolution": "bundler",
+    "strict": false,
+    "lib": ["DOM", "esnext.asynciterable"],
+    "experimentalDecorators": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "out-tsc"
+  ]
 }

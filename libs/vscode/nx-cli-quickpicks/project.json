@@ -1,8 +1,0 @@
-{
-  "name": "vscode-nx-cli-quickpicks",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nx-cli-quickpicks/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

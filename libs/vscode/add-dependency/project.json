@@ -1,8 +1,0 @@
-{
-  "name": "vscode-add-dependency",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/add-dependency/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

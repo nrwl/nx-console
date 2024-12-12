@@ -1,4 +1,4 @@
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { commands, ExtensionContext, window } from 'vscode';
 
 let run = false;

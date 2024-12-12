@@ -1,7 +1,7 @@
 import {
   NxParseTargetStringRequest,
   NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import type { Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
