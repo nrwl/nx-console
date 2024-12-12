@@ -4,7 +4,7 @@ import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import { canReadNxJson } from '@nx-console/shared/npm';
-import { gte, NxVersion } from '@nx-console/shared/nx-version';
+import { gte, NxVersion } from '@nx-console/nx-version';
 
 export class DaemonWatcher {
   private stopped = false;

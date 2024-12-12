@@ -5,7 +5,7 @@ import {
 } from '../nx-console-plugin-types';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { Logger } from '@nx-console/shared/schema';
-import { gte } from '@nx-console/shared/nx-version';
+import { gte } from '@nx-console/nx-version';
 
 export const projectNameAndRootProcessor: SchemaProcessor = (
   schema: GeneratorSchema,

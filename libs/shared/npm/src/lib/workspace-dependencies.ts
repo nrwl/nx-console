@@ -1,6 +1,6 @@
 import { directoryExists, fileExists } from '@nx-console/shared/file-system';
 import type { Logger, WorkspaceProjects } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { NxVersion } from '@nx-console/nx-version';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';
@@ -11,7 +11,7 @@ import {
   pnpDependencyPath,
 } from './pnp-dependencies';
 import { platform } from 'os';
-import { gte } from '@nx-console/shared/nx-version';
+import { gte } from '@nx-console/nx-version';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 /**

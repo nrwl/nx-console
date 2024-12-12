@@ -2,7 +2,7 @@ import {
   GeneratorContext,
   GeneratorSchema,
 } from '@nx-console/shared/generate-ui-types';
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { NxVersion } from '@nx-console/nx-version';
 import {
   GeneratorCollectionInfo,
   Option,

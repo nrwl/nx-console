@@ -1,5 +1,5 @@
 import { importNxPackagePath } from '@nx-console/shared/npm';
-import { gte } from '@nx-console/shared/nx-version';
+import { gte } from '@nx-console/nx-version';
 import { getPackageManagerCommand } from '@nx-console/shared/utils';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
