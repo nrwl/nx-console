@@ -13,7 +13,7 @@ export const CheckboxWrapper = <
   base: T
 ) => {
   return class extends base {
-    protected render() {
+    render() {
       return html`
         <div
           class="${this.shouldRenderError()
