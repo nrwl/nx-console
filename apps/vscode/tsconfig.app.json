@@ -5,5 +5,10 @@
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts"],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "references": [
+    { "path": "../../libs/vscode/nx-cloud-onboarding-webview" },
+    { "path": "../nxls/tsconfig.app.json" },
+    { "path": "../generate-ui-v2/tsconfig.app.json" }
+  ]
 }
