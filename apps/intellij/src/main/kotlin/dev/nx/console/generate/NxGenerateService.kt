@@ -17,6 +17,7 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.GeneratorFilter
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nxlsWorkingPath
 import java.awt.Dimension
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
@@ -61,20 +62,16 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
         }
     }
 
-    suspend fun selectGenerator(
-        actionEvent: AnActionEvent?,
-    ) = suspendCoroutine {
+    suspend fun selectGenerator(actionEvent: AnActionEvent?) = suspendCoroutine {
         cs.launch {
             val generators = getFilteredGenerators()
 
             if (generators.isEmpty()) {
-                it.resume(null)
-            }
-            val generatorNames = generators.map { it.name }
+                val hasErrors =
+                    (NxlsService.getInstance(project).workspace()?.errors?.size ?: 0) > 0
+                Notifier.notifyNoGenerators(project, hasErrors)
 
-            if (generatorNames.size == 1) {
-                val chosenGenerator = generators.find { g -> g.name == generatorNames[0] }
-                it.resume(chosenGenerator)
+                return@launch it.resume(null)
             }
 
             val popup =
@@ -111,7 +108,7 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
         project: Project,
         generator: NxGenerator,
         contextPath: String? = null,
-        options: List<NxGeneratorOption>? = null
+        options: List<NxGeneratorOption>? = null,
     ) {
         val generatorOptions =
             options
@@ -121,7 +118,7 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
                         NxGeneratorOptionsRequestOptions(
                             generator.data.collection,
                             generator.data.name,
-                            generator.schemaPath
+                            generator.schemaPath,
                         )
                     )
 
@@ -132,7 +129,7 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
                 .service<NxlsService>()
                 .generatorContextFromPath(
                     generatorWithOptions,
-                    contextPath?.let { nxlsWorkingPath(contextPath) }
+                    contextPath?.let { nxlsWorkingPath(contextPath) },
                 )
 
         ApplicationManager.getApplication().invokeLater {
@@ -141,7 +138,7 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
             renderer.openGenerateUi(
                 project,
                 NxGenerator(generator = generatorWithOptions, contextValues = generatorContext),
-                RunGeneratorManager(project)
+                RunGeneratorManager(project),
             )
         }
     }
