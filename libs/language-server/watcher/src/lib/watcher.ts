@@ -4,7 +4,7 @@ import { debounce } from '@nx-console/shared/utils';
 import { DaemonWatcher } from './daemon-watcher';
 import { NativeWatcher } from './native-watcher';
 import { ParcelWatcher } from './parcel-watcher';
-import { gte } from '@nx-console/shared/nx-version';
+import { gte } from '@nx-console/nx-version';
 
 let _daemonWatcher: DaemonWatcher | undefined;
 let _nativeWatcher: NativeWatcher | undefined;

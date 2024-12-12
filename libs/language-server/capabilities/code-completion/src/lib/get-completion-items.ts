@@ -11,7 +11,7 @@ import {
   X_COMPLETION_TYPE,
 } from '@nx-console/shared/json-schema';
 import { Logger } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { NxVersion } from '@nx-console/nx-version';
 import {
   ASTNode,
   CompletionItem,

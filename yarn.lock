@@ -3060,6 +3060,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@monodon/typescript-nx-imports-plugin@npm:0.3.0":
+  version: 0.3.0
+  resolution: "@monodon/typescript-nx-imports-plugin@npm:0.3.0"
+  checksum: 311485a893f06351dcf2a12477138d8d0f6eb5e03412d1919ea04cd2e60e9fee06f2add68da438206ca90b64ead16573ba7704cc1c2caa69cb74e0cbd4959cd8
+  languageName: node
+  linkType: hard
+
 "@napi-rs/wasm-runtime@npm:0.2.4":
   version: 0.2.4
   resolution: "@napi-rs/wasm-runtime@npm:0.2.4"
@@ -3347,6 +3354,18 @@ __metadata:
   checksum: d6afcee3010730cdbe39b2b56dcdd67e9b23cfda1d55a348d6675161245fd12598ddbcbb5fbceaaea981f22efd0df8168f9cf2eff2db35ee8be1e7edbd4ab300
   languageName: node
   linkType: hard
+
+"@nx-console/nx-version@workspace:libs/shared/nx-version":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/nx-version@workspace:libs/shared/nx-version"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/shared-types@workspace:libs/shared/types":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-types@workspace:libs/shared/types"
+  languageName: unknown
+  linkType: soft
 
 "@nx/cypress@npm:20.2.2":
   version: 20.2.2
@@ -4227,7 +4246,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/watcher@npm:^2.4.1":
+"@parcel/watcher@npm:2.4.1, @parcel/watcher@npm:^2.4.1":
   version: 2.4.1
   resolution: "@parcel/watcher@npm:2.4.1"
   dependencies:
@@ -7444,6 +7463,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"angular-console@workspace:apps/vscode":
+  version: 0.0.0-use.local
+  resolution: "angular-console@workspace:apps/vscode"
+  dependencies:
+    "@monodon/typescript-nx-imports-plugin": 0.3.0
+    "@parcel/watcher": 2.4.1
+    "@parcel/watcher-darwin-arm64": 2.4.1
+    "@parcel/watcher-darwin-x64": 2.4.1
+    "@parcel/watcher-linux-arm-glibc": 2.4.1
+    "@parcel/watcher-linux-arm64-glibc": 2.4.1
+    "@parcel/watcher-linux-arm64-musl": 2.4.1
+    "@parcel/watcher-linux-x64-glibc": 2.4.1
+    "@parcel/watcher-linux-x64-musl": 2.4.1
+    "@parcel/watcher-win32-arm64": 2.4.1
+    "@parcel/watcher-win32-x64": 2.4.1
+    "@vscode-elements/elements": ^1.6.1
+  languageName: unknown
+  linkType: soft
+
 "ansi-align@npm:^3.0.0":
   version: 3.0.1
   resolution: "ansi-align@npm:3.0.1"
@@ -9449,6 +9487,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"configuration-bebabc@workspace:libs/vscode/configuration":
+  version: 0.0.0-use.local
+  resolution: "configuration-bebabc@workspace:libs/vscode/configuration"
+  languageName: unknown
+  linkType: soft
+
 "confusing-browser-globals@npm:^1.0.9":
   version: 1.0.11
   resolution: "confusing-browser-globals@npm:1.0.11"
@@ -10557,6 +10601,12 @@ __metadata:
   checksum: b4ccd00597dd46cb2d4a379398f5b19fca84a16f3374e2249201992f36b30f6835949a9429669ee6b41b6e837205a163eadd745e472069e70dfc10f03e5fcc12
   languageName: node
   linkType: hard
+
+"definition-e48912@workspace:libs/language-server/capabilities/definition":
+  version: 0.0.0-use.local
+  resolution: "definition-e48912@workspace:libs/language-server/capabilities/definition"
+  languageName: unknown
+  linkType: soft
 
 "del@npm:^6.0.0":
   version: 6.1.1
@@ -12917,6 +12967,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"generate-ui-v2-351732@workspace:apps/generate-ui-v2-e2e/dist/generate-ui-v2":
+  version: 0.0.0-use.local
+  resolution: "generate-ui-v2-351732@workspace:apps/generate-ui-v2-e2e/dist/generate-ui-v2"
+  languageName: unknown
+  linkType: soft
+
+"generate-ui-v2-5fe625@workspace:apps/generate-ui-v2":
+  version: 0.0.0-use.local
+  resolution: "generate-ui-v2-5fe625@workspace:apps/generate-ui-v2"
+  languageName: unknown
+  linkType: soft
+
 "gensync@npm:^1.0.0-beta.2":
   version: 1.0.0-beta.2
   resolution: "gensync@npm:1.0.0-beta.2"
@@ -13602,6 +13664,12 @@ __metadata:
   checksum: 467cf908a56556417b18e86ae3b8dee03c2360ef1d51e61c4028fe87f6f309b6ff038589c94b5666af207da9d972d5107698906aabeb78aca134641962a5c6f8
   languageName: node
   linkType: hard
+
+"hover-33f7a5@workspace:libs/language-server/capabilities/hover":
+  version: 0.0.0-use.local
+  resolution: "hover-33f7a5@workspace:libs/language-server/capabilities/hover"
+  languageName: unknown
+  linkType: soft
 
 "hpack.js@npm:^2.1.6":
   version: 2.1.6
@@ -15694,6 +15762,12 @@ __metadata:
   checksum: 798ed4cf3354a2d9ccd78e86d2169515a0097a5c133337807cdf7f1fc32e1391d207ccfc276518cc1d7d8d4db93288b8a50ba4293d212ad1336e52a8ec0a941f
   languageName: node
   linkType: hard
+
+"json-schema-282283@workspace:libs/shared/json-schema":
+  version: 0.0.0-use.local
+  resolution: "json-schema-282283@workspace:libs/shared/json-schema"
+  languageName: unknown
+  linkType: soft
 
 "json-schema-traverse@npm:^0.4.1":
   version: 0.4.1
@@ -18470,6 +18544,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"npm-dbe71e@workspace:libs/shared/npm":
+  version: 0.0.0-use.local
+  resolution: "npm-dbe71e@workspace:libs/shared/npm"
+  languageName: unknown
+  linkType: soft
+
 "npm-install-checks@npm:^5.0.0":
   version: 5.0.0
   resolution: "npm-install-checks@npm:5.0.0"
@@ -18714,6 +18794,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nx-cloud-onboarding-webview-be14fc@workspace:libs/vscode/nx-cloud-onboarding-webview":
+  version: 0.0.0-use.local
+  resolution: "nx-cloud-onboarding-webview-be14fc@workspace:libs/vscode/nx-cloud-onboarding-webview"
+  dependencies:
+    "@microsoft/fast-foundation": ^2.49.0
+    "@vscode/webview-ui-toolkit": ^1.2.0
+    lit: ^2.4.1
+  languageName: unknown
+  linkType: soft
+
+"nx-cloud-view-199390@workspace:libs/vscode/nx-cloud-view":
+  version: 0.0.0-use.local
+  resolution: "nx-cloud-view-199390@workspace:libs/vscode/nx-cloud-view"
+  dependencies:
+    tslib: ^2.3.0
+  languageName: unknown
+  linkType: soft
+
+"nx-commands-view-32869a@workspace:libs/vscode/nx-commands-view":
+  version: 0.0.0-use.local
+  resolution: "nx-commands-view-32869a@workspace:libs/vscode/nx-commands-view"
+  languageName: unknown
+  linkType: soft
+
 "nx-console@workspace:.":
   version: 0.0.0-use.local
   resolution: "nx-console@workspace:."
@@ -18836,6 +18940,30 @@ __metadata:
     webpack: 5.88.2
     xstate: ^5.18.2
     zone.js: 0.14.3
+  languageName: unknown
+  linkType: soft
+
+"nx-conversion-e0758f@workspace:libs/vscode/nx-conversion":
+  version: 0.0.0-use.local
+  resolution: "nx-conversion-e0758f@workspace:libs/vscode/nx-conversion"
+  languageName: unknown
+  linkType: soft
+
+"nx-help-and-feedback-view-63a574@workspace:libs/vscode/nx-help-and-feedback-view":
+  version: 0.0.0-use.local
+  resolution: "nx-help-and-feedback-view-63a574@workspace:libs/vscode/nx-help-and-feedback-view"
+  languageName: unknown
+  linkType: soft
+
+"nx-project-view-a8a6f0@workspace:libs/vscode/nx-project-view":
+  version: 0.0.0-use.local
+  resolution: "nx-project-view-a8a6f0@workspace:libs/vscode/nx-project-view"
+  languageName: unknown
+  linkType: soft
+
+"nx-workspace-609ed1@workspace:libs/vscode/nx-workspace":
+  version: 0.0.0-use.local
+  resolution: "nx-workspace-609ed1@workspace:libs/vscode/nx-workspace"
   languageName: unknown
   linkType: soft
 
@@ -19003,6 +19131,25 @@ __metadata:
   checksum: 9b83bf5b8f2bc163d114366a5fd65d1951662d556d7a0842b1606f1a9009333cd2a0ef92d9cdfec807df07a4499ef389f367d38752be323c1d9b93066830b14f
   languageName: node
   linkType: hard
+
+"nxls@workspace:apps/nxls":
+  version: 0.0.0-use.local
+  resolution: "nxls@workspace:apps/nxls"
+  dependencies:
+    "@parcel/watcher": 2.4.1
+    "@parcel/watcher-darwin-arm64": 2.4.1
+    "@parcel/watcher-darwin-x64": 2.4.1
+    "@parcel/watcher-linux-arm-glibc": 2.4.1
+    "@parcel/watcher-linux-arm64-glibc": 2.4.1
+    "@parcel/watcher-linux-arm64-musl": 2.4.1
+    "@parcel/watcher-linux-x64-glibc": 2.4.1
+    "@parcel/watcher-linux-x64-musl": 2.4.1
+    "@parcel/watcher-win32-arm64": 2.4.1
+    "@parcel/watcher-win32-x64": 2.4.1
+  bin:
+    nxls: bin/nxls
+  languageName: unknown
+  linkType: soft
 
 "object-assign@npm:^4.0.1, object-assign@npm:^4.1.0, object-assign@npm:^4.1.1":
   version: 4.1.1
@@ -20601,6 +20748,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"project-details-bb5ef5@workspace:libs/vscode/project-details":
+  version: 0.0.0-use.local
+  resolution: "project-details-bb5ef5@workspace:libs/vscode/project-details"
+  dependencies:
+    tslib: ^2.3.0
+  languageName: unknown
+  linkType: soft
+
 "promise-all-reject-late@npm:^1.0.0":
   version: 1.0.1
   resolution: "promise-all-reject-late@npm:1.0.1"
@@ -21924,6 +22079,12 @@ __metadata:
   checksum: 3e82d1f419e240ef6219d794ff29c7ee415fbdc19e038f680a10c067108e06284f1847450a210b29bbaf97b9d8a97ced5f624c31c681248ac84c80d56ad5a2c4
   languageName: node
   linkType: hard
+
+"schema-c90119@workspace:libs/shared/schema":
+  version: 0.0.0-use.local
+  resolution: "schema-c90119@workspace:libs/shared/schema"
+  languageName: unknown
+  linkType: soft
 
 "schema-utils@npm:^3.1.1, schema-utils@npm:^3.2.0":
   version: 3.3.0
@@ -23320,6 +23481,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tasks-2e0beb@workspace:libs/vscode/tasks":
+  version: 0.0.0-use.local
+  resolution: "tasks-2e0beb@workspace:libs/vscode/tasks"
+  languageName: unknown
+  linkType: soft
+
 "tcp-port-used@npm:^1.0.2":
   version: 1.0.2
   resolution: "tcp-port-used@npm:1.0.2"
@@ -24123,6 +24290,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript-plugin-6dc9fd@workspace:libs/vscode/typescript-plugin":
+  version: 0.0.0-use.local
+  resolution: "typescript-plugin-6dc9fd@workspace:libs/vscode/typescript-plugin"
+  languageName: unknown
+  linkType: soft
+
 "typescript@npm:5.6.3, typescript@npm:~5.6.2":
   version: 5.6.3
   resolution: "typescript@npm:5.6.3"
@@ -24540,6 +24713,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"utils-7a4a1f@workspace:libs/shared/utils":
+  version: 0.0.0-use.local
+  resolution: "utils-7a4a1f@workspace:libs/shared/utils"
+  languageName: unknown
+  linkType: soft
+
 "utils-merge@npm:1.0.1":
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
@@ -24624,6 +24803,12 @@ __metadata:
   checksum: ae0123222c6df65b437669d63dfa8c36cee20a504101b2fcd97b8bf76f91259c17f9f2b4d70a1e3c6bbcee7f51b28392833adb6b2770b23b01abec84e369660b
   languageName: node
   linkType: hard
+
+"verify-1a848a@workspace:libs/vscode/verify":
+  version: 0.0.0-use.local
+  resolution: "verify-1a848a@workspace:libs/vscode/verify"
+  languageName: unknown
+  linkType: soft
 
 "verror@npm:1.10.0":
   version: 1.10.0

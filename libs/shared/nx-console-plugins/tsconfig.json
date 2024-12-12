@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-version"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

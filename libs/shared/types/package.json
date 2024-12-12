@@ -1,12 +1,12 @@
 {
-  "name": "@nx-console/nx-version",
+  "name": "@nx-console/shared-types",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "nx": {
-    "name": "nx-version",
-    "sourceRoot": "libs/shared/nx-version/src",
+    "name": "shared-types",
+    "sourceRoot": "libs/shared/types/src",
     "projectType": "library",
     "tags": [
       "type:shared"
