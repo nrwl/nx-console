@@ -18,6 +18,7 @@ import {
   spawnChild,
 } from 'xstate';
 
+const SLEEP_POLLING_TIME = 3_600_000;
 const COLD_POLLING_TIME = 180_000;
 const HOT_POLLING_TIME = 10_000;
 
@@ -25,7 +26,6 @@ const pollingMachine = setup({
   types: {
     context: {} as {
       pollingFrequency: number;
-      emptyCounter: number;
     },
   },
   delays: {
@@ -46,7 +46,17 @@ const pollingMachine = setup({
             error?: CIPEInfoError;
           }
         | undefined;
-      if (recentCIPEData?.info?.some((cipe) => cipe.status === 'IN_PROGRESS')) {
+      if (
+        recentCIPEData?.error &&
+        recentCIPEData.error.type === 'authentication'
+      ) {
+        return {
+          ...context,
+          pollingFrequency: SLEEP_POLLING_TIME,
+        };
+      } else if (
+        recentCIPEData?.info?.some((cipe) => cipe.status === 'IN_PROGRESS')
+      ) {
         return {
           ...context,
           pollingFrequency: HOT_POLLING_TIME,
@@ -65,10 +75,9 @@ const pollingMachine = setup({
     }),
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdLOmGMrlAMQDqAggNICiA+gKoAKA2gAwC6iKqWFgAuWVDn4gAHogDMAdnwAmABwBGAGzy1StQE4lAVg1KjAGhABPOXpX4ALFz2yNGw7JUr5p2QF9fFmiY5PgA7gCGIuQU3HxIIGhCouKSMghKTvgaHnryhup6XCqySvIW1ghq9oqGerYaxUqO1cX+gRjYeGGRongUUrDC4cJg+OEAZiMATgAUQZ1QAGJTYACOAK5gOADGlgCUFPMhEVF4sZKJUSnxaRr2GvjqOp5Keg2GhvbliPam+IbyLhqNTyeT2Wx1LiGNoJDohI59CDiUa4ABuqAA1qMEQQcQg0ahtsMxDhYud4pdkhIboglNl8FwXCpVB5HK81N90iDHvZ3LztMymnoYTj8DiKGAplNUFMxehhuMZQBbMVwrp4glEqlk3gXQRXamgNLgh7yBT2e62UxqLhKTmqJQOV5ve72EFQt7+AIgHCoCBwPXBPB6pIk1KIAC0NvwApKXhUXDBCjynIBWQMr3B9gTsl+ahFaoIRBIZGDFP1VPDCEBjwauU87jquU5VUMDLUhiUsjUsjenYUSgLQYIJ16UBDBqrsmMMa03fs840XEchhbvPb-Z7fa73iHC1Vw4nlZplQaWTNsiKS6XzIBnPNWRM+VcWi4rnsXt8QA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdAO4CGWALrlAMQBiA8gEoDCAogPoAKdAMtwNoAGALqIUqWOSyocokAA9EAZkUAmfAA51KgJzKB2gOy6VAVhMAaEAE9EARnUA2fAJUH1qgCwqBt2w+0eAL6BlmiYlESkFHhUcrBkxGRg+MQAZkkATgAUYdh4NBlgAI4ArmA4AMZWAJRUuREkkniCIkggaBIU0rIKCIq2HvgmAh4+tiYe2uoeHg6WNn0CBviTBiqK-uprDorqwaEYeQT1MRDSybgAbqgA1sknx4eUCFeoFYlSOC0tsh2S3W1ejonAEVLYjG51PoPIp5ogPJpnCNhgIzOpxqoDPt2k88PgHlQwBkMqgMvj0IlUqSALb43GPcJ4F44a7vLpfYQ-Np-dk9RA6ZYOaFGLwmewOObWeHKfBTDwmLbTLSuLHYnCoCBwX707WdT58hAmNSo7RC+y6ATqQyKDxwhBTfAGEbaFTuWzaS0+EzYh6RJpQXX-GSAuwCATOEymnxWxSW612xRuDSTEaOMxGb0hHGMhlHQO8kOGkyKfDggy2WMDTTaGt21zhhxlisSgQOTRBYKBIA */
   context: {
     pollingFrequency: COLD_POLLING_TIME,
-    emptyCounter: 0,
   },
   id: 'polling',
   initial: 'polling',
@@ -76,6 +85,11 @@ const pollingMachine = setup({
     waiting: {
       after: {
         pollingFrequency: {
+          target: 'polling',
+        },
+      },
+      on: {
+        FORCE_POLL: {
           target: 'polling',
         },
       },
