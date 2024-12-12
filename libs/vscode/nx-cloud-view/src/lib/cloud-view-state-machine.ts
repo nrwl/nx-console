@@ -4,7 +4,6 @@ import type {
   CloudOnboardingInfo,
 } from '@nx-console/shared/types';
 import { getRecentCIPEData } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import {
   and,
   AnyEventObject,
@@ -19,6 +18,7 @@ import {
   spawnChild,
 } from 'xstate';
 
+const SLEEP_POLLING_TIME = 3_600_000;
 const COLD_POLLING_TIME = 180_000;
 const HOT_POLLING_TIME = 10_000;
 
@@ -33,33 +33,6 @@ const pollingMachine = setup({
     pollingFrequency: ({ context }) => context.pollingFrequency,
   },
   actions: {
-    adjustAuthErrorCounter: assign(({ context, event }) => {
-      const recentCIPEData = event['output'] as
-        | {
-            info?: CIPEInfo[];
-            error?: CIPEInfoError;
-          }
-        | undefined;
-
-      if (
-        recentCIPEData?.error &&
-        recentCIPEData.error.type === 'authentication'
-      ) {
-        return {
-          ...context,
-          authErrorCounter: context.authErrorCounter + 1,
-        };
-      } else {
-        return {
-          ...context,
-          authErrorCounter: 0,
-        };
-      }
-    }),
-    resetAuthErrorCounter: assign(({ context }) => ({
-      ...context,
-      authErrorCounter: 0,
-    })),
     sendCIPEUpdate: sendTo(
       ({ system }) => system.get('cloud-view'),
       ({ event }) => ({
@@ -74,7 +47,17 @@ const pollingMachine = setup({
             error?: CIPEInfoError;
           }
         | undefined;
-      if (recentCIPEData?.info?.some((cipe) => cipe.status === 'IN_PROGRESS')) {
+      if (
+        recentCIPEData?.error &&
+        recentCIPEData.error.type === 'authentication'
+      ) {
+        return {
+          ...context,
+          pollingFrequency: SLEEP_POLLING_TIME,
+        };
+      } else if (
+        recentCIPEData?.info?.some((cipe) => cipe.status === 'IN_PROGRESS')
+      ) {
         return {
           ...context,
           pollingFrequency: HOT_POLLING_TIME,
@@ -92,13 +75,8 @@ const pollingMachine = setup({
       return await getRecentCIPEData();
     }),
   },
-  guards: {
-    isAuthErrorCounterTooHigh: ({ context }) => {
-      return context.authErrorCounter > 4;
-    },
-  },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdAO4CGWALrlAMQDaADALqIqqzlao7MgAeiATAHZ8ATjoBmEQBY6-AGwi5guVKkAaEAE8BQ-BMFSArCKEBGEcqEBfKxrSZKRUhTxUesMsTJh8xAGbeAE4AFPbYeABigWAAjgCuYDgAxpoAlFRhjiTsePRMSCBobBSc3HwI4qZS+IZ0MqamhlIiAByqchraFXTCzYL84got-XLiLTZ2GOEEsOhgYMiUVADqAIIA0gCiAPoAqgAKedxF7KUF5eJGeopGTS0KgiKmnYiPeoISpvx00lLidD0JoUpo5Mq4IJwfLgAG6oADWPjBBCRCBhqCSXg4ODyRwKJxKXHOAkUoik-FMKmMLTGhmpLwQUhaLXwA0M-VMlwMbNMQKR+CRVDAgUCqEC-PQXj8ooAtvyQXg5Q48KicLCMQScYxjqxToTQOV+BZ8HIfoz2S1yYZDPS-oY9A0-o0pIJBoY5DZbCAcKgIHBtUqoNriliyogALTfa4m4wuiSsjpacPM2lSOT8e4DS6mQSNXnygjZFyBvE6gmhhCmAF6Ywm0wtET-esu+niQTMtpiRlyK2PQx5gP4WbzRZ4IO68sNET4ST8fjO9PyHoGelt-Aui31+SCQwDHmevlIsdlokIK3ifDZnP-KpMkR3+lCOjGy8cuQmuRMqQeqxAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdAO4CGWALrlAMQBiA8gEoDCAogPoAKdAMtwNoAGALqIUqWOSyocokAA9EAZkUAmfAA51KgJzKB2gOy6VAVhMAaEAE9EARnUA2fAJUH1qgCwqBt2w+0eAL6BlmiYlESkFHhUcrBkxGRg+MQAZkkATgAUYdh4NBlgAI4ArmA4AMZWAJRUuREkkniCIkggaBIU0rIKCIq2HvgmAh4+tiYe2uoeHg6WNn0CBviTBiqK-uprDorqwaEYeQT1MRDSybgAbqgA1sknx4eUCFeoFYlSOC0tsh2S3W1ejonAEVLYjG51PoPIp5ogPJpnCNhgIzOpxqoDPt2k88PgHlQwBkMqgMvj0IlUqSALb43GPcJ4F44a7vLpfYQ-Np-dk9RA6ZYOaFGLwmewOObWeHKfBTDwmLbTLSuLHYnCoCBwX707WdT58hAmNSo7RC+y6ATqQyKDxwhBTfAGEbaFTuWzaS0+EzYh6RJpQXX-GSAuwCATOEymnxWxSW612xRuDSTEaOMxGb0hHGMhlHQO8kOGkyKfDggy2WMDTTaGt21zhhxlisSgQOTRBYKBIA */
   context: {
     pollingFrequency: COLD_POLLING_TIME,
     authErrorCounter: 0,
@@ -112,40 +90,17 @@ const pollingMachine = setup({
           target: 'polling',
         },
       },
-      always: {
-        guard: 'isAuthErrorCounterTooHigh',
-        target: 'sleeping',
-      },
-    },
-    sleeping: {
       on: {
-        WAKE_UP: {
+        FORCE_POLL: {
           target: 'polling',
-          actions: ['resetAuthErrorCounter'],
         },
       },
-      entry: [
-        () => {
-          getOutputChannel().appendLine(
-            'Stopping cloud polling after 5 failed authentication attempts'
-          );
-        },
-      ],
-      exit: [
-        () => {
-          getOutputChannel().appendLine('Restarting cloud polling');
-        },
-      ],
     },
     polling: {
       invoke: {
         src: 'getRecentCIPEData',
         onDone: {
-          actions: [
-            'sendCIPEUpdate',
-            'setPollingFrequency',
-            'adjustAuthErrorCounter',
-          ],
+          actions: ['sendCIPEUpdate', 'setPollingFrequency'],
           target: 'waiting',
         },
         onError: {

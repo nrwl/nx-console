@@ -82,14 +82,6 @@ export function initNxCloudView(context: ExtensionContext) {
     })
   );
 
-  async function updateRecentCIPE() {
-    const recentCIPEData = await getRecentCIPEData();
-    actor.send({
-      type: 'UPDATE_RECENT_CIPE',
-      value: recentCIPEData,
-    });
-  }
-
   context.subscriptions.push(
     showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
@@ -108,11 +100,10 @@ export function initNxCloudView(context: ExtensionContext) {
       }
     ),
     commands.registerCommand('nxCloud.refresh', () => {
-      actor.system.get('polling').send({ type: 'WAKE_UP' });
-      const loadingPromise = Promise.allSettled([
-        updateOnboarding(),
-        updateRecentCIPE(),
-      ]);
+      actor.system.get('polling').send({ type: 'FORCE_POLL' });
+      const loadingPromise = updateOnboarding().catch(() => {
+        // ignore errors
+      });
       window.withProgress(
         { location: { viewId: 'nxCloudLoading' } },
         async () => await loadingPromise
@@ -152,8 +143,7 @@ export function initNxCloudView(context: ExtensionContext) {
       const subscription = tasks.onDidEndTaskProcess(
         (e: TaskProcessEndEvent) => {
           if (e.execution.task.name === command) {
-            actor.system.get('polling').send({ type: 'WAKE_UP' });
-            updateRecentCIPE();
+            actor.system.get('polling').send({ type: 'FORCE_POLL' });
             subscription.dispose();
           }
         }
