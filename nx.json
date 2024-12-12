@@ -27,52 +27,31 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "inputs": [
-        "production",
-        "^production"
-      ],
+      "inputs": ["production", "^production"],
       "cache": true
     },
     "test": {
-      "inputs": [
-        "default",
-        "^production",
-        "{workspaceRoot}/jest.preset.js"
-      ],
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
       "cache": true
     },
     "lint": {
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     },
     "e2e": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
+      "inputs": ["default", "^production"],
       "cache": true
     },
     "e2e-ci--**/**": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
+      "inputs": ["default", "^production"],
       "cache": true,
       "parallelism": false,
-      "dependsOn": [
-        "^build",
-        "setup-lit-dir"
-      ]
+      "dependsOn": ["^build", "setup-lit-dir"]
     },
     "e2e-local": {
       "cache": true,
       "parallelism": false,
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "build-storybook": {
       "inputs": [
@@ -93,20 +72,12 @@
     },
     "@nx/esbuild:esbuild": {
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "kotlin": [
       "{projectRoot}/build.gradle.kts",
       "{projectRoot}/**/*.kt",
@@ -147,18 +118,14 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "exclude": [
-        "apps/nxls-e2e/**/*"
-      ],
+      "exclude": ["apps/nxls-e2e/**/*"],
       "options": {
         "targetName": "test"
       }
     },
     {
       "plugin": "@nx/jest/plugin",
-      "include": [
-        "apps/nxls-e2e/**/*"
-      ],
+      "include": ["apps/nxls-e2e/**/*"],
       "options": {
         "targetName": "e2e-local",
         "ciTargetName": "e2e-ci"
@@ -192,21 +159,15 @@
     "@nx/powerpack-owners"
   ],
   "sync": {
-    "globalGenerators": [
-      "@nx/powerpack-owners:sync-codeowners-file"
-    ],
+    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],
     "applyChanges": true
   },
   "owners": {
     "format": "github",
     "patterns": [
       {
-        "projects": [
-          "*"
-        ],
-        "owners": [
-          "@MaxKless"
-        ]
+        "projects": ["*"],
+        "owners": ["@MaxKless"]
       }
     ]
   },
