@@ -9,7 +9,7 @@ import {
   GeneratorContext,
   GeneratorSchema,
   ValidationResults,
-} from '@nx-console/shared/generate-ui-types';
+} from '@nx-console/shared-generate-ui-types';
 import { ReactiveController, ReactiveElement } from 'lit';
 
 import type { WebviewApi } from 'vscode-webview';

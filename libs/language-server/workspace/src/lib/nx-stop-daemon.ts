@@ -1,5 +1,5 @@
-import { Logger } from '@nx-console/shared/schema';
-import { getPackageManagerCommand } from '@nx-console/shared/utils';
+import { Logger } from '@nx-console/shared-schema';
+import { getPackageManagerCommand } from '@nx-console/shared-utils';
 import { execSync } from 'node:child_process';
 
 export async function nxStopDaemon(workspacePath: string, logger: Logger) {

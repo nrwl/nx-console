@@ -1,5 +1,5 @@
-import { TreeMap, TreeNode } from '@nx-console/shared/types';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { TreeMap, TreeNode } from '@nx-console/shared-types';
+import { getWorkspacePath } from '@nx-console/vscode-utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { join, parse } from 'path';
 import { TreeItemCollapsibleState } from 'vscode';

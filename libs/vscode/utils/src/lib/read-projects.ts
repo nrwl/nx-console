@@ -1,24 +1,23 @@
 import {
-  Targets,
-  Option,
   DefaultValue,
+  Option,
   TargetConfiguration,
-  WorkspaceProjects,
-} from '@nx-console/shared/schema';
-import * as path from 'path';
+  Targets,
+} from '@nx-console/shared-schema';
 import type {
   TargetConfiguration as NxTargetConfiguration,
   ProjectGraphProjectNode,
 } from 'nx/src/devkit-exports';
+import * as path from 'path';
 
+import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import {
   localDependencyPath,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { normalizeSchema } from '@nx-console/shared/schema/normalize';
-import { getPrimitiveValue } from '@nx-console/shared/utils';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+} from '@nx-console/shared-npm';
+import { normalizeSchema } from '@nx-console/shared-schema';
+import { getPrimitiveValue } from '@nx-console/shared-utils';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
 export function readTargetDef(
   targetName: string,

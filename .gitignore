@@ -8,6 +8,7 @@ build/
 /osbuilds
 /.angular
 /cypress
+**/out-tsc
 
 # dependencies
 **/node_modules
@@ -47,6 +48,7 @@ yarn-error.log
 testem.log
 *.log
 /typings
+**/test-output
 
 # System Files
 .DS_Store

@@ -9,7 +9,7 @@ import { Combobox, ComboboxAutocomplete } from '@microsoft/fast-foundation';
 
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
-  protected renderField(): TemplateResult {
+  renderField(): TemplateResult {
     if (this.editor === 'vscode') {
       return this.renderVSCode();
     } else {
@@ -94,9 +94,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
     this.dispatchValue(value);
   }
 
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ) {
+  setFieldValue(value: string | boolean | number | string[] | undefined) {
     const selector =
       this.editor === 'vscode' ? 'vscode-combobox' : 'intellij-combobox';
     const autocompleteNode = this.renderRoot.querySelector(selector);

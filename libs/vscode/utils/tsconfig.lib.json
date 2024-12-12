@@ -1,11 +1,37 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
-    "types": ["node"]
+    "outDir": "out-tsc/vscode-utils",
+    "types": ["node"],
+    "strict": false,
+    "noImplicitReturns": false
   },
-  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["**/*.ts"]
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
+  "include": ["**/*.ts"],
+  "references": [
+    {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/file-system/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    }
+  ]
 }

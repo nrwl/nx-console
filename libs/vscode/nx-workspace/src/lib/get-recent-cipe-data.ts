@@ -1,6 +1,6 @@
-import { NxRecentCIPEDataRequest } from '@nx-console/language-server/types';
-import { CIPEInfo, CIPEInfoError } from '@nx-console/shared/types';
-import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+import { NxRecentCIPEDataRequest } from '@nx-console/language-server-types';
+import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
+import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 
 export async function getRecentCIPEData(): Promise<
   { info?: CIPEInfo[]; error?: CIPEInfoError } | undefined

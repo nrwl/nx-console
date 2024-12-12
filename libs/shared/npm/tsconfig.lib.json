@@ -1,11 +1,24 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
-    "types": ["node"]
+    "outDir": "out-tsc/shared-npm",
+    "types": ["node"],
+    "strict": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
-  "include": ["**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../file-system/tsconfig.lib.json"
+    }
+  ]
 }

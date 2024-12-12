@@ -2,7 +2,7 @@ import { platform } from 'os';
 import { xhr, XHRResponse } from 'request-light';
 import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
 // @ts-expect-error -- Browser Rollbar is not typed
 import Rollbar = require('rollbar/src/browser/rollbar');

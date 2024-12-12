@@ -1,4 +1,4 @@
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { NxVersion } from '@nx-console/nx-version';
 import type {
   NxJsonConfiguration,
   ProjectConfiguration,

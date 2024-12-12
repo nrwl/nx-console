@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import type { CloudOnboardingInfo } from '@nx-console/shared/types';
+import type { CloudOnboardingInfo } from '@nx-console/shared-types';
 import {
   provideVSCodeDesignSystem,
   vsCodeButton,

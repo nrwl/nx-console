@@ -1,8 +1,8 @@
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 
 import { Disposable, window } from 'vscode';
 
-import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server/types';
+import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server-types';
 import { ProgressLocation } from 'vscode';
 import { getNxlsClient } from './nxls-client';
 

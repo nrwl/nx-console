@@ -1,7 +1,7 @@
-import { NxError } from '@nx-console/shared/types';
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { NxError } from '@nx-console/shared-types';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import {

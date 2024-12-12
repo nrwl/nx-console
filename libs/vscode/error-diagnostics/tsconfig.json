@@ -1,22 +1,49 @@
 {
   "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "module": "commonjs",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  },
   "files": [],
   "include": [],
   "references": [
     {
-      "path": "./tsconfig.lib.json"
+      "path": "../nx-workspace"
     },
     {
-      "path": "./tsconfig.spec.json"
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "./tsconfig.lib.json"
     }
   ]
 }

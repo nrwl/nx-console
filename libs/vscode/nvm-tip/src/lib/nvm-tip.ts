@@ -1,4 +1,4 @@
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { ConfigurationTarget, ExtensionContext, window } from 'vscode';

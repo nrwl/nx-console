@@ -16,49 +16,49 @@ import {
   checkIsNxWorkspace,
   killGroup,
   withTimeout,
-} from '@nx-console/shared/utils';
+} from '@nx-console/shared-utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
-import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
+} from '@nx-console/vscode-configuration';
+import { initNxCommandsView } from '@nx-console/vscode-nx-commands-view';
 import {
   NxProjectTreeProvider,
   initNxProjectView,
-} from '@nx-console/vscode/nx-project-view';
-import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
-import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-nx-project-view';
+import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
+import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
 
-import { fileExists } from '@nx-console/shared/file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
-} from '@nx-console/vscode/add-dependency';
-import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
+} from '@nx-console/vscode-add-dependency';
+import { initGenerateUiWebview } from '@nx-console/vscode-generate-ui-webview';
 import {
   createNxlsClient,
   getNxlsClient,
   showRefreshLoadingAtLocation,
-} from '@nx-console/vscode/lsp-client';
-import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
-import { initNxConversion } from '@nx-console/vscode/nx-conversion';
-import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
-import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
-import { initTypeScriptServerPlugin } from '@nx-console/vscode/typescript-plugin';
+} from '@nx-console/vscode-lsp-client';
+import { initNxConfigDecoration } from '@nx-console/vscode-nx-config-decoration';
+import { initNxConversion } from '@nx-console/vscode-nx-conversion';
+import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
+import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
+import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
 
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
-} from '@nx-console/language-server/types';
-import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
-import { initNvmTip } from '@nx-console/vscode/nvm-tip';
-import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
+} from '@nx-console/language-server-types';
+import { initErrorDiagnostics } from '@nx-console/vscode-error-diagnostics';
+import { initNvmTip } from '@nx-console/vscode-nvm-tip';
+import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
 import {
   getOutputChannel,
   initOutputChannels,
-} from '@nx-console/vscode/output-channels';
-import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
-import { getTelemetry, initTelemetry } from '@nx-console/vscode/telemetry';
+} from '@nx-console/vscode-output-channels';
+import { initVscodeProjectDetails } from '@nx-console/vscode-project-details';
+import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';

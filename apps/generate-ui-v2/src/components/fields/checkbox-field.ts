@@ -30,9 +30,7 @@ export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {
     }
   }
 
-  protected setFieldValue(
-    value: string | number | boolean | string[] | undefined
-  ): void {
+  setFieldValue(value: string | number | boolean | string[] | undefined): void {
     const inputElement = this.renderRoot.querySelector(
       this.editor === 'intellij' ? 'input' : 'vscode-checkbox'
     );

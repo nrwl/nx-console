@@ -1,5 +1,5 @@
-import { buildProjectPath } from '@nx-console/shared/utils';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { buildProjectPath } from '@nx-console/shared-utils';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { join } from 'path';
 import {
   Selection,
@@ -11,7 +11,7 @@ import {
 } from 'vscode';
 
 import { getProjectLocations } from './get-project-locations';
-import { fileExists } from '@nx-console/shared/file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 
 export async function revealNxProject(
   projectName: string,

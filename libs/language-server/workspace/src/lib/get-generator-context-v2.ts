@@ -1,4 +1,4 @@
-import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
+import { GeneratorContext } from '@nx-console/shared-generate-ui-types';
 import { existsSync, lstatSync } from 'fs';
 import { normalize, parse } from 'path';
 import { getProjectByPath } from './get-project-by-path';

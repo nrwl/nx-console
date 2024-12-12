@@ -116,7 +116,6 @@
         "format": ["cjs"],
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
-        "generatePackageJson": false,
         "assets": [
           {
             "glob": "nx-schema.json",

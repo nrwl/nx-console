@@ -1,15 +1,27 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "sourceMap": false,
-    "outDir": "../../dist/out-tsc",
-    "types": ["cypress", "node", "cypress-real-events"],
-    "moduleResolution": "node"
+    "outDir": "out-tsc/generate-ui-v2-e2e",
+    "types": ["cypress", "node", "cypress-real-events"]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
     "cypress.config.ts",
     "src/support/test-schema.ts"
+  ],
+  "references": [
+    {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types"
+    },
+    {
+      "path": "../../libs/shared/schema"
+    },
+    {
+      "path": "../generate-ui-v2"
+    }
   ]
 }

@@ -1,4 +1,4 @@
-import type { GenerateUiInputMessage } from '@nx-console/shared/generate-ui-types';
+import type { GenerateUiInputMessage } from '@nx-console/shared-generate-ui-types';
 
 declare global {
   interface Window {

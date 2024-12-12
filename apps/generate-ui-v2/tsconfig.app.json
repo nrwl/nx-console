@@ -1,11 +1,31 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "outDir": "out-tsc/generate-ui-v2",
     "module": "ESNext",
+    "moduleResolution": "bundler",
     "types": ["node"],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "lib": ["DOM", "esnext.asynciterable"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitOverride": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "isolatedModules": false,
+    "strict": false
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../libs/shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/schema/tsconfig.lib.json"
+    }
+  ]
 }

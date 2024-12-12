@@ -34,9 +34,9 @@
 
 /libs/vscode/nx-commands-view/ @MaxKless
 
-/libs/vscode/output-channels/ @MaxKless
-
 /libs/vscode/nx-project-view/ @MaxKless
+
+/libs/vscode/output-channels/ @MaxKless
 
 /libs/vscode/project-details/ @MaxKless
 

@@ -98,9 +98,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
     this.dispatchValue(this.elements);
   }
 
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ) {
+  setFieldValue(value: string | boolean | number | string[] | undefined) {
     if (typeof value === 'string') {
       this.elements = value.split(',');
     } else if (Array.isArray(value)) {

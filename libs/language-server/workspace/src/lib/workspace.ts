@@ -1,8 +1,8 @@
-import { formatError } from '@nx-console/shared/utils';
+import { formatError } from '@nx-console/shared-utils';
 
-import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
-import { Logger } from '@nx-console/shared/schema';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { clearJsonCache, fileExists } from '@nx-console/shared-file-system';
+import { Logger } from '@nx-console/shared-schema';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { join } from 'path';
 import {
   firstValueFrom,
@@ -15,7 +15,7 @@ import {
 } from 'rxjs';
 import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 const enum Status {
   not_started,

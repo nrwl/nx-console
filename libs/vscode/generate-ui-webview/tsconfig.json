@@ -1,22 +1,64 @@
 {
   "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "module": "commonjs",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  },
   "files": [],
   "include": [],
   "references": [
     {
-      "path": "./tsconfig.lib.json"
+      "path": "../telemetry"
     },
     {
-      "path": "./tsconfig.spec.json"
+      "path": "../tasks"
+    },
+    {
+      "path": "../verify"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "./tsconfig.lib.json"
     }
   ]
 }

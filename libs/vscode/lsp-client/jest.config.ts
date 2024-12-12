@@ -9,10 +9,10 @@ export default {
       'ts-jest',
       {
         tsconfig: '<rootDir>/tsconfig.spec.json',
+        isolatedModules: true,
       },
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/lsp-client',
-  passWithNoTests: true,
+  coverageDirectory: 'test-output/jest/coverage',
 };

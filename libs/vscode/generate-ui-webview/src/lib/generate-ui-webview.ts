@@ -7,16 +7,16 @@ import {
   GenerateUiValidationResultsInputMessage,
   GeneratorSchema,
   ValidationResults,
-} from '@nx-console/shared/generate-ui-types';
+} from '@nx-console/shared-generate-ui-types';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
-} from '@nx-console/vscode/configuration';
+} from '@nx-console/vscode-configuration';
 import {
   getStartupMessage,
   getTransformedGeneratorSchema,
-} from '@nx-console/vscode/nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+} from '@nx-console/vscode-nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { existsSync } from 'node:fs';
 import {
   commands,

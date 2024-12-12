@@ -1,14 +1,14 @@
 import {
   selectGeneratorAndPromptForFlags,
   selectReMoveGenerator,
-} from '@nx-console/vscode/nx-cli-quickpicks';
+} from '@nx-console/vscode-nx-cli-quickpicks';
 import {
   NxTreeItem,
   ProjectViewItem,
-} from '@nx-console/vscode/nx-project-view';
-import { getGeneratorContextV2 } from '@nx-console/vscode/nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+} from '@nx-console/vscode-nx-project-view';
+import { getGeneratorContextV2 } from '@nx-console/vscode-nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { ExtensionContext, Uri, commands } from 'vscode';
 import { openGenerateUi } from './init-generate-ui-webview';
 

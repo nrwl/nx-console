@@ -86,16 +86,12 @@
         }
       },
       "configurations": {
-        "ci": {
-          "skipTypeCheck": false
-        },
         "debug": {
           "minify": false,
           "sourcemap": "both"
         },
         "production": {
-          "minify": true,
-          "skipTypeCheck": true
+          "minify": true
         }
       }
     },

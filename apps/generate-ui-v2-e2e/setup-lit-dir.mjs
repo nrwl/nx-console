@@ -42,3 +42,11 @@ fs.writeFileSync(
     </html>
 `
 );
+
+fs.writeFileSync(
+  normalize('./dist/generate-ui-v2/package.json'),
+  `{
+    "name": "generate-ui-v2-copy",
+    "sideEffects": true
+  }`
+);

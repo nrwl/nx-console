@@ -1,5 +1,5 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { Option } from '@nx-console/shared/schema';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
+import { Option } from '@nx-console/shared-schema';
 
 export function getGeneratorIdentifier(
   generatorSchema: GeneratorSchema | undefined

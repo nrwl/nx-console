@@ -1,15 +1,15 @@
-import { listFiles } from '@nx-console/shared/file-system';
+import { listFiles } from '@nx-console/shared-file-system';
 import { existsSync, readFileSync } from 'fs';
 import * as os from 'node:os';
 import { join } from 'path';
 
-import { isNxCloudUsed, lspLogger } from '@nx-console/language-server/utils';
+import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
 import {
   getNxAccessToken,
   getNxCloudId,
   getNxCloudUrl,
-} from '@nx-console/shared/npm';
-import { CloudOnboardingInfo } from '@nx-console/shared/types';
+} from '@nx-console/shared-npm';
+import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { parse } from 'ini';
 import { xhr } from 'request-light';
 
