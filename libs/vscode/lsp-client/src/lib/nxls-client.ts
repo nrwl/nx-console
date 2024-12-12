@@ -23,7 +23,7 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
-import { killGroup } from '@nx-console/shared/utils';
+import { killGroup } from '@nx-console/shared-utils';
 
 let _nxlsClient: NxlsClient | undefined;
 

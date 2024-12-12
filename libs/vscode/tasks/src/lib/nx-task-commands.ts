@@ -8,7 +8,7 @@ import {
   window,
 } from 'vscode';
 
-import { readAndParseJson } from '@nx-console/shared/file-system';
+import { readAndParseJson } from '@nx-console/shared-file-system';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { resolveDependencyVersioning } from '@nx-console/vscode/utils';
 

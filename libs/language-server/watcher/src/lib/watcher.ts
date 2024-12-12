@@ -1,6 +1,6 @@
 import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
-import { debounce } from '@nx-console/shared/utils';
+import { debounce } from '@nx-console/shared-utils';
 import { DaemonWatcher } from './daemon-watcher';
 import { NativeWatcher } from './native-watcher';
 import { ParcelWatcher } from './parcel-watcher';

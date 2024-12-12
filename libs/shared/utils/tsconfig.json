@@ -4,19 +4,22 @@
   "include": [],
   "references": [
     {
-      "path": "../schema"
+      "path": "../types"
     },
     {
       "path": "../nx-version"
     },
     {
-      "path": "../types"
+      "path": "../schema"
+    },
+    {
+      "path": "../npm"
+    },
+    {
+      "path": "../file-system"
     },
     {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
     }
   ]
 }

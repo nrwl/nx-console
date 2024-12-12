@@ -3,7 +3,7 @@ import {
   lspLogger,
 } from '@nx-console/language-server/utils';
 import { getExecutors } from '@nx-console/language-server/workspace';
-import { importNxPackagePath } from '@nx-console/shared/npm';
+import { importNxPackagePath } from '@nx-console/shared-npm';
 import { dirname } from 'path';
 import { JSONDocument } from 'vscode-json-languageservice';
 import { DefinitionParams, LocationLink } from 'vscode-languageserver';

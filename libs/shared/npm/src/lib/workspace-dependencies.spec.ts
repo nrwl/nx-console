@@ -1,4 +1,3 @@
-import { PartialDeep } from 'type-fest';
 import { mocked } from 'jest-mock';
 import { workspaceDependencyPath } from './workspace-dependencies';
 
@@ -14,10 +13,10 @@ jest.mock(
 );
 const mockedPnpDependencies = mocked(pnpDependencies);
 
-import * as fs from '@nx-console/shared/file-system';
+import * as fs from '@nx-console/shared-file-system';
 import { normalize } from 'path';
-jest.mock('@nx-console/shared/file-system', (): Partial<typeof fs> => {
-  const original = jest.requireActual('@nx-console/shared/file-system');
+jest.mock('@nx-console/shared-file-system', (): Partial<typeof fs> => {
+  const original = jest.requireActual('@nx-console/shared-file-system');
   return {
     ...original,
     fileExists: jest.fn(() => Promise.resolve(true)),

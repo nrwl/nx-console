@@ -12,10 +12,25 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/nx-version"
+      "path": "../../libs/shared/npm"
+    },
+    {
+      "path": "../../libs/shared/file-system"
+    },
+    {
+      "path": "../../libs/shared/utils"
     },
     {
       "path": "../../libs/shared/types"
+    },
+    {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/schema"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types"
     },
     {
       "path": "../nxls"

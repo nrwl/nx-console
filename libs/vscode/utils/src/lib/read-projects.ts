@@ -14,10 +14,10 @@ import type {
 import {
   localDependencyPath,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
+} from '@nx-console/shared-npm';
+import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import { normalizeSchema } from '@nx-console/shared-schema/normalize';
-import { getPrimitiveValue } from '@nx-console/shared/utils';
+import { getPrimitiveValue } from '@nx-console/shared-utils';
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
 export function readTargetDef(

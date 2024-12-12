@@ -1,4 +1,4 @@
-import { directoryExists } from '@nx-console/shared/file-system';
+import { directoryExists } from '@nx-console/shared-file-system';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';

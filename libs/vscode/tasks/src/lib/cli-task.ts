@@ -5,8 +5,8 @@ import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { NxWorkspace } from '@nx-console/shared-types';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
-import { importNxPackagePath } from '@nx-console/shared/npm';
-import { getPackageManagerCommand } from '@nx-console/shared/utils';
+import { importNxPackagePath } from '@nx-console/shared-npm';
+import { getPackageManagerCommand } from '@nx-console/shared-utils';
 
 export class CliTask extends Task {
   /**

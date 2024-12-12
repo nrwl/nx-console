@@ -4,6 +4,15 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../../shared/nx-version"
     },
     {

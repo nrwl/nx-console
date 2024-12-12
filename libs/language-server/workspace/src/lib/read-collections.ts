@@ -1,12 +1,12 @@
 import {
   clearJsonCache,
   readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
+} from '@nx-console/shared-file-system';
 import {
   packageDetails,
   workspaceDependencies,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import {
   CollectionInfo,
   ExecutorCollectionInfo,

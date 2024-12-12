@@ -11,6 +11,12 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../../shared/file-system/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/npm/tsconfig.lib.json"
+    },
+    {
       "path": "../../../shared/schema/tsconfig.lib.json"
     },
     {

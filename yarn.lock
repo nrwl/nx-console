@@ -3361,9 +3361,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-file-system@workspace:libs/shared/file-system":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-file-system@workspace:libs/shared/file-system"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-generate-ui-types@workspace:libs/shared/generate-ui-types":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-generate-ui-types@workspace:libs/shared/generate-ui-types"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/shared-npm@workspace:libs/shared/npm":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-npm@workspace:libs/shared/npm"
   languageName: unknown
   linkType: soft
 
@@ -3376,6 +3388,12 @@ __metadata:
 "@nx-console/shared-types@workspace:libs/shared/types":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-types@workspace:libs/shared/types"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/shared-utils@workspace:libs/shared/utils":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-utils@workspace:libs/shared/utils"
   languageName: unknown
   linkType: soft
 
@@ -18556,12 +18574,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm-dbe71e@workspace:libs/shared/npm":
-  version: 0.0.0-use.local
-  resolution: "npm-dbe71e@workspace:libs/shared/npm"
-  languageName: unknown
-  linkType: soft
-
 "npm-install-checks@npm:^5.0.0":
   version: 5.0.0
   resolution: "npm-install-checks@npm:5.0.0"
@@ -24718,12 +24730,6 @@ __metadata:
   checksum: 97ffd3bd2bb80c773429d3fb8396469115cd190dded1e733f190d8b602bd0a1bcd6216b7ce3c4395ee3c79e3c879c19d268dbaae3093564cb169ad1212d436f4
   languageName: node
   linkType: hard
-
-"utils-7a4a1f@workspace:libs/shared/utils":
-  version: 0.0.0-use.local
-  resolution: "utils-7a4a1f@workspace:libs/shared/utils"
-  languageName: unknown
-  linkType: soft
 
 "utils-merge@npm:1.0.1":
   version: 1.0.1

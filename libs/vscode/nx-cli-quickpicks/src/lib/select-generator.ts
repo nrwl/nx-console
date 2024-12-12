@@ -3,7 +3,7 @@ import {
   GeneratorCollectionInfo,
   GeneratorType,
 } from '@nx-console/shared-schema';
-import { matchWithWildcards } from '@nx-console/shared/utils';
+import { matchWithWildcards } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getGeneratorOptions,

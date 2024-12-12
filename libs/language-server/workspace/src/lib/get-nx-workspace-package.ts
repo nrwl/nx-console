@@ -8,7 +8,7 @@ import { join } from 'path';
 import {
   findNxPackagePath,
   importWorkspaceDependency,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import { Logger } from '@nx-console/shared-schema';
 
 export async function getNxDaemonClient(

@@ -4,7 +4,7 @@ import {
   fileExists,
   listFiles,
   readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
+} from '@nx-console/shared-file-system';
 import {
   GeneratorCollectionInfo,
   GeneratorType,

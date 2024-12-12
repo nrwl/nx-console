@@ -1,8 +1,8 @@
 import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';
-import { directoryExists, readDirectory } from '@nx-console/shared/file-system';
+import { directoryExists, readDirectory } from '@nx-console/shared-file-system';
 
-jest.mock('@nx-console/shared/file-system');
+jest.mock('@nx-console/shared-file-system');
 
 describe('npmDependencies', () => {
   beforeEach(() => {

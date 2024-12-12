@@ -13,10 +13,22 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-version"
+      "path": "../../shared/utils"
     },
     {
       "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/npm"
     },
     {
       "path": "./tsconfig.lib.json"

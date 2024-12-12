@@ -1,6 +1,6 @@
 import { gte } from '@nx-console/nx-version';
 import { NxError } from '@nx-console/shared-types';
-import { debounce } from '@nx-console/shared/utils';
+import { debounce } from '@nx-console/shared-utils';
 import {
   NxGraphServer,
   getNxGraphServer,

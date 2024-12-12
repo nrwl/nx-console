@@ -3,7 +3,7 @@ import {
   getNxAccessToken,
   getNxCloudId,
   getNxCloudUrl,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { execSync } from 'child_process';
 import { xhr } from 'request-light';

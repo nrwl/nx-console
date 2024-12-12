@@ -5,8 +5,8 @@ import {
   lspLogger,
 } from '@nx-console/language-server/utils';
 import { nxWorkspace } from '@nx-console/language-server/workspace';
-import { fileExists, readFile } from '@nx-console/shared/file-system';
-import { parseTargetString } from '@nx-console/shared/utils';
+import { fileExists, readFile } from '@nx-console/shared-file-system';
+import { parseTargetString } from '@nx-console/shared-utils';
 import { join } from 'path';
 import {
   ASTNode,

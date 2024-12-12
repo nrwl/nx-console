@@ -1,4 +1,4 @@
-import { workspaceDependencyPath } from '@nx-console/shared/npm';
+import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';

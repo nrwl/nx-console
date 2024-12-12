@@ -4,6 +4,18 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../../shared/schema"
     },
     {

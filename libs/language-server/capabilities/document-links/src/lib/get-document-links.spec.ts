@@ -7,10 +7,10 @@ import { getDocumentLinks } from './get-document-links';
 
 import { X_COMPLETION_TYPE } from '@nx-console/shared/json-schema';
 
-import * as fs from '@nx-console/shared/file-system';
+import * as fs from '@nx-console/shared-file-system';
 import { normalize } from 'path';
 jest.mock(
-  '@nx-console/shared/file-system',
+  '@nx-console/shared-file-system',
   (): Partial<typeof fs> => ({
     fileExists: jest.fn(() => Promise.resolve(true)),
   })

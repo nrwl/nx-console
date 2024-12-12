@@ -1,8 +1,8 @@
-import { clearJsonCache } from '@nx-console/shared/file-system';
+import { clearJsonCache } from '@nx-console/shared-file-system';
 import {
   importWorkspaceDependency,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,

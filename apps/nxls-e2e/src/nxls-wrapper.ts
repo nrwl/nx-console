@@ -12,7 +12,7 @@ import {
 } from 'vscode-languageserver/node';
 
 import { defaultVersion } from './utils';
-import { killGroup } from '@nx-console/shared/utils';
+import { killGroup } from '@nx-console/shared-utils';
 
 export class NxlsWrapper {
   private cwd?: string;

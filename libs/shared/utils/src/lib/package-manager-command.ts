@@ -1,4 +1,4 @@
-import { importNxPackagePath } from '@nx-console/shared/npm';
+import { importNxPackagePath } from '@nx-console/shared-npm';
 import { Logger } from '@nx-console/shared-schema';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 

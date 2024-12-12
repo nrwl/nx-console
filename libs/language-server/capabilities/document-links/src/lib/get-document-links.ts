@@ -4,7 +4,7 @@ import {
   hasDefaultCompletionType,
   isStringNode,
 } from '@nx-console/language-server/utils';
-import { fileExists } from '@nx-console/shared/file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 import {
   CompletionType,
   hasCompletionType,

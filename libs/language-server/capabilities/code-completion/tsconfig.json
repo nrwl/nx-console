@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../../shared/file-system"
+    },
+    {
+      "path": "../../../shared/npm"
+    },
+    {
       "path": "../../../shared/schema"
     },
     {

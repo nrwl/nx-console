@@ -1,11 +1,11 @@
 {
-  "name": "@nx-console/shared-utils",
+  "name": "@nx-console/shared-file-system",
   "version": "0.0.1",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "nx": {
-    "name": "shared-utils",
-    "sourceRoot": "libs/shared/utils/src",
+    "name": "shared-file-system",
+    "sourceRoot": "libs/shared/file-system/src",
     "projectType": "library",
     "tags": [
       "type:shared"

@@ -17,7 +17,7 @@ import {
   namedInputs,
   tags,
 } from '@nx-console/shared/json-schema';
-import { findNxPackagePath } from '@nx-console/shared/npm';
+import { findNxPackagePath } from '@nx-console/shared-npm';
 import { CollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
