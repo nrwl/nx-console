@@ -26,7 +26,6 @@ const pollingMachine = setup({
   types: {
     context: {} as {
       pollingFrequency: number;
-      authErrorCounter: number;
     },
   },
   delays: {
@@ -79,7 +78,6 @@ const pollingMachine = setup({
   /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbdBLAdlAdAO4CGWALrlAMQBiA8gEoDCAogPoAKdAMtwNoAGALqIUqWOSyocokAA9EAZkUAmfAA51KgJzKB2gOy6VAVhMAaEAE9EARnUA2fAJUH1qgCwqBt2w+0eAL6BlmiYlESkFHhUcrBkxGRg+MQAZkkATgAUYdh4NBlgAI4ArmA4AMZWAJRUuREkkniCIkggaBIU0rIKCIq2HvgmAh4+tiYe2uoeHg6WNn0CBviTBiqK-uprDorqwaEYeQT1MRDSybgAbqgA1sknx4eUCFeoFYlSOC0tsh2S3W1ejonAEVLYjG51PoPIp5ogPJpnCNhgIzOpxqoDPt2k88PgHlQwBkMqgMvj0IlUqSALb43GPcJ4F44a7vLpfYQ-Np-dk9RA6ZYOaFGLwmewOObWeHKfBTDwmLbTLSuLHYnCoCBwX707WdT58hAmNSo7RC+y6ATqQyKDxwhBTfAGEbaFTuWzaS0+EzYh6RJpQXX-GSAuwCATOEymnxWxSW612xRuDSTEaOMxGb0hHGMhlHQO8kOGkyKfDggy2WMDTTaGt21zhhxlisSgQOTRBYKBIA */
   context: {
     pollingFrequency: COLD_POLLING_TIME,
-    authErrorCounter: 0,
   },
   id: 'polling',
   initial: 'polling',
