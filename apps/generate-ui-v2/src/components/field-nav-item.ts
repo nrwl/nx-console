@@ -6,7 +6,7 @@ import { FieldValueConsumer } from './field-value-consumer-mixin';
 @customElement('field-nav-item')
 export class FieldNavItem extends FieldValueConsumer(LitElement) {
   @property()
-  protected option: Option;
+  option: Option;
 
   @property()
   greyedOut = false;

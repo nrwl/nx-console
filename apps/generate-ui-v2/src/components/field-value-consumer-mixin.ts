@@ -10,33 +10,33 @@ import { generatorContextContext } from '../contexts/generator-context-context';
 type Constructor<T> = new (...args: any[]) => T;
 
 export declare class FieldValueConsumerInterface {
-  protected option: Option;
-  protected validation: boolean | string | undefined;
-  protected touched: boolean;
-  protected isDefaultValue: boolean;
-  protected submitted: boolean;
-  protected generatorContext: GeneratorContext | undefined;
-  protected shouldRenderChanged(): boolean;
-  protected shouldRenderError(): boolean;
+  option: Option;
+  validation: boolean | string | undefined;
+  touched: boolean;
+  isDefaultValue: boolean;
+  submitted: boolean;
+  generatorContext: GeneratorContext | undefined;
+  shouldRenderChanged(): boolean;
+  shouldRenderError(): boolean;
 }
 
 export const FieldValueConsumer = <T extends Constructor<LitElement>>(
   superClass: T
 ) => {
   class FieldValueConsumerElement extends superClass {
-    protected option: Option;
+    option: Option;
 
     @state()
-    private validation: string | boolean | undefined;
+    validation: string | boolean | undefined;
 
     @state()
-    private touched = false;
+    touched = false;
 
     @state()
-    private isDefaultValue = true;
+    isDefaultValue = true;
 
     @state()
-    private submitted = false;
+    submitted = false;
 
     @state() generatorContext: GeneratorContext | undefined;
 
@@ -85,7 +85,7 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
       return this.touched && !this.isDefaultValue;
     }
 
-    protected createRenderRoot(): Element | ShadowRoot {
+    createRenderRoot(): Element | ShadowRoot {
       return this;
     }
   }
