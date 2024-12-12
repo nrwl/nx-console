@@ -1,4 +1,4 @@
-import { OptionType, Option } from '@nx-console/shared/schema';
+import { OptionType, Option } from '@nx-console/shared-schema';
 import { selectFlags } from './select-flags';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 

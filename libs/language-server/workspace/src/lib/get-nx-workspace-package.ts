@@ -9,7 +9,7 @@ import {
   findNxPackagePath,
   importWorkspaceDependency,
 } from '@nx-console/shared/npm';
-import { Logger } from '@nx-console/shared/schema';
+import { Logger } from '@nx-console/shared-schema';
 
 export async function getNxDaemonClient(
   workspacePath: string,

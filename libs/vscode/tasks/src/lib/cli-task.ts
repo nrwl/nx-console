@@ -2,7 +2,7 @@ import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
 import { Task, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
 import { importNxPackagePath } from '@nx-console/shared/npm';

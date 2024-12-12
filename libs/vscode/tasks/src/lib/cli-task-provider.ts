@@ -1,4 +1,4 @@
-import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared/schema';
+import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared-schema';
 import {
   getNxWorkspace,
   getNxWorkspacePathFromNxls,

@@ -9,7 +9,7 @@ import {
   getNxCloudId,
   getNxCloudUrl,
 } from '@nx-console/shared/npm';
-import { CloudOnboardingInfo } from '@nx-console/shared/types';
+import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { parse } from 'ini';
 import { xhr } from 'request-light';
 

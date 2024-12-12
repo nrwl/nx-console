@@ -1,13 +1,13 @@
 import {
   GeneratorContext,
   GeneratorSchema,
-} from '@nx-console/shared/generate-ui-types';
-import { NxVersion } from '@nx-console/shared/nx-version';
+} from '@nx-console/shared-generate-ui-types';
+import { NxVersion } from '@nx-console/nx-version';
 import {
   GeneratorCollectionInfo,
   Option,
   TaskExecutionSchema,
-} from '@nx-console/shared/schema';
+} from '@nx-console/shared-schema';
 import {
   CIPEInfo,
   CIPEInfoError,
@@ -15,7 +15,7 @@ import {
   NxWorkspace,
   PDVData,
   TreeNode,
-} from '@nx-console/shared/types';
+} from '@nx-console/shared-types';
 import type {
   ProjectConfiguration,
   Target,

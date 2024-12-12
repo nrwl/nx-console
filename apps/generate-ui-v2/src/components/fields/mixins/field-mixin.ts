@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/shared/schema';
+import { Option } from '@nx-console/shared-schema';
 import { LitElement, PropertyValueMap, TemplateResult, html } from 'lit';
 import { property } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
@@ -25,17 +25,13 @@ export type OptionChangedDetails = {
 
 export declare class FieldInterface {
   option: Option;
-  protected renderField(): TemplateResult;
-  protected validation: boolean | string | undefined;
-  protected touched: boolean;
-  protected dispatchValue(
-    value: string | boolean | number | string[] | undefined
-  ): void;
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ): void;
-  protected fieldId: string;
-  protected ariaAttributes: Record<string, string>;
+  renderField(): TemplateResult;
+  validation: boolean | string | undefined;
+  touched: boolean;
+  dispatchValue(value: string | boolean | number | string[] | undefined): void;
+  setFieldValue(value: string | boolean | number | string[] | undefined): void;
+  fieldId: string;
+  ariaAttributes: Record<string, string>;
 }
 
 export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
@@ -43,9 +39,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     @property()
     option: Option;
 
-    protected dispatchValue(
-      value: string | boolean | number | string[] | undefined
-    ) {
+    dispatchValue(value: string | boolean | number | string[] | undefined) {
       const defaultValue = extractDefaultValue(this.option);
       const isDefaultValue = compareWithDefaultValue(value, defaultValue);
 
@@ -62,7 +56,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       );
     }
 
-    protected firstUpdated(
+    firstUpdated(
       _changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>
     ): void {
       super.updated(_changedProperties);
@@ -87,11 +81,11 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       this.dispatchValue(undefined);
     }
 
-    protected get fieldId(): string {
+    get fieldId(): string {
       return `${this.option.name}-field`;
     }
 
-    protected get ariaAttributes(): Record<
+    get ariaAttributes(): Record<
       'id' | 'aria-invalid' | 'aria-describedby',
       string
     > {
@@ -101,19 +95,19 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
         'aria-describedby': `${this.fieldId}-error`,
       };
     }
-    protected createRenderRoot(): Element | ShadowRoot {
+    createRenderRoot(): Element | ShadowRoot {
       return this;
     }
 
     // placeholders for subclasses
-    protected setFieldValue(
+    setFieldValue(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       value: string | boolean | number | string[] | undefined
     ): void {
       throw new Error('Not implemented');
     }
 
-    protected renderField(): TemplateResult {
+    renderField(): TemplateResult {
       throw new Error('Not implemented');
     }
   }

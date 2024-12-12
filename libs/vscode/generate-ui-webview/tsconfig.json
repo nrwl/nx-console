@@ -13,6 +13,15 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

@@ -14,7 +14,7 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { getCompletionItems } from './get-completion-items';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { normalize } from 'path';
 
 jest.mock(

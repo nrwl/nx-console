@@ -1,4 +1,4 @@
-import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared/types';
+import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared/utils';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { isDeepStrictEqual } from 'util';

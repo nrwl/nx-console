@@ -12,6 +12,15 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/nx-version"
+    },
+    {
+      "path": "../../libs/shared/types"
+    },
+    {
+      "path": "../nxls"
+    },
+    {
       "path": "./tsconfig.spec.json"
     }
   ]

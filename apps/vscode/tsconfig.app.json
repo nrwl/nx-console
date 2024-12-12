@@ -5,5 +5,28 @@
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts"],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "references": [
+    {
+      "path": "../../libs/vscode/nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../../libs/shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../nxls/tsconfig.app.json"
+    },
+    {
+      "path": "../../libs/shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../generate-ui-v2/tsconfig.app.json"
+    }
+  ]
 }
