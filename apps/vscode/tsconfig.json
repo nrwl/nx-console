@@ -3,11 +3,10 @@
   "files": [],
   "include": [],
   "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
+    { "path": "../../libs/vscode/nx-cloud-onboarding-webview" },
+    { "path": "../nxls" },
+    { "path": "../generate-ui-v2" },
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.spec.json" }
   ]
 }

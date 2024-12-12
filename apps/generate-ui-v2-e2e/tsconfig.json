@@ -11,5 +11,6 @@
     "src/**/*.js",
     "cypress.config.ts",
     "src/support/test-schema.ts"
-  ]
+  ],
+  "references": [{ "path": "../generate-ui-v2" }]
 }

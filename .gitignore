@@ -8,6 +8,7 @@ build/
 /osbuilds
 /.angular
 /cypress
+**/out-tsc
 
 # dependencies
 **/node_modules
