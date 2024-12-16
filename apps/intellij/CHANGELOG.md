@@ -1,3 +1,11 @@
+## <small>1.35.1 (2024-12-16)</small>
+
+### Bug Fixes
+
+* **intellij:** improve behaviour when 0 or 1 generators are available ([#2362](https://github.com/nrwl/nx-console/issues/2362)) ([fae213f](https://github.com/nrwl/nx-console/commit/fae213f83c45f42b6911041fcfd46b320461b9bb))
+* **nxls:** always provide at least empty project graph object ([#2358](https://github.com/nrwl/nx-console/issues/2358)) ([504ef56](https://github.com/nrwl/nx-console/commit/504ef560f804a1e1799f78d579097280e0b11f73))
+* **nxls:** clean up connection & ipc channel when shutting down nxls to prevent it from staying open ([#2353](https://github.com/nrwl/nx-console/issues/2353)) ([6357105](https://github.com/nrwl/nx-console/commit/63571050a0a5eeda4cfb4485b4b78f3f55988caf))
+
 ## 1.35.0 (2024-12-11)
 
 ### Bug Fixes
