@@ -25,7 +25,6 @@ import com.intellij.util.messages.Topic
 import com.intellij.util.ui.JBUI
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
-import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
@@ -326,7 +325,12 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     }
 
                     override fun actionPerformed(e: AnActionEvent) {
-                        NxRefreshWorkspaceAction().actionPerformed(e)
+                        TelemetryService.getInstance(project)
+                            .featureUsed(
+                                TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                                mapOf("source" to TelemetryEventSource.PROJECTS_VIEW),
+                            )
+                        NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
                     }
                 }
 
