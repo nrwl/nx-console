@@ -170,48 +170,5 @@ describe('namedInput link completion - default', () => {
       expect(targetLink).toMatch(new RegExp(`#8$`));
       expect(decodeURI(targetLink)).toContain(join(workspaceName, 'nx.json'));
     });
-
-    // it('should return correct target link for x-completion-type:projectTarget if no build target is specified in project.json', async () => {
-    //   modifyJsonFile(projectJsonPath, (data) => {
-    //     delete data.targets.build;
-    //     return data;
-    //   });
-
-    //   const targetsLine =
-    //     readFileSync(projectJsonPath, 'utf-8')
-    //       .split('\n')
-    //       .findIndex((line) => line.includes('"targets": {')) + 1;
-
-    //   nxlsWrapper.sendNotification({
-    //     method: 'textDocument/didChange',
-    //     params: {
-    //       textDocument: {
-    //         uri: URI.file(projectJsonPath).toString(),
-    //         languageId: 'JSON',
-    //         version: 2,
-    //       },
-    //       contentChanges: [
-    //         {
-    //           text: readFileSync(projectJsonPath, 'utf-8'),
-    //         },
-    //       ],
-    //     },
-    //   });
-
-    //   const linkResponse = await nxlsWrapper.sendRequest({
-    //     method: 'textDocument/documentLink',
-    //     params: {
-    //       textDocument: {
-    //         uri: URI.file(projectJsonPath).toString(),
-    //       },
-    //       position: Position.create(0, 1),
-    //     },
-    //   });
-    //   const targetLink = (linkResponse.result as any[])[0].target;
-    //   expect(targetLink).toMatch(new RegExp(`#${targetsLine}$`));
-    //   expect(decodeURI(targetLink)).toContain(
-    //     join('apps', workspaceName, 'project.json')
-    //   );
-    // });
   });
 });
