@@ -38,7 +38,7 @@ import {
   NxWorkspaceRefreshStartedNotification,
   NxWorkspaceRequest,
   NxWorkspaceSerializedRequest,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import {
   getJsonLanguageService,
   getLanguageModelCache,

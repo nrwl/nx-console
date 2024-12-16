@@ -4,6 +4,15 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
       "path": "../../shared/types"
     },
     {
@@ -13,13 +22,10 @@
       "path": "../../shared/schema"
     },
     {
-      "path": "../../shared/npm"
+      "path": "../../shared/generate-ui-types"
     },
     {
-      "path": "../../shared/file-system"
-    },
-    {
-      "path": "../../shared/utils"
+      "path": "../../language-server/types"
     },
     {
       "path": "./tsconfig.lib.json"

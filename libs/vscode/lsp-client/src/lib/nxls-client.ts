@@ -2,7 +2,7 @@ import {
   NxChangeWorkspace,
   NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,

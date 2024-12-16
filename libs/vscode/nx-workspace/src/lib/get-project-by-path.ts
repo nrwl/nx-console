@@ -2,7 +2,7 @@ import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import {
   NxProjectByPathRequest,
   NxProjectByRootRequest,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 
 export async function getProjectByPath(

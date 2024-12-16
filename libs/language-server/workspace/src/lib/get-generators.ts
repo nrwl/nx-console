@@ -1,4 +1,4 @@
-import { NxGeneratorsRequestOptions } from '@nx-console/language-server/types';
+import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import {
   directoryExists,
   fileExists,

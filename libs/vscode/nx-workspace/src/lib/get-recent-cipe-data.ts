@@ -1,4 +1,4 @@
-import { NxRecentCIPEDataRequest } from '@nx-console/language-server/types';
+import { NxRecentCIPEDataRequest } from '@nx-console/language-server-types';
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 

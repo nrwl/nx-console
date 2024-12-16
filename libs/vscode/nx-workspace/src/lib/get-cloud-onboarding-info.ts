@@ -1,4 +1,4 @@
-import { NxCloudOnboardingInfoRequest } from '@nx-console/language-server/types';
+import { NxCloudOnboardingInfoRequest } from '@nx-console/language-server-types';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 

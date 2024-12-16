@@ -3,7 +3,7 @@ import { NxlsWrapper } from '../nxls-wrapper';
 import { e2eCwd, uniq } from '../utils';
 import { mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
-import { NxWorkspaceRequest } from '@nx-console/language-server/types';
+import { NxWorkspaceRequest } from '@nx-console/language-server-types';
 import { NxWorkspace } from '@nx-console/shared-types';
 
 let nxlsWrapper: NxlsWrapper;

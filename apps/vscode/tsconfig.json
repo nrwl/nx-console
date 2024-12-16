@@ -19,6 +19,9 @@
       "path": "../../libs/shared/types"
     },
     {
+      "path": "../../libs/language-server/types"
+    },
+    {
       "path": "../nxls"
     },
     {

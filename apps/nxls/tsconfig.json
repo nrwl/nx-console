@@ -25,6 +25,9 @@
       "path": "../../libs/shared/generate-ui-types"
     },
     {
+      "path": "../../libs/language-server/types"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

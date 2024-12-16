@@ -1,4 +1,4 @@
-import { NxWorkspaceRequest } from '@nx-console/language-server/types';
+import { NxWorkspaceRequest } from '@nx-console/language-server-types';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';

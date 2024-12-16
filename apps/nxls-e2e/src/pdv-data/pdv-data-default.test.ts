@@ -1,7 +1,7 @@
 import {
   NxPDVDataRequest,
   NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import { PDVData } from '@nx-console/shared-types';
 import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';

@@ -23,6 +23,9 @@
       "path": "../../libs/shared/types/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/language-server/types/tsconfig.lib.json"
+    },
+    {
       "path": "../nxls/tsconfig.app.json"
     },
     {

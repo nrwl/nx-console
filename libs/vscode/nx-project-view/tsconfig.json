@@ -4,10 +4,19 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/types"
+    },
+    {
       "path": "../../shared/nx-version"
     },
     {
-      "path": "../../shared/types"
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../language-server/types"
     },
     {
       "path": "./tsconfig.lib.json"

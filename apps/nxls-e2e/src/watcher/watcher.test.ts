@@ -1,7 +1,7 @@
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import { execSync } from 'child_process';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';

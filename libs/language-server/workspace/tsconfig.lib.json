@@ -10,6 +10,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../types/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/generate-ui-types/tsconfig.lib.json"
     },
     {
