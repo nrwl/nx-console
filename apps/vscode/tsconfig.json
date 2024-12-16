@@ -10,7 +10,7 @@
       "path": "../../libs/language-server/watcher"
     },
     {
-      "path": "../../libs/shared/json-schema"
+      "path": "../../libs/language-server/capabilities/definition"
     },
     {
       "path": "../../libs/shared/nx-console-plugins"
@@ -19,19 +19,22 @@
       "path": "../../libs/language-server/types"
     },
     {
+      "path": "../../libs/language-server/workspace"
+    },
+    {
       "path": "../../libs/shared/types"
     },
     {
-      "path": "../../libs/shared/utils"
-    },
-    {
-      "path": "../../libs/language-server/workspace"
+      "path": "../../libs/shared/npm"
     },
     {
       "path": "../../libs/shared/file-system"
     },
     {
-      "path": "../../libs/shared/npm"
+      "path": "../../libs/shared/utils"
+    },
+    {
+      "path": "../../libs/shared/json-schema"
     },
     {
       "path": "../../libs/language-server/utils"

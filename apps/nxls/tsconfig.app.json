@@ -13,7 +13,7 @@
       "path": "../../libs/language-server/watcher/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/json-schema/tsconfig.lib.json"
+      "path": "../../libs/language-server/capabilities/definition/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/nx-console-plugins/tsconfig.lib.json"
@@ -25,25 +25,28 @@
       "path": "../../libs/shared/generate-ui-types/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/utils/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/language-server/workspace/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/nx-version/tsconfig.lib.json"
+      "path": "../../libs/shared/types/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/file-system/tsconfig.lib.json"
+      "path": "../../libs/shared/schema/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/npm/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/shared/schema/tsconfig.lib.json"
+      "path": "../../libs/shared/file-system/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/json-schema/tsconfig.lib.json"
     },
     {
       "path": "../../libs/language-server/utils/tsconfig.lib.json"

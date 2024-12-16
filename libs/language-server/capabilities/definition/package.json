@@ -1,4 +1,16 @@
 {
+  "name": "@nx-console/language-server-capabilities-definition",
   "version": "0.0.1",
-  "type": "commonjs"
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "nx": {
+    "name": "language-server-capabilities-definition",
+    "sourceRoot": "libs/language-server/capabilities/definition/src",
+    "projectType": "library",
+    "tags": [
+      "type:lsp"
+    ]
+  }
 }

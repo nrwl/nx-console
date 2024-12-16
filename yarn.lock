@@ -3361,6 +3361,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/language-server-capabilities-definition@workspace:libs/language-server/capabilities/definition":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/language-server-capabilities-definition@workspace:libs/language-server/capabilities/definition"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/language-server-types@workspace:libs/language-server/types":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-types@workspace:libs/language-server/types"
@@ -10673,12 +10679,6 @@ __metadata:
   checksum: b4ccd00597dd46cb2d4a379398f5b19fca84a16f3374e2249201992f36b30f6835949a9429669ee6b41b6e837205a163eadd745e472069e70dfc10f03e5fcc12
   languageName: node
   linkType: hard
-
-"definition-e48912@workspace:libs/language-server/capabilities/definition":
-  version: 0.0.0-use.local
-  resolution: "definition-e48912@workspace:libs/language-server/capabilities/definition"
-  languageName: unknown
-  linkType: soft
 
 "del@npm:^6.0.0":
   version: 6.1.1
