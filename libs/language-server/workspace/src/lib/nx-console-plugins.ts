@@ -6,7 +6,7 @@ import {
   NxConsolePluginsDefinition,
   StartupMessageDefinition,
   internalPlugins,
-} from 'shared/nx-console-plugins';
+} from '@nx-console/shared-nx-console-plugins';
 
 export async function getTransformedGeneratorSchema(
   workspacePath: string,

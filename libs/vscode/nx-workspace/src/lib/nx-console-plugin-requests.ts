@@ -4,7 +4,7 @@ import {
 } from '@nx-console/language-server/types';
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
-import { StartupMessageDefinition } from 'shared/nx-console-plugins';
+import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 
 export function getTransformedGeneratorSchema(
   schema: GeneratorSchema
