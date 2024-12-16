@@ -3373,6 +3373,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-json-schema@workspace:libs/shared/json-schema":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-json-schema@workspace:libs/shared/json-schema"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-npm@workspace:libs/shared/npm":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-npm@workspace:libs/shared/npm"
@@ -15792,12 +15798,6 @@ __metadata:
   checksum: 798ed4cf3354a2d9ccd78e86d2169515a0097a5c133337807cdf7f1fc32e1391d207ccfc276518cc1d7d8d4db93288b8a50ba4293d212ad1336e52a8ec0a941f
   languageName: node
   linkType: hard
-
-"json-schema-282283@workspace:libs/shared/json-schema":
-  version: 0.0.0-use.local
-  resolution: "json-schema-282283@workspace:libs/shared/json-schema"
-  languageName: unknown
-  linkType: soft
 
 "json-schema-traverse@npm:^0.4.1":
   version: 0.4.1

@@ -16,7 +16,7 @@ import {
   implicitDependencies,
   namedInputs,
   tags,
-} from '@nx-console/shared/json-schema';
+} from '@nx-console/shared-json-schema';
 import { findNxPackagePath } from '@nx-console/shared-npm';
 import { CollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';

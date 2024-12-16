@@ -5,7 +5,7 @@ import {
 import {
   CompletionType,
   EnhancedJsonSchema,
-} from '@nx-console/shared/json-schema';
+} from '@nx-console/shared-json-schema';
 import type * as workspace from '@nx-console/language-server/workspace';
 import { vol } from 'memfs';
 import {

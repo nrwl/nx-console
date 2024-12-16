@@ -1,8 +1,5 @@
 import { CollectionInfo } from '@nx-console/shared-schema';
-import type {
-  ProjectConfiguration,
-  ProjectGraphProjectNode,
-} from 'nx/src/devkit-exports';
+import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 import type { JSONSchema } from 'vscode-json-languageservice';
 import { namedInputs, targets } from './common-json-schema';
 import { CompletionType } from './completion-type';

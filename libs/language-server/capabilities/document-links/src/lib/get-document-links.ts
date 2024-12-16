@@ -9,7 +9,7 @@ import {
   CompletionType,
   hasCompletionType,
   X_COMPLETION_TYPE,
-} from '@nx-console/shared/json-schema';
+} from '@nx-console/shared-json-schema';
 import { join } from 'path';
 import {
   DocumentLink,
