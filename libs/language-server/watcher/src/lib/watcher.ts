@@ -1,4 +1,4 @@
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { debounce } from '@nx-console/shared-utils';
 import { DaemonWatcher } from './daemon-watcher';

@@ -15,7 +15,7 @@ import {
 } from 'rxjs';
 import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 const enum Status {
   not_started,

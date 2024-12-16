@@ -3,7 +3,7 @@ import {
   getJsonLanguageService,
   getSchemaRequestService,
   lspLogger,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   getExecutors,
   getProjectByRoot,

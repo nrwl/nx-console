@@ -44,7 +44,7 @@ import {
   getLanguageModelCache,
   lspLogger,
   setLspLogger,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   NativeWatcher,
   languageServerWatcher,

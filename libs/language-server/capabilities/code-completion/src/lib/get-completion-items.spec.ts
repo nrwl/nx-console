@@ -1,7 +1,7 @@
 import {
   configureJsonLanguageService,
   getLanguageModelCache,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   CompletionType,
   EnhancedJsonSchema,

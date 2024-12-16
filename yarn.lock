@@ -3361,6 +3361,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/language-server-utils@workspace:libs/language-server/utils":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/language-server-utils@workspace:libs/language-server/utils"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/nx-version@workspace:libs/shared/nx-version":
   version: 0.0.0-use.local
   resolution: "@nx-console/nx-version@workspace:libs/shared/nx-version"

@@ -3,7 +3,7 @@ import {
   getDefaultCompletionType,
   hasDefaultCompletionType,
   isStringNode,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   CompletionType,

@@ -16,13 +16,16 @@
       "path": "../../../shared/nx-version"
     },
     {
-      "path": "../../../shared/schema"
-    },
-    {
       "path": "../../../shared/file-system"
     },
     {
       "path": "../../../shared/npm"
+    },
+    {
+      "path": "../../../shared/schema"
+    },
+    {
+      "path": "../../utils"
     },
     {
       "path": "./tsconfig.lib.json"

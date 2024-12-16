@@ -2,7 +2,7 @@ import {
   getJsonLanguageService,
   LanguageModelCache,
   mergeArrays,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import { dirname, relative } from 'path';
 import {
   ClientCapabilities,

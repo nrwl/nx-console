@@ -12,13 +12,16 @@
       "path": "../../../shared/nx-version/tsconfig.lib.json"
     },
     {
-      "path": "../../../shared/schema/tsconfig.lib.json"
-    },
-    {
       "path": "../../../shared/file-system/tsconfig.lib.json"
     },
     {
       "path": "../../../shared/npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../utils/tsconfig.lib.json"
     }
   ]
 }

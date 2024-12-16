@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'fs';
 import * as os from 'node:os';
 import { join } from 'path';
 
-import { isNxCloudUsed, lspLogger } from '@nx-console/language-server/utils';
+import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
 import {
   getNxAccessToken,
   getNxCloudId,

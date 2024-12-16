@@ -1,4 +1,4 @@
-import { isNxCloudUsed, lspLogger } from '@nx-console/language-server/utils';
+import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
 import {
   getNxAccessToken,
   getNxCloudId,

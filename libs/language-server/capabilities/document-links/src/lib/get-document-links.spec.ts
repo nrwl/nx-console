@@ -1,7 +1,7 @@
 import {
   configureJsonLanguageService,
   getLanguageModelCache,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import { getDocumentLinks } from './get-document-links';
 

@@ -1,4 +1,4 @@
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 import {
   findNxPackagePath,
   importWorkspaceDependency,

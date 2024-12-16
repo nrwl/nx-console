@@ -1,4 +1,4 @@
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 import { readJsonFile, readNxJson } from '@nx-console/shared-npm';
 import { gte, NxVersion } from '@nx-console/nx-version';
 import { Logger } from '@nx-console/shared-schema';

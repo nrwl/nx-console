@@ -1,8 +1,7 @@
 import {
   getDefaultCompletionType,
   isArrayNode,
-  lspLogger,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   CompletionType,
   hasCompletionGlob,
