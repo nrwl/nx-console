@@ -60,7 +60,10 @@ export const inputs = (nxVersion: NxVersion): JSONSchema[] => [
 export const namedInputs = (nxVersion: NxVersion): JSONSchema => ({
   type: 'object',
   additionalProperties: {
-    oneOf: inputs(nxVersion),
+    type: 'array',
+    items: {
+      oneOf: inputs(nxVersion),
+    },
   },
 });
 

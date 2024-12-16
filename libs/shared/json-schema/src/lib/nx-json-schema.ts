@@ -4,7 +4,7 @@ import type {
   ProjectGraphProjectNode,
 } from 'nx/src/devkit-exports';
 import type { JSONSchema } from 'vscode-json-languageservice';
-import { targets } from './common-json-schema';
+import { namedInputs, targets } from './common-json-schema';
 import { CompletionType } from './completion-type';
 import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
 import { NxVersion } from '@nx-console/shared/nx-version';
@@ -105,6 +105,7 @@ function createJsonSchema(
           },
         },
       },
+      namedInputs: namedInputs(nxVersion),
     },
   };
 }
