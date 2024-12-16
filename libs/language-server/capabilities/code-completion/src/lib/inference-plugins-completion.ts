@@ -1,5 +1,5 @@
 import { lspLogger } from '@nx-console/language-server-utils';
-import { getNxVersion } from '@nx-console/language-server/workspace';
+import { getNxVersion } from '@nx-console/language-server-workspace';
 import { workspaceDependencies } from '@nx-console/shared-npm';
 import { existsSync } from 'fs';
 import { join, posix, sep } from 'path';

@@ -4,7 +4,13 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/nx-console-plugins"
+    },
+    {
       "path": "../../libs/shared/utils"
+    },
+    {
+      "path": "../../libs/language-server/workspace"
     },
     {
       "path": "../../libs/shared/file-system"

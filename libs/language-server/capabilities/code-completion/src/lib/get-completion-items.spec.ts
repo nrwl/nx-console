@@ -6,7 +6,7 @@ import {
   CompletionType,
   EnhancedJsonSchema,
 } from '@nx-console/shared-json-schema';
-import type * as workspace from '@nx-console/language-server/workspace';
+import type * as workspace from '@nx-console/language-server-workspace';
 import { vol } from 'memfs';
 import {
   ClientCapabilities,
@@ -18,7 +18,7 @@ import { NxWorkspace } from '@nx-console/shared-types';
 import { normalize } from 'path';
 
 jest.mock(
-  '@nx-console/language-server/workspace',
+  '@nx-console/language-server-workspace',
   (): Partial<typeof workspace> => ({
     nxWorkspace: jest.fn(() =>
       Promise.resolve<NxWorkspace>({

@@ -8,7 +8,7 @@ import {
   getExecutors,
   getProjectByRoot,
   nxWorkspace,
-} from '@nx-console/language-server/workspace';
+} from '@nx-console/language-server-workspace';
 import {
   CompletionType,
   getNxJsonSchema,

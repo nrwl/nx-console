@@ -13,6 +13,24 @@
   "include": [],
   "references": [
     {
+      "path": "../../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../types"
+    },
+    {
+      "path": "../../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../../shared/types"
+    },
+    {
+      "path": "../../../shared/utils"
+    },
+    {
+      "path": "../../workspace"
+    },
+    {
       "path": "../../../shared/nx-version"
     },
     {

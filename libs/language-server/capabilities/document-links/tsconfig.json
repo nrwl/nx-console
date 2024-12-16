@@ -4,6 +4,18 @@
   "include": [],
   "references": [
     {
+      "path": "../../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../types"
+    },
+    {
+      "path": "../../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../workspace"
+    },
+    {
       "path": "../../../shared/types"
     },
     {

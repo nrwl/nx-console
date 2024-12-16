@@ -10,7 +10,13 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../libs/shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/language-server/workspace/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/file-system/tsconfig.lib.json"

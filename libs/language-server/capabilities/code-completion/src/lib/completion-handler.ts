@@ -17,7 +17,7 @@ import {
   configureSchemaForProject,
   projectSchemaIsRegistered,
 } from './schema-completion';
-import { nxWorkspace } from '@nx-console/language-server/workspace';
+import { nxWorkspace } from '@nx-console/language-server-workspace';
 import { getCompletionItems } from './get-completion-items';
 
 export async function completionHandler(

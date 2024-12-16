@@ -1,6 +1,5 @@
 import type { Target } from 'nx/src/devkit-exports';
 import { nxWorkspace } from './workspace';
-import { getNxVersion } from './get-nx-version';
 import { parseTargetString as parseTargetStringUtil } from '@nx-console/shared-utils';
 import { lspLogger } from '@nx-console/language-server-utils';
 

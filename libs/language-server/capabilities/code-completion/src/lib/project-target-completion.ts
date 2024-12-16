@@ -1,4 +1,4 @@
-import { nxWorkspace } from '@nx-console/language-server/workspace';
+import { nxWorkspace } from '@nx-console/language-server-workspace';
 import {
   ASTNode,
   CompletionItem,

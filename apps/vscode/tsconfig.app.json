@@ -11,7 +11,13 @@
       "path": "../../libs/vscode/nx-cloud-onboarding-webview"
     },
     {
+      "path": "../../libs/shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/language-server/workspace/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/file-system/tsconfig.lib.json"
