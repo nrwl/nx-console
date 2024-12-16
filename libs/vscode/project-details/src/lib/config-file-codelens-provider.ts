@@ -32,7 +32,7 @@ import {
   window,
 } from 'vscode';
 
-const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
+export const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
 const CODELENS_OPEN_RUN_QUICKPICK_COMMAND =
   'nxConsole.config-codelens.open-run-quickpick';
 
