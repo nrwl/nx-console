@@ -1,8 +1,10 @@
 package dev.nx.console.utils
 
+import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.*
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
@@ -111,13 +113,8 @@ class Notifier {
                 )
                 .setTitle("Nx Console")
                 .addAction(
-                    object : NotificationAction("Learn more") {
-                        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-                            BrowserUtil.browse(
-                                "https://plugins.jetbrains.com/docs/intellij/jcef.html"
-                            )
-                            notification.expire()
-                        }
+                    NotificationAction.createSimpleExpiring("Learn more") {
+                        BrowserUtil.browse("https://plugins.jetbrains.com/docs/intellij/jcef.html")
                     }
                 )
                 .notify(project)
@@ -155,6 +152,28 @@ class Notifier {
             notification.notify(project)
 
             return notification
+        }
+
+        fun notifyNoGenerators(project: Project, hasNxErrors: Boolean) {
+            val notification =
+                getGroup()
+                    .createNotification(
+                        if (hasNxErrors) "No generators found. View Nx Errors for more information."
+                        else "No generators found. View logs for more information.",
+                        NotificationType.ERROR,
+                    )
+                    .setTitle("Nx Console")
+
+            if (hasNxErrors) {
+                notification.addAction(
+                    NotificationAction.createSimpleExpiring("View Nx Errors") {
+                        ProblemsView.getToolWindow(project)?.show()
+                    }
+                )
+            } else {
+                notification.addAction(ActionManager.getInstance().getAction("OpenLog"))
+            }
+            notification.notify(project)
         }
 
         fun notifyAnything(

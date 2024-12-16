@@ -2,9 +2,7 @@ import {
   NxChangeWorkspace,
   NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
-  NxWorkspaceRefreshStartedNotification,
 } from '@nx-console/language-server/types';
-import { killTree } from '@nx-console/shared/utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -25,6 +23,7 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { killGroup } from '@nx-console/shared/utils';
 
 let _nxlsClient: NxlsClient | undefined;
 
@@ -55,9 +54,6 @@ export class NxlsClient {
 
   constructor(private extensionContext: ExtensionContext) {
     this.actor.start();
-    extensionContext.subscriptions.push(
-      this.showRefreshLoadingAtLocation(ProgressLocation.Window)
-    );
   }
 
   private actor = createActor(
@@ -227,37 +223,6 @@ export class NxlsClient {
     });
   }
 
-  public showRefreshLoadingAtLocation(
-    location:
-      | ProgressLocation
-      | {
-          viewId: string;
-        }
-  ): Disposable {
-    return this.onNotification(NxWorkspaceRefreshStartedNotification, () => {
-      const refreshPromise = new Promise<void>((resolve) => {
-        const disposable = this.onNotification(
-          NxWorkspaceRefreshNotification,
-          () => {
-            disposable?.dispose();
-            resolve();
-          }
-        );
-      });
-
-      window.withProgress(
-        {
-          location,
-          cancellable: false,
-          title: 'Refreshing Nx workspace',
-        },
-        async () => {
-          await refreshPromise;
-        }
-      );
-    });
-  }
-
   private async _start(workspacePath: string | undefined) {
     if (!workspacePath) {
       throw new Error('Workspace path is required to start the client');
@@ -296,7 +261,7 @@ export class NxlsClient {
         // timeout, kill the process forcefully instead
         const pid = this.actor.getSnapshot().context.nxlsPid;
         if (pid) {
-          killTree(pid, 'SIGTERM');
+          killGroup(pid);
         }
       }
     }

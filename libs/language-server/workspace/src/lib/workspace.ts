@@ -79,7 +79,10 @@ async function _workspace(
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
     return {
-      projectGraph,
+      projectGraph: projectGraph ?? {
+        nodes: {},
+        dependencies: {},
+      },
       sourceMaps,
       nxJson,
       projectFileMap,

@@ -11,8 +11,8 @@ import {
   StreamMessageWriter,
 } from 'vscode-languageserver/node';
 
-import { killTree } from '@nx-console/shared/utils';
 import { defaultVersion } from './utils';
+import { killGroup } from '@nx-console/shared/utils';
 
 export class NxlsWrapper {
   private cwd?: string;
@@ -147,7 +147,7 @@ export class NxlsWrapper {
 
     if (this.process?.pid) {
       try {
-        killTree(this.process.pid, 'SIGKILL');
+        killGroup(this.process.pid);
       } catch (e) {
         console.log(`NXLS WRAPPER: ${e}`);
       }

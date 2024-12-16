@@ -27,7 +27,7 @@ export async function getNxWorkspaceConfig(
   nxVersion: NxVersion,
   logger: Logger
 ): Promise<{
-  projectGraph: ProjectGraph;
+  projectGraph: ProjectGraph | undefined;
   sourceMaps: ConfigurationSourceMaps | undefined;
   nxJson: NxJsonConfiguration;
   projectFileMap: ProjectFileMap | undefined;

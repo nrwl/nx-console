@@ -4,6 +4,7 @@ import {
   Disposable,
   ExtensionContext,
   ExtensionMode,
+  ProgressLocation,
   RelativePattern,
   commands,
   tasks,
@@ -13,7 +14,7 @@ import {
 
 import {
   checkIsNxWorkspace,
-  killTree,
+  killGroup,
   withTimeout,
 } from '@nx-console/shared/utils';
 import {
@@ -34,7 +35,11 @@ import {
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
 import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
-import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
+import {
+  createNxlsClient,
+  getNxlsClient,
+  showRefreshLoadingAtLocation,
+} from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
@@ -80,6 +85,10 @@ export async function activate(c: ExtensionContext) {
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
     initNxInit(context);
+
+    context.subscriptions.push(
+      showRefreshLoadingAtLocation(ProgressLocation.Window)
+    );
 
     initHelpAndFeedbackView(context);
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
@@ -137,12 +146,12 @@ export async function deactivate() {
 
   const nxlsPid = getNxlsClient()?.getNxlsPid();
   if (nxlsPid) {
-    killTree(nxlsPid, 'SIGINT');
+    killGroup(nxlsPid);
   }
 
   getTelemetry().logUsage('extension-deactivate');
 
-  killTree(process.pid, 'SIGTERM');
+  killGroup(process.pid);
 }
 
 // -----------------------------------------------------------------------------
