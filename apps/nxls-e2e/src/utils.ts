@@ -63,11 +63,7 @@ export function newWorkspace({
 
   if (verbose) {
     console.log(
-      `setting up new workspace ${name} with ${command} and env ${JSON.stringify(
-        process.env,
-        null,
-        2
-      )} at ${new Date().toISOString()}`
+      `setting up new workspace ${name} with ${command} at ${new Date().toISOString()}`
     );
   }
 
