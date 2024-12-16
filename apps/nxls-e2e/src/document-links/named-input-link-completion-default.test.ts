@@ -1,17 +1,9 @@
-import { join } from 'path';
-import { NxlsWrapper } from '../nxls-wrapper';
-import {
-  e2eCwd,
-  modifyJsonFile,
-  newWorkspace,
-  simpleReactWorkspaceOptions,
-  uniq,
-} from '../utils';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
 import { readFileSync } from 'fs';
-import { URI } from 'vscode-uri';
+import { join } from 'path';
 import { Position } from 'vscode-languageserver';
-import { fileURLToPath } from 'url';
+import { URI } from 'vscode-uri';
+import { NxlsWrapper } from '../nxls-wrapper';
+import { e2eCwd, modifyJsonFile, newWorkspace, uniq } from '../utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -87,9 +79,13 @@ describe('namedInput link completion - default', () => {
         },
       });
 
+      const defaultLine =
+        readFileSync(join(e2eCwd, workspaceName, 'nx.json'), 'utf-8')
+          .split('\n')
+          .findIndex((line) => line.includes('"default":')) + 1;
+
       const targetLink = (linkResponse.result as any[])[0].target;
-      // line 4 is where the `default` namedInput is defined in nx.json
-      expect(targetLink).toMatch(new RegExp(`#4$`));
+      expect(targetLink).toMatch(new RegExp(`#${defaultLine}$`));
       expect(decodeURI(targetLink)).toContain(join(workspaceName, 'nx.json'));
     });
 
@@ -165,9 +161,13 @@ describe('namedInput link completion - default', () => {
         },
       });
 
+      const oneLine =
+        readFileSync(nxJsonPath, 'utf-8')
+          .split('\n')
+          .findIndex((line) => line.includes('"one": [')) + 1;
+
       const targetLink = (linkResponse.result as any[])[0].target;
-      // line 8 is where the `one` namedInput is defined in nx.json with default formatting
-      expect(targetLink).toMatch(new RegExp(`#8$`));
+      expect(targetLink).toMatch(new RegExp(`#${oneLine}$`));
       expect(decodeURI(targetLink)).toContain(join(workspaceName, 'nx.json'));
     });
   });
