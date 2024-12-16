@@ -1,6 +1,7 @@
 import {
   getDefaultCompletionType,
   isArrayNode,
+  lspLogger,
 } from '@nx-console/language-server/utils';
 import {
   CompletionType,
@@ -132,12 +133,15 @@ function completionItems(
         return targetsCompletion(workingPath, node, document, true);
       }
       case CompletionType.inputName: {
+        lspLogger.log(`inputName completion ${node.value}`);
         return inputNameCompletion(workingPath, node, document);
       }
       case CompletionType.inputNameWithDeps: {
+        lspLogger.log(`inputNameWithDeps completion ${node.value}`);
         return inputNameCompletion(workingPath, node, document, true);
       }
       case CompletionType.inferencePlugins: {
+        lspLogger.log(`inferencePlugins completion ${node.value}`);
         return inferencePluginsCompletion(workingPath);
       }
       default: {
