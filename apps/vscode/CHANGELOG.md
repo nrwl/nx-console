@@ -1,3 +1,14 @@
+## [18.33.2](https://github.com/nrwl/nx-console/compare/vscode-v18.33.1...vscode-v18.33.2) (2024-12-16)
+
+
+### Bug Fixes
+
+* **nxls:** always provide at least empty project graph object ([#2358](https://github.com/nrwl/nx-console/issues/2358)) ([504ef56](https://github.com/nrwl/nx-console/commit/504ef560f804a1e1799f78d579097280e0b11f73))
+* **nxls:** clean up connection & ipc channel when shutting down nxls to prevent it from staying open ([#2353](https://github.com/nrwl/nx-console/issues/2353)) ([6357105](https://github.com/nrwl/nx-console/commit/63571050a0a5eeda4cfb4485b4b78f3f55988caf))
+* **vscode:** make sure only one refresh progress indicator is shown per location ([#2359](https://github.com/nrwl/nx-console/issues/2359)) ([0379c2e](https://github.com/nrwl/nx-console/commit/0379c2e05d3859aa8ac05a2c73d3dc1b16a5c74d))
+* **vscode:** show project details codelens above package.json#nx if it exists ([#2361](https://github.com/nrwl/nx-console/issues/2361)) ([2cd8cb7](https://github.com/nrwl/nx-console/commit/2cd8cb7a5f97178572d8048a9c1f4d091717772a))
+* **vscode:** slow down recent cipe polling after auth error ([#2360](https://github.com/nrwl/nx-console/issues/2360)) ([714fb4a](https://github.com/nrwl/nx-console/commit/714fb4ad6b77eed765435f325e8d33b1643ebc16))
+
 ## [18.33.1](https://github.com/nrwl/nx-console/compare/vscode-v18.33.0...vscode-v18.33.1) (2024-12-10)
 
 
