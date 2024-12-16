@@ -1,14 +1,10 @@
-import { importNxPackagePath } from '@nx-console/shared/npm';
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared/types';
+import { getPackageManagerCommand } from '@nx-console/shared/utils';
 import {
-  getNxlsClient,
   onWorkspaceRefreshed,
   showRefreshLoadingAtLocation,
 } from '@nx-console/vscode/lsp-client';
-import {
-  getCloudOnboardingInfo,
-  getRecentCIPEData,
-} from '@nx-console/vscode/nx-workspace';
+import { getCloudOnboardingInfo } from '@nx-console/vscode/nx-workspace';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -35,7 +31,6 @@ import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
-import { getPackageManagerCommand } from '@nx-console/shared/utils';
 
 export function initNxCloudView(context: ExtensionContext) {
   // set up state machine & listeners
@@ -102,7 +97,8 @@ export function initNxCloudView(context: ExtensionContext) {
     commands.registerCommand('nxCloud.refresh', () => {
       actor.system.get('polling').send({ type: 'FORCE_POLL' });
       const loadingPromise = updateOnboarding().catch(() => {
-        // ignore errors
+        // ignore errors to make sure the loading state is cleaned up
+        // errors will be shown in nxls logs already
       });
       window.withProgress(
         { location: { viewId: 'nxCloudLoading' } },
