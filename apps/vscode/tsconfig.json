@@ -16,6 +16,9 @@
       "path": "../../libs/language-server/workspace"
     },
     {
+      "path": "../../libs/language-server/watcher"
+    },
+    {
       "path": "../../libs/shared/file-system"
     },
     {

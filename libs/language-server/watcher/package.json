@@ -1,0 +1,16 @@
+{
+  "name": "@nx-console/language-server-watcher",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "nx": {
+    "name": "language-server-watcher",
+    "sourceRoot": "libs/language-server/watcher/src",
+    "projectType": "library",
+    "tags": [
+      "type:lsp"
+    ]
+  }
+}

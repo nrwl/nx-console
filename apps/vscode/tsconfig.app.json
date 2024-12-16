@@ -20,6 +20,9 @@
       "path": "../../libs/language-server/workspace/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/language-server/watcher/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/file-system/tsconfig.lib.json"
     },
     {

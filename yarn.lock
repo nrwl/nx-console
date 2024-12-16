@@ -3367,6 +3367,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/language-server-watcher@workspace:libs/language-server/watcher":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/language-server-watcher@workspace:libs/language-server/watcher"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/language-server-workspace@workspace:libs/language-server/workspace":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-workspace@workspace:libs/language-server/workspace"

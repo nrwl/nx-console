@@ -48,7 +48,7 @@ import {
 import {
   NativeWatcher,
   languageServerWatcher,
-} from '@nx-console/language-server/watcher';
+} from '@nx-console/language-server-watcher';
 import {
   createProjectGraph,
   getCloudOnboardingInfo,
