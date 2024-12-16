@@ -4,7 +4,7 @@ import {
   configureSchemas,
   projectSchemaIsRegistered,
   resetInferencePluginsCompletionCache,
-} from '@nx-console/language-server/capabilities/code-completion';
+} from '@nx-console/language-server-capabilities-code-completion';
 import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';

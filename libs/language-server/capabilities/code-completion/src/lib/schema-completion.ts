@@ -1,6 +1,5 @@
 import {
   configureJsonLanguageService,
-  getJsonLanguageService,
   getSchemaRequestService,
   lspLogger,
 } from '@nx-console/language-server-utils';

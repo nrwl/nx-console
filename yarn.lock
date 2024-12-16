@@ -3355,6 +3355,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx-console/language-server-capabilities-code-completion@workspace:libs/language-server/capabilities/code-completion":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/language-server-capabilities-code-completion@workspace:libs/language-server/capabilities/code-completion"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/language-server-types@workspace:libs/language-server/types":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-types@workspace:libs/language-server/types"

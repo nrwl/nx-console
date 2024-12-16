@@ -8,6 +8,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/types/tsconfig.lib.json"
     },
     {

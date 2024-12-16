@@ -13,6 +13,9 @@
       "path": "../../shared/utils"
     },
     {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
       "path": "../../shared/types"
     },
     {

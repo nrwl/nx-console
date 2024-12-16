@@ -19,10 +19,16 @@
       "path": "../../shared/generate-ui-types/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/json-schema/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/schema/tsconfig.lib.json"
     },
     {
       "path": "../../shared/nx-version/tsconfig.lib.json"
@@ -35,9 +41,6 @@
     },
     {
       "path": "../../shared/utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/schema/tsconfig.lib.json"
     }
   ]
 }
