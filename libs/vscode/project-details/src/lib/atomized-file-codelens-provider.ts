@@ -1,6 +1,5 @@
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
@@ -27,6 +26,7 @@ import {
   TextDocument,
 } from 'vscode';
 import { CODELENS_RUN_TARGET_COMMAND } from './config-file-codelens-provider';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
   constructor(
@@ -117,13 +117,23 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
     const sourceFilesToAtomizedTargetsMap =
       await getSourceFilesToAtomizedTargetsMap(workspacePath);
 
-    getOutputChannel().appendLine(
-      JSON.stringify(sourceFilesToAtomizedTargetsMap, null, 2)
-    );
-
     const provider = new AtomizedFileCodelensProvider(
       workspacePath,
       sourceFilesToAtomizedTargetsMap
+    );
+
+    context.subscriptions.push(
+      onWorkspaceRefreshed(async () => {
+        const updatedWorkspacePath = getNxWorkspacePath();
+        const updatedSourceFilesToAtomizedTargetsMap =
+          await getSourceFilesToAtomizedTargetsMap(updatedWorkspacePath);
+
+        provider.workspaceRoot = updatedWorkspacePath;
+        provider.sourceFilesToAtomizedTargetsMap =
+          updatedSourceFilesToAtomizedTargetsMap;
+
+        provider.refresh();
+      })
     );
 
     registerCodeLensProvider(provider);
