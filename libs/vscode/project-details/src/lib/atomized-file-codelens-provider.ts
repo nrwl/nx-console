@@ -54,6 +54,9 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
     token: CancellationToken
   ): ProviderResult<CodeLens[]> {
     const path = document.uri.fsPath;
+    if (!this.sourceFilesToAtomizedTargetsMap[path]) {
+      return [];
+    }
     const [project, target] = this.sourceFilesToAtomizedTargetsMap[path];
     if (project && target) {
       const location = this.getCodeLensLocation(document);
