@@ -26,6 +26,7 @@ import { ProjectDetailsCodelensProvider } from './project-details-codelens-provi
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { gte } from '@nx-console/shared/nx-version';
+import { AtomizedFileCodelensProvider } from './atomized-file-codelens-provider';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -38,6 +39,7 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
 
   ProjectDetailsCodelensProvider.register(context);
   ConfigFileCodelensProvider.register(context);
+  AtomizedFileCodelensProvider.register(context);
 }
 
 function registerCommand(context: ExtensionContext) {
