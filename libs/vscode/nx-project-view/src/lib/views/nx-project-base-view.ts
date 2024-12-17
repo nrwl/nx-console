@@ -243,7 +243,7 @@ export abstract class BaseView {
       id: 'projectGraphError',
       contextValue: 'projectGraphError',
       errorCount: count,
-      label: `Nx Error${count !== 1 ? 's' : ''} Detected`,
+      label: `Project Graph Error`,
       collapsible: TreeItemCollapsibleState.None,
     };
   }

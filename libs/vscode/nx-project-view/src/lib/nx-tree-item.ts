@@ -31,6 +31,7 @@ export class NxTreeItem extends TreeItem {
         scheme: PROJECT_GRAPH_ERROR_DECORATION_SCHEME,
         path: item.errorCount.toString(),
       });
+      this.tooltip = `${item.errorCount} errors detected. The project graph may be missing some information`;
     }
 
     this.setIcons();

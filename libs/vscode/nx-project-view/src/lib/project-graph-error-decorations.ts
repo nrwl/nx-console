@@ -19,7 +19,6 @@ export class ProjectGraphErrorDecorationProvider
       const errorCount = uri.path;
       return {
         badge: errorCount,
-        tooltip: 'Project Graph Error',
         propagate: false,
         color: new ThemeColor('errorForeground'),
       };
