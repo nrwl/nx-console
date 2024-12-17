@@ -7,6 +7,9 @@
       "path": "../../libs/language-server/watcher"
     },
     {
+      "path": "../../libs/language-server/capabilities/document-links"
+    },
+    {
       "path": "../../libs/language-server/capabilities/definition"
     },
     {

@@ -3367,6 +3367,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/language-server-capabilities-document-links@workspace:libs/language-server/capabilities/document-links":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/language-server-capabilities-document-links@workspace:libs/language-server/capabilities/document-links"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/language-server-types@workspace:libs/language-server/types":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-types@workspace:libs/language-server/types"

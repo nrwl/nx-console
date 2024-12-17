@@ -9,7 +9,7 @@ import {
   GeneratorCollectionInfo,
   GeneratorType,
 } from '@nx-console/shared-schema';
-import { normalizeSchema } from '@nx-console/shared-schema/normalize';
+import { normalizeSchema } from '@nx-console/shared-schema/src/normalize-schema';
 import { basename, join } from 'path';
 import { getCollectionInfo, readCollections } from './read-collections';
 

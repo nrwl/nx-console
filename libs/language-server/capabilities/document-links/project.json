@@ -1,8 +1,0 @@
-{
-  "name": "language-server-capabilities-document-links",
-  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/language-server/capabilities/document-links/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:lsp"]
-}

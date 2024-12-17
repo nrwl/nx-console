@@ -5,7 +5,7 @@
     "types": ["node"],
     "noImplicitReturns": false
   },
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
+  "exclude": ["out-tsc", "**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
   "include": ["**/*.ts"],
   "references": [
     {

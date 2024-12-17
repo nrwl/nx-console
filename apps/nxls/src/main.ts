@@ -6,7 +6,7 @@ import {
   resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server-capabilities-code-completion';
 import { getDefinition } from '@nx-console/language-server-capabilities-definition';
-import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
+import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
   NxChangeWorkspace,
