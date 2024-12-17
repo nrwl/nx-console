@@ -7,6 +7,7 @@ import {
   TargetViewItem,
 } from './views/nx-project-base-view';
 import { ATOMIZED_SCHEME } from './atomizer-decorations';
+import { PROJECT_GRAPH_ERROR_DECORATION_SCHEME } from './project-graph-error-decorations';
 
 export class NxTreeItem extends TreeItem {
   id: string;
@@ -25,6 +26,12 @@ export class NxTreeItem extends TreeItem {
         path: item.nxTarget.name,
       });
       this.contextValue = 'target-atomized';
+    } else if (item.contextValue === 'projectGraphError') {
+      this.resourceUri = Uri.from({
+        scheme: PROJECT_GRAPH_ERROR_DECORATION_SCHEME,
+        path: item.errorCount.toString(),
+      });
+      this.tooltip = `${item.errorCount} errors detected. The project graph may be missing some information`;
     }
 
     this.setIcons();
@@ -45,6 +52,9 @@ export class NxTreeItem extends TreeItem {
       this.contextValue === 'target-atomized'
     ) {
       this.iconPath = new ThemeIcon('symbol-property');
+    }
+    if (this.contextValue === 'projectGraphError') {
+      this.iconPath = new ThemeIcon('error');
     }
   }
 

@@ -212,6 +212,11 @@
           "command": "nxCloud.showRunInApp",
           "when": "view == nxCloudRecentCIPE && viewItem == run",
           "group": "inline@1"
+        },
+        {
+          "command": "nxConsole.showProblems",
+          "when": "view == nxProjects && viewItem == projectGraphError",
+          "group": "inline@1"
         }
       ],
       "editor/title": [
@@ -652,6 +657,12 @@
         "title": "Open Workspace in Browser",
         "command": "nxCloud.openApp",
         "icon": "$(cloud)"
+      },
+      {
+        "category": "Nx",
+        "title": "Show Nx Errors in Problems View",
+        "command": "nxConsole.showProblems",
+        "icon": "$(eye)"
       }
     ],
     "configuration": {
