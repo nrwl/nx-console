@@ -14,6 +14,9 @@
       "path": "../../libs/language-server/watcher/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/language-server/capabilities/hover/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/language-server/capabilities/document-links/tsconfig.lib.json"
     },
     {

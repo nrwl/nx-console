@@ -1,16 +1,20 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
-    "module": "ESNext",
-    "esModuleInterop": true,
-    "types": ["node"]
+    "outDir": "out-tsc/nxls",
+    "types": ["node"],
+    "strict": false,
+    "noImplicitReturns": false,
+    "baseUrl": "."
   },
-  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
   "include": ["**/*.ts"],
   "references": [
     {
       "path": "../../libs/language-server/watcher/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/language-server/capabilities/hover/tsconfig.lib.json"
     },
     {
       "path": "../../libs/language-server/capabilities/document-links/tsconfig.lib.json"

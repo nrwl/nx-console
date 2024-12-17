@@ -3373,6 +3373,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/language-server-capabilities-hover@workspace:libs/language-server/capabilities/hover":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/language-server-capabilities-hover@workspace:libs/language-server/capabilities/hover"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/language-server-types@workspace:libs/language-server/types":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-types@workspace:libs/language-server/types"
@@ -13742,12 +13748,6 @@ __metadata:
   checksum: 467cf908a56556417b18e86ae3b8dee03c2360ef1d51e61c4028fe87f6f309b6ff038589c94b5666af207da9d972d5107698906aabeb78aca134641962a5c6f8
   languageName: node
   linkType: hard
-
-"hover-33f7a5@workspace:libs/language-server/capabilities/hover":
-  version: 0.0.0-use.local
-  resolution: "hover-33f7a5@workspace:libs/language-server/capabilities/hover"
-  languageName: unknown
-  linkType: soft
 
 "hpack.js@npm:^2.1.6":
   version: 2.1.6

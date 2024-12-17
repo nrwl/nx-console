@@ -7,6 +7,9 @@
       "path": "../../libs/language-server/watcher"
     },
     {
+      "path": "../../libs/language-server/capabilities/hover"
+    },
+    {
       "path": "../../libs/language-server/capabilities/document-links"
     },
     {
@@ -53,9 +56,6 @@
     },
     {
       "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
     }
   ]
 }

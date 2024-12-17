@@ -1,8 +1,8 @@
 import {
   findProperty,
   getLanguageModelCache,
-} from '@nx-console/language-server/utils';
-import { readNxJson } from '@nx-console/shared/npm';
+} from '@nx-console/language-server-utils';
+import { readNxJson } from '@nx-console/shared-npm';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
