@@ -1,6 +1,6 @@
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { StartupMessageDefinition } from '../nx-console-plugin-types';
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { promisify } from 'util';
 import { exec } from 'child_process';
 

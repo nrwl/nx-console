@@ -4,7 +4,7 @@ import {
   DefaultValue,
   TargetConfiguration,
   WorkspaceProjects,
-} from '@nx-console/shared/schema';
+} from '@nx-console/shared-schema';
 import * as path from 'path';
 import type {
   TargetConfiguration as NxTargetConfiguration,
@@ -14,10 +14,10 @@ import type {
 import {
   localDependencyPath,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { normalizeSchema } from '@nx-console/shared/schema/normalize';
-import { getPrimitiveValue } from '@nx-console/shared/utils';
+} from '@nx-console/shared-npm';
+import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
+import { normalizeSchema } from '@nx-console/shared-schema/src/normalize-schema';
+import { getPrimitiveValue } from '@nx-console/shared-utils';
 import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
 export function readTargetDef(

@@ -1,4 +1,4 @@
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {

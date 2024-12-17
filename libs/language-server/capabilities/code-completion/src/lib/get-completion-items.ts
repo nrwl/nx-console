@@ -2,16 +2,15 @@ import {
   getDefaultCompletionType,
   isArrayNode,
   lspLogger,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import {
   CompletionType,
   hasCompletionGlob,
   hasCompletionType,
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
-} from '@nx-console/shared/json-schema';
-import { Logger } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/nx-version';
+} from '@nx-console/shared-json-schema';
+import { NxVersion } from '@nx-console/nx-version';
 import {
   ASTNode,
   CompletionItem,

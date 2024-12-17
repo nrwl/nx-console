@@ -12,7 +12,7 @@ import {
   GenerateUiCopyToClipboardOutputMessage,
   GeneratorSchema,
   ValidationResults,
-} from '@nx-console/shared/generate-ui-types';
+} from '@nx-console/shared-generate-ui-types';
 import { OptionChangedDetails } from './components/fields/mixins/field-mixin';
 import { Root } from './main';
 import { submittedContext } from './contexts/submitted-context';

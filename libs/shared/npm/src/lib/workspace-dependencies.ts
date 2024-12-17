@@ -1,7 +1,9 @@
-import { directoryExists, fileExists } from '@nx-console/shared/file-system';
-import type { Logger, WorkspaceProjects } from '@nx-console/shared/schema';
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { gte, NxVersion } from '@nx-console/nx-version';
+import { directoryExists } from '@nx-console/shared-file-system';
+import type { Logger } from '@nx-console/shared-schema';
 import { stat } from 'fs/promises';
+import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
+import { platform } from 'os';
 import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';
 import { packageDetails } from './package-details';
@@ -10,9 +12,6 @@ import {
   pnpDependencies,
   pnpDependencyPath,
 } from './pnp-dependencies';
-import { platform } from 'os';
-import { gte } from '@nx-console/shared/nx-version';
-import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 /**
  * Get dependencies for the current workspace.

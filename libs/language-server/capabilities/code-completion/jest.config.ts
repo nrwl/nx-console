@@ -13,6 +13,5 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory:
-    '../../../../coverage/libs/language-server/capabilities/code-completion',
+  coverageDirectory: 'test-output/jest/coverage',
 };

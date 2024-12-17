@@ -13,6 +13,27 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

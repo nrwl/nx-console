@@ -3,8 +3,8 @@ import {
   getNxAccessToken,
   getNxCloudUrl,
   importWorkspaceDependency,
-} from '@nx-console/shared/npm';
-import { CloudOnboardingInfo } from '@nx-console/shared/types';
+} from '@nx-console/shared-npm';
+import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
 
@@ -21,7 +21,7 @@ import {
   window,
 } from 'vscode';
 
-import { withTimeout } from '@nx-console/shared/utils';
+import { withTimeout } from '@nx-console/shared-utils';
 import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/telemetry';

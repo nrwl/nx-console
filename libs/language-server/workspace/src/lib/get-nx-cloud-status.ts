@@ -6,7 +6,7 @@ import {
   getNxAccessToken,
   getNxCloudId,
   getNxCloudUrl,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 
 export async function getNxCloudStatus(
   workspaceRoot: string

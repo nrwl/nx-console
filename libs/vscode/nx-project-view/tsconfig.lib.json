@@ -7,5 +7,25 @@
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "references": [
+    {
+      "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/generate-ui-types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../language-server/types/tsconfig.lib.json"
+    }
+  ]
 }

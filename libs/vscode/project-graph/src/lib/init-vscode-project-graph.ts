@@ -26,7 +26,7 @@ import {
 import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { gte } from '@nx-console/shared/nx-version';
+import { gte } from '@nx-console/nx-version';
 
 let _graphWebviewManager: GraphWebviewManager | undefined;
 

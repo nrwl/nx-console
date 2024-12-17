@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { nxWorkspace } from './workspace';
-import { getNxExecutionCommand } from '@nx-console/shared/utils';
-import { Logger } from '@nx-console/shared/schema';
+import { getNxExecutionCommand } from '@nx-console/shared-utils';
+import { Logger } from '@nx-console/shared-schema';
 
 export async function hasAffectedProjects(
   workspacePath: string,

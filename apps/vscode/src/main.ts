@@ -16,7 +16,7 @@ import {
   checkIsNxWorkspace,
   killGroup,
   withTimeout,
-} from '@nx-console/shared/utils';
+} from '@nx-console/shared-utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -29,7 +29,7 @@ import {
 import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
 import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode/utils';
 
-import { fileExists } from '@nx-console/shared/file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
@@ -50,7 +50,7 @@ import {
   NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';

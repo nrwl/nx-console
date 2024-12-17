@@ -1,6 +1,6 @@
 import { ActorRef, AnyEventObject, createActor } from 'xstate';
 import { machine } from './cloud-view-state-machine';
-import { CIPEInfo, CloudOnboardingInfo } from '@nx-console/shared/types';
+import { CIPEInfo, CloudOnboardingInfo } from '@nx-console/shared-types';
 
 let actor: ActorRef<any, AnyEventObject>;
 

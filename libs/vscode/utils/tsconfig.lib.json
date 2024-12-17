@@ -7,5 +7,25 @@
     "types": ["node"]
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "references": [
+    {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/file-system/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    }
+  ]
 }

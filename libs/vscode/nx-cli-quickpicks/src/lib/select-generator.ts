@@ -1,9 +1,9 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   GeneratorCollectionInfo,
   GeneratorType,
-} from '@nx-console/shared/schema';
-import { matchWithWildcards } from '@nx-console/shared/utils';
+} from '@nx-console/shared-schema';
+import { matchWithWildcards } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getGeneratorOptions,

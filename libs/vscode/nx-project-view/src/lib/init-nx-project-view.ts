@@ -13,7 +13,7 @@ import {
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
-} from '@nx-console/language-server/types';
+} from '@nx-console/language-server-types';
 
 export function initNxProjectView(
   context: ExtensionContext

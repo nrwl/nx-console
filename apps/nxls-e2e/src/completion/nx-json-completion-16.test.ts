@@ -10,7 +10,7 @@ import {
 import { readFileSync, rmSync } from 'fs';
 import { URI } from 'vscode-uri';
 import { CompletionList, Position } from 'vscode-languageserver';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');

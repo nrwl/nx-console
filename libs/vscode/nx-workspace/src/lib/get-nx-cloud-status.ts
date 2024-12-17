@@ -1,4 +1,4 @@
-import { NxCloudStatusRequest } from '@nx-console/language-server/types';
+import { NxCloudStatusRequest } from '@nx-console/language-server-types';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
 
 export async function getNxCloudStatus(): Promise<

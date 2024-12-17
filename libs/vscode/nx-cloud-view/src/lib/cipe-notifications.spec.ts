@@ -1,4 +1,4 @@
-import { CIPEInfo } from '@nx-console/shared/types';
+import { CIPEInfo } from '@nx-console/shared-types';
 import { window } from 'vscode';
 import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 

@@ -1,130 +1,53 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "sourceMap": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "emitDecoratorMetadata": false,
+    "esModuleInterop": true,
+    "experimentalDecorators": false,
+    "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "ES2022",
+    "incremental": true,
+    "isolatedModules": true,
+    "lib": ["es2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "pretty": true,
+    "removeComments": false,
+    "resolveJsonModule": false,
+    "skipDefaultLibCheck": false,
     "skipLibCheck": true,
-    "strictNullChecks": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictFunctionTypes": true,
-    "downlevelIteration": true,
-    "lib": ["es2019", "dom", "esnext.asynciterable"],
-    "types": ["node", "jest"],
-    "module": "commonjs",
-    "baseUrl": ".",
-    "rootDir": ".",
-    "paths": {
-      "@nx-console/language-server/capabilities/code-completion": [
-        "libs/language-server/capabilities/code-completion/src/index.ts"
-      ],
-      "@nx-console/language-server/capabilities/definition": [
-        "libs/language-server/capabilities/definition/src/index.ts"
-      ],
-      "@nx-console/language-server/capabilities/document-links": [
-        "libs/language-server/capabilities/document-links/src/index.ts"
-      ],
-      "@nx-console/language-server/capabilities/hover": [
-        "libs/language-server/capabilities/hover/src/index.ts"
-      ],
-      "@nx-console/language-server/types": [
-        "libs/language-server/types/src/index.ts"
-      ],
-      "@nx-console/language-server/utils": [
-        "libs/language-server/utils/src/index.ts"
-      ],
-      "@nx-console/language-server/watcher": [
-        "libs/language-server/watcher/src/index.ts"
-      ],
-      "@nx-console/language-server/workspace": [
-        "libs/language-server/workspace/src/index.ts"
-      ],
-      "@nx-console/shared/file-system": [
-        "libs/shared/file-system/src/index.ts"
-      ],
-      "@nx-console/shared/generate-ui-types": [
-        "libs/shared/generate-ui-types/src/index.ts"
-      ],
-      "@nx-console/shared/json-schema": [
-        "libs/shared/json-schema/src/index.ts"
-      ],
-      "@nx-console/shared/npm": ["libs/shared/npm/src/index.ts"],
-      "@nx-console/shared/nx-version": ["libs/shared/nx-version/src/index.ts"],
-      "@nx-console/shared/schema": ["libs/shared/schema/src/index.ts"],
-      "@nx-console/shared/schema/normalize": [
-        "libs/shared/schema/src/normalize-schema.ts"
-      ],
-      "@nx-console/shared/types": ["libs/shared/types/src/index.ts"],
-      "@nx-console/shared/utils": ["libs/shared/utils/src/index.ts"],
-      "@nx-console/vscode/add-dependency": [
-        "libs/vscode/add-dependency/src/index.ts"
-      ],
-      "@nx-console/vscode/configuration": [
-        "libs/vscode/configuration/src/index.ts"
-      ],
-      "@nx-console/vscode/error-diagnostics": [
-        "libs/vscode/error-diagnostics/src/index.ts"
-      ],
-      "@nx-console/vscode/generate-ui-webview": [
-        "libs/vscode/generate-ui-webview/src/index.ts"
-      ],
-      "@nx-console/vscode/graph-base": ["libs/vscode/graph-base/src/index.ts"],
-      "@nx-console/vscode/lsp-client": ["libs/vscode/lsp-client/src/index.ts"],
-      "@nx-console/vscode/nvm-tip": ["libs/vscode/nvm-tip/src/index.ts"],
-      "@nx-console/vscode/nx-cli-quickpicks": [
-        "libs/vscode/nx-cli-quickpicks/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-cloud-onboarding-webview": [
-        "libs/vscode/nx-cloud-onboarding-webview/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-cloud-view": [
-        "libs/vscode/nx-cloud-view/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-commands-view": [
-        "libs/vscode/nx-commands-view/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-config-decoration": [
-        "libs/vscode/nx-config-decoration/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-conversion": [
-        "libs/vscode/nx-conversion/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-help-and-feedback-view": [
-        "libs/vscode/nx-help-and-feedback-view/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-project-view": [
-        "libs/vscode/nx-project-view/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-workspace": [
-        "libs/vscode/nx-workspace/src/index.ts"
-      ],
-      "@nx-console/vscode/output-channels": [
-        "libs/vscode/output-channels/src/index.ts"
-      ],
-      "@nx-console/vscode/project-details": [
-        "libs/vscode/project-details/src/index.ts"
-      ],
-      "@nx-console/vscode/project-graph": [
-        "libs/vscode/project-graph/src/index.ts"
-      ],
-      "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
-      "@nx-console/vscode/telemetry": ["libs/vscode/telemetry/src/index.ts"],
-      "@nx-console/vscode/typescript-plugin": [
-        "libs/vscode/typescript-plugin/src/index.ts"
-      ],
-      "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
-      "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
-      "nxls-e2e": ["apps/nxls-e2e/src/index.ts"],
-      "shared/nx-console-plugins": [
-        "libs/shared/nx-console-plugins/src/index.ts"
-      ]
-    }
-  },
-  "exclude": ["node_modules", "tmp"]
+    "sourceMap": false,
+    "strict": true,
+    "target": "es2022",
+    "verbatimModuleSyntax": false
+    // "sourceMap": true,
+    // "importHelpers": true,
+    // "moduleResolution": "node",
+    // "emitDecoratorMetadata": true,
+    // "experimentalDecorators": true,
+    // "target": "ES2022",
+    // "skipLibCheck": true,
+    // "strictNullChecks": true,
+    // "allowUnreachableCode": false,
+    // "allowUnusedLabels": true,
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
+    // "strictFunctionTypes": true,
+    // "downlevelIteration": true,
+    // "lib": ["es2019", "dom", "esnext.asynciterable"],
+    // "types": ["node", "jest"],
+    // "module": "commonjs",
+    // "baseUrl": ".",
+    // "rootDir": "."
+  }
 }

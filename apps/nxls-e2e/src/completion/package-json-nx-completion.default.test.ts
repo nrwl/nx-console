@@ -22,7 +22,7 @@ import {
 } from '../utils';
 import { Position } from 'vscode-json-languageservice';
 import { CompletionList } from 'vscode-languageserver';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -57,7 +57,7 @@ describe('package.json nx property completion - default', () => {
       packageJsonPath,
       `{
         "nx": {
-         
+
         }
         }`
     );
