@@ -13,6 +13,6 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/language-server/watcher',
+  coverageDirectory: 'test-output/jest/coverage',
   passWithNoTests: true,
 };

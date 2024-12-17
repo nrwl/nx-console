@@ -5,7 +5,9 @@
     "module": "commonjs",
     "moduleResolution": "node10",
     "types": ["jest", "node"],
-    "noImplicitAny": false
+    "strict": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false
   },
   "include": [
     "jest.config.ts",
