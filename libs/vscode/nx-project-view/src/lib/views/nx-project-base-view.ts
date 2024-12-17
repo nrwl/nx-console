@@ -8,7 +8,7 @@ import type {
   ProjectGraphProjectNode,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { TreeItemCollapsibleState } from 'vscode';
+import { ThemeIcon, TreeItemCollapsibleState } from 'vscode';
 
 interface BaseViewItem<Context extends string> {
   id: string;
@@ -37,6 +37,11 @@ export interface TargetGroupViewItem extends BaseViewItem<'targetGroup'> {
   nxProject: NxProject;
   nxTargets: NxTarget[];
   targetGroupName: string;
+}
+
+export interface ProjectGraphErrorViewItem
+  extends BaseViewItem<'projectGraphError'> {
+  errorCount: number;
 }
 
 export interface NxProject {
@@ -231,6 +236,16 @@ export abstract class BaseView {
           targets[target.name],
         ])
       );
+  }
+
+  createProjectGraphErrorViewItem(count: number): ProjectGraphErrorViewItem {
+    return {
+      id: 'projectGraphError',
+      contextValue: 'projectGraphError',
+      errorCount: count,
+      label: `Nx Error${count !== 1 ? 's' : ''} Detected`,
+      collapsible: TreeItemCollapsibleState.None,
+    };
   }
 
   protected async getProjectData() {
