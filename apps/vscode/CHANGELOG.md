@@ -1,3 +1,19 @@
+# [18.34.0](https://github.com/nrwl/nx-console/compare/vscode-v18.33.2...vscode-v18.34.0) (2024-12-18)
+
+
+### Bug Fixes
+
+* **nxls:** provide autocomplete only for plugins that contain nx ([#2365](https://github.com/nrwl/nx-console/issues/2365)) ([d94aa70](https://github.com/nrwl/nx-console/commit/d94aa70971ec074f62e8ac5d862e1c6295ac8dca))
+* **vscode:** handle non-atomized file paths gracefully ([#2373](https://github.com/nrwl/nx-console/issues/2373)) ([b37f4da](https://github.com/nrwl/nx-console/commit/b37f4dae35caae45b9a455f994a2f540c5ae39b0))
+* **vscode:** subscribe to project graph updates in atomizer codelens provider ([#2372](https://github.com/nrwl/nx-console/issues/2372)) ([4949292](https://github.com/nrwl/nx-console/commit/4949292c5953358ba39af8a628d2b47e52518864))
+
+
+### Features
+
+* **nxls:** add namedInputs target links & fix namedInputs completion in nx.json ([#2368](https://github.com/nrwl/nx-console/issues/2368)) ([6a18b68](https://github.com/nrwl/nx-console/commit/6a18b6814a057b89719f268c463f70d08973a0ce))
+* **vscode:** add atomizer codelenses ([#2370](https://github.com/nrwl/nx-console/issues/2370)) ([68fccde](https://github.com/nrwl/nx-console/commit/68fccde92133475e264b61ccbe67f8314f3046f3))
+* **vscode:** show project graph error message in projects view ([#2371](https://github.com/nrwl/nx-console/issues/2371)) ([8935212](https://github.com/nrwl/nx-console/commit/89352120a6b887edb850e1c09a3027656973b637))
+
 ## [18.33.2](https://github.com/nrwl/nx-console/compare/vscode-v18.33.1...vscode-v18.33.2) (2024-12-16)
 
 
