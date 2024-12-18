@@ -33,9 +33,11 @@ export async function inferencePluginsCompletion(
         .split('node_modules/')
         .pop();
 
-      inferencePluginsCompletion.push({
-        label: `${dependencyPath}/plugin`,
-      });
+      if (dependencyPath?.includes('nx')) {
+        inferencePluginsCompletion.push({
+          label: `${dependencyPath}/plugin`,
+        });
+      }
     }
   }
 

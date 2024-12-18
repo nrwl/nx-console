@@ -11,7 +11,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import dev.nx.console.models.NxVersion
-import dev.nx.console.nxls.NxRefreshWorkspaceAction
+import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
@@ -59,7 +59,7 @@ class ProjectDetailsEditorWithPreview(private val project: Project, file: Virtua
                             TelemetryEvent.MISC_REFRESH_WORKSPACE,
                             mapOf("source" to TelemetryEventSource.EDITOR_TOOLBAR),
                         )
-                    NxRefreshWorkspaceAction().actionPerformed(e)
+                    NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
                 }
             }
 

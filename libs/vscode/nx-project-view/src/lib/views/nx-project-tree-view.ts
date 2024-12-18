@@ -6,6 +6,7 @@ import { TreeItemCollapsibleState } from 'vscode';
 import {
   BaseView,
   FolderViewItem,
+  ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
   TargetViewItem,
@@ -15,7 +16,8 @@ export type TreeViewItem =
   | FolderViewItem
   | ProjectViewItem
   | TargetViewItem
-  | TargetGroupViewItem;
+  | TargetGroupViewItem
+  | ProjectGraphErrorViewItem;
 
 export type ProjectInfo = {
   dir: string;
@@ -31,25 +33,36 @@ export class TreeView extends BaseView {
     element?: TreeViewItem
   ): Promise<TreeViewItem[] | undefined> {
     if (!element) {
+      const items: TreeViewItem[] = [];
+
+      if (this.workspaceData?.errors) {
+        items.push(
+          this.createProjectGraphErrorViewItem(this.workspaceData.errors.length)
+        );
+      }
+
       // if there's only a single root, start with it expanded
       const isSingleProject = this.roots.length === 1;
-      return this.roots
-        .sort((a, b) => {
-          // the VSCode tree view looks chaotic when folders and projects are on the same level
-          // so we sort the nodes to have folders first and projects after
-          if (!!a.projectName == !!b.projectName) {
-            return a.dir.localeCompare(b.dir);
-          }
-          return a.projectName ? 1 : -1;
-        })
-        .map((root) =>
-          this.createFolderOrProjectTreeItemFromNode(
-            root,
-            isSingleProject
-              ? TreeItemCollapsibleState.Expanded
-              : TreeItemCollapsibleState.Collapsed
+      items.push(
+        ...this.roots
+          .sort((a, b) => {
+            // the VSCode tree view looks chaotic when folders and projects are on the same level
+            // so we sort the nodes to have folders first and projects after
+            if (!!a.projectName == !!b.projectName) {
+              return a.dir.localeCompare(b.dir);
+            }
+            return a.projectName ? 1 : -1;
+          })
+          .map((root) =>
+            this.createFolderOrProjectTreeItemFromNode(
+              root,
+              isSingleProject
+                ? TreeItemCollapsibleState.Expanded
+                : TreeItemCollapsibleState.Collapsed
+            )
           )
-        );
+      );
+      return items;
     }
 
     if (element.contextValue === 'project') {

@@ -1,6 +1,6 @@
-import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import {
   BaseView,
+  ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
   TargetViewItem,
@@ -9,19 +9,30 @@ import {
 export type ListViewItem =
   | ProjectViewItem
   | TargetViewItem
-  | TargetGroupViewItem;
+  | TargetGroupViewItem
+  | ProjectGraphErrorViewItem;
 
 export class ListView extends BaseView {
   async getChildren(element?: ListViewItem) {
     if (!element) {
+      const items: ListViewItem[] = [];
+      if (this.workspaceData?.errors) {
+        items.push(
+          this.createProjectGraphErrorViewItem(this.workspaceData.errors.length)
+        );
+      }
       // should return root elements if no element was passed
-      return this.createProjects();
+      items.push(...(await this.createProjects()));
+      return items;
     }
     if (element.contextValue === 'project') {
       return this.createTargetsAndGroupsFromProject(element);
     }
     if (element.contextValue === 'targetGroup') {
       return this.createTargetsFromTargetGroup(element);
+    }
+    if (element.contextValue === 'projectGraphError') {
+      return [];
     }
     return this.createConfigurationsFromTarget(element);
   }
