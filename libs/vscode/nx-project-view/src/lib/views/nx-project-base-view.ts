@@ -4,7 +4,6 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { join } from 'node:path';
 import type {
-  ProjectConfiguration,
   ProjectGraphProjectNode,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';

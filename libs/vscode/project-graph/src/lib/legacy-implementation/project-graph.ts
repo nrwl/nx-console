@@ -3,7 +3,7 @@ import {
   NxTreeItem,
   ProjectViewItem,
   TargetViewItem,
-} from '@nx-console/vscode/nx-project-view';
+} from '@nx-console/vscode-nx-project-view';
 import {
   getNxWorkspace,
   getProjectByPath,

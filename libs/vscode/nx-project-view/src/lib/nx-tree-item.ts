@@ -9,8 +9,6 @@ import {
 import { ATOMIZED_SCHEME } from './atomizer-decorations';
 
 export class NxTreeItem extends TreeItem {
-  id: string;
-
   constructor(public readonly item: ViewItem) {
     super(item.label, item.collapsible);
 

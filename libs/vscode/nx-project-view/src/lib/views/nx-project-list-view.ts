@@ -1,4 +1,3 @@
-import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import {
   BaseView,
   ProjectViewItem,

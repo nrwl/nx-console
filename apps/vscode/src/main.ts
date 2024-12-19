@@ -25,7 +25,7 @@ import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
 import {
   NxProjectTreeProvider,
   initNxProjectView,
-} from '@nx-console/vscode/nx-project-view';
+} from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
 
