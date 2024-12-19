@@ -10,10 +10,19 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../telemetry/tsconfig.lib.json"
+    },
+    {
+      "path": "../verify/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {
-      "path": "../nx-workspace/tsconfig.lib.json"
+      "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-cli-quickpicks/tsconfig.lib.json"
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
@@ -23,6 +32,9 @@
     },
     {
       "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../lsp-client/tsconfig.lib.json"
     },
     {
       "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
@@ -40,10 +52,10 @@
       "path": "../../language-server/types/tsconfig.lib.json"
     },
     {
-      "path": "../lsp-client/tsconfig.lib.json"
+      "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
-      "path": "../configuration/tsconfig.lib.json"
+      "path": "../tasks/tsconfig.lib.json"
     },
     {
       "path": "../../shared/schema/tsconfig.lib.json"

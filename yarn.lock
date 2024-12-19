@@ -3487,6 +3487,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-nx-cloud-onboarding-webview@workspace:libs/vscode/nx-cloud-onboarding-webview":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-nx-cloud-onboarding-webview@workspace:libs/vscode/nx-cloud-onboarding-webview"
+  dependencies:
+    "@microsoft/fast-foundation": ^2.49.0
+    "@vscode/webview-ui-toolkit": ^1.2.0
+    lit: ^2.4.1
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-nx-workspace@workspace:libs/vscode/nx-workspace":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-nx-workspace@workspace:libs/vscode/nx-workspace"
@@ -18925,16 +18935,6 @@ __metadata:
   checksum: 5f1d361b38c47ab49727d5ea8bbfeb5867ae6de0e538eec9a8b77c88005ddde36d8b930e0730b50ee5e5dda949112c0f9ffed1bf15e7e1b3cd9cfa319f5a9b6f
   languageName: node
   linkType: hard
-
-"nx-cloud-onboarding-webview-be14fc@workspace:libs/vscode/nx-cloud-onboarding-webview":
-  version: 0.0.0-use.local
-  resolution: "nx-cloud-onboarding-webview-be14fc@workspace:libs/vscode/nx-cloud-onboarding-webview"
-  dependencies:
-    "@microsoft/fast-foundation": ^2.49.0
-    "@vscode/webview-ui-toolkit": ^1.2.0
-    lit: ^2.4.1
-  languageName: unknown
-  linkType: soft
 
 "nx-cloud-view-199390@workspace:libs/vscode/nx-cloud-view":
   version: 0.0.0-use.local

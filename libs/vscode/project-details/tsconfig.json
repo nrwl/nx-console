@@ -16,6 +16,15 @@
       "path": "../telemetry"
     },
     {
+      "path": "../verify"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../tasks"
+    },
+    {
       "path": "../utils"
     },
     {

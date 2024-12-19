@@ -16,6 +16,9 @@
       "path": "../telemetry"
     },
     {
+      "path": "../tasks"
+    },
+    {
       "path": "../verify"
     },
     {

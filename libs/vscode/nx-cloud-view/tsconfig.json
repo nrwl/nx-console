@@ -13,7 +13,16 @@
   "include": [],
   "references": [
     {
+      "path": "../verify"
+    },
+    {
       "path": "../utils"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../tasks"
     },
     {
       "path": "../lsp-client"

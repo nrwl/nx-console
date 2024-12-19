@@ -10,10 +10,22 @@
       "path": "../../libs/vscode/typescript-plugin"
     },
     {
+      "path": "../../libs/vscode/add-dependency"
+    },
+    {
       "path": "../../libs/vscode/telemetry"
     },
     {
       "path": "../../libs/vscode/verify"
+    },
+    {
+      "path": "../../libs/vscode/utils"
+    },
+    {
+      "path": "../../libs/vscode/nx-cli-quickpicks"
+    },
+    {
+      "path": "../../libs/vscode/output-channels"
     },
     {
       "path": "../../libs/vscode/lsp-client"
@@ -22,16 +34,7 @@
       "path": "../../libs/vscode/nx-workspace"
     },
     {
-      "path": "../../libs/vscode/nx-cli-quickpicks"
-    },
-    {
-      "path": "../../libs/vscode/add-dependency"
-    },
-    {
-      "path": "../../libs/vscode/output-channels"
-    },
-    {
-      "path": "../../libs/vscode/utils"
+      "path": "../../libs/vscode/tasks"
     },
     {
       "path": "../../libs/vscode/configuration"

@@ -4,10 +4,19 @@
   "include": [],
   "references": [
     {
+      "path": "../telemetry"
+    },
+    {
+      "path": "../verify"
+    },
+    {
       "path": "../utils"
     },
     {
-      "path": "../nx-workspace"
+      "path": "../configuration"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
     },
     {
       "path": "../../shared/npm"
@@ -17,6 +26,9 @@
     },
     {
       "path": "../../shared/utils"
+    },
+    {
+      "path": "../lsp-client"
     },
     {
       "path": "../../shared/nx-console-plugins"
@@ -34,10 +46,10 @@
       "path": "../../language-server/types"
     },
     {
-      "path": "../lsp-client"
+      "path": "../nx-workspace"
     },
     {
-      "path": "../configuration"
+      "path": "../tasks"
     },
     {
       "path": "../../shared/schema"

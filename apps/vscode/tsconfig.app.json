@@ -14,10 +14,22 @@
       "path": "../../libs/vscode/typescript-plugin/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/add-dependency/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/telemetry/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/verify/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/nx-cli-quickpicks/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/output-channels/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/lsp-client/tsconfig.lib.json"
@@ -26,16 +38,7 @@
       "path": "../../libs/vscode/nx-workspace/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/nx-cli-quickpicks/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/add-dependency/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/output-channels/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/utils/tsconfig.lib.json"
+      "path": "../../libs/vscode/tasks/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/configuration/tsconfig.lib.json"

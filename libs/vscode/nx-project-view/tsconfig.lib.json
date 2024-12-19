@@ -10,6 +10,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../tasks/tsconfig.lib.json"
+    },
+    {
       "path": "../verify/tsconfig.lib.json"
     },
     {
