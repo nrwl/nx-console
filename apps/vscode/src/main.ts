@@ -51,7 +51,7 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server-types';
-import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
+import { initErrorDiagnostics } from '@nx-console/vscode-error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
 import {

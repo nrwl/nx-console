@@ -3469,6 +3469,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-error-diagnostics@workspace:libs/vscode/error-diagnostics":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-error-diagnostics@workspace:libs/vscode/error-diagnostics"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client"
