@@ -33,7 +33,7 @@ import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
-} from '@nx-console/vscode/add-dependency';
+} from '@nx-console/vscode-add-dependency';
 import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
 import {
   createNxlsClient,

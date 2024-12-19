@@ -3457,6 +3457,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-add-dependency@workspace:libs/vscode/add-dependency":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-add-dependency@workspace:libs/vscode/add-dependency"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-configuration@workspace:libs/vscode/configuration":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-configuration@workspace:libs/vscode/configuration"
