@@ -1,1 +1,1 @@
-export * from './lib/init-vscode-project-details';
+export * from './init-vscode-project-details';

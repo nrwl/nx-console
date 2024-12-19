@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/project-details"
+    },
+    {
       "path": "../../libs/vscode/error-diagnostics"
     },
     {

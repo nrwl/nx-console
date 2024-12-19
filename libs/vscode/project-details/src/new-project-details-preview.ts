@@ -11,7 +11,7 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import { assign, createActor, enqueueActions, fromPromise } from 'xstate';
+import { createActor, fromPromise } from 'xstate';
 import { machine } from './pdv-state-machine';
 import { ProjectDetailsPreview } from './project-details-preview';
 

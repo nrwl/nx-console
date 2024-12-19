@@ -19,18 +19,18 @@ import { parseJsonText } from 'typescript';
 import {
   CancellationToken,
   CodeLens,
+  commands,
   Event,
+  EventEmitter,
   ExtensionContext,
   Position,
   ProviderResult,
-  TextDocument,
-  Range,
-  window,
-  commands,
   QuickPickItem,
-  ThemeIcon,
   QuickPickItemKind,
-  EventEmitter,
+  Range,
+  TextDocument,
+  ThemeIcon,
+  window,
 } from 'vscode';
 
 const OPEN_QUICKPICK_COMMAND = 'nxConsole.project-details.open-quickpick';

@@ -3539,6 +3539,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-project-details@workspace:libs/vscode/project-details":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-project-details@workspace:libs/vscode/project-details"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-project-graph@workspace:libs/vscode/project-graph":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-project-graph@workspace:libs/vscode/project-graph"
@@ -20895,14 +20901,6 @@ __metadata:
   checksum: f67403fe7b34912148d9252cb7481266a354bd99ce82c835f79070643bb3c6583d10dbcfda4d41e04bbc1d8437e9af0fb1e1f2135727878f5308682a579429b7
   languageName: node
   linkType: hard
-
-"project-details-bb5ef5@workspace:libs/vscode/project-details":
-  version: 0.0.0-use.local
-  resolution: "project-details-bb5ef5@workspace:libs/vscode/project-details"
-  dependencies:
-    tslib: ^2.3.0
-  languageName: unknown
-  linkType: soft
 
 "promise-all-reject-late@npm:^1.0.0":
   version: 1.0.1
