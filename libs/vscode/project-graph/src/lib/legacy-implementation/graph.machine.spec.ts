@@ -10,7 +10,7 @@ import {
 import { graphMachine } from './graph.machine';
 
 import { NxWorkspace } from '@nx-console/shared-types';
-import type * as nxWorkspace from '@nx-console/vscode/nx-workspace';
+import type * as nxWorkspace from '@nx-console/vscode-nx-workspace';
 import * as outputChannels from '@nx-console/vscode-output-channels';
 import { MessageType } from './graph-message-type';
 
@@ -28,7 +28,7 @@ jest.mock(
 );
 
 jest.mock(
-  '@nx-console/vscode/nx-workspace',
+  '@nx-console/vscode-nx-workspace',
   (): PartialDeep<typeof nxWorkspace> => {
     return {
       async getNxWorkspace(_?: boolean): Promise<NxWorkspace> {

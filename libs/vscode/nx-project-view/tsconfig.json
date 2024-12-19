@@ -4,10 +4,13 @@
   "include": [],
   "references": [
     {
-      "path": "../output-channels"
+      "path": "../utils"
     },
     {
-      "path": "../../shared/utils"
+      "path": "../configuration"
+    },
+    {
+      "path": "../nx-workspace"
     },
     {
       "path": "../../shared/npm"
@@ -16,10 +19,10 @@
       "path": "../../shared/file-system"
     },
     {
-      "path": "../utils"
+      "path": "../../shared/utils"
     },
     {
-      "path": "../configuration"
+      "path": "../output-channels"
     },
     {
       "path": "../../shared/nx-console-plugins"
@@ -38,6 +41,9 @@
     },
     {
       "path": "../../language-server/types"
+    },
+    {
+      "path": "../lsp-client"
     },
     {
       "path": "./tsconfig.lib.json"

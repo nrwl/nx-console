@@ -13,6 +13,33 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../lsp-client"
+    },
+    {
       "path": "../../shared/schema"
     },
     {

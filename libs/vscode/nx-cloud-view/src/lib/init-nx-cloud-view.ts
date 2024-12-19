@@ -3,8 +3,8 @@ import { getPackageManagerCommand } from '@nx-console/shared/utils';
 import {
   onWorkspaceRefreshed,
   showRefreshLoadingAtLocation,
-} from '@nx-console/vscode/lsp-client';
-import { getCloudOnboardingInfo } from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-lsp-client';
+import { getCloudOnboardingInfo } from '@nx-console/vscode-nx-workspace';
 import {
   getNxlsOutputChannel,
   getOutputChannel,

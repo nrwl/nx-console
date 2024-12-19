@@ -3469,6 +3469,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-nx-workspace@workspace:libs/vscode/nx-workspace":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-nx-workspace@workspace:libs/vscode/nx-workspace"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels"
@@ -19048,12 +19054,6 @@ __metadata:
 "nx-project-view-a8a6f0@workspace:libs/vscode/nx-project-view":
   version: 0.0.0-use.local
   resolution: "nx-project-view-a8a6f0@workspace:libs/vscode/nx-project-view"
-  languageName: unknown
-  linkType: soft
-
-"nx-workspace-609ed1@workspace:libs/vscode/nx-workspace":
-  version: 0.0.0-use.local
-  resolution: "nx-workspace-609ed1@workspace:libs/vscode/nx-workspace"
   languageName: unknown
   linkType: soft
 

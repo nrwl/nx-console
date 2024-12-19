@@ -1,4 +1,4 @@
-import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import {
   CancellationToken,
   Event,

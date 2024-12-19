@@ -3,7 +3,7 @@ import {
   NxProjectByPathRequest,
   NxProjectByRootRequest,
 } from '@nx-console/language-server-types';
-import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 
 export async function getProjectByPath(
   selectedPath: string | undefined

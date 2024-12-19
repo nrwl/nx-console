@@ -16,6 +16,18 @@
       "path": "../verify"
     },
     {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
       "path": "../output-channels"
     },
     {

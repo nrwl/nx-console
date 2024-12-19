@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
-import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
+import { getProjectByPath } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from './cli-task-provider';
 
 import { selectRunInformation } from '@nx-console/vscode/nx-cli-quickpicks';

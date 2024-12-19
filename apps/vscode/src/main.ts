@@ -39,7 +39,7 @@ import {
   createNxlsClient,
   getNxlsClient,
   showRefreshLoadingAtLocation,
-} from '@nx-console/vscode/lsp-client';
+} from '@nx-console/vscode-lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';

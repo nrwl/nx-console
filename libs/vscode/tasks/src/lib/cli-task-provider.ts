@@ -2,7 +2,7 @@ import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared-schema';
 import {
   getNxWorkspace,
   getNxWorkspacePathFromNxls,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { Task, TaskExecution, TaskProvider, tasks, window } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';

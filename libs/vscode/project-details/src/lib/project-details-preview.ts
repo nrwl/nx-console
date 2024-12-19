@@ -8,11 +8,11 @@ import {
   loadGraphErrorHtml,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getNxWorkspace,
   getProjectByPath,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import {

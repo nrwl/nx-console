@@ -3,8 +3,8 @@ import {
   getNxlsClient,
   onWorkspaceRefreshed,
   showRefreshLoadingAtLocation,
-} from '@nx-console/vscode/lsp-client';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-lsp-client';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { AbstractTreeProvider } from '@nx-console/vscode-utils';
 import { commands, ExtensionContext } from 'vscode';
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';

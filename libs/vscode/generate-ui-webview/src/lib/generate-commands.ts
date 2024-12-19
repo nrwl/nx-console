@@ -6,7 +6,7 @@ import {
   NxTreeItem,
   ProjectViewItem,
 } from '@nx-console/vscode/nx-project-view';
-import { getGeneratorContextV2 } from '@nx-console/vscode/nx-workspace';
+import { getGeneratorContextV2 } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { ExtensionContext, Uri, commands } from 'vscode';

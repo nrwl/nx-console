@@ -3,7 +3,7 @@ import type {
   CIPEInfoError,
   CloudOnboardingInfo,
 } from '@nx-console/shared-types';
-import { getRecentCIPEData } from '@nx-console/vscode/nx-workspace';
+import { getRecentCIPEData } from '@nx-console/vscode-nx-workspace';
 import {
   and,
   AnyEventObject,

@@ -7,8 +7,8 @@ import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { getNxVersion } from '@nx-console/vscode/nx-workspace';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { watchFile } from '@nx-console/vscode-utils';
 import { join } from 'path';
 import * as vscode from 'vscode';

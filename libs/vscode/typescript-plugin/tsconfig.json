@@ -4,10 +4,25 @@
   "include": [],
   "references": [
     {
+      "path": "../utils"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
       "path": "../output-channels"
     },
     {
-      "path": "../utils"
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../lsp-client"
     },
     {
       "path": "../configuration"

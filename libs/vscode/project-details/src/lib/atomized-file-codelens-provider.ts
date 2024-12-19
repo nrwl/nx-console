@@ -1,5 +1,5 @@
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import {
   NxCodeLensProvider,

@@ -7,13 +7,13 @@ import {
 import {
   getNxWorkspace,
   getProjectByPath,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { showNoProjectsMessage } from '@nx-console/vscode-utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 

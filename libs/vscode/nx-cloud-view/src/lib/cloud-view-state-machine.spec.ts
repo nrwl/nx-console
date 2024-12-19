@@ -4,11 +4,11 @@ import { CIPEInfo, CloudOnboardingInfo } from '@nx-console/shared-types';
 
 let actor: ActorRef<any, AnyEventObject>;
 
-jest.mock('@nx-console/vscode/nx-workspace', () => ({
+jest.mock('@nx-console/vscode-nx-workspace', () => ({
   getRecentCIPEData: jest.fn(),
 }));
 
-jest.mock('@nx-console/vscode/lsp-client', () => ({
+jest.mock('@nx-console/vscode-lsp-client', () => ({
   onWorkspaceRefreshed: jest.fn(),
 }));
 

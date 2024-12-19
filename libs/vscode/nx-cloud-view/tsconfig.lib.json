@@ -15,6 +15,21 @@
       "path": "../output-channels/tsconfig.lib.json"
     },
     {
+      "path": "../lsp-client/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/generate-ui-types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../language-server/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-workspace/tsconfig.lib.json"
+    },
+    {
       "path": "../configuration/tsconfig.lib.json"
     },
     {

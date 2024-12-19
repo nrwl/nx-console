@@ -1,5 +1,5 @@
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getProperties,
   getPropertyName,
@@ -7,7 +7,7 @@ import {
 import {
   getNxWorkspace,
   getProjectByPath,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {

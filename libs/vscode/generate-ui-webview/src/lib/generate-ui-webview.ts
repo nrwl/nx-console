@@ -15,7 +15,7 @@ import {
 import {
   getStartupMessage,
   getTransformedGeneratorSchema,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { existsSync } from 'node:fs';
 import {

@@ -1,6 +1,6 @@
 import { handleGraphInteractionEventBase } from '@nx-console/vscode/graph-base';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { getPDVData } from '@nx-console/vscode/nx-workspace';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
+import { getPDVData } from '@nx-console/vscode-nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { join } from 'path';
 import {

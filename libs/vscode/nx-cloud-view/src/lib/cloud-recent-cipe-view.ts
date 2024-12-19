@@ -20,7 +20,7 @@ import { ActorRef, EventObject } from 'xstate';
 import { formatMillis } from './format-time';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
-import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
+import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 
 abstract class BaseRecentCIPETreeItem extends TreeItem {
   abstract type: 'CIPE' | 'runGroup' | 'run' | 'label';

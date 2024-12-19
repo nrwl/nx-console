@@ -2,12 +2,12 @@ import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
 } from '@nx-console/vscode-configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getNxVersion,
   getProjectByPath,
   getSourceMapFilesToProjectsMap,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode-utils';

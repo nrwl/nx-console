@@ -9,7 +9,7 @@ import {
   getGeneratorOptions,
   getGenerators,
   getNxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { showNoGeneratorsMessage } from '@nx-console/vscode-utils';
 import { QuickPickItem, window } from 'vscode';
 import { selectFlags } from './select-flags';

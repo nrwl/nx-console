@@ -7,7 +7,7 @@ import {
   getNxVersion,
   getNxWorkspaceProjects,
   getProjectByPath,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode-utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { ExtensionContext, Uri, commands, window } from 'vscode';

@@ -19,6 +19,21 @@
       "path": "../output-channels"
     },
     {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
       "path": "../configuration"
     },
     {

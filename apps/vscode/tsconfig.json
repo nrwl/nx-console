@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/lsp-client"
+    },
+    {
       "path": "../../libs/vscode/output-channels"
     },
     {
