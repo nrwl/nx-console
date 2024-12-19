@@ -6,7 +6,7 @@ import { selectFlags } from './select-flags';
 import {
   showNoProjectsMessage,
   showNoTargetsMessage,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 
 export async function selectRunInformation(
   projectName?: string,

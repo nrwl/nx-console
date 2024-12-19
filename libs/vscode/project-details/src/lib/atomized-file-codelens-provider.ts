@@ -4,7 +4,7 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 import { join } from 'path';
 import {
   CallExpression,

@@ -13,7 +13,7 @@ import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   getShellExecutionForConfig,
   resolveDependencyVersioning,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import type { PackageManager } from 'nx/src/devkit-exports';

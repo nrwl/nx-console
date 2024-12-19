@@ -3469,6 +3469,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-utils@workspace:libs/vscode/utils":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-utils@workspace:libs/vscode/utils"
+  languageName: unknown
+  linkType: soft
+
 "@nx/cypress@npm:20.2.2":
   version: 20.2.2
   resolution: "@nx/cypress@npm:20.2.2"

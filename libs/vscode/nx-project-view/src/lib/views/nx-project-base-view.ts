@@ -1,7 +1,7 @@
 import { NxWorkspace } from '@nx-console/shared-types';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { join } from 'node:path';
 import type {
   ProjectConfiguration,

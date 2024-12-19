@@ -10,7 +10,7 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
+import { showNoProjectAtPathMessage } from '@nx-console/vscode-utils';
 import { dirname, join } from 'path';
 import {
   commands,

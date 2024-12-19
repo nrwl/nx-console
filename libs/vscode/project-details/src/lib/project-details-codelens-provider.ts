@@ -13,7 +13,7 @@ import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { parseJsonText } from 'typescript';
 import {

@@ -10,7 +10,7 @@ import { getTelemetry } from '@nx-console/vscode/telemetry';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 import { relative } from 'path';
 import {
   Node,

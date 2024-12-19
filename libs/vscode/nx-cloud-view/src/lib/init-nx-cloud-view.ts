@@ -14,7 +14,7 @@ import {
   getTelemetry,
   TelemetryEventSource,
 } from '@nx-console/vscode/telemetry';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { getWorkspacePath } from '@nx-console/vscode-utils';
 import {
   commands,
   ExtensionContext,

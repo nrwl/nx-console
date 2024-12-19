@@ -6,7 +6,7 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { NxCodeLensProvider } from '@nx-console/vscode/utils';
+import { NxCodeLensProvider } from '@nx-console/vscode-utils';
 import { ProjectLocations, getProjectLocations } from './get-project-locations';
 
 export class TargetCodeLens extends CodeLens {

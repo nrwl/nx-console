@@ -5,7 +5,7 @@ import {
   getProjectGraphOutput,
   hasAffectedProjects,
 } from '@nx-console/vscode/nx-workspace';
-import { showNoProjectsMessage } from '@nx-console/vscode/utils';
+import { showNoProjectsMessage } from '@nx-console/vscode-utils';
 import {
   commands,
   Disposable,
