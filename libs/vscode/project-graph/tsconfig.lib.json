@@ -1,14 +1,16 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
-    "types": ["node"]
+    "outDir": "out-tsc/vscode-project-graph",
+    "types": ["node"],
+    "noImplicitReturns": false
   },
-  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
   "include": ["**/*.ts"],
   "references": [
+    {
+      "path": "../nx-commands-view/tsconfig.lib.json"
+    },
     {
       "path": "../nx-cloud-onboarding-webview"
     },

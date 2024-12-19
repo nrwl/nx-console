@@ -13,6 +13,21 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-commands-view"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view"
+    },
+    {
+      "path": "../nx-project-view"
+    },
+    {
+      "path": "../project-graph"
+    },
+    {
       "path": "../nx-config-decoration"
     },
     {

@@ -13,7 +13,7 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode-nx-workspace';
-import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
+import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import {
   ExtensionContext,

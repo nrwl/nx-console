@@ -3539,6 +3539,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-project-graph@workspace:libs/vscode/project-graph":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-project-graph@workspace:libs/vscode/project-graph"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-tasks@workspace:libs/vscode/tasks":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-tasks@workspace:libs/vscode/tasks"

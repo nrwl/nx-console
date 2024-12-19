@@ -1,13 +1,6 @@
 import { createProjectGraph } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import {
-  assign,
-  createActor,
-  createMachine,
-  fromPromise,
-  interpret,
-  setup,
-} from 'xstate';
+import { assign, createActor, createMachine, fromPromise } from 'xstate';
 import { MessageType } from './graph-message-type';
 
 export const enum State {

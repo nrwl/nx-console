@@ -9,6 +9,21 @@
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
+      "path": "../nx-commands-view/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-project-view/tsconfig.lib.json"
+    },
+    {
+      "path": "../project-graph/tsconfig.lib.json"
+    },
+    {
       "path": "../nx-config-decoration/tsconfig.lib.json"
     },
     {
