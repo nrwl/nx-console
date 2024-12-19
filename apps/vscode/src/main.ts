@@ -21,7 +21,7 @@ import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
-import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
+import { initNxCommandsView } from '@nx-console/vscode-nx-commands-view';
 import {
   NxProjectTreeProvider,
   initNxProjectView,

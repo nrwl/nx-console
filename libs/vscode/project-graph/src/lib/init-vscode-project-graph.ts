@@ -24,7 +24,7 @@ import {
   legacyTaskButton,
 } from './legacy-implementation/project-graph';
 import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
-import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
+import { NxCommandsTreeItem } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { gte } from '@nx-console/nx-version';
 

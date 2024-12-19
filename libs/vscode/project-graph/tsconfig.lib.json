@@ -10,6 +10,15 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-project-view/tsconfig.lib.json"
+    },
+    {
       "path": "../telemetry/tsconfig.lib.json"
     },
     {

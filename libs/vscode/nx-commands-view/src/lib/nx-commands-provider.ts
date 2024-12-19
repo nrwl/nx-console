@@ -1,6 +1,5 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import {
-  getNxlsClient,
   onWorkspaceRefreshed,
   showRefreshLoadingAtLocation,
 } from '@nx-console/vscode-lsp-client';

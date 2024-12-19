@@ -4,6 +4,15 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view"
+    },
+    {
+      "path": "../nx-project-view"
+    },
+    {
       "path": "../telemetry"
     },
     {

@@ -14,7 +14,7 @@ import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
-import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
+import { NxCommandsTreeItem } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export function legacyShowAll(graphWebView: GraphWebView) {
