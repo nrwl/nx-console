@@ -3,11 +3,11 @@ import {
   getNxWorkspace,
   getNxWorkspacePathFromNxls,
 } from '@nx-console/vscode-nx-workspace';
-import { Task, TaskExecution, TaskProvider, tasks, window } from 'vscode';
+import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
+import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
-import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
 
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;

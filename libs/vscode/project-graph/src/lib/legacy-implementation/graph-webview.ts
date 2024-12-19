@@ -18,7 +18,7 @@ import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 import { join } from 'node:path';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';

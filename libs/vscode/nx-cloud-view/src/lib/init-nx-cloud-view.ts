@@ -9,7 +9,7 @@ import {
   getNxlsOutputChannel,
   getOutputChannel,
 } from '@nx-console/vscode-output-channels';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import {
   getTelemetry,
   TelemetryEventSource,

@@ -26,7 +26,7 @@ import {
   NxProjectTreeProvider,
   initNxProjectView,
 } from '@nx-console/vscode/nx-project-view';
-import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
+import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
 
 import { fileExists } from '@nx-console/shared-file-system';

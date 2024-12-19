@@ -3499,6 +3499,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-tasks@workspace:libs/vscode/tasks":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-tasks@workspace:libs/vscode/tasks"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry"
@@ -23600,12 +23606,6 @@ __metadata:
   checksum: f1322768c9741a25356c11373bce918483f40fa9a25c69c59410c8a1247632487edef5fe76c5f12ac51a6356d2f1829e96d2bc34098668a2fc34d76050ac2b6c
   languageName: node
   linkType: hard
-
-"tasks-2e0beb@workspace:libs/vscode/tasks":
-  version: 0.0.0-use.local
-  resolution: "tasks-2e0beb@workspace:libs/vscode/tasks"
-  languageName: unknown
-  linkType: soft
 
 "tcp-port-used@npm:^1.0.2":
   version: 1.0.2
