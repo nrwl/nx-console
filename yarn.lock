@@ -3469,6 +3469,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-nx-cli-quickpicks@workspace:libs/vscode/nx-cli-quickpicks":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-nx-cli-quickpicks@workspace:libs/vscode/nx-cli-quickpicks"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-nx-workspace@workspace:libs/vscode/nx-workspace":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-nx-workspace@workspace:libs/vscode/nx-workspace"

@@ -1,7 +1,7 @@
 import {
   selectGeneratorAndPromptForFlags,
   selectReMoveGenerator,
-} from '@nx-console/vscode/nx-cli-quickpicks';
+} from '@nx-console/vscode-nx-cli-quickpicks';
 import {
   NxTreeItem,
   ProjectViewItem,

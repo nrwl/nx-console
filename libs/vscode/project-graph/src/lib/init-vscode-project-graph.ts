@@ -1,7 +1,7 @@
 import {
   selectProject,
   selectTarget,
-} from '@nx-console/vscode/nx-cli-quickpicks';
+} from '@nx-console/vscode-nx-cli-quickpicks';
 import { NxTreeItem } from '@nx-console/vscode/nx-project-view';
 import {
   getNxVersion,

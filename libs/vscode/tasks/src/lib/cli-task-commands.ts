@@ -3,7 +3,7 @@ import { commands, ExtensionContext, Uri, window } from 'vscode';
 import { getProjectByPath } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from './cli-task-provider';
 
-import { selectRunInformation } from '@nx-console/vscode/nx-cli-quickpicks';
+import { selectRunInformation } from '@nx-console/vscode-nx-cli-quickpicks';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 
 export async function registerCliTaskCommands(context: ExtensionContext) {

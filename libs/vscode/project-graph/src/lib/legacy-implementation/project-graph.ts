@@ -1,4 +1,4 @@
-import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
+import { selectProject } from '@nx-console/vscode-nx-cli-quickpicks';
 import {
   NxTreeItem,
   ProjectViewItem,

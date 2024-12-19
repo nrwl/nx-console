@@ -1,4 +1,4 @@
-import { getOrSelectGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
+import { getOrSelectGenerator } from '@nx-console/vscode-nx-cli-quickpicks';
 import { getGeneratorContextV2 } from '@nx-console/vscode-nx-workspace';
 import { ExtensionContext, Uri } from 'vscode';
 import { registerGenerateCommands } from './generate-commands';

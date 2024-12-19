@@ -16,7 +16,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   selectAffectedFlags,
   selectRunManyFlags,
-} from '@nx-console/vscode/nx-cli-quickpicks';
+} from '@nx-console/vscode-nx-cli-quickpicks';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { NxTask } from './nx-task';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
