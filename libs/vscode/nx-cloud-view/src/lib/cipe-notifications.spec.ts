@@ -25,7 +25,7 @@ describe('CIPE Notifications', () => {
     jest
       .spyOn(
         //nx-ignore-next-line
-        require('@nx-console/vscode/configuration').GlobalConfigurationStore, // eslint-disable-line @typescript-eslint/no-var-requires
+        require('@nx-console/vscode-configuration').GlobalConfigurationStore, // eslint-disable-line @typescript-eslint/no-var-requires
         'instance',
         'get'
       )

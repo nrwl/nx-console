@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

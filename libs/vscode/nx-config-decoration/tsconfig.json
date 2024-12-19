@@ -11,13 +11,16 @@
   "include": [],
   "references": [
     {
+      "path": "../configuration"
+    },
+    {
       "path": "../../shared/types"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../../shared/schema"
     },
     {
-      "path": "../../shared/schema"
+      "path": "../../shared/nx-version"
     },
     {
       "path": "../../shared/npm"

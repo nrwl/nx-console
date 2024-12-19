@@ -7,6 +7,9 @@
       "path": "../output-channels"
     },
     {
+      "path": "../configuration"
+    },
+    {
       "path": "../../shared/nx-console-plugins"
     },
     {

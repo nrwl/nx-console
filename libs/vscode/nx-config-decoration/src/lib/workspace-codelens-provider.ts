@@ -1,7 +1,7 @@
 import { CodeLens, Command, Range, TextDocument, Uri } from 'vscode';
 
 import { buildProjectPath } from '@nx-console/shared-utils';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getNxWorkspace,
   getProjectByPath,

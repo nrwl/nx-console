@@ -11,7 +11,7 @@ import {
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
-} from '@nx-console/vscode/configuration';
+} from '@nx-console/vscode-configuration';
 import {
   getStartupMessage,
   getTransformedGeneratorSchema,

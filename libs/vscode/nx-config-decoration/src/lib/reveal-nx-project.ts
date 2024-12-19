@@ -1,5 +1,5 @@
 import { buildProjectPath } from '@nx-console/shared-utils';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { join } from 'path';
 import {
   Selection,

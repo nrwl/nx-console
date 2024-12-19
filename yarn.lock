@@ -3457,6 +3457,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-configuration@workspace:libs/vscode/configuration":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-configuration@workspace:libs/vscode/configuration"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels"
@@ -9582,12 +9588,6 @@ __metadata:
   checksum: 60ef65d493b63f96e14b11ba7ec072fdbf3d40110a94fb7199d1c287761bdea5c5244e76b2596325f30c1b652213aa75de96ea20afd4a5f82065e61ea090988e
   languageName: node
   linkType: hard
-
-"configuration-bebabc@workspace:libs/vscode/configuration":
-  version: 0.0.0-use.local
-  resolution: "configuration-bebabc@workspace:libs/vscode/configuration"
-  languageName: unknown
-  linkType: soft
 
 "confusing-browser-globals@npm:^1.0.9":
   version: 1.0.11

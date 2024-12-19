@@ -22,6 +22,9 @@
       "path": "../../shared/schema"
     },
     {
+      "path": "../configuration"
+    },
+    {
       "path": "../../shared/nx-version"
     },
     {

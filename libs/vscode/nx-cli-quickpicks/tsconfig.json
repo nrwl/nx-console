@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../configuration"
+    },
+    {
       "path": "../../shared/types"
     },
     {

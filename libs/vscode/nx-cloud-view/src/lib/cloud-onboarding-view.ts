@@ -5,7 +5,7 @@ import {
   importWorkspaceDependency,
 } from '@nx-console/shared-npm';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxCloudStatus } from '@nx-console/vscode/nx-workspace';
 
 import {

@@ -20,7 +20,7 @@ import {
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
+} from '@nx-console/vscode-configuration';
 import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
 import {
   NxProjectTreeProvider,

@@ -1,5 +1,5 @@
 import { matchWithWildcards } from '@nx-console/shared-utils';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getGenerators } from '@nx-console/vscode/nx-workspace';
 import { window } from 'vscode';
 

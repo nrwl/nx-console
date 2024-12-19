@@ -1,6 +1,6 @@
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { getPackageManagerCommand } from '@nx-console/shared-utils';
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
 import { xhr } from 'request-light';

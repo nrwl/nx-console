@@ -1,7 +1,7 @@
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
-} from '@nx-console/vscode/configuration';
+} from '@nx-console/vscode-configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxVersion,
