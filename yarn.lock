@@ -19198,6 +19198,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nxls-e2e@workspace:apps/nxls-e2e":
+  version: 0.0.0-use.local
+  resolution: "nxls-e2e@workspace:apps/nxls-e2e"
+  languageName: unknown
+  linkType: soft
+
 "nxls@workspace:apps/nxls":
   version: 0.0.0-use.local
   resolution: "nxls@workspace:apps/nxls"

@@ -4,8 +4,7 @@
     "outDir": "out-tsc/nxls",
     "types": ["node"],
     "strict": false,
-    "noImplicitReturns": false,
-    "baseUrl": "."
+    "noImplicitReturns": false
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
   "include": ["**/*.ts"],

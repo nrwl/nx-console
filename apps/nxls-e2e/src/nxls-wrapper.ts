@@ -11,8 +11,8 @@ import {
   StreamMessageWriter,
 } from 'vscode-languageserver/node';
 
-import { defaultVersion } from './utils';
 import { killGroup } from '@nx-console/shared-utils';
+import { defaultVersion } from './utils';
 
 export class NxlsWrapper {
   private cwd?: string;
