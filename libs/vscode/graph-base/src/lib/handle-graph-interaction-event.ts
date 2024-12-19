@@ -1,5 +1,5 @@
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
+import { revealNxProject } from '@nx-console/vscode-nx-config-decoration';
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';

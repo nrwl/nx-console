@@ -3,7 +3,7 @@ import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getProperties,
   getPropertyName,
-} from '@nx-console/vscode/nx-config-decoration';
+} from '@nx-console/vscode-nx-config-decoration';
 import {
   getNxWorkspace,
   getProjectByPath,
