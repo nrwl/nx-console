@@ -4,6 +4,15 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/telemetry"
+    },
+    {
+      "path": "../../libs/vscode/nx-workspace"
+    },
+    {
+      "path": "../../libs/vscode/typescript-plugin"
+    },
+    {
       "path": "../../libs/vscode/lsp-client"
     },
     {

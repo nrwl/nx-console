@@ -13,7 +13,7 @@ import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import {
   getTelemetry,
   TelemetryEventSource,
-} from '@nx-console/vscode/telemetry';
+} from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import {
   commands,

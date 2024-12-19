@@ -59,7 +59,7 @@ import {
   initOutputChannels,
 } from '@nx-console/vscode-output-channels';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
-import { getTelemetry, initTelemetry } from '@nx-console/vscode/telemetry';
+import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';

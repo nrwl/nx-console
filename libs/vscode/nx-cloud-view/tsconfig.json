@@ -16,9 +16,6 @@
       "path": "../utils"
     },
     {
-      "path": "../output-channels"
-    },
-    {
       "path": "../lsp-client"
     },
     {
@@ -32,6 +29,12 @@
     },
     {
       "path": "../nx-workspace"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../telemetry"
     },
     {
       "path": "../configuration"

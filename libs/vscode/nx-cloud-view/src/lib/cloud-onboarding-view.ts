@@ -24,7 +24,7 @@ import {
 import { withTimeout } from '@nx-console/shared-utils';
 import { getNxlsOutputChannel } from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { join } from 'path';
 import { isDeepStrictEqual } from 'util';
 import { ActorRef, EventObject } from 'xstate';

@@ -14,7 +14,7 @@ jest.mock('vscode', () => ({
   },
 }));
 
-jest.mock('@nx-console/vscode/telemetry', () => ({
+jest.mock('@nx-console/vscode-telemetry', () => ({
   getTelemetry: () => ({
     logUsage: jest.fn(),
   }),

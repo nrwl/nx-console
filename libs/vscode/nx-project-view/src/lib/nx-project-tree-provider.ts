@@ -9,7 +9,7 @@ import {
   CliTaskProvider,
   selectRunInformationAndRun,
 } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { AbstractTreeProvider } from '@nx-console/vscode-utils';
 import { commands, env, ExtensionContext } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';

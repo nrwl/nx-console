@@ -4,19 +4,28 @@
   "include": [],
   "references": [
     {
+      "path": "../telemetry"
+    },
+    {
+      "path": "../verify"
+    },
+    {
       "path": "../lsp-client"
     },
     {
       "path": "../../shared/nx-console-plugins"
     },
     {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
       "path": "../../language-server/types"
     },
     {
       "path": "../nx-workspace"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
     },
     {
       "path": "../output-channels"

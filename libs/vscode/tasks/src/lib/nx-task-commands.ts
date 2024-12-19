@@ -19,7 +19,7 @@ import {
 } from '@nx-console/vscode-nx-cli-quickpicks';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { NxTask } from './nx-task';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(

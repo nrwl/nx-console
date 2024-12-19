@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../telemetry"
+    },
+    {
       "path": "../../shared/npm"
     },
     {

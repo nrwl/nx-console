@@ -10,10 +10,19 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../verify/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-cli-quickpicks/tsconfig.lib.json"
+    },
+    {
+      "path": "../telemetry/tsconfig.lib.json"
     },
     {
       "path": "../nx-workspace/tsconfig.lib.json"

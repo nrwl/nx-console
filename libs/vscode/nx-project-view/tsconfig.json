@@ -4,10 +4,19 @@
   "include": [],
   "references": [
     {
+      "path": "../verify"
+    },
+    {
       "path": "../utils"
     },
     {
       "path": "../configuration"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../telemetry"
     },
     {
       "path": "../nx-workspace"

@@ -3487,6 +3487,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-typescript-plugin@workspace:libs/vscode/typescript-plugin":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-typescript-plugin@workspace:libs/vscode/typescript-plugin"
