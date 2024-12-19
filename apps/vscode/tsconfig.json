@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/output-channels"
+    },
+    {
       "path": "../../libs/vscode/nx-cloud-onboarding-webview"
     },
     {

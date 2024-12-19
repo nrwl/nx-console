@@ -8,7 +8,7 @@ import { getCloudOnboardingInfo } from '@nx-console/vscode/nx-workspace';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
-} from '@nx-console/vscode/output-channels';
+} from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import {
   getTelemetry,

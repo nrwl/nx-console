@@ -11,11 +11,11 @@ import { graphMachine } from './graph.machine';
 
 import { NxWorkspace } from '@nx-console/shared-types';
 import type * as nxWorkspace from '@nx-console/vscode/nx-workspace';
-import * as outputChannels from '@nx-console/vscode/output-channels';
+import * as outputChannels from '@nx-console/vscode-output-channels';
 import { MessageType } from './graph-message-type';
 
 jest.mock(
-  '@nx-console/vscode/output-channels',
+  '@nx-console/vscode-output-channels',
   (): PartialDeep<typeof outputChannels> => ({
     getOutputChannel: () => {
       return {

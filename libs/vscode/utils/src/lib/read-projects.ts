@@ -18,7 +18,7 @@ import {
 import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import { normalizeSchema } from '@nx-console/shared-schema';
 import { getPrimitiveValue } from '@nx-console/shared-utils';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
 export function readTargetDef(
   targetName: string,

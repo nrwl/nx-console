@@ -13,6 +13,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

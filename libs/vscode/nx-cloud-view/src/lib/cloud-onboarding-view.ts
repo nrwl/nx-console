@@ -22,7 +22,7 @@ import {
 } from 'vscode';
 
 import { withTimeout } from '@nx-console/shared-utils';
-import { getNxlsOutputChannel } from '@nx-console/vscode/output-channels';
+import { getNxlsOutputChannel } from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { join } from 'path';

@@ -1,5 +1,5 @@
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { Task, TaskScope } from 'vscode';

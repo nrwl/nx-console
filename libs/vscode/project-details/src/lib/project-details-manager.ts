@@ -2,7 +2,7 @@ import {
   getNxVersion,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
+import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
 import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
 import {
   OldProjectDetailsPreview,

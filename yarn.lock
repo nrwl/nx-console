@@ -3457,6 +3457,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels"
+  languageName: unknown
+  linkType: soft
+
 "@nx/cypress@npm:20.2.2":
   version: 20.2.2
   resolution: "@nx/cypress@npm:20.2.2"

@@ -1,5 +1,5 @@
 import { createProjectGraph } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import {
   assign,
   createActor,

@@ -2,7 +2,7 @@ import {
   getNxVersion,
   getProjectGraphOutput,
 } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { gte } from '@nx-console/nx-version';

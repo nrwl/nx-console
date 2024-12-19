@@ -1,7 +1,7 @@
 // THIS ENTIRE LOGIC IS COPIED FROM THE NX REPO
 // WE SHOULD CONSIDER MOVING THIS TO THE LIGHT CLIENT AND REUSING IT
 
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { execSync } from 'child_process';
 
 export async function createNxCloudOnboardingURL(accessToken?: string) {

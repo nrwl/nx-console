@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../output-channels"
+    },
+    {
       "path": "../../shared/schema"
     },
     {

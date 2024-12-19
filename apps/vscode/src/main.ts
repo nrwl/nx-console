@@ -57,7 +57,7 @@ import { initNxCloudView } from '@nx-console/vscode/nx-cloud-view';
 import {
   getOutputChannel,
   initOutputChannels,
-} from '@nx-console/vscode/output-channels';
+} from '@nx-console/vscode-output-channels';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { getTelemetry, initTelemetry } from '@nx-console/vscode/telemetry';
 import { RequestType } from 'vscode-languageserver';

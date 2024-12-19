@@ -20,7 +20,7 @@ import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 import { join } from 'node:path';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode/telemetry';
 import { waitFor } from 'xstate';
 

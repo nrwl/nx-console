@@ -1,14 +1,15 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
+    "outDir": "out-tsc/vscode-utils",
     "types": ["node"]
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"],
   "references": [
+    {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
     {
       "path": "../../shared/types/tsconfig.lib.json"
     },

@@ -14,7 +14,7 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 import { Actor, createActor, fromPromise, setup } from 'xstate';
 import { getExternalFiles, TSCONFIG_BASE } from './get-external-files';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { gte } from '@nx-console/nx-version';
 
 let disposables: vscode.Disposable[] = [];

@@ -19,6 +19,9 @@
       "path": "../../shared/types"
     },
     {
+      "path": "../output-channels"
+    },
+    {
       "path": "../../shared/schema"
     },
     {

@@ -13,9 +13,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/schema"
-    },
-    {
       "path": "../../shared/npm"
     },
     {
@@ -29,6 +26,12 @@
     },
     {
       "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../output-channels"
     },
     {
       "path": "./tsconfig.lib.json"

@@ -4,13 +4,16 @@
   "include": [],
   "references": [
     {
+      "path": "../output-channels"
+    },
+    {
       "path": "../../shared/types"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../../shared/schema"
     },
     {
-      "path": "../../shared/schema"
+      "path": "../../shared/nx-version"
     },
     {
       "path": "../../shared/npm"
