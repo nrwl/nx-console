@@ -47,7 +47,6 @@ import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode/typescript-plugin';
 
 import {
-  NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -337,15 +336,6 @@ async function registerWorkspaceFileWatcher(
     if (projects && Object.keys(projects).length > 0) {
       return;
     } else {
-      try {
-        await Promise.race([
-          nxlsClient.sendRequest(NxStopDaemonRequest, undefined),
-          new Promise((resolve) => setTimeout(resolve, 2000)),
-        ]);
-      } catch (e) {
-        // errors while stopping the daemon aren't critical
-      }
-
       await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
       await new Promise<void>((resolve) => {
