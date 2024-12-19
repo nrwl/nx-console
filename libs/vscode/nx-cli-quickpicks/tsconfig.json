@@ -13,6 +13,15 @@
   "include": [],
   "references": [
     {
+      "path": "../verify"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../utils"
+    },
+    {
       "path": "../configuration"
     },
     {

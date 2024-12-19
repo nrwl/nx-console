@@ -4,6 +4,24 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../utils"
+    },
+    {
       "path": "../configuration"
     },
     {

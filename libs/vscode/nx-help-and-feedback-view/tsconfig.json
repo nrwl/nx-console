@@ -4,6 +4,33 @@
   "include": [],
   "references": [
     {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../utils"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

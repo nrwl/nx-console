@@ -11,6 +11,12 @@
       "path": "../../libs/vscode/output-channels/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/configuration/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/nx-cloud-onboarding-webview"
     },
     {

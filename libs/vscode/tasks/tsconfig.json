@@ -4,22 +4,25 @@
   "include": [],
   "references": [
     {
-      "path": "../configuration"
+      "path": "../../shared/types"
     },
     {
       "path": "../../shared/utils"
     },
     {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../../shared/file-system"
     },
     {
-      "path": "../../shared/npm"
+      "path": "../configuration"
     },
     {
       "path": "../../shared/nx-version"
     },
     {
-      "path": "../../shared/types"
+      "path": "../utils"
     },
     {
       "path": "../output-channels"

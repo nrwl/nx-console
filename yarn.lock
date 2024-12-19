@@ -3475,6 +3475,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-verify@workspace:libs/vscode/verify":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-verify@workspace:libs/vscode/verify"
+  languageName: unknown
+  linkType: soft
+
 "@nx/cypress@npm:20.2.2":
   version: 20.2.2
   resolution: "@nx/cypress@npm:20.2.2"
@@ -24875,12 +24881,6 @@ __metadata:
   checksum: ae0123222c6df65b437669d63dfa8c36cee20a504101b2fcd97b8bf76f91259c17f9f2b4d70a1e3c6bbcee7f51b28392833adb6b2770b23b01abec84e369660b
   languageName: node
   linkType: hard
-
-"verify-1a848a@workspace:libs/vscode/verify":
-  version: 0.0.0-use.local
-  resolution: "verify-1a848a@workspace:libs/vscode/verify"
-  languageName: unknown
-  linkType: soft
 
 "verror@npm:1.10.0":
   version: 1.10.0

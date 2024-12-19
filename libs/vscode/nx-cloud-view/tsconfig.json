@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../utils"
+    },
+    {
       "path": "../output-channels"
     },
     {
