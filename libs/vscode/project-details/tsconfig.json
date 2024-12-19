@@ -13,6 +13,9 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-config-decoration"
+    },
+    {
       "path": "../telemetry"
     },
     {

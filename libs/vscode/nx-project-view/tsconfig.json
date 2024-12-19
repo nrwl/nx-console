@@ -4,7 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../tasks"
+      "path": "../nx-config-decoration"
     },
     {
       "path": "../verify"
@@ -13,16 +13,25 @@
       "path": "../utils"
     },
     {
-      "path": "../configuration"
+      "path": "../nx-cli-quickpicks"
     },
     {
-      "path": "../nx-cli-quickpicks"
+      "path": "../tasks"
+    },
+    {
+      "path": "../nx-workspace"
     },
     {
       "path": "../telemetry"
     },
     {
-      "path": "../nx-workspace"
+      "path": "../configuration"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view"
     },
     {
       "path": "../../shared/npm"

@@ -19,37 +19,16 @@
       "path": "../verify"
     },
     {
-      "path": "../utils"
-    },
-    {
       "path": "../nx-cli-quickpicks"
     },
     {
       "path": "../tasks"
     },
     {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../../shared/file-system"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
       "path": "../lsp-client"
     },
     {
       "path": "../../shared/nx-console-plugins"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../../shared/nx-version"
     },
     {
       "path": "../../shared/generate-ui-types"
@@ -59,6 +38,30 @@
     },
     {
       "path": "../nx-workspace"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../nx-config-decoration"
     },
     {
       "path": "../../shared/schema"

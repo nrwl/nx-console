@@ -3497,6 +3497,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-nx-cloud-view@workspace:libs/vscode/nx-cloud-view":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-nx-cloud-view@workspace:libs/vscode/nx-cloud-view"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-nx-config-decoration@workspace:libs/vscode/nx-config-decoration":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-nx-config-decoration@workspace:libs/vscode/nx-config-decoration"
@@ -18941,14 +18947,6 @@ __metadata:
   checksum: 5f1d361b38c47ab49727d5ea8bbfeb5867ae6de0e538eec9a8b77c88005ddde36d8b930e0730b50ee5e5dda949112c0f9ffed1bf15e7e1b3cd9cfa319f5a9b6f
   languageName: node
   linkType: hard
-
-"nx-cloud-view-199390@workspace:libs/vscode/nx-cloud-view":
-  version: 0.0.0-use.local
-  resolution: "nx-cloud-view-199390@workspace:libs/vscode/nx-cloud-view"
-  dependencies:
-    tslib: ^2.3.0
-  languageName: unknown
-  linkType: soft
 
 "nx-commands-view-32869a@workspace:libs/vscode/nx-commands-view":
   version: 0.0.0-use.local
