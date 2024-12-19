@@ -1,10 +1,7 @@
-import { getExternalFiles } from './get-external-files';
-import {
-  readAndCacheJsonFile,
-  listFiles,
-} from '@nx-console/shared-file-system';
+import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import { findConfig } from '@nx-console/shared-utils';
 import { dirname, join, posix, sep } from 'node:path';
+import { getExternalFiles } from './get-external-files';
 
 jest.mock('@nx-console/shared-file-system', () => ({
   readAndCacheJsonFile: jest.fn(),

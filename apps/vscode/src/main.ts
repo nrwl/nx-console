@@ -44,7 +44,7 @@ import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration'
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
-import { initTypeScriptServerPlugin } from '@nx-console/vscode/typescript-plugin';
+import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
 
 import {
   NxStopDaemonRequest,

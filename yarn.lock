@@ -3481,6 +3481,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-typescript-plugin@workspace:libs/vscode/typescript-plugin":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-typescript-plugin@workspace:libs/vscode/typescript-plugin"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-utils@workspace:libs/vscode/utils":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-utils@workspace:libs/vscode/utils"
@@ -24379,12 +24385,6 @@ __metadata:
   checksum: 07bfebdfb7a67b2a80557bf4f1061d8a68ee847d7f04c91c7aa327aa90681f97e1ea3efef17b3b8f336a7f2da1d2ff95dd92de59a4788b4e6373318b27fca2c1
   languageName: node
   linkType: hard
-
-"typescript-plugin-6dc9fd@workspace:libs/vscode/typescript-plugin":
-  version: 0.0.0-use.local
-  resolution: "typescript-plugin-6dc9fd@workspace:libs/vscode/typescript-plugin"
-  languageName: unknown
-  linkType: soft
 
 "typescript@npm:5.6.3, typescript@npm:~5.6.2":
   version: 5.6.3
