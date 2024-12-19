@@ -8,6 +8,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/nx-cloud-view/tsconfig.lib.json"
     },
     {

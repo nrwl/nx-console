@@ -1,4 +1,4 @@
-import { getNxGraphServer } from '@nx-console/vscode/graph-base';
+import { getNxGraphServer } from '@nx-console/vscode-graph-base';
 import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';

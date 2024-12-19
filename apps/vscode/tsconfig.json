@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/graph-base"
+    },
+    {
       "path": "../../libs/vscode/nx-cloud-view"
     },
     {

@@ -16,6 +16,9 @@
       "path": "../nx-config-decoration"
     },
     {
+      "path": "../graph-base"
+    },
+    {
       "path": "../telemetry"
     },
     {

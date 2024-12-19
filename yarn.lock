@@ -3475,6 +3475,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-graph-base@workspace:libs/vscode/graph-base":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-graph-base@workspace:libs/vscode/graph-base"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client"

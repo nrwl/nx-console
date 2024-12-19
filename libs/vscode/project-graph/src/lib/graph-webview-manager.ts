@@ -4,7 +4,7 @@ import {
   handleGraphInteractionEventBase,
   loadGraphBaseHtml,
   loadGraphErrorHtml,
-} from '@nx-console/vscode/graph-base';
+} from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import {
