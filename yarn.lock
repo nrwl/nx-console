@@ -3463,6 +3463,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-output-channels@workspace:libs/vscode/output-channels"
