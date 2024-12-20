@@ -12,7 +12,7 @@
     "serve": {
       "executor": "@nx/web:file-server",
       "options": {
-        "staticFilePath": "apps/generate-ui-v2-e2e/dist/generate-ui-v2",
+        "staticFilePath": "dist/apps/generate-ui-v2-e2e/generate-ui-v2",
         "buildTarget": "generate-ui-v2-e2e:setup-lit-dir",
         "watch": false
       },
