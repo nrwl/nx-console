@@ -1,6 +1,4 @@
-export const spyOnConsoleLog = (): Cypress.Chainable<
-  Cypress.Agent<sinon.SinonSpy>
-> =>
+export const spyOnConsoleLog = (): any =>
   cy.window().then((win) => {
     return cy.spy(win.console, 'log').as('consoleLog');
   });
