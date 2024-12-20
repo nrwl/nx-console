@@ -1,2 +1,2 @@
-export * from './lib/nxls-client';
-export * from './lib/show-refresh-loading';
+export * from './nxls-client';
+export * from './show-refresh-loading';
