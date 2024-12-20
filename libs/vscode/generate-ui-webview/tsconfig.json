@@ -4,10 +4,22 @@
   "include": [],
   "references": [
     {
-      "path": "../telemetry"
+      "path": "../nx-config-decoration"
     },
     {
       "path": "../tasks"
+    },
+    {
+      "path": "../telemetry"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view"
+    },
+    {
+      "path": "../nx-project-view"
     },
     {
       "path": "../verify"
