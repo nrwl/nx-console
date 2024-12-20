@@ -28,6 +28,16 @@ jobs:
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
 
+      - name: Gradle Wrapper Validation
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
       - name: Ensure Nx Cloud Agents are configured correctly
         run: yarn dlx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
 
@@ -48,16 +58,6 @@ jobs:
 
       - name: Install NPM dependencies
         run: yarn install --immutable
-
-      - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v3
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: gradle
 
       # We intentionally put the gradle tasks first because their artifacts are needed for project graph construction
       # and we do not want to give the false impression that the artifact download time is part of nx commands.
