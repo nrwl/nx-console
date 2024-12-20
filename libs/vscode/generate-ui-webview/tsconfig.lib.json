@@ -15,10 +15,22 @@
   ],
   "references": [
     {
-      "path": "../telemetry/tsconfig.lib.json"
+      "path": "../nx-config-decoration/tsconfig.lib.json"
     },
     {
       "path": "../tasks/tsconfig.lib.json"
+    },
+    {
+      "path": "../telemetry/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "../nx-cloud-view/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-project-view/tsconfig.lib.json"
     },
     {
       "path": "../verify/tsconfig.lib.json"
