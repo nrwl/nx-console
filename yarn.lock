@@ -13193,12 +13193,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"generate-ui-v2-copy@workspace:apps/generate-ui-v2-e2e/dist/generate-ui-v2":
-  version: 0.0.0-use.local
-  resolution: "generate-ui-v2-copy@workspace:apps/generate-ui-v2-e2e/dist/generate-ui-v2"
-  languageName: unknown
-  linkType: soft
-
 "generate-ui-v2@workspace:apps/generate-ui-v2":
   version: 0.0.0-use.local
   resolution: "generate-ui-v2@workspace:apps/generate-ui-v2"
