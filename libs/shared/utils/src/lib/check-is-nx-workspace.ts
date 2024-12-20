@@ -2,8 +2,8 @@ import { join } from 'path';
 import {
   fileExists,
   readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
-import { workspaceDependencyPath } from '@nx-console/shared/npm';
+} from '@nx-console/shared-file-system';
+import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { coerce } from 'semver';
 
 export async function checkIsNxWorkspace(

@@ -1,8 +1,0 @@
-{
-  "name": "vscode-tasks",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/tasks/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

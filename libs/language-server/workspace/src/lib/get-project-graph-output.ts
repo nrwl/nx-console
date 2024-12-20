@@ -1,8 +1,8 @@
-import { lspLogger } from '@nx-console/language-server/utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 import {
   findNxPackagePath,
   importWorkspaceDependency,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import { join, relative, normalize } from 'path';
 
 export async function getProjectGraphOutput(workspacePath: string) {

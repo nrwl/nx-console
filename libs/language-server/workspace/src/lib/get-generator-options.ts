@@ -1,6 +1,6 @@
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { Option } from '@nx-console/shared/schema';
-import { normalizeSchema } from '@nx-console/shared/schema/normalize';
+import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
+import { Option } from '@nx-console/shared-schema';
+import { normalizeSchema } from '@nx-console/shared-schema';
 import { nxWorkspace } from './workspace';
 
 export async function getGeneratorOptions(

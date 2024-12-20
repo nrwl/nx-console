@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/shared/schema';
+import { Option } from '@nx-console/shared-schema';
 import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
@@ -71,9 +71,7 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
     `;
   }
 
-  protected setFieldValue(
-    value: string | number | boolean | string[] | undefined
-  ): void {
+  setFieldValue(value: string | number | boolean | string[] | undefined): void {
     const selectNode = this.renderRoot.querySelector(
       this.editor === 'intellij' ? 'select' : 'vscode-dropdown'
     );
@@ -83,7 +81,7 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
     selectNode.value = value ? `${value}` : '';
   }
 
-  private handleChange(e: Event) {
+  handleChange(e: Event) {
     const value = (e.target as HTMLInputElement).value;
     this.dispatchValue(value);
   }

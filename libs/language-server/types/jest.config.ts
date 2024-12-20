@@ -13,6 +13,6 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/language-server/types',
+  coverageDirectory: 'test-output/jest/coverage',
   passWithNoTests: true,
 };

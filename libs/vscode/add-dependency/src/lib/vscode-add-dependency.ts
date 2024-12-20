@@ -1,19 +1,19 @@
-import { importNxPackagePath } from '@nx-console/shared/npm';
-import { gte } from '@nx-console/shared/nx-version';
-import { getPackageManagerCommand } from '@nx-console/shared/utils';
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
-import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
+import { importNxPackagePath } from '@nx-console/shared-npm';
+import { gte } from '@nx-console/nx-version';
+import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { selectFlags } from '@nx-console/vscode-nx-cli-quickpicks';
 import {
   getGeneratorOptions,
   getGenerators,
   getNxVersion,
-} from '@nx-console/vscode/nx-workspace';
-import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+} from '@nx-console/vscode-nx-workspace';
+import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getShellExecutionForConfig,
   resolveDependencyVersioning,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import type { PackageManager } from 'nx/src/devkit-exports';

@@ -1,6 +1,6 @@
 export { NxProjectTreeProvider } from './lib/nx-project-tree-provider';
 export { NxTreeItem } from './lib/nx-tree-item';
-export {
+export type {
   ProjectViewItem,
   NxProject,
   TargetViewItem,

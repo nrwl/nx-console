@@ -1,16 +1,16 @@
-import { NxWorkspace } from '@nx-console/shared/types';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { NxWorkspace } from '@nx-console/shared-types';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getNxWorkspace,
   getProjectFolderTree,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode-nx-workspace';
 import {
   CliTaskProvider,
   selectRunInformationAndRun,
-} from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
-import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-tasks';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { AbstractTreeProvider } from '@nx-console/vscode-utils';
 import { commands, env, ExtensionContext } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';

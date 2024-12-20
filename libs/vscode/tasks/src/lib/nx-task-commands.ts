@@ -8,18 +8,18 @@ import {
   window,
 } from 'vscode';
 
-import { readAndParseJson } from '@nx-console/shared/file-system';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { resolveDependencyVersioning } from '@nx-console/vscode/utils';
+import { readAndParseJson } from '@nx-console/shared-file-system';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { resolveDependencyVersioning } from '@nx-console/vscode-utils';
 
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   selectAffectedFlags,
   selectRunManyFlags,
-} from '@nx-console/vscode/nx-cli-quickpicks';
-import { logAndShowError } from '@nx-console/vscode/output-channels';
+} from '@nx-console/vscode-nx-cli-quickpicks';
+import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { NxTask } from './nx-task';
-import { getTelemetry } from '@nx-console/vscode/telemetry';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(

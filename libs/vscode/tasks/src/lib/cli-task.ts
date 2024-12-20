@@ -1,12 +1,11 @@
-import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
-import { Task, TaskScope } from 'vscode';
-import { CliTaskDefinition } from './cli-task-definition';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
+import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
-import { importNxPackagePath } from '@nx-console/shared/npm';
-import { getPackageManagerCommand } from '@nx-console/shared/utils';
+import { Task, TaskScope } from 'vscode';
+import { CliTaskDefinition } from './cli-task-definition';
 
 export class CliTask extends Task {
   /**

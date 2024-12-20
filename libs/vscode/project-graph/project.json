@@ -1,8 +1,0 @@
-{
-  "name": "vscode-project-graph",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/project-graph/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

@@ -1,7 +1,7 @@
 import {
   findProjectRoot,
   isStringNode,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 import fastGlob from 'fast-glob';
 import {
   ASTNode,

@@ -1,6 +1,5 @@
-import { lspLogger } from '@nx-console/language-server/utils';
-import { findNxPackagePath } from '@nx-console/shared/npm';
-import { NxVersion } from '@nx-console/shared/nx-version';
+import { findNxPackagePath } from '@nx-console/shared-npm';
+import { NxVersion } from '@nx-console/nx-version';
 import { coerce, SemVer } from 'semver';
 
 let nxWorkspacePackageJson: { version: string } | undefined;

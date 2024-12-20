@@ -1,6 +1,6 @@
 import type { PnpApi } from '@yarnpkg/pnp';
 import { join } from 'path';
-import { fileExists } from '@nx-console/shared/file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 
 let PNP_API: PnpApi;
 
@@ -59,7 +59,9 @@ export async function pnpDependencies(workspacePath: string) {
     if (!pkg?.packageDependencies) {
       continue;
     }
-    for (const [name, reference] of pkg?.packageDependencies ?? {}) {
+    for (const [name, reference] of Object.entries(
+      pkg?.packageDependencies ?? {}
+    )) {
       // Unmet peer dependencies
       if (reference === null) continue;
       if (!Array.isArray(reference) && reference.startsWith('workspace:'))
