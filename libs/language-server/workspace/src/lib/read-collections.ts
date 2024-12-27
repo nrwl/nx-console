@@ -148,6 +148,7 @@ export async function getCollectionInfo(
         schema.implementation
       ),
       configPath: formatPath(resolve(collectionPath, executorCollection.path)),
+      collectionName,
     };
     if (
       collectionMap.has(collectionNameWithType(collectionInfo.name, 'executor'))
@@ -182,6 +183,7 @@ export async function getCollectionInfo(
           resolve(collectionPath, generatorCollection.path)
         ),
         data: readCollectionGenerator(collectionName, key, schema),
+        collectionName,
       };
       if (
         collectionMap.has(

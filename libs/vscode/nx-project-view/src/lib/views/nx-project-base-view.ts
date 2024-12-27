@@ -7,7 +7,7 @@ import type {
   ProjectGraphProjectNode,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { ThemeIcon, TreeItemCollapsibleState } from 'vscode';
+import { TreeItemCollapsibleState } from 'vscode';
 
 interface BaseViewItem<Context extends string> {
   id: string;
