@@ -2874,12 +2874,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nrwl/devkit@npm:16.0.0":
-  version: 16.0.0
-  resolution: "@nrwl/devkit@npm:16.0.0"
+"@nrwl/devkit@npm:19.6.0":
+  version: 19.6.0
+  resolution: "@nrwl/devkit@npm:19.6.0"
   dependencies:
-    "@nx/devkit": 16.0.0
-  checksum: d6afcee3010730cdbe39b2b56dcdd67e9b23cfda1d55a348d6675161245fd12598ddbcbb5fbceaaea981f22efd0df8168f9cf2eff2db35ee8be1e7edbd4ab300
+    "@nx/devkit": 19.6.0
+  checksum: bf0b8c552727a0bde78de5c794a28d3a186e439f3a8d14b8847019c9691c086934042255e10eef1132de595258261e1ee43a0c5006085b2213ddf79a5c02f57c
   languageName: node
   linkType: hard
 
@@ -3152,19 +3152,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/devkit@npm:16.0.0":
-  version: 16.0.0
-  resolution: "@nx/devkit@npm:16.0.0"
+"@nx/devkit@npm:19.6.0":
+  version: 19.6.0
+  resolution: "@nx/devkit@npm:19.6.0"
   dependencies:
-    "@nrwl/devkit": 16.0.0
+    "@nrwl/devkit": 19.6.0
     ejs: ^3.1.7
+    enquirer: ~2.3.6
     ignore: ^5.0.4
-    semver: 7.3.4
+    minimatch: 9.0.3
+    semver: ^7.5.3
     tmp: ~0.2.1
     tslib: ^2.3.0
+    yargs-parser: 21.1.1
   peerDependencies:
-    nx: ">= 15 <= 17"
-  checksum: e7ca14daab3d26d299f69647739a78c539597e33fbfae80d1b633da84003fc1b28844f5fb064340fc17bd943f6be54e352766aaf1d22d600fe5c5fac4fb3bc2d
+    nx: ">= 17 <= 20"
+  checksum: 84346c146ea3c3b1d075ebf1fc500f16abcc382162f14c1435d6457eb4ed09dec8e033284f0f799f854e32f08528e79f9f7fb1df3d9c5cb786f2147d4b67b7bd
   languageName: node
   linkType: hard
 
@@ -4429,21 +4432,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@theunderscorer/nx-semantic-release@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@theunderscorer/nx-semantic-release@npm:2.4.0"
+"@theunderscorer/nx-semantic-release@npm:2.12.0":
+  version: 2.12.0
+  resolution: "@theunderscorer/nx-semantic-release@npm:2.12.0"
   dependencies:
-    "@nx/devkit": 16.0.0
+    "@nrwl/devkit": 19.6.0
+    "@nx/devkit": 19.6.0
     "@semantic-release/changelog": ^6.0.2
     "@semantic-release/exec": ^6.0.3
     "@semantic-release/git": ^10.0.1
     "@semantic-release/github": ^8.0.7
     "@semantic-release/npm": ^9.0.2
     cosmiconfig: ^7.0.1
+    deep-map: ^2.0.0
+    es6-weak-map: ^2.0.3
     remeda: ^0.0.32
     semantic-release: 20.1.0
     semantic-release-plugin-decorators: 3.0.1
-  checksum: 7d544f3cef9f4d51d9dbbad25fb2feecc610d83ddfb12cab982fef1dea2ca0e270a14a39ad393d1207a03c88792de562a34e82b9b22d869866df1a6217936779
+  checksum: 6aa1c98f67bfba76b6d3746b0bc6ef54a34524969b224d571409ad78c08680347643059007460e3c26b4ba5e6b5fcddb0d6f96c54685be414cb211dbf7df2d15
   languageName: node
   linkType: hard
 
@@ -7832,6 +7838,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"d@npm:1, d@npm:^1.0.1, d@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "d@npm:1.0.2"
+  dependencies:
+    es5-ext: ^0.10.64
+    type: ^2.7.2
+  checksum: 775db1e8ced6707cddf64a5840522fcf5475d38ef49a5d615be0ac47f86ef64d15f5a73de1522b09327cc466d4dc35ea83dbfeed456f7a0fdcab138deb800355
+  languageName: node
+  linkType: hard
+
 "dashdash@npm:^1.12.0":
   version: 1.14.1
   resolution: "dashdash@npm:1.14.1"
@@ -8020,6 +8036,16 @@ __metadata:
   version: 0.1.4
   resolution: "deep-is@npm:0.1.4"
   checksum: edb65dd0d7d1b9c40b2f50219aef30e116cedd6fc79290e740972c132c09106d2e80aa0bc8826673dd5a00222d4179c84b36a790eef63a4c4bca75a37ef90804
+  languageName: node
+  linkType: hard
+
+"deep-map@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "deep-map@npm:2.0.0"
+  dependencies:
+    lodash: ^4.17.11
+    tslib: ^1.6.0
+  checksum: a5cb07d7d5191fd7ec3f342e1782c4188f1200fb43ef7345e997814fc01009245a73c30c30a4d3fc201121d0b43c6bfe19adaa5cc44dc856fa56646f2ac229cc
   languageName: node
   linkType: hard
 
@@ -8725,6 +8751,51 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es5-ext@npm:^0.10.35, es5-ext@npm:^0.10.46, es5-ext@npm:^0.10.62, es5-ext@npm:^0.10.64, es5-ext@npm:~0.10.14":
+  version: 0.10.64
+  resolution: "es5-ext@npm:0.10.64"
+  dependencies:
+    es6-iterator: ^2.0.3
+    es6-symbol: ^3.1.3
+    esniff: ^2.0.1
+    next-tick: ^1.1.0
+  checksum: 01179fab0769fdbef213062222f99d0346724dbaccf04b87c0e6ee7f0c97edabf14be647ca1321f0497425ea7145de0fd278d1b3f3478864b8933e7136a5c645
+  languageName: node
+  linkType: hard
+
+"es6-iterator@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "es6-iterator@npm:2.0.3"
+  dependencies:
+    d: 1
+    es5-ext: ^0.10.35
+    es6-symbol: ^3.1.1
+  checksum: 6e48b1c2d962c21dee604b3d9f0bc3889f11ed5a8b33689155a2065d20e3107e2a69cc63a71bd125aeee3a589182f8bbcb5c8a05b6a8f38fa4205671b6d09697
+  languageName: node
+  linkType: hard
+
+"es6-symbol@npm:^3.1.1, es6-symbol@npm:^3.1.3":
+  version: 3.1.4
+  resolution: "es6-symbol@npm:3.1.4"
+  dependencies:
+    d: ^1.0.2
+    ext: ^1.7.0
+  checksum: 52125ec4b5d1b6b93b8d3d42830bb19f8da21080ffcf45253b614bc6ff3e31349be202fb745d4d1af6778cdf5e38fea30e0c7e7dc37e2aecd44acc43502055f9
+  languageName: node
+  linkType: hard
+
+"es6-weak-map@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "es6-weak-map@npm:2.0.3"
+  dependencies:
+    d: 1
+    es5-ext: ^0.10.46
+    es6-iterator: ^2.0.3
+    es6-symbol: ^3.1.1
+  checksum: 19ca15f46d50948ce78c2da5f21fb5b1ef45addd4fe17b5df952ff1f2a3d6ce4781249bc73b90995257264be2a98b2ec749bb2aba0c14b5776a1154178f9c927
+  languageName: node
+  linkType: hard
+
 "esbuild-copy-files-plugin@npm:^1.1.0":
   version: 1.2.0
   resolution: "esbuild-copy-files-plugin@npm:1.2.0"
@@ -9046,6 +9117,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esniff@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "esniff@npm:2.0.1"
+  dependencies:
+    d: ^1.0.1
+    es5-ext: ^0.10.62
+    event-emitter: ^0.3.5
+    type: ^2.7.2
+  checksum: d814c0e5c39bce9925b2e65b6d8767af72c9b54f35a65f9f3d6e8c606dce9aebe35a9599d30f15b0807743f88689f445163cfb577a425de4fb8c3c5bc16710cc
+  languageName: node
+  linkType: hard
+
 "espree@npm:^9.0.0, espree@npm:^9.6.0, espree@npm:^9.6.1":
   version: 9.6.1
   resolution: "espree@npm:9.6.1"
@@ -9110,6 +9193,16 @@ __metadata:
   version: 1.8.1
   resolution: "etag@npm:1.8.1"
   checksum: 571aeb3dbe0f2bbd4e4fadbdb44f325fc75335cd5f6f6b6a091e6a06a9f25ed5392f0863c5442acb0646787446e816f13cbfc6edce5b07658541dff573cab1ff
+  languageName: node
+  linkType: hard
+
+"event-emitter@npm:^0.3.5":
+  version: 0.3.5
+  resolution: "event-emitter@npm:0.3.5"
+  dependencies:
+    d: 1
+    es5-ext: ~0.10.14
+  checksum: 27c1399557d9cd7e0aa0b366c37c38a4c17293e3a10258e8b692a847dd5ba9fb90429c3a5a1eeff96f31f6fa03ccbd31d8ad15e00540b22b22f01557be706030
   languageName: node
   linkType: hard
 
@@ -9271,6 +9364,15 @@ __metadata:
     utils-merge: 1.0.1
     vary: ~1.1.2
   checksum: 212dbd6c2c222a96a61bc927639c95970a53b06257080bb9e2838adb3bffdb966856551fdad1ab5dd654a217c35db94f987d0aa88d48fb04d306340f5f34dca5
+  languageName: node
+  linkType: hard
+
+"ext@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "ext@npm:1.7.0"
+  dependencies:
+    type: ^2.7.2
+  checksum: ef481f9ef45434d8c867cfd09d0393b60945b7c8a1798bedc4514cb35aac342ccb8d8ecb66a513e6a2b4ec1e294a338e3124c49b29736f8e7c735721af352c31
   languageName: node
   linkType: hard
 
@@ -12840,7 +12942,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
+"lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -13628,6 +13730,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-tick@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "next-tick@npm:1.1.0"
+  checksum: 83b5cf36027a53ee6d8b7f9c0782f2ba87f4858d977342bfc3c20c21629290a2111f8374d13a81221179603ffc4364f38374b5655d17b6a8f8a8c77bdea4fe8b
+  languageName: node
+  linkType: hard
+
 "no-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "no-case@npm:3.0.4"
@@ -14136,7 +14245,7 @@ __metadata:
     "@swc/core": 1.5.7
     "@swc/helpers": 0.5.11
     "@tailwindcss/forms": 0.5.3
-    "@theunderscorer/nx-semantic-release": 2.4.0
+    "@theunderscorer/nx-semantic-release": 2.12.0
     "@types/find-cache-dir": ^3.2.1
     "@types/ini": ^4.1.1
     "@types/jest": 29.5.12
@@ -16648,17 +16757,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:7.3.4":
-  version: 7.3.4
-  resolution: "semver@npm:7.3.4"
-  dependencies:
-    lru-cache: ^6.0.0
-  bin:
-    semver: bin/semver.js
-  checksum: 96451bfd7cba9b60ee87571959dc47e87c95b2fe58a9312a926340fee9907fc7bc062c352efdaf5bb24b2dff59c145e14faf7eb9d718a84b4751312531b39f43
-  languageName: node
-  linkType: hard
-
 "semver@npm:7.5.4":
   version: 7.5.4
   resolution: "semver@npm:7.5.4"
@@ -18041,7 +18139,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.13.0":
+"tslib@npm:^1.13.0, tslib@npm:^1.6.0":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
@@ -18150,6 +18248,13 @@ __metadata:
     media-typer: 0.3.0
     mime-types: ~2.1.24
   checksum: 2c8e47675d55f8b4e404bcf529abdf5036c537a04c2b20177bcf78c9e3c1da69da3942b1346e6edb09e823228c0ee656ef0e033765ec39a70d496ef601a0c657
+  languageName: node
+  linkType: hard
+
+"type@npm:^2.7.2":
+  version: 2.7.3
+  resolution: "type@npm:2.7.3"
+  checksum: 69cfda3248847998f93b9d292fd251c10facf8d29513e2047d4684509d67bae82d910d7a00c1e9d9bbf2af242d36425b6616807d6c652c5c370c2be1f0008a47
   languageName: node
   linkType: hard
 
