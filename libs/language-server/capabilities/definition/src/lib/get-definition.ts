@@ -45,7 +45,7 @@ export async function getDefinition(
 
   let executorFile: string;
 
-  if (gte(nxVersion, '20.3.0-rc.0')) {
+  if (gte(nxVersion, '20.3.0')) {
     const projectGraph = (await nxWorkspace(workingPath)).projectGraph;
     const projects = Object.entries(projectGraph.nodes).reduce(
       (acc, [projectName, project]) => {
