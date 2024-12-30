@@ -164,7 +164,7 @@ intellijPlatformTesting {
                                 destinationDir,
                                 intellijPlatform.projectName.map { "$it/nxls" }.get(),
                             )
-                        commandLine = buildCommands() + "npm install --force"
+                        commandLine = listOf("cd && ") + buildCommands() + "npm install --force"
                     }
                 }
             }
