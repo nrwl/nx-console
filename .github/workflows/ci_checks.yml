@@ -43,7 +43,7 @@ jobs:
 
       - name: Start the Nx Cloud CI Run
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on="4 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING"
+          yarn dlx nx-cloud start-ci-run --distribute-on="4 linux-medium-plus-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING"
 
       - uses: browser-actions/setup-chrome@v1
 
