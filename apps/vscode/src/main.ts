@@ -82,7 +82,7 @@ export async function activate(c: ExtensionContext) {
 
     createNxlsClient(context);
 
-    initTelemetry(context.extensionMode === ExtensionMode.Production);
+    initTelemetry(context);
     initNxInit(context);
 
     context.subscriptions.push(
