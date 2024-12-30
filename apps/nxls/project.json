@@ -52,6 +52,11 @@
       }
     },
     "build": {
+      "command": "node ./tools/scripts/copy-nxls-package-json.js",
+      "dependsOn": ["_build"],
+      "inputs": ["{workspaceRoot}/tools/scripts/copy-nxls-package-json.js"]
+    },
+    "_build": {
       "defaultConfiguration": "production",
       "executor": "@nx/esbuild:esbuild",
       "outputs": ["{workspaceRoot}/dist/apps/nxls"],
