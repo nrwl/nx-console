@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../../shared/json-schema"
-    },
-    {
       "path": "../../../shared/nx-console-plugins"
     },
     {
@@ -16,25 +13,28 @@
       "path": "../../../shared/generate-ui-types"
     },
     {
-      "path": "../../../shared/types"
-    },
-    {
-      "path": "../../../shared/utils"
-    },
-    {
       "path": "../../workspace"
     },
     {
-      "path": "../../../shared/nx-version"
+      "path": "../../../shared/types"
     },
     {
-      "path": "../../../shared/file-system"
+      "path": "../../../shared/schema"
     },
     {
       "path": "../../../shared/npm"
     },
     {
-      "path": "../../../shared/schema"
+      "path": "../../../shared/file-system"
+    },
+    {
+      "path": "../../../shared/utils"
+    },
+    {
+      "path": "../../../shared/nx-version"
+    },
+    {
+      "path": "../../../shared/json-schema"
     },
     {
       "path": "../../utils"

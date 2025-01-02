@@ -13,10 +13,10 @@
       "path": "../../shared/utils"
     },
     {
-      "path": "../../shared/file-system"
+      "path": "../../shared/npm"
     },
     {
-      "path": "../../shared/npm"
+      "path": "../../shared/file-system"
     },
     {
       "path": "../../shared/schema"

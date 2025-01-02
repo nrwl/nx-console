@@ -19,10 +19,10 @@
       "path": "../../shared/utils/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/file-system/tsconfig.lib.json"
+      "path": "../../shared/npm/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/npm/tsconfig.lib.json"
+      "path": "../../shared/file-system/tsconfig.lib.json"
     },
     {
       "path": "../../shared/schema/tsconfig.lib.json"

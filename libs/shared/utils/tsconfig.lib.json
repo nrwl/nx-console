@@ -12,10 +12,10 @@
       "path": "../types/tsconfig.lib.json"
     },
     {
-      "path": "../nx-version/tsconfig.lib.json"
+      "path": "../schema/tsconfig.lib.json"
     },
     {
-      "path": "../schema/tsconfig.lib.json"
+      "path": "../nx-version/tsconfig.lib.json"
     },
     {
       "path": "../npm/tsconfig.lib.json"

@@ -12,10 +12,10 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../nx-version/tsconfig.lib.json"
+      "path": "../schema/tsconfig.lib.json"
     },
     {
-      "path": "../schema/tsconfig.lib.json"
+      "path": "../nx-version/tsconfig.lib.json"
     },
     {
       "path": "../file-system/tsconfig.lib.json"

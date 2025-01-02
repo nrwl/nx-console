@@ -7,6 +7,12 @@
       "path": "../verify"
     },
     {
+      "path": "../utils"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
       "path": "../lsp-client"
     },
     {
@@ -17,12 +23,6 @@
     },
     {
       "path": "../nx-workspace"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../utils"
     },
     {
       "path": "../configuration"

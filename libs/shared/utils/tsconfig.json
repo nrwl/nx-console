@@ -7,10 +7,10 @@
       "path": "../types"
     },
     {
-      "path": "../nx-version"
+      "path": "../schema"
     },
     {
-      "path": "../schema"
+      "path": "../nx-version"
     },
     {
       "path": "../npm"

@@ -6,8 +6,8 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
 // @ts-expect-error -- Browser Rollbar is not typed
 import Rollbar = require('rollbar/src/browser/rollbar');
-import { getNxVersion } from '@nx-console/vscode/nx-workspace';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 export class GoogleAnalyticsSender implements TelemetrySender {
   MEASUREMENT_ID = 'G-TNJ97NGX40';
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
@@ -26,7 +26,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     environment: this._version,
   });
 
-  constructor(private production: boolean, private context: ExtensionContext) {
+  constructor(private production: boolean, context: ExtensionContext) {
     getNxVersion().then((version) => (this._nxVersion = version?.full));
     context.subscriptions.push(
       onWorkspaceRefreshed(async () => {
