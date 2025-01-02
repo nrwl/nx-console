@@ -28,13 +28,15 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
       `;
     } else {
       return html`
-        <vscode-text-field
+        <vscode-textfield
           type="text"
           @input="${this.handleChange}"
-          style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+          style="${vscodeErrorStyleOverrides(this.shouldRenderError())} 
+          border-width: calc(var(--border-width)* 1px);"
+          class="w-full"
           ${spread(this.ariaAttributes)}
         >
-        </vscode-text-field>
+        </vscode-textfield>
       `;
     }
   }
@@ -46,7 +48,7 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
 
   setFieldValue(value: string | boolean | number | string[] | undefined) {
     const inputNode = this.renderRoot.querySelector(
-      this.editor === 'intellij' ? 'input' : 'vscode-text-field'
+      this.editor === 'intellij' ? 'input' : 'vscode-textfield'
     );
     if (!inputNode) {
       return;

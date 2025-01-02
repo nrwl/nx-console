@@ -30,29 +30,32 @@ export class SearchBar extends EditorContext(LitElement) {
       `;
     } else {
       return html`
-        <vscode-text-field
+        <vscode-textfield
+          style="border-width: calc(var(--border-width)* 1px);"
           class="w-full"
           placeholder="Search..."
           type="text"
           @input="${this.handleInput}"
           id="search-bar"
         >
-          <span slot="start">
-            <icon-element icon="search"></icon-element>
-          </span>
-          <div slot="end">
+          <vscode-icon
+            slot="content-before"
+            name="search"
+            title="search"
+          ></vscode-icon>
+          <div slot="content-after">
             <kbd class="bg-background whitespace-nowrap"
               >${this.getKeyboardShortcutSymbol()}S</kbd
             >
           </div>
-        </vscode-text-field>
+        </vscode-textfield>
       `;
     }
   }
 
   clearSearch() {
     const inputElement = this.renderRoot.querySelector<HTMLInputElement>(
-      this.editor === 'vscode' ? 'vscode-text-field' : 'input'
+      this.editor === 'vscode' ? 'vscode-textfield' : 'input'
     );
     if (inputElement) {
       inputElement.value = '';

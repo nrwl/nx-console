@@ -58,18 +58,18 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
         ${spread(this.ariaAttributes)}
       />`;
     } else {
-      return html`<vscode-text-field
+      return html`<vscode-textfield
         type="text"
         class="grow"
         @keydown="${this.handleEnterKeyAdd}"
         style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
         ${spread(this.ariaAttributes)}
-      ></vscode-text-field>`;
+      ></vscode-textfield>`;
     }
   }
 
   private get inputFieldSelector() {
-    return this.editor === 'intellij' ? 'input' : 'vscode-text-field';
+    return this.editor === 'intellij' ? 'input' : 'vscode-textfield';
   }
 
   private handleEnterKeyAdd(event: KeyboardEvent) {

@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { FormValuesService } from './form-values.service';
@@ -27,10 +27,15 @@ export class Root extends LitElement {
   @state()
   private searchValue = '';
 
+  private rootStyles = css`
+    --vscode-settings-textInputBorder: var(--field-border-color);
+  `;
+
   render() {
     const options = this.icc.generatorSchema?.options;
     return html` <div
       class="text-foreground m-auto flex h-screen max-w-screen-xl flex-col p-6"
+      style="${this.rootStyles}"
     >
       <div
         class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-3"
