@@ -42,8 +42,7 @@
     "onStartupFinished"
   ],
   "dependencies": {
-    "@monodon/typescript-nx-imports-plugin": "0.3.0",
-    "@vscode-elements/elements": "^1.6.1"
+    "@monodon/typescript-nx-imports-plugin": "0.3.0"
   },
   "contributes": {
     "typescriptServerPlugins": [
