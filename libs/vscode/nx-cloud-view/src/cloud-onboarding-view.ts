@@ -156,6 +156,17 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 				<title>Nx Cloud Onboarding</title>
       </head>
       <body>
+       <script
+        src="${webviewView.webview
+          .asWebviewUri(
+            Uri.joinPath(
+              this.extensionContext.extensionUri,
+              'node_modules/@vscode-elements/elements/dist/bundled.js'
+            )
+          )
+          .toString()}"
+        type="module"
+      ></script>
         <script type="module" src="${webviewScriptUri}"></script>
 				<root-element cloudOnboardingInfo='${JSON.stringify(
           cloudOnboardingInfo

@@ -2929,7 +2929,6 @@ __metadata:
   resolution: "@nx-console/vscode-nx-cloud-onboarding-webview@workspace:libs/vscode/nx-cloud-onboarding-webview"
   dependencies:
     "@microsoft/fast-foundation": ^2.49.0
-    "@vscode/webview-ui-toolkit": ^1.2.0
     lit: ^2.4.1
   languageName: unknown
   linkType: soft
