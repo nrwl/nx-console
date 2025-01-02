@@ -1,9 +1,15 @@
 import {
   isExecutorStringNode,
   lspLogger,
-} from '@nx-console/language-server/utils';
-import { getExecutors } from '@nx-console/language-server/workspace';
-import { importNxPackagePath } from '@nx-console/shared/npm';
+} from '@nx-console/language-server-utils';
+import {
+  getExecutors,
+  getNxVersion,
+  nxWorkspace,
+} from '@nx-console/language-server-workspace';
+import { gte } from '@nx-console/nx-version';
+import { importNxPackagePath } from '@nx-console/shared-npm';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { dirname } from 'path';
 import { JSONDocument } from 'vscode-json-languageservice';
 import { DefinitionParams, LocationLink } from 'vscode-languageserver';
@@ -31,13 +37,35 @@ export async function getDefinition(
     return undefined;
   }
 
+  const nxVersion = await getNxVersion(workingPath);
+
   const { resolveImplementation } = await importNxPackagePath<
     typeof import('nx/src/config/schema-utils')
   >(workingPath, 'src/config/schema-utils', lspLogger);
-  const executorFile = resolveImplementation(
-    executor.implementationPath,
-    dirname(executor.configPath)
-  );
+
+  let executorFile: string;
+
+  if (gte(nxVersion, '20.3.0')) {
+    const projectGraph = (await nxWorkspace(workingPath)).projectGraph;
+    const projects = Object.entries(projectGraph.nodes).reduce(
+      (acc, [projectName, project]) => {
+        acc[projectName] = project.data;
+        return acc;
+      },
+      {} as Record<string, ProjectConfiguration>
+    );
+    executorFile = resolveImplementation(
+      executor.implementationPath,
+      dirname(executor.configPath),
+      executor.collectionName,
+      projects
+    );
+  } else {
+    executorFile = (resolveImplementation as any)(
+      executor.implementationPath,
+      dirname(executor.configPath)
+    ) as string;
+  }
 
   return [
     LocationLink.create(

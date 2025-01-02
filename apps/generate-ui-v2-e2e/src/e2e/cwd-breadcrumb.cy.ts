@@ -1,4 +1,4 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { schema } from '../support/test-schema';
 import { visitGenerateUi } from '../support/visit-generate-ui';
 

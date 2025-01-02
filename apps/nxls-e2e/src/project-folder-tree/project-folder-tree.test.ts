@@ -11,8 +11,8 @@ import {
 import {
   NxProjectFolderTreeRequest,
   NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
-import { TreeMap, TreeNode } from '@nx-console/shared/types';
+} from '@nx-console/language-server-types';
+import { TreeMap, TreeNode } from '@nx-console/shared-types';
 import { mkdirSync, writeFileSync } from 'fs';
 
 let nxlsWrapper: NxlsWrapper;

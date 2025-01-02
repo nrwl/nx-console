@@ -1,6 +1,6 @@
-import { NxProjectFolderTreeRequest } from '@nx-console/language-server/types';
-import { TreeMap, TreeNode } from '@nx-console/shared/types';
-import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+import { NxProjectFolderTreeRequest } from '@nx-console/language-server-types';
+import { TreeMap, TreeNode } from '@nx-console/shared-types';
+import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 
 export async function getProjectFolderTree(): Promise<
   | {

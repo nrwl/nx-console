@@ -1,0 +1,14 @@
+{
+  "name": "@nx-console/vscode-graph-base",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-graph-base",
+    "sourceRoot": "libs/vscode/graph-base/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
+}

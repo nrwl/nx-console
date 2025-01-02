@@ -1,15 +1,15 @@
-import { NxGeneratorsRequestOptions } from '@nx-console/language-server/types';
+import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import {
   directoryExists,
   fileExists,
   listFiles,
   readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
+} from '@nx-console/shared-file-system';
 import {
   GeneratorCollectionInfo,
   GeneratorType,
-} from '@nx-console/shared/schema';
-import { normalizeSchema } from '@nx-console/shared/schema/normalize';
+} from '@nx-console/shared-schema';
+import { normalizeSchema } from '@nx-console/shared-schema';
 import { basename, join } from 'path';
 import { getCollectionInfo, readCollections } from './read-collections';
 

@@ -1,8 +1,0 @@
-{
-  "name": "language-server-capabilities-hover",
-  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/language-server/capabilities/hover/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:lsp"]
-}

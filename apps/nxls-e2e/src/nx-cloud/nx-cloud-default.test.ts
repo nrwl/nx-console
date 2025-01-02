@@ -9,7 +9,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from '../utils';
-import { NxCloudStatusRequest } from '@nx-console/language-server/types';
+import { NxCloudStatusRequest } from '@nx-console/language-server-types';
 import { readFileSync, writeFileSync } from 'fs';
 
 let nxlsWrapper: NxlsWrapper;

@@ -1,14 +1,13 @@
-import { NxWorkspace } from '@nx-console/shared/types';
-import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { NxWorkspace } from '@nx-console/shared-types';
+import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { join } from 'node:path';
 import type {
-  ProjectConfiguration,
   ProjectGraphProjectNode,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { ThemeIcon, TreeItemCollapsibleState } from 'vscode';
+import { TreeItemCollapsibleState } from 'vscode';
 
 interface BaseViewItem<Context extends string> {
   id: string;

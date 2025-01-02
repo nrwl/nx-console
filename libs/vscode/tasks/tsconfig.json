@@ -4,6 +4,57 @@
   "include": [],
   "references": [
     {
+      "path": "../telemetry"
+    },
+    {
+      "path": "../verify"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

@@ -1,10 +1,61 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
+    "outDir": "out-tsc/vscode-nx-cli-quickpicks",
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "out-tsc"
+  ],
+  "references": [
+    {
+      "path": "../verify/tsconfig.lib.json"
+    },
+    {
+      "path": "../utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../lsp-client/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
+      "path": "../../language-server/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-workspace/tsconfig.lib.json"
+    },
+    {
+      "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/file-system/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/generate-ui-types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/schema/tsconfig.lib.json"
+    }
+  ]
 }

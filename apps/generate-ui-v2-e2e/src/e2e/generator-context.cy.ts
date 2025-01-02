@@ -1,4 +1,4 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   expectConsoleLogToHaveBeenCalledWith,
   spyOnConsoleLog,
@@ -32,7 +32,7 @@ describe('generator context', () => {
     visitGenerateUi(schemaProj);
     getFieldByName('project').should('have.value', 'project3');
 
-    spyOnConsoleLog().then((consoleLog) => {
+    spyOnConsoleLog().then((consoleLog: any) => {
       cy.get("[data-cy='generate-button']").click();
       expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
       expectConsoleLogToHaveBeenCalledWith(consoleLog, '--project=project3');
@@ -59,7 +59,7 @@ describe('generator context', () => {
   };
   it('should use fixed form value and use them to construct the generate command', () => {
     visitGenerateUi(schemaFixed);
-    spyOnConsoleLog().then((consoleLog) => {
+    spyOnConsoleLog().then((consoleLog: any) => {
       cy.get("[data-cy='generate-button']").click();
       expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
       expectConsoleLogToHaveBeenCalledWith(consoleLog, '--sample=value');

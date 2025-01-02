@@ -1,4 +1,14 @@
 {
-  "name": "@nx-console/vscode/nx-conversion",
-  "version": "0.0.1"
+  "name": "@nx-console/vscode-nx-conversion",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-nx-conversion",
+    "sourceRoot": "libs/vscode/nx-conversion/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
 }

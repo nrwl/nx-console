@@ -1,6 +1,6 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { SchemaProcessor } from '../nx-console-plugin-types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 
 export const useGeneratorDefaultsProcessor: SchemaProcessor = (
   schema: GeneratorSchema,

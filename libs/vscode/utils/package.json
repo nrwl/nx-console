@@ -1,0 +1,14 @@
+{
+  "name": "@nx-console/vscode-utils",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-utils",
+    "sourceRoot": "libs/vscode/utils/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
+}

@@ -1,9 +1,4 @@
-import {
-  xhr,
-  XHRResponse,
-  configure as configureHttpRequests,
-  getErrorStatusDescription,
-} from 'request-light';
+import { xhr, XHRResponse, getErrorStatusDescription } from 'request-light';
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
 import { Thenable } from 'vscode-json-languageservice';

@@ -1,4 +1,3 @@
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import {
   ExtensionContext,
   ExtensionMode,
@@ -6,6 +5,7 @@ import {
   TelemetrySender,
   env,
 } from 'vscode';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { GoogleAnalyticsSender } from './google-analytics-sender';
 import { LoggerSender } from './logger-sender';
 import { TelemetryData, TelemetryEvents } from './telemetry-types';

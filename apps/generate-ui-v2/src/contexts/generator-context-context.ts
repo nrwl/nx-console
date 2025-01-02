@@ -1,5 +1,5 @@
 import { ContextConsumer, createContext } from '@lit-labs/context';
-import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
+import { GeneratorContext } from '@nx-console/shared-generate-ui-types';
 import { LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 

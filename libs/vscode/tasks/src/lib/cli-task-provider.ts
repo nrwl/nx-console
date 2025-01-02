@@ -1,13 +1,13 @@
-import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared/schema';
+import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared-schema';
 import {
   getNxWorkspace,
   getNxWorkspacePathFromNxls,
-} from '@nx-console/vscode/nx-workspace';
-import { Task, TaskExecution, TaskProvider, tasks, window } from 'vscode';
+} from '@nx-console/vscode-nx-workspace';
+import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
+import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
-import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
 
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;

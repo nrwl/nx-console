@@ -3,12 +3,14 @@ import { normalize } from 'node:path';
 
 fs.copySync(
   normalize('../../dist/apps/generate-ui-v2'),
-  normalize('./dist/generate-ui-v2')
+  normalize('../../dist/apps/generate-ui-v2-e2e/generate-ui-v2')
 );
 
-fs.createFileSync(normalize('./dist/generate-ui-v2/index.html'));
+fs.createFileSync(
+  normalize('../../dist/apps/generate-ui-v2-e2e/generate-ui-v2/index.html')
+);
 fs.writeFileSync(
-  normalize('./dist/generate-ui-v2/index.html'),
+  normalize('../../dist/apps/generate-ui-v2-e2e/generate-ui-v2/index.html'),
   `
     <!DOCTYPE html>
     <html lang="en">
@@ -41,4 +43,12 @@ fs.writeFileSync(
     </body>
     </html>
 `
+);
+
+fs.writeFileSync(
+  normalize('../../dist/apps/generate-ui-v2-e2e/generate-ui-v2/package.json'),
+  `{
+    "name": "generate-ui-v2-copy",
+    "sideEffects": true
+  }`
 );

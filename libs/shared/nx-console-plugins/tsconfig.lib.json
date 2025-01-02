@@ -1,10 +1,28 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
-    "declaration": true,
+    "outDir": "out-tsc/shared-nx-console-plugins",
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": [
+    "out-tsc",
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../types/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../generate-ui-types/tsconfig.lib.json"
+    }
+  ]
 }

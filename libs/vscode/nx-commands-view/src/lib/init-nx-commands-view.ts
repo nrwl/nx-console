@@ -1,5 +1,5 @@
-import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { commands, ExtensionContext, window } from 'vscode';
 import { NxCommandsTreeProvider } from './nx-commands-provider';
 export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';

@@ -53,14 +53,6 @@
       "parallelism": false,
       "dependsOn": ["^build"]
     },
-    "build-storybook": {
-      "inputs": [
-        "production",
-        "^production",
-        "{workspaceRoot}/.storybook/**/*",
-        "{projectRoot}/.storybook/**/*"
-      ]
-    },
     "_build": {
       "cache": true
     },
@@ -92,9 +84,7 @@
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/.storybook/**/*",
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
-      "!{projectRoot}/tsconfig.storybook.json",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/src/test/**/*"
     ],
@@ -106,6 +96,10 @@
     ]
   },
   "plugins": [
+    {
+      "plugin": "@nx/js/typescript",
+      "options": {}
+    },
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
@@ -136,25 +130,20 @@
       }
     },
     {
-      "plugin": "@nx/storybook/plugin",
-      "options": {
-        "buildStorybookTargetName": "build-storybook",
-        "serveStorybookTargetName": "storybook"
-      }
-    },
-    {
       "plugin": "@nx/gradle",
       "options": {
         "testTargetName": "test",
         "classesTargetName": "classes",
-        "buildTargetName": "build"
+        "buildTargetName": "build",
+        "includeSubprojectsTasks": true
       }
     },
     "@nx/powerpack-enterprise-cloud",
     "@nx/powerpack-owners"
   ],
   "sync": {
-    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"]
+    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],
+    "applyChanges": true
   },
   "owners": {
     "format": "github",

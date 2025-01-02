@@ -1,4 +1,14 @@
 {
-  "name": "@nx-console/vscode/tasks",
-  "version": "0.0.1"
+  "name": "@nx-console/vscode-tasks",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-tasks",
+    "sourceRoot": "libs/vscode/tasks/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
 }

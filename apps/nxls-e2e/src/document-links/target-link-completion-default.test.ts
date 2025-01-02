@@ -7,7 +7,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from '../utils';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 import { readFileSync } from 'fs';
 import { URI } from 'vscode-uri';
 import { Position } from 'vscode-languageserver';

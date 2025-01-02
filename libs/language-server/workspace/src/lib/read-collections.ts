@@ -1,19 +1,19 @@
 import {
   clearJsonCache,
   readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
+} from '@nx-console/shared-file-system';
 import {
   packageDetails,
   workspaceDependencies,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import {
   CollectionInfo,
   ExecutorCollectionInfo,
   Generator,
   GeneratorCollectionInfo,
   GeneratorType,
-} from '@nx-console/shared/schema';
+} from '@nx-console/shared-schema';
 import { platform } from 'os';
 import { dirname, resolve } from 'path';
 import { nxWorkspace } from './workspace';
@@ -148,6 +148,7 @@ export async function getCollectionInfo(
         schema.implementation
       ),
       configPath: formatPath(resolve(collectionPath, executorCollection.path)),
+      collectionName,
     };
     if (
       collectionMap.has(collectionNameWithType(collectionInfo.name, 'executor'))
@@ -182,6 +183,7 @@ export async function getCollectionInfo(
           resolve(collectionPath, generatorCollection.path)
         ),
         data: readCollectionGenerator(collectionName, key, schema),
+        collectionName,
       };
       if (
         collectionMap.has(

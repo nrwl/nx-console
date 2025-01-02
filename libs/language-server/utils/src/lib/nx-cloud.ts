@@ -1,4 +1,4 @@
-import { importNxPackagePath, readNxJson } from '@nx-console/shared/npm';
+import { importNxPackagePath, readNxJson } from '@nx-console/shared-npm';
 import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
 import { lspLogger } from './lsp-log';
 

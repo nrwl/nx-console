@@ -13,7 +13,7 @@ import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('input-field')
 export class InputField extends FieldWrapper(Field(LitElement)) {
-  protected renderField(): TemplateResult {
+  renderField(): TemplateResult {
     const error = this.shouldRenderError();
     if (this.editor === 'intellij') {
       return html`
@@ -44,9 +44,7 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
     this.dispatchValue(value);
   }
 
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ) {
+  setFieldValue(value: string | boolean | number | string[] | undefined) {
     const inputNode = this.renderRoot.querySelector(
       this.editor === 'intellij' ? 'input' : 'vscode-text-field'
     );

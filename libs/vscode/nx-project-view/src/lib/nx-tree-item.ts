@@ -10,8 +10,6 @@ import { ATOMIZED_SCHEME } from './atomizer-decorations';
 import { PROJECT_GRAPH_ERROR_DECORATION_SCHEME } from './project-graph-error-decorations';
 
 export class NxTreeItem extends TreeItem {
-  id: string;
-
   constructor(public readonly item: ViewItem) {
     super(item.label, item.collapsible);
 
