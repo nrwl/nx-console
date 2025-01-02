@@ -61,7 +61,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [this._webviewSourceUri],
+      localResourceRoots: [this.extensionContext.extensionUri],
     };
 
     webviewView.webview.html = this.getWebviewContent(
@@ -146,6 +146,17 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
       )
     );
 
+    const vscodeElementsUri = webviewView.webview.asWebviewUri(
+      Uri.joinPath(
+        this.extensionContext.extensionUri,
+        'node_modules',
+        '@vscode-elements',
+        'elements',
+        'dist',
+        'bundled.js'
+      )
+    );
+
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -154,19 +165,12 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         <link href="${codiconsUri}" rel="stylesheet">
 
 				<title>Nx Cloud Onboarding</title>
-      </head>
-      <body>
-       <script
-        src="${webviewView.webview
-          .asWebviewUri(
-            Uri.joinPath(
-              this.extensionContext.extensionUri,
-              'node_modules/@vscode-elements/elements/dist/bundled.js'
-            )
-          )
-          .toString()}"
+         <script
+        src="${vscodeElementsUri}"
         type="module"
       ></script>
+      </head>
+      <body>
         <script type="module" src="${webviewScriptUri}"></script>
 				<root-element cloudOnboardingInfo='${JSON.stringify(
           cloudOnboardingInfo
