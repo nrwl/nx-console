@@ -3,7 +3,6 @@ import { dirname, join, parse, relative, resolve } from 'path';
 import {
   Disposable,
   ExtensionContext,
-  ExtensionMode,
   ProgressLocation,
   RelativePattern,
   commands,

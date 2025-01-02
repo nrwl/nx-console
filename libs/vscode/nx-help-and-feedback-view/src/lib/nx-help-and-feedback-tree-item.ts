@@ -12,11 +12,7 @@ export class NxHelpAndFeedbackTreeItem extends TreeItem {
   constructor(
     private readonly title: string,
     private readonly link: string,
-    readonly icon:
-      | string
-      | Uri
-      | { light: string | Uri; dark: string | Uri }
-      | ThemeIcon
+    readonly icon: string | Uri | { light: Uri; dark: Uri } | ThemeIcon
   ) {
     super(title, TreeItemCollapsibleState.None);
     this.iconPath = icon;
