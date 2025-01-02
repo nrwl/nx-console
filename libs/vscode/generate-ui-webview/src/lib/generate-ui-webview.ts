@@ -58,7 +58,7 @@ export class GenerateUiWebview {
       {
         retainContextWhenHidden: true,
         enableScripts: true,
-        localResourceRoots: [this._webviewSourceUri],
+        localResourceRoots: [this.context.extensionUri],
       }
     );
 
@@ -79,6 +79,17 @@ export class GenerateUiWebview {
       )
     );
 
+    const vscodeElementsUri = this.webviewPanel.webview.asWebviewUri(
+      Uri.joinPath(
+        this.context.extensionUri,
+        'node_modules',
+        '@vscode-elements',
+        'elements',
+        'dist',
+        'bundled.js'
+      )
+    );
+
     this.webviewPanel.webview.html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -86,7 +97,11 @@ export class GenerateUiWebview {
             <meta charset="UTF-8">
             <title>Generate UI</title>
             <link href="${stylesUri}" rel="stylesheet">
-            <link href="${codiconsUri}" rel="stylesheet">
+            <link 
+            href="${codiconsUri}" 
+            rel="stylesheet"
+            id="vscode-codicon-stylesheet"
+            >
             <style>
             :root {
               ${this.getVscodeStyleMappings()}
@@ -96,6 +111,7 @@ export class GenerateUiWebview {
               padding: 0;
             }
             </style>
+            <script type="module" src="${vscodeElementsUri}"></script>
         </head>
         <body>
           <script type="module" src="${scriptUri}"></script>

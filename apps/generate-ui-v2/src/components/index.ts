@@ -1,11 +1,3 @@
-import {
-  provideVSCodeDesignSystem,
-  vsCodeButton,
-  vsCodeCheckbox,
-  vsCodeDropdown,
-  vsCodeOption,
-  vsCodeTextField,
-} from '@vscode/webview-ui-toolkit';
 import { vscodeComboboxStyles } from './fields/autocomplete/vscode-autocomplete-styles';
 import {
   fastCombobox,
@@ -65,12 +57,4 @@ provideFASTDesignSystem().register(
       ></img>`,
   }),
   fastOption({ prefix: 'intellij', styles: intellijOptionStyles })
-);
-
-provideVSCodeDesignSystem().register(
-  vsCodeButton(),
-  vsCodeTextField(),
-  vsCodeCheckbox(),
-  vsCodeDropdown(),
-  vsCodeOption()
 );
