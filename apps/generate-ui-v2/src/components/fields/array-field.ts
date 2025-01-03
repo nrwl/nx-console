@@ -25,7 +25,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
           appearance="secondary"
           @click="${this.addValue}"
           data-cy="${this.fieldId}-add-button"
-          class="self-center"
+          class="flex items-center self-center"
           style="${this.shouldRenderError()
             ? '--field-border-color: var(--error-color); --focus-border-color: var(--error-color);'
             : ''}"
@@ -60,9 +60,11 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
     } else {
       return html`<vscode-textfield
         type="text"
-        class="grow"
+        class="focus:border-focusBorder grow "
         @keydown="${this.handleEnterKeyAdd}"
-        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+        style="border-width: calc(var(--border-width) * 1px); ${vscodeErrorStyleOverrides(
+          this.shouldRenderError()
+        )}"
         ${spread(this.ariaAttributes)}
       ></vscode-textfield>`;
     }
