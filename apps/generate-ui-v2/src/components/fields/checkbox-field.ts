@@ -1,13 +1,9 @@
-import { html, LitElement, PropertyValueMap } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { Field } from './mixins/field-mixin';
 import { spread } from '@open-wc/lit-helpers';
-import {
-  intellijFieldColors,
-  intellijFieldPadding,
-  intellijFocusRing,
-} from '../../utils/ui-utils';
+import { html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
+import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
 import { CheckboxWrapper } from './mixins/checkbox-wrapper-mixin';
+import { Field } from './mixins/field-mixin';
 
 @customElement('checkbox-field')
 export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {

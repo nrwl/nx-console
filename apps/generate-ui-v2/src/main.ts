@@ -29,7 +29,6 @@ export class Root extends LitElement {
 
   private rootStyles = css`
     --border-width: 1;
-    --vscode-settings-textInputBorder: var(--field-border-color);
   `;
 
   render() {

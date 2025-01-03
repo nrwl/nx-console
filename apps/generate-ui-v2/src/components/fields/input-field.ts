@@ -32,8 +32,8 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
           type="text"
           @input="${this.handleChange}"
           style="${vscodeErrorStyleOverrides(this.shouldRenderError())} 
-          border-width: calc(var(--border-width)* 1px);"
-          class="w-full"
+          border-width: calc(var(--border-width) * 1px);"
+          class="focus:border-focusBorder w-full"
           ${spread(this.ariaAttributes)}
         >
         </vscode-textfield>
