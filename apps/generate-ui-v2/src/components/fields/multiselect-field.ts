@@ -63,9 +63,11 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         )}
       </select>`;
     } else {
+      const shouldRenderError = this.shouldRenderError();
       return html` <vscode-single-select
         @change="${this.addValue}"
-        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+        style="${vscodeErrorStyleOverrides(shouldRenderError)}"
+        ?invalid=${shouldRenderError}
         ${spread(this.ariaAttributes)}
       >
         <vscode-option value="">

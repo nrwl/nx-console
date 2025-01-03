@@ -22,6 +22,7 @@ export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {
           ? '--border-width: 1; --checkbox-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
           : ''}"
         ${spread(this.ariaAttributes)}
+        ?invalid=${this.shouldRenderError()}
       ></vscode-checkbox>`;
     }
   }

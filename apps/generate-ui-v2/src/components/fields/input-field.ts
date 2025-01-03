@@ -1,14 +1,13 @@
-import { html, LitElement, TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { Field } from './mixins/field-mixin';
 import { spread } from '@open-wc/lit-helpers';
+import { css, html, LitElement, TemplateResult } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import {
   intellijErrorRingStyles,
   intellijFieldColors,
   intellijFieldPadding,
   intellijFocusRing,
-  vscodeErrorStyleOverrides,
 } from '../../utils/ui-utils';
+import { Field } from './mixins/field-mixin';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('input-field')
@@ -31,9 +30,9 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
         <vscode-textfield
           type="text"
           @input="${this.handleChange}"
-          style="${vscodeErrorStyleOverrides(this.shouldRenderError())} 
-          border-width: calc(var(--border-width) * 1px);"
+          style="border-width: calc(var(--border-width) * 1px);"
           class="focus:border-focusBorder w-full"
+          ?invalid=${this.shouldRenderError()}
           ${spread(this.ariaAttributes)}
         >
         </vscode-textfield>

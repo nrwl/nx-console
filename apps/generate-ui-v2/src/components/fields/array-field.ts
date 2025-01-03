@@ -62,9 +62,8 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
         type="text"
         class="focus:border-focusBorder grow "
         @keydown="${this.handleEnterKeyAdd}"
-        style="border-width: calc(var(--border-width) * 1px); ${vscodeErrorStyleOverrides(
-          this.shouldRenderError()
-        )}"
+        style="border-width: calc(var(--border-width) * 1px);"
+        ?invalid=${this.shouldRenderError()}
         ${spread(this.ariaAttributes)}
       ></vscode-textfield>`;
     }

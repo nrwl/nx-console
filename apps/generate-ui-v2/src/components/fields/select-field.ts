@@ -58,10 +58,8 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
     return html`
       <vscode-single-select
         @change="${this.handleChange}"
-        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
         class="w-full"
-        ?combobox="${itemOptions.length > 5}"
-        filter="fuzzy"
+        ?invalid=${this.shouldRenderError()}
         ${spread(this.ariaAttributes)}
       >
         ${when(
