@@ -1,10 +1,16 @@
 import { ContextConsumer } from '@lit-labs/context';
 import { LitElement } from 'lit';
-import { formValuesServiceContext } from '../form-values.service';
+import {
+  FormValuesService,
+  formValuesServiceContext,
+} from '../form-values.service';
 import { submittedContext } from '../contexts/submitted-context';
 import { state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared-schema';
-import { GeneratorContext } from '@nx-console/shared-generate-ui-types';
+import {
+  FormValues,
+  GeneratorContext,
+} from '@nx-console/shared-generate-ui-types';
 import { generatorContextContext } from '../contexts/generator-context-context';
 
 type Constructor<T> = new (...args: any[]) => T;
@@ -18,6 +24,7 @@ export declare class FieldValueConsumerInterface {
   generatorContext: GeneratorContext | undefined;
   shouldRenderChanged(): boolean;
   shouldRenderError(): boolean;
+  getFormValues(): FormValues;
 }
 
 export const FieldValueConsumer = <T extends Constructor<LitElement>>(
@@ -38,6 +45,12 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
     @state()
     submitted = false;
 
+    private formValuesService: FormValuesService;
+
+    protected getFormValues() {
+      return this.formValuesService.getFormValues();
+    }
+
     @state() generatorContext: GeneratorContext | undefined;
 
     constructor(...rest: any[]) {
@@ -45,6 +58,7 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
       new ContextConsumer(this, {
         context: formValuesServiceContext,
         callback: (service) => {
+          this.formValuesService = service;
           service.registerValidationListener(
             this.option.name,
             (value) => (this.validation = value)

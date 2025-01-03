@@ -70,6 +70,10 @@ export class FormValuesService {
     );
   }
 
+  public getFormValues() {
+    return this.formValues;
+  }
+
   private async handleOptionChange(details: OptionChangedDetails) {
     this.formValues = {
       ...this.formValues,
@@ -215,6 +219,8 @@ export class FormValuesService {
   private touchedListeners: Record<string, ((isTouched: boolean) => void)[]> =
     {};
 
+  private formValueListeners: ((formValues: FormValues) => void)[] = [];
+
   registerValidationListener(
     key: string,
     listener: (value: string | boolean | undefined) => void
@@ -234,5 +240,9 @@ export class FormValuesService {
   registerTouchedListener(key: string, listener: (isTouched: boolean) => void) {
     if (!this.touchedListeners[key]) this.touchedListeners[key] = [];
     this.touchedListeners[key].push(listener);
+  }
+
+  registerFormValueListener(listener: (formValues: FormValues) => void) {
+    this.formValueListeners.push(listener);
   }
 }

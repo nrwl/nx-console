@@ -1,7 +1,7 @@
+import { FormValues } from '@nx-console/shared-generate-ui-types';
 import { Option } from '@nx-console/shared-schema';
-import { LitElement, PropertyValueMap, TemplateResult, html } from 'lit';
+import { LitElement, PropertyValueMap, TemplateResult } from 'lit';
 import { property } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
 import {
   EditorContext,
   EditorContextInterface,
@@ -28,6 +28,7 @@ export declare class FieldInterface {
   renderField(): TemplateResult;
   validation: boolean | string | undefined;
   touched: boolean;
+  getFormValues(): FormValues;
   dispatchValue(value: string | boolean | number | string[] | undefined): void;
   setFieldValue(value: string | boolean | number | string[] | undefined): void;
   fieldId: string;
@@ -75,6 +76,13 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       if (defaultValue) {
         this.setFieldValue(defaultValue);
         this.dispatchValue(defaultValue);
+        return;
+      }
+
+      const value = this.getFormValues()[this.option.name];
+      if (value) {
+        this.setFieldValue(value);
+        this.dispatchValue(value);
         return;
       }
 
