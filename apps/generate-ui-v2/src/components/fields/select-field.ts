@@ -1,5 +1,5 @@
 import { Option } from '@nx-console/shared-schema';
-import { html, LitElement, PropertyValueMap } from 'lit';
+import { html, LitElement, PropertyValueMap, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
@@ -38,26 +38,6 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
       >
         ${when(
           extractDefaultValue(this.option) === undefined,
-          () => html`<option value="">--</option>`
-        )}
-        ${map(
-          extractItemOptions(this.option),
-          (item) =>
-            html`<option value="${item}" title="${item}">${item}</option>`
-        )}
-      </select>
-    `;
-  }
-
-  private renderVscode() {
-    return html`
-      <vscode-dropdown
-        @change="${this.handleChange}"
-        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
-        ${spread(this.ariaAttributes)}
-      >
-        ${when(
-          extractDefaultValue(this.option) === undefined,
           () => html`<vscode-option value="">--</vscode-option>`
         )}
         ${map(
@@ -67,13 +47,41 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
               >${item}</vscode-option
             >`
         )}
-      </vscode-dropdown>
+      </select>
+    `;
+  }
+
+  private renderVscode() {
+    const itemOptions = extractItemOptions(this.option);
+    const defaultValue = extractDefaultValue(this.option);
+
+    return html`
+      <vscode-single-select
+        @change="${this.handleChange}"
+        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+        class="w-full"
+        ?combobox="${itemOptions.length > 5}"
+        filter="fuzzy"
+        ${spread(this.ariaAttributes)}
+      >
+        ${when(
+          defaultValue === undefined,
+          () => html`<vscode-option value="">--</vscode-option>`
+        )}
+        ${map(
+          itemOptions,
+          (item) =>
+            html`<vscode-option value="${item}" title="${item}"
+              >${item}</vscode-option
+            >`
+        )}
+      </vscode-single-select>
     `;
   }
 
   setFieldValue(value: string | number | boolean | string[] | undefined): void {
     const selectNode = this.renderRoot.querySelector(
-      this.editor === 'intellij' ? 'select' : 'vscode-dropdown'
+      this.editor === 'intellij' ? 'select' : 'vscode-single-select'
     );
     if (!selectNode) {
       return;

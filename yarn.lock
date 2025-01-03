@@ -5197,7 +5197,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vscode-elements/elements@npm:^1.6.1":
+"@vscode-elements/elements@npm:^1.9.0":
   version: 1.9.0
   resolution: "@vscode-elements/elements@npm:1.9.0"
   dependencies:
@@ -13893,7 +13893,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 7.16.1
     "@typescript-eslint/parser": 7.16.1
     "@typescript-eslint/utils": 7.16.1
-    "@vscode-elements/elements": ^1.6.1
+    "@vscode-elements/elements": ^1.9.0
     "@vscode/codicons": ^0.0.36
     "@vscode/test-electron": ^2.1.5
     "@vscode/vsce": ^2.15.0

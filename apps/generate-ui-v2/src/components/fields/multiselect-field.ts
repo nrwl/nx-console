@@ -63,7 +63,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         )}
       </select>`;
     } else {
-      return html` <vscode-dropdown
+      return html` <vscode-single-select
         @change="${this.addValue}"
         style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
         ${spread(this.ariaAttributes)}
@@ -80,7 +80,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
               >${item}</vscode-option
             >`
         )}
-      </vscode-dropdown>`;
+      </vscode-single-select>`;
     }
   }
 
