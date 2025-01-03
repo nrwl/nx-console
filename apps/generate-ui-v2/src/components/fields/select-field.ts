@@ -1,20 +1,18 @@
-import { Option } from '@nx-console/shared-schema';
-import { html, LitElement, PropertyValueMap, PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { spread } from '@open-wc/lit-helpers';
+import { html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
-import { Field } from './mixins/field-mixin';
 import {
   extractDefaultValue,
   extractItemOptions,
 } from '../../utils/generator-schema-utils';
-import { spread } from '@open-wc/lit-helpers';
 import {
   intellijErrorRingStyles,
   intellijFieldPadding,
   intellijFocusRing,
-  vscodeErrorStyleOverrides,
 } from '../../utils/ui-utils';
+import { Field } from './mixins/field-mixin';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('select-field')
