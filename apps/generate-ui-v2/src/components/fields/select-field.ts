@@ -36,14 +36,12 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
       >
         ${when(
           extractDefaultValue(this.option) === undefined,
-          () => html`<vscode-option value="">--</vscode-option>`
+          () => html`<option value="">--</option>`
         )}
         ${map(
           extractItemOptions(this.option),
           (item) =>
-            html`<vscode-option value="${item}" title="${item}"
-              >${item}</vscode-option
-            >`
+            html`<option value="${item}" title="${item}">${item}</option>`
         )}
       </select>
     `;
