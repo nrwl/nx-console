@@ -5197,12 +5197,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vscode-elements/elements@npm:^1.9.1":
-  version: 1.9.1
-  resolution: "@vscode-elements/elements@npm:1.9.1"
+"@vscode-elements/elements@npm:1.9.2-pre.0":
+  version: 1.9.2-pre.0
+  resolution: "@vscode-elements/elements@npm:1.9.2-pre.0"
   dependencies:
     lit: ^3.2.1
-  checksum: 94fd51f6f45bfb88393c2ff14c6dcdc6913de5b38495104cd4303093de7fa6841456809acb1855b7c0f7da0bb473ff85916620f2bcacab4265ddc191c1964502
+  checksum: bdbc9d6346a2a280632b717c9c8fa08d099301826d88f201e93023f9e68078c62878ae35f92a9fcc47790b6be92ebf642098984ffa82307860f4c07ac11125b7
   languageName: node
   linkType: hard
 
@@ -13893,7 +13893,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 7.16.1
     "@typescript-eslint/parser": 7.16.1
     "@typescript-eslint/utils": 7.16.1
-    "@vscode-elements/elements": ^1.9.1
+    "@vscode-elements/elements": 1.9.2-pre.0
     "@vscode/codicons": ^0.0.36
     "@vscode/test-electron": ^2.1.5
     "@vscode/vsce": ^2.15.0
