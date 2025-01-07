@@ -100,4 +100,20 @@ describe('generate-ui-v2', () => {
       });
     });
   });
+
+  describe('search bar', () => {
+    it('should find field by name', () => {
+      cy.get('[id="search-bar"]').type('option1');
+      getFieldByName('option1').should('be.visible');
+      cy.get(`[id="select-field-field"]`).should('not.be.visible');
+    });
+
+    it('should preserve value in field after search', () => {
+      getFieldByName('option1').type('test-value');
+      cy.get('[id="search-bar"]').type('option1');
+      getFieldByName('option1').should('have.value', 'test-value');
+      cy.get('[id="search-bar"]').clear();
+      getFieldByName('option1').should('have.value', 'test-value');
+    });
+  });
 });
