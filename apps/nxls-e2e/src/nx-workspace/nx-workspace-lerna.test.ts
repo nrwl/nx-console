@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, uniq } from '../utils';
+import { e2eCwd, uniq, waitFor } from '../utils';
 import { mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { NxWorkspaceRequest } from '@nx-console/language-server-types';
@@ -49,6 +49,7 @@ describe('nx/workspace - lerna.json only repo', () => {
         }
     }`
     );
+    await waitFor(1000);
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(workspacePath);
