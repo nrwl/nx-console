@@ -134,6 +134,8 @@ export class CwdBreadcrumb extends GeneratorContextContext(
         .value="${this.path}"
         @keydown="${this.handleInlineEditKeydown}"
         data-cy="inline-edit-field"
+        style="border-width: calc(var(--border-width) * 1px);"
+        class="focus:border-focusBorder"
       >
       </vscode-textfield>`;
     } else {
