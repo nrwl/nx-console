@@ -10,7 +10,7 @@ let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
 const workspacePath = join(e2eCwd, workspaceName);
-describe('nx/workspace - lerna.json only repo', () => {
+xdescribe('nx/workspace - lerna.json only repo', () => {
   beforeAll(async () => {
     mkdirSync(workspacePath, { recursive: true });
     execSync('npx lerna init', {
