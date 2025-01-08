@@ -91,11 +91,6 @@
       }
     },
     "build": {
-      "command": "node ./tools/scripts/install-vscode-deps.js",
-      "dependsOn": ["_build"],
-      "inputs": ["{workspaceRoot}/tools/scripts/*"]
-    },
-    "_build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "external": [

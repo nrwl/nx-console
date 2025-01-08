@@ -41,9 +41,6 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "dependencies": {
-    "@monodon/typescript-nx-imports-plugin": "0.3.0"
-  },
   "contributes": {
     "typescriptServerPlugins": [
       {

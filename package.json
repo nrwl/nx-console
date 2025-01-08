@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.21.0",
+    "@monodon/typescript-nx-imports-plugin": "0.3.0",
     "@nx/cypress": "20.3.1",
     "@nx/devkit": "20.3.1",
     "@nx/esbuild": "20.3.1",

@@ -2472,13 +2472,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@monodon/typescript-nx-imports-plugin@npm:0.2.0":
-  version: 0.2.0
-  resolution: "@monodon/typescript-nx-imports-plugin@npm:0.2.0"
-  checksum: 4d966b52c514ee67cdf96469bfc67a536a8e4dcc53b4d892bd9d82288a6caf9c5ccc8897309724bfc9337676ffa59c5a019b53ccec93f28c12834fcded7876f5
-  languageName: node
-  linkType: hard
-
 "@monodon/typescript-nx-imports-plugin@npm:0.3.0":
   version: 0.3.0
   resolution: "@monodon/typescript-nx-imports-plugin@npm:0.3.0"
@@ -5831,8 +5824,6 @@ __metadata:
 "angular-console@workspace:apps/vscode":
   version: 0.0.0-use.local
   resolution: "angular-console@workspace:apps/vscode"
-  dependencies:
-    "@monodon/typescript-nx-imports-plugin": 0.3.0
   languageName: unknown
   linkType: soft
 
@@ -13857,7 +13848,7 @@ __metadata:
     "@microsoft/fast-components": ^2.30.6
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
-    "@monodon/typescript-nx-imports-plugin": 0.2.0
+    "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/cypress": 20.3.1
     "@nx/devkit": 20.3.1
     "@nx/esbuild": 20.3.1
