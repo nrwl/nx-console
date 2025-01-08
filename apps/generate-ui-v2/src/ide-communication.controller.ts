@@ -9,7 +9,7 @@ import {
   GeneratorContext,
   GeneratorSchema,
   ValidationResults,
-} from '@nx-console/shared/generate-ui-types';
+} from '@nx-console/shared-generate-ui-types';
 import { ReactiveController, ReactiveElement } from 'lit';
 
 import type { WebviewApi } from 'vscode-webview';
@@ -71,7 +71,10 @@ export class IdeCommunicationController implements ReactiveController {
   }
 
   postMessageToIde(message: GenerateUiOutputMessage) {
-    console.log('sending message to ide', message);
+    // we filter these messages out because they're noisy
+    if (message.payloadType !== 'request-validation') {
+      console.log('sending message to ide', message);
+    }
     this.postToIde(message);
   }
 
@@ -103,7 +106,10 @@ export class IdeCommunicationController implements ReactiveController {
         if (!data) {
           return;
         }
-        console.log('received message from vscode', data);
+        // we filter these messages out because they're noisy
+        if (data.payloadType !== 'validation-results') {
+          console.log('received message from vscode', data);
+        }
 
         this.handleInputMessage(data);
       }

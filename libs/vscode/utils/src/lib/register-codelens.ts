@@ -1,4 +1,4 @@
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   CodeLensProvider,
   ConfigurationChangeEvent,

@@ -1,0 +1,14 @@
+{
+  "name": "@nx-console/vscode-lsp-client",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-lsp-client",
+    "sourceRoot": "libs/vscode/lsp-client/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
+}

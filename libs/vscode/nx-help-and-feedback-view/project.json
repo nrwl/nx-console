@@ -1,8 +1,0 @@
-{
-  "name": "vscode-nx-help-and-feedback-view",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nx-help-and-feedback-view/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

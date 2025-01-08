@@ -1,5 +1,5 @@
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { findConfig } from '@nx-console/shared/utils';
+import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
+import { findConfig } from '@nx-console/shared-utils';
 import { dirname, join } from 'path';
 
 const TSCONFIG_LIB = 'tsconfig.lib.json';

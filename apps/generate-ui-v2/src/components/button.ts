@@ -26,17 +26,19 @@ export class Button extends EditorContext(LitElement) {
   renderVSCode() {
     if (this.appearance === 'icon') {
       return html`
-        <vscode-button appearance="icon">
-          <icon-element
-            class="flex items-start"
-            icon="${this.text}"
-            color="${this.color}"
-            ?applyFillColor=${this.applyFillColor}
-          ></icon-element>
+        <vscode-button
+          icon="${this.text}"
+          style="
+          --vscode-button-background: none;
+          --vscode-button-foreground: ${this.color ??
+          'var(--foreground-color)'};
+          --vscode-button-hoverBackground: var(--field-nav-hover-color);"
+          class="h-[1.25rem] w-[1.25rem]"
+        >
         </vscode-button>
       `;
     }
-    return html`<vscode-button appearance="${this.appearance}"
+    return html`<vscode-button ?secondary="${this.appearance === 'secondary'}"
       >${this.text}</vscode-button
     >`;
   }

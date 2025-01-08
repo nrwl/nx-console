@@ -7,16 +7,16 @@ import {
   GenerateUiValidationResultsInputMessage,
   GeneratorSchema,
   ValidationResults,
-} from '@nx-console/shared/generate-ui-types';
+} from '@nx-console/shared-generate-ui-types';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
-} from '@nx-console/vscode/configuration';
+} from '@nx-console/vscode-configuration';
 import {
   getStartupMessage,
   getTransformedGeneratorSchema,
-} from '@nx-console/vscode/nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+} from '@nx-console/vscode-nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { existsSync } from 'node:fs';
 import {
   commands,
@@ -58,7 +58,7 @@ export class GenerateUiWebview {
       {
         retainContextWhenHidden: true,
         enableScripts: true,
-        localResourceRoots: [this._webviewSourceUri],
+        localResourceRoots: [this.context.extensionUri],
       }
     );
 
@@ -79,6 +79,17 @@ export class GenerateUiWebview {
       )
     );
 
+    const vscodeElementsUri = this.webviewPanel.webview.asWebviewUri(
+      Uri.joinPath(
+        this.context.extensionUri,
+        'node_modules',
+        '@vscode-elements',
+        'elements',
+        'dist',
+        'bundled.js'
+      )
+    );
+
     this.webviewPanel.webview.html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -86,7 +97,11 @@ export class GenerateUiWebview {
             <meta charset="UTF-8">
             <title>Generate UI</title>
             <link href="${stylesUri}" rel="stylesheet">
-            <link href="${codiconsUri}" rel="stylesheet">
+            <link 
+            href="${codiconsUri}" 
+            rel="stylesheet"
+            id="vscode-codicon-stylesheet"
+            >
             <style>
             :root {
               ${this.getVscodeStyleMappings()}
@@ -96,6 +111,7 @@ export class GenerateUiWebview {
               padding: 0;
             }
             </style>
+            <script type="module" src="${vscodeElementsUri}"></script>
         </head>
         <body>
           <script type="module" src="${scriptUri}"></script>
@@ -222,7 +238,7 @@ export class GenerateUiWebview {
       --foreground-color: var(--vscode-editor-foreground);
       --muted-foreground-color: var(--vscode-input-placeholderForeground);
       --background-color: var(--vscode-editor-background);
-      --primary-color: var(--button-primary-background);
+      --primary-color: var(--button-primary-background, var(--vscode-button-background));
       --secondary-color: var(--button-secondary-background);
       --error-color: var(--vscode-inputValidation-errorBorder);
       --field-border-color: var(--panel-view-border);

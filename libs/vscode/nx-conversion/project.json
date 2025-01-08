@@ -1,8 +1,0 @@
-{
-  "name": "vscode-nx-conversion",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nx-conversion/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

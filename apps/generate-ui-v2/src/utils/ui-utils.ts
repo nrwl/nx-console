@@ -11,5 +11,5 @@ export const intellijErrorRingStyles = (error: boolean) =>
 
 export const vscodeErrorStyleOverrides = (error: boolean) =>
   error
-    ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
+    ? '--border-width: 1; --field-border-color: var(--vscode-inputValidation-errorBorder); --focus-border-color: var(--vscode-inputValidation-errorBorder); --vscode-focusBorder: var(--vscode-inputValidation-errorBorder);'
     : '';

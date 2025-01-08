@@ -13,6 +13,6 @@ export default {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/shared/npm',
+  coverageDirectory: 'test-output/jest/coverage',
   preset: '../../../jest.preset.js',
 };

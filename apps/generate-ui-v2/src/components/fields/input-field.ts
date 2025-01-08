@@ -1,19 +1,18 @@
-import { html, LitElement, TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { Field } from './mixins/field-mixin';
 import { spread } from '@open-wc/lit-helpers';
+import { css, html, LitElement, TemplateResult } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import {
   intellijErrorRingStyles,
   intellijFieldColors,
   intellijFieldPadding,
   intellijFocusRing,
-  vscodeErrorStyleOverrides,
 } from '../../utils/ui-utils';
+import { Field } from './mixins/field-mixin';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('input-field')
 export class InputField extends FieldWrapper(Field(LitElement)) {
-  protected renderField(): TemplateResult {
+  renderField(): TemplateResult {
     const error = this.shouldRenderError();
     if (this.editor === 'intellij') {
       return html`
@@ -28,13 +27,15 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
       `;
     } else {
       return html`
-        <vscode-text-field
+        <vscode-textfield
           type="text"
           @input="${this.handleChange}"
-          style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+          style="border-width: calc(var(--border-width) * 1px);"
+          class="focus:border-focusBorder w-full"
+          ?invalid=${this.shouldRenderError()}
           ${spread(this.ariaAttributes)}
         >
-        </vscode-text-field>
+        </vscode-textfield>
       `;
     }
   }
@@ -44,11 +45,9 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
     this.dispatchValue(value);
   }
 
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ) {
+  setFieldValue(value: string | boolean | number | string[] | undefined) {
     const inputNode = this.renderRoot.querySelector(
-      this.editor === 'intellij' ? 'input' : 'vscode-text-field'
+      this.editor === 'intellij' ? 'input' : 'vscode-textfield'
     );
     if (!inputNode) {
       return;

@@ -1,6 +1,6 @@
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { useGeneratorDefaultsProcessor } from './use-generator-defaults-processor';
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 const mockLogger = {
   log: (value: string) => {
     // noop

@@ -1,4 +1,14 @@
 {
-  "name": "@nx-console/vscode/typescript-plugin",
-  "version": "0.0.1"
+  "name": "@nx-console/vscode-typescript-plugin",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-typescript-plugin",
+    "sourceRoot": "libs/vscode/typescript-plugin/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
 }

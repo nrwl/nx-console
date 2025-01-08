@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  coverageDirectory: '../../../coverage/libs/shared/schema',
+  coverageDirectory: 'test-output/jest/coverage',
   globals: {},
   displayName: 'shared-schema',
   testEnvironment: 'node',

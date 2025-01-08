@@ -1,8 +1,0 @@
-{
-  "name": "language-server-workspace",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/language-server/workspace/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:lsp"]
-}

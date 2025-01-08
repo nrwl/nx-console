@@ -1,8 +1,0 @@
-{
-  "name": "vscode-nvm-tip",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nvm-tip/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

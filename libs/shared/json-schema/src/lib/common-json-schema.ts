@@ -1,7 +1,7 @@
 import { JSONSchema } from 'vscode-json-languageservice';
 import { CompletionType } from './completion-type';
-import { NxVersion } from '@nx-console/shared/nx-version';
-import { gte } from '@nx-console/shared/nx-version';
+import { NxVersion } from '@nx-console/nx-version';
+import { gte } from '@nx-console/nx-version';
 
 export const implicitDependencies: JSONSchema = {
   type: 'array',

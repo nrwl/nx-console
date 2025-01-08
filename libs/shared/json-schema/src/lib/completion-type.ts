@@ -1,4 +1,4 @@
-import { hasKey } from '@nx-console/shared/utils';
+import { hasKey } from '@nx-console/shared-utils';
 import { JSONSchema } from 'vscode-json-languageservice';
 
 export const X_COMPLETION_TYPE = 'x-completion-type' as const;

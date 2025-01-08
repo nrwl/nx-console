@@ -1,6 +1,6 @@
-import { OptionType, Option } from '@nx-console/shared/schema';
+import { OptionType, Option } from '@nx-console/shared-schema';
 import { selectFlags } from './select-flags';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 
 export async function selectRunManyFlags(
   target: string

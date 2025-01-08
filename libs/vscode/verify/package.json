@@ -1,4 +1,14 @@
 {
-  "name": "@nx-console/vscode/verify",
-  "version": "0.0.1"
+  "name": "@nx-console/vscode-verify",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "nx": {
+    "name": "vscode-verify",
+    "sourceRoot": "libs/vscode/verify/src",
+    "projectType": "library",
+    "tags": [
+      "type:vscode"
+    ]
+  }
 }

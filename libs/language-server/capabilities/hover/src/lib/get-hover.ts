@@ -8,7 +8,7 @@ import { Hover, HoverParams } from 'vscode-languageserver';
 import {
   getJsonLanguageService,
   isExecutorStringNode,
-} from '@nx-console/language-server/utils';
+} from '@nx-console/language-server-utils';
 
 export async function getHover(
   hoverParams: HoverParams,

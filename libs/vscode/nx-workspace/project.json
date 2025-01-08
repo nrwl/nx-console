@@ -1,8 +1,0 @@
-{
-  "name": "vscode-nx-workspace",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nx-workspace/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

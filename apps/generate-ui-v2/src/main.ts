@@ -1,12 +1,9 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { FormValuesService } from './form-values.service';
 import { IdeCommunicationController } from './ide-communication.controller';
-import {
-  getGeneratorIdentifier,
-  getGeneratorNameTitleCase,
-} from './utils/generator-schema-utils';
+import { getGeneratorNameTitleCase } from './utils/generator-schema-utils';
 
 import './components/index';
 import { SearchBar } from './components/search-bar';
@@ -30,10 +27,15 @@ export class Root extends LitElement {
   @state()
   private searchValue = '';
 
+  private rootStyles = css`
+    --border-width: 1;
+  `;
+
   render() {
     const options = this.icc.generatorSchema?.options;
     return html` <div
       class="text-foreground m-auto flex h-screen max-w-screen-xl flex-col p-6"
+      style="${this.rootStyles}"
     >
       <div
         class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-3"
@@ -95,13 +97,13 @@ export class Root extends LitElement {
                     title="Open generator documentation on nx.dev"
                     appearance="icon"
                     text="link-external"
-                    class="focus:ring-focusBorder flex items-center py-2 pl-3 focus:outline-none focus:ring-1"
+                    class="self-center py-2 pl-3"
                   >
                   </button-element>
                 `
             )}
             <button-element
-              class="flex items-center py-2 pl-3"
+              class="self-center py-2 pl-3"
               appearance="icon"
               text="copy"
               title="Copy generate command to clipboard"
@@ -113,7 +115,7 @@ export class Root extends LitElement {
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
               () =>
                 html`<button-element
-                    class="py-2 pl-3 sm:hidden"
+                    class="self-center py-2 pl-3 sm:hidden"
                     @click="${() => this.formValuesService.runGenerator(true)}"
                     text="debug"
                     appearance="icon"

@@ -1,28 +1,8 @@
-import { execSync } from 'child_process';
-import { readFileSync, rmSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import {
-  ArrayLiteralExpression,
-  ObjectLiteralExpression,
-  PropertyAssignment,
-  isObjectLiteralExpression,
-  isPropertyAssignment,
-  isStringLiteral,
-  parseJsonText,
-} from 'typescript';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-import {
-  e2eCwd,
-  modifyJsonFile,
-  newWorkspace,
-  simpleReactWorkspaceOptions,
-  uniq,
-  waitFor,
-} from '../utils';
-import { Position } from 'vscode-json-languageservice';
-import { CompletionList } from 'vscode-languageserver';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import { e2eCwd, newWorkspace, uniq } from '../utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -57,7 +37,7 @@ describe('package.json nx property completion - default', () => {
       packageJsonPath,
       `{
         "nx": {
-         
+
         }
         }`
     );

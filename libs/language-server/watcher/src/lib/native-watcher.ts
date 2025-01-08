@@ -1,6 +1,6 @@
 import type { WatchEvent, Watcher } from 'nx/src/native';
-import { lspLogger } from '@nx-console/language-server/utils';
-import { importNxPackagePath } from '@nx-console/shared/npm';
+import { lspLogger } from '@nx-console/language-server-utils';
+import { importNxPackagePath } from '@nx-console/shared-npm';
 import { normalize } from 'path';
 import { match as minimatch } from 'minimatch';
 

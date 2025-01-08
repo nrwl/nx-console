@@ -1,8 +1,0 @@
-{
-  "name": "vscode-generate-ui-webview",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/generate-ui-webview/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

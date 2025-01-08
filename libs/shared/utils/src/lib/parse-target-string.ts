@@ -1,7 +1,7 @@
 import {
   importWorkspaceDependency,
   workspaceDependencyPath,
-} from '@nx-console/shared/npm';
+} from '@nx-console/shared-npm';
 import type { ProjectGraph, Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 

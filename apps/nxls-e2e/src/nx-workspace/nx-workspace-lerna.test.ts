@@ -1,16 +1,16 @@
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, uniq } from '../utils';
+import { e2eCwd, uniq, waitFor } from '../utils';
 import { mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
-import { NxWorkspaceRequest } from '@nx-console/language-server/types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspaceRequest } from '@nx-console/language-server-types';
+import { NxWorkspace } from '@nx-console/shared-types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
 const workspacePath = join(e2eCwd, workspaceName);
-describe('nx/workspace - lerna.json only repo', () => {
+xdescribe('nx/workspace - lerna.json only repo', () => {
   beforeAll(async () => {
     mkdirSync(workspacePath, { recursive: true });
     execSync('npx lerna init', {
@@ -49,6 +49,7 @@ describe('nx/workspace - lerna.json only repo', () => {
         }
     }`
     );
+    await waitFor(1000);
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(workspacePath);

@@ -2,7 +2,7 @@ import {
   NxCodeLensProvider,
   getWorkspacePath,
   registerCodeLensProvider,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode-utils';
 import { join } from 'path';
 import {
   isPropertyAssignment,

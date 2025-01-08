@@ -1,4 +1,4 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { visitGenerateUi } from '../support/visit-generate-ui';
 
 export const schema: GeneratorSchema = {

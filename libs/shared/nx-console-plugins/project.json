@@ -1,8 +1,0 @@
-{
-  "name": "shared-nx-console-plugins",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/nx-console-plugins/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:shared"]
-}

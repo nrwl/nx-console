@@ -1,11 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import type { CloudOnboardingInfo } from '@nx-console/shared/types';
-import {
-  provideVSCodeDesignSystem,
-  vsCodeButton,
-  vsCodeLink,
-  vsCodeTag,
-} from '@vscode/webview-ui-toolkit';
+import type { CloudOnboardingInfo } from '@nx-console/shared-types';
 
 import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
@@ -13,8 +7,6 @@ import { customElement, property } from 'lit/decorators.js';
 import type { WebviewApi } from 'vscode-webview';
 
 import './list-entry';
-
-provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeLink(), vsCodeTag());
 
 @customElement('root-element')
 export class Root extends LitElement {
