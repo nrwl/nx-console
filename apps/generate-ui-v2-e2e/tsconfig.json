@@ -11,13 +11,10 @@
       "path": "../../libs/shared/nx-version"
     },
     {
-      "path": "../../libs/shared/generate-ui-types"
-    },
-    {
       "path": "../../libs/shared/schema"
     },
     {
-      "path": "../generate-ui-v2"
+      "path": "../../libs/shared/generate-ui-types"
     }
   ]
 }

@@ -24,9 +24,6 @@
       "path": "../telemetry/tsconfig.lib.json"
     },
     {
-      "path": "../nx-cloud-onboarding-webview"
-    },
-    {
       "path": "../nx-cloud-view/tsconfig.lib.json"
     },
     {

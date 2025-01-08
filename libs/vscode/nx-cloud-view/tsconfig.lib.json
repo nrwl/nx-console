@@ -65,9 +65,6 @@
     },
     {
       "path": "../../shared/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../nx-cloud-onboarding-webview"
     }
   ]
 }

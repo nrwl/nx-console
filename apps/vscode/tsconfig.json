@@ -58,6 +58,15 @@
       "path": "../../libs/vscode/lsp-client"
     },
     {
+      "path": "../../libs/shared/nx-console-plugins"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types"
+    },
+    {
+      "path": "../../libs/language-server/types"
+    },
+    {
       "path": "../../libs/vscode/nx-workspace"
     },
     {
@@ -73,31 +82,13 @@
       "path": "../../libs/vscode/configuration"
     },
     {
-      "path": "../../libs/vscode/nx-cloud-onboarding-webview"
-    },
-    {
-      "path": "../../libs/language-server/watcher"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/hover"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/document-links"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/definition"
-    },
-    {
-      "path": "../../libs/shared/nx-console-plugins"
-    },
-    {
-      "path": "../../libs/language-server/types"
-    },
-    {
-      "path": "../../libs/language-server/workspace"
-    },
-    {
       "path": "../../libs/shared/types"
+    },
+    {
+      "path": "../../libs/shared/schema"
+    },
+    {
+      "path": "../../libs/shared/nx-version"
     },
     {
       "path": "../../libs/shared/npm"
@@ -107,30 +98,6 @@
     },
     {
       "path": "../../libs/shared/utils"
-    },
-    {
-      "path": "../../libs/shared/json-schema"
-    },
-    {
-      "path": "../../libs/language-server/utils"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/code-completion"
-    },
-    {
-      "path": "../nxls"
-    },
-    {
-      "path": "../../libs/shared/nx-version"
-    },
-    {
-      "path": "../../libs/shared/generate-ui-types"
-    },
-    {
-      "path": "../../libs/shared/schema"
-    },
-    {
-      "path": "../generate-ui-v2"
     },
     {
       "path": "./tsconfig.app.json"
