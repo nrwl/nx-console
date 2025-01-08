@@ -1,7 +1,7 @@
 const { execSync } = require('child_process');
 const { normalize } = require('path');
-
-execSync('npm i -f', {
+const cwd = normalize('dist/apps/vscode');
+execSync('npm i -f --ignore-scripts', {
   stdio: 'inherit',
-  cwd: normalize('dist/apps/vscode'),
+  cwd,
 });
