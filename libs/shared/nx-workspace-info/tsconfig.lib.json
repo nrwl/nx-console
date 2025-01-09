@@ -12,6 +12,9 @@
       "path": "../types/tsconfig.lib.json"
     },
     {
+      "path": "../../language-server/utils/tsconfig.lib.json"
+    },
+    {
       "path": "../nx-version/tsconfig.lib.json"
     },
     {

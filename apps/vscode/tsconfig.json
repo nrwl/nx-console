@@ -31,6 +31,18 @@
       "path": "../../libs/language-server/types"
     },
     {
+<<<<<<< HEAD
+=======
+      "path": "../../libs/vscode/cursor"
+    },
+    {
+      "path": "../../libs/vscode/migrate"
+    },
+    {
+      "path": "../../libs/vscode/copilot"
+    },
+    {
+>>>>>>> 91a33ac9 (feat: add migrate ui)
       "path": "../../libs/vscode/typescript-plugin"
     },
     {

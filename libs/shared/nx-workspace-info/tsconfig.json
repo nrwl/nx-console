@@ -7,6 +7,9 @@
       "path": "../types"
     },
     {
+      "path": "../../language-server/utils"
+    },
+    {
       "path": "../nx-version"
     },
     {

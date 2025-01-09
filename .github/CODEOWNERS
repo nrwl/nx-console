@@ -14,7 +14,11 @@
 
 /libs/vscode/nx-help-and-feedback-view/ @MaxKless
 
+<<<<<<< HEAD
 /libs/vscode/typescript-import-plugin/ @MaxKless
+=======
+/libs/vscode/migrate-sidebar-webview/ @MaxKless
+>>>>>>> 91a33ac9 (feat: add migrate ui)
 
 /libs/vscode/nx-config-decoration/ @MaxKless
 
@@ -87,6 +91,8 @@
 /apps/generate-ui-v2/ @MaxKless
 
 /libs/vscode/copilot/ @MaxKless
+
+/libs/vscode/migrate/ @MaxKless
 
 /libs/vscode/nvm-tip/ @MaxKless
 

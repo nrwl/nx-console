@@ -137,7 +137,8 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
     const codiconsUri = webviewView.webview.asWebviewUri(
       Uri.joinPath(
-        this._webviewSourceUri,
+        this.extensionContext.extensionUri,
+        'node_modules',
         '@vscode',
         'codicons',
         'dist',
@@ -161,7 +162,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 			<head>
 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="${codiconsUri}" rel="stylesheet">
+        <link href="${codiconsUri}" rel="stylesheet" id="vscode-codicon-stylesheet">
 
 				<title>Nx Cloud Onboarding</title>
          <script

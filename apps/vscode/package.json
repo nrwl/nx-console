@@ -117,6 +117,11 @@
           "when": "view == nxProjects && isInCursor && isNxWorkspace && !hasNxMcpConfigured",
           "group": "navigation@0",
           "title": "Add Nx to Cursor Agent"
+        },
+        {
+          "command": "nxMigrate.refresh",
+          "when": "view == nxMigrate",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -869,6 +874,11 @@
         "title": "Configure Nx MCP Server",
         "command": "nx.configureMcpServer",
         "icon": "$(wand)"
+      },
+      {
+        "title": "Refresh Nx Migrate View",
+        "command": "nxMigrate.refresh",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -1183,6 +1193,12 @@
           "id": "nxHelpAndFeedback",
           "name": "Help and Feedback",
           "visibility": "collapsed"
+        },
+        {
+          "id": "nxMigrate",
+          "type": "webview",
+          "name": "Nx Migrate ",
+          "when": "isNxWorkspace"
         }
       ]
     }

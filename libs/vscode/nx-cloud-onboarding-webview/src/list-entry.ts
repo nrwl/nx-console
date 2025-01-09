@@ -1,5 +1,3 @@
-// eslint-disable-next-line @nx/enforce-module-boundaries
-
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 

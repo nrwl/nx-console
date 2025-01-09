@@ -1,6 +1,7 @@
 import { gte as semverGte } from 'semver';
 import { NxVersion } from './nx-version';
 
+export function gte(a: NxVersion, b: NxVersion): boolean;
 export function gte(a: NxVersion, b: string): boolean;
 export function gte(a: string, b: NxVersion): boolean;
 export function gte(a: string, b: string): boolean;
