@@ -6,7 +6,7 @@ import { QuickPickItem, QuickPickItemKind, window } from 'vscode';
 type VersionMap = Record<string, { latest: string; all: string[] }>;
 
 export async function resolveDependencyVersioning(
-  depInput: string
+  depInput: string,
 ): Promise<{ dep: string; version: string | undefined } | undefined> {
   const match = depInput.match(/^(.+)@(.+)/);
   if (match) {
@@ -18,7 +18,7 @@ export async function resolveDependencyVersioning(
     packageInfo = await getPackageInfo(depInput);
   } catch (e) {
     window.showErrorMessage(
-      `Package ${depInput} couldn't be found. Are you sure it exists?`
+      `Package ${depInput} couldn't be found. Are you sure it exists?`,
     );
     return { dep: depInput, version: undefined };
   }
@@ -33,7 +33,7 @@ export async function resolveDependencyVersioning(
 
 async function promptForVersion(
   versionQuickPickItems: QuickPickItem[],
-  versionMap: VersionMap
+  versionMap: VersionMap,
 ): Promise<string | undefined> {
   const selection = await new Promise<string | undefined>((resolve) => {
     const quickPick = window.createQuickPick();
@@ -54,6 +54,7 @@ async function promptForVersion(
     quickPick.onDidAccept(() => {
       resolve(quickPick.selectedItems[0]?.label);
       quickPick.hide();
+      quickPick.dispose();
     });
 
     quickPick.show();
@@ -75,7 +76,9 @@ async function promptForVersion(
 /**
  * Create a map that tracks the latest version and an array of all versions per major version
  */
-function createVersionMap(packageInfo: PackageInformationResponse): VersionMap {
+export function createVersionMap(
+  packageInfo: PackageInformationResponse,
+): VersionMap {
   const versionMap: VersionMap = {};
   Object.entries(packageInfo.versions).forEach(([versionNum, versionInfo]) => {
     if (versionInfo.deprecated) {
@@ -105,8 +108,8 @@ function createVersionQuickPickItems(versionMap: VersionMap): QuickPickItem[] {
     .sort(
       (
         a: [keyof VersionMap, VersionMap[keyof VersionMap]],
-        b: [keyof VersionMap, VersionMap[keyof VersionMap]]
-      ) => (parseInt(a[0]) < parseInt(b[0]) ? 1 : -1)
+        b: [keyof VersionMap, VersionMap[keyof VersionMap]],
+      ) => (parseInt(a[0]) < parseInt(b[0]) ? 1 : -1),
     )
     .flatMap(([major, { latest, all }], index) => {
       const allSorted = all.sort(rcompare);
@@ -124,7 +127,7 @@ function createVersionQuickPickItems(versionMap: VersionMap): QuickPickItem[] {
       }
       const minorBefore = allSorted.find(
         (v) =>
-          v.split('.')[1] === (parseInt(latest.split('.')[1]) - 1).toString()
+          v.split('.')[1] === (parseInt(latest.split('.')[1]) - 1).toString(),
       );
       if (minorBefore && minorBefore !== allSorted[1]) {
         quickPickOptions.push({ label: minorBefore });
@@ -139,10 +142,13 @@ function createVersionQuickPickItems(versionMap: VersionMap): QuickPickItem[] {
     });
 }
 
-type PackageInformationResponse = {
+export type PackageInformationResponse = {
   versions: Record<string, { deprecated: string }>;
+  'dist-tags': Record<string, string>;
 };
-function getPackageInfo(dep: string): Promise<PackageInformationResponse> {
+export function getPackageInfo(
+  dep: string,
+): Promise<PackageInformationResponse> {
   const headers = {
     'Accept-Encoding': 'gzip, deflate',
     Accept: 'application/vnd.npm.install-v1+json',
@@ -154,6 +160,6 @@ function getPackageInfo(dep: string): Promise<PackageInformationResponse> {
     headers,
   }).then(
     (res) => JSON.parse(res.responseText),
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 }

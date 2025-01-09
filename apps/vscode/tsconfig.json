@@ -34,6 +34,9 @@
       "path": "../../libs/vscode/cursor"
     },
     {
+      "path": "../../libs/vscode/migrate"
+    },
+    {
       "path": "../../libs/vscode/copilot"
     },
     {

@@ -1,0 +1,13 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "types": ["node"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["DOM", "esnext.asynciterable"],
+    "experimentalDecorators": true
+  },
+  "include": ["src/**/*.ts"],
+  "references": []
+}

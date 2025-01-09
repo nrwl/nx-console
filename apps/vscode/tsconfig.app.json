@@ -40,6 +40,9 @@
       "path": "../../libs/vscode/cursor/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/migrate/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/copilot/tsconfig.lib.json"
     },
     {

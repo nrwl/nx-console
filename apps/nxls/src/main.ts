@@ -416,11 +416,11 @@ connection.onRequest(
   },
 );
 
-connection.onRequest(NxVersionRequest, async () => {
+connection.onRequest(NxVersionRequest, async ({ reset }) => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  const nxVersion = await getNxVersion(WORKING_PATH);
+  const nxVersion = await getNxVersion(WORKING_PATH, reset);
   return nxVersion;
 });
 
