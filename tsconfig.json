@@ -142,7 +142,7 @@
       "path": "./apps/nxls"
     },
     {
-      "path": "./libs/vscode/copilot"
+      "path": "./libs/vscode/migrate"
     }
   ]
 }
