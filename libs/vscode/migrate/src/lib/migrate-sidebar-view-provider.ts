@@ -1,5 +1,6 @@
 import {
   CancellationToken,
+  commands,
   Disposable,
   ExtensionContext,
   Uri,
@@ -49,6 +50,12 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
     webviewView.onDidDispose(() => {
       this._refreshSubscription?.dispose();
+    });
+
+    webviewView.webview.onDidReceiveMessage((message) => {
+      if (message.type === 'open') {
+        commands.executeCommand('nxMigrate.open');
+      }
     });
   }
 
