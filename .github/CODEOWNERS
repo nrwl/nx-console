@@ -75,6 +75,7 @@
 /apps/generate-ui-v2/ @MaxKless
 
 /libs/vscode/copilot/ @MaxKless
+/libs/vscode/migrate/ @MaxKless
 
 /libs/vscode/nvm-tip/ @MaxKless
 

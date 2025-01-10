@@ -31,7 +31,10 @@
       "path": "../../libs/vscode/error-diagnostics/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/language-server/types/tsconfig.lib.json"
+      "path": "../../libs/vscode/migrate/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/typescript-plugin/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/copilot/tsconfig.lib.json"
