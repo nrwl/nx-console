@@ -89,7 +89,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun version(): CompletableFuture<NxVersion> {
+    fun version(request: NxVersionRequest): CompletableFuture<NxVersion> {
         throw UnsupportedOperationException()
     }
 
