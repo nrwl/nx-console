@@ -118,8 +118,11 @@ export const NxGeneratorContextV2Request: RequestType<
   unknown
 > = new RequestType('nx/generatorContextV2');
 
-export const NxVersionRequest: RequestType<undefined, NxVersion, unknown> =
-  new RequestType('nx/version');
+export const NxVersionRequest: RequestType<
+  { reset: boolean },
+  NxVersion,
+  unknown
+> = new RequestType('nx/version');
 
 export const NxProjectGraphOutputRequest: RequestType<
   undefined,

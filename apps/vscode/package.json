@@ -111,6 +111,11 @@
           "command": "nxCloud.openApp",
           "when": "view == nxCloudRecentCIPE",
           "group": "navigation"
+        },
+        {
+          "command": "nxMigrate.refresh",
+          "when": "view == nxMigrate",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -701,6 +706,11 @@
         "title": "Show Nx Errors in Problems View",
         "command": "nxConsole.showProblems",
         "icon": "$(eye)"
+      },
+      {
+        "title": "Refresh Nx Migrate View",
+        "command": "nxMigrate.refresh",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {

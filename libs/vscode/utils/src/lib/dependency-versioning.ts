@@ -141,8 +141,11 @@ function createVersionQuickPickItems(versionMap: VersionMap): QuickPickItem[] {
 
 type PackageInformationResponse = {
   versions: Record<string, { deprecated: string }>;
+  'dist-tags': Record<string, string>;
 };
-function getPackageInfo(dep: string): Promise<PackageInformationResponse> {
+export function getPackageInfo(
+  dep: string
+): Promise<PackageInformationResponse> {
   const headers = {
     'Accept-Encoding': 'gzip, deflate',
     Accept: 'application/vnd.npm.install-v1+json',
