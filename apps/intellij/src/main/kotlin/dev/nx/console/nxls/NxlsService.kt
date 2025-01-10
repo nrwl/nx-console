@@ -178,9 +178,9 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         }()
     }
 
-    suspend fun nxVersion(): NxVersion? {
+    suspend fun nxVersion(reset: Boolean = false): NxVersion? {
         return withMessageIssueCatch("nx/version") {
-            server()?.getNxService()?.version()?.await()
+            server()?.getNxService()?.version(NxVersionRequest(reset))?.await()
         }()
     }
 
