@@ -1,10 +1,10 @@
 const fs = require('fs-extra');
-const { normalize } = require('path');
+const { normalize, join } = require('path');
 
 // copy dependency outputs
 const nxlsDest = './dist/apps/vscode/nxls';
 if (fs.existsSync(nxlsDest)) {
-  fs.rmdirSync(nxlsDest, { recursive: true });
+  fs.rmSync(nxlsDest, { recursive: true });
 }
 fs.copySync('./dist/apps/nxls', nxlsDest);
 
@@ -13,12 +13,21 @@ fs.copySync(
   './dist/libs/vscode/nx-cloud-onboarding-webview',
   './dist/apps/vscode/nx-cloud-onboarding-webview'
 );
+fs.copySync(
+  './dist/libs/vscode/migrate-sidebar-webview',
+  './dist/apps/vscode/migrate-sidebar-webview'
+);
 
 // copy package.json
 fs.copySync('./apps/vscode/package.json', './dist/apps/vscode/package.json');
 
 // copy required dependencies
-//  we don't need the entire @vscode-elements/elements package, just the bundled.js file
+// we don't need the entire @vscode-elements/elements package, just the bundled.js file
+if (!fs.existsSync('node_modules')) {
+  throw new Error(
+    'Please make sure node_modules are installed by running yarn.'
+  );
+}
 const destFolder = normalize(
   './dist/apps/vscode/node_modules/@vscode-elements/elements/dist'
 );
@@ -41,4 +50,20 @@ fs.cpSync(
   normalize('./node_modules/@monodon/typescript-nx-imports-plugin'),
   normalize(`${typescriptPluginDestFolder}`),
   { recursive: true }
+);
+
+// copy codicons
+const codiconsDestFolder = normalize(
+  './dist/apps/vscode/node_modules/@vscode/codicons/dist'
+);
+if (!fs.existsSync(codiconsDestFolder)) {
+  fs.mkdirSync(codiconsDestFolder, { recursive: true });
+}
+fs.copySync(
+  './node_modules/@vscode/codicons/dist/codicon.css',
+  join(codiconsDestFolder, 'codicon.css')
+);
+fs.copySync(
+  './node_modules/@vscode/codicons/dist/codicon.ttf',
+  join(codiconsDestFolder, 'codicon.ttf')
 );

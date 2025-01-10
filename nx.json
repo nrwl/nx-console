@@ -93,13 +93,17 @@
         "runtime": "node -p '`${process.platform}_${process.arch}`'"
       },
       "{workspaceRoot}/.env"
-    ]
+    ],
+    "scripts": ["{workspaceRoot}/tools/scripts/**"]
   },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
       "options": {},
-      "exclude": ["libs/vscode/migrate/*"]
+      "exclude": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*"
+      ]
     },
     {
       "plugin": "@nx/eslint/plugin",
@@ -143,7 +147,10 @@
     "@nx/powerpack-owners",
     {
       "plugin": "@nx/js/typescript",
-      "include": ["libs/vscode/migrate/*"],
+      "include": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*"
+      ],
       "options": {
         "typecheck": {
           "targetName": "typecheck"

@@ -40,22 +40,74 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
     this._view = webviewView;
 
-    webviewView.webview.html = this.getWebviewContent();
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this.extensionContext.extensionUri],
+    };
+
+    webviewView.webview.html = this.getWebviewContent(webviewView);
+
+    webviewView.onDidDispose(() => {
+      this._refreshSubscription?.dispose();
+    });
   }
 
   refresh() {
     if (!this._view) {
       return;
     }
-    this._view.webview.html = this.getWebviewContent();
+    this._view.webview.html = this.getWebviewContent(this._view);
   }
 
-  private getWebviewContent(): string {
-    return `
-    <pre>
-    ${this.actor.getSnapshot().value}
-    </pre>
-    `;
+  private getWebviewContent(webviewView: WebviewView): string {
+    const webviewScriptUri = webviewView.webview.asWebviewUri(
+      Uri.joinPath(this._webviewSourceUri, 'main.js')
+    );
+
+    const codiconsUri = webviewView.webview.asWebviewUri(
+      Uri.joinPath(
+        this.extensionContext.extensionUri,
+        'node_modules',
+        '@vscode',
+        'codicons',
+        'dist',
+        'codicon.css'
+      )
+    );
+
+    const vscodeElementsUri = webviewView.webview.asWebviewUri(
+      Uri.joinPath(
+        this.extensionContext.extensionUri,
+        'node_modules',
+        '@vscode-elements',
+        'elements',
+        'dist',
+        'bundled.js'
+      )
+    );
+
+    return `<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${codiconsUri}" rel="stylesheet" id="vscode-codicon-stylesheet">
+
+				<title>Nx Cloud Onboarding</title>
+         <script
+        src="${vscodeElementsUri}"
+        type="module"
+      ></script>
+      </head>
+      <body>
+        <script type="module" src="${webviewScriptUri}"></script>
+				<root-element state='${
+          this.actor.getSnapshot().value
+        }' migrateViewData='${JSON.stringify(
+      this._migrateViewData
+    )}'></root-element>
+			</body>
+			</html>`;
   }
 
   private ensureStateSubscription() {

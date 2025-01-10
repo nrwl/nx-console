@@ -10,6 +10,9 @@
     "name": "vscode-migrate",
     "tags": [
       "type:vscode"
+    ],
+    "implicitDependencies": [
+      "vscode-migrate-sidebar-webview"
     ]
   }
 }

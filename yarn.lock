@@ -2905,6 +2905,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-migrate-sidebar-webview@workspace:libs/vscode/migrate-sidebar-webview":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-migrate-sidebar-webview@workspace:libs/vscode/migrate-sidebar-webview"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-migrate@workspace:libs/vscode/migrate":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-migrate@workspace:libs/vscode/migrate"
