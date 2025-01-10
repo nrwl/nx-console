@@ -143,6 +143,9 @@
     },
     {
       "path": "./libs/vscode/migrate"
+    },
+    {
+      "path": "./libs/vscode/migrate-sidebar-webview"
     }
   ]
 }
