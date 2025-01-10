@@ -8,7 +8,8 @@
   "implicitDependencies": [
     "generate-ui-v2",
     "nxls",
-    "nx-cloud-onboarding-webview"
+    "nx-cloud-onboarding-webview",
+    "vscode-migrate-sidebar-webview"
   ],
   "targets": {
     "watch-all": {

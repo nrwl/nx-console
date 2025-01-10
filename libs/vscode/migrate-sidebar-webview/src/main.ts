@@ -12,10 +12,18 @@ export class Root extends LitElement {
   protected migrateViewData: MigrateViewData | undefined;
 
   override render(): TemplateResult {
-    return html`
-      <h2>${this.state}</h2>
-      <pre>${JSON.stringify(this.migrateViewData, null, 2)}</pre>
-      <vscode-icon name="account"></vscode-icon>
-    `;
+    if (this.state === 'update-available') {
+      return html`
+        <p>A newer version of Nx is available to migrate to :)</p>
+        <vscode-button>Update</vscode-button>
+      `;
+    } else if (this.state === 'in-progress') {
+      return html`
+        <p>Migration in progress...</p>
+        <vscode-button>Open Migrate UI</vscode-button>
+      `;
+    } else {
+      return html` <p>You're up to date!</p> `;
+    }
   }
 }
