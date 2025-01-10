@@ -963,6 +963,12 @@
           "id": "nxHelpAndFeedback",
           "name": "Help and Feedback",
           "visibility": "collapsed"
+        },
+        {
+          "id": "nxMigrate",
+          "type": "webview",
+          "name": "Nx Migrate ",
+          "when": "isNxWorkspace"
         }
       ]
     }

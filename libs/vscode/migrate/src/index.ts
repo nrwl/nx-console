@@ -1,1 +1,1 @@
-export * from './lib/vscode-migrate';
+export * from './lib/init-migrate';

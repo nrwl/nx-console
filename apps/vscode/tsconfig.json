@@ -13,6 +13,9 @@
       "path": "../../libs/vscode/error-diagnostics"
     },
     {
+      "path": "../../libs/vscode/migrate"
+    },
+    {
       "path": "../../libs/vscode/typescript-plugin"
     },
     {

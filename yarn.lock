@@ -2905,6 +2905,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-migrate@workspace:libs/vscode/migrate":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-migrate@workspace:libs/vscode/migrate"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-nvm-tip@workspace:libs/vscode/nvm-tip":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-nvm-tip@workspace:libs/vscode/nvm-tip"
