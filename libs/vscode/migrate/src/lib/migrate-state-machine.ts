@@ -16,13 +16,11 @@ export const migrateMachine = setup({
     context: {} as MigrateViewData,
   },
   actions: {
-    updateWorkspaceData: assign(({ context, event }) => {
+    updateViewData: assign(({ context, event }) => {
       const workspaceData = event['value'];
       return {
         ...context,
-        migrationsJsonSection: workspaceData.migrationsJsonSection,
-        hasMigrationsJson: workspaceData.hasMigrationsJson,
-        currentNxVersion: workspaceData.currentNxVersion,
+        ...workspaceData,
       };
     }),
   },
@@ -32,7 +30,9 @@ export const migrateMachine = setup({
     isUpdateAvailable: ({ context }) =>
       !!context.currentNxVersion &&
       !!context.latestNxVersion &&
-      gte(context.latestNxVersion, context.currentNxVersion),
+      gte(context.latestNxVersion, context.currentNxVersion) &&
+      (context.latestNxVersion.major > context.currentNxVersion.major ||
+        context.latestNxVersion.minor > context.currentNxVersion.minor),
   },
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOgjADN0BXAGwBcBiAbQAYBdRUABwHtZc9XL3xcQAD0QBGACwB2EqzkAOKawCcM2QDYATOoDMAVgA0IAJ6JdrXSW1HdB7Rt1ypqqQF9PZtFjyEpORUdEzMUpxIIHwCQiJikgiyCkqqGloyeoamFojKBiQySkZG9lraUlK62t6+GDgExCTU3BDo9GAAtOgAbui4tOgARrRgLBxiMYLColGJpbYOcgaOBgYyyipSZpYI+YXFpUblldXePiD4vOTwUX4NgZP80-FziJ3aO+81F-cBTcEaAwnrEZglEDJdF89gpliojHItMp1MoSnJaiA-o1SC02h1un0BsNRiCXrNQIkDMptIU1kZlLopHJtCyKtDVCQVvoqpCUVJtMoZBisYESAROtwAE68KCSuC3HjPOLkiSIORGApydQClZVNROdTs5QkBGVdTFRzudTnTxAA */
@@ -51,10 +51,16 @@ export const migrateMachine = setup({
       ],
     },
     'update-available': {
-      always: {
-        guard: 'isMigrationInProgress',
-        target: 'in-progress',
-      },
+      always: [
+        {
+          guard: 'isMigrationInProgress',
+          target: 'in-progress',
+        },
+        {
+          guard: not('isUpdateAvailable'),
+          target: 'default',
+        },
+      ],
     },
     'in-progress': {
       always: {
@@ -64,8 +70,8 @@ export const migrateMachine = setup({
     },
   },
   on: {
-    UPDATE_WORKSPACE_DATA: {
-      actions: ['updateWorkspaceData'],
+    UPDATE_VIEW_DATA: {
+      actions: ['updateViewData'],
     },
   },
 });
