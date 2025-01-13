@@ -1,6 +1,8 @@
+import { gte } from '@nx-console/nx-version';
 import { directoryExists } from '@nx-console/shared-file-system';
 import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { join } from 'path';
 import {
@@ -21,8 +23,11 @@ export class MigrateWebview {
       this._webviewPanel.reveal();
       return;
     }
-    const graphBasePath = await getGraphBasePath(getNxWorkspacePath());
-    if (!graphBasePath) {
+    const nxInstallationLocation = await workspaceDependencyPath(
+      getNxWorkspacePath(),
+      'nx'
+    );
+    if (!nxInstallationLocation) {
       window.showErrorMessage(
         'Error loading the Migrate UI. Did you run npm/yarn/pnpm install?'
       );
@@ -37,13 +42,12 @@ export class MigrateWebview {
         enableScripts: true,
         localResourceRoots: [
           this.context.extensionUri,
-          Uri.file(graphBasePath),
+          Uri.file(nxInstallationLocation),
         ],
       }
     );
 
-    this._webviewPanel.webview.html = this.loadMigrateHtml(
-      graphBasePath,
+    this._webviewPanel.webview.html = await this.loadMigrateHtml(
       this._webviewPanel
     );
 
@@ -56,13 +60,15 @@ export class MigrateWebview {
     });
   }
 
-  private loadMigrateHtml(
-    graphBasePath: string,
-    webviewPanel: WebviewPanel
-  ): string {
+  private async loadMigrateHtml(webviewPanel: WebviewPanel): Promise<string> {
+    const graphHtmlLocation = await getGraphHtmlLocation(this.context);
+
+    if (!graphHtmlLocation) {
+      return '<div>CANNOT LOAD MIGRATE UI</div>';
+    }
     const asWebviewUri = (path: string) =>
       webviewPanel.webview
-        .asWebviewUri(Uri.file(join(graphBasePath, path)))
+        .asWebviewUri(Uri.joinPath(graphHtmlLocation, path))
         .toString();
 
     return `<html>
@@ -105,11 +111,36 @@ export class MigrateWebview {
   }
 }
 
+async function getGraphHtmlLocation(
+  context: ExtensionContext
+): Promise<Uri | undefined> {
+  const nxVersion = await getNxVersion();
+
+  // TODO: replace this with proper nx version check once released
+  if (nxVersion && gte(nxVersion, '20.3.0')) {
+    const graphBasePath = await getGraphBasePath();
+    if (!graphBasePath) {
+      return undefined;
+    }
+    return Uri.file(graphBasePath);
+  } else {
+    return Uri.joinPath(
+      context.extensionUri,
+      'node_modules',
+      'nx',
+      'src',
+      'core',
+      'graph'
+    );
+  }
+}
+
 // TODO: don't simply duplicate this from nxls code?
-async function getGraphBasePath(
-  workspacePath: string
-): Promise<string | undefined> {
-  const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
+async function getGraphBasePath(): Promise<string | undefined> {
+  const nxWorkspaceDepPath = await workspaceDependencyPath(
+    getNxWorkspacePath(),
+    'nx'
+  );
 
   if (!nxWorkspaceDepPath) {
     return undefined;

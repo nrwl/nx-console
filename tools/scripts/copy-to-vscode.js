@@ -67,3 +67,12 @@ fs.copySync(
   './node_modules/@vscode/codicons/dist/codicon.ttf',
   join(codiconsDestFolder, 'codicon.ttf')
 );
+
+// copy bundled nx graph
+const nxGraphDestFolder = normalize(
+  './dist/apps/vscode/node_modules/nx/src/core/graph'
+);
+if (!fs.existsSync(nxGraphDestFolder)) {
+  fs.mkdirSync(nxGraphDestFolder, { recursive: true });
+}
+fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
