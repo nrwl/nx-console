@@ -1,7 +1,7 @@
 import { setup, assign, not } from 'xstate';
 import { NxVersion, gte } from '@nx-console/nx-version';
 
-// @ts-expect-error -- need this import for type inference
+// need this import for type inference
 import type { Guard } from 'xstate/guards';
 
 export type MigrateViewData = {
