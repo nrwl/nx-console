@@ -4,6 +4,8 @@ import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { readFileSync } from 'fs';
+import type { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
 import { join } from 'path';
 import {
   ExtensionContext,
@@ -12,6 +14,7 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
+import { runSingleMigration } from './migrate-commands';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
@@ -52,7 +55,9 @@ export class MigrateWebview {
     );
 
     this._webviewPanel.webview.onDidReceiveMessage((message) => {
-      getOutputChannel().appendLine(JSON.stringify(message, null, 2));
+      if (message.type === 'run-migration') {
+        runSingleMigration(message.payload.migration);
+      }
     });
 
     this._webviewPanel.onDidDispose(() => {
@@ -66,6 +71,9 @@ export class MigrateWebview {
     if (!graphHtmlLocation) {
       return '<div>CANNOT LOAD MIGRATE UI</div>';
     }
+
+    const initialData = await this.getMigrateUIData();
+
     const asWebviewUri = (path: string) =>
       webviewPanel.webview
         .asWebviewUri(Uri.joinPath(graphHtmlLocation, path))
@@ -96,7 +104,7 @@ export class MigrateWebview {
         <script src="${asWebviewUri('styles.js')}"></script>
         <script src="${asWebviewUri('main.js')}"></script>
         <script>
-          const data = { migrations: [{description: 'hello'}]}
+          const data = ${JSON.stringify(initialData)}
           const migrateService = window.renderMigrate(data)
 
           const vscode = acquireVsCodeApi()
@@ -108,6 +116,16 @@ export class MigrateWebview {
         </script>
     </body>
     </html>`;
+  }
+
+  private async getMigrateUIData(): Promise<{
+    migrations: MigrationsJsonEntry[];
+    'nx-console': any | undefined;
+  }> {
+    const nxWorkspacePath = getNxWorkspacePath();
+    const migrationsJsonPath = join(nxWorkspacePath, 'migrations.json');
+    const migrationsJson = readFileSync(migrationsJsonPath, 'utf-8');
+    return JSON.parse(migrationsJson);
   }
 }
 

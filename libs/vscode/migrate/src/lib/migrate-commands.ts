@@ -19,10 +19,13 @@ import {
 import { gte } from '@nx-console/nx-version';
 import { rcompare } from 'semver';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { join, relative } from 'path';
 import { execSync } from 'child_process';
 import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
+import { tmpdir } from 'os';
+import { findNxPackagePath, importNxPackagePath } from '@nx-console/shared-npm';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -178,4 +181,41 @@ async function promptForVersion() {
       resolve(undefined);
     });
   });
+}
+
+export async function runSingleMigration(migration: MigrationsJsonEntry) {
+  const nxWorkspacePath = getNxWorkspacePath();
+
+  const cacheDirectoryModule = await importNxPackagePath<
+    typeof import('nx/src/utils/cache-directory')
+  >(nxWorkspacePath, 'src/utils/cache-directory');
+
+  const tmpFolder =
+    cacheDirectoryModule.workspaceDataDirectory ??
+    cacheDirectoryModule.cacheDir;
+
+  const tmpMigrationsJsonPath = join(
+    tmpFolder,
+    `migrations~${new Date().getTime()}.json`
+  );
+
+  if (!existsSync(tmpFolder)) {
+    mkdirSync(tmpFolder, { recursive: true });
+  }
+  writeFileSync(
+    tmpMigrationsJsonPath,
+    JSON.stringify({ migrations: [migration] }, null, 2)
+  );
+  const relativePath = relative(getNxWorkspacePath(), tmpMigrationsJsonPath);
+  const pm = await getPackageManagerCommand(getNxWorkspacePath());
+
+  try {
+    execSync(`${pm.exec} nx migrate --runMigrations=${relativePath}`, {
+      cwd: getNxWorkspacePath(),
+    });
+  } catch (e) {
+    getOutputChannel().appendLine(e);
+  }
+
+  rmSync(tmpMigrationsJsonPath);
 }
