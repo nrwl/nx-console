@@ -20,16 +20,18 @@ export class Root extends LitElement {
         <p>A newer version of Nx is available to migrate to :)</p>
         <vscode-button
           @click="${() => {
-            console.log('clicked');
-            this.vscodeApi.postMessage({ type: 'open' });
+            this.vscodeApi.postMessage({ type: 'start-migration' });
           }}"
-          >Update</vscode-button
+          >Start Migration</vscode-button
         >
       `;
     } else if (this.state === 'in-progress') {
       return html`
         <p>Migration in progress...</p>
-        <vscode-button>Open Migrate UI</vscode-button>
+        <vscode-button
+          @click="${() => this.vscodeApi.postMessage({ type: 'open' })}"
+          >Open Migrate UI</vscode-button
+        >
       `;
     } else {
       return html` <p>You're up to date!</p> `;

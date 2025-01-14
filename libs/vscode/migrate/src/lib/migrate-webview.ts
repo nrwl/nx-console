@@ -117,7 +117,7 @@ async function getGraphHtmlLocation(
   const nxVersion = await getNxVersion();
 
   // TODO: replace this with proper nx version check once released
-  if (nxVersion && gte(nxVersion, '20.3.0')) {
+  if (nxVersion && gte(nxVersion, '21.0.0')) {
     const graphBasePath = await getGraphBasePath();
     if (!graphBasePath) {
       return undefined;

@@ -54,6 +54,7 @@ async function promptForVersion(
     quickPick.onDidAccept(() => {
       resolve(quickPick.selectedItems[0]?.label);
       quickPick.hide();
+      quickPick.dispose();
     });
 
     quickPick.show();
@@ -75,7 +76,9 @@ async function promptForVersion(
 /**
  * Create a map that tracks the latest version and an array of all versions per major version
  */
-function createVersionMap(packageInfo: PackageInformationResponse): VersionMap {
+export function createVersionMap(
+  packageInfo: PackageInformationResponse
+): VersionMap {
   const versionMap: VersionMap = {};
   Object.entries(packageInfo.versions).forEach(([versionNum, versionInfo]) => {
     if (versionInfo.deprecated) {
@@ -139,7 +142,7 @@ function createVersionQuickPickItems(versionMap: VersionMap): QuickPickItem[] {
     });
 }
 
-type PackageInformationResponse = {
+export type PackageInformationResponse = {
   versions: Record<string, { deprecated: string }>;
   'dist-tags': Record<string, string>;
 };

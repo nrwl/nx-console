@@ -53,7 +53,9 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     });
 
     webviewView.webview.onDidReceiveMessage((message) => {
-      if (message.type === 'open') {
+      if (message.type === 'start-migration') {
+        commands.executeCommand('nxMigrate.startMigration');
+      } else if (message.type === 'open') {
         commands.executeCommand('nxMigrate.open');
       }
     });
