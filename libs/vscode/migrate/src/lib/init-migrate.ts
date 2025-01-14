@@ -11,6 +11,7 @@ import { getPackageInfo } from '@nx-console/vscode-utils';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { coerce } from 'semver';
 import { MigrateWebview } from './migrate-webview';
+import { registerCommands } from './migrate-commands';
 export function initMigrate(context: ExtensionContext): void {
   const actor = createActor(migrateMachine);
   actor.start();
@@ -25,14 +26,12 @@ export function initMigrate(context: ExtensionContext): void {
   MigrateSidebarViewProvider.create(context, actor);
 
   const migrateWebview = new MigrateWebview(context);
+  registerCommands(context, migrateWebview);
 
   context.subscriptions.push(
     commands.registerCommand('nxMigrate.refresh', () => {
       updateWorkspaceData(actor);
       updateLatestNxVersion(actor);
-    }),
-    commands.registerCommand('nxMigrate.open', () => {
-      migrateWebview.openMigrateUi();
     })
   );
 }
