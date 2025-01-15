@@ -218,23 +218,56 @@ export async function runSingleMigration(migration: MigrationsJsonEntry) {
     },
     async () => {
       try {
-        execSync(`${pm.exec} nx migrate --runMigrations=${relativePath}`, {
-          cwd: getNxWorkspacePath(),
-        });
-        modifyMigrationsJsonMetadata((migrationsJsonMetadata) => {
-          if (!migrationsJsonMetadata.successfulMigrations) {
-            migrationsJsonMetadata.successfulMigrations = [];
+        const result = execSync(
+          `${pm.exec} nx migrate --runMigrations=${relativePath}`,
+          {
+            cwd: getNxWorkspacePath(),
           }
-          migrationsJsonMetadata.successfulMigrations.push(migration.name);
-          return migrationsJsonMetadata;
-        });
+        );
+
+        if (result.includes(`Failed to run ${migration.name}`)) {
+          modifyMigrationsJsonMetadata(
+            addFailedMigration(migration.name, result.toString())
+          );
+        } else {
+          modifyMigrationsJsonMetadata(
+            addSuccessfulMigration(migration.name, result.toString())
+          );
+        }
       } catch (e) {
+        modifyMigrationsJsonMetadata(addFailedMigration(migration.name, e));
         getOutputChannel().appendLine(e);
       }
     }
   );
 
   rmSync(tmpMigrationsJsonPath);
+}
+
+function addSuccessfulMigration(name: string, result: string) {
+  return (migrationsJsonMetadata: any) => {
+    if (!migrationsJsonMetadata.successfulMigrations) {
+      migrationsJsonMetadata.successfulMigrations = [];
+    }
+    migrationsJsonMetadata.successfulMigrations.push({
+      name: name,
+      changes: result.includes('No changes were made') ? [] : ['dummy'],
+    });
+    return migrationsJsonMetadata;
+  };
+}
+
+function addFailedMigration(name: string, error: string) {
+  return (migrationsJsonMetadata: any) => {
+    if (!migrationsJsonMetadata.failedMigrations) {
+      migrationsJsonMetadata.failedMigrations = [];
+    }
+    migrationsJsonMetadata.failedMigrations.push({
+      name: name,
+      error,
+    });
+    return migrationsJsonMetadata;
+  };
 }
 
 function modifyMigrationsJsonMetadata(

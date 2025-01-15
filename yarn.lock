@@ -3054,6 +3054,7 @@ __metadata:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/cypress@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/cypress@npm:20.5.0-beta.2"
@@ -3079,6 +3080,15 @@ __metadata:
     "@nx/eslint": 21.0.3-local
     "@nx/js": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/cypress@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/cypress@npm:21.0.5-local"
+  dependencies:
+    "@nx/devkit": 21.0.5-local
+    "@nx/eslint": 21.0.5-local
+    "@nx/js": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@phenomnomnominal/tsquery": ~5.0.1
     detect-port: ^1.5.1
     tslib: ^2.3.0
@@ -3089,6 +3099,7 @@ __metadata:
       optional: true
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: cedf48bc833e82517cb5d3dbd48127926a8c7eff9d858b87d942c379b515cc601a2387b9637c72c82e383cc6139a9a1bab4e99f297b998d5bc1bf69044c8b9fb
 =======
   checksum: dffb2199a3cbd7ef5010a1954969584a4280e9cfe2d18d73d090532a1f31b5238db5daaa761fc7ca9b6d9724fd7414821561256b961a4b8482c8dd2b39466455
@@ -3096,6 +3107,9 @@ __metadata:
 =======
   checksum: 99aec243f6f38aec2e2f64688f82e82005813f20b8b23a99bb6966e4a271ff0e40d1f0bb96cb4371cee702bdfd826623df6b6fb8326ccaf3988e0f5c8fef624c
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 473dec02b90b985fa3e932a36d3927107a9348aa0eb26ca3ef000ed270fb9e05ef5c8cabfe1ab3b7c86b887b7b5d980be4054825b700b8e901e919c32c506016
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
@@ -3138,6 +3152,7 @@ __metadata:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/devkit@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/devkit@npm:20.5.0-beta.2"
@@ -3151,6 +3166,11 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/devkit@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/devkit@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/devkit@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   dependencies:
     ejs: ^3.1.7
     enquirer: ~2.3.6
@@ -3162,6 +3182,7 @@ __metadata:
     yargs-parser: 21.1.1
   peerDependencies:
     nx: ">= 19 <= 21"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   checksum: dccb6b3b6c740ee1fc86cb50a4d3b2ca6296551baecb27d036030d9f0f41c732dd2770a33216c7a18c315837c886a4728da57c2277fbe18936b6d31b2dd621f3
@@ -3179,15 +3200,18 @@ __metadata:
 =======
   checksum: 159ac4ace131c6a55345f2a6f2e492ad218aa7fe08358828a0d40e1313c46e2b0cc518b586c671b7560de9c4099d83315d1d9160711740f3914286481a3b7f2a
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 6204974a46f1761617eaa352c059fc75bd06f09163783d5c9d8a15f02bb5f2cf0fdf7aff18eef45c0cf79aa69a21e257214961d75e57f434aa86df5a756dded0
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/esbuild@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/esbuild@npm:21.0.3-local"
+"@nx/esbuild@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/esbuild@npm:21.0.5-local"
   dependencies:
-    "@nx/devkit": 21.0.3-local
-    "@nx/js": 21.0.3-local
+    "@nx/devkit": 21.0.5-local
+    "@nx/js": 21.0.5-local
     fast-glob: 3.2.7
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
     picocolors: ^1.1.0
@@ -3199,6 +3223,7 @@ __metadata:
   peerDependenciesMeta:
     esbuild:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   checksum: ca7169748769d44d90542c296beb0eddbdcc72bef028de27f425d8ab57cb8b9d77a44450f131f347aa0a75dae60c4c80853cf100d1862d41792ca33726bce83d
@@ -3216,13 +3241,17 @@ __metadata:
 =======
   checksum: 87c3c20f94f9d74451e3878c1e101dd2dfb143395cb5358d921fb9d254da2b16de1ea0ffde7b6b3e451707b8d5252eef7ae4b02fca5acdb49e69e37c028140e0
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 232ebff6174453b7cb69cf62d43432303ab5f88b4c6075c3cbec930118264e1fa053a74bfed9e46eb1bcc38e7bb83ee57387b6eb05b8efaf932a1a8bb10e128b
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/eslint-plugin@npm:21.0.3-local"
+"@nx/eslint-plugin@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/eslint-plugin@npm:21.0.5-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
@@ -3231,6 +3260,10 @@ __metadata:
     "@nx/devkit": 21.0.3-local
     "@nx/js": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    "@nx/devkit": 21.0.5-local
+    "@nx/js": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@typescript-eslint/type-utils": ^8.0.0
     "@typescript-eslint/utils": ^8.0.0
     chalk: ^4.1.0
@@ -3245,6 +3278,7 @@ __metadata:
   peerDependenciesMeta:
     eslint-config-prettier:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   checksum: f817adfb18e4c8adb176e11dd86d0c68c229a61f9a85f07c8b415ddee72a45a56fc5ac129344cb037ba43d66b6f0ad511c8f776e12f0f31281e5f8e9876d226f
@@ -3262,13 +3296,17 @@ __metadata:
 =======
   checksum: 0b06f516912eb2acce88e590678a11d0901397c34c77ac68a601b3a9d40164c87b385c005b86563afd54f2ce6aa276ecb21a74027175a41e6f11703cc2272132
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 3f4dfdf9497d35531e4f84f13bd8d68c531023f4c41eb9c05261e7739627d52354cbb1cc5ebcf2d6381a677b119ad39c018698a3e47236e88a6b8be24ac7c5e3
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/eslint@npm:21.0.3-local"
+"@nx/eslint@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/eslint@npm:21.0.5-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
@@ -3277,6 +3315,10 @@ __metadata:
     "@nx/devkit": 21.0.3-local
     "@nx/js": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    "@nx/devkit": 21.0.5-local
+    "@nx/js": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     semver: ^7.5.3
     tslib: ^2.3.0
     typescript: ~5.7.2
@@ -3286,6 +3328,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   checksum: c1235890d807348fe124b9fd2c169591bec55f1e4a5b1875a8cb750d0417c4be65f35d72acf3bfa041af88ff6c45fd6675e77eb786d2104c37c16ac6e4d9292a
@@ -3314,24 +3357,28 @@ __metadata:
 =======
   checksum: 3ce5c9ca1198e0429f5ac24299afa16fe40614f5af8dbd4ba73e15235d38340f54a159ea8b570502019521f6762f8a6706caf1aea0712ce1078f507dac2ea175
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 12659de7e5dd61927a9f0bd06a895a221f526c4b3895bdc89ac169a97221c68e050b35912b6a906ada9673b5475a1dcd2c34536af3ae720f65cb5ddab11a5cc2
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/gradle@npm:21.0.3-local"
+"@nx/gradle@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/gradle@npm:21.0.5-local"
   dependencies:
-    "@nx/devkit": 21.0.3-local
-  checksum: bb69772aeb8dfda3b683f387c08fa4dabd1db270c262a52ed8226fb067e90ef4c374453c959744f65e1e9c7cb09a4a35a7beeaea9c01c96b9c396401e11e2f6f
+    "@nx/devkit": 21.0.5-local
+  checksum: 8fc991bcc0814b38b7dad81290718e283b83e55038b8a87b65c5f7a3728fe8dda801f203335f6390eda006aa66e4108698d5331c763adc271ee31fa34b29c193
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/jest@npm:21.0.3-local"
+"@nx/jest@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/jest@npm:21.0.5-local"
   dependencies:
     "@jest/reporters": ^29.4.1
     "@jest/test-result": ^29.4.1
+<<<<<<< HEAD
 <<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
@@ -3340,6 +3387,10 @@ __metadata:
     "@nx/devkit": 21.0.3-local
     "@nx/js": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    "@nx/devkit": 21.0.5-local
+    "@nx/js": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@phenomnomnominal/tsquery": ~5.0.1
     identity-obj-proxy: 3.0.0
     jest-config: ^29.4.1
@@ -3351,6 +3402,7 @@ __metadata:
     semver: ^7.5.3
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 3ea9a9fec2e040e6a8f09bb11b6d4ae10572dd2fbabf5e56539f118aeca744c909c0d8d2b131bdaa8ad57d95d5bcd223de155e2ba66582c146ca55b038f8889c
@@ -3378,6 +3430,15 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/js@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 92414467cebff5fffee709bb8bf73836a22f3a661d18cc5934de7d291cf5085a40cbd5510d39a6bbbd3b69c57baadf458d6fc06be66a0e824d0ae93f084c12f6
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/js@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   dependencies:
     "@babel/core": ^7.23.2
     "@babel/plugin-proposal-decorators": ^7.22.7
@@ -3386,6 +3447,7 @@ __metadata:
     "@babel/preset-env": ^7.23.2
     "@babel/preset-typescript": ^7.22.5
     "@babel/runtime": ^7.22.6
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     "@nx/devkit": 20.5.0-beta.2
@@ -3398,6 +3460,10 @@ __metadata:
     "@nx/devkit": 21.0.3-local
     "@nx/workspace": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    "@nx/devkit": 21.0.5-local
+    "@nx/workspace": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@zkochan/js-yaml": 0.0.7
     babel-plugin-const-enum: ^1.0.1
     babel-plugin-macros: ^3.1.0
@@ -3426,6 +3492,7 @@ __metadata:
       optional: true
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 43061f86c978e66ae5bca2fc02bba42edb2e1ac08f0cc3a88960e6822cf3335166a7fb8c74628d443fe216058ca7f5edd205ffa571f28bd2402a5c1919031c5e
   languageName: node
   linkType: hard
@@ -3451,22 +3518,26 @@ __metadata:
 =======
   checksum: 4a87cad6a2680a1ad0769cc241b466c08c3be208c9d6cc15c0e5a1a835b0da71339c0b8e5599ea89efa568fbb622b56888196090a17b2be16ef07cc139bcada0
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 67110b9a999dfb9fa703e9f5aefb02410a5d9c9b58432d6d6418ce8f68719e875ce904eb4767e6386a403d6231be9f3ec5fc441c736afe56049793900bcffbc6
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/node@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/node@npm:21.0.3-local"
+"@nx/node@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/node@npm:21.0.5-local"
   dependencies:
-    "@nx/devkit": 21.0.3-local
-    "@nx/eslint": 21.0.3-local
-    "@nx/jest": 21.0.3-local
-    "@nx/js": 21.0.3-local
+    "@nx/devkit": 21.0.5-local
+    "@nx/eslint": 21.0.5-local
+    "@nx/jest": 21.0.5-local
+    "@nx/js": 21.0.5-local
     tslib: ^2.3.0
-  checksum: ed5830c841fd3c0364bb120bd77a35745d78f99b5021e31edb8fa2f043525a17dd3593a495042ff62f886fa22419f298b1eab7c2221b6e4a10be244599224b2b
+  checksum: 7e757fdf46a5ac5d36f79a82773e10c1f215ffe93abc7dfd83c452017d1cde6ed05e265b91402c8f305d7f4849c33fe2a9293bb094d84c4046083181b6379c84
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-darwin-arm64@npm:21.0.1--local-test":
   version: 21.0.1--local-test
@@ -3477,10 +3548,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-darwin-arm64@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-darwin-arm64@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-darwin-arm64@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-darwin-x64@npm:20.5.0-beta.2":
@@ -3496,10 +3573,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-darwin-x64@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-darwin-x64@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-darwin-x64@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-freebsd-x64@npm:20.5.0-beta.2":
@@ -3515,10 +3598,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-freebsd-x64@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-freebsd-x64@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-freebsd-x64@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-arm-gnueabihf@npm:20.5.0-beta.2":
@@ -3534,10 +3623,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-arm64-gnu@npm:20.5.0-beta.2":
@@ -3553,10 +3648,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-linux-arm64-gnu@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-arm64-musl@npm:20.5.0-beta.2":
@@ -3572,10 +3673,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-linux-arm64-musl@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-linux-arm64-musl@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-linux-arm64-musl@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-x64-gnu@npm:20.5.0-beta.2":
@@ -3591,10 +3698,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-linux-x64-gnu@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-linux-x64-gnu@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-linux-x64-gnu@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-x64-musl@npm:20.5.0-beta.2":
@@ -3610,10 +3723,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-linux-x64-musl@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-linux-x64-musl@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-linux-x64-musl@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-win32-arm64-msvc@npm:20.5.0-beta.2":
@@ -3629,10 +3748,16 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-win32-arm64-msvc@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-win32-x64-msvc@npm:20.5.0-beta.2":
@@ -3648,6 +3773,11 @@ __metadata:
   version: 21.0.3-local
   resolution: "@nx/nx-win32-x64-msvc@npm:21.0.3-local"
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/nx-win32-x64-msvc@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/nx-win32-x64-msvc@npm:21.0.5-local"
+>>>>>>> 7df4b951 (handle failed migration runs)
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -3802,6 +3932,7 @@ __metadata:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/web@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/web@npm:20.5.0-beta.2"
@@ -3824,10 +3955,19 @@ __metadata:
     "@nx/devkit": 21.0.3-local
     "@nx/js": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"@nx/web@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/web@npm:21.0.5-local"
+  dependencies:
+    "@nx/devkit": 21.0.5-local
+    "@nx/js": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     detect-port: ^1.5.1
     http-server: ^14.1.0
     picocolors: ^1.1.0
     tslib: ^2.3.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 77d112d03a6bd590e19593b8eaf37c7fc9ad8296952f964d4c7993f8032acf487b8cecd72f400ef18da0e872f1f708692d959ce0a88f2d49b348f33074111f3b
@@ -3846,14 +3986,18 @@ __metadata:
 =======
   checksum: 062713e7cf25df8bb752ee1643729f2abeba0baf22ce4a6be09c2bd204e3a17e876b53c5a847c8333ac694ccab796e1c6eddf6463100ca88f64b9eaa4e9fcc19
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 27f2df39c09265874adeb9768f214787f5af802234cf1c2a30591418bfdcb6cbabda4cd31c4fbf1af0ef27d09b8cf833f29dc7f0e2f336b85fe6e052576ec73d
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/webpack@npm:21.0.3-local"
+"@nx/webpack@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/webpack@npm:21.0.5-local"
   dependencies:
     "@babel/core": ^7.23.2
+<<<<<<< HEAD
 <<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
@@ -3862,6 +4006,10 @@ __metadata:
     "@nx/devkit": 21.0.3-local
     "@nx/js": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    "@nx/devkit": 21.0.5-local
+    "@nx/js": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@phenomnomnominal/tsquery": ~5.0.1
     ajv: ^8.12.0
     autoprefixer: ^10.4.9
@@ -3898,6 +4046,7 @@ __metadata:
     webpack-subresource-integrity: ^5.1.0
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: c3e41ae4d7cd7e50491dccac89ec0d60d369366baad4226991fde53d9023d6ff6061f06210ba38c4ddb1f6e087c1036c122cde7a4f9eddf8db9af86b14d885aa
   languageName: node
   linkType: hard
@@ -3918,25 +4067,32 @@ __metadata:
 =======
   checksum: 00186ac525999b879e02614b2d362a3dde5a563fc0300de49f75ab975bc68d598d8b64b91aa7627151367ae99f42368294de8bce14de4d4c55b5ffb6bf05027c
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 9781333d3aa605fdd4547e9c64d51c8d095fc5391b444168d051b747c9595e9038b87fc7a2a59a82578353dffbb03d568213a28b893ce9b46d0b81d6a3b581a3
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:21.0.3-local":
-  version: 21.0.3-local
-  resolution: "@nx/workspace@npm:21.0.3-local"
+"@nx/workspace@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "@nx/workspace@npm:21.0.5-local"
   dependencies:
-    "@nx/devkit": 21.0.3-local
+    "@nx/devkit": 21.0.5-local
     chalk: ^4.1.0
     enquirer: ~2.3.6
-    nx: 21.0.3-local
+    nx: 21.0.5-local
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 660aad9df7200436cf766b47a8d4fb47f0ea576c3d2b669a9828e907a28ec428ff0bc49fb6bbf899932da3e22fbbc10bc1adc9f7a25b32cdab01c3a8d9319014
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
 =======
   checksum: ff3e972b4fcb74645ed0d4d5d607ed7e6018372f172e0859477f070b383442b5c8013879aeefa84fcfe56cf760cb9b2f0716c09cafa930a4755b58fd886c1319
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 4636ca206fe955bdf79b85e2c6a4fba21b257b4205b9d1599b84132e78e5f62852b86f611394e4b4a6ec90222b5ddc614fe1fcea181abfabf26afb40573257cc
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
@@ -14302,6 +14458,7 @@ __metadata:
     "@monodon/typescript-nx-imports-plugin": 0.3.0
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
     "@nx/esbuild": 20.5.0-beta.2
@@ -14351,6 +14508,23 @@ __metadata:
     "@nx/webpack": 21.0.3-local
     "@nx/workspace": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    "@nx/cypress": 21.0.5-local
+    "@nx/devkit": 21.0.5-local
+    "@nx/esbuild": 21.0.5-local
+    "@nx/eslint": 21.0.5-local
+    "@nx/eslint-plugin": 21.0.5-local
+    "@nx/gradle": 21.0.5-local
+    "@nx/jest": 21.0.5-local
+    "@nx/js": 21.0.5-local
+    "@nx/node": 21.0.5-local
+    "@nx/powerpack-conformance": 1.1.1
+    "@nx/powerpack-enterprise-cloud": 1.1.1
+    "@nx/powerpack-owners": 1.1.1
+    "@nx/web": 21.0.5-local
+    "@nx/webpack": 21.0.5-local
+    "@nx/workspace": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -14407,6 +14581,7 @@ __metadata:
     mocha: ^10.0.0
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nx: 20.5.0-beta.2
     ovsx: ^0.10.1
     prettier: ^3.5.1
@@ -14416,6 +14591,9 @@ __metadata:
 =======
     nx: 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+    nx: 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
@@ -14446,6 +14624,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 "nx@npm:20.5.0-beta.2":
@@ -14497,6 +14676,23 @@ __metadata:
     "@nx/nx-win32-arm64-msvc": 21.0.3-local
     "@nx/nx-win32-x64-msvc": 21.0.3-local
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+"nx@npm:21.0.5-local":
+  version: 21.0.5-local
+  resolution: "nx@npm:21.0.5-local"
+  dependencies:
+    "@napi-rs/wasm-runtime": 0.2.4
+    "@nx/nx-darwin-arm64": 21.0.5-local
+    "@nx/nx-darwin-x64": 21.0.5-local
+    "@nx/nx-freebsd-x64": 21.0.5-local
+    "@nx/nx-linux-arm-gnueabihf": 21.0.5-local
+    "@nx/nx-linux-arm64-gnu": 21.0.5-local
+    "@nx/nx-linux-arm64-musl": 21.0.5-local
+    "@nx/nx-linux-x64-gnu": 21.0.5-local
+    "@nx/nx-linux-x64-musl": 21.0.5-local
+    "@nx/nx-win32-arm64-msvc": 21.0.5-local
+    "@nx/nx-win32-x64-msvc": 21.0.5-local
+>>>>>>> 7df4b951 (handle failed migration runs)
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
@@ -14564,6 +14760,7 @@ __metadata:
     nx-cloud: bin/nx-cloud.js
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 0ef4860fb9a74cbbf7bfb25353909042ead8d01915419eec153daee0508801264fd91dcc34bbf6cc4250e28925d9b319c7964d41910e44cd0ac151fb77a306b2
 =======
   checksum: f33ff06bf3aabbaed007706d58e54a789c1e4dbbd8e58f4e73929251de0e44e0e3dc79b19149160c6b1126f39987f8c1be82e9c0b62167b28411b2f8d5e06835
@@ -14571,6 +14768,9 @@ __metadata:
 =======
   checksum: bc50189fd5bf22c1b4269c852754b9e3c769c4c2b67b483bfc4ea8beddf5a8c97004876f22f3810dd96891938cc33edd39867d1ffefc5e2fd882f7656ddc0ecf
 >>>>>>> a0d3d7a8 (update webview on migrations.json change)
+=======
+  checksum: 08de75b67f1d8b84b0d645e5beab3d57bcc24837901166516ee72610d9deda6b234bf85411041f3b242db8c160bfd086a806254e7e50aea8c44cb0837e5542e6
+>>>>>>> 7df4b951 (handle failed migration runs)
   languageName: node
   linkType: hard
 
