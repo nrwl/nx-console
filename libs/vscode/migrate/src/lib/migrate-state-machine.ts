@@ -28,11 +28,7 @@ export const migrateMachine = setup({
   guards: {
     isMigrationInProgress: ({ context }) => !!context.migrationsJsonSection,
     isUpdateAvailable: ({ context }) =>
-      !!context.currentNxVersion &&
-      !!context.latestNxVersion &&
-      gte(context.latestNxVersion, context.currentNxVersion) &&
-      (context.latestNxVersion.major > context.currentNxVersion.major ||
-        context.latestNxVersion.minor > context.currentNxVersion.minor),
+      isUpdateAvailable(context.currentNxVersion, context.latestNxVersion),
   },
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOgjADN0BXAGwBcBiAbQAYBdRUABwHtZc9XL3xcQAD0QBGACwB2EqzkAOKawCcM2QDYATOoDMAVgA0IAJ6JdrXSW1HdB7Rt1ypqqQF9PZtFjyEpORUdEzMUpxIIHwCQiJikgiyCkqqGloyeoamFojKBiQySkZG9lraUlK62t6+GDgExCTU3BDo9GAAtOgAbui4tOgARrRgLBxiMYLColGJpbYOcgaOBgYyyipSZpYI+YXFpUblldXePiD4vOTwUX4NgZP80-FziJ3aO+81F-cBTcEaAwnrEZglEDJdF89gpliojHItMp1MoSnJaiA-o1SC02h1un0BsNRiCXrNQIkDMptIU1kZlLopHJtCyKtDVCQVvoqpCUVJtMoZBisYESAROtwAE68KCSuC3HjPOLkiSIORGApydQClZVNROdTs5QkBGVdTFRzudTnTxAA */
@@ -75,3 +71,16 @@ export const migrateMachine = setup({
     },
   },
 });
+
+export function isUpdateAvailable(
+  currentNxVersion: NxVersion,
+  latestNxVersion: NxVersion
+): boolean {
+  return (
+    !!currentNxVersion &&
+    !!latestNxVersion &&
+    gte(latestNxVersion, currentNxVersion) &&
+    (latestNxVersion.major > currentNxVersion.major ||
+      latestNxVersion.minor > currentNxVersion.minor)
+  );
+}

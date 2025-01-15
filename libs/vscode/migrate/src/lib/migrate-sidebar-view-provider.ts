@@ -11,7 +11,7 @@ import {
 } from 'vscode';
 import { EventObject } from 'xstate';
 import { ActorRef } from 'xstate';
-import { MigrateViewData } from './migrate-state-machine';
+import { isUpdateAvailable, MigrateViewData } from './migrate-state-machine';
 import { isDeepStrictEqual } from 'util';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
@@ -47,6 +47,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     };
 
     webviewView.webview.html = this.getWebviewContent(webviewView);
+    this.setViewBadge();
 
     webviewView.onDidDispose(() => {
       this._refreshSubscription?.dispose();
@@ -66,6 +67,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       return;
     }
     this._view.webview.html = this.getWebviewContent(this._view);
+    this.setViewBadge();
   }
 
   private getWebviewContent(webviewView: WebviewView): string {
@@ -138,6 +140,51 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       this._refreshSubscription = undefined;
     });
     this.extensionContext.subscriptions.push(this._refreshSubscription);
+  }
+
+  private setViewBadge() {
+    if (
+      !this._migrateViewData.currentNxVersion ||
+      !this._migrateViewData.latestNxVersion
+    ) {
+      this._view.badge = undefined;
+      return;
+    }
+    if (
+      !isUpdateAvailable(
+        this._migrateViewData.currentNxVersion,
+        this._migrateViewData.latestNxVersion
+      )
+    ) {
+      this._view.badge = undefined;
+      return;
+    }
+    const latestMajor = this._migrateViewData.latestNxVersion.major;
+    const latestMinor = this._migrateViewData.latestNxVersion.minor;
+    const currentMajor = this._migrateViewData.currentNxVersion.major;
+    const currentMinor = this._migrateViewData.currentNxVersion.minor;
+
+    if (latestMajor == currentMajor) {
+      const difference = latestMinor - currentMinor;
+      this._view.badge = {
+        value: difference,
+        tooltip: `nx ${
+          this._migrateViewData.currentNxVersion.full
+        } is ${difference} minor version${
+          difference === 1 ? '' : 's'
+        } behind latest.`,
+      };
+    } else {
+      const difference = latestMajor - currentMajor;
+      this._view.badge = {
+        value: difference,
+        tooltip: `nx ${
+          this._migrateViewData.currentNxVersion.full
+        } is ${difference} major version${
+          difference === 1 ? '' : 's'
+        } behind latest.`,
+      };
+    }
   }
 
   static create(context: ExtensionContext, actor: ActorRef<any, EventObject>) {
