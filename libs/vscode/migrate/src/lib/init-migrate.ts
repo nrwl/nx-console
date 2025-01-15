@@ -7,7 +7,7 @@ import { join } from 'path';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getPackageInfo } from '@nx-console/vscode-utils';
+import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { coerce } from 'semver';
 import { MigrateWebview } from './migrate-webview';
@@ -33,6 +33,14 @@ export function initMigrate(context: ExtensionContext): void {
       updateWorkspaceData(actor);
       updateLatestNxVersion(actor);
     })
+  );
+
+  watchFile(
+    join(getNxWorkspacePath(), 'migrations.json'),
+    () => {
+      updateWorkspaceData(actor);
+    },
+    context.subscriptions
   );
 }
 async function updateWorkspaceData(actor: ActorRef<any, any>) {

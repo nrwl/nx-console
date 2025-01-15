@@ -3053,6 +3053,7 @@ __metadata:
   linkType: soft
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/cypress@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/cypress@npm:20.5.0-beta.2"
@@ -3069,6 +3070,15 @@ __metadata:
     "@nx/eslint": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/cypress@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/cypress@npm:21.0.3-local"
+  dependencies:
+    "@nx/devkit": 21.0.3-local
+    "@nx/eslint": 21.0.3-local
+    "@nx/js": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@phenomnomnominal/tsquery": ~5.0.1
     detect-port: ^1.5.1
     tslib: ^2.3.0
@@ -3078,10 +3088,14 @@ __metadata:
     cypress:
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: cedf48bc833e82517cb5d3dbd48127926a8c7eff9d858b87d942c379b515cc601a2387b9637c72c82e383cc6139a9a1bab4e99f297b998d5bc1bf69044c8b9fb
 =======
   checksum: dffb2199a3cbd7ef5010a1954969584a4280e9cfe2d18d73d090532a1f31b5238db5daaa761fc7ca9b6d9724fd7414821561256b961a4b8482c8dd2b39466455
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+  checksum: 99aec243f6f38aec2e2f64688f82e82005813f20b8b23a99bb6966e4a271ff0e40d1f0bb96cb4371cee702bdfd826623df6b6fb8326ccaf3988e0f5c8fef624c
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
@@ -3123,6 +3137,7 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/devkit@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/devkit@npm:20.5.0-beta.2"
@@ -3131,6 +3146,11 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/devkit@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/devkit@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/devkit@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   dependencies:
     ejs: ^3.1.7
     enquirer: ~2.3.6
@@ -3142,6 +3162,7 @@ __metadata:
     yargs-parser: 21.1.1
   peerDependencies:
     nx: ">= 19 <= 21"
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: dccb6b3b6c740ee1fc86cb50a4d3b2ca6296551baecb27d036030d9f0f41c732dd2770a33216c7a18c315837c886a4728da57c2277fbe18936b6d31b2dd621f3
   languageName: node
@@ -3155,15 +3176,18 @@ __metadata:
     "@nx/js": 20.5.0-beta.2
 =======
   checksum: 9b0270c1410db937ba4a07859b47372210091cdda39d6b152ec0e9160adb52e12ab4313a73ce1c5ad620b74183ba2842f0cff67a7d11ec74136de13407d9ac0e
+=======
+  checksum: 159ac4ace131c6a55345f2a6f2e492ad218aa7fe08358828a0d40e1313c46e2b0cc518b586c671b7560de9c4099d83315d1d9160711740f3914286481a3b7f2a
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/esbuild@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/esbuild@npm:21.0.1--local-test"
+"@nx/esbuild@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/esbuild@npm:21.0.3-local"
   dependencies:
-    "@nx/devkit": 21.0.1--local-test
-    "@nx/js": 21.0.1--local-test
+    "@nx/devkit": 21.0.3-local
+    "@nx/js": 21.0.3-local
     fast-glob: 3.2.7
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
     picocolors: ^1.1.0
@@ -3175,6 +3199,7 @@ __metadata:
   peerDependenciesMeta:
     esbuild:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: ca7169748769d44d90542c296beb0eddbdcc72bef028de27f425d8ab57cb8b9d77a44450f131f347aa0a75dae60c4c80853cf100d1862d41792ca33726bce83d
   languageName: node
@@ -3188,16 +3213,24 @@ __metadata:
     "@nx/js": 20.5.0-beta.2
 =======
   checksum: 073b30e9d35d24a37bb6494c4024b6ae0a9dc1b4409978a4143606c1c63bc8a57cf0bbe7bdf0d9de49aebf72d4199d6df2a8ec85f8fe534ad259fc9ea04113ee
+=======
+  checksum: 87c3c20f94f9d74451e3878c1e101dd2dfb143395cb5358d921fb9d254da2b16de1ea0ffde7b6b3e451707b8d5252eef7ae4b02fca5acdb49e69e37c028140e0
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/eslint-plugin@npm:21.0.1--local-test"
+"@nx/eslint-plugin@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/eslint-plugin@npm:21.0.3-local"
   dependencies:
+<<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/devkit": 21.0.3-local
+    "@nx/js": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@typescript-eslint/type-utils": ^8.0.0
     "@typescript-eslint/utils": ^8.0.0
     chalk: ^4.1.0
@@ -3213,6 +3246,7 @@ __metadata:
     eslint-config-prettier:
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: f817adfb18e4c8adb176e11dd86d0c68c229a61f9a85f07c8b415ddee72a45a56fc5ac129344cb037ba43d66b6f0ad511c8f776e12f0f31281e5f8e9876d226f
   languageName: node
   linkType: hard
@@ -3225,16 +3259,24 @@ __metadata:
     "@nx/js": 20.5.0-beta.2
 =======
   checksum: 89b7f49e9704254848724a22a788547ad59d0faf12c4502124ec0476c439cd770a11206aa73009d8f5b30a9934749028a264a0da31df0ada0b1fd41f95d5eaae
+=======
+  checksum: 0b06f516912eb2acce88e590678a11d0901397c34c77ac68a601b3a9d40164c87b385c005b86563afd54f2ce6aa276ecb21a74027175a41e6f11703cc2272132
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/eslint@npm:21.0.1--local-test"
+"@nx/eslint@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/eslint@npm:21.0.3-local"
   dependencies:
+<<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/devkit": 21.0.3-local
+    "@nx/js": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     semver: ^7.5.3
     tslib: ^2.3.0
     typescript: ~5.7.2
@@ -3244,6 +3286,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: c1235890d807348fe124b9fd2c169591bec55f1e4a5b1875a8cb750d0417c4be65f35d72acf3bfa041af88ff6c45fd6675e77eb786d2104c37c16ac6e4d9292a
   languageName: node
@@ -3268,27 +3311,35 @@ __metadata:
     "@nx/js": 20.5.0-beta.2
 =======
   checksum: 78a0ff037cd923fa2dea861c755034c43a17fd3c8483fe29185f663d94357d9e7ced6eab0138e82d1e7b249cbdca516f970f64096322bd2a8e98602c9e4b896f
+=======
+  checksum: 3ce5c9ca1198e0429f5ac24299afa16fe40614f5af8dbd4ba73e15235d38340f54a159ea8b570502019521f6762f8a6706caf1aea0712ce1078f507dac2ea175
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/gradle@npm:21.0.1--local-test"
+"@nx/gradle@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/gradle@npm:21.0.3-local"
   dependencies:
-    "@nx/devkit": 21.0.1--local-test
-  checksum: fc0cf3ab744d0740e6bb50ec1fa708b9f001ef9539445f06aca4e4811e453dee0527e79d1f2cb70cef3560acbe4be99f6e15bf64c9110038a086cfeb45ddb9e0
+    "@nx/devkit": 21.0.3-local
+  checksum: bb69772aeb8dfda3b683f387c08fa4dabd1db270c262a52ed8226fb067e90ef4c374453c959744f65e1e9c7cb09a4a35a7beeaea9c01c96b9c396401e11e2f6f
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/jest@npm:21.0.1--local-test"
+"@nx/jest@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/jest@npm:21.0.3-local"
   dependencies:
     "@jest/reporters": ^29.4.1
     "@jest/test-result": ^29.4.1
+<<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/devkit": 21.0.3-local
+    "@nx/js": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@phenomnomnominal/tsquery": ~5.0.1
     identity-obj-proxy: 3.0.0
     jest-config: ^29.4.1
@@ -3300,6 +3351,7 @@ __metadata:
     semver: ^7.5.3
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 3ea9a9fec2e040e6a8f09bb11b6d4ae10572dd2fbabf5e56539f118aeca744c909c0d8d2b131bdaa8ad57d95d5bcd223de155e2ba66582c146ca55b038f8889c
   languageName: node
@@ -3317,6 +3369,15 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/js@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+  checksum: 48d7a7ef7cf5200342e0bd109d31d963e6b8022962fc412d1127ef32d5d679c1be588636afe7c461b4119fc7a84e6fbacdf00ad28dd7595b17ba436be027179c
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/js@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   dependencies:
     "@babel/core": ^7.23.2
     "@babel/plugin-proposal-decorators": ^7.22.7
@@ -3326,12 +3387,17 @@ __metadata:
     "@babel/preset-typescript": ^7.22.5
     "@babel/runtime": ^7.22.6
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/devkit": 20.5.0-beta.2
     "@nx/workspace": 20.5.0-beta.2
 =======
     "@nx/devkit": 21.0.1--local-test
     "@nx/workspace": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/devkit": 21.0.3-local
+    "@nx/workspace": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@zkochan/js-yaml": 0.0.7
     babel-plugin-const-enum: ^1.0.1
     babel-plugin-macros: ^3.1.0
@@ -3359,6 +3425,7 @@ __metadata:
     verdaccio:
       optional: true
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 43061f86c978e66ae5bca2fc02bba42edb2e1ac08f0cc3a88960e6822cf3335166a7fb8c74628d443fe216058ca7f5edd205ffa571f28bd2402a5c1919031c5e
   languageName: node
   linkType: hard
@@ -3381,30 +3448,40 @@ __metadata:
   resolution: "@nx/nx-darwin-arm64@npm:20.5.0-beta.2"
 =======
   checksum: 88213209aa01ccf231d599b25ccf233e406339975d5a8c9b6e7965aabdc6f221ec8b48ce1d7491002f8f90a42b2a1f8ee80aa22a478599ed5c258d9d350742ec
+=======
+  checksum: 4a87cad6a2680a1ad0769cc241b466c08c3be208c9d6cc15c0e5a1a835b0da71339c0b8e5599ea89efa568fbb622b56888196090a17b2be16ef07cc139bcada0
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/node@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/node@npm:21.0.1--local-test"
+"@nx/node@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/node@npm:21.0.3-local"
   dependencies:
-    "@nx/devkit": 21.0.1--local-test
-    "@nx/eslint": 21.0.1--local-test
-    "@nx/jest": 21.0.1--local-test
-    "@nx/js": 21.0.1--local-test
+    "@nx/devkit": 21.0.3-local
+    "@nx/eslint": 21.0.3-local
+    "@nx/jest": 21.0.3-local
+    "@nx/js": 21.0.3-local
     tslib: ^2.3.0
-  checksum: 3be0d493d191b138780a004c7e3d60348dfe3d9410c99d2041ab0ff422bdca4d019a95e13b325358aee84c8ea2f605ed11fe1e382e2155708dc12c853001b0a6
+  checksum: ed5830c841fd3c0364bb120bd77a35745d78f99b5021e31edb8fa2f043525a17dd3593a495042ff62f886fa22419f298b1eab7c2221b6e4a10be244599224b2b
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@nx/nx-darwin-arm64@npm:21.0.1--local-test":
   version: 21.0.1--local-test
   resolution: "@nx/nx-darwin-arm64@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-darwin-arm64@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-darwin-arm64@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-darwin-x64@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3414,10 +3491,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-darwin-x64@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-darwin-x64@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-darwin-x64@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-freebsd-x64@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3427,10 +3510,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-freebsd-x64@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-freebsd-x64@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-freebsd-x64@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-arm-gnueabihf@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3440,10 +3529,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-arm64-gnu@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3453,10 +3548,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-linux-arm64-gnu@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-arm64-musl@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3466,10 +3567,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-linux-arm64-musl@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-linux-arm64-musl@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-linux-arm64-musl@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-x64-gnu@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3479,10 +3586,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-linux-x64-gnu@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-linux-x64-gnu@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-linux-x64-gnu@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-linux-x64-musl@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3492,10 +3605,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-linux-x64-musl@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-linux-x64-musl@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-linux-x64-musl@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-win32-arm64-msvc@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3505,10 +3624,16 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-win32-arm64-msvc@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@nx/nx-win32-x64-msvc@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -3518,6 +3643,11 @@ __metadata:
   version: 21.0.1--local-test
   resolution: "@nx/nx-win32-x64-msvc@npm:21.0.1--local-test"
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/nx-win32-x64-msvc@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/nx-win32-x64-msvc@npm:21.0.3-local"
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -3671,6 +3801,7 @@ __metadata:
   linkType: hard
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/web@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/web@npm:20.5.0-beta.2"
@@ -3685,10 +3816,19 @@ __metadata:
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"@nx/web@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/web@npm:21.0.3-local"
+  dependencies:
+    "@nx/devkit": 21.0.3-local
+    "@nx/js": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     detect-port: ^1.5.1
     http-server: ^14.1.0
     picocolors: ^1.1.0
     tslib: ^2.3.0
+<<<<<<< HEAD
 <<<<<<< HEAD
   checksum: 77d112d03a6bd590e19593b8eaf37c7fc9ad8296952f964d4c7993f8032acf487b8cecd72f400ef18da0e872f1f708692d959ce0a88f2d49b348f33074111f3b
   languageName: node
@@ -3703,17 +3843,25 @@ __metadata:
     "@nx/js": 20.5.0-beta.2
 =======
   checksum: 787307068eea0c82b1f9392d98c590cb4407b02080890776f8b88515de2b5295e50eb2413fd691b29df3cfe5ee446de6765183cd8230ee3c39715478a71f162d
+=======
+  checksum: 062713e7cf25df8bb752ee1643729f2abeba0baf22ce4a6be09c2bd204e3a17e876b53c5a847c8333ac694ccab796e1c6eddf6463100ca88f64b9eaa4e9fcc19
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/webpack@npm:21.0.1--local-test"
+"@nx/webpack@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/webpack@npm:21.0.3-local"
   dependencies:
     "@babel/core": ^7.23.2
+<<<<<<< HEAD
     "@nx/devkit": 21.0.1--local-test
     "@nx/js": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/devkit": 21.0.3-local
+    "@nx/js": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@phenomnomnominal/tsquery": ~5.0.1
     ajv: ^8.12.0
     autoprefixer: ^10.4.9
@@ -3749,6 +3897,7 @@ __metadata:
     webpack-node-externals: ^3.0.0
     webpack-subresource-integrity: ^5.1.0
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: c3e41ae4d7cd7e50491dccac89ec0d60d369366baad4226991fde53d9023d6ff6061f06210ba38c4ddb1f6e087c1036c122cde7a4f9eddf8db9af86b14d885aa
   languageName: node
   linkType: hard
@@ -3766,21 +3915,28 @@ __metadata:
   checksum: 61348313ea3c35e567b174fd75909d6c5457e5ce0e4dbd3eaaf49150f99cdc396314d2ea1c17f36a331f23fcda38655d129fdcf1cc21caa1cb3f6134d5522e31
 =======
   checksum: a59ea90fbc1209b168376184ab76cb18124b6ab5f82e4d5c56e5401649efb9ee373be5748d240ed9f475458bf4c2d21b9a269b8c38c31bf55c196a1eea54916b
+=======
+  checksum: 00186ac525999b879e02614b2d362a3dde5a563fc0300de49f75ab975bc68d598d8b64b91aa7627151367ae99f42368294de8bce14de4d4c55b5ffb6bf05027c
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:21.0.1--local-test":
-  version: 21.0.1--local-test
-  resolution: "@nx/workspace@npm:21.0.1--local-test"
+"@nx/workspace@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "@nx/workspace@npm:21.0.3-local"
   dependencies:
-    "@nx/devkit": 21.0.1--local-test
+    "@nx/devkit": 21.0.3-local
     chalk: ^4.1.0
     enquirer: ~2.3.6
-    nx: 21.0.1--local-test
+    nx: 21.0.3-local
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
   checksum: 660aad9df7200436cf766b47a8d4fb47f0ea576c3d2b669a9828e907a28ec428ff0bc49fb6bbf899932da3e22fbbc10bc1adc9f7a25b32cdab01c3a8d9319014
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+  checksum: ff3e972b4fcb74645ed0d4d5d607ed7e6018372f172e0859477f070b383442b5c8013879aeefa84fcfe56cf760cb9b2f0716c09cafa930a4755b58fd886c1319
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 
@@ -14145,6 +14301,7 @@ __metadata:
     "@microsoft/fast-foundation": ^2.49.0
     "@monodon/typescript-nx-imports-plugin": 0.3.0
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
     "@nx/esbuild": 20.5.0-beta.2
@@ -14177,6 +14334,23 @@ __metadata:
     "@nx/webpack": 21.0.1--local-test
     "@nx/workspace": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/cypress": 21.0.3-local
+    "@nx/devkit": 21.0.3-local
+    "@nx/esbuild": 21.0.3-local
+    "@nx/eslint": 21.0.3-local
+    "@nx/eslint-plugin": 21.0.3-local
+    "@nx/gradle": 21.0.3-local
+    "@nx/jest": 21.0.3-local
+    "@nx/js": 21.0.3-local
+    "@nx/node": 21.0.3-local
+    "@nx/powerpack-conformance": 1.1.1
+    "@nx/powerpack-enterprise-cloud": 1.1.1
+    "@nx/powerpack-owners": 1.1.1
+    "@nx/web": 21.0.3-local
+    "@nx/webpack": 21.0.3-local
+    "@nx/workspace": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -14232,12 +14406,16 @@ __metadata:
     minimatch: ^9.0.3
     mocha: ^10.0.0
 <<<<<<< HEAD
+<<<<<<< HEAD
     nx: 20.5.0-beta.2
     ovsx: ^0.10.1
     prettier: ^3.5.1
     prettier-plugin-tailwindcss: ^0.6.11
 =======
     nx: 21.0.1--local-test
+=======
+    nx: 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
@@ -14268,6 +14446,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "nx@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
@@ -14301,6 +14480,23 @@ __metadata:
     "@nx/nx-win32-arm64-msvc": 21.0.1--local-test
     "@nx/nx-win32-x64-msvc": 21.0.1--local-test
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+"nx@npm:21.0.3-local":
+  version: 21.0.3-local
+  resolution: "nx@npm:21.0.3-local"
+  dependencies:
+    "@napi-rs/wasm-runtime": 0.2.4
+    "@nx/nx-darwin-arm64": 21.0.3-local
+    "@nx/nx-darwin-x64": 21.0.3-local
+    "@nx/nx-freebsd-x64": 21.0.3-local
+    "@nx/nx-linux-arm-gnueabihf": 21.0.3-local
+    "@nx/nx-linux-arm64-gnu": 21.0.3-local
+    "@nx/nx-linux-arm64-musl": 21.0.3-local
+    "@nx/nx-linux-x64-gnu": 21.0.3-local
+    "@nx/nx-linux-x64-musl": 21.0.3-local
+    "@nx/nx-win32-arm64-msvc": 21.0.3-local
+    "@nx/nx-win32-x64-msvc": 21.0.3-local
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
@@ -14367,10 +14563,14 @@ __metadata:
     nx: bin/nx.js
     nx-cloud: bin/nx-cloud.js
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 0ef4860fb9a74cbbf7bfb25353909042ead8d01915419eec153daee0508801264fd91dcc34bbf6cc4250e28925d9b319c7964d41910e44cd0ac151fb77a306b2
 =======
   checksum: f33ff06bf3aabbaed007706d58e54a789c1e4dbbd8e58f4e73929251de0e44e0e3dc79b19149160c6b1126f39987f8c1be82e9c0b62167b28411b2f8d5e06835
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+  checksum: bc50189fd5bf22c1b4269c852754b9e3c769c4c2b67b483bfc4ea8beddf5a8c97004876f22f3810dd96891938cc33edd39867d1ffefc5e2fd882f7656ddc0ecf
+>>>>>>> a0d3d7a8 (update webview on migrations.json change)
   languageName: node
   linkType: hard
 

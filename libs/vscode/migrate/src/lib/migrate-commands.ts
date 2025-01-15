@@ -92,6 +92,7 @@ async function startMigration() {
           migrationsJsonPath,
           JSON.stringify(parsedMigrationsJson, null, 2)
         );
+        commands.executeCommand('nxMigrate.open');
       } catch (e) {
         logAndShowError(
           'An error occurred while migrating',
@@ -209,13 +210,39 @@ export async function runSingleMigration(migration: MigrationsJsonEntry) {
   const relativePath = relative(getNxWorkspacePath(), tmpMigrationsJsonPath);
   const pm = await getPackageManagerCommand(getNxWorkspacePath());
 
-  try {
-    execSync(`${pm.exec} nx migrate --runMigrations=${relativePath}`, {
-      cwd: getNxWorkspacePath(),
-    });
-  } catch (e) {
-    getOutputChannel().appendLine(e);
-  }
+  window.withProgress(
+    {
+      location: ProgressLocation.Notification,
+      title: `Running ${migration.name}`,
+      cancellable: false,
+    },
+    async () => {
+      try {
+        execSync(`${pm.exec} nx migrate --runMigrations=${relativePath}`, {
+          cwd: getNxWorkspacePath(),
+        });
+        modifyMigrationsJsonMetadata((migrationsJsonMetadata) => {
+          if (!migrationsJsonMetadata.successfulMigrations) {
+            migrationsJsonMetadata.successfulMigrations = [];
+          }
+          migrationsJsonMetadata.successfulMigrations.push(migration.name);
+          return migrationsJsonMetadata;
+        });
+      } catch (e) {
+        getOutputChannel().appendLine(e);
+      }
+    }
+  );
 
   rmSync(tmpMigrationsJsonPath);
+}
+
+function modifyMigrationsJsonMetadata(
+  modify: (migrationsJsonMetadata: any) => any
+) {
+  const nxWorkspacePath = getNxWorkspacePath();
+  const migrationsJsonPath = join(nxWorkspacePath, 'migrations.json');
+  const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
+  migrationsJson['nx-console'] = modify(migrationsJson['nx-console']);
+  writeFileSync(migrationsJsonPath, JSON.stringify(migrationsJson, null, 2));
 }

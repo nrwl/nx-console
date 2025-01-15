@@ -15,6 +15,7 @@ import {
   window,
 } from 'vscode';
 import { runSingleMigration } from './migrate-commands';
+import { watchFile } from '@nx-console/vscode-utils';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
@@ -60,8 +61,19 @@ export class MigrateWebview {
       }
     });
 
+    const migrationJsonSubscription = watchFile(
+      join(getNxWorkspacePath(), 'migrations.json'),
+      () => {
+        this._webviewPanel.webview.postMessage({
+          type: 'reload',
+          data: this.getMigrateUIData(),
+        });
+      }
+    );
+
     this._webviewPanel.onDidDispose(() => {
       this._webviewPanel = undefined;
+      migrationJsonSubscription.dispose();
     });
   }
 
@@ -108,17 +120,29 @@ export class MigrateWebview {
           const migrateService = window.renderMigrate(data)
 
           const vscode = acquireVsCodeApi()
+          // message to the extension
           window.externalApi.graphInteractionEventListener = (message) => {
-            console.log('message', message);
             vscode.postMessage(message);
           }
+
+          // messages from the extension
+          window.addEventListener('message', event => {
+            const message = event.data; 
+            console.log('message', message);
+            if(message.type === 'reload') {
+              migrateService.send({
+                type: 'loadData',
+                ...message.data,
+              });
+            }
+          });
             
         </script>
     </body>
     </html>`;
   }
 
-  private async getMigrateUIData(): Promise<{
+  private getMigrateUIData(): Promise<{
     migrations: MigrationsJsonEntry[];
     'nx-console': any | undefined;
   }> {
