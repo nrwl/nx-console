@@ -5,20 +5,27 @@ import { MigrateSidebarViewProvider } from './migrate-sidebar-view-provider';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
+import {
+  getNxlsClient,
+  onWorkspaceRefreshed,
+} from '@nx-console/vscode-lsp-client';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { coerce } from 'semver';
 import { MigrateWebview } from './migrate-webview';
 import { registerCommands } from './migrate-commands';
+import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server-types';
+import { execSync } from 'child_process';
 export function initMigrate(context: ExtensionContext): void {
   const actor = createActor(migrateMachine);
   actor.start();
 
   updateWorkspaceData(actor);
   context.subscriptions.push(
-    onWorkspaceRefreshed(() => updateWorkspaceData(actor))
+    getNxlsClient().onNotification(NxWorkspaceRefreshStartedNotification, () =>
+      updateWorkspaceData(actor)
+    )
   );
 
   updateLatestNxVersion(actor);
@@ -52,12 +59,25 @@ async function updateWorkspaceData(actor: ActorRef<any, any>) {
   const migrationsJsonSection =
     hasMigrationsJson && checkHasMigrationsSection(migrationsJsonPath);
 
+  let hasPendingChanges = false;
+  try {
+    hasPendingChanges =
+      execSync('git status --porcelain', {
+        cwd: workspacePath,
+      })
+        .toString()
+        .trim().length > 0;
+  } catch (e) {
+    // error, maybe we're not in a git repo
+  }
+
   actor.send({
     type: 'UPDATE_VIEW_DATA',
     value: {
       nxVersion,
       hasMigrationsJson,
       migrationsJsonSection,
+      hasPendingChanges,
     },
   });
 }

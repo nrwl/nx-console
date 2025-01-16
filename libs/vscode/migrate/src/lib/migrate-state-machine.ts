@@ -9,6 +9,7 @@ export type MigrateViewData = {
   latestNxVersion?: NxVersion;
   hasMigrationsJson?: boolean;
   migrationsJsonSection?: any;
+  hasPendingChanges?: boolean;
 };
 
 export const migrateMachine = setup({

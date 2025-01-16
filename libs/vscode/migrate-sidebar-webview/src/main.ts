@@ -18,10 +18,20 @@ export class Root extends LitElement {
     if (this.state === 'update-available') {
       return html`
         <p>A newer version of Nx is available to migrate to :)</p>
+        ${this.migrateViewData?.hasPendingChanges
+          ? html`<p>
+              Please commit or stash all changes first before starting a
+              migration.
+            </p>`
+          : ''}
         <vscode-button
+          ?disabled="${this.migrateViewData?.hasPendingChanges}"
           @click="${() => {
             this.vscodeApi.postMessage({ type: 'start-migration' });
           }}"
+          style="${this.migrateViewData?.hasPendingChanges
+            ? 'cursor: not-allowed;'
+            : ''}"
           >Start Migration</vscode-button
         >
       `;
