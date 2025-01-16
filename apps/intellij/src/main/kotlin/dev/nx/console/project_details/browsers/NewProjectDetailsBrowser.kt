@@ -639,6 +639,14 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
               }
               console.log("$backgroundColor")
               body.style?.setProperty('background-color', '$backgroundColor', 'important');
+              body.style?.setProperty('color', '${
+                getHexColor(
+                    when (!JBColor.isBright()) {
+                        true -> UIUtil.getActiveTextColor()
+                        false -> UIUtil.getLabelForeground()
+                    }
+                )
+              }', 'important');
                 """
                 .trimIndent()
         )
