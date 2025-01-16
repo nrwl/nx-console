@@ -35,6 +35,9 @@ export function registerCommands(
     commands.registerCommand('nxMigrate.open', () => {
       migrateWebview.openMigrateUi();
     }),
+    commands.registerCommand('nxMigrate.close', () => {
+      migrateWebview.closeMigrateUi();
+    }),
     commands.registerCommand('nxMigrate.startMigration', async () => {
       await startMigration();
     })
@@ -87,7 +90,28 @@ async function startMigration() {
         const parsedMigrationsJson = JSON.parse(
           readFileSync(migrationsJsonPath, 'utf-8')
         );
-        parsedMigrationsJson['nx-console'] = {};
+
+        try {
+          const gitRef = execSync('git rev-parse HEAD', {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+          }).trim();
+
+          const gitSubject = execSync('git log -1 --pretty=%s', {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+          }).trim();
+
+          parsedMigrationsJson['nx-console'] = {
+            initialGitRef: {
+              ref: gitRef,
+              subject: gitSubject,
+            },
+          };
+        } catch (e) {
+          parsedMigrationsJson['nx-console'] = {};
+        }
+
         writeFileSync(
           migrationsJsonPath,
           JSON.stringify(parsedMigrationsJson, null, 2)
@@ -249,7 +273,46 @@ export async function finishMigration() {
 }
 
 export async function cancelMigration() {
-  getOutputChannel().appendLine('Migration cancelled');
+  const nxWorkspacePath = getNxWorkspacePath();
+  const migrationsJsonPath = join(nxWorkspacePath, 'migrations.json');
+  const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
+
+  const data = migrationsJson['nx-console']?.initialGitRef;
+
+  if (!data) {
+    window.showErrorMessage(
+      "Couldn't find previous git ref. Did you manually modify migrations.json?"
+    );
+    return;
+  }
+
+  window
+    .showInformationMessage(
+      `Are you sure you want to cancel the migration? This will reset your workspace to the commit "${
+        data.subject
+      }" (${data.ref.slice(0, 7)})`,
+      {
+        modal: true,
+      },
+      'Abort migration'
+    )
+    .then(async (result) => {
+      if (result === 'Abort migration') {
+        execSync(`git reset --hard ${data.ref}`, { cwd: nxWorkspacePath });
+        const pm = await getPackageManagerCommand(nxWorkspacePath);
+        commands.executeCommand('nxMigrate.close');
+        window.withProgress(
+          {
+            location: ProgressLocation.Notification,
+            title: 'Installing original dependencies',
+          },
+          async () => {
+            execSync(`${pm.exec} install`, { cwd: nxWorkspacePath });
+            commands.executeCommand('nxMigrate.refresh');
+          }
+        );
+      }
+    });
 }
 
 function addSuccessfulMigration(name: string, result: string) {

@@ -89,6 +89,12 @@ export class MigrateWebview {
     });
   }
 
+  closeMigrateUi() {
+    if (this._webviewPanel) {
+      this._webviewPanel.dispose();
+    }
+  }
+
   private async loadMigrateHtml(webviewPanel: WebviewPanel): Promise<string> {
     const graphHtmlLocation = await getGraphHtmlLocation(this.context);
 
