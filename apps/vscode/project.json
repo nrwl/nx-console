@@ -91,10 +91,6 @@
       }
     },
     "build": {
-      "command": "node ./tools/scripts/install-vscode-deps.js",
-      "dependsOn": ["_build"]
-    },
-    "_build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "external": [
@@ -116,7 +112,6 @@
         "format": ["cjs"],
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
-        "generatePackageJson": false,
         "assets": [
           {
             "glob": "nx-schema.json",

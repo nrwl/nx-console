@@ -1,10 +1,10 @@
-import { isNxCloudUsed, lspLogger } from '@nx-console/language-server/utils';
+import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
 import {
   getNxAccessToken,
   getNxCloudId,
   getNxCloudUrl,
-} from '@nx-console/shared/npm';
-import { CIPEInfo, CIPEInfoError } from '@nx-console/shared/types';
+} from '@nx-console/shared-npm';
+import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { execSync } from 'child_process';
 import { xhr } from 'request-light';
 import { getNxCloudConfigIni } from './get-cloud-onboarding-info';

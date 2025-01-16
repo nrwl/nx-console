@@ -1,7 +1,7 @@
-import { directoryExists } from '@nx-console/shared/file-system';
-import { readNxJson, workspaceDependencyPath } from '@nx-console/shared/npm';
-import { gte } from '@nx-console/shared/nx-version';
-import { PDVData } from '@nx-console/shared/types';
+import { directoryExists } from '@nx-console/shared-file-system';
+import { readNxJson, workspaceDependencyPath } from '@nx-console/shared-npm';
+import { gte } from '@nx-console/nx-version';
+import { PDVData } from '@nx-console/shared-types';
 import type {
   ProjectConfiguration,
   ProjectGraphProjectNode,

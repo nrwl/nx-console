@@ -1,7 +1,7 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { SchemaProcessor } from '../nx-console-plugin-types';
-import { NxWorkspace } from '@nx-console/shared/types';
-import { gte } from '@nx-console/shared/nx-version';
+import { NxWorkspace } from '@nx-console/shared-types';
+import { gte } from '@nx-console/nx-version';
 
 export const prefillProjectAndDirProcessor: SchemaProcessor = (
   schema: GeneratorSchema,

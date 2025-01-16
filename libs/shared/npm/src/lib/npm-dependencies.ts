@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { directoryExists, readDirectory } from '@nx-console/shared/file-system';
+import { directoryExists, readDirectory } from '@nx-console/shared-file-system';
 
 /**
  * Get a flat list of all node_modules folders in the workspace.

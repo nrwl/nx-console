@@ -1,5 +1,11 @@
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
-import { TelemetryLogger, TelemetrySender, env } from 'vscode';
+import {
+  ExtensionContext,
+  ExtensionMode,
+  TelemetryLogger,
+  TelemetrySender,
+  env,
+} from 'vscode';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { GoogleAnalyticsSender } from './google-analytics-sender';
 import { LoggerSender } from './logger-sender';
 import { TelemetryData, TelemetryEvents } from './telemetry-types';
@@ -10,9 +16,10 @@ export function getTelemetry() {
   return telemetry;
 }
 
-export function initTelemetry(production: boolean) {
+export function initTelemetry(context: ExtensionContext) {
+  const production = context.extensionMode === ExtensionMode.Production;
   const telemetrySender: TelemetrySender = production
-    ? new GoogleAnalyticsSender(production)
+    ? new GoogleAnalyticsSender(production, context)
     : new LoggerSender();
 
   telemetry = env.createTelemetryLogger(telemetrySender, {

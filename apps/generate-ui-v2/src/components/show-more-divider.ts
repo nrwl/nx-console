@@ -20,7 +20,7 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
           }"
           style="${
             this.editor === 'vscode'
-              ? 'border-top: calc(var(--border-width) * 1px) solid var(--divider-background);'
+              ? 'border-top: calc(var(--border-width) * 1px) solid var(--separator-color);'
               : ''
           }"
         />

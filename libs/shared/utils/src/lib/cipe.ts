@@ -1,4 +1,4 @@
-import { CIPEExecutionStatus } from '@nx-console/shared/types';
+import { CIPEExecutionStatus } from '@nx-console/shared-types';
 
 export function isCompleteStatus(status: CIPEExecutionStatus): boolean {
   switch (status) {

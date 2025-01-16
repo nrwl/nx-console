@@ -18,7 +18,7 @@ describe('generate-ui-v2', () => {
     });
 
     it('should send message when generate button is clicked', () => {
-      spyOnConsoleLog().then((consoleLog) => {
+      spyOnConsoleLog().then((consoleLog: any) => {
         cy.get("[data-cy='generate-button']").click();
         expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
       });
@@ -37,7 +37,7 @@ describe('generate-ui-v2', () => {
       getFieldByName('array-field').type('test-value2{enter}');
       getFieldByName('option2').type('test-option2');
 
-      spyOnConsoleLog().then((consoleLog) => {
+      spyOnConsoleLog().then((consoleLog: any) => {
         cy.get('body').type('{ctrl}{enter}');
         expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
         expectConsoleLogToHaveBeenCalledWith(
@@ -87,17 +87,33 @@ describe('generate-ui-v2', () => {
       cy.get('[id="search-bar"]').should('be.focused');
     });
     it('should be able to run generator with shortcut', () => {
-      spyOnConsoleLog().then((consoleLog) => {
+      spyOnConsoleLog().then((consoleLog: any) => {
         cy.get('body').type('{ctrl}{enter}');
         expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
       });
     });
     it('should be able to dry run generator with shortcut', () => {
-      spyOnConsoleLog().then((consoleLog) => {
+      spyOnConsoleLog().then((consoleLog: any) => {
         cy.get('body').type('{ctrl}{shift}{enter}');
         expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
         expectConsoleLogToHaveBeenCalledWith(consoleLog, '--dry-run');
       });
+    });
+  });
+
+  describe('search bar', () => {
+    it('should find field by name', () => {
+      cy.get('[id="search-bar"]').type('option1');
+      getFieldByName('option1').should('be.visible');
+      cy.get(`[id="select-field-field"]`).should('not.be.visible');
+    });
+
+    it('should preserve value in field after search', () => {
+      getFieldByName('option1').type('test-value');
+      cy.get('[id="search-bar"]').type('option1');
+      getFieldByName('option1').should('have.value', 'test-value');
+      cy.get('[id="search-bar"]').clear();
+      getFieldByName('option1').should('have.value', 'test-value');
     });
   });
 });

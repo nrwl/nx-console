@@ -1,14 +1,18 @@
 import { platform } from 'os';
 import { xhr, XHRResponse } from 'request-light';
-import { env, extensions, TelemetrySender } from 'vscode';
+import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
-import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
 // @ts-expect-error -- Browser Rollbar is not typed
 import Rollbar = require('rollbar/src/browser/rollbar');
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 export class GoogleAnalyticsSender implements TelemetrySender {
   MEASUREMENT_ID = 'G-TNJ97NGX40';
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
+
+  private _nxVersion: string | undefined;
 
   private _version: string =
     extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
@@ -22,7 +26,15 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     environment: this._version,
   });
 
-  constructor(private production: boolean) {}
+  constructor(private production: boolean, context: ExtensionContext) {
+    getNxVersion().then((version) => (this._nxVersion = version?.full));
+    context.subscriptions.push(
+      onWorkspaceRefreshed(async () => {
+        const version = await getNxVersion();
+        this._nxVersion = version?.full;
+      })
+    );
+  }
 
   sendEventData(eventName: string, data?: Record<string, any>): void {
     eventName = eventName.replace('nrwl.angular-console/', '');
@@ -70,6 +82,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
         editor: { value: 'vscode' },
         os: { value: platform() },
         appversion: { value: this._version },
+        nxversion: { value: this._nxVersion ?? '0.0.0' },
       },
       events: [event],
     };

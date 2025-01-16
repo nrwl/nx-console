@@ -400,6 +400,14 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
               }
               console.log("$backgroundColor")
               body.style?.setProperty('background-color', '$backgroundColor', 'important');
+              body.style?.setProperty('color', '${
+                    getHexColor(
+                        when (!JBColor.isBright()) {
+                            true -> UIUtil.getActiveTextColor()
+                            false -> UIUtil.getLabelForeground()
+                        }
+                    )
+                }', 'important');
                 """
                     .trimIndent()
             )

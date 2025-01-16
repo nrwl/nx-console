@@ -1,8 +1,8 @@
 import {
   NxSourceMapFilesToProjectsMapRequest,
   NxTargetsForConfigFileRequest,
-} from '@nx-console/language-server/types';
-import { getNxlsClient } from '@nx-console/vscode/lsp-client';
+} from '@nx-console/language-server-types';
+import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 import type { TargetConfiguration } from 'nx/src/devkit-exports';
 
 export async function getSourceMapFilesToProjectsMap(): Promise<

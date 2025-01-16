@@ -87,6 +87,7 @@ export interface GeneratorCollectionInfo {
   configPath: string;
   schemaPath: string;
   data?: Generator;
+  collectionName: string;
 }
 
 export interface ExecutorCollectionInfo {
@@ -98,6 +99,7 @@ export interface ExecutorCollectionInfo {
   configPath: string;
   schemaPath: string;
   implementationPath: string;
+  collectionName: string;
 }
 
 export enum GeneratorType {

@@ -1,7 +1,7 @@
 import {
   TaskExecutionSchema,
   isProjectOption,
-} from '@nx-console/shared/schema';
+} from '@nx-console/shared-schema';
 import { getProjectByPath } from './get-project-by-path';
 import { nxWorkspace } from './workspace';
 

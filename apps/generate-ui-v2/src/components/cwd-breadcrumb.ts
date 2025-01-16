@@ -33,7 +33,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
       setTimeout(() => {
         this.renderRoot
           .querySelector<HTMLInputElement>(
-            this.editor === 'vscode' ? 'vscode-text-field' : 'input'
+            this.editor === 'vscode' ? 'vscode-textfield' : 'input'
           )
           ?.focus();
       }, 0);
@@ -43,7 +43,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   confirmEdit() {
     this.path =
       this.renderRoot.querySelector(
-        this.editor === 'vscode' ? 'vscode-text-field' : 'input'
+        this.editor === 'vscode' ? 'vscode-textfield' : 'input'
       )?.value || '';
     this.isEditable = false;
     this.dispatchValue();
@@ -129,13 +129,15 @@ export class CwdBreadcrumb extends GeneratorContextContext(
 
   renderInlineEdit() {
     if (this.editor === 'vscode') {
-      return html` <vscode-text-field
+      return html` <vscode-textfield
         type="text"
         .value="${this.path}"
         @keydown="${this.handleInlineEditKeydown}"
         data-cy="inline-edit-field"
+        style="border-width: calc(var(--border-width) * 1px);"
+        class="focus:border-focusBorder"
       >
-      </vscode-text-field>`;
+      </vscode-textfield>`;
     } else {
       return html`
         <input

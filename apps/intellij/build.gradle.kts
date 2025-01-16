@@ -152,20 +152,9 @@ intellijPlatformTesting {
             version = "243.12818.47"
             prepareSandboxTask {
                 from(nxlsRoot) {
-                    include("**/*.js")
-                    include("**/package.json")
-                    include("**/*.map")
+                    include("**")
+                    include("**/**")
                     into(intellijPlatform.projectName.map { "$it/nxls" }.get())
-                }
-                doLast {
-                    exec {
-                        workingDir =
-                            File(
-                                destinationDir,
-                                intellijPlatform.projectName.map { "$it/nxls" }.get(),
-                            )
-                        commandLine = buildCommands() + "npm install --force"
-                    }
                 }
             }
         }
@@ -199,17 +188,9 @@ tasks {
 
     prepareSandbox() {
         from(nxlsRoot) {
-            include("**/*.js")
-            include("**/package.json")
-            include("**/*.map")
+            include("**")
+            include("**/**")
             into(intellijPlatform.projectName.map { "$it/nxls" }.get())
-        }
-        doLast {
-            exec {
-                workingDir =
-                    File(destinationDir, intellijPlatform.projectName.map { "$it/nxls" }.get())
-                commandLine = buildCommands() + "npm install --force"
-            }
         }
     }
 

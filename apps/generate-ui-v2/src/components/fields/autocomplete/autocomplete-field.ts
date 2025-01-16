@@ -1,15 +1,15 @@
-import { LitElement, PropertyValueMap, TemplateResult, html } from 'lit';
-import { Field } from '../mixins/field-mixin';
+import { Combobox, ComboboxAutocomplete } from '@microsoft/fast-foundation';
+import { spread } from '@open-wc/lit-helpers';
+import { LitElement, TemplateResult, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { FieldWrapper } from '../mixins/field-wrapper-mixin';
 import { map } from 'lit/directives/map.js';
 import { extractItemOptions } from '../../../utils/generator-schema-utils';
-import { spread } from '@open-wc/lit-helpers';
-import { Combobox, ComboboxAutocomplete } from '@microsoft/fast-foundation';
+import { Field } from '../mixins/field-mixin';
+import { FieldWrapper } from '../mixins/field-wrapper-mixin';
 
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
-  protected renderField(): TemplateResult {
+  renderField(): TemplateResult {
     if (this.editor === 'vscode') {
       return this.renderVSCode();
     } else {
@@ -19,18 +19,19 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
 
   private renderVSCode() {
     return html`
-      <vscode-combobox
-        autocomplete="list"
-        position="below"
+      <vscode-single-select
         @change="${this.handleChange}"
-        @input="${this.handleInput}"
         ${spread(this.ariaAttributes)}
+        ?invalid=${this.shouldRenderError()}
+        class="w-full"
+        filter="fuzzy"
+        combobox
       >
         ${map(
           extractItemOptions(this.option),
           (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
         )}
-      </vscode-combobox>
+      </vscode-single-select>
     `;
   }
 
@@ -85,18 +86,12 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
     };
   }
 
-  private handleInput(e: Event) {
-    const value = e.target as Combobox;
-  }
-
   private handleChange(e: Event) {
     const value = (e.target as HTMLInputElement).value;
     this.dispatchValue(value);
   }
 
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ) {
+  setFieldValue(value: string | boolean | number | string[] | undefined) {
     const selector =
       this.editor === 'vscode' ? 'vscode-combobox' : 'intellij-combobox';
     const autocompleteNode = this.renderRoot.querySelector(selector);

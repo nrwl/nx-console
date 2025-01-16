@@ -1,0 +1,15 @@
+{
+  "name": "@nx-console/shared-generate-ui-types",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "nx": {
+    "name": "shared-generate-ui-types",
+    "sourceRoot": "libs/shared/generate-ui-types/src",
+    "projectType": "library",
+    "tags": [
+      "type:shared"
+    ]
+  }
+}

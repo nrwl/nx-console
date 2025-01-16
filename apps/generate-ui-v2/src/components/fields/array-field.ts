@@ -25,7 +25,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
           appearance="secondary"
           @click="${this.addValue}"
           data-cy="${this.fieldId}-add-button"
-          class="self-center"
+          class="flex items-center self-center"
           style="${this.shouldRenderError()
             ? '--field-border-color: var(--error-color); --focus-border-color: var(--error-color);'
             : ''}"
@@ -58,18 +58,19 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
         ${spread(this.ariaAttributes)}
       />`;
     } else {
-      return html`<vscode-text-field
+      return html`<vscode-textfield
         type="text"
-        class="grow"
+        class="focus:border-focusBorder grow "
         @keydown="${this.handleEnterKeyAdd}"
-        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+        style="border-width: calc(var(--border-width) * 1px);"
+        ?invalid=${this.shouldRenderError()}
         ${spread(this.ariaAttributes)}
-      ></vscode-text-field>`;
+      ></vscode-textfield>`;
     }
   }
 
   private get inputFieldSelector() {
-    return this.editor === 'intellij' ? 'input' : 'vscode-text-field';
+    return this.editor === 'intellij' ? 'input' : 'vscode-textfield';
   }
 
   private handleEnterKeyAdd(event: KeyboardEvent) {
@@ -98,9 +99,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
     this.dispatchValue(this.elements);
   }
 
-  protected setFieldValue(
-    value: string | boolean | number | string[] | undefined
-  ) {
+  setFieldValue(value: string | boolean | number | string[] | undefined) {
     if (typeof value === 'string') {
       this.elements = value.split(',');
     } else if (Array.isArray(value)) {

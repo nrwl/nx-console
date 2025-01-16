@@ -4,6 +4,21 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/nx-console-plugins"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

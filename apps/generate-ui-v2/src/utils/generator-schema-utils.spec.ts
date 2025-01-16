@@ -5,7 +5,7 @@ import {
   getGeneratorIdentifier,
   getGeneratorNameTitleCase,
 } from './generator-schema-utils';
-import { OptionType } from '@nx-console/shared/schema';
+import { OptionType } from '@nx-console/shared-schema';
 
 describe('generator schema utils', () => {
   describe('getGeneratorIdentifier', () => {

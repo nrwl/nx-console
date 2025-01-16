@@ -1,4 +1,4 @@
-import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+import { AbstractTreeProvider } from '@nx-console/vscode-utils';
 import { join } from 'path';
 import { ExtensionContext, ThemeIcon, TreeItem, Uri } from 'vscode';
 import { NxHelpAndFeedbackTreeItem } from './nx-help-and-feedback-tree-item';

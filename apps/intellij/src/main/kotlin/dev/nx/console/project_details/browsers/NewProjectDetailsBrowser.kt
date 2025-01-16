@@ -459,6 +459,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     <body>
         <script>
             window.__NX_RENDER_GRAPH__ = false;
+            window.environment = "nx-console";
         </script>
         <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem" id="app"></div>
 
@@ -639,6 +640,14 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
               }
               console.log("$backgroundColor")
               body.style?.setProperty('background-color', '$backgroundColor', 'important');
+              body.style?.setProperty('color', '${
+                getHexColor(
+                    when (!JBColor.isBright()) {
+                        true -> UIUtil.getActiveTextColor()
+                        false -> UIUtil.getLabelForeground()
+                    }
+                )
+              }', 'important');
                 """
                 .trimIndent()
         )

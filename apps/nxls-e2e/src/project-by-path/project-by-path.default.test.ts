@@ -7,7 +7,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from '../utils';
-import { NxProjectByPathRequest } from '@nx-console/language-server/types';
+import { NxProjectByPathRequest } from '@nx-console/language-server-types';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 
 let nxlsWrapper: NxlsWrapper;
