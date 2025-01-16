@@ -244,6 +244,14 @@ export async function runSingleMigration(migration: MigrationsJsonEntry) {
   rmSync(tmpMigrationsJsonPath);
 }
 
+export async function finishMigration() {
+  getOutputChannel().appendLine('Migration finished');
+}
+
+export async function cancelMigration() {
+  getOutputChannel().appendLine('Migration cancelled');
+}
+
 function addSuccessfulMigration(name: string, result: string) {
   return (migrationsJsonMetadata: any) => {
     if (!migrationsJsonMetadata.successfulMigrations) {
