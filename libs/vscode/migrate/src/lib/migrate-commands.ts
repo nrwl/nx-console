@@ -269,7 +269,27 @@ export async function runSingleMigration(migration: MigrationsJsonEntry) {
 }
 
 export async function finishMigration() {
-  getOutputChannel().appendLine('Migration finished');
+  window
+    .showWarningMessage(
+      'Are you sure you want to finish the migration?',
+      {
+        modal: true,
+        detail: 'This will remove the migrations.json file',
+      },
+      'Finish Migration'
+    )
+    .then(async (result) => {
+      if (result === 'Finish Migration') {
+        const workspacePath = getNxWorkspacePath();
+        const migrationsJsonPath = join(workspacePath, 'migrations.json');
+
+        if (existsSync(migrationsJsonPath)) {
+          rmSync(migrationsJsonPath);
+        }
+        commands.executeCommand('nxMigrate.close');
+        commands.executeCommand('nxMigrate.refresh');
+      }
+    });
 }
 
 export async function cancelMigration() {
@@ -287,7 +307,7 @@ export async function cancelMigration() {
   }
 
   window
-    .showInformationMessage(
+    .showWarningMessage(
       `Are you sure you want to cancel the migration? This will reset your workspace to the commit "${
         data.subject
       }" (${data.ref.slice(0, 7)})`,
