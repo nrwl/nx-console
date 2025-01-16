@@ -341,6 +341,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     <body>
         <script>
             window.__NX_RENDER_GRAPH__ = false;
+            window.environment = "nx-console";
         </script>
         <div style="padding: 0.5rem 0.5rem 0.5rem 0.5rem" id="app"></div>
 
