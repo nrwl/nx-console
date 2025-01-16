@@ -14,15 +14,15 @@
     "email": "hello@nrwl.io"
   },
   "dependencies": {
-    "@parcel/watcher": "2.4.1",
-    "@parcel/watcher-darwin-arm64": "2.4.1",
-    "@parcel/watcher-darwin-x64": "2.4.1",
-    "@parcel/watcher-linux-arm-glibc": "2.4.1",
-    "@parcel/watcher-linux-arm64-glibc": "2.4.1",
-    "@parcel/watcher-linux-arm64-musl": "2.4.1",
-    "@parcel/watcher-linux-x64-glibc": "2.4.1",
-    "@parcel/watcher-linux-x64-musl": "2.4.1",
-    "@parcel/watcher-win32-arm64": "2.4.1",
-    "@parcel/watcher-win32-x64": "2.4.1"
+    "@parcel/watcher": "2.5.0",
+    "@parcel/watcher-darwin-arm64": "2.5.0",
+    "@parcel/watcher-darwin-x64": "2.5.0",
+    "@parcel/watcher-linux-arm-glibc": "2.5.0",
+    "@parcel/watcher-linux-arm64-glibc": "2.5.0",
+    "@parcel/watcher-linux-arm64-musl": "2.5.0",
+    "@parcel/watcher-linux-x64-glibc": "2.5.0",
+    "@parcel/watcher-linux-x64-musl": "2.5.0",
+    "@parcel/watcher-win32-arm64": "2.5.0",
+    "@parcel/watcher-win32-x64": "2.5.0"
   }
 }
