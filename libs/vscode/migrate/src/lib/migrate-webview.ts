@@ -14,7 +14,11 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import { runSingleMigration } from './migrate-commands';
+import {
+  cancelMigration,
+  finishMigration,
+  runSingleMigration,
+} from './migrate-commands';
 import { watchFile } from '@nx-console/vscode-utils';
 
 export class MigrateWebview {
@@ -56,8 +60,16 @@ export class MigrateWebview {
     );
 
     this._webviewPanel.webview.onDidReceiveMessage((message) => {
-      if (message.type === 'run-migration') {
-        runSingleMigration(message.payload.migration);
+      switch (message.type) {
+        case 'run-migration':
+          runSingleMigration(message.payload.migration);
+          break;
+        case 'finish':
+          finishMigration();
+          break;
+        case 'cancel':
+          cancelMigration();
+          break;
       }
     });
 
