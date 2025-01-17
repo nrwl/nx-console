@@ -22,7 +22,6 @@
     "@microsoft/fast-foundation": "^2.49.0",
     "@monodon/typescript-nx-imports-plugin": "0.2.0",
     "@open-wc/lit-helpers": "^0.6.0",
-    "@parcel/watcher": "^2.4.1",
     "@vscode-elements/elements": "1.9.2-pre.1",
     "@vscode/codicons": "^0.0.36",
     "@vscode/webview-ui-toolkit": "^1.2.0",
