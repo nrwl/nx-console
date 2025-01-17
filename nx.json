@@ -164,5 +164,13 @@
   },
   "defaultBase": "master",
   "nxCloudAccessToken": "OGQ4ZGI1ZmMtMmFkMy00NGM1LThlMDMtZjFlNGZiMWRmZTQ1fHJlYWQ=",
-  "nxCloudUrl": "https://staging.nx.app"
+  "nxCloudUrl": "https://staging.nx.app",
+  "release": {
+    "projects": ["vscode"],
+    "projectsRelationship": "independent",
+    "conventionalCommits": true,
+    "changelog": {
+      "workspaceChangelog": true
+    }
+  }
 }
