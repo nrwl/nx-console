@@ -13,6 +13,7 @@ import { EventObject } from 'xstate';
 import { ActorRef } from 'xstate';
 import { isUpdateAvailable, MigrateViewData } from './migrate-state-machine';
 import { isDeepStrictEqual } from 'util';
+import { startMigration } from './migrate-commands';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';
@@ -55,7 +56,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage((message) => {
       if (message.type === 'start-migration') {
-        commands.executeCommand('nxMigrate.startMigration');
+        startMigration(message.custom);
       } else if (message.type === 'open') {
         commands.executeCommand('nxMigrate.open');
       }
