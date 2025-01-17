@@ -1,3 +1,18 @@
+## 1.36.0 (2025-01-17)
+
+### Bug Fixes
+
+* **intellij:** correctly set pdv text color on theme change ([#2382](https://github.com/nrwl/nx-console/issues/2382)) ([03b7958](https://github.com/nrwl/nx-console/commit/03b795836f1151d6904508e88c3551114f45e448))
+* **intellij:** use refresh service directly and avoid going through actionPerformed ([#2366](https://github.com/nrwl/nx-console/issues/2366)) ([0648d52](https://github.com/nrwl/nx-console/commit/0648d527166ce32efdbcc142d5e7537025cea968))
+* **nxls:** install deps only in nested folder ([#2384](https://github.com/nrwl/nx-console/issues/2384)) ([de5fcb5](https://github.com/nrwl/nx-console/commit/de5fcb5a8fba52d8b90822a747a5e52550906612))
+* **nxls:** provide autocomplete only for plugins that contain nx ([#2365](https://github.com/nrwl/nx-console/issues/2365)) ([d94aa70](https://github.com/nrwl/nx-console/commit/d94aa70971ec074f62e8ac5d862e1c6295ac8dca))
+* set right window.environment when rendering pdv ([#2381](https://github.com/nrwl/nx-console/issues/2381)) ([d5818b1](https://github.com/nrwl/nx-console/commit/d5818b1218c04a742eea93b861e741c94413a0fc))
+
+
+### Features
+
+* **nxls:** add namedInputs target links & fix namedInputs completion in nx.json ([#2368](https://github.com/nrwl/nx-console/issues/2368)) ([6a18b68](https://github.com/nrwl/nx-console/commit/6a18b6814a057b89719f268c463f70d08973a0ce))
+
 ## <small>1.35.1 (2024-12-16)</small>
 
 ### Bug Fixes
