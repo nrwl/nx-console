@@ -11,9 +11,10 @@ import {
 } from 'vscode';
 import { EventObject } from 'xstate';
 import { ActorRef } from 'xstate';
-import { isUpdateAvailable, MigrateViewData } from './migrate-state-machine';
+import { isUpdateAvailable } from './migrate-state-machine';
 import { isDeepStrictEqual } from 'util';
 import { startMigration } from './migrate-commands';
+import { MigrateViewData } from '@nx-console/shared-types';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';
@@ -113,9 +114,9 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       </head>
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
-				<root-element state='${
+				<root-element state='${JSON.stringify(
           this.actor.getSnapshot().value
-        }' migrateViewData='${JSON.stringify(
+        )}' migrateViewData='${JSON.stringify(
       this._migrateViewData
     )}'></root-element>
 			</body>

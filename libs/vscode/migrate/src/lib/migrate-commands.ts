@@ -4,6 +4,10 @@ import {
   ProgressLocation,
   QuickPickItem,
   QuickPickItemKind,
+  ShellExecution,
+  Task,
+  tasks,
+  TaskScope,
   window,
 } from 'vscode';
 import { MigrateWebview } from './migrate-webview';
@@ -26,6 +30,8 @@ import { getPackageManagerCommand } from '@nx-console/shared-utils';
 import { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
 import { tmpdir } from 'os';
 import { findNxPackagePath, importNxPackagePath } from '@nx-console/shared-npm';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
+import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -77,69 +83,92 @@ export async function startMigration(custom = false) {
   }
 
   const pm = await getPackageManagerCommand(workspacePath);
+  const command = `nx migrate ${versionToMigrateTo}`;
 
-  window.withProgress(
-    {
-      title: `Migrating to ${versionToMigrateTo}`,
-      location: ProgressLocation.Notification,
-      cancellable: false,
-    },
-    async (progress) => {
-      try {
-        progress.report({
-          message: 'Running nx migrate',
-        });
-        execSync(`${pm.exec} nx migrate ${versionToMigrateTo}`, {
-          cwd: workspacePath,
-        });
-        progress.report({
-          increment: 70,
-          message: 'Installing dependencies',
-        });
-        execSync(`${pm.install}`, {
-          cwd: workspacePath,
-        });
-        progress.report({
-          increment: 25,
-        });
-        const parsedMigrationsJson = JSON.parse(
-          readFileSync(migrationsJsonPath, 'utf-8')
-        );
+  const { detectPackageManager } = await importNxPackagePath<
+    typeof import('nx/src/devkit-exports')
+  >(workspacePath, 'src/devkit-exports');
+  const pkgManager = detectPackageManager(workspacePath);
 
-        try {
-          const gitRef = execSync('git rev-parse HEAD', {
-            cwd: workspacePath,
-            encoding: 'utf-8',
-          }).trim();
+  const task = await CliTask.create({
+    command: 'migrate',
+    positional: versionToMigrateTo,
+    flags: [],
+  });
+  await tasks.executeTask(task);
 
-          const gitSubject = execSync('git log -1 --pretty=%s', {
-            cwd: workspacePath,
-            encoding: 'utf-8',
-          }).trim();
-
-          parsedMigrationsJson['nx-console'] = {
-            initialGitRef: {
-              ref: gitRef,
-              subject: gitSubject,
-            },
-          };
-        } catch (e) {
-          parsedMigrationsJson['nx-console'] = {};
-        }
-
-        writeFileSync(
-          migrationsJsonPath,
-          JSON.stringify(parsedMigrationsJson, null, 2)
-        );
-        commands.executeCommand('nxMigrate.open');
-      } catch (e) {
-        logAndShowError(
-          'An error occurred while migrating',
-          `An error occurred while migrating: \n ${e}`
-        );
+  await new Promise((resolve) => {
+    tasks.onDidEndTaskProcess((taskEndEvent) => {
+      if (taskEndEvent.execution.task.name === command) {
+        resolve(true);
       }
-    }
+    });
+  });
+
+  const parsedMigrationsJson = JSON.parse(
+    readFileSync(migrationsJsonPath, 'utf-8')
   );
+
+  try {
+    const gitRef = execSync('git rev-parse HEAD', {
+      cwd: workspacePath,
+      encoding: 'utf-8',
+    }).trim();
+
+    const gitSubject = execSync('git log -1 --pretty=%s', {
+      cwd: workspacePath,
+      encoding: 'utf-8',
+    }).trim();
+
+    parsedMigrationsJson['nx-console'] = {
+      initialGitRef: {
+        ref: gitRef,
+        subject: gitSubject,
+      },
+    };
+  } catch (e) {
+    parsedMigrationsJson['nx-console'] = {};
+  }
+
+  writeFileSync(
+    migrationsJsonPath,
+    JSON.stringify(parsedMigrationsJson, null, 2)
+  );
+
+  // window.withProgress(
+  //   {
+  //     title: `Migrating to ${versionToMigrateTo}`,
+  //     location: ProgressLocation.Notification,
+  //     cancellable: false,
+  //   },
+  //   async (progress) => {
+  //     try {
+  //       progress.report({
+  //         message: 'Running nx migrate',
+  //       });
+  //       execSync(`${pm.exec} nx migrate ${versionToMigrateTo}`, {
+  //         cwd: workspacePath,
+  //       });
+  //       progress.report({
+  //         increment: 70,
+  //         message: 'Installing dependencies',
+  //       });
+  //       execSync(`${pm.install}`, {
+  //         cwd: workspacePath,
+  //       });
+  //       progress.report({
+  //         increment: 25,
+  //       });
+
+  //       commands.executeCommand('nxMigrate.open');
+  //     } catch (e) {
+  //       logAndShowError(
+  //         'An error occurred while migrating',
+  //         `An error occurred while migrating: \n ${e}`
+  //       );
+  //     }
+  //   }
+  // );
 }
 
 async function promptForVersion(

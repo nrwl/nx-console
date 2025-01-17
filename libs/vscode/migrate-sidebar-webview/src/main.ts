@@ -1,13 +1,16 @@
 import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import type { MigrateViewData } from '@nx-console/vscode-migrate';
+import type { MigrateViewData } from '@nx-console/shared-types';
 import type { WebviewApi } from 'vscode-webview';
 
 @customElement('root-element')
 export class Root extends LitElement {
-  @property({ type: String })
-  protected state: 'default' | 'update-available' | 'in-progress' = 'default';
+  @property({ converter: (value) => JSON.parse(value) })
+  protected state:
+    | 'default'
+    | 'update-available'
+    | { 'in-progress': 'default' | 'pending-package-updates' } = 'default';
 
   @property({ type: Object })
   protected migrateViewData: MigrateViewData | undefined;
@@ -15,6 +18,7 @@ export class Root extends LitElement {
   private vscodeApi: WebviewApi<undefined> = acquireVsCodeApi();
 
   override render(): TemplateResult {
+    console.log('state', this.state);
     if (this.state === 'update-available') {
       return html`
         <p>A newer version of Nx is available to migrate to :)</p>
@@ -53,7 +57,9 @@ export class Root extends LitElement {
           </vscode-button>
         </div>
       `;
-    } else if (this.state === 'in-progress') {
+    } else if (this.state === 'default') {
+      return html` <p>You're up to date!</p> `;
+    } else if (this.state['in-progress'] === 'default') {
       return html`
         <p>Migration in progress...</p>
         <vscode-button
@@ -61,8 +67,10 @@ export class Root extends LitElement {
           >Open Migrate UI</vscode-button
         >
       `;
-    } else {
-      return html` <p>You're up to date!</p> `;
+    } else if (this.state['in-progress'] === 'pending-package-updates') {
+      console.log('pending-package-updates');
+      return html`<p>Waiting for package updates to be confirmed...</p>
+        <vscode-button>Confirm diff</vscode-button>`;
     }
   }
 }
