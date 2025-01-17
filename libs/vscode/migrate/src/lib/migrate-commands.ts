@@ -16,7 +16,7 @@ import {
   getOutputChannel,
   logAndShowError,
 } from '@nx-console/vscode-output-channels';
-import { gte } from '@nx-console/nx-version';
+import { gte, NxVersion } from '@nx-console/nx-version';
 import { rcompare } from 'semver';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
@@ -44,12 +44,27 @@ export function registerCommands(
   );
 }
 
-// select version to migrate to
-// delete old migrations.json
-// run nx migrate
-// add nx-console section to migrations.json
-async function startMigration() {
-  const versionToMigrateTo = await promptForVersion();
+export async function startMigration(custom = false) {
+  const nxVersion = await getNxVersion();
+
+  let pkgInfo: PackageInformationResponse;
+  try {
+    pkgInfo = await getPackageInfo('nx');
+  } catch (e) {
+    logAndShowError(
+      'Failed to retrieve version information from npm',
+      `Error while retrieving Nx version information from npm: \n ${e}`
+    );
+    return;
+  }
+
+  let versionToMigrateTo: string | undefined;
+  if (custom) {
+    versionToMigrateTo = await promptForVersion(nxVersion, pkgInfo);
+  } else {
+    versionToMigrateTo = getDefaultMigrateVersion(nxVersion, pkgInfo);
+  }
+
   if (!versionToMigrateTo) {
     return;
   }
@@ -127,20 +142,10 @@ async function startMigration() {
   );
 }
 
-async function promptForVersion() {
-  const nxVersion = await getNxVersion();
-
-  let pkgInfo: PackageInformationResponse;
-  try {
-    pkgInfo = await getPackageInfo('nx');
-  } catch (e) {
-    logAndShowError(
-      'Failed to retrieve version information from npm',
-      `Error while retrieving Nx version information from npm: \n ${e}`
-    );
-    return;
-  }
-
+async function promptForVersion(
+  nxVersion: NxVersion,
+  pkgInfo: PackageInformationResponse
+) {
   const quickpickOptions: QuickPickItem[] = [];
 
   quickpickOptions.push({ label: 'latest' });
@@ -206,6 +211,32 @@ async function promptForVersion() {
       resolve(undefined);
     });
   });
+}
+
+// latest: 20.x
+// current: 20.x -> latest
+// current: 19.x -> latest
+// current: 18.x -> 19
+// current: 17.x -> 18
+function getDefaultMigrateVersion(
+  nxVersion: NxVersion,
+  pkgInfo: PackageInformationResponse
+): string {
+  const currentMajor = nxVersion.major;
+  const latestMajor = pkgInfo['dist-tags']?.['latest']?.split('.')?.[0];
+
+  if (!latestMajor) {
+    return 'latest';
+  }
+
+  if (
+    currentMajor === parseInt(latestMajor) ||
+    currentMajor === parseInt(latestMajor) - 1
+  ) {
+    return 'latest';
+  }
+
+  return (currentMajor - 1).toString();
 }
 
 export async function runSingleMigration(migration: MigrationsJsonEntry) {

@@ -24,16 +24,34 @@ export class Root extends LitElement {
               migration.
             </p>`
           : ''}
-        <vscode-button
-          ?disabled="${this.migrateViewData?.hasPendingChanges}"
-          @click="${() => {
-            this.vscodeApi.postMessage({ type: 'start-migration' });
-          }}"
-          style="${this.migrateViewData?.hasPendingChanges
-            ? 'cursor: not-allowed;'
-            : ''}"
-          >Start Migration</vscode-button
-        >
+        <div style="display: flex; flex-direction: row; gap: 2px; width: 100%;">
+          <vscode-button
+            ?disabled="${this.migrateViewData?.hasPendingChanges}"
+            @click="${() => {
+              this.vscodeApi.postMessage({ type: 'start-migration' });
+            }}"
+            style="width: 100%; ${this.migrateViewData?.hasPendingChanges
+              ? 'cursor: not-allowed;'
+              : ''}"
+            >Start Migration</vscode-button
+          >
+          <vscode-button
+            icon="edit"
+            style="padding-right: 0px; padding-left: 3px; display: flex; ${this
+              .migrateViewData?.hasPendingChanges
+              ? 'cursor: not-allowed;'
+              : ''}"
+            ?disabled="${this.migrateViewData?.hasPendingChanges}"
+            @click="${() => {
+              this.vscodeApi.postMessage({
+                type: 'start-migration',
+                custom: true,
+              });
+              this.title = 'Customize Migration';
+            }}"
+          >
+          </vscode-button>
+        </div>
       `;
     } else if (this.state === 'in-progress') {
       return html`
