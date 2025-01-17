@@ -1,3 +1,17 @@
+# [18.35.0](https://github.com/nrwl/nx-console/compare/vscode-v18.34.0...vscode-v18.35.0) (2025-01-17)
+
+
+### Bug Fixes
+
+* **nxls:** install deps only in nested folder ([#2384](https://github.com/nrwl/nx-console/issues/2384)) ([de5fcb5](https://github.com/nrwl/nx-console/commit/de5fcb5a8fba52d8b90822a747a5e52550906612))
+* set right window.environment when rendering pdv ([#2381](https://github.com/nrwl/nx-console/issues/2381)) ([d5818b1](https://github.com/nrwl/nx-console/commit/d5818b1218c04a742eea93b861e741c94413a0fc))
+* **vscode:** dont stop daemon in attempt to recover on startup ([#2374](https://github.com/nrwl/nx-console/issues/2374)) ([328532f](https://github.com/nrwl/nx-console/commit/328532f4facb16a2abbfe9fe061314d3aa57443f))
+
+
+### Features
+
+* **vscode:** track nx version in analytics ([#2377](https://github.com/nrwl/nx-console/issues/2377)) ([632263d](https://github.com/nrwl/nx-console/commit/632263d4f0235b97b1bae7141b5cd4bf9f7aeeab))
+
 # [18.34.0](https://github.com/nrwl/nx-console/compare/vscode-v18.33.2...vscode-v18.34.0) (2024-12-18)
 
 
