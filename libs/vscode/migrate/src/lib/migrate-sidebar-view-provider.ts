@@ -3,6 +3,8 @@ import {
   commands,
   Disposable,
   ExtensionContext,
+  extensions,
+  TextDocumentShowOptions,
   Uri,
   WebviewView,
   WebviewViewProvider,
@@ -13,8 +15,15 @@ import { EventObject } from 'xstate';
 import { ActorRef } from 'xstate';
 import { isUpdateAvailable } from './migrate-state-machine';
 import { isDeepStrictEqual } from 'util';
-import { startMigration } from './migrate-commands';
+import {
+  cancelMigration,
+  confirmPackageChanges,
+  startMigration,
+} from './migrate-commands';
 import { MigrateViewData } from '@nx-console/shared-types';
+import { GitExtension } from './git-extension/git';
+import { join } from 'path';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';
@@ -60,6 +69,12 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         startMigration(message.custom);
       } else if (message.type === 'open') {
         commands.executeCommand('nxMigrate.open');
+      } else if (message.type === 'view-diff') {
+        this.viewDiff();
+      } else if (message.type === 'confirm-changes') {
+        confirmPackageChanges();
+      } else if (message.type === 'cancel-migration') {
+        cancelMigration();
       }
     });
   }
@@ -187,6 +202,22 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         } behind latest.`,
       };
     }
+  }
+
+  async viewDiff() {
+    const gitExtension =
+      extensions.getExtension<GitExtension>('vscode.git').exports;
+    const api = gitExtension.getAPI(1);
+
+    const packageJsonPath = join(getNxWorkspacePath(), 'package.json');
+    const packageJsonUri = Uri.file(packageJsonPath);
+
+    const gitUri = api.toGitUri(packageJsonUri, 'HEAD');
+    commands.executeCommand('vscode.diff', gitUri, packageJsonUri, null, {
+      preview: true,
+      preserveFocus: true,
+    } as TextDocumentShowOptions);
+    console.log(gitUri);
   }
 
   static create(context: ExtensionContext, actor: ActorRef<any, EventObject>) {
