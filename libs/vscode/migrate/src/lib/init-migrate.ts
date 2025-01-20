@@ -1,4 +1,4 @@
-import { commands, ExtensionContext } from 'vscode';
+import { commands, ExtensionContext, window } from 'vscode';
 import { migrateMachine } from './migrate-state-machine';
 import { ActorRef, createActor } from 'xstate';
 import { MigrateSidebarViewProvider } from './migrate-sidebar-view-provider';
@@ -17,6 +17,7 @@ import { MigrateWebview } from './migrate-webview';
 import { registerCommands } from './migrate-commands';
 import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server-types';
 import { execSync } from 'child_process';
+import { DiffEditorTerminalLinkProvider } from './diff-editor-terminal-link-provider';
 export function initMigrate(context: ExtensionContext): void {
   const actor = createActor(migrateMachine);
   actor.start();
@@ -49,6 +50,8 @@ export function initMigrate(context: ExtensionContext): void {
     },
     context.subscriptions
   );
+
+  window.registerTerminalLinkProvider(new DiffEditorTerminalLinkProvider());
 }
 async function updateWorkspaceData(actor: ActorRef<any, any>) {
   const nxVersion = await getNxVersion(true);
