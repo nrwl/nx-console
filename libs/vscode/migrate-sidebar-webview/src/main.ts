@@ -69,8 +69,31 @@ export class Root extends LitElement {
       `;
     } else if (this.state['in-progress'] === 'pending-package-updates') {
       console.log('pending-package-updates');
+
       return html`<p>Waiting for package updates to be confirmed...</p>
-        <vscode-button>Confirm diff</vscode-button>`;
+        <div style="display: flex; padding-bottom: 0.5rem;">
+          <vscode-button
+            style="width: 100%"
+            @click="${() => this.vscodeApi.postMessage({ type: 'view-diff' })}"
+            >View diff</vscode-button
+          >
+        </div>
+        <div style="display: flex; flex-direction: row; gap: 2px; width: 100%;">
+          <vscode-button
+            icon="check"
+            style="flex-grow: 1;"
+            @click="${() =>
+              this.vscodeApi.postMessage({ type: 'confirm-changes' })}"
+            >Confirm</vscode-button
+          >
+          <vscode-button
+            icon="close"
+            style="flex-grow: 1;"
+            @click="${() =>
+              this.vscodeApi.postMessage({ type: 'cancel-migration' })}"
+            >Cancel</vscode-button
+          >
+        </div> `;
     }
   }
 }

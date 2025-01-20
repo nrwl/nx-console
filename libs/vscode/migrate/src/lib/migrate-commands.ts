@@ -1,6 +1,7 @@
 import {
   commands,
   ExtensionContext,
+  extensions,
   ProgressLocation,
   QuickPickItem,
   QuickPickItemKind,
@@ -32,6 +33,7 @@ import { tmpdir } from 'os';
 import { findNxPackagePath, importNxPackagePath } from '@nx-console/shared-npm';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
+import { GitExtension } from './git-extension/git';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -82,13 +84,7 @@ export async function startMigration(custom = false) {
     rmSync(migrationsJsonPath);
   }
 
-  const pm = await getPackageManagerCommand(workspacePath);
   const command = `nx migrate ${versionToMigrateTo}`;
-
-  const { detectPackageManager } = await importNxPackagePath<
-    typeof import('nx/src/devkit-exports')
-  >(workspacePath, 'src/devkit-exports');
-  const pkgManager = detectPackageManager(workspacePath);
 
   const task = await CliTask.create({
     command: 'migrate',
@@ -134,41 +130,6 @@ export async function startMigration(custom = false) {
     migrationsJsonPath,
     JSON.stringify(parsedMigrationsJson, null, 2)
   );
-
-  // window.withProgress(
-  //   {
-  //     title: `Migrating to ${versionToMigrateTo}`,
-  //     location: ProgressLocation.Notification,
-  //     cancellable: false,
-  //   },
-  //   async (progress) => {
-  //     try {
-  //       progress.report({
-  //         message: 'Running nx migrate',
-  //       });
-  //       execSync(`${pm.exec} nx migrate ${versionToMigrateTo}`, {
-  //         cwd: workspacePath,
-  //       });
-  //       progress.report({
-  //         increment: 70,
-  //         message: 'Installing dependencies',
-  //       });
-  //       execSync(`${pm.install}`, {
-  //         cwd: workspacePath,
-  //       });
-  //       progress.report({
-  //         increment: 25,
-  //       });
-
-  //       commands.executeCommand('nxMigrate.open');
-  //     } catch (e) {
-  //       logAndShowError(
-  //         'An error occurred while migrating',
-  //         `An error occurred while migrating: \n ${e}`
-  //       );
-  //     }
-  //   }
-  // );
 }
 
 async function promptForVersion(
@@ -242,7 +203,7 @@ async function promptForVersion(
   });
 }
 
-// latest: 20.x
+// if latest is 20.x, do the following
 // current: 20.x -> latest
 // current: 19.x -> latest
 // current: 18.x -> 19
@@ -350,6 +311,65 @@ export async function finishMigration() {
         commands.executeCommand('nxMigrate.refresh');
       }
     });
+}
+
+export async function confirmPackageChanges() {
+  window.withProgress(
+    {
+      title: `Installing dependencies`,
+      location: ProgressLocation.Notification,
+      cancellable: false,
+    },
+    async () => {
+      const nxWorkspacePath = getNxWorkspacePath();
+      const pm = await getPackageManagerCommand(nxWorkspacePath);
+
+      try {
+        execSync(`${pm.install}`, {
+          cwd: nxWorkspacePath,
+        });
+
+        modifyMigrationsJsonMetadata((migrationsJsonMetadata) => {
+          migrationsJsonMetadata.confirmedPackageUpdates = true;
+          return migrationsJsonMetadata;
+        });
+
+        await commands.executeCommand('git.refresh');
+
+        const gitExtension =
+          extensions.getExtension<GitExtension>('vscode.git').exports;
+        const api = gitExtension.getAPI(1);
+
+        const repository = api.repositories[0];
+
+        const filesToAdd = repository.state.workingTreeChanges
+          .map((change) => change.uri.fsPath)
+          .filter((change) => {
+            return (
+              change.includes('package.json') ||
+              change.includes('migrations.json') ||
+              change.includes('package-lock.json') ||
+              change.includes('yarn.lock') ||
+              change.includes('pnpm-lock.yaml')
+            );
+          });
+
+        repository.add(filesToAdd);
+
+        repository.commit('chore: start nx migration', {
+          signCommit: true,
+          noVerify: true,
+        });
+
+        commands.executeCommand('nxMigrate.open');
+      } catch (e) {
+        logAndShowError(
+          'An error occurred while installing dependencies',
+          `An error occurred while installing dependencies: \n ${e}`
+        );
+      }
+    }
+  );
 }
 
 export async function cancelMigration() {
