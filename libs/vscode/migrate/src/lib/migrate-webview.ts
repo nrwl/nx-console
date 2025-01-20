@@ -62,7 +62,10 @@ export class MigrateWebview {
     this._webviewPanel.webview.onDidReceiveMessage((message) => {
       switch (message.type) {
         case 'run-migration':
-          runSingleMigration(message.payload.migration);
+          runSingleMigration(
+            message.payload.migration,
+            message.payload.configuration
+          );
           break;
         case 'finish':
           finishMigration();

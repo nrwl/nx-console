@@ -37,6 +37,10 @@ export const migrateMachine = setup({
           guard: 'isUpdateAvailable',
           target: 'update-available',
         },
+        {
+          guard: 'isMigrationInProgress',
+          target: 'in-progress',
+        },
       ],
     },
     'update-available': {

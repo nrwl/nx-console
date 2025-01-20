@@ -1,39 +1,35 @@
+import { gte, NxVersion } from '@nx-console/nx-version';
+import { importNxPackagePath } from '@nx-console/shared-npm';
+import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import {
+  getOutputChannel,
+  logAndShowError,
+} from '@nx-console/vscode-output-channels';
+import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
+import {
+  getPackageInfo,
+  PackageInformationResponse,
+} from '@nx-console/vscode-utils';
+import { execSync } from 'child_process';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
+import { join, relative } from 'path';
+import { rcompare } from 'semver';
 import {
   commands,
   ExtensionContext,
   extensions,
   ProgressLocation,
   QuickPickItem,
-  QuickPickItemKind,
-  ShellExecution,
-  Task,
   tasks,
-  TaskScope,
+  TextDocumentShowOptions,
+  Uri,
   window,
 } from 'vscode';
-import { MigrateWebview } from './migrate-webview';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import {
-  getPackageInfo,
-  PackageInformationResponse,
-} from '@nx-console/vscode-utils';
-import {
-  getOutputChannel,
-  logAndShowError,
-} from '@nx-console/vscode-output-channels';
-import { gte, NxVersion } from '@nx-console/nx-version';
-import { rcompare } from 'semver';
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
-import { join, relative } from 'path';
-import { execSync } from 'child_process';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
-import { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
-import { tmpdir } from 'os';
-import { findNxPackagePath, importNxPackagePath } from '@nx-console/shared-npm';
-import { CliTaskProvider } from '@nx-console/vscode-tasks';
-import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
 import { GitExtension } from './git-extension/git';
+import { MigrateWebview } from './migrate-webview';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -48,6 +44,9 @@ export function registerCommands(
     }),
     commands.registerCommand('nxMigrate.startMigration', async () => {
       await startMigration();
+    }),
+    commands.registerCommand('nxMigrate.viewDiff', async () => {
+      await viewDiff();
     })
   );
 }
@@ -229,7 +228,10 @@ function getDefaultMigrateVersion(
   return (currentMajor - 1).toString();
 }
 
-export async function runSingleMigration(migration: MigrationsJsonEntry) {
+export async function runSingleMigration(
+  migration: MigrationsJsonEntry,
+  configuration: { createCommits: boolean }
+) {
   const nxWorkspacePath = getNxWorkspacePath();
 
   const cacheDirectoryModule = await importNxPackagePath<
@@ -264,7 +266,9 @@ export async function runSingleMigration(migration: MigrationsJsonEntry) {
     async () => {
       try {
         const result = execSync(
-          `${pm.exec} nx migrate --runMigrations=${relativePath}`,
+          `${pm.exec} nx migrate --runMigrations=${relativePath} ${
+            configuration.createCommits ? '--createCommits' : ''
+          }`,
           {
             cwd: getNxWorkspacePath(),
           }
@@ -449,4 +453,21 @@ function modifyMigrationsJsonMetadata(
   const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
   migrationsJson['nx-console'] = modify(migrationsJson['nx-console']);
   writeFileSync(migrationsJsonPath, JSON.stringify(migrationsJson, null, 2));
+}
+
+export async function viewDiff() {
+  const gitExtension =
+    extensions.getExtension<GitExtension>('vscode.git').exports;
+  const api = gitExtension.getAPI(1);
+
+  const packageJsonPath = join(getNxWorkspacePath(), 'package.json');
+  const packageJsonUri = Uri.file(packageJsonPath);
+
+  const gitUri = api.toGitUri(packageJsonUri, 'HEAD');
+  commands.executeCommand('vscode.diff', gitUri, packageJsonUri, null, {
+    preview: true,
+    preserveFocus: true,
+  } as TextDocumentShowOptions);
+
+  commands.executeCommand('nxMigrate.focus');
 }
