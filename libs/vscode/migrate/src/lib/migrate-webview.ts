@@ -14,9 +14,10 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import { cancelMigration, runSingleMigration } from './migrate-commands';
+import { cancelMigration } from './migrate-commands';
 import { watchFile } from '@nx-console/vscode-utils';
 import { finishMigration } from './commands/finish-migration';
+import { runSingleMigration } from './commands/run-migration';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
