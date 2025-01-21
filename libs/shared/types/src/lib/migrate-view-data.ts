@@ -16,6 +16,7 @@ export type MigrationsJsonMetadata = {
     subject: string;
   };
   confirmedPackageUpdates?: boolean;
+  targetVersion?: string;
 };
 
 export type SuccessfulMigration = {

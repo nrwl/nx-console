@@ -66,6 +66,10 @@ export async function startMigration(custom = false) {
     command: 'migrate',
     positional: versionToMigrateTo,
     flags,
+    // TODO: remove this once actual version is released
+    env: {
+      // NX_MIGRATE_CLI_VERSION: '21.0.17-local',
+    },
   });
   await tasks.executeTask(task);
 
@@ -99,6 +103,7 @@ export async function startMigration(custom = false) {
         ref: gitRef,
         subject: gitSubject,
       },
+      targetVersion: versionToMigrateTo,
     };
   } catch (e) {
     parsedMigrationsJson['nx-console'] = {};
