@@ -4,13 +4,13 @@ import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
 import {
-  PackageInformationResponse,
   getPackageInfo,
+  PackageInformationResponse,
 } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
-import { existsSync, rmSync, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { rcompare } from 'semver';
+import { major, rcompare } from 'semver';
 import { QuickPickItem, tasks, window } from 'vscode';
 
 export async function startMigration(custom = false) {
@@ -32,6 +32,14 @@ export async function startMigration(custom = false) {
   if (custom) {
     versionToMigrateTo = await promptForVersion(nxVersion, pkgInfo);
     if (!versionToMigrateTo) {
+      return;
+    }
+    const continueMigration = await checkAndConfirmMultipleMajors(
+      nxVersion,
+      versionToMigrateTo,
+      pkgInfo
+    );
+    if (!continueMigration) {
       return;
     }
     const flagsObject = await promptForCustomFlags();
@@ -110,7 +118,7 @@ function getDefaultMigrateVersion(
   pkgInfo: PackageInformationResponse
 ): string {
   const currentMajor = nxVersion.major;
-  const latestMajor = pkgInfo['dist-tags']?.['latest']?.split('.')?.[0];
+  const latestMajor = major(pkgInfo['dist-tags']?.['latest']).toString();
 
   if (!latestMajor) {
     return 'latest';
@@ -148,19 +156,15 @@ async function promptForVersion(
     )
     .sort(([a], [b]) => rcompare(a, b));
 
+  const existingMajorOptions = new Set<string>();
+
   possibleVersions.forEach(([versionNum]) => {
-    const major = versionNum.split('.')[0];
-    const existingOption = quickpickOptions.find(
-      (opt) => opt.label === major || opt.label.startsWith(major + '.')
-    );
-    if (existingOption) {
+    const versionMajor = major(versionNum).toString();
+    if (existingMajorOptions.has(versionMajor)) {
       return;
     }
-    if (major === nxVersion.major.toString()) {
-      quickpickOptions.push({ label: versionNum });
-    } else {
-      quickpickOptions.push({ label: major[0] });
-    }
+    existingMajorOptions.add(versionMajor);
+    quickpickOptions.push({ label: versionNum });
   });
 
   const quickPick = window.createQuickPick();
@@ -195,6 +199,36 @@ async function promptForVersion(
       resolve(undefined);
     });
   });
+}
+
+async function checkAndConfirmMultipleMajors(
+  nxVersion: NxVersion,
+  versionToMigrateTo: string,
+  pkgInfo: PackageInformationResponse
+): Promise<boolean> {
+  try {
+    if (pkgInfo['dist-tags'] && pkgInfo['dist-tags'][versionToMigrateTo]) {
+      versionToMigrateTo = pkgInfo['dist-tags'][versionToMigrateTo];
+    }
+    const targetMajor = major(versionToMigrateTo);
+    const currentMajor = major(nxVersion.full);
+
+    if (!targetMajor || !currentMajor) {
+      return true;
+    }
+
+    if (targetMajor > currentMajor + 1) {
+      return await window
+        .showQuickPick([{ label: 'Yes' }, { label: 'No' }], {
+          title: `Version ${versionToMigrateTo} is more than one major version ahead of the ${nxVersion.full}. This is not supported and may cause issues.`,
+          placeHolder: `Do you want to continue?`,
+        })
+        .then((selection) => selection?.label === 'Yes');
+    }
+    return true;
+  } catch (e) {
+    return true;
+  }
 }
 
 type MigrateFlagsToPrompt = {
