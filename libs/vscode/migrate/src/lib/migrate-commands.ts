@@ -7,7 +7,7 @@ import {
 } from '@nx-console/vscode-output-channels';
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
-import { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
+import type { GeneratedMigrationDetails } from 'nx/src/config/misc-interfaces';
 import { join, relative } from 'path';
 import {
   commands,
@@ -43,7 +43,7 @@ export function registerCommands(
 }
 
 export async function runSingleMigration(
-  migration: MigrationsJsonEntry,
+  migration: GeneratedMigrationDetails,
   configuration: { createCommits: boolean }
 ) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -105,30 +105,6 @@ export async function runSingleMigration(
   );
 
   rmSync(tmpMigrationsJsonPath);
-}
-
-export async function finishMigration() {
-  window
-    .showWarningMessage(
-      'Are you sure you want to finish the migration?',
-      {
-        modal: true,
-        detail: 'This will remove the migrations.json file',
-      },
-      'Finish Migration'
-    )
-    .then(async (result) => {
-      if (result === 'Finish Migration') {
-        const workspacePath = getNxWorkspacePath();
-        const migrationsJsonPath = join(workspacePath, 'migrations.json');
-
-        if (existsSync(migrationsJsonPath)) {
-          rmSync(migrationsJsonPath);
-        }
-        commands.executeCommand('nxMigrate.close');
-        commands.executeCommand('nxMigrate.refresh');
-      }
-    });
 }
 
 export async function confirmPackageChanges() {

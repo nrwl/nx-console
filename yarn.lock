@@ -3057,6 +3057,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/cypress@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/cypress@npm:20.5.0-beta.2"
@@ -3109,6 +3110,15 @@ __metadata:
     "@nx/eslint": 21.0.8-local
     "@nx/js": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/cypress@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/cypress@npm:21.0.9-local"
+  dependencies:
+    "@nx/devkit": 21.0.9-local
+    "@nx/eslint": 21.0.9-local
+    "@nx/js": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@phenomnomnominal/tsquery": ~5.0.1
     detect-port: ^1.5.1
     tslib: ^2.3.0
@@ -3117,6 +3127,7 @@ __metadata:
   peerDependenciesMeta:
     cypress:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3138,6 +3149,9 @@ __metadata:
 =======
   checksum: 9a4c6e7bb1aa543e43090c512ba75f7a9474dc964afc2d3fc9316b209fc01fd4d031d1947fdf2023e35108573b60f3cb73952aeb537bb6d1f69410e53a3c6db1
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: d83646cee7c8b2b61ac0cfca87735c66c6e6a9f72f89d796c04f18c73b8f8294c703da737c067603e26677547a4e2a49bd58f6f7c40499290f410735b8d48916
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
@@ -3183,6 +3197,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/devkit@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/devkit@npm:20.5.0-beta.2"
@@ -3211,6 +3226,11 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/devkit@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/devkit@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/devkit@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   dependencies:
     ejs: ^3.1.7
     enquirer: ~2.3.6
@@ -3222,6 +3242,7 @@ __metadata:
     yargs-parser: 21.1.1
   peerDependencies:
     nx: ">= 19 <= 21"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3251,15 +3272,18 @@ __metadata:
 =======
   checksum: 8cc7db8fe149f40dce033c68ba5c4769b35638a73cddd0c218ed2ee9b74c33767019e58cdb15766f846f7dc1884463f71fc4f4202894d93d61f6332784836c0a
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: ebc1b52a5fbb6a12459240bd2086f753b73e2c49899e26004d959eaad343e074e02956d1e325ccce14dab3f1766dc5b04f98f3139c545aeda4000ec59edd1112
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/esbuild@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/esbuild@npm:21.0.8-local"
+"@nx/esbuild@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/esbuild@npm:21.0.9-local"
   dependencies:
-    "@nx/devkit": 21.0.8-local
-    "@nx/js": 21.0.8-local
+    "@nx/devkit": 21.0.9-local
+    "@nx/js": 21.0.9-local
     fast-glob: 3.2.7
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
     picocolors: ^1.1.0
@@ -3271,6 +3295,7 @@ __metadata:
   peerDependenciesMeta:
     esbuild:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3300,13 +3325,17 @@ __metadata:
 =======
   checksum: 679ea9b7291616849c2615e7d2fbe54d4eae75eebf2dd6768db595b1e54718d9078399ca5aefdb802de031fe33e0ba4d6ceb3706ae5f54fa6df3391438ad61d1
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: a7d61ba3d44d37bbfb722e7cbf1daae800c576178fe2a33be2e929407979947a74b92db91afa070d799deb06e1b79a7027bed44805134b490b73ac6d92310a0b
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/eslint-plugin@npm:21.0.8-local"
+"@nx/eslint-plugin@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/eslint-plugin@npm:21.0.9-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3330,6 +3359,10 @@ __metadata:
     "@nx/devkit": 21.0.8-local
     "@nx/js": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    "@nx/devkit": 21.0.9-local
+    "@nx/js": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@typescript-eslint/type-utils": ^8.0.0
     "@typescript-eslint/utils": ^8.0.0
     chalk: ^4.1.0
@@ -3344,6 +3377,7 @@ __metadata:
   peerDependenciesMeta:
     eslint-config-prettier:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3373,13 +3407,17 @@ __metadata:
 =======
   checksum: 460a157509ed25b80adb434a5d9223f9792fc8300758a2e572d00754af7e8a4526733ac7dc6d8859ecbd2364c733095d1c88bba87e2d42e798166ddee19626ed
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: 21621fff9003fdfbb7ce7e08576ea67ec2c8f2b3e08ceb08fe64916fd885b46548d796e1074c061367154e5df6b6b019100ff7273407cb4636758584d031b961
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/eslint@npm:21.0.8-local"
+"@nx/eslint@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/eslint@npm:21.0.9-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3403,6 +3441,10 @@ __metadata:
     "@nx/devkit": 21.0.8-local
     "@nx/js": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    "@nx/devkit": 21.0.9-local
+    "@nx/js": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     semver: ^7.5.3
     tslib: ^2.3.0
     typescript: ~5.7.2
@@ -3412,6 +3454,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3452,24 +3495,28 @@ __metadata:
 =======
   checksum: d08df7a7e87ab3a35a4c22a8509f6ac7d79aebe29e2750c6d90235d0176fa9469edefd681679eb4d1a9bfe02f78ef6eac0cd23efdfc2ade826aefc1b24f735a1
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: 6601f7f69b5dddc21706136f84f2d3ae0d683cb6691b5bb66f0efd604836abcfe6e778a00903e3e612bc1cf1359eb05cd9487fa15bf27ec56560c01ccaf1786e
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/gradle@npm:21.0.8-local"
+"@nx/gradle@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/gradle@npm:21.0.9-local"
   dependencies:
-    "@nx/devkit": 21.0.8-local
-  checksum: 9246d1c5b340183846edf843131a5d193cb371930cbc9ef29a1f7dfd7d7cc38535e6f8531be28865a26f6ad4fae40daae6b6b3685a93e6edafcde17714febb33
+    "@nx/devkit": 21.0.9-local
+  checksum: 2298b965d4b45594fdb644cbfc880340affe65ba0a98e82fe363955d2c6eaa7920edf33eb0f5d6521aca9da7417ae46615cf341ecc51b3685d172d994e6e54b4
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/jest@npm:21.0.8-local"
+"@nx/jest@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/jest@npm:21.0.9-local"
   dependencies:
     "@jest/reporters": ^29.4.1
     "@jest/test-result": ^29.4.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3493,6 +3540,10 @@ __metadata:
     "@nx/devkit": 21.0.8-local
     "@nx/js": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    "@nx/devkit": 21.0.9-local
+    "@nx/js": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@phenomnomnominal/tsquery": ~5.0.1
     identity-obj-proxy: 3.0.0
     jest-config: ^29.4.1
@@ -3504,6 +3555,7 @@ __metadata:
     semver: ^7.5.3
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3561,6 +3613,15 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/js@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: 725494fff7306b08319a2b873984b3d7b48923ec96ccc46c7640ba811de80d397fe314a3b5ab841d0919215681fefb0ef3d4a2e335e906622e216489b90174be
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/js@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   dependencies:
     "@babel/core": ^7.23.2
     "@babel/plugin-proposal-decorators": ^7.22.7
@@ -3569,6 +3630,7 @@ __metadata:
     "@babel/preset-env": ^7.23.2
     "@babel/preset-typescript": ^7.22.5
     "@babel/runtime": ^7.22.6
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3596,6 +3658,10 @@ __metadata:
     "@nx/devkit": 21.0.8-local
     "@nx/workspace": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    "@nx/devkit": 21.0.9-local
+    "@nx/workspace": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@zkochan/js-yaml": 0.0.7
     babel-plugin-const-enum: ^1.0.1
     babel-plugin-macros: ^3.1.0
@@ -3622,6 +3688,7 @@ __metadata:
   peerDependenciesMeta:
     verdaccio:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3661,22 +3728,26 @@ __metadata:
 =======
   checksum: 94bd5c4e5ce15565f38c65f4f8b773fac4565acefe1c69f6fac6d1791916da9619910403a0f736a1f4f924c16ab137fac38b08accea7327b7c997ae513a99b58
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: 53e7c7c7db46091e6a0b37439a884ff48e98c1d623d9f5f83e321bd3d9d8d172c1549a4c9d337aeef031ea841c67917bf5e2aea9ee0498772016cd4cd214b3de
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/node@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/node@npm:21.0.8-local"
+"@nx/node@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/node@npm:21.0.9-local"
   dependencies:
-    "@nx/devkit": 21.0.8-local
-    "@nx/eslint": 21.0.8-local
-    "@nx/jest": 21.0.8-local
-    "@nx/js": 21.0.8-local
+    "@nx/devkit": 21.0.9-local
+    "@nx/eslint": 21.0.9-local
+    "@nx/jest": 21.0.9-local
+    "@nx/js": 21.0.9-local
     tslib: ^2.3.0
-  checksum: 4d1bd4da4a0f2110ecaac8a2fc8ae5cb0c054b2f29a1761343e4062c2d4eef334abc14370704f0ba074b12b108848e69b108145242500ba6163b0e453b52edb9
+  checksum: 80b4261c8cb78f99c18290f511a2c1334e5289e7cc8290a85756e89682493c1282f247dd23a707a58e0bdf6502457d7ee89b97eaab8660e30e93ecf2b485a3ea
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3705,10 +3776,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-darwin-arm64@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-darwin-arm64@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-darwin-arm64@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3742,10 +3819,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-darwin-x64@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-darwin-x64@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-darwin-x64@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3779,10 +3862,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-freebsd-x64@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-freebsd-x64@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-freebsd-x64@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3816,10 +3905,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3853,10 +3948,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-linux-arm64-gnu@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3890,10 +3991,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-linux-arm64-musl@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-linux-arm64-musl@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-linux-arm64-musl@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3927,10 +4034,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-linux-x64-gnu@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-linux-x64-gnu@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-linux-x64-gnu@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3964,10 +4077,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-linux-x64-musl@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-linux-x64-musl@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-linux-x64-musl@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4001,10 +4120,16 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-win32-arm64-msvc@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4038,6 +4163,11 @@ __metadata:
   version: 21.0.8-local
   resolution: "@nx/nx-win32-x64-msvc@npm:21.0.8-local"
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/nx-win32-x64-msvc@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/nx-win32-x64-msvc@npm:21.0.9-local"
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -4195,6 +4325,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/web@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/web@npm:20.5.0-beta.2"
@@ -4241,10 +4372,19 @@ __metadata:
     "@nx/devkit": 21.0.8-local
     "@nx/js": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"@nx/web@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/web@npm:21.0.9-local"
+  dependencies:
+    "@nx/devkit": 21.0.9-local
+    "@nx/js": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     detect-port: ^1.5.1
     http-server: ^14.1.0
     picocolors: ^1.1.0
     tslib: ^2.3.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4275,14 +4415,18 @@ __metadata:
 =======
   checksum: 3b26908f9a4aec767d7a9d4076fc535ef448afa67f93b26d8d1179e58aae90f16e0342a66e0b4f40c49814ef35dc0356a64bb6c11b028ef5f4440a4ea63cea70
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: 6575c468477e8c89bf51d445caae5536a499cd07db03b21f80b44ef107a144f8a23b301ef51af1748e2679a1f49b3bb182df2f244f23385fd5c02c77ebbe312f
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/webpack@npm:21.0.8-local"
+"@nx/webpack@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/webpack@npm:21.0.9-local"
   dependencies:
     "@babel/core": ^7.23.2
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4306,6 +4450,10 @@ __metadata:
     "@nx/devkit": 21.0.8-local
     "@nx/js": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    "@nx/devkit": 21.0.9-local
+    "@nx/js": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@phenomnomnominal/tsquery": ~5.0.1
     ajv: ^8.12.0
     autoprefixer: ^10.4.9
@@ -4345,6 +4493,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: c3e41ae4d7cd7e50491dccac89ec0d60d369366baad4226991fde53d9023d6ff6061f06210ba38c4ddb1f6e087c1036c122cde7a4f9eddf8db9af86b14d885aa
   languageName: node
   linkType: hard
@@ -4374,19 +4523,23 @@ __metadata:
 =======
   checksum: 986a3124d8c0259a11536b81b671f8ba532943cf4bac25383da0c45accee75c8044124b7f5c23c61695c1fe60a422065bb54f47e6a1e128f9e317ce21a5eb53c
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: a04b7bf5d5259bf6eb518be4d23895c1792970c611a2bfe372077d40d9a8c51af6d8d3ddcb735d5632600a4d26175f74eb989030794f8ea0e5dc27241451fd81
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:21.0.8-local":
-  version: 21.0.8-local
-  resolution: "@nx/workspace@npm:21.0.8-local"
+"@nx/workspace@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "@nx/workspace@npm:21.0.9-local"
   dependencies:
-    "@nx/devkit": 21.0.8-local
+    "@nx/devkit": 21.0.9-local
     chalk: ^4.1.0
     enquirer: ~2.3.6
-    nx: 21.0.8-local
+    nx: 21.0.9-local
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4405,6 +4558,9 @@ __metadata:
 =======
   checksum: 07964817903ee86edb0d6b03613e411da5825d4c7de905fba7e722529c8e3dd847056fd80b839a71f22cc77f081aa3750e7375b00db63c7b8f98350916d5235a
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: 24c0a4aedb58675c6b7a40f2548270caf4d3b68e335772903000a31187812a7a88e4230d453d906c70fe99b4b77113799d5c7f3ca10d8a3dcec1073cb8175a31
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 
@@ -14773,6 +14929,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
     "@nx/esbuild": 20.5.0-beta.2
@@ -14873,6 +15030,23 @@ __metadata:
     "@nx/webpack": 21.0.8-local
     "@nx/workspace": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    "@nx/cypress": 21.0.9-local
+    "@nx/devkit": 21.0.9-local
+    "@nx/esbuild": 21.0.9-local
+    "@nx/eslint": 21.0.9-local
+    "@nx/eslint-plugin": 21.0.9-local
+    "@nx/gradle": 21.0.9-local
+    "@nx/jest": 21.0.9-local
+    "@nx/js": 21.0.9-local
+    "@nx/node": 21.0.9-local
+    "@nx/powerpack-conformance": 1.1.1
+    "@nx/powerpack-enterprise-cloud": 1.1.1
+    "@nx/powerpack-owners": 1.1.1
+    "@nx/web": 21.0.9-local
+    "@nx/webpack": 21.0.9-local
+    "@nx/workspace": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -14932,6 +15106,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nx: 20.5.0-beta.2
     ovsx: ^0.10.1
     prettier: ^3.5.1
@@ -14950,6 +15125,9 @@ __metadata:
 =======
     nx: 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+    nx: 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
@@ -14980,6 +15158,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -15085,6 +15264,23 @@ __metadata:
     "@nx/nx-win32-arm64-msvc": 21.0.8-local
     "@nx/nx-win32-x64-msvc": 21.0.8-local
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+"nx@npm:21.0.9-local":
+  version: 21.0.9-local
+  resolution: "nx@npm:21.0.9-local"
+  dependencies:
+    "@napi-rs/wasm-runtime": 0.2.4
+    "@nx/nx-darwin-arm64": 21.0.9-local
+    "@nx/nx-darwin-x64": 21.0.9-local
+    "@nx/nx-freebsd-x64": 21.0.9-local
+    "@nx/nx-linux-arm-gnueabihf": 21.0.9-local
+    "@nx/nx-linux-arm64-gnu": 21.0.9-local
+    "@nx/nx-linux-arm64-musl": 21.0.9-local
+    "@nx/nx-linux-x64-gnu": 21.0.9-local
+    "@nx/nx-linux-x64-musl": 21.0.9-local
+    "@nx/nx-win32-arm64-msvc": 21.0.9-local
+    "@nx/nx-win32-x64-msvc": 21.0.9-local
+>>>>>>> ab7b0e96 (changes & pass squash commits)
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
@@ -15155,6 +15351,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 0ef4860fb9a74cbbf7bfb25353909042ead8d01915419eec153daee0508801264fd91dcc34bbf6cc4250e28925d9b319c7964d41910e44cd0ac151fb77a306b2
 =======
   checksum: f33ff06bf3aabbaed007706d58e54a789c1e4dbbd8e58f4e73929251de0e44e0e3dc79b19149160c6b1126f39987f8c1be82e9c0b62167b28411b2f8d5e06835
@@ -15171,6 +15368,9 @@ __metadata:
 =======
   checksum: d1011827f0c0f4afe61a24389262235679424fc01e89d62b28957976226e3fdbc7309b646f8f3fa3be05c7ccb1c0c3205f3c48eb4cb21c71cf99bea485512bbe
 >>>>>>> 85d7f4d8 (pass createCommits configuration to extension)
+=======
+  checksum: d918954d6ac5dd340cd0bece9389d2e353fad96a855986ab6db9916fc76b96d1aa77aa1199f56085715d26f9fa9084a38d3c981e443c3c8edae96604f9607f26
+>>>>>>> ab7b0e96 (changes & pass squash commits)
   languageName: node
   linkType: hard
 

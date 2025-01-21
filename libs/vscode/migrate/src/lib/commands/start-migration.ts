@@ -77,6 +77,8 @@ export async function startMigration(custom = false) {
     });
   });
 
+  // TODO: Figure out way to check if the task ended properly and differentiate between user cancelled and no migrations needed
+
   const parsedMigrationsJson = JSON.parse(
     readFileSync(migrationsJsonPath, 'utf-8')
   );
@@ -131,7 +133,7 @@ function getDefaultMigrateVersion(
     return 'latest';
   }
 
-  return (currentMajor - 1).toString();
+  return (currentMajor + 1).toString();
 }
 
 async function promptForVersion(

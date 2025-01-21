@@ -14,12 +14,9 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import {
-  cancelMigration,
-  finishMigration,
-  runSingleMigration,
-} from './migrate-commands';
+import { cancelMigration, runSingleMigration } from './migrate-commands';
 import { watchFile } from '@nx-console/vscode-utils';
+import { finishMigration } from './commands/finish-migration';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
@@ -68,7 +65,7 @@ export class MigrateWebview {
           );
           break;
         case 'finish':
-          finishMigration();
+          finishMigration(message.payload.squashCommits);
           break;
         case 'cancel':
           cancelMigration();
