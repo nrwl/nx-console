@@ -1,14 +1,12 @@
-import { importNxPackagePath } from '@nx-console/shared-npm';
+import { MigrationsJsonMetadata } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { execSync } from 'child_process';
-import { existsSync, mkdirSync, writeFileSync, rmSync } from 'fs';
-import type { GeneratedMigrationDetails } from 'nx/src/config/misc-interfaces';
-import { join, relative, resolve } from 'path';
-import { window, ProgressLocation } from 'vscode';
-import { modifyMigrationsJsonMetadata } from './utils';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
 import { nxCliPath } from 'nx/src/command-line/migrate/migrate';
+import type { GeneratedMigrationDetails } from 'nx/src/config/misc-interfaces';
+import type { FileChange } from 'nx/src/devkit-exports';
+import { resolve } from 'path';
+import { ProgressLocation, window } from 'vscode';
+import { modifyMigrationsJsonMetadata } from './utils';
+import { execSync } from 'child_process';
 
 export async function runSingleMigration(
   migration: GeneratedMigrationDetails,
@@ -25,7 +23,7 @@ export async function runSingleMigration(
       try {
         // TODO: remove this once actual version is released
         //       the nx implementation ignores custom registries here
-        process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.14-local';
+        process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.17-local';
         const cliPath = nxCliPath(workspacePath);
         const updatedMigrateLocation = resolve(
           cliPath,
@@ -41,6 +39,11 @@ export async function runSingleMigration(
         const updatedMigrateModule: typeof import('nx/src/command-line/migrate/migrate') =
           await import(updatedMigrateLocation);
 
+        const gitRefBefore = execSync('git rev-parse HEAD', {
+          cwd: workspacePath,
+          encoding: 'utf-8',
+        }).trim();
+
         const fileChanges = await updatedMigrateModule.runNxOrAngularMigration(
           workspacePath,
           migration,
@@ -49,12 +52,31 @@ export async function runSingleMigration(
           'chore: [nx migration] '
         );
 
+        const gitRefAfter = execSync('git rev-parse HEAD', {
+          cwd: workspacePath,
+          encoding: 'utf-8',
+        }).trim();
+
         modifyMigrationsJsonMetadata(
           addSuccessfulMigration(
             migration.name,
-            fileChanges.map((change) => change.path)
+            fileChanges.map((change) => ({
+              path: change.path,
+              type: change.type,
+            }))
           )
         );
+
+        if (gitRefBefore !== gitRefAfter) {
+          execSync('git add migrations.json', {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+          });
+          execSync('git commit --amend --no-verify --no-edit', {
+            cwd: workspacePath,
+            encoding: 'utf-8',
+          });
+        }
       } catch (e) {
         console.error(e);
         modifyMigrationsJsonMetadata(
@@ -65,28 +87,33 @@ export async function runSingleMigration(
   );
 }
 
-function addSuccessfulMigration(name: string, fileChanges: string[]) {
-  return (migrationsJsonMetadata: any) => {
-    if (!migrationsJsonMetadata.successfulMigrations) {
-      migrationsJsonMetadata.successfulMigrations = [];
+function addSuccessfulMigration(
+  name: string,
+  fileChanges: Omit<FileChange, 'content'>[]
+) {
+  return (migrationsJsonMetadata: MigrationsJsonMetadata) => {
+    if (!migrationsJsonMetadata.completedMigrations) {
+      migrationsJsonMetadata.completedMigrations = {};
     }
-    migrationsJsonMetadata.successfulMigrations.push({
-      name: name,
-      changes: fileChanges,
-    });
+    migrationsJsonMetadata.completedMigrations[name] = {
+      type: 'successful',
+      name,
+      changedFiles: fileChanges,
+    };
     return migrationsJsonMetadata;
   };
 }
 
 function addFailedMigration(name: string, error: string) {
-  return (migrationsJsonMetadata: any) => {
-    if (!migrationsJsonMetadata.failedMigrations) {
-      migrationsJsonMetadata.failedMigrations = [];
+  return (migrationsJsonMetadata: MigrationsJsonMetadata) => {
+    if (!migrationsJsonMetadata.completedMigrations) {
+      migrationsJsonMetadata.completedMigrations = {};
     }
-    migrationsJsonMetadata.failedMigrations.push({
-      name: name,
+    migrationsJsonMetadata.completedMigrations[name] = {
+      type: 'failed',
+      name,
       error,
-    });
+    };
     return migrationsJsonMetadata;
   };
 }
