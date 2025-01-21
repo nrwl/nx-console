@@ -21,6 +21,11 @@ export async function runSingleMigration(
     },
     async () => {
       try {
+        const gitRefBefore = execSync('git rev-parse HEAD', {
+          cwd: workspacePath,
+          encoding: 'utf-8',
+        }).trim();
+
         // TODO: remove this once actual version is released
         //       the nx implementation ignores custom registries here
         process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.17-local';
@@ -38,11 +43,6 @@ export async function runSingleMigration(
 
         const updatedMigrateModule: typeof import('nx/src/command-line/migrate/migrate') =
           await import(updatedMigrateLocation);
-
-        const gitRefBefore = execSync('git rev-parse HEAD', {
-          cwd: workspacePath,
-          encoding: 'utf-8',
-        }).trim();
 
         const fileChanges = await updatedMigrateModule.runNxOrAngularMigration(
           workspacePath,
