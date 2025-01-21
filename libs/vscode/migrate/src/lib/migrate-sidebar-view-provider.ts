@@ -1,30 +1,24 @@
+import { MigrateViewData } from '@nx-console/shared-types';
+import { isDeepStrictEqual } from 'util';
 import {
   CancellationToken,
   commands,
   Disposable,
   ExtensionContext,
-  extensions,
-  TextDocumentShowOptions,
   Uri,
   WebviewView,
   WebviewViewProvider,
   WebviewViewResolveContext,
   window,
 } from 'vscode';
-import { EventObject } from 'xstate';
-import { ActorRef } from 'xstate';
-import { isUpdateAvailable } from './migrate-state-machine';
-import { isDeepStrictEqual } from 'util';
+import { ActorRef, EventObject } from 'xstate';
+import { startMigration } from './commands/start-migration';
 import {
   cancelMigration,
   confirmPackageChanges,
-  startMigration,
   viewDiff,
 } from './migrate-commands';
-import { MigrateViewData } from '@nx-console/shared-types';
-import { GitExtension } from './git-extension/git';
-import { join } from 'path';
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { isUpdateAvailable } from './migrate-state-machine';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';

@@ -1,33 +1,24 @@
-import { gte, NxVersion } from '@nx-console/nx-version';
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { getPackageManagerCommand } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import {
   getOutputChannel,
   logAndShowError,
 } from '@nx-console/vscode-output-channels';
-import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
-import {
-  getPackageInfo,
-  PackageInformationResponse,
-} from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
 import { join, relative } from 'path';
-import { rcompare } from 'semver';
 import {
   commands,
   ExtensionContext,
   extensions,
   ProgressLocation,
-  QuickPickItem,
-  tasks,
   TextDocumentShowOptions,
   Uri,
   window,
 } from 'vscode';
+import { startMigration } from './commands/start-migration';
 import { GitExtension } from './git-extension/git';
 import { MigrateWebview } from './migrate-webview';
 
@@ -49,183 +40,6 @@ export function registerCommands(
       await viewDiff();
     })
   );
-}
-
-export async function startMigration(custom = false) {
-  const nxVersion = await getNxVersion();
-
-  let pkgInfo: PackageInformationResponse;
-  try {
-    pkgInfo = await getPackageInfo('nx');
-  } catch (e) {
-    logAndShowError(
-      'Failed to retrieve version information from npm',
-      `Error while retrieving Nx version information from npm: \n ${e}`
-    );
-    return;
-  }
-
-  let versionToMigrateTo: string | undefined;
-  if (custom) {
-    versionToMigrateTo = await promptForVersion(nxVersion, pkgInfo);
-  } else {
-    versionToMigrateTo = getDefaultMigrateVersion(nxVersion, pkgInfo);
-  }
-
-  if (!versionToMigrateTo) {
-    return;
-  }
-
-  const workspacePath = getNxWorkspacePath();
-  const migrationsJsonPath = join(workspacePath, 'migrations.json');
-
-  if (existsSync(migrationsJsonPath)) {
-    rmSync(migrationsJsonPath);
-  }
-
-  const command = `nx migrate ${versionToMigrateTo}`;
-
-  const task = await CliTask.create({
-    command: 'migrate',
-    positional: versionToMigrateTo,
-    flags: [],
-  });
-  await tasks.executeTask(task);
-
-  await new Promise((resolve) => {
-    tasks.onDidEndTaskProcess((taskEndEvent) => {
-      if (taskEndEvent.execution.task.name === command) {
-        resolve(true);
-      }
-    });
-  });
-
-  const parsedMigrationsJson = JSON.parse(
-    readFileSync(migrationsJsonPath, 'utf-8')
-  );
-
-  try {
-    const gitRef = execSync('git rev-parse HEAD', {
-      cwd: workspacePath,
-      encoding: 'utf-8',
-    }).trim();
-
-    const gitSubject = execSync('git log -1 --pretty=%s', {
-      cwd: workspacePath,
-      encoding: 'utf-8',
-    }).trim();
-
-    parsedMigrationsJson['nx-console'] = {
-      initialGitRef: {
-        ref: gitRef,
-        subject: gitSubject,
-      },
-    };
-  } catch (e) {
-    parsedMigrationsJson['nx-console'] = {};
-  }
-
-  writeFileSync(
-    migrationsJsonPath,
-    JSON.stringify(parsedMigrationsJson, null, 2)
-  );
-}
-
-async function promptForVersion(
-  nxVersion: NxVersion,
-  pkgInfo: PackageInformationResponse
-) {
-  const quickpickOptions: QuickPickItem[] = [];
-
-  quickpickOptions.push({ label: 'latest' });
-  quickpickOptions.push({ label: 'next' });
-
-  const possibleVersions = Object.entries(pkgInfo.versions)
-    .filter(
-      ([versionNum, versionInfo]) =>
-        !versionInfo.deprecated &&
-        gte(versionNum, nxVersion) &&
-        !versionNum.startsWith('9999') &&
-        !versionNum.startsWith('0.0.0-pr') &&
-        !versionNum.includes('canary') &&
-        !versionNum.includes('beta') &&
-        !versionNum.includes('rc')
-    )
-    .sort(([a], [b]) => rcompare(a, b));
-
-  possibleVersions.forEach(([versionNum]) => {
-    const major = versionNum.split('.')[0];
-    const existingOption = quickpickOptions.find(
-      (opt) => opt.label === major || opt.label.startsWith(major + '.')
-    );
-    if (existingOption) {
-      return;
-    }
-    if (major === nxVersion.major.toString()) {
-      quickpickOptions.push({ label: versionNum });
-    } else {
-      quickpickOptions.push({ label: major[0] });
-    }
-  });
-
-  const quickPick = window.createQuickPick();
-
-  quickPick.items = [
-    ...quickpickOptions,
-    { label: '', description: 'Start typing to install a custom version' },
-  ];
-
-  quickPick.onDidChangeValue((value: string) => {
-    quickPick.items = [
-      ...quickpickOptions,
-      {
-        label: quickPick.value,
-        description: value
-          ? 'Install custom version'
-          : 'Start typing to install a custom version',
-      },
-    ];
-  });
-
-  quickPick.placeholder = 'Select a version to migrate to';
-
-  return await new Promise<string | undefined>((resolve) => {
-    quickPick.show();
-    quickPick.onDidAccept(() => {
-      resolve(quickPick.selectedItems[0]?.label);
-      quickPick.hide();
-      quickPick.dispose();
-    });
-    quickPick.onDidHide(() => {
-      resolve(undefined);
-    });
-  });
-}
-
-// if latest is 20.x, do the following
-// current: 20.x -> latest
-// current: 19.x -> latest
-// current: 18.x -> 19
-// current: 17.x -> 18
-function getDefaultMigrateVersion(
-  nxVersion: NxVersion,
-  pkgInfo: PackageInformationResponse
-): string {
-  const currentMajor = nxVersion.major;
-  const latestMajor = pkgInfo['dist-tags']?.['latest']?.split('.')?.[0];
-
-  if (!latestMajor) {
-    return 'latest';
-  }
-
-  if (
-    currentMajor === parseInt(latestMajor) ||
-    currentMajor === parseInt(latestMajor) - 1
-  ) {
-    return 'latest';
-  }
-
-  return (currentMajor - 1).toString();
 }
 
 export async function runSingleMigration(
