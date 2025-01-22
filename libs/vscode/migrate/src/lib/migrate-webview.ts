@@ -17,7 +17,11 @@ import {
 import { cancelMigration } from './migrate-commands';
 import { watchFile } from '@nx-console/vscode-utils';
 import { finishMigration } from './commands/finish-migration';
-import { runSingleMigration } from './commands/run-migration';
+import {
+  runManyMigrations,
+  runSingleMigration,
+} from './commands/run-migration';
+import { viewDiff } from './git-extension/view-diff';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
@@ -65,18 +69,27 @@ export class MigrateWebview {
             message.payload.configuration
           );
           break;
+        case 'run-many':
+          runManyMigrations(
+            message.payload.migrations,
+            message.payload.configuration
+          );
+          break;
         case 'finish':
           finishMigration(message.payload.squashCommits);
           break;
         case 'cancel':
           cancelMigration();
           break;
+        case 'file-click':
+          viewDiff(message.payload.path);
+          break;
       }
     });
 
     const migrationJsonSubscription = watchFile(
       join(getNxWorkspacePath(), 'migrations.json'),
-      () => {
+      async () => {
         this._webviewPanel.webview.postMessage({
           type: 'reload',
           data: this.getMigrateUIData(),
@@ -96,6 +109,15 @@ export class MigrateWebview {
     }
   }
 
+  refresh() {
+    if (this._webviewPanel) {
+      this._webviewPanel.webview.postMessage({
+        type: 'reload',
+        data: this.getMigrateUIData(),
+      });
+    }
+  }
+
   private async loadMigrateHtml(webviewPanel: WebviewPanel): Promise<string> {
     const graphHtmlLocation = await getGraphHtmlLocation(this.context);
 
@@ -103,7 +125,7 @@ export class MigrateWebview {
       return '<div>CANNOT LOAD MIGRATE UI</div>';
     }
 
-    const initialData = await this.getMigrateUIData();
+    const initialData = this.getMigrateUIData();
 
     const asWebviewUri = (path: string) =>
       webviewPanel.webview
@@ -161,10 +183,10 @@ export class MigrateWebview {
     </html>`;
   }
 
-  private getMigrateUIData(): Promise<{
+  private getMigrateUIData(): {
     migrations: MigrationsJsonEntry[];
     'nx-console': any | undefined;
-  }> {
+  } {
     const nxWorkspacePath = getNxWorkspacePath();
     const migrationsJsonPath = join(nxWorkspacePath, 'migrations.json');
     const migrationsJson = readFileSync(migrationsJsonPath, 'utf-8');

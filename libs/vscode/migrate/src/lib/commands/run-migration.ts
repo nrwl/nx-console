@@ -4,7 +4,7 @@ import { nxCliPath } from 'nx/src/command-line/migrate/migrate';
 import type { GeneratedMigrationDetails } from 'nx/src/config/misc-interfaces';
 import type { FileChange } from 'nx/src/devkit-exports';
 import { resolve } from 'path';
-import { ProgressLocation, window } from 'vscode';
+import { commands, ProgressLocation, window } from 'vscode';
 import { modifyMigrationsJsonMetadata } from './utils';
 import { execSync } from 'child_process';
 
@@ -14,13 +14,16 @@ export async function runSingleMigration(
 ) {
   const workspacePath = getNxWorkspacePath();
 
-  window.withProgress(
+  await window.withProgress(
     {
       location: ProgressLocation.Notification,
       title: `Running ${migration.name}`,
     },
     async () => {
       try {
+        modifyMigrationsJsonMetadata(addRunningMigration(migration.name));
+        commands.executeCommand('nxMigrate.refreshWebview');
+
         const gitRefBefore = execSync('git rev-parse HEAD', {
           cwd: workspacePath,
           encoding: 'utf-8',
@@ -28,7 +31,7 @@ export async function runSingleMigration(
 
         // TODO: remove this once actual version is released
         //       the nx implementation ignores custom registries here
-        process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.17-local';
+        process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.20-local';
         const cliPath = nxCliPath(workspacePath);
         const updatedMigrateLocation = resolve(
           cliPath,
@@ -82,9 +85,20 @@ export async function runSingleMigration(
         modifyMigrationsJsonMetadata(
           addFailedMigration(migration.name, e.message)
         );
+      } finally {
+        modifyMigrationsJsonMetadata(removeRunningMigration(migration.name));
       }
     }
   );
+}
+
+export async function runManyMigrations(
+  migrations: GeneratedMigrationDetails[],
+  configuration: { createCommits: boolean }
+) {
+  for (const migration of migrations) {
+    await runSingleMigration(migration, configuration);
+  }
 }
 
 function addSuccessfulMigration(
@@ -114,6 +128,27 @@ function addFailedMigration(name: string, error: string) {
       name,
       error,
     };
+    return migrationsJsonMetadata;
+  };
+}
+
+function addRunningMigration(name: string) {
+  return (migrationsJsonMetadata: MigrationsJsonMetadata) => {
+    migrationsJsonMetadata.runningMigrations = [
+      ...(migrationsJsonMetadata.runningMigrations ?? []),
+      name,
+    ];
+    return migrationsJsonMetadata;
+  };
+}
+
+function removeRunningMigration(name: string) {
+  return (migrationsJsonMetadata: MigrationsJsonMetadata) => {
+    migrationsJsonMetadata.runningMigrations =
+      migrationsJsonMetadata.runningMigrations?.filter((n) => n !== name);
+    if (migrationsJsonMetadata.runningMigrations?.length === 0) {
+      delete migrationsJsonMetadata.runningMigrations;
+    }
     return migrationsJsonMetadata;
   };
 }

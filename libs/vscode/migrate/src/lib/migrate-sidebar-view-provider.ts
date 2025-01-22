@@ -13,11 +13,8 @@ import {
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
 import { startMigration } from './commands/start-migration';
-import {
-  cancelMigration,
-  confirmPackageChanges,
-  viewDiff,
-} from './migrate-commands';
+import { viewPackageJsonDiff } from './git-extension/view-diff';
+import { cancelMigration, confirmPackageChanges } from './migrate-commands';
 import { isUpdateAvailable } from './migrate-state-machine';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
@@ -65,7 +62,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       } else if (message.type === 'open') {
         commands.executeCommand('nxMigrate.open');
       } else if (message.type === 'view-diff') {
-        viewDiff();
+        viewPackageJsonDiff();
       } else if (message.type === 'confirm-changes') {
         confirmPackageChanges();
       } else if (message.type === 'cancel-migration') {

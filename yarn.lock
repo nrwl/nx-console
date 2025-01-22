@@ -3061,6 +3061,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/cypress@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/cypress@npm:20.5.0-beta.2"
@@ -3149,6 +3150,15 @@ __metadata:
     "@nx/eslint": 21.0.17-local
     "@nx/js": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/cypress@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/cypress@npm:21.0.20-local"
+  dependencies:
+    "@nx/devkit": 21.0.20-local
+    "@nx/eslint": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@phenomnomnominal/tsquery": ~5.0.1
     detect-port: ^1.5.1
     tslib: ^2.3.0
@@ -3157,6 +3167,7 @@ __metadata:
   peerDependenciesMeta:
     cypress:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3194,6 +3205,9 @@ __metadata:
 =======
   checksum: 4d372bbf11d65eaf9b1ac1c0f90afcd2dff83563b3b0a607c4207d82dfe6b0e742169b4c6958af17eeb5c6dfb68f8388bd3e6432f5f5879273feb5dbf0686432
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 9a4b0d32a77573b255c071bb2246570bd58b4aafd2cb7b5835f9a4c294177734c850d2bf3b4793946e3a7910ef40531cf3c46f0f4bc8dbdc000f0a5bfe5d8009
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
@@ -3234,6 +3248,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3291,6 +3306,11 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/devkit@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/devkit@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/devkit@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   dependencies:
     ejs: ^3.1.7
     enquirer: ~2.3.6
@@ -3302,6 +3322,7 @@ __metadata:
     yargs-parser: 21.1.1
   peerDependencies:
     nx: ">= 19 <= 21"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3347,17 +3368,25 @@ __metadata:
 =======
   checksum: 9c7c2083354bb80dad191efa040c11c6afeb9083304a3b7ff6895cac14bf74e73f3103c32ed442ef9716606dcf02cd7ad96f97f8f8df7caa87f36bf445398759
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: ec257e14d372778cf6074d156009bf48fac3b84a6183f4b4468e1a947cbef1476cd0c55de5e9aea6edd2c3e013cdbf952a4593575797311eaadd0a0cc6ea35c5
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/esbuild@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/esbuild@npm:21.0.17-local"
+"@nx/esbuild@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/esbuild@npm:21.0.20-local"
   dependencies:
+<<<<<<< HEAD
     "@nx/devkit": 21.0.17-local
     "@nx/js": 21.0.17-local
     fast-glob: 3.2.7
 >>>>>>> 98028183 (update to local version with bundled migrate ui)
+=======
+    "@nx/devkit": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     picocolors: ^1.1.0
     tinyglobby: ^0.2.10
     tsconfig-paths: ^4.1.2
@@ -3367,6 +3396,7 @@ __metadata:
   peerDependenciesMeta:
     esbuild:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3412,13 +3442,17 @@ __metadata:
 =======
   checksum: 2d8efb4c97388b568a0ec0486a73dd0be7f3ad127dc670e5d4eddedfe731abe10f1205ab82b01226357799ac5a66f50c78ea9544be6cf2834aa2bc558c8bbc32
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 9c4019ecbbef07f4d8678aa46d27d4872f0d596b11f4ed80b205cca6ad96e9a7bcd152dd3f88c893aad6f9d32ebadc98887db7093cc821de1da61ba9e284ad16
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/eslint-plugin@npm:21.0.17-local"
+"@nx/eslint-plugin@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/eslint-plugin@npm:21.0.20-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3462,6 +3496,10 @@ __metadata:
     "@nx/devkit": 21.0.17-local
     "@nx/js": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    "@nx/devkit": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@typescript-eslint/type-utils": ^8.0.0
     "@typescript-eslint/utils": ^8.0.0
     chalk: ^4.1.0
@@ -3476,6 +3514,7 @@ __metadata:
   peerDependenciesMeta:
     eslint-config-prettier:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3521,13 +3560,17 @@ __metadata:
 =======
   checksum: 668b9d5d20cb60d04fc0d4c28021d8b1fe5ba04827e7b19e3404a7810c00c27379eb918ab4c85c6e5949986028c4a3c032bf4a94517bb896c543a3f8b370c334
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: a43a1a2a5ef97d43320032b5d4c43fa31c76bc6c349910396a98e984aa19be5dee7dc5a1f8ccd28bb2fa9dcc58c048141ef0e4002e091e664786f24744a43a93
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/eslint@npm:21.0.17-local"
+"@nx/eslint@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/eslint@npm:21.0.20-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3571,6 +3614,10 @@ __metadata:
     "@nx/devkit": 21.0.17-local
     "@nx/js": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    "@nx/devkit": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     semver: ^7.5.3
     tslib: ^2.3.0
     typescript: ~5.7.2
@@ -3580,6 +3627,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3636,24 +3684,28 @@ __metadata:
 =======
   checksum: aaea3c035c498a43f7756cca049415425e8e7159aa51de3690f8dde656ba31502a9beb2d75d210e100cbde9cd6397a968ce88621888c57c934bc71ed0fa956a7
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: ed79939c0f256f5fb588e3e62b3821fed24666e38d87bc161e262f8757e27b82d4cf6c29732e002a16348cdfcc65762d5672a57990378599fb78e65f727245d7
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/gradle@npm:21.0.17-local"
+"@nx/gradle@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/gradle@npm:21.0.20-local"
   dependencies:
-    "@nx/devkit": 21.0.17-local
-  checksum: 0c001a629d7d0f69c4250756c98355a17181ac338e17b1d14972a43a95855008b0eb37cfab2a36125b0e994a9151787a9929b26e3104fe632ab7e40e698de230
+    "@nx/devkit": 21.0.20-local
+  checksum: b2f7e850bdca062cf564159f579d2ef71187f8883fa147c4ec674915488e7e3a9f8118e7cf6793718a0337e979e22ee5d06b3d8d3cdd554f27a3bc58756353c1
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/jest@npm:21.0.17-local"
+"@nx/jest@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/jest@npm:21.0.20-local"
   dependencies:
     "@jest/reporters": ^29.4.1
     "@jest/test-result": ^29.4.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3697,6 +3749,10 @@ __metadata:
     "@nx/devkit": 21.0.17-local
     "@nx/js": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    "@nx/devkit": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@phenomnomnominal/tsquery": ~5.0.1
     identity-obj-proxy: 3.0.0
     jest-config: ^29.4.1
@@ -3708,6 +3764,7 @@ __metadata:
     semver: ^7.5.3
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3805,6 +3862,15 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/js@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 1fbdee1613106399892e0c4db49b86c5b6a4e35dc4b7ac97d0d9fd9129b3bc1f7a00a704f9d3e7030b961608a91aa9cbe02e06ea4bf310a230ed408347949c79
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/js@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   dependencies:
     "@babel/core": ^7.23.2
     "@babel/plugin-proposal-decorators": ^7.22.7
@@ -3813,6 +3879,7 @@ __metadata:
     "@babel/preset-env": ^7.23.2
     "@babel/preset-typescript": ^7.22.5
     "@babel/runtime": ^7.22.6
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3860,6 +3927,10 @@ __metadata:
     "@nx/devkit": 21.0.17-local
     "@nx/workspace": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    "@nx/devkit": 21.0.20-local
+    "@nx/workspace": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@zkochan/js-yaml": 0.0.7
     babel-plugin-const-enum: ^1.0.1
     babel-plugin-macros: ^3.1.0
@@ -3886,6 +3957,7 @@ __metadata:
   peerDependenciesMeta:
     verdaccio:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3941,22 +4013,26 @@ __metadata:
 =======
   checksum: bb4c0920d496eab059aab4acccf4c2ed50441f7622a34a372d4e7e6cfc6f132c39853434df6727d25f2390bf1e8ab5311fcbede20e18fba038ff61ed43f63f53
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 2c08ddd3a1da5f95ec2102fce2a801ab9459c851fbe753b78b721e262cfbf63aa113f9717185fa0836c83f6fe95118ea03070f6dc96a30578e2a1c71463e09ae
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/node@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/node@npm:21.0.17-local"
+"@nx/node@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/node@npm:21.0.20-local"
   dependencies:
-    "@nx/devkit": 21.0.17-local
-    "@nx/eslint": 21.0.17-local
-    "@nx/jest": 21.0.17-local
-    "@nx/js": 21.0.17-local
+    "@nx/devkit": 21.0.20-local
+    "@nx/eslint": 21.0.20-local
+    "@nx/jest": 21.0.20-local
+    "@nx/js": 21.0.20-local
     tslib: ^2.3.0
-  checksum: 93fcb1d4da42114887cc82fde4c6155ae00dcda9c9729d0aa6763acd2df7e1536e608941ec136d5e33c095cfc980b52d6248920225d6933cd27ccdab9ab17f96
+  checksum: 250bec1b29898a1b1cb26d2b13f5cc7ab74d702df53f5ec748cc42ca1b1541e89c241f491dbe61e38e5762757b9cf295d0694bae0802b099e699a63de90d6024
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4009,10 +4085,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-darwin-arm64@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-darwin-arm64@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-darwin-arm64@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4070,10 +4152,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-darwin-x64@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-darwin-x64@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-darwin-x64@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4131,10 +4219,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-freebsd-x64@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-freebsd-x64@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-freebsd-x64@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4192,10 +4286,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4253,10 +4353,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-linux-arm64-gnu@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4314,10 +4420,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-linux-arm64-musl@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-linux-arm64-musl@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-linux-arm64-musl@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4375,10 +4487,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-linux-x64-gnu@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-linux-x64-gnu@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-linux-x64-gnu@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4436,10 +4554,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-linux-x64-musl@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-linux-x64-musl@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-linux-x64-musl@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4497,10 +4621,16 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-win32-arm64-msvc@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4558,6 +4688,11 @@ __metadata:
   version: 21.0.17-local
   resolution: "@nx/nx-win32-x64-msvc@npm:21.0.17-local"
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/nx-win32-x64-msvc@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/nx-win32-x64-msvc@npm:21.0.20-local"
+>>>>>>> 59e8999f (handle so much more stuff)
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -4719,6 +4854,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/web@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/web@npm:20.5.0-beta.2"
@@ -4797,10 +4933,19 @@ __metadata:
     "@nx/devkit": 21.0.17-local
     "@nx/js": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"@nx/web@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/web@npm:21.0.20-local"
+  dependencies:
+    "@nx/devkit": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     detect-port: ^1.5.1
     http-server: ^14.1.0
     picocolors: ^1.1.0
     tslib: ^2.3.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4847,14 +4992,18 @@ __metadata:
 =======
   checksum: 9467928914d656df1c30e374ec9269ab475b9136611c47e55fdd636b8b51975eb218ed9c907d3c354414b7c779f307afed7af950083967aca93a87d6125f56b7
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: a7b973e3326535e07c93584227691efc8b279a3a90c904e9574e75688534cee87281234f3f954ae8af37ee221186dc5eb8a397bcad1acddc3daf7f2b70a0dc60
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/webpack@npm:21.0.17-local"
+"@nx/webpack@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/webpack@npm:21.0.20-local"
   dependencies:
     "@babel/core": ^7.23.2
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4898,6 +5047,10 @@ __metadata:
     "@nx/devkit": 21.0.17-local
     "@nx/js": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    "@nx/devkit": 21.0.20-local
+    "@nx/js": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@phenomnomnominal/tsquery": ~5.0.1
     ajv: ^8.12.0
     autoprefixer: ^10.4.9
@@ -4932,6 +5085,7 @@ __metadata:
     webpack-dev-server: ^5.0.4
     webpack-node-externals: ^3.0.0
     webpack-subresource-integrity: ^5.1.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4982,19 +5136,23 @@ __metadata:
 =======
   checksum: f381e82e3d038238bc51d0f90b6baf84af3909172a308a4257c809c028b6bcee7b85a1a734e979ae10566d477e5f984f697d4a445efb4bbaf09279728e4c4fa1
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 96e90dd9666efb348dced91e85dedfda7805a164cea46ced909d7d75c916e3c2f1cb8507aad956e43e42321d04cf89f15d0ddca06b2984c2f001550dc2cb42e3
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:21.0.17-local":
-  version: 21.0.17-local
-  resolution: "@nx/workspace@npm:21.0.17-local"
+"@nx/workspace@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "@nx/workspace@npm:21.0.20-local"
   dependencies:
-    "@nx/devkit": 21.0.17-local
+    "@nx/devkit": 21.0.20-local
     chalk: ^4.1.0
     enquirer: ~2.3.6
-    nx: 21.0.17-local
+    nx: 21.0.20-local
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5029,6 +5187,9 @@ __metadata:
 =======
   checksum: b9e89165668e0496f22fd35a6fb516f2470934825570b08cf9329b7829d0b96c0ee4644998501a03db5dcc2653ee1e4e39205b1201393ac6360340abb2330235
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 49b4f9e5ba98581610efd88cdcd78d22dc2a047eb0ada9e31d69a2a083269fed71a5d67c2acfe56a975af0199580bf5e748bf73df2ebc0ad8e7fc309525e093c
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
@@ -15401,6 +15562,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
     "@nx/esbuild": 20.5.0-beta.2
@@ -15569,6 +15731,23 @@ __metadata:
     "@nx/webpack": 21.0.17-local
     "@nx/workspace": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    "@nx/cypress": 21.0.20-local
+    "@nx/devkit": 21.0.20-local
+    "@nx/esbuild": 21.0.20-local
+    "@nx/eslint": 21.0.20-local
+    "@nx/eslint-plugin": 21.0.20-local
+    "@nx/gradle": 21.0.20-local
+    "@nx/jest": 21.0.20-local
+    "@nx/js": 21.0.20-local
+    "@nx/node": 21.0.20-local
+    "@nx/powerpack-conformance": 1.1.1
+    "@nx/powerpack-enterprise-cloud": 1.1.1
+    "@nx/powerpack-owners": 1.1.1
+    "@nx/web": 21.0.20-local
+    "@nx/webpack": 21.0.20-local
+    "@nx/workspace": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -15632,6 +15811,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nx: 20.5.0-beta.2
     ovsx: ^0.10.1
     prettier: ^3.5.1
@@ -15662,6 +15842,9 @@ __metadata:
 =======
     nx: 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+    nx: 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
@@ -15692,6 +15875,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -15869,6 +16053,23 @@ __metadata:
     "@nx/nx-win32-arm64-msvc": 21.0.17-local
     "@nx/nx-win32-x64-msvc": 21.0.17-local
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+"nx@npm:21.0.20-local":
+  version: 21.0.20-local
+  resolution: "nx@npm:21.0.20-local"
+  dependencies:
+    "@napi-rs/wasm-runtime": 0.2.4
+    "@nx/nx-darwin-arm64": 21.0.20-local
+    "@nx/nx-darwin-x64": 21.0.20-local
+    "@nx/nx-freebsd-x64": 21.0.20-local
+    "@nx/nx-linux-arm-gnueabihf": 21.0.20-local
+    "@nx/nx-linux-arm64-gnu": 21.0.20-local
+    "@nx/nx-linux-arm64-musl": 21.0.20-local
+    "@nx/nx-linux-x64-gnu": 21.0.20-local
+    "@nx/nx-linux-x64-musl": 21.0.20-local
+    "@nx/nx-win32-arm64-msvc": 21.0.20-local
+    "@nx/nx-win32-x64-msvc": 21.0.20-local
+>>>>>>> 59e8999f (handle so much more stuff)
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
@@ -15943,6 +16144,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 0ef4860fb9a74cbbf7bfb25353909042ead8d01915419eec153daee0508801264fd91dcc34bbf6cc4250e28925d9b319c7964d41910e44cd0ac151fb77a306b2
 =======
   checksum: f33ff06bf3aabbaed007706d58e54a789c1e4dbbd8e58f4e73929251de0e44e0e3dc79b19149160c6b1126f39987f8c1be82e9c0b62167b28411b2f8d5e06835
@@ -15971,6 +16173,9 @@ __metadata:
 =======
   checksum: d04c10914b41aba78e1be72e328288f2db6db810f00d7a69b06c5b4a83e7eb19bbdb1a338044f0c910aa867c57dcb6d4064db289d6b721b5c49eff9801a3d3df
 >>>>>>> b64aad58 (fix createCommit functionality)
+=======
+  checksum: 16fb7e843bccf0ce9773f9e9cd54bdc789360b2c83d2afb7477214208999d3387aad5c05bedf6c3e5bb82ad376a8a1d1f3e99f75ef6a58af10cd10a95191295c
+>>>>>>> 59e8999f (handle so much more stuff)
   languageName: node
   linkType: hard
 
@@ -19829,7 +20034,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "typescript@npm:5.7.3, typescript@npm:~5.7.2":
+  version: 5.7.3
+  resolution: "typescript@npm:5.7.3"
+=======
+"typescript@npm:5.6.3":
+  version: 5.6.3
+  resolution: "typescript@npm:5.6.3"
+>>>>>>> 59e8999f (handle so much more stuff)
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 6c38b1e989918e576f0307e6ee013522ea480dfce5f3ca85c9b2d8adb1edeffd37f4f30cd68de0c38a44563d12ba922bdb7e36aa2dac9c51de5d561e6e9a2e9c
+  languageName: node
+  linkType: hard
+
+<<<<<<< HEAD
+"typescript@patch:typescript@5.7.3#~builtin<compat/typescript>, typescript@patch:typescript@~5.7.2#~builtin<compat/typescript>":
+  version: 5.7.3
+  resolution: "typescript@patch:typescript@npm%3A5.7.3#~builtin<compat/typescript>::version=5.7.3&hash=a1c5e5"
+=======
+"typescript@npm:~5.7.2":
   version: 5.7.3
   resolution: "typescript@npm:5.7.3"
   bin:
@@ -19839,7 +20065,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@5.7.3#~builtin<compat/typescript>, typescript@patch:typescript@~5.7.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@5.6.3#~builtin<compat/typescript>":
+  version: 5.6.3
+  resolution: "typescript@patch:typescript@npm%3A5.6.3#~builtin<compat/typescript>::version=5.6.3&hash=a1c5e5"
+>>>>>>> 59e8999f (handle so much more stuff)
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 633cd749d6cd7bc842c6b6245847173bba99742a60776fae3c0fbcc0d1733cd51a733995e5f4dadd8afb0e64e57d3c7dbbeae953a072ee303940eca69e22f311
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@~5.7.2#~builtin<compat/typescript>":
   version: 5.7.3
   resolution: "typescript@patch:typescript@npm%3A5.7.3#~builtin<compat/typescript>::version=5.7.3&hash=a1c5e5"
   bin:

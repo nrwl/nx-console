@@ -11,6 +11,7 @@ export type MigrateViewData = {
 
 export type MigrationsJsonMetadata = {
   completedMigrations?: Record<string, SuccessfulMigration | FailedMigration>;
+  runningMigrations?: string[];
   initialGitRef?: {
     ref: string;
     subject: string;

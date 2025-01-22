@@ -2,20 +2,20 @@ import { getPackageManagerCommand } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { execSync } from 'child_process';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import {
   commands,
   ExtensionContext,
   extensions,
   ProgressLocation,
-  TextDocumentShowOptions,
-  Uri,
   window,
 } from 'vscode';
 import { startMigration } from './commands/start-migration';
-import { modifyMigrationsJsonMetadata } from './commands/utils';
+import {
+  modifyMigrationsJsonMetadata,
+  readMigrationsJsonMetadata,
+} from './commands/utils';
 import { GitExtension } from './git-extension/git';
+import { viewPackageJsonDiff } from './git-extension/view-diff';
 import { MigrateWebview } from './migrate-webview';
 
 export function registerCommands(
@@ -33,7 +33,7 @@ export function registerCommands(
       await startMigration();
     }),
     commands.registerCommand('nxMigrate.viewDiff', async () => {
-      await viewDiff();
+      await viewPackageJsonDiff();
     })
   );
 }
@@ -99,10 +99,8 @@ export async function confirmPackageChanges() {
 
 export async function cancelMigration() {
   const nxWorkspacePath = getNxWorkspacePath();
-  const migrationsJsonPath = join(nxWorkspacePath, 'migrations.json');
-  const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
-
-  const data = migrationsJson['nx-console']?.initialGitRef;
+  const migrationsJsonMetadata = readMigrationsJsonMetadata();
+  const data = migrationsJsonMetadata.initialGitRef;
 
   if (!data) {
     window.showErrorMessage(
@@ -138,21 +136,4 @@ export async function cancelMigration() {
         );
       }
     });
-}
-
-export async function viewDiff() {
-  const gitExtension =
-    extensions.getExtension<GitExtension>('vscode.git').exports;
-  const api = gitExtension.getAPI(1);
-
-  const packageJsonPath = join(getNxWorkspacePath(), 'package.json');
-  const packageJsonUri = Uri.file(packageJsonPath);
-
-  const gitUri = api.toGitUri(packageJsonUri, 'HEAD');
-  commands.executeCommand('vscode.diff', gitUri, packageJsonUri, null, {
-    preview: true,
-    preserveFocus: true,
-  } as TextDocumentShowOptions);
-
-  commands.executeCommand('nxMigrate.focus');
 }
