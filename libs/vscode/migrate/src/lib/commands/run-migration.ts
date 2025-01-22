@@ -31,7 +31,7 @@ export async function runSingleMigration(
 
         // TODO: remove this once actual version is released
         //       the nx implementation ignores custom registries here
-        process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.20-local';
+        process.env['NX_MIGRATE_CLI_VERSION'] = '0.0.0-pr-29720-6055188';
         const cliPath = nxCliPath(workspacePath);
         const updatedMigrateLocation = resolve(
           cliPath,

@@ -68,7 +68,7 @@ export async function startMigration(custom = false) {
     flags,
     // TODO: remove this once actual version is released
     env: {
-      NX_MIGRATE_CLI_VERSION: '21.0.20-local',
+      NX_MIGRATE_CLI_VERSION: '0.0.0-pr-29720-6055188',
     },
   });
   await tasks.executeTask(task);
