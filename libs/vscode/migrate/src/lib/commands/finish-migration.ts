@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import { existsSync, readFileSync, rmSync } from 'fs';
 import { join } from 'path';
 import { window, commands } from 'vscode';
+import { readMigrationsJsonMetadata } from './utils';
 
 export async function finishMigration(squashCommits: boolean) {
   window
@@ -19,11 +20,10 @@ export async function finishMigration(squashCommits: boolean) {
       if (result === 'Finish Migration') {
         const workspacePath = getNxWorkspacePath();
         const migrationsJsonPath = join(workspacePath, 'migrations.json');
-        const migrationsJson = JSON.parse(
-          readFileSync(migrationsJsonPath, 'utf-8')
-        );
-        const initialGitRef = migrationsJson['nx-console']?.initialGitRef.ref;
-        const targetVersion = migrationsJson['nx-console']?.targetVersion;
+
+        const migrationsJsonMetadata = readMigrationsJsonMetadata();
+        const initialGitRef = migrationsJsonMetadata.initialGitRef.ref;
+        const targetVersion = migrationsJsonMetadata.targetVersion;
 
         const commitMessage = squashCommits
           ? await window.showInputBox({

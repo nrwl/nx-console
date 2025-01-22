@@ -14,3 +14,10 @@ export function modifyMigrationsJsonMetadata(
   migrationsJson['nx-console'] = modify(migrationsJson['nx-console']);
   writeFileSync(migrationsJsonPath, JSON.stringify(migrationsJson, null, 2));
 }
+
+export function readMigrationsJsonMetadata(): MigrationsJsonMetadata {
+  const workspacePath = getNxWorkspacePath();
+  const migrationsJsonPath = join(workspacePath, 'migrations.json');
+  const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
+  return migrationsJson['nx-console'];
+}

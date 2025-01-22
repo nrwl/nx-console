@@ -5,7 +5,7 @@ import {
   TerminalLinkContext,
   TerminalLinkProvider,
 } from 'vscode';
-import { viewDiff } from './migrate-commands';
+import { viewPackageJsonDiff } from './git-extension/view-diff';
 
 export class DiffEditorTerminalLinkProvider implements TerminalLinkProvider {
   provideTerminalLinks(
@@ -24,6 +24,6 @@ export class DiffEditorTerminalLinkProvider implements TerminalLinkProvider {
   }
 
   handleTerminalLink(_: TerminalLink): ProviderResult<void> {
-    viewDiff();
+    viewPackageJsonDiff();
   }
 }

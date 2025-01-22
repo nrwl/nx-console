@@ -40,6 +40,9 @@ export function initMigrate(context: ExtensionContext): void {
     commands.registerCommand('nxMigrate.refresh', () => {
       updateWorkspaceData(actor);
       updateLatestNxVersion(actor);
+    }),
+    commands.registerCommand('nxMigrate.refreshWebview', () => {
+      migrateWebview.refresh();
     })
   );
 
