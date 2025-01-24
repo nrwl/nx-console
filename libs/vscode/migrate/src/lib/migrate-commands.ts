@@ -11,12 +11,14 @@ import {
 } from 'vscode';
 import { startMigration } from './commands/start-migration';
 import {
+  importMigrateUIApi,
   modifyMigrationsJsonMetadata,
   readMigrationsJsonMetadata,
 } from './commands/utils';
 import { GitExtension } from './git-extension/git';
 import { viewPackageJsonDiff } from './git-extension/view-diff';
 import { MigrateWebview } from './migrate-webview';
+import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -35,6 +37,15 @@ export function registerCommands(
     commands.registerCommand('nxMigrate.viewDiff', async () => {
       await viewPackageJsonDiff();
     })
+  );
+}
+
+export async function skipMigration(migration: MigrationDetailsWithId) {
+  const workspacePath = getNxWorkspacePath();
+  const migrateUIApi = await importMigrateUIApi(workspacePath);
+  migrateUIApi.modifyMigrationsJsonMetadata(
+    workspacePath,
+    migrateUIApi.addSkippedMigration(migration.id)
   );
 }
 
