@@ -18,14 +18,14 @@ export async function readAndParseJson(filePath: string) {
     const result = parseJson(content, errors);
 
     if (errors.length > 0) {
-      for (const { error, offset } of errors) {
-        // TODO(cammisuli): output this generically
-        // getOutputChannel().appendLine(
-        //   `${printParseErrorCode(
-        //     error
-        //   )} in JSON at position ${offset} in ${filePath}`
-        // );
-      }
+      // for (const { error, offset } of errors) {
+      // TODO(cammisuli): output this generically
+      // getOutputChannel().appendLine(
+      //   `${printParseErrorCode(
+      //     error
+      //   )} in JSON at position ${offset} in ${filePath}`
+      // );
+      // }
     }
 
     return result;
