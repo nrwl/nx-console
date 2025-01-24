@@ -3,7 +3,8 @@ import { execSync } from 'child_process';
 import { existsSync, readFileSync, rmSync } from 'fs';
 import { join } from 'path';
 import { window, commands } from 'vscode';
-import { readMigrationsJsonMetadata } from './utils';
+import { importMigrateUIApi, readMigrationsJsonMetadata } from './utils';
+import { logAndShowError } from '@nx-console/vscode-output-channels';
 
 export async function finishMigration(squashCommits: boolean) {
   window
@@ -19,51 +20,31 @@ export async function finishMigration(squashCommits: boolean) {
     .then(async (result) => {
       if (result === 'Finish Migration') {
         const workspacePath = getNxWorkspacePath();
-        const migrationsJsonPath = join(workspacePath, 'migrations.json');
-
         const migrationsJsonMetadata = readMigrationsJsonMetadata();
-        const initialGitRef = migrationsJsonMetadata.initialGitRef.ref;
-        const targetVersion = migrationsJsonMetadata.targetVersion;
 
         const commitMessage = squashCommits
           ? await window.showInputBox({
               prompt: 'Enter a commit message',
-              value: `chore: migrate nx to ${targetVersion}`,
+              value: `chore: migrate nx to ${migrationsJsonMetadata.targetVersion}`,
             })
-          : `chore: migrate nx to ${targetVersion}`;
+          : `chore: migrate nx to ${migrationsJsonMetadata.targetVersion}`;
 
         if (!commitMessage) {
           return;
         }
 
-        if (existsSync(migrationsJsonPath)) {
-          rmSync(migrationsJsonPath);
-        }
-        execSync('git add .', {
-          cwd: workspacePath,
-          encoding: 'utf-8',
-        });
-
-        execSync(`git commit -m "${commitMessage}" --no-verify`, {
-          cwd: workspacePath,
-          encoding: 'utf-8',
-        });
-
-        if (squashCommits && initialGitRef) {
-          try {
-            execSync(`git reset --soft ${initialGitRef}`, {
-              cwd: workspacePath,
-              encoding: 'utf-8',
-            });
-
-            execSync(`git commit -m "${commitMessage}" --no-verify`, {
-              cwd: workspacePath,
-              encoding: 'utf-8',
-            });
-          } catch (e) {
-            window.showErrorMessage(`Failed to squash commits: ${e.message}`);
-            return;
-          }
+        try {
+          const migrateUiApi = await importMigrateUIApi(workspacePath);
+          migrateUiApi.finishMigrationProcess(
+            workspacePath,
+            squashCommits,
+            commitMessage
+          );
+        } catch (e) {
+          logAndShowError(
+            'Failed to finish migration process',
+            `Failed to finish migration process: ${e}`
+          );
         }
 
         commands.executeCommand('nxMigrate.close');

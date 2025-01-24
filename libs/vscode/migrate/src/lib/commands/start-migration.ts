@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { major, rcompare } from 'semver';
 import { QuickPickItem, tasks, window } from 'vscode';
+import { importMigrateUIApi } from './utils';
 
 export async function startMigration(custom = false) {
   const nxVersion = await getNxVersion();
@@ -68,7 +69,7 @@ export async function startMigration(custom = false) {
     flags,
     // TODO: remove this once actual version is released
     env: {
-      NX_MIGRATE_CLI_VERSION: '0.0.0-pr-29720-6055188',
+      NX_MIGRATE_CLI_VERSION: '21.0.24-local',
     },
   });
   await tasks.executeTask(task);
@@ -82,36 +83,10 @@ export async function startMigration(custom = false) {
   });
 
   // TODO: Figure out way to check if the task ended properly and differentiate between user cancelled and no migrations needed
-
-  const parsedMigrationsJson = JSON.parse(
-    readFileSync(migrationsJsonPath, 'utf-8')
-  );
-
-  try {
-    const gitRef = execSync('git rev-parse HEAD', {
-      cwd: workspacePath,
-      encoding: 'utf-8',
-    }).trim();
-
-    const gitSubject = execSync('git log -1 --pretty=%s', {
-      cwd: workspacePath,
-      encoding: 'utf-8',
-    }).trim();
-
-    parsedMigrationsJson['nx-console'] = {
-      initialGitRef: {
-        ref: gitRef,
-        subject: gitSubject,
-      },
-      targetVersion: versionToMigrateTo,
-    };
-  } catch (e) {
-    parsedMigrationsJson['nx-console'] = {};
-  }
-
-  writeFileSync(
-    migrationsJsonPath,
-    JSON.stringify(parsedMigrationsJson, null, 2)
+  const migrateUiApi = await importMigrateUIApi(workspacePath);
+  migrateUiApi.recordInitialMigrationMetadata(
+    workspacePath,
+    versionToMigrateTo
   );
 }
 
