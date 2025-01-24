@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/nx-version"
-    },
-    {
       "path": "../../libs/shared/generate-ui-types"
     },
     {
