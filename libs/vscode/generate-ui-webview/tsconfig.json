@@ -4,64 +4,22 @@
   "include": [],
   "references": [
     {
-      "path": "../nx-config-decoration"
-    },
-    {
-      "path": "../tasks"
-    },
-    {
-      "path": "../telemetry"
-    },
-    {
-      "path": "../nx-cloud-view"
-    },
-    {
-      "path": "../nx-project-view"
-    },
-    {
-      "path": "../verify"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../../shared/nx-console-plugins"
-    },
-    {
-      "path": "../../language-server/types"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
       "path": "../configuration"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../../shared/file-system"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/nx-version"
     },
     {
       "path": "../../shared/generate-ui-types"
     },
     {
-      "path": "../../shared/schema"
+      "path": "../telemetry"
+    },
+    {
+      "path": "../tasks"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../nx-project-view"
     },
     {
       "path": "../nx-cli-quickpicks"

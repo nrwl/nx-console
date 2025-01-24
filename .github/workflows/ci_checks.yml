@@ -126,5 +126,7 @@ jobs:
           cache: gradle
 
       # There's no need to check formatting, linting & typecheck again on windows
-      - run: yarn nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3
+      - run: yarn nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3 --verbose
         timeout-minutes: 45
+        env:
+          NX_VERBOSE_LOGGING: true

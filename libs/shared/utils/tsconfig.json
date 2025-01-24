@@ -4,13 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../types"
-    },
-    {
       "path": "../schema"
     },
     {
-      "path": "../nx-version"
+      "path": "../types"
     },
     {
       "path": "../npm"

@@ -15,64 +15,22 @@
   ],
   "references": [
     {
-      "path": "../nx-config-decoration/tsconfig.lib.json"
-    },
-    {
-      "path": "../tasks/tsconfig.lib.json"
-    },
-    {
-      "path": "../telemetry/tsconfig.lib.json"
-    },
-    {
-      "path": "../nx-cloud-view/tsconfig.lib.json"
-    },
-    {
-      "path": "../nx-project-view/tsconfig.lib.json"
-    },
-    {
-      "path": "../verify/tsconfig.lib.json"
-    },
-    {
-      "path": "../utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../output-channels/tsconfig.lib.json"
-    },
-    {
-      "path": "../lsp-client/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
-    },
-    {
-      "path": "../../language-server/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../nx-workspace/tsconfig.lib.json"
-    },
-    {
       "path": "../configuration/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/npm/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/file-system/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/nx-version/tsconfig.lib.json"
     },
     {
       "path": "../../shared/generate-ui-types/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/schema/tsconfig.lib.json"
+      "path": "../telemetry/tsconfig.lib.json"
+    },
+    {
+      "path": "../tasks/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-workspace/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-project-view/tsconfig.lib.json"
     },
     {
       "path": "../nx-cli-quickpicks/tsconfig.lib.json"

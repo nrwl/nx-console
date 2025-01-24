@@ -4,7 +4,19 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/graph-base"
+    },
+    {
+      "path": "../../libs/vscode/telemetry"
+    },
+    {
       "path": "../../libs/vscode/project-details"
+    },
+    {
+      "path": "../../libs/vscode/output-channels"
+    },
+    {
+      "path": "../../libs/vscode/nx-cloud-view"
     },
     {
       "path": "../../libs/vscode/nvm-tip"
@@ -13,10 +25,10 @@
       "path": "../../libs/vscode/error-diagnostics"
     },
     {
-      "path": "../../libs/vscode/typescript-plugin"
+      "path": "../../libs/language-server/types"
     },
     {
-      "path": "../../libs/vscode/graph-base"
+      "path": "../../libs/vscode/typescript-plugin"
     },
     {
       "path": "../../libs/vscode/project-graph"
@@ -28,73 +40,34 @@
       "path": "../../libs/vscode/nx-conversion"
     },
     {
+      "path": "../../libs/vscode/nx-config-decoration"
+    },
+    {
+      "path": "../../libs/vscode/lsp-client"
+    },
+    {
       "path": "../../libs/vscode/generate-ui-webview"
     },
     {
       "path": "../../libs/vscode/add-dependency"
     },
     {
-      "path": "../../libs/vscode/nx-config-decoration"
-    },
-    {
-      "path": "../../libs/vscode/nx-cloud-view"
-    },
-    {
-      "path": "../../libs/vscode/nx-project-view"
-    },
-    {
-      "path": "../../libs/vscode/telemetry"
-    },
-    {
-      "path": "../../libs/vscode/verify"
+      "path": "../../libs/shared/file-system"
     },
     {
       "path": "../../libs/vscode/utils"
     },
     {
-      "path": "../../libs/vscode/nx-cli-quickpicks"
-    },
-    {
-      "path": "../../libs/vscode/lsp-client"
-    },
-    {
-      "path": "../../libs/shared/nx-console-plugins"
-    },
-    {
-      "path": "../../libs/shared/generate-ui-types"
-    },
-    {
-      "path": "../../libs/language-server/types"
-    },
-    {
-      "path": "../../libs/vscode/nx-workspace"
-    },
-    {
       "path": "../../libs/vscode/tasks"
     },
     {
-      "path": "../../libs/vscode/output-channels"
+      "path": "../../libs/vscode/nx-project-view"
     },
     {
       "path": "../../libs/vscode/nx-commands-view"
     },
     {
       "path": "../../libs/vscode/configuration"
-    },
-    {
-      "path": "../../libs/shared/types"
-    },
-    {
-      "path": "../../libs/shared/schema"
-    },
-    {
-      "path": "../../libs/shared/nx-version"
-    },
-    {
-      "path": "../../libs/shared/npm"
-    },
-    {
-      "path": "../../libs/shared/file-system"
     },
     {
       "path": "../../libs/shared/utils"

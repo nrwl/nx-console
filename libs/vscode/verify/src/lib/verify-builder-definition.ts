@@ -63,7 +63,11 @@ export async function verifyBuilderDefinition(
   options: Array<Option>;
 }> {
   const projects = projectGraph.nodes || {};
-  const projectDef = projects[project] || {};
+  const projectDef = projects[project] || {
+    data: {
+      targets: {},
+    },
+  };
   const targetDef = projectDef.data.targets || {};
   const commandDef = targetDef[command] || {};
   const configurations = Object.keys(commandDef.configurations || {});

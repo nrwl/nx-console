@@ -4,16 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../types"
-    },
-    {
-      "path": "../schema"
-    },
-    {
       "path": "../npm"
     },
     {
-      "path": "../file-system"
+      "path": "../schema"
     },
     {
       "path": "../utils"
