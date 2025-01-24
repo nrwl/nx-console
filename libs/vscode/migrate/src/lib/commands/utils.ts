@@ -1,7 +1,10 @@
+import { importNxPackagePath } from '@nx-console/shared-npm';
 import { MigrationsJsonMetadata } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import * as migrateUiApi from 'nx/src/command-line/migrate/migrate-ui-api';
 
 export function modifyMigrationsJsonMetadata(
   modify: (
@@ -20,4 +23,17 @@ export function readMigrationsJsonMetadata(): MigrationsJsonMetadata {
   const migrationsJsonPath = join(workspacePath, 'migrations.json');
   const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
   return migrationsJson['nx-console'];
+}
+
+// tries importing the migrate ui from the local nx package but falls back to the bundled one
+export async function importMigrateUIApi(workspacePath: string) {
+  try {
+    const migrateUiApi = await importNxPackagePath<
+      typeof import('nx/src/command-line/migrate/migrate-ui-api')
+    >(workspacePath, 'src/command-line/migrate/migrate-ui-api');
+    return migrateUiApi;
+  } catch (e) {
+    // do nothing
+  }
+  return migrateUiApi;
 }

@@ -3063,6 +3063,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/cypress@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/cypress@npm:20.5.0-beta.2"
@@ -3169,6 +3170,15 @@ __metadata:
     "@nx/eslint": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/cypress@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/cypress@npm:21.0.24-local"
+  dependencies:
+    "@nx/devkit": 21.0.24-local
+    "@nx/eslint": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@phenomnomnominal/tsquery": ~5.0.1
     detect-port: ^1.5.1
     tslib: ^2.3.0
@@ -3177,6 +3187,7 @@ __metadata:
   peerDependenciesMeta:
     cypress:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3240,6 +3251,9 @@ __metadata:
     nx: ">= 19 <= 21"
   checksum: 79670d34a1a134722b21e53bd5e803c2b930494bc5431ddb9732b387bdd08757d3775d2a0aff8b6fc2d988e67c03f7f0c578ec7b5cf3d2d920edc8414c5a3b1d
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: 038969d0f2ccafe4146ce3b64dd6264678968a5bad7cd335d61ae1fadff9d6a6eb5356989d69076b6e62c8e51217d8534585d83674576a7941d905937b1928b4
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
@@ -3280,6 +3294,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3428,6 +3443,32 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/devkit@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/devkit@npm:21.0.24-local"
+  dependencies:
+    ejs: ^3.1.7
+    enquirer: ~2.3.6
+    ignore: ^5.0.4
+    minimatch: 9.0.3
+    semver: ^7.5.3
+    tmp: ~0.2.1
+    tslib: ^2.3.0
+    yargs-parser: 21.1.1
+  peerDependencies:
+    nx: ">= 19 <= 21"
+  checksum: 721f81aaf6782f179f2117c6d7267f4ef51e97a25b1168a81f030890c4041768a2c7d44a5e8bc0a4ae32d61da465e569c14b6c5ae4f5baf48b54b163e4fdc77d
+  languageName: node
+  linkType: hard
+
+"@nx/esbuild@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/esbuild@npm:21.0.24-local"
+  dependencies:
+    "@nx/devkit": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     picocolors: ^1.1.0
     tinyglobby: ^0.2.10
     tsconfig-paths: ^4.1.2
@@ -3437,6 +3478,7 @@ __metadata:
   peerDependenciesMeta:
     esbuild:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3490,13 +3532,17 @@ __metadata:
 =======
   checksum: fe31f5ace2ab7af422f5d9613850d04b39603d0a288fb5d301bc9690c65c964a413cedbeb5b054c99381eb5ea1e98c7cad75b6826a484a825c299a7551aad78e
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: adc51bffa472674d952b8724f33e46e580c1ce8674093ee7559a175efa3459b60e91b368d3317f9f80e819a854a817fbf8ed11189e185867478037ccfb686cc8
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/eslint-plugin@npm:0.0.0-pr-29720-6055188"
+"@nx/eslint-plugin@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/eslint-plugin@npm:21.0.24-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3550,6 +3596,10 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    "@nx/devkit": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@typescript-eslint/type-utils": ^8.0.0
     "@typescript-eslint/utils": ^8.0.0
     chalk: ^4.1.0
@@ -3564,6 +3614,7 @@ __metadata:
   peerDependenciesMeta:
     eslint-config-prettier:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3617,13 +3668,17 @@ __metadata:
 =======
   checksum: 598898eab25e1b6c7ce3c9feb2242ec01bf2ff31f1a0f6bf5caaa056f2c327150095037c62344f0f6f8821c19bf07a5639093e35b6279c709e63039712e34390
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: c6f67b60f166217cdb2a38500e83d8c1ace62db1b66cc64509f2c6ababbaab637c9a5619ba4ff2f41b3c8bcb5ba7dec890d9739e60e500b5bc5e4e718b13b32e
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/eslint@npm:0.0.0-pr-29720-6055188"
+"@nx/eslint@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/eslint@npm:21.0.24-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3677,6 +3732,10 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    "@nx/devkit": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     semver: ^7.5.3
     tslib: ^2.3.0
     typescript: ~5.7.2
@@ -3686,6 +3745,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3750,24 +3810,28 @@ __metadata:
 =======
   checksum: a9d31b0a9b8f44189638999b82c63352c01784ee29f675bd4c4988b78a79a4485dfeeb02976f0cc2041ac211015bbd678a3373db5715c7beefd515f8a6dab317
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: bce49836deec13eec678a59c178e3d1c95ce992f4b885787a432c5f7cff37a99312e0b2ebc82b5a4df32ef1722e3bba54bf22dacc264a51b6d20266d3f4202c9
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/gradle@npm:0.0.0-pr-29720-6055188"
+"@nx/gradle@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/gradle@npm:21.0.24-local"
   dependencies:
-    "@nx/devkit": 0.0.0-pr-29720-6055188
-  checksum: 37f7207a974cf70360512646106a8714bcf0b2c86c4edc571454b91b15c58fb083b4b56bd00fe42aeede41b2b146c0800b2c0ab8259eb6c2b02532a93064a18d
+    "@nx/devkit": 21.0.24-local
+  checksum: cbf49adee762c8eef07eb3483730783359972a84ca0da59482f8581bc72cff07289ea7155184b6759aeb77304d4019517244aef9c343a9e87d00f657fc092012
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/jest@npm:0.0.0-pr-29720-6055188"
+"@nx/jest@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/jest@npm:21.0.24-local"
   dependencies:
     "@jest/reporters": ^29.4.1
     "@jest/test-result": ^29.4.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3821,6 +3885,10 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    "@nx/devkit": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@phenomnomnominal/tsquery": ~5.0.1
     identity-obj-proxy: 3.0.0
     jest-config: ^29.4.1
@@ -3832,6 +3900,7 @@ __metadata:
     semver: ^7.5.3
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3949,6 +4018,15 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/js@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: 8cd9eb747bf17f2ac022f4fcdde626c48d189baee79a5ae059d23b70e3c69a98e5c9c4b423802de20cc3e1a045ebf9652f3b6af59f5fe2f9ded5358976870c26
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/js@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   dependencies:
     "@babel/core": ^7.23.2
     "@babel/plugin-proposal-decorators": ^7.22.7
@@ -3957,6 +4035,7 @@ __metadata:
     "@babel/preset-env": ^7.23.2
     "@babel/preset-typescript": ^7.22.5
     "@babel/runtime": ^7.22.6
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4014,6 +4093,10 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/workspace": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    "@nx/devkit": 21.0.24-local
+    "@nx/workspace": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@zkochan/js-yaml": 0.0.7
     babel-plugin-const-enum: ^1.0.1
     babel-plugin-macros: ^3.1.0
@@ -4040,6 +4123,7 @@ __metadata:
   peerDependenciesMeta:
     verdaccio:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4103,22 +4187,26 @@ __metadata:
 =======
   checksum: 5eb77cfb1aed43418ad7b23931a6b83abb613e8a698ecd1e4cfa6dac5d93eb0abd1d5248a25a061800a6cc9f1cfd50699784ca42dccd90224c082e2c16113baa
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: cfe3526dfcb18293123b80bb78111d211ede092ace24005c5775b37958a15abd6db19598135b81028974832c6fb38491ae3bd115d940b05a811d07395d0c7839
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
-"@nx/node@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/node@npm:0.0.0-pr-29720-6055188"
+"@nx/node@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/node@npm:21.0.24-local"
   dependencies:
-    "@nx/devkit": 0.0.0-pr-29720-6055188
-    "@nx/eslint": 0.0.0-pr-29720-6055188
-    "@nx/jest": 0.0.0-pr-29720-6055188
-    "@nx/js": 0.0.0-pr-29720-6055188
+    "@nx/devkit": 21.0.24-local
+    "@nx/eslint": 21.0.24-local
+    "@nx/jest": 21.0.24-local
+    "@nx/js": 21.0.24-local
     tslib: ^2.3.0
-  checksum: 66bfa1a4d26c9d9d14340442734593d729913982586b70abe58c44de63a466d6dda8a24f079af20b83a10a1efd7a9749d4eb2b29609a01fb3ce26c34f79d022f
+  checksum: d52745f538c9b7eb04e9486dd33602ea0f821a3379ab435eab4001f11c3eb1eb82d5b5ef8937b376a9d39715d85d748b91a86ec4ed184653c769adc27ef9eb38
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4183,10 +4271,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-darwin-arm64@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-darwin-arm64@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-darwin-arm64@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4256,10 +4350,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-darwin-x64@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-darwin-x64@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-darwin-x64@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4329,10 +4429,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-freebsd-x64@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-freebsd-x64@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-freebsd-x64@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4402,10 +4508,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4475,10 +4587,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-linux-arm64-gnu@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-linux-arm64-gnu@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4548,10 +4666,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-linux-arm64-musl@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-linux-arm64-musl@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-linux-arm64-musl@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4621,10 +4745,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-linux-x64-gnu@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-linux-x64-gnu@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-linux-x64-gnu@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4694,10 +4824,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-linux-x64-musl@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-linux-x64-musl@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-linux-x64-musl@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4767,10 +4903,16 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-win32-arm64-msvc@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-win32-arm64-msvc@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4840,6 +4982,11 @@ __metadata:
   version: 0.0.0-pr-29720-6055188
   resolution: "@nx/nx-win32-x64-msvc@npm:0.0.0-pr-29720-6055188"
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/nx-win32-x64-msvc@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/nx-win32-x64-msvc@npm:21.0.24-local"
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -5003,6 +5150,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/web@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/web@npm:20.5.0-beta.2"
@@ -5097,10 +5245,19 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+"@nx/web@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/web@npm:21.0.24-local"
+  dependencies:
+    "@nx/devkit": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     detect-port: ^1.5.1
     http-server: ^14.1.0
     picocolors: ^1.1.0
     tslib: ^2.3.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5155,14 +5312,18 @@ __metadata:
 =======
   checksum: 81c6bec9ffea95eafc88a5bca78611e40ed482eeb7878c1348b26146bbd572dc2cb864d20b1161d7b9d481a4fc9aac514f839e190a8d4df869f8fcbcfc16a9c4
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: 4aa67e33fd839695a500ff6b6f2804153c9ff24f431783e8117a75559ecac061715a92e2f8d263d60422260b0c913022084f27799ce1672031e5ca3c51cf0673
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/webpack@npm:0.0.0-pr-29720-6055188"
+"@nx/webpack@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/webpack@npm:21.0.24-local"
   dependencies:
     "@babel/core": ^7.23.2
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5216,6 +5377,10 @@ __metadata:
     "@nx/devkit": 0.0.0-pr-29720-6055188
     "@nx/js": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    "@nx/devkit": 21.0.24-local
+    "@nx/js": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@phenomnomnominal/tsquery": ~5.0.1
     ajv: ^8.12.0
     autoprefixer: ^10.4.9
@@ -5250,6 +5415,7 @@ __metadata:
     webpack-dev-server: ^5.0.4
     webpack-node-externals: ^3.0.0
     webpack-subresource-integrity: ^5.1.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5308,19 +5474,23 @@ __metadata:
 =======
   checksum: d74f681de5cac1ab31d9defbd13eecd19fb6f2a13cb1606bf631b1266d8670caeeb97c607941faab11ffd4b0cca2c197738c938614cb0ab4c0d279c6806efd6d
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: b76a79aa39786f9cd5123f2e2c948c4f6a9806e5309ce03e253af70ced808dd27dc99fb3157b1f92bc222d69c8d152f5876be7f449481cffe6dff66c2824a6e4
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:0.0.0-pr-29720-6055188":
-  version: 0.0.0-pr-29720-6055188
-  resolution: "@nx/workspace@npm:0.0.0-pr-29720-6055188"
+"@nx/workspace@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "@nx/workspace@npm:21.0.24-local"
   dependencies:
-    "@nx/devkit": 0.0.0-pr-29720-6055188
+    "@nx/devkit": 21.0.24-local
     chalk: ^4.1.0
     enquirer: ~2.3.6
-    nx: 0.0.0-pr-29720-6055188
+    nx: 21.0.24-local
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5363,6 +5533,9 @@ __metadata:
 =======
   checksum: eefccd452dc50666db8b3a0bf25d6d3ffe83b812cf1d87d85e0f8eaaf39d9ee319f3fe57a1bafb145174433c8f314ef2a21829680783adce944084be7e498f71
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: fd78ca78f304f6f51f0005146052f9caca8472081a0e231ea7d4f1e8b2776b2cca9a7b75d284246d23ee95d69814ca782344288a33638d225bbf6b6818c6869b
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
@@ -15737,6 +15910,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
     "@nx/esbuild": 20.5.0-beta.2
@@ -15939,6 +16113,23 @@ __metadata:
     "@nx/webpack": 0.0.0-pr-29720-6055188
     "@nx/workspace": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    "@nx/cypress": 21.0.24-local
+    "@nx/devkit": 21.0.24-local
+    "@nx/esbuild": 21.0.24-local
+    "@nx/eslint": 21.0.24-local
+    "@nx/eslint-plugin": 21.0.24-local
+    "@nx/gradle": 21.0.24-local
+    "@nx/jest": 21.0.24-local
+    "@nx/js": 21.0.24-local
+    "@nx/node": 21.0.24-local
+    "@nx/powerpack-conformance": 1.1.1
+    "@nx/powerpack-enterprise-cloud": 1.1.1
+    "@nx/powerpack-owners": 1.1.1
+    "@nx/web": 21.0.24-local
+    "@nx/webpack": 21.0.24-local
+    "@nx/workspace": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -16004,6 +16195,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nx: 20.5.0-beta.2
     ovsx: ^0.10.1
     prettier: ^3.5.1
@@ -16040,6 +16232,9 @@ __metadata:
 =======
     nx: 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+    nx: 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
@@ -16070,6 +16265,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -16283,6 +16479,23 @@ __metadata:
     "@nx/nx-win32-arm64-msvc": 0.0.0-pr-29720-6055188
     "@nx/nx-win32-x64-msvc": 0.0.0-pr-29720-6055188
 >>>>>>> 6cefc173 (use pr release)
+=======
+"nx@npm:21.0.24-local":
+  version: 21.0.24-local
+  resolution: "nx@npm:21.0.24-local"
+  dependencies:
+    "@napi-rs/wasm-runtime": 0.2.4
+    "@nx/nx-darwin-arm64": 21.0.24-local
+    "@nx/nx-darwin-x64": 21.0.24-local
+    "@nx/nx-freebsd-x64": 21.0.24-local
+    "@nx/nx-linux-arm-gnueabihf": 21.0.24-local
+    "@nx/nx-linux-arm64-gnu": 21.0.24-local
+    "@nx/nx-linux-arm64-musl": 21.0.24-local
+    "@nx/nx-linux-x64-gnu": 21.0.24-local
+    "@nx/nx-linux-x64-musl": 21.0.24-local
+    "@nx/nx-win32-arm64-msvc": 21.0.24-local
+    "@nx/nx-win32-x64-msvc": 21.0.24-local
+>>>>>>> bd7f8732 (use migrate ui api from nx)
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
@@ -16359,6 +16572,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 0ef4860fb9a74cbbf7bfb25353909042ead8d01915419eec153daee0508801264fd91dcc34bbf6cc4250e28925d9b319c7964d41910e44cd0ac151fb77a306b2
 =======
   checksum: f33ff06bf3aabbaed007706d58e54a789c1e4dbbd8e58f4e73929251de0e44e0e3dc79b19149160c6b1126f39987f8c1be82e9c0b62167b28411b2f8d5e06835
@@ -16393,6 +16607,9 @@ __metadata:
 =======
   checksum: d125fb06594cf7e1d56360bc07eac23c2fe8e90e9efc502c5ba1c70461e5205c0918e23ff3456728268a872bb930be993ea0412850210cc9854bb776dfffa25f
 >>>>>>> 6cefc173 (use pr release)
+=======
+  checksum: 1cad108964e4581813ed96f1d6a767882ac6aa3602a60107a1198e2ad758c29d5180fec85754a5bde666aa393811061151c940f5aa9e2d7a4024a51c9200f56b
+>>>>>>> bd7f8732 (use migrate ui api from nx)
   languageName: node
   linkType: hard
 
