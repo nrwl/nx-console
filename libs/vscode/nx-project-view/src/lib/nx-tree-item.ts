@@ -14,6 +14,7 @@ export class NxTreeItem extends TreeItem {
     super(item.label, item.collapsible);
 
     this.id = item.id;
+    this.description = item.description
     this.contextValue = item.contextValue;
 
     if (item.contextValue === 'folder' || item.contextValue === 'project') {
