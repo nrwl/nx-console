@@ -51,7 +51,7 @@ export async function getStartupMessage(
   }
 }
 
-async function loadPlugins(
+export async function loadPlugins(
   workspacePath: string
 ): Promise<NxConsolePluginsDefinition> {
   let workspacePlugins: NxConsolePluginsDefinition | undefined = undefined;
@@ -80,5 +80,9 @@ async function loadPlugins(
       ...(internalPlugins.startupMessageFactories ?? []),
       ...(workspacePlugins?.startupMessageFactories ?? []),
     ],
+    projectViewItemProcessors: [
+      ...(internalPlugins.projectViewItemProcessors ?? []),
+      ...(workspacePlugins?.projectViewItemProcessors ?? []),      
+    ]
   };
 }

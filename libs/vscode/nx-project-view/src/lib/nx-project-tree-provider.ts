@@ -16,6 +16,11 @@ import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { ListView, ListViewItem } from './views/nx-project-list-view';
 import { TreeView, TreeViewItem } from './views/nx-project-tree-view';
+// error: a project tagged with "type:vscode" can only depend on libs tagged with "type:shared", "type:vscode"
+import { loadPlugins } from "@nx-console/language-server-workspace";
+// ===
+import { NxConsolePluginsDefinition } from '@nx-console/shared-nx-console-plugins';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 
 export type ViewItem = ListViewItem | TreeViewItem;
 
@@ -31,6 +36,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly treeView: TreeView = new TreeView();
 
   private workspaceData: NxWorkspace | undefined = undefined;
+  private plugins: NxConsolePluginsDefinition | undefined = undefined
 
   constructor(context: ExtensionContext) {
     super();
@@ -68,6 +74,10 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       this.listView.workspaceData = this.workspaceData;
     }
 
+    if (!this.plugins) {
+      this.plugins = await loadPlugins(getNxWorkspacePath());
+    }
+
     let items: (TreeViewItem | ListViewItem)[] | undefined;
 
     if (this.shouldUseTreeView()) {
@@ -85,7 +95,16 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       items = await this.listView.getChildren(element?.item as ListViewItem);
     }
     if (!items) return;
-    return items.map((item) => new NxTreeItem(item));
+
+    let nxTreeItems = items.map((item) => new NxTreeItem(item))
+
+    if (this.plugins.projectViewItemProcessors) {
+      this.plugins.projectViewItemProcessors.forEach( (processor) => {
+        nxTreeItems = nxTreeItems.map( item => processor(item,this.workspaceData))
+      })
+    }
+
+    return nxTreeItems;
   }
 
   private shouldUseTreeView() {

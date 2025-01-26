@@ -11,6 +11,7 @@ import { TreeItemCollapsibleState } from 'vscode';
 
 interface BaseViewItem<Context extends string> {
   id: string;
+  description?: string;
   contextValue: Context;
   label: string;
   collapsible: TreeItemCollapsibleState;
