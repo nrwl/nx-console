@@ -17,7 +17,7 @@ export async function runSingleMigration(
     async () => {
       // TODO: remove this once actual version is released
       //       the nx implementation ignores custom registries here
-      process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.31-local';
+      process.env['NX_MIGRATE_CLI_VERSION'] = '21.0.34-local';
       commands.executeCommand('nxMigrate.refreshWebview');
 
       const migrateUiApi = await importMigrateUIApi(workspacePath);

@@ -14,7 +14,7 @@ import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { coerce } from 'semver';
 import { MigrateWebview } from './migrate-webview';
-import { registerCommands } from './migrate-commands';
+import { registerCommands } from './commands/migrate-commands';
 import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server-types';
 import { execSync } from 'child_process';
 import { DiffEditorTerminalLinkProvider } from './diff-editor-terminal-link-provider';

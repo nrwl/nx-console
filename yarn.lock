@@ -3067,6 +3067,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/cypress@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/cypress@npm:20.5.0-beta.2"
@@ -3209,6 +3210,15 @@ __metadata:
     "@nx/eslint": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+"@nx/cypress@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/cypress@npm:21.0.34-local"
+  dependencies:
+    "@nx/devkit": 21.0.34-local
+    "@nx/eslint": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@phenomnomnominal/tsquery": ~5.0.1
     detect-port: ^1.5.1
     tslib: ^2.3.0
@@ -3217,6 +3227,7 @@ __metadata:
   peerDependenciesMeta:
     cypress:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3296,6 +3307,9 @@ __metadata:
 =======
   checksum: fc97faeb4fbe20c5e4afe159f3db0a79fac05972a10b40c9b69c72cadf9b66a69341424f266ee7ae73a8262716ef1ea62c350c368c04d2425c14c74e2b4818a0
 >>>>>>> f1642428 (update)
+=======
+  checksum: 0c00bea94bfda13c7a6279aac79572fe9426a1171aa7766c41a2829476190363f640d7d39717d0ed93403fc535df6e8208b316413c08fec9df6aaf0a445a1df6
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
@@ -3336,6 +3350,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3507,6 +3522,11 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/devkit@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/devkit@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/devkit@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   dependencies:
     ejs: ^3.1.7
     enquirer: ~2.3.6
@@ -3518,14 +3538,15 @@ __metadata:
     yargs-parser: 21.1.1
   peerDependencies:
     nx: ">= 19 <= 21"
-  checksum: bf792dcb555977bbf7b21df1c12aab4cd4371c8b5ecfca410b55286932c5898d013468460a5d4684cefa4a8f08f39086eed3fd4194168db94e26798253c78736
+  checksum: b255ef82e428ee4abd0f4da589292e56741673289af0fb0640ea13e6badfa58356d949fd2c63deef42fcbbca45028a9b61030c307c60e88c72a78df91a97569b
   languageName: node
   linkType: hard
 
-"@nx/esbuild@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/esbuild@npm:21.0.31-local"
+"@nx/esbuild@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/esbuild@npm:21.0.34-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3544,6 +3565,10 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/devkit": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     picocolors: ^1.1.0
     tinyglobby: ^0.2.10
     tsconfig-paths: ^4.1.2
@@ -3553,6 +3578,7 @@ __metadata:
   peerDependenciesMeta:
     esbuild:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3622,13 +3648,17 @@ __metadata:
 =======
   checksum: 49597737a433f053f89e2608bedb30d8a52d1e9fcb57eecd920517b485f851bb9e9e531da67094b00a5ac73d1eaa33f2c13097de11e61d3f82e7a76e21f1f21a
 >>>>>>> f1642428 (update)
+=======
+  checksum: 4a0d0bf8b8906baf761640ec4830917501a17f677146dbd68058714f8711671bd4c34cd29e3171cf1f18b0366a09f824b2a43ee364a88afeef31538bb6ff095f
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/eslint-plugin@npm:21.0.31-local"
+"@nx/eslint-plugin@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/eslint-plugin@npm:21.0.34-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3702,6 +3732,10 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/devkit": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@typescript-eslint/type-utils": ^8.0.0
     "@typescript-eslint/utils": ^8.0.0
     chalk: ^4.1.0
@@ -3716,6 +3750,7 @@ __metadata:
   peerDependenciesMeta:
     eslint-config-prettier:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3785,13 +3820,17 @@ __metadata:
 =======
   checksum: 03e9235612820749dfe60fb5b335197d04d2a839d39a2eb152b59923cc18b37365401eb726387e845e63ffc3285164d316e31a07f6eb60faa8f9659f25d476af
 >>>>>>> f1642428 (update)
+=======
+  checksum: dad6e2626072b47f26aa96023f9ccbc6c69ea9603607d4cff1572855ddf72cc7baa9369e3701dcfdbb8b812488a467e7ff5f45d34cd46417e933e16698413784
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/eslint@npm:21.0.31-local"
+"@nx/eslint@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/eslint@npm:21.0.34-local"
   dependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3865,6 +3904,10 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/devkit": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     semver: ^7.5.3
     tslib: ^2.3.0
     typescript: ~5.7.2
@@ -3874,6 +3917,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -3954,24 +3998,28 @@ __metadata:
 =======
   checksum: d8657d364eca54a61129d6470eae4dba517b7deedbd27b483980e07237aef903e02bd443f39d1c9ad2961ec84d608b05a79f21cd489f7971fd69bf60eb57d019
 >>>>>>> f1642428 (update)
+=======
+  checksum: c895edd06df5bcceb20d5918fdce46cd3b5aec676de436ce293b96a54ef0a2ed75749edc9b0ce7e4e89e5124109783c93f45d7ec171c724f28774efef28db947
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/gradle@npm:21.0.31-local"
+"@nx/gradle@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/gradle@npm:21.0.34-local"
   dependencies:
-    "@nx/devkit": 21.0.31-local
-  checksum: 9c4ab1e9e66f453411e794d26ebaa5d14f153853dfb63278204eea5158feaad099bf6fecca9fd66d0b67ca39b8153257bfeff9806895a05785465b88b6cd5bc6
+    "@nx/devkit": 21.0.34-local
+  checksum: ef6d5484422078a5464410b65d07adb5eafa505d1e5b397c7b4c790e83b22b0b4727454eafd27f32db545284adb9190c6c0fbb9a023163d3b92235c6528fe5ae
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/jest@npm:21.0.31-local"
+"@nx/jest@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/jest@npm:21.0.34-local"
   dependencies:
     "@jest/reporters": ^29.4.1
     "@jest/test-result": ^29.4.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4045,6 +4093,10 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/devkit": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@phenomnomnominal/tsquery": ~5.0.1
     identity-obj-proxy: 3.0.0
     jest-config: ^29.4.1
@@ -4056,6 +4108,7 @@ __metadata:
     semver: ^7.5.3
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4213,6 +4266,15 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/js@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+  checksum: e90902052f604319e78b55aeb00b1b6a305f6244351c41d481e703ffb379f4ca45d115eb425ccf530a06f3ff84379045a2ec2f7cc77117ad397ba5db6c07f0af
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/js@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   dependencies:
     "@babel/core": ^7.23.2
     "@babel/plugin-proposal-decorators": ^7.22.7
@@ -4221,6 +4283,7 @@ __metadata:
     "@babel/preset-env": ^7.23.2
     "@babel/preset-typescript": ^7.22.5
     "@babel/runtime": ^7.22.6
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4298,6 +4361,10 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/workspace": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/devkit": 21.0.34-local
+    "@nx/workspace": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@zkochan/js-yaml": 0.0.7
     babel-plugin-const-enum: ^1.0.1
     babel-plugin-macros: ^3.1.0
@@ -4324,6 +4391,7 @@ __metadata:
   peerDependenciesMeta:
     verdaccio:
       optional: true
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4403,22 +4471,26 @@ __metadata:
 =======
   checksum: 385fdfdb6d64b6a48f4321f1d2b54880acf53f0c2ff243482b5066afbd0e919e0eefb0e9c2559896db98586de584981bc35d00e191ed6bb6310acc55761a35a2
 >>>>>>> f1642428 (update)
+=======
+  checksum: bd26e9415c6f79a54c52699bff48430c7b7b6550fa183c6c09350ab3dc65f967762f0f88780efcefaca4934aa3864a2ca135dcbe20482d60c76d0ca5231670d6
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
-"@nx/node@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/node@npm:21.0.31-local"
+"@nx/node@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/node@npm:21.0.34-local"
   dependencies:
-    "@nx/devkit": 21.0.31-local
-    "@nx/eslint": 21.0.31-local
-    "@nx/jest": 21.0.31-local
-    "@nx/js": 21.0.31-local
+    "@nx/devkit": 21.0.34-local
+    "@nx/eslint": 21.0.34-local
+    "@nx/jest": 21.0.34-local
+    "@nx/js": 21.0.34-local
     tslib: ^2.3.0
-  checksum: c2caab5ec4a4ca6cd14780033cd6432c0b097c8bd717c83be2fdef9d0ed87cd6fc065e623d13f4200cb51b80a7ee1ec203b1d22bb47bedfc5177d5539b748eec
+  checksum: 3fb734bfb0e981e6808d84264730321fa3691f52183578501180a2590d1e7265bc2bf92be4d776728561eb2c74a6461a3d05d3053980fad5a80713657b3994ec
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4507,10 +4579,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-darwin-arm64@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-darwin-arm64@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-darwin-arm64@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4604,10 +4682,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-darwin-x64@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-darwin-x64@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-darwin-x64@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4701,10 +4785,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-freebsd-x64@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-freebsd-x64@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-freebsd-x64@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4798,10 +4888,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4895,10 +4991,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-linux-arm64-gnu@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -4992,10 +5094,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-linux-arm64-musl@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-linux-arm64-musl@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-linux-arm64-musl@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5089,10 +5197,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-linux-x64-gnu@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-linux-x64-gnu@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-linux-x64-gnu@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5186,10 +5300,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-linux-x64-musl@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-linux-x64-musl@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-linux-x64-musl@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5283,10 +5403,16 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-win32-arm64-msvc@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5380,6 +5506,11 @@ __metadata:
   version: 21.0.31-local
   resolution: "@nx/nx-win32-x64-msvc@npm:21.0.31-local"
 >>>>>>> f1642428 (update)
+=======
+"@nx/nx-win32-x64-msvc@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/nx-win32-x64-msvc@npm:21.0.34-local"
+>>>>>>> ef845f3b (open implementation file on click)
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -5547,6 +5678,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@nx/web@npm:20.5.0-beta.2":
   version: 20.5.0-beta.2
   resolution: "@nx/web@npm:20.5.0-beta.2"
@@ -5673,10 +5805,19 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+"@nx/web@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/web@npm:21.0.34-local"
+  dependencies:
+    "@nx/devkit": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     detect-port: ^1.5.1
     http-server: ^14.1.0
     picocolors: ^1.1.0
     tslib: ^2.3.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5747,14 +5888,18 @@ __metadata:
 =======
   checksum: 717dce3796ee47fd61fc35e30b663bcc63e314238af486f4f5f07e9a38276985364dce26791325908888759778f4099eae7c5a18d6000aa8e51eb1bf2dde87af
 >>>>>>> f1642428 (update)
+=======
+  checksum: e504fa61bea616b313c0c69fbb8fd9d9c7568be05ec8a6292139cd4ba5ff747e0780e898f45bfe5e653c36e5c506389f727bc3e1c9a4b35d87c5ac83648d9813
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/webpack@npm:21.0.31-local"
+"@nx/webpack@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/webpack@npm:21.0.34-local"
   dependencies:
     "@babel/core": ^7.23.2
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5828,6 +5973,10 @@ __metadata:
     "@nx/devkit": 21.0.31-local
     "@nx/js": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/devkit": 21.0.34-local
+    "@nx/js": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@phenomnomnominal/tsquery": ~5.0.1
     ajv: ^8.12.0
     autoprefixer: ^10.4.9
@@ -5862,6 +6011,7 @@ __metadata:
     webpack-dev-server: ^5.0.4
     webpack-node-externals: ^3.0.0
     webpack-subresource-integrity: ^5.1.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -5936,19 +6086,23 @@ __metadata:
 =======
   checksum: f761f1ee16360c0a6aa987c812e93a1f71ed04f084a52522f4eac4d2b204065c1d8f3893a1e899735c0984c1cff6f87a5db2ff4cceaf198d96911c0ddd283c35
 >>>>>>> f1642428 (update)
+=======
+  checksum: eeb2e50401b3638496eff305df714962ec37012b088df9e22c65503ef0b612c175a29d3f8affbec88250c07b8949a7807975485bae1af47a021701470acb5612
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:21.0.31-local":
-  version: 21.0.31-local
-  resolution: "@nx/workspace@npm:21.0.31-local"
+"@nx/workspace@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "@nx/workspace@npm:21.0.34-local"
   dependencies:
-    "@nx/devkit": 21.0.31-local
+    "@nx/devkit": 21.0.34-local
     chalk: ^4.1.0
     enquirer: ~2.3.6
-    nx: 21.0.31-local
+    nx: 21.0.34-local
     tslib: ^2.3.0
     yargs-parser: 21.1.1
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -6007,6 +6161,9 @@ __metadata:
 =======
   checksum: 7d631a6a5b98670721c34dc4a2355402d219e0a882d004012e301e1fc92ed6072c7a6efb75141ac8dbd2c746039dfab9b1931e82ab0b5fa1ae37a541300b213c
 >>>>>>> f1642428 (update)
+=======
+  checksum: ae8f31d9965aa58a1600ecc950f69afa0f55f51afd8ed097213c3727ca8e48cf93ded61270b6676485283a713272a774f6079cf30251b430fd1a1155a880ac27
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 
@@ -16385,6 +16542,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
     "@nx/esbuild": 20.5.0-beta.2
@@ -16655,6 +16813,23 @@ __metadata:
     "@nx/webpack": 21.0.31-local
     "@nx/workspace": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    "@nx/cypress": 21.0.34-local
+    "@nx/devkit": 21.0.34-local
+    "@nx/esbuild": 21.0.34-local
+    "@nx/eslint": 21.0.34-local
+    "@nx/eslint-plugin": 21.0.34-local
+    "@nx/gradle": 21.0.34-local
+    "@nx/jest": 21.0.34-local
+    "@nx/js": 21.0.34-local
+    "@nx/node": 21.0.34-local
+    "@nx/powerpack-conformance": 1.1.1
+    "@nx/powerpack-enterprise-cloud": 1.1.1
+    "@nx/powerpack-owners": 1.1.1
+    "@nx/web": 21.0.34-local
+    "@nx/webpack": 21.0.34-local
+    "@nx/workspace": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -16724,6 +16899,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     nx: 20.5.0-beta.2
     ovsx: ^0.10.1
     prettier: ^3.5.1
@@ -16772,6 +16948,9 @@ __metadata:
 =======
     nx: 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+    nx: 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
@@ -16802,6 +16981,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -17087,6 +17267,23 @@ __metadata:
     "@nx/nx-win32-arm64-msvc": 21.0.31-local
     "@nx/nx-win32-x64-msvc": 21.0.31-local
 >>>>>>> f1642428 (update)
+=======
+"nx@npm:21.0.34-local":
+  version: 21.0.34-local
+  resolution: "nx@npm:21.0.34-local"
+  dependencies:
+    "@napi-rs/wasm-runtime": 0.2.4
+    "@nx/nx-darwin-arm64": 21.0.34-local
+    "@nx/nx-darwin-x64": 21.0.34-local
+    "@nx/nx-freebsd-x64": 21.0.34-local
+    "@nx/nx-linux-arm-gnueabihf": 21.0.34-local
+    "@nx/nx-linux-arm64-gnu": 21.0.34-local
+    "@nx/nx-linux-arm64-musl": 21.0.34-local
+    "@nx/nx-linux-x64-gnu": 21.0.34-local
+    "@nx/nx-linux-x64-musl": 21.0.34-local
+    "@nx/nx-win32-arm64-msvc": 21.0.34-local
+    "@nx/nx-win32-x64-msvc": 21.0.34-local
+>>>>>>> ef845f3b (open implementation file on click)
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
@@ -17167,6 +17364,7 @@ __metadata:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   checksum: 0ef4860fb9a74cbbf7bfb25353909042ead8d01915419eec153daee0508801264fd91dcc34bbf6cc4250e28925d9b319c7964d41910e44cd0ac151fb77a306b2
 =======
   checksum: f33ff06bf3aabbaed007706d58e54a789c1e4dbbd8e58f4e73929251de0e44e0e3dc79b19149160c6b1126f39987f8c1be82e9c0b62167b28411b2f8d5e06835
@@ -17213,6 +17411,9 @@ __metadata:
 =======
   checksum: beb9403e3a93c68e7d258119b94be72704ff80da47bf6750040ee8d4c121a8e97602a28d73df183f87f1855cef130f109c353fe3e764496cb7f7105ad01f1349
 >>>>>>> f1642428 (update)
+=======
+  checksum: 154563507d7c5f0c214afb5cfe35091a7bab76e19a9be2fbda823e1cd5f04336d595c25ada77aacc7b18be535816d7a2a2c11bb37cab16330f20d462791384f4
+>>>>>>> ef845f3b (open implementation file on click)
   languageName: node
   linkType: hard
 

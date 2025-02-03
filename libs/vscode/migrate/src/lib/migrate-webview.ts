@@ -14,7 +14,11 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import { cancelMigration, skipMigration } from './migrate-commands';
+import {
+  cancelMigration,
+  skipMigration,
+  viewImplementation,
+} from './commands/migrate-commands';
 import { watchFile } from '@nx-console/vscode-utils';
 import { finishMigration } from './commands/finish-migration';
 import {
@@ -86,6 +90,9 @@ export class MigrateWebview {
           break;
         case 'skip-migration':
           skipMigration(message.payload.migration);
+          break;
+        case 'view-implementation':
+          viewImplementation(message.payload.migration);
           break;
       }
     });

@@ -8,17 +8,20 @@ import {
   extensions,
   ProgressLocation,
   window,
+  workspace,
 } from 'vscode';
-import { startMigration } from './commands/start-migration';
+import { startMigration } from './start-migration';
 import {
   importMigrateUIApi,
   modifyMigrationsJsonMetadata,
   readMigrationsJsonMetadata,
-} from './commands/utils';
-import { GitExtension } from './git-extension/git';
-import { viewPackageJsonDiff } from './git-extension/view-diff';
-import { MigrateWebview } from './migrate-webview';
+} from './utils';
+import { GitExtension } from '../git-extension/git';
+import { viewPackageJsonDiff } from '../git-extension/view-diff';
+import { MigrateWebview } from '../migrate-webview';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -147,4 +150,29 @@ export async function cancelMigration() {
         );
       }
     });
+}
+
+export async function viewImplementation(migration: MigrationDetailsWithId) {
+  const nxWorkspacePath = getNxWorkspacePath();
+
+  const migrateUIApi = await importMigrateUIApi(nxWorkspacePath);
+
+  try {
+    const fullPath = await migrateUIApi.getImplementationPath(
+      nxWorkspacePath,
+      migration
+    );
+
+    if (!existsSync(fullPath)) {
+      window.showErrorMessage(`Cannot find implementation file at ${fullPath}`);
+      return;
+    }
+    workspace.openTextDocument(fullPath).then((doc) => {
+      window.showTextDocument(doc);
+    });
+  } catch (e) {
+    window.showErrorMessage(
+      `Cannot find implementation file for ${migration.name}`
+    );
+  }
 }
