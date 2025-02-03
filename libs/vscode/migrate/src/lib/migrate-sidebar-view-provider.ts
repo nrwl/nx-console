@@ -14,7 +14,10 @@ import {
 import { ActorRef, EventObject } from 'xstate';
 import { startMigration } from './commands/start-migration';
 import { viewPackageJsonDiff } from './git-extension/view-diff';
-import { cancelMigration, confirmPackageChanges } from './migrate-commands';
+import {
+  cancelMigration,
+  confirmPackageChanges,
+} from './commands/migrate-commands';
 import { isUpdateAvailable } from './migrate-state-machine';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
