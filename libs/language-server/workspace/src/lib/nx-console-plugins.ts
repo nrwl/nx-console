@@ -1,11 +1,9 @@
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
-import { existsSync } from 'fs';
 import { nxWorkspace } from './workspace';
 import { lspLogger } from '@nx-console/language-server-utils';
 import {
-  NxConsolePluginsDefinition,
   StartupMessageDefinition,
-  internalPlugins,
+  loadPlugins
 } from '@nx-console/shared-nx-console-plugins';
 
 export async function getTransformedGeneratorSchema(
@@ -49,40 +47,4 @@ export async function getStartupMessage(
     lspLogger.log('error while getting startup message' + e);
     return startupMessageDefinition;
   }
-}
-
-export async function loadPlugins(
-  workspacePath: string
-): Promise<NxConsolePluginsDefinition> {
-  let workspacePlugins: NxConsolePluginsDefinition | undefined = undefined;
-  try {
-    const pluginFile = `${workspacePath}/.nx/console/plugins.mjs`;
-    if (!existsSync(pluginFile)) {
-      workspacePlugins = undefined;
-    }
-    workspacePlugins = await import(pluginFile).then(
-      (module) => module.default
-    );
-  } catch (_) {
-    workspacePlugins = undefined;
-  }
-
-  return {
-    schemaProcessors: [
-      ...(internalPlugins.schemaProcessors ?? []),
-      ...(workspacePlugins?.schemaProcessors ?? []),
-    ],
-    validators: [
-      ...(internalPlugins.validators ?? []),
-      ...(workspacePlugins?.validators ?? []),
-    ],
-    startupMessageFactories: [
-      ...(internalPlugins.startupMessageFactories ?? []),
-      ...(workspacePlugins?.startupMessageFactories ?? []),
-    ],
-    projectViewItemProcessors: [
-      ...(internalPlugins.projectViewItemProcessors ?? []),
-      ...(workspacePlugins?.projectViewItemProcessors ?? []),      
-    ]
-  };
 }

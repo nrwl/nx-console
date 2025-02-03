@@ -16,10 +16,7 @@ import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { ListView, ListViewItem } from './views/nx-project-list-view';
 import { TreeView, TreeViewItem } from './views/nx-project-tree-view';
-// error: a project tagged with "type:vscode" can only depend on libs tagged with "type:shared", "type:vscode"
-import { loadPlugins } from "@nx-console/language-server-workspace";
-// ===
-import { NxConsolePluginsDefinition } from '@nx-console/shared-nx-console-plugins';
+import { NxConsolePluginsDefinition, loadPlugins } from '@nx-console/shared-nx-console-plugins';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 
 export type ViewItem = ListViewItem | TreeViewItem;
@@ -100,7 +97,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
     if (this.plugins.projectViewItemProcessors) {
       this.plugins.projectViewItemProcessors.forEach( (processor) => {
-        nxTreeItems = nxTreeItems.map( item => processor(item,this.workspaceData))
+        nxTreeItems = nxTreeItems.map( item => {
+          return Object.assign({}, item, processor(item,this.workspaceData))
+        })
       })
     }
 
