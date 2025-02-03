@@ -1,7 +1,6 @@
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { Logger } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
-// NxTreeItem import here...
 
 export type NxConsolePluginsDefinition = {
   schemaProcessors?: SchemaProcessor[];
@@ -31,6 +30,12 @@ export type StartupMessageFactory = (
   | Promise<StartupMessageDefinition | undefined>;
 
 export type ProjectViewItemProcessor = (
-  schema: NxTreeItem,
+  schema: ProjectViewItem,
   workspace: NxWorkspace
-) => NxTreeItem;
+) => ProjectViewItem;
+
+export type ProjectViewItem = {
+  description?: string | boolean,
+  // this throws a ts error: Type 'string | MarkdownString' is not assignable to type 'string'
+  // tooltip?: string
+}
