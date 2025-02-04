@@ -8,12 +8,6 @@
   "include": ["src/**/*.ts", "src/**/*.js", "cypress.config.ts"],
   "references": [
     {
-      "path": "../../libs/shared/nx-version"
-    },
-    {
-      "path": "../../libs/shared/schema"
-    },
-    {
       "path": "../../libs/shared/generate-ui-types"
     }
   ]
