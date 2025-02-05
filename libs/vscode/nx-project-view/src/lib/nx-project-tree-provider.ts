@@ -67,12 +67,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   async getChildren(element?: NxTreeItem): Promise<NxTreeItem[] | undefined> {
     if (!element) {
       this.workspaceData = await getNxWorkspace();
+      this.plugins = await loadPlugins(getNxWorkspacePath());
       this.treeView.workspaceData = this.workspaceData;
       this.listView.workspaceData = this.workspaceData;
-    }
-
-    if (!this.plugins) {
-      this.plugins = await loadPlugins(getNxWorkspacePath());
     }
 
     let items: (TreeViewItem | ListViewItem)[] | undefined;

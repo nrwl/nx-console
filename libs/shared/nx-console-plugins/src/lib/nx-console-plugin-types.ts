@@ -30,12 +30,11 @@ export type StartupMessageFactory = (
   | Promise<StartupMessageDefinition | undefined>;
 
 export type ProjectViewItemProcessor = (
-  schema: ProjectViewItem,
+  schema: ProjectViewTreeItem,
   workspace: NxWorkspace
-) => ProjectViewItem;
+) => ProjectViewTreeItem;
 
-export type ProjectViewItem = {
-  description?: string | boolean,
-  // this throws a ts error: Type 'string | MarkdownString' is not assignable to type 'string'
-  // tooltip?: string
+export type ProjectViewTreeItem = {
+  description?: string,
+  tooltip?: string
 }
