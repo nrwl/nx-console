@@ -15,6 +15,7 @@ export class NxTreeItem extends TreeItem {
 
     this.id = item.id;
     this.description = item.description
+    this.tooltip = item.tooltip
     this.contextValue = item.contextValue;
 
     if (item.contextValue === 'folder' || item.contextValue === 'project') {

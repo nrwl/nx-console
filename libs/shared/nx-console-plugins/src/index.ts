@@ -1,6 +1,8 @@
 import { NxConsolePluginsDefinition } from './lib/nx-console-plugin-types';
 import { internalPlugins } from './lib/internal-plugins/index';
 import { existsSync } from 'fs';
+import { pathToFileURL } from "url"
+import path from "path"
 
 export { internalPlugins } from './lib/internal-plugins/index';
 export * from './lib/nx-console-plugin-types';
@@ -10,11 +12,14 @@ export async function loadPlugins(
 ): Promise<NxConsolePluginsDefinition> {
   let workspacePlugins: NxConsolePluginsDefinition | undefined = undefined;
   try {
-    const pluginFile = `${workspacePath}/.nx/console/plugins.mjs`;
-    if (!existsSync(pluginFile)) {
+    const pluginFileRelativePath = "/.nx/console/plugins.mjs";
+    const pluginFileFullPath = path.join(workspacePath, pluginFileRelativePath)
+    const pluginFilePath = pathToFileURL(pluginFileFullPath).href
+
+    if (!existsSync(pluginFilePath)) {
       workspacePlugins = undefined;
     }
-    workspacePlugins = await import(pluginFile).then(
+    workspacePlugins = await import(pluginFilePath).then(
       (module) => module.default
     );
   } catch (_) {
