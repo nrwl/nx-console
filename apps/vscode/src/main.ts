@@ -44,6 +44,7 @@ import { initNxConversion } from '@nx-console/vscode-nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
+import { initCopilot } from '@nx-console/vscode-copilot';
 
 import {
   NxWorkspaceRefreshNotification,
@@ -253,6 +254,7 @@ async function setWorkspace(workspacePath: string) {
     getNxlsClient().start(workspacePath);
 
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
+    initOutputChannels(context);
     initTasks(context);
     registerVscodeAddDependency(context);
 
@@ -266,7 +268,7 @@ async function setWorkspace(workspacePath: string) {
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);
     initErrorDiagnostics(context);
-    initOutputChannels(context);
+    initCopilot(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

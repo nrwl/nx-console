@@ -392,6 +392,30 @@
         }
       ]
     },
+    "chatParticipants": [
+      {
+        "id": "nx-console.nx",
+        "fullName": "Nx",
+        "name": "nx",
+        "description": "Get insights into your Nx workspace",
+        "isSticky": true,
+        "disambiguation": [
+          {
+            "category": "nx",
+            "description": "The user wants to include context-aware insights using their Nx monorepo.",
+            "examples": [
+              "Tell me about my nx workspace",
+              "What libraries exist in my workspace?",
+              "Find a core components library and create a new Dialog component.",
+              "Remove the deprecated properties from the Auth API and update all clients.",
+              "What is the impact of merging 'ui-common' and 'ui-core'?",
+              "Compare the retry logic in all data access libraries for the shop app",
+              "Show me all the core projects"
+            ]
+          }
+        ]
+      }
+    ],
     "commands": [
       {
         "command": "nxConsole.refreshWorkspace",

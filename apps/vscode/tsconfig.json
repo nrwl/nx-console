@@ -28,6 +28,9 @@
       "path": "../../libs/language-server/types"
     },
     {
+      "path": "../../libs/vscode/copilot"
+    },
+    {
       "path": "../../libs/vscode/typescript-plugin"
     },
     {

@@ -3,51 +3,146 @@
   "compileOnSave": false,
   "files": [],
   "references": [
-    { "path": "./libs/language-server/capabilities/code-completion" },
-    { "path": "./libs/language-server/capabilities/document-links" },
-    { "path": "./libs/language-server/capabilities/definition" },
-    { "path": "./libs/language-server/capabilities/hover" },
-    { "path": "./libs/vscode/nx-cloud-onboarding-webview" },
-    { "path": "./libs/vscode/nx-help-and-feedback-view" },
-    { "path": "./libs/vscode/nx-config-decoration" },
-    { "path": "./libs/vscode/generate-ui-webview" },
-    { "path": "./libs/language-server/workspace" },
-    { "path": "./libs/shared/nx-console-plugins" },
-    { "path": "./libs/shared/generate-ui-types" },
-    { "path": "./libs/vscode/error-diagnostics" },
-    { "path": "./libs/vscode/nx-cli-quickpicks" },
-    { "path": "./libs/vscode/typescript-plugin" },
-    { "path": "./libs/language-server/watcher" },
-    { "path": "./libs/vscode/nx-commands-view" },
-    { "path": "./libs/vscode/output-channels" },
-    { "path": "./libs/vscode/nx-project-view" },
-    { "path": "./libs/vscode/project-details" },
-    { "path": "./libs/language-server/types" },
-    { "path": "./libs/language-server/utils" },
-    { "path": "./libs/vscode/add-dependency" },
-    { "path": "./libs/vscode/configuration" },
-    { "path": "./libs/vscode/nx-cloud-view" },
-    { "path": "./libs/vscode/nx-conversion" },
-    { "path": "./libs/vscode/project-graph" },
-    { "path": "./libs/vscode/nx-workspace" },
-    { "path": "./apps/generate-ui-v2-e2e" },
-    { "path": "./libs/shared/file-system" },
-    { "path": "./libs/shared/json-schema" },
-    { "path": "./libs/shared/nx-version" },
-    { "path": "./libs/vscode/graph-base" },
-    { "path": "./libs/vscode/lsp-client" },
-    { "path": "./libs/vscode/telemetry" },
-    { "path": "./apps/generate-ui-v2" },
-    { "path": "./libs/vscode/nvm-tip" },
-    { "path": "./libs/shared/schema" },
-    { "path": "./libs/vscode/verify" },
-    { "path": "./libs/shared/types" },
-    { "path": "./libs/shared/utils" },
-    { "path": "./libs/vscode/tasks" },
-    { "path": "./libs/vscode/utils" },
-    { "path": "./libs/shared/npm" },
-    { "path": "./apps/nxls-e2e" },
-    { "path": "./apps/vscode" },
-    { "path": "./apps/nxls" }
+    {
+      "path": "./libs/language-server/capabilities/code-completion"
+    },
+    {
+      "path": "./libs/language-server/capabilities/document-links"
+    },
+    {
+      "path": "./libs/language-server/capabilities/definition"
+    },
+    {
+      "path": "./libs/language-server/capabilities/hover"
+    },
+    {
+      "path": "./libs/vscode/nx-cloud-onboarding-webview"
+    },
+    {
+      "path": "./libs/vscode/nx-help-and-feedback-view"
+    },
+    {
+      "path": "./libs/vscode/nx-config-decoration"
+    },
+    {
+      "path": "./libs/vscode/generate-ui-webview"
+    },
+    {
+      "path": "./libs/language-server/workspace"
+    },
+    {
+      "path": "./libs/shared/nx-console-plugins"
+    },
+    {
+      "path": "./libs/shared/generate-ui-types"
+    },
+    {
+      "path": "./libs/vscode/error-diagnostics"
+    },
+    {
+      "path": "./libs/vscode/nx-cli-quickpicks"
+    },
+    {
+      "path": "./libs/vscode/typescript-plugin"
+    },
+    {
+      "path": "./libs/language-server/watcher"
+    },
+    {
+      "path": "./libs/vscode/nx-commands-view"
+    },
+    {
+      "path": "./libs/vscode/output-channels"
+    },
+    {
+      "path": "./libs/vscode/nx-project-view"
+    },
+    {
+      "path": "./libs/vscode/project-details"
+    },
+    {
+      "path": "./libs/language-server/types"
+    },
+    {
+      "path": "./libs/language-server/utils"
+    },
+    {
+      "path": "./libs/vscode/add-dependency"
+    },
+    {
+      "path": "./libs/vscode/configuration"
+    },
+    {
+      "path": "./libs/vscode/nx-cloud-view"
+    },
+    {
+      "path": "./libs/vscode/nx-conversion"
+    },
+    {
+      "path": "./libs/vscode/project-graph"
+    },
+    {
+      "path": "./libs/vscode/nx-workspace"
+    },
+    {
+      "path": "./apps/generate-ui-v2-e2e"
+    },
+    {
+      "path": "./libs/shared/file-system"
+    },
+    {
+      "path": "./libs/shared/json-schema"
+    },
+    {
+      "path": "./libs/shared/nx-version"
+    },
+    {
+      "path": "./libs/vscode/graph-base"
+    },
+    {
+      "path": "./libs/vscode/lsp-client"
+    },
+    {
+      "path": "./libs/vscode/telemetry"
+    },
+    {
+      "path": "./apps/generate-ui-v2"
+    },
+    {
+      "path": "./libs/vscode/nvm-tip"
+    },
+    {
+      "path": "./libs/shared/schema"
+    },
+    {
+      "path": "./libs/vscode/verify"
+    },
+    {
+      "path": "./libs/shared/types"
+    },
+    {
+      "path": "./libs/shared/utils"
+    },
+    {
+      "path": "./libs/vscode/tasks"
+    },
+    {
+      "path": "./libs/vscode/utils"
+    },
+    {
+      "path": "./libs/shared/npm"
+    },
+    {
+      "path": "./apps/nxls-e2e"
+    },
+    {
+      "path": "./apps/vscode"
+    },
+    {
+      "path": "./apps/nxls"
+    },
+    {
+      "path": "./libs/vscode/copilot"
+    }
   ]
 }
