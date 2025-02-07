@@ -176,3 +176,15 @@ export async function viewImplementation(migration: MigrationDetailsWithId) {
     );
   }
 }
+
+export async function viewDocumentation(migration: MigrationDetailsWithId) {
+  const migrationPackage = migration.package.startsWith('@nx')
+    ? migration.package.replace('@nx/', '')
+    : migration.package;
+  const url = `https://nx.dev/nx-api/${migrationPackage}#${migration.name.replace(
+    /[.-]/g,
+    ''
+  )}`;
+
+  commands.executeCommand('vscode.open', url);
+}

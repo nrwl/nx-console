@@ -1,7 +1,6 @@
 import { importNxPackagePath } from '@nx-console/shared-npm';
-import { MigrationsJsonMetadata } from '@nx-console/shared-types';
+import type { MigrationsJsonMetadata } from 'nx/src/command-line/migrate/migrate-ui-api';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import * as migrateUiApi from 'nx/src/command-line/migrate/migrate-ui-api';

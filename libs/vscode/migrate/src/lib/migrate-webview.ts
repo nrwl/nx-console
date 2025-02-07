@@ -17,6 +17,7 @@ import {
 import {
   cancelMigration,
   skipMigration,
+  viewDocumentation,
   viewImplementation,
 } from './commands/migrate-commands';
 import { watchFile } from '@nx-console/vscode-utils';
@@ -25,7 +26,7 @@ import {
   runManyMigrations,
   runSingleMigration,
 } from './commands/run-migration';
-import { viewDiff } from './git-extension/view-diff';
+import { viewDiff, viewDiffForMigration } from './git-extension/view-diff';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
@@ -86,13 +87,16 @@ export class MigrateWebview {
           cancelMigration();
           break;
         case 'file-click':
-          viewDiff(message.payload.path);
+          viewDiffForMigration(message.payload.path, message.payload.migration);
           break;
         case 'skip-migration':
           skipMigration(message.payload.migration);
           break;
         case 'view-implementation':
           viewImplementation(message.payload.migration);
+          break;
+        case 'view-documentation':
+          viewDocumentation(message.payload.migration);
           break;
       }
     });

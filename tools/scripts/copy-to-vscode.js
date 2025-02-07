@@ -1,3 +1,4 @@
+const { execSync } = require('child_process');
 const fs = require('fs-extra');
 const { normalize, join } = require('path');
 
@@ -20,6 +21,11 @@ fs.copySync(
 
 // copy package.json
 fs.copySync('./apps/vscode/package.json', './dist/apps/vscode/package.json');
+
+execSync('npm install -f', {
+  cwd: './dist/apps/vscode',
+  stdio: 'inherit',
+});
 
 // copy required dependencies
 // we don't need the entire @vscode-elements/elements package, just the bundled.js file
@@ -68,11 +74,11 @@ fs.copySync(
   join(codiconsDestFolder, 'codicon.ttf')
 );
 
-// copy bundled nx graph
-const nxGraphDestFolder = normalize(
-  './dist/apps/vscode/node_modules/nx/src/core/graph'
-);
-if (!fs.existsSync(nxGraphDestFolder)) {
-  fs.mkdirSync(nxGraphDestFolder, { recursive: true });
-}
-fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
+// copy nx
+// const nxGraphDestFolder = normalize(
+//   './dist/apps/vscode/node_modules/nx/src/core/graph'
+// );
+// if (!fs.existsSync(nxGraphDestFolder)) {
+//   fs.mkdirSync(nxGraphDestFolder, { recursive: true });
+// }
+// fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
