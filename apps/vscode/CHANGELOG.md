@@ -1,3 +1,10 @@
+# [18.36.0](https://github.com/nrwl/nx-console/compare/vscode-v18.35.0...vscode-v18.36.0) (2025-02-07)
+
+
+### Features
+
+* **vscode:** add copilot chat participant ([#2393](https://github.com/nrwl/nx-console/issues/2393)) ([617b5a5](https://github.com/nrwl/nx-console/commit/617b5a5e854e97f4bf2a2f43d8ae3d2d6d90b819))
+
 # [18.35.0](https://github.com/nrwl/nx-console/compare/vscode-v18.34.0...vscode-v18.35.0) (2025-01-17)
 
 
