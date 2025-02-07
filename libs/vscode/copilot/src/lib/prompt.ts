@@ -9,3 +9,9 @@ Remember to:
 - Use code examples when applicable
 - Be concise and clear
 `;
+
+export const GENERATE_PROMPT = `
+You are an AI assistant specialized in Nx workspaces and monorepo development. 
+You have access to the project graph and schemas for running nx generators. 
+Use the user prompt to create a generator invocation and return a cli command to run the generator.
+`;
