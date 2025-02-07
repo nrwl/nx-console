@@ -10,7 +10,19 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/telemetry/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/project-details/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/nx-cloud-view/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/nvm-tip/tsconfig.lib.json"
@@ -19,10 +31,13 @@
       "path": "../../libs/vscode/error-diagnostics/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/typescript-plugin/tsconfig.lib.json"
+      "path": "../../libs/language-server/types/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
+      "path": "../../libs/vscode/copilot/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/typescript-plugin/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/project-graph/tsconfig.lib.json"
@@ -34,73 +49,34 @@
       "path": "../../libs/vscode/nx-conversion/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/nx-config-decoration/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/lsp-client/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/generate-ui-webview/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/add-dependency/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/nx-config-decoration/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/nx-cloud-view/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/nx-project-view/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/telemetry/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/verify/tsconfig.lib.json"
+      "path": "../../libs/shared/file-system/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/utils/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/nx-cli-quickpicks/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/lsp-client/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/nx-console-plugins/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/generate-ui-types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/language-server/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/nx-workspace/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/vscode/tasks/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/output-channels/tsconfig.lib.json"
+      "path": "../../libs/vscode/nx-project-view/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/nx-commands-view/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/configuration/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/schema/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/nx-version/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/npm/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/file-system/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/utils/tsconfig.lib.json"

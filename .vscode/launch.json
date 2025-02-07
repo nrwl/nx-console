@@ -6,11 +6,11 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Extension",
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
-      "name": "Launch Extension",
       "outFiles": [
         "${workspaceFolder}/dist/apps/vscode",
         "${workspaceFolder}/dist/apps/generate-ui-v2",
@@ -28,6 +28,29 @@
         "!**/node_modules/**"
       ]
     },
+    {
+      "name": "Launch Extension (with other extensions)",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/apps/vscode",
+        "${workspaceFolder}/dist/apps/generate-ui-v2",
+        "${workspaceFolder}/node_modules"
+      ],
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**",
+        "/Applications/Visual Studio Code.app/**"
+      ],
+      "type": "extensionHost",
+      "enableTurboSourcemaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+
     {
       "type": "node",
       "request": "attach",

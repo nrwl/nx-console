@@ -4,7 +4,6 @@ import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
-// @ts-expect-error -- Browser Rollbar is not typed
 import Rollbar = require('rollbar/src/browser/rollbar');
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';

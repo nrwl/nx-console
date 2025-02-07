@@ -17,7 +17,7 @@ import {
   setup,
   spawnChild,
 } from 'xstate';
-// @ts-expect-error -- need this import for type inference
+// need this import for type inference
 import type { Guard } from 'xstate/guards';
 
 const SLEEP_POLLING_TIME = 3_600_000;

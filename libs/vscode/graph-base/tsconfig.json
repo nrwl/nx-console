@@ -4,58 +4,25 @@
   "include": [],
   "references": [
     {
-      "path": "../telemetry"
-    },
-    {
-      "path": "../verify"
-    },
-    {
-      "path": "../nx-cli-quickpicks"
-    },
-    {
-      "path": "../tasks"
-    },
-    {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../../shared/nx-console-plugins"
-    },
-    {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
-      "path": "../../language-server/types"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../output-channels"
+      "path": "../../shared/utils"
     },
     {
       "path": "../../shared/types"
     },
     {
-      "path": "../../shared/utils"
-    },
-    {
       "path": "../../shared/npm"
     },
     {
-      "path": "../../shared/file-system"
+      "path": "../telemetry"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../tasks"
     },
     {
-      "path": "../utils"
+      "path": "../nx-workspace"
     },
     {
       "path": "../nx-config-decoration"
-    },
-    {
-      "path": "../../shared/schema"
     },
     {
       "path": "../configuration"

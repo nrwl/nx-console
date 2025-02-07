@@ -4,7 +4,25 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/utils"
+    },
+    {
+      "path": "../../libs/shared/types"
+    },
+    {
+      "path": "../../libs/shared/generate-ui-types"
+    },
+    {
+      "path": "../../libs/language-server/workspace"
+    },
+    {
       "path": "../../libs/language-server/watcher"
+    },
+    {
+      "path": "../../libs/language-server/utils"
+    },
+    {
+      "path": "../../libs/language-server/types"
     },
     {
       "path": "../../libs/language-server/capabilities/hover"
@@ -14,42 +32,6 @@
     },
     {
       "path": "../../libs/language-server/capabilities/definition"
-    },
-    {
-      "path": "../../libs/shared/nx-console-plugins"
-    },
-    {
-      "path": "../../libs/language-server/types"
-    },
-    {
-      "path": "../../libs/shared/generate-ui-types"
-    },
-    {
-      "path": "../../libs/language-server/workspace"
-    },
-    {
-      "path": "../../libs/shared/types"
-    },
-    {
-      "path": "../../libs/shared/schema"
-    },
-    {
-      "path": "../../libs/shared/npm"
-    },
-    {
-      "path": "../../libs/shared/file-system"
-    },
-    {
-      "path": "../../libs/shared/utils"
-    },
-    {
-      "path": "../../libs/shared/nx-version"
-    },
-    {
-      "path": "../../libs/shared/json-schema"
-    },
-    {
-      "path": "../../libs/language-server/utils"
     },
     {
       "path": "../../libs/language-server/capabilities/code-completion"

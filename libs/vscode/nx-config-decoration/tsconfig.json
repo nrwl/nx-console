@@ -4,43 +4,16 @@
   "include": [],
   "references": [
     {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../../shared/nx-console-plugins"
-    },
-    {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
-      "path": "../../language-server/types"
-    },
-    {
       "path": "../nx-workspace"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/npm"
     },
     {
       "path": "../../shared/file-system"
     },
     {
-      "path": "../../shared/schema"
-    },
-    {
       "path": "../configuration"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../../shared/utils"
     },
     {
       "path": "../utils"

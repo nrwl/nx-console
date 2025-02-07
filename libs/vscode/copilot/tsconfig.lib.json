@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/vscode-copilot",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
+  "references": [
+    {
+      "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-workspace/tsconfig.lib.json"
+    }
+  ]
+}
