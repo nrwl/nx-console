@@ -1034,5 +1034,18 @@
         }
       ]
     }
+  },
+  "dependencies": {
+    "@nx/nx-darwin-arm64": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-darwin-x64": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-freebsd-x64": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-linux-arm-gnueabihf": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-linux-arm64-gnu": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-linux-arm64-musl": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-linux-x64-gnu": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-linux-x64-musl": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-win32-arm64-msvc": "0.0.0-pr-29720-ae0a5be",
+    "@nx/nx-win32-x64-msvc": "0.0.0-pr-29720-ae0a5be",
+    "nx": "0.0.0-pr-29720-ae0a5be"
   }
 }
