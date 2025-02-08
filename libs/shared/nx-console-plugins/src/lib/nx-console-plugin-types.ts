@@ -35,6 +35,8 @@ export type ProjectViewItemProcessor = (
 ) => ProjectViewTreeItem;
 
 export type ProjectViewTreeItem = {
+  label?: string,
   description?: string,
-  tooltip?: string
+  tooltip?: string,
+  iconPath?: string
 }

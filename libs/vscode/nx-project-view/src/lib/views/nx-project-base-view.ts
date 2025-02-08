@@ -13,6 +13,7 @@ interface BaseViewItem<Context extends string> {
   id: string;
   description?: string;
   tooltip?: string;
+  iconPath?: string;
   contextValue: Context;
   label: string;
   collapsible: TreeItemCollapsibleState;

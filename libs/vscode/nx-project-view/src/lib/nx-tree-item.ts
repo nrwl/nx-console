@@ -33,11 +33,19 @@ export class NxTreeItem extends TreeItem {
       });
       this.tooltip = `${item.errorCount} errors detected. The project graph may be missing some information`;
     }
-
-    this.setIcons();
+    
+    this.setIcons(item.iconPath);
   }
 
-  setIcons() {
+  setIcons(customIconPath?: string) {
+    if (this.contextValue === 'projectGraphError') {
+      this.iconPath = new ThemeIcon('error');
+      return
+    }
+    if (customIconPath) {
+      this.iconPath = customIconPath
+      return
+    }
     if (this.contextValue === 'folder') {
       this.iconPath = new ThemeIcon('folder');
     }
@@ -52,9 +60,6 @@ export class NxTreeItem extends TreeItem {
       this.contextValue === 'target-atomized'
     ) {
       this.iconPath = new ThemeIcon('symbol-property');
-    }
-    if (this.contextValue === 'projectGraphError') {
-      this.iconPath = new ThemeIcon('error');
     }
   }
 
