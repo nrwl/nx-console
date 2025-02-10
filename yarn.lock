@@ -13991,6 +13991,7 @@ __metadata:
     vscode-uri: ^3.0.8
     webpack: 5.88.2
     xstate: ^5.18.2
+    yargs: ^17.7.2
     zone.js: 0.14.3
   languageName: unknown
   linkType: soft
@@ -18928,7 +18929,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:17.7.2, yargs@npm:^17.3.1, yargs@npm:^17.5.1, yargs@npm:^17.6.2":
+"yargs@npm:17.7.2, yargs@npm:^17.3.1, yargs@npm:^17.5.1, yargs@npm:^17.6.2, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:

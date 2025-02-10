@@ -15,6 +15,9 @@
   ],
   "references": [
     {
+      "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
       "path": "../configuration/tsconfig.lib.json"
     },
     {

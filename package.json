@@ -45,7 +45,8 @@
     "vscode-languageclient": "^8.0.2",
     "vscode-languageserver": "^8.0.2",
     "vscode-uri": "^3.0.8",
-    "xstate": "^5.18.2"
+    "xstate": "^5.18.2",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@babel/core": "7.21.0",

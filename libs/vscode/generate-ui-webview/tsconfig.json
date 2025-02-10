@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/schema"
+    },
+    {
       "path": "../configuration"
     },
     {
