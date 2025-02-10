@@ -4,7 +4,10 @@
     "outDir": "./out-tsc/jest",
     "types": ["jest", "node"],
     "strict": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "jsx": "react",
+    "jsxFactory": "vscpp",
+    "jsxFragmentFactory": "vscppf"
   },
   "include": [
     "jest.config.ts",

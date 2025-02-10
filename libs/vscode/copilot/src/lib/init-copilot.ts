@@ -14,7 +14,7 @@ import {
   MarkdownString,
 } from 'vscode';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { BASE_PROMPT, GENERATE_PROMPT } from './prompt.js';
+import { BASE_PROMPT, GENERATE_PROMPT } from './prompts/prompt.js';
 import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
 import {
   getNxWorkspacePath,
