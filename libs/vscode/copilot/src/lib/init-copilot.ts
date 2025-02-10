@@ -1,30 +1,30 @@
-import {
-  CancellationToken,
-  ChatContext,
-  ChatRequest,
-  ChatRequestHandler,
-  ChatResponseStream,
-  ExtensionContext,
-  LanguageModelChatMessage,
-  Uri,
-  chat,
-  commands,
-  Command,
-  LanguageModelChatResponse,
-  MarkdownString,
-} from 'vscode';
-import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { BASE_PROMPT, GENERATE_PROMPT } from './prompts/prompt.js';
-import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
+import { readNxJson } from '@nx-console/shared-npm';
+import { getPackageManagerCommand } from '@nx-console/shared-utils';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
 } from '@nx-console/vscode-configuration';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
-import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
-import { readFile } from 'fs/promises';
-import { readNxJson } from '@nx-console/shared-npm';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
+import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
+import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { renderPrompt } from '@vscode/prompt-tsx';
+import { readFile } from 'fs/promises';
+import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
+import {
+  CancellationToken,
+  chat,
+  ChatContext,
+  ChatRequest,
+  ChatRequestHandler,
+  ChatResponseStream,
+  commands,
+  ExtensionContext,
+  LanguageModelChatMessage,
+  MarkdownString,
+  Uri,
+} from 'vscode';
+import { GeneratePrompt } from './prompts/generate-prompt';
+import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import yargs = require('yargs');
 
 export function initCopilot(context: ExtensionContext) {
@@ -68,30 +68,50 @@ const handler: ChatRequestHandler = async (
   }
   const workspacePath = getNxWorkspacePath();
   const pmExec = (await getPackageManagerCommand(workspacePath)).dlx;
-  let prompt = BASE_PROMPT(pmExec);
 
   stream.progress('Retrieving workspace information...');
 
   const projectGraph = await getPrunedProjectGraph();
-  const messages = [LanguageModelChatMessage.User(prompt)];
-  messages.push(LanguageModelChatMessage.User(JSON.stringify(projectGraph)));
-  messages.push(
-    LanguageModelChatMessage.User(
-      'nx.json:' + JSON.stringify(await readNxJson(workspacePath))
-    )
-  );
+
+  let messages: LanguageModelChatMessage[];
+  const baseProps: NxCopilotPromptProps = {
+    userQuery: request.prompt,
+    packageManagerExecCommand: pmExec,
+    projectGraph: projectGraph,
+    history: context.history,
+    nxJson: 'nx.json:' + JSON.stringify(await readNxJson(workspacePath)),
+  };
 
   if (request.command === 'generate') {
-    prompt = GENERATE_PROMPT(pmExec);
-
     stream.progress('Retrieving generator schemas...');
-    const generatorSchemas = await getGeneratorSchemas();
-    messages.push(
-      LanguageModelChatMessage.User(JSON.stringify(generatorSchemas))
-    );
-  }
 
-  messages.push(LanguageModelChatMessage.User(request.prompt));
+    const prompt = await renderPrompt(
+      GeneratePrompt,
+      {
+        ...baseProps,
+        generatorSchemas: await getGeneratorSchemas(),
+      },
+      { modelMaxPromptTokens: request.model.maxInputTokens },
+      request.model
+    );
+    messages = prompt.messages;
+  } else {
+    try {
+      const prompt = await renderPrompt(
+        NxCopilotPrompt,
+        baseProps,
+        { modelMaxPromptTokens: request.model.maxInputTokens },
+        request.model
+      );
+      messages = prompt.messages;
+    } catch (error) {
+      console.error('Error rendering prompt:', error);
+      stream.markdown(
+        'An error occurred while rendering the prompt. Please try again later.'
+      );
+      return;
+    }
+  }
 
   const chatResponse = await request.model.sendRequest(messages, {}, token);
 
@@ -231,7 +251,7 @@ async function getPrunedProjectGraph() {
 async function getGeneratorSchemas() {
   const generators = await getGenerators();
 
-  const schemas: Array<{ name: string; schema: any }> = [];
+  const schemas = [];
   for (const generator of generators) {
     if (generator.schemaPath) {
       try {

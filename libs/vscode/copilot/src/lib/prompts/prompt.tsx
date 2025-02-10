@@ -5,19 +5,21 @@ import {
   BasePromptElementProps,
 } from '@vscode/prompt-tsx';
 import { ChatContext } from 'vscode';
+import { History } from './history';
 
-interface NxCopilotPromptProps extends BasePromptElementProps {
+export interface NxCopilotPromptProps extends BasePromptElementProps {
   packageManagerExecCommand: string;
   projectGraph: Record<string, any>;
   history: ChatContext['history'];
   userQuery: string;
+  nxJson: string;
 }
 
 export class NxCopilotPrompt extends PromptElement<NxCopilotPromptProps> {
   render() {
     return (
       <>
-        <SystemMessage>
+        <SystemMessage priority={100}>
           You are an AI assistant specialized in Nx workspaces and monorepo
           development. You provide precise, technical guidance for developers
           working with Nx tools, patterns, and best practices. You have access
@@ -30,6 +32,21 @@ export class NxCopilotPrompt extends PromptElement<NxCopilotPromptProps> {
           about the workspace - Reference official Nx documentation when
           relevant - Use code examples when applicable - Be concise and clear
         </SystemMessage>
+        {/* <History
+          history={this.props.history}
+          passPriority
+          older={0}
+          newer={80}
+          flexGrow={2}
+          flexReserve="/8"
+        /> */}
+        <UserMessage priority={90}>{this.props.userQuery}</UserMessage>
+        <UserMessage priority={60} flexGrow={2}>
+          {JSON.stringify(this.props.projectGraph)}
+        </UserMessage>
+        <UserMessage priority={50} flexGrow={3}>
+          {this.props.nxJson}
+        </UserMessage>
       </>
     );
   }

@@ -2,12 +2,9 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/vscode-copilot",
-    "types": ["node"],
-    "jsx": "react",
-    "jsxFactory": "vscpp",
-    "jsxFragmentFactory": "vscppf"
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "src/lib/prompts/nx-base-prompt.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
