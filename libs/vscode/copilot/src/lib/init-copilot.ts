@@ -20,6 +20,7 @@ import {
   commands,
   ExtensionContext,
   LanguageModelChatMessage,
+  lm,
   MarkdownString,
   Uri,
 } from 'vscode';
@@ -73,13 +74,19 @@ const handler: ChatRequestHandler = async (
 
   const projectGraph = await getPrunedProjectGraph();
 
+  const models = await lm.selectChatModels({
+    vendor: 'copilot',
+    family: 'gpt-4o',
+  });
+  const model = models[0];
+
   let messages: LanguageModelChatMessage[];
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
     packageManagerExecCommand: pmExec,
     projectGraph: projectGraph,
     history: context.history,
-    nxJson: 'nx.json:' + JSON.stringify(await readNxJson(workspacePath)),
+    nxJson: JSON.stringify(await readNxJson(workspacePath)),
   };
 
   if (request.command === 'generate') {
@@ -91,8 +98,8 @@ const handler: ChatRequestHandler = async (
         ...baseProps,
         generatorSchemas: await getGeneratorSchemas(),
       },
-      { modelMaxPromptTokens: request.model.maxInputTokens },
-      request.model
+      { modelMaxPromptTokens: model.maxInputTokens },
+      model
     );
     messages = prompt.messages;
   } else {
@@ -100,8 +107,8 @@ const handler: ChatRequestHandler = async (
       const prompt = await renderPrompt(
         NxCopilotPrompt,
         baseProps,
-        { modelMaxPromptTokens: request.model.maxInputTokens },
-        request.model
+        { modelMaxPromptTokens: model.maxInputTokens },
+        model
       );
       messages = prompt.messages;
     } catch (error) {
@@ -113,7 +120,7 @@ const handler: ChatRequestHandler = async (
     }
   }
 
-  const chatResponse = await request.model.sendRequest(messages, {}, token);
+  const chatResponse = await model.sendRequest(messages, {}, token);
 
   const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
   const endMarker = `"""`;
