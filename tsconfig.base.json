@@ -29,7 +29,10 @@
     "sourceMap": false,
     "strict": false,
     "target": "es2022",
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "jsx": "react",
+    "jsxFactory": "vscpp",
+    "jsxFragmentFactory": "vscppf"
     // "sourceMap": true,
     // "importHelpers": true,
     // "moduleResolution": "node",

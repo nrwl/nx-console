@@ -25,3 +25,6 @@ if (ktFiles.length > 0) {
     process.exit(1);
   }
 }
+
+console.log('nx sync:check');
+execSync('npx nx sync:check', { stdio: 'ignore' });

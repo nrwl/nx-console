@@ -399,6 +399,12 @@
         "name": "nx",
         "description": "Get insights into your Nx workspace",
         "isSticky": true,
+        "commands": [
+          {
+            "name": "generate",
+            "description": "Run Nx generators"
+          }
+        ],
         "disambiguation": [
           {
             "category": "nx",
