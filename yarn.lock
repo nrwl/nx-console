@@ -5171,6 +5171,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vscode/prompt-tsx@npm:^0.3.0-alpha.18":
+  version: 0.3.0-alpha.18
+  resolution: "@vscode/prompt-tsx@npm:0.3.0-alpha.18"
+  checksum: fd273d88c4b7dc0f6ffab3b1f0079b2e691a225bd38082d90eca046b9e500679e6f9b43411ca6db72203db150f5ab4cb36861730387455619c1cf309bac94283
+  languageName: node
+  linkType: hard
+
 "@vscode/test-electron@npm:^2.1.5":
   version: 2.4.1
   resolution: "@vscode/test-electron@npm:2.4.1"
@@ -13936,6 +13943,7 @@ __metadata:
     "@typescript-eslint/utils": 7.16.1
     "@vscode-elements/elements": 1.9.2-pre.1
     "@vscode/codicons": ^0.0.36
+    "@vscode/prompt-tsx": ^0.3.0-alpha.18
     "@vscode/test-electron": ^2.1.5
     "@vscode/vsce": ^2.15.0
     "@vscode/webview-ui-toolkit": ^1.2.0
@@ -13991,6 +13999,7 @@ __metadata:
     vscode-uri: ^3.0.8
     webpack: 5.88.2
     xstate: ^5.18.2
+    yargs: ^17.7.2
     zone.js: 0.14.3
   languageName: unknown
   linkType: soft
@@ -18928,7 +18937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:17.7.2, yargs@npm:^17.3.1, yargs@npm:^17.5.1, yargs@npm:^17.6.2":
+"yargs@npm:17.7.2, yargs@npm:^17.3.1, yargs@npm:^17.5.1, yargs@npm:^17.6.2, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:

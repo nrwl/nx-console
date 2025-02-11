@@ -45,7 +45,8 @@
     "vscode-languageclient": "^8.0.2",
     "vscode-languageserver": "^8.0.2",
     "vscode-uri": "^3.0.8",
-    "xstate": "^5.18.2"
+    "xstate": "^5.18.2",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@babel/core": "7.21.0",
@@ -84,6 +85,7 @@
     "@typescript-eslint/eslint-plugin": "7.16.1",
     "@typescript-eslint/parser": "7.16.1",
     "@typescript-eslint/utils": "7.16.1",
+    "@vscode/prompt-tsx": "^0.3.0-alpha.18",
     "@vscode/test-electron": "^2.1.5",
     "@vscode/vsce": "^2.15.0",
     "@yarnpkg/pnp": "^3.1.1-rc.12",

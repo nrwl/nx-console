@@ -4,9 +4,21 @@
     "outDir": "out-tsc/vscode-copilot",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
+    {
+      "path": "../generate-ui-webview/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-commands-view/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
     {
       "path": "../configuration/tsconfig.lib.json"
     },

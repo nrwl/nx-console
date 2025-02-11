@@ -4,6 +4,18 @@
   "include": [],
   "references": [
     {
+      "path": "../generate-ui-webview"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../nx-commands-view"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
       "path": "../configuration"
     },
     {
