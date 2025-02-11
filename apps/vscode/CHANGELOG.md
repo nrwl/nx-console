@@ -1,3 +1,10 @@
+# [18.37.0](https://github.com/nrwl/nx-console/compare/vscode-v18.36.0...vscode-v18.37.0) (2025-02-11)
+
+
+### Features
+
+* **vscode:** add /generate command to copilot participant ([#2395](https://github.com/nrwl/nx-console/issues/2395)) ([783e1b5](https://github.com/nrwl/nx-console/commit/783e1b5cce368b9abc97a714d74b9bd64d49c8b6))
+
 # [18.36.0](https://github.com/nrwl/nx-console/compare/vscode-v18.35.0...vscode-v18.36.0) (2025-02-07)
 
 
