@@ -226,7 +226,10 @@ async function getPrunedProjectGraph() {
               if (target.options.commands) {
                 prunedTarget.command = target.options.commands;
               }
-              if (target.configurations) {
+              if (
+                target.configurations &&
+                Object.keys(target.configurations).length > 0
+              ) {
                 prunedTarget.configurations = Object.keys(
                   target.configurations
                 );
