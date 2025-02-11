@@ -74,12 +74,6 @@ const handler: ChatRequestHandler = async (
 
   const projectGraph = await getPrunedProjectGraph();
 
-  const models = await lm.selectChatModels({
-    vendor: 'copilot',
-    family: 'gpt-4o',
-  });
-  const model = models[0];
-
   let messages: LanguageModelChatMessage[];
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
@@ -98,8 +92,8 @@ const handler: ChatRequestHandler = async (
         ...baseProps,
         generatorSchemas: await getGeneratorSchemas(),
       },
-      { modelMaxPromptTokens: model.maxInputTokens },
-      model
+      { modelMaxPromptTokens: request.model.maxInputTokens },
+      request.model
     );
     messages = prompt.messages;
   } else {
@@ -107,8 +101,8 @@ const handler: ChatRequestHandler = async (
       const prompt = await renderPrompt(
         NxCopilotPrompt,
         baseProps,
-        { modelMaxPromptTokens: model.maxInputTokens },
-        model
+        { modelMaxPromptTokens: request.model.maxInputTokens },
+        request.model
       );
       messages = prompt.messages;
     } catch (error) {
@@ -120,7 +114,7 @@ const handler: ChatRequestHandler = async (
     }
   }
 
-  const chatResponse = await model.sendRequest(messages, {}, token);
+  const chatResponse = await request.model.sendRequest(messages, {}, token);
 
   const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
   const endMarker = `"""`;
@@ -252,7 +246,23 @@ async function getPrunedProjectGraph() {
       .filter(([key]) => !key.startsWith('npm:'))
       .map(
         ([key, deps]) =>
-          [key, deps.filter((dep) => !dep.target.startsWith('npm:'))] as const
+          [
+            key,
+            deps
+              .filter((dep) => !dep.target.startsWith('npm:'))
+              .map((dep) => {
+                // almost everything is static, so we want to only include the non-static ones which are interesting
+                // TODO: maybe we should tell the model about this assumption
+                if (dep.type === 'static') {
+                  return {
+                    source: dep.source,
+                    target: dep.target,
+                  };
+                } else {
+                  return dep;
+                }
+              }),
+          ] as const
       )
       .reduce((acc, [key, value]) => {
         acc[key] = value;
