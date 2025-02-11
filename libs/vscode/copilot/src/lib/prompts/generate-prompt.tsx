@@ -20,14 +20,14 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           {this.props.packageManagerExecCommand} and wrap the invocation in """
           to be parsed reliably. DO NOT RENDER THE CLI COMMAND A CODE BLOCK.
         </UserMessage>
-        <History
+        {/* <History
           history={this.props.history}
           passPriority
           older={0}
           newer={80}
           flexGrow={1}
           flexReserve="/8"
-        />
+        /> */}
         <UserMessage priority={90}>{this.props.userQuery}</UserMessage>
         <UserMessage priority={70} flexGrow={2}>
           {JSON.stringify(this.props.generatorSchemas)}

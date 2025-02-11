@@ -33,14 +33,14 @@ export class NxCopilotPrompt extends PromptElement<NxCopilotPromptProps> {
           official Nx documentation when relevant - Use code examples when
           applicable - Be concise and clear
         </UserMessage>
-        <History
+        {/* <History
           history={this.props.history}
           passPriority
           older={0}
           newer={80}
           flexGrow={2}
           flexReserve="/8"
-        />
+        /> */}
         <UserMessage priority={90}>{this.props.userQuery}</UserMessage>
         <UserMessage priority={60} flexGrow={2}>
           {JSON.stringify(this.props.projectGraph)}

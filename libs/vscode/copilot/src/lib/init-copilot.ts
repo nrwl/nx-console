@@ -211,6 +211,9 @@ async function getPrunedProjectGraph() {
         if (node.data.metadata?.technologies) {
           prunedNode.technologies = node.data.metadata.technologies;
         }
+        if (node.data.metadata?.owners) {
+          prunedNode.owners = node.data.metadata.owners;
+        }
         if (node.data.targets) {
           prunedNode.targets = Object.entries(node.data.targets)
             .map(([key, target]) => {
