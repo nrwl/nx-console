@@ -73,12 +73,15 @@ const handler: ChatRequestHandler = async (
 
   const projectGraph = await getPrunedProjectGraph();
 
+  const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
+
   let messages: LanguageModelChatMessage[];
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
     projectGraph: projectGraph,
     history: context.history,
     nxJson: JSON.stringify(await readNxJson(workspacePath)),
+    packageManagerExecCommand: pmExec,
   };
 
   if (request.command === 'generate') {
@@ -114,7 +117,7 @@ const handler: ChatRequestHandler = async (
 
   const chatResponse = await request.model.sendRequest(messages, {}, token);
 
-  const startMarker = new RegExp(`"""\\s*nx\\s*`);
+  const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
   const endMarker = `"""`;
 
   let pendingText = '';
@@ -152,7 +155,7 @@ const handler: ChatRequestHandler = async (
       }
       const codeSnippet = codeBuffer.slice(0, endIndex);
 
-      renderCommandSnippet(codeSnippet, stream);
+      renderCommandSnippet(codeSnippet, stream, pmExec);
       codeBuffer = codeBuffer.slice(endIndex + endMarker.length);
 
       // switch back to normal mode.
@@ -170,7 +173,8 @@ const handler: ChatRequestHandler = async (
 
 async function renderCommandSnippet(
   snippet: string,
-  stream: ChatResponseStream
+  stream: ChatResponseStream,
+  pmExec: string
 ) {
   snippet = snippet.replace(/\s+/g, ' ');
   const parsedArgs = await yargs.parse(snippet);
@@ -181,7 +185,7 @@ async function renderCommandSnippet(
     .trim();
 
   const markdownString = new MarkdownString();
-  markdownString.appendCodeblock(`nx ${cleanedSnippet}`, 'bash');
+  markdownString.appendCodeblock(`${pmExec} nx ${cleanedSnippet}`, 'bash');
   stream.markdown(markdownString);
   if (parsedArgs['cwd']) {
     stream.markdown(`cwd: \`${parsedArgs['cwd']}\``);
