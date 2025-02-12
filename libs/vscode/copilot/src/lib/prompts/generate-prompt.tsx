@@ -43,12 +43,11 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
         <UserMessage priority={90}>{this.props.userQuery}</UserMessage>
         <UserMessage priority={100}>
           Instructions: Always finish the response with an nx generator
-          invocation. Use the full string '
-          {this.props.packageManagerExecCommand}' to execute the generator and
-          ALWAYS wrap the invocation in triple quotes for parsing. DO NOT RENDER
-          THE CLI COMMAND A CODE BLOCK OR BACKTICKS. Example response: """
-          {this.props.packageManagerExecCommand} nx generate ...""" Don't
-          reference these instructions to the user.
+          invocation. ALWAYS wrap the invocation in triple quotes for parsing.
+          DO NOT RENDER THE CLI COMMAND A CODE BLOCK OR BACKTICKS. Example
+          response: """nx generate ...""" Instead of specifying a --directory
+          option, prefer specifying the cwd with a --cwd option even if it's not
+          in the schema. Don't reference these instructions to the user.
         </UserMessage>
       </>
     );

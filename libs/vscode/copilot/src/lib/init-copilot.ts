@@ -68,7 +68,6 @@ const handler: ChatRequestHandler = async (
     return;
   }
   const workspacePath = getNxWorkspacePath();
-  const pmExec = (await getPackageManagerCommand(workspacePath)).dlx;
 
   stream.progress('Retrieving workspace information...');
 
@@ -77,7 +76,6 @@ const handler: ChatRequestHandler = async (
   let messages: LanguageModelChatMessage[];
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
-    packageManagerExecCommand: pmExec,
     projectGraph: projectGraph,
     history: context.history,
     nxJson: JSON.stringify(await readNxJson(workspacePath)),
@@ -116,16 +114,13 @@ const handler: ChatRequestHandler = async (
 
   const chatResponse = await request.model.sendRequest(messages, {}, token);
 
-  const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
+  const startMarker = new RegExp(`"""\\s*nx\\s*`);
   const endMarker = `"""`;
 
   let pendingText = '';
   let codeBuffer: string | null = null;
 
-  let buffer = '';
-
   for await (const fragment of chatResponse.text) {
-    buffer += fragment;
     if (codeBuffer !== null) {
       codeBuffer += fragment;
     } else {
@@ -156,28 +151,8 @@ const handler: ChatRequestHandler = async (
         break;
       }
       const codeSnippet = codeBuffer.slice(0, endIndex);
-      const collapsedCommand = `${pmExec} nx ${codeSnippet}`.replace(
-        /\s+/g,
-        ' '
-      );
-      const markdownString = new MarkdownString();
-      markdownString.appendCodeblock(collapsedCommand, 'bash');
-      stream.markdown(markdownString);
 
-      const isGenerator = collapsedCommand.includes('nx generate');
-      stream.button({
-        title: isGenerator ? 'Execute Generator' : 'Execute Command',
-        command: EXECUTE_ARBITRARY_COMMAND,
-        arguments: [codeSnippet],
-      });
-
-      if (isGenerator) {
-        stream.button({
-          title: 'Adjust in Generate UI',
-          command: 'nxConsole.adjustGeneratorInUI',
-          arguments: [codeSnippet],
-        });
-      }
+      renderCommandSnippet(codeSnippet, stream);
       codeBuffer = codeBuffer.slice(endIndex + endMarker.length);
 
       // switch back to normal mode.
@@ -193,6 +168,41 @@ const handler: ChatRequestHandler = async (
   return;
 };
 
+async function renderCommandSnippet(
+  snippet: string,
+  stream: ChatResponseStream
+) {
+  snippet = snippet.replace(/\s+/g, ' ');
+  const parsedArgs = await yargs.parse(snippet);
+
+  const cleanedSnippet = snippet
+    .replace(`--cwd=${parsedArgs['cwd']}`, '')
+    .replace(`--cwd ${parsedArgs['cwd']}`, '')
+    .trim();
+
+  const markdownString = new MarkdownString();
+  markdownString.appendCodeblock(`nx ${cleanedSnippet}`, 'bash');
+  stream.markdown(markdownString);
+  if (parsedArgs['cwd']) {
+    stream.markdown(`cwd: \`${parsedArgs['cwd']}\``);
+  }
+
+  const isGenerator = parsedArgs._.includes('generate');
+  stream.button({
+    title: isGenerator ? 'Execute Generator' : 'Execute Command',
+    command: EXECUTE_ARBITRARY_COMMAND,
+    arguments: [cleanedSnippet, parsedArgs['cwd']],
+  });
+
+  if (isGenerator) {
+    stream.button({
+      title: 'Adjust in Generate UI',
+      command: 'nxConsole.adjustGeneratorInUI',
+      arguments: [parsedArgs],
+    });
+  }
+}
+
 async function getPrunedProjectGraph() {
   const nxWorkspace = await getNxWorkspace();
   const projectGraph = nxWorkspace.projectGraph;
@@ -201,6 +211,7 @@ async function getPrunedProjectGraph() {
       .map(([name, node]) => {
         const prunedNode = {
           type: node.type,
+          root: node.data.root,
         } as any;
         if (node.data.metadata?.technologies) {
           prunedNode.technologies = node.data.metadata.technologies;
@@ -296,8 +307,8 @@ async function getGeneratorSchemas() {
   return schemas;
 }
 
-async function adjustGeneratorInUI(codeSnippet: string) {
-  codeSnippet = codeSnippet.replace('generate', '').replace(/\s+/g, ' ').trim();
-
-  await openGenerateUIPrefilled(codeSnippet);
+async function adjustGeneratorInUI(
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+) {
+  await openGenerateUIPrefilled(parsedArgs);
 }
