@@ -28,7 +28,7 @@ export async function getShellExecutionForConfig(
     if (packageManagerCommands) {
       pmc = packageManagerCommands;
     } else {
-      pmc = await getPackageManagerCommand(config.cwd);
+      pmc = await getPackageManagerCommand(config.workspacePath ?? config.cwd);
     }
 
     command = `${pmc.exec} ${command}`;

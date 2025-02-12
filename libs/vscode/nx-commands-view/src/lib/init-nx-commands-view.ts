@@ -24,7 +24,7 @@ export function initNxCommandsView(context: ExtensionContext) {
   );
 }
 
-async function executeArbitraryCommand(command: string) {
+async function executeArbitraryCommand(command: string, cwd?: string) {
   let _command: string;
   let positional: string | undefined;
 
@@ -47,6 +47,7 @@ async function executeArbitraryCommand(command: string) {
       command: _command,
       positional,
       flags,
+      cwd,
     });
   } catch (e) {
     logAndShowTaskCreationError(e);
