@@ -1,3 +1,16 @@
+# [18.38.0](https://github.com/nrwl/nx-console/compare/vscode-v18.37.0...vscode-v18.38.0) (2025-02-12)
+
+
+### Bug Fixes
+
+* add debug mode in vscode ([#2400](https://github.com/nrwl/nx-console/issues/2400)) ([2324c95](https://github.com/nrwl/nx-console/commit/2324c959dccee246ad6dc3161ff995cdd2f0e03a))
+* **nxls:** handle broken nx.json better in nxls requests ([#2399](https://github.com/nrwl/nx-console/issues/2399)) ([b631a9d](https://github.com/nrwl/nx-console/commit/b631a9d4823b71f6a605a613bc3df5c96cd24070))
+
+
+### Features
+
+* **vscode:** allow copilot integration to specify cwd when running generators ([#2398](https://github.com/nrwl/nx-console/issues/2398)) ([f35eee1](https://github.com/nrwl/nx-console/commit/f35eee12f607a0d6dbe2b3656f81afd80db29899))
+
 # [18.37.0](https://github.com/nrwl/nx-console/compare/vscode-v18.36.0...vscode-v18.37.0) (2025-02-11)
 
 
