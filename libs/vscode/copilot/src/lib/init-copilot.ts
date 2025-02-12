@@ -56,7 +56,7 @@ const handler: ChatRequestHandler = async (
   );
 
   if (!enableNxCopilotFeaturesSetting) {
-    stream.markdown('The @nx chat participant is coming soon. Stay tuned!');
+    stream.markdown('@nx is coming soon. Stay tuned!');
     return;
   }
   const workspacePath = getNxWorkspacePath();
