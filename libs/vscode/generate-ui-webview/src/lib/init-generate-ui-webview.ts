@@ -38,9 +38,10 @@ export async function openGenerateUi(contextUri?: Uri, projectName?: string) {
   });
 }
 
-export async function openGenerateUIPrefilled(commandLine: string) {
-  const parsed = await yargs.parse(commandLine);
-  const generatorName = parsed['_'][0];
+export async function openGenerateUIPrefilled(
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+) {
+  const generatorName = parsedArgs['_'][1];
   const generator = await getOrSelectGenerator(generatorName.toString());
 
   if (!generator) {
@@ -56,7 +57,7 @@ export async function openGenerateUIPrefilled(commandLine: string) {
       ...generatorContext,
       prefillValues: {
         ...generatorContext.prefillValues,
-        ...parseIntoPrefillValues(parsed, generator.options),
+        ...parseIntoPrefillValues(parsedArgs, generator.options),
       },
     },
   });
@@ -66,7 +67,7 @@ function parseIntoPrefillValues(
   yargsParseResult: Awaited<ReturnType<typeof yargs.parse>>,
   options: Option[]
 ): Record<string, string> {
-  const positionals = yargsParseResult['_'].slice(1);
+  const positionals = yargsParseResult['_'].slice(2);
 
   const positionalFlags = options
     .filter((opt) => opt.positional !== undefined)

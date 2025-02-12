@@ -3,7 +3,12 @@ import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
 import { lspLogger } from './lsp-log';
 
 export async function isNxCloudUsed(workspacePath: string): Promise<boolean> {
-  const nxJson = await readNxJson(workspacePath);
+  let nxJson: NxJsonConfiguration;
+  try {
+    nxJson = await readNxJson(workspacePath);
+  } catch (e) {
+    return false;
+  }
 
   let getIsNxCloudUsed: (nxJson: NxJsonConfiguration) => boolean;
   try {

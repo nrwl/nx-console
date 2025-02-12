@@ -223,7 +223,7 @@ connection.onHover(async (hoverParams) => {
   return await getHover(hoverParams, jsonAst, document);
 });
 
-connection.onDefinition((definitionParams) => {
+connection.onDefinition(async (definitionParams) => {
   const definitionDocument = documents.get(definitionParams.textDocument.uri);
 
   if (!definitionDocument || !WORKING_PATH) {
@@ -232,28 +232,37 @@ connection.onDefinition((definitionParams) => {
 
   const { jsonAst, document } = getJsonDocument(definitionDocument);
 
-  return getDefinition(WORKING_PATH, definitionParams, jsonAst, document);
+  return await getDefinition(WORKING_PATH, definitionParams, jsonAst, document);
 });
 
 connection.onDocumentLinks(async (params) => {
-  const linkDocument = documents.get(params.textDocument.uri);
+  try {
+    const linkDocument = documents.get(params.textDocument.uri);
 
-  if (!linkDocument) {
-    return null;
-  }
+    if (!linkDocument) {
+      return null;
+    }
 
-  const { jsonAst, document } = getJsonDocument(linkDocument);
+    const { jsonAst, document } = getJsonDocument(linkDocument);
 
-  const schemas = await getJsonLanguageService()?.getMatchingSchemas(
-    document,
-    jsonAst
-  );
+    const schemas = await getJsonLanguageService()?.getMatchingSchemas(
+      document,
+      jsonAst
+    );
 
-  if (!schemas) {
+    if (!schemas) {
+      return;
+    }
+    const links = await getDocumentLinks(
+      WORKING_PATH,
+      jsonAst,
+      document,
+      schemas
+    );
+    return links;
+  } catch (e) {
     return;
   }
-
-  return getDocumentLinks(WORKING_PATH, jsonAst, document, schemas);
 });
 
 const jsonDocumentMapper = getLanguageModelCache();
@@ -305,7 +314,7 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  return nxWorkspace(WORKING_PATH, reset);
+  return await nxWorkspace(WORKING_PATH, reset);
 });
 
 connection.onRequest(NxWorkspaceSerializedRequest, async ({ reset }) => {
@@ -331,7 +340,7 @@ connection.onRequest(
       );
     }
 
-    return getGenerators(WORKING_PATH, args.options);
+    return await getGenerators(WORKING_PATH, args.options);
   }
 );
 
@@ -345,7 +354,7 @@ connection.onRequest(
       );
     }
 
-    return getGeneratorOptions(
+    return await getGeneratorOptions(
       WORKING_PATH,
       args.options.collection,
       args.options.name,
@@ -363,7 +372,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getProjectByPath(args.projectPath, WORKING_PATH);
+    return await getProjectByPath(args.projectPath, WORKING_PATH);
   }
 );
 
@@ -376,7 +385,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getProjectsByPaths(args.paths, WORKING_PATH);
+    return await getProjectsByPaths(args.paths, WORKING_PATH);
   }
 );
 
@@ -389,7 +398,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getProjectByRoot(args.projectRoot, WORKING_PATH);
+    return await getProjectByRoot(args.projectRoot, WORKING_PATH);
   }
 );
 
@@ -402,7 +411,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getGeneratorContextV2(args.path, WORKING_PATH);
+    return await getGeneratorContextV2(args.path, WORKING_PATH);
   }
 );
 
@@ -418,7 +427,7 @@ connection.onRequest(NxProjectGraphOutputRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getProjectGraphOutput(WORKING_PATH);
+  return await getProjectGraphOutput(WORKING_PATH);
 });
 
 connection.onRequest(NxCreateProjectGraphRequest, async ({ showAffected }) => {
@@ -449,7 +458,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getTransformedGeneratorSchema(WORKING_PATH, schema);
+    return await getTransformedGeneratorSchema(WORKING_PATH, schema);
   }
 );
 
@@ -462,7 +471,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getStartupMessage(WORKING_PATH, schema);
+    return await getStartupMessage(WORKING_PATH, schema);
   }
 );
 
@@ -470,14 +479,14 @@ connection.onRequest(NxHasAffectedProjectsRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return hasAffectedProjects(WORKING_PATH, lspLogger);
+  return await hasAffectedProjects(WORKING_PATH, lspLogger);
 });
 
 connection.onRequest(NxSourceMapFilesToProjectsMapRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getSourceMapFilesToProjectsMap(WORKING_PATH);
+  return await getSourceMapFilesToProjectsMap(WORKING_PATH);
 });
 
 connection.onRequest(
@@ -489,7 +498,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getTargetsForConfigFile(
+    return await getTargetsForConfigFile(
       args.projectName,
       args.configFilePath,
       WORKING_PATH
@@ -501,21 +510,21 @@ connection.onRequest(NxCloudStatusRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getNxCloudStatus(WORKING_PATH);
+  return await getNxCloudStatus(WORKING_PATH);
 });
 
 connection.onRequest(NxCloudOnboardingInfoRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getCloudOnboardingInfo(WORKING_PATH);
+  return await getCloudOnboardingInfo(WORKING_PATH);
 });
 
 connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getPDVData(WORKING_PATH, args.filePath);
+  return await getPDVData(WORKING_PATH, args.filePath);
 });
 
 connection.onRequest(NxRecentCIPEDataRequest, async () => {
@@ -523,7 +532,7 @@ connection.onRequest(NxRecentCIPEDataRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  return getRecentCIPEData(WORKING_PATH);
+  return await getRecentCIPEData(WORKING_PATH);
 });
 
 connection.onRequest(
@@ -535,7 +544,7 @@ connection.onRequest(
         'Unable to get Nx info: no workspace path'
       );
     }
-    return parseTargetString(targetString, WORKING_PATH);
+    return await parseTargetString(targetString, WORKING_PATH);
   }
 );
 
