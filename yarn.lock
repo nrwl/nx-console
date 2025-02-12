@@ -5157,6 +5157,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vscode/chat-extension-utils@npm:^0.0.0-alpha.5":
+  version: 0.0.0-alpha.5
+  resolution: "@vscode/chat-extension-utils@npm:0.0.0-alpha.5"
+  dependencies:
+    "@vscode/prompt-tsx": ^0.3.0-alpha.14
+  checksum: 20a182c54398d8985af47209dcb7efc6fef2eb47f25bfb13800d3c45546fe28042439386175264ff2b14a704d0601bc0a0a59fd146d2cdb8c331236be7982fc9
+  languageName: node
+  linkType: hard
+
 "@vscode/codicons@npm:^0.0.36":
   version: 0.0.36
   resolution: "@vscode/codicons@npm:0.0.36"
@@ -5171,7 +5180,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vscode/prompt-tsx@npm:^0.3.0-alpha.18":
+"@vscode/prompt-tsx@npm:^0.3.0-alpha.14, @vscode/prompt-tsx@npm:^0.3.0-alpha.18":
   version: 0.3.0-alpha.18
   resolution: "@vscode/prompt-tsx@npm:0.3.0-alpha.18"
   checksum: fd273d88c4b7dc0f6ffab3b1f0079b2e691a225bd38082d90eca046b9e500679e6f9b43411ca6db72203db150f5ab4cb36861730387455619c1cf309bac94283
@@ -13942,6 +13951,7 @@ __metadata:
     "@typescript-eslint/parser": 7.16.1
     "@typescript-eslint/utils": 7.16.1
     "@vscode-elements/elements": 1.9.2-pre.1
+    "@vscode/chat-extension-utils": ^0.0.0-alpha.5
     "@vscode/codicons": ^0.0.36
     "@vscode/prompt-tsx": ^0.3.0-alpha.18
     "@vscode/test-electron": ^2.1.5
