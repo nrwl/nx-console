@@ -796,11 +796,11 @@
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
         },
-        "nxConsole.enableNxCopilotFeatures": {
+        "nxConsole.debugMode": {
           "type": "boolean",
           "default": false,
           "scope": "machine",
-          "description": "Enable Nx-specific copilot features (Experimental)."
+          "description": "Enable debug mode (internal)"
         }
       }
     },

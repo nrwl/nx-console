@@ -14,7 +14,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'showNodeVersionOnStartup',
   'nxWorkspacePath',
   'nxCloudNotifications',
-  'enableNxCopilotFeatures',
+  'debugMode',
 ] as const;
 
 export type GlobalConfig = {
@@ -33,7 +33,7 @@ export type GlobalConfig = {
   showNodeVersionOnStartup: boolean;
   nxWorkspacePath: string;
   nxCloudNotifications: 'all' | 'errors' | 'none';
-  enableNxCopilotFeatures: boolean;
+  debugMode: boolean;
 };
 
 /**

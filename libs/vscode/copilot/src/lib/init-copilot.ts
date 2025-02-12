@@ -7,7 +7,8 @@ import {
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { renderPrompt } from '@vscode/prompt-tsx';
+import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
+import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
 import { readFile } from 'fs/promises';
 import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
 import {
@@ -19,8 +20,7 @@ import {
   ChatResponseStream,
   commands,
   ExtensionContext,
-  LanguageModelChatMessage,
-  lm,
+  LanguageModelToolResult,
   MarkdownString,
   Uri,
 } from 'vscode';
@@ -51,20 +51,12 @@ const handler: ChatRequestHandler = async (
   token: CancellationToken
 ) => {
   const enableNxCopilotFeaturesSetting = GlobalConfigurationStore.instance.get(
-    'enableNxCopilotFeatures',
+    'debugMode',
     false
   );
 
   if (!enableNxCopilotFeaturesSetting) {
-    stream.markdown(
-      'The @nx copilot chat participant is experimental. To use it, please enable it in the settings.'
-    );
-
-    stream.button({
-      title: 'Enable Nx Copilot',
-      command: 'workbench.action.openSettings',
-      arguments: ['nxConsole.enableNxCopilotFeatures'],
-    });
+    stream.markdown('The @nx chat participant is coming soon. Stay tuned!');
     return;
   }
   const workspacePath = getNxWorkspacePath();
@@ -75,7 +67,6 @@ const handler: ChatRequestHandler = async (
 
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
 
-  let messages: LanguageModelChatMessage[];
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
     projectGraph: projectGraph,
@@ -84,38 +75,39 @@ const handler: ChatRequestHandler = async (
     packageManagerExecCommand: pmExec,
   };
 
+  let promptElementAndProps: PromptElementAndProps<
+    NxCopilotPrompt | GeneratePrompt
+  >;
+
   if (request.command === 'generate') {
     stream.progress('Retrieving generator schemas...');
 
-    const prompt = await renderPrompt(
-      GeneratePrompt,
-      {
+    promptElementAndProps = {
+      promptElement: GeneratePrompt,
+      props: {
         ...baseProps,
         generatorSchemas: await getGeneratorSchemas(),
       },
-      { modelMaxPromptTokens: request.model.maxInputTokens },
-      request.model
-    );
-    messages = prompt.messages;
+    };
   } else {
-    try {
-      const prompt = await renderPrompt(
-        NxCopilotPrompt,
-        baseProps,
-        { modelMaxPromptTokens: request.model.maxInputTokens },
-        request.model
-      );
-      messages = prompt.messages;
-    } catch (error) {
-      console.error('Error rendering prompt:', error);
-      stream.markdown(
-        'An error occurred while rendering the prompt. Please try again later.'
-      );
-      return;
-    }
+    promptElementAndProps = {
+      promptElement: NxCopilotPrompt,
+      props: baseProps,
+    };
   }
 
-  const chatResponse = await request.model.sendRequest(messages, {}, token);
+  const chatParticipantRequest = sendChatParticipantRequest(
+    request,
+    context,
+    {
+      prompt: promptElementAndProps,
+      responseStreamOptions: {
+        stream,
+      },
+      tools: [],
+    },
+    token
+  );
 
   const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
   const endMarker = `"""`;
@@ -123,44 +115,49 @@ const handler: ChatRequestHandler = async (
   let pendingText = '';
   let codeBuffer: string | null = null;
 
-  for await (const fragment of chatResponse.text) {
-    if (codeBuffer !== null) {
-      codeBuffer += fragment;
+  for await (const fragment of chatParticipantRequest.stream) {
+    if (fragment instanceof LanguageModelToolResult) {
+      stream.markdown(JSON.stringify(fragment));
+      continue;
     } else {
-      pendingText += fragment;
-    }
-
-    // Process when we're not in a code block: look for a start marker.
-    while (codeBuffer === null) {
-      const match = pendingText.match(startMarker);
-      const startIndex = match ? match.index : -1;
-      if (startIndex === -1) {
-        break;
+      if (codeBuffer !== null) {
+        codeBuffer += fragment.value;
+      } else {
+        pendingText += fragment.value;
       }
-      if (startIndex > 0) {
-        stream.markdown(pendingText.slice(0, startIndex));
+
+      // Process when we're not in a code block: look for a start marker.
+      while (codeBuffer === null) {
+        const match = pendingText.match(startMarker);
+        const startIndex = match ? match.index : -1;
+        if (startIndex === -1) {
+          break;
+        }
+        if (startIndex > 0) {
+          stream.markdown(pendingText.slice(0, startIndex));
+        }
+        // Switch to code mode.
+        codeBuffer = '';
+        pendingText = pendingText.slice(startIndex + match[0].length);
+        codeBuffer += pendingText;
+        pendingText = '';
       }
-      // Switch to code mode.
-      codeBuffer = '';
-      pendingText = pendingText.slice(startIndex + match[0].length);
-      codeBuffer += pendingText;
-      pendingText = '';
-    }
 
-    // If we are in a code block, look for the end marker.
-    while (codeBuffer !== null) {
-      const endIndex = codeBuffer.indexOf(endMarker);
-      if (endIndex === -1) {
-        break;
+      // If we are in a code block, look for the end marker.
+      while (codeBuffer !== null) {
+        const endIndex = codeBuffer.indexOf(endMarker);
+        if (endIndex === -1) {
+          break;
+        }
+        const codeSnippet = codeBuffer.slice(0, endIndex);
+
+        renderCommandSnippet(codeSnippet, stream, pmExec);
+        codeBuffer = codeBuffer.slice(endIndex + endMarker.length);
+
+        // switch back to normal mode.
+        pendingText += codeBuffer;
+        codeBuffer = null;
       }
-      const codeSnippet = codeBuffer.slice(0, endIndex);
-
-      renderCommandSnippet(codeSnippet, stream, pmExec);
-      codeBuffer = codeBuffer.slice(endIndex + endMarker.length);
-
-      // switch back to normal mode.
-      pendingText += codeBuffer;
-      codeBuffer = null;
     }
   }
 
@@ -168,7 +165,7 @@ const handler: ChatRequestHandler = async (
     stream.markdown(pendingText);
   }
 
-  return;
+  return await chatParticipantRequest.result;
 };
 
 async function renderCommandSnippet(
