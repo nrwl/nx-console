@@ -17,9 +17,9 @@ import {
 
 interface IHistoryProps extends BasePromptElementProps {
   history: ChatContext['history'];
-  newer: number; // last 2 message priority values
-  older: number; // previous message priority values
-  passPriority: true; // require this prop be set!
+  newer: number;
+  older: number;
+  passPriority: true;
 }
 
 export class History extends PromptElement<IHistoryProps> {

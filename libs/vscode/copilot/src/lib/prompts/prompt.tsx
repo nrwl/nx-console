@@ -6,10 +6,12 @@ import {
 } from '@vscode/prompt-tsx';
 import { ChatContext } from 'vscode';
 import { History } from './history';
+import { NxProjectGraphPrompt } from './project-graph-prompt';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
 
 export interface NxCopilotPromptProps extends BasePromptElementProps {
   packageManagerExecCommand: string;
-  projectGraph: Record<string, any>;
+  projectGraph: ProjectGraph;
   history: ChatContext['history'];
   userQuery: string;
   nxJson: string;
@@ -35,9 +37,12 @@ export class NxCopilotPrompt extends PromptElement<NxCopilotPromptProps> {
           remember the user cannot see this, so don't reference it directly. Use
           the metadata to answer questions about ownership, dependencies, etc.
         </UserMessage>
-        <UserMessage priority={60} flexGrow={2} flexReserve="/4">
-          {JSON.stringify(this.props.projectGraph)}
-        </UserMessage>
+        <NxProjectGraphPrompt
+          projectGraph={this.props.projectGraph}
+          flexGrow={2}
+          flexReserve="/4"
+          passPriority
+        />
         <UserMessage priority={50} flexGrow={3}>
           {this.props.nxJson}
         </UserMessage>

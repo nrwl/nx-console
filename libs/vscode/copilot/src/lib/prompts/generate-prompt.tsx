@@ -1,5 +1,6 @@
-import { PromptElement, SystemMessage, UserMessage } from '@vscode/prompt-tsx';
+import { PromptElement, UserMessage } from '@vscode/prompt-tsx';
 import { History } from './history';
+import { NxProjectGraphPrompt } from './project-graph-prompt';
 import { NxCopilotPromptProps } from './prompt';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
@@ -28,9 +29,13 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
         <UserMessage priority={70} flexGrow={1}>
           {JSON.stringify(this.props.generatorSchemas)}
         </UserMessage>
-        <UserMessage priority={60} flexGrow={2}>
-          {JSON.stringify(this.props.projectGraph)}
-        </UserMessage>
+        <NxProjectGraphPrompt
+          projectGraph={this.props.projectGraph}
+          priority={60}
+          flexGrow={2}
+          flexReserve="/4"
+          passPriority
+        />
         <UserMessage priority={50} flexGrow={3}>
           {this.props.nxJson}
         </UserMessage>

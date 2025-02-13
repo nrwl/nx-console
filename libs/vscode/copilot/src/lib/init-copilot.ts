@@ -63,7 +63,7 @@ const handler: ChatRequestHandler = async (
 
   stream.progress('Retrieving workspace information...');
 
-  const projectGraph = await getPrunedProjectGraph();
+  const projectGraph = (await getNxWorkspace()).projectGraph;
 
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
 
@@ -202,88 +202,6 @@ async function renderCommandSnippet(
       arguments: [parsedArgs],
     });
   }
-}
-
-async function getPrunedProjectGraph() {
-  const nxWorkspace = await getNxWorkspace();
-  const projectGraph = nxWorkspace.projectGraph;
-  return {
-    nodes: Object.entries(projectGraph.nodes)
-      .map(([name, node]) => {
-        const prunedNode = {
-          type: node.type,
-          root: node.data.root,
-        } as any;
-        if (node.data.metadata?.technologies) {
-          prunedNode.technologies = node.data.metadata.technologies;
-        }
-        if (node.data.metadata?.owners) {
-          prunedNode.owners = node.data.metadata.owners;
-        }
-        if (node.data.tags) {
-          prunedNode.tags = node.data.tags;
-        }
-        if (node.data.targets) {
-          prunedNode.targets = Object.entries(node.data.targets)
-            .map(([key, target]) => {
-              const prunedTarget = {
-                executor: target.executor,
-              } as Partial<TargetConfiguration>;
-              if (target.command) {
-                prunedTarget.command = target.command;
-              }
-              if (target.options.commands) {
-                prunedTarget.command = target.options.commands;
-              }
-              if (
-                target.configurations &&
-                Object.keys(target.configurations).length > 0
-              ) {
-                prunedTarget.configurations = Object.keys(
-                  target.configurations
-                );
-              }
-              return [key, prunedTarget] as const;
-            })
-            .reduce((acc, [key, target]) => {
-              acc[key] = target;
-              return acc;
-            }, {});
-        }
-
-        return [name, prunedNode] as const;
-      })
-      .reduce((acc, [name, node]) => {
-        acc[name] = node;
-        return acc;
-      }, {}),
-    dependencies: Object.entries(projectGraph.dependencies)
-      .filter(([key]) => !key.startsWith('npm:'))
-      .map(
-        ([key, deps]) =>
-          [
-            key,
-            deps
-              .filter((dep) => !dep.target.startsWith('npm:'))
-              .map((dep) => {
-                // almost everything is static, so we want to only include the non-static ones which are interesting
-                // TODO: maybe we should tell the model about this assumption
-                if (dep.type === 'static') {
-                  return {
-                    source: dep.source,
-                    target: dep.target,
-                  };
-                } else {
-                  return dep;
-                }
-              }),
-          ] as const
-      )
-      .reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {}),
-  };
 }
 
 async function getGeneratorSchemas() {
