@@ -10,7 +10,7 @@ import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
 import { readFile } from 'fs/promises';
-import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
+import type { NxJsonConfiguration } from 'nx/src/devkit-exports.js';
 import {
   CancellationToken,
   chat,
@@ -67,12 +67,14 @@ const handler: ChatRequestHandler = async (
 
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
 
+  const nxJson = await tryReadNxJson(workspacePath);
+
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
-    projectGraph: projectGraph,
     history: context.history,
-    nxJson: JSON.stringify(await readNxJson(workspacePath)),
     packageManagerExecCommand: pmExec,
+    projectGraph,
+    nxJson,
   };
 
   let promptElementAndProps: PromptElementAndProps<
@@ -233,4 +235,14 @@ async function adjustGeneratorInUI(
   parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
 ) {
   await openGenerateUIPrefilled(parsedArgs);
+}
+
+export async function tryReadNxJson(
+  workspacePath: string
+): Promise<NxJsonConfiguration | undefined> {
+  try {
+    return await readNxJson(workspacePath);
+  } catch (e) {
+    return undefined;
+  }
 }

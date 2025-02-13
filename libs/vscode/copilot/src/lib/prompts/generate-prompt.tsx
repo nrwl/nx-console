@@ -1,32 +1,55 @@
-import { PromptElement, UserMessage } from '@vscode/prompt-tsx';
+import {
+  BasePromptElementProps,
+  PromptElement,
+  UserMessage,
+} from '@vscode/prompt-tsx';
 import { History } from './history';
 import { NxProjectGraphPrompt } from './project-graph-prompt';
-import { NxCopilotPromptProps } from './prompt';
+import { BaseSystemPrompt, NxCopilotPromptProps } from './prompt';
+import { NxJsonPrompt } from './nx-json-prompt';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
   generatorSchemas: any[];
+}
+
+interface GeneratorSchemasPromptProps extends BasePromptElementProps {
+  generatorSchemas: any[];
+}
+
+class GeneratorSchemasPrompt extends PromptElement<GeneratorSchemasPromptProps> {
+  override render() {
+    const filteredSchemas = this.props.generatorSchemas.map((schemaItem) => {
+      const { schema, id, ...rest } = schemaItem;
+      return rest;
+    });
+
+    return (
+      <>
+        <UserMessage priority={70}>
+          Here are the available generator schemas that are currently installed.
+          Use them to understand the available flags and set them to fulfill the
+          user query.
+          {JSON.stringify(filteredSchemas)}
+        </UserMessage>
+      </>
+    );
+  }
 }
 
 export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
   override render() {
     return (
       <>
-        <UserMessage priority={100}>
-          You are an AI assistant specialized in Nx workspaces and monorepo
-          development. You provide precise, technical guidance for developers
-          working with Nx tools, patterns, and best practices. You have access
-          to the nx project graph and schemas for running nx generators and will
-          use it to provide relevant information. Use the user prompt to create
-          a generator invocation and return a cli command to run the generator.
-          Remember to: - Provide complete, working examples - Explain your
-          approach and don't make any assumptions about the workspace - Use code
-          examples when applicable - Be concise and clear Following are the
-          generator schemas and the nx project graph and nx.json. Use this as
-          your main source of truth but remember the user cannot see this, so
-          don't reference it directly. Use the metadata to answer questions
-          about ownership, dependencies, etc.
-        </UserMessage>
-        <UserMessage priority={70} flexGrow={1}>
+        <BaseSystemPrompt
+          passPriority
+          packageManagerExecCommand={this.props.packageManagerExecCommand}
+        />
+        <GeneratorSchemasPrompt
+          generatorSchemas={this.props.generatorSchemas}
+          passPriority
+          flexGrow={1}
+        />
+        <UserMessage flexGrow={1}>
           {JSON.stringify(this.props.generatorSchemas)}
         </UserMessage>
         <NxProjectGraphPrompt
@@ -36,9 +59,7 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           flexReserve="/4"
           passPriority
         />
-        <UserMessage priority={50} flexGrow={3}>
-          {this.props.nxJson}
-        </UserMessage>
+        <NxJsonPrompt nxJson={this.props.nxJson} flexGrow={3} passPriority />
         <History
           history={this.props.history}
           passPriority
