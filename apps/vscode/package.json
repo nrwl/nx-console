@@ -422,6 +422,28 @@
         ]
       }
     ],
+    "languageModelTools": [
+      {
+        "name": "nx_generator-details",
+        "tags": [
+          "nx"
+        ],
+        "toolReferenceName": "nxGeneratorDetails",
+        "displayName": "Generator Details",
+        "modelDescription": "The detailed JSON schema for an nx generator",
+        "icon": "$(code-oss)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "generatorName": {
+              "type": "string",
+              "description": "The name of the generator to get details for.",
+              "default": 0
+            }
+          }
+        }
+      }
+    ],
     "commands": [
       {
         "command": "nxConsole.refreshWorkspace",

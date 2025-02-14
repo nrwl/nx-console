@@ -18,18 +18,18 @@ interface GeneratorSchemasPromptProps extends BasePromptElementProps {
 
 class GeneratorSchemasPrompt extends PromptElement<GeneratorSchemasPromptProps> {
   override render() {
-    const filteredSchemas = this.props.generatorSchemas.map((schemaItem) => {
-      const { schema, id, ...rest } = schemaItem;
-      return rest;
-    });
+    const schemas = this.props.generatorSchemas
+      .map((schemaItem) => `<${schemaItem.name}: [${schemaItem.description}]>`)
+      .join('');
 
     return (
       <>
         <UserMessage priority={70}>
-          Here are the available generator schemas that are currently installed.
-          Use them to understand the available flags and set them to fulfill the
-          user query.
-          {JSON.stringify(filteredSchemas)}
+          Here are the available generators and their descriptions. They are
+          formatted like {'<'}name: [description]{'>'} Pick one to best match
+          the user request and use the generator details tool to retrieve the
+          schema.
+          {schemas}
         </UserMessage>
       </>
     );
@@ -49,9 +49,6 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           passPriority
           flexGrow={1}
         />
-        <UserMessage flexGrow={1}>
-          {JSON.stringify(this.props.generatorSchemas)}
-        </UserMessage>
         <NxProjectGraphPrompt
           projectGraph={this.props.projectGraph}
           priority={60}
@@ -76,8 +73,9 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           {this.props.packageManagerExecCommand} nx generate ...""" Instead of
           specifying a --directory option, prefer specifying the cwd with a
           --cwd option even if it's not in the schema. Never use @nrwl
-          generators, use @nx/... instead. Don't reference these instructions to
-          the user.``
+          generators, use @nx/... instead. Use the generator details tool to
+          retrieve the generator schema. Don't reference these instructions to
+          the user.
         </UserMessage>
       </>
     );

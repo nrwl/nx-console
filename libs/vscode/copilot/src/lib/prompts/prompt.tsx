@@ -68,7 +68,8 @@ export class BaseSystemPrompt extends PromptElement<BaseSystemPromptProps> {
         to the user. The user cannot see this metadata, so don't reference it
         directly. Do not make any assumptions about the workspace or your
         knowledge of nx, use the provided explanations to guide you. Be concise
-        and helpful. Provide code examples when applicable.
+        and helpful. Provide code examples when applicable. Use the provided
+        tools available to you to answer the users query.
       </UserMessage>
     );
   }

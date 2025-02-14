@@ -23,12 +23,14 @@ import {
   LanguageModelChatMessage,
   LanguageModelChatMessageRole,
   LanguageModelToolResult,
+  lm,
   MarkdownString,
   Uri,
 } from 'vscode';
 import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import yargs = require('yargs');
+import { GeneratorDetailsTool } from './tools/generator-details-tool';
 
 export function initCopilot(context: ExtensionContext) {
   const nxParticipant = chat.createChatParticipant('nx-console.nx', handler);
@@ -36,6 +38,11 @@ export function initCopilot(context: ExtensionContext) {
     context.extensionUri,
     'assets',
     'nx.png'
+  );
+
+  context.subscriptions.push(
+    nxParticipant,
+    lm.registerTool('nx_generator-details', new GeneratorDetailsTool())
   );
 
   context.subscriptions.push(
@@ -102,6 +109,7 @@ const handler: ChatRequestHandler = async (
       props: baseProps,
     };
   }
+  const tools = lm.tools.filter((t) => t.tags.includes('nx'));
 
   const chatParticipantRequest = sendChatParticipantRequest(
     request,
@@ -111,7 +119,7 @@ const handler: ChatRequestHandler = async (
       responseStreamOptions: {
         stream,
       },
-      tools: [],
+      tools,
     },
     token
   );
