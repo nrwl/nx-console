@@ -4,22 +4,25 @@
   "include": [],
   "references": [
     {
-      "path": "../generate-ui-webview"
-    },
-    {
-      "path": "../../shared/npm"
+      "path": "../nx-workspace"
     },
     {
       "path": "../nx-commands-view"
     },
     {
-      "path": "../../shared/utils"
+      "path": "../generate-ui-webview"
     },
     {
       "path": "../configuration"
     },
     {
-      "path": "../nx-workspace"
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/npm"
     },
     {
       "path": "./tsconfig.lib.json"

@@ -9,28 +9,34 @@ import { BaseSystemPrompt, NxCopilotPromptProps } from './prompt';
 import { NxJsonPrompt } from './nx-json-prompt';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
-  generatorSchemas: any[];
+  generators: { name: string; description: string }[];
 }
 
 interface GeneratorSchemasPromptProps extends BasePromptElementProps {
-  generatorSchemas: any[];
+  generators: { name: string; description: string }[];
 }
 
 class GeneratorSchemasPrompt extends PromptElement<GeneratorSchemasPromptProps> {
   override render() {
-    const schemas = this.props.generatorSchemas
+    const generators = this.props.generators
       .map((schemaItem) => `<${schemaItem.name}: [${schemaItem.description}]>`)
       .join('');
 
+    const hasGenerators = this.props.generators.length > 0;
+
     return (
       <>
-        <UserMessage priority={70}>
-          Here are the available generators and their descriptions. They are
-          formatted like {'<'}name: [description]{'>'} Pick one to best match
-          the user request and use the generator details tool to retrieve the
-          schema.
-          {schemas}
-        </UserMessage>
+        {hasGenerators ? (
+          <UserMessage priority={70}>
+            Here are the available generators and their descriptions. They are
+            formatted like {'<'}name: [description]{'>'} Pick one to best match
+            the user request and use the generator details tool to retrieve the
+            schema.
+            {generators}
+          </UserMessage>
+        ) : (
+          <UserMessage> </UserMessage>
+        )}
       </>
     );
   }
@@ -45,7 +51,7 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           packageManagerExecCommand={this.props.packageManagerExecCommand}
         />
         <GeneratorSchemasPrompt
-          generatorSchemas={this.props.generatorSchemas}
+          generators={this.props.generators}
           passPriority
           flexGrow={1}
         />

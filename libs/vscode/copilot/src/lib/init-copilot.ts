@@ -1,5 +1,9 @@
 import { readNxJson } from '@nx-console/shared-npm';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
+import {
+  getPackageManagerCommand,
+  withTimeout,
+} from '@nx-console/shared-utils';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
@@ -9,14 +13,14 @@ import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
-import { readFile } from 'fs/promises';
-import type { NxJsonConfiguration } from 'nx/src/devkit-exports.js';
+import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
 import {
   CancellationToken,
   chat,
   ChatContext,
   ChatRequest,
   ChatRequestHandler,
+  ChatResponseMarkdownPart,
   ChatResponseStream,
   commands,
   ExtensionContext,
@@ -29,8 +33,8 @@ import {
 } from 'vscode';
 import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
-import yargs = require('yargs');
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
+import yargs = require('yargs');
 
 export function initCopilot(context: ExtensionContext) {
   const nxParticipant = chat.createChatParticipant('nx-console.nx', handler);
@@ -75,11 +79,14 @@ const handler: ChatRequestHandler = async (
 
   stream.progress('Retrieving workspace information...');
 
-  const projectGraph = (await getNxWorkspace()).projectGraph;
+  const projectGraph = await getProjectGraph(stream);
 
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
 
   const nxJson = await tryReadNxJson(workspacePath);
+
+  const generatorNamesAndDescriptions =
+    await getGeneratorNamesAndDescriptions();
 
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
@@ -100,7 +107,7 @@ const handler: ChatRequestHandler = async (
       promptElement: GeneratePrompt,
       props: {
         ...baseProps,
-        generatorSchemas: await getGeneratorSchemas(),
+        generators: generatorNamesAndDescriptions,
       },
     };
   } else {
@@ -109,7 +116,12 @@ const handler: ChatRequestHandler = async (
       props: baseProps,
     };
   }
-  const tools = lm.tools.filter((t) => t.tags.includes('nx'));
+
+  const tools = [];
+  // only include generator tool if there are generators
+  if (generatorNamesAndDescriptions.length > 0) {
+    tools.push(lm.tools.find((tool) => tool.name === 'nx_generator-details'));
+  }
 
   const chatParticipantRequest = sendChatParticipantRequest(
     request,
@@ -219,29 +231,51 @@ async function renderCommandSnippet(
   }
 }
 
-async function getGeneratorSchemas() {
-  const generators = await getGenerators();
-
-  const schemas = [];
-  for (const generator of generators) {
-    if (generator.schemaPath) {
-      try {
-        const schemaContent = JSON.parse(
-          await readFile(generator.schemaPath, 'utf-8')
-        );
-        delete schemaContent['$schema'];
-        delete schemaContent['$id'];
-        schemaContent.name = generator.name;
-        schemas.push(schemaContent);
-      } catch (error) {
-        console.error(
-          `Failed to read schema for generator ${generator.name}:`,
-          error
-        );
-      }
-    }
+async function getProjectGraph(
+  stream: ChatResponseStream
+): Promise<ProjectGraph | undefined> {
+  let projectGraph: ProjectGraph | undefined;
+  try {
+    await withTimeout<void>(async () => {
+      const workspace = await getNxWorkspace();
+      projectGraph = workspace?.projectGraph;
+    }, 10000);
+  } catch (e) {
+    projectGraph = undefined;
   }
-  return schemas;
+  if (
+    projectGraph === undefined ||
+    Object.keys(projectGraph.nodes).length === 0
+  ) {
+    const md = new MarkdownString();
+    md.supportThemeIcons = true;
+    md.appendMarkdown(
+      '$(warning) Unable to retrieve workspace information. Proceeding without workspace data.  '
+    );
+    stream.markdown(md);
+  }
+  return projectGraph;
+}
+
+async function getGeneratorNamesAndDescriptions(): Promise<
+  {
+    name: string;
+    description: string;
+  }[]
+> {
+  let generators: GeneratorCollectionInfo[];
+  try {
+    await withTimeout<void>(async () => {
+      generators = await getGenerators();
+    }, 3000);
+  } catch (e) {
+    generators = [];
+  }
+
+  return generators.map((generator) => ({
+    name: generator.name,
+    description: generator.data.description,
+  }));
 }
 
 async function adjustGeneratorInUI(
