@@ -75,8 +75,9 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           THE CLI COMMAND A CODE BLOCK OR BACKTICKS. Example response: """
           {this.props.packageManagerExecCommand} nx generate ...""" Instead of
           specifying a --directory option, prefer specifying the cwd with a
-          --cwd option even if it's not in the schema. Don't reference these
-          instructions to the user.
+          --cwd option even if it's not in the schema. Never use @nrwl
+          generators, use @nx/... instead. Don't reference these instructions to
+          the user.``
         </UserMessage>
       </>
     );

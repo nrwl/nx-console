@@ -20,6 +20,8 @@ import {
   ChatResponseStream,
   commands,
   ExtensionContext,
+  LanguageModelChatMessage,
+  LanguageModelChatMessageRole,
   LanguageModelToolResult,
   MarkdownString,
   Uri,
@@ -59,6 +61,9 @@ const handler: ChatRequestHandler = async (
     stream.markdown('@nx is coming soon. Stay tuned!');
     return;
   }
+
+  const intent = await determineIntent(request);
+
   const workspacePath = getNxWorkspacePath();
 
   stream.progress('Retrieving workspace information...');
@@ -81,7 +86,7 @@ const handler: ChatRequestHandler = async (
     NxCopilotPrompt | GeneratePrompt
   >;
 
-  if (request.command === 'generate') {
+  if (request.command === 'generate' || intent === 'generate') {
     stream.progress('Retrieving generator schemas...');
 
     promptElementAndProps = {
@@ -244,5 +249,52 @@ export async function tryReadNxJson(
     return await readNxJson(workspacePath);
   } catch (e) {
     return undefined;
+  }
+}
+async function determineIntent(
+  request: ChatRequest
+): Promise<'generate' | 'other'> {
+  const messages = [
+    new LanguageModelChatMessage(
+      LanguageModelChatMessageRole.User,
+      `
+      You are a classification system for an nx AI assistant. Classify the following user query into one of the following categories:
+      - <generate>
+      - <other>
+
+      Return one of these categories, wrapped in a tag like this: <other>. Return only one category.
+      If the user clearly wants to generate something, like a component, app, library or run any other kind of generator, classify it as <generate>.
+      Otherwise, classify it as <other>.
+      Here are some examples marked with Q for the query and A for the answer:
+      - Q: "Generate a library called ui-feature" A: <generate>
+      - Q: "Run the affected command" A: <other>
+      - Q: "Can you create a new react app?" A: <generate>
+      - Q: "What is the best way to test my app?" A: <other>
+      - Q: "Setup a new Nx workspace with React and Typescript" A: <generate>
+      - Q: "How do I run affected commands in Nx?" A: <other>
+      - Q: "Make a new e2e testing project" A: <generate>
+
+      If you are unsure, classify it as <other>. If the user query is not clear, classify it as <other>.
+      Here is the user query: "${request.prompt}"
+      `
+    ),
+  ];
+  let buffer = '';
+  try {
+    const stream = await request.model.sendRequest(messages, {
+      justification: 'Determine the intent of the user query',
+    });
+
+    for await (const fragment of stream.text) {
+      buffer += fragment;
+    }
+
+    if (buffer.includes(`<generate>`)) {
+      return 'generate';
+    } else {
+      return 'other';
+    }
+  } catch (e) {
+    return 'other';
   }
 }
