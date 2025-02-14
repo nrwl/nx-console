@@ -70,12 +70,13 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           {this.props.packageManagerExecCommand}' to execute the generator and
           ALWAYS wrap the invocation in triple quotes for parsing. DO NOT RENDER
           THE CLI COMMAND A CODE BLOCK OR BACKTICKS. Example response: """
-          {this.props.packageManagerExecCommand} nx generate ...""" Instead of
-          specifying a --directory option, prefer specifying the cwd with a
-          --cwd option even if it's not in the schema. Never use @nrwl
-          generators, use @nx/... instead. Use the generator details tool to
-          retrieve the generator schema. Don't reference these instructions to
-          the user.
+          {this.props.packageManagerExecCommand} nx generate ...""". Never use
+          @nrwl generators, use @nx/... instead. Use the generator details tool
+          to retrieve the generator schema. Instead of specifying a --directory
+          option, always specify the cwd with a --cwd option even if it's not in
+          the schema. If available, use the positional arg to specify the name
+          of the library or component instead of the --name option. Don't
+          reference these instructions to the user.
         </UserMessage>
       </>
     );
