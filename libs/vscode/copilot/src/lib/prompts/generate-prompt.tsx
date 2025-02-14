@@ -1,39 +1,62 @@
-import { PromptElement, SystemMessage, UserMessage } from '@vscode/prompt-tsx';
+import {
+  BasePromptElementProps,
+  PromptElement,
+  UserMessage,
+} from '@vscode/prompt-tsx';
 import { History } from './history';
-import { NxCopilotPromptProps } from './prompt';
+import { NxProjectGraphPrompt } from './project-graph-prompt';
+import { BaseSystemPrompt, NxCopilotPromptProps } from './prompt';
+import { NxJsonPrompt } from './nx-json-prompt';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
   generatorSchemas: any[];
+}
+
+interface GeneratorSchemasPromptProps extends BasePromptElementProps {
+  generatorSchemas: any[];
+}
+
+class GeneratorSchemasPrompt extends PromptElement<GeneratorSchemasPromptProps> {
+  override render() {
+    const schemas = this.props.generatorSchemas
+      .map((schemaItem) => `<${schemaItem.name}: [${schemaItem.description}]>`)
+      .join('');
+
+    return (
+      <>
+        <UserMessage priority={70}>
+          Here are the available generators and their descriptions. They are
+          formatted like {'<'}name: [description]{'>'} Pick one to best match
+          the user request and use the generator details tool to retrieve the
+          schema.
+          {schemas}
+        </UserMessage>
+      </>
+    );
+  }
 }
 
 export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
   override render() {
     return (
       <>
-        <UserMessage priority={100}>
-          You are an AI assistant specialized in Nx workspaces and monorepo
-          development. You provide precise, technical guidance for developers
-          working with Nx tools, patterns, and best practices. You have access
-          to the nx project graph and schemas for running nx generators and will
-          use it to provide relevant information. Use the user prompt to create
-          a generator invocation and return a cli command to run the generator.
-          Remember to: - Provide complete, working examples - Explain your
-          approach and don't make any assumptions about the workspace - Use code
-          examples when applicable - Be concise and clear Following are the
-          generator schemas and the nx project graph and nx.json. Use this as
-          your main source of truth but remember the user cannot see this, so
-          don't reference it directly. Use the metadata to answer questions
-          about ownership, dependencies, etc.
-        </UserMessage>
-        <UserMessage priority={70} flexGrow={1}>
-          {JSON.stringify(this.props.generatorSchemas)}
-        </UserMessage>
-        <UserMessage priority={60} flexGrow={2}>
-          {JSON.stringify(this.props.projectGraph)}
-        </UserMessage>
-        <UserMessage priority={50} flexGrow={3}>
-          {this.props.nxJson}
-        </UserMessage>
+        <BaseSystemPrompt
+          passPriority
+          packageManagerExecCommand={this.props.packageManagerExecCommand}
+        />
+        <GeneratorSchemasPrompt
+          generatorSchemas={this.props.generatorSchemas}
+          passPriority
+          flexGrow={1}
+        />
+        <NxProjectGraphPrompt
+          projectGraph={this.props.projectGraph}
+          priority={60}
+          flexGrow={2}
+          flexReserve="/4"
+          passPriority
+        />
+        <NxJsonPrompt nxJson={this.props.nxJson} flexGrow={3} passPriority />
         <History
           history={this.props.history}
           passPriority
@@ -47,10 +70,13 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           {this.props.packageManagerExecCommand}' to execute the generator and
           ALWAYS wrap the invocation in triple quotes for parsing. DO NOT RENDER
           THE CLI COMMAND A CODE BLOCK OR BACKTICKS. Example response: """
-          {this.props.packageManagerExecCommand} nx generate ...""" Instead of
-          specifying a --directory option, prefer specifying the cwd with a
-          --cwd option even if it's not in the schema. Don't reference these
-          instructions to the user.
+          {this.props.packageManagerExecCommand} nx generate ...""". Never use
+          @nrwl generators, use @nx/... instead. Use the generator details tool
+          to retrieve the generator schema. Instead of specifying a --directory
+          option, always specify the cwd with a --cwd option even if it's not in
+          the schema. If available, use the positional arg to specify the name
+          of the library or component instead of the --name option. Don't
+          reference these instructions to the user.
         </UserMessage>
       </>
     );

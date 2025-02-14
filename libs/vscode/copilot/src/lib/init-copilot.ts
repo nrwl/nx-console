@@ -10,7 +10,7 @@ import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
 import { readFile } from 'fs/promises';
-import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
+import type { NxJsonConfiguration } from 'nx/src/devkit-exports.js';
 import {
   CancellationToken,
   chat,
@@ -20,13 +20,17 @@ import {
   ChatResponseStream,
   commands,
   ExtensionContext,
+  LanguageModelChatMessage,
+  LanguageModelChatMessageRole,
   LanguageModelToolResult,
+  lm,
   MarkdownString,
   Uri,
 } from 'vscode';
 import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import yargs = require('yargs');
+import { GeneratorDetailsTool } from './tools/generator-details-tool';
 
 export function initCopilot(context: ExtensionContext) {
   const nxParticipant = chat.createChatParticipant('nx-console.nx', handler);
@@ -34,6 +38,11 @@ export function initCopilot(context: ExtensionContext) {
     context.extensionUri,
     'assets',
     'nx.png'
+  );
+
+  context.subscriptions.push(
+    nxParticipant,
+    lm.registerTool('nx_generator-details', new GeneratorDetailsTool())
   );
 
   context.subscriptions.push(
@@ -59,27 +68,32 @@ const handler: ChatRequestHandler = async (
     stream.markdown('@nx is coming soon. Stay tuned!');
     return;
   }
+
+  const intent = await determineIntent(request);
+
   const workspacePath = getNxWorkspacePath();
 
   stream.progress('Retrieving workspace information...');
 
-  const projectGraph = await getPrunedProjectGraph();
+  const projectGraph = (await getNxWorkspace()).projectGraph;
 
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
 
+  const nxJson = await tryReadNxJson(workspacePath);
+
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
-    projectGraph: projectGraph,
     history: context.history,
-    nxJson: JSON.stringify(await readNxJson(workspacePath)),
     packageManagerExecCommand: pmExec,
+    projectGraph,
+    nxJson,
   };
 
   let promptElementAndProps: PromptElementAndProps<
     NxCopilotPrompt | GeneratePrompt
   >;
 
-  if (request.command === 'generate') {
+  if (request.command === 'generate' || intent === 'generate') {
     stream.progress('Retrieving generator schemas...');
 
     promptElementAndProps = {
@@ -95,6 +109,7 @@ const handler: ChatRequestHandler = async (
       props: baseProps,
     };
   }
+  const tools = lm.tools.filter((t) => t.tags.includes('nx'));
 
   const chatParticipantRequest = sendChatParticipantRequest(
     request,
@@ -104,7 +119,7 @@ const handler: ChatRequestHandler = async (
       responseStreamOptions: {
         stream,
       },
-      tools: [],
+      tools,
     },
     token
   );
@@ -204,88 +219,6 @@ async function renderCommandSnippet(
   }
 }
 
-async function getPrunedProjectGraph() {
-  const nxWorkspace = await getNxWorkspace();
-  const projectGraph = nxWorkspace.projectGraph;
-  return {
-    nodes: Object.entries(projectGraph.nodes)
-      .map(([name, node]) => {
-        const prunedNode = {
-          type: node.type,
-          root: node.data.root,
-        } as any;
-        if (node.data.metadata?.technologies) {
-          prunedNode.technologies = node.data.metadata.technologies;
-        }
-        if (node.data.metadata?.owners) {
-          prunedNode.owners = node.data.metadata.owners;
-        }
-        if (node.data.tags) {
-          prunedNode.tags = node.data.tags;
-        }
-        if (node.data.targets) {
-          prunedNode.targets = Object.entries(node.data.targets)
-            .map(([key, target]) => {
-              const prunedTarget = {
-                executor: target.executor,
-              } as Partial<TargetConfiguration>;
-              if (target.command) {
-                prunedTarget.command = target.command;
-              }
-              if (target.options.commands) {
-                prunedTarget.command = target.options.commands;
-              }
-              if (
-                target.configurations &&
-                Object.keys(target.configurations).length > 0
-              ) {
-                prunedTarget.configurations = Object.keys(
-                  target.configurations
-                );
-              }
-              return [key, prunedTarget] as const;
-            })
-            .reduce((acc, [key, target]) => {
-              acc[key] = target;
-              return acc;
-            }, {});
-        }
-
-        return [name, prunedNode] as const;
-      })
-      .reduce((acc, [name, node]) => {
-        acc[name] = node;
-        return acc;
-      }, {}),
-    dependencies: Object.entries(projectGraph.dependencies)
-      .filter(([key]) => !key.startsWith('npm:'))
-      .map(
-        ([key, deps]) =>
-          [
-            key,
-            deps
-              .filter((dep) => !dep.target.startsWith('npm:'))
-              .map((dep) => {
-                // almost everything is static, so we want to only include the non-static ones which are interesting
-                // TODO: maybe we should tell the model about this assumption
-                if (dep.type === 'static') {
-                  return {
-                    source: dep.source,
-                    target: dep.target,
-                  };
-                } else {
-                  return dep;
-                }
-              }),
-          ] as const
-      )
-      .reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {}),
-  };
-}
-
 async function getGeneratorSchemas() {
   const generators = await getGenerators();
 
@@ -315,4 +248,61 @@ async function adjustGeneratorInUI(
   parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
 ) {
   await openGenerateUIPrefilled(parsedArgs);
+}
+
+export async function tryReadNxJson(
+  workspacePath: string
+): Promise<NxJsonConfiguration | undefined> {
+  try {
+    return await readNxJson(workspacePath);
+  } catch (e) {
+    return undefined;
+  }
+}
+async function determineIntent(
+  request: ChatRequest
+): Promise<'generate' | 'other'> {
+  const messages = [
+    new LanguageModelChatMessage(
+      LanguageModelChatMessageRole.User,
+      `
+      You are a classification system for an nx AI assistant. Classify the following user query into one of the following categories:
+      - <generate>
+      - <other>
+
+      Return one of these categories, wrapped in a tag like this: <other>. Return only one category.
+      If the user clearly wants to generate something, like a component, app, library or run any other kind of generator, classify it as <generate>.
+      Otherwise, classify it as <other>.
+      Here are some examples marked with Q for the query and A for the answer:
+      - Q: "Generate a library called ui-feature" A: <generate>
+      - Q: "Run the affected command" A: <other>
+      - Q: "Can you create a new react app?" A: <generate>
+      - Q: "What is the best way to test my app?" A: <other>
+      - Q: "Setup a new Nx workspace with React and Typescript" A: <generate>
+      - Q: "How do I run affected commands in Nx?" A: <other>
+      - Q: "Make a new e2e testing project" A: <generate>
+
+      If you are unsure, classify it as <other>. If the user query is not clear, classify it as <other>.
+      Here is the user query: "${request.prompt}"
+      `
+    ),
+  ];
+  let buffer = '';
+  try {
+    const stream = await request.model.sendRequest(messages, {
+      justification: 'Determine the intent of the user query',
+    });
+
+    for await (const fragment of stream.text) {
+      buffer += fragment;
+    }
+
+    if (buffer.includes(`<generate>`)) {
+      return 'generate';
+    } else {
+      return 'other';
+    }
+  } catch (e) {
+    return 'other';
+  }
 }

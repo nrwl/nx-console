@@ -194,7 +194,8 @@
         {
           "dependentTasksOutputFiles": "**/*",
           "transitive": true
-        }
+        },
+        "{projectRoot}/src/package.json"
       ],
       "dependsOn": ["^build"]
     },
