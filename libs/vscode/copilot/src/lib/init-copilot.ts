@@ -305,7 +305,7 @@ async function determineIntent(
       - <other>
 
       Return one of these categories, wrapped in a tag like this: <other>. Return only one category.
-      If the user clearly wants to generate something, like a component, app, library or run any other kind of generator, classify it as <generate>.
+      If the user wants to generate something or is interested in generators or related functionality classify it as <generate>.
       Otherwise, classify it as <other>.
       Here are some examples marked with Q for the query and A for the answer:
       - Q: "Generate a library called ui-feature" A: <generate>
@@ -315,8 +315,10 @@ async function determineIntent(
       - Q: "Setup a new Nx workspace with React and Typescript" A: <generate>
       - Q: "How do I run affected commands in Nx?" A: <other>
       - Q: "Make a new e2e testing project" A: <generate>
+      - Q: "I need to create a lib with some features. Where should I do it?" A: <generate>
+      - Q: "How do I set up a new app?" A: <generate>
 
-      If you are unsure, classify it as <other>. If the user query is not clear, classify it as <other>.
+      If the user query is not clear, classify it as <other>. If you are unsure, classify it as <generate>.
       Here is the user query: "${request.prompt}"
       `
     ),
