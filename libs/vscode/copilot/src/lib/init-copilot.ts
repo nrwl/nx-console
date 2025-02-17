@@ -63,16 +63,6 @@ const handler: ChatRequestHandler = async (
   stream: ChatResponseStream,
   token: CancellationToken
 ) => {
-  const enableNxCopilotFeaturesSetting = GlobalConfigurationStore.instance.get(
-    'debugMode',
-    false
-  );
-
-  if (!enableNxCopilotFeaturesSetting) {
-    stream.markdown('@nx is coming soon. Stay tuned!');
-    return;
-  }
-
   const intent = await determineIntent(request);
 
   const workspacePath = getNxWorkspacePath();

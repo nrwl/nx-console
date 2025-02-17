@@ -817,12 +817,6 @@
           ],
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
-        },
-        "nxConsole.debugMode": {
-          "type": "boolean",
-          "default": false,
-          "scope": "machine",
-          "description": "Enable debug mode (internal)"
         }
       }
     },
