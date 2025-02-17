@@ -9,6 +9,8 @@ import { History } from './history';
 import { NxProjectGraphPrompt } from './project-graph-prompt';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
 import { NxJsonPrompt } from './nx-json-prompt';
+import { DocsPageSection } from '../context';
+import { DocsPagesPrompt } from './docs-pages-prompt';
 
 export interface NxCopilotPromptProps extends BasePromptElementProps {
   packageManagerExecCommand: string;
@@ -16,6 +18,7 @@ export interface NxCopilotPromptProps extends BasePromptElementProps {
   history: ChatContext['history'];
   userQuery: string;
   nxJson: NxJsonConfiguration;
+  docsPages: DocsPageSection[];
 }
 
 export class NxCopilotPrompt extends PromptElement<NxCopilotPromptProps> {
@@ -33,6 +36,11 @@ export class NxCopilotPrompt extends PromptElement<NxCopilotPromptProps> {
           passPriority
         />
         <NxJsonPrompt nxJson={this.props.nxJson} flexGrow={3} passPriority />
+        <DocsPagesPrompt
+          docsPages={this.props.docsPages}
+          flexGrow={5}
+          passPriority
+        />
         <History
           history={this.props.history}
           passPriority

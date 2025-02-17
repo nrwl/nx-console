@@ -7,6 +7,7 @@ import { History } from './history';
 import { NxProjectGraphPrompt } from './project-graph-prompt';
 import { BaseSystemPrompt, NxCopilotPromptProps } from './prompt';
 import { NxJsonPrompt } from './nx-json-prompt';
+import { DocsPagesPrompt } from './docs-pages-prompt';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
   generators: { name: string; description: string }[];
@@ -63,6 +64,11 @@ export class GeneratePrompt extends PromptElement<GeneratePromptProps> {
           passPriority
         />
         <NxJsonPrompt nxJson={this.props.nxJson} flexGrow={3} passPriority />
+        <DocsPagesPrompt
+          docsPages={this.props.docsPages}
+          flexGrow={5}
+          passPriority
+        />
         <History
           history={this.props.history}
           passPriority

@@ -33,6 +33,13 @@ import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
+import { get } from 'http';
+import {
+  getDocsContext,
+  getGeneratorNamesAndDescriptions,
+  getProjectGraph,
+  tryReadNxJson,
+} from './context';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -76,15 +83,15 @@ const handler: ChatRequestHandler = async (
   const telemetry = getTelemetry();
   telemetry.logUsage('ai.chat-message');
   const intent = await determineIntent(request);
-
   const workspacePath = getNxWorkspacePath();
 
   stream.progress('Retrieving workspace information...');
-
   const projectGraph = await getProjectGraph(stream);
 
-  const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
+  stream.progress('Retrieving relevant documentation...');
+  const docsPages = await getDocsContext(request.prompt, context.history);
 
+  const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
   const nxJson = await tryReadNxJson(workspacePath);
 
   const generatorNamesAndDescriptions =
@@ -96,6 +103,7 @@ const handler: ChatRequestHandler = async (
     packageManagerExecCommand: pmExec,
     projectGraph,
     nxJson,
+    docsPages,
   };
 
   let promptElementAndProps: PromptElementAndProps<
@@ -233,53 +241,6 @@ async function renderCommandSnippet(
   }
 }
 
-async function getProjectGraph(
-  stream: ChatResponseStream
-): Promise<ProjectGraph | undefined> {
-  let projectGraph: ProjectGraph | undefined;
-  try {
-    await withTimeout<void>(async () => {
-      const workspace = await getNxWorkspace();
-      projectGraph = workspace?.projectGraph;
-    }, 10000);
-  } catch (e) {
-    projectGraph = undefined;
-  }
-  if (
-    projectGraph === undefined ||
-    Object.keys(projectGraph.nodes).length === 0
-  ) {
-    const md = new MarkdownString();
-    md.supportThemeIcons = true;
-    md.appendMarkdown(
-      '$(warning) Unable to retrieve workspace information. Proceeding without workspace data.  '
-    );
-    stream.markdown(md);
-  }
-  return projectGraph;
-}
-
-async function getGeneratorNamesAndDescriptions(): Promise<
-  {
-    name: string;
-    description: string;
-  }[]
-> {
-  let generators: GeneratorCollectionInfo[];
-  try {
-    await withTimeout<void>(async () => {
-      generators = await getGenerators();
-    }, 3000);
-  } catch (e) {
-    generators = [];
-  }
-
-  return generators.map((generator) => ({
-    name: generator.name,
-    description: generator.data.description,
-  }));
-}
-
 async function adjustGeneratorInUI(
   parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
 ) {
@@ -304,15 +265,6 @@ function executeResponseCommand(
   );
 }
 
-export async function tryReadNxJson(
-  workspacePath: string
-): Promise<NxJsonConfiguration | undefined> {
-  try {
-    return await readNxJson(workspacePath);
-  } catch (e) {
-    return undefined;
-  }
-}
 async function determineIntent(
   request: ChatRequest
 ): Promise<'generate' | 'other'> {

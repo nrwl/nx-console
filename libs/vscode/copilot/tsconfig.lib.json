@@ -11,9 +11,6 @@
       "path": "../telemetry/tsconfig.lib.json"
     },
     {
-      "path": "../nx-workspace/tsconfig.lib.json"
-    },
-    {
       "path": "../nx-commands-view/tsconfig.lib.json"
     },
     {
@@ -21,6 +18,12 @@
     },
     {
       "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
       "path": "../../shared/utils/tsconfig.lib.json"
