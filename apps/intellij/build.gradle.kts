@@ -12,10 +12,6 @@ val nxlsRoot = "${rootDir}/dist/apps/nxls"
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
-    // Java support
-    id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "2.0.20"
     // Kotlin serialization
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
     // Gradle IntelliJ Platform Plugin
@@ -27,8 +23,6 @@ plugins {
     id("org.jetbrains.qodana") version "0.1.13"
     // Gradle Kover Plugin
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
-
-    id("com.ncorti.ktfmt.gradle") version "0.11.0"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -80,6 +74,15 @@ dependencies {
         zipSigner()
         instrumentationTools()
     }
+    implementation(project(":libs:intellij:models"))
+    implementation(project(":libs:intellij:nxls"))
+    implementation(project(":libs:intellij:utils"))
+    implementation(project(":libs:intellij:settings"))
+    implementation(project(":libs:intellij:console_bundle"))
+    implementation(project(":libs:intellij:icons"))
+    implementation(project(":libs:intellij:ide"))
+    implementation(project(":libs:intellij:telemetry"))
+    implementation(project(":libs:intellij:project"))
 }
 
 ktfmt { kotlinLangStyle() }

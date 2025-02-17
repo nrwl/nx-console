@@ -33,7 +33,7 @@
     <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
     <!-- Nxls -->
-    <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
+    <postStartupActivity implementation="dev.nx.console.project.ProjectPostStartup"/>
 
     <!-- Settings -->
     <projectConfigurable
@@ -81,7 +81,7 @@
     <toolWindow id="Nx Console"
                 anchor="right"
                 factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
-                icon="dev.nx.console.NxIcons.Action"/>
+                icon="dev.nx.console.icons.NxIcons.Action"/>
 
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
   </extensions>
@@ -94,47 +94,47 @@
   </applicationListeners>
   <actions>
     <!-- Misc -->
-    <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
-            text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
+    <action id="dev.nx.console.graph.NxRefreshWorkspaceAction" class="dev.nx.console.graph.NxRefreshWorkspaceAction"
+            text="Nx: Refresh Workspace" icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="EditorTabPopupMenu"/>
       <add-to-group group-id="EditorTabsEntryPoint"/>
     </action>
     <action id="dev.nx.console.ide.ShowNxProjectConfigurationAction"
             class="dev.nx.console.ide.ShowNxProjectConfigurationAction"
-            text="Nx: Show Project Configuration" icon="dev.nx.console.NxIcons.Action">
+            text="Nx: Show Project Configuration" icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
 
-    <action id="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
-            class="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
-            icon="dev.nx.console.NxIcons.Action"
+    <action id="dev.nx.console.notifier.AnalyzeNxConfigurationFilesAction"
+            class="dev.nx.console.notifier.AnalyzeNxConfigurationFilesAction"
+            icon="dev.nx.console.icons.NxIcons.Action"
             text="Nx: Analyze Nx Configuration Files"
             description="Makes sure project.json and nx.json files conform to the schema"/>
 
     <action id="dev.nx.console.run.actions.NxConnectAction" class="dev.nx.console.run.actions.NxConnectAction"
-            text="Nx: Connect to Nx Cloud" icon="dev.nx.console.NxIcons.Action"/>
+            text="Nx: Connect to Nx Cloud" icon="dev.nx.console.icons.NxIcons.Action"/>
     <!-- Generate -->
     <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
             class="dev.nx.console.generate.actions.NxGenerateUiAction"
-            text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
+            text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="NewGroup"/>
       <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
     </action>
     <action id="dev.nx.console.generate.actions.NxGenerateRunAnythingAction"
             class="dev.nx.console.generate.actions.NxGenerateRunAnythingAction" text="Nx Generate"
             description="Run a generator via the Run Anything popup."
-            icon="dev.nx.console.NxIcons.Action"
+            icon="dev.nx.console.icons.NxIcons.Action"
     />
     <action id="dev.nx.console.generate.actions.NxMoveProjectAction"
             class="dev.nx.console.generate.actions.NxMoveProjectAction"
             text="Move Nx Project" description="Move an Nx project to the desired location using a generator"
-            icon="dev.nx.console.NxIcons.Action">
+            icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="RefactoringMenu" anchor="last"/>
     </action>
     <action id="dev.nx.console.generate.actions.NxRemoveProjectAction"
             class="dev.nx.console.generate.actions.NxRemoveProjectAction"
             text="Remove Nx Project" description="Safely remove an Nx project using a generator"
-            icon="dev.nx.console.NxIcons.Action">
+            icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="RefactoringMenu" anchor="last"/>
     </action>
 
@@ -145,7 +145,7 @@
       description="Run any target based on the selected project"
       class="dev.nx.console.run.actions.NxRunTargetAction"
       popup="true"
-      icon="dev.nx.console.NxIcons.Action"
+      icon="dev.nx.console.icons.NxIcons.Action"
     >
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
@@ -159,19 +159,19 @@
     <action id="dev.nx.console.graph.actions.NxGraphSelectAllAction"
             class="dev.nx.console.graph.actions.NxGraphSelectAllAction"
             text="Nx Graph: View Full Project Graph"
-            icon="dev.nx.console.NxIcons.Action"/>
+            icon="dev.nx.console.icons.NxIcons.Action"/>
     <action id="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
             class="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
-            text="Nx Graph: Focus Project" icon="dev.nx.console.NxIcons.Action">
+            text="Nx Graph: Focus Project" icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
 
     <action id="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"
             class="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
-            icon="dev.nx.console.NxIcons.Action"/>
+            icon="dev.nx.console.icons.NxIcons.Action"/>
     <action id="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
             class="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
-            text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
+            text="Nx Graph: Focus Task" icon="dev.nx.console.icons.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
     <action id="dev.nx.console.settings.MarkDirectoryAsNxWorkspace"

@@ -8,8 +8,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.PathUtil
-import dev.nx.console.NxConsoleBundle
-import dev.nx.console.NxIcons
+import dev.nx.console.console_bundle.NxConsoleBundle
+import dev.nx.console.icons.NxIcons
 import javax.swing.Icon
 
 internal class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() {
