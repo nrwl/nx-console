@@ -47,7 +47,12 @@ export type TelemetryEvents =
   | 'cli.list'
   | 'cli.migrate'
   | 'cli.affected'
-  | 'cli.init';
+  | 'cli.init'
+  // ai
+  | 'ai.chat-message'
+  | 'ai.feedback-good'
+  | 'ai.feedback-bad'
+  | 'ai.response-interaction';
 
 export type TelemetryData = {
   source?: TelemetryEventSource;

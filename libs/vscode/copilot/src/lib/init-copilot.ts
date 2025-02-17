@@ -4,13 +4,11 @@ import {
   getPackageManagerCommand,
   withTimeout,
 } from '@nx-console/shared-utils';
-import {
-  getNxWorkspacePath,
-  GlobalConfigurationStore,
-} from '@nx-console/vscode-configuration';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
@@ -20,8 +18,8 @@ import {
   ChatContext,
   ChatRequest,
   ChatRequestHandler,
-  ChatResponseMarkdownPart,
   ChatResponseStream,
+  ChatResultFeedbackKind,
   commands,
   ExtensionContext,
   LanguageModelChatMessage,
@@ -37,12 +35,20 @@ import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
 
 export function initCopilot(context: ExtensionContext) {
+  const telemetry = getTelemetry();
   const nxParticipant = chat.createChatParticipant('nx-console.nx', handler);
   nxParticipant.iconPath = Uri.joinPath(
     context.extensionUri,
     'assets',
     'nx.png'
   );
+  nxParticipant.onDidReceiveFeedback((feedback) => {
+    telemetry.logUsage(
+      feedback.kind === ChatResultFeedbackKind.Helpful
+        ? 'ai.feedback-good'
+        : 'ai.feedback-bad'
+    );
+  });
 
   context.subscriptions.push(
     nxParticipant,
@@ -53,6 +59,10 @@ export function initCopilot(context: ExtensionContext) {
     commands.registerCommand(
       'nxConsole.adjustGeneratorInUI',
       adjustGeneratorInUI
+    ),
+    commands.registerCommand(
+      'nxConsole.executeResponseCommand',
+      executeResponseCommand
     )
   );
 }
@@ -63,6 +73,8 @@ const handler: ChatRequestHandler = async (
   stream: ChatResponseStream,
   token: CancellationToken
 ) => {
+  const telemetry = getTelemetry();
+  telemetry.logUsage('ai.chat-message');
   const intent = await determineIntent(request);
 
   const workspacePath = getNxWorkspacePath();
@@ -208,8 +220,8 @@ async function renderCommandSnippet(
   const isGenerator = parsedArgs._.includes('generate');
   stream.button({
     title: isGenerator ? 'Execute Generator' : 'Execute Command',
-    command: EXECUTE_ARBITRARY_COMMAND,
-    arguments: [cleanedSnippet, parsedArgs['cwd']],
+    command: 'nxConsole.executeResponseCommand',
+    arguments: [cleanedSnippet, parsedArgs],
   });
 
   if (isGenerator) {
@@ -271,7 +283,25 @@ async function getGeneratorNamesAndDescriptions(): Promise<
 async function adjustGeneratorInUI(
   parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
 ) {
+  getTelemetry().logUsage('ai.response-interaction', {
+    type: 'adjust-generator',
+  });
   await openGenerateUIPrefilled(parsedArgs);
+}
+
+function executeResponseCommand(
+  snippet: string,
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+) {
+  const isGenerator = parsedArgs._.includes('generate');
+  getTelemetry().logUsage('ai.response-interaction', {
+    type: isGenerator ? 'execute-generate' : 'execute-command',
+  });
+  commands.executeCommand(
+    EXECUTE_ARBITRARY_COMMAND,
+    snippet,
+    parsedArgs['cwd']
+  );
 }
 
 export async function tryReadNxJson(
