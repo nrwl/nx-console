@@ -1,16 +1,17 @@
 import { readNxJson } from '@nx-console/shared-npm';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import {
-  getNxWorkspacePath,
-  GlobalConfigurationStore,
-} from '@nx-console/vscode-configuration';
+  getPackageManagerCommand,
+  withTimeout,
+} from '@nx-console/shared-utils';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
-import { readFile } from 'fs/promises';
-import type { TargetConfiguration } from 'nx/src/devkit-exports.js';
+import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
 import {
   CancellationToken,
   chat,
@@ -18,28 +19,50 @@ import {
   ChatRequest,
   ChatRequestHandler,
   ChatResponseStream,
+  ChatResultFeedbackKind,
   commands,
   ExtensionContext,
+  LanguageModelChatMessage,
+  LanguageModelChatMessageRole,
   LanguageModelToolResult,
+  lm,
   MarkdownString,
   Uri,
 } from 'vscode';
 import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
+import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
 
 export function initCopilot(context: ExtensionContext) {
+  const telemetry = getTelemetry();
   const nxParticipant = chat.createChatParticipant('nx-console.nx', handler);
   nxParticipant.iconPath = Uri.joinPath(
     context.extensionUri,
     'assets',
     'nx.png'
   );
+  nxParticipant.onDidReceiveFeedback((feedback) => {
+    telemetry.logUsage(
+      feedback.kind === ChatResultFeedbackKind.Helpful
+        ? 'ai.feedback-good'
+        : 'ai.feedback-bad'
+    );
+  });
+
+  context.subscriptions.push(
+    nxParticipant,
+    lm.registerTool('nx_generator-details', new GeneratorDetailsTool())
+  );
 
   context.subscriptions.push(
     commands.registerCommand(
       'nxConsole.adjustGeneratorInUI',
       adjustGeneratorInUI
+    ),
+    commands.registerCommand(
+      'nxConsole.executeResponseCommand',
+      executeResponseCommand
     )
   );
 }
@@ -50,43 +73,43 @@ const handler: ChatRequestHandler = async (
   stream: ChatResponseStream,
   token: CancellationToken
 ) => {
-  const enableNxCopilotFeaturesSetting = GlobalConfigurationStore.instance.get(
-    'debugMode',
-    false
-  );
+  const telemetry = getTelemetry();
+  telemetry.logUsage('ai.chat-message');
+  const intent = await determineIntent(request);
 
-  if (!enableNxCopilotFeaturesSetting) {
-    stream.markdown('@nx is coming soon. Stay tuned!');
-    return;
-  }
   const workspacePath = getNxWorkspacePath();
 
   stream.progress('Retrieving workspace information...');
 
-  const projectGraph = await getPrunedProjectGraph();
+  const projectGraph = await getProjectGraph(stream);
 
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
 
+  const nxJson = await tryReadNxJson(workspacePath);
+
+  const generatorNamesAndDescriptions =
+    await getGeneratorNamesAndDescriptions();
+
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
-    projectGraph: projectGraph,
     history: context.history,
-    nxJson: JSON.stringify(await readNxJson(workspacePath)),
     packageManagerExecCommand: pmExec,
+    projectGraph,
+    nxJson,
   };
 
   let promptElementAndProps: PromptElementAndProps<
     NxCopilotPrompt | GeneratePrompt
   >;
 
-  if (request.command === 'generate') {
+  if (request.command === 'generate' || intent === 'generate') {
     stream.progress('Retrieving generator schemas...');
 
     promptElementAndProps = {
       promptElement: GeneratePrompt,
       props: {
         ...baseProps,
-        generatorSchemas: await getGeneratorSchemas(),
+        generators: generatorNamesAndDescriptions,
       },
     };
   } else {
@@ -94,6 +117,12 @@ const handler: ChatRequestHandler = async (
       promptElement: NxCopilotPrompt,
       props: baseProps,
     };
+  }
+
+  const tools = [];
+  // only include generator tool if there are generators
+  if (generatorNamesAndDescriptions.length > 0) {
+    tools.push(lm.tools.find((tool) => tool.name === 'nx_generator-details'));
   }
 
   const chatParticipantRequest = sendChatParticipantRequest(
@@ -104,7 +133,7 @@ const handler: ChatRequestHandler = async (
       responseStreamOptions: {
         stream,
       },
-      tools: [],
+      tools,
     },
     token
   );
@@ -191,8 +220,8 @@ async function renderCommandSnippet(
   const isGenerator = parsedArgs._.includes('generate');
   stream.button({
     title: isGenerator ? 'Execute Generator' : 'Execute Command',
-    command: EXECUTE_ARBITRARY_COMMAND,
-    arguments: [cleanedSnippet, parsedArgs['cwd']],
+    command: 'nxConsole.executeResponseCommand',
+    arguments: [cleanedSnippet, parsedArgs],
   });
 
   if (isGenerator) {
@@ -204,115 +233,132 @@ async function renderCommandSnippet(
   }
 }
 
-async function getPrunedProjectGraph() {
-  const nxWorkspace = await getNxWorkspace();
-  const projectGraph = nxWorkspace.projectGraph;
-  return {
-    nodes: Object.entries(projectGraph.nodes)
-      .map(([name, node]) => {
-        const prunedNode = {
-          type: node.type,
-          root: node.data.root,
-        } as any;
-        if (node.data.metadata?.technologies) {
-          prunedNode.technologies = node.data.metadata.technologies;
-        }
-        if (node.data.metadata?.owners) {
-          prunedNode.owners = node.data.metadata.owners;
-        }
-        if (node.data.tags) {
-          prunedNode.tags = node.data.tags;
-        }
-        if (node.data.targets) {
-          prunedNode.targets = Object.entries(node.data.targets)
-            .map(([key, target]) => {
-              const prunedTarget = {
-                executor: target.executor,
-              } as Partial<TargetConfiguration>;
-              if (target.command) {
-                prunedTarget.command = target.command;
-              }
-              if (target.options.commands) {
-                prunedTarget.command = target.options.commands;
-              }
-              if (
-                target.configurations &&
-                Object.keys(target.configurations).length > 0
-              ) {
-                prunedTarget.configurations = Object.keys(
-                  target.configurations
-                );
-              }
-              return [key, prunedTarget] as const;
-            })
-            .reduce((acc, [key, target]) => {
-              acc[key] = target;
-              return acc;
-            }, {});
-        }
-
-        return [name, prunedNode] as const;
-      })
-      .reduce((acc, [name, node]) => {
-        acc[name] = node;
-        return acc;
-      }, {}),
-    dependencies: Object.entries(projectGraph.dependencies)
-      .filter(([key]) => !key.startsWith('npm:'))
-      .map(
-        ([key, deps]) =>
-          [
-            key,
-            deps
-              .filter((dep) => !dep.target.startsWith('npm:'))
-              .map((dep) => {
-                // almost everything is static, so we want to only include the non-static ones which are interesting
-                // TODO: maybe we should tell the model about this assumption
-                if (dep.type === 'static') {
-                  return {
-                    source: dep.source,
-                    target: dep.target,
-                  };
-                } else {
-                  return dep;
-                }
-              }),
-          ] as const
-      )
-      .reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {}),
-  };
+async function getProjectGraph(
+  stream: ChatResponseStream
+): Promise<ProjectGraph | undefined> {
+  let projectGraph: ProjectGraph | undefined;
+  try {
+    await withTimeout<void>(async () => {
+      const workspace = await getNxWorkspace();
+      projectGraph = workspace?.projectGraph;
+    }, 10000);
+  } catch (e) {
+    projectGraph = undefined;
+  }
+  if (
+    projectGraph === undefined ||
+    Object.keys(projectGraph.nodes).length === 0
+  ) {
+    const md = new MarkdownString();
+    md.supportThemeIcons = true;
+    md.appendMarkdown(
+      '$(warning) Unable to retrieve workspace information. Proceeding without workspace data.  '
+    );
+    stream.markdown(md);
+  }
+  return projectGraph;
 }
 
-async function getGeneratorSchemas() {
-  const generators = await getGenerators();
-
-  const schemas = [];
-  for (const generator of generators) {
-    if (generator.schemaPath) {
-      try {
-        const schemaContent = JSON.parse(
-          await readFile(generator.schemaPath, 'utf-8')
-        );
-        delete schemaContent['$schema'];
-        delete schemaContent['$id'];
-        schemaContent.name = generator.name;
-        schemas.push(schemaContent);
-      } catch (error) {
-        console.error(
-          `Failed to read schema for generator ${generator.name}:`,
-          error
-        );
-      }
-    }
+async function getGeneratorNamesAndDescriptions(): Promise<
+  {
+    name: string;
+    description: string;
+  }[]
+> {
+  let generators: GeneratorCollectionInfo[];
+  try {
+    await withTimeout<void>(async () => {
+      generators = await getGenerators();
+    }, 3000);
+  } catch (e) {
+    generators = [];
   }
-  return schemas;
+
+  return generators.map((generator) => ({
+    name: generator.name,
+    description: generator.data.description,
+  }));
 }
 
 async function adjustGeneratorInUI(
   parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
 ) {
+  getTelemetry().logUsage('ai.response-interaction', {
+    type: 'adjust-generator',
+  });
   await openGenerateUIPrefilled(parsedArgs);
+}
+
+function executeResponseCommand(
+  snippet: string,
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+) {
+  const isGenerator = parsedArgs._.includes('generate');
+  getTelemetry().logUsage('ai.response-interaction', {
+    type: isGenerator ? 'execute-generate' : 'execute-command',
+  });
+  commands.executeCommand(
+    EXECUTE_ARBITRARY_COMMAND,
+    snippet,
+    parsedArgs['cwd']
+  );
+}
+
+export async function tryReadNxJson(
+  workspacePath: string
+): Promise<NxJsonConfiguration | undefined> {
+  try {
+    return await readNxJson(workspacePath);
+  } catch (e) {
+    return undefined;
+  }
+}
+async function determineIntent(
+  request: ChatRequest
+): Promise<'generate' | 'other'> {
+  const messages = [
+    new LanguageModelChatMessage(
+      LanguageModelChatMessageRole.User,
+      `
+      You are a classification system for an nx AI assistant. Classify the following user query into one of the following categories:
+      - <generate>
+      - <other>
+
+      Return one of these categories, wrapped in a tag like this: <other>. Return only one category.
+      If the user wants to generate something or is interested in generators or related functionality classify it as <generate>.
+      Otherwise, classify it as <other>.
+      Here are some examples marked with Q for the query and A for the answer:
+      - Q: "Generate a library called ui-feature" A: <generate>
+      - Q: "Run the affected command" A: <other>
+      - Q: "Can you create a new react app?" A: <generate>
+      - Q: "What is the best way to test my app?" A: <other>
+      - Q: "Setup a new Nx workspace with React and Typescript" A: <generate>
+      - Q: "How do I run affected commands in Nx?" A: <other>
+      - Q: "Make a new e2e testing project" A: <generate>
+      - Q: "I need to create a lib with some features. Where should I do it?" A: <generate>
+      - Q: "How do I set up a new app?" A: <generate>
+
+      If the user query is not clear, classify it as <other>. If you are unsure, classify it as <generate>.
+      Here is the user query: "${request.prompt}"
+      `
+    ),
+  ];
+  let buffer = '';
+  try {
+    const stream = await request.model.sendRequest(messages, {
+      justification: 'Determine the intent of the user query',
+    });
+
+    for await (const fragment of stream.text) {
+      buffer += fragment;
+    }
+
+    if (buffer.includes(`<generate>`)) {
+      return 'generate';
+    } else {
+      return 'other';
+    }
+  } catch (e) {
+    return 'other';
+  }
 }

@@ -17,6 +17,8 @@ export async function getShellExecutionForConfig(
   packageManagerCommands?: PackageManagerCommands
 ): Promise<ShellExecution> {
   let command = config.displayCommand;
+  let pmc: PackageManagerCommands;
+
   if (config.encapsulatedNx) {
     if (platform() == 'win32') {
       command = command.replace(/^nx/, './nx.bat');
@@ -24,7 +26,6 @@ export async function getShellExecutionForConfig(
       command = command.replace(/^nx/, './nx');
     }
   } else {
-    let pmc: PackageManagerCommands;
     if (packageManagerCommands) {
       pmc = packageManagerCommands;
     } else {
@@ -44,11 +45,17 @@ export async function getShellExecutionForConfig(
     command = command.replace(/"/g, '\\"');
   }
 
+  const env = {
+    ...config.env,
+    NX_CONSOLE: 'true',
+  };
+
+  if (pmc.install.includes('pnpm')) {
+    env['INIT_CWD'] = config.cwd;
+  }
+
   return new ShellExecution(command, {
     cwd: config.cwd,
-    env: {
-      ...config.env,
-      NX_CONSOLE: 'true',
-    },
+    env,
   });
 }
