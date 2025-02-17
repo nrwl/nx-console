@@ -1,3 +1,15 @@
+# [18.39.0](https://github.com/nrwl/nx-console/compare/vscode-v18.38.0...vscode-v18.39.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* **vscode:** rework prompts ([#2401](https://github.com/nrwl/nx-console/issues/2401)) ([0bbedd3](https://github.com/nrwl/nx-console/commit/0bbedd3b9354cbd23edaaf508b6587a4fe53faa3))
+
+
+### Features
+
+* **vscode:** add telemetry to ai interactions ([#2403](https://github.com/nrwl/nx-console/issues/2403)) ([93035fc](https://github.com/nrwl/nx-console/commit/93035fc0afcbd4331c20c9f35fa5708f7f7119ec))
+
 # [18.38.0](https://github.com/nrwl/nx-console/compare/vscode-v18.37.0...vscode-v18.38.0) (2025-02-12)
 
 
