@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../telemetry"
+    },
+    {
       "path": "../nx-workspace"
     },
     {
