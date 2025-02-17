@@ -66,7 +66,7 @@ export class HistoryMessages extends PromptElement<IHistoryMessagesProps> {
 /**
  * Convert the stream of chat response parts into something that can be rendered in the prompt.
  */
-function chatResponseToString(response: ChatResponseTurn): string {
+export function chatResponseToString(response: ChatResponseTurn): string {
   return response.response
     .map((r) => {
       if (r instanceof ChatResponseMarkdownPart) {

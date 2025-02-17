@@ -1,17 +1,17 @@
 import { readNxJson } from '@nx-console/shared-npm';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { withTimeout } from '@nx-console/shared-utils';
-import { getNxWorkspace, getGenerators } from '@nx-console/vscode-nx-workspace';
+import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
+import { xhr } from 'request-light';
 import {
-  ChatContext,
   ChatRequestTurn,
   ChatResponseStream,
   ChatResponseTurn,
   MarkdownString,
 } from 'vscode';
-import { xhr } from 'request-light';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { chatResponseToString } from './prompts/history';
 
 export async function getProjectGraph(
   stream: ChatResponseStream
@@ -87,9 +87,7 @@ export async function getDocsContext(
       content:
         chatItem instanceof ChatRequestTurn
           ? chatItem.prompt
-          : chatItem.response
-              .map((responseItem) => responseItem.value)
-              .join(' '),
+          : chatResponseToString(chatItem),
     }));
     messages.push({
       role: 'user',
