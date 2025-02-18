@@ -1,3 +1,16 @@
+# [18.40.0](https://github.com/nrwl/nx-console/compare/vscode-v18.39.0...vscode-v18.40.0) (2025-02-18)
+
+
+### Bug Fixes
+
+* **nxls:** repair generatorOptions request in node 22 ([#2407](https://github.com/nrwl/nx-console/issues/2407)) ([b259610](https://github.com/nrwl/nx-console/commit/b25961086e523a0a9e69f3c6d972b3513f3719bb))
+* **vscode:** switch telemetry reporting param to "kind" ([#2408](https://github.com/nrwl/nx-console/issues/2408)) ([781cb45](https://github.com/nrwl/nx-console/commit/781cb45fc9534ddbb72373102391048ec4732863))
+
+
+### Features
+
+* **vscode:** upgrade required vscode version ([#2409](https://github.com/nrwl/nx-console/issues/2409)) ([4db5e73](https://github.com/nrwl/nx-console/commit/4db5e73c4cdf5846e4cc1aee26d8af228c6c4b79))
+
 # [18.39.0](https://github.com/nrwl/nx-console/compare/vscode-v18.38.0...vscode-v18.39.0) (2025-02-17)
 
 
