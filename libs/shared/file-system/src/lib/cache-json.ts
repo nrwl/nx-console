@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { PosixFS } from '@yarnpkg/fslib';
 import { ZipOpenFS, getLibzipSync as libzip } from '@yarnpkg/libzip';
+import { Logger } from '@nx-console/shared-schema';
 
 import { parse as parseJson, ParseError } from 'jsonc-parser';
 
@@ -39,7 +40,8 @@ export function clearJsonCache(filePath: string, basedir = '') {
 
 export async function readAndCacheJsonFile(
   filePath: string | undefined,
-  basedir = ''
+  basedir = '',
+  logger?: Logger
 ): Promise<{ path: string; json: any }> {
   if (!filePath) {
     return {
@@ -47,9 +49,13 @@ export async function readAndCacheJsonFile(
       json: {},
     };
   }
-  let fullFilePath = path.join(basedir, filePath);
+
+  let fullFilePath = basedir ? path.join(basedir, filePath) : filePath;
   if (fullFilePath.startsWith('file:\\')) {
     fullFilePath = fullFilePath.replace('file:\\', '');
+  }
+  if (fullFilePath.startsWith('file://')) {
+    fullFilePath = fullFilePath.replace('file://', '');
   }
   try {
     const stats = await crossFs.statPromise(fullFilePath);
@@ -61,8 +67,7 @@ export async function readAndCacheJsonFile(
       };
     }
   } catch (e) {
-    // TODO(cammisuli): output this generically
-    // getOutputChannel().appendLine(`${fullFilePath} does not exist`);
+    logger?.log(`${fullFilePath} does not exist`);
   }
 
   return {

@@ -2,6 +2,7 @@ import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import { Option } from '@nx-console/shared-schema';
 import { normalizeSchema } from '@nx-console/shared-schema';
 import { nxWorkspace } from './workspace';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function getGeneratorOptions(
   workspacePath: string,
@@ -9,12 +10,17 @@ export async function getGeneratorOptions(
   generatorName: string,
   generatorPath: string
 ): Promise<Option[]> {
-  const generatorSchema = await readAndCacheJsonFile(generatorPath);
+  const generatorSchema = await readAndCacheJsonFile(
+    generatorPath,
+    undefined,
+    lspLogger
+  );
   const workspaceDefaults = await readWorkspaceJsonDefaults(workspacePath);
   const defaults =
     workspaceDefaults &&
     workspaceDefaults[collectionName] &&
     workspaceDefaults[collectionName][generatorName];
+
   return await normalizeSchema(generatorSchema.json, defaults);
 }
 
