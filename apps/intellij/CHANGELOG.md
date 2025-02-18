@@ -1,3 +1,18 @@
+## 1.37.0 (2025-02-18)
+
+### Bug Fixes
+
+* add debug mode in vscode ([#2400](https://github.com/nrwl/nx-console/issues/2400)) ([2324c95](https://github.com/nrwl/nx-console/commit/2324c959dccee246ad6dc3161ff995cdd2f0e03a))
+* **nxls:** handle broken nx.json better in nxls requests ([#2399](https://github.com/nrwl/nx-console/issues/2399)) ([b631a9d](https://github.com/nrwl/nx-console/commit/b631a9d4823b71f6a605a613bc3df5c96cd24070))
+* **nxls:** repair generatorOptions request in node 22 ([#2407](https://github.com/nrwl/nx-console/issues/2407)) ([b259610](https://github.com/nrwl/nx-console/commit/b25961086e523a0a9e69f3c6d972b3513f3719bb))
+* **vscode:** switch telemetry reporting param to "kind" ([#2408](https://github.com/nrwl/nx-console/issues/2408)) ([781cb45](https://github.com/nrwl/nx-console/commit/781cb45fc9534ddbb72373102391048ec4732863))
+
+
+### Features
+
+* **vscode:** add /generate command to copilot participant ([#2395](https://github.com/nrwl/nx-console/issues/2395)) ([783e1b5](https://github.com/nrwl/nx-console/commit/783e1b5cce368b9abc97a714d74b9bd64d49c8b6))
+* **vscode:** add copilot chat participant ([#2393](https://github.com/nrwl/nx-console/issues/2393)) ([617b5a5](https://github.com/nrwl/nx-console/commit/617b5a5e854e97f4bf2a2f43d8ae3d2d6d90b819))
+
 ## 1.36.0 (2025-01-17)
 
 ### Bug Fixes
