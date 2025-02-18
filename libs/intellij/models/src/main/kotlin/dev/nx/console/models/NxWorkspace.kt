@@ -1,7 +1,6 @@
 package dev.nx.console.models
 
 import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
 
 data class NxWorkspace(
     val validWorkspaceJson: Boolean,

@@ -43,8 +43,8 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
         cs.launch {
             val nxWorkspace = NxlsService.getInstance(project).workspace()
             val newProblems =
-                nxWorkspace?.errors?.let {
-                    nxWorkspace.errors.mapNotNull { error -> nxErrorToFileProblem(error) }
+                nxWorkspace?.errors?.let { errors ->
+                    errors.mapNotNull { error -> nxErrorToFileProblem(error) }
                 }
 
             problems.forEach { problemsCollector.problemDisappeared(it) }

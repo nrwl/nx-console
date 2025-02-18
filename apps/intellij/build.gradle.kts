@@ -42,6 +42,26 @@ repositories {
     intellijPlatform { defaultRepositories() }
 }
 
+allprojects {
+  apply {
+    plugin("project-report")
+    plugin("org.jetbrains.kotlin.jvm")
+    plugin("com.ncorti.ktfmt.gradle")
+  }
+}
+
+tasks.register("projectReportAll") {
+  // All project reports of subprojects
+  allprojects.forEach {
+    dependsOn(it.tasks.get("projectReport"))
+  }
+
+  // All projectReportAll of included builds
+  gradle.includedBuilds.forEach {
+    dependsOn(it.task(":projectReportAll"))
+  }
+}
+
 configurations.all {
     exclude("org.slf4j", "slf4j-api")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
@@ -80,6 +100,7 @@ dependencies {
         zipSigner()
         instrumentationTools()
     }
+    implementation(project(":libs:intellij:models"))
 }
 
 ktfmt { kotlinLangStyle() }

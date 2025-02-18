@@ -38,7 +38,7 @@ jobs:
 
       - name: Start the Nx Cloud CI Run
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING"
+          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION"
 
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@v3
@@ -65,7 +65,7 @@ jobs:
       - name: Gradle artifacts and formatting
         run: |
           yarn nx-cloud record -- ./gradlew projectReportAll
-          yarn nx-cloud record -- ./gradlew ktfmtCheck
+          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
 
       - name: Check project graph creation
         run: yarn nx show projects --verbose
@@ -112,7 +112,7 @@ jobs:
 
       - name: Start the Nx Cloud CI Run
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/windows-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
+          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/windows-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION"
 
       - uses: browser-actions/setup-chrome@v1
 
