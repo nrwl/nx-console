@@ -217,37 +217,38 @@ class ProjectLevelConfigFileCodeVisionManager(
             }
         }
 
-        if (nxProject.targets.isNullOrEmpty()) {
-            return CodeVisionState.READY_EMPTY
-        }
-
-        var targetsString = "Nx Targets: ${nxProject.targets.keys.joinToString(", ")}"
-        if (targetsString.length > 50) {
-            targetsString = "${targetsString.slice(IntRange(0, 50 -3))}..."
-        }
-        return CodeVisionState.Ready(
-            listOf(
-                Pair(
-                    codeVisionTextRange ?: TextRange(0, 0),
-                    ClickableTextCodeVisionEntry(
-                        targetsString,
-                        providerId = ConfigFileCodeVisionProvider.ID,
-                        icon = AllIcons.Actions.Execute,
-                        onClick = { _, _ ->
-                            val popup =
-                                createSelectTargetPopup(
-                                    "Select target of ${nxProject.name} to run",
-                                    nxProject.targets.keys.toList(),
-                                ) {
-                                    NxTaskExecutionManager.getInstance(project)
-                                        .execute(nxProject.name, it)
-                                }
-                            popup.showInBestPositionFor(editor)
-                        },
-                    ),
+        nxProject.targets
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { targets ->
+                var targetsString = "Nx Targets: ${targets.keys.joinToString(", ")}"
+                if (targetsString.length > 50) {
+                    targetsString = "${targetsString.slice(IntRange(0, 50 -3))}..."
+                }
+                return CodeVisionState.Ready(
+                    listOf(
+                        Pair(
+                            codeVisionTextRange ?: TextRange(0, 0),
+                            ClickableTextCodeVisionEntry(
+                                targetsString,
+                                providerId = ConfigFileCodeVisionProvider.ID,
+                                icon = AllIcons.Actions.Execute,
+                                onClick = { _, _ ->
+                                    val popup =
+                                        createSelectTargetPopup(
+                                            "Select target of ${nxProject.name} to run",
+                                            targets.keys.toList(),
+                                        ) {
+                                            NxTaskExecutionManager.getInstance(project)
+                                                .execute(nxProject.name, it)
+                                        }
+                                    popup.showInBestPositionFor(editor)
+                                },
+                            ),
+                        )
+                    )
                 )
-            )
-        )
+            }
+            ?: return CodeVisionState.READY_EMPTY
     }
 
     fun shouldRecomputeForEditor(editor: Editor): Boolean = true

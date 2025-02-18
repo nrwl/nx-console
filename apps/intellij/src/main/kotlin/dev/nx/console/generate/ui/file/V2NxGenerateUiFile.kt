@@ -71,13 +71,13 @@ class V2NxGenerateUiFile(
             }
 
             // we will send this info to the webview once it's initialized
-            generator.options?.let {
+            generator.options?.let { options ->
                 this.generatorToDisplay =
                     GeneratorSchema(
                         generatorName = generator.data.name,
                         collectionName = generator.data.collection,
                         description = generator.data.description ?: "",
-                        options = generator.options,
+                        options = options,
                         context = generator.contextValues
                     )
             }

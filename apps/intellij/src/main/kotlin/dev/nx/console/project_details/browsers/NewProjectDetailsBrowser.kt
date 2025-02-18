@@ -370,59 +370,55 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             return
         }
         try {
-
             val nxlsService = NxlsService.getInstance(project)
 
-            if (!nxlsService.isStarted()) {
-                return
-            }
+            if (!nxlsService.isStarted()) return
 
-            val pdvData = nxlsService.pdvData(file.path)
-
-            if (
-                pdvData == null ||
-                    pdvData.resultType === "NO_GRAPH_ERROR" ||
-                    pdvData.graphBasePath == null
-            ) {
-                stateMachine.processEvent(Events.LoadErrorNoGraph())
-                return
-            }
-
-            if (pdvData.resultType == "OLD_NX_VERSION") {
-                stateMachine.processEvent(Events.LoadOldBrowser())
-                return
-            }
-
-            if (pdvData.resultType == "ERROR") {
-                stateMachine.processEvent(
-                    Events.LoadError(
-                        LoadErrorData(
-                            pdvData.graphBasePath,
-                            pdvData.errorsSerialized ?: "",
-                            pdvData.errorMessage ?: "",
-                        )
-                    )
-                )
-            } else if (pdvData.resultType == "SUCCESS_MULTI") {
-                if (pdvData.pdvDataSerializedMulti != null) {
-                    stateMachine.processEvent(
-                        Events.LoadSuccessMulti(
-                            LoadSuccessMultiData(
-                                pdvData.graphBasePath,
-                                pdvData.pdvDataSerializedMulti,
+            nxlsService.pdvData(file.path)?.let { pdvData ->
+                pdvData.graphBasePath?.let { graphBasePath ->
+                    when (pdvData.resultType) {
+                        "NO_GRAPH_ERROR" -> {
+                            stateMachine.processEvent(Events.LoadErrorNoGraph())
+                            return
+                        }
+                        "OLD_NX_VERSION" -> stateMachine.processEvent(Events.LoadOldBrowser())
+                        "ERROR" ->
+                            stateMachine.processEvent(
+                                Events.LoadError(
+                                    LoadErrorData(
+                                        graphBasePath,
+                                        pdvData.errorsSerialized ?: "",
+                                        pdvData.errorMessage ?: "",
+                                    )
+                                )
                             )
-                        )
-                    )
+                        "SUCCESS_MULTI" ->
+                            pdvData.pdvDataSerializedMulti?.let { pdvDataSerializedMulti ->
+                                stateMachine.processEvent(
+                                    Events.LoadSuccessMulti(
+                                        LoadSuccessMultiData(graphBasePath, pdvDataSerializedMulti)
+                                    )
+                                )
+                            }
+                        "SUCCESS" ->
+                            pdvData.pdvDataSerialized?.let { pdvDataSerialized ->
+                                stateMachine.processEvent(
+                                    Events.LoadSuccess(
+                                        LoadSuccessData(graphBasePath, pdvDataSerialized)
+                                    )
+                                )
+                            }
+                        else -> {
+                            // Handle unexpected result types gracefully
+                            stateMachine.processEvent(Events.LoadErrorNoGraph())
+                        }
+                    }
                 }
-            } else if (pdvData.resultType == "SUCCESS") {
-                if (pdvData.pdvDataSerialized != null) {
-                    stateMachine.processEvent(
-                        Events.LoadSuccess(
-                            LoadSuccessData(pdvData.graphBasePath, pdvData.pdvDataSerialized)
-                        )
-                    )
-                }
+                    ?: stateMachine.processEvent(
+                        Events.LoadErrorNoGraph()
+                    ) // Handles null `graphBasePath`
             }
+                ?: stateMachine.processEvent(Events.LoadErrorNoGraph()) // Handles null `pdvData`
         } catch (e: Throwable) {
             logger<NewProjectDetailsBrowser>().warn("Error loading PDV: ${e.message}")
             stateMachine.processEvent(Events.LoadErrorNoGraph(e.message))
