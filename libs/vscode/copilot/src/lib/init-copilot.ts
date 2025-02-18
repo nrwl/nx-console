@@ -284,7 +284,7 @@ async function adjustGeneratorInUI(
   parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
 ) {
   getTelemetry().logUsage('ai.response-interaction', {
-    type: 'adjust-generator',
+    kind: 'adjust-generator',
   });
   await openGenerateUIPrefilled(parsedArgs);
 }
@@ -295,7 +295,7 @@ function executeResponseCommand(
 ) {
   const isGenerator = parsedArgs._.includes('generate');
   getTelemetry().logUsage('ai.response-interaction', {
-    type: isGenerator ? 'execute-generate' : 'execute-command',
+    kind: isGenerator ? 'execute-generate' : 'execute-command',
   });
   commands.executeCommand(
     EXECUTE_ARBITRARY_COMMAND,
