@@ -41,7 +41,7 @@ export function clearJsonCache(filePath: string, basedir = '') {
 export async function readAndCacheJsonFile(
   filePath: string | undefined,
   basedir = '',
-  logger?: Logger
+  logger?: Logger,
 ): Promise<{ path: string; json: any }> {
   if (!filePath) {
     return {

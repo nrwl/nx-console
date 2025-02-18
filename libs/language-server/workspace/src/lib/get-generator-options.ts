@@ -8,12 +8,12 @@ export async function getGeneratorOptions(
   workspacePath: string,
   collectionName: string,
   generatorName: string,
-  generatorPath: string
+  generatorPath: string,
 ): Promise<Option[]> {
   const generatorSchema = await readAndCacheJsonFile(
     generatorPath,
     undefined,
-    lspLogger
+    lspLogger,
   );
   const workspaceDefaults = await readWorkspaceJsonDefaults(workspacePath);
   const defaults =
@@ -58,12 +58,12 @@ async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
           (generatorName) => {
             collectionDefaultsMap[collectionName][generatorName] =
               defaults?.[collectionName][generatorName];
-          }
+          },
         );
       }
       return collectionDefaultsMap;
     },
-    {}
+    {},
   );
   return collectionDefaults;
 }
