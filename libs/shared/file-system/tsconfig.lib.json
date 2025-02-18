@@ -6,5 +6,10 @@
     "noUnusedLocals": false
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../schema/tsconfig.lib.json"
+    }
+  ]
 }
