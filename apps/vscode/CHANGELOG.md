@@ -1,3 +1,10 @@
+## [18.41.1](https://github.com/nrwl/nx-console/compare/vscode-v18.41.0...vscode-v18.41.1) (2025-02-20)
+
+
+### Bug Fixes
+
+* **vscode:** handle missing packagemanagercommands ([#2414](https://github.com/nrwl/nx-console/issues/2414)) ([5dba101](https://github.com/nrwl/nx-console/commit/5dba101c9a2f18a8f415586e24794dcc72bef2c9))
+
 # [18.41.0](https://github.com/nrwl/nx-console/compare/vscode-v18.40.0...vscode-v18.41.0) (2025-02-20)
 
 
