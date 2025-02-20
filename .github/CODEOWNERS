@@ -70,6 +70,8 @@
 
 /libs/vscode/telemetry/ @MaxKless
 
+/libs/intellij/models/ @MaxKless
+
 /apps/generate-ui-v2/ @MaxKless
 
 /libs/vscode/copilot/ @MaxKless
