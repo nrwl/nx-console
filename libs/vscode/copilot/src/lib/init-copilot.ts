@@ -33,6 +33,13 @@ import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
+import { get } from 'http';
+import {
+  getDocsContext,
+  getGeneratorNamesAndDescriptions,
+  getProjectGraph,
+  tryReadNxJson,
+} from './context';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -40,30 +47,30 @@ export function initCopilot(context: ExtensionContext) {
   nxParticipant.iconPath = Uri.joinPath(
     context.extensionUri,
     'assets',
-    'nx.png'
+    'nx.png',
   );
   nxParticipant.onDidReceiveFeedback((feedback) => {
     telemetry.logUsage(
       feedback.kind === ChatResultFeedbackKind.Helpful
         ? 'ai.feedback-good'
-        : 'ai.feedback-bad'
+        : 'ai.feedback-bad',
     );
   });
 
   context.subscriptions.push(
     nxParticipant,
-    lm.registerTool('nx_generator-details', new GeneratorDetailsTool())
+    lm.registerTool('nx_generator-details', new GeneratorDetailsTool()),
   );
 
   context.subscriptions.push(
     commands.registerCommand(
       'nxConsole.adjustGeneratorInUI',
-      adjustGeneratorInUI
+      adjustGeneratorInUI,
     ),
     commands.registerCommand(
       'nxConsole.executeResponseCommand',
-      executeResponseCommand
-    )
+      executeResponseCommand,
+    ),
   );
 }
 
@@ -71,20 +78,20 @@ const handler: ChatRequestHandler = async (
   request: ChatRequest,
   context: ChatContext,
   stream: ChatResponseStream,
-  token: CancellationToken
+  token: CancellationToken,
 ) => {
   const telemetry = getTelemetry();
   telemetry.logUsage('ai.chat-message');
   const intent = await determineIntent(request);
-
   const workspacePath = getNxWorkspacePath();
 
   stream.progress('Retrieving workspace information...');
-
   const projectGraph = await getProjectGraph(stream);
 
-  const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
+  stream.progress('Retrieving relevant documentation...');
+  const docsPages = await getDocsContext(request.prompt, context.history);
 
+  const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
   const nxJson = await tryReadNxJson(workspacePath);
 
   const generatorNamesAndDescriptions =
@@ -96,6 +103,7 @@ const handler: ChatRequestHandler = async (
     packageManagerExecCommand: pmExec,
     projectGraph,
     nxJson,
+    docsPages,
   };
 
   let promptElementAndProps: PromptElementAndProps<
@@ -135,7 +143,7 @@ const handler: ChatRequestHandler = async (
       },
       tools,
     },
-    token
+    token,
   );
 
   const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
@@ -200,7 +208,7 @@ const handler: ChatRequestHandler = async (
 async function renderCommandSnippet(
   snippet: string,
   stream: ChatResponseStream,
-  pmExec: string
+  pmExec: string,
 ) {
   snippet = snippet.replace(/\s+/g, ' ');
   const parsedArgs = await yargs.parse(snippet);
@@ -233,55 +241,8 @@ async function renderCommandSnippet(
   }
 }
 
-async function getProjectGraph(
-  stream: ChatResponseStream
-): Promise<ProjectGraph | undefined> {
-  let projectGraph: ProjectGraph | undefined;
-  try {
-    await withTimeout<void>(async () => {
-      const workspace = await getNxWorkspace();
-      projectGraph = workspace?.projectGraph;
-    }, 10000);
-  } catch (e) {
-    projectGraph = undefined;
-  }
-  if (
-    projectGraph === undefined ||
-    Object.keys(projectGraph.nodes).length === 0
-  ) {
-    const md = new MarkdownString();
-    md.supportThemeIcons = true;
-    md.appendMarkdown(
-      '$(warning) Unable to retrieve workspace information. Proceeding without workspace data.  '
-    );
-    stream.markdown(md);
-  }
-  return projectGraph;
-}
-
-async function getGeneratorNamesAndDescriptions(): Promise<
-  {
-    name: string;
-    description: string;
-  }[]
-> {
-  let generators: GeneratorCollectionInfo[];
-  try {
-    await withTimeout<void>(async () => {
-      generators = await getGenerators();
-    }, 3000);
-  } catch (e) {
-    generators = [];
-  }
-
-  return generators.map((generator) => ({
-    name: generator.name,
-    description: generator.data.description,
-  }));
-}
-
 async function adjustGeneratorInUI(
-  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>,
 ) {
   getTelemetry().logUsage('ai.response-interaction', {
     kind: 'adjust-generator',
@@ -291,7 +252,7 @@ async function adjustGeneratorInUI(
 
 function executeResponseCommand(
   snippet: string,
-  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>,
 ) {
   const isGenerator = parsedArgs._.includes('generate');
   getTelemetry().logUsage('ai.response-interaction', {
@@ -300,21 +261,12 @@ function executeResponseCommand(
   commands.executeCommand(
     EXECUTE_ARBITRARY_COMMAND,
     snippet,
-    parsedArgs['cwd']
+    parsedArgs['cwd'],
   );
 }
 
-export async function tryReadNxJson(
-  workspacePath: string
-): Promise<NxJsonConfiguration | undefined> {
-  try {
-    return await readNxJson(workspacePath);
-  } catch (e) {
-    return undefined;
-  }
-}
 async function determineIntent(
-  request: ChatRequest
+  request: ChatRequest,
 ): Promise<'generate' | 'other'> {
   const messages = [
     new LanguageModelChatMessage(
@@ -340,7 +292,7 @@ async function determineIntent(
 
       If the user query is not clear, classify it as <other>. If you are unsure, classify it as <generate>.
       Here is the user query: "${request.prompt}"
-      `
+      `,
     ),
   ];
   let buffer = '';
