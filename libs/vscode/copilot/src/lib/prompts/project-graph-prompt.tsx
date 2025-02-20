@@ -19,7 +19,7 @@ export class NxProjectGraphPrompt extends PromptElement<NxProjectGraphPromptProp
             {`The following is a representation of the Nx workspace. It includes all
         projects in the monorepo. The projects are separated by <></> tags including the project name.
         Each project contains:
-        - its dependents, marked by "deps: [...]".
+        - its dependencies (projects that this depends on), marked by "deps: [...]".
         - its available targets, marked by "targets: [...]". Targets are tasks that the user can run for each project.
         - its type (libary, app, or e2e tests), marked by "type: [...]".
         - its source file location, marked by "root: [...]".
@@ -51,12 +51,12 @@ function getRobotReadableProjectGraph(projectGraph: ProjectGraph): string {
     nodeString += `root: [${node.data.root}]`;
     if (node.data.metadata?.technologies) {
       nodeString += `technologies: [${node.data.metadata.technologies.join(
-        ', '
+        ', ',
       )}]`;
     }
     if (node.data.metadata?.owners) {
       nodeString += `owners: [${Object.keys(node.data.metadata.owners).join(
-        ', '
+        ', ',
       )}]`;
     }
     if (node.data.tags) {

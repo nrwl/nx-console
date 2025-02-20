@@ -7,9 +7,6 @@
       "path": "../telemetry"
     },
     {
-      "path": "../nx-workspace"
-    },
-    {
       "path": "../nx-commands-view"
     },
     {
@@ -17,6 +14,12 @@
     },
     {
       "path": "../configuration"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../nx-workspace"
     },
     {
       "path": "../../shared/utils"
