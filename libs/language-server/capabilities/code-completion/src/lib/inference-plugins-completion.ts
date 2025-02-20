@@ -1,13 +1,12 @@
-import { getNxVersion } from '@nx-console/language-server-workspace';
+import { getNxVersion } from '@nx-console/shared-nx-workspace-info';
 import { workspaceDependencies } from '@nx-console/shared-npm';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { CompletionItem } from 'vscode-json-languageservice';
-
 let inferencePluginsCompletionCache: CompletionItem[] | undefined = undefined;
 
 export async function inferencePluginsCompletion(
-  workingPath: string | undefined
+  workingPath: string | undefined,
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];

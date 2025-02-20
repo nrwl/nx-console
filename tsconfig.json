@@ -146,6 +146,9 @@
     },
     {
       "path": "./apps/nx-mcp"
+    },
+    {
+      "path": "./libs/shared/nx-workspace-info"
     }
   ]
 }

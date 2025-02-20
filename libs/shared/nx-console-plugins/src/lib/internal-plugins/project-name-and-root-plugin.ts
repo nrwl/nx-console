@@ -4,17 +4,17 @@ import {
   StartupMessageFactory,
 } from '../nx-console-plugin-types';
 import { NxWorkspace } from '@nx-console/shared-types';
-import { Logger } from '@nx-console/shared-schema';
+import { Logger } from '@nx-console/shared-utils';
 import { gte } from '@nx-console/nx-version';
 
 export const projectNameAndRootProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
   workspace: NxWorkspace,
-  lspLogger: Logger
+  lspLogger: Logger,
 ) => {
   if (
     !schema?.options?.find(
-      (option) => option.name === 'projectNameAndRootFormat'
+      (option) => option.name === 'projectNameAndRootFormat',
     )
   ) {
     return schema;
@@ -34,7 +34,7 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
   }
 
   const pnarfDefault = schema.options.find(
-    (opt) => opt.name === 'projectNameAndRootFormat'
+    (opt) => opt.name === 'projectNameAndRootFormat',
   )?.default;
   return {
     ...schema,
@@ -71,14 +71,14 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
 export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   schema: GeneratorSchema,
   workspace: NxWorkspace,
-  lspLogger: Logger
+  lspLogger: Logger,
 ) => {
   if (gte(workspace.nxVersion, '18.0.0')) {
     return undefined;
   }
   if (
     !schema?.options?.find(
-      (option) => option.name === 'projectNameAndRootFormat'
+      (option) => option.name === 'projectNameAndRootFormat',
     )
   ) {
     return undefined;

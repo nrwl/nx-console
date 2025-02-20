@@ -1,9 +1,6 @@
 import { readNxJson } from '@nx-console/shared-npm';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import {
-  getPackageManagerCommand,
-  withTimeout,
-} from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';

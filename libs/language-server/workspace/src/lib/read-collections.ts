@@ -16,7 +16,8 @@ import {
 } from '@nx-console/shared-schema';
 import { platform } from 'os';
 import { dirname, resolve } from 'path';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export type ReadCollectionsOptions = {
   clearPackageJsonCache?: boolean;
@@ -26,29 +27,32 @@ export type ReadCollectionsOptions = {
 
 export async function readCollections(
   workspacePath: string,
-  options: ReadCollectionsOptions
+  options: ReadCollectionsOptions,
 ): Promise<CollectionInfo[]> {
   if (options?.clearPackageJsonCache) {
     clearJsonCache('package.json', workspacePath);
   }
 
-  const { projectGraph, nxVersion } = await nxWorkspace(workspacePath);
+  const { projectGraph, nxVersion } = await nxWorkspace(
+    workspacePath,
+    lspLogger,
+  );
 
   const packages = await workspaceDependencies(
     workspacePath,
     nxVersion,
-    projectGraph.nodes
+    projectGraph.nodes,
   );
 
   const collections = await Promise.all(
     packages.map(async (p) => {
       return await packageDetails(p);
-    })
+    }),
   );
 
   const allCollections = (
     await Promise.all(
-      collections.map((c) => readCollection(workspacePath, c, options))
+      collections.map((c) => readCollection(workspacePath, c, options)),
     )
   ).flat();
 
@@ -63,12 +67,12 @@ export async function readCollections(
 
     if (
       !dedupedCollections.has(
-        collectionNameWithType(singleCollection.name, singleCollection.type)
+        collectionNameWithType(singleCollection.name, singleCollection.type),
       )
     ) {
       dedupedCollections.set(
         collectionNameWithType(singleCollection.name, singleCollection.type),
-        singleCollection
+        singleCollection,
       );
     }
   }
@@ -87,7 +91,7 @@ async function readCollection(
     packageName: string;
     packageJson: any;
   },
-  options: ReadCollectionsOptions
+  options: ReadCollectionsOptions,
 ): Promise<CollectionInfo[] | null> {
   try {
     const [executorCollections, generatorCollections] = await Promise.all([
@@ -101,7 +105,7 @@ async function readCollection(
       packagePath,
       executorCollections,
       generatorCollections,
-      options
+      options,
     );
   } catch (e) {
     return null;
@@ -114,7 +118,7 @@ export async function getCollectionInfo(
   collectionPath: string,
   executorCollection: { path: string; json: any },
   generatorCollection: { path: string; json: any },
-  options: ReadCollectionsOptions
+  options: ReadCollectionsOptions,
 ): Promise<CollectionInfo[]> {
   const collectionMap: Map<string, CollectionInfo> = new Map();
 
@@ -140,12 +144,12 @@ export async function getCollectionInfo(
       schemaPath: formatCollectionPath(
         collectionPath,
         executorCollection.path,
-        schema.schema
+        schema.schema,
       ),
       implementationPath: formatCollectionPath(
         collectionPath,
         executorCollection.path,
-        schema.implementation
+        schema.implementation,
       ),
       configPath: formatPath(resolve(collectionPath, executorCollection.path)),
       collectionName,
@@ -157,7 +161,7 @@ export async function getCollectionInfo(
     }
     collectionMap.set(
       collectionNameWithType(collectionInfo.name, 'executor'),
-      collectionInfo
+      collectionInfo,
     );
   }
 
@@ -177,24 +181,24 @@ export async function getCollectionInfo(
         schemaPath: formatCollectionPath(
           collectionPath,
           generatorCollection.path,
-          schema.schema
+          schema.schema,
         ),
         configPath: formatPath(
-          resolve(collectionPath, generatorCollection.path)
+          resolve(collectionPath, generatorCollection.path),
         ),
         data: readCollectionGenerator(collectionName, key, schema),
         collectionName,
       };
       if (
         collectionMap.has(
-          collectionNameWithType(collectionInfo.name, 'generator')
+          collectionNameWithType(collectionInfo.name, 'generator'),
         )
       ) {
         continue;
       }
       collectionMap.set(
         collectionNameWithType(collectionInfo.name, 'generator'),
-        collectionInfo
+        collectionInfo,
       );
     } catch (e) {
       // noop - generator is invalid
@@ -211,12 +215,12 @@ export async function getCollectionInfo(
         extendedSchema
           .filter(
             (extended) =>
-              extended !== '@nx/workspace' && extended !== '@nrwl/workspace'
+              extended !== '@nx/workspace' && extended !== '@nrwl/workspace',
           )
           .map(async (extended: string) => {
             const dependencyPath = await workspaceDependencyPath(
               workspacePath,
-              extended
+              extended,
             );
 
             if (!dependencyPath) {
@@ -226,9 +230,9 @@ export async function getCollectionInfo(
             return readCollection(
               workspacePath,
               await packageDetails(dependencyPath),
-              options
+              options,
             );
-          })
+          }),
       )
     )
       .flat()
@@ -249,7 +253,7 @@ export async function getCollectionInfo(
 function readCollectionGenerator(
   collectionName: string,
   collectionSchemaName: string,
-  collectionJson: any
+  collectionJson: any,
 ): Generator | undefined {
   try {
     let generatorType: GeneratorType;
@@ -274,14 +278,14 @@ function readCollectionGenerator(
   } catch (e) {
     console.error(e);
     console.error(
-      `Invalid package.json for schematic ${collectionName}:${collectionSchemaName}`
+      `Invalid package.json for schematic ${collectionName}:${collectionSchemaName}`,
     );
   }
 }
 
 async function resolveDelegatedExecutor(
   delegatedExecutor: string,
-  workspacePath: string
+  workspacePath: string,
 ) {
   const [pkgName, executor] = delegatedExecutor.split(':');
   const dependencyPath = await workspaceDependencyPath(workspacePath, pkgName);
@@ -297,7 +301,7 @@ async function resolveDelegatedExecutor(
 
   const collection = await readAndCacheJsonFile(
     executors || builders,
-    packagePath
+    packagePath,
   );
 
   if (!collection.json?.[executor]) {
@@ -327,7 +331,7 @@ function canUse(
     'x-deprecated'?: string;
   },
   includeHiddenCollections = false,
-  includeNgAddCollection = false
+  includeNgAddCollection = false,
 ): boolean {
   return (
     (!s.hidden || includeHiddenCollections) &&
@@ -345,7 +349,7 @@ function collectionNameWithType(name: string, type: 'generator' | 'executor') {
 function formatCollectionPath(
   collectionPath: string,
   jsonFilePath: string,
-  path: string
+  path: string,
 ): string {
   return formatPath(resolve(collectionPath, dirname(jsonFilePath), path));
 }

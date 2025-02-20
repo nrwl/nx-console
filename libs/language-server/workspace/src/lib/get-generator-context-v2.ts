@@ -2,17 +2,21 @@ import { GeneratorContext } from '@nx-console/shared-generate-ui-types';
 import { existsSync, lstatSync } from 'fs';
 import { normalize, parse } from 'path';
 import { getProjectByPath } from './get-project-by-path';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function getGeneratorContextV2(
   path: string | undefined,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<GeneratorContext> {
   let projectName: string | undefined = undefined;
   let directory: string | undefined = undefined;
   let normalizedDirectory: string | undefined = undefined;
 
-  const { workspaceLayout, nxVersion } = await nxWorkspace(workspacePath);
+  const { workspaceLayout, nxVersion } = await nxWorkspace(
+    workspacePath,
+    lspLogger,
+  );
   if (path) {
     const normalizedPath = normalize(path);
     const project = await getProjectByPath(normalizedPath, workspacePath);
@@ -24,7 +28,7 @@ export async function getGeneratorContextV2(
     normalizedDirectory = getDirectoryWithoutAppsDirLibsDir(
       normalizedPath,
       workspaceLayout,
-      workspacePath
+      workspacePath,
     );
   }
 
@@ -53,7 +57,7 @@ function getDirectory(path: string, workspacePath: string): string | undefined {
 function getDirectoryWithoutAppsDirLibsDir(
   path: string,
   { appsDir, libsDir }: { appsDir?: string; libsDir?: string },
-  workspacePath: string
+  workspacePath: string,
 ) {
   let dir = getDirectory(path, workspacePath);
 

@@ -1,7 +1,7 @@
 import { formatError } from '@nx-console/shared-utils';
 
 import { clearJsonCache, fileExists } from '@nx-console/shared-file-system';
-import { Logger } from '@nx-console/shared-schema';
+import { Logger } from '@nx-console/shared-utils';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { join } from 'path';
 import {
@@ -15,7 +15,6 @@ import {
 } from 'rxjs';
 import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
-import { lspLogger } from '@nx-console/language-server-utils';
 
 const enum Status {
   not_started,
@@ -36,8 +35,8 @@ function resetStatus(workspacePath: string) {
 
 export async function nxWorkspace(
   workspacePath: string,
-
-  reset?: boolean
+  logger: Logger,
+  reset?: boolean,
 ): Promise<NxWorkspace> {
   if (reset) {
     resetStatus(workspacePath);
@@ -50,20 +49,20 @@ export async function nxWorkspace(
         tap(() => {
           status = Status.in_progress;
         }),
-        switchMap(() => from(_workspace(workspacePath, lspLogger))),
+        switchMap(() => from(_workspace(workspacePath, logger))),
         tap((workspace) => {
           cachedReplay.next(workspace);
           status = Status.cached;
-        })
+        }),
       ),
-      cachedReplay
-    )
+      cachedReplay,
+    ),
   );
 }
 
 async function _workspace(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<NxWorkspace> {
   try {
     const nxVersion = await getNxVersion(workspacePath);

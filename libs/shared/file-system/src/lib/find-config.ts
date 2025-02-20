@@ -1,9 +1,9 @@
 import { dirname, join } from 'path';
-import { fileExists } from '@nx-console/shared-file-system';
+import { fileExists } from './file-exists';
 
 export async function forEachAncestorDirectory(
   directory: string,
-  callback: (directory: string) => Promise<string | undefined>
+  callback: (directory: string) => Promise<string | undefined>,
 ): Promise<string | undefined> {
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -23,7 +23,7 @@ export async function forEachAncestorDirectory(
 
 export async function findConfig(
   searchPath: string,
-  configName: string
+  configName: string,
 ): Promise<string | undefined> {
   return forEachAncestorDirectory(searchPath, async (ancestor) => {
     const fileName = join(ancestor, configName);

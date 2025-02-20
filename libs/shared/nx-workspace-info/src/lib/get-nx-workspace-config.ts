@@ -1,7 +1,6 @@
-import { lspLogger } from '@nx-console/language-server-utils';
 import { readJsonFile, readNxJson } from '@nx-console/shared-npm';
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { Logger } from '@nx-console/shared-schema';
+import { Logger } from '@nx-console/shared-utils';
 import { NxError } from '@nx-console/shared-types';
 import type {
   NxJsonConfiguration,
@@ -17,7 +16,7 @@ import {
   getNxProjectGraph,
   getNxProjectGraphUtils,
 } from './get-nx-workspace-package';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { execSync } from 'child_process';
 
 let _defaultProcessExit: typeof process.exit;
@@ -25,7 +24,7 @@ let _defaultProcessExit: typeof process.exit;
 export async function getNxWorkspaceConfig(
   workspacePath: string,
   nxVersion: NxVersion,
-  logger: Logger
+  logger: Logger,
 ): Promise<{
   projectGraph: ProjectGraph | undefined;
   sourceMaps: ConfigurationSourceMaps | undefined;
@@ -49,7 +48,7 @@ export async function getNxWorkspaceConfig(
   logger.log(`Retrieving workspace configuration for nx ${nxVersion.full}`);
 
   if (!gte(nxVersion, '12.0.0')) {
-    lspLogger.log('Major version is less than 12');
+    logger.log('Major version is less than 12');
     return {
       projectGraph,
       sourceMaps,
@@ -117,7 +116,7 @@ export async function getNxWorkspaceConfig(
       }
 
       if (gte(nxVersion, '17.2.0')) {
-        lspLogger.log('createProjectGraphAndSourceMapsAsync');
+        logger.log('createProjectGraphAndSourceMapsAsync');
         try {
           const projectGraphAndSourceMaps = await (
             nxProjectGraph as any
@@ -129,7 +128,7 @@ export async function getNxWorkspaceConfig(
           sourceMaps = projectGraphAndSourceMaps.sourceMaps;
         } catch (e) {
           if (isProjectGraphError(e)) {
-            lspLogger.log('caught ProjectGraphError, using partial graph');
+            logger.log('caught ProjectGraphError, using partial graph');
             projectGraph = e.getPartialProjectGraph() ?? {
               nodes: {},
               dependencies: {},
@@ -150,24 +149,24 @@ export async function getNxWorkspaceConfig(
             throw e;
           }
         }
-        lspLogger.log('createProjectGraphAndSourceMapsAsync successful');
+        logger.log('createProjectGraphAndSourceMapsAsync successful');
       } else {
-        lspLogger.log('createProjectGraphAsync');
+        logger.log('createProjectGraphAsync');
         projectGraph = await nxProjectGraph.createProjectGraphAsync({
           exitOnError: false,
         });
-        lspLogger.log('createProjectGraphAsync successful');
+        logger.log('createProjectGraphAsync successful');
       }
     } catch (e) {
-      lspLogger.log('Unable to get project graph');
-      lspLogger.log(e.stack);
+      logger.log('Unable to get project graph');
+      logger.log(e.stack);
       errors = [{ stack: e.stack }];
     }
 
     if (gte(nxVersion, '16.3.1') && projectGraph) {
       projectFileMap =
         (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
-          projectGraph
+          projectGraph,
         )) ?? {};
     } else {
       Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
@@ -180,10 +179,10 @@ export async function getNxWorkspaceConfig(
     // reset the daemon client after getting all required information from the daemon
     if (nxDaemonClientModule && nxDaemonClientModule.daemonClient?.enabled()) {
       try {
-        lspLogger.log('Resetting daemon client');
+        logger.log('Resetting daemon client');
         nxDaemonClientModule.daemonClient?.reset();
       } catch (e) {
-        lspLogger.log(`Error while resetting daemon client, moving on...`);
+        logger.log(`Error while resetting daemon client, moving on...`);
       }
     }
 
@@ -193,7 +192,7 @@ export async function getNxWorkspaceConfig(
     process.exit = _defaultProcessExit;
 
     projectGraph.nodes = Object.fromEntries(
-      Object.entries(projectGraph.nodes).sort(([a], [b]) => a.localeCompare(b))
+      Object.entries(projectGraph.nodes).sort(([a], [b]) => a.localeCompare(b)),
     );
 
     return {
@@ -205,7 +204,7 @@ export async function getNxWorkspaceConfig(
       isPartial,
     };
   } catch (e) {
-    lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
+    logger.log(`Unable to get nx workspace configuration: ${e}`);
     process.exit = _defaultProcessExit;
     return {
       projectGraph,

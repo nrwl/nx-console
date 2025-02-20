@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { fileExists } from '@nx-console/shared-file-system';
+import { fileExists } from './file-exists';
 
 /**
  * Builds the project path from the given project name.
@@ -9,7 +9,7 @@ import { fileExists } from '@nx-console/shared-file-system';
  */
 export async function buildProjectPath(
   workspacePath: string,
-  projectPath: string
+  projectPath: string,
 ): Promise<string | undefined> {
   const basePath = join(workspacePath, projectPath);
 
