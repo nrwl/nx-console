@@ -1,0 +1,15 @@
+{
+  "name": "@nx-console/shared-prompts",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "nx": {
+    "name": "shared-prompts",
+    "sourceRoot": "libs/shared/prompts/src",
+    "projectType": "lib",
+    "tags": [
+      "type:shared"
+    ]
+  }
+}
