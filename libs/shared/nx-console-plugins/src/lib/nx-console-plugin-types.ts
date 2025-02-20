@@ -6,6 +6,7 @@ export type NxConsolePluginsDefinition = {
   schemaProcessors?: SchemaProcessor[];
   validators?: any[];
   startupMessageFactories?: StartupMessageFactory[];
+  projectViewItemProcessors?: ProjectViewItemProcessor[];
 };
 
 export type SchemaProcessor = (
@@ -27,3 +28,15 @@ export type StartupMessageFactory = (
   | StartupMessageDefinition
   | undefined
   | Promise<StartupMessageDefinition | undefined>;
+
+export type ProjectViewItemProcessor = (
+  schema: ProjectViewTreeItem,
+  workspace: NxWorkspace
+) => ProjectViewTreeItem;
+
+export type ProjectViewTreeItem = {
+  label?: string,
+  description?: string,
+  tooltip?: string,
+  iconPath?: string
+}
