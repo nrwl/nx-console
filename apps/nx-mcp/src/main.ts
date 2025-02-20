@@ -7,21 +7,16 @@ const server = new McpServer({
   version: '0.0.1',
 });
 
-server.tool('add', { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-  content: [{ type: 'text', text: String(a + b) }],
-}));
-
-server.prompt('review-code', { code: z.string() }, ({ code }) => ({
-  messages: [
-    {
-      role: 'user',
-      content: {
-        type: 'text',
-        text: `Please review this code:\n\n${code}`,
-      },
-    },
-  ],
-}));
+server.tool(
+  'project-graph',
+  'Returns a readable representation of the nx project graph and global nx configuration. Use it to answer questions about the nx workspace and architecture',
+  async () => {
+    const roots = await server.server.listRoots();
+    return {
+      content: [{ type: 'text', text: String(roots.roots.join(', ')) }],
+    };
+  },
+);
 
 const transport = new StdioServerTransport();
 server.connect(transport);
