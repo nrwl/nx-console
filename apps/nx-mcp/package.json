@@ -43,25 +43,6 @@
             }
           }
         }
-      },
-      "serve": {
-        "executor": "@nx/js:node",
-        "defaultConfiguration": "development",
-        "dependsOn": [
-          "build"
-        ],
-        "options": {
-          "buildTarget": "nx-mcp:build",
-          "runBuildTargetDependencies": false
-        },
-        "configurations": {
-          "development": {
-            "buildTarget": "nx-mcp:build:development"
-          },
-          "production": {
-            "buildTarget": "nx-mcp:build:production"
-          }
-        }
       }
     }
   }
