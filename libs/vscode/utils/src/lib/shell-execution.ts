@@ -1,4 +1,4 @@
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 
@@ -14,7 +14,7 @@ export interface ShellConfig {
 
 export async function getShellExecutionForConfig(
   config: ShellConfig,
-  packageManagerCommands?: PackageManagerCommands
+  packageManagerCommands?: PackageManagerCommands,
 ): Promise<ShellExecution> {
   let command = config.displayCommand;
   let pmc: PackageManagerCommands;

@@ -1,6 +1,6 @@
 import { gte, NxVersion } from '@nx-console/nx-version';
 import { directoryExists } from '@nx-console/shared-file-system';
-import type { Logger } from '@nx-console/shared-schema';
+import type { Logger } from '@nx-console/shared-utils';
 import { stat } from 'fs/promises';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 import { platform } from 'os';
@@ -22,12 +22,12 @@ import {
 export async function workspaceDependencies(
   workspacePath: string,
   nxVersion: NxVersion,
-  projects?: Record<string, ProjectGraphProjectNode>
+  projects?: Record<string, ProjectGraphProjectNode>,
 ): Promise<string[]> {
   const dependencies: string[] = [];
 
   dependencies.push(
-    ...(await localDependencies(workspacePath, nxVersion, projects))
+    ...(await localDependencies(workspacePath, nxVersion, projects)),
   );
 
   if (await isWorkspaceInPnp(workspacePath)) {
@@ -41,7 +41,7 @@ export async function workspaceDependencies(
 
 export async function workspaceDependencyPath(
   workspacePath: string,
-  workspaceDependencyName: string
+  workspaceDependencyName: string,
 ) {
   if (workspaceDependencyName.startsWith('.')) {
     return join(workspacePath, workspaceDependencyName);
@@ -54,14 +54,14 @@ export async function workspaceDependencyPath(
   const nodeModulesPath = join(
     workspacePath,
     'node_modules',
-    workspaceDependencyName
+    workspaceDependencyName,
   );
   const encapsulatedPath = join(
     workspacePath,
     '.nx',
     'installation',
     'node_modules',
-    workspaceDependencyName
+    workspaceDependencyName,
   );
 
   try {
@@ -79,7 +79,7 @@ export async function workspaceDependencyPath(
 
 export function importWorkspaceDependency<T>(
   importPath: string,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<T> {
   if (platform() === 'win32') {
     importPath = importPath.replace(/\\/g, '/');
@@ -96,27 +96,27 @@ export function importWorkspaceDependency<T>(
 export async function importNxPackagePath<T>(
   workspacePath: string,
   nestedPath: string,
-  logger?: Logger
+  logger?: Logger,
 ): Promise<T> {
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
 
   if (!nxWorkspaceDepPath) {
     logger?.log(
-      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`,
     );
     throw 'local Nx dependency not found';
   }
 
   return importWorkspaceDependency(
     join(nxWorkspaceDepPath, nestedPath),
-    logger
+    logger,
   );
 }
 
 export async function localDependencyPath(
   workspacePath: string,
   workspaceDependencyName: string,
-  projects: Record<string, ProjectGraphProjectNode>
+  projects: Record<string, ProjectGraphProjectNode>,
 ): Promise<string | undefined> {
   for (const project of Object.values(projects)) {
     const projectPath = join(workspacePath, project.data.root);
@@ -130,7 +130,7 @@ export async function localDependencyPath(
 async function localDependencies(
   workspacePath: string,
   version: NxVersion,
-  projects?: Record<string, ProjectGraphProjectNode>
+  projects?: Record<string, ProjectGraphProjectNode>,
 ): Promise<string[]> {
   if (!projects) {
     return [];
@@ -142,7 +142,7 @@ async function localDependencies(
   }
 
   const packages = Object.values(projects).map(
-    (project) => `${workspacePath}/${project.data.root}/package.json`
+    (project) => `${workspacePath}/${project.data.root}/package.json`,
   );
 
   const existingPackages: string[] = [];

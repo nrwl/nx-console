@@ -17,15 +17,16 @@ import {
   configureSchemaForProject,
   projectSchemaIsRegistered,
 } from './schema-completion';
-import { nxWorkspace } from '@nx-console/language-server-workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { getCompletionItems } from './get-completion-items';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function completionHandler(
   workspacePath: string,
   documents: TextDocuments<TextDocument>,
   completionParams: CompletionParams,
   jsonDocumentMapper: LanguageModelCache<JSONDocument>,
-  clientCapabilities: ClientCapabilities | undefined
+  clientCapabilities: ClientCapabilities | undefined,
 ): Promise<CompletionList | null> {
   const changedDocument = documents.get(completionParams.textDocument.uri);
   if (!changedDocument) {
@@ -48,7 +49,7 @@ export async function completionHandler(
       await configureSchemaForProject(
         relativeRootPath,
         workspacePath,
-        clientCapabilities
+        clientCapabilities,
       );
     }
   }
@@ -57,19 +58,19 @@ export async function completionHandler(
     (await getJsonLanguageService()?.doComplete(
       document,
       completionParams.position,
-      jsonAst
+      jsonAst,
     )) ?? CompletionList.create([]);
 
   const schemas = await getJsonLanguageService()?.getMatchingSchemas(
     document,
-    jsonAst
+    jsonAst,
   );
 
   if (!schemas) {
     return completionResults;
   }
 
-  const { nxVersion } = await nxWorkspace(workspacePath);
+  const { nxVersion } = await nxWorkspace(workspacePath, lspLogger);
 
   const pathItems = await getCompletionItems(
     workspacePath,
@@ -77,7 +78,7 @@ export async function completionHandler(
     jsonAst,
     document,
     schemas,
-    completionParams.position
+    completionParams.position,
   );
 
   mergeArrays(completionResults.items, pathItems);

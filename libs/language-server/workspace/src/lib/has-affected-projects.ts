@@ -1,13 +1,14 @@
 import { execSync } from 'child_process';
-import { nxWorkspace } from './workspace';
-import { getNxExecutionCommand } from '@nx-console/shared-utils';
-import { Logger } from '@nx-console/shared-schema';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import { getNxExecutionCommand } from '@nx-console/shared-npm';
+import { Logger } from '@nx-console/shared-utils';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function hasAffectedProjects(
   workspacePath: string,
-  _: Logger
+  _: Logger,
 ): Promise<boolean> {
-  const { isEncapsulatedNx } = await nxWorkspace(workspacePath);
+  const { isEncapsulatedNx } = await nxWorkspace(workspacePath, lspLogger);
 
   const command = await getNxExecutionCommand({
     cwd: workspacePath,

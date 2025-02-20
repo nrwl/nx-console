@@ -1,4 +1,4 @@
-import { nxWorkspace } from '@nx-console/language-server-workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import {
   ASTNode,
   CompletionItem,
@@ -6,17 +6,17 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { createCompletionItem } from './create-completion-path-item';
-
+import { lspLogger } from '@nx-console/language-server-utils';
 export async function projectCompletion(
   workingPath: string | undefined,
   node: ASTNode,
-  document: TextDocument
+  document: TextDocument,
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
   }
 
-  const { projectGraph } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath, lspLogger);
 
   const projectCompletion: CompletionItem[] = [];
 
@@ -27,7 +27,7 @@ export async function projectCompletion(
         '',
         node,
         document,
-        CompletionItemKind.Struct
+        CompletionItemKind.Struct,
       ),
       createCompletionItem(
         `!${projectName}`,
@@ -35,8 +35,8 @@ export async function projectCompletion(
         node,
         document,
         CompletionItemKind.Struct,
-        `Exclude "${projectName}" from this project's dependencies`
-      )
+        `Exclude "${projectName}" from this project's dependencies`,
+      ),
     );
   }
 

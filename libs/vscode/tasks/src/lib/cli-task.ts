@@ -1,5 +1,5 @@
 import { NxWorkspace } from '@nx-console/shared-types';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
@@ -15,7 +15,7 @@ export class CliTask extends Task {
   static async create(
     definition: CliTaskDefinition,
     workspace?: NxWorkspace,
-    packageManagerCommands?: PackageManagerCommands
+    packageManagerCommands?: PackageManagerCommands,
   ): Promise<CliTask | undefined> {
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
@@ -45,8 +45,8 @@ export class CliTask extends Task {
           workspacePath,
           env: definition.env,
         },
-        packageManagerCommands
-      )
+        packageManagerCommands,
+      ),
     );
 
     return task;
@@ -54,7 +54,7 @@ export class CliTask extends Task {
 
   static async batchCreate(
     definitions: CliTaskDefinition[],
-    workspace?: NxWorkspace
+    workspace?: NxWorkspace,
   ): Promise<CliTask[]> {
     const w = workspace ?? (await getNxWorkspace());
 
@@ -63,12 +63,12 @@ export class CliTask extends Task {
     }
 
     const packageManagerCommands = await getPackageManagerCommand(
-      w.workspacePath
+      w.workspacePath,
     );
     const tasks = await Promise.all(
       definitions.map((definition) =>
-        this.create(definition, w, packageManagerCommands)
-      )
+        this.create(definition, w, packageManagerCommands),
+      ),
     );
     return tasks.filter((task) => task !== undefined) as CliTask[];
   }
