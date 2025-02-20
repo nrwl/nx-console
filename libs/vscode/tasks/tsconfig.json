@@ -13,7 +13,7 @@
       "path": "../utils"
     },
     {
-      "path": "../../shared/utils"
+      "path": "../../shared/npm"
     },
     {
       "path": "../../shared/types"

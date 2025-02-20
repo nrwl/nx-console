@@ -4,10 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../schema"
+      "path": "../nx-version"
     },
     {
-      "path": "../nx-version"
+      "path": "../utils"
     },
     {
       "path": "../file-system"

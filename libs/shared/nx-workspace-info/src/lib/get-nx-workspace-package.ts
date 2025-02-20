@@ -9,15 +9,15 @@ import {
   findNxPackagePath,
   importWorkspaceDependency,
 } from '@nx-console/shared-npm';
-import { Logger } from '@nx-console/shared-schema';
+import { Logger } from '@nx-console/shared-utils';
 
 export async function getNxDaemonClient(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<typeof NxDaemonClient | undefined> {
   const importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'daemon', 'client', 'client.js')
+    join('src', 'daemon', 'client', 'client.js'),
   );
   if (!importPath) {
     return;
@@ -27,22 +27,22 @@ export async function getNxDaemonClient(
 
 export async function getNxDaemonCache(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<typeof NxDaemonCache> {
   const importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'daemon', 'cache.js')
+    join('src', 'daemon', 'cache.js'),
   );
   return getNxPackage(importPath, logger);
 }
 
 export async function getNxOutput(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<typeof NxOutput | undefined> {
   const importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'utils', 'output.js')
+    join('src', 'utils', 'output.js'),
   );
 
   if (!importPath) {
@@ -54,11 +54,11 @@ export async function getNxOutput(
 
 export async function getNxProjectGraphUtils(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<typeof NxProjectGraphFileUtils | undefined> {
   const importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'project-graph', 'file-map-utils.js')
+    join('src', 'project-graph', 'file-map-utils.js'),
   );
 
   if (!importPath) {
@@ -70,17 +70,17 @@ export async function getNxProjectGraphUtils(
 
 export async function getNxProjectGraph(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<typeof NxProjectGraph> {
   let importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'project-graph', 'project-graph.js')
+    join('src', 'project-graph', 'project-graph.js'),
   );
 
   if (!importPath) {
     importPath = await findNxPackagePath(
       workspacePath,
-      join('src', 'core', 'project-graph', 'project-graph.js')
+      join('src', 'core', 'project-graph', 'project-graph.js'),
     );
   }
 
@@ -92,17 +92,17 @@ export async function getNxProjectGraph(
  */
 export async function getNxWorkspacePackageFileUtils(
   workspacePath: string,
-  logger: Logger
+  logger: Logger,
 ): Promise<typeof NxFileUtils> {
   let importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'project-graph', 'file-utils.js')
+    join('src', 'project-graph', 'file-utils.js'),
   );
 
   if (!importPath) {
     importPath = await findNxPackagePath(
       workspacePath,
-      join('src', 'core', 'file-utils.js')
+      join('src', 'core', 'file-utils.js'),
     );
   }
 
@@ -111,11 +111,11 @@ export async function getNxWorkspacePackageFileUtils(
 
 export async function getNxPackage<T>(
   importPath: string | undefined,
-  logger: Logger
+  logger: Logger,
 ): Promise<T> {
   if (!importPath) {
     logger.log(
-      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`,
     );
     throw 'local Nx dependency not found';
   }

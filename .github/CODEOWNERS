@@ -24,6 +24,8 @@
 
 /libs/shared/generate-ui-types/ @MaxKless
 
+/libs/shared/nx-workspace-info/ @MaxKless
+
 /libs/vscode/error-diagnostics/ @MaxKless
 
 /libs/vscode/nx-cli-quickpicks/ @MaxKless
@@ -72,6 +74,8 @@
 
 /apps/generate-ui-v2/ @MaxKless
 
+/libs/shared/prompts/ @MaxKless
+
 /libs/vscode/copilot/ @MaxKless
 
 /libs/vscode/nvm-tip/ @MaxKless
@@ -93,6 +97,8 @@
 /apps/intellij/ @MaxKless
 
 /apps/nxls-e2e/ @MaxKless
+
+/apps/nx-mcp/ @MaxKless
 
 /apps/vscode/ @MaxKless
 

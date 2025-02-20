@@ -13,13 +13,16 @@
   ],
   "references": [
     {
-      "path": "../types/tsconfig.lib.json"
+      "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../nx-version/tsconfig.lib.json"
     },
     {
       "path": "../schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../types/tsconfig.lib.json"
     },
     {
       "path": "../generate-ui-types/tsconfig.lib.json"

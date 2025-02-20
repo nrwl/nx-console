@@ -143,6 +143,15 @@
     },
     {
       "path": "./libs/vscode/copilot"
+    },
+    {
+      "path": "./apps/nx-mcp"
+    },
+    {
+      "path": "./libs/shared/nx-workspace-info"
+    },
+    {
+      "path": "./libs/shared/prompts"
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { gte } from '@nx-console/nx-version';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { selectFlags } from '@nx-console/vscode-nx-cli-quickpicks';
 import {
@@ -38,12 +38,12 @@ export function registerVscodeAddDependency(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(
       ADD_DEPENDENCY_COMMAND,
-      vscodeAddDependencyCommand(false)
+      vscodeAddDependencyCommand(false),
     ),
     commands.registerCommand(
       ADD_DEV_DEPENDENCY_COMMAND,
-      vscodeAddDependencyCommand(true)
-    )
+      vscodeAddDependencyCommand(true),
+    ),
   );
 }
 
@@ -137,13 +137,13 @@ async function addDependency(
   dependency: string,
   version: string,
   installAsDevDependency: boolean,
-  workspacePath: string
+  workspacePath: string,
 ) {
   try {
     const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
     const pkgManagerWorkspaceFlag = await getWorkspaceAddFlag(
       pkgManager,
-      workspacePath
+      workspacePath,
     );
     const command = `${
       installAsDevDependency
@@ -158,13 +158,13 @@ async function addDependency(
       TaskScope.Workspace,
       command,
       pkgManager,
-      new ShellExecution(command, { cwd: workspacePath })
+      new ShellExecution(command, { cwd: workspacePath }),
     );
     tasks.executeTask(task);
   } catch (e) {
     logAndShowTaskCreationError(
       e,
-      `An error occured while adding ${dependency}. Please see the logs for more information.`
+      `An error occured while adding ${dependency}. Please see the logs for more information.`,
     );
   }
 }
@@ -210,7 +210,7 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
       displayCommand: command,
       encapsulatedNx: false,
       workspacePath,
-    })
+    }),
   );
   tasks.executeTask(task);
 }
@@ -242,7 +242,7 @@ async function getDependencySuggestions(): Promise<
             pkg.name !== 'create-nx-plugin' &&
             pkg.name !== 'create-nx-workspace' &&
             pkg.name !== 'make-angular-cli-faster' &&
-            pkg.name !== 'tao'
+            pkg.name !== 'tao',
         )
         .map((pkg) => {
           let prefix: string;
@@ -270,13 +270,13 @@ async function getDependencySuggestions(): Promise<
     (responses) => responses.flat(1),
     (error: XHRResponse) => {
       return Promise.reject(error.responseText);
-    }
+    },
   );
 }
 
 async function getWorkspaceAddFlag(
   pkgManager: string,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<string> {
   const { readJsonFile } = await importNxPackagePath<
     typeof import('nx/src/devkit-exports')
@@ -292,7 +292,7 @@ async function getWorkspaceAddFlag(
           windowsHide: true,
         })
           .toString()
-          .trim()
+          .trim(),
       ) === 1;
     const isWorkspace =
       !!pkgJson.private &&

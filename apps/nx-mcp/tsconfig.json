@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../libs/shared/utils"
+    },
+    {
+      "path": "../../libs/shared/prompts"
+    },
+    {
+      "path": "../../libs/shared/nx-workspace-info"
+    },
+    {
+      "path": "../../libs/shared/npm"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
+}

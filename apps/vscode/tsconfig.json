@@ -7,6 +7,9 @@
       "path": "../../libs/vscode/graph-base"
     },
     {
+      "path": "../../libs/shared/npm"
+    },
+    {
       "path": "../../libs/vscode/telemetry"
     },
     {

@@ -13,6 +13,9 @@
       "path": "../../libs/shared/generate-ui-types"
     },
     {
+      "path": "../../libs/shared/nx-workspace-info"
+    },
+    {
       "path": "../../libs/language-server/workspace"
     },
     {

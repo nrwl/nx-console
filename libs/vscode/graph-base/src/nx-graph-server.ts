@@ -1,4 +1,4 @@
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
@@ -34,7 +34,10 @@ export class NxGraphServer implements Disposable {
   isStarted = false;
   updatedEventEmitter = new EventEmitter();
 
-  constructor(private startPort: number, private affected = false) {}
+  constructor(
+    private startPort: number,
+    private affected = false,
+  ) {}
 
   async handleWebviewRequest(request: {
     type: string;
@@ -164,7 +167,7 @@ export class NxGraphServer implements Disposable {
           windowsHide: true,
           shell: true,
           env: process.env,
-        }
+        },
       );
 
       nxGraphProcess.stdout.setEncoding('utf8');

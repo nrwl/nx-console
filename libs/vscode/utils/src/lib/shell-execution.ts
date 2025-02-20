@@ -1,4 +1,4 @@
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 

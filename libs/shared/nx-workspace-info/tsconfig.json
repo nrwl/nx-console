@@ -1,0 +1,25 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../file-system"
+    },
+    {
+      "path": "../types"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../nx-version"
+    },
+    {
+      "path": "../npm"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    }
+  ]
+}

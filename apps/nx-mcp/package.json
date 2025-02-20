@@ -1,0 +1,53 @@
+{
+  "name": "nx-mcp",
+  "version": "0.0.1",
+  "private": true,
+  "main": "main.js",
+  "nx": {
+    "name": "nx-mcp",
+    "projectType": "application",
+    "sourceRoot": "apps/nx-mcp/src",
+    "tags": [
+      "type:mcp"
+    ],
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "dist/apps/nx-mcp",
+          "outputFileName": "main.js",
+          "format": [
+            "cjs"
+          ],
+          "thirdParty": true,
+          "main": "apps/nx-mcp/src/main.ts",
+          "tsConfig": "apps/nx-mcp/tsconfig.app.json",
+          "sourcemap": false,
+          "minify": true,
+          "esbuildOptions": {
+            "mainFields": [
+              "module",
+              "main"
+            ],
+            "treeShaking": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "production": {},
+          "debug": {
+            "minify": false,
+            "sourcemap": true
+          }
+        }
+      }
+    }
+  }
+}

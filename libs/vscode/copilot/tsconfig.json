@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/prompts"
+    },
+    {
       "path": "../telemetry"
     },
     {

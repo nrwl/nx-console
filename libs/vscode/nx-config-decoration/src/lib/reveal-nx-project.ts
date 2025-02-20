@@ -1,4 +1,4 @@
-import { buildProjectPath } from '@nx-console/shared-utils';
+import { buildProjectPath } from '@nx-console/shared-file-system';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { join } from 'path';
 import {
@@ -16,11 +16,11 @@ import { fileExists } from '@nx-console/shared-file-system';
 export async function revealNxProject(
   projectName: string,
   root: string,
-  target?: { name: string; configuration?: string }
+  target?: { name: string; configuration?: string },
 ) {
   const workspacePath = WorkspaceConfigurationStore.instance.get(
     'nxWorkspacePath',
-    ''
+    '',
   );
   const projectPath = await buildProjectPath(workspacePath, root);
   const workspaceJsonPath = join(workspacePath, 'workspace.json');
@@ -33,7 +33,7 @@ export async function revealNxProject(
   }
 
   const document: TextDocument = await workspace.openTextDocument(
-    Uri.file(path)
+    Uri.file(path),
   );
 
   const projectLocations = getProjectLocations(document, projectName);
