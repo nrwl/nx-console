@@ -98,8 +98,7 @@
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
-      "options": {},
-      "exclude": ["libs/shared/nx-workspace-info/*"]
+      "options": {}
     },
     {
       "plugin": "@nx/eslint/plugin",
@@ -140,20 +139,7 @@
       }
     },
     "@nx/powerpack-enterprise-cloud",
-    "@nx/powerpack-owners",
-    {
-      "plugin": "@nx/js/typescript",
-      "include": ["libs/shared/nx-workspace-info/*"],
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
-        "build": {
-          "targetName": "build",
-          "configName": "tsconfig.lib.json"
-        }
-      }
-    }
+    "@nx/powerpack-owners"
   ],
   "sync": {
     "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],

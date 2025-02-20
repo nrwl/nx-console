@@ -2888,6 +2888,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-prompts@workspace:libs/shared/prompts":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-prompts@workspace:libs/shared/prompts"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-schema@workspace:libs/shared/schema":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-schema@workspace:libs/shared/schema"
