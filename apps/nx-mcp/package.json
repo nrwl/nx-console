@@ -15,7 +15,7 @@
         "defaultConfiguration": "production",
         "options": {
           "platform": "node",
-          "outputPath": "apps/nx-mcp/dist",
+          "outputPath": "dist/apps/nx-mcp",
           "format": [
             "cjs"
           ],
