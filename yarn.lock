@@ -2490,6 +2490,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@modelcontextprotocol/sdk@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@modelcontextprotocol/sdk@npm:1.5.0"
+  dependencies:
+    content-type: ^1.0.5
+    eventsource: ^3.0.2
+    raw-body: ^3.0.0
+    zod: ^3.23.8
+    zod-to-json-schema: ^3.24.1
+  checksum: dc1ebeef6ed5e0ccc27428a87d694b746c94a3856a143696ba6a8b21b13c1fd2381a596c8dbc48d993bd9941eb0d74aceaf4a9400ee8c61385dc932972fd2555
+  languageName: node
+  linkType: hard
+
 "@monodon/typescript-nx-imports-plugin@npm:0.3.0":
   version: 0.3.0
   resolution: "@monodon/typescript-nx-imports-plugin@npm:0.3.0"
@@ -7307,7 +7320,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"content-type@npm:~1.0.4, content-type@npm:~1.0.5":
+"content-type@npm:^1.0.5, content-type@npm:~1.0.4, content-type@npm:~1.0.5":
   version: 1.0.5
   resolution: "content-type@npm:1.0.5"
   checksum: 566271e0a251642254cde0f845f9dd4f9856e52d988f4eb0d0dcffbb7a1f8ec98de7a5215fc628f3bce30fe2fb6fd2bc064b562d721658c59b544e2d34ea2766
@@ -9080,6 +9093,22 @@ __metadata:
   version: 3.3.0
   resolution: "events@npm:3.3.0"
   checksum: f6f487ad2198aa41d878fa31452f1a3c00958f46e9019286ff4787c84aac329332ab45c9cdc8c445928fc6d7ded294b9e005a7fce9426488518017831b272780
+  languageName: node
+  linkType: hard
+
+"eventsource-parser@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "eventsource-parser@npm:3.0.0"
+  checksum: af7df874537a65e996568e5fed12db6eb27b4e041a70f5cc3a12b8b5b6f2ce229ba260d76b01f70f45ae0bf263e644d8f3768d24242f9ad86a8305991f61c7c0
+  languageName: node
+  linkType: hard
+
+"eventsource@npm:^3.0.2":
+  version: 3.0.5
+  resolution: "eventsource@npm:3.0.5"
+  dependencies:
+    eventsource-parser: ^3.0.0
+  checksum: 90f98d4b50c7bce9869eb3b88293502be572ddffd8c9141ca595d03f2c465828c6eb69c55d297c959b34c86f8eff2343e49a16e30490385de0472a0757d4f07e
   languageName: node
   linkType: hard
 
@@ -13914,6 +13943,7 @@ __metadata:
     "@microsoft/fast-components": ^2.30.6
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
+    "@modelcontextprotocol/sdk": ^1.5.0
     "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/cypress": 20.5.0-beta.2
     "@nx/devkit": 20.5.0-beta.2
@@ -14010,7 +14040,14 @@ __metadata:
     webpack: 5.88.2
     xstate: ^5.18.2
     yargs: ^17.7.2
+    zod: ^3.24.2
     zone.js: 0.14.3
+  languageName: unknown
+  linkType: soft
+
+"nx-mcp@workspace:apps/nx-mcp":
+  version: 0.0.0-use.local
+  resolution: "nx-mcp@workspace:apps/nx-mcp"
   languageName: unknown
   linkType: soft
 
@@ -15654,6 +15691,18 @@ __metadata:
     iconv-lite: 0.4.24
     unpipe: 1.0.0
   checksum: ba1583c8d8a48e8fbb7a873fdbb2df66ea4ff83775421bfe21ee120140949ab048200668c47d9ae3880012f6e217052690628cf679ddfbd82c9fc9358d574676
+  languageName: node
+  linkType: hard
+
+"raw-body@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "raw-body@npm:3.0.0"
+  dependencies:
+    bytes: 3.1.2
+    http-errors: 2.0.0
+    iconv-lite: 0.6.3
+    unpipe: 1.0.0
+  checksum: 25b7cf7964183db322e819050d758a5abd0f22c51e9f37884ea44a9ed6855a1fb61f8caa8ec5b61d07e69f54db43dbbc08ad98ef84556696d6aa806be247af0e
   languageName: node
   linkType: hard
 
@@ -19027,6 +19076,22 @@ __metadata:
   version: 1.1.1
   resolution: "yocto-queue@npm:1.1.1"
   checksum: f2e05b767ed3141e6372a80af9caa4715d60969227f38b1a4370d60bffe153c9c5b33a862905609afc9b375ec57cd40999810d20e5e10229a204e8bde7ef255c
+  languageName: node
+  linkType: hard
+
+"zod-to-json-schema@npm:^3.24.1":
+  version: 3.24.2
+  resolution: "zod-to-json-schema@npm:3.24.2"
+  peerDependencies:
+    zod: ^3.24.1
+  checksum: 1edcf680c4938f99a7b9df5b0d5eb3a3eb2f2cc57d4d0dbe5cc34539c104443a8498bb225a43fd3a848f117205027cd20f4ea8324fdb1e4aede8433fc1595ee9
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.8, zod@npm:^3.24.2":
+  version: 3.24.2
+  resolution: "zod@npm:3.24.2"
+  checksum: c02455c09678c5055c636d64f9fcda2424fea0aa46ac7d9681e7f41990bc55f488bcd84b9d7cfef0f6e906f51f55b245239d92a9f726248aa74c5b84edf00c2d
   languageName: node
   linkType: hard
 

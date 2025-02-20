@@ -143,6 +143,9 @@
     },
     {
       "path": "./libs/vscode/copilot"
+    },
+    {
+      "path": "./apps/nx-mcp"
     }
   ]
 }
