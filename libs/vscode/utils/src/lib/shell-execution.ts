@@ -14,7 +14,7 @@ export interface ShellConfig {
 
 export async function getShellExecutionForConfig(
   config: ShellConfig,
-  packageManagerCommands?: PackageManagerCommands
+  packageManagerCommands?: PackageManagerCommands,
 ): Promise<ShellExecution> {
   let command = config.displayCommand;
   let pmc: PackageManagerCommands;
@@ -50,7 +50,7 @@ export async function getShellExecutionForConfig(
     NX_CONSOLE: 'true',
   };
 
-  if (pmc.install.includes('pnpm')) {
+  if (pmc?.install?.includes('pnpm')) {
     env['INIT_CWD'] = config.cwd;
   }
 
