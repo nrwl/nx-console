@@ -1,3 +1,15 @@
+# [18.41.0](https://github.com/nrwl/nx-console/compare/vscode-v18.40.0...vscode-v18.41.0) (2025-02-20)
+
+
+### Bug Fixes
+
+* **vscode:** tweak dep wording for project graph prompt ([#2410](https://github.com/nrwl/nx-console/issues/2410)) ([f01befb](https://github.com/nrwl/nx-console/commit/f01befb6a2ace8253482ce3208318d99c0e63552))
+
+
+### Features
+
+* **vscode:** feed docs into copilot integration (RAG) ([#2404](https://github.com/nrwl/nx-console/issues/2404)) ([a307f07](https://github.com/nrwl/nx-console/commit/a307f07be663ea98c3cf6df09548b8a0215b46fc))
+
 # [18.40.0](https://github.com/nrwl/nx-console/compare/vscode-v18.39.0...vscode-v18.40.0) (2025-02-18)
 
 
