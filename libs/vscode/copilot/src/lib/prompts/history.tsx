@@ -51,7 +51,7 @@ export class HistoryMessages extends PromptElement<IHistoryMessagesProps> {
         history.push(<UserMessage>{turn.prompt}</UserMessage>);
       } else if (turn instanceof ChatResponseTurn) {
         history.push(
-          <AssistantMessage>{chatResponseToString(turn)}</AssistantMessage>
+          <AssistantMessage>{chatResponseToString(turn)}</AssistantMessage>,
         );
       }
     }

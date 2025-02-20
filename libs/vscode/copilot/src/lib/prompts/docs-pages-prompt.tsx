@@ -29,7 +29,7 @@ export class DocsPagesPrompt extends PromptElement<DocsPagesPromptProps> {
                 (page, index) =>
                   `- ${page.longer_heading ?? page.heading ?? index} <br/> ${
                     page.content
-                  }`
+                  }`,
               )
               .join('<br/>')}
           </UserMessage>

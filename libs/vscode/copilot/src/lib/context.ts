@@ -14,7 +14,7 @@ import {
 import { chatResponseToString } from './prompts/history';
 
 export async function getProjectGraph(
-  stream: ChatResponseStream
+  stream: ChatResponseStream,
 ): Promise<ProjectGraph | undefined> {
   let projectGraph: ProjectGraph | undefined;
   try {
@@ -32,7 +32,7 @@ export async function getProjectGraph(
     const md = new MarkdownString();
     md.supportThemeIcons = true;
     md.appendMarkdown(
-      '$(warning) Unable to retrieve workspace information. Proceeding without workspace data.  '
+      '$(warning) Unable to retrieve workspace information. Proceeding without workspace data.  ',
     );
     stream.markdown(md);
   }
@@ -61,7 +61,7 @@ export async function getGeneratorNamesAndDescriptions(): Promise<
 }
 
 export async function tryReadNxJson(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<NxJsonConfiguration | undefined> {
   try {
     return await readNxJson(workspacePath);
@@ -79,7 +79,7 @@ export type DocsPageSection = {
 
 export async function getDocsContext(
   prompt: string,
-  history: ReadonlyArray<ChatRequestTurn | ChatResponseTurn>
+  history: ReadonlyArray<ChatRequestTurn | ChatResponseTurn>,
 ): Promise<DocsPageSection[]> {
   try {
     const messages = history.map((chatItem) => ({
@@ -95,7 +95,7 @@ export async function getDocsContext(
     });
 
     const req = await xhr({
-      url: 'https://nx-dev-git-embedding-api-nrwl.vercel.app/api/query-ai-embeddings',
+      url: 'https://nx.dev/api/query-ai-embeddings',
       type: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: JSON.stringify({
@@ -107,7 +107,7 @@ export async function getDocsContext(
     return response.context.pageSections;
   } catch (error) {
     getOutputChannel().appendLine(
-      `Error fetching AI context: ${JSON.stringify(error)}`
+      `Error fetching AI context: ${JSON.stringify(error)}`,
     );
     return [];
   }
