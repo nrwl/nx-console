@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../../shared/nx-workspace-info"
+    },
+    {
       "path": "../../../shared/npm"
     },
     {

@@ -24,6 +24,8 @@
 
 /libs/shared/generate-ui-types/ @MaxKless
 
+/libs/shared/nx-workspace-info/ @MaxKless
+
 /libs/vscode/error-diagnostics/ @MaxKless
 
 /libs/vscode/nx-cli-quickpicks/ @MaxKless

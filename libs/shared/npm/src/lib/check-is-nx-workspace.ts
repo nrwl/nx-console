@@ -3,11 +3,11 @@ import {
   fileExists,
   readAndCacheJsonFile,
 } from '@nx-console/shared-file-system';
-import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { coerce } from 'semver';
+import { workspaceDependencyPath } from './workspace-dependencies';
 
 export async function checkIsNxWorkspace(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<boolean> {
   let isNxWorkspace = await fileExists(join(workspacePath, 'nx.json'));
 
@@ -18,7 +18,7 @@ export async function checkIsNxWorkspace(
     }
 
     const lernaPackageJson = await readAndCacheJsonFile(
-      join(lernaPath, 'package.json')
+      join(lernaPath, 'package.json'),
     );
     const lernaVersion = coerce(lernaPackageJson.json.version);
 

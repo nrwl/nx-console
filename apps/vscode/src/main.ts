@@ -11,11 +11,7 @@ import {
   workspace,
 } from 'vscode';
 
-import {
-  checkIsNxWorkspace,
-  killGroup,
-  withTimeout,
-} from '@nx-console/shared-utils';
+import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -67,6 +63,7 @@ import {
   hasNxGraphServer,
   getNxGraphServer,
 } from '@nx-console/vscode-graph-base';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 

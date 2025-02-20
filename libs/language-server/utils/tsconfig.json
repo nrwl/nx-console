@@ -7,7 +7,7 @@
       "path": "../../shared/npm"
     },
     {
-      "path": "../../shared/schema"
+      "path": "../../shared/utils"
     },
     {
       "path": "../../shared/json-schema"

@@ -2,9 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/nx-mcp",
-    "types": ["node"],
-    "rootDir": "src",
-    "tsBuildInfoFile": "out-tsc/nx-mcp/tsconfig.app.tsbuildinfo"
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"]

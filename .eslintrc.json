@@ -22,6 +22,11 @@
                 "bannedExternalImports": ["vscode"]
               },
               {
+                "sourceTag": "type:mcp",
+                "onlyDependOnLibsWithTags": ["type:mcp", "type:shared"],
+                "bannedExternalImports": ["vscode"]
+              },
+              {
                 "sourceTag": "type:shared",
                 "onlyDependOnLibsWithTags": ["type:shared"],
                 "bannedExternalImports": ["vscode"]

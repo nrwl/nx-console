@@ -1,17 +1,18 @@
-import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
-import { nxWorkspace } from './workspace';
 import { lspLogger } from '@nx-console/language-server-utils';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   StartupMessageDefinition,
   loadPlugins,
 } from '@nx-console/shared-nx-console-plugins';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import { consoleLogger } from '@nx-console/shared-utils';
 
 export async function getTransformedGeneratorSchema(
   workspacePath: string,
   schema: GeneratorSchema,
 ): Promise<GeneratorSchema> {
   const plugins = await loadPlugins(workspacePath);
-  const workspace = await nxWorkspace(workspacePath);
+  const workspace = await nxWorkspace(workspacePath, consoleLogger);
 
   let modifiedSchema = schema;
   try {
@@ -30,7 +31,7 @@ export async function getStartupMessage(
   schema: GeneratorSchema,
 ): Promise<StartupMessageDefinition | undefined> {
   const plugins = await loadPlugins(workspacePath);
-  const workspace = await nxWorkspace(workspacePath);
+  const workspace = await nxWorkspace(workspacePath, consoleLogger);
 
   let startupMessageDefinition: StartupMessageDefinition | undefined =
     undefined;

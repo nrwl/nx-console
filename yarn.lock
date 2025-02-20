@@ -2882,6 +2882,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-nx-workspace-info@workspace:libs/shared/nx-workspace-info":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-nx-workspace-info@workspace:libs/shared/nx-workspace-info"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-schema@workspace:libs/shared/schema":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-schema@workspace:libs/shared/schema"

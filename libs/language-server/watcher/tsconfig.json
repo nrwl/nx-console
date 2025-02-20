@@ -16,7 +16,7 @@
       "path": "../utils"
     },
     {
-      "path": "../workspace"
+      "path": "../../shared/nx-workspace-info"
     },
     {
       "path": "./tsconfig.lib.json"
