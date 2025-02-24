@@ -4,7 +4,7 @@ import {
   UserMessage,
 } from '@vscode/prompt-tsx';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
-import { getProjectGraphPrompt } from '@nx-console/shared-prompts';
+import { getProjectGraphPrompt } from '@nx-console/shared-llm-context';
 
 interface NxProjectGraphPromptProps extends BasePromptElementProps {
   projectGraph: ProjectGraph;

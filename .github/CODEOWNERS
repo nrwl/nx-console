@@ -64,6 +64,8 @@
 
 /libs/shared/json-schema/ @MaxKless
 
+/libs/shared/llm-context/ @MaxKless
+
 /libs/shared/nx-version/ @MaxKless
 
 /libs/vscode/graph-base/ @MaxKless
@@ -73,8 +75,6 @@
 /libs/vscode/telemetry/ @MaxKless
 
 /apps/generate-ui-v2/ @MaxKless
-
-/libs/shared/prompts/ @MaxKless
 
 /libs/vscode/copilot/ @MaxKless
 

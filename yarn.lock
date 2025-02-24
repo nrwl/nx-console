@@ -2870,6 +2870,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-llm-context@workspace:libs/shared/llm-context":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-llm-context@workspace:libs/shared/llm-context"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-npm@workspace:libs/shared/npm":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-npm@workspace:libs/shared/npm"
@@ -2885,12 +2891,6 @@ __metadata:
 "@nx-console/shared-nx-workspace-info@workspace:libs/shared/nx-workspace-info":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-nx-workspace-info@workspace:libs/shared/nx-workspace-info"
-  languageName: unknown
-  linkType: soft
-
-"@nx-console/shared-prompts@workspace:libs/shared/prompts":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/shared-prompts@workspace:libs/shared/prompts"
   languageName: unknown
   linkType: soft
 

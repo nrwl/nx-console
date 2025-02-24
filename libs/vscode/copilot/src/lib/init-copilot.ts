@@ -27,7 +27,7 @@ import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
-import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-prompts';
+import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-llm-context';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
