@@ -28,6 +28,9 @@ import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
 import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-llm-context';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
+import { withTimeout } from '@nx-console/shared-utils';
+import { getGenerators } from '@nx-console/vscode-nx-workspace';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -82,8 +85,17 @@ const handler: ChatRequestHandler = async (
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
   const nxJson = await tryReadNxJson(workspacePath);
 
+  let generators: GeneratorCollectionInfo[];
+  try {
+    generators = await withTimeout<GeneratorCollectionInfo[]>(
+      async () => await getGenerators(),
+      3000,
+    );
+  } catch (e) {
+    generators = [];
+  }
   const generatorNamesAndDescriptions =
-    await getGeneratorNamesAndDescriptions(workspacePath);
+    await getGeneratorNamesAndDescriptions(generators);
 
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,

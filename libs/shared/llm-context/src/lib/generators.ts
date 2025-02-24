@@ -23,24 +23,13 @@ ${generators}`;
 }
 
 export async function getGeneratorNamesAndDescriptions(
-  workspacePath: string,
-  logger?: Logger,
+  generators: GeneratorCollectionInfo[],
 ): Promise<
   {
     name: string;
     description: string;
   }[]
 > {
-  let generators: GeneratorCollectionInfo[];
-  try {
-    generators = await withTimeout<GeneratorCollectionInfo[]>(
-      async () => await getGenerators(workspacePath, undefined, logger),
-      10000,
-    );
-  } catch (e) {
-    generators = [];
-  }
-
   return generators.map((generator) => ({
     name: generator.name,
     description: generator.data?.description ?? '',

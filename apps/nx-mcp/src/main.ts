@@ -1,11 +1,15 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import {
+  getGenerators,
+  nxWorkspace,
+} from '@nx-console/shared-nx-workspace-info';
 import {
   getDocsContext,
   getDocsPrompt,
   getGeneratorNamesAndDescriptions,
+  getGeneratorSchema,
   getGeneratorsPrompt,
   getNxJsonPrompt,
   getProjectGraphPrompt,
@@ -91,16 +95,17 @@ server.tool(
   'nx_generators',
   'Returns a list of generators that could be relevant to the user query.',
   async () => {
-    const generators = await getGeneratorNamesAndDescriptions(
-      nxWorkspacePath,
-      logger,
-    );
+    const generators = await getGenerators(nxWorkspacePath, undefined, logger);
+
     if (generators.length === 0) {
       return {
         content: [{ type: 'text', text: 'No generators found' }],
       };
     }
-    const prompt = await getGeneratorsPrompt(generators);
+
+    const generatorNamesAndDescriptions =
+      await getGeneratorNamesAndDescriptions(generators);
+    const prompt = await getGeneratorsPrompt(generatorNamesAndDescriptions);
     return {
       content: [{ type: 'text', text: prompt }],
     };
@@ -108,13 +113,28 @@ server.tool(
 );
 
 server.tool(
-  'nx_generator_details',
+  'nx_generator_schema',
   'Returns the detailed JSON schema for an nx generator',
   {
     generatorName: z.string(),
   },
   async ({ generatorName }) => {
-    const generatorDetails = await getGeneratorDetails(generatorName);
+    const generators = await getGenerators(nxWorkspacePath, undefined, logger);
+    const generatorDetails = await getGeneratorSchema(
+      generatorName,
+      generators,
+    );
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Found generator schema for ${generatorName}: ${JSON.stringify(
+            generatorDetails,
+          )}`,
+        },
+      ],
+    };
   },
 );
 
