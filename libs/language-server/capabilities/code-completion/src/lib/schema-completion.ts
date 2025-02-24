@@ -3,10 +3,7 @@ import {
   getSchemaRequestService,
   lspLogger,
 } from '@nx-console/language-server-utils';
-import {
-  getExecutors,
-  getProjectByRoot,
-} from '@nx-console/language-server-workspace';
+import { getProjectByRoot } from '@nx-console/language-server-workspace';
 import {
   CompletionType,
   getNxJsonSchema,
@@ -16,7 +13,10 @@ import {
   tags,
 } from '@nx-console/shared-json-schema';
 import { findNxPackagePath } from '@nx-console/shared-npm';
-import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import {
+  getExecutors,
+  nxWorkspace,
+} from '@nx-console/shared-nx-workspace-info';
 import { CollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';

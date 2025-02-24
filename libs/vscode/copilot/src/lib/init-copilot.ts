@@ -1,14 +1,10 @@
-import { readNxJson } from '@nx-console/shared-npm';
-import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
-import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
-import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
 import {
   CancellationToken,
   chat,
@@ -26,17 +22,12 @@ import {
   MarkdownString,
   Uri,
 } from 'vscode';
+import { getDocsContext, getProjectGraph, tryReadNxJson } from './context';
 import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
-import { get } from 'http';
-import {
-  getDocsContext,
-  getGeneratorNamesAndDescriptions,
-  getProjectGraph,
-  tryReadNxJson,
-} from './context';
+import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-prompts';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -92,7 +83,7 @@ const handler: ChatRequestHandler = async (
   const nxJson = await tryReadNxJson(workspacePath);
 
   const generatorNamesAndDescriptions =
-    await getGeneratorNamesAndDescriptions();
+    await getGeneratorNamesAndDescriptions(workspacePath);
 
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,

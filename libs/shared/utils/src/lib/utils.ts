@@ -12,7 +12,7 @@ export function getPrimitiveValue(value: any): string | undefined {
 
 export function hasKey<T extends object>(
   obj: T,
-  key: PropertyKey
+  key: PropertyKey,
 ): key is keyof T {
   return key in obj;
 }
@@ -32,12 +32,12 @@ export function formatError(message: string, err: any): string {
 export function matchWithWildcards(
   text: string,
   expression: string,
-  strict = true
+  strict = true,
 ) {
   const escapeRegex = (str: string) =>
     str.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
   return new RegExp(
-    `${strict ? '^' : ''}${expression.split('*').map(escapeRegex).join('.*')}$`
+    `${strict ? '^' : ''}${expression.split('*').map(escapeRegex).join('.*')}$`,
   ).test(text);
 }
 
@@ -51,7 +51,10 @@ export function debounce(callback: (...args: any[]) => any, wait: number) {
   };
 }
 
-export function withTimeout<T>(asyncFn: () => Promise<T>, timeoutMs: number) {
+export function withTimeout<T>(
+  asyncFn: () => Promise<T>,
+  timeoutMs: number,
+): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error(`Function timed out after ${timeoutMs} milliseconds`));

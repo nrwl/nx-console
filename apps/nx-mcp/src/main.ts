@@ -5,6 +5,8 @@ import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import {
   getDocsContext,
   getDocsPrompt,
+  getGeneratorNamesAndDescriptions,
+  getGeneratorsPrompt,
   getNxJsonPrompt,
   getProjectGraphPrompt,
 } from '@nx-console/shared-prompts';
@@ -84,5 +86,26 @@ server.tool(
     };
   },
 );
+
+server.tool(
+  'nx_generators',
+  'Returns a list of generators that could be relevant to the user query.',
+  async () => {
+    const generators = await getGeneratorNamesAndDescriptions(
+      nxWorkspacePath,
+      logger,
+    );
+    if (generators.length === 0) {
+      return {
+        content: [{ type: 'text', text: 'No generators found' }],
+      };
+    }
+    const prompt = await getGeneratorsPrompt(generators);
+    return {
+      content: [{ type: 'text', text: prompt }],
+    };
+  },
+);
+
 const transport = new StdioServerTransport();
 server.connect(transport);

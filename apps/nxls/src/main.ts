@@ -54,7 +54,6 @@ import {
   getCloudOnboardingInfo,
   getGeneratorContextV2,
   getGeneratorOptions,
-  getGenerators,
   getNxCloudStatus,
   getPDVData,
   getProjectByPath,
@@ -74,6 +73,7 @@ import {
   resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server-workspace';
 import {
+  getGenerators,
   getNxVersion,
   nxWorkspace,
   resetNxVersionCache,

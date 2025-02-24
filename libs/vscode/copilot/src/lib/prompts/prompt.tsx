@@ -9,8 +9,8 @@ import { History } from './history';
 import { NxProjectGraphPrompt } from './project-graph-prompt';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
 import { NxJsonPrompt } from './nx-json-prompt';
-import { DocsPageSection } from '../context';
 import { DocsPagesPrompt } from './docs-pages-prompt';
+import { DocsPageSection } from '@nx-console/shared-prompts';
 
 export interface NxCopilotPromptProps extends BasePromptElementProps {
   packageManagerExecCommand: string;

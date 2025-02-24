@@ -16,8 +16,8 @@ import {
 } from '@nx-console/shared-schema';
 import { platform } from 'os';
 import { dirname, resolve } from 'path';
-import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
-import { lspLogger } from '@nx-console/language-server-utils';
+import { nxWorkspace } from './workspace';
+import { Logger } from '@nx-console/shared-utils';
 
 export type ReadCollectionsOptions = {
   clearPackageJsonCache?: boolean;
@@ -28,15 +28,13 @@ export type ReadCollectionsOptions = {
 export async function readCollections(
   workspacePath: string,
   options: ReadCollectionsOptions,
+  logger?: Logger,
 ): Promise<CollectionInfo[]> {
   if (options?.clearPackageJsonCache) {
     clearJsonCache('package.json', workspacePath);
   }
 
-  const { projectGraph, nxVersion } = await nxWorkspace(
-    workspacePath,
-    lspLogger,
-  );
+  const { projectGraph, nxVersion } = await nxWorkspace(workspacePath, logger);
 
   const packages = await workspaceDependencies(
     workspacePath,
