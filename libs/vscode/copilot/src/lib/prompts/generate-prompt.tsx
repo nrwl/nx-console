@@ -8,7 +8,7 @@ import { NxProjectGraphPrompt } from './project-graph-prompt';
 import { BaseSystemPrompt, NxCopilotPromptProps } from './prompt';
 import { NxJsonPrompt } from './nx-json-prompt';
 import { DocsPagesPrompt } from './docs-pages-prompt';
-import { getGeneratorsPrompt } from '@nx-console/shared-prompts';
+import { getGeneratorsPrompt } from '@nx-console/shared-llm-context';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
   generators: { name: string; description: string }[];

@@ -9,7 +9,7 @@ import {
   getGeneratorsPrompt,
   getNxJsonPrompt,
   getProjectGraphPrompt,
-} from '@nx-console/shared-prompts';
+} from '@nx-console/shared-llm-context';
 import { getMcpLogger } from './mcp-logger';
 import { z } from 'zod';
 
@@ -104,6 +104,17 @@ server.tool(
     return {
       content: [{ type: 'text', text: prompt }],
     };
+  },
+);
+
+server.tool(
+  'nx_generator_details',
+  'Returns the detailed JSON schema for an nx generator',
+  {
+    generatorName: z.string(),
+  },
+  async ({ generatorName }) => {
+    const generatorDetails = await getGeneratorDetails(generatorName);
   },
 );
 

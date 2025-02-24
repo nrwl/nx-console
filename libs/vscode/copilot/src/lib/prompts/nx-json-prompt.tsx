@@ -1,4 +1,4 @@
-import { getNxJsonPrompt } from '@nx-console/shared-prompts';
+import { getNxJsonPrompt } from '@nx-console/shared-llm-context';
 import {
   BasePromptElementProps,
   PromptElement,

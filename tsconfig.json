@@ -151,7 +151,7 @@
       "path": "./libs/shared/nx-workspace-info"
     },
     {
-      "path": "./libs/shared/prompts"
+      "path": "./libs/shared/llm-context"
     }
   ]
 }

@@ -7,7 +7,7 @@
       "path": "../../libs/shared/utils"
     },
     {
-      "path": "../../libs/shared/prompts"
+      "path": "../../libs/shared/llm-context"
     },
     {
       "path": "../../libs/shared/nx-workspace-info"

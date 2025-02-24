@@ -1,4 +1,4 @@
-import { DocsPageSection, getDocsPrompt } from '@nx-console/shared-prompts';
+import { DocsPageSection, getDocsPrompt } from '@nx-console/shared-llm-context';
 import {
   PromptElement,
   UserMessage,
