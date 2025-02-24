@@ -1,3 +1,4 @@
+import { getGeneratorSchema } from '@nx-console/shared-llm-context';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
 import { readFile } from 'fs/promises';
 import {
@@ -20,28 +21,34 @@ export class GeneratorDetailsTool
 {
   async invoke(
     options: LanguageModelToolInvocationOptions<GeneratorDetailsToolInput>,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     const params = options.input as GeneratorDetailsToolInput;
 
-    const generatorSchemas = await getGeneratorSchemas();
+    const generators = await getGenerators();
 
-    const schema = generatorSchemas.find(
-      (schema) => schema.name === params.generatorName
-    );
+    const schema = await getGeneratorSchema(params.generatorName, generators);
+
+    if (!schema) {
+      return new LanguageModelToolResult([
+        new LanguageModelTextPart(
+          `Generator ${params.generatorName} not found`,
+        ),
+      ]);
+    }
 
     return new LanguageModelToolResult([
       new LanguageModelTextPart(
         `Found generator schema for ${params.generatorName}: ${JSON.stringify(
-          schema
-        )}`
+          schema,
+        )}`,
       ),
     ]);
   }
 
   prepareInvocation(
     options: LanguageModelToolInvocationPrepareOptions<GeneratorDetailsToolInput>,
-    token: CancellationToken
+    token: CancellationToken,
   ): PreparedToolInvocation {
     return {
       invocationMessage: 'Reading generator schema...',
@@ -57,7 +64,7 @@ async function getGeneratorSchemas() {
     if (generator.schemaPath) {
       try {
         const schemaContent = JSON.parse(
-          await readFile(generator.schemaPath, 'utf-8')
+          await readFile(generator.schemaPath, 'utf-8'),
         );
         delete schemaContent['$schema'];
         delete schemaContent['$id'];
@@ -66,7 +73,7 @@ async function getGeneratorSchemas() {
       } catch (error) {
         console.error(
           `Failed to read schema for generator ${generator.name}:`,
-          error
+          error,
         );
       }
     }
