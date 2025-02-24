@@ -13,9 +13,6 @@
       "path": "../../../shared/nx-version"
     },
     {
-      "path": "../../workspace"
-    },
-    {
       "path": "../../utils"
     },
     {

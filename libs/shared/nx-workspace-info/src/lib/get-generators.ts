@@ -11,6 +11,7 @@ import {
 } from '@nx-console/shared-schema';
 import { normalizeSchema } from '@nx-console/shared-schema';
 import { basename, join } from 'path';
+import { Logger } from '@nx-console/shared-utils';
 import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
@@ -21,11 +22,15 @@ export async function getGenerators(
   },
 ): Promise<GeneratorCollectionInfo[]> {
   const basedir = workspacePath;
-  const collections = await readCollections(workspacePath, {
-    clearPackageJsonCache: false,
-    includeHidden: options.includeHidden,
-    includeNgAdd: options.includeNgAdd,
-  });
+  const collections = await readCollections(
+    workspacePath,
+    {
+      clearPackageJsonCache: false,
+      includeHidden: options.includeHidden,
+      includeNgAdd: options.includeNgAdd,
+    },
+    logger,
+  );
   let generatorCollections = collections.filter(
     (collection) => collection.type === 'generator',
   );

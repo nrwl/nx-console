@@ -4,6 +4,15 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-workspace-info"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../schema"
+    },
+    {
       "path": "./tsconfig.lib.json"
     }
   ]

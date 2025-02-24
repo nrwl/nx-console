@@ -2,10 +2,12 @@ import {
   isExecutorStringNode,
   lspLogger,
 } from '@nx-console/language-server-utils';
-import { getExecutors } from '@nx-console/language-server-workspace';
 import { gte } from '@nx-console/nx-version';
 import { importNxPackagePath } from '@nx-console/shared-npm';
-import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import {
+  getExecutors,
+  nxWorkspace,
+} from '@nx-console/shared-nx-workspace-info';
 import { getNxVersion } from '@nx-console/shared-nx-workspace-info';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { dirname } from 'path';

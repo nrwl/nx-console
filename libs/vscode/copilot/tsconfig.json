@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/prompts"
-    },
-    {
       "path": "../telemetry"
     },
     {
@@ -28,7 +25,7 @@
       "path": "../../shared/utils"
     },
     {
-      "path": "../../shared/schema"
+      "path": "../../shared/prompts"
     },
     {
       "path": "../../shared/npm"
