@@ -2,7 +2,10 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
-import { getProjectGraphPrompt } from '@nx-console/shared-prompts';
+import {
+  getNxJsonPrompt,
+  getProjectGraphPrompt,
+} from '@nx-console/shared-prompts';
 import { getMcpLogger } from './mcp-logger';
 
 const nxWorkspacePath = process.argv[2];
@@ -21,8 +24,8 @@ server.server.registerCapabilities({
 const logger = getMcpLogger(server);
 
 server.tool(
-  'nx-project-graph',
-  'Returns a readable representation of the nx project graph. Use it to answer questions about the nx workspace and architecture',
+  'nx-workspace',
+  'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
   async () => {
     try {
       if (!(await checkIsNxWorkspace(nxWorkspacePath))) {
@@ -40,6 +43,10 @@ server.tool(
       const workspace = await nxWorkspace(nxWorkspacePath, logger);
       return {
         content: [
+          {
+            type: 'text',
+            text: getNxJsonPrompt(workspace.nxJson),
+          },
           {
             type: 'text',
             text: getProjectGraphPrompt(workspace.projectGraph),
