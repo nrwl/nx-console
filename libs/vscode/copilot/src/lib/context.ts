@@ -3,7 +3,6 @@ import {
   DocsPageSection,
   getDocsContext as getSharedDocsContext,
 } from '@nx-console/shared-prompts';
-import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
@@ -40,27 +39,6 @@ export async function getProjectGraph(
     stream.markdown(md);
   }
   return projectGraph;
-}
-
-export async function getGeneratorNamesAndDescriptions(): Promise<
-  {
-    name: string;
-    description: string;
-  }[]
-> {
-  let generators: GeneratorCollectionInfo[];
-  try {
-    await withTimeout<void>(async () => {
-      generators = await getGenerators();
-    }, 3000);
-  } catch (e) {
-    generators = [];
-  }
-
-  return generators.map((generator) => ({
-    name: generator.name,
-    description: generator.data.description,
-  }));
 }
 
 export async function tryReadNxJson(

@@ -11,6 +11,7 @@ import {
 } from '@nx-console/shared-schema';
 import { normalizeSchema } from '@nx-console/shared-schema';
 import { basename, join } from 'path';
+import { Logger } from '@nx-console/shared-utils';
 import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
@@ -18,16 +19,21 @@ export async function getGenerators(
   options: NxGeneratorsRequestOptions = {
     includeHidden: false,
     includeNgAdd: false,
-  }
+  },
+  logger?: Logger,
 ): Promise<GeneratorCollectionInfo[]> {
   const basedir = workspacePath;
-  const collections = await readCollections(workspacePath, {
-    clearPackageJsonCache: false,
-    includeHidden: options.includeHidden,
-    includeNgAdd: options.includeNgAdd,
-  });
+  const collections = await readCollections(
+    workspacePath,
+    {
+      clearPackageJsonCache: false,
+      includeHidden: options.includeHidden,
+      includeNgAdd: options.includeNgAdd,
+    },
+    logger,
+  );
   let generatorCollections = collections.filter(
-    (collection) => collection.type === 'generator'
+    (collection) => collection.type === 'generator',
   );
 
   generatorCollections = [
@@ -37,14 +43,14 @@ export async function getGenerators(
   ];
   return generatorCollections.filter(
     (collection): collection is GeneratorCollectionInfo =>
-      collection.type === 'generator'
+      collection.type === 'generator',
   );
 }
 
 async function checkAndReadWorkspaceGenerators(
   basedir: string,
   workspaceGeneratorType: 'generators' | 'schematics',
-  options: NxGeneratorsRequestOptions
+  options: NxGeneratorsRequestOptions,
 ) {
   const workspaceGeneratorsPath = join('tools', workspaceGeneratorType);
   if (await directoryExists(join(basedir, workspaceGeneratorsPath))) {
@@ -52,7 +58,7 @@ async function checkAndReadWorkspaceGenerators(
       basedir,
       workspaceGeneratorsPath,
       workspaceGeneratorType,
-      options
+      options,
     );
     return collection;
   }
@@ -63,7 +69,7 @@ async function readWorkspaceGeneratorsCollection(
   basedir: string,
   workspaceGeneratorsPath: string,
   workspaceGeneratorType: 'generators' | 'schematics',
-  options: NxGeneratorsRequestOptions
+  options: NxGeneratorsRequestOptions,
 ): Promise<GeneratorCollectionInfo[]> {
   const collectionDir = join(basedir, workspaceGeneratorsPath);
   const collectionName = `workspace-${
@@ -72,7 +78,7 @@ async function readWorkspaceGeneratorsCollection(
   const collectionPath = join(collectionDir, 'collection.json');
   if (await fileExists(collectionPath)) {
     const collection = await readAndCacheJsonFile(
-      `${collectionDir}/collection.json`
+      `${collectionDir}/collection.json`,
     );
 
     return getCollectionInfo(
@@ -84,7 +90,7 @@ async function readWorkspaceGeneratorsCollection(
         json: {},
       },
       collection.json,
-      options
+      options,
     ) as Promise<GeneratorCollectionInfo[]>;
   } else {
     return await Promise.all(
@@ -107,7 +113,7 @@ async function readWorkspaceGeneratorsCollection(
               type,
             },
           } as GeneratorCollectionInfo;
-        })
+        }),
     );
   }
 }
