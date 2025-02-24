@@ -3,10 +3,13 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import {
+  getDocsContext,
+  getDocsPrompt,
   getNxJsonPrompt,
   getProjectGraphPrompt,
 } from '@nx-console/shared-prompts';
 import { getMcpLogger } from './mcp-logger';
+import { z } from 'zod';
 
 const nxWorkspacePath = process.argv[2];
 if (!nxWorkspacePath) {
@@ -24,7 +27,7 @@ server.server.registerCapabilities({
 const logger = getMcpLogger(server);
 
 server.tool(
-  'nx-workspace',
+  'nx_workspace',
   'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
   async () => {
     try {
@@ -61,5 +64,25 @@ server.tool(
   },
 );
 
+server.tool(
+  'nx_docs',
+  'Returns a list of documentation sections that could be relevant to the user query. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+  {
+    userQuery: z.string(),
+    lastAssistantMessage: z.string().optional(),
+  },
+  async ({
+    userQuery,
+    lastAssistantMessage,
+  }: {
+    userQuery: string;
+    lastAssistantMessage: string;
+  }) => {
+    const docsPages = await getDocsContext(userQuery, lastAssistantMessage);
+    return {
+      content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
+    };
+  },
+);
 const transport = new StdioServerTransport();
 server.connect(transport);
