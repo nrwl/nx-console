@@ -25,7 +25,7 @@
       "path": "../../shared/utils"
     },
     {
-      "path": "../../shared/prompts"
+      "path": "../../shared/llm-context"
     },
     {
       "path": "../../shared/npm"

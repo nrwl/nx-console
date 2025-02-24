@@ -29,7 +29,7 @@
       "path": "../../shared/utils/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/prompts/tsconfig.lib.json"
+      "path": "../../shared/llm-context/tsconfig.lib.json"
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
