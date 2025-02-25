@@ -1,14 +1,11 @@
 import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
-import { findConfig } from '@nx-console/shared-utils';
+import { findConfig } from '@nx-console/shared-file-system';
 import { dirname, join, posix, sep } from 'node:path';
 import { getExternalFiles } from './get-external-files';
 
 jest.mock('@nx-console/shared-file-system', () => ({
   readAndCacheJsonFile: jest.fn(),
   listFiles: jest.fn(),
-}));
-
-jest.mock('@nx-console/shared-utils', () => ({
   findConfig: jest.fn(),
 }));
 
@@ -121,7 +118,7 @@ describe('getExternalFiles', () => {
 });
 
 function pathNormalize(
-  externalFiles: { directory: string; mainFile: string }[]
+  externalFiles: { directory: string; mainFile: string }[],
 ): { directory: string; mainFile: string }[] {
   return externalFiles.map(({ directory, mainFile }) => ({
     directory: directory.split(sep).join(posix.sep),
