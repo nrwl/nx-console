@@ -17,6 +17,9 @@
       "path": "../../libs/shared/nx-workspace-info/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/telemetry/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/npm/tsconfig.lib.json"
     }
   ]

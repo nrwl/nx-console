@@ -1,4 +1,4 @@
-import { GoogleAnalytics } from '@nx-console/shared-telemetry';
+import { GoogleAnalytics, TelemetryEvents } from '@nx-console/shared-telemetry';
 import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
@@ -36,11 +36,10 @@ export class GoogleAnalyticsSender implements TelemetrySender {
       this.production ? 'production' : 'debug_view',
       env.machineId,
       env.machineId,
+      env.sessionId,
       this._version,
-      env.isTelemetryEnabled,
       'vscode',
       logger,
-      env.sessionId,
       this._nxVersion,
     );
 
@@ -62,11 +61,17 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     );
   }
 
-  sendEventData(eventName: string, data?: Record<string, any>): void {
-    this.analytics.sendEventData(eventName, data);
+  sendEventData(eventName: TelemetryEvents, data?: Record<string, any>): void {
+    if (env.isTelemetryEnabled) {
+      this.analytics.sendEventData(eventName, data);
+    }
   }
 
   sendErrorData(error: Error, data?: Record<string, any>): void {
+    if (!env.isTelemetryEnabled) {
+      return;
+    }
+
     getOutputChannel().appendLine(`Uncaught Exception: ${error}`);
 
     const shouldLogToRollbar = this.production

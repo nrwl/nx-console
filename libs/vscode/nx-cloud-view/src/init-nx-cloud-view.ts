@@ -10,10 +10,7 @@ import {
   getOutputChannel,
 } from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
-import {
-  getTelemetry,
-  TelemetryEventSource,
-} from '@nx-console/vscode-telemetry';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import {
   commands,
@@ -31,6 +28,7 @@ import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
+import { TelemetryEventSource } from '@nx-console/shared-telemetry';
 
 export function initNxCloudView(context: ExtensionContext) {
   // set up state machine & listeners
