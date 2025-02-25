@@ -2900,6 +2900,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-telemetry@workspace:libs/shared/telemetry":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-telemetry@workspace:libs/shared/telemetry"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-types@workspace:libs/shared/types":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-types@workspace:libs/shared/types"
@@ -17466,12 +17472,6 @@ __metadata:
   checksum: 8485350c0688331c94493031f417df069b778aadb25598abdad51862e007c39d1dd5310702c7be4a6784731a174799d8885d2fde0484269aea205b724d7b2ffa
   languageName: node
   linkType: hard
-
-"telemetry@workspace:libs/shared/telemetry":
-  version: 0.0.0-use.local
-  resolution: "telemetry@workspace:libs/shared/telemetry"
-  languageName: unknown
-  linkType: soft
 
 "temp-dir@npm:^2.0.0":
   version: 2.0.0
