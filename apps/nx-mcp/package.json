@@ -1,8 +1,13 @@
 {
   "name": "nx-mcp",
   "version": "0.0.1",
-  "private": true,
   "main": "main.js",
+  "bin": {
+    "nx-mcp": "main.js"
+  },
+  "files": [
+    "main.js"
+  ],
   "nx": {
     "name": "nx-mcp",
     "projectType": "application",
@@ -47,6 +52,15 @@
             "sourcemap": true
           }
         }
+      },
+      "setup-publish": {
+        "command": "node setup-publish.js",
+        "options": {
+          "cwd": "apps/nx-mcp"
+        },
+        "dependsOn": [
+          "build"
+        ]
       }
     }
   }
