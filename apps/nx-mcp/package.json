@@ -2,11 +2,35 @@
   "name": "nx-mcp",
   "version": "0.0.2",
   "main": "main.js",
+  "description": "A Model Context Protocol server implementation for Nx",
+  "author": {
+    "name": "Narwhal Technologies Inc",
+    "email": "hello@nrwl.io"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nrwl/nx-console.git"
+  },
+  "homepage": "https://nx.dev",
+  "bugs": {
+    "url": "https://github.com/nrwl/nx-console/issues"
+  },
+  "keywords": [
+    "nx",
+    "monorepo",
+    "ai",
+    "mcp",
+    "model",
+    "context",
+    "protocol"
+  ],
   "bin": {
     "nx-mcp": "main.js"
   },
   "files": [
-    "main.js"
+    "main.js",
+    "README.md"
   ],
   "nx": {
     "name": "nx-mcp",
@@ -34,6 +58,9 @@
           "tsConfig": "apps/nx-mcp/tsconfig.app.json",
           "sourcemap": false,
           "minify": true,
+          "assets": [
+            "apps/nx-mcp/README.md"
+          ],
           "esbuildOptions": {
             "mainFields": [
               "module",
