@@ -25,9 +25,7 @@
     "context",
     "protocol"
   ],
-  "bin": {
-    "nx-mcp": "main.js"
-  },
+  "bin": "main.js",
   "files": [
     "main.js",
     "README.md"
