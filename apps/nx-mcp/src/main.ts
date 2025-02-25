@@ -129,9 +129,24 @@ server.tool(
       content: [
         {
           type: 'text',
-          text: `Found generator schema for ${generatorName}: ${JSON.stringify(
+          text: `
+Found generator schema for ${generatorName}: ${JSON.stringify(
             generatorDetails,
-          )}`,
+          )}.          
+**IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
+
+1. FIRST navigate to the parent directory where you want to create the item:
+- Example: 'cd libs/shared' to create a library in libs/shared
+
+2. THEN run the generate command using the positional arg for the name & directory:
+- Example: 'nx generate @nx/js:library library-name' instead of using --name or --directory
+
+3. AVOID using --directory flag when possible as it can lead to path confusion
+- Use 'cd' to change directories and specify the positional arg instead
+
+This approach provides better clarity about where new code will be generated
+and follows the Nx workspace convention for project organization.
+          `,
         },
       ],
     };
