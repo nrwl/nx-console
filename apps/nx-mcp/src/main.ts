@@ -35,7 +35,7 @@ server.server.registerCapabilities({
 const logger = getMcpLogger(server);
 const clientId = randomUUID();
 const googleAnalytics = new GoogleAnalytics(
-  'debug_view',
+  'production',
   clientId,
   clientId,
   clientId,
