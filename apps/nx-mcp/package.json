@@ -1,6 +1,6 @@
 {
   "name": "nx-mcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "main.js",
   "bin": {
     "nx-mcp": "main.js"
