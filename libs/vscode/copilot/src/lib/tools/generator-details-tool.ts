@@ -1,6 +1,5 @@
 import { getGeneratorSchema } from '@nx-console/shared-llm-context';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
-import { readFile } from 'fs/promises';
 import {
   CancellationToken,
   LanguageModelTextPart,
@@ -9,7 +8,6 @@ import {
   LanguageModelToolInvocationPrepareOptions,
   LanguageModelToolResult,
   PreparedToolInvocation,
-  ProviderResult,
 } from 'vscode';
 
 export interface GeneratorDetailsToolInput {
@@ -54,29 +52,4 @@ export class GeneratorDetailsTool
       invocationMessage: 'Reading generator schema...',
     };
   }
-}
-
-async function getGeneratorSchemas() {
-  const generators = await getGenerators();
-
-  const schemas = [];
-  for (const generator of generators) {
-    if (generator.schemaPath) {
-      try {
-        const schemaContent = JSON.parse(
-          await readFile(generator.schemaPath, 'utf-8'),
-        );
-        delete schemaContent['$schema'];
-        delete schemaContent['$id'];
-        schemaContent.name = generator.name;
-        schemas.push(schemaContent);
-      } catch (error) {
-        console.error(
-          `Failed to read schema for generator ${generator.name}:`,
-          error,
-        );
-      }
-    }
-  }
-  return schemas;
 }
