@@ -89,7 +89,7 @@ async function readWorkspaceGeneratorsCollection(
         path: collectionPath,
         json: {},
       },
-      collection.json,
+      collection,
       options,
     ) as Promise<GeneratorCollectionInfo[]>;
   } else {

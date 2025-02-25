@@ -25,9 +25,6 @@
       "path": "../../shared/npm"
     },
     {
-      "path": "../../shared/utils"
-    },
-    {
       "path": "../../shared/file-system"
     },
     {
