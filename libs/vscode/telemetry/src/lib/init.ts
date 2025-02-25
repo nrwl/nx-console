@@ -27,7 +27,7 @@ export function initTelemetry(context: ExtensionContext) {
   });
 
   getOutputChannel().appendLine(
-    `Telemetry: ${production ? 'production' : 'development'}`
+    `Telemetry: ${production ? 'production' : 'development'}`,
   );
 }
 

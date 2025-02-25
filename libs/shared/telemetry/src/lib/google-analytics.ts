@@ -2,52 +2,46 @@ import { platform } from 'os';
 import { xhr, XHRResponse } from 'request-light';
 import { Logger } from '@nx-console/shared-utils';
 
+// There are different ways google analytics can process events:
+// - production: events are sent to the real google analytics & processed lazily
+// - debug_view: events are send to google analytics and individually visible in the DebugView
+// - debug_validate: events are sent to the /debug/mp endpoint which returns validation messages
+export type GoogleAnalyticsMode =
+  | 'production'
+  | 'debug_view'
+  | 'debug_validate';
+
 export class GoogleAnalytics {
   MEASUREMENT_ID = 'G-TNJ97NGX40';
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
 
-  private production: boolean;
-  private clientId: string;
-  private userId: string;
-  private applicationVersion: string;
   private nxVersion: string;
-  private isTelemetryEnabled: boolean;
-  private editor: string;
 
   constructor(
-    production: boolean,
-    clientId: string,
-    userId: string,
-    applicationVersion: string,
-    isTelemetryEnabled: boolean,
-    editor: string,
+    private mode: GoogleAnalyticsMode,
+    private clientId: string,
+    private userId: string,
+    private applicationVersion: string,
+    private isTelemetryEnabled: boolean,
+    private editor: string,
     private logger: Logger,
+    private sessionId: string,
     nxVersion?: string,
   ) {
-    this.production = production;
-    this.clientId = clientId;
-    this.userId = userId;
-    this.applicationVersion = applicationVersion;
     this.nxVersion = nxVersion || '0.0.0';
-    this.isTelemetryEnabled = isTelemetryEnabled;
-    this.editor = editor;
   }
 
   public setNxVersion(version: string): void {
     this.nxVersion = version;
   }
 
-  public sendEventData(
-    eventName: string,
-    data?: Record<string, any>,
-    sessionId?: string,
-  ): void {
+  public sendEventData(eventName: string, data?: Record<string, any>): void {
     eventName = eventName.replace('nrwl.angular-console/', '');
     this._post(
       this._buildPayload({
         name: 'action_triggered',
         params: {
-          ...this._eventParams(sessionId),
+          ...this._eventParams(),
           action_type: eventName,
           ...data,
         },
@@ -55,11 +49,11 @@ export class GoogleAnalytics {
     );
   }
 
-  private _eventParams(sessionId?: string) {
+  private _eventParams() {
     return {
       engagement_time_msec: '1',
-      session_id: sessionId || 'unknown-session',
-      debug_mode: !this.production,
+      session_id: this.sessionId,
+      debug_mode: this.mode !== 'production',
     };
   }
 
@@ -84,9 +78,10 @@ export class GoogleAnalytics {
       return;
     }
 
-    const base = this.production
-      ? 'https://www.google-analytics.com/mp'
-      : 'https://www.google-analytics.com/debug/mp';
+    const base =
+      this.mode !== 'debug_validate'
+        ? 'https://www.google-analytics.com/mp'
+        : 'https://www.google-analytics.com/debug/mp';
 
     const url = `${base}/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`;
 
@@ -96,7 +91,7 @@ export class GoogleAnalytics {
       type: 'POST',
     })
       .then((response) => {
-        if (this.production === false && response.responseText.length > 0) {
+        if (this.mode !== 'production' && response.responseText.length > 0) {
           this.logger.log(`Telemetry Response: ${response.responseText}`);
         }
       })
