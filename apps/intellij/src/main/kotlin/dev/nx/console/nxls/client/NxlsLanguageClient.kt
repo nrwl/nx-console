@@ -35,7 +35,9 @@ class NxlsLanguageClient : LanguageClient {
     }
 
     override fun logMessage(message: MessageParams?) {
-        log.info(message?.message)
+        message?.message?.let { msg ->
+            log.info(if (msg.endsWith("\n")) msg.substring(0, msg.length - 1) else msg)
+        }
     }
 
     fun registerRefreshCallback(block: () -> Unit) {
