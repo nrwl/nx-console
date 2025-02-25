@@ -7,7 +7,7 @@
   "nx": {
     "name": "shared-llm-context",
     "sourceRoot": "libs/shared/llm-context/src",
-    "projectType": "lib",
+    "projectType": "library",
     "tags": [
       "type:shared"
     ]
