@@ -18,7 +18,11 @@
               },
               {
                 "sourceTag": "type:lsp",
-                "onlyDependOnLibsWithTags": ["type:lsp", "type:shared"],
+                "onlyDependOnLibsWithTags": [
+                  "type:lsp",
+                  "type:shared",
+                  "type:mcp"
+                ],
                 "bannedExternalImports": ["vscode"]
               },
               {
