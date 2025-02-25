@@ -1,8 +1,8 @@
 import { NxConsolePluginsDefinition } from './lib/nx-console-plugin-types';
 import { internalPlugins } from './lib/internal-plugins/index';
 import { existsSync } from 'fs';
-import { pathToFileURL } from "url"
-import path from "path"
+import { pathToFileURL } from 'url';
+import path from 'path';
 
 export { internalPlugins } from './lib/internal-plugins/index';
 export * from './lib/nx-console-plugin-types';
@@ -12,9 +12,9 @@ export async function loadPlugins(
 ): Promise<NxConsolePluginsDefinition> {
   let workspacePlugins: NxConsolePluginsDefinition | undefined = undefined;
   try {
-    const pluginFileRelativePath = "/.nx/console/plugins.mjs";
-    const pluginFileFullPath = path.join(workspacePath, pluginFileRelativePath)
-    const pluginFilePath = pathToFileURL(pluginFileFullPath).href
+    const pluginFileRelativePath = '/.nx/console/plugins.mjs';
+    const pluginFileFullPath = path.join(workspacePath, pluginFileRelativePath);
+    const pluginFilePath = pathToFileURL(pluginFileFullPath).href;
 
     if (!existsSync(pluginFilePath)) {
       workspacePlugins = undefined;
@@ -41,7 +41,7 @@ export async function loadPlugins(
     ],
     projectViewItemProcessors: [
       ...(internalPlugins.projectViewItemProcessors ?? []),
-      ...(workspacePlugins?.projectViewItemProcessors ?? []),      
-    ]
+      ...(workspacePlugins?.projectViewItemProcessors ?? []),
+    ],
   };
 }

@@ -28,5 +28,5 @@ export const internalPlugins: NxConsolePluginsDefinition = {
     projectNameAndRootStartupMessage,
     nameAndDirectoryStartupMessage,
   ],
-  projectViewItemProcessors: []
+  projectViewItemProcessors: [],
 };

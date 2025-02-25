@@ -16,7 +16,11 @@ import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { ListView, ListViewItem } from './views/nx-project-list-view';
 import { TreeView, TreeViewItem } from './views/nx-project-tree-view';
-import { NxConsolePluginsDefinition, loadPlugins } from '@nx-console/shared-nx-console-plugins';
+import {
+  NxConsolePluginsDefinition,
+  ProjectViewTreeItem,
+  loadPlugins,
+} from '@nx-console/shared-nx-console-plugins';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 
 export type ViewItem = ListViewItem | TreeViewItem;
@@ -33,7 +37,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly treeView: TreeView = new TreeView();
 
   private workspaceData: NxWorkspace | undefined = undefined;
-  private plugins: NxConsolePluginsDefinition | undefined = undefined
+  private plugins: NxConsolePluginsDefinition | undefined = undefined;
 
   constructor(context: ExtensionContext) {
     super();
@@ -90,14 +94,22 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     }
     if (!items) return;
 
-    let nxTreeItems = items.map((item) => new NxTreeItem(item))
+    let nxTreeItems = items.map((item) => new NxTreeItem(item));
 
     if (this.plugins.projectViewItemProcessors) {
-      this.plugins.projectViewItemProcessors.forEach( (processor) => {
-        nxTreeItems = nxTreeItems.map( item => {
-          return Object.assign({}, item, processor(item,this.workspaceData))
-        })
-      })
+      this.plugins.projectViewItemProcessors.forEach((processor) => {
+        nxTreeItems = nxTreeItems.map((item) => {
+          const processed = processor(
+            item as ProjectViewTreeItem,
+            this.workspaceData
+          );
+          item.label = processed.label || item.label;
+          item.description = processed.description || item.description;
+          item.tooltip = processed.tooltip || item.tooltip;
+          item.iconPath = processed.iconPath || item.iconPath;
+          return item;
+        });
+      });
     }
 
     return nxTreeItems;

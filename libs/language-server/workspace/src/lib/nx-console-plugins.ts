@@ -3,7 +3,7 @@ import { nxWorkspace } from './workspace';
 import { lspLogger } from '@nx-console/language-server-utils';
 import {
   StartupMessageDefinition,
-  loadPlugins
+  loadPlugins,
 } from '@nx-console/shared-nx-console-plugins';
 
 export async function getTransformedGeneratorSchema(

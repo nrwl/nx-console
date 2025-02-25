@@ -30,13 +30,14 @@ export type StartupMessageFactory = (
   | Promise<StartupMessageDefinition | undefined>;
 
 export type ProjectViewItemProcessor = (
-  schema: ProjectViewTreeItem,
+  item: any, // this is NxTreeItem but figuring out the dependency graph is too tricky
   workspace: NxWorkspace
 ) => ProjectViewTreeItem;
 
+// these are the attributes you can override for now
 export type ProjectViewTreeItem = {
-  label?: string,
-  description?: string,
-  tooltip?: string,
-  iconPath?: string
-}
+  label?: string;
+  description?: string;
+  tooltip?: string;
+  iconPath?: string;
+};
