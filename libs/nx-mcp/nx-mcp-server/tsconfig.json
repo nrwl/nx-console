@@ -4,13 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
-      "path": "../../language-server/types"
+      "path": "../../shared/nx-workspace-info"
     },
     {
       "path": "../../shared/npm"

@@ -11,12 +11,15 @@ import {
   getProjectGraphPrompt,
 } from '@nx-console/shared-llm-context';
 import { z } from 'zod';
-import { WorkspaceInfoProvider } from './workspace-info-provider';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { getMcpLogger } from './mcp-logger';
+import {
+  getGenerators,
+  nxWorkspace,
+} from '@nx-console/shared-nx-workspace-info';
+
 export function createNxMcpServer(
   nxWorkspacePath: string,
-  workspaceInfoProvider: WorkspaceInfoProvider,
   telemetry?: GoogleAnalytics,
 ): McpServer {
   const server = new McpServer({
@@ -49,10 +52,7 @@ export function createNxMcpServer(
           };
         }
 
-        const workspace = await workspaceInfoProvider.nxWorkspace(
-          nxWorkspacePath,
-          logger,
-        );
+        const workspace = await nxWorkspace(nxWorkspacePath, logger);
         return {
           content: [
             {
@@ -83,10 +83,7 @@ export function createNxMcpServer(
       telemetry?.sendEventData('ai.tool-call', {
         tool: 'nx_project_details',
       });
-      const workspace = await workspaceInfoProvider.nxWorkspace(
-        nxWorkspacePath,
-        logger,
-      );
+      const workspace = await nxWorkspace(nxWorkspacePath, logger);
       const project = workspace.projectGraph.nodes[projectName];
 
       if (!project) {
@@ -133,7 +130,7 @@ export function createNxMcpServer(
       telemetry?.sendEventData('ai.tool-call', {
         tool: 'nx_generators',
       });
-      const generators = await workspaceInfoProvider.getGenerators(
+      const generators = await getGenerators(
         nxWorkspacePath,
         undefined,
         logger,
@@ -164,7 +161,7 @@ export function createNxMcpServer(
       telemetry?.sendEventData('ai.tool-call', {
         tool: 'nx_generator_schema',
       });
-      const generators = await workspaceInfoProvider.getGenerators(
+      const generators = await getGenerators(
         nxWorkspacePath,
         undefined,
         logger,

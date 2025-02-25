@@ -1,12 +1,5 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  createNxMcpServer,
-  WorkspaceInfoProvider,
-} from '@nx-console/nx-mcp-server';
-import {
-  getGenerators,
-  nxWorkspace,
-} from '@nx-console/shared-nx-workspace-info';
+import { createNxMcpServer } from '@nx-console/nx-mcp-server';
 import { GoogleAnalytics } from '@nx-console/shared-telemetry';
 import { randomUUID } from 'crypto';
 
@@ -26,16 +19,7 @@ const googleAnalytics = new GoogleAnalytics(
   'nx-mcp',
 );
 
-const workspaceInfoProvider: WorkspaceInfoProvider = {
-  nxWorkspace,
-  getGenerators,
-};
-
-const server = createNxMcpServer(
-  nxWorkspacePath,
-  workspaceInfoProvider,
-  googleAnalytics,
-);
+const server = createNxMcpServer(nxWorkspacePath, googleAnalytics);
 
 const transport = new StdioServerTransport();
 server.connect(transport);
