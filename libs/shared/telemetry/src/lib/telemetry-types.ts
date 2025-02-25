@@ -52,11 +52,13 @@ export type TelemetryEvents =
   | 'ai.chat-message'
   | 'ai.feedback-good'
   | 'ai.feedback-bad'
-  | 'ai.response-interaction';
+  | 'ai.response-interaction'
+  | 'ai.tool-call';
 
 export type TelemetryData = {
   source?: TelemetryEventSource;
   file?: 'project.json' | 'other';
+  tool?: string;
   [key: string]: any;
 };
 export type TelemetryEventSource =

@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { GoogleAnalytics } from '@nx-console/shared-telemetry';
 import {
   getGenerators,
   nxWorkspace,
@@ -16,6 +17,7 @@ import {
 } from '@nx-console/shared-llm-context';
 import { getMcpLogger } from './mcp-logger';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 
 const nxWorkspacePath = process.argv[2];
 if (!nxWorkspacePath) {
@@ -31,11 +33,24 @@ server.server.registerCapabilities({
   logging: {},
 });
 const logger = getMcpLogger(server);
+const clientId = randomUUID();
+const googleAnalytics = new GoogleAnalytics(
+  'debug_view',
+  clientId,
+  clientId,
+  clientId,
+  getPackageVersion(),
+  'nx-mcp',
+  logger,
+);
 
 server.tool(
   'nx_workspace',
   'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
   async () => {
+    googleAnalytics.sendEventData('ai.tool-call', {
+      tool: 'nx_workspace',
+    });
     try {
       if (!(await checkIsNxWorkspace(nxWorkspacePath))) {
         return {
@@ -84,6 +99,9 @@ server.tool(
     userQuery: string;
     lastAssistantMessage: string;
   }) => {
+    googleAnalytics.sendEventData('ai.tool-call', {
+      tool: 'nx_docs',
+    });
     const docsPages = await getDocsContext(userQuery, lastAssistantMessage);
     return {
       content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
@@ -95,6 +113,9 @@ server.tool(
   'nx_generators',
   'Returns a list of generators that could be relevant to the user query.',
   async () => {
+    googleAnalytics.sendEventData('ai.tool-call', {
+      tool: 'nx_generators',
+    });
     const generators = await getGenerators(nxWorkspacePath, undefined, logger);
 
     if (generators.length === 0) {
@@ -119,6 +140,9 @@ server.tool(
     generatorName: z.string(),
   },
   async ({ generatorName }) => {
+    googleAnalytics.sendEventData('ai.tool-call', {
+      tool: 'nx_generator_schema',
+    });
     const generators = await getGenerators(nxWorkspacePath, undefined, logger);
     const generatorDetails = await getGeneratorSchema(
       generatorName,
@@ -155,3 +179,12 @@ and follows the Nx workspace convention for project organization.
 
 const transport = new StdioServerTransport();
 server.connect(transport);
+
+function getPackageVersion() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('./package.json').version;
+  } catch {
+    return '0.0.0';
+  }
+}
