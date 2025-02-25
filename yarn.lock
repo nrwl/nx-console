@@ -17467,6 +17467,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"telemetry@workspace:libs/shared/telemetry":
+  version: 0.0.0-use.local
+  resolution: "telemetry@workspace:libs/shared/telemetry"
+  languageName: unknown
+  linkType: soft
+
 "temp-dir@npm:^2.0.0":
   version: 2.0.0
   resolution: "temp-dir@npm:2.0.0"
