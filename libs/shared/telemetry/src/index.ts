@@ -1,1 +1,1 @@
-export * from './lib/telemetry.js';
+export * from './lib/google-analytics';
