@@ -8,7 +8,7 @@ import {
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { GoogleAnalyticsSender } from './google-analytics-sender';
 import { LoggerSender } from './logger-sender';
-import { TelemetryData, TelemetryEvents } from './telemetry-types';
+import { TelemetryData, TelemetryEvents } from '@nx-console/shared-telemetry';
 
 let telemetry: NxConsoleTelemetryLogger;
 

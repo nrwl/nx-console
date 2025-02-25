@@ -13,6 +13,9 @@
       "path": "../../libs/shared/nx-workspace-info"
     },
     {
+      "path": "../../libs/shared/telemetry"
+    },
+    {
       "path": "../../libs/shared/npm"
     },
     {

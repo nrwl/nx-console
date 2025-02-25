@@ -1,6 +1,7 @@
 import { platform } from 'os';
 import { xhr, XHRResponse } from 'request-light';
 import { Logger } from '@nx-console/shared-utils';
+import { TelemetryEvents } from './telemetry-types';
 
 // There are different ways google analytics can process events:
 // - production: events are sent to the real google analytics & processed lazily
@@ -21,11 +22,10 @@ export class GoogleAnalytics {
     private mode: GoogleAnalyticsMode,
     private clientId: string,
     private userId: string,
+    private sessionId: string,
     private applicationVersion: string,
-    private isTelemetryEnabled: boolean,
     private editor: string,
     private logger: Logger,
-    private sessionId: string,
     nxVersion?: string,
   ) {
     this.nxVersion = nxVersion || '0.0.0';
@@ -35,14 +35,17 @@ export class GoogleAnalytics {
     this.nxVersion = version;
   }
 
-  public sendEventData(eventName: string, data?: Record<string, any>): void {
-    eventName = eventName.replace('nrwl.angular-console/', '');
+  public sendEventData(
+    eventName: TelemetryEvents,
+    data?: Record<string, any>,
+  ): void {
+    const eventNameString = eventName.replace('nrwl.angular-console/', '');
     this._post(
       this._buildPayload({
         name: 'action_triggered',
         params: {
           ...this._eventParams(),
-          action_type: eventName,
+          action_type: eventNameString,
           ...data,
         },
       }),
@@ -74,10 +77,6 @@ export class GoogleAnalytics {
   }
 
   private _post(body: object) {
-    if (!this.isTelemetryEnabled) {
-      return;
-    }
-
     const base =
       this.mode !== 'debug_validate'
         ? 'https://www.google-analytics.com/mp'
