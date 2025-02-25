@@ -155,6 +155,9 @@
     },
     {
       "path": "./libs/shared/telemetry"
+    },
+    {
+      "path": "./libs/nx-mcp/nx-mcp-server"
     }
   ]
 }

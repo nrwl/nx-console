@@ -4,19 +4,13 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/utils"
-    },
-    {
-      "path": "../../libs/shared/llm-context"
+      "path": "../../libs/shared/telemetry"
     },
     {
       "path": "../../libs/shared/nx-workspace-info"
     },
     {
-      "path": "../../libs/shared/telemetry"
-    },
-    {
-      "path": "../../libs/shared/npm"
+      "path": "../../libs/nx-mcp/nx-mcp-server"
     },
     {
       "path": "./tsconfig.app.json"

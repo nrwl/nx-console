@@ -25,7 +25,7 @@ export class GoogleAnalytics {
     private sessionId: string,
     private applicationVersion: string,
     private editor: string,
-    private logger: Logger,
+    private logger?: Logger,
     nxVersion?: string,
   ) {
     this.nxVersion = nxVersion || '0.0.0';
@@ -91,11 +91,11 @@ export class GoogleAnalytics {
     })
       .then((response) => {
         if (this.mode !== 'production' && response.responseText.length > 0) {
-          this.logger.log(`Telemetry Response: ${response.responseText}`);
+          this.logger?.log(`Telemetry Response: ${response.responseText}`);
         }
       })
       .catch((reason: XHRResponse) => {
-        this.logger.log(`unable to send telemetry: ${reason.responseText}`);
+        this.logger?.log(`unable to send telemetry: ${reason.responseText}`);
       });
   }
 }
