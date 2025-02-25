@@ -24,6 +24,7 @@ Currently, the Nx MCP server only works in `stdio` mode.
 Currently, the Nx MCP server provides a set of tools. Resources, Roots and Prompts aren't supported yet.
 
 - **nx_workspace**: Returns an annotated representation of the local nx configuration and the project graph
+- **nx_project_details**: Returns the full project configuration for a specific nx project
 - **nx_docs**: Retrieves documentation sections relevant to user queries
 - **nx_generators**: Returns a list of available generators in the workspace
 - **nx_generator_schema**: Provides detailed schema information for a specific generator

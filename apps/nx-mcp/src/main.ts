@@ -86,6 +86,34 @@ server.tool(
 );
 
 server.tool(
+  'nx_project_details',
+  'Returns the complete project configuration in JSON format for a given nx project.',
+  {
+    projectName: z.string(),
+  },
+  async ({ projectName }) => {
+    const workspace = await nxWorkspace(nxWorkspacePath, logger);
+    const project = workspace.projectGraph.nodes[projectName];
+
+    if (!project) {
+      return {
+        isError: true,
+        content: [
+          {
+            type: 'text',
+            text: `Project ${projectName} not found`,
+          },
+        ],
+      };
+    }
+
+    return {
+      content: [{ type: 'text', text: JSON.stringify(project.data, null, 2) }],
+    };
+  },
+);
+
+server.tool(
   'nx_docs',
   'Returns a list of documentation sections that could be relevant to the user query. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
   {
