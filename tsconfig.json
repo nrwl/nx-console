@@ -152,6 +152,9 @@
     },
     {
       "path": "./libs/shared/llm-context"
+    },
+    {
+      "path": "./libs/shared/telemetry"
     }
   ]
 }

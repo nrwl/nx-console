@@ -72,6 +72,8 @@
 
 /libs/vscode/lsp-client/ @MaxKless
 
+/libs/shared/telemetry/ @MaxKless
+
 /libs/vscode/telemetry/ @MaxKless
 
 /apps/generate-ui-v2/ @MaxKless
