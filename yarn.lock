@@ -2846,6 +2846,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/nx-mcp-server@workspace:libs/nx-mcp/nx-mcp-server":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/nx-mcp-server@workspace:libs/nx-mcp/nx-mcp-server"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/nx-version@workspace:libs/shared/nx-version":
   version: 0.0.0-use.local
   resolution: "@nx-console/nx-version@workspace:libs/shared/nx-version"

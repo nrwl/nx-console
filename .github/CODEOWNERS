@@ -48,6 +48,8 @@
 
 /libs/vscode/add-dependency/ @MaxKless
 
+/libs/nx-mcp/nx-mcp-server/ @MaxKless
+
 /libs/vscode/configuration/ @MaxKless
 
 /libs/vscode/nx-cloud-view/ @MaxKless
