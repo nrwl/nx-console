@@ -13,6 +13,9 @@
       "path": "../output-channels/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {

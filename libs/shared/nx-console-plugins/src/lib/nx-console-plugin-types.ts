@@ -12,7 +12,7 @@ export type NxConsolePluginsDefinition = {
 export type SchemaProcessor = (
   schema: GeneratorSchema,
   workspace: NxWorkspace,
-  lspLogger: Logger
+  lspLogger: Logger,
 ) => GeneratorSchema;
 
 export type StartupMessageDefinition = {
@@ -23,7 +23,7 @@ export type StartupMessageDefinition = {
 export type StartupMessageFactory = (
   schema: GeneratorSchema,
   workspace: NxWorkspace,
-  lspLogger: Logger
+  lspLogger: Logger,
 ) =>
   | StartupMessageDefinition
   | undefined
@@ -31,7 +31,7 @@ export type StartupMessageFactory = (
 
 export type ProjectViewItemProcessor = (
   item: any, // this is NxTreeItem but figuring out the dependency graph is too tricky
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ) => ProjectViewTreeItem;
 
 // these are the attributes you can override for now

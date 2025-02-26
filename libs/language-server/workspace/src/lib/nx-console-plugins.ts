@@ -8,7 +8,7 @@ import {
 
 export async function getTransformedGeneratorSchema(
   workspacePath: string,
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): Promise<GeneratorSchema> {
   const plugins = await loadPlugins(workspacePath);
   const workspace = await nxWorkspace(workspacePath);
@@ -27,7 +27,7 @@ export async function getTransformedGeneratorSchema(
 
 export async function getStartupMessage(
   workspacePath: string,
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): Promise<StartupMessageDefinition | undefined> {
   const plugins = await loadPlugins(workspacePath);
   const workspace = await nxWorkspace(workspacePath);

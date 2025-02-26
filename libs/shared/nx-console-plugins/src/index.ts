@@ -8,7 +8,7 @@ export { internalPlugins } from './lib/internal-plugins/index';
 export * from './lib/nx-console-plugin-types';
 
 export async function loadPlugins(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<NxConsolePluginsDefinition> {
   let workspacePlugins: NxConsolePluginsDefinition | undefined = undefined;
   try {
@@ -20,7 +20,7 @@ export async function loadPlugins(
       workspacePlugins = undefined;
     }
     workspacePlugins = await import(pluginFilePath).then(
-      (module) => module.default
+      (module) => module.default,
     );
   } catch (_) {
     workspacePlugins = undefined;

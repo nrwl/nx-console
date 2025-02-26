@@ -52,12 +52,12 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       ] as const
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
-        commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
+        commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this),
       );
     });
 
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
-      this.refresh()
+      this.refresh(),
     );
 
     onWorkspaceRefreshed(() => this.refresh());
@@ -101,7 +101,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
         nxTreeItems = nxTreeItems.map((item) => {
           const processed = processor(
             item as ProjectViewTreeItem,
-            this.workspaceData
+            this.workspaceData,
           );
           item.label = processed.label || item.label;
           item.description = processed.description || item.description;
@@ -132,7 +132,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
   private async runTask(
     selection: NxTreeItem | undefined,
-    optionalFlags?: NxOptionalFlags
+    optionalFlags?: NxOptionalFlags,
   ) {
     getTelemetry().logUsage('tasks.run', {
       source: 'projects-view',
