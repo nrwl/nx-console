@@ -20,6 +20,7 @@ export async function getGenerators(
     includeHidden: false,
     includeNgAdd: false,
   },
+  logger?: Logger,
 ): Promise<GeneratorCollectionInfo[]> {
   const basedir = workspacePath;
   const collections = await readCollections(
