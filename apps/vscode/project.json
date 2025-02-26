@@ -191,6 +191,7 @@
         "command": "node ./tools/scripts/copy-to-vscode.js"
       },
       "inputs": [
+        "{workspaceRoot}/tools/scripts/copy-to-vscode.js",
         {
           "dependentTasksOutputFiles": "**/*",
           "transitive": true
