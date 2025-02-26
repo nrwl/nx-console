@@ -86,6 +86,8 @@
 
 /libs/vscode/nvm-tip/ @MaxKless
 
+/libs/vscode/cursor/ @MaxKless
+
 /libs/shared/schema/ @MaxKless
 
 /libs/vscode/verify/ @MaxKless
