@@ -119,3 +119,36 @@ export function ensureCursorDirExists(): boolean {
 
   return true;
 }
+
+/**
+ * Gets the port number from the nx-mcp entry in mcp.json.
+ * @returns The port number or null if it doesn't exist or can't be parsed.
+ */
+export function getNxMcpPort(): number | undefined {
+  if (!hasNxMcpEntry()) {
+    return undefined;
+  }
+
+  const mcpJson = readMcpJson();
+  if (!mcpJson || !mcpJson.mcpServers || !mcpJson.mcpServers['nx-mcp']) {
+    return undefined;
+  }
+
+  try {
+    const url = mcpJson.mcpServers['nx-mcp'].url;
+    if (!url) {
+      return undefined;
+    }
+
+    // Extract port from URL (format: http://localhost:PORT/sse)
+    const match = url.match(/:(\d+)\//);
+    if (match && match[1]) {
+      return parseInt(match[1], 10);
+    }
+
+    return undefined;
+  } catch (error) {
+    console.error('Error extracting port from mcp.json:', error);
+    return undefined;
+  }
+}

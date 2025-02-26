@@ -9,7 +9,10 @@ export interface McpServerReturn {
   server_instance: ReturnType<express.Application['listen']>;
 }
 
-export function startMcpServer(workspacePath: string): McpServerReturn {
+export function startMcpServer(
+  workspacePath: string,
+  port: number,
+): McpServerReturn {
   const server = new NxMcpServerWrapper(workspacePath, undefined, lspLogger);
 
   const app = express();
@@ -28,8 +31,8 @@ export function startMcpServer(workspacePath: string): McpServerReturn {
     await transport.handlePostMessage(req, res);
   });
 
-  const server_instance = app.listen(3001);
-  lspLogger.log('MCP server started on port 3001');
+  const server_instance = app.listen(port);
+  lspLogger.log(`MCP server started on port ${port}`);
 
   return { server, app, server_instance };
 }
