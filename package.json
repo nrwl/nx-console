@@ -30,6 +30,7 @@
     "@yarnpkg/fslib": "^3.0.0-rc.48",
     "@yarnpkg/libzip": "^3.0.0-rc.48",
     "dotenv": "^16.0.3",
+    "express": "^4.21.2",
     "fast-glob": "^3.2.11",
     "find-cache-dir": "^3.3.2",
     "graphql": "^16.6.0",
