@@ -24,11 +24,13 @@ import {
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
 
+import { initCursor } from '@nx-console/cursor';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode-add-dependency';
+import { initCopilot } from '@nx-console/vscode-copilot';
 import { initGenerateUiWebview } from '@nx-console/vscode-generate-ui-webview';
 import {
   createNxlsClient,
@@ -40,13 +42,12 @@ import { initNxConversion } from '@nx-console/vscode-nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
-import { initCopilot } from '@nx-console/vscode-copilot';
-import { initCursor } from '@nx-console/cursor';
 
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server-types';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { initErrorDiagnostics } from '@nx-console/vscode-error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
@@ -59,7 +60,6 @@ import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 

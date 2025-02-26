@@ -32,6 +32,7 @@ import {
   NxStopDaemonRequest,
   NxTargetsForConfigFileRequest,
   NxTransformedGeneratorSchemaRequest,
+  NxUpdateMcpSseServerPortNotification,
   NxVersionRequest,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
@@ -128,7 +129,8 @@ connection.onInitialize(async (params) => {
   setLspLogger(connection);
   lspLogger.log('Initializing Nx Language Server');
 
-  const { workspacePath } = params.initializationOptions ?? {};
+  const { workspacePath, mcpSseServerPort } =
+    params.initializationOptions ?? {};
   try {
     WORKING_PATH =
       workspacePath ||
@@ -141,7 +143,9 @@ connection.onInitialize(async (params) => {
     }
 
     loadRootEnvFiles(WORKING_PATH);
-    mcpServerReturn = startMcpServer(WORKING_PATH);
+    if (mcpSseServerPort) {
+      mcpServerReturn = startMcpServer(WORKING_PATH, mcpSseServerPort);
+    }
 
     CLIENT_CAPABILITIES = params.capabilities;
 
@@ -611,6 +615,27 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
+connection.onNotification(
+  NxUpdateMcpSseServerPortNotification,
+  async (newPort: number | undefined) => {
+    if (!WORKING_PATH) {
+      return;
+    }
+
+    lspLogger.log(`Updating MCP SSE server port to ${newPort}`);
+
+    if (mcpServerReturn?.server_instance) {
+      mcpServerReturn.server_instance.close();
+    }
+
+    if (newPort) {
+      mcpServerReturn = startMcpServer(WORKING_PATH, newPort);
+    }
+
+    lspLogger.log(`MCP server restarted on port ${newPort}`);
+  },
+);
+
 async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
   if (reconfigureAttempts === 0) {
     connection.sendNotification(NxWorkspaceRefreshStartedNotification.method);
@@ -696,4 +721,5 @@ const exitHandler = () => {
 process.on('SIGTERM', exitHandler);
 
 connection.onExit(exitHandler);
+
 connection.listen();

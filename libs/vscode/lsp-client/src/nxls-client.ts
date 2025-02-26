@@ -1,6 +1,7 @@
 import {
   NxChangeWorkspace,
   NxStopDaemonRequest,
+  NxUpdateMcpSseServerPortNotification,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server-types';
 import {
@@ -24,6 +25,7 @@ import {
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
 import { killGroup } from '@nx-console/shared-utils';
+import { getNxMcpPort } from '@nx-console/vscode-utils';
 
 let _nxlsClient: NxlsClient | undefined;
 
@@ -40,7 +42,7 @@ export function getNxlsClient(): NxlsClient {
 
 export function onWorkspaceRefreshed(callback: () => void): Disposable {
   return getNxlsClient().onNotification(NxWorkspaceRefreshNotification, () =>
-    callback()
+    callback(),
   );
 }
 
@@ -70,12 +72,12 @@ export class NxlsClient {
             input: { workspacePath: string | undefined };
           }) => {
             return await this._start(input.workspacePath);
-          }
+          },
         ),
         stopClient: fromPromise(
           async ({ input }: { input: { isNxlsProcessAlive?: boolean } }) => {
             return await this._stop(input.isNxlsProcessAlive);
-          }
+          },
         ),
       },
     }),
@@ -86,7 +88,7 @@ export class NxlsClient {
           getOutputChannel().appendLine(`Nxls Client - ${snapshot.value}`);
         }
       },
-    }
+    },
   );
 
   public start(workspacePath?: string) {
@@ -131,23 +133,23 @@ export class NxlsClient {
               () => {
                 disposable.dispose();
                 resolve();
-              }
+              },
             );
           });
         } catch (error) {
           logAndShowError(
             "Couldn't refresh workspace. Please view the logs for more information.",
-            error
+            error,
           );
         }
-      }
+      },
     );
   }
 
   public async sendRequest<P, R, E>(
     requestType: RequestType<P, R, E>,
     params: P,
-    retry = 0
+    retry = 0,
   ): Promise<R | undefined> {
     try {
       if (this.actor.getSnapshot().matches('idle')) {
@@ -165,7 +167,7 @@ export class NxlsClient {
         }
       } else {
         getOutputChannel().appendLine(
-          `Error sending request to Nx Language Server: ${e}`
+          `Error sending request to Nx Language Server: ${e}`,
         );
         return undefined;
       }
@@ -174,7 +176,7 @@ export class NxlsClient {
 
   public async sendNotification<P>(
     notificationType: NotificationType<P>,
-    params?: P
+    params?: P,
   ) {
     if (this.actor.getSnapshot().matches('idle')) {
       this.actor.send({ type: 'START' });
@@ -230,7 +232,7 @@ export class NxlsClient {
 
     this.client = await createLanguageClient(
       this.extensionContext,
-      workspacePath
+      workspacePath,
     );
 
     await this.client.start();
@@ -248,7 +250,7 @@ export class NxlsClient {
     this.registerNotificationListeners();
 
     getOutputChannel().appendLine(
-      `Nxls process started with pid: ${this.client.initializeResult?.['pid']}`
+      `Nxls process started with pid: ${this.client.initializeResult?.['pid']}`,
     );
     return this.client.initializeResult?.['pid'];
   }
@@ -281,7 +283,7 @@ export class NxlsClient {
           for (const callback of callbacks.values()) {
             callback();
           }
-        })
+        }),
       );
     }
   }
@@ -301,7 +303,7 @@ export class NxlsClientNotInitializedError extends Error {
 
 async function createLanguageClient(
   extensionContext: ExtensionContext,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<LanguageClient> {
   const serverModule = extensionContext.asAbsolutePath(join('nxls', 'main.js'));
 
@@ -318,11 +320,15 @@ async function createLanguageClient(
     },
   };
 
+  // Get the mcpSseServerPort from configuration
+  const mcpSseServerPort = getNxMcpPort();
+
   // Options to control the language client
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     initializationOptions: {
       workspacePath,
+      mcpSseServerPort,
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
@@ -349,6 +355,6 @@ async function createLanguageClient(
     'NxConsoleClient',
     getNxlsOutputChannel().name,
     serverOptions,
-    clientOptions
+    clientOptions,
   );
 }
