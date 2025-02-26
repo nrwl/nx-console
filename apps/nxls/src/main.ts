@@ -96,6 +96,8 @@ import {
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
+import { startMcpServer } from './mcp-server';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -110,7 +112,7 @@ let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
 };
-
+let mcpServer: McpServer;
 let reconfigureAttempts = 0;
 
 const connection = createConnection(ProposedFeatures.all);
@@ -196,6 +198,8 @@ connection.onInitialize(async (params) => {
     },
     pid: process.pid,
   };
+
+  mcpServer = startMcpServer(WORKING_PATH);
 
   return result;
 });
