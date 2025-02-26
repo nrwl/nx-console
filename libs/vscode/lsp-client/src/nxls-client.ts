@@ -320,7 +320,6 @@ async function createLanguageClient(
     },
   };
 
-  // Get the mcpSseServerPort from configuration
   const mcpSseServerPort = getNxMcpPort();
 
   // Options to control the language client

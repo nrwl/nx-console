@@ -10,7 +10,6 @@ import {
   readMcpJson,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
-import * as fs from 'fs';
 import * as net from 'net';
 import {
   ExtensionContext,
