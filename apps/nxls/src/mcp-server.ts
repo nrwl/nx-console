@@ -1,18 +1,23 @@
-import { createNxMcpServer } from '@nx-console/nx-mcp-server';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import express from 'express';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { lspLogger } from '@nx-console/language-server-utils';
+import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
+import express from 'express';
 
-export function startMcpServer(workspacePath: string): McpServer {
-  const server = createNxMcpServer(workspacePath);
+export interface McpServerReturn {
+  server: NxMcpServerWrapper;
+  app: express.Application;
+  server_instance: ReturnType<express.Application['listen']>;
+}
+
+export function startMcpServer(workspacePath: string): McpServerReturn {
+  const server = new NxMcpServerWrapper(workspacePath, undefined, lspLogger);
 
   const app = express();
   let transport: SSEServerTransport;
   app.get('/sse', async (req, res) => {
     lspLogger.log('SSE connection established');
     transport = new SSEServerTransport('/messages', res);
-    await server.connect(transport);
+    await server.getMcpServer().connect(transport);
   });
 
   app.post('/messages', async (req, res) => {
@@ -23,8 +28,8 @@ export function startMcpServer(workspacePath: string): McpServer {
     await transport.handlePostMessage(req, res);
   });
 
-  app.listen(3001);
+  const server_instance = app.listen(3001);
   lspLogger.log('MCP server started on port 3001');
 
-  return server;
+  return { server, app, server_instance };
 }

@@ -18,167 +18,192 @@ import {
   nxWorkspace,
 } from '@nx-console/shared-nx-workspace-info';
 
-export function createNxMcpServer(
-  nxWorkspacePath: string,
-  telemetry?: GoogleAnalytics,
-): McpServer {
-  const server = new McpServer({
-    name: 'Nx MCP',
-    version: '0.0.1',
-  });
-  server.server.registerCapabilities({
-    logging: {},
-  });
+export class NxMcpServerWrapper {
+  private server: McpServer;
+  private logger: Logger;
+  private _nxWorkspacePath: string;
+  private telemetry?: GoogleAnalytics;
 
-  const logger = getMcpLogger(server);
+  constructor(
+    initialWorkspacePath: string,
+    telemetry?: GoogleAnalytics,
+    logger?: Logger,
+  ) {
+    this._nxWorkspacePath = initialWorkspacePath;
+    this.telemetry = telemetry;
+    this.server = new McpServer({
+      name: 'Nx MCP',
+      version: '0.0.1',
+    });
 
-  server.tool(
-    'nx_workspace',
-    'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
-    async () => {
-      telemetry?.sendEventData('ai.tool-call', {
-        tool: 'nx_workspace',
-      });
-      try {
-        if (!(await checkIsNxWorkspace(nxWorkspacePath))) {
+    this.server.server.registerCapabilities({
+      logging: {},
+    });
+
+    this.logger = logger ?? getMcpLogger(this.server);
+    this.registerTools();
+  }
+
+  setNxWorkspacePath(path: string) {
+    this.logger.log(`Setting nx workspace path to ${path}`);
+    this._nxWorkspacePath = path;
+  }
+
+  getMcpServer(): McpServer {
+    return this.server;
+  }
+
+  private registerTools(): void {
+    this.server.tool(
+      'nx_workspace',
+      'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
+      async () => {
+        this.telemetry?.sendEventData('ai.tool-call', {
+          tool: 'nx_workspace',
+        });
+        try {
+          if (!(await checkIsNxWorkspace(this._nxWorkspacePath))) {
+            return {
+              isError: true,
+              content: [
+                {
+                  type: 'text',
+                  text: 'Error: The provided root is not a valid nx workspace.',
+                },
+              ],
+            };
+          }
+
+          const workspace = await nxWorkspace(
+            this._nxWorkspacePath,
+            this.logger,
+          );
+          return {
+            content: [
+              {
+                type: 'text',
+                text: getNxJsonPrompt(workspace.nxJson),
+              },
+              {
+                type: 'text',
+                text: getProjectGraphPrompt(workspace.projectGraph),
+              },
+            ],
+          };
+        } catch (e) {
+          return {
+            content: [{ type: 'text', text: String(e) }],
+          };
+        }
+      },
+    );
+
+    this.server.tool(
+      'nx_project_details',
+      'Returns the complete project configuration in JSON format for a given nx project.',
+      {
+        projectName: z.string(),
+      },
+      async ({ projectName }) => {
+        this.telemetry?.sendEventData('ai.tool-call', {
+          tool: 'nx_project_details',
+        });
+        const workspace = await nxWorkspace(this._nxWorkspacePath, this.logger);
+        const project = workspace.projectGraph.nodes[projectName];
+
+        if (!project) {
           return {
             isError: true,
             content: [
               {
                 type: 'text',
-                text: 'Error: The provided root is not a valid nx workspace.',
+                text: `Project ${projectName} not found`,
               },
             ],
           };
         }
 
-        const workspace = await nxWorkspace(nxWorkspacePath, logger);
+        return {
+          content: [
+            { type: 'text', text: JSON.stringify(project.data, null, 2) },
+          ],
+        };
+      },
+    );
+
+    this.server.tool(
+      'nx_docs',
+      'Returns a list of documentation sections that could be relevant to the user query. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+      {
+        userQuery: z.string(),
+      },
+      async ({ userQuery }: { userQuery: string }) => {
+        this.telemetry?.sendEventData('ai.tool-call', {
+          tool: 'nx_docs',
+        });
+        const docsPages = await getDocsContext(userQuery);
+        return {
+          content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
+        };
+      },
+    );
+
+    this.server.tool(
+      'nx_generators',
+      'Returns a list of generators that could be relevant to the user query.',
+      async () => {
+        this.telemetry?.sendEventData('ai.tool-call', {
+          tool: 'nx_generators',
+        });
+        const generators = await getGenerators(
+          this._nxWorkspacePath,
+          undefined,
+          this.logger,
+        );
+
+        if (generators.length === 0) {
+          return {
+            content: [{ type: 'text', text: 'No generators found' }],
+          };
+        }
+
+        const generatorNamesAndDescriptions =
+          await getGeneratorNamesAndDescriptions(generators);
+        const prompt = await getGeneratorsPrompt(generatorNamesAndDescriptions);
+        return {
+          content: [{ type: 'text', text: prompt }],
+        };
+      },
+    );
+
+    this.server.tool(
+      'nx_generator_schema',
+      'Returns the detailed JSON schema for an nx generator',
+      {
+        generatorName: z.string(),
+      },
+      async ({ generatorName }) => {
+        this.telemetry?.sendEventData('ai.tool-call', {
+          tool: 'nx_generator_schema',
+        });
+        const generators = await getGenerators(
+          this._nxWorkspacePath,
+          undefined,
+          this.logger,
+        );
+        const generatorDetails = await getGeneratorSchema(
+          generatorName,
+          generators,
+        );
+
         return {
           content: [
             {
               type: 'text',
-              text: getNxJsonPrompt(workspace.nxJson),
-            },
-            {
-              type: 'text',
-              text: getProjectGraphPrompt(workspace.projectGraph),
-            },
-          ],
-        };
-      } catch (e) {
-        return {
-          content: [{ type: 'text', text: String(e) }],
-        };
-      }
-    },
-  );
-
-  server.tool(
-    'nx_project_details',
-    'Returns the complete project configuration in JSON format for a given nx project.',
-    {
-      projectName: z.string(),
-    },
-    async ({ projectName }) => {
-      telemetry?.sendEventData('ai.tool-call', {
-        tool: 'nx_project_details',
-      });
-      const workspace = await nxWorkspace(nxWorkspacePath, logger);
-      const project = workspace.projectGraph.nodes[projectName];
-
-      if (!project) {
-        return {
-          isError: true,
-          content: [
-            {
-              type: 'text',
-              text: `Project ${projectName} not found`,
-            },
-          ],
-        };
-      }
-
-      return {
-        content: [
-          { type: 'text', text: JSON.stringify(project.data, null, 2) },
-        ],
-      };
-    },
-  );
-
-  server.tool(
-    'nx_docs',
-    'Returns a list of documentation sections that could be relevant to the user query. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
-    {
-      userQuery: z.string(),
-    },
-    async ({ userQuery }: { userQuery: string }) => {
-      telemetry?.sendEventData('ai.tool-call', {
-        tool: 'nx_docs',
-      });
-      const docsPages = await getDocsContext(userQuery);
-      return {
-        content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
-      };
-    },
-  );
-
-  server.tool(
-    'nx_generators',
-    'Returns a list of generators that could be relevant to the user query.',
-    async () => {
-      telemetry?.sendEventData('ai.tool-call', {
-        tool: 'nx_generators',
-      });
-      const generators = await getGenerators(
-        nxWorkspacePath,
-        undefined,
-        logger,
-      );
-
-      if (generators.length === 0) {
-        return {
-          content: [{ type: 'text', text: 'No generators found' }],
-        };
-      }
-
-      const generatorNamesAndDescriptions =
-        await getGeneratorNamesAndDescriptions(generators);
-      const prompt = await getGeneratorsPrompt(generatorNamesAndDescriptions);
-      return {
-        content: [{ type: 'text', text: prompt }],
-      };
-    },
-  );
-
-  server.tool(
-    'nx_generator_schema',
-    'Returns the detailed JSON schema for an nx generator',
-    {
-      generatorName: z.string(),
-    },
-    async ({ generatorName }) => {
-      telemetry?.sendEventData('ai.tool-call', {
-        tool: 'nx_generator_schema',
-      });
-      const generators = await getGenerators(
-        nxWorkspacePath,
-        undefined,
-        logger,
-      );
-      const generatorDetails = await getGeneratorSchema(
-        generatorName,
-        generators,
-      );
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `
+              text: `
 Found generator schema for ${generatorName}: ${JSON.stringify(
-              generatorDetails,
-            )}.          
+                generatorDetails,
+              )}.          
 **IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
 
 1. FIRST navigate to the parent directory where you want to create the item:
@@ -192,12 +217,11 @@ Found generator schema for ${generatorName}: ${JSON.stringify(
 
 This approach provides better clarity about where new code will be generated
 and follows the Nx workspace convention for project organization.
-          `,
-          },
-        ],
-      };
-    },
-  );
-
-  return server;
+            `,
+            },
+          ],
+        };
+      },
+    );
+  }
 }

@@ -196,7 +196,8 @@
           "dependentTasksOutputFiles": "**/*",
           "transitive": true
         },
-        "{projectRoot}/package.json"
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/dist/apps/nxls/**"
       ],
       "dependsOn": ["^build"]
     },
