@@ -1,7 +1,7 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { createNxMcpServer } from '@nx-console/nx-mcp-server';
 import { GoogleAnalytics } from '@nx-console/shared-telemetry';
 import { randomUUID } from 'crypto';
+import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 
 const nxWorkspacePath = process.argv[2];
 if (!nxWorkspacePath) {
@@ -19,10 +19,10 @@ const googleAnalytics = new GoogleAnalytics(
   'nx-mcp',
 );
 
-const server = createNxMcpServer(nxWorkspacePath, googleAnalytics);
+const server = new NxMcpServerWrapper(nxWorkspacePath, googleAnalytics);
 
 const transport = new StdioServerTransport();
-server.connect(transport);
+server.getMcpServer().connect(transport);
 
 function getPackageVersion() {
   try {

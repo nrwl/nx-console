@@ -72,13 +72,14 @@ import {
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server-workspace';
+import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   getGenerators,
   getNxVersion,
   nxWorkspace,
   resetNxVersionCache,
 } from '@nx-console/shared-nx-workspace-info';
-import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { formatError, killGroup } from '@nx-console/shared-utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
@@ -96,8 +97,7 @@ import {
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
-import { startMcpServer } from './mcp-server';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServerReturn, startMcpServer } from './mcp-server';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -112,8 +112,8 @@ let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
 };
-let mcpServer: McpServer;
 let reconfigureAttempts = 0;
+let mcpServerReturn: McpServerReturn | undefined;
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -141,7 +141,7 @@ connection.onInitialize(async (params) => {
     }
 
     loadRootEnvFiles(WORKING_PATH);
-    mcpServer = startMcpServer(WORKING_PATH);
+    mcpServerReturn = startMcpServer(WORKING_PATH);
 
     CLIENT_CAPABILITIES = params.capabilities;
 
@@ -304,6 +304,12 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+
+  // Shutdown the Express server if it exists
+  if (mcpServerReturn?.server_instance) {
+    lspLogger.log('Shutting down MCP Express server');
+    mcpServerReturn.server_instance.close();
+  }
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {
@@ -600,6 +606,7 @@ connection.onNotification(
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   WORKING_PATH = workspacePath;
   loadRootEnvFiles(WORKING_PATH);
+  mcpServerReturn.server.setNxWorkspacePath(WORKING_PATH);
 
   await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
@@ -670,6 +677,12 @@ const exitHandler = () => {
 
   try {
     connection.dispose();
+
+    // Close the Express server if it exists
+    if (mcpServerReturn?.server_instance) {
+      lspLogger.log('Shutting down MCP Express server');
+      mcpServerReturn.server_instance.close();
+    }
   } catch (e) {
     // noop
   }
