@@ -141,6 +141,7 @@ connection.onInitialize(async (params) => {
     }
 
     loadRootEnvFiles(WORKING_PATH);
+    mcpServer = startMcpServer(WORKING_PATH);
 
     CLIENT_CAPABILITIES = params.capabilities;
 
@@ -198,8 +199,6 @@ connection.onInitialize(async (params) => {
     },
     pid: process.pid,
   };
-
-  mcpServer = startMcpServer(WORKING_PATH);
 
   return result;
 });
