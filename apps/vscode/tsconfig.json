@@ -31,6 +31,9 @@
       "path": "../../libs/language-server/types"
     },
     {
+      "path": "../../libs/vscode/cursor"
+    },
+    {
       "path": "../../libs/vscode/copilot"
     },
     {
