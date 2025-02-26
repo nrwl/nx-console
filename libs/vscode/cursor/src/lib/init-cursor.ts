@@ -1,11 +1,17 @@
-import { ExtensionContext, env, window, workspace } from 'vscode';
+import { ExtensionContext, env, window } from 'vscode';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
-import * as path from 'path';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import {
+  getMcpJsonPath,
+  hasNxMcpEntry,
+  ensureCursorDirExists,
+  readMcpJson,
+  writeMcpJson,
+} from './mcp-json';
+
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 export function initCursor(context: ExtensionContext) {
-  if (!env.appName.toLowerCase().includes('cursor')) {
+  if (!isInCursor()) {
     return;
   }
 
@@ -23,24 +29,8 @@ async function showMCPNotification() {
     return;
   }
 
-  const vscodeWorkspacePath =
-    workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-
-  if (!vscodeWorkspacePath) {
+  if (hasNxMcpEntry()) {
     return;
-  }
-
-  const mcpJsonPath = path.join(vscodeWorkspacePath, '.cursor', 'mcp.json');
-
-  if (existsSync(mcpJsonPath)) {
-    try {
-      const mcpJson = JSON.parse(readFileSync(mcpJsonPath, 'utf8'));
-      if (mcpJson.mcpServers?.['nx-mcp']) {
-        return;
-      }
-    } catch (e) {
-      // ignore
-    }
   }
 
   const answer = await window.showInformationMessage(
@@ -54,41 +44,16 @@ async function showMCPNotification() {
   }
 
   if (answer === 'Yes') {
-    updateMcpJson(vscodeWorkspacePath);
+    updateMcpJson();
   }
 }
 
-function updateMcpJson(workspacePath: string) {
-  const cursorDirPath = path.join(workspacePath, '.cursor');
-  const mcpJsonPath = path.join(cursorDirPath, 'mcp.json');
-  let mcpJson: any = { mcpServers: {} };
-
-  if (!existsSync(cursorDirPath)) {
-    try {
-      mkdirSync(cursorDirPath, { recursive: true });
-    } catch (error) {
-      window.showErrorMessage(
-        `Failed to create .cursor directory: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      return;
-    }
+function updateMcpJson() {
+  if (!ensureCursorDirExists()) {
+    return;
   }
 
-  if (existsSync(mcpJsonPath)) {
-    try {
-      const fileContent = readFileSync(mcpJsonPath, 'utf8');
-      if (fileContent.trim() === '') {
-        mcpJson = {};
-      } else {
-        mcpJson = JSON.parse(fileContent);
-      }
-    } catch (error) {
-      window.showErrorMessage(
-        `Failed to parse mcp.json: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      return;
-    }
-  }
+  const mcpJson = readMcpJson() || { mcpServers: {} };
 
   if (!mcpJson.mcpServers) {
     mcpJson.mcpServers = {};
@@ -98,11 +63,11 @@ function updateMcpJson(workspacePath: string) {
     url: 'http://localhost:3001/sse',
   };
 
-  try {
-    writeFileSync(mcpJsonPath, JSON.stringify(mcpJson, null, 2), 'utf8');
-  } catch (error) {
-    window.showErrorMessage(
-      `Failed to write to mcp.json: ${error instanceof Error ? error.message : String(error)}`,
-    );
+  if (!writeMcpJson(mcpJson)) {
+    window.showErrorMessage('Failed to write to mcp.json');
   }
+}
+
+export function isInCursor() {
+  return env.appName.toLowerCase().includes('cursor');
 }

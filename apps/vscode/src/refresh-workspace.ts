@@ -3,6 +3,7 @@ import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { commands, ExtensionContext } from 'vscode';
+import { refreshMcp } from '@nx-console/cursor';
 
 const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 
@@ -22,13 +23,14 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
       try {
         await getNxlsClient().refreshWorkspace();
         await getNxGraphServer(context).restart();
+        refreshMcp();
       } catch (e) {
         getOutputChannel().appendLine(
-          `Error refreshing workspace: ${e.message}`
+          `Error refreshing workspace: ${e.message}`,
         );
       }
 
       isRefreshing = false;
-    })
+    }),
   );
 }
