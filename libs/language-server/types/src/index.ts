@@ -25,7 +25,7 @@ import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins'
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
-  'nx/changeWorkspace'
+  'nx/changeWorkspace',
 );
 
 export const NxWorkspaceRefreshNotification: NotificationType<void> =
@@ -33,6 +33,9 @@ export const NxWorkspaceRefreshNotification: NotificationType<void> =
 
 export const NxWorkspaceRefreshStartedNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspaceStarted');
+
+export const NxUpdateMcpSseServerPortNotification: NotificationType<number> =
+  new NotificationType('nx/updateMcpSseServerPort');
 
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');

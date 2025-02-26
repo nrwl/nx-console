@@ -1,6 +1,11 @@
-import { isInCursor } from './init-cursor';
-import { getMcpJsonPath, readMcpJson, writeMcpJson } from './mcp-json';
 import { existsSync } from 'fs';
+import {
+  getMcpJsonPath,
+  readMcpJson,
+  writeMcpJson,
+} from '@nx-console/vscode-utils';
+
+import { isInCursor } from './init-cursor';
 
 export function refreshMcp() {
   if (!isInCursor()) {
