@@ -37,6 +37,9 @@
       "path": "../../libs/language-server/types/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/cursor/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/copilot/tsconfig.lib.json"
     },
     {

@@ -41,6 +41,7 @@ import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
 import { initCopilot } from '@nx-console/vscode-copilot';
+import { initCursor } from '@nx-console/cursor';
 
 import {
   NxWorkspaceRefreshNotification,
@@ -266,6 +267,7 @@ async function setWorkspace(workspacePath: string) {
     initVscodeProjectGraph(context);
     initErrorDiagnostics(context);
     initCopilot(context);
+    initCursor(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

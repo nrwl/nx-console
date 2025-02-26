@@ -158,6 +158,9 @@
     },
     {
       "path": "./libs/nx-mcp/nx-mcp-server"
+    },
+    {
+      "path": "./libs/vscode/cursor"
     }
   ]
 }
