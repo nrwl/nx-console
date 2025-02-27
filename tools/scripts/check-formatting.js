@@ -27,4 +27,9 @@ if (ktFiles.length > 0) {
 }
 
 console.log('nx sync:check');
-execSync('npx nx sync:check', { stdio: 'ignore' });
+try {
+  execSync('npx nx sync:check', { stdio: 'ignore' });
+} catch (e) {
+  console.error('nx sync:check failed');
+  process.exit(1);
+}
