@@ -43,7 +43,7 @@ export class VisualizeTaskGraphTool
 
     return new LanguageModelToolResult([
       new LanguageModelTextPart(
-        `Opening the Nx task graph focused on task "${taskName}" for project "${projectName}".`,
+        `Opening the Nx task graph focused on task "${taskName}" for project "${projectName}". There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
       ),
     ]);
   }

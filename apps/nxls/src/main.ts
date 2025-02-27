@@ -40,6 +40,7 @@ import {
   NxWorkspaceRefreshStartedNotification,
   NxWorkspaceRequest,
   NxWorkspaceSerializedRequest,
+  NxRefreshMcpServerNotification,
 } from '@nx-console/language-server-types';
 import {
   getJsonLanguageService,
@@ -152,6 +153,7 @@ connection.onInitialize(async (params) => {
           connection.sendNotification(NxMcpIdeCallbackNotification, message);
         },
       );
+      connection.sendNotification(NxRefreshMcpServerNotification.method);
     }
 
     CLIENT_CAPABILITIES = params.capabilities;
@@ -639,6 +641,7 @@ connection.onNotification(
       mcpServerReturn = startMcpServer(WORKING_PATH, newPort, (message) => {
         connection.sendNotification(NxMcpIdeCallbackNotification, message);
       });
+      connection.sendNotification(NxRefreshMcpServerNotification.method);
     }
 
     lspLogger.log(`MCP server restarted on port ${newPort}`);
