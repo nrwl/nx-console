@@ -17,6 +17,7 @@ import * as net from 'net';
 import {
   ExtensionContext,
   FileSystemWatcher,
+  commands,
   env,
   window,
   workspace,
@@ -30,12 +31,25 @@ let mcpJsonWatcher: FileSystemWatcher | null = null;
 
 export function initCursor(context: ExtensionContext) {
   if (!isInCursor()) {
+    commands.executeCommand('setContext', 'isInCursor', false);
     return;
   }
+
+  commands.executeCommand('setContext', 'isInCursor', true);
+  commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
   showMCPNotification();
 
   setupMcpJsonWatcher(context);
+
+  context.subscriptions.push(
+    commands.registerCommand('nx.configureMcpServer', async () => {
+      const success = await updateMcpJson();
+      if (success) {
+        window.showInformationMessage('Nx MCP Server configured successfully');
+      }
+    }),
+  );
 
   getNxlsClient().onNotification(
     NxMcpIdeCallbackNotification,
@@ -62,37 +76,31 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
 
   mcpJsonWatcher = workspace.createFileSystemWatcher(mcpJsonPath);
 
-  mcpJsonWatcher.onDidChange(async (uri) => {
-    getOutputChannel().appendLine(
-      'mcp.json file changed, updating server port',
-    );
+  const handleMcpJsonChange = async (eventMessage: string) => {
+    getOutputChannel().appendLine(eventMessage);
     const port = getNxMcpPort();
     if (port !== lastPort) {
       lastPort = port;
       await syncMcpPortToLanguageServer(port);
     }
+
+    commands.executeCommand(
+      'setContext',
+      'hasNxMcpConfigured',
+      hasNxMcpEntry(),
+    );
+  };
+
+  mcpJsonWatcher.onDidChange(async (uri) => {
+    await handleMcpJsonChange('mcp.json file changed, updating server port');
   });
 
   mcpJsonWatcher.onDidCreate(async (uri) => {
-    getOutputChannel().appendLine(
-      'mcp.json file created, updating server port',
-    );
-    const port = getNxMcpPort();
-    if (port !== lastPort) {
-      lastPort = port;
-      await syncMcpPortToLanguageServer(port);
-    }
+    await handleMcpJsonChange('mcp.json file created, updating server port');
   });
 
   mcpJsonWatcher.onDidDelete(async (uri) => {
-    getOutputChannel().appendLine(
-      'mcp.json file deleted, updating server port',
-    );
-    const port = getNxMcpPort();
-    if (port !== lastPort) {
-      lastPort = port;
-      await syncMcpPortToLanguageServer(port);
-    }
+    await handleMcpJsonChange('mcp.json file deleted, updating server port');
   });
 
   context.subscriptions.push(mcpJsonWatcher);
@@ -146,6 +154,10 @@ async function showMCPNotification() {
 async function updateMcpJson() {
   if (!ensureCursorDirExists()) {
     return false;
+  }
+
+  if (hasNxMcpEntry()) {
+    return true;
   }
 
   const port = await findAvailablePort();

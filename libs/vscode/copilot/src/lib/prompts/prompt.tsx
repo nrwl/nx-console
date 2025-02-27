@@ -1,16 +1,15 @@
-import {
-  SystemMessage,
-  UserMessage,
-  PromptElement,
-  BasePromptElementProps,
-} from '@vscode/prompt-tsx';
-import { ChatContext } from 'vscode';
-import { History } from './history';
-import { NxProjectGraphPrompt } from './project-graph-prompt';
-import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
-import { NxJsonPrompt } from './nx-json-prompt';
-import { DocsPagesPrompt } from './docs-pages-prompt';
 import { DocsPageSection } from '@nx-console/shared-llm-context';
+import {
+  BasePromptElementProps,
+  PromptElement,
+  UserMessage,
+} from '@vscode/prompt-tsx';
+import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
+import { ChatContext } from 'vscode';
+import { DocsPagesPrompt } from './docs-pages-prompt';
+import { History } from './history';
+import { NxJsonPrompt } from './nx-json-prompt';
+import { NxProjectGraphPrompt } from './project-graph-prompt';
 
 export interface NxCopilotPromptProps extends BasePromptElementProps {
   packageManagerExecCommand: string;
