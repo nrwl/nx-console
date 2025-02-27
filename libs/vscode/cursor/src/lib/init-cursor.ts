@@ -1,5 +1,6 @@
 import {
   NxMcpIdeCallbackNotification,
+  NxRefreshMcpServerNotification,
   NxUpdateMcpSseServerPortNotification,
 } from '@nx-console/language-server-types';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
@@ -23,6 +24,7 @@ import {
   workspace,
 } from 'vscode';
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
+import { refreshMcp } from './refresh-mcp';
 
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
@@ -85,6 +87,11 @@ export function initCursor(context: ExtensionContext) {
       }
     },
   );
+
+  getNxlsClient().onNotification(NxRefreshMcpServerNotification, async () => {
+    getOutputChannel().appendLine('Refreshing MCP server...');
+    refreshMcp();
+  });
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {

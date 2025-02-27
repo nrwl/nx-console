@@ -237,56 +237,58 @@ and follows the Nx workspace convention for project organization.
 
   private registerIdeCallbackTools(): void {
     this.server.tool(
-      'nx_visualize_project_graph_project',
-      'Visualize the nx project graph for a given project. Use this to show the project dependencies and help users understand the project structure.',
+      'nx_visualize_graph',
+      'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
       {
+        visualizationType: z.enum(['project', 'project-task']),
         projectName: z.string(),
+        taskName: z.string().optional(),
       },
-      async ({ projectName }) => {
+      async ({ visualizationType, projectName, taskName }) => {
         if (this.ideCallback) {
-          this.ideCallback({
-            type: 'focus-project',
-            payload: {
-              projectName,
-            },
-          } satisfies FocusProjectMessage);
-          return {
-            content: [
-              { type: 'text', text: `Opening graph for ${projectName}` },
-            ],
-          };
-        }
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'No IDE available' }],
-        };
-      },
-    );
-
-    this.server.tool(
-      'nx_visualize_task_graph',
-      'Visualize the nx task graph for a given project and task. Use this to show the task dependencies and help users understand the task graph.',
-      {
-        projectName: z.string(),
-        taskName: z.string(),
-      },
-      async ({ projectName, taskName }) => {
-        if (this.ideCallback) {
-          this.ideCallback({
-            type: 'focus-task',
-            payload: {
-              projectName,
-              taskName,
-            },
-          } satisfies FocusTaskMessage);
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Opening graph focused on task ${taskName} for project ${projectName}`,
+          if (visualizationType === 'project') {
+            this.ideCallback({
+              type: 'focus-project',
+              payload: {
+                projectName,
               },
-            ],
-          };
+            } satisfies FocusProjectMessage);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Opening project graph for ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                },
+              ],
+            };
+          } else if (visualizationType === 'project-task') {
+            if (!taskName) {
+              return {
+                isError: true,
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Task name is required for task graph visualization',
+                  },
+                ],
+              };
+            }
+            this.ideCallback({
+              type: 'focus-task',
+              payload: {
+                projectName,
+                taskName,
+              },
+            } satisfies FocusTaskMessage);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                },
+              ],
+            };
+          }
         }
         return {
           isError: true,

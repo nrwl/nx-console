@@ -41,6 +41,9 @@ export const NxUpdateMcpSseServerPortNotification: NotificationType<number> =
 export const NxMcpIdeCallbackNotification: NotificationType<IdeCallbackMessage> =
   new NotificationType('nx/mcpIdeCallback');
 
+export const NxRefreshMcpServerNotification: NotificationType<void> =
+  new NotificationType('nx/refreshMcpServer');
+
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');
 

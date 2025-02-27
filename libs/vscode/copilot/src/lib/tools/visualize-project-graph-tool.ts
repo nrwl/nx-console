@@ -37,7 +37,7 @@ export class VisualizeProjectGraphTool
 
     return new LanguageModelToolResult([
       new LanguageModelTextPart(
-        `Opening the Nx project graph focused on project "${projectName}".`,
+        `Opening the Nx project graph focused on project "${projectName}". There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
       ),
     ]);
   }
