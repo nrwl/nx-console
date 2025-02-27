@@ -16,6 +16,12 @@ import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { ListView, ListViewItem } from './views/nx-project-list-view';
 import { TreeView, TreeViewItem } from './views/nx-project-tree-view';
+import {
+  NxConsolePluginsDefinition,
+  ProjectViewTreeItem,
+  loadPlugins,
+} from '@nx-console/shared-nx-console-plugins';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 
 export type ViewItem = ListViewItem | TreeViewItem;
 
@@ -31,6 +37,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly treeView: TreeView = new TreeView();
 
   private workspaceData: NxWorkspace | undefined = undefined;
+  private plugins: NxConsolePluginsDefinition | undefined = undefined;
 
   constructor(context: ExtensionContext) {
     super();
@@ -45,12 +52,12 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       ] as const
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
-        commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
+        commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this),
       );
     });
 
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
-      this.refresh()
+      this.refresh(),
     );
 
     onWorkspaceRefreshed(() => this.refresh());
@@ -64,6 +71,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   async getChildren(element?: NxTreeItem): Promise<NxTreeItem[] | undefined> {
     if (!element) {
       this.workspaceData = await getNxWorkspace();
+      this.plugins = await loadPlugins(getNxWorkspacePath());
       this.treeView.workspaceData = this.workspaceData;
       this.listView.workspaceData = this.workspaceData;
     }
@@ -85,7 +93,26 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       items = await this.listView.getChildren(element?.item as ListViewItem);
     }
     if (!items) return;
-    return items.map((item) => new NxTreeItem(item));
+
+    let nxTreeItems = items.map((item) => new NxTreeItem(item));
+
+    if (this.plugins.projectViewItemProcessors) {
+      this.plugins.projectViewItemProcessors.forEach((processor) => {
+        nxTreeItems = nxTreeItems.map((item) => {
+          const processed = processor(
+            item as ProjectViewTreeItem,
+            this.workspaceData,
+          );
+          item.label = processed.label || item.label;
+          item.description = processed.description || item.description;
+          item.tooltip = processed.tooltip || item.tooltip;
+          item.iconPath = processed.iconPath || item.iconPath;
+          return item;
+        });
+      });
+    }
+
+    return nxTreeItems;
   }
 
   private shouldUseTreeView() {
@@ -105,7 +132,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
   private async runTask(
     selection: NxTreeItem | undefined,
-    optionalFlags?: NxOptionalFlags
+    optionalFlags?: NxOptionalFlags,
   ) {
     getTelemetry().logUsage('tasks.run', {
       source: 'projects-view',

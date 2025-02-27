@@ -11,6 +11,9 @@ import { TreeItemCollapsibleState } from 'vscode';
 
 interface BaseViewItem<Context extends string> {
   id: string;
+  description?: string;
+  tooltip?: string;
+  iconPath?: string;
   contextValue: Context;
   label: string;
   collapsible: TreeItemCollapsibleState;
@@ -59,9 +62,9 @@ export abstract class BaseView {
   createProjectViewItem(
     [projectName, projectGraphNode]: [
       projectName: string,
-      projectDefinition: ProjectGraphProjectNode
+      projectDefinition: ProjectGraphProjectNode,
     ],
-    collapsible = TreeItemCollapsibleState.Collapsed
+    collapsible = TreeItemCollapsibleState.Collapsed,
   ): ProjectViewItem {
     const {
       data: { root, name, targets },
@@ -75,7 +78,7 @@ export abstract class BaseView {
 
     if (root === undefined) {
       getOutputChannel().appendLine(
-        `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
+        `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`,
       );
     }
 
@@ -90,7 +93,7 @@ export abstract class BaseView {
   }
 
   async createTargetsAndGroupsFromProject(
-    parent: ProjectViewItem
+    parent: ProjectViewItem,
   ): Promise<(TargetViewItem | TargetGroupViewItem)[] | undefined> {
     const { nxProject } = parent;
 
@@ -106,7 +109,7 @@ export abstract class BaseView {
 
     if (!projectDef.data.metadata?.targetGroups) {
       return Object.entries(targets).map((target) =>
-        this.createTargetTreeItem(nxProject, target)
+        this.createTargetTreeItem(nxProject, target),
       );
     }
 
@@ -114,7 +117,7 @@ export abstract class BaseView {
     const nonGroupedTargets: Set<string> = new Set(Object.keys(targets));
 
     for (const [targetGroupName, targets] of Object.entries(
-      projectDef.data.metadata.targetGroups
+      projectDef.data.metadata.targetGroups,
     )) {
       if (!targetGroupMap.has(targetGroupName)) {
         targetGroupMap.set(targetGroupName, []);
@@ -128,10 +131,10 @@ export abstract class BaseView {
     return [
       ...Array.from(targetGroupMap.entries()).map(
         ([targetGroupName, targets]) =>
-          this.createTargetGroupTreeItem(nxProject, targetGroupName, targets)
+          this.createTargetGroupTreeItem(nxProject, targetGroupName, targets),
       ),
       ...Array.from(nonGroupedTargets).map((targetName) =>
-        this.createTargetTreeItem(nxProject, [targetName, targets[targetName]])
+        this.createTargetTreeItem(nxProject, [targetName, targets[targetName]]),
       ),
     ];
   }
@@ -140,8 +143,8 @@ export abstract class BaseView {
     nxProject: NxProject,
     [targetName, { configurations, metadata }]: [
       targetName: string,
-      targetDefinition: TargetConfiguration
-    ]
+      targetDefinition: TargetConfiguration,
+    ],
   ): TargetViewItem {
     const hasChildren =
       configurations && Object.keys(configurations).length > 0;
@@ -162,7 +165,7 @@ export abstract class BaseView {
   createTargetGroupTreeItem(
     nxProject: NxProject,
     targetGroupName: string,
-    targetNames: string[]
+    targetNames: string[],
   ): TargetGroupViewItem {
     return {
       id: `${nxProject.project}:${targetGroupName}`,
@@ -176,7 +179,7 @@ export abstract class BaseView {
   }
 
   async createConfigurationsFromTarget(
-    parent: TargetViewItem
+    parent: TargetViewItem,
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject, nxTarget } = parent;
 
@@ -212,7 +215,7 @@ export abstract class BaseView {
   }
 
   async createTargetsFromTargetGroup(
-    parent: TargetGroupViewItem
+    parent: TargetGroupViewItem,
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject } = parent;
 
@@ -233,7 +236,7 @@ export abstract class BaseView {
         this.createTargetTreeItem(nxProject, [
           target.name,
           targets[target.name],
-        ])
+        ]),
       );
   }
 

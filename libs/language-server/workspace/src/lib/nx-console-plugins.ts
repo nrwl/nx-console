@@ -1,16 +1,14 @@
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
-import { existsSync } from 'fs';
 import { nxWorkspace } from './workspace';
 import { lspLogger } from '@nx-console/language-server-utils';
 import {
-  NxConsolePluginsDefinition,
   StartupMessageDefinition,
-  internalPlugins,
+  loadPlugins,
 } from '@nx-console/shared-nx-console-plugins';
 
 export async function getTransformedGeneratorSchema(
   workspacePath: string,
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): Promise<GeneratorSchema> {
   const plugins = await loadPlugins(workspacePath);
   const workspace = await nxWorkspace(workspacePath);
@@ -29,7 +27,7 @@ export async function getTransformedGeneratorSchema(
 
 export async function getStartupMessage(
   workspacePath: string,
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): Promise<StartupMessageDefinition | undefined> {
   const plugins = await loadPlugins(workspacePath);
   const workspace = await nxWorkspace(workspacePath);
@@ -49,36 +47,4 @@ export async function getStartupMessage(
     lspLogger.log('error while getting startup message' + e);
     return startupMessageDefinition;
   }
-}
-
-async function loadPlugins(
-  workspacePath: string
-): Promise<NxConsolePluginsDefinition> {
-  let workspacePlugins: NxConsolePluginsDefinition | undefined = undefined;
-  try {
-    const pluginFile = `${workspacePath}/.nx/console/plugins.mjs`;
-    if (!existsSync(pluginFile)) {
-      workspacePlugins = undefined;
-    }
-    workspacePlugins = await import(pluginFile).then(
-      (module) => module.default
-    );
-  } catch (_) {
-    workspacePlugins = undefined;
-  }
-
-  return {
-    schemaProcessors: [
-      ...(internalPlugins.schemaProcessors ?? []),
-      ...(workspacePlugins?.schemaProcessors ?? []),
-    ],
-    validators: [
-      ...(internalPlugins.validators ?? []),
-      ...(workspacePlugins?.validators ?? []),
-    ],
-    startupMessageFactories: [
-      ...(internalPlugins.startupMessageFactories ?? []),
-      ...(workspacePlugins?.startupMessageFactories ?? []),
-    ],
-  };
 }
