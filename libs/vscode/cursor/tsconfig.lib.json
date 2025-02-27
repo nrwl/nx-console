@@ -12,19 +12,19 @@
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../nx-mcp/nx-mcp-server/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../output-channels/tsconfig.lib.json"
     },
     {
-      "path": "../lsp-client/tsconfig.lib.json"
-    },
-    {
       "path": "../configuration/tsconfig.lib.json"
-    },
-    {
-      "path": "../../language-server/types/tsconfig.lib.json"
     }
   ],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]

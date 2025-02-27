@@ -7,3 +7,4 @@ export { getWorkspacePath } from './lib/get-workspace-path';
 export { resolveDependencyVersioning } from './lib/dependency-versioning';
 export * from './lib/register-codelens';
 export * from './lib/mcp-json';
+export * from './lib/logger';

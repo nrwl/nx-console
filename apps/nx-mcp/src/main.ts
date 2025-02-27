@@ -1,7 +1,14 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { GoogleAnalytics } from '@nx-console/shared-telemetry';
 import { randomUUID } from 'crypto';
-import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
+import {
+  NxMcpServerWrapper,
+  NxWorkspaceInfoProvider,
+} from '@nx-console/nx-mcp-server';
+import {
+  nxWorkspace,
+  getGenerators,
+} from '@nx-console/shared-nx-workspace-info';
 
 const nxWorkspacePath = process.argv[2];
 if (!nxWorkspacePath) {
@@ -19,8 +26,14 @@ const googleAnalytics = new GoogleAnalytics(
   'nx-mcp',
 );
 
+const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
+  nxWorkspace,
+  getGenerators,
+};
+
 const server = new NxMcpServerWrapper(
   nxWorkspacePath,
+  nxWorkspaceInfoProvider,
   undefined,
   googleAnalytics,
 );

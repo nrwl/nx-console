@@ -14,7 +14,11 @@
             "depConstraints": [
               {
                 "sourceTag": "type:vscode",
-                "onlyDependOnLibsWithTags": ["type:shared", "type:vscode"]
+                "onlyDependOnLibsWithTags": [
+                  "type:shared",
+                  "type:vscode",
+                  "type:mcp"
+                ]
               },
               {
                 "sourceTag": "type:lsp",

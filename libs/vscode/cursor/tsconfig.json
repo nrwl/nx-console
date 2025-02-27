@@ -7,19 +7,19 @@
       "path": "../nx-workspace"
     },
     {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../nx-mcp/nx-mcp-server"
+    },
+    {
       "path": "../utils"
     },
     {
       "path": "../output-channels"
     },
     {
-      "path": "../lsp-client"
-    },
-    {
       "path": "../configuration"
-    },
-    {
-      "path": "../../language-server/types"
     },
     {
       "path": "./tsconfig.lib.json"

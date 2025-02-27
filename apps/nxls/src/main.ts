@@ -19,7 +19,6 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
-  NxMcpIdeCallbackNotification,
   NxPDVDataRequest,
   NxParseTargetStringRequest,
   NxProjectByPathRequest,
@@ -33,14 +32,12 @@ import {
   NxStopDaemonRequest,
   NxTargetsForConfigFileRequest,
   NxTransformedGeneratorSchemaRequest,
-  NxUpdateMcpSseServerPortNotification,
   NxVersionRequest,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
   NxWorkspaceRequest,
   NxWorkspaceSerializedRequest,
-  NxRefreshMcpServerNotification,
 } from '@nx-console/language-server-types';
 import {
   getJsonLanguageService,
@@ -75,7 +72,6 @@ import {
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server-workspace';
-import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   getGenerators,
@@ -100,7 +96,6 @@ import {
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
-import { McpServerReturn, startMcpServer } from './mcp-server';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -116,7 +111,6 @@ let unregisterFileWatcher: () => void = () => {
   //noop
 };
 let reconfigureAttempts = 0;
-let mcpServerReturn: McpServerReturn | undefined;
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -131,8 +125,7 @@ connection.onInitialize(async (params) => {
   setLspLogger(connection);
   lspLogger.log('Initializing Nx Language Server');
 
-  const { workspacePath, mcpSseServerPort } =
-    params.initializationOptions ?? {};
+  const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
       workspacePath ||
@@ -145,16 +138,6 @@ connection.onInitialize(async (params) => {
     }
 
     loadRootEnvFiles(WORKING_PATH);
-    if (mcpSseServerPort) {
-      mcpServerReturn = startMcpServer(
-        WORKING_PATH,
-        mcpSseServerPort,
-        (message) => {
-          connection.sendNotification(NxMcpIdeCallbackNotification, message);
-        },
-      );
-      connection.sendNotification(NxRefreshMcpServerNotification.method);
-    }
 
     CLIENT_CAPABILITIES = params.capabilities;
 
@@ -317,12 +300,6 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
-
-  // Shutdown the Express server if it exists
-  if (mcpServerReturn?.server_instance) {
-    lspLogger.log('Shutting down MCP Express server');
-    mcpServerReturn.server_instance.close();
-  }
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {
@@ -619,34 +596,9 @@ connection.onNotification(
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   WORKING_PATH = workspacePath;
   loadRootEnvFiles(WORKING_PATH);
-  mcpServerReturn.server.setNxWorkspacePath(WORKING_PATH);
 
   await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
-
-connection.onNotification(
-  NxUpdateMcpSseServerPortNotification,
-  async (newPort: number | undefined) => {
-    if (!WORKING_PATH) {
-      return;
-    }
-
-    lspLogger.log(`Updating MCP SSE server port to ${newPort}`);
-
-    if (mcpServerReturn?.server_instance) {
-      mcpServerReturn.server_instance.close();
-    }
-
-    if (newPort) {
-      mcpServerReturn = startMcpServer(WORKING_PATH, newPort, (message) => {
-        connection.sendNotification(NxMcpIdeCallbackNotification, message);
-      });
-      connection.sendNotification(NxRefreshMcpServerNotification.method);
-    }
-
-    lspLogger.log(`MCP server restarted on port ${newPort}`);
-  },
-);
 
 async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
   if (reconfigureAttempts === 0) {
@@ -714,12 +666,6 @@ const exitHandler = () => {
 
   try {
     connection.dispose();
-
-    // Close the Express server if it exists
-    if (mcpServerReturn?.server_instance) {
-      lspLogger.log('Shutting down MCP Express server');
-      mcpServerReturn.server_instance.close();
-    }
   } catch (e) {
     // noop
   }

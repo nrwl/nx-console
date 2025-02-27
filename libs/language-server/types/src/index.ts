@@ -1,8 +1,9 @@
+import { NxVersion } from '@nx-console/nx-version';
 import {
   GeneratorContext,
   GeneratorSchema,
 } from '@nx-console/shared-generate-ui-types';
-import { NxVersion } from '@nx-console/nx-version';
+import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 import {
   GeneratorCollectionInfo,
   Option,
@@ -12,7 +13,6 @@ import {
   CIPEInfo,
   CIPEInfoError,
   CloudOnboardingInfo,
-  IdeCallbackMessage,
   NxWorkspace,
   PDVData,
   TreeNode,
@@ -22,7 +22,6 @@ import type {
   Target,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
@@ -34,15 +33,6 @@ export const NxWorkspaceRefreshNotification: NotificationType<void> =
 
 export const NxWorkspaceRefreshStartedNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspaceStarted');
-
-export const NxUpdateMcpSseServerPortNotification: NotificationType<number> =
-  new NotificationType('nx/updateMcpSseServerPort');
-
-export const NxMcpIdeCallbackNotification: NotificationType<IdeCallbackMessage> =
-  new NotificationType('nx/mcpIdeCallback');
-
-export const NxRefreshMcpServerNotification: NotificationType<void> =
-  new NotificationType('nx/refreshMcpServer');
 
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');

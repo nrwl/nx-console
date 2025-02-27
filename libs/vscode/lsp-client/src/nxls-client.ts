@@ -327,14 +327,11 @@ async function createLanguageClient(
     },
   };
 
-  const mcpSseServerPort = getNxMcpPort();
-
   // Options to control the language client
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     initializationOptions: {
       workspacePath,
-      mcpSseServerPort,
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
