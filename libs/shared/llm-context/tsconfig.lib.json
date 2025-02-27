@@ -10,12 +10,6 @@
   "exclude": ["out-tsc", "**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
   "references": [
     {
-      "path": "../nx-workspace-info/tsconfig.lib.json"
-    },
-    {
-      "path": "../utils/tsconfig.lib.json"
-    },
-    {
       "path": "../schema/tsconfig.lib.json"
     }
   ]

@@ -21,16 +21,12 @@ interface GeneratorSchemasPromptProps extends BasePromptElementProps {
 class GeneratorSchemasPrompt extends PromptElement<GeneratorSchemasPromptProps> {
   override render() {
     const hasGenerators = this.props.generators.length > 0;
-    return (
-      <>
-        {hasGenerators ? (
-          <UserMessage priority={70}>
-            {getGeneratorsPrompt(this.props.generators)}
-          </UserMessage>
-        ) : (
-          <UserMessage> </UserMessage>
-        )}
-      </>
+    return hasGenerators ? (
+      <UserMessage priority={70}>
+        {getGeneratorsPrompt(this.props.generators)}
+      </UserMessage>
+    ) : (
+      <UserMessage> </UserMessage>
     );
   }
 }

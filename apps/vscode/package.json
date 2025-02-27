@@ -437,10 +437,34 @@
           "properties": {
             "generatorName": {
               "type": "string",
-              "description": "The name of the generator to get details for.",
-              "default": 0
+              "description": "The name of the generator to get details for."
             }
-          }
+          },
+          "required": [
+            "generatorName"
+          ]
+        }
+      },
+      {
+        "name": "nx_project-details",
+        "tags": [
+          "nx"
+        ],
+        "toolReferenceName": "nxProjectDetails",
+        "displayName": "Project Details",
+        "modelDescription": "Retrieves a specific nx project configuration. Includes details like project targets/tasks and their details, type, tags, and dependencies and other metadata.",
+        "icon": "$(file-code)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "projectName": {
+              "type": "string",
+              "description": "The name of the project to get details for."
+            }
+          },
+          "required": [
+            "projectName"
+          ]
         }
       }
     ],
