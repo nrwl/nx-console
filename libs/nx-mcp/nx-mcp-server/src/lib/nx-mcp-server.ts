@@ -13,15 +13,28 @@ import {
 import { z } from 'zod';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { getMcpLogger } from './mcp-logger';
-import {
-  getGenerators,
-  nxWorkspace,
-} from '@nx-console/shared-nx-workspace-info';
+
 import {
   FocusProjectMessage,
   FocusTaskMessage,
   IdeCallbackMessage,
+  NxWorkspace,
 } from '@nx-console/shared-types';
+import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
+
+export interface NxWorkspaceInfoProvider {
+  nxWorkspace: (
+    workspacePath: string,
+    logger: Logger,
+    reset?: boolean,
+  ) => Promise<NxWorkspace | undefined>;
+  getGenerators: (
+    workspacePath: string,
+    options?: NxGeneratorsRequestOptions,
+    logger?: Logger,
+  ) => Promise<GeneratorCollectionInfo[] | undefined>;
+}
 
 export class NxMcpServerWrapper {
   private server: McpServer;
@@ -31,6 +44,7 @@ export class NxMcpServerWrapper {
 
   constructor(
     initialWorkspacePath: string,
+    private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
     private ideCallback?: (message: IdeCallbackMessage) => void,
     telemetry?: GoogleAnalytics,
     logger?: Logger,
@@ -80,10 +94,16 @@ export class NxMcpServerWrapper {
             };
           }
 
-          const workspace = await nxWorkspace(
+          const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
             this._nxWorkspacePath,
             this.logger,
           );
+          if (!workspace) {
+            return {
+              isError: true,
+              content: [{ type: 'text', text: 'Error: Workspace not found' }],
+            };
+          }
           return {
             content: [
               {
@@ -114,7 +134,16 @@ export class NxMcpServerWrapper {
         this.telemetry?.sendEventData('ai.tool-call', {
           tool: 'nx_project_details',
         });
-        const workspace = await nxWorkspace(this._nxWorkspacePath, this.logger);
+        const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+          this._nxWorkspacePath,
+          this.logger,
+        );
+        if (!workspace) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace not found' }],
+          };
+        }
         const project = workspace.projectGraph.nodes[projectName];
 
         if (!project) {
@@ -161,12 +190,16 @@ export class NxMcpServerWrapper {
         this.telemetry?.sendEventData('ai.tool-call', {
           tool: 'nx_generators',
         });
-        const generators = await getGenerators(
+        const generators = await this.nxWorkspaceInfoProvider.getGenerators(
           this._nxWorkspacePath,
           undefined,
           this.logger,
         );
-
+        if (!generators) {
+          return {
+            content: [{ type: 'text', text: 'No generators found' }],
+          };
+        }
         if (generators.length === 0) {
           return {
             content: [{ type: 'text', text: 'No generators found' }],
@@ -192,11 +225,16 @@ export class NxMcpServerWrapper {
         this.telemetry?.sendEventData('ai.tool-call', {
           tool: 'nx_generator_schema',
         });
-        const generators = await getGenerators(
+        const generators = await this.nxWorkspaceInfoProvider.getGenerators(
           this._nxWorkspacePath,
           undefined,
           this.logger,
         );
+        if (!generators) {
+          return {
+            content: [{ type: 'text', text: 'No generators found' }],
+          };
+        }
         const generatorDetails = await getGeneratorSchema(
           generatorName,
           generators,

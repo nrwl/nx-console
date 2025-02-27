@@ -1,10 +1,7 @@
 import {
-  NxMcpIdeCallbackNotification,
-  NxRefreshMcpServerNotification,
-  NxUpdateMcpSseServerPortNotification,
-} from '@nx-console/language-server-types';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
-import { getNxlsClient } from '@nx-console/vscode-lsp-client';
+  getNxWorkspacePath,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import {
   ensureCursorDirExists,
@@ -14,17 +11,16 @@ import {
   readMcpJson,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
-import * as net from 'net';
 import {
-  ExtensionContext,
-  FileSystemWatcher,
   commands,
   env,
+  ExtensionContext,
+  FileSystemWatcher,
   window,
   workspace,
 } from 'vscode';
-import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
-import { refreshMcp } from './refresh-mcp';
+import { restartMcpServer, tryStartMcpServer } from './mcp-server';
+import { findAvailablePort } from './ports';
 
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
@@ -39,6 +35,8 @@ export function initCursor(context: ExtensionContext) {
   commands.executeCommand('setContext', 'isInCursor', true);
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
+  tryStartMcpServer(getNxWorkspacePath());
+
   showMCPNotification();
 
   setupMcpJsonWatcher(context);
@@ -48,50 +46,6 @@ export function initCursor(context: ExtensionContext) {
       await updateMcpJson();
     }),
   );
-
-  getNxlsClient().onNotification(
-    NxMcpIdeCallbackNotification,
-    async ({ type, payload }) => {
-      if (type === 'focus-project') {
-        const workspaceProjects = await getNxWorkspaceProjects();
-        if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
-          window.showErrorMessage(
-            `Cannot find project "${payload.projectName}"`,
-          );
-          return;
-        }
-        commands.executeCommand('nx.graph.focus', payload.projectName);
-      } else if (type === 'focus-task') {
-        const workspaceProjects = await getNxWorkspaceProjects();
-        if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
-          window.showErrorMessage(
-            `Cannot find project "${payload.projectName}"`,
-          );
-          return;
-        }
-        if (
-          !workspaceProjects[payload.projectName].data.targets?.[
-            payload.taskName
-          ]
-        ) {
-          window.showErrorMessage(
-            `Cannot find task "${payload.taskName}" in project "${payload.projectName}"`,
-          );
-          return;
-        }
-
-        commands.executeCommand('nx.graph.task', {
-          projectName: payload.projectName,
-          taskName: payload.taskName,
-        });
-      }
-    },
-  );
-
-  getNxlsClient().onNotification(NxRefreshMcpServerNotification, async () => {
-    getOutputChannel().appendLine('Refreshing MCP server...');
-    refreshMcp();
-  });
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {
@@ -109,7 +63,7 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
     const port = getNxMcpPort();
     if (port !== lastPort) {
       lastPort = port;
-      await syncMcpPortToLanguageServer(port);
+      await restartMcpServer();
     }
 
     commands.executeCommand(
@@ -119,34 +73,19 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
     );
   };
 
-  mcpJsonWatcher.onDidChange(async (uri) => {
+  mcpJsonWatcher.onDidChange(async () => {
     await handleMcpJsonChange('mcp.json file changed, updating server port');
   });
 
-  mcpJsonWatcher.onDidCreate(async (uri) => {
+  mcpJsonWatcher.onDidCreate(async () => {
     await handleMcpJsonChange('mcp.json file created, updating server port');
   });
 
-  mcpJsonWatcher.onDidDelete(async (uri) => {
+  mcpJsonWatcher.onDidDelete(async () => {
     await handleMcpJsonChange('mcp.json file deleted, updating server port');
   });
 
   context.subscriptions.push(mcpJsonWatcher);
-}
-
-async function syncMcpPortToLanguageServer(port: number | undefined) {
-  if (port) {
-    getOutputChannel().appendLine(
-      `Synchronizing MCP port ${port} from mcp.json to language server`,
-    );
-    const nxlsClient = getNxlsClient();
-    if (nxlsClient) {
-      await nxlsClient.sendNotification(
-        NxUpdateMcpSseServerPortNotification,
-        port,
-      );
-    }
-  }
 }
 
 async function showMCPNotification() {
@@ -223,47 +162,6 @@ async function updateMcpJson() {
     });
 
   return true;
-}
-
-/**
- * Generates a random port number and checks if it's available
- * @returns A promise that resolves to an available port number or null if none found
- */
-async function findAvailablePort(): Promise<number | null> {
-  // Try up to 100 times to find an available port
-  for (let i = 0; i < 10; i++) {
-    // Generate a random port between 3000 and 10000
-    const port = Math.floor(Math.random() * 7000) + 3000;
-
-    if (await isPortAvailable(port)) {
-      return port;
-    }
-  }
-
-  return null;
-}
-
-/**
- * Checks if a port is available by attempting to create a server on that port
- * @param port The port to check
- * @returns A promise that resolves to true if the port is available, false otherwise
- */
-function isPortAvailable(port: number): Promise<boolean> {
-  return new Promise((resolve) => {
-    const server = net.createServer();
-
-    server.once('error', () => {
-      resolve(false);
-    });
-
-    server.once('listening', () => {
-      server.close(() => {
-        resolve(true);
-      });
-    });
-
-    server.listen(port);
-  });
 }
 
 export function isInCursor() {

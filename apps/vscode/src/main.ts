@@ -24,7 +24,7 @@ import {
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
 
-import { initCursor } from '@nx-console/cursor';
+import { initCursor, updateMcpServerWorkspacePath } from '@nx-console/cursor';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
@@ -192,6 +192,7 @@ function manuallySelectWorkspaceDefinition() {
             'nxWorkspacePath',
             selectedDirectoryRelativePath,
           );
+          updateMcpServerWorkspacePath(selectedDirectory);
           setWorkspace(selectedDirectory);
         }
       });
