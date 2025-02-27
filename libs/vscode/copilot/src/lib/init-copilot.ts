@@ -31,6 +31,7 @@ import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-llm-context
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
+import { ProjectDetailsTool } from './tools/project-details-tool';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -51,6 +52,7 @@ export function initCopilot(context: ExtensionContext) {
   context.subscriptions.push(
     nxParticipant,
     lm.registerTool('nx_generator-details', new GeneratorDetailsTool()),
+    lm.registerTool('nx_project-details', new ProjectDetailsTool()),
   );
 
   context.subscriptions.push(
@@ -127,11 +129,7 @@ const handler: ChatRequestHandler = async (
     };
   }
 
-  const tools = [];
-  // only include generator tool if there are generators
-  if (generatorNamesAndDescriptions.length > 0) {
-    tools.push(lm.tools.find((tool) => tool.name === 'nx_generator-details'));
-  }
+  stream.progress('Thinking...');
 
   const chatParticipantRequest = sendChatParticipantRequest(
     request,
@@ -141,7 +139,7 @@ const handler: ChatRequestHandler = async (
       responseStreamOptions: {
         stream,
       },
-      tools,
+      tools: lm.tools,
     },
     token,
   );

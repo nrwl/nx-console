@@ -1,8 +1,6 @@
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import { Logger, withTimeout } from '@nx-console/shared-utils';
-import { getGenerators } from '@nx-console/shared-nx-workspace-info';
 
-export async function getGeneratorsPrompt(
+export function getGeneratorsPrompt(
   generatorNamesAndDescriptions: {
     name: string;
     description: string;
