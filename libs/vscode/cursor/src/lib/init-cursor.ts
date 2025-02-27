@@ -22,8 +22,7 @@ import {
   window,
   workspace,
 } from 'vscode';
-
-import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
+import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
@@ -44,10 +43,7 @@ export function initCursor(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand('nx.configureMcpServer', async () => {
-      const success = await updateMcpJson();
-      if (success) {
-        window.showInformationMessage('Nx MCP Server configured successfully');
-      }
+      await updateMcpJson();
     }),
   );
 
@@ -55,8 +51,33 @@ export function initCursor(context: ExtensionContext) {
     NxMcpIdeCallbackNotification,
     async ({ type, payload }) => {
       if (type === 'focus-project') {
+        const workspaceProjects = await getNxWorkspaceProjects();
+        if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
+          window.showErrorMessage(
+            `Cannot find project "${payload.projectName}"`,
+          );
+          return;
+        }
         commands.executeCommand('nx.graph.focus', payload.projectName);
       } else if (type === 'focus-task') {
+        const workspaceProjects = await getNxWorkspaceProjects();
+        if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
+          window.showErrorMessage(
+            `Cannot find project "${payload.projectName}"`,
+          );
+          return;
+        }
+        if (
+          !workspaceProjects[payload.projectName].data.targets?.[
+            payload.taskName
+          ]
+        ) {
+          window.showErrorMessage(
+            `Cannot find task "${payload.taskName}" in project "${payload.projectName}"`,
+          );
+          return;
+        }
+
         commands.executeCommand('nx.graph.task', {
           projectName: payload.projectName,
           taskName: payload.taskName,
@@ -182,6 +203,17 @@ async function updateMcpJson() {
     window.showErrorMessage('Failed to write to mcp.json');
     return false;
   }
+
+  window
+    .showInformationMessage(
+      `Nx MCP Server configured successfully. Make sure it's enabled in Cursor Settings -> MCP`,
+      'Open Settings',
+    )
+    .then((result) => {
+      if (result === 'Open Settings') {
+        commands.executeCommand('aiSettings.action.open');
+      }
+    });
 
   return true;
 }
