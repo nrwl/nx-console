@@ -1,4 +1,5 @@
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   CancellationToken,
   LanguageModelTextPart,
@@ -20,12 +21,13 @@ export class ProjectDetailsTool
     options: LanguageModelToolInvocationOptions<ProjectDetailsToolInput>,
     token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
+    getTelemetry().logUsage('ai.tool-call', {
+      tool: 'nx_project_details',
+    });
     const params = options.input;
 
-    // Retrieve all projects in the workspace
     const projects = await getNxWorkspaceProjects();
 
-    // Find the project matching the given name
     const project = projects?.[params.projectName];
 
     if (!project) {

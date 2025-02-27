@@ -476,6 +476,55 @@
             "projectName"
           ]
         }
+      },
+      {
+        "name": "nx_visualize_project_graph_project",
+        "tags": [
+          "nx"
+        ],
+        "toolReferenceName": "nxVisualizeProjectGraph",
+        "displayName": "Visualize Project Graph",
+        "modelDescription": "Opens the Nx project graph visualization focused on a specific project. Helps to understand project dependencies and relationships.",
+        "icon": "$(target)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "projectName": {
+              "type": "string",
+              "description": "The name of the project to focus on in the graph."
+            }
+          },
+          "required": [
+            "projectName"
+          ]
+        }
+      },
+      {
+        "name": "nx_visualize_task_graph",
+        "tags": [
+          "nx"
+        ],
+        "toolReferenceName": "nxVisualizeTaskGraph",
+        "displayName": "Visualize Task Graph",
+        "modelDescription": "Opens the Nx task graph visualization focused on a specific project and task. Helps to understand task dependencies.",
+        "icon": "$(target)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "projectName": {
+              "type": "string",
+              "description": "The name of the project containing the task."
+            },
+            "taskName": {
+              "type": "string",
+              "description": "The name of the task to focus on in the graph."
+            }
+          },
+          "required": [
+            "projectName",
+            "taskName"
+          ]
+        }
       }
     ],
     "commands": [

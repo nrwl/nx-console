@@ -32,6 +32,8 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
 import { ProjectDetailsTool } from './tools/project-details-tool';
+import { VisualizeProjectGraphTool } from './tools/visualize-project-graph-tool';
+import { VisualizeTaskGraphTool } from './tools/visualize-task-graph-tool';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -53,6 +55,11 @@ export function initCopilot(context: ExtensionContext) {
     nxParticipant,
     lm.registerTool('nx_generator-details', new GeneratorDetailsTool()),
     lm.registerTool('nx_project-details', new ProjectDetailsTool()),
+    lm.registerTool(
+      'nx_visualize_project_graph_project',
+      new VisualizeProjectGraphTool(),
+    ),
+    lm.registerTool('nx_visualize_task_graph', new VisualizeTaskGraphTool()),
   );
 
   context.subscriptions.push(

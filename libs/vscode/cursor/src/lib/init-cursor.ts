@@ -55,12 +55,12 @@ export function initCursor(context: ExtensionContext) {
     NxMcpIdeCallbackNotification,
     async ({ type, payload }) => {
       if (type === 'focus-project') {
-        getGraphWebviewManager().focusProject(payload.projectName);
+        commands.executeCommand('nx.graph.focus', payload.projectName);
       } else if (type === 'focus-task') {
-        getGraphWebviewManager().focusTarget(
-          payload.projectName,
-          payload.taskName,
-        );
+        commands.executeCommand('nx.graph.task', {
+          projectName: payload.projectName,
+          taskName: payload.taskName,
+        });
       }
     },
   );

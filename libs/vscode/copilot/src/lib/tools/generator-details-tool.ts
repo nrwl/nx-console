@@ -1,5 +1,6 @@
 import { getGeneratorSchema } from '@nx-console/shared-llm-context';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   CancellationToken,
   LanguageModelTextPart,
@@ -21,6 +22,10 @@ export class GeneratorDetailsTool
     options: LanguageModelToolInvocationOptions<GeneratorDetailsToolInput>,
     token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
+    getTelemetry().logUsage('ai.tool-call', {
+      tool: 'nx_generator_details',
+    });
+
     const params = options.input as GeneratorDetailsToolInput;
 
     const generators = await getGenerators();
