@@ -1,3 +1,15 @@
+## 1.38.0 (2025-02-27)
+
+### Bug Fixes
+
+* **intellij:** remove newline after nxls logs for better readability ([#2417](https://github.com/nrwl/nx-console/issues/2417)) ([7b7173d](https://github.com/nrwl/nx-console/commit/7b7173d6542143dbf80cb9df1cc7d485a87047fe))
+* **nxls:** repair generator reading with schematics/collection.json ([#2419](https://github.com/nrwl/nx-console/issues/2419)) ([2721f31](https://github.com/nrwl/nx-console/commit/2721f31fdf37de498b0138ef85c8eecc0d6662a1))
+
+
+### Features
+
+* new projectViewItemProcessors plugin ([#2420](https://github.com/nrwl/nx-console/issues/2420)) ([1d3c3fb](https://github.com/nrwl/nx-console/commit/1d3c3fb85e8f155157530ee1dabbb914e23cf698))
+
 ## 1.37.0 (2025-02-18)
 
 ### Bug Fixes
