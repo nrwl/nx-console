@@ -19,7 +19,11 @@ const googleAnalytics = new GoogleAnalytics(
   'nx-mcp',
 );
 
-const server = new NxMcpServerWrapper(nxWorkspacePath, googleAnalytics);
+const server = new NxMcpServerWrapper(
+  nxWorkspacePath,
+  undefined,
+  googleAnalytics,
+);
 
 const transport = new StdioServerTransport();
 server.getMcpServer().connect(transport);

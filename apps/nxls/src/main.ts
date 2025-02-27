@@ -19,6 +19,7 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
+  NxMcpIdeCallbackNotification,
   NxPDVDataRequest,
   NxParseTargetStringRequest,
   NxProjectByPathRequest,
@@ -144,7 +145,13 @@ connection.onInitialize(async (params) => {
 
     loadRootEnvFiles(WORKING_PATH);
     if (mcpSseServerPort) {
-      mcpServerReturn = startMcpServer(WORKING_PATH, mcpSseServerPort);
+      mcpServerReturn = startMcpServer(
+        WORKING_PATH,
+        mcpSseServerPort,
+        (message) => {
+          connection.sendNotification(NxMcpIdeCallbackNotification, message);
+        },
+      );
     }
 
     CLIENT_CAPABILITIES = params.capabilities;
@@ -629,7 +636,9 @@ connection.onNotification(
     }
 
     if (newPort) {
-      mcpServerReturn = startMcpServer(WORKING_PATH, newPort);
+      mcpServerReturn = startMcpServer(WORKING_PATH, newPort, (message) => {
+        connection.sendNotification(NxMcpIdeCallbackNotification, message);
+      });
     }
 
     lspLogger.log(`MCP server restarted on port ${newPort}`);

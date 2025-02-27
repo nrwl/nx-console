@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/types"
+    },
+    {
       "path": "../../shared/nx-workspace-info"
     },
     {

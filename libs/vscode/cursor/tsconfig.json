@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../project-graph"
+    },
+    {
       "path": "../utils"
     },
     {

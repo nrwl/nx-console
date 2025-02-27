@@ -1,14 +1,15 @@
 import {
   NxChangeWorkspace,
   NxStopDaemonRequest,
-  NxUpdateMcpSseServerPortNotification,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server-types';
+import { killGroup } from '@nx-console/shared-utils';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
   logAndShowError,
 } from '@nx-console/vscode-output-channels';
+import { getNxMcpPort } from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
@@ -24,8 +25,6 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
-import { killGroup } from '@nx-console/shared-utils';
-import { getNxMcpPort } from '@nx-console/vscode-utils';
 
 let _nxlsClient: NxlsClient | undefined;
 
@@ -49,8 +48,10 @@ export function onWorkspaceRefreshed(callback: () => void): Disposable {
 export class NxlsClient {
   private client: LanguageClient | undefined;
 
-  private notificationListeners: Map<string, Map<string, () => void>> =
-    new Map();
+  private notificationListeners: Map<
+    string,
+    Map<string, (payload: any) => void>
+  > = new Map();
   private notificationListenerDisposables: Disposable[] = [];
   private processExitListener: Disposable | undefined;
 
@@ -197,7 +198,10 @@ export class NxlsClient {
     this.actor.send({ type: 'SET_WORKSPACE_PATH', value: workspacePath });
   }
 
-  public onNotification(type: NotificationType<any>, callback: () => void) {
+  public onNotification<P>(
+    type: NotificationType<P>,
+    callback: (payload: P) => void,
+  ) {
     const id = randomUUID();
 
     if (!this.notificationListeners.has(type.method)) {
@@ -212,7 +216,7 @@ export class NxlsClient {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- type safe maps are tricky
     const callbacks = this.notificationListeners.get(type.method)!;
-    callbacks.set(id, callback);
+    callbacks.set(id, (payload: P) => callback(payload));
 
     return new Disposable(() => {
       const typeCallbacks = this.notificationListeners.get(type.method);
@@ -279,11 +283,14 @@ export class NxlsClient {
     for (const listener of this.notificationListeners) {
       const [method, callbacks] = listener;
       this.notificationListenerDisposables.push(
-        this.client.onNotification(new NotificationType(method), () => {
-          for (const callback of callbacks.values()) {
-            callback();
-          }
-        }),
+        this.client.onNotification(
+          new NotificationType(method),
+          (payload: any) => {
+            for (const callback of callbacks.values()) {
+              callback(payload);
+            }
+          },
+        ),
       );
     }
   }

@@ -12,8 +12,14 @@ export interface McpServerReturn {
 export function startMcpServer(
   workspacePath: string,
   port: number,
+  ideCallback?: (message: { type: string; payload?: any }) => void,
 ): McpServerReturn {
-  const server = new NxMcpServerWrapper(workspacePath, undefined, lspLogger);
+  const server = new NxMcpServerWrapper(
+    workspacePath,
+    ideCallback,
+    undefined,
+    lspLogger,
+  );
 
   const app = express();
   let transport: SSEServerTransport;

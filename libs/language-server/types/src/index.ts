@@ -12,6 +12,7 @@ import {
   CIPEInfo,
   CIPEInfoError,
   CloudOnboardingInfo,
+  IdeCallbackMessage,
   NxWorkspace,
   PDVData,
   TreeNode,
@@ -36,6 +37,9 @@ export const NxWorkspaceRefreshStartedNotification: NotificationType<void> =
 
 export const NxUpdateMcpSseServerPortNotification: NotificationType<number> =
   new NotificationType('nx/updateMcpSseServerPort');
+
+export const NxMcpIdeCallbackNotification: NotificationType<IdeCallbackMessage> =
+  new NotificationType('nx/mcpIdeCallback');
 
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');
