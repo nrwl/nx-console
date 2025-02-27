@@ -17,6 +17,11 @@ import {
   getGenerators,
   nxWorkspace,
 } from '@nx-console/shared-nx-workspace-info';
+import {
+  FocusProjectMessage,
+  FocusTaskMessage,
+  IdeCallbackMessage,
+} from '@nx-console/shared-types';
 
 export class NxMcpServerWrapper {
   private server: McpServer;
@@ -26,6 +31,7 @@ export class NxMcpServerWrapper {
 
   constructor(
     initialWorkspacePath: string,
+    private ideCallback?: (message: IdeCallbackMessage) => void,
     telemetry?: GoogleAnalytics,
     logger?: Logger,
   ) {
@@ -220,6 +226,71 @@ and follows the Nx workspace convention for project organization.
             `,
             },
           ],
+        };
+      },
+    );
+
+    if (this.ideCallback) {
+      this.registerIdeCallbackTools();
+    }
+  }
+
+  private registerIdeCallbackTools(): void {
+    this.server.tool(
+      'nx_visualize_project_graph_project',
+      'Visualize the nx project graph for a given project. Use this to show the project dependencies and help users understand the project structure.',
+      {
+        projectName: z.string(),
+      },
+      async ({ projectName }) => {
+        if (this.ideCallback) {
+          this.ideCallback({
+            type: 'focus-project',
+            payload: {
+              projectName,
+            },
+          } satisfies FocusProjectMessage);
+          return {
+            content: [
+              { type: 'text', text: `Opening graph for ${projectName}` },
+            ],
+          };
+        }
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'No IDE available' }],
+        };
+      },
+    );
+
+    this.server.tool(
+      'nx_visualize_task_graph',
+      'Visualize the nx task graph for a given project and task. Use this to show the task dependencies and help users understand the task graph.',
+      {
+        projectName: z.string(),
+        taskName: z.string(),
+      },
+      async ({ projectName, taskName }) => {
+        if (this.ideCallback) {
+          this.ideCallback({
+            type: 'focus-task',
+            payload: {
+              projectName,
+              taskName,
+            },
+          } satisfies FocusTaskMessage);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Opening graph focused on task ${taskName} for project ${projectName}`,
+              },
+            ],
+          };
+        }
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'No IDE available' }],
         };
       },
     );

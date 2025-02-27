@@ -1,4 +1,7 @@
-import { NxUpdateMcpSseServerPortNotification } from '@nx-console/language-server-types';
+import {
+  NxMcpIdeCallbackNotification,
+  NxUpdateMcpSseServerPortNotification,
+} from '@nx-console/language-server-types';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
@@ -19,9 +22,10 @@ import {
   workspace,
 } from 'vscode';
 
+import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
+
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
-// Add a file watcher for mcp.json
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 
 export function initCursor(context: ExtensionContext) {
@@ -31,8 +35,21 @@ export function initCursor(context: ExtensionContext) {
 
   showMCPNotification();
 
-  // Set up a file watcher for mcp.json
   setupMcpJsonWatcher(context);
+
+  getNxlsClient().onNotification(
+    NxMcpIdeCallbackNotification,
+    async ({ type, payload }) => {
+      if (type === 'focus-project') {
+        getGraphWebviewManager().focusProject(payload.projectName);
+      } else if (type === 'focus-task') {
+        getGraphWebviewManager().focusTarget(
+          payload.projectName,
+          payload.taskName,
+        );
+      }
+    },
+  );
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {
@@ -43,7 +60,6 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
 
   let lastPort = getNxMcpPort();
 
-  // Set up a file watcher for mcp.json
   mcpJsonWatcher = workspace.createFileSystemWatcher(mcpJsonPath);
 
   mcpJsonWatcher.onDidChange(async (uri) => {
@@ -98,7 +114,7 @@ async function syncMcpPortToLanguageServer(port: number | undefined) {
 }
 
 async function showMCPNotification() {
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   const dontAskAgain = WorkspaceConfigurationStore.instance.get(
     MCP_DONT_ASK_AGAIN_KEY,
     false,
