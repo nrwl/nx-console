@@ -1,4 +1,8 @@
-import { GoogleAnalytics, TelemetryEvents } from '@nx-console/shared-telemetry';
+import {
+  GoogleAnalytics,
+  TelemetryEvents,
+  NxConsoleTelemetryLogger as NxConsoleTelemetryLoggerBase,
+} from '@nx-console/shared-telemetry';
 import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';

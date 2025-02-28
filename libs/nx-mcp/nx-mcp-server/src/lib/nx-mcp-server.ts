@@ -1,6 +1,9 @@
 import { Logger } from '@nx-console/shared-utils';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { GoogleAnalytics } from '@nx-console/shared-telemetry';
+import {
+  GoogleAnalytics,
+  NxConsoleTelemetryLogger,
+} from '@nx-console/shared-telemetry';
 import {
   getDocsContext,
   getDocsPrompt,
@@ -40,17 +43,15 @@ export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
   private _nxWorkspacePath: string;
-  private telemetry?: GoogleAnalytics;
 
   constructor(
     initialWorkspacePath: string,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
     private ideCallback?: (message: IdeCallbackMessage) => void,
-    telemetry?: GoogleAnalytics,
+    private telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
   ) {
     this._nxWorkspacePath = initialWorkspacePath;
-    this.telemetry = telemetry;
     this.server = new McpServer({
       name: 'Nx MCP',
       version: '0.0.1',
@@ -78,7 +79,7 @@ export class NxMcpServerWrapper {
       'nx_workspace',
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
       async () => {
-        this.telemetry?.sendEventData('ai.tool-call', {
+        this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_workspace',
         });
         try {
@@ -131,7 +132,7 @@ export class NxMcpServerWrapper {
         projectName: z.string(),
       },
       async ({ projectName }) => {
-        this.telemetry?.sendEventData('ai.tool-call', {
+        this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_project_details',
         });
         const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
@@ -173,7 +174,7 @@ export class NxMcpServerWrapper {
         userQuery: z.string(),
       },
       async ({ userQuery }: { userQuery: string }) => {
-        this.telemetry?.sendEventData('ai.tool-call', {
+        this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_docs',
         });
         const docsPages = await getDocsContext(userQuery);
@@ -187,7 +188,7 @@ export class NxMcpServerWrapper {
       'nx_generators',
       'Returns a list of generators that could be relevant to the user query.',
       async () => {
-        this.telemetry?.sendEventData('ai.tool-call', {
+        this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_generators',
         });
         const generators = await this.nxWorkspaceInfoProvider.getGenerators(
@@ -222,7 +223,7 @@ export class NxMcpServerWrapper {
         generatorName: z.string(),
       },
       async ({ generatorName }) => {
-        this.telemetry?.sendEventData('ai.tool-call', {
+        this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_generator_schema',
         });
         const generators = await this.nxWorkspaceInfoProvider.getGenerators(
@@ -283,6 +284,10 @@ and follows the Nx workspace convention for project organization.
         taskName: z.string().optional(),
       },
       async ({ visualizationType, projectName, taskName }) => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: 'nx_visualize_graph',
+          kind: visualizationType,
+        });
         if (this.ideCallback) {
           if (visualizationType === 'project') {
             this.ideCallback({
