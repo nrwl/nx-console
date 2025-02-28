@@ -1,5 +1,8 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { GoogleAnalytics } from '@nx-console/shared-telemetry';
+import {
+  GoogleAnalytics,
+  NxConsoleTelemetryLogger,
+} from '@nx-console/shared-telemetry';
 import { randomUUID } from 'crypto';
 import {
   NxMcpServerWrapper,
@@ -26,6 +29,12 @@ const googleAnalytics = new GoogleAnalytics(
   'nx-mcp',
 );
 
+const telemetryLogger: NxConsoleTelemetryLogger = {
+  logUsage: (eventName, data) => {
+    googleAnalytics.sendEventData(eventName, data);
+  },
+};
+
 const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   nxWorkspace,
   getGenerators,
@@ -35,7 +44,7 @@ const server = new NxMcpServerWrapper(
   nxWorkspacePath,
   nxWorkspaceInfoProvider,
   undefined,
-  googleAnalytics,
+  telemetryLogger,
 );
 
 const transport = new StdioServerTransport();

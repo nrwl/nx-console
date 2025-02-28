@@ -53,7 +53,8 @@ export type TelemetryEvents =
   | 'ai.feedback-good'
   | 'ai.feedback-bad'
   | 'ai.response-interaction'
-  | 'ai.tool-call';
+  | 'ai.tool-call'
+  | 'ai.add-mcp';
 
 export type TelemetryData = {
   source?: TelemetryEventSource;
@@ -74,3 +75,7 @@ export type TelemetryEventSource =
   | 'editor-toolbar'
   | 'notification'
   | 'cloud-view';
+
+export interface NxConsoleTelemetryLogger {
+  logUsage(eventName: TelemetryEvents, data?: TelemetryData): void;
+}

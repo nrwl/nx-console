@@ -15,6 +15,7 @@ import { getNxMcpPort, vscodeLogger } from '@nx-console/vscode-utils';
 import { commands } from 'vscode';
 import express from 'express';
 import { window } from 'vscode';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -37,7 +38,7 @@ export function tryStartMcpServer(workspacePath: string) {
     workspacePath,
     nxWorkspaceInfoProvider,
     mcpIdeCallback,
-    undefined,
+    getTelemetry(),
     vscodeLogger,
   );
 

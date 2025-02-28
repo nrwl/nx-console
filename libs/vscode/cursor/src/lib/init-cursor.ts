@@ -21,7 +21,7 @@ import {
 } from 'vscode';
 import { restartMcpServer, tryStartMcpServer } from './mcp-server';
 import { findAvailablePort } from './ports';
-
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
@@ -126,6 +126,8 @@ async function updateMcpJson() {
   if (hasNxMcpEntry()) {
     return true;
   }
+
+  getTelemetry().logUsage('ai.add-mcp');
 
   const port = await findAvailablePort();
   if (!port) {
