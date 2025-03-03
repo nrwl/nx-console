@@ -13,6 +13,9 @@
       "path": "../../nx-mcp/nx-mcp-server"
     },
     {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../telemetry"
     },
     {

@@ -22,7 +22,11 @@ import {
   initNxProjectView,
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
-import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
+import {
+  vscodeLogger,
+  watchCodeLensConfigChange,
+  watchFile,
+} from '@nx-console/vscode-utils';
 
 import { initCursor, updateMcpServerWorkspacePath } from '@nx-console/cursor';
 import { fileExists } from '@nx-console/shared-file-system';
@@ -77,6 +81,7 @@ let hasInitializedExtensionPoints = false;
 
 export async function activate(c: ExtensionContext) {
   try {
+    vscodeLogger.log('Activating Nx Console');
     const startTime = Date.now();
     context = c;
 
@@ -84,8 +89,9 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     createNxlsClient(context);
-
     initTelemetry(context);
+    initCursor(context);
+
     initNxInit(context);
 
     context.subscriptions.push(

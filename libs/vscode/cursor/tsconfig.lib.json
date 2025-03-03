@@ -18,6 +18,9 @@
       "path": "../../nx-mcp/nx-mcp-server/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
       "path": "../telemetry/tsconfig.lib.json"
     },
     {

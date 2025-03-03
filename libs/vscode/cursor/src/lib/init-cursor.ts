@@ -22,17 +22,27 @@ import {
 import { restartMcpServer, tryStartMcpServer } from './mcp-server';
 import { findAvailablePort } from './ports';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
+let hasInitializedCursor = false;
 
-export function initCursor(context: ExtensionContext) {
+export async function initCursor(context: ExtensionContext) {
+  if (hasInitializedCursor) {
+    return;
+  }
   if (!isInCursor()) {
     commands.executeCommand('setContext', 'isInCursor', false);
     return;
   }
-
   commands.executeCommand('setContext', 'isInCursor', true);
+
+  if (!(await checkIsNxWorkspace(getNxWorkspacePath()))) {
+    return;
+  }
+  hasInitializedCursor = true;
+
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
   tryStartMcpServer(getNxWorkspacePath());
@@ -89,7 +99,7 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
 }
 
 async function showMCPNotification() {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 20000));
   const dontAskAgain = WorkspaceConfigurationStore.instance.get(
     MCP_DONT_ASK_AGAIN_KEY,
     false,
