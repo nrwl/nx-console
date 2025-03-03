@@ -7,9 +7,9 @@ fun isWindows(): Boolean {
     return System.getProperty("os.name").lowercase().startsWith("windows")
 }
 
-val nxlsRoot = "${rootDir}/dist/apps/nxls"
+val nxlsRoot = "${rootDir}/../../dist/apps/nxls"
 
-layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
+layout.buildDirectory = file("${rootDir}/../../dist/apps/intellij")
 
 plugins {
     // Java support
@@ -205,7 +205,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 tasks {
-    runInspections { mount("${rootDir}/gradle.properties", "/data/project/gradle.properties") }
+    runInspections { mount("${rootDir}/../../gradle.properties", "/data/project/gradle.properties") }
 
     prepareSandbox() {
         from(nxlsRoot) {
@@ -226,7 +226,7 @@ tasks {
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
-    from("${rootDir}/dist/apps/generate-ui-v2")
+    from("${rootDir}/../../dist/apps/generate-ui-v2")
     include("*.js", "*.css")
     into(layout.buildDirectory.file("resources/main/generate_ui_v2"))
 }
