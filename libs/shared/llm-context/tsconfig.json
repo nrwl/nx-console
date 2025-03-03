@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../utils"
+    },
+    {
+      "path": "../types"
+    },
+    {
       "path": "../schema"
     },
     {

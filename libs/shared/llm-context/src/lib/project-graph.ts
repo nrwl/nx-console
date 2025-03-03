@@ -1,4 +1,6 @@
 import type { ProjectGraph } from 'nx/src/devkit-exports';
+import type { NxError } from '@nx-console/shared-types';
+import { getMessageForError } from '@nx-console/shared-utils';
 
 export function getProjectGraphPrompt(projectGraph: ProjectGraph): string {
   return `
@@ -46,4 +48,18 @@ function getRobotReadableProjectGraph(projectGraph: ProjectGraph): string {
     serializedGraph += nodeString;
   });
   return serializedGraph;
+}
+
+export function getProjectGraphErrorsPrompt(
+  errors: NxError[],
+  isPartial: boolean,
+): string {
+  return `
+There were errors while calculating the project graph. ${
+    isPartial
+      ? 'The following is the list of errors. If the user needs help, you can help fix the errors. Otherwise simply answer the question based on the information available.'
+      : 'Due to these errors, project graph creation failed completely. You can help the user fix the errors or simply answer the question based on other information.'
+  }
+${errors.map((error) => `- ${getMessageForError(error)}`).join('\n')}
+`.trim();
 }

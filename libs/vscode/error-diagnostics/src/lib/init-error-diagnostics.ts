@@ -14,6 +14,7 @@ import {
   DiagnosticSeverity,
   commands,
 } from 'vscode';
+import { getMessageForError } from '@nx-console/shared-utils';
 
 export function initErrorDiagnostics(context: ExtensionContext) {
   const diagnosticCollection = languages.createDiagnosticCollection('nx');
@@ -25,7 +26,7 @@ export function initErrorDiagnostics(context: ExtensionContext) {
     commands.executeCommand(
       'setContext',
       'nxConsole.hasWorkspaceErrors',
-      nxWorkspace?.errors?.length
+      nxWorkspace?.errors?.length,
     );
   });
 
@@ -35,7 +36,7 @@ export function initErrorDiagnostics(context: ExtensionContext) {
     commands.executeCommand(
       'setContext',
       'nxConsole.hasWorkspaceErrors',
-      nxWorkspace?.errors?.length
+      nxWorkspace?.errors?.length,
     );
   });
 
@@ -46,7 +47,7 @@ export function initErrorDiagnostics(context: ExtensionContext) {
 
 function setDiagnostics(
   errors: NxError[],
-  diagnosticCollection: DiagnosticCollection
+  diagnosticCollection: DiagnosticCollection,
 ) {
   diagnosticCollection.clear();
 
@@ -57,7 +58,7 @@ function setDiagnostics(
     const diagnostic = new Diagnostic(
       new Range(0, 0, 0, 0),
       getMessageForError(error),
-      DiagnosticSeverity.Error
+      DiagnosticSeverity.Error,
     );
 
     if (!diagnosticsByUri.has(uri.toString())) {
@@ -89,19 +90,4 @@ function getUriForError(error: NxError) {
   }
 
   return Uri.parse(workspacePath);
-}
-
-function getMessageForError(error: NxError): string {
-  if (error.message && error.cause?.message) {
-    return `${error.message} \n ${error.cause.message}`;
-  }
-  if (
-    (error.name === 'ProjectsWithNoNameError' ||
-      error.name === 'MultipleProjectsWithSameNameError' ||
-      error.name === 'ProjectWithExistingNameError') &&
-    error.message
-  ) {
-    return error.message;
-  }
-  return error.stack ?? error.message ?? 'Unknown error';
 }

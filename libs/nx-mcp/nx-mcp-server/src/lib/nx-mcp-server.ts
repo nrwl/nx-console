@@ -1,9 +1,4 @@
-import { Logger } from '@nx-console/shared-utils';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import {
-  GoogleAnalytics,
-  NxConsoleTelemetryLogger,
-} from '@nx-console/shared-telemetry';
 import {
   getDocsContext,
   getDocsPrompt,
@@ -11,20 +6,24 @@ import {
   getGeneratorSchema,
   getGeneratorsPrompt,
   getNxJsonPrompt,
+  getProjectGraphErrorsPrompt,
   getProjectGraphPrompt,
 } from '@nx-console/shared-llm-context';
-import { z } from 'zod';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
+import { Logger } from '@nx-console/shared-utils';
+import { z } from 'zod';
 import { getMcpLogger } from './mcp-logger';
 
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import {
   FocusProjectMessage,
   FocusTaskMessage,
   IdeCallbackMessage,
   NxWorkspace,
 } from '@nx-console/shared-types';
-import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
-import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -77,7 +76,7 @@ export class NxMcpServerWrapper {
   private registerTools(): void {
     this.server.tool(
       'nx_workspace',
-      'Returns a readable representation of the nx project graph and the nx.json that configures nx. Use it to answer questions about the nx workspace and architecture',
+      'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_workspace',
@@ -105,17 +104,34 @@ export class NxMcpServerWrapper {
               content: [{ type: 'text', text: 'Error: Workspace not found' }],
             };
           }
+          const content: CallToolResult['content'] = [];
+          if (workspace.nxJson) {
+            content.push({
+              type: 'text',
+              text: getNxJsonPrompt(workspace.nxJson),
+            });
+          }
+          const hasProjects =
+            workspace.projectGraph &&
+            Object.keys(workspace.projectGraph.nodes).length > 0;
+
+          if (hasProjects) {
+            content.push({
+              type: 'text',
+              text: getProjectGraphPrompt(workspace.projectGraph),
+            });
+          }
+          if (workspace.errors) {
+            content.push({
+              type: 'text',
+              text: getProjectGraphErrorsPrompt(
+                workspace.errors,
+                !!workspace.isPartial,
+              ),
+            });
+          }
           return {
-            content: [
-              {
-                type: 'text',
-                text: getNxJsonPrompt(workspace.nxJson),
-              },
-              {
-                type: 'text',
-                text: getProjectGraphPrompt(workspace.projectGraph),
-              },
-            ],
+            content,
           };
         } catch (e) {
           return {
