@@ -1,0 +1,4 @@
+distribute-on:
+  small-changeset: 3 windows-medium-js
+  medium-changeset: 4 windows-medium-js
+  large-changeset: 6 windows-medium-js
