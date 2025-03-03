@@ -6,9 +6,9 @@ import * as net from 'net';
  */
 export async function findAvailablePort(): Promise<number | null> {
   // Try up to 100 times to find an available port
-  for (let i = 0; i < 10; i++) {
-    // Generate a random port between 3000 and 10000
-    const port = Math.floor(Math.random() * 7000) + 3000;
+  for (let i = 0; i < 100; i++) {
+    // Generate a random port between 9000 and 10000
+    const port = Math.floor(Math.random() * 1000) + 9000;
 
     if (await isPortAvailable(port)) {
       return port;

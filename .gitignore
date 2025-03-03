@@ -49,6 +49,7 @@ testem.log
 *.log
 /typings
 **/test-output
+.cursor/mcp.json
 
 # System Files
 .DS_Store
