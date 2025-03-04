@@ -19,7 +19,7 @@ plugins {
     // Kotlin serialization
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
     // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.1.0"
+    id("org.jetbrains.intellij.platform") version "2.3.0"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
@@ -149,7 +149,7 @@ intellijPlatform {
 intellijPlatformTesting {
     runIde {
         create("runIntelliJLatest") {
-            version = "243.12818.47"
+            version = "251.23536.34"
             prepareSandboxTask {
                 from(nxlsRoot) {
                     include("**")
