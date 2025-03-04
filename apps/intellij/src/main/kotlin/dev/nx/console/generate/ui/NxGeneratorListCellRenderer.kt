@@ -33,17 +33,16 @@ class NxGeneratorListCellRenderer(
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             true
         )
-        if (value.data.description != null && value.name.length < 80) {
-            append(
-                " " +
-                    StringUtil.shortenTextWithEllipsis(
-                        value.data.description,
-                        80 - value.name.length,
-                        0
-                    ),
-                SimpleTextAttributes.GRAY_ATTRIBUTES,
-                false
-            )
-        }
+
+        value.data.description
+            ?.takeIf { value.name.length < 80 }
+            ?.let { description ->
+                append(
+                    " " +
+                        StringUtil.shortenTextWithEllipsis(description, 80 - value.name.length, 0),
+                    SimpleTextAttributes.GRAY_ATTRIBUTES,
+                    false
+                )
+            }
     }
 }
