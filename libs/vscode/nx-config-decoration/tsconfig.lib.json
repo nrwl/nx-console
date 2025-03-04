@@ -17,13 +17,10 @@
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/file-system/tsconfig.lib.json"
-    },
-    {
       "path": "../configuration/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/utils/tsconfig.lib.json"
+      "path": "../../shared/file-system/tsconfig.lib.json"
     },
     {
       "path": "../utils/tsconfig.lib.json"

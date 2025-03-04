@@ -140,7 +140,3 @@ export const WORKSPACE_GENERATOR_NAME_REGEX =
   /^workspace-(schematic|generator):(.+)/;
 
 export type WorkspaceProjects = ProjectsConfigurations['projects'];
-
-export interface Logger {
-  log(message: string, ...args: any[]): void;
-}

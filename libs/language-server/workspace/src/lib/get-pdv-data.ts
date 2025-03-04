@@ -8,14 +8,16 @@ import type {
 } from 'nx/src/devkit-exports';
 import { join, relative } from 'path';
 import { getNxCloudStatus } from './get-nx-cloud-status';
-import { getNxVersion } from './get-nx-version';
+import {
+  getNxVersion,
+  nxWorkspace,
+} from '@nx-console/shared-nx-workspace-info';
 import { getProjectByPath } from './get-project-by-path';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
-import { nxWorkspace } from './workspace';
-
+import { lspLogger } from '@nx-console/language-server-utils';
 export async function getPDVData(
   workspacePath: string,
-  filePath: string
+  filePath: string,
 ): Promise<PDVData> {
   const graphBasePath = await getGraphBasePath(workspacePath);
 
@@ -42,7 +44,7 @@ export async function getPDVData(
       errorMessage: undefined,
     };
   }
-  const workspace = await nxWorkspace(workspacePath);
+  const workspace = await nxWorkspace(workspacePath, lspLogger);
 
   const hasProjects = Object.keys(workspace.projectGraph.nodes).length > 0;
 
@@ -63,15 +65,13 @@ export async function getPDVData(
 
   const relativePath = relative(workspacePath, filePath);
 
-  const sourceMapsFilesToProjectsMap = await getSourceMapFilesToProjectsMap(
-    workspacePath
-  );
+  const sourceMapsFilesToProjectsMap =
+    await getSourceMapFilesToProjectsMap(workspacePath);
   const projectRootsForConfigFile = sourceMapsFilesToProjectsMap[relativePath];
 
   const nxCloudStatus = await getNxCloudStatus(workspacePath);
-  const disabledTaskSyncGenerators = await getDisabledTaskSyncGenerators(
-    workspacePath
-  );
+  const disabledTaskSyncGenerators =
+    await getDisabledTaskSyncGenerators(workspacePath);
 
   if (!projectRootsForConfigFile || projectRootsForConfigFile.length <= 1) {
     const project = await getProjectByPath(filePath, workspacePath);
@@ -137,7 +137,7 @@ export async function getPDVData(
 }
 
 async function getGraphBasePath(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<string | undefined> {
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
 
@@ -155,7 +155,7 @@ async function getGraphBasePath(
 }
 
 function projectGraphNodeFromProject(
-  project: ProjectConfiguration & { name: string }
+  project: ProjectConfiguration & { name: string },
 ): ProjectGraphProjectNode {
   return {
     name: project.name,
@@ -163,20 +163,20 @@ function projectGraphNodeFromProject(
       project.projectType === 'application'
         ? 'app'
         : project.projectType === 'library'
-        ? 'lib'
-        : 'e2e',
+          ? 'lib'
+          : 'e2e',
     data: project,
   };
 }
 
 function isCompleteProjectConfiguration(
-  project: ProjectConfiguration | undefined
+  project: ProjectConfiguration | undefined,
 ): project is ProjectConfiguration & { name: string } {
   return !!project && !!project.name;
 }
 
 async function getDisabledTaskSyncGenerators(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<string[] | undefined> {
   try {
     const nxJson = await readNxJson(workspacePath);

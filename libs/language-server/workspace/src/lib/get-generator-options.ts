@@ -1,7 +1,7 @@
 import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import { Option } from '@nx-console/shared-schema';
 import { normalizeSchema } from '@nx-console/shared-schema';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function getGeneratorOptions(
@@ -25,7 +25,7 @@ export async function getGeneratorOptions(
 }
 
 async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
-  const { nxJson } = await nxWorkspace(workspacePath);
+  const { nxJson } = await nxWorkspace(workspacePath, lspLogger);
 
   let defaults = nxJson.generators;
 

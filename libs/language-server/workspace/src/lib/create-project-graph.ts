@@ -1,15 +1,15 @@
-import { getNxExecutionCommand } from '@nx-console/shared-utils';
+import { getNxExecutionCommand } from '@nx-console/shared-npm';
 
 import { execSync } from 'child_process';
 import { getProjectGraphOutput } from './get-project-graph-output';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function createProjectGraph(
   workspacePath: string,
-  showAffected: boolean
+  showAffected: boolean,
 ): Promise<string | undefined> {
-  const { isEncapsulatedNx } = await nxWorkspace(workspacePath);
+  const { isEncapsulatedNx } = await nxWorkspace(workspacePath, lspLogger);
   const projectGraphOutput = await getProjectGraphOutput(workspacePath);
 
   return getNxExecutionCommand({

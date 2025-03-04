@@ -1,0 +1,34 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../shared/schema"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/llm-context"
+    },
+    {
+      "path": "../../shared/telemetry"
+    },
+    {
+      "path": "../../shared/utils"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

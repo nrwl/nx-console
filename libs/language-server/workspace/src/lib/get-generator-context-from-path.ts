@@ -3,12 +3,13 @@ import {
   isProjectOption,
 } from '@nx-console/shared-schema';
 import { getProjectByPath } from './get-project-by-path';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function getGeneratorContextFromPath(
   generator: TaskExecutionSchema | undefined,
   path: string,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<
   | {
       path?: string;
@@ -29,7 +30,7 @@ export async function getGeneratorContextFromPath(
     .replace(/\\/g, '/')
     .replace(/^\//, '');
 
-  const { workspaceLayout } = await nxWorkspace(workspacePath);
+  const { workspaceLayout } = await nxWorkspace(workspacePath, lspLogger);
   const appsDir = workspaceLayout.appsDir;
   const libsDir = workspaceLayout.libsDir;
   if (

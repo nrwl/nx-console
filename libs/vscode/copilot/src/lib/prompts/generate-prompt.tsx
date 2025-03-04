@@ -8,6 +8,7 @@ import { NxProjectGraphPrompt } from './project-graph-prompt';
 import { BaseSystemPrompt, NxCopilotPromptProps } from './prompt';
 import { NxJsonPrompt } from './nx-json-prompt';
 import { DocsPagesPrompt } from './docs-pages-prompt';
+import { getGeneratorsPrompt } from '@nx-console/shared-llm-context';
 
 interface GeneratePromptProps extends NxCopilotPromptProps {
   generators: { name: string; description: string }[];
@@ -19,26 +20,13 @@ interface GeneratorSchemasPromptProps extends BasePromptElementProps {
 
 class GeneratorSchemasPrompt extends PromptElement<GeneratorSchemasPromptProps> {
   override render() {
-    const generators = this.props.generators
-      .map((schemaItem) => `<${schemaItem.name}: [${schemaItem.description}]>`)
-      .join('');
-
     const hasGenerators = this.props.generators.length > 0;
-
-    return (
-      <>
-        {hasGenerators ? (
-          <UserMessage priority={70}>
-            Here are the available generators and their descriptions. They are
-            formatted like {'<'}name: [description]{'>'}. You may pick one to
-            best match the user request and use the generator details tool to
-            retrieve the schema for more details.
-            {generators}
-          </UserMessage>
-        ) : (
-          <UserMessage> </UserMessage>
-        )}
-      </>
+    return hasGenerators ? (
+      <UserMessage priority={70}>
+        {getGeneratorsPrompt(this.props.generators)}
+      </UserMessage>
+    ) : (
+      <UserMessage> </UserMessage>
     );
   }
 }

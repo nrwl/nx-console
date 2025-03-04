@@ -13,6 +13,9 @@
       "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/npm/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/telemetry/tsconfig.lib.json"
     },
     {
@@ -32,6 +35,9 @@
     },
     {
       "path": "../../libs/language-server/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/cursor/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/copilot/tsconfig.lib.json"

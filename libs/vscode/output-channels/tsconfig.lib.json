@@ -13,7 +13,7 @@
   ],
   "references": [
     {
-      "path": "../../shared/schema/tsconfig.lib.json"
+      "path": "../../shared/utils/tsconfig.lib.json"
     }
   ]
 }

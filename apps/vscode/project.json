@@ -191,11 +191,13 @@
         "command": "node ./tools/scripts/copy-to-vscode.js"
       },
       "inputs": [
+        "{workspaceRoot}/tools/scripts/copy-to-vscode.js",
         {
           "dependentTasksOutputFiles": "**/*",
           "transitive": true
         },
-        "{projectRoot}/package.json"
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/dist/apps/nxls/**"
       ],
       "dependsOn": ["^build"]
     },

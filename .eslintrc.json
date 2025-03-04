@@ -14,11 +14,24 @@
             "depConstraints": [
               {
                 "sourceTag": "type:vscode",
-                "onlyDependOnLibsWithTags": ["type:shared", "type:vscode"]
+                "onlyDependOnLibsWithTags": [
+                  "type:shared",
+                  "type:vscode",
+                  "type:mcp"
+                ]
               },
               {
                 "sourceTag": "type:lsp",
-                "onlyDependOnLibsWithTags": ["type:lsp", "type:shared"],
+                "onlyDependOnLibsWithTags": [
+                  "type:lsp",
+                  "type:shared",
+                  "type:mcp"
+                ],
+                "bannedExternalImports": ["vscode"]
+              },
+              {
+                "sourceTag": "type:mcp",
+                "onlyDependOnLibsWithTags": ["type:mcp", "type:shared"],
                 "bannedExternalImports": ["vscode"]
               },
               {

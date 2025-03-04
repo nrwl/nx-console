@@ -8,6 +8,9 @@
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {

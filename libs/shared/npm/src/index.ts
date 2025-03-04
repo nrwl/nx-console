@@ -4,3 +4,7 @@ export * from './lib/package-details';
 export * from './lib/nx-json';
 export * from './lib/read-json';
 export * from './lib/pnp-dependencies';
+export { checkIsNxWorkspace } from './lib/check-is-nx-workspace';
+export { getNxExecutionCommand } from './lib/get-nx-execution-command';
+export { getPackageManagerCommand } from './lib/package-manager-command';
+export * from './lib/parse-target-string';
