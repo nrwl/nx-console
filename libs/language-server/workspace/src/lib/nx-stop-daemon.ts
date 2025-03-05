@@ -1,5 +1,5 @@
-import { Logger } from '@nx-console/shared-schema';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { Logger } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { execSync } from 'node:child_process';
 
 export async function nxStopDaemon(workspacePath: string, logger: Logger) {
@@ -7,7 +7,7 @@ export async function nxStopDaemon(workspacePath: string, logger: Logger) {
 
   const packageManagerCommands = await getPackageManagerCommand(
     workspacePath,
-    logger
+    logger,
   );
   execSync(`${packageManagerCommands.exec} nx daemon --stop`, {
     cwd: workspacePath,

@@ -1,5 +1,4 @@
 import { findNxExecutable } from '@nx-console/shared-npm';
-import { getPackageManagerCommand, killGroup } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { ChildProcess, spawn } from 'child_process';

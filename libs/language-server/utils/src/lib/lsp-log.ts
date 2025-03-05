@@ -1,4 +1,4 @@
-import { Logger } from '@nx-console/shared-schema';
+import { Logger } from '@nx-console/shared-utils';
 import { Connection } from 'vscode-languageserver';
 
 let log: Console['log'] | undefined;
@@ -15,7 +15,7 @@ export const lspLogger: Logger = {
   log(message: string, ...args: any[]) {
     log?.(
       `[Nxls] - ${new Date(Date.now()).toISOString()} - ${message}\n`,
-      ...args
+      ...args,
     );
   },
 };

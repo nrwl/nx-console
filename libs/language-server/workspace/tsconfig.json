@@ -7,10 +7,10 @@
       "path": "../../shared/nx-console-plugins"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../../shared/utils"
     },
     {
-      "path": "../types"
+      "path": "../../shared/nx-version"
     },
     {
       "path": "../../shared/generate-ui-types"
@@ -22,16 +22,16 @@
       "path": "../../shared/types"
     },
     {
-      "path": "../../shared/npm"
-    },
-    {
       "path": "../../shared/file-system"
     },
     {
       "path": "../utils"
     },
     {
-      "path": "../../shared/utils"
+      "path": "../../shared/nx-workspace-info"
+    },
+    {
+      "path": "../../shared/npm"
     },
     {
       "path": "./tsconfig.lib.json"

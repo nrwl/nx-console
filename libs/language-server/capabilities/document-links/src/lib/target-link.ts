@@ -4,9 +4,9 @@ import {
   isStringNode,
   lspLogger,
 } from '@nx-console/language-server-utils';
-import { nxWorkspace } from '@nx-console/language-server-workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { fileExists, readFile } from '@nx-console/shared-file-system';
-import { parseTargetString } from '@nx-console/shared-utils';
+import { parseTargetString } from '@nx-console/shared-npm';
 import { join } from 'path';
 import {
   ASTNode,
@@ -21,13 +21,13 @@ const tempDocumentCounter = new Map<string, number>();
 
 export async function targetLink(
   workingPath: string,
-  node: ASTNode
+  node: ASTNode,
 ): Promise<string | undefined> {
   if (!isStringNode(node)) {
     return;
   }
 
-  const { projectGraph } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath, lspLogger);
 
   const targetString = node.value;
   let project, target, configuration;
@@ -35,7 +35,7 @@ export async function targetLink(
     const parsedTarget = await parseTargetString(
       targetString,
       projectGraph,
-      workingPath
+      workingPath,
     );
 
     project = parsedTarget.project;
@@ -76,9 +76,9 @@ export async function targetLink(
       baseTargetProjectPath,
       'json',
       versionNumber,
-      projectJson
+      projectJson,
     ),
-    false
+    false,
   );
   languageModelCache.dispose();
 
@@ -101,7 +101,7 @@ function findLinkedTargetRange(
   document: TextDocument,
   jsonAst: JSONDocument,
   target: string,
-  configuration: string | undefined
+  configuration: string | undefined,
 ): Range | undefined {
   if (!jsonAst.root) {
     return;
@@ -133,7 +133,7 @@ function findLinkedTargetRange(
 
 function findTargetsRange(
   document: TextDocument,
-  jsonAst: JSONDocument
+  jsonAst: JSONDocument,
 ): Range | undefined {
   if (!jsonAst.root) {
     return;

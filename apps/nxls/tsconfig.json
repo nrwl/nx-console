@@ -10,6 +10,9 @@
       "path": "../../libs/shared/types"
     },
     {
+      "path": "../../libs/shared/nx-workspace-info"
+    },
+    {
       "path": "../../libs/shared/generate-ui-types"
     },
     {

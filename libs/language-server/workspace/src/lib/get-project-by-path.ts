@@ -1,9 +1,9 @@
 import { directoryExists } from '@nx-console/shared-file-system';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { platform } from 'os';
-
+import { lspLogger } from '@nx-console/language-server-utils';
 let _rootProjectMap: Record<string, ProjectConfiguration> | undefined;
 
 export function resetProjectPathCache() {
@@ -12,7 +12,7 @@ export function resetProjectPathCache() {
 
 export async function getProjectByPath(
   path: string,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<ProjectConfiguration | undefined> {
   path = normalize(path);
   // windows paths like /c:/Users/... aren't correctly picked up by normalize() so we need to handle them ourselves
@@ -24,13 +24,13 @@ export async function getProjectByPath(
 
 export async function getProjectByRoot(
   rootPath: string,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<ProjectConfiguration | undefined> {
   if (_rootProjectMap && _rootProjectMap[rootPath]) {
     return _rootProjectMap[rootPath];
   }
 
-  const { projectGraph } = await nxWorkspace(workspacePath);
+  const { projectGraph } = await nxWorkspace(workspacePath, lspLogger);
   const rootProjectMap: Record<string, ProjectConfiguration> = {};
   const projectEntries = Object.entries(projectGraph.nodes);
   for (const [, projectConfig] of projectEntries) {
@@ -43,7 +43,7 @@ export async function getProjectByRoot(
 
 export async function getProjectsByPaths(
   paths: string[] | undefined,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<Record<string, ProjectConfiguration> | undefined> {
   if (!paths) {
     return undefined;
@@ -52,7 +52,7 @@ export async function getProjectsByPaths(
   const pathsNormalized = paths
     .map((p) => normalize(p))
     .map((p) =>
-      p.startsWith(sep) && platform() === 'win32' ? p.substring(1) : p
+      p.startsWith(sep) && platform() === 'win32' ? p.substring(1) : p,
     );
   workspacePath = normalize(workspacePath);
   workspacePath =
@@ -60,7 +60,10 @@ export async function getProjectsByPaths(
       ? workspacePath.substring(1)
       : workspacePath;
 
-  const { projectGraph, projectFileMap } = await nxWorkspace(workspacePath);
+  const { projectGraph, projectFileMap } = await nxWorkspace(
+    workspacePath,
+    lspLogger,
+  );
   const pathsMap = new Map<
     string,
     { relativePath: string; isDirectory: boolean }
@@ -89,7 +92,7 @@ export async function getProjectsByPaths(
         const foundProject = findByFilePath(
           [projectName, projectConfig.data],
           workspacePath,
-          path
+          path,
         );
         if (foundProject) {
           foundProjects.set(path, foundProject);
@@ -105,7 +108,7 @@ export async function getProjectsByPaths(
 
       const isChildOfRoot = isChildOrEqual(
         projectConfig.data.root,
-        relativePath
+        relativePath,
       );
       const relativeRootConfig = projectConfig.data.sourceRoot
         ? relative(workspacePath, projectConfig.data.sourceRoot)
@@ -121,7 +124,7 @@ export async function getProjectsByPaths(
 
     // iterate over the project files once and find all the paths that match
     const nonDirectoryPaths = [...pathsMap.entries()].filter(
-      ([_, { isDirectory }]) => !isDirectory
+      ([_, { isDirectory }]) => !isDirectory,
     );
     projectFileMap?.[projectName]?.forEach(({ file }) => {
       for (const [path, { relativePath }] of nonDirectoryPaths) {
@@ -140,7 +143,7 @@ export async function getProjectsByPaths(
   // if a directory is not found in any projects & there's a root project, use that
   if (pathsMap.size > 0) {
     const rootProject = projectEntries.find(
-      ([, projectConfig]) => projectConfig.data.root === '.'
+      ([, projectConfig]) => projectConfig.data.root === '.',
     );
     if (rootProject) {
       new Map(pathsMap).forEach(({ isDirectory }, path) => {
@@ -160,7 +163,7 @@ export async function getProjectsByPaths(
 function findByFilePath(
   entry: [string, ProjectConfiguration] | undefined,
   workspacePath: string,
-  selectedPath: string
+  selectedPath: string,
 ) {
   if (!entry) {
     return null;
@@ -173,7 +176,7 @@ function findByFilePath(
   const fullProjectPath = join(
     workspacePath,
     // If root is empty, that means we're in an angular project with the old ng workspace setup. Otherwise use the sourceRoot
-    projectConfiguration.root || projectConfiguration.sourceRoot || ''
+    projectConfiguration.root || projectConfiguration.sourceRoot || '',
   );
   if (fullProjectPath === selectedPath) {
     perfectMatchEntry = entry;

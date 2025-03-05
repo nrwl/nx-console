@@ -16,10 +16,13 @@
       "path": "../../../shared/types"
     },
     {
+      "path": "../../workspace"
+    },
+    {
       "path": "../../../shared/json-schema"
     },
     {
-      "path": "../../workspace"
+      "path": "../../../shared/nx-workspace-info"
     },
     {
       "path": "../../utils"

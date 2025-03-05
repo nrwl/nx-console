@@ -6,7 +6,7 @@ import {
   CompletionType,
   EnhancedJsonSchema,
 } from '@nx-console/shared-json-schema';
-import type * as workspace from '@nx-console/language-server-workspace';
+import type * as workspace from '@nx-console/shared-nx-workspace-info';
 import { vol } from 'memfs';
 import {
   ClientCapabilities,
@@ -18,7 +18,7 @@ import { NxWorkspace } from '@nx-console/shared-types';
 import { normalize } from 'path';
 
 jest.mock(
-  '@nx-console/language-server-workspace',
+  '@nx-console/shared-nx-workspace-info',
   (): Partial<typeof workspace> => ({
     nxWorkspace: jest.fn(() =>
       Promise.resolve<NxWorkspace>({
@@ -79,9 +79,9 @@ jest.mock(
           dependencies: {},
         },
         nxJson: {},
-      })
+      }),
     ),
-  })
+  }),
 );
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -91,13 +91,13 @@ const languageService = configureJsonLanguageService(
   {
     clientCapabilities: ClientCapabilities.LATEST,
   },
-  {}
+  {},
 );
 
 describe('getCompletionItems', () => {
   const getTestCompletionItemsFor = async (
     text: string,
-    schema?: EnhancedJsonSchema
+    schema?: EnhancedJsonSchema,
   ) => {
     const offset = text.indexOf('|');
     text = text.substr(0, offset) + text.substr(offset + 1);
@@ -106,13 +106,13 @@ describe('getCompletionItems', () => {
       'file:///project.json',
       'json',
       0,
-      text
+      text,
     );
     const jsonAst = languageService.parseJSONDocument(document);
     const matchingSchemas = await languageService.getMatchingSchemas(
       document,
       jsonAst,
-      schema
+      schema,
     );
 
     const items = await getCompletionItems(
@@ -125,7 +125,7 @@ describe('getCompletionItems', () => {
       jsonAst,
       document,
       matchingSchemas,
-      Position.create(0, offset)
+      Position.create(0, offset),
     );
 
     return {
@@ -162,13 +162,13 @@ describe('getCompletionItems', () => {
             'x-completion-type': CompletionType.file,
           },
         },
-      }
+      },
     );
 
     expect(labels.map((l) => normalize(l)).sort()).toEqual(
       [`"file.js"`, `"project/src/main.js"`, `"project/src/main.ts"`]
         .map((l) => normalize(l))
-        .sort()
+        .sort(),
     );
     expect(details.map((l) => normalize(l ?? '')).sort()).toEqual(
       [
@@ -177,7 +177,7 @@ describe('getCompletionItems', () => {
         '/workspace/project/src/main.ts',
       ]
         .map((l) => normalize(l))
-        .sort()
+        .sort(),
     );
   });
 
@@ -193,7 +193,7 @@ describe('getCompletionItems', () => {
             'x-completion-glob': '*.ts',
           },
         },
-      }
+      },
     );
 
     expect(labels).toMatchInlineSnapshot(`
@@ -220,7 +220,7 @@ describe('getCompletionItems', () => {
     it('should return tags', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"tags": ["|"]}`,
-        tagSchema
+        tagSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
               Array [
@@ -234,7 +234,7 @@ describe('getCompletionItems', () => {
     it('should filter tags that already exist on the property', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"tags": ["tag1", "|"]}`,
-        tagSchema
+        tagSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
               Array [
@@ -261,7 +261,7 @@ describe('getCompletionItems', () => {
     it('should return projects', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"projects": ["|"]}`,
-        projectSchema
+        projectSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
               Array [
@@ -298,7 +298,7 @@ describe('getCompletionItems', () => {
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"targets": ["|"]}`,
-        targetSchema
+        targetSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
               Array [
@@ -312,7 +312,7 @@ describe('getCompletionItems', () => {
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"targetsWithDeps": ["|"]}`,
-        targetSchema
+        targetSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
         Array [
@@ -348,7 +348,7 @@ describe('getCompletionItems', () => {
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"projectTargets": ["|"]}`,
-        projectWithTargetsSchema
+        projectWithTargetsSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
         Array [
@@ -365,7 +365,7 @@ describe('getCompletionItems', () => {
     it('should return completion-type results before trying default implementations', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"targets": "|"}`,
-        projectWithTargetsSchema
+        projectWithTargetsSchema,
       );
       expect(labels).toMatchInlineSnapshot(`
         Array [

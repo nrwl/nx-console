@@ -1,12 +1,12 @@
 import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
-import { findConfig } from '@nx-console/shared-utils';
+import { findConfig } from '@nx-console/shared-file-system';
 import { dirname, join } from 'path';
 
 const TSCONFIG_LIB = 'tsconfig.lib.json';
 export const TSCONFIG_BASE = 'tsconfig.base.json';
 
 export async function getExternalFiles(
-  workspaceRoot: string
+  workspaceRoot: string,
 ): Promise<{ mainFile: string; directory: string }[]> {
   let tsconfig = (await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot))
     .json;

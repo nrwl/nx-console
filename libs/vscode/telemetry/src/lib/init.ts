@@ -8,7 +8,11 @@ import {
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { GoogleAnalyticsSender } from './google-analytics-sender';
 import { LoggerSender } from './logger-sender';
-import { TelemetryData, TelemetryEvents } from './telemetry-types';
+import {
+  TelemetryData,
+  TelemetryEvents,
+  NxConsoleTelemetryLogger as NxConsoleTelemetryLoggerBase,
+} from '@nx-console/shared-telemetry';
 
 let telemetry: NxConsoleTelemetryLogger;
 
@@ -27,10 +31,12 @@ export function initTelemetry(context: ExtensionContext) {
   });
 
   getOutputChannel().appendLine(
-    `Telemetry: ${production ? 'production' : 'development'}`
+    `Telemetry: ${production ? 'production' : 'development'}`,
   );
 }
 
-export interface NxConsoleTelemetryLogger extends TelemetryLogger {
+export interface NxConsoleTelemetryLogger
+  extends TelemetryLogger,
+    NxConsoleTelemetryLoggerBase {
   logUsage(eventName: TelemetryEvents, data?: TelemetryData): void;
 }

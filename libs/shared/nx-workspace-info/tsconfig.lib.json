@@ -1,0 +1,33 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/nx-workspace-info",
+    "strict": false,
+    "noImplicitReturns": false,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../types/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../file-system/tsconfig.lib.json"
+    },
+    {
+      "path": "../../language-server/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../schema/tsconfig.lib.json"
+    }
+  ]
+}

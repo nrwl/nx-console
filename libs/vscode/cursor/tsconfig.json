@@ -1,0 +1,37 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../nx-mcp/nx-mcp-server"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../telemetry"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

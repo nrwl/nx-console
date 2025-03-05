@@ -7,6 +7,9 @@
       "path": "../../libs/vscode/graph-base"
     },
     {
+      "path": "../../libs/shared/npm"
+    },
+    {
       "path": "../../libs/vscode/telemetry"
     },
     {
@@ -26,6 +29,9 @@
     },
     {
       "path": "../../libs/language-server/types"
+    },
+    {
+      "path": "../../libs/vscode/cursor"
     },
     {
       "path": "../../libs/vscode/copilot"

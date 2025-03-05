@@ -3,11 +3,7 @@ import {
   getSchemaRequestService,
   lspLogger,
 } from '@nx-console/language-server-utils';
-import {
-  getExecutors,
-  getProjectByRoot,
-  nxWorkspace,
-} from '@nx-console/language-server-workspace';
+import { getProjectByRoot } from '@nx-console/language-server-workspace';
 import {
   CompletionType,
   getNxJsonSchema,
@@ -17,6 +13,10 @@ import {
   tags,
 } from '@nx-console/shared-json-schema';
 import { findNxPackagePath } from '@nx-console/shared-npm';
+import {
+  getExecutors,
+  nxWorkspace,
+} from '@nx-console/shared-nx-workspace-info';
 import { CollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
@@ -35,33 +35,33 @@ let currentNxWorkspace: NxWorkspace | undefined;
 
 export async function configureSchemas(
   workingPath: string | undefined,
-  capabilities: ClientCapabilities | undefined
+  capabilities: ClientCapabilities | undefined,
 ) {
   if (!workingPath) {
     lspLogger.log('No workspace path provided');
     return;
   }
 
-  currentNxWorkspace = await nxWorkspace(workingPath);
+  currentNxWorkspace = await nxWorkspace(workingPath, lspLogger);
   const { nxVersion, nxJson, projectGraph } = currentNxWorkspace;
 
   currentExecutors = await getExecutors(workingPath);
   const projectJsonSchema = getProjectJsonSchema(
     currentExecutors,
     nxJson.targetDefaults,
-    nxVersion
+    nxVersion,
   );
 
   const packageJsonSchema = await getPackageJsonSchema(
     workingPath,
-    projectJsonSchema
+    projectJsonSchema,
   );
 
   const nxSchema = await getNxJsonSchema(
     currentExecutors,
     projectGraph.nodes,
     nxVersion,
-    workingPath
+    workingPath,
   );
 
   currentBaseSchemas = [
@@ -93,7 +93,7 @@ export async function configureSchemas(
   _configureJsonLanguageService(
     capabilities,
     getProjectSchemas(),
-    currentBaseSchemas
+    currentBaseSchemas,
   );
 }
 
@@ -114,7 +114,7 @@ function getProjectSchemas(): SchemaConfiguration[] {
 export async function configureSchemaForProject(
   projectRootPath: string,
   workingPath: string | undefined,
-  capabilities: ClientCapabilities | undefined
+  capabilities: ClientCapabilities | undefined,
 ) {
   const projectSchema = await getProjectSchema(projectRootPath, workingPath);
   if (!projectSchema) {
@@ -126,22 +126,22 @@ export async function configureSchemaForProject(
   _configureJsonLanguageService(
     capabilities,
     getProjectSchemas(),
-    currentBaseSchemas
+    currentBaseSchemas,
   );
 }
 
 async function getProjectSchema(
   projectRootPath: string,
-  workingPath: string | undefined
+  workingPath: string | undefined,
 ): Promise<SchemaConfiguration | undefined> {
   if (!workingPath) {
     lspLogger.log(
-      `No workspace path provided when configuring schema for ${projectRootPath}`
+      `No workspace path provided when configuring schema for ${projectRootPath}`,
     );
     return;
   }
   if (!currentNxWorkspace) {
-    currentNxWorkspace = await nxWorkspace(workingPath);
+    currentNxWorkspace = await nxWorkspace(workingPath, lspLogger);
   }
   if (!currentExecutors) {
     currentExecutors = await getExecutors(workingPath);
@@ -158,7 +158,7 @@ async function getProjectSchema(
   Object.entries(project.targets ?? {}).forEach(([key, target]) => {
     const executor = target.executor ?? 'nx:run-commands';
     const matchingCollection = currentExecutors?.find(
-      (e) => e.name === executor
+      (e) => e.name === executor,
     );
     if (!matchingCollection) {
       return;
@@ -207,16 +207,16 @@ async function getProjectSchema(
 
 async function getPackageJsonSchema(
   workspacePath: string,
-  projectJsonSchema: JSONSchema
+  projectJsonSchema: JSONSchema,
 ) {
   try {
     const projectJsonSchemaPath = await findNxPackagePath(
       workspacePath,
-      join('schemas', 'project-schema.json')
+      join('schemas', 'project-schema.json'),
     );
     if (projectJsonSchemaPath) {
       const nxProjectSchema = JSON.parse(
-        await readFile(projectJsonSchemaPath, 'utf-8')
+        await readFile(projectJsonSchemaPath, 'utf-8'),
       );
       return {
         type: 'object',
@@ -249,7 +249,7 @@ async function getPackageJsonSchema(
 function _configureJsonLanguageService(
   capabilities: ClientCapabilities | undefined,
   projectSchemas: SchemaConfiguration[],
-  baseSchemas: SchemaConfiguration[]
+  baseSchemas: SchemaConfiguration[],
 ) {
   configureJsonLanguageService(
     {
@@ -260,7 +260,7 @@ function _configureJsonLanguageService(
     },
     {
       schemas: [...projectSchemas, ...baseSchemas],
-    }
+    },
   );
 }
 const workspaceContextService = {

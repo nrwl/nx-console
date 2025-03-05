@@ -11,11 +11,7 @@ import {
   workspace,
 } from 'vscode';
 
-import {
-  checkIsNxWorkspace,
-  killGroup,
-  withTimeout,
-} from '@nx-console/shared-utils';
+import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -26,13 +22,19 @@ import {
   initNxProjectView,
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
-import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
+import {
+  vscodeLogger,
+  watchCodeLensConfigChange,
+  watchFile,
+} from '@nx-console/vscode-utils';
 
+import { initCursor, updateMcpServerWorkspacePath } from '@nx-console/cursor';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode-add-dependency';
+import { initCopilot } from '@nx-console/vscode-copilot';
 import { initGenerateUiWebview } from '@nx-console/vscode-generate-ui-webview';
 import {
   createNxlsClient,
@@ -44,12 +46,12 @@ import { initNxConversion } from '@nx-console/vscode-nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
-import { initCopilot } from '@nx-console/vscode-copilot';
 
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server-types';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { initErrorDiagnostics } from '@nx-console/vscode-error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
@@ -79,6 +81,7 @@ let hasInitializedExtensionPoints = false;
 
 export async function activate(c: ExtensionContext) {
   try {
+    vscodeLogger.log('Activating Nx Console');
     const startTime = Date.now();
     context = c;
 
@@ -86,8 +89,9 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     createNxlsClient(context);
-
     initTelemetry(context);
+    initCursor(context);
+
     initNxInit(context);
 
     context.subscriptions.push(
@@ -194,6 +198,7 @@ function manuallySelectWorkspaceDefinition() {
             'nxWorkspacePath',
             selectedDirectoryRelativePath,
           );
+          updateMcpServerWorkspacePath(selectedDirectory);
           setWorkspace(selectedDirectory);
         }
       });
@@ -286,6 +291,7 @@ async function setWorkspace(workspacePath: string) {
     initVscodeProjectGraph(context);
     initErrorDiagnostics(context);
     initCopilot(context);
+    initCursor(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

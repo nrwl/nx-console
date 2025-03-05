@@ -1,6 +1,6 @@
 import { CodeLens, Command, Range, TextDocument, Uri } from 'vscode';
 
-import { buildProjectPath } from '@nx-console/shared-utils';
+import { buildProjectPath } from '@nx-console/shared-file-system';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getNxWorkspace,
@@ -14,7 +14,7 @@ export class TargetCodeLens extends CodeLens {
     range: Range,
     public project: string,
     public target: string,
-    public configuration?: string
+    public configuration?: string,
   ) {
     super(range);
   }
@@ -24,14 +24,18 @@ export class ProjectCodeLens extends CodeLens {
   constructor(
     range: Range,
     public project: string,
-    public projectPath: string
+    public projectPath: string,
   ) {
     super(range);
   }
 }
 
 export class TaskGraphCodeLens extends CodeLens {
-  constructor(range: Range, public project: string, public target: string) {
+  constructor(
+    range: Range,
+    public project: string,
+    public target: string,
+  ) {
     super(range);
   }
 }
@@ -44,7 +48,7 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
    * @returns ProjectCodeLens Range locations and properties for the document
    */
   async provideCodeLenses(
-    document: TextDocument
+    document: TextDocument,
   ): Promise<CodeLens[] | undefined> {
     try {
       const lens: CodeLens[] = [];
@@ -77,7 +81,7 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
           document,
           lens,
           projectName,
-          WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
+          WorkspaceConfigurationStore.instance.get('nxWorkspacePath', ''),
         );
 
         this.buildTargetLenses(project, document, lens, projectName);
@@ -92,7 +96,7 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
     document: TextDocument,
     lens: CodeLens[],
     projectName: string,
-    workspacePath: string
+    workspacePath: string,
   ) {
     if (!project.projectPath) {
       return;
@@ -102,8 +106,8 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
       new ProjectCodeLens(
         new Range(position, position),
         projectName,
-        (await buildProjectPath(workspacePath, project.projectPath)) ?? ''
-      )
+        (await buildProjectPath(workspacePath, project.projectPath)) ?? '',
+      ),
     );
   }
 
@@ -111,7 +115,7 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
     project: ProjectLocations[string],
     document: TextDocument,
     lens: CodeLens[],
-    projectName: string
+    projectName: string,
   ) {
     const projectTargets = project.targets;
     for (const target in projectTargets) {
@@ -122,14 +126,14 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
         new TaskGraphCodeLens(
           new Range(position, position),
           projectName,
-          target
-        )
+          target,
+        ),
       );
       const configurations = projectTargets[target].configurations;
       if (configurations) {
         for (const configuration in configurations) {
           const configurationPosition = document.positionAt(
-            configurations[configuration].position
+            configurations[configuration].position,
           );
 
           lens.push(
@@ -137,8 +141,8 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
               new Range(configurationPosition, configurationPosition),
               projectName,
               target,
-              configuration
-            )
+              configuration,
+            ),
           );
         }
       }

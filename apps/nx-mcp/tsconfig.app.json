@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/nx-mcp",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
+  "references": [
+    {
+      "path": "../../libs/shared/nx-workspace-info/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/nx-mcp/nx-mcp-server/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/telemetry/tsconfig.lib.json"
+    }
+  ]
+}
