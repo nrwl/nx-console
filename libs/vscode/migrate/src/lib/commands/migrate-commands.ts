@@ -25,7 +25,7 @@ import { existsSync } from 'fs';
 
 export function registerCommands(
   context: ExtensionContext,
-  migrateWebview: MigrateWebview
+  migrateWebview: MigrateWebview,
 ) {
   context.subscriptions.push(
     commands.registerCommand('nxMigrate.open', () => {
@@ -39,7 +39,7 @@ export function registerCommands(
     }),
     commands.registerCommand('nxMigrate.viewDiff', async () => {
       await viewPackageJsonDiff();
-    })
+    }),
   );
 }
 
@@ -48,7 +48,7 @@ export async function skipMigration(migration: MigrationDetailsWithId) {
   const migrateUIApi = await importMigrateUIApi(workspacePath);
   migrateUIApi.modifyMigrationsJsonMetadata(
     workspacePath,
-    migrateUIApi.addSkippedMigration(migration.id)
+    migrateUIApi.addSkippedMigration(migration.id),
   );
 }
 
@@ -104,10 +104,10 @@ export async function confirmPackageChanges() {
       } catch (e) {
         logAndShowError(
           'An error occurred while installing dependencies',
-          `An error occurred while installing dependencies: \n ${e}`
+          `An error occurred while installing dependencies: \n ${e}`,
         );
       }
-    }
+    },
   );
 }
 
@@ -118,7 +118,7 @@ export async function cancelMigration() {
 
   if (!data) {
     window.showErrorMessage(
-      "Couldn't find previous git ref. Did you manually modify migrations.json?"
+      "Couldn't find previous git ref. Did you manually modify migrations.json?",
     );
     return;
   }
@@ -131,7 +131,7 @@ export async function cancelMigration() {
       {
         modal: true,
       },
-      'Abort migration'
+      'Abort migration',
     )
     .then(async (result) => {
       if (result === 'Abort migration') {
@@ -146,7 +146,7 @@ export async function cancelMigration() {
           async () => {
             execSync(`${pm.exec} install`, { cwd: nxWorkspacePath });
             commands.executeCommand('nxMigrate.refresh');
-          }
+          },
         );
       }
     });
@@ -160,7 +160,7 @@ export async function viewImplementation(migration: MigrationDetailsWithId) {
   try {
     const fullPath = await migrateUIApi.getImplementationPath(
       nxWorkspacePath,
-      migration
+      migration,
     );
 
     if (!existsSync(fullPath)) {
@@ -172,7 +172,7 @@ export async function viewImplementation(migration: MigrationDetailsWithId) {
     });
   } catch (e) {
     window.showErrorMessage(
-      `Cannot find implementation file for ${migration.name}`
+      `Cannot find implementation file for ${migration.name}`,
     );
   }
 }
@@ -183,7 +183,7 @@ export async function viewDocumentation(migration: MigrationDetailsWithId) {
     : migration.package;
   const url = `https://nx.dev/nx-api/${migrationPackage}#${migration.name.replace(
     /[.-]/g,
-    ''
+    '',
   )}`;
 
   commands.executeCommand('vscode.open', url);

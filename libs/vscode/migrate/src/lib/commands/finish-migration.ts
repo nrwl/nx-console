@@ -15,7 +15,7 @@ export async function finishMigration(squashCommits: boolean) {
         detail:
           'This will remove the migrations.json file and commit the changes.',
       },
-      'Finish Migration'
+      'Finish Migration',
     )
     .then(async (result) => {
       if (result === 'Finish Migration') {
@@ -38,12 +38,12 @@ export async function finishMigration(squashCommits: boolean) {
           migrateUiApi.finishMigrationProcess(
             workspacePath,
             squashCommits,
-            commitMessage
+            commitMessage,
           );
         } catch (e) {
           logAndShowError(
             'Failed to finish migration process',
-            `Failed to finish migration process: ${e}`
+            `Failed to finish migration process: ${e}`,
           );
         }
 

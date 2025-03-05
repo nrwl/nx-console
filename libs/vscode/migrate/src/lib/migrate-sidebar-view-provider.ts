@@ -30,18 +30,18 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
   constructor(
     private extensionContext: ExtensionContext,
-    private actor: ActorRef<any, EventObject>
+    private actor: ActorRef<any, EventObject>,
   ) {
     this._webviewSourceUri = Uri.joinPath(
       this.extensionContext.extensionUri,
-      'migrate-sidebar-webview'
+      'migrate-sidebar-webview',
     );
   }
 
   resolveWebviewView(
     webviewView: WebviewView,
     context: WebviewViewResolveContext,
-    token: CancellationToken
+    token: CancellationToken,
   ): Thenable<void> | void {
     this.ensureStateSubscription();
 
@@ -84,7 +84,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
   private getWebviewContent(webviewView: WebviewView): string {
     const webviewScriptUri = webviewView.webview.asWebviewUri(
-      Uri.joinPath(this._webviewSourceUri, 'main.js')
+      Uri.joinPath(this._webviewSourceUri, 'main.js'),
     );
 
     const codiconsUri = webviewView.webview.asWebviewUri(
@@ -94,8 +94,8 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         '@vscode',
         'codicons',
         'dist',
-        'codicon.css'
-      )
+        'codicon.css',
+      ),
     );
 
     const vscodeElementsUri = webviewView.webview.asWebviewUri(
@@ -105,8 +105,8 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         '@vscode-elements',
         'elements',
         'dist',
-        'bundled.js'
-      )
+        'bundled.js',
+      ),
     );
 
     return `<!DOCTYPE html>
@@ -125,10 +125,10 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
 				<root-element state='${JSON.stringify(
-          this.actor.getSnapshot().value
+          this.actor.getSnapshot().value,
         )}' migrateViewData='${JSON.stringify(
-      this._migrateViewData
-    )}'></root-element>
+          this._migrateViewData,
+        )}'></root-element>
 			</body>
 			</html>`;
   }
@@ -165,7 +165,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     if (
       !isUpdateAvailable(
         this._migrateViewData.currentNxVersion,
-        this._migrateViewData.latestNxVersion
+        this._migrateViewData.latestNxVersion,
       )
     ) {
       this._view.badge = undefined;
@@ -204,8 +204,8 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     context.subscriptions.push(
       window.registerWebviewViewProvider(
         MigrateSidebarViewProvider.viewId,
-        onboardingProvider
-      )
+        onboardingProvider,
+      ),
     );
   }
 }

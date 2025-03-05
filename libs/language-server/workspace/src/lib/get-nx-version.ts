@@ -11,7 +11,7 @@ const defaultSemver = new SemVer('0.0.0');
 
 export async function getNxVersion(
   workspacePath: string,
-  reset = false
+  reset = false,
 ): Promise<NxVersion> {
   lspLogger.log(`reset: ${reset}`);
   if (!loadedNxPackage || reset) {

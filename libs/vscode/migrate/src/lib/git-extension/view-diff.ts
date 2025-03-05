@@ -11,7 +11,7 @@ export async function viewPackageJsonDiff() {
 
 export function viewDiffForMigration(
   path: string,
-  migration: MigrationDetailsWithId
+  migration: MigrationDetailsWithId,
 ) {
   const completedMigration =
     readMigrationsJsonMetadata().completedMigrations[migration.id];

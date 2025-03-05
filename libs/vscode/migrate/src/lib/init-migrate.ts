@@ -25,8 +25,8 @@ export function initMigrate(context: ExtensionContext): void {
   updateWorkspaceData(actor);
   context.subscriptions.push(
     getNxlsClient().onNotification(NxWorkspaceRefreshStartedNotification, () =>
-      updateWorkspaceData(actor)
-    )
+      updateWorkspaceData(actor),
+    ),
   );
 
   updateLatestNxVersion(actor);
@@ -43,7 +43,7 @@ export function initMigrate(context: ExtensionContext): void {
     }),
     commands.registerCommand('nxMigrate.refreshWebview', () => {
       migrateWebview.refresh();
-    })
+    }),
   );
 
   watchFile(
@@ -51,7 +51,7 @@ export function initMigrate(context: ExtensionContext): void {
     () => {
       updateWorkspaceData(actor);
     },
-    context.subscriptions
+    context.subscriptions,
   );
 
   window.registerTerminalLinkProvider(new DiffEditorTerminalLinkProvider());
@@ -88,7 +88,7 @@ async function updateWorkspaceData(actor: ActorRef<any, any>) {
   });
 }
 function checkHasMigrationsSection(
-  migrationsJsonPath: string
+  migrationsJsonPath: string,
 ): any | undefined {
   try {
     const migrationsJson = readFileSync(migrationsJsonPath, 'utf-8');

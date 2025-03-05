@@ -92,7 +92,7 @@ export const migrateMachine = setup({
 
 export function isUpdateAvailable(
   currentNxVersion: NxVersion,
-  latestNxVersion: NxVersion
+  latestNxVersion: NxVersion,
 ): boolean {
   return (
     !!currentNxVersion &&

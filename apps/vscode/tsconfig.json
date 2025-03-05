@@ -25,10 +25,10 @@
       "path": "../../libs/vscode/error-diagnostics"
     },
     {
-      "path": "../../libs/vscode/migrate"
+      "path": "../../libs/language-server/types"
     },
     {
-      "path": "../../libs/vscode/typescript-plugin"
+      "path": "../../libs/vscode/migrate"
     },
     {
       "path": "../../libs/vscode/copilot"

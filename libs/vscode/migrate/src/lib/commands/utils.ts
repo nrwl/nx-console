@@ -7,8 +7,8 @@ import * as migrateUiApi from 'nx/src/command-line/migrate/migrate-ui-api';
 
 export function modifyMigrationsJsonMetadata(
   modify: (
-    migrationsJsonMetadata: MigrationsJsonMetadata
-  ) => MigrationsJsonMetadata
+    migrationsJsonMetadata: MigrationsJsonMetadata,
+  ) => MigrationsJsonMetadata,
 ) {
   const nxWorkspacePath = getNxWorkspacePath();
   const migrationsJsonPath = join(nxWorkspacePath, 'migrations.json');

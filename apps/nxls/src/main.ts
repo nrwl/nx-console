@@ -148,7 +148,7 @@ connection.onInitialize(async (params) => {
           return;
         }
         await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
-      }
+      },
     );
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
@@ -208,7 +208,7 @@ connection.onCompletion(async (completionParams) => {
     documents,
     completionParams,
     jsonDocumentMapper,
-    CLIENT_CAPABILITIES
+    CLIENT_CAPABILITIES,
   );
 });
 
@@ -247,7 +247,7 @@ connection.onDocumentLinks(async (params) => {
 
     const schemas = await getJsonLanguageService()?.getMatchingSchemas(
       document,
-      jsonAst
+      jsonAst,
     );
 
     if (!schemas) {
@@ -257,7 +257,7 @@ connection.onDocumentLinks(async (params) => {
       WORKING_PATH,
       jsonAst,
       document,
-      schemas
+      schemas,
     );
     return links;
   } catch (e) {
@@ -282,7 +282,7 @@ documents.onDidOpen(async (e) => {
   }
   const project = await getProjectByPath(
     URI.parse(e.document.uri).fsPath,
-    WORKING_PATH
+    WORKING_PATH,
   );
 
   if (!project || !project.name) {
@@ -336,12 +336,12 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
 
     return await getGenerators(WORKING_PATH, args.options);
-  }
+  },
 );
 
 connection.onRequest(
@@ -350,7 +350,7 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
 
@@ -358,9 +358,9 @@ connection.onRequest(
       WORKING_PATH,
       args.options.collection,
       args.options.name,
-      args.options.path
+      args.options.path,
     );
-  }
+  },
 );
 
 connection.onRequest(
@@ -369,11 +369,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getProjectByPath(args.projectPath, WORKING_PATH);
-  }
+  },
 );
 
 connection.onRequest(
@@ -382,11 +382,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getProjectsByPaths(args.paths, WORKING_PATH);
-  }
+  },
 );
 
 connection.onRequest(
@@ -395,11 +395,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getProjectByRoot(args.projectRoot, WORKING_PATH);
-  }
+  },
 );
 
 connection.onRequest(
@@ -408,11 +408,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getGeneratorContextV2(args.path, WORKING_PATH);
-  }
+  },
 );
 
 connection.onRequest(NxVersionRequest, async ({ reset }) => {
@@ -455,11 +455,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getTransformedGeneratorSchema(WORKING_PATH, schema);
-  }
+  },
 );
 
 connection.onRequest(
@@ -468,11 +468,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getStartupMessage(WORKING_PATH, schema);
-  }
+  },
 );
 
 connection.onRequest(NxHasAffectedProjectsRequest, async () => {
@@ -495,15 +495,15 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await getTargetsForConfigFile(
       args.projectName,
       args.configFilePath,
-      WORKING_PATH
+      WORKING_PATH,
     );
-  }
+  },
 );
 
 connection.onRequest(NxCloudStatusRequest, async () => {
@@ -541,11 +541,11 @@ connection.onRequest(
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
     return await parseTargetString(targetString, WORKING_PATH);
-  }
+  },
 );
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
@@ -566,12 +566,12 @@ connection.onNotification(
     if (!WORKING_PATH) {
       return new ResponseError(
         1001,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
 
     await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
-  }
+  },
 );
 
 connection.onNotification(
@@ -584,12 +584,12 @@ connection.onNotification(
     if (!WORKING_PATH) {
       return new ResponseError(
         1001,
-        'Unable to get Nx info: no workspace path'
+        'Unable to get Nx info: no workspace path',
       );
     }
 
     await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
-  }
+  },
 );
 
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
@@ -621,21 +621,21 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
     lspLogger.log(
       `reconfiguration failed, trying again in ${
         reconfigureAttempts * reconfigureAttempts
-      } seconds`
+      } seconds`,
     );
     new Promise((resolve) =>
-      setTimeout(resolve, 1000 * reconfigureAttempts * reconfigureAttempts)
+      setTimeout(resolve, 1000 * reconfigureAttempts * reconfigureAttempts),
     ).then(() => reconfigureAndSendNotificationWithBackoff(workingPath));
   } else {
     lspLogger.log(
-      `reconfiguration failed after ${reconfigureAttempts} attempts`
+      `reconfiguration failed after ${reconfigureAttempts} attempts`,
     );
     reconfigureAttempts = 0;
   }
 }
 
 async function reconfigure(
-  workingPath: string
+  workingPath: string,
 ): Promise<NxWorkspace | undefined> {
   resetNxVersionCache();
   resetProjectPathCache();

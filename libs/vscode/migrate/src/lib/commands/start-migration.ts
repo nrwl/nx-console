@@ -23,7 +23,7 @@ export async function startMigration(custom = false) {
   } catch (e) {
     logAndShowError(
       'Failed to retrieve version information from npm',
-      `Error while retrieving Nx version information from npm: \n ${e}`
+      `Error while retrieving Nx version information from npm: \n ${e}`,
     );
     return;
   }
@@ -38,7 +38,7 @@ export async function startMigration(custom = false) {
     const continueMigration = await checkAndConfirmMultipleMajors(
       nxVersion,
       versionToMigrateTo,
-      pkgInfo
+      pkgInfo,
     );
     if (!continueMigration) {
       return;
@@ -48,7 +48,7 @@ export async function startMigration(custom = false) {
       return;
     }
     flags = Object.entries(flagsObject).map(
-      ([key, value]) => `--${key}=${value}`
+      ([key, value]) => `--${key}=${value}`,
     );
   } else {
     versionToMigrateTo = getDefaultMigrateVersion(nxVersion, pkgInfo);
@@ -86,7 +86,7 @@ export async function startMigration(custom = false) {
   const migrateUiApi = await importMigrateUIApi(workspacePath);
   migrateUiApi.recordInitialMigrationMetadata(
     workspacePath,
-    versionToMigrateTo
+    versionToMigrateTo,
   );
 }
 
@@ -97,7 +97,7 @@ export async function startMigration(custom = false) {
 // current: 17.x -> 18
 function getDefaultMigrateVersion(
   nxVersion: NxVersion,
-  pkgInfo: PackageInformationResponse
+  pkgInfo: PackageInformationResponse,
 ): string {
   const currentMajor = nxVersion.major;
   const latestMajor = major(pkgInfo['dist-tags']?.['latest']).toString();
@@ -118,7 +118,7 @@ function getDefaultMigrateVersion(
 
 async function promptForVersion(
   nxVersion: NxVersion,
-  pkgInfo: PackageInformationResponse
+  pkgInfo: PackageInformationResponse,
 ) {
   const quickpickOptions: QuickPickItem[] = [];
 
@@ -134,7 +134,7 @@ async function promptForVersion(
         !versionNum.startsWith('0.0.0-pr') &&
         !versionNum.includes('canary') &&
         !versionNum.includes('beta') &&
-        !versionNum.includes('rc')
+        !versionNum.includes('rc'),
     )
     .sort(([a], [b]) => rcompare(a, b));
 
@@ -186,7 +186,7 @@ async function promptForVersion(
 async function checkAndConfirmMultipleMajors(
   nxVersion: NxVersion,
   versionToMigrateTo: string,
-  pkgInfo: PackageInformationResponse
+  pkgInfo: PackageInformationResponse,
 ): Promise<boolean> {
   try {
     if (pkgInfo['dist-tags'] && pkgInfo['dist-tags'][versionToMigrateTo]) {
@@ -220,7 +220,7 @@ type MigrateFlagsToPrompt = {
 };
 
 async function promptForCustomFlags(
-  selectedOptions?: MigrateFlagsToPrompt
+  selectedOptions?: MigrateFlagsToPrompt,
 ): Promise<MigrateFlagsToPrompt | undefined> {
   if (!selectedOptions) {
     selectedOptions = {};
@@ -287,7 +287,7 @@ async function promptForCustomFlags(
       {
         placeHolder:
           'Enable prompts to confirm whether to collect optional package updates and migrations.',
-      }
+      },
     );
     return await promptForCustomFlags({
       ...selectedOptions,

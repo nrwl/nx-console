@@ -10,7 +10,7 @@ import { viewPackageJsonDiff } from './git-extension/view-diff';
 export class DiffEditorTerminalLinkProvider implements TerminalLinkProvider {
   provideTerminalLinks(
     context: TerminalLinkContext,
-    _: CancellationToken
+    _: CancellationToken,
   ): ProviderResult<TerminalLink[]> {
     const line = context.line;
     const diffEditorText =

@@ -12,11 +12,11 @@ fs.copySync('./dist/apps/nxls', nxlsDest);
 fs.copySync('./dist/apps/generate-ui-v2', './dist/apps/vscode/generate-ui-v2');
 fs.copySync(
   './dist/libs/vscode/nx-cloud-onboarding-webview',
-  './dist/apps/vscode/nx-cloud-onboarding-webview'
+  './dist/apps/vscode/nx-cloud-onboarding-webview',
 );
 fs.copySync(
   './dist/libs/vscode/migrate-sidebar-webview',
-  './dist/apps/vscode/migrate-sidebar-webview'
+  './dist/apps/vscode/migrate-sidebar-webview',
 );
 
 // copy package.json
@@ -31,23 +31,23 @@ execSync('npm install -f', {
 // we don't need the entire @vscode-elements/elements package, just the bundled.js file
 if (!fs.existsSync('node_modules')) {
   throw new Error(
-    'Please make sure node_modules are installed by running yarn.'
+    'Please make sure node_modules are installed by running yarn.',
   );
 }
 const destFolder = normalize(
-  './dist/apps/vscode/node_modules/@vscode-elements/elements/dist'
+  './dist/apps/vscode/node_modules/@vscode-elements/elements/dist',
 );
 if (!fs.existsSync(destFolder)) {
   fs.mkdirSync(destFolder, { recursive: true });
 }
 fs.copyFileSync(
   normalize('./node_modules/@vscode-elements/elements/dist/bundled.js'),
-  normalize(`${destFolder}/bundled.js`)
+  normalize(`${destFolder}/bundled.js`),
 );
 
 // copy the typescript plugin which is required at runtime
 const typescriptPluginDestFolder = normalize(
-  './dist/apps/vscode/node_modules/@monodon/typescript-nx-imports-plugin'
+  './dist/apps/vscode/node_modules/@monodon/typescript-nx-imports-plugin',
 );
 if (!fs.existsSync(typescriptPluginDestFolder)) {
   fs.mkdirSync(typescriptPluginDestFolder, { recursive: true });
@@ -55,23 +55,23 @@ if (!fs.existsSync(typescriptPluginDestFolder)) {
 fs.cpSync(
   normalize('./node_modules/@monodon/typescript-nx-imports-plugin'),
   normalize(`${typescriptPluginDestFolder}`),
-  { recursive: true }
+  { recursive: true },
 );
 
 // copy codicons
 const codiconsDestFolder = normalize(
-  './dist/apps/vscode/node_modules/@vscode/codicons/dist'
+  './dist/apps/vscode/node_modules/@vscode/codicons/dist',
 );
 if (!fs.existsSync(codiconsDestFolder)) {
   fs.mkdirSync(codiconsDestFolder, { recursive: true });
 }
 fs.copySync(
   './node_modules/@vscode/codicons/dist/codicon.css',
-  join(codiconsDestFolder, 'codicon.css')
+  join(codiconsDestFolder, 'codicon.css'),
 );
 fs.copySync(
   './node_modules/@vscode/codicons/dist/codicon.ttf',
-  join(codiconsDestFolder, 'codicon.ttf')
+  join(codiconsDestFolder, 'codicon.ttf'),
 );
 
 // copy nx

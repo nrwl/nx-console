@@ -40,11 +40,11 @@ export class MigrateWebview {
     }
     const nxInstallationLocation = await workspaceDependencyPath(
       getNxWorkspacePath(),
-      'nx'
+      'nx',
     );
     if (!nxInstallationLocation) {
       window.showErrorMessage(
-        'Error loading the Migrate UI. Did you run npm/yarn/pnpm install?'
+        'Error loading the Migrate UI. Did you run npm/yarn/pnpm install?',
       );
       return;
     }
@@ -59,11 +59,11 @@ export class MigrateWebview {
           this.context.extensionUri,
           Uri.file(nxInstallationLocation),
         ],
-      }
+      },
     );
 
     this._webviewPanel.webview.html = await this.loadMigrateHtml(
-      this._webviewPanel
+      this._webviewPanel,
     );
 
     this._webviewPanel.webview.onDidReceiveMessage((message) => {
@@ -71,13 +71,13 @@ export class MigrateWebview {
         case 'run-migration':
           runSingleMigration(
             message.payload.migration,
-            message.payload.configuration
+            message.payload.configuration,
           );
           break;
         case 'run-many':
           runManyMigrations(
             message.payload.migrations,
-            message.payload.configuration
+            message.payload.configuration,
           );
           break;
         case 'finish':
@@ -108,7 +108,7 @@ export class MigrateWebview {
           type: 'reload',
           data: this.getMigrateUIData(),
         });
-      }
+      },
     );
 
     this._webviewPanel.onDidDispose(() => {
@@ -209,7 +209,7 @@ export class MigrateWebview {
 }
 
 async function getGraphHtmlLocation(
-  context: ExtensionContext
+  context: ExtensionContext,
 ): Promise<Uri | undefined> {
   const nxVersion = await getNxVersion();
 
@@ -227,7 +227,7 @@ async function getGraphHtmlLocation(
       'nx',
       'src',
       'core',
-      'graph'
+      'graph',
     );
   }
 }
@@ -236,7 +236,7 @@ async function getGraphHtmlLocation(
 async function getGraphBasePath(): Promise<string | undefined> {
   const nxWorkspaceDepPath = await workspaceDependencyPath(
     getNxWorkspacePath(),
-    'nx'
+    'nx',
   );
 
   if (!nxWorkspaceDepPath) {
