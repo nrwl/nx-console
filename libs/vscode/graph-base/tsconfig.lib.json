@@ -14,6 +14,9 @@
   ],
   "references": [
     {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/utils/tsconfig.lib.json"
     },
     {

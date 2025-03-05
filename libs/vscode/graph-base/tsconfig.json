@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../output-channels"
+    },
+    {
       "path": "../../shared/utils"
     },
     {
