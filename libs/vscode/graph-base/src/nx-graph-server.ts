@@ -1,5 +1,7 @@
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { findNxExecutable } from '@nx-console/shared-npm';
+import { getPackageManagerCommand, killGroup } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
 import { xhr } from 'request-light';
@@ -7,6 +9,14 @@ import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
 
 let nxGraphServer: NxGraphServer | undefined = undefined;
 let nxGraphServerAffected: NxGraphServer | undefined = undefined;
+
+export function hasNxGraphServer() {
+  return !!nxGraphServer;
+}
+
+export function hasNxGraphServerAffected() {
+  return !!nxGraphServerAffected;
+}
 
 export function getNxGraphServer(context: ExtensionContext, affected = false) {
   if (affected) {
@@ -34,7 +44,10 @@ export class NxGraphServer implements Disposable {
   isStarted = false;
   updatedEventEmitter = new EventEmitter();
 
-  constructor(private startPort: number, private affected = false) {}
+  constructor(
+    private startPort: number,
+    private affected = false,
+  ) {}
 
   async handleWebviewRequest(request: {
     type: string;
@@ -144,13 +157,13 @@ export class NxGraphServer implements Disposable {
 
   private async spawnProcess(port: number): Promise<void> {
     const workspacePath = getNxWorkspacePath();
-    const packageManagerCommand = await getPackageManagerCommand(workspacePath);
+    const nxExecutable = await findNxExecutable(workspacePath);
 
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
+      getOutputChannel().appendLine(`Starting nx graph server at port ${port}`);
       const nxGraphProcess = spawn(
-        packageManagerCommand.exec,
+        nxExecutable,
         [
-          'nx',
           'graph',
           `--port`,
           `${port}`,
@@ -164,7 +177,7 @@ export class NxGraphServer implements Disposable {
           windowsHide: true,
           shell: true,
           env: process.env,
-        }
+        },
       );
 
       nxGraphProcess.stdout.setEncoding('utf8');
