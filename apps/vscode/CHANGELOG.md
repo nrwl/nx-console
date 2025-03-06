@@ -1,3 +1,19 @@
+# [18.42.0](https://github.com/nrwl/nx-console/compare/vscode-v18.41.1...vscode-v18.42.0) (2025-03-06)
+
+
+### Bug Fixes
+
+* **nxls:** repair generator reading with schematics/collection.json ([#2419](https://github.com/nrwl/nx-console/issues/2419)) ([2721f31](https://github.com/nrwl/nx-console/commit/2721f31fdf37de498b0138ef85c8eecc0d6662a1))
+* use nx binary directly in graph & shut down correctly in vscode ([#2423](https://github.com/nrwl/nx-console/issues/2423)) ([88a054e](https://github.com/nrwl/nx-console/commit/88a054e93bfefbb4a95963c781e5205ef3c02eb4))
+* **vscode:** shut down graph with SIGINT to propagate signals ([#2425](https://github.com/nrwl/nx-console/issues/2425)) ([fe2680f](https://github.com/nrwl/nx-console/commit/fe2680f815300c0b9f1b25d0c099bac62f913c2d))
+* **vscode:** tweak mcp impl ([#2426](https://github.com/nrwl/nx-console/issues/2426)) ([1f1f3e8](https://github.com/nrwl/nx-console/commit/1f1f3e888492a21744f63b113303a93e94ffd8bb))
+
+
+### Features
+
+* add nx mcp ([#2415](https://github.com/nrwl/nx-console/issues/2415)) ([db12e19](https://github.com/nrwl/nx-console/commit/db12e1987167d6ce75692e983383baacae2d818f))
+* new projectViewItemProcessors plugin ([#2420](https://github.com/nrwl/nx-console/issues/2420)) ([1d3c3fb](https://github.com/nrwl/nx-console/commit/1d3c3fb85e8f155157530ee1dabbb914e23cf698))
+
 ## [18.41.1](https://github.com/nrwl/nx-console/compare/vscode-v18.41.0...vscode-v18.41.1) (2025-02-20)
 
 
