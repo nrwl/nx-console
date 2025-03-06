@@ -13,13 +13,16 @@
   ],
   "references": [
     {
-      "path": "../lsp-client/tsconfig.lib.json"
+      "path": "../output-channels/tsconfig.lib.json"
     },
     {
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
-      "path": "../output-channels/tsconfig.lib.json"
+      "path": "../lsp-client/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/telemetry/tsconfig.lib.json"
     }
   ]
 }

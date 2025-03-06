@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/schema"
+    },
+    {
       "path": "../telemetry"
     },
     {
@@ -25,7 +28,7 @@
       "path": "../../shared/utils"
     },
     {
-      "path": "../../shared/schema"
+      "path": "../../shared/llm-context"
     },
     {
       "path": "../../shared/npm"

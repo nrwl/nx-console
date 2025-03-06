@@ -1,4 +1,4 @@
-import { getNxDaemonClient } from '@nx-console/language-server-workspace';
+import { getNxDaemonClient } from '@nx-console/shared-nx-workspace-info';
 import { lspLogger } from '@nx-console/language-server-utils';
 import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
@@ -15,7 +15,7 @@ export class DaemonWatcher {
   constructor(
     private workspacePath: string,
     private nxVersion: NxVersion,
-    private callback: () => unknown
+    private callback: () => unknown,
   ) {}
 
   async start() {
@@ -40,7 +40,7 @@ export class DaemonWatcher {
     try {
       const daemonClientModule = await getNxDaemonClient(
         this.workspacePath,
-        lspLogger
+        lspLogger,
       );
 
       if (!daemonClientModule?.daemonClient.enabled()) {
@@ -52,7 +52,7 @@ export class DaemonWatcher {
       lspLogger.log(
         `Initializing daemon watcher ${
           this.retryCount > 0 ? `, retries ${this.retryCount}` : ''
-        }`
+        }`,
       );
 
       let projectGraphErrors = false;
@@ -71,7 +71,7 @@ export class DaemonWatcher {
 
       if (!daemonClientModule || projectGraphErrors) {
         lspLogger.log(
-          `project graph computation error during daemon watcher initialization, using native watcher.`
+          `project graph computation error during daemon watcher initialization, using native watcher.`,
         );
         this.retryCount = 0;
         this.useNativeWatcher();
@@ -118,7 +118,7 @@ export class DaemonWatcher {
                 lspLogger.log(
                   `filtered out files: ${data?.changedFiles
                     .map((f) => f.path)
-                    .join(', ')}`
+                    .join(', ')}`,
                 );
                 return;
               }
@@ -127,12 +127,12 @@ export class DaemonWatcher {
                   'Files changed: ' +
                     filteredChangedFiles
                       .map((f) => `${f.path} (${f.type})`)
-                      .join(', ')
+                      .join(', '),
                 );
                 this.callback();
               }
             }
-          }
+          },
         );
 
       lspLogger.log('Initialized daemon watcher');
@@ -140,7 +140,7 @@ export class DaemonWatcher {
       this.disposables.add(unregister);
     } catch (e) {
       lspLogger.log(
-        `Error initializing daemon watcher, check daemon logs. ${e}`
+        `Error initializing daemon watcher, check daemon logs. ${e}`,
       );
       this.useNativeWatcher();
     }

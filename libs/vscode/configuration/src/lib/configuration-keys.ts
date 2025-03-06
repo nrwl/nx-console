@@ -39,14 +39,15 @@ export type GlobalConfig = {
 /**
  * configuration Keys used for NxConsole
  */
-export type GlobalConfigKeys = typeof GLOBAL_CONFIG_KEYS[number];
+export type GlobalConfigKeys = (typeof GLOBAL_CONFIG_KEYS)[number];
 
 export const WORKSPACE_CONFIG_KEYS = [
   'nxWorkspacePath',
   'nxConversionDate',
   'projectsViewCollapsibleState',
+  'mcpDontAskAgain',
 ] as const;
 /**
  * configuration Keys used for NxConsole on a vscode workspace level
  */
-export type WorkspaceConfigKeys = typeof WORKSPACE_CONFIG_KEYS[number];
+export type WorkspaceConfigKeys = (typeof WORKSPACE_CONFIG_KEYS)[number];

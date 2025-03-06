@@ -1,17 +1,10 @@
-import { readNxJson } from '@nx-console/shared-npm';
-import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import {
-  getPackageManagerCommand,
-  withTimeout,
-} from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
-import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
 import { PromptElementAndProps } from '@vscode/chat-extension-utils/dist/toolsPrompt';
-import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
 import {
   CancellationToken,
   chat,
@@ -29,17 +22,18 @@ import {
   MarkdownString,
   Uri,
 } from 'vscode';
+import { getDocsContext, getProjectGraph, tryReadNxJson } from './context';
 import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
-import { get } from 'http';
-import {
-  getDocsContext,
-  getGeneratorNamesAndDescriptions,
-  getProjectGraph,
-  tryReadNxJson,
-} from './context';
+import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-llm-context';
+import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
+import { withTimeout } from '@nx-console/shared-utils';
+import { getGenerators } from '@nx-console/vscode-nx-workspace';
+import { ProjectDetailsTool } from './tools/project-details-tool';
+import { VisualizeProjectGraphTool } from './tools/visualize-project-graph-tool';
+import { VisualizeTaskGraphTool } from './tools/visualize-task-graph-tool';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -60,6 +54,12 @@ export function initCopilot(context: ExtensionContext) {
   context.subscriptions.push(
     nxParticipant,
     lm.registerTool('nx_generator-details', new GeneratorDetailsTool()),
+    lm.registerTool('nx_project-details', new ProjectDetailsTool()),
+    lm.registerTool(
+      'nx_visualize_project_graph_project',
+      new VisualizeProjectGraphTool(),
+    ),
+    lm.registerTool('nx_visualize_task_graph', new VisualizeTaskGraphTool()),
   );
 
   context.subscriptions.push(
@@ -94,8 +94,17 @@ const handler: ChatRequestHandler = async (
   const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
   const nxJson = await tryReadNxJson(workspacePath);
 
+  let generators: GeneratorCollectionInfo[];
+  try {
+    generators = await withTimeout<GeneratorCollectionInfo[]>(
+      async () => await getGenerators(),
+      3000,
+    );
+  } catch (e) {
+    generators = [];
+  }
   const generatorNamesAndDescriptions =
-    await getGeneratorNamesAndDescriptions();
+    await getGeneratorNamesAndDescriptions(generators);
 
   const baseProps: NxCopilotPromptProps = {
     userQuery: request.prompt,
@@ -127,11 +136,7 @@ const handler: ChatRequestHandler = async (
     };
   }
 
-  const tools = [];
-  // only include generator tool if there are generators
-  if (generatorNamesAndDescriptions.length > 0) {
-    tools.push(lm.tools.find((tool) => tool.name === 'nx_generator-details'));
-  }
+  stream.progress('Thinking...');
 
   const chatParticipantRequest = sendChatParticipantRequest(
     request,
@@ -141,7 +146,7 @@ const handler: ChatRequestHandler = async (
       responseStreamOptions: {
         stream,
       },
-      tools,
+      tools: lm.tools,
     },
     token,
   );

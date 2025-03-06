@@ -7,13 +7,10 @@
       "path": "../nx-workspace"
     },
     {
-      "path": "../../shared/file-system"
-    },
-    {
       "path": "../configuration"
     },
     {
-      "path": "../../shared/utils"
+      "path": "../../shared/file-system"
     },
     {
       "path": "../utils"

@@ -1,5 +1,5 @@
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
-import { getPackageManagerCommand } from '@nx-console/shared-utils';
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import {
   onWorkspaceRefreshed,
   showRefreshLoadingAtLocation,
@@ -10,10 +10,7 @@ import {
   getOutputChannel,
 } from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
-import {
-  getTelemetry,
-  TelemetryEventSource,
-} from '@nx-console/vscode-telemetry';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import {
   commands,
@@ -31,6 +28,7 @@ import { compareCIPEDataAndSendNotification } from './cipe-notifications';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
+import { TelemetryEventSource } from '@nx-console/shared-telemetry';
 
 export function initNxCloudView(context: ExtensionContext) {
   // set up state machine & listeners
@@ -42,7 +40,7 @@ export function initNxCloudView(context: ExtensionContext) {
           params: {
             oldData: CIPEInfo[] | null;
             newData: CIPEInfo[];
-          }
+          },
         ) => {
           compareCIPEDataAndSendNotification(params.oldData, params.newData);
         },
@@ -57,7 +55,7 @@ export function initNxCloudView(context: ExtensionContext) {
     {
       inspect: getStateMachineLogger(context),
       systemId: 'cloud-view',
-    }
+    },
   ).start();
   CloudOnboardingViewProvider.create(context, actor);
   CloudRecentCIPEProvider.create(context, actor);
@@ -74,13 +72,13 @@ export function initNxCloudView(context: ExtensionContext) {
   context.subscriptions.push(
     onWorkspaceRefreshed(async () => {
       updateOnboarding();
-    })
+    }),
   );
 
   context.subscriptions.push(
     showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
-    showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' })
+    showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' }),
   );
 
   // register commands
@@ -92,7 +90,7 @@ export function initNxCloudView(context: ExtensionContext) {
       'nxConsole.connectToCloud.welcomeView',
       async () => {
         runNxConnect('welcome-view');
-      }
+      },
     ),
     commands.registerCommand('nxCloud.refresh', () => {
       actor.system.get('polling').send({ type: 'FORCE_POLL' });
@@ -102,15 +100,15 @@ export function initNxCloudView(context: ExtensionContext) {
       });
       window.withProgress(
         { location: { viewId: 'nxCloudLoading' } },
-        async () => await loadingPromise
+        async () => await loadingPromise,
       );
       window.withProgress(
         { location: { viewId: 'nxCloudRecentCIPE' } },
-        async () => await loadingPromise
+        async () => await loadingPromise,
       );
       window.withProgress(
         { location: { viewId: 'nxCloudOnboarding' } },
-        async () => await loadingPromise
+        async () => await loadingPromise,
       );
     }),
     commands.registerCommand('nxCloud.login', async () => {
@@ -130,7 +128,7 @@ export function initNxCloudView(context: ExtensionContext) {
             ...process.env,
             NX_CONSOLE: 'true',
           },
-        })
+        }),
       );
       task.presentationOptions.focus = true;
 
@@ -142,7 +140,7 @@ export function initNxCloudView(context: ExtensionContext) {
             actor.system.get('polling').send({ type: 'FORCE_POLL' });
             subscription.dispose();
           }
-        }
+        },
       );
     }),
     commands.registerCommand('nxCloud.viewRecentError', () => {
@@ -154,7 +152,7 @@ export function initNxCloudView(context: ExtensionContext) {
       } else {
         getNxlsOutputChannel().show();
       }
-    })
+    }),
   );
 }
 
@@ -179,7 +177,7 @@ const getStateMachineLogger = (context: ExtensionContext) =>
           (event.actorRef as any)['_systemId'] === 'cloud-view'
         ) {
           getOutputChannel().appendLine(
-            `Nx Cloud - ${JSON.stringify(snapshot.value)}`
+            `Nx Cloud - ${JSON.stringify(snapshot.value)}`,
           );
         }
       };
@@ -191,13 +189,13 @@ function setCloudViewContext(viewId: string) {
       commands.executeCommand(
         'setContext',
         `nxCloudView.visible.${view}`,
-        true
+        true,
       );
     } else {
       commands.executeCommand(
         'setContext',
         `nxCloudView.visible.${view}`,
-        false
+        false,
       );
     }
   });

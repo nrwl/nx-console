@@ -8,6 +8,9 @@
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
+      "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
       "path": "../telemetry/tsconfig.lib.json"
     },
     {
@@ -29,7 +32,7 @@
       "path": "../../shared/utils/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/schema/tsconfig.lib.json"
+      "path": "../../shared/llm-context/tsconfig.lib.json"
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"

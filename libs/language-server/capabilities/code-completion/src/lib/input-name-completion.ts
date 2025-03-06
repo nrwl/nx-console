@@ -1,4 +1,4 @@
-import { nxWorkspace } from '@nx-console/language-server-workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import {
   ASTNode,
   CompletionItem,
@@ -6,12 +6,13 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { createCompletionItem } from './create-completion-path-item';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function inputNameCompletion(
   workingPath: string | undefined,
   node: ASTNode,
   document: TextDocument,
-  hasDependencyHat = false
+  hasDependencyHat = false,
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
@@ -19,7 +20,7 @@ export async function inputNameCompletion(
 
   const inputNameCompletion: CompletionItem[] = [];
 
-  const { nxJson } = await nxWorkspace(workingPath);
+  const { nxJson } = await nxWorkspace(workingPath, lspLogger);
 
   for (const inputName of Object.keys(nxJson.namedInputs ?? {})) {
     if (hasDependencyHat) {
@@ -30,8 +31,8 @@ export async function inputNameCompletion(
           node,
           document,
           CompletionItemKind.Property,
-          `Base "${inputName}" on this project's dependencies`
-        )
+          `Base "${inputName}" on this project's dependencies`,
+        ),
       );
     }
     inputNameCompletion.push(
@@ -40,8 +41,8 @@ export async function inputNameCompletion(
         '',
         node,
         document,
-        CompletionItemKind.Property
-      )
+        CompletionItemKind.Property,
+      ),
     );
   }
 

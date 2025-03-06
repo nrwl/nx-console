@@ -1,8 +1,9 @@
+import { NxVersion } from '@nx-console/nx-version';
 import {
   GeneratorContext,
   GeneratorSchema,
 } from '@nx-console/shared-generate-ui-types';
-import { NxVersion } from '@nx-console/nx-version';
+import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 import {
   GeneratorCollectionInfo,
   Option,
@@ -21,11 +22,10 @@ import type {
   Target,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
-import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
-  'nx/changeWorkspace'
+  'nx/changeWorkspace',
 );
 
 export const NxWorkspaceRefreshNotification: NotificationType<void> =
