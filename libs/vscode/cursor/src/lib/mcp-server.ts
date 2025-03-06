@@ -82,8 +82,11 @@ export function updateMcpServerWorkspacePath(workspacePath: string) {
   }
 }
 
-async function mcpIdeCallback({ type, payload }: IdeCallbackMessage) {
+async function mcpIdeCallback(callbackMessage: IdeCallbackMessage) {
+  const type = callbackMessage.type;
   if (type === 'focus-project') {
+    const payload = callbackMessage.payload;
+
     const workspaceProjects = await getNxWorkspaceProjects();
     if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
       window.showErrorMessage(`Cannot find project "${payload.projectName}"`);
@@ -91,6 +94,8 @@ async function mcpIdeCallback({ type, payload }: IdeCallbackMessage) {
     }
     commands.executeCommand('nx.graph.focus', payload.projectName);
   } else if (type === 'focus-task') {
+    const payload = callbackMessage.payload;
+
     const workspaceProjects = await getNxWorkspaceProjects();
     if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
       window.showErrorMessage(`Cannot find project "${payload.projectName}"`);
@@ -109,5 +114,7 @@ async function mcpIdeCallback({ type, payload }: IdeCallbackMessage) {
       projectName: payload.projectName,
       taskName: payload.taskName,
     });
+  } else if (type === 'full-project-graph') {
+    commands.executeCommand('nx.graph.showAll');
   }
 }

@@ -1,4 +1,7 @@
-export type IdeCallbackMessage = FocusProjectMessage | FocusTaskMessage;
+export type IdeCallbackMessage =
+  | FocusProjectMessage
+  | FocusTaskMessage
+  | FullProjectGraphMessage;
 
 export type FocusProjectMessage = {
   type: 'focus-project';
@@ -13,4 +16,8 @@ export type FocusTaskMessage = {
     projectName: string;
     taskName: string;
   };
+};
+
+export type FullProjectGraphMessage = {
+  type: 'full-project-graph';
 };

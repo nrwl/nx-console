@@ -21,6 +21,7 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import {
   FocusProjectMessage,
   FocusTaskMessage,
+  FullProjectGraphMessage,
   IdeCallbackMessage,
   NxWorkspace,
 } from '@nx-console/shared-types';
@@ -185,7 +186,7 @@ export class NxMcpServerWrapper {
 
     this.server.tool(
       'nx_docs',
-      'Returns a list of documentation sections that could be relevant to the user query. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
       {
         userQuery: z.string(),
       },
@@ -295,8 +296,12 @@ and follows the Nx workspace convention for project organization.
       'nx_visualize_graph',
       'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
       {
-        visualizationType: z.enum(['project', 'project-task']),
-        projectName: z.string(),
+        visualizationType: z.enum([
+          'project',
+          'project-task',
+          'full-project-graph',
+        ]),
+        projectName: z.string().optional(),
         taskName: z.string().optional(),
       },
       async ({ visualizationType, projectName, taskName }) => {
@@ -306,6 +311,12 @@ and follows the Nx workspace convention for project organization.
         });
         if (this.ideCallback) {
           if (visualizationType === 'project') {
+            if (!projectName) {
+              return {
+                isError: true,
+                content: [{ type: 'text', text: 'Project name is required' }],
+              };
+            }
             this.ideCallback({
               type: 'focus-project',
               payload: {
@@ -344,6 +355,18 @@ and follows the Nx workspace convention for project organization.
                 {
                   type: 'text',
                   text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                },
+              ],
+            };
+          } else if (visualizationType === 'full-project-graph') {
+            this.ideCallback({
+              type: 'full-project-graph',
+            } satisfies FullProjectGraphMessage);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: 'Opening full project graph. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
                 },
               ],
             };
