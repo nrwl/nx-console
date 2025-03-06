@@ -9,7 +9,10 @@ import {
   getProjectGraphErrorsPrompt,
   getProjectGraphPrompt,
 } from '@nx-console/shared-llm-context';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import {
+  checkIsNxWorkspace,
+  findMatchingProject,
+} from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -21,6 +24,7 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import {
   FocusProjectMessage,
   FocusTaskMessage,
+  FullProjectGraphMessage,
   IdeCallbackMessage,
   NxWorkspace,
 } from '@nx-console/shared-types';
@@ -161,7 +165,11 @@ export class NxMcpServerWrapper {
             content: [{ type: 'text', text: 'Error: Workspace not found' }],
           };
         }
-        const project = workspace.projectGraph.nodes[projectName];
+        const project = await findMatchingProject(
+          projectName,
+          workspace.projectGraph.nodes,
+          this._nxWorkspacePath,
+        );
 
         if (!project) {
           return {
@@ -185,7 +193,7 @@ export class NxMcpServerWrapper {
 
     this.server.tool(
       'nx_docs',
-      'Returns a list of documentation sections that could be relevant to the user query. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
       {
         userQuery: z.string(),
       },
@@ -295,8 +303,12 @@ and follows the Nx workspace convention for project organization.
       'nx_visualize_graph',
       'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
       {
-        visualizationType: z.enum(['project', 'project-task']),
-        projectName: z.string(),
+        visualizationType: z.enum([
+          'project',
+          'project-task',
+          'full-project-graph',
+        ]),
+        projectName: z.string().optional(),
         taskName: z.string().optional(),
       },
       async ({ visualizationType, projectName, taskName }) => {
@@ -305,48 +317,73 @@ and follows the Nx workspace convention for project organization.
           kind: visualizationType,
         });
         if (this.ideCallback) {
-          if (visualizationType === 'project') {
-            this.ideCallback({
-              type: 'focus-project',
-              payload: {
-                projectName,
-              },
-            } satisfies FocusProjectMessage);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Opening project graph for ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+          switch (visualizationType) {
+            case 'project':
+              if (!projectName) {
+                return {
+                  isError: true,
+                  content: [{ type: 'text', text: 'Project name is required' }],
+                };
+              }
+              this.ideCallback({
+                type: 'focus-project',
+                payload: {
+                  projectName,
                 },
-              ],
-            };
-          } else if (visualizationType === 'project-task') {
-            if (!taskName) {
+              } satisfies FocusProjectMessage);
               return {
-                isError: true,
                 content: [
                   {
                     type: 'text',
-                    text: 'Task name is required for task graph visualization',
+                    text: `Opening project graph for ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
                   },
                 ],
               };
-            }
-            this.ideCallback({
-              type: 'focus-task',
-              payload: {
-                projectName,
-                taskName,
-              },
-            } satisfies FocusTaskMessage);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+            case 'project-task':
+              if (!taskName) {
+                return {
+                  isError: true,
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Task name is required for task graph visualization',
+                    },
+                  ],
+                };
+              }
+              if (!projectName) {
+                return {
+                  isError: true,
+                  content: [{ type: 'text', text: 'Project name is required' }],
+                };
+              }
+              this.ideCallback({
+                type: 'focus-task',
+                payload: {
+                  projectName,
+                  taskName,
                 },
-              ],
-            };
+              } satisfies FocusTaskMessage);
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                  },
+                ],
+              };
+            case 'full-project-graph':
+              this.ideCallback({
+                type: 'full-project-graph',
+              } satisfies FullProjectGraphMessage);
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Opening full project graph. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
+                  },
+                ],
+              };
           }
         }
         return {

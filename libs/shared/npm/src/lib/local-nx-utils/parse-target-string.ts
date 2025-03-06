@@ -3,7 +3,7 @@ import { join } from 'path';
 import {
   importWorkspaceDependency,
   workspaceDependencyPath,
-} from './workspace-dependencies';
+} from '../workspace-dependencies';
 
 export async function parseTargetString(
   targetString: string,

@@ -113,19 +113,21 @@ async function showMCPNotification() {
     return;
   }
 
-  const answer = await window.showInformationMessage(
-    'Improve Cursor Agents with Nx-specific context?',
-    'Yes',
-    "Don't ask again",
-  );
+  window
+    .showInformationMessage(
+      'Improve Cursor Agents with Nx-specific context?',
+      'Yes',
+      "Don't ask again",
+    )
+    .then((answer) => {
+      if (answer === "Don't ask again") {
+        WorkspaceConfigurationStore.instance.set(MCP_DONT_ASK_AGAIN_KEY, true);
+      }
 
-  if (answer === "Don't ask again") {
-    WorkspaceConfigurationStore.instance.set(MCP_DONT_ASK_AGAIN_KEY, true);
-  }
-
-  if (answer === 'Yes') {
-    await updateMcpJson();
-  }
+      if (answer === 'Yes') {
+        updateMcpJson();
+      }
+    });
 }
 
 async function updateMcpJson() {

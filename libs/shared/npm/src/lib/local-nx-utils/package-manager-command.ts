@@ -1,6 +1,6 @@
 import { Logger } from '@nx-console/shared-utils';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
-import { importNxPackagePath } from './workspace-dependencies';
+import { importNxPackagePath } from '../workspace-dependencies';
 
 export async function getPackageManagerCommand(
   workspacePath: string,
