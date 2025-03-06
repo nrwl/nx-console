@@ -2,10 +2,10 @@ import { parse } from 'dotenv';
 import { existsSync, readFileSync } from 'fs';
 import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
 import { join } from 'path';
-import { readJsonFile } from './read-json';
+import { readJsonFile } from './local-nx-utils/read-json';
 
 export async function readNxJson(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<NxJsonConfiguration> {
   return await readJsonFile<NxJsonConfiguration>('nx.json', workspacePath);
 }
@@ -20,7 +20,7 @@ export async function canReadNxJson(workspacePath: string): Promise<boolean> {
 }
 
 export async function getNxAccessToken(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<string | undefined> {
   try {
     const nxJson = await readNxJson(workspacePath);
@@ -50,7 +50,7 @@ export async function getNxCloudUrl(workspacePath: string): Promise<string> {
 }
 
 export async function getNxCloudId(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<string | undefined> {
   try {
     const nxJson = await readNxJson(workspacePath);

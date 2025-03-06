@@ -4,10 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../../shared/utils"
-    },
-    {
-      "path": "../../workspace"
+      "path": "../../../shared/nx-workspace-info"
     },
     {
       "path": "../../../shared/npm"

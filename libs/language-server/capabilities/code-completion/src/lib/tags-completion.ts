@@ -1,5 +1,5 @@
-import { isArrayNode } from '@nx-console/language-server-utils';
-import { nxWorkspace } from '@nx-console/language-server-workspace';
+import { isArrayNode, lspLogger } from '@nx-console/language-server-utils';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import {
   ASTNode,
   CompletionItem,
@@ -11,7 +11,7 @@ import { createCompletionItem } from './create-completion-path-item';
 export async function tagsCompletion(
   workingPath: string | undefined,
   node: ASTNode,
-  document: TextDocument
+  document: TextDocument,
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
@@ -19,7 +19,7 @@ export async function tagsCompletion(
 
   const tagCompletion: CompletionItem[] = [];
 
-  const { projectGraph } = await nxWorkspace(workingPath);
+  const { projectGraph } = await nxWorkspace(workingPath, lspLogger);
   const tags = new Set<string>();
   for (const projectConfiguration of Object.values(projectGraph.nodes)) {
     for (const tag of projectConfiguration.data.tags ?? []) {
@@ -35,7 +35,13 @@ export async function tagsCompletion(
     }
 
     tagCompletion.push(
-      createCompletionItem(tag, '', node, document, CompletionItemKind.Constant)
+      createCompletionItem(
+        tag,
+        '',
+        node,
+        document,
+        CompletionItemKind.Constant,
+      ),
     );
   }
 

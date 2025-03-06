@@ -13,6 +13,9 @@
   ],
   "references": [
     {
+      "path": "../../shared/telemetry/tsconfig.lib.json"
+    },
+    {
       "path": "../lsp-client/tsconfig.lib.json"
     },
     {

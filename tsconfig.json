@@ -143,6 +143,24 @@
     },
     {
       "path": "./libs/vscode/copilot"
+    },
+    {
+      "path": "./apps/nx-mcp"
+    },
+    {
+      "path": "./libs/shared/nx-workspace-info"
+    },
+    {
+      "path": "./libs/shared/llm-context"
+    },
+    {
+      "path": "./libs/shared/telemetry"
+    },
+    {
+      "path": "./libs/nx-mcp/nx-mcp-server"
+    },
+    {
+      "path": "./libs/vscode/cursor"
     }
   ]
 }

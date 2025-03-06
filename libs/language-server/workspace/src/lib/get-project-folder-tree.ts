@@ -1,7 +1,8 @@
 import { TreeNode } from '@nx-console/shared-types';
 import { parse } from 'path';
-import { nxWorkspace } from './workspace';
+import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
+import { lspLogger } from '@nx-console/language-server-utils';
 
 /*
  * Construct a tree (all nodes are saved in a map) from the project definitions by doing the following:
@@ -14,7 +15,7 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
   serializedTreeMap: { dir: string; node: TreeNode }[];
   roots: TreeNode[];
 }> {
-  const { projectGraph } = await nxWorkspace(workspacePath);
+  const { projectGraph } = await nxWorkspace(workspacePath, lspLogger);
 
   const treeMap = new Map<string, TreeNode>();
   const roots = new Set<TreeNode>();
@@ -26,7 +27,7 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
   function addProjectOrFolderTreeNode(
     dir: string,
     projectName?: string,
-    projectConfiguration?: ProjectGraphProjectNode
+    projectConfiguration?: ProjectGraphProjectNode,
   ) {
     // if a node is only a folder and exists already, we don't need to add it again
     if (!projectConfiguration && !projectName && treeMap.has(dir)) {
@@ -90,7 +91,7 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
     ([dir, node]) => ({
       dir,
       node,
-    })
+    }),
   );
   const sortedRoots = Array.from(roots).sort((a, b) => {
     return a.dir.localeCompare(b.dir);

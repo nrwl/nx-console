@@ -70,25 +70,39 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         legacyShowAffected(legacyGrapyWebView);
       }
     }),
-    commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
-      getTelemetry().logUsage('graph.focus-project', {
-        source: uri ? 'explorer-context-menu' : 'command',
-      });
-      const nxVersion = await getNxVersion();
-      if (!nxVersion) {
-        showNoNxVersionMessage();
-        return;
-      }
-      if (gte(nxVersion, '17.3.0-beta.3')) {
-        const project = await getProjectForContext(uri);
-
-        if (project && project.name) {
-          graphWebviewManager.focusProject(project.name);
+    commands.registerCommand(
+      'nx.graph.focus',
+      async (uriOrProjectName: Uri | string | undefined) => {
+        getTelemetry().logUsage('graph.focus-project', {
+          source:
+            uriOrProjectName instanceof Uri
+              ? 'explorer-context-menu'
+              : 'command',
+        });
+        const nxVersion = await getNxVersion();
+        if (!nxVersion) {
+          showNoNxVersionMessage();
+          return;
         }
-      } else {
-        legacyFocus(legacyGrapyWebView, uri);
-      }
-    }),
+        if (gte(nxVersion, '17.3.0-beta.3')) {
+          if (typeof uriOrProjectName === 'string') {
+            graphWebviewManager.focusProject(uriOrProjectName);
+            return;
+          }
+
+          const project = await getProjectForContext(uriOrProjectName);
+
+          if (project && project.name) {
+            graphWebviewManager.focusProject(project.name);
+          }
+        } else {
+          legacyFocus(
+            legacyGrapyWebView,
+            uriOrProjectName instanceof Uri ? uriOrProjectName : undefined,
+          );
+        }
+      },
+    ),
     commands.registerCommand('nx.graph.select', async (uri: Uri) => {
       getTelemetry().logUsage('graph.select-project', {
         source: uri ? 'explorer-context-menu' : 'command',
@@ -127,7 +141,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         } else {
           legacyFocusButton(legacyGrapyWebView, treeItem);
         }
-      }
+      },
     ),
     commands.registerCommand(
       'nx.graph.select.button',
@@ -148,42 +162,69 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         } else {
           legacySelectButton(legacyGrapyWebView, treeItem);
         }
-      }
+      },
     ),
-    commands.registerCommand('nx.graph.task', async (uri: Uri | undefined) => {
-      getTelemetry().logUsage('graph.show-task', {
-        source: uri ? 'explorer-context-menu' : 'command',
-      });
-      const nxVersion = await getNxVersion();
-      if (!nxVersion) {
-        showNoNxVersionMessage();
-        return;
-      }
-      if (gte(nxVersion, '17.3.0-beta.3')) {
-        const project = await getProjectForContext(uri);
-        if (!project) return;
-
-        const targets = project.targets;
-        if (!targets || Object.keys(targets).length === 0) {
-          window.showErrorMessage(
-            `Project '${project.name}' has no targets defined.`
-          );
+    commands.registerCommand(
+      'nx.graph.task',
+      async (
+        uriOrTaskParams:
+          | Uri
+          | { projectName: string; taskName: string }
+          | undefined,
+      ) => {
+        getTelemetry().logUsage('graph.show-task', {
+          source:
+            uriOrTaskParams instanceof Uri
+              ? 'explorer-context-menu'
+              : 'command',
+        });
+        const nxVersion = await getNxVersion();
+        if (!nxVersion) {
+          showNoNxVersionMessage();
           return;
         }
+        if (gte(nxVersion, '17.3.0-beta.3')) {
+          // If direct project and task names were provided
+          if (
+            typeof uriOrTaskParams === 'object' &&
+            !(uriOrTaskParams instanceof Uri)
+          ) {
+            const { projectName, taskName } = uriOrTaskParams;
+            graphWebviewManager.focusTarget(projectName, taskName);
+            return;
+          }
 
-        const selectedTarget = await selectTarget(Object.keys(targets));
+          // Otherwise, continue with the existing URI-based logic
+          const project = await getProjectForContext(
+            uriOrTaskParams instanceof Uri ? uriOrTaskParams : undefined,
+          );
+          if (!project) return;
 
-        if (selectedTarget && project.name) {
-          graphWebviewManager.focusTarget(project.name, selectedTarget);
+          const targets = project.targets;
+          if (!targets || Object.keys(targets).length === 0) {
+            window.showErrorMessage(
+              `Project '${project.name}' has no targets defined.`,
+            );
+            return;
+          }
+
+          const selectedTarget = await selectTarget(Object.keys(targets));
+
+          if (selectedTarget && project.name) {
+            graphWebviewManager.focusTarget(project.name, selectedTarget);
+          }
+        } else {
+          legacyTask(
+            legacyGrapyWebView,
+            uriOrTaskParams instanceof Uri ? uriOrTaskParams : undefined,
+          );
         }
-      } else {
-        legacyTask(legacyGrapyWebView, uri);
-      }
-    }),
+      },
+    ),
     commands.registerCommand(
       'nx.graph.task.button',
       async (
-        item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
+        item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string],
       ) => {
         getTelemetry().logUsage('graph.show-task', {
           source: 'projects-view',
@@ -203,7 +244,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           } else if (item instanceof NxCommandsTreeItem) {
             if (item.commandConfig.type === 'target') {
               graphWebviewManager.showAllTargetsByName(
-                item.commandConfig.target
+                item.commandConfig.target,
               );
             }
           } else if (Array.isArray(item))
@@ -211,13 +252,13 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         } else {
           legacyTaskButton(legacyGrapyWebView, item);
         }
-      }
-    )
+      },
+    ),
   );
 }
 
 async function getProjectForContext(
-  uri: Uri | undefined
+  uri: Uri | undefined,
 ): Promise<ProjectConfiguration | undefined> {
   let filePath = uri?.fsPath;
 

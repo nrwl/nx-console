@@ -4,13 +4,16 @@
   "include": [],
   "references": [
     {
-      "path": "../lsp-client"
+      "path": "../output-channels"
     },
     {
       "path": "../nx-workspace"
     },
     {
-      "path": "../output-channels"
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/telemetry"
     },
     {
       "path": "./tsconfig.lib.json"

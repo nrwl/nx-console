@@ -11,11 +11,7 @@ import {
   workspace,
 } from 'vscode';
 
-import {
-  checkIsNxWorkspace,
-  killGroup,
-  withTimeout,
-} from '@nx-console/shared-utils';
+import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -26,13 +22,19 @@ import {
   initNxProjectView,
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
-import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
+import {
+  vscodeLogger,
+  watchCodeLensConfigChange,
+  watchFile,
+} from '@nx-console/vscode-utils';
 
+import { initCursor, updateMcpServerWorkspacePath } from '@nx-console/cursor';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode-add-dependency';
+import { initCopilot } from '@nx-console/vscode-copilot';
 import { initGenerateUiWebview } from '@nx-console/vscode-generate-ui-webview';
 import {
   createNxlsClient,
@@ -44,12 +46,12 @@ import { initNxConversion } from '@nx-console/vscode-nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
-import { initCopilot } from '@nx-console/vscode-copilot';
 
 import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server-types';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { initErrorDiagnostics } from '@nx-console/vscode-error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
@@ -62,6 +64,11 @@ import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import {
+  hasNxGraphServerAffected,
+  hasNxGraphServer,
+  getNxGraphServer,
+} from '@nx-console/vscode-graph-base';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -74,6 +81,7 @@ let hasInitializedExtensionPoints = false;
 
 export async function activate(c: ExtensionContext) {
   try {
+    vscodeLogger.log('Activating Nx Console');
     const startTime = Date.now();
     context = c;
 
@@ -81,12 +89,13 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     createNxlsClient(context);
-
     initTelemetry(context);
+    initCursor(context);
+
     initNxInit(context);
 
     context.subscriptions.push(
-      showRefreshLoadingAtLocation(ProgressLocation.Window)
+      showRefreshLoadingAtLocation(ProgressLocation.Window),
     );
 
     initHelpAndFeedbackView(context);
@@ -94,7 +103,7 @@ export async function activate(c: ExtensionContext) {
       'nxConsole.selectWorkspaceManually',
       async () => {
         manuallySelectWorkspaceDefinition();
-      }
+      },
     );
     const vscodeWorkspacePath =
       workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
@@ -118,30 +127,42 @@ export async function activate(c: ExtensionContext) {
     });
   } catch (e) {
     window.showErrorMessage(
-      'Nx Console encountered an error when activating (see output panel)'
+      'Nx Console encountered an error when activating (see output panel)',
     );
     getOutputChannel().appendLine(
-      'Nx Console encountered an error when activating'
+      'Nx Console encountered an error when activating',
     );
     getOutputChannel().appendLine(e.stack);
   }
+
+  process.on('exit', () => {
+    deactivate();
+  });
 }
 
 export async function deactivate() {
+  if (hasNxGraphServer()) {
+    getNxGraphServer(context).dispose();
+  }
+
+  if (hasNxGraphServerAffected()) {
+    getNxGraphServer(context, true).dispose();
+  }
+
+  workspaceFileWatcher?.dispose();
+
   try {
     await withTimeout(
       async () =>
         await getNxlsClient()?.sendRequest(
           new RequestType('shutdown'),
-          undefined
+          undefined,
         ),
-      2000
+      2000,
     );
   } catch (e) {
     // do nothing, we have to deactivate before the process is killed
   }
-
-  workspaceFileWatcher?.dispose();
 
   const nxlsPid = getNxlsClient()?.getNxlsPid();
   if (nxlsPid) {
@@ -171,18 +192,19 @@ function manuallySelectWorkspaceDefinition() {
             workspace.workspaceFolders?.[0].uri.fsPath || '';
           const selectedDirectoryRelativePath = relative(
             workspaceRoot,
-            selectedDirectory
+            selectedDirectory,
           );
           GlobalConfigurationStore.instance.set(
             'nxWorkspacePath',
-            selectedDirectoryRelativePath
+            selectedDirectoryRelativePath,
           );
+          updateMcpServerWorkspacePath(selectedDirectory);
           setWorkspace(selectedDirectory);
         }
       });
   } else {
     window.showInformationMessage(
-      'Cannot select an Nx workspace when no folders are opened in the explorer'
+      'Cannot select an Nx workspace when no folders are opened in the explorer',
     );
   }
 }
@@ -197,12 +219,12 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
   if (workspacePathFromSettings) {
     currentDirectory = resolve(
       workspace.workspaceFolders?.[0].uri.fsPath || '',
-      workspacePathFromSettings
+      workspacePathFromSettings,
     );
   } else {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
       'nxWorkspacePath',
-      ''
+      '',
     );
     if (workspacePath) {
       currentDirectory = workspacePath;
@@ -269,6 +291,7 @@ async function setWorkspace(workspacePath: string) {
     initVscodeProjectGraph(context);
     initErrorDiagnostics(context);
     initCopilot(context);
+    initCursor(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 
@@ -286,7 +309,7 @@ async function setWorkspace(workspacePath: string) {
   commands.executeCommand(
     'setContext',
     'isAngularWorkspace',
-    isAngularWorkspace
+    isAngularWorkspace,
   );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
 
@@ -295,7 +318,7 @@ async function setWorkspace(workspacePath: string) {
 
 async function registerWorkspaceFileWatcher(
   context: ExtensionContext,
-  workspacePath: string
+  workspacePath: string,
 ) {
   if (workspaceFileWatcher) {
     workspaceFileWatcher.dispose();
@@ -308,12 +331,12 @@ async function registerWorkspaceFileWatcher(
         await setWorkspace(workspacePath);
         if (isNxWorkspace) {
           getOutputChannel().appendLine(
-            'Detected Nx workspace. Refreshing workspace.'
+            'Detected Nx workspace. Refreshing workspace.',
           );
           refreshWorkspaceWithBackoff();
         }
       }
-    }
+    },
   );
 
   context.subscriptions.push(workspaceFileWatcher);
@@ -345,7 +368,7 @@ async function registerWorkspaceFileWatcher(
           () => {
             disposable.dispose();
             resolve();
-          }
+          },
         );
       });
       refreshWorkspaceWithBackoff(iteration + 1);
@@ -359,17 +382,17 @@ async function registerSettingsNxWorkspacePathWatcher() {
       if (event.affectsConfiguration('nxConsole.nxWorkspacePath')) {
         const newWorkspacePath =
           GlobalConfigurationStore.instance.config.get<string>(
-            'nxWorkspacePath'
+            'nxWorkspacePath',
           );
         if (newWorkspacePath) {
           const nxWorkspacePath = resolve(
             workspace.workspaceFolders?.[0].uri.fsPath || '',
-            newWorkspacePath
+            newWorkspacePath,
           );
           await setWorkspace(nxWorkspacePath);
         }
       }
-    }
+    },
   );
 
   context.subscriptions.push(settingsNxWorkspacePathWatcher);

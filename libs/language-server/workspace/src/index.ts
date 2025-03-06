@@ -1,11 +1,7 @@
-export * from './lib/workspace';
-export * from './lib/get-generators';
 export * from './lib/get-generator-options';
 export * from './lib/get-project-by-path';
 export * from './lib/get-generator-context-from-path';
 export * from './lib/get-generator-context-v2';
-export * from './lib/get-executors';
-export * from './lib/get-nx-version';
 export * from './lib/get-project-graph-output';
 export * from './lib/create-project-graph';
 export * from './lib/get-project-folder-tree';
@@ -18,4 +14,3 @@ export * from './lib/get-cloud-onboarding-info';
 export * from './lib/get-pdv-data';
 export * from './lib/get-recent-cipe-data';
 export * from './lib/parse-target-string';
-export { getNxDaemonClient } from './lib/get-nx-workspace-package';

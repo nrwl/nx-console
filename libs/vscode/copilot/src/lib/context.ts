@@ -1,10 +1,12 @@
 import { readNxJson } from '@nx-console/shared-npm';
-import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
+import {
+  DocsPageSection,
+  getDocsContext as getSharedDocsContext,
+} from '@nx-console/shared-llm-context';
 import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
-import { xhr } from 'request-light';
 import {
   ChatRequestTurn,
   ChatResponseStream,
@@ -39,27 +41,6 @@ export async function getProjectGraph(
   return projectGraph;
 }
 
-export async function getGeneratorNamesAndDescriptions(): Promise<
-  {
-    name: string;
-    description: string;
-  }[]
-> {
-  let generators: GeneratorCollectionInfo[];
-  try {
-    await withTimeout<void>(async () => {
-      generators = await getGenerators();
-    }, 3000);
-  } catch (e) {
-    generators = [];
-  }
-
-  return generators.map((generator) => ({
-    name: generator.name,
-    description: generator.data.description,
-  }));
-}
-
 export async function tryReadNxJson(
   workspacePath: string,
 ): Promise<NxJsonConfiguration | undefined> {
@@ -70,41 +51,23 @@ export async function tryReadNxJson(
   }
 }
 
-export type DocsPageSection = {
-  heading: string;
-  longer_heading: string;
-  content: string;
-  similarity: number;
-};
-
 export async function getDocsContext(
   prompt: string,
   history: ReadonlyArray<ChatRequestTurn | ChatResponseTurn>,
 ): Promise<DocsPageSection[]> {
   try {
-    const messages = history.map((chatItem) => ({
-      role: chatItem instanceof ChatRequestTurn ? 'user' : 'assistant',
-      content:
-        chatItem instanceof ChatRequestTurn
-          ? chatItem.prompt
-          : chatResponseToString(chatItem),
-    }));
-    messages.push({
-      role: 'user',
-      content: prompt,
-    });
+    const lastAssistantMessage = history
+      .filter(
+        (turn): turn is ChatResponseTurn => turn instanceof ChatResponseTurn,
+      )
+      .slice(-1)[0];
 
-    const req = await xhr({
-      url: 'https://nx.dev/api/query-ai-embeddings',
-      type: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: JSON.stringify({
-        messages,
-      }),
-    });
-
-    const response = JSON.parse(req.responseText);
-    return response.context.pageSections;
+    return await getSharedDocsContext(
+      prompt,
+      lastAssistantMessage
+        ? chatResponseToString(lastAssistantMessage)
+        : undefined,
+    );
   } catch (error) {
     getOutputChannel().appendLine(
       `Error fetching AI context: ${JSON.stringify(error)}`,

@@ -1,5 +1,5 @@
 import { lspLogger } from '@nx-console/language-server-utils';
-import { getNxVersion } from '@nx-console/language-server-workspace';
+import { getNxVersion } from '@nx-console/shared-nx-workspace-info';
 import { debounce } from '@nx-console/shared-utils';
 import { DaemonWatcher } from './daemon-watcher';
 import { NativeWatcher } from './native-watcher';
@@ -11,7 +11,7 @@ let _nativeWatcher: NativeWatcher | undefined;
 
 export async function languageServerWatcher(
   workspacePath: string,
-  callback: () => unknown
+  callback: () => unknown,
 ): Promise<() => void> {
   const version = await getNxVersion(workspacePath);
   const debouncedCallback = debounce(callback, 1000);
@@ -36,7 +36,7 @@ export async function languageServerWatcher(
       const daemonWatcher = new DaemonWatcher(
         workspacePath,
         version,
-        debouncedCallback
+        debouncedCallback,
       );
       _daemonWatcher = daemonWatcher;
 

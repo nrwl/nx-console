@@ -4,7 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/utils"
+      "path": "../output-channels"
     },
     {
       "path": "../../shared/types"

@@ -7,9 +7,9 @@ fun isWindows(): Boolean {
     return System.getProperty("os.name").lowercase().startsWith("windows")
 }
 
-val nxlsRoot = "${rootDir}/dist/apps/nxls"
+val nxlsRoot = "${rootDir}/../../dist/apps/nxls"
 
-layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
+layout.buildDirectory = file("${rootDir}/../../dist/apps/intellij")
 
 plugins {
     // Java support
@@ -19,7 +19,7 @@ plugins {
     // Kotlin serialization
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
     // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.1.0"
+    id("org.jetbrains.intellij.platform") version "2.3.0"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
@@ -40,6 +40,26 @@ repositories {
     mavenCentral()
 
     intellijPlatform { defaultRepositories() }
+}
+
+allprojects {
+  apply {
+    plugin("project-report")
+    plugin("org.jetbrains.kotlin.jvm")
+    plugin("com.ncorti.ktfmt.gradle")
+  }
+}
+
+tasks.register("projectReportAll") {
+  // All project reports of subprojects
+  allprojects.forEach {
+    dependsOn(it.tasks.get("projectReport"))
+  }
+
+  // All projectReportAll of included builds
+  gradle.includedBuilds.forEach {
+    dependsOn(it.task(":projectReportAll"))
+  }
 }
 
 configurations.all {
@@ -80,6 +100,7 @@ dependencies {
         zipSigner()
         instrumentationTools()
     }
+    implementation(project(":libs:intellij:models"))
 }
 
 ktfmt { kotlinLangStyle() }
@@ -149,7 +170,7 @@ intellijPlatform {
 intellijPlatformTesting {
     runIde {
         create("runIntelliJLatest") {
-            version = "243.12818.47"
+            version = "251.23536.34"
             prepareSandboxTask {
                 from(nxlsRoot) {
                     include("**")
@@ -184,7 +205,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 tasks {
-    runInspections { mount("${rootDir}/gradle.properties", "/data/project/gradle.properties") }
+    runInspections { mount("${rootDir}/../../gradle.properties", "/data/project/gradle.properties") }
 
     prepareSandbox() {
         from(nxlsRoot) {
@@ -205,7 +226,7 @@ tasks {
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
-    from("${rootDir}/dist/apps/generate-ui-v2")
+    from("${rootDir}/../../dist/apps/generate-ui-v2")
     include("*.js", "*.css")
     into(layout.buildDirectory.file("resources/main/generate_ui_v2"))
 }
