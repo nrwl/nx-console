@@ -247,7 +247,7 @@ export class NxGraphServer implements Disposable {
   }
 
   dispose() {
-    this.nxGraphProcess?.kill('SIGTERM');
+    this.nxGraphProcess?.kill('SIGINT');
     this.nxGraphProcess = undefined;
   }
 }
