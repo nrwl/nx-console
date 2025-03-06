@@ -9,7 +9,10 @@ import {
   getProjectGraphErrorsPrompt,
   getProjectGraphPrompt,
 } from '@nx-console/shared-llm-context';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import {
+  checkIsNxWorkspace,
+  findMatchingProject,
+} from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -162,7 +165,11 @@ export class NxMcpServerWrapper {
             content: [{ type: 'text', text: 'Error: Workspace not found' }],
           };
         }
-        const project = workspace.projectGraph.nodes[projectName];
+        const project = await findMatchingProject(
+          projectName,
+          workspace.projectGraph.nodes,
+          this._nxWorkspacePath,
+        );
 
         if (!project) {
           return {
@@ -310,66 +317,73 @@ and follows the Nx workspace convention for project organization.
           kind: visualizationType,
         });
         if (this.ideCallback) {
-          if (visualizationType === 'project') {
-            if (!projectName) {
-              return {
-                isError: true,
-                content: [{ type: 'text', text: 'Project name is required' }],
-              };
-            }
-            this.ideCallback({
-              type: 'focus-project',
-              payload: {
-                projectName,
-              },
-            } satisfies FocusProjectMessage);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Opening project graph for ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+          switch (visualizationType) {
+            case 'project':
+              if (!projectName) {
+                return {
+                  isError: true,
+                  content: [{ type: 'text', text: 'Project name is required' }],
+                };
+              }
+              this.ideCallback({
+                type: 'focus-project',
+                payload: {
+                  projectName,
                 },
-              ],
-            };
-          } else if (visualizationType === 'project-task') {
-            if (!taskName) {
+              } satisfies FocusProjectMessage);
               return {
-                isError: true,
                 content: [
                   {
                     type: 'text',
-                    text: 'Task name is required for task graph visualization',
+                    text: `Opening project graph for ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
                   },
                 ],
               };
-            }
-            this.ideCallback({
-              type: 'focus-task',
-              payload: {
-                projectName,
-                taskName,
-              },
-            } satisfies FocusTaskMessage);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+            case 'project-task':
+              if (!taskName) {
+                return {
+                  isError: true,
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Task name is required for task graph visualization',
+                    },
+                  ],
+                };
+              }
+              if (!projectName) {
+                return {
+                  isError: true,
+                  content: [{ type: 'text', text: 'Project name is required' }],
+                };
+              }
+              this.ideCallback({
+                type: 'focus-task',
+                payload: {
+                  projectName,
+                  taskName,
                 },
-              ],
-            };
-          } else if (visualizationType === 'full-project-graph') {
-            this.ideCallback({
-              type: 'full-project-graph',
-            } satisfies FullProjectGraphMessage);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: 'Opening full project graph. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
-                },
-              ],
-            };
+              } satisfies FocusTaskMessage);
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                  },
+                ],
+              };
+            case 'full-project-graph':
+              this.ideCallback({
+                type: 'full-project-graph',
+              } satisfies FullProjectGraphMessage);
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Opening full project graph. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
+                  },
+                ],
+              };
           }
         }
         return {

@@ -16,6 +16,7 @@ import { commands } from 'vscode';
 import express from 'express';
 import { window } from 'vscode';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { findMatchingProject } from '@nx-console/shared-npm';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -88,22 +89,30 @@ async function mcpIdeCallback(callbackMessage: IdeCallbackMessage) {
     const payload = callbackMessage.payload;
 
     const workspaceProjects = await getNxWorkspaceProjects();
-    if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
+    const project = await findMatchingProject(
+      payload.projectName,
+      workspaceProjects,
+      getNxWorkspacePath(),
+    );
+    if (!project) {
       window.showErrorMessage(`Cannot find project "${payload.projectName}"`);
       return;
     }
-    commands.executeCommand('nx.graph.focus', payload.projectName);
+    commands.executeCommand('nx.graph.focus', project.name);
   } else if (type === 'focus-task') {
     const payload = callbackMessage.payload;
 
     const workspaceProjects = await getNxWorkspaceProjects();
-    if (!workspaceProjects || !workspaceProjects[payload.projectName]) {
+    const project = await findMatchingProject(
+      payload.projectName,
+      workspaceProjects,
+      getNxWorkspacePath(),
+    );
+    if (!project) {
       window.showErrorMessage(`Cannot find project "${payload.projectName}"`);
       return;
     }
-    if (
-      !workspaceProjects[payload.projectName].data.targets?.[payload.taskName]
-    ) {
+    if (!project.data.targets?.[payload.taskName]) {
       window.showErrorMessage(
         `Cannot find task "${payload.taskName}" in project "${payload.projectName}"`,
       );
@@ -111,7 +120,7 @@ async function mcpIdeCallback(callbackMessage: IdeCallbackMessage) {
     }
 
     commands.executeCommand('nx.graph.task', {
-      projectName: payload.projectName,
+      projectName: project.name,
       taskName: payload.taskName,
     });
   } else if (type === 'full-project-graph') {

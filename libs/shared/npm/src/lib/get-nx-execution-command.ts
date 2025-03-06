@@ -1,5 +1,5 @@
 import { platform } from 'os';
-import { getPackageManagerCommand } from './package-manager-command';
+import { getPackageManagerCommand } from './local-nx-utils/package-manager-command';
 
 /**
  * see `getShellExecutionForConfig` for a vscode-specific implementation of this
