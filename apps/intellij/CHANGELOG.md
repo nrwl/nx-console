@@ -1,3 +1,16 @@
+## 1.39.0 (2025-03-10)
+
+### Bug Fixes
+
+* **intellij:** update version compat ([#2422](https://github.com/nrwl/nx-console/issues/2422)) ([2e49a56](https://github.com/nrwl/nx-console/commit/2e49a564653420732b5de0aad85762c4c54b80b7))
+* use nx binary directly in graph & shut down correctly in vscode ([#2423](https://github.com/nrwl/nx-console/issues/2423)) ([88a054e](https://github.com/nrwl/nx-console/commit/88a054e93bfefbb4a95963c781e5205ef3c02eb4))
+* **vscode:** tweak mcp impl ([#2426](https://github.com/nrwl/nx-console/issues/2426)) ([1f1f3e8](https://github.com/nrwl/nx-console/commit/1f1f3e888492a21744f63b113303a93e94ffd8bb))
+
+
+### Features
+
+* add nx mcp ([#2415](https://github.com/nrwl/nx-console/issues/2415)) ([db12e19](https://github.com/nrwl/nx-console/commit/db12e1987167d6ce75692e983383baacae2d818f))
+
 ## 1.38.0 (2025-02-27)
 
 ### Bug Fixes
