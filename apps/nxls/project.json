@@ -4,31 +4,6 @@
   "sourceRoot": "apps/nxls/src",
   "projectType": "application",
   "targets": {
-    "watch": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/apps/vscode/nxls",
-        "main": "apps/nxls/src/main.ts",
-        "tsConfig": "apps/nxls/tsconfig.app.json",
-        "assets": ["apps/nxls/src/assets"],
-        "sourcemap": true,
-        "watch": true,
-        "skipTypeCheck": false,
-        "external": ["@swc/*", "@parcel/watcher", "nx", "webpack", "fsevents"],
-        "outputFileName": "main.js",
-        "format": ["cjs"],
-        "platform": "node",
-        "generatePackageJson": false,
-        "esbuildOptions": {
-          "mainFields": ["module", "main"],
-          "outExtension": {
-            ".js": ".js"
-          }
-        },
-        "thirdParty": true
-      }
-    },
     "package": {
       "executor": "@nx/webpack:webpack",
       "options": {

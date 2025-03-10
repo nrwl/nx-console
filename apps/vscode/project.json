@@ -30,65 +30,8 @@
       }
     },
     "watch": {
-      "executor": "@nx/esbuild:esbuild",
-      "options": {
-        "watch": true,
-        "external": [
-          "vscode",
-          "typescript",
-          "@swc/core",
-          "fsevents",
-          "ts-node",
-          "pnpapi",
-          "@angular-devkit/*",
-          "nx"
-        ],
-        "bundle": true,
-        "thirdParty": true,
-        "sourcemap": true,
-        "outputPath": "dist/apps/vscode",
-        "skipTypeCheck": false,
-        "outputFileName": "main.js",
-        "format": ["cjs"],
-        "main": "apps/vscode/src/main.ts",
-        "tsConfig": "apps/vscode/tsconfig.app.json",
-        "assets": [
-          {
-            "glob": "nx-schema.json",
-            "input": "apps/vscode/src",
-            "output": "/"
-          },
-          {
-            "glob": "tree-view-icon.svg",
-            "input": "apps/vscode/src",
-            "output": "/"
-          },
-          {
-            "glob": "**/*",
-            "input": "apps/vscode/src/assets",
-            "output": "/assets"
-          },
-          {
-            "glob": "**/*",
-            "input": "apps/vscode/src/getting-started",
-            "output": "/getting-started"
-          }
-        ],
-        "deleteOutputPath": false,
-        "generatePackageJson": false,
-        "platform": "node",
-        "esbuildOptions": {
-          "mainFields": ["module", "main"],
-          "sourcemap": "both",
-          "outExtension": {
-            ".js": ".js"
-          },
-          "loader": {
-            ".node": "dataurl"
-          },
-          "logLevel": "error"
-        }
-      }
+      "command": "nx watch --projects=vscode --includeDependentProjects -- nx run vscode:build:debug",
+      "dependsOn": ["build"]
     },
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -187,10 +130,12 @@
     },
     "extract-dependencies": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/vscode"],
       "options": {
         "command": "node ./tools/scripts/copy-to-vscode.js"
       },
       "inputs": [
+        "default",
         "{workspaceRoot}/tools/scripts/copy-to-vscode.js",
         {
           "dependentTasksOutputFiles": "**/*",
