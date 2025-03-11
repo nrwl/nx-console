@@ -8,6 +8,7 @@ on:
 env:
   NODE_VERSION: 22
   JAVA_VERSION: 21
+  MAYBE_CLOUD_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
 
 jobs:
   main-linux:
@@ -36,8 +37,8 @@ jobs:
           cache: yarn
 
       - name: Set Nx Cloud Token
-        if: github.repository == 'nrwl/nx-console'
-        run: echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}" >> $GITHUB_ENV
+        if: ${{ env.MAYBE_CLOUD_TOKEN != '' }}
+        run: echo "NX_CLOUD_ACCESS_TOKEN=${{ env.MAYBE_CLOUD_TOKEN }}" >> $GITHUB_ENV
 
       - name: Start the Nx Cloud CI Run
         run: |
@@ -114,8 +115,8 @@ jobs:
           cache: yarn
 
       - name: Set Nx Cloud Token
-        if: github.repository == 'nrwl/nx-console'
-        run: echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}" >> $env:GITHUB_ENV
+        if: ${{ env.MAYBE_CLOUD_TOKEN != '' }}
+        run: echo "NX_CLOUD_ACCESS_TOKEN=${{ env.MAYBE_CLOUD_TOKEN }}" >> $env:GITHUB_ENV
 
       - name: Start the Nx Cloud CI Run
         run: |
