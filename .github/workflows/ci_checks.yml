@@ -8,7 +8,6 @@ on:
 env:
   NODE_VERSION: 22
   JAVA_VERSION: 21
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
 
 jobs:
   main-linux:
@@ -35,6 +34,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           check-latest: true
           cache: yarn
+
+      - name: Set Nx Cloud Token
+        if: github.repository == 'nrwl/nx-console'
+        run: echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}" >> $GITHUB_ENV
 
       - name: Start the Nx Cloud CI Run
         run: |
@@ -109,6 +112,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           check-latest: true
           cache: yarn
+
+      - name: Set Nx Cloud Token
+        if: github.repository == 'nrwl/nx-console'
+        run: echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}" >> $env:GITHUB_ENV
 
       - name: Start the Nx Cloud CI Run
         run: |
