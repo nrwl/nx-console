@@ -11,7 +11,7 @@ import {
 } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { AbstractTreeProvider } from '@nx-console/vscode-utils';
-import { commands, env, ExtensionContext } from 'vscode';
+import { commands, env, ExtensionContext, ThemeIcon } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { ListView, ListViewItem } from './views/nx-project-list-view';
@@ -106,7 +106,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
           item.label = processed.label || item.label;
           item.description = processed.description || item.description;
           item.tooltip = processed.tooltip || item.tooltip;
-          item.iconPath = processed.iconPath || item.iconPath;
+          item.iconPath = new ThemeIcon(processed.iconPath) || item.iconPath;
           return item;
         });
       });

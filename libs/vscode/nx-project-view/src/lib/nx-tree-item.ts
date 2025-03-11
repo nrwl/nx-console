@@ -34,18 +34,15 @@ export class NxTreeItem extends TreeItem {
       this.tooltip = `${item.errorCount} errors detected. The project graph may be missing some information`;
     }
 
-    this.setIcons(item.iconPath);
+    this.setIcons();
   }
 
-  setIcons(customIconPath?: string) {
+  setIcons() {
     if (this.contextValue === 'projectGraphError') {
       this.iconPath = new ThemeIcon('error');
       return;
     }
-    if (customIconPath) {
-      this.iconPath = customIconPath;
-      return;
-    }
+
     if (this.contextValue === 'folder') {
       this.iconPath = new ThemeIcon('folder');
     }
