@@ -81,7 +81,7 @@ let hasInitializedExtensionPoints = false;
 
 export async function activate(c: ExtensionContext) {
   try {
-    vscodeLogger.log('Activating Nx Console');
+    vscodeLogger.log(`Activating Nx Console (pid ${process.pid})`);
     const startTime = Date.now();
     context = c;
 
