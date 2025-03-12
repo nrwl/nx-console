@@ -47,7 +47,12 @@ You can download Nx Console from the following places:
 
 Nx Console enhances your editors AI features by providing relevant context to the large language models powering VSCode and Cursor. Automatically teach AI about your workspace architecture, generators and feed it up-to-date nx docs!
 
-[PLACEHOLDER FOR LLM INTEGRATION GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai.gif" width="100%">
+    </picture>
+</p>
 
 In VSCode, access the enhancements via the `@nx` chat participant. Learn more [in our blog post](https://nx.dev/blog/nx-just-made-your-llm-smarter) or the [Nx docs](https://nx.dev/features/enhance-AI#vs-code-with-github-copilot)
 
@@ -59,8 +64,8 @@ Nx Console provides seamless integration with the Project Details View (PDV). Yo
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/pdv-demo.gif">
-        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/pdv-demo.gif" width="100%">
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-pdv.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-pdv.gif" width="100%">
     </picture>
 </p>
 
