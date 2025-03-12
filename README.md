@@ -35,7 +35,10 @@ Nx Console is that tool. It helps developers stay in the flow and unlocks new wo
 
 ## Installation
 
+You can download Nx Console from the following places:
+
 - [Nx Console for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) from the Visual Studio Marketplace.
+- [Nx Console for Visual Studio Code](https://open-vsx.org/extension/nrwl/angular-console) from the OpenVSX Registry
 - [Nx Console for JetBrains](https://plugins.jetbrains.com/plugin/21060-nx-console) from the JetBrains Marketplace
 
 ## Key Features

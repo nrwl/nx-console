@@ -146,6 +146,9 @@
       ],
       "dependsOn": ["^build"]
     },
+    "prune-readme": {
+      "command": "node ./tools/scripts/prune-vscode-readme.js"
+    },
     "package": {
       "executor": "nx:run-commands",
       "dependsOn": ["build", "^build"],
