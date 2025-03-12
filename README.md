@@ -64,7 +64,7 @@ Nx Console provides seamless integration with the Project Details View (PDV). Yo
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-pdv.gif">
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-pdv-dark.gif">
         <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-pdv.gif" width="100%">
     </picture>
 </p>
