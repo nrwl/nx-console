@@ -11,28 +11,6 @@
     "nx-cloud-onboarding-webview"
   ],
   "targets": {
-    "watch-all": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          {
-            "command": "yarn nx run vscode:watch",
-            "prefix": "vscode",
-            "color": "blue"
-          },
-          {
-            "command": "yarn nx run nxls:watch",
-            "prefix": "lsp",
-            "color": "magenta"
-          }
-        ],
-        "parallel": true
-      }
-    },
-    "watch": {
-      "command": "nx watch --projects=vscode --includeDependentProjects -- nx run vscode:build:debug",
-      "dependsOn": ["build"]
-    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
@@ -127,6 +105,10 @@
       ],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production"
+    },
+    "watch": {
+      "command": "nx watch --projects=vscode --includeDependentProjects -- nx run vscode:build:debug",
+      "dependsOn": ["build"]
     },
     "extract-dependencies": {
       "executor": "nx:run-commands",

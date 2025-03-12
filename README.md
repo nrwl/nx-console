@@ -51,13 +51,18 @@ Nx Console enhances your editors AI features by providing relevant context to th
 
 In VSCode, access the enhancements via the `@nx` chat participant. Learn more [in our blog post](https://nx.dev/blog/nx-just-made-your-llm-smarter) or the [Nx docs](https://nx.dev/features/enhance-AI#vs-code-with-github-copilot)
 
-In Cursor or anywhere else, use the Nx MCP server. Learn more [in our Cursor blog](https://nx.dev/blog/nx-made-cursor-smarter) post or the [Nx docs](https://nx.dev/features/enhance-AI#cursor)
+In Cursor or anywhere else, use the Nx MCP server. Learn more [in our Cursor blog](https://nx.dev/blog/nx-made-cursor-smarter) post or [watch the announcement video](https://www.youtube.com/watch?v=V2W94Sq_v6A)
 
 ### Project Details View
 
 Nx Console provides seamless integration with the Project Details View (PDV). You can learn more about your project, the available tasks and detailed configuration information. With the PDV in Nx Console, you can run tasks or navigate the task graph with just a few clicks!
 
-[PLACEHOLDER FOR PROJECT DETAILS GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/pdv-demo.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/pdv-demo.gif" width="100%">
+    </picture>
+</p>
 
 [Learn more about the Project Details view on nx.dev](https://nx.dev/recipes/nx-console/console-project-details#nx-console-project-details-view)
 
