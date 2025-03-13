@@ -45,7 +45,7 @@ export class NxTreeItem extends TreeItem {
 
     if (iconPath) {
       this.iconPath = new ThemeIcon(iconPath);
-      return
+      return;
     }
 
     if (this.contextValue === 'folder') {
