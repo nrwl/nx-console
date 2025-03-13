@@ -109,7 +109,12 @@ Nx Console presents an overview of your workspace from an Nx perspective. You ca
 
 Nx Console visualizes the Nx project & task graphs right in your editor. It knows which file you're working on, so you can easily open the graph focused on that specific project. Also, with the tight integration into your editor, you can run tasks or explore the files that cause project dependencies with a single click.
 
-[PLACEHOLDER FOR NX GRAPH GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-graph-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-graph.gif" width="100%">
+    </picture>
+</p>
 
 ## Requirements
 
