@@ -43,23 +43,19 @@ repositories {
 }
 
 allprojects {
-  apply {
-    plugin("project-report")
-    plugin("org.jetbrains.kotlin.jvm")
-    plugin("com.ncorti.ktfmt.gradle")
-  }
+    apply {
+        plugin("project-report")
+        plugin("org.jetbrains.kotlin.jvm")
+        plugin("com.ncorti.ktfmt.gradle")
+    }
 }
 
 tasks.register("projectReportAll") {
-  // All project reports of subprojects
-  allprojects.forEach {
-    dependsOn(it.tasks.get("projectReport"))
-  }
+    // All project reports of subprojects
+    allprojects.forEach { dependsOn(it.tasks.get("projectReport")) }
 
-  // All projectReportAll of included builds
-  gradle.includedBuilds.forEach {
-    dependsOn(it.task(":projectReportAll"))
-  }
+    // All projectReportAll of included builds
+    gradle.includedBuilds.forEach { dependsOn(it.task(":projectReportAll")) }
 }
 
 configurations.all {
@@ -96,9 +92,9 @@ dependencies {
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
             }
         )
+        bundledModule("com.intellij.modules.json")
         pluginVerifier()
         zipSigner()
-        instrumentationTools()
     }
     implementation(project(":libs:intellij:models"))
 }
@@ -205,7 +201,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 tasks {
-    runInspections { mount("${rootDir}/../../gradle.properties", "/data/project/gradle.properties") }
+    runInspections {
+        mount("${rootDir}/../../gradle.properties", "/data/project/gradle.properties")
+    }
 
     prepareSandbox() {
         from(nxlsRoot) {
