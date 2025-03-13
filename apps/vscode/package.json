@@ -1,7 +1,7 @@
 {
   "name": "angular-console",
   "displayName": "Nx Console",
-  "description": "The UI for Nx & Lerna",
+  "description": "The UI for Monorepos, providing visual workflows and enriching your AI Chat with deep insights",
   "version": "17.28.2",
   "repository": {
     "type": "git",
