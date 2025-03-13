@@ -75,7 +75,12 @@ Nx Console provides seamless integration with the Project Details View (PDV). Yo
 
 Nx Console makes it easier to run generators through our interactive Generate UI. It automatically parses the schema for any generator and provides autocomplete, validation and dry-run previews as you type.
 
-[PLACEHOLDER FOR GENERATE UI GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-generate-ui-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-generate-ui.gif" width="100%">
+    </picture>
+</p>
 
 You can launch the Generate UI via the `Nx: Generate (UI)` command or through the context menu in the file explorer. Paths will be automatically prefilled! [Learn more about the Generate UI on nx.dev](https://nx.dev/recipes/nx-console/console-generate-command)
 
