@@ -101,9 +101,14 @@ Additionally, Nx Console helps by guiding you through the Nx Cloud onboarding pr
 
 ### Projects & Tasks Overview
 
-Nx Console presents an overview of your workspace from an Nx perspective. You can browse projects, their targets & configurations in the Projects view. Run available targets or create shortcuts for frequent commands in the `Common Nx Commands` view.
+Nx Console presents an overview of your workspace from an Nx perspective. You can browse projects, their targets & configurations in the `Projects` view. Run available targets or create shortcuts for frequent commands in the `Common Nx Commands` view.
 
-[PLACEHOLDER FOR TASK RUNNING GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-tasks-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-tasks.gif" width="100%">
+    </picture>
+</p>
 
 ### Workspace Visualization
 
