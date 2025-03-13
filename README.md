@@ -49,7 +49,7 @@ Nx Console enhances your editors AI features by providing relevant context to th
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai.gif">
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai-dark.gif">
         <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai.gif" width="100%">
     </picture>
 </p>
@@ -97,7 +97,7 @@ Nx Console improves the experience of using Nx Cloud by giving you an overview o
 
 Additionally, Nx Console helps by guiding you through the Nx Cloud onboarding process, right in your editor.
 
-[Learn more about the Nx Cloud Integratino on nx.dev](https://nx.dev/recipes/nx-console/console-nx-cloud)
+[Learn more about the Nx Cloud Integration on nx.dev](https://nx.dev/recipes/nx-console/console-nx-cloud)
 
 ### Projects & Tasks Overview
 

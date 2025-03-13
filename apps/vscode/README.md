@@ -45,7 +45,7 @@ Nx Console enhances your editors AI features by providing relevant context to th
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai.gif">
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai-dark.gif">
         <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-ai.gif" width="100%">
     </picture>
 </p>
@@ -71,7 +71,12 @@ Nx Console provides seamless integration with the Project Details View (PDV). Yo
 
 Nx Console makes it easier to run generators through our interactive Generate UI. It automatically parses the schema for any generator and provides autocomplete, validation and dry-run previews as you type.
 
-[PLACEHOLDER FOR GENERATE UI GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-generate-ui-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-generate-ui.gif" width="100%">
+    </picture>
+</p>
 
 You can launch the Generate UI via the `Nx: Generate (UI)` command or through the context menu in the file explorer. Paths will be automatically prefilled! [Learn more about the Generate UI on nx.dev](https://nx.dev/recipes/nx-console/console-generate-command)
 
@@ -79,23 +84,38 @@ You can launch the Generate UI via the `Nx: Generate (UI)` command or through th
 
 Nx Console improves the experience of using Nx Cloud by giving you an overview of current CI Pipeline Executions and showing notifications when CI is done or an error occurs. No more refreshing GitHub forever, just keep working and Nx Console will let you know once your PR is ready!
 
-[PLACEHOLDER FOR NX CLOUD INTEGRATION GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-cloud-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-cloud.gif" width="100%">
+    </picture>
+</p>
 
 Additionally, Nx Console helps by guiding you through the Nx Cloud onboarding process, right in your editor.
 
-[Learn more about the Nx Cloud Integratino on nx.dev](https://nx.dev/recipes/nx-console/console-nx-cloud)
+[Learn more about the Nx Cloud Integration on nx.dev](https://nx.dev/recipes/nx-console/console-nx-cloud)
 
 ### Projects & Tasks Overview
 
-Nx Console presents an overview of your workspace from an Nx perspective. You can browse projects, their targets & configurations in the Projects view. Run available targets or create shortcuts for frequent commands in the `Common Nx Commands` view.
+Nx Console presents an overview of your workspace from an Nx perspective. You can browse projects, their targets & configurations in the `Projects` view. Run available targets or create shortcuts for frequent commands in the `Common Nx Commands` view.
 
-[PLACEHOLDER FOR TASK RUNNING GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-tasks-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-tasks.gif" width="100%">
+    </picture>
+</p>
 
 ### Workspace Visualization
 
 Nx Console visualizes the Nx project & task graphs right in your editor. It knows which file you're working on, so you can easily open the graph focused on that specific project. Also, with the tight integration into your editor, you can run tasks or explore the files that cause project dependencies with a single click.
 
-[PLACEHOLDER FOR NX GRAPH GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-graph-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-graph.gif" width="100%">
+    </picture>
+</p>
 
 ## Requirements
 
