@@ -88,7 +88,12 @@ You can launch the Generate UI via the `Nx: Generate (UI)` command or through th
 
 Nx Console improves the experience of using Nx Cloud by giving you an overview of current CI Pipeline Executions and showing notifications when CI is done or an error occurs. No more refreshing GitHub forever, just keep working and Nx Console will let you know once your PR is ready!
 
-[PLACEHOLDER FOR NX CLOUD INTEGRATION GIF]
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-cloud-dark.gif">
+        <img alt="Nx Console - The UI for Nx & Lerna" src="https://raw.githubusercontent.com/nrwl/nx-console/readme-update/static/demo-cloud.gif" width="100%">
+    </picture>
+</p>
 
 Additionally, Nx Console helps by guiding you through the Nx Cloud onboarding process, right in your editor.
 
