@@ -149,7 +149,9 @@ export class NxMcpServerWrapper {
       'nx_project_details',
       'Returns the complete project configuration in JSON format for a given nx project.',
       {
-        projectName: z.string(),
+        projectName: z
+          .string()
+          .describe('The name of the project to get details for'),
       },
       async ({ projectName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
@@ -195,7 +197,11 @@ export class NxMcpServerWrapper {
       'nx_docs',
       'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
       {
-        userQuery: z.string(),
+        userQuery: z
+          .string()
+          .describe(
+            'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
+          ),
       },
       async ({ userQuery }: { userQuery: string }) => {
         this.telemetry?.logUsage('ai.tool-call', {
@@ -244,7 +250,11 @@ export class NxMcpServerWrapper {
       'nx_generator_schema',
       'Returns the detailed JSON schema for an nx generator',
       {
-        generatorName: z.string(),
+        generatorName: z
+          .string()
+          .describe(
+            'The name of the generator to get schema for. Use the generator name from the nx_generators tool.',
+          ),
       },
       async ({ generatorName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
@@ -303,13 +313,23 @@ and follows the Nx workspace convention for project organization.
       'nx_visualize_graph',
       'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
       {
-        visualizationType: z.enum([
-          'project',
-          'project-task',
-          'full-project-graph',
-        ]),
-        projectName: z.string().optional(),
-        taskName: z.string().optional(),
+        visualizationType: z
+          .enum(['project', 'project-task', 'full-project-graph'])
+          .describe(
+            'The way in which to visualize the graph. "project" shows the project graph focused on a single project. "project-task" shows the task graph focused on a specific task for a specific project. "full-project-graph" shows the full project graph for the entire repository.',
+          ),
+        projectName: z
+          .string()
+          .optional()
+          .describe(
+            'The name of the project to focus the graph on. Only used if visualizationType is "project" or "project-task".',
+          ),
+        taskName: z
+          .string()
+          .optional()
+          .describe(
+            'The name of the task to focus the graph on. Only used if visualizationType is "project-task".',
+          ),
       },
       async ({ visualizationType, projectName, taskName }) => {
         this.telemetry?.logUsage('ai.tool-call', {

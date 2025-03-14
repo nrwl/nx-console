@@ -1,11 +1,4 @@
 {
-  "tasksRunnerOptions": {
-    "default": {
-      "options": {
-        "useLightClient": true
-      }
-    }
-  },
   "cli": {
     "packageManager": "yarn"
   },
@@ -163,6 +156,6 @@
     ]
   },
   "defaultBase": "master",
-  "nxCloudAccessToken": "OGQ4ZGI1ZmMtMmFkMy00NGM1LThlMDMtZjFlNGZiMWRmZTQ1fHJlYWQ=",
-  "nxCloudUrl": "https://staging.nx.app"
+  "nxCloudUrl": "https://staging.nx.app",
+  "nxCloudId": "6660892a00a733543826cfcd"
 }

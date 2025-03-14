@@ -6,11 +6,14 @@
   "targets": {
     "build": {
       "command": "npx tailwindcss -i dist/apps/generate-ui-v2/tailwind.css -o dist/apps/generate-ui-v2/output.css -c apps/generate-ui-v2/tailwind.config.js",
-      "dependsOn": ["extract-dependencies"]
+      "dependsOn": ["extract-dependencies"],
+      "outputs": ["{workspaceRoot}/dist/apps/generate-ui-v2"]
     },
     "extract-dependencies": {
       "command": "node ./tools/scripts/copy-generate-ui-deps.mjs dist/apps/generate-ui-v2",
-      "dependsOn": ["_build"]
+      "dependsOn": ["_build"],
+      "outputs": ["{workspaceRoot}/dist/apps/generate-ui-v2"],
+      "inputs": ["default", "{projectRoot}/package.json"]
     },
     "_build": {
       "executor": "@nx/esbuild:esbuild",
