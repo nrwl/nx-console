@@ -1,3 +1,11 @@
+## [18.42.1](https://github.com/nrwl/nx-console/compare/vscode-v18.42.0...vscode-v18.42.1) (2025-03-14)
+
+
+### Bug Fixes
+
+* **mcp:** add descriptions to tool parameters ([#2436](https://github.com/nrwl/nx-console/issues/2436)) ([4503c33](https://github.com/nrwl/nx-console/commit/4503c33a6608436f57a124ea662f029cabd96ad1))
+* **vscode:** custom icon in projectViewItemsProcessors plugin ([#2428](https://github.com/nrwl/nx-console/issues/2428)) ([9ba0304](https://github.com/nrwl/nx-console/commit/9ba03042f02be432498f3070d0bd3fb540710a8a))
+
 # [18.42.0](https://github.com/nrwl/nx-console/compare/vscode-v18.41.1...vscode-v18.42.0) (2025-03-06)
 
 
