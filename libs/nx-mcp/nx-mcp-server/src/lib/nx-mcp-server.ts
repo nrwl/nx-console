@@ -28,6 +28,8 @@ import {
   IdeCallbackMessage,
   NxWorkspace,
 } from '@nx-console/shared-types';
+import { ProjectSearch } from './search';
+import { join } from 'path';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -78,6 +80,95 @@ export class NxMcpServerWrapper {
   }
 
   private registerTools(): void {
+    this.server.tool(
+      'nx_find_relevant_projects_information',
+      'Finds a list of relevant projects based on a user query and returns their descriptions. Return the relevant part of the nx project graph as well.',
+      {
+        userQuery: z.string(),
+      },
+      async ({ userQuery }) => {
+        console.log('Relevant query', userQuery);
+        const projectSearch = new ProjectSearch();
+        const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+          this._nxWorkspacePath,
+          this.logger,
+        );
+        if (!workspace) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace not found' }],
+          };
+        }
+        console.log('Loading projects');
+        projectSearch.loadProjects(
+          workspace.projectGraph,
+          join(this._nxWorkspacePath, 'tmp/ai'),
+        );
+        console.log('Searching projects');
+        const results = projectSearch.search(userQuery).slice(0, 30);
+        console.log('Found results', results.length);
+        const contentItems = results.map((result) => {
+          return {
+            type: 'text' as const,
+            text: JSON.stringify(result, null, 2),
+          };
+        });
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: getProjectGraphPrompt(workspace.projectGraph),
+            },
+            ...contentItems,
+          ],
+        };
+      },
+    );
+
+    // use project information to get the files
+    this.server.tool(
+      'nx_find_relevant_files_information',
+      'Find a list of relevant files based on a user query and returns their descriptions.',
+      {
+        userQuery: z.string(),
+      },
+      async ({ userQuery }) => {
+        console.log('Relevant query', userQuery);
+        const projectSearch = new ProjectSearch();
+        const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+          this._nxWorkspacePath,
+          this.logger,
+        );
+        if (!workspace) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace not found' }],
+          };
+        }
+        console.log('Loading projects');
+        projectSearch.loadProjects(
+          workspace.projectGraph,
+          join(this._nxWorkspacePath, 'tmp/ai'),
+        );
+        console.log('Searching projects');
+        const results = projectSearch.search(userQuery).slice(0, 30);
+        console.log('Found results', results.length);
+        const contentItems = results.map((result) => {
+          return {
+            type: 'text' as const,
+            text: JSON.stringify(result, null, 2),
+          };
+        });
+
+        return {
+          content: [
+            ...contentItems,
+          ],
+        };
+      },
+    );
+
     this.server.tool(
       'nx_workspace',
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',

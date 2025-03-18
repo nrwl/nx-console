@@ -13284,6 +13284,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minisearch@npm:7.1.2":
+  version: 7.1.2
+  resolution: "minisearch@npm:7.1.2"
+  checksum: 40fc8534bd40bf131f2c3928b03321b31cc9a49d0bff57edb23ac67a7cd4c9c83e32a304cce23d1cdb0926d7c09d78a767d5956a7e464c53556412b630cdf7af
+  languageName: node
+  linkType: hard
+
 "minizlib@npm:^2.1.1, minizlib@npm:^2.1.2":
   version: 2.1.2
   resolution: "minizlib@npm:2.1.2"
@@ -14067,6 +14074,7 @@ __metadata:
     lit: ^2.4.1
     memfs: ^3.4.7
     minimatch: ^9.0.3
+    minisearch: 7.1.2
     mocha: ^10.0.0
     nx: 20.5.0-rc.1
     ovsx: ^0.10.1

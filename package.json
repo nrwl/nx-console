@@ -39,6 +39,7 @@
     "jsonc-parser": "^3.0.0",
     "lit": "^2.4.1",
     "minimatch": "^9.0.3",
+    "minisearch": "7.1.2",
     "request-light": "^0.5.8",
     "rollbar": "^2.26.4",
     "rxjs": "7.5.6",
