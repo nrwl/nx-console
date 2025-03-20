@@ -1,6 +1,20 @@
 import { Logger } from '@nx-console/shared-utils';
-import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
+import type {
+  PackageManager,
+  PackageManagerCommands,
+} from 'nx/src/utils/package-manager';
 import { importNxPackagePath } from '../workspace-dependencies';
+
+export async function detectPackageManager(
+  workspacePath: string,
+  logger?: Logger,
+): Promise<PackageManager> {
+  const { detectPackageManager } = await importNxPackagePath<
+    typeof import('nx/src/utils/package-manager')
+  >(workspacePath, 'src/utils/package-manager', logger);
+
+  return detectPackageManager(workspacePath);
+}
 
 export async function getPackageManagerCommand(
   workspacePath: string,

@@ -161,6 +161,9 @@
     },
     {
       "path": "./libs/vscode/cursor"
+    },
+    {
+      "path": "./libs/vscode/typescript-import-plugin"
     }
   ]
 }
