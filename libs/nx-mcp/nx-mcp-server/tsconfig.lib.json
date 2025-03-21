@@ -9,22 +9,25 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/schema/tsconfig.lib.json"
     },
     {
       "path": "../../language-server/types/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/types/tsconfig.lib.json"
+      "path": "../../shared/telemetry/tsconfig.lib.json"
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
     },
     {
       "path": "../../shared/llm-context/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/telemetry/tsconfig.lib.json"
     },
     {
       "path": "../../shared/utils/tsconfig.lib.json"

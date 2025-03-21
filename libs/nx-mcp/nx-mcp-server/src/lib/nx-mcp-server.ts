@@ -12,11 +12,14 @@ import {
 import {
   checkIsNxWorkspace,
   findMatchingProject,
+  isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
-import { Logger } from '@nx-console/shared-utils';
+import { getAvailableNxPlugins, Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { getMcpLogger } from './mcp-logger';
+import * as fs from 'fs/promises';
+import { join } from 'path';
 
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
@@ -28,6 +31,7 @@ import {
   IdeCallbackMessage,
   NxWorkspace,
 } from '@nx-console/shared-types';
+import { gte, NxVersion } from '@nx-console/nx-version';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -95,6 +99,124 @@ export class NxMcpServerWrapper {
         const docsPages = await getDocsContext(userQuery);
         return {
           content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
+        };
+      },
+    );
+
+    this.server.tool(
+      'nx_available_plugins',
+      'Returns a list of available nx plugins - this includes both official and approved community plugins.',
+      async () => {
+        let nxVersion: NxVersion | undefined = undefined;
+
+        if (this._nxWorkspacePath) {
+          const nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+            this._nxWorkspacePath,
+            this.logger,
+          );
+          nxVersion = nxWorkspace?.nxVersion;
+        }
+
+        const availablePlugins = await getAvailableNxPlugins(nxVersion);
+
+        // Create a Set of plugin names for efficient lookup
+        const availablePluginNames = new Set([
+          ...availablePlugins.official.map((plugin) => plugin.name),
+          ...availablePlugins.community.map((plugin) => plugin.name),
+        ]);
+
+        // Initialize installed plugins array
+        let installedPlugins: string[] = [];
+
+        // Only try to determine installed plugins if workspace path exists
+        if (this._nxWorkspacePath) {
+          try {
+            // Determine if it's a dot nx installation
+            const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
+
+            // Determine package.json path
+            const packageJsonPath = isDotNx
+              ? join(
+                  this._nxWorkspacePath,
+                  '.nx',
+                  'installation',
+                  'package.json',
+                )
+              : join(this._nxWorkspacePath, 'package.json');
+
+            // Read package.json
+            const packageJsonContent = await fs.readFile(
+              packageJsonPath,
+              'utf-8',
+            );
+            const packageJson = JSON.parse(packageJsonContent);
+
+            // Combine dependencies and devDependencies
+            const allDependencies = {
+              ...(packageJson.dependencies || {}),
+              ...(packageJson.devDependencies || {}),
+            };
+
+            // Filter for installed plugins that match available plugins
+            installedPlugins = Object.keys(allDependencies).filter((depName) =>
+              availablePluginNames.has(depName),
+            );
+          } catch (error) {
+            // Error handling: log the error but continue with empty installed plugins
+            this.logger.log(
+              `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
+            );
+            installedPlugins = [];
+          }
+        }
+
+        let formattedText = '';
+
+        if (installedPlugins.length > 0) {
+          formattedText += `=== INSTALLED NX PLUGINS ===\n`;
+          formattedText += `(Note: Installed plugins are not repeated in other categories)\n\n`;
+          installedPlugins.forEach((pluginName) => {
+            formattedText += `[${pluginName}]\n`;
+          });
+          formattedText += `\n`;
+        }
+
+        formattedText += `=== OFFICIAL NX PLUGINS ===\n`;
+
+        availablePlugins.official
+          .filter((plugin) => !installedPlugins.includes(plugin.name))
+          .forEach((plugin) => {
+            const cleanDescription = plugin.description
+              .replace(/\n/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+          });
+
+        formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
+        availablePlugins.community
+          .filter((plugin) => !installedPlugins.includes(plugin.name))
+          .forEach((plugin) => {
+            const cleanDescription = plugin.description
+              .replace(/\n/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+
+            if (plugin.url) {
+              formattedText += `URL: ${plugin.url}\n`;
+            }
+          });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: formattedText,
+            },
+          ],
         };
       },
     );

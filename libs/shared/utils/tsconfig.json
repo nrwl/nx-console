@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../nx-version"
+    },
+    {
       "path": "../types"
     },
     {
