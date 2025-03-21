@@ -11,13 +11,10 @@
   "include": ["**/*.ts"],
   "references": [
     {
-      "path": "../../shared/nx-version/tsconfig.lib.json"
+      "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../output-channels/tsconfig.lib.json"
-    },
-    {
-      "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../nx-workspace/tsconfig.lib.json"
@@ -27,6 +24,12 @@
     },
     {
       "path": "../configuration/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../typescript-import-plugin/tsconfig.lib.json"
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"

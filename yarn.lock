@@ -2510,13 +2510,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@monodon/typescript-nx-imports-plugin@npm:0.3.0":
-  version: 0.3.0
-  resolution: "@monodon/typescript-nx-imports-plugin@npm:0.3.0"
-  checksum: 311485a893f06351dcf2a12477138d8d0f6eb5e03412d1919ea04cd2e60e9fee06f2add68da438206ca90b64ead16573ba7704cc1c2caa69cb74e0cbd4959cd8
-  languageName: node
-  linkType: hard
-
 "@napi-rs/wasm-runtime@npm:0.2.4":
   version: 0.2.4
   resolution: "@napi-rs/wasm-runtime@npm:0.2.4"
@@ -3069,6 +3062,12 @@ __metadata:
 "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/vscode-typescript-import-plugin@workspace:libs/vscode/typescript-import-plugin":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-typescript-import-plugin@workspace:libs/vscode/typescript-import-plugin"
   languageName: unknown
   linkType: soft
 
@@ -13997,7 +13996,6 @@ __metadata:
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
     "@modelcontextprotocol/sdk": ^1.5.0
-    "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/cypress": 20.5.0
     "@nx/devkit": 20.5.0
     "@nx/esbuild": 20.5.0

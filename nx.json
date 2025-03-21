@@ -91,7 +91,9 @@
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
-      "options": {}
+      "options": {
+        "build": true
+      }
     },
     {
       "plugin": "@nx/eslint/plugin",

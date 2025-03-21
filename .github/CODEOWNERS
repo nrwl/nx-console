@@ -14,6 +14,8 @@
 
 /libs/vscode/nx-help-and-feedback-view/ @MaxKless
 
+/libs/vscode/typescript-import-plugin/ @MaxKless
+
 /libs/vscode/nx-config-decoration/ @MaxKless
 
 /libs/vscode/generate-ui-webview/ @MaxKless
