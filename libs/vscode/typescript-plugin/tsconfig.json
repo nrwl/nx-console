@@ -4,13 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-version"
+      "path": "../utils"
     },
     {
       "path": "../output-channels"
-    },
-    {
-      "path": "../utils"
     },
     {
       "path": "../nx-workspace"
@@ -20,6 +17,12 @@
     },
     {
       "path": "../configuration"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../typescript-import-plugin"
     },
     {
       "path": "../../shared/npm"

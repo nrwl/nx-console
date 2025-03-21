@@ -1,3 +1,4 @@
+import { gte } from '@nx-console/nx-version';
 import { clearJsonCache } from '@nx-console/shared-file-system';
 import {
   importWorkspaceDependency,
@@ -8,19 +9,23 @@ import {
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { getNxVersion, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { watchFile } from '@nx-console/vscode-utils';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { Actor, createActor, fromPromise, setup } from 'xstate';
-import { getExternalFiles, TSCONFIG_BASE } from './get-external-files';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { gte } from '@nx-console/nx-version';
+import {
+  getPluginConfiguration,
+  PluginConfigurationCache,
+  TSCONFIG_BASE,
+} from './plugin-configuration';
 
 let disposables: vscode.Disposable[] = [];
 
 export async function initTypeScriptServerPlugin(
-  vscodeContext: vscode.ExtensionContext
+  vscodeContext: vscode.ExtensionContext,
 ) {
   const machine = createActor(
     setup({
@@ -35,9 +40,9 @@ export async function initTypeScriptServerPlugin(
           async ({ input }: { input: { workspaceRoot: string } }) => {
             return await enableTypescriptServerPlugin(
               vscodeContext,
-              input.workspaceRoot
+              input.workspaceRoot,
             );
-          }
+          },
         ),
       },
       types: {
@@ -49,7 +54,7 @@ export async function initTypeScriptServerPlugin(
         tsExtensionExists: () => {
           try {
             const tsExtension = vscode.extensions.getExtension(
-              'vscode.typescript-language-features'
+              'vscode.typescript-language-features',
             );
             return !!tsExtension;
           } catch (e) {
@@ -63,7 +68,7 @@ export async function initTypeScriptServerPlugin(
       context: {
         workspaceRoot: WorkspaceConfigurationStore.instance.get(
           'nxWorkspacePath',
-          ''
+          '',
         ),
       },
       initial: 'disabled',
@@ -96,7 +101,7 @@ export async function initTypeScriptServerPlugin(
           },
         },
       },
-    })
+    }),
   ).start();
 
   handleServerPluginEnablement(machine);
@@ -105,7 +110,7 @@ export async function initTypeScriptServerPlugin(
     async (configurationChange) => {
       configurationChange;
       const affectsNxConsole = configurationChange.affectsConfiguration(
-        GlobalConfigurationStore.configurationSection
+        GlobalConfigurationStore.configurationSection,
       );
 
       if (!affectsNxConsole) {
@@ -115,12 +120,12 @@ export async function initTypeScriptServerPlugin(
       handleServerPluginEnablement(machine);
     },
     undefined,
-    vscodeContext.subscriptions
+    vscodeContext.subscriptions,
   );
 
-  const disposable = onWorkspaceRefreshed(() =>
-    handleServerPluginEnablement(machine)
-  );
+  const disposable = onWorkspaceRefreshed(async () => {
+    await handleServerPluginEnablement(machine);
+  });
   if (disposable) {
     vscodeContext.subscriptions.push(disposable);
   }
@@ -128,14 +133,10 @@ export async function initTypeScriptServerPlugin(
 
 async function handleServerPluginEnablement(machine: Actor<any>) {
   const enableLibraryImports = GlobalConfigurationStore.instance.get(
-    'enableLibraryImports'
+    'enableLibraryImports',
   );
 
-  const usingTsSolutionSetup = await isUsingTsSolutionSetup(
-    machine.getSnapshot().context.workspaceRoot
-  );
-
-  if (enableLibraryImports && !usingTsSolutionSetup) {
+  if (enableLibraryImports) {
     machine.send({ type: 'ENABLE' });
   } else {
     machine.send({ type: 'DISABLE' });
@@ -144,13 +145,13 @@ async function handleServerPluginEnablement(machine: Actor<any>) {
 
 async function enableTypescriptServerPlugin(
   context: vscode.ExtensionContext,
-  workspaceRoot: string
+  workspaceRoot: string,
 ) {
   getOutputChannel().appendLine(
-    `Enabling TypeScript plugin for workspace ${workspaceRoot}`
+    `Enabling TypeScript plugin for workspace ${workspaceRoot}`,
   );
   const tsExtension = vscode.extensions.getExtension(
-    'vscode.typescript-language-features'
+    'vscode.typescript-language-features',
   );
   if (!tsExtension) {
     return;
@@ -170,6 +171,26 @@ async function enableTypescriptServerPlugin(
     return;
   }
 
+  const pluginConfigurationCache = new PluginConfigurationCache();
+
+  const isTsSolutionSetup = await isUsingTsSolutionSetup(workspaceRoot);
+  let projectGraph: ProjectGraph | undefined;
+  if (isTsSolutionSetup) {
+    ({ projectGraph } = await getNxWorkspace());
+
+    disposables.push(
+      onWorkspaceRefreshed(async () => {
+        ({ projectGraph } = await getNxWorkspace());
+        await configurePlugin(
+          workspaceRoot,
+          projectGraph,
+          api,
+          pluginConfigurationCache,
+        );
+      }),
+    );
+  }
+
   disposables.push(
     vscode.workspace.onDidOpenTextDocument(
       (document) => {
@@ -177,32 +198,52 @@ async function enableTypescriptServerPlugin(
           document.uri.fsPath.endsWith('.ts') ||
           document.uri.fsPath.endsWith('.tsx')
         ) {
-          configurePlugin(workspaceRoot, api);
+          configurePlugin(
+            workspaceRoot,
+            projectGraph,
+            api,
+            pluginConfigurationCache,
+          );
         }
       },
       undefined,
-      context.subscriptions
+      context.subscriptions,
     ),
     watchFile(
       `${workspaceRoot}/tsconfig.base.json`,
       () => {
         clearJsonCache(TSCONFIG_BASE, workspaceRoot);
-        configurePlugin(workspaceRoot, api);
+        configurePlugin(
+          workspaceRoot,
+          projectGraph,
+          api,
+          pluginConfigurationCache,
+        );
       },
-      context.subscriptions
+      context.subscriptions,
     ),
     vscode.workspace.onDidChangeTextDocument(
       ({ document }) => {
         if (document.uri.fsPath.endsWith(TSCONFIG_BASE)) {
-          configurePlugin(workspaceRoot, api);
+          configurePlugin(
+            workspaceRoot,
+            projectGraph,
+            api,
+            pluginConfigurationCache,
+          );
         }
       },
       undefined,
-      context.subscriptions
-    )
+      context.subscriptions,
+    ),
   );
 
-  await configurePlugin(workspaceRoot, api);
+  await configurePlugin(
+    workspaceRoot,
+    projectGraph,
+    api,
+    pluginConfigurationCache,
+  );
 }
 
 async function disableTypescriptServerPlugin() {
@@ -216,15 +257,32 @@ async function disableTypescriptServerPlugin() {
     },
     async () => {
       await vscode.commands.executeCommand('typescript.restartTsServer');
-    }
+    },
   );
 }
 
-async function configurePlugin(workspaceRoot: string, api: any) {
-  const externalFiles = await getExternalFiles(workspaceRoot);
-  api.configurePlugin('@monodon/typescript-nx-imports-plugin', {
-    externalFiles,
-  });
+async function configurePlugin(
+  workspaceRoot: string,
+  projectGraph: ProjectGraph | undefined,
+  api: any,
+  pluginConfigurationCache: PluginConfigurationCache,
+) {
+  const configuration = await getPluginConfiguration(
+    workspaceRoot,
+    projectGraph,
+  );
+
+  if (pluginConfigurationCache.matchesCachedResult(configuration)) {
+    // if the result is cached, we don't need to configure the plugin again
+    return;
+  }
+
+  pluginConfigurationCache.store(configuration);
+
+  api.configurePlugin(
+    '@nx-console/vscode-typescript-import-plugin',
+    configuration,
+  );
 }
 
 async function isUsingTsSolutionSetup(workspaceRoot: string): Promise<boolean> {
@@ -233,7 +291,7 @@ async function isUsingTsSolutionSetup(workspaceRoot: string): Promise<boolean> {
     try {
       const nxJsPath = await workspaceDependencyPath(
         workspaceRoot,
-        join('@nx', 'js')
+        join('@nx', 'js'),
       );
       if (!nxJsPath) {
         return false;
@@ -243,12 +301,13 @@ async function isUsingTsSolutionSetup(workspaceRoot: string): Promise<boolean> {
         'src',
         'utils',
         'typescript',
-        'ts-solution-setup.js'
+        'ts-solution-setup.js',
       );
 
-      const { isUsingTsSolutionSetup } = await importWorkspaceDependency<
-        typeof import('@nx/js/src/utils/typescript/ts-solution-setup')
-      >(tsSolutionSetupPath);
+      const { isUsingTsSolutionSetup } =
+        await importWorkspaceDependency<
+          typeof import('@nx/js/src/utils/typescript/ts-solution-setup')
+        >(tsSolutionSetupPath);
       return isUsingTsSolutionSetup();
     } catch (e) {
       return false;

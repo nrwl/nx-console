@@ -6,7 +6,11 @@ export * from './lib/pnp-dependencies';
 export { checkIsNxWorkspace } from './lib/check-is-nx-workspace';
 export { getNxExecutionCommand } from './lib/get-nx-execution-command';
 
-export { getPackageManagerCommand } from './lib/local-nx-utils/package-manager-command';
+export {
+  detectPackageManager,
+  getPackageManagerCommand,
+  getPackageManagerVersion,
+} from './lib/local-nx-utils/package-manager-command';
 export * from './lib/local-nx-utils/read-json';
 export * from './lib/local-nx-utils/parse-target-string';
 export * from './lib/local-nx-utils/find-matching-projects';
