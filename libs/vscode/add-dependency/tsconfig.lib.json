@@ -9,6 +9,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
       "path": "../telemetry/tsconfig.lib.json"
     },
     {

@@ -30,6 +30,7 @@ import {
   TaskScope,
   window,
 } from 'vscode';
+import { getAvailableNxPlugins } from '@nx-console/shared-utils';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -88,7 +89,12 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
 }
 
 async function promptForDependencyInput(): Promise<string | undefined> {
-  const packageSuggestions = (await getDependencySuggestions()).map((pkg) => ({
+  const nxVersion = await getNxVersion();
+  const availablePlugins = await getAvailableNxPlugins(nxVersion);
+  const packageSuggestions = [
+    ...availablePlugins.official,
+    ...availablePlugins.community,
+  ].map((pkg) => ({
     label: pkg.name,
     description: pkg.description,
   }));
@@ -213,65 +219,6 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
     }),
   );
   tasks.executeTask(task);
-}
-
-async function getDependencySuggestions(): Promise<
-  {
-    name: string;
-    description: string;
-  }[]
-> {
-  const version = await getNxVersion();
-  const headers = { 'Accept-Encoding': 'gzip, deflate' };
-  return Promise.all([
-    xhr({
-      url: 'https://raw.githubusercontent.com/nrwl/nx/master/docs/packages.json',
-      followRedirects: 5,
-      headers,
-    }).then((response) => {
-      return (
-        JSON.parse(response.responseText) as {
-          name: string;
-          description: string;
-        }[]
-      )
-        .filter(
-          (pkg) =>
-            pkg.name !== 'add-nx-to-monorepo' &&
-            pkg.name !== 'cra-to-nx' &&
-            pkg.name !== 'create-nx-plugin' &&
-            pkg.name !== 'create-nx-workspace' &&
-            pkg.name !== 'make-angular-cli-faster' &&
-            pkg.name !== 'tao',
-        )
-        .map((pkg) => {
-          let prefix: string;
-          if (!version) {
-            prefix = '@nx';
-          } else if (gte(version, '16.0.0')) {
-            prefix = '@nx';
-          } else {
-            prefix = '@nrwl';
-          }
-          return {
-            name: `${prefix}/${pkg.name}`,
-            description: pkg.description,
-          };
-        });
-    }),
-    xhr({
-      url: 'https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json',
-      followRedirects: 5,
-      headers,
-    }).then((response) => {
-      return JSON.parse(response.responseText);
-    }),
-  ]).then(
-    (responses) => responses.flat(1),
-    (error: XHRResponse) => {
-      return Promise.reject(error.responseText);
-    },
-  );
 }
 
 async function getWorkspaceAddFlag(
