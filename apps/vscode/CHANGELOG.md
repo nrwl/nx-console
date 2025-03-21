@@ -1,3 +1,16 @@
+# [18.43.0](https://github.com/nrwl/nx-console/compare/vscode-v18.42.1...vscode-v18.43.0) (2025-03-21)
+
+
+### Bug Fixes
+
+* **vscode:** differentiate between cursor & vscode in telemetry ([#2442](https://github.com/nrwl/nx-console/issues/2442)) ([a80b02c](https://github.com/nrwl/nx-console/commit/a80b02c23ff6e2bc569340868c846e35eb2a28aa))
+
+
+### Features
+
+* add mcp tool with for available plugins ([#2448](https://github.com/nrwl/nx-console/issues/2448)) ([bf08385](https://github.com/nrwl/nx-console/commit/bf083852de7af7a56f3161b5c87a99d075ae464a))
+* added collapsible state option to project view plugin ([#2438](https://github.com/nrwl/nx-console/issues/2438)) ([50236a3](https://github.com/nrwl/nx-console/commit/50236a3ec5adac776d53449ca7822155e87a0555))
+
 ## [18.42.1](https://github.com/nrwl/nx-console/compare/vscode-v18.42.0...vscode-v18.42.1) (2025-03-14)
 
 

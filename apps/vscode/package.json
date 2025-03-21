@@ -1,7 +1,7 @@
 {
   "name": "angular-console",
   "displayName": "Nx Console",
-  "version": "18.42.1",
+  "version": "18.43.0",
   "description": "The UI for Monorepos, providing visual workflows and enriching your AI Chat with deep insights",
   "repository": {
     "type": "git",
