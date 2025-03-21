@@ -1,8 +1,4 @@
-import {
-  GoogleAnalytics,
-  TelemetryEvents,
-  NxConsoleTelemetryLogger as NxConsoleTelemetryLoggerBase,
-} from '@nx-console/shared-telemetry';
+import { GoogleAnalytics, TelemetryEvents } from '@nx-console/shared-telemetry';
 import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
@@ -42,7 +38,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
       env.machineId,
       env.sessionId,
       this._version,
-      'vscode',
+      env.appName.toLowerCase().includes('cursor') ? 'cursor' : 'vscode',
       logger,
       this._nxVersion,
     );

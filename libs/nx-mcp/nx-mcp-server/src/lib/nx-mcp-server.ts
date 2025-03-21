@@ -12,11 +12,14 @@ import {
 import {
   checkIsNxWorkspace,
   findMatchingProject,
+  isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
-import { Logger } from '@nx-console/shared-utils';
+import { getAvailableNxPlugins, Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { getMcpLogger } from './mcp-logger';
+import * as fs from 'fs/promises';
+import { join } from 'path';
 
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
@@ -28,6 +31,7 @@ import {
   IdeCallbackMessage,
   NxWorkspace,
 } from '@nx-console/shared-types';
+import { gte, NxVersion } from '@nx-console/nx-version';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -45,10 +49,10 @@ export interface NxWorkspaceInfoProvider {
 export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
-  private _nxWorkspacePath: string;
+  private _nxWorkspacePath?: string;
 
   constructor(
-    initialWorkspacePath: string,
+    initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
     private ideCallback?: (message: IdeCallbackMessage) => void,
     private telemetry?: NxConsoleTelemetryLogger,
@@ -79,6 +83,155 @@ export class NxMcpServerWrapper {
 
   private registerTools(): void {
     this.server.tool(
+      'nx_docs',
+      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+      {
+        userQuery: z
+          .string()
+          .describe(
+            'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
+          ),
+      },
+      async ({ userQuery }: { userQuery: string }) => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: 'nx_docs',
+        });
+        const docsPages = await getDocsContext(userQuery);
+        return {
+          content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
+        };
+      },
+    );
+
+    this.server.tool(
+      'nx_available_plugins',
+      'Returns a list of available nx plugins - this includes both official and approved community plugins.',
+      async () => {
+        let nxVersion: NxVersion | undefined = undefined;
+
+        if (this._nxWorkspacePath) {
+          const nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+            this._nxWorkspacePath,
+            this.logger,
+          );
+          nxVersion = nxWorkspace?.nxVersion;
+        }
+
+        const availablePlugins = await getAvailableNxPlugins(nxVersion);
+
+        // Create a Set of plugin names for efficient lookup
+        const availablePluginNames = new Set([
+          ...availablePlugins.official.map((plugin) => plugin.name),
+          ...availablePlugins.community.map((plugin) => plugin.name),
+        ]);
+
+        // Initialize installed plugins array
+        let installedPlugins: string[] = [];
+
+        // Only try to determine installed plugins if workspace path exists
+        if (this._nxWorkspacePath) {
+          try {
+            // Determine if it's a dot nx installation
+            const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
+
+            // Determine package.json path
+            const packageJsonPath = isDotNx
+              ? join(
+                  this._nxWorkspacePath,
+                  '.nx',
+                  'installation',
+                  'package.json',
+                )
+              : join(this._nxWorkspacePath, 'package.json');
+
+            // Read package.json
+            const packageJsonContent = await fs.readFile(
+              packageJsonPath,
+              'utf-8',
+            );
+            const packageJson = JSON.parse(packageJsonContent);
+
+            // Combine dependencies and devDependencies
+            const allDependencies = {
+              ...(packageJson.dependencies || {}),
+              ...(packageJson.devDependencies || {}),
+            };
+
+            // Filter for installed plugins that match available plugins
+            installedPlugins = Object.keys(allDependencies).filter((depName) =>
+              availablePluginNames.has(depName),
+            );
+          } catch (error) {
+            // Error handling: log the error but continue with empty installed plugins
+            this.logger.log(
+              `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
+            );
+            installedPlugins = [];
+          }
+        }
+
+        let formattedText = '';
+
+        if (installedPlugins.length > 0) {
+          formattedText += `=== INSTALLED NX PLUGINS ===\n`;
+          formattedText += `(Note: Installed plugins are not repeated in other categories)\n\n`;
+          installedPlugins.forEach((pluginName) => {
+            formattedText += `[${pluginName}]\n`;
+          });
+          formattedText += `\n`;
+        }
+
+        formattedText += `=== OFFICIAL NX PLUGINS ===\n`;
+
+        availablePlugins.official
+          .filter((plugin) => !installedPlugins.includes(plugin.name))
+          .forEach((plugin) => {
+            const cleanDescription = plugin.description
+              .replace(/\n/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+          });
+
+        formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
+        availablePlugins.community
+          .filter((plugin) => !installedPlugins.includes(plugin.name))
+          .forEach((plugin) => {
+            const cleanDescription = plugin.description
+              .replace(/\n/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+
+            if (plugin.url) {
+              formattedText += `URL: ${plugin.url}\n`;
+            }
+          });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: formattedText,
+            },
+          ],
+        };
+      },
+    );
+
+    if (this._nxWorkspacePath) {
+      this.registerWorkspaceTools();
+    }
+
+    if (this.ideCallback) {
+      this.registerIdeCallbackTools();
+    }
+  }
+
+  private registerWorkspaceTools(): void {
+    this.server.tool(
       'nx_workspace',
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
       async () => {
@@ -86,6 +239,14 @@ export class NxMcpServerWrapper {
           tool: 'nx_workspace',
         });
         try {
+          if (!this._nxWorkspacePath) {
+            return {
+              isError: true,
+              content: [
+                { type: 'text', text: 'Error: Workspace path not set' },
+              ],
+            };
+          }
           if (!(await checkIsNxWorkspace(this._nxWorkspacePath))) {
             return {
               isError: true,
@@ -157,6 +318,12 @@ export class NxMcpServerWrapper {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_project_details',
         });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
         const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
           this._nxWorkspacePath,
           this.logger,
@@ -194,33 +361,18 @@ export class NxMcpServerWrapper {
     );
 
     this.server.tool(
-      'nx_docs',
-      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
-      {
-        userQuery: z
-          .string()
-          .describe(
-            'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
-          ),
-      },
-      async ({ userQuery }: { userQuery: string }) => {
-        this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_docs',
-        });
-        const docsPages = await getDocsContext(userQuery);
-        return {
-          content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
-        };
-      },
-    );
-
-    this.server.tool(
       'nx_generators',
       'Returns a list of generators that could be relevant to the user query.',
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_generators',
         });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
         const generators = await this.nxWorkspaceInfoProvider.getGenerators(
           this._nxWorkspacePath,
           undefined,
@@ -260,6 +412,12 @@ export class NxMcpServerWrapper {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_generator_schema',
         });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
         const generators = await this.nxWorkspaceInfoProvider.getGenerators(
           this._nxWorkspacePath,
           undefined,
@@ -302,10 +460,6 @@ and follows the Nx workspace convention for project organization.
         };
       },
     );
-
-    if (this.ideCallback) {
-      this.registerIdeCallbackTools();
-    }
   }
 
   private registerIdeCallbackTools(): void {

@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/utils"
+    },
+    {
       "path": "../telemetry"
     },
     {

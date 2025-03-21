@@ -9,6 +9,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
       "path": "../types/tsconfig.lib.json"
     }
   ]

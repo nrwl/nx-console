@@ -40,4 +40,5 @@ export type ProjectViewTreeItem = {
   description?: string;
   tooltip?: string;
   iconPath?: string;
+  collapsible?: number;
 };

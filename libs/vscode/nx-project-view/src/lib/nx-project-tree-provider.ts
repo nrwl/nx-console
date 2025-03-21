@@ -11,7 +11,7 @@ import {
 } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { AbstractTreeProvider } from '@nx-console/vscode-utils';
-import { commands, env, ExtensionContext, ThemeIcon } from 'vscode';
+import { commands, env, ExtensionContext } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
 import { ListView, ListViewItem } from './views/nx-project-list-view';
@@ -94,25 +94,24 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     }
     if (!items) return;
 
-    let nxTreeItems = items.map((item) => new NxTreeItem(item));
-
     if (this.plugins.projectViewItemProcessors) {
       this.plugins.projectViewItemProcessors.forEach((processor) => {
-        nxTreeItems = nxTreeItems.map((item) => {
+        items = items.map((item) => {
           const processed = processor(
             item as ProjectViewTreeItem,
             this.workspaceData,
           );
-          item.label = processed.label || item.label;
-          item.description = processed.description || item.description;
-          item.tooltip = processed.tooltip || item.tooltip;
-          item.iconPath = new ThemeIcon(processed.iconPath) || item.iconPath;
+          item.label = processed.label ?? item.label;
+          item.description = processed.description ?? item.description;
+          item.tooltip = processed.tooltip ?? item.tooltip;
+          item.iconPath = processed.iconPath ?? item.iconPath;
+          item.collapsible = processed.collapsible ?? item.collapsible;
           return item;
         });
       });
     }
 
-    return nxTreeItems;
+    return items.map((item) => new NxTreeItem(item));
   }
 
   private shouldUseTreeView() {
