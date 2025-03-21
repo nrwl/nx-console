@@ -10,7 +10,7 @@ export type RootFileInfo = {
 
 export interface Configuration {
   additionalRootFiles?: RootFileInfo[];
-  packageManager?: PackageManager;
+  packageManager?: PackageManager | 'yarn-classic';
   workspacePackages?: string[];
 }
 
@@ -41,19 +41,9 @@ export class NxImportsPlugin {
       return;
     }
 
-    const intercept: Partial<ts.LanguageService> = Object.create(null);
-
-    const oldGetCompletionsAtPosition =
-      languageService.getCompletionsAtPosition.bind(languageService);
-    intercept.getCompletionsAtPosition = (
-      fileName: string,
-      position: number,
-      options: ts.GetCompletionsAtPositionOptions | undefined,
-    ) => {
-      this.logger?.log(`getCompletionsAtPosition ${fileName}:${position}`);
-      return oldGetCompletionsAtPosition(fileName, position, options);
-    };
-
+    // We currently don't need to modify the language service, so we simply
+    // return the decorated language service as recommended by the tsserver
+    // docs: https://github.com/microsoft/TypeScript/wiki/Writing-a-Language-Service-Plugin#decorator-creation
     return new Proxy(languageService, {
       get: (
         target: any,
@@ -62,7 +52,7 @@ export class NxImportsPlugin {
         if (property === isNxImportPlugin) {
           return true;
         }
-        return intercept[property] || target[property];
+        return target[property];
       },
     });
   }
@@ -76,6 +66,9 @@ export class NxImportsPlugin {
     });
   }
 
+  /**
+   * Get any additional root files to add to the project.
+   */
   private getRootFiles(project: ts.server.Project): string[] {
     this.logger?.log('get root files: ' + JSON.stringify(this.config));
     const additionalRootFiles = this.config.additionalRootFiles || [];
@@ -99,8 +92,14 @@ export class NxImportsPlugin {
     return filteredAdditionalRootFiles;
   }
 
+  /**
+   * Patches the ts.server.Project.getPackageJsonsForAutoImport method to add
+   * workspace packages as dependencies if they are not already present.
+   */
   private patchGetPackageJsonsForAutoImport(project: ts.server.Project) {
     if (!(project as any).getPackageJsonsForAutoImport) {
+      // no getPackageJsonsForAutoImport method, the internal implementation
+      // might have changed, return early to avoid crashing the tsserver
       this.logger?.log(`no project.getPackageJsonsForAutoImport`);
       return;
     }
@@ -115,10 +114,18 @@ export class NxImportsPlugin {
       const packageJsons = originalGetPackageJsonsForAutoImport(...args);
 
       if (!this.config.workspacePackages?.length) {
+        // no workspace packages to add, return the original result
         return packageJsons;
       }
 
       try {
+        // npm and yarn classic don't support the workspace protocol
+        const defaultVersion = ['npm', 'yarn-classic'].includes(
+          this.config.packageManager,
+        )
+          ? '*'
+          : 'workspace:*';
+
         for (const packageJson of packageJsons) {
           for (const dependency of this.config.workspacePackages ?? []) {
             if (
@@ -128,20 +135,25 @@ export class NxImportsPlugin {
               packageJson.dependencies ??= new Map<string, string>();
 
               const version =
-                packageJson.devDependencies?.get(dependency) ??
-                (this.config.packageManager === 'pnpm' ? 'workspace:*' : '*');
+                packageJson.devDependencies?.get(dependency) ?? defaultVersion;
               packageJson.dependencies.set(dependency, version);
             }
           }
         }
-      } catch {
-        // ignore
+      } catch (e) {
+        this.logger?.log(
+          `error setting workspace packages as dependencies: ${e}`,
+        );
       }
 
       return packageJsons;
     };
   }
 
+  /**
+   * Add any additional root files to the project and invalidate the package
+   * json cache.
+   */
   private updateProject(project: ts.server.Project) {
     this.logger?.log('updating project: ' + project.getProjectName());
     const rootFiles = this.getRootFiles(project);
@@ -151,6 +163,8 @@ export class NxImportsPlugin {
 
     // ensure the package json cache is invalidated
     if (!(project as any).onAutoImportProviderSettingsChanged) {
+      // no onAutoImportProviderSettingsChanged method, the internal implementation
+      // might have changed, return early to avoid crashing the tsserver
       this.logger?.log(`no project.onAutoImportProviderSettingsChanged`);
       return;
     }

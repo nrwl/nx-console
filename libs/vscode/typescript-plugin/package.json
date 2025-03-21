@@ -9,9 +9,6 @@
     "projectType": "library",
     "tags": [
       "type:vscode"
-    ],
-    "implicitDependencies": [
-      "vscode-typescript-import-plugin"
     ]
   }
 }

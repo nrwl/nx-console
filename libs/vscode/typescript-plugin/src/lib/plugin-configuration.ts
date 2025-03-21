@@ -2,26 +2,27 @@ import {
   findConfig,
   readAndCacheJsonFile,
 } from '@nx-console/shared-file-system';
-import { detectPackageManager } from '@nx-console/shared-npm';
+import {
+  detectPackageManager,
+  getPackageManagerVersion,
+} from '@nx-console/shared-npm';
+import type { Configuration as PluginConfiguration } from '@nx-console/vscode-typescript-import-plugin/src/lib/typescript-import-plugin';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
 import { dirname, join } from 'path';
+import { lt } from 'semver';
 
 export type RootFileInfo = {
   mainFile: string;
   directory: string;
 };
+export type Configuration = Required<PluginConfiguration>;
 
-export type Configuration = {
-  additionalRootFiles: RootFileInfo[];
-  packageManager: string;
-  workspacePackages: string[];
-};
 type CachedConfiguration = {
   additionalRootFiles: {
     count: number;
     stringified: string;
   };
-  packageManager: string;
+  packageManager: Configuration['packageManager'];
   workspacePackages: {
     count: number;
     stringified: string;
@@ -80,7 +81,17 @@ export async function getPluginConfiguration(
   projectGraph?: ProjectGraph,
 ): Promise<Configuration> {
   const additionalRootFiles = await getAdditionalRootFiles(workspaceRoot);
-  const packageManager = await detectPackageManager(workspaceRoot);
+  let packageManager: Configuration['packageManager'] =
+    await detectPackageManager(workspaceRoot);
+  if (packageManager === 'yarn') {
+    const yarnVersion = await getPackageManagerVersion(
+      packageManager,
+      workspaceRoot,
+    );
+    if (lt(yarnVersion, '2.0.0')) {
+      packageManager = 'yarn-classic';
+    }
+  }
 
   if (!projectGraph) {
     return { additionalRootFiles, workspacePackages: [], packageManager };

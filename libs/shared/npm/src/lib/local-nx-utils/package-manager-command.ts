@@ -16,6 +16,17 @@ export async function detectPackageManager(
   return detectPackageManager(workspacePath);
 }
 
+export async function getPackageManagerVersion(
+  packageManager: PackageManager,
+  workspacePath: string,
+  logger?: Logger,
+): Promise<string> {
+  const { getPackageManagerVersion } = await importNxPackagePath<
+    typeof import('nx/src/utils/package-manager')
+  >(workspacePath, 'src/utils/package-manager', logger);
+
+  return getPackageManagerVersion(packageManager, workspacePath);
+}
 export async function getPackageManagerCommand(
   workspacePath: string,
   logger?: Logger,

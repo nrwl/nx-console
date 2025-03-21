@@ -9,6 +9,7 @@ export { getNxExecutionCommand } from './lib/get-nx-execution-command';
 export {
   detectPackageManager,
   getPackageManagerCommand,
+  getPackageManagerVersion,
 } from './lib/local-nx-utils/package-manager-command';
 export * from './lib/local-nx-utils/read-json';
 export * from './lib/local-nx-utils/parse-target-string';
