@@ -1,3 +1,10 @@
+# [18.44.0](https://github.com/nrwl/nx-console/compare/vscode-v18.43.0...vscode-v18.44.0) (2025-03-21)
+
+
+### Features
+
+* **vscode:** provide completion info for workspace projects using package manager workspaces ([#2447](https://github.com/nrwl/nx-console/issues/2447)) ([ebc6423](https://github.com/nrwl/nx-console/commit/ebc6423b2de2396e9bda78ee823cdd1d5da5da7b))
+
 # [18.43.0](https://github.com/nrwl/nx-console/compare/vscode-v18.42.1...vscode-v18.43.0) (2025-03-21)
 
 
