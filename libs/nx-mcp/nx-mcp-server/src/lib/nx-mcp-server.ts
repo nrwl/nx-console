@@ -45,10 +45,10 @@ export interface NxWorkspaceInfoProvider {
 export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
-  private _nxWorkspacePath: string;
+  private _nxWorkspacePath?: string;
 
   constructor(
-    initialWorkspacePath: string,
+    initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
     private ideCallback?: (message: IdeCallbackMessage) => void,
     private telemetry?: NxConsoleTelemetryLogger,
@@ -79,6 +79,37 @@ export class NxMcpServerWrapper {
 
   private registerTools(): void {
     this.server.tool(
+      'nx_docs',
+      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+      {
+        userQuery: z
+          .string()
+          .describe(
+            'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
+          ),
+      },
+      async ({ userQuery }: { userQuery: string }) => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: 'nx_docs',
+        });
+        const docsPages = await getDocsContext(userQuery);
+        return {
+          content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
+        };
+      },
+    );
+
+    if (this._nxWorkspacePath) {
+      this.registerWorkspaceTools();
+    }
+
+    if (this.ideCallback) {
+      this.registerIdeCallbackTools();
+    }
+  }
+
+  private registerWorkspaceTools(): void {
+    this.server.tool(
       'nx_workspace',
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
       async () => {
@@ -86,6 +117,14 @@ export class NxMcpServerWrapper {
           tool: 'nx_workspace',
         });
         try {
+          if (!this._nxWorkspacePath) {
+            return {
+              isError: true,
+              content: [
+                { type: 'text', text: 'Error: Workspace path not set' },
+              ],
+            };
+          }
           if (!(await checkIsNxWorkspace(this._nxWorkspacePath))) {
             return {
               isError: true,
@@ -157,6 +196,12 @@ export class NxMcpServerWrapper {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_project_details',
         });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
         const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
           this._nxWorkspacePath,
           this.logger,
@@ -194,33 +239,18 @@ export class NxMcpServerWrapper {
     );
 
     this.server.tool(
-      'nx_docs',
-      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
-      {
-        userQuery: z
-          .string()
-          .describe(
-            'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
-          ),
-      },
-      async ({ userQuery }: { userQuery: string }) => {
-        this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_docs',
-        });
-        const docsPages = await getDocsContext(userQuery);
-        return {
-          content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
-        };
-      },
-    );
-
-    this.server.tool(
       'nx_generators',
       'Returns a list of generators that could be relevant to the user query.',
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_generators',
         });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
         const generators = await this.nxWorkspaceInfoProvider.getGenerators(
           this._nxWorkspacePath,
           undefined,
@@ -260,6 +290,12 @@ export class NxMcpServerWrapper {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_generator_schema',
         });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
         const generators = await this.nxWorkspaceInfoProvider.getGenerators(
           this._nxWorkspacePath,
           undefined,
@@ -302,10 +338,6 @@ and follows the Nx workspace convention for project organization.
         };
       },
     );
-
-    if (this.ideCallback) {
-      this.registerIdeCallbackTools();
-    }
   }
 
   private registerIdeCallbackTools(): void {

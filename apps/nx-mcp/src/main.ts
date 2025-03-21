@@ -65,13 +65,9 @@ const argv = yargs(hideBin(process.argv))
   .help()
   .parseSync() as ArgvType;
 
-const nxWorkspacePath = argv.workspacePath || (argv._[0] as string);
-if (!nxWorkspacePath) {
-  console.error(
-    'Please provide a workspace root as the first argument or with --workspacePath',
-  );
-  process.exit(1);
-}
+const nxWorkspacePath: string | undefined =
+  argv.workspacePath || (argv._[0] as string);
+
 let googleAnalytics: GoogleAnalytics | undefined;
 
 if (!argv.disableTelemetry) {
