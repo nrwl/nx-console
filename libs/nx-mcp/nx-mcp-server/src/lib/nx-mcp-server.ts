@@ -84,7 +84,9 @@ export class NxMcpServerWrapper {
       'nx_find_relevant_projects_information',
       'Finds a list of relevant projects based on a user query and returns their descriptions. Return the relevant part of the nx project graph as well.',
       {
-        userQuery: z.string(),
+        userQuery: z
+          .string()
+          .describe('The user query to find relevant projects for'),
       },
       async ({ userQuery }) => {
         console.log('Relevant query', userQuery);
@@ -106,20 +108,28 @@ export class NxMcpServerWrapper {
         );
         console.log('Searching projects');
         const results = projectSearch.search(userQuery).slice(0, 30);
+        // name, path, description
         console.log('Found results', results.length);
-        const contentItems = results.map((result) => {
-          return {
-            type: 'text' as const,
-            text: JSON.stringify(result, null, 2),
-          };
-        });
+        const contentItems = results
+          .filter((result) => result.score > 20)
+          .map((result) => {
+            const details = {
+              name: result.name,
+              path: result.path,
+              description: result.description,
+            };
+            return {
+              type: 'text' as const,
+              text: JSON.stringify(details, null, 2),
+            };
+          });
 
         return {
           content: [
-            {
-              type: 'text' as const,
-              text: getProjectGraphPrompt(workspace.projectGraph),
-            },
+            // {
+            //   type: 'text' as const,
+            //   text: getProjectGraphPrompt(workspace.projectGraph),
+            // },
             ...contentItems,
           ],
         };
@@ -162,9 +172,7 @@ export class NxMcpServerWrapper {
         });
 
         return {
-          content: [
-            ...contentItems,
-          ],
+          content: [...contentItems],
         };
       },
     );
@@ -363,7 +371,7 @@ export class NxMcpServerWrapper {
               text: `
 Found generator schema for ${generatorName}: ${JSON.stringify(
                 generatorDetails,
-              )}.          
+              )}.
 **IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
 
 1. FIRST navigate to the parent directory where you want to create the item:
