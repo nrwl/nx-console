@@ -12,6 +12,7 @@ import {
 import {
   checkIsNxWorkspace,
   findMatchingProject,
+  getLocalWorkspacePlugins,
   isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
@@ -105,12 +106,13 @@ export class NxMcpServerWrapper {
 
     this.server.tool(
       'nx_available_plugins',
-      'Returns a list of available nx plugins - this includes both official and approved community plugins.',
+      'Returns a list of available nx plugins - this includes local, official and approved community plugins.',
       async () => {
         let nxVersion: NxVersion | undefined = undefined;
+        let nxWorkspace: NxWorkspace | undefined = undefined;
 
         if (this._nxWorkspacePath) {
-          const nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+          nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
             this._nxWorkspacePath,
             this.logger,
           );
@@ -119,22 +121,18 @@ export class NxMcpServerWrapper {
 
         const availablePlugins = await getAvailableNxPlugins(nxVersion);
 
-        // Create a Set of plugin names for efficient lookup
         const availablePluginNames = new Set([
           ...availablePlugins.official.map((plugin) => plugin.name),
           ...availablePlugins.community.map((plugin) => plugin.name),
         ]);
 
-        // Initialize installed plugins array
         let installedPlugins: string[] = [];
+        let localPlugins: string[] = [];
 
-        // Only try to determine installed plugins if workspace path exists
-        if (this._nxWorkspacePath) {
+        if (this._nxWorkspacePath && nxWorkspace) {
           try {
-            // Determine if it's a dot nx installation
             const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
 
-            // Determine package.json path
             const packageJsonPath = isDotNx
               ? join(
                   this._nxWorkspacePath,
@@ -144,33 +142,51 @@ export class NxMcpServerWrapper {
                 )
               : join(this._nxWorkspacePath, 'package.json');
 
-            // Read package.json
             const packageJsonContent = await fs.readFile(
               packageJsonPath,
               'utf-8',
             );
             const packageJson = JSON.parse(packageJsonContent);
 
-            // Combine dependencies and devDependencies
             const allDependencies = {
               ...(packageJson.dependencies || {}),
               ...(packageJson.devDependencies || {}),
             };
 
-            // Filter for installed plugins that match available plugins
             installedPlugins = Object.keys(allDependencies).filter((depName) =>
               availablePluginNames.has(depName),
             );
           } catch (error) {
-            // Error handling: log the error but continue with empty installed plugins
             this.logger.log(
               `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
             );
             installedPlugins = [];
           }
+
+          try {
+            const localPluginsMap = await getLocalWorkspacePlugins(
+              this._nxWorkspacePath,
+              nxWorkspace,
+            );
+            localPluginsMap.forEach((plugin) => {
+              localPlugins.push(plugin.name);
+            });
+          } catch (error) {
+            this.logger.log(
+              `Error determining local plugins: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
         }
 
         let formattedText = '';
+
+        if (localPlugins.length > 0) {
+          formattedText += `=== LOCAL NX PLUGINS ===\n`;
+          localPlugins.forEach((pluginName) => {
+            formattedText += `[${pluginName}]\n`;
+          });
+          formattedText += `\n`;
+        }
 
         if (installedPlugins.length > 0) {
           formattedText += `=== INSTALLED NX PLUGINS ===\n`;

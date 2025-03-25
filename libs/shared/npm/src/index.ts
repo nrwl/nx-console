@@ -14,3 +14,4 @@ export {
 export * from './lib/local-nx-utils/read-json';
 export * from './lib/local-nx-utils/parse-target-string';
 export * from './lib/local-nx-utils/find-matching-projects';
+export * from './lib/local-nx-utils/get-local-workspace-plugins';

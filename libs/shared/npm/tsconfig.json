@@ -10,6 +10,9 @@
       "path": "../utils"
     },
     {
+      "path": "../types"
+    },
+    {
       "path": "../file-system"
     },
     {
