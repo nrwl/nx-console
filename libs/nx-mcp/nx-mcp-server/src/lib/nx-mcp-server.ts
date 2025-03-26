@@ -121,48 +121,9 @@ export class NxMcpServerWrapper {
 
         const availablePlugins = await getAvailableNxPlugins(nxVersion);
 
-        const availablePluginNames = new Set([
-          ...availablePlugins.official.map((plugin) => plugin.name),
-          ...availablePlugins.community.map((plugin) => plugin.name),
-        ]);
-
-        let installedPlugins: string[] = [];
-        let localPlugins: string[] = [];
+        const localPlugins: string[] = [];
 
         if (this._nxWorkspacePath && nxWorkspace) {
-          try {
-            const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
-
-            const packageJsonPath = isDotNx
-              ? join(
-                  this._nxWorkspacePath,
-                  '.nx',
-                  'installation',
-                  'package.json',
-                )
-              : join(this._nxWorkspacePath, 'package.json');
-
-            const packageJsonContent = await fs.readFile(
-              packageJsonPath,
-              'utf-8',
-            );
-            const packageJson = JSON.parse(packageJsonContent);
-
-            const allDependencies = {
-              ...(packageJson.dependencies || {}),
-              ...(packageJson.devDependencies || {}),
-            };
-
-            installedPlugins = Object.keys(allDependencies).filter((depName) =>
-              availablePluginNames.has(depName),
-            );
-          } catch (error) {
-            this.logger.log(
-              `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
-            );
-            installedPlugins = [];
-          }
-
           try {
             const localPluginsMap = await getLocalWorkspacePlugins(
               this._nxWorkspacePath,
@@ -181,17 +142,9 @@ export class NxMcpServerWrapper {
         let formattedText = '';
 
         if (localPlugins.length > 0) {
-          formattedText += `=== LOCAL NX PLUGINS ===\n`;
-          localPlugins.forEach((pluginName) => {
-            formattedText += `[${pluginName}]\n`;
-          });
-          formattedText += `\n`;
-        }
-
-        if (installedPlugins.length > 0) {
           formattedText += `=== INSTALLED NX PLUGINS ===\n`;
           formattedText += `(Note: Installed plugins are not repeated in other categories)\n\n`;
-          installedPlugins.forEach((pluginName) => {
+          localPlugins.forEach((pluginName) => {
             formattedText += `[${pluginName}]\n`;
           });
           formattedText += `\n`;
@@ -200,7 +153,7 @@ export class NxMcpServerWrapper {
         formattedText += `=== OFFICIAL NX PLUGINS ===\n`;
 
         availablePlugins.official
-          .filter((plugin) => !installedPlugins.includes(plugin.name))
+          .filter((plugin) => !localPlugins.includes(plugin.name))
           .forEach((plugin) => {
             const cleanDescription = plugin.description
               .replace(/\n/g, ' ')
@@ -210,21 +163,27 @@ export class NxMcpServerWrapper {
             formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
           });
 
-        formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
-        availablePlugins.community
-          .filter((plugin) => !installedPlugins.includes(plugin.name))
-          .forEach((plugin) => {
-            const cleanDescription = plugin.description
-              .replace(/\n/g, ' ')
-              .replace(/\s+/g, ' ')
-              .trim();
+        // We are going to disable community plugins for now as we work on cleaning up the registry
 
-            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+        // const availablePluginNames = new Set([
+        //   ...availablePlugins.official.map((plugin) => plugin.name),
+        //   ...availablePlugins.community.map((plugin) => plugin.name),
+        // ]);
+        // formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
+        // availablePlugins.community
+        //   .filter((plugin) => !localPlugins.includes(plugin.name))
+        //   .forEach((plugin) => {
+        //     const cleanDescription = plugin.description
+        //       .replace(/\n/g, ' ')
+        //       .replace(/\s+/g, ' ')
+        //       .trim();
 
-            if (plugin.url) {
-              formattedText += `URL: ${plugin.url}\n`;
-            }
-          });
+        //     formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+
+        //     if (plugin.url) {
+        //       formattedText += `URL: ${plugin.url}\n`;
+        //     }
+        //   });
 
         return {
           content: [
