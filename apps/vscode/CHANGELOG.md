@@ -1,3 +1,10 @@
+## [18.44.1](https://github.com/nrwl/nx-console/compare/vscode-v18.44.0...vscode-v18.44.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* **vscode:** catch yarn --version error in new typescript plugin ([#2453](https://github.com/nrwl/nx-console/issues/2453)) ([83bf98d](https://github.com/nrwl/nx-console/commit/83bf98de880de035628adbd8b32038d5b80ef575))
+
 # [18.44.0](https://github.com/nrwl/nx-console/compare/vscode-v18.43.0...vscode-v18.44.0) (2025-03-21)
 
 
