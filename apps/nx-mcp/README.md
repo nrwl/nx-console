@@ -31,6 +31,9 @@ Currently, the Nx MCP server provides a set of tools. Resources, Roots and Promp
 - **nx_docs**: Retrieves documentation sections relevant to user queries
 - **nx_generators**: Returns a list of available generators in the workspace
 - **nx_generator_schema**: Provides detailed schema information for a specific generator
+- **nx_available_plugins**: Returns a list of available Nx plugins from the npm registry with their descriptions
+
+When no workspace path is specified, only the `nx_docs` and `nx_available_plugins` tools will be available.
 
 ## Contributing & Development
 
