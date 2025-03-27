@@ -15,7 +15,13 @@
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/types/tsconfig.lib.json"
+      "path": "../nx-cli-quickpicks/tsconfig.lib.json"
+    },
+    {
+      "path": "../generate-ui-webview/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/llm-context/tsconfig.lib.json"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server/tsconfig.lib.json"

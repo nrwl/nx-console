@@ -10,7 +10,13 @@
       "path": "../nx-workspace"
     },
     {
-      "path": "../../shared/types"
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../generate-ui-webview"
+    },
+    {
+      "path": "../../shared/llm-context"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"

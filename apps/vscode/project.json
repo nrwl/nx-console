@@ -37,6 +37,11 @@
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "assets": [
           {
+            "glob": "wrap-generator.js",
+            "input": "apps/vscode/src",
+            "output": "/"
+          },
+          {
             "glob": "nx-schema.json",
             "input": "apps/vscode/src",
             "output": "/"

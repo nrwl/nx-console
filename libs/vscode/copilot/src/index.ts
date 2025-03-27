@@ -1,1 +1,1 @@
-export * from './lib/init-copilot.js';
+export * from './lib/init-copilot';
