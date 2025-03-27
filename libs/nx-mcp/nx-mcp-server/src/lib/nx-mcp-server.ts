@@ -13,7 +13,6 @@ import {
   checkIsNxWorkspace,
   findMatchingProject,
   getLocalWorkspacePlugins,
-  isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { getAvailableNxPlugins, Logger } from '@nx-console/shared-utils';
