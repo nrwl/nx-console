@@ -13,14 +13,11 @@ import {
   checkIsNxWorkspace,
   findMatchingProject,
   getLocalWorkspacePlugins,
-  isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { getAvailableNxPlugins, Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { getMcpLogger } from './mcp-logger';
-import * as fs from 'fs/promises';
-import { join } from 'path';
 
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
@@ -106,7 +103,7 @@ export class NxMcpServerWrapper {
 
     this.server.tool(
       'nx_available_plugins',
-      'Returns a list of available nx plugins - this includes local, official and approved community plugins.',
+      'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
       async () => {
         let nxVersion: NxVersion | undefined = undefined;
         let nxWorkspace: NxWorkspace | undefined = undefined;
@@ -415,7 +412,7 @@ export class NxMcpServerWrapper {
               text: `
 Found generator schema for ${generatorName}: ${JSON.stringify(
                 generatorDetails,
-              )}.          
+              )}.
 **IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
 
 1. FIRST navigate to the parent directory where you want to create the item:

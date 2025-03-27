@@ -18,20 +18,26 @@ We are trying to keep GitHub issues for bug reports and feature requests. Stack 
 
 Alternatively, if you are using IntelliJ IDEA to develop Nx Console, it can take care of the java installation for you.
 
-## Running the Extension locally
+## Development
 
-### VSCode
+### Running the Extension locally
+
+#### VSCode
 
 In order to start Nx Console in development mode, the repo needs to be built. Running `yarn watch` via the terminal or using the command prompt to execute `Tasks: Run Task -> Build and watch Nx Console` will automatically generate build artifacts whenever the code changes. </br>
 Use the `F5` key or the debug menu option `Launch Client + Server` to start the Extension Development Host.
 
 > :warning: Even though builds will be generated automatically, the Extension Development Host needs to be restarted in order to apply a new set of changes.
 
-### IntelliJ
+#### IntelliJ
 
 The `runIde` gradle task takes care of building Nx Console and starting a development instance of IntelliJ. Run the `nx-console [runIde]` gradle config in your IDE or use `nx run intellij:runIde` (which executes `./gradlew :apps:intellij:runIde` under the hood).
 
 When debugging the JCEF-based generate UI, you can attach an instance of Chrome Devtools to the browser. To enable this, make sure to [set the corresponding registry key](https://plugins.jetbrains.com/docs/intellij/jcef.html#debugging).
+
+### Building the extension for local testing
+
+
 
 ## Submitting a PR
 
