@@ -13,6 +13,7 @@ import {
   checkIsNxWorkspace,
   findMatchingProject,
   getLocalWorkspacePlugins,
+  getPackageManagerCommand,
   isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
@@ -33,6 +34,7 @@ import {
 import { gte, NxVersion } from '@nx-console/nx-version';
 import { join } from 'path';
 import { readFile } from 'fs/promises';
+import { execSync } from 'child_process';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -473,6 +475,65 @@ and follows the Nx workspace convention for project organization.
             },
           ],
         };
+      },
+    );
+
+    this.server.tool(
+      'nx_run_generator',
+      'Runs an nx generator. ALWAYS DRY RUN THE GENERATOR FIRST IN ORDER TO MAKE SURE THE CHANGES YOU ARE TRYING TO MAKE ARE CORRECT. ALWAYS USE THIS INSTEAD OF RUNNING A GENERATOR DIRECTLY VIA THE CLI.',
+      {
+        dryRun: z
+          .boolean()
+          .optional()
+          .describe('Whether to dry run the generator'),
+        generatorName: z.string().describe('The name of the generator to run'),
+        options: z
+          .string()
+          .describe(
+            'The options to pass to the generator, as commandline options',
+          ),
+      },
+      async ({ dryRun, generatorName, options }) => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: 'nx_generator_run',
+          dryRun,
+          generatorName,
+          options,
+        });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
+
+        try {
+          const packageManagerCommand = await getPackageManagerCommand(
+            this._nxWorkspacePath,
+          );
+          const result = execSync(
+            `${packageManagerCommand.exec} nx generate ${generatorName} ${options} ${dryRun ? '--dry-run --verbose' : ''} --no-interactive`,
+            {
+              cwd: this._nxWorkspacePath,
+            },
+          );
+          const text =
+            `Here is ${dryRun ? 'what would happen if you ran the generator - AFTER THE DRY RUN, SUMMARIZE THE CHANGES IN A FEW ENGLISH SENTENCES OR BULLET POINTSAND ASK THE USER IF THEY WOULD LIKE TO MOVE ON. IF THEY DO, RUN THE GENERATOR AGAIN WITHOUT THE DRY RUN.' : 'the result of the generator invocation'} \n` +
+            result.toString();
+          return {
+            content: [
+              {
+                type: 'text',
+                text,
+              },
+            ],
+          };
+        } catch (e) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: String(e) }],
+          };
+        }
       },
     );
   }
