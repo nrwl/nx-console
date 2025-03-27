@@ -49,6 +49,17 @@ export interface NxWorkspaceInfoProvider {
   ) => Promise<GeneratorCollectionInfo[] | undefined>;
 }
 
+export interface NxIdeProvider {
+  focusProject: (projectName: string) => void;
+  focusTask: (projectName: string, taskName: string) => void;
+  showFullProjectGraph: () => void;
+  runGeneratorInTerminal: (
+    generatorName: string,
+    options: string,
+    cwd?: string,
+  ) => Promise<string>;
+}
+
 export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
@@ -57,7 +68,7 @@ export class NxMcpServerWrapper {
   constructor(
     initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
-    private ideCallback?: (message: IdeCallbackMessage) => void,
+    private ideProvider?: NxIdeProvider,
     private telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
   ) {
@@ -242,8 +253,8 @@ export class NxMcpServerWrapper {
       this.registerWorkspaceTools();
     }
 
-    if (this.ideCallback) {
-      this.registerIdeCallbackTools();
+    if (this.ideProvider) {
+      this.registerIdeTools();
     }
   }
 
@@ -492,13 +503,16 @@ and follows the Nx workspace convention for project organization.
           .describe(
             'The options to pass to the generator, as commandline options',
           ),
+        cwd: z
+          .string()
+          .optional()
+          .describe(
+            'The current working directory to run the generator from. If not specified, the workspace root will be used.',
+          ),
       },
-      async ({ dryRun, generatorName, options }) => {
+      async ({ dryRun, generatorName, options, cwd }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_generator_run',
-          dryRun,
-          generatorName,
-          options,
+          tool: 'nx_run_generator',
         });
         if (!this._nxWorkspacePath) {
           return {
@@ -508,26 +522,43 @@ and follows the Nx workspace convention for project organization.
         }
 
         try {
-          const packageManagerCommand = await getPackageManagerCommand(
-            this._nxWorkspacePath,
-          );
-          const result = execSync(
-            `${packageManagerCommand.exec} nx generate ${generatorName} ${options} ${dryRun ? '--dry-run --verbose' : ''} --no-interactive`,
-            {
-              cwd: this._nxWorkspacePath,
-            },
-          );
-          const text =
-            `Here is ${dryRun ? 'what would happen if you ran the generator - AFTER THE DRY RUN, SUMMARIZE THE CHANGES IN A FEW ENGLISH SENTENCES OR BULLET POINTSAND ASK THE USER IF THEY WOULD LIKE TO MOVE ON. IF THEY DO, RUN THE GENERATOR AGAIN WITHOUT THE DRY RUN.' : 'the result of the generator invocation'} \n` +
-            result.toString();
-          return {
-            content: [
+          if (this.ideProvider && !dryRun) {
+            const result = await this.ideProvider.runGeneratorInTerminal(
+              generatorName,
+              options,
+              cwd,
+            );
+
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Result of generator invocation:\n${result}`,
+                },
+              ],
+            };
+          } else {
+            const packageManagerCommand = await getPackageManagerCommand(
+              this._nxWorkspacePath,
+            );
+            const result = execSync(
+              `${packageManagerCommand.exec} nx generate ${generatorName} ${options} ${dryRun ? '--dry-run --verbose' : ''} --no-interactive`,
               {
-                type: 'text',
-                text,
+                cwd: cwd || this._nxWorkspacePath,
               },
-            ],
-          };
+            );
+            const text =
+              `Here is ${dryRun ? 'what would happen if you ran the generator - AFTER THE DRY RUN, SUMMARIZE THE CHANGES IN A FEW ENGLISH SENTENCES OR BULLET POINTSAND ASK THE USER IF THEY WOULD LIKE TO MOVE ON. IF THEY DO, RUN THE GENERATOR AGAIN WITHOUT THE DRY RUN.' : 'the result of the generator invocation'} \n` +
+              result.toString();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text,
+                },
+              ],
+            };
+          }
         } catch (e) {
           return {
             isError: true,
@@ -538,7 +569,7 @@ and follows the Nx workspace convention for project organization.
     );
   }
 
-  private registerIdeCallbackTools(): void {
+  private registerIdeTools(): void {
     this.server.tool(
       'nx_visualize_graph',
       'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
@@ -566,7 +597,8 @@ and follows the Nx workspace convention for project organization.
           tool: 'nx_visualize_graph',
           kind: visualizationType,
         });
-        if (this.ideCallback) {
+
+        if (this.ideProvider) {
           switch (visualizationType) {
             case 'project':
               if (!projectName) {
@@ -575,12 +607,7 @@ and follows the Nx workspace convention for project organization.
                   content: [{ type: 'text', text: 'Project name is required' }],
                 };
               }
-              this.ideCallback({
-                type: 'focus-project',
-                payload: {
-                  projectName,
-                },
-              } satisfies FocusProjectMessage);
+              this.ideProvider.focusProject(projectName);
               return {
                 content: [
                   {
@@ -607,13 +634,7 @@ and follows the Nx workspace convention for project organization.
                   content: [{ type: 'text', text: 'Project name is required' }],
                 };
               }
-              this.ideCallback({
-                type: 'focus-task',
-                payload: {
-                  projectName,
-                  taskName,
-                },
-              } satisfies FocusTaskMessage);
+              this.ideProvider.focusTask(projectName, taskName);
               return {
                 content: [
                   {
@@ -623,9 +644,7 @@ and follows the Nx workspace convention for project organization.
                 ],
               };
             case 'full-project-graph':
-              this.ideCallback({
-                type: 'full-project-graph',
-              } satisfies FullProjectGraphMessage);
+              this.ideProvider.showFullProjectGraph();
               return {
                 content: [
                   {
@@ -638,7 +657,7 @@ and follows the Nx workspace convention for project organization.
         }
         return {
           isError: true,
-          content: [{ type: 'text', text: 'No IDE available' }],
+          content: [{ type: 'text', text: 'No IDE provider available' }],
         };
       },
     );
