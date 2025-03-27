@@ -56,7 +56,7 @@ Nx Console enhances your editors AI features by providing relevant context to th
 
 In VSCode, access the enhancements via the `@nx` chat participant. Learn more [in our blog post](https://nx.dev/blog/nx-just-made-your-llm-smarter) or the [Nx docs](https://nx.dev/features/enhance-AI#vs-code-with-github-copilot)
 
-In Cursor or anywhere else, use the Nx MCP server. Learn more [in our Cursor blog](https://nx.dev/blog/nx-made-cursor-smarter) post or [the Nx docs](https://nx.dev/features/enhance-AI#cursor)
+In Cursor or anywhere else, use the [Nx MCP server](./apps/nx-mcp/README.md). Learn more [in our Cursor blog](https://nx.dev/blog/nx-made-cursor-smarter) post or [the Nx docs](https://nx.dev/features/enhance-AI#cursor)
 
 ### Project Details View
 

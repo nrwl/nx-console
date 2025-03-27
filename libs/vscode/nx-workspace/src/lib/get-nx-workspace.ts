@@ -4,14 +4,14 @@ import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 
 export function getNxWorkspace(
-  reset?: boolean
+  reset?: boolean,
 ): Promise<NxWorkspace | undefined> {
   return getNxlsClient().sendRequest(NxWorkspaceRequest, { reset });
 }
 
 // shortcuts to reduce repeated destructuring all over the codebase
 export async function getNxWorkspaceProjects(
-  reset?: boolean
+  reset?: boolean,
 ): Promise<Record<string, ProjectGraphProjectNode>> {
   const nxWorkspace = await getNxWorkspace(reset);
   if (!nxWorkspace) {
