@@ -6,9 +6,15 @@ A [Model Context Protocol](https://modelcontextprotocol.io/introduction) server 
 
 ## Overview
 
-The Nx MCP Server provides structured context about your Nx workspace to AI assistant models, enabling them to better understand and interact with your Nx projects. It serves as a bridge between AI models and your Nx workspace and documentation.
+The Nx MCP server gives LLMs deep access to your monorepo’s structure: project relationships, file mappings, runnable tasks, ownership info, tech stacks, Nx generators, and even Nx documentation. With this context, LLMs can generate code tailored to your stack, understand the impact of a change, and apply modifications across connected files with precision. This is possible because Nx already understands the higher-level architecture of your workspace, and monorepos bring all relevant projects into one place.
 
-## Installation
+Read more in [our blog post](https://nx.dev/blog/nx-made-cursor-smarter) and [in our docs](https://nx.dev/features/enhance-AI).
+
+## Installation and Usage
+
+There are two ways to use this MCP server:
+
+### a) Run it via the nx-mcp package
 
 Simply invoke the MCP server via `npx` or your package manager's equivalent.
 
@@ -21,6 +27,15 @@ Refer to your AI tool's documentation for how to register an MCP server. For exa
 If you want to host the server instead of communicating via `stdio`, you can use the `--sse` and `--port` flags. Keep in mind that the Nx MCP server only supports a single concurrent connection right now, so connecting multiple clients at the same time might break in some cases.
 
 Run `nx-mcp --help` to see what options are available.
+
+### b) Use the Nx Console extension
+
+If you're using Cursor you can directly install the Nx Console extension which automatically manages the MCP server for you.
+
+More info:
+
+- [Install Nx Console](https://nx.dev/getting-started/editor-setup)
+- [Configure Cursor to use the nx-mcp](https://nx.dev/features/enhance-AI#cursor)
 
 ## Available Tools
 
