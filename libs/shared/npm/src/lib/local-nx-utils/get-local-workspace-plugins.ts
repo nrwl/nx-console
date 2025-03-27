@@ -32,5 +32,8 @@ export async function getLocalWorkspacePlugins(
     projectsConfiguration.projects[projectName] = project.data;
   }
 
-  return getLocalWorkspacePlugins(projectsConfiguration, workspace.nxJson);
+  return await getLocalWorkspacePlugins(
+    projectsConfiguration,
+    workspace.nxJson,
+  );
 }

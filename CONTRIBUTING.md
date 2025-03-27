@@ -37,8 +37,6 @@ When debugging the JCEF-based generate UI, you can attach an instance of Chrome 
 
 ### Building the extension for local testing
 
-
-
 ## Submitting a PR
 
 Please follow the following guidelines:

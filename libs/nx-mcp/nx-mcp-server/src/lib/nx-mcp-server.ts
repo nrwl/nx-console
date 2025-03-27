@@ -13,6 +13,7 @@ import {
   checkIsNxWorkspace,
   findMatchingProject,
   getLocalWorkspacePlugins,
+  isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { getAvailableNxPlugins, Logger } from '@nx-console/shared-utils';
@@ -30,6 +31,8 @@ import {
   NxWorkspace,
 } from '@nx-console/shared-types';
 import { gte, NxVersion } from '@nx-console/nx-version';
+import { join } from 'path';
+import { readFile } from 'fs/promises';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -118,16 +121,51 @@ export class NxMcpServerWrapper {
 
         const availablePlugins = await getAvailableNxPlugins(nxVersion);
 
-        const localPlugins: string[] = [];
+        const availablePluginNames = new Set([
+          ...availablePlugins.official.map((plugin) => plugin.name),
+          ...availablePlugins.community.map((plugin) => plugin.name),
+        ]);
+
+        const localWorkspacePlugins: string[] = [];
+        let installedPlugins: string[] = [];
 
         if (this._nxWorkspacePath && nxWorkspace) {
+          try {
+            const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
+
+            const packageJsonPath = isDotNx
+              ? join(
+                  this._nxWorkspacePath,
+                  '.nx',
+                  'installation',
+                  'package.json',
+                )
+              : join(this._nxWorkspacePath, 'package.json');
+
+            const packageJsonContent = await readFile(packageJsonPath, 'utf-8');
+            const packageJson = JSON.parse(packageJsonContent);
+
+            const allDependencies = {
+              ...(packageJson.dependencies || {}),
+              ...(packageJson.devDependencies || {}),
+            };
+
+            installedPlugins = Object.keys(allDependencies).filter((depName) =>
+              availablePluginNames.has(depName),
+            );
+          } catch (error) {
+            this.logger.log(
+              `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
+            );
+            installedPlugins = [];
+          }
           try {
             const localPluginsMap = await getLocalWorkspacePlugins(
               this._nxWorkspacePath,
               nxWorkspace,
             );
             localPluginsMap.forEach((plugin) => {
-              localPlugins.push(plugin.name);
+              localWorkspacePlugins.push(plugin.name);
             });
           } catch (error) {
             this.logger.log(
@@ -138,10 +176,19 @@ export class NxMcpServerWrapper {
 
         let formattedText = '';
 
-        if (localPlugins.length > 0) {
+        if (localWorkspacePlugins.length > 0) {
+          formattedText += `=== LOCAL NX PLUGINS ===\n`;
+          formattedText += `(Note: These plugins are local to your workspace)\n\n`;
+          localWorkspacePlugins.forEach((pluginName) => {
+            formattedText += `[${pluginName}]\n`;
+          });
+          formattedText += `\n`;
+        }
+
+        if (installedPlugins.length > 0) {
           formattedText += `=== INSTALLED NX PLUGINS ===\n`;
           formattedText += `(Note: Installed plugins are not repeated in other categories)\n\n`;
-          localPlugins.forEach((pluginName) => {
+          installedPlugins.forEach((pluginName) => {
             formattedText += `[${pluginName}]\n`;
           });
           formattedText += `\n`;
@@ -150,7 +197,7 @@ export class NxMcpServerWrapper {
         formattedText += `=== OFFICIAL NX PLUGINS ===\n`;
 
         availablePlugins.official
-          .filter((plugin) => !localPlugins.includes(plugin.name))
+          .filter((plugin) => !installedPlugins.includes(plugin.name))
           .forEach((plugin) => {
             const cleanDescription = plugin.description
               .replace(/\n/g, ' ')
@@ -162,10 +209,6 @@ export class NxMcpServerWrapper {
 
         // We are going to disable community plugins for now as we work on cleaning up the registry
 
-        // const availablePluginNames = new Set([
-        //   ...availablePlugins.official.map((plugin) => plugin.name),
-        //   ...availablePlugins.community.map((plugin) => plugin.name),
-        // ]);
         // formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
         // availablePlugins.community
         //   .filter((plugin) => !localPlugins.includes(plugin.name))
