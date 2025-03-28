@@ -53,11 +53,11 @@ export interface NxIdeProvider {
   focusProject: (projectName: string) => void;
   focusTask: (projectName: string, taskName: string) => void;
   showFullProjectGraph: () => void;
-  runGeneratorInTerminal: (
+  openGenerateUi: (
     generatorName: string,
-    options: string,
+    options: Record<string, unknown>,
     cwd?: string,
-  ) => Promise<string>;
+  ) => void;
 }
 
 export class NxMcpServerWrapper {
@@ -488,64 +488,6 @@ and follows the Nx workspace convention for project organization.
         };
       },
     );
-
-    this.server.tool(
-      'nx_dry_run_generator',
-      'Dry runs an nx generator. ALWAYS DRY RUN THE GENERATOR BEFORE RUNNING IT IN ORDER TO MAKE SURE THE CHANGES YOU ARE TRYING TO MAKE ARE CORRECT.',
-      {
-        generatorName: z.string().describe('The name of the generator to run'),
-        options: z
-          .string()
-          .describe(
-            'The options to pass to the generator, as commandline options',
-          ),
-        cwd: z
-          .string()
-          .optional()
-          .describe(
-            'The current working directory to run the generator from. If not specified, the workspace root will be used.',
-          ),
-      },
-      async ({ generatorName, options, cwd }) => {
-        this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_run_generator',
-        });
-        if (!this._nxWorkspacePath) {
-          return {
-            isError: true,
-            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
-          };
-        }
-
-        try {
-          const packageManagerCommand = await getPackageManagerCommand(
-            this._nxWorkspacePath,
-          );
-          const result = execSync(
-            `${packageManagerCommand.exec} nx generate ${generatorName} ${options} --dry-run --verbose --no-interactive`,
-            {
-              cwd: cwd || this._nxWorkspacePath,
-            },
-          );
-          const text =
-            `Here is what would happen if you ran the generator - AFTER THE DRY RUN, SUMMARIZE THE CHANGES IN A FEW ENGLISH SENTENCES OR BULLET POINTS AND ASK THE USER IF THEY WOULD LIKE TO MOVE ON. IF THEY DO, RUN THE GENERATOR AGAIN WITHOUT THE DRY RUN. \n` +
-            result.toString();
-          return {
-            content: [
-              {
-                type: 'text',
-                text,
-              },
-            ],
-          };
-        } catch (e) {
-          return {
-            isError: true,
-            content: [{ type: 'text', text: String(e) }],
-          };
-        }
-      },
-    );
   }
 
   private registerIdeTools(): void {
@@ -638,6 +580,51 @@ and follows the Nx workspace convention for project organization.
           isError: true,
           content: [{ type: 'text', text: 'No IDE provider available' }],
         };
+      },
+    );
+
+    this.server.tool(
+      'nx_open_generate_ui',
+      'Opens the generate ui with options prefilled. This allows the user to tweak the generator options before running it. ALWAYS use this instead of running a generator directly via the CLI.',
+      {
+        generatorName: z.string().describe('The name of the generator to run'),
+        options: z
+          .record(z.string(), z.unknown())
+          .describe('The options to pass to the generator'),
+        cwd: z
+          .string()
+          .optional()
+          .describe(
+            'The current working directory to run the generator from. If not specified, the workspace root will be used.',
+          ),
+      },
+      async ({ generatorName, options, cwd }) => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: 'nx_run_generator',
+        });
+        if (!this._nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
+
+        try {
+          this.ideProvider?.openGenerateUi(generatorName, options, cwd);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Opening generate UI for ${generatorName} - THE USER IS MAKING CHANGES. PAUSE YOUR ANSWER. WAIT FOR THEM TO ASK YOU TO FINISH.`,
+              },
+            ],
+          };
+        } catch (e) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: String(e) }],
+          };
+        }
       },
     );
   }

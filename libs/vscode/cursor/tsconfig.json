@@ -4,13 +4,13 @@
   "include": [],
   "references": [
     {
-      "path": "../tasks"
-    },
-    {
       "path": "../nx-workspace"
     },
     {
-      "path": "../../shared/types"
+      "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../generate-ui-webview"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"
