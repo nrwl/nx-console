@@ -490,13 +490,9 @@ and follows the Nx workspace convention for project organization.
     );
 
     this.server.tool(
-      'nx_run_generator',
-      'Runs an nx generator. ALWAYS DRY RUN THE GENERATOR FIRST IN ORDER TO MAKE SURE THE CHANGES YOU ARE TRYING TO MAKE ARE CORRECT. ALWAYS USE THIS INSTEAD OF RUNNING A GENERATOR DIRECTLY VIA THE CLI.',
+      'nx_dry_run_generator',
+      'Dry runs an nx generator. ALWAYS DRY RUN THE GENERATOR BEFORE RUNNING IT IN ORDER TO MAKE SURE THE CHANGES YOU ARE TRYING TO MAKE ARE CORRECT.',
       {
-        dryRun: z
-          .boolean()
-          .optional()
-          .describe('Whether to dry run the generator'),
         generatorName: z.string().describe('The name of the generator to run'),
         options: z
           .string()
@@ -510,7 +506,7 @@ and follows the Nx workspace convention for project organization.
             'The current working directory to run the generator from. If not specified, the workspace root will be used.',
           ),
       },
-      async ({ dryRun, generatorName, options, cwd }) => {
+      async ({ generatorName, options, cwd }) => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_run_generator',
         });
@@ -522,43 +518,26 @@ and follows the Nx workspace convention for project organization.
         }
 
         try {
-          if (this.ideProvider && !dryRun) {
-            const result = await this.ideProvider.runGeneratorInTerminal(
-              generatorName,
-              options,
-              cwd,
-            );
-
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `Result of generator invocation:\n${result}`,
-                },
-              ],
-            };
-          } else {
-            const packageManagerCommand = await getPackageManagerCommand(
-              this._nxWorkspacePath,
-            );
-            const result = execSync(
-              `${packageManagerCommand.exec} nx generate ${generatorName} ${options} ${dryRun ? '--dry-run --verbose' : ''} --no-interactive`,
+          const packageManagerCommand = await getPackageManagerCommand(
+            this._nxWorkspacePath,
+          );
+          const result = execSync(
+            `${packageManagerCommand.exec} nx generate ${generatorName} ${options} --dry-run --verbose --no-interactive`,
+            {
+              cwd: cwd || this._nxWorkspacePath,
+            },
+          );
+          const text =
+            `Here is what would happen if you ran the generator - AFTER THE DRY RUN, SUMMARIZE THE CHANGES IN A FEW ENGLISH SENTENCES OR BULLET POINTS AND ASK THE USER IF THEY WOULD LIKE TO MOVE ON. IF THEY DO, RUN THE GENERATOR AGAIN WITHOUT THE DRY RUN. \n` +
+            result.toString();
+          return {
+            content: [
               {
-                cwd: cwd || this._nxWorkspacePath,
+                type: 'text',
+                text,
               },
-            );
-            const text =
-              `Here is ${dryRun ? 'what would happen if you ran the generator - AFTER THE DRY RUN, SUMMARIZE THE CHANGES IN A FEW ENGLISH SENTENCES OR BULLET POINTSAND ASK THE USER IF THEY WOULD LIKE TO MOVE ON. IF THEY DO, RUN THE GENERATOR AGAIN WITHOUT THE DRY RUN.' : 'the result of the generator invocation'} \n` +
-              result.toString();
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text,
-                },
-              ],
-            };
-          }
+            ],
+          };
         } catch (e) {
           return {
             isError: true,
