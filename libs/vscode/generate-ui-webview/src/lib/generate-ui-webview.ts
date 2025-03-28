@@ -16,11 +16,14 @@ import {
   getStartupMessage,
   getTransformedGeneratorSchema,
 } from '@nx-console/vscode-nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode-tasks';
+import { CliTaskProvider, NodeTask } from '@nx-console/vscode-tasks';
 import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   commands,
   ExtensionContext,
+  Task,
+  tasks,
   Uri,
   ViewColumn,
   WebviewPanel,
@@ -41,7 +44,7 @@ export class GenerateUiWebview {
   constructor(private context: ExtensionContext) {
     this._webviewSourceUri = Uri.joinPath(
       this.context.extensionUri,
-      'generate-ui-v2'
+      'generate-ui-v2',
     );
   }
 
@@ -59,14 +62,14 @@ export class GenerateUiWebview {
         retainContextWhenHidden: true,
         enableScripts: true,
         localResourceRoots: [this.context.extensionUri],
-      }
+      },
     );
 
     const scriptUri = this.webviewPanel.webview.asWebviewUri(
-      Uri.joinPath(this._webviewSourceUri, 'main.js')
+      Uri.joinPath(this._webviewSourceUri, 'main.js'),
     );
     const stylesUri = this.webviewPanel.webview.asWebviewUri(
-      Uri.joinPath(this._webviewSourceUri, 'output.css')
+      Uri.joinPath(this._webviewSourceUri, 'output.css'),
     );
 
     const codiconsUri = this.webviewPanel.webview.asWebviewUri(
@@ -75,8 +78,8 @@ export class GenerateUiWebview {
         '@vscode',
         'codicons',
         'dist',
-        'codicon.css'
-      )
+        'codicon.css',
+      ),
     );
 
     const vscodeElementsUri = this.webviewPanel.webview.asWebviewUri(
@@ -86,8 +89,8 @@ export class GenerateUiWebview {
         '@vscode-elements',
         'elements',
         'dist',
-        'bundled.js'
-      )
+        'bundled.js',
+      ),
     );
 
     this.webviewPanel.webview.html = `
@@ -125,7 +128,7 @@ export class GenerateUiWebview {
     this.webviewPanel.webview.onDidReceiveMessage(
       (message: GenerateUiOutputMessage) => {
         this.handleMessageFromWebview(message);
-      }
+      },
     );
 
     this.webviewPanel.onDidDispose(() => {
@@ -150,10 +153,28 @@ export class GenerateUiWebview {
   private async handleMessageFromWebview(message: GenerateUiOutputMessage) {
     switch (message.payloadType) {
       case 'run-generator': {
-        CliTaskProvider.instance.executeTask({
-          command: 'generate',
-          ...message.payload,
-        });
+        if (message.payload.flags.includes('--dry-run')) {
+          CliTaskProvider.instance.executeTask({
+            command: 'generate',
+            ...message.payload,
+          });
+        } else {
+          const scriptLocation = join(
+            this.context.extensionUri.fsPath,
+            'wrap-generator.js',
+          );
+          const task = await NodeTask.create({
+            script: scriptLocation,
+            args: [
+              'npx',
+              'nx',
+              'generate',
+              message.payload.positional,
+              ...message.payload.flags,
+            ],
+          });
+          tasks.executeTask(task);
+        }
         break;
       }
       case 'output-init': {
@@ -165,18 +186,18 @@ export class GenerateUiWebview {
           new GenerateUiConfigurationInputMessage({
             enableTaskExecutionDryRunOnChange:
               !!GlobalConfigurationStore.instance.get(
-                'enableTaskExecutionDryRunOnChange'
+                'enableTaskExecutionDryRunOnChange',
               ),
-          })
+          }),
         );
         this.postMessageToWebview(
-          new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay)
+          new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay),
         );
 
         getStartupMessage(this.generatorToDisplay).then((startupMessage) => {
           if (startupMessage) {
             this.postMessageToWebview(
-              new GenerateUiBannerInputMessage(startupMessage)
+              new GenerateUiBannerInputMessage(startupMessage),
             );
           }
         });
@@ -189,7 +210,7 @@ export class GenerateUiWebview {
           validators.forEach((validator) => {
             const result = validator(
               message.payload.formValues,
-              message.payload.schema
+              message.payload.schema,
             );
             if (result) {
               validationErrors = { ...validationErrors, ...result };
@@ -197,7 +218,7 @@ export class GenerateUiWebview {
           });
         }
         this.postMessageToWebview(
-          new GenerateUiValidationResultsInputMessage(validationErrors)
+          new GenerateUiValidationResultsInputMessage(validationErrors),
         );
         break;
       }
@@ -220,10 +241,10 @@ export class GenerateUiWebview {
   }
 
   private async transformMessage(
-    message: GenerateUiGeneratorSchemaInputMessage
+    message: GenerateUiGeneratorSchemaInputMessage,
   ): Promise<GenerateUiGeneratorSchemaInputMessage> {
     const transformedSchema = await getTransformedGeneratorSchema(
-      message.payload
+      message.payload,
     );
     return {
       ...message,
