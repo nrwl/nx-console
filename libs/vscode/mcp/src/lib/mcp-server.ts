@@ -1,29 +1,21 @@
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import {
+  NxIdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
-  NxIdeProvider,
 } from '@nx-console/nx-mcp-server';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
-import { IdeCallbackMessage } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
+import { getOrSelectGenerator } from '@nx-console/vscode-nx-cli-quickpicks';
 import {
+  getGeneratorContextV2,
   getGenerators,
   getNxWorkspace,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { getNxMcpPort, vscodeLogger } from '@nx-console/vscode-utils';
-import {
-  commands,
-  tasks,
-  TaskExecution,
-  TaskEndEvent,
-  Disposable,
-} from 'vscode';
-import express from 'express';
-import { window } from 'vscode';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
@@ -31,10 +23,10 @@ import {
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express from 'express';
-import { commands, window } from 'vscode';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { CliTask } from '@nx-console/vscode-tasks/src/lib/cli-task';
 import { CliTaskDefinition } from '@nx-console/vscode-tasks/src/lib/cli-task-definition';
+import { commands, window } from 'vscode';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -100,48 +92,23 @@ export async function tryStartMcpServer(workspacePath: string) {
     showFullProjectGraph: () => {
       commands.executeCommand('nx.graph.showAll');
     },
-    runGeneratorInTerminal: async (
+    openGenerateUi: async (
       generatorName: string,
-      options: string,
+      options: Record<string, unknown>,
       cwd?: string,
     ): Promise<string> => {
-      return new Promise<string>(async (resolve) => {
-        try {
-          // Parse options string into individual flags
-          const flags = options
-            .split(' ')
-            .filter((part) => part.trim() !== '')
-            .concat(['--no-interactive']);
-
-          // Create the task definition
-          const taskDefinition: CliTaskDefinition = {
-            command: 'generate',
-            positional: generatorName,
-            flags: flags,
-            cwd: cwd,
-          };
-
-          // Create a CLI task
-          const task = await CliTask.create(taskDefinition);
-          if (!task) {
-            resolve('Failed to create task for generator execution');
-            return;
-          }
-
-          await tasks.executeTask(task);
-
-          let disposable: Disposable | undefined;
-
-          disposable = tasks.onDidEndTaskProcess((e: TaskEndEvent) => {
-            disposable?.dispose();
-            resolve('Generator executed');
-          });
-        } catch (error) {
-          resolve(
-            `Error executing generator: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        }
+      const generator = await getOrSelectGenerator(generatorName);
+      if (!generator) {
+        window.showErrorMessage(`Could not find generator "${generatorName}"`);
+        return '';
+      }
+      await openGenerateUIPrefilled({
+        $0: 'nx',
+        _: ['generate', generatorName],
+        ...options,
+        cwd: cwd,
       });
+      return 'UI opened';
     },
   };
 

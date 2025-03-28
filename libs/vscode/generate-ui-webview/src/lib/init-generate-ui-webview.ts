@@ -39,7 +39,7 @@ export async function openGenerateUi(contextUri?: Uri, projectName?: string) {
 }
 
 export async function openGenerateUIPrefilled(
-  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>,
 ) {
   const generatorName = parsedArgs['_'][1];
   const generator = await getOrSelectGenerator(generatorName.toString());
@@ -65,7 +65,7 @@ export async function openGenerateUIPrefilled(
 
 function parseIntoPrefillValues(
   yargsParseResult: Awaited<ReturnType<typeof yargs.parse>>,
-  options: Option[]
+  options: Option[],
 ): Record<string, string> {
   const positionals = yargsParseResult['_'].slice(2);
 
@@ -85,7 +85,7 @@ function parseIntoPrefillValues(
   }
 
   for (const [key, value] of Object.entries(yargsParseResult)) {
-    if (key !== '_' && key !== '$0') {
+    if (key !== '_' && key !== '$0' && value !== undefined) {
       prefillValues[key] = value.toString();
     }
   }
