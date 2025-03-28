@@ -47,7 +47,7 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
 
   constructor(
     public cipe: CIPEInfo,
-    private treeDataProvider: AbstractTreeProvider<BaseRecentCIPETreeItem>
+    private treeDataProvider: AbstractTreeProvider<BaseRecentCIPETreeItem>,
   ) {
     let title = cipe.branch;
     if (cipe.commitTitle) {
@@ -71,7 +71,7 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
     }
 
     this.description = formatMillis(
-      (cipe.completedAt ?? Date.now()) - cipe.createdAt
+      (cipe.completedAt ?? Date.now()) - cipe.createdAt,
     );
 
     this.id = cipe.ciPipelineExecutionId;
@@ -92,17 +92,17 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
     if (this.cipe.status === 'SUCCEEDED') {
       this.iconPath = new ThemeIcon(
         'pass',
-        new ThemeColor('notebookStatusSuccessIcon.foreground')
+        new ThemeColor('notebookStatusSuccessIcon.foreground'),
       );
     } else if (isFailedStatus(this.cipe.status)) {
       this.iconPath = new ThemeIcon(
         'error',
-        new ThemeColor('notebookStatusErrorIcon.foreground')
+        new ThemeColor('notebookStatusErrorIcon.foreground'),
       );
     } else {
       this.iconPath = new ThemeIcon(
         'loading~spin',
-        new ThemeColor('notebookStatusRunningIcon.foreground')
+        new ThemeColor('notebookStatusRunningIcon.foreground'),
       );
     }
   }
@@ -136,8 +136,8 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
             runGroup.runs
               .filter((run) => run.status && isFailedStatus(run.status))
               .map(
-                (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId)
-              )
+                (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId),
+              ),
           ),
         ];
       }
@@ -152,7 +152,7 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
 
     if (this.cipe.runGroups.length === 1) {
       return this.cipe.runGroups[0].runs.map(
-        (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId)
+        (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId),
       );
     } else {
       return this.cipe.runGroups.map((runGroup) => {
@@ -169,7 +169,10 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
 class RunGroupTreeItem extends BaseRecentCIPETreeItem {
   type = 'runGroup' as const;
 
-  constructor(public runGroup: CIPERunGroup, public cipeId: string) {
+  constructor(
+    public runGroup: CIPERunGroup,
+    public cipeId: string,
+  ) {
     super(runGroup.ciExecutionEnv ?? runGroup.runGroup);
 
     this.collapsibleState = TreeItemCollapsibleState.Expanded;
@@ -196,11 +199,14 @@ class RunGroupTreeItem extends BaseRecentCIPETreeItem {
 class RunTreeItem extends BaseRecentCIPETreeItem {
   type = 'run' as const;
 
-  constructor(public run: CIPERun, public cipeId: string) {
+  constructor(
+    public run: CIPERun,
+    public cipeId: string,
+  ) {
     super(run.command);
 
     this.collapsibleState = TreeItemCollapsibleState.None;
-    this.id = `${cipeId}-${run.linkId}`;
+    this.id = `${cipeId}-${run.linkId ?? run.executionId}`;
     this.setIcon();
     this.contextValue = 'run';
   }
@@ -213,17 +219,17 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
     ) {
       this.iconPath = new ThemeIcon(
         'loading~spin',
-        new ThemeColor('notebookStatusRunningIcon.foreground')
+        new ThemeColor('notebookStatusRunningIcon.foreground'),
       );
     } else if (this.run.status === 'SUCCEEDED') {
       this.iconPath = new ThemeIcon(
         'pass',
-        new ThemeColor('notebookStatusSuccessIcon.foreground')
+        new ThemeColor('notebookStatusSuccessIcon.foreground'),
       );
     } else if (isFailedStatus(this.run.status)) {
       this.iconPath = new ThemeIcon(
         'error',
-        new ThemeColor('notebookStatusErrorIcon.foreground')
+        new ThemeColor('notebookStatusErrorIcon.foreground'),
       );
     }
   }
@@ -255,7 +261,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
 
   constructor(
     actor: ActorRef<any, EventObject>,
-    private fileDecorationProvider: CIPEFileDecorationProvider
+    private fileDecorationProvider: CIPEFileDecorationProvider,
   ) {
     super();
 
@@ -273,7 +279,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     });
   }
   override getChildren(
-    element?: BaseRecentCIPETreeItem | undefined
+    element?: BaseRecentCIPETreeItem | undefined,
   ): ProviderResult<BaseRecentCIPETreeItem[]> {
     if (!this.recentCIPEInfo) {
       return undefined;
@@ -295,19 +301,19 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     return element.getChildren();
   }
   override getParent(
-    element: BaseRecentCIPETreeItem
+    element: BaseRecentCIPETreeItem,
   ): ProviderResult<BaseRecentCIPETreeItem | null | undefined> {
     return undefined;
   }
 
   static create(
     extensionContext: ExtensionContext,
-    actor: ActorRef<any, EventObject>
+    actor: ActorRef<any, EventObject>,
   ) {
     const fileDecorationProvider = new CIPEFileDecorationProvider();
     const recentCIPEProvider = new CloudRecentCIPEProvider(
       actor,
-      fileDecorationProvider
+      fileDecorationProvider,
     );
 
     extensionContext.subscriptions.push(
@@ -325,7 +331,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
             source: 'cloud-view',
           });
           commands.executeCommand('vscode.open', treeItem.cipe.cipeUrl);
-        }
+        },
       ),
       commands.registerCommand(
         'nxCloud.showRunInApp',
@@ -337,7 +343,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
             source: 'cloud-view',
           });
           commands.executeCommand('vscode.open', treeItem.run.runUrl);
-        }
+        },
       ),
       commands.registerCommand(
         'nxCloud.showCommitForCIPE',
@@ -351,14 +357,14 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
             });
             commands.executeCommand('vscode.open', treeItem.cipe.commitUrl);
           }
-        }
+        },
       ),
       commands.registerCommand('nxCloud.openApp', async () => {
         if (recentCIPEProvider.workspaceUrl) {
           getTelemetry().logUsage('cloud.open-app');
           commands.executeCommand(
             'vscode.open',
-            recentCIPEProvider.workspaceUrl
+            recentCIPEProvider.workspaceUrl,
           );
         } else {
           // this shouldn't happen but as a fallback, we try to guess the cloud url
@@ -373,11 +379,11 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
             commands.executeCommand('vscode.open', cloudUrlWithTracking);
           } else {
             showErrorMessageWithOpenLogs(
-              'Something went wrong while retrieving the Nx Cloud URL.'
+              'Something went wrong while retrieving the Nx Cloud URL.',
             );
           }
         }
-      })
+      }),
     );
   }
 }
@@ -395,11 +401,11 @@ class CIPEFileDecorationProvider implements FileDecorationProvider {
 
       const failedTasks = runGroup?.runs.reduce(
         (total, run) => total + (run.numFailedTasks ?? 0),
-        0
+        0,
       );
       const totalTasks = runGroup?.runs.reduce(
         (total, run) => total + (run.numTasks ?? 0),
-        0
+        0,
       );
 
       if (failedTasks && failedTasks > 0) {
