@@ -38,7 +38,8 @@ export type CIPERunGroup = {
 };
 
 export type CIPERun = {
-  linkId: string;
+  linkId?: string;
+  executionId?: string;
   command: string;
   status?: CIPEExecutionStatus;
   numFailedTasks?: number;
