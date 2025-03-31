@@ -37,6 +37,9 @@ import { ProjectDetailsTool } from './tools/project-details-tool';
 import { VisualizeProjectGraphTool } from './tools/visualize-project-graph-tool';
 import { VisualizeTaskGraphTool } from './tools/visualize-task-graph-tool';
 import { explainCipe } from './commands/explain-cipe';
+import { AvailablePluginsTool } from './tools/available-plugins-tool';
+import { OpenGenerateUiTool } from './tools/open-generate-ui-tool';
+import { VisualizeFullProjectGraphTool } from './tools/visualize-full-project-graph-tool';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -78,10 +81,16 @@ export function initCopilot(context: ExtensionContext) {
     lm.registerTool('nx_generator-details', new GeneratorDetailsTool()),
     lm.registerTool('nx_project-details', new ProjectDetailsTool()),
     lm.registerTool(
-      'nx_visualize_project_graph_project',
+      'nx_visualize-project-graph-project',
       new VisualizeProjectGraphTool(),
     ),
-    lm.registerTool('nx_visualize_task_graph', new VisualizeTaskGraphTool()),
+    lm.registerTool('nx_visualize-task-graph', new VisualizeTaskGraphTool()),
+    lm.registerTool('nx_available-plugins', new AvailablePluginsTool()),
+    lm.registerTool('nx_open-generate-ui', new OpenGenerateUiTool()),
+    lm.registerTool(
+      'nx_visualize-full-project-graph',
+      new VisualizeFullProjectGraphTool(),
+    ),
   );
 
   context.subscriptions.push(
