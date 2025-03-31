@@ -8,6 +8,12 @@ import {
   getNxJsonPrompt,
   getProjectGraphErrorsPrompt,
   getProjectGraphPrompt,
+  formatAvailablePluginsPrompt,
+  getProjectGraphVisualizationMessage,
+  getTaskGraphVisualizationMessage,
+  createGeneratorLogFileName,
+  createGeneratorUiResponseMessage,
+  getPluginsInformation,
 } from '@nx-console/shared-llm-context';
 import {
   checkIsNxWorkspace,
@@ -123,8 +129,13 @@ export class NxMcpServerWrapper {
       'nx_available_plugins',
       'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
       async () => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: 'nx_available_plugins',
+        });
+
         let nxVersion: NxVersion | undefined = undefined;
         let nxWorkspace: NxWorkspace | undefined = undefined;
+        let workspacePath: string | undefined = this._nxWorkspacePath;
 
         if (this._nxWorkspacePath) {
           nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
@@ -134,117 +145,18 @@ export class NxMcpServerWrapper {
           nxVersion = nxWorkspace?.nxVersion;
         }
 
-        const availablePlugins = await getAvailableNxPlugins(nxVersion);
-
-        const availablePluginNames = new Set([
-          ...availablePlugins.official.map((plugin) => plugin.name),
-          ...availablePlugins.community.map((plugin) => plugin.name),
-        ]);
-
-        const localWorkspacePlugins: string[] = [];
-        let installedPlugins: string[] = [];
-
-        if (this._nxWorkspacePath && nxWorkspace) {
-          try {
-            const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
-
-            const packageJsonPath = isDotNx
-              ? join(
-                  this._nxWorkspacePath,
-                  '.nx',
-                  'installation',
-                  'package.json',
-                )
-              : join(this._nxWorkspacePath, 'package.json');
-
-            const packageJsonContent = await readFile(packageJsonPath, 'utf-8');
-            const packageJson = JSON.parse(packageJsonContent);
-
-            const allDependencies = {
-              ...(packageJson.dependencies || {}),
-              ...(packageJson.devDependencies || {}),
-            };
-
-            installedPlugins = Object.keys(allDependencies).filter((depName) =>
-              availablePluginNames.has(depName),
-            );
-          } catch (error) {
-            this.logger.log(
-              `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
-            );
-            installedPlugins = [];
-          }
-          try {
-            const localPluginsMap = await getLocalWorkspacePlugins(
-              this._nxWorkspacePath,
-              nxWorkspace,
-            );
-            localPluginsMap.forEach((plugin) => {
-              localWorkspacePlugins.push(plugin.name);
-            });
-          } catch (error) {
-            this.logger.log(
-              `Error determining local plugins: ${error instanceof Error ? error.message : String(error)}`,
-            );
-          }
-        }
-
-        let formattedText = '';
-
-        if (localWorkspacePlugins.length > 0) {
-          formattedText += `=== LOCAL NX PLUGINS ===\n`;
-          formattedText += `(Note: These plugins are local to your workspace)\n\n`;
-          localWorkspacePlugins.forEach((pluginName) => {
-            formattedText += `[${pluginName}]\n`;
-          });
-          formattedText += `\n`;
-        }
-
-        if (installedPlugins.length > 0) {
-          formattedText += `=== INSTALLED NX PLUGINS ===\n`;
-          formattedText += `(Note: Installed plugins are not repeated in other categories)\n\n`;
-          installedPlugins.forEach((pluginName) => {
-            formattedText += `[${pluginName}]\n`;
-          });
-          formattedText += `\n`;
-        }
-
-        formattedText += `=== OFFICIAL NX PLUGINS ===\n`;
-
-        availablePlugins.official
-          .filter((plugin) => !installedPlugins.includes(plugin.name))
-          .forEach((plugin) => {
-            const cleanDescription = plugin.description
-              .replace(/\n/g, ' ')
-              .replace(/\s+/g, ' ')
-              .trim();
-
-            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
-          });
-
-        // We are going to disable community plugins for now as we work on cleaning up the registry
-
-        // formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
-        // availablePlugins.community
-        //   .filter((plugin) => !localPlugins.includes(plugin.name))
-        //   .forEach((plugin) => {
-        //     const cleanDescription = plugin.description
-        //       .replace(/\n/g, ' ')
-        //       .replace(/\s+/g, ' ')
-        //       .trim();
-
-        //     formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
-
-        //     if (plugin.url) {
-        //       formattedText += `URL: ${plugin.url}\n`;
-        //     }
-        //   });
+        const pluginsInfo = await getPluginsInformation(
+          nxVersion,
+          workspacePath,
+          nxWorkspace,
+          this.logger,
+        );
 
         return {
           content: [
             {
               type: 'text',
-              text: formattedText,
+              text: pluginsInfo.formattedText,
             },
           ],
         };
@@ -535,7 +447,7 @@ and follows the Nx workspace convention for project organization.
                 content: [
                   {
                     type: 'text',
-                    text: `Opening project graph for ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                    text: getProjectGraphVisualizationMessage(projectName),
                   },
                 ],
               };
@@ -562,7 +474,10 @@ and follows the Nx workspace convention for project organization.
                 content: [
                   {
                     type: 'text',
-                    text: `Opening graph focused on task ${taskName} for project ${projectName}. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+                    text: getTaskGraphVisualizationMessage(
+                      projectName,
+                      taskName,
+                    ),
                   },
                 ],
               };
@@ -572,7 +487,7 @@ and follows the Nx workspace convention for project organization.
                 content: [
                   {
                     type: 'text',
-                    text: 'Opening full project graph. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
+                    text: getProjectGraphVisualizationMessage(),
                   },
                 ],
               };
@@ -613,35 +528,19 @@ and follows the Nx workspace convention for project organization.
 
         try {
           this.ideProvider?.openGenerateUi(generatorName, options ?? {}, cwd);
-          const sanitizedGeneratorName = generatorName.startsWith('@')
-            ? generatorName.substring(1).replace(/\//g, '-')
-            : generatorName.replace(/[@/]/g, '-');
-
-          const outputDir = await getWorkspaceDataDirectory(
+          const finalFileName = await createGeneratorLogFileName(
             this._nxWorkspacePath,
+            generatorName,
           );
-          const baseFileName = path.join(
-            outputDir,
-            `${sanitizedGeneratorName}.log`,
-          );
-
-          let finalFileName = baseFileName;
-          if (existsSync(baseFileName)) {
-            let counter = 1;
-            do {
-              finalFileName = path.join(
-                outputDir,
-                `${sanitizedGeneratorName}-${counter}.log`,
-              );
-              counter++;
-            } while (existsSync(finalFileName));
-          }
 
           return {
             content: [
               {
                 type: 'text',
-                text: `Opening generate UI for ${generatorName} - THE USER IS MAKING CHANGES. PAUSE YOUR ANSWER. WAIT FOR THEM TO ASK YOU TO FINISH. THE GENERATOR RESULTS WILL BE WRITTEN TO ${finalFileName}. THIS FILE SHOULD NOT BE MENTIONED TO THE USER BUT YOU CAN READ THIS FILE TO UNDERSTAND WHAT HAPPENED DURING THE GENERATOR INVOCATION. IF MULTIPLE GENERATORS ARE INVOKED, THERE WILL BE MULTIPLE FILES.`,
+                text: createGeneratorUiResponseMessage(
+                  generatorName,
+                  finalFileName,
+                ),
               },
             ],
           };
