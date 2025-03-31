@@ -3,29 +3,57 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 
-// Get all arguments passed to this script
-const args = process.argv.slice(4);
+const args = process.argv.slice(2);
 
-// Determine the generator name (assuming first arg is the command and second is the generator)
-const generatorName = args[1] || 'unknown-generator';
+let generatorName = args[3] || 'unknown-generator';
 
-// Create output directory if it doesn't exist
-const outputDir = path.join(process.cwd(), '.nx/workspace-data');
+generatorName = generatorName.startsWith('@')
+  ? generatorName.substring(1).replace(/\//g, '-')
+  : generatorName.replace(/[@/]/g, '-');
+
+const cacheDirModule = require('nx/src/utils/cache-directory');
+const cacheDir = cacheDirModule.workspaceDataDirectory;
+
+const outputDir = path.join(cacheDir, 'console-generators');
 mkdirp.sync(outputDir);
 
-// Output file path
-const outputFile = path.join(outputDir, `${generatorName}.log`);
+const findNextAvailableFileName = (baseName) => {
+  const baseFileName = path.join(outputDir, `${baseName}.log`);
 
-// Storage for output lines
+  if (!fs.existsSync(baseFileName)) {
+    return baseFileName;
+  }
+
+  let counter = 1;
+  let nextFileName;
+
+  do {
+    nextFileName = path.join(outputDir, `${baseName}-${counter}.log`);
+    counter++;
+  } while (fs.existsSync(nextFileName));
+
+  return nextFileName;
+};
+
+const outputFile = findNextAvailableFileName(generatorName);
+
 const outputLines = [];
 
-// Execute the command with all arguments
 const command = args[0];
 const commandArgs = args.slice(1);
+
+const env = {
+  ...process.env,
+  FORCE_COLOR: 'true',
+  COLORTERM: 'truecolor',
+  TERM: process.env.TERM || 'xterm-256color',
+};
 
 const childProcess = spawn(command, commandArgs, {
   stdio: ['inherit', 'pipe', 'pipe'],
   shell: true,
+  env,
+  cwd: process.cwd(),
 });
 
 // Capture and forward stdout

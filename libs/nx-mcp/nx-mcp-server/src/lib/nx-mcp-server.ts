@@ -14,6 +14,7 @@ import {
   findMatchingProject,
   getLocalWorkspacePlugins,
   getPackageManagerCommand,
+  getWorkspaceDataDirectory,
   isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
@@ -32,10 +33,11 @@ import {
   NxWorkspace,
 } from '@nx-console/shared-types';
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { join } from 'path';
+import path, { join } from 'path';
 import { readFile } from 'fs/promises';
 import { registerNxCloudTools } from './tools/nx-cloud';
 import { execSync } from 'child_process';
+import { existsSync } from 'fs';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -602,7 +604,7 @@ and follows the Nx workspace convention for project organization.
 
     this.server.tool(
       'nx_open_generate_ui',
-      'Opens the generate ui with options prefilled. This allows the user to tweak the generator options before running it. ALWAYS use this instead of running a generator directly via the CLI.',
+      'Opens the generate ui WITH WHATEVER OPTIONS YOU PROVIDE PREFILLED. This allows the user to tweak the generator options before running it. ALWAYS use this instead of running a generator directly via the CLI. You can also call this tool to overwrite the options for an existing generator invocation.',
       {
         generatorName: z.string().describe('The name of the generator to run'),
         options: z
@@ -612,12 +614,12 @@ and follows the Nx workspace convention for project organization.
           .string()
           .optional()
           .describe(
-            'The current working directory to run the generator from. If not specified, the workspace root will be used.',
+            'The current working directory to run the generator from. This is always relative to the workspace root. If not specified, the workspace root will be used.',
           ),
       },
       async ({ generatorName, options, cwd }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_run_generator',
+          tool: 'nx_open_generate_ui',
         });
         if (!this._nxWorkspacePath) {
           return {
@@ -627,12 +629,36 @@ and follows the Nx workspace convention for project organization.
         }
 
         try {
-          this.ideProvider?.openGenerateUi(generatorName, options, cwd);
+          this.ideProvider?.openGenerateUi(generatorName, options ?? {}, cwd);
+          const sanitizedGeneratorName = generatorName.startsWith('@')
+            ? generatorName.substring(1).replace(/\//g, '-')
+            : generatorName.replace(/[@/]/g, '-');
+
+          const outputDir = await getWorkspaceDataDirectory(
+            this._nxWorkspacePath,
+          );
+          const baseFileName = path.join(
+            outputDir,
+            `${sanitizedGeneratorName}.log`,
+          );
+
+          let finalFileName = baseFileName;
+          if (existsSync(baseFileName)) {
+            let counter = 1;
+            do {
+              finalFileName = path.join(
+                outputDir,
+                `${sanitizedGeneratorName}-${counter}.log`,
+              );
+              counter++;
+            } while (existsSync(finalFileName));
+          }
+
           return {
             content: [
               {
                 type: 'text',
-                text: `Opening generate UI for ${generatorName} - THE USER IS MAKING CHANGES. PAUSE YOUR ANSWER. WAIT FOR THEM TO ASK YOU TO FINISH.`,
+                text: `Opening generate UI for ${generatorName} - THE USER IS MAKING CHANGES. PAUSE YOUR ANSWER. WAIT FOR THEM TO ASK YOU TO FINISH. THE GENERATOR RESULTS WILL BE WRITTEN TO ${finalFileName}. THIS FILE SHOULD NOT BE MENTIONED TO THE USER BUT YOU CAN READ THIS FILE TO UNDERSTAND WHAT HAPPENED DURING THE GENERATOR INVOCATION. IF MULTIPLE GENERATORS ARE INVOKED, THERE WILL BE MULTIPLE FILES.`,
               },
             ],
           };
