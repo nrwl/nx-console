@@ -142,7 +142,7 @@ export class NxMcpServerWrapper {
 
         let nxVersion: NxVersion | undefined = undefined;
         let nxWorkspace: NxWorkspace | undefined = undefined;
-        let workspacePath: string | undefined = this._nxWorkspacePath;
+        const workspacePath: string | undefined = this._nxWorkspacePath;
 
         if (this._nxWorkspacePath) {
           nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
@@ -392,6 +392,18 @@ export class NxMcpServerWrapper {
           generators,
         );
 
+        let examples = '';
+        try {
+          const examplesPath = path.join(
+            generators.find((g) => g.name === generatorName)?.schemaPath ?? '',
+            '..',
+            'examples.md',
+          );
+          examples = await readFile(examplesPath, 'utf-8');
+        } catch (e) {
+          examples = 'No examples available';
+        }
+
         return {
           content: [
             {
@@ -414,6 +426,10 @@ Found generator schema for ${generatorName}: ${JSON.stringify(
 This approach provides better clarity about where new code will be generated
 and follows the Nx workspace convention for project organization.
             `,
+            },
+            {
+              type: 'text',
+              text: 'Examples: \n' + examples,
             },
           ],
         };
