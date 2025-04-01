@@ -45,6 +45,9 @@ async function getAdditionalRootFiles(
   if (!('compilerOptions' in tsconfig)) {
     tsconfig = (await readAndCacheJsonFile('tsconfig.json', workspaceRoot))
       .json;
+    if (!tsconfig) {
+      return [];
+    }
     if (!('compilerOptions' in tsconfig)) {
       return [];
     }
