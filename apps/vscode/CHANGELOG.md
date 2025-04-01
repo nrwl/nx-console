@@ -1,3 +1,13 @@
+## [18.44.2](https://github.com/nrwl/nx-console/compare/vscode-v18.44.1...vscode-v18.44.2) (2025-04-01)
+
+
+### Bug Fixes
+
+* **nxls:** make runLinkId nullable for cloud future compat ([#2455](https://github.com/nrwl/nx-console/issues/2455)) ([be05f23](https://github.com/nrwl/nx-console/commit/be05f23a18b0f6e0f79e1bfc92173cda4c9e2fee))
+* **vscode:** catch one more undefined tsconfig case ([#2459](https://github.com/nrwl/nx-console/issues/2459)) ([74ecf28](https://github.com/nrwl/nx-console/commit/74ecf28f1ada997d50f821e83b0c5d08cf0baa05))
+* **vscode:** catch potential errors importing from nx paths ([#2461](https://github.com/nrwl/nx-console/issues/2461)) ([bffb4c2](https://github.com/nrwl/nx-console/commit/bffb4c2b11728ed30a3521c8e90cf03310f9fd6d))
+* **vscode:** include local plugins in tool result & hide community plugins for now ([#2454](https://github.com/nrwl/nx-console/issues/2454)) ([7271fc5](https://github.com/nrwl/nx-console/commit/7271fc5ff834a930ed90ed73ae68a27ac2d032e5))
+
 ## [18.44.1](https://github.com/nrwl/nx-console/compare/vscode-v18.44.0...vscode-v18.44.1) (2025-03-26)
 
 
