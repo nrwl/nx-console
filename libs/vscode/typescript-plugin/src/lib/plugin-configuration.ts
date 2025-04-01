@@ -89,10 +89,9 @@ export async function getPluginConfiguration(
   if (packageManager === 'yarn') {
     let yarnVersion;
     try {
-      yarnVersion = await getPackageManagerVersion(
-        packageManager,
-        workspaceRoot,
-      );
+      yarnVersion =
+        (await getPackageManagerVersion(packageManager, workspaceRoot)) ??
+        '1.0.0';
     } catch {
       yarnVersion = '1.0.0';
     }
