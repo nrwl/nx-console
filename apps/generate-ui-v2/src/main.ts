@@ -13,6 +13,11 @@ export class Root extends LitElement {
   icc: IdeCommunicationController;
 
   private formValuesService: FormValuesService;
+  @state()
+  private searchValue = '';
+  private rootStyles = css`
+    --border-width: 1;
+  `;
 
   constructor() {
     super();
@@ -20,16 +25,9 @@ export class Root extends LitElement {
     this.formValuesService = new FormValuesService(this);
 
     window.addEventListener('keydown', (e) =>
-      this.handleGlobalKeyboardShortcuts(e)
+      this.handleGlobalKeyboardShortcuts(e),
     );
   }
-
-  @state()
-  private searchValue = '';
-
-  private rootStyles = css`
-    --border-width: 1;
-  `;
 
   render() {
     const options = this.icc.generatorSchema?.options;
@@ -53,6 +51,20 @@ export class Root extends LitElement {
             ></field-list>`}
       </div>
     </div>`;
+  }
+
+  openNxDev(link: string) {
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank'; // Optional: Open in new tab
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  protected createRenderRoot() {
+    return this;
   }
 
   private renderHeader() {
@@ -90,17 +102,16 @@ export class Root extends LitElement {
           <div class="flex shrink-0">
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
-              () =>
-                html`
-                  <button-element
-                    @click="${() => this.openNxDev(nxDevLink)}"
-                    title="Open generator documentation on nx.dev"
-                    appearance="icon"
-                    text="link-external"
-                    class="self-center py-2 pl-3"
-                  >
-                  </button-element>
-                `
+              () => html`
+                <button-element
+                  @click="${() => this.openNxDev(nxDevLink)}"
+                  title="Open generator documentation on nx.dev"
+                  appearance="icon"
+                  text="link-external"
+                  class="self-center py-2 pl-3"
+                >
+                </button-element>
+              `,
             )}
             <button-element
               class="self-center py-2 pl-3"
@@ -113,22 +124,23 @@ export class Root extends LitElement {
             </button-element>
             ${when(
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
-              () =>
-                html`<button-element
-                    class="self-center py-2 pl-3 sm:hidden"
-                    @click="${() => this.formValuesService.runGenerator(true)}"
-                    text="debug"
-                    appearance="icon"
-                    title="Dry Run"
-                  >
-                  </button-element>
-                  <button-element
-                    class="hidden py-2 pl-3 sm:block"
-                    @click="${() => this.formValuesService.runGenerator(true)}"
-                    text="Dry Run"
-                    appearance="secondary"
-                  >
-                  </button-element> `
+              () => html`
+                <button-element
+                  class="self-center py-2 pl-3 sm:hidden"
+                  @click="${() => this.formValuesService.runGenerator(true)}"
+                  text="debug"
+                  appearance="icon"
+                  title="Dry Run"
+                >
+                </button-element>
+                <button-element
+                  class="hidden py-2 pl-3 sm:block"
+                  @click="${() => this.formValuesService.runGenerator(true)}"
+                  text="Dry Run"
+                  appearance="secondary"
+                >
+                </button-element>
+              `,
             )}
 
             <button-element
@@ -146,7 +158,7 @@ export class Root extends LitElement {
             html` <banner-element
               message="${this.icc.banner?.message}"
               type="${this.icc.banner?.type}"
-            ></banner-element>`
+            ></banner-element>`,
         )}
         <div class="mt-5">
           <search-bar
@@ -186,19 +198,5 @@ export class Root extends LitElement {
         (searchBar as HTMLElement).focus();
       }
     }
-  }
-
-  openNxDev(link: string) {
-    const a = document.createElement('a');
-    a.href = link;
-    a.target = '_blank'; // Optional: Open in new tab
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-
-  protected createRenderRoot() {
-    return this;
   }
 }

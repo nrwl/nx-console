@@ -9,23 +9,36 @@ export async function detectPackageManager(
   workspacePath: string,
   logger?: Logger,
 ): Promise<PackageManager> {
-  const { detectPackageManager } = await importNxPackagePath<
-    typeof import('nx/src/utils/package-manager')
-  >(workspacePath, 'src/utils/package-manager', logger);
+  try {
+    const { detectPackageManager } = await importNxPackagePath<
+      typeof import('nx/src/utils/package-manager')
+    >(workspacePath, 'src/utils/package-manager', logger);
 
-  return detectPackageManager(workspacePath);
+    return detectPackageManager(workspacePath);
+  } catch (e) {
+    logger?.log(`Error detecting package manager: ${JSON.stringify(e)}`);
+
+    // return npm by default
+    return 'npm';
+  }
 }
 
 export async function getPackageManagerVersion(
   packageManager: PackageManager,
   workspacePath: string,
   logger?: Logger,
-): Promise<string> {
-  const { getPackageManagerVersion } = await importNxPackagePath<
-    typeof import('nx/src/utils/package-manager')
-  >(workspacePath, 'src/utils/package-manager', logger);
+): Promise<string | null> {
+  try {
+    const { getPackageManagerVersion } = await importNxPackagePath<
+      typeof import('nx/src/utils/package-manager')
+    >(workspacePath, 'src/utils/package-manager', logger);
 
-  return getPackageManagerVersion(packageManager, workspacePath);
+    return getPackageManagerVersion(packageManager, workspacePath);
+  } catch (e) {
+    logger?.log(`Error getting package manager version: ${JSON.stringify(e)}`);
+
+    return null;
+  }
 }
 export async function getPackageManagerCommand(
   workspacePath: string,

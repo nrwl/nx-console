@@ -12,14 +12,13 @@ import {
 import {
   checkIsNxWorkspace,
   findMatchingProject,
+  getLocalWorkspacePlugins,
   isDotNxInstallation,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { getAvailableNxPlugins, Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { getMcpLogger } from './mcp-logger';
-import * as fs from 'fs/promises';
-import { join } from 'path';
 
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
@@ -32,6 +31,8 @@ import {
   NxWorkspace,
 } from '@nx-console/shared-types';
 import { gte, NxVersion } from '@nx-console/nx-version';
+import { join } from 'path';
+import { readFile } from 'fs/promises';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -105,12 +106,13 @@ export class NxMcpServerWrapper {
 
     this.server.tool(
       'nx_available_plugins',
-      'Returns a list of available nx plugins - this includes both official and approved community plugins.',
+      'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
       async () => {
         let nxVersion: NxVersion | undefined = undefined;
+        let nxWorkspace: NxWorkspace | undefined = undefined;
 
         if (this._nxWorkspacePath) {
-          const nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
+          nxWorkspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
             this._nxWorkspacePath,
             this.logger,
           );
@@ -119,22 +121,18 @@ export class NxMcpServerWrapper {
 
         const availablePlugins = await getAvailableNxPlugins(nxVersion);
 
-        // Create a Set of plugin names for efficient lookup
         const availablePluginNames = new Set([
           ...availablePlugins.official.map((plugin) => plugin.name),
           ...availablePlugins.community.map((plugin) => plugin.name),
         ]);
 
-        // Initialize installed plugins array
+        const localWorkspacePlugins: string[] = [];
         let installedPlugins: string[] = [];
 
-        // Only try to determine installed plugins if workspace path exists
-        if (this._nxWorkspacePath) {
+        if (this._nxWorkspacePath && nxWorkspace) {
           try {
-            // Determine if it's a dot nx installation
             const isDotNx = await isDotNxInstallation(this._nxWorkspacePath);
 
-            // Determine package.json path
             const packageJsonPath = isDotNx
               ? join(
                   this._nxWorkspacePath,
@@ -144,33 +142,48 @@ export class NxMcpServerWrapper {
                 )
               : join(this._nxWorkspacePath, 'package.json');
 
-            // Read package.json
-            const packageJsonContent = await fs.readFile(
-              packageJsonPath,
-              'utf-8',
-            );
+            const packageJsonContent = await readFile(packageJsonPath, 'utf-8');
             const packageJson = JSON.parse(packageJsonContent);
 
-            // Combine dependencies and devDependencies
             const allDependencies = {
               ...(packageJson.dependencies || {}),
               ...(packageJson.devDependencies || {}),
             };
 
-            // Filter for installed plugins that match available plugins
             installedPlugins = Object.keys(allDependencies).filter((depName) =>
               availablePluginNames.has(depName),
             );
           } catch (error) {
-            // Error handling: log the error but continue with empty installed plugins
             this.logger.log(
               `Error determining installed plugins: ${error instanceof Error ? error.message : String(error)}`,
             );
             installedPlugins = [];
           }
+          try {
+            const localPluginsMap = await getLocalWorkspacePlugins(
+              this._nxWorkspacePath,
+              nxWorkspace,
+            );
+            localPluginsMap.forEach((plugin) => {
+              localWorkspacePlugins.push(plugin.name);
+            });
+          } catch (error) {
+            this.logger.log(
+              `Error determining local plugins: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
         }
 
         let formattedText = '';
+
+        if (localWorkspacePlugins.length > 0) {
+          formattedText += `=== LOCAL NX PLUGINS ===\n`;
+          formattedText += `(Note: These plugins are local to your workspace)\n\n`;
+          localWorkspacePlugins.forEach((pluginName) => {
+            formattedText += `[${pluginName}]\n`;
+          });
+          formattedText += `\n`;
+        }
 
         if (installedPlugins.length > 0) {
           formattedText += `=== INSTALLED NX PLUGINS ===\n`;
@@ -194,21 +207,23 @@ export class NxMcpServerWrapper {
             formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
           });
 
-        formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
-        availablePlugins.community
-          .filter((plugin) => !installedPlugins.includes(plugin.name))
-          .forEach((plugin) => {
-            const cleanDescription = plugin.description
-              .replace(/\n/g, ' ')
-              .replace(/\s+/g, ' ')
-              .trim();
+        // We are going to disable community plugins for now as we work on cleaning up the registry
 
-            formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+        // formattedText += `=== COMMUNITY NX PLUGINS ===\n`;
+        // availablePlugins.community
+        //   .filter((plugin) => !localPlugins.includes(plugin.name))
+        //   .forEach((plugin) => {
+        //     const cleanDescription = plugin.description
+        //       .replace(/\n/g, ' ')
+        //       .replace(/\s+/g, ' ')
+        //       .trim();
 
-            if (plugin.url) {
-              formattedText += `URL: ${plugin.url}\n`;
-            }
-          });
+        //     formattedText += `[${plugin.name}]\n${cleanDescription}\n`;
+
+        //     if (plugin.url) {
+        //       formattedText += `URL: ${plugin.url}\n`;
+        //     }
+        //   });
 
         return {
           content: [
@@ -440,7 +455,7 @@ export class NxMcpServerWrapper {
               text: `
 Found generator schema for ${generatorName}: ${JSON.stringify(
                 generatorDetails,
-              )}.          
+              )}.
 **IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
 
 1. FIRST navigate to the parent directory where you want to create the item:

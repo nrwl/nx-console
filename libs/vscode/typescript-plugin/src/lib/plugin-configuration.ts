@@ -45,6 +45,9 @@ async function getAdditionalRootFiles(
   if (!('compilerOptions' in tsconfig)) {
     tsconfig = (await readAndCacheJsonFile('tsconfig.json', workspaceRoot))
       .json;
+    if (!tsconfig) {
+      return [];
+    }
     if (!('compilerOptions' in tsconfig)) {
       return [];
     }
@@ -86,10 +89,9 @@ export async function getPluginConfiguration(
   if (packageManager === 'yarn') {
     let yarnVersion;
     try {
-      yarnVersion = await getPackageManagerVersion(
-        packageManager,
-        workspaceRoot,
-      );
+      yarnVersion =
+        (await getPackageManagerVersion(packageManager, workspaceRoot)) ??
+        '1.0.0';
     } catch {
       yarnVersion = '1.0.0';
     }

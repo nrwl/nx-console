@@ -6,9 +6,15 @@ A [Model Context Protocol](https://modelcontextprotocol.io/introduction) server 
 
 ## Overview
 
-The Nx MCP Server provides structured context about your Nx workspace to AI assistant models, enabling them to better understand and interact with your Nx projects. It serves as a bridge between AI models and your Nx workspace and documentation.
+The Nx MCP server gives LLMs deep access to your monorepo’s structure: project relationships, file mappings, runnable tasks, ownership info, tech stacks, Nx generators, and even Nx documentation. With this context, LLMs can generate code tailored to your stack, understand the impact of a change, and apply modifications across connected files with precision. This is possible because Nx already understands the higher-level architecture of your workspace, and monorepos bring all relevant projects into one place.
 
-## Installation
+Read more in [our blog post](https://nx.dev/blog/nx-made-cursor-smarter) and [in our docs](https://nx.dev/features/enhance-AI).
+
+## Installation and Usage
+
+There are two ways to use this MCP server:
+
+### a) Run it via the nx-mcp package
 
 Simply invoke the MCP server via `npx` or your package manager's equivalent.
 
@@ -22,6 +28,15 @@ If you want to host the server instead of communicating via `stdio`, you can use
 
 Run `nx-mcp --help` to see what options are available.
 
+### b) Use the Nx Console extension
+
+If you're using Cursor you can directly install the Nx Console extension which automatically manages the MCP server for you.
+
+More info:
+
+- [Install Nx Console](https://nx.dev/getting-started/editor-setup)
+- [Configure Cursor to use the nx-mcp](https://nx.dev/features/enhance-AI#cursor)
+
 ## Available Tools
 
 Currently, the Nx MCP server provides a set of tools. Resources, Roots and Prompts aren't supported yet.
@@ -31,6 +46,9 @@ Currently, the Nx MCP server provides a set of tools. Resources, Roots and Promp
 - **nx_docs**: Retrieves documentation sections relevant to user queries
 - **nx_generators**: Returns a list of available generators in the workspace
 - **nx_generator_schema**: Provides detailed schema information for a specific generator
+- **nx_available_plugins**: Returns a list of available Nx plugins from the npm registry with their descriptions
+
+When no workspace path is specified, only the `nx_docs` and `nx_available_plugins` tools will be available.
 
 ## Contributing & Development
 
