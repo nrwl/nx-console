@@ -6,19 +6,14 @@ export async function getGeneratorSchema(
   generatorName: string,
   generators: GeneratorCollectionInfo[],
 ): Promise<any | undefined> {
-  const generator = generators.find((g) => {
-    if (g.name === generatorName) {
-      return true;
-    }
-
-    // check to see if the generator name has an alias
-    const [lib, gen] = generatorName.split(':');
-    if (g.collectionName === lib && g.data?.aliases.some((a) => a === gen)) {
-      return true;
-    }
-
-    return false;
-  });
+  const generatorInfo = {
+    collection: generatorName.split(':')[0],
+    name: generatorName.split(':')[1],
+  };
+  const generator = generators.find(
+    (g) =>
+      g.name === generatorName || g.data?.aliases?.includes(generatorInfo.name),
+  );
   if (!generator) {
     return undefined;
   }
