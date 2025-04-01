@@ -65,7 +65,7 @@ export interface NxIdeProvider {
     generatorName: string,
     options: Record<string, unknown>,
     cwd?: string,
-  ) => void;
+  ) => Promise<string>;
 }
 
 export class NxMcpServerWrapper {
@@ -542,11 +542,17 @@ and follows the Nx workspace convention for project organization.
           };
         }
 
+        if (!this.ideProvider) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'No IDE provider available' }],
+          };
+        }
         try {
-          this.ideProvider?.openGenerateUi(generatorName, options ?? {}, cwd);
-          const finalFileName = await createGeneratorLogFileName(
-            this._nxWorkspacePath,
+          const logFileName = await this.ideProvider.openGenerateUi(
             generatorName,
+            options ?? {},
+            cwd,
           );
 
           return {
@@ -555,7 +561,7 @@ and follows the Nx workspace convention for project organization.
                 type: 'text',
                 text: createGeneratorUiResponseMessage(
                   generatorName,
-                  finalFileName,
+                  logFileName,
                 ),
               },
             ],

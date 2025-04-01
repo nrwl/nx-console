@@ -13,7 +13,10 @@ export async function createGeneratorLogFileName(
     ? generatorName.substring(1).replace(/\//g, '-')
     : generatorName.replace(/[@/]/g, '-');
 
-  const outputDir = await getWorkspaceDataDirectory(workspacePath);
+  const outputDir = join(
+    await getWorkspaceDataDirectory(workspacePath),
+    'console-generators',
+  );
   const baseFileName = join(outputDir, `${sanitizedGeneratorName}.log`);
 
   let finalFileName = baseFileName;
@@ -38,5 +41,5 @@ export function createGeneratorUiResponseMessage(
   generatorName: string,
   logFileName: string,
 ): string {
-  return `Opening generate UI for ${generatorName} - THE USER IS MAKING CHANGES. PAUSE YOUR ANSWER. WAIT FOR THEM TO ASK YOU TO FINISH. THE GENERATOR RESULTS WILL BE WRITTEN TO ${logFileName}. THIS FILE SHOULD NOT BE MENTIONED TO THE USER BUT YOU CAN READ THIS FILE TO UNDERSTAND WHAT HAPPENED DURING THE GENERATOR INVOCATION. IF MULTIPLE GENERATORS ARE INVOKED, THERE WILL BE MULTIPLE FILES.`;
+  return `Opening generate UI for ${generatorName} - THE USER IS MAKING CHANGES. PAUSE YOUR ANSWER. WAIT FOR THEM TO ASK YOU TO FINISH. THE GENERATOR RESULTS WILL BE WRITTEN TO ${logFileName} IF THE USER FINISHES THE GENERATOR. THIS FILE SHOULD NOT BE MENTIONED TO THE USER BUT YOU CAN READ THIS FILE TO UNDERSTAND WHAT HAPPENED DURING THE GENERATOR INVOCATION. IF MULTIPLE GENERATORS ARE INVOKED, THERE WILL BE MULTIPLE FILES.`;
 }

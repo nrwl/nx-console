@@ -136,6 +136,7 @@ export function formatAvailablePluginsPrompt(
   }
 
   formattedText += `=== OFFICIAL NX PLUGINS ===\n`;
+  formattedText += `(Note: These plugins are not installed to your workspace, DO NOT TRY TO USE THEM. You can add them by running 'nx add {PLUGIN-NAME})' \n\n`;
 
   officialPlugins
     .filter((plugin) => !installedPlugins.includes(plugin.name))

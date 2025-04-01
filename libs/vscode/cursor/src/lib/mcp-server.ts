@@ -4,6 +4,7 @@ import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
+import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
@@ -84,18 +85,31 @@ export function tryStartMcpServer(workspacePath: string) {
       options: Record<string, unknown>,
       cwd?: string,
     ): Promise<string> => {
-      const generator = await getOrSelectGenerator(generatorName);
-      if (!generator) {
+      const generatorInfo = {
+        collection: generatorName.split(':')[0],
+        name: generatorName.split(':')[1],
+      };
+      const foundGenerator = ((await getGenerators()) ?? []).find(
+        (gen) =>
+          generatorInfo.collection === gen.data?.collection &&
+          (generatorInfo.name === gen.data?.name ||
+            gen.data?.aliases?.includes(generatorInfo.name)),
+      );
+      if (!foundGenerator) {
         window.showErrorMessage(`Could not find generator "${generatorName}"`);
-        return '';
+        throw new Error(`Could not find generator "${generatorName}"`);
       }
       await openGenerateUIPrefilled({
         $0: 'nx',
-        _: ['generate', generatorName],
+        _: ['generate', foundGenerator.name],
         ...options,
         cwd: cwd,
       });
-      return 'UI opened';
+      const finalFileName = await createGeneratorLogFileName(
+        getNxWorkspacePath(),
+        foundGenerator.name,
+      );
+      return finalFileName;
     },
   };
 
