@@ -3,6 +3,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   getFillWithGenerateUiService,
   openGenerateUIPrefilled,
+  updateGenerateUIValues,
 } from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -265,7 +266,25 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
 
   if (codeBuffer === null && pendingText) {
     if (request.command === 'fill-generate-ui') {
-      // we don't want to just output everything, instead we want
+      // we don't want to just output everything, instead we want to send code blocks back to the UI
+      if (pendingText.startsWith('```')) {
+        const codeBlockPattern = /^```(?:json)?\s*\n([\s\S]*?)\n```$/;
+        const trimmedText = pendingText.trim();
+        const match = trimmedText.match(codeBlockPattern);
+        if (match) {
+          const codeContent = match[1].trim();
+          try {
+            const parsed = JSON.parse(codeContent);
+            updateGenerateUIValues(parsed);
+            stream.markdown('Updated Generate UI');
+          } catch (error) {
+            stream.markdown(trimmedText);
+            return;
+          }
+        } else {
+          stream.markdown(trimmedText);
+        }
+      }
     } else {
       stream.markdown(pendingText);
     }

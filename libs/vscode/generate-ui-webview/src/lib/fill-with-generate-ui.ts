@@ -2,6 +2,7 @@ import { FormValues } from '@nx-console/shared-generate-ui-types';
 import { commands } from 'vscode';
 
 import { window } from 'vscode';
+import { updateGenerateUIValues } from './init-generate-ui-webview';
 
 let fillWithGenerateUiService: FillWithGenerateUiService;
 
@@ -43,5 +44,10 @@ export class FillWithGenerateUiService {
       generatorName: this.generatorName,
       formValues: this.formValues,
     };
+  }
+
+  clearFillInfo() {
+    this.generatorName = '';
+    this.formValues = {} as FormValues;
   }
 }

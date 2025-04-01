@@ -14,6 +14,10 @@ import {
   FieldValueConsumer,
   FieldValueConsumerInterface,
 } from '../../field-value-consumer-mixin';
+import {
+  FormValueSubscriber,
+  FormValueSubscriberInterface,
+} from './form-value-subscriber-mixin';
 
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -36,7 +40,9 @@ export declare class FieldInterface {
 }
 
 export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
-  class FieldElement extends FieldValueConsumer(EditorContext(superClass)) {
+  class FieldElement extends FormValueSubscriber(
+    FieldValueConsumer(EditorContext(superClass)),
+  ) {
     @property()
     option: Option;
 
@@ -53,12 +59,31 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
             value,
             isDefaultValue: isDefaultValue,
           },
-        })
+        }),
       );
     }
 
+    // Implementation for FormValueSubscriber mixin
+    getFieldNameForSubscription(): string | undefined {
+      return this.option?.name;
+    }
+
+    // Add updated method to handle value changes from FormValueSubscriber
+    updated(changedProperties: Map<PropertyKey, unknown>): void {
+      super.updated?.(changedProperties);
+
+      // React to value updates from FormValueSubscriber
+      if (changedProperties.has('value') && (this as any).value !== undefined) {
+        // Only call setFieldValue if setFieldValue didn't set the value itself
+        // This prevents infinite loops
+        const valueFromSubscriber = (this as any).value;
+        delete (this as any).value; // Clear the value to avoid double processing
+        this.setFieldValue(valueFromSubscriber);
+      }
+    }
+
     firstUpdated(
-      _changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>
+      _changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>,
     ): void {
       super.updated(_changedProperties);
       if (this.generatorContext) {
@@ -110,7 +135,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     // placeholders for subclasses
     setFieldValue(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      value: string | boolean | number | string[] | undefined
+      value: string | boolean | number | string[] | undefined,
     ): void {
       throw new Error('Not implemented');
     }
@@ -121,7 +146,10 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
   }
 
   return FieldElement as unknown as Constructor<
-    FieldInterface & EditorContextInterface & FieldValueConsumerInterface
+    FieldInterface &
+      EditorContextInterface &
+      FieldValueConsumerInterface &
+      FormValueSubscriberInterface
   > &
     T;
 };

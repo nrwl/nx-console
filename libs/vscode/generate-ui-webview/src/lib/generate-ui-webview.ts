@@ -1,4 +1,5 @@
 import {
+  FormValues,
   GenerateUiBannerInputMessage,
   GenerateUiConfigurationInputMessage,
   GenerateUiGeneratorSchemaInputMessage,
@@ -139,6 +140,13 @@ export class GenerateUiWebview {
     this.plugins = await this.loadPlugins();
 
     this.webviewPanel.reveal();
+  }
+
+  async updateFormValues(formValues: FormValues) {
+    this.postMessageToWebview({
+      payloadType: 'update-form-values',
+      payload: formValues,
+    });
   }
 
   private async postMessageToWebview(message: GenerateUiInputMessage) {
