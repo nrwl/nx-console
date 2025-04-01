@@ -598,7 +598,11 @@
         "toolReferenceName": "nxAvailablePlugins",
         "tags": [
           "nx"
-        ]
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
       },
       {
         "name": "nx_open-generate-ui",
@@ -641,7 +645,11 @@
         "modelDescription": "Visualizes the entire Nx project graph for the workspace",
         "icon": "$(source-control)",
         "displayName": "Nx Full Project Graph",
-        "toolReferenceName": "nxVisualizeFullProjectGraph"
+        "toolReferenceName": "nxVisualizeFullProjectGraph",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
       }
     ],
     "commands": [

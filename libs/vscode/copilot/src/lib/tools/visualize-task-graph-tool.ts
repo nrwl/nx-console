@@ -54,7 +54,7 @@ export class VisualizeTaskGraphTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: `Opening task graph visualization for "${options.input.taskName}" in project "${options.input.projectName}"...`,
+      invocationMessage: `Opening task graph visualization for "${options.input.taskName}" in project "${options.input.projectName}"`,
     };
   }
 }

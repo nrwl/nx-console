@@ -48,7 +48,7 @@ export class VisualizeProjectGraphTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: `Opening project graph visualization for "${options.input.projectName}"...`,
+      invocationMessage: `Opening project graph visualization for "${options.input.projectName}"`,
     };
   }
 }

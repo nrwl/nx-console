@@ -71,7 +71,7 @@ export class OpenGenerateUiTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: 'Opening Nx generator UI...',
+      invocationMessage: 'Opening Nx generator UI',
     };
   }
 }
