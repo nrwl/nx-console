@@ -164,17 +164,6 @@ async function updateMcpJson() {
     return false;
   }
 
-  window
-    .showInformationMessage(
-      `Nx MCP Server configured successfully. Make sure it's enabled in Cursor Settings -> MCP`,
-      'Open Settings',
-    )
-    .then((result) => {
-      if (result === 'Open Settings') {
-        commands.executeCommand('aiSettings.action.open');
-      }
-    });
-
   return true;
 }
 
