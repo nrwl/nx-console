@@ -28,6 +28,7 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
+import { fillWithGenerateUi } from './fill-with-generate-ui';
 
 export class GenerateUiWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -222,16 +223,11 @@ export class GenerateUiWebview {
         break;
       }
       case 'fill-with-copilot': {
-        const prompt = await window.showInputBox({
-          title: `What would you like to do with the ${message.payload.generatorName} generator?`,
-        });
-        if (!prompt) {
-          return;
-        }
-        commands.executeCommand(
-          'workbench.action.chat.open',
-          `@nx /fill-generate-ui ${prompt}`,
+        await fillWithGenerateUi(
+          message.payload.generatorName,
+          message.payload.formValues,
         );
+        break;
       }
     }
   }

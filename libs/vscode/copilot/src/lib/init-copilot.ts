@@ -1,6 +1,9 @@
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
+import {
+  getFillWithGenerateUiService,
+  openGenerateUIPrefilled,
+} from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
@@ -29,7 +32,10 @@ import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
-import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-llm-context';
+import {
+  getGeneratorNamesAndDescriptions,
+  getGeneratorSchema,
+} from '@nx-console/shared-llm-context';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
@@ -40,6 +46,7 @@ import { explainCipe } from './commands/explain-cipe';
 import { AvailablePluginsTool } from './tools/available-plugins-tool';
 import { OpenGenerateUiTool } from './tools/open-generate-ui-tool';
 import { VisualizeFullProjectGraphTool } from './tools/visualize-full-project-graph-tool';
+import { FillGenerateUIPrompt } from './prompts/fill-generate-ui-prompt';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -155,16 +162,21 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
     };
 
     let promptElementAndProps: PromptElementAndProps<
-      NxCopilotPrompt | GeneratePrompt
+      NxCopilotPrompt | GeneratePrompt | FillGenerateUIPrompt
     >;
 
-    if (request.command === 'fill-generate-ui') {
-    // TODO: fix this
+  if (request.command === 'fill-generate-ui') {
+    const fillInfo = getFillWithGenerateUiService().getFillInfo();
+    const generators = await getGenerators();
+    const schema = await getGeneratorSchema(fillInfo.generatorName, generators);
+
     promptElementAndProps = {
-      promptElement: GeneratePrompt,
+      promptElement: FillGenerateUIPrompt,
       props: {
+        formValues: fillInfo.formValues,
+        generatorName: fillInfo.generatorName,
+        generatorSchema: schema,
         ...baseProps,
-        generators: generatorNamesAndDescriptions,
       },
     };
   } else if (request.command === 'generate' || intent === 'generate') {
@@ -251,9 +263,13 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
       }
     }
 
-    if (codeBuffer === null && pendingText) {
+  if (codeBuffer === null && pendingText) {
+    if (request.command === 'fill-generate-ui') {
+      // we don't want to just output everything, instead we want
+    } else {
       stream.markdown(pendingText);
     }
+  }
 
     return await chatParticipantRequest.result;
   };
