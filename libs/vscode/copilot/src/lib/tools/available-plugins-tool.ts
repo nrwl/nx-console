@@ -12,13 +12,9 @@ import {
   PreparedToolInvocation,
 } from 'vscode';
 
-export interface AvailablePluginsToolInput {}
-
-export class AvailablePluginsTool
-  implements LanguageModelTool<AvailablePluginsToolInput>
-{
+export class AvailablePluginsTool implements LanguageModelTool<unknown> {
   async invoke(
-    options: LanguageModelToolInvocationOptions<AvailablePluginsToolInput>,
+    options: LanguageModelToolInvocationOptions<unknown>,
     token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     getTelemetry().logUsage('ai.tool-call', {
@@ -48,11 +44,11 @@ export class AvailablePluginsTool
   }
 
   prepareInvocation(
-    options: LanguageModelToolInvocationPrepareOptions<AvailablePluginsToolInput>,
+    options: LanguageModelToolInvocationPrepareOptions<unknown>,
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: 'Fetching available Nx plugins...',
+      invocationMessage: 'Fetching available Nx plugins',
     };
   }
 }

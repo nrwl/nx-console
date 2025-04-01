@@ -11,13 +11,11 @@ import {
   PreparedToolInvocation,
 } from 'vscode';
 
-export interface VisualizeFullProjectGraphToolInput {}
-
 export class VisualizeFullProjectGraphTool
-  implements LanguageModelTool<VisualizeFullProjectGraphToolInput>
+  implements LanguageModelTool<unknown>
 {
   async invoke(
-    options: LanguageModelToolInvocationOptions<VisualizeFullProjectGraphToolInput>,
+    options: LanguageModelToolInvocationOptions<unknown>,
     token: CancellationToken,
   ): Promise<LanguageModelToolResult> {
     getTelemetry().logUsage('ai.tool-call', {
@@ -26,7 +24,7 @@ export class VisualizeFullProjectGraphTool
 
     try {
       // Execute the VS Code command to show the full project graph
-      await commands.executeCommand('nxConsole.showNxGraph');
+      await commands.executeCommand('nx.graph.showAll');
 
       return new LanguageModelToolResult([
         new LanguageModelTextPart(getProjectGraphVisualizationMessage()),
@@ -39,11 +37,11 @@ export class VisualizeFullProjectGraphTool
   }
 
   prepareInvocation(
-    options: LanguageModelToolInvocationPrepareOptions<VisualizeFullProjectGraphToolInput>,
+    options: LanguageModelToolInvocationPrepareOptions<unknown>,
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: 'Opening full project graph...',
+      invocationMessage: 'Opening full project graph',
     };
   }
 }
