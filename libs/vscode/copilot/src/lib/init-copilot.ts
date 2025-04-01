@@ -128,7 +128,16 @@ const handler: ChatRequestHandler = async (
     NxCopilotPrompt | GeneratePrompt
   >;
 
-  if (request.command === 'generate' || intent === 'generate') {
+  if (request.command === 'fill-generate-ui') {
+    // TODO: fix this
+    promptElementAndProps = {
+      promptElement: GeneratePrompt,
+      props: {
+        ...baseProps,
+        generators: generatorNamesAndDescriptions,
+      },
+    };
+  } else if (request.command === 'generate' || intent === 'generate') {
     stream.progress('Retrieving generator schemas...');
 
     promptElementAndProps = {

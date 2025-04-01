@@ -22,7 +22,6 @@ import { join } from 'node:path';
 import {
   commands,
   ExtensionContext,
-  Task,
   tasks,
   Uri,
   ViewColumn,
@@ -221,6 +220,18 @@ export class GenerateUiWebview {
           new GenerateUiValidationResultsInputMessage(validationErrors),
         );
         break;
+      }
+      case 'fill-with-copilot': {
+        const prompt = await window.showInputBox({
+          title: `What would you like to do with the ${message.payload.generatorName} generator?`,
+        });
+        if (!prompt) {
+          return;
+        }
+        commands.executeCommand(
+          'workbench.action.chat.open',
+          `@nx /fill-generate-ui ${prompt}`,
+        );
       }
     }
   }

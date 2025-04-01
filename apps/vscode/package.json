@@ -413,6 +413,11 @@
           {
             "name": "generate",
             "description": "Run Nx generators"
+          },
+          {
+            "name": "fill-generate-ui",
+            "description": "Fill the Nx generate UI with options",
+            "isSticky": false
           }
         ],
         "disambiguation": [
