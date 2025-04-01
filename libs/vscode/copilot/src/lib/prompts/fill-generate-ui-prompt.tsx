@@ -33,13 +33,14 @@ export class FillGenerateUIPrompt extends PromptElement<FillGenerateUIPromptProp
           <br /> YOU HAVE ONE JOB AND ONE JOB ONLY: PROVIDE A JSON OBJECT OF
           FORM VALUES THAT WILL BE USED TO FILL THE GENERATE UI IN THE EDITOR.
           The generate UI is a form that allows users to select options for a
-          generator. <br />
+          generator. Output nothing but the changes in a JSON code block. <br />
           The user is trying to use the {this.props.generatorName} generator.
           <br />
           The current form values are: {JSON.stringify(this.props.formValues)}
           <br />
           You can make changes to them or overwrite them but leave those that
-          aren't relevant to the query the same.
+          aren't relevant to the query the same. ONLY USE VALUES THAT CONFORM TO
+          THE SCHEMA BELOW.
         </UserMessage>
         <UserMessage priority={80}>
           This is the schema for the generator:{' '}

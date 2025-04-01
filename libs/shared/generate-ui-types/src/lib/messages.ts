@@ -69,8 +69,8 @@ export type GenerateUiInputMessage =
   | GenerateUiConfigurationInputMessage
   | GenerateUiStylesInputMessage
   | GenerateUiBannerInputMessage
-  | GenerateUiValidationResultsInputMessage;
-
+  | GenerateUiValidationResultsInputMessage
+  | GenerateUiUpdateFormValuesInputMessage;
 export class GenerateUiGeneratorSchemaInputMessage {
   readonly payloadType = 'generator';
 
@@ -129,4 +129,10 @@ export class GenerateUiValidationResultsInputMessage {
   readonly payloadType = 'validation-results';
 
   constructor(public readonly payload: ValidationResults) {}
+}
+
+export class GenerateUiUpdateFormValuesInputMessage {
+  readonly payloadType = 'update-form-values';
+
+  constructor(public readonly payload: FormValues) {}
 }

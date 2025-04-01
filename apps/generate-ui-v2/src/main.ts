@@ -67,7 +67,7 @@ export class Root extends LitElement {
     this.icc.postMessageToIde({
       payloadType: 'fill-with-copilot',
       payload: {
-        generatorName: this.icc.generatorSchema?.generatorName,
+        generatorName: `${this.icc.generatorSchema?.collectionName}:${this.icc.generatorSchema?.generatorName}`,
         formValues: this.formValuesService.getFormValues(),
       },
     });

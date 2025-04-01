@@ -8,6 +8,7 @@ import { registerGenerateCommands } from './generate-commands';
 import { GenerateUiWebview } from './generate-ui-webview';
 import yargs = require('yargs');
 import { Option } from '@nx-console/shared-schema';
+import { FormValues } from '@nx-console/shared-generate-ui-types';
 
 let generateUIWebview: GenerateUiWebview;
 
@@ -61,6 +62,10 @@ export async function openGenerateUIPrefilled(
       },
     },
   });
+}
+
+export async function updateGenerateUIValues(formValues: FormValues) {
+  generateUIWebview.updateFormValues(formValues);
 }
 
 function parseIntoPrefillValues(
