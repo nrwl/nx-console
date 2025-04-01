@@ -14,7 +14,8 @@ export type GenerateUiOutputMessage =
   | GenerateUiFormInitOutputMessage
   | GenerateUiRunGeneratorOutputMessage
   | GenerateUiRequestValidationOutputMessage
-  | GenerateUiCopyToClipboardOutputMessage;
+  | GenerateUiCopyToClipboardOutputMessage
+  | GenerateUiFillWithCopilotOutputMessage;
 
 export class GenerateUiFormInitOutputMessage {
   readonly payloadType = 'output-init';
@@ -36,7 +37,10 @@ export class GenerateUiRequestValidationOutputMessage {
   readonly payloadType = 'request-validation';
 
   constructor(
-    public readonly payload: { formValues: FormValues; schema: GeneratorSchema }
+    public readonly payload: {
+      formValues: FormValues;
+      schema: GeneratorSchema;
+    },
   ) {}
 }
 
@@ -44,6 +48,16 @@ export class GenerateUiCopyToClipboardOutputMessage {
   readonly payloadType = 'copy-to-clipboard';
 
   constructor(public readonly payload: string) {}
+}
+
+export class GenerateUiFillWithCopilotOutputMessage {
+  readonly payloadType = 'fill-with-copilot';
+  constructor(
+    public readonly payload: {
+      generatorName: string;
+      formValues: FormValues;
+    },
+  ) {}
 }
 
 /**
@@ -107,7 +121,7 @@ export class GenerateUiBannerInputMessage {
     public readonly payload: {
       message: string;
       type: 'warning' | 'error';
-    }
+    },
   ) {}
 }
 

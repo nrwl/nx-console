@@ -435,6 +435,11 @@
           {
             "name": "explain-cipe",
             "description": "Explain the CI pipeline execution failure"
+          },
+          {
+            "name": "fill-generate-ui",
+            "description": "Fill the Nx generate UI with options",
+            "isSticky": false
           }
         ],
         "disambiguation": [
