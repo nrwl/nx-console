@@ -6,6 +6,7 @@ type Constructor<T> = new (...args: any[]) => T;
 
 export declare class FormValueSubscriberInterface {
   getFieldNameForSubscription(): string | undefined;
+  setFieldValue(value: any): void;
 }
 
 /**
@@ -34,13 +35,7 @@ export const FormValueSubscriber = <T extends Constructor<LitElement>>(
               // Register for value changes from the form values service
               service.registerValueChangeListener(fieldName, (newValue) => {
                 if (newValue !== undefined) {
-                  // Use setFieldValue if available, otherwise update value directly
-                  if (typeof (this as any).setFieldValue === 'function') {
-                    (this as any).setFieldValue(newValue);
-                  } else {
-                    (this as any).value = newValue;
-                    this.requestUpdate();
-                  }
+                  (this as any).setFieldValue(newValue);
                 }
               });
             }

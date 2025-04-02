@@ -28,12 +28,15 @@ export class CwdBreadcrumb extends FormValueSubscriber(
     return this._path;
   }
 
-  // Implementation for FormValueSubscriber mixin
   getFieldNameForSubscription(): string | undefined {
     return 'cwd';
   }
 
-  // Update path when value changes from IDE
+  setFieldValue(value: any) {
+    console.log('setting cwd value', value);
+    this.path = value;
+  }
+
   protected updated(changedProperties: Map<PropertyKey, unknown>): void {
     super.updated(changedProperties);
 
@@ -43,16 +46,6 @@ export class CwdBreadcrumb extends FormValueSubscriber(
         this.path = prefillValue;
         this.dispatchValue();
       }
-    }
-
-    if (
-      changedProperties.has('value') &&
-      (this as any).value !== undefined &&
-      typeof (this as any).value === 'string'
-    ) {
-      this.path = (this as any).value;
-      // Clear the value to avoid double processing
-      delete (this as any).value;
     }
   }
 
