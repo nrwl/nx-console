@@ -13,6 +13,7 @@ import { join } from 'path';
 import { major, rcompare } from 'semver';
 import { QuickPickItem, tasks, window } from 'vscode';
 import { importMigrateUIApi } from './utils';
+import { viewPackageJsonDiff } from '../git-extension/view-diff';
 
 export async function startMigration(custom = false) {
   const nxVersion = await getNxVersion();
@@ -74,20 +75,32 @@ export async function startMigration(custom = false) {
   });
   await tasks.executeTask(task);
 
+  let success = false;
   await new Promise((resolve) => {
     tasks.onDidEndTaskProcess((taskEndEvent) => {
       if (taskEndEvent.execution.task.name === command) {
+        if (taskEndEvent.exitCode === 0) {
+          success = true;
+        }
         resolve(true);
       }
     });
   });
 
-  // TODO: Figure out way to check if the task ended properly and differentiate between user cancelled and no migrations needed
+  if (!success) {
+    window.showErrorMessage(
+      'Migration failed, see integrated terminal for more details.',
+    );
+    return;
+  }
+
   const migrateUiApi = await importMigrateUIApi(workspacePath);
   migrateUiApi.recordInitialMigrationMetadata(
     workspacePath,
     versionToMigrateTo,
   );
+
+  viewPackageJsonDiff();
 }
 
 // if latest is 20.x, do the following

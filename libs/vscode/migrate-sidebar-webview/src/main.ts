@@ -18,10 +18,14 @@ export class Root extends LitElement {
   private vscodeApi: WebviewApi<undefined> = acquireVsCodeApi();
 
   override render(): TemplateResult {
-    console.log('state', this.state);
     if (this.state === 'update-available') {
       return html`
-        <p>A newer version of Nx is available to migrate to :)</p>
+        <p>
+          A newer version of Nx is available. <br />
+          Use the button below to start a guided migration using the Migrate UI.
+          <a href="https://nx.dev/latest/react/cli/migrate">Learn more</a>
+        </p>
+
         ${this.migrateViewData?.hasPendingChanges
           ? html`<p>
               Please commit or stash all changes first before starting a
