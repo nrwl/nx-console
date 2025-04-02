@@ -92,7 +92,6 @@ dependencies {
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
             }
         )
-        bundledModule("com.intellij.modules.json")
         pluginVerifier()
         zipSigner()
     }
