@@ -73,7 +73,7 @@
       "configurations": {
         "debug": {
           "minify": false,
-          "sourcemap": "both"
+          "sourcemap": true
         },
         "production": {
           "minify": true

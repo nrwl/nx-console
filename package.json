@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "nx": "NODE_OPTIONS=--max-old-space-size=4096 && nx",
-    "watch": "nx watch-all vscode",
+    "watch": "nx run vscode:watch:debug",
     "e2e": "nx e2e vscode-e2e",
     "update": "nx migrate latest",
     "prepare": "husky"
