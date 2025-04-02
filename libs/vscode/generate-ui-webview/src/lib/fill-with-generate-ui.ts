@@ -37,6 +37,11 @@ export class FillWithGenerateUiService {
   setFillInfo(generatorName: string, formValues: FormValues) {
     this.generatorName = generatorName;
     this.formValues = formValues;
+    commands.executeCommand(
+      'setContext',
+      'nxConsole.isFillingGenerateUi',
+      true,
+    );
   }
 
   getFillInfo() {
@@ -49,5 +54,10 @@ export class FillWithGenerateUiService {
   clearFillInfo() {
     this.generatorName = '';
     this.formValues = {} as FormValues;
+    commands.executeCommand(
+      'setContext',
+      'nxConsole.isFillingGenerateUi',
+      false,
+    );
   }
 }

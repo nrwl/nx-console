@@ -41,6 +41,15 @@ export class FillGenerateUIPrompt extends PromptElement<FillGenerateUIPromptProp
           You can make changes to them or overwrite them but leave those that
           aren't relevant to the query the same. ONLY USE VALUES THAT CONFORM TO
           THE SCHEMA BELOW.
+          <></>
+          If you're generating a library, app or component, you can specify the
+          parent directory via the cwd option. Don't use the directory option to
+          specify this, ALWAYS specify the cwd with a cwd option even if it's
+          not in the schema. If there is a name and a directory option, use the
+          directory option to specify what the library should be called / what
+          directory it should be placed in. This is not the parent directory but
+          the library itself.
+          <></>
         </UserMessage>
         <UserMessage priority={80}>
           This is the schema for the generator:{' '}

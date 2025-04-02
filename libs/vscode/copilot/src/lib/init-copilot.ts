@@ -276,7 +276,15 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
           try {
             const parsed = JSON.parse(codeContent);
             updateGenerateUIValues(parsed);
-            stream.markdown('Updated Generate UI');
+            getFillWithGenerateUiService().clearFillInfo();
+            stream.markdown('Updated Generate UI \n');
+            const updatedValues = Object.entries(parsed);
+            if (updatedValues.length) {
+              const bulletList = updatedValues
+                .map(([key, value]) => `- ${key}: ${value}`)
+                .join('\n');
+              stream.markdown(bulletList);
+            }
           } catch (error) {
             stream.markdown(trimmedText);
             return;
