@@ -36,6 +36,7 @@ export const FormValueSubscriber = <T extends Constructor<LitElement>>(
               service.registerValueChangeListener(fieldName, (newValue) => {
                 if (newValue !== undefined) {
                   (this as any).setFieldValue(newValue);
+                  (this as any).dispatchValue();
                 }
               });
             }
