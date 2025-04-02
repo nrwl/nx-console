@@ -369,7 +369,7 @@
         },
         {
           "command": "nx.migrate",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace && config.nxConsole.enableMigrateUi"
         },
         {
           "command": "nx.generate.ui",
@@ -878,7 +878,8 @@
       {
         "title": "Refresh Nx Migrate View",
         "command": "nxMigrate.refresh",
-        "icon": "$(refresh)"
+        "icon": "$(refresh)",
+        "when": "isNxWorkspace && config.nxConsole.enableMigrateUi"
       }
     ],
     "configuration": {
@@ -995,6 +996,11 @@
           ],
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
+        },
+        "nxConsole.enableMigrateUi": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enables the experimental Nx Migrate UI feature (alpha)."
         }
       }
     },
@@ -1198,7 +1204,7 @@
           "id": "nxMigrate",
           "type": "webview",
           "name": "Nx Migrate ",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace && config.nxConsole.enableMigrateUi"
         }
       ]
     }

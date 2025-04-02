@@ -3186,7 +3186,7 @@ __metadata:
     "@nx/devkit": 20.5.0
     "@nx/js": 20.5.0
     picocolors: ^1.1.0
-    tinyglobby: ^0.2.10
+    tinyglobby: ^0.2.12
     tsconfig-paths: ^4.1.2
     tslib: ^2.3.0
   peerDependencies:
@@ -3214,7 +3214,7 @@ __metadata:
     tslib: ^2.3.0
   peerDependencies:
     "@typescript-eslint/parser": ^6.13.2 || ^7.0.0 || ^8.0.0
-    eslint-config-prettier: ^9.0.0
+    eslint-config-prettier: ^10.0.0
   peerDependenciesMeta:
     eslint-config-prettier:
       optional: true
@@ -3304,9 +3304,7 @@ __metadata:
     picomatch: 4.0.2
     semver: ^7.5.3
     source-map-support: 0.5.19
-    tinyglobby: ^0.2.10
-    ts-node: 10.9.1
-    tsconfig-paths: ^4.1.2
+    tinyglobby: ^0.2.12
     tslib: ^2.3.0
   peerDependencies:
     verdaccio: ^6.0.5
@@ -6212,7 +6210,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.7.4":
+"axios@npm:^1.8.3":
   version: 1.8.4
   resolution: "axios@npm:1.8.4"
   dependencies:
@@ -14129,7 +14127,7 @@ __metadata:
     "@yarnpkg/lockfile": ^1.1.0
     "@yarnpkg/parsers": 3.0.2
     "@zkochan/js-yaml": 0.0.7
-    axios: ^1.7.4
+    axios: ^1.8.3
     chalk: ^4.1.0
     cli-cursor: 3.1.0
     cli-spinners: 2.6.1
@@ -17956,7 +17954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.10":
+"tinyglobby@npm:^0.2.12":
   version: 0.2.12
   resolution: "tinyglobby@npm:0.2.12"
   dependencies:
