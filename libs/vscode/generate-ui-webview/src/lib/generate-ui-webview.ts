@@ -23,6 +23,7 @@ import { join } from 'node:path';
 import {
   commands,
   ExtensionContext,
+  extensions,
   tasks,
   Uri,
   ViewColumn,
@@ -196,6 +197,7 @@ export class GenerateUiWebview {
               !!GlobalConfigurationStore.instance.get(
                 'enableTaskExecutionDryRunOnChange',
               ),
+            hasCopilot: !!extensions.getExtension('github.copilot-chat'),
           }),
         );
         this.postMessageToWebview(

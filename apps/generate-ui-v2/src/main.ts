@@ -111,7 +111,8 @@ export class Root extends LitElement {
 
           <div class="flex shrink-0">
             ${when(
-              this.icc.editor === 'vscode',
+              this.icc.editor === 'vscode' &&
+                this.icc.configuration?.hasCopilot,
               () => html`
                 <button-element
                   @click="${() => this.fillWithCopilot()}"
