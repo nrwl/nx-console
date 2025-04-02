@@ -85,6 +85,7 @@ export class GenerateUiConfigurationInputMessage {
 
 export type GenerateUiConfiguration = {
   enableTaskExecutionDryRunOnChange: boolean;
+  hasCopilot: boolean;
 };
 
 export class GenerateUiStylesInputMessage {
