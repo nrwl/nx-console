@@ -44,7 +44,7 @@ function getRobotReadableProjectGraph(projectGraph: ProjectGraph): string {
     if (node.data.tags) {
       nodeString += `tags:[${node.data.tags.join(', ')}]`;
     }
-    nodeString += `<${name}/>\n`;
+    nodeString += `</${name}>\n`;
     serializedGraph += nodeString;
   });
   return serializedGraph;
