@@ -5,7 +5,14 @@ export async function getGeneratorSchema(
   generatorName: string,
   generators: GeneratorCollectionInfo[],
 ): Promise<any | undefined> {
-  const generator = generators.find((g) => g.name === generatorName);
+  const generatorInfo = {
+    collection: generatorName.split(':')[0],
+    name: generatorName.split(':')[1],
+  };
+  const generator = generators.find(
+    (g) =>
+      g.name === generatorName || g.data?.aliases?.includes(generatorInfo.name),
+  );
   if (!generator) {
     return undefined;
   }

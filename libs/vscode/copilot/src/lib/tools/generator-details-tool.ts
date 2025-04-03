@@ -54,7 +54,7 @@ export class GeneratorDetailsTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: 'Reading generator schema...',
+      invocationMessage: 'Reading generator schema',
     };
   }
 }
