@@ -10,6 +10,8 @@ import { ChatResponsePart } from '@vscode/prompt-tsx/dist/base/vscodeTypes';
 import { Progress, CancellationToken } from 'vscode';
 import { NxCopilotPromptProps } from './prompt';
 import { DocsPagesPrompt } from './docs-pages-prompt';
+import { NxProjectGraphPrompt } from './project-graph-prompt';
+import { NxJsonPrompt } from './nx-json-prompt';
 export interface FillGenerateUIPromptProps extends NxCopilotPromptProps {
   formValues: FormValues;
   generatorName: string;
@@ -34,6 +36,9 @@ export class FillGenerateUIPrompt extends PromptElement<FillGenerateUIPromptProp
           FORM VALUES THAT WILL BE USED TO FILL THE GENERATE UI IN THE EDITOR.
           The generate UI is a form that allows users to select options for a
           generator. Output nothing but the changes in a JSON code block. <br />
+          Read the metadata about the nx workspace and docs to inform your
+          choices. The things you generate should fit in with similar projects
+          <br />
           The user is trying to use the {this.props.generatorName} generator.
           <br />
           The current form values are: {JSON.stringify(this.props.formValues)}
@@ -60,6 +65,14 @@ export class FillGenerateUIPrompt extends PromptElement<FillGenerateUIPromptProp
           flexGrow={5}
           passPriority
         />
+        <NxProjectGraphPrompt
+          projectGraph={this.props.projectGraph}
+          priority={60}
+          flexGrow={2}
+          flexReserve="/4"
+          passPriority
+        />
+        <NxJsonPrompt nxJson={this.props.nxJson} flexGrow={3} passPriority />
         <UserMessage priority={90}>{this.props.userQuery}</UserMessage>
       </>
     );
