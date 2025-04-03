@@ -87,15 +87,14 @@ export async function getPluginConfiguration(
   let packageManager: Configuration['packageManager'] =
     await detectPackageManager(workspaceRoot);
   if (packageManager === 'yarn') {
-    let yarnVersion;
     try {
-      yarnVersion =
+      const yarnVersion =
         (await getPackageManagerVersion(packageManager, workspaceRoot)) ??
         '1.0.0';
+      if (lt(yarnVersion, '2.0.0')) {
+        packageManager = 'yarn-classic';
+      }
     } catch {
-      yarnVersion = '1.0.0';
-    }
-    if (lt(yarnVersion, '2.0.0')) {
       packageManager = 'yarn-classic';
     }
   }
