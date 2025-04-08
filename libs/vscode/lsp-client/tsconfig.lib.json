@@ -14,10 +14,10 @@
       "path": "../utils/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/utils/tsconfig.lib.json"
+      "path": "../output-channels/tsconfig.lib.json"
     },
     {
-      "path": "../output-channels/tsconfig.lib.json"
+      "path": "../../shared/utils/tsconfig.lib.json"
     },
     {
       "path": "../../language-server/types/tsconfig.lib.json"

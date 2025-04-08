@@ -4,8 +4,8 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "watch",
+      "type": "nx",
+      "command": "run vscode:build:debug",
       "isBackground": true,
       "label": "Build and watch Nx Console",
       "presentation": {

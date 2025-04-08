@@ -19,6 +19,9 @@
       "path": "../utils"
     },
     {
+      "path": "../../shared/nx-cloud"
+    },
+    {
       "path": "../tasks"
     },
     {

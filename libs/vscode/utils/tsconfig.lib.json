@@ -7,14 +7,8 @@
     "noImplicitReturns": false
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "src/lib/git-extension.d.ts", "src/lib/git.ts"],
   "references": [
-    {
-      "path": "../output-channels/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/utils/tsconfig.lib.json"
-    },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
     },
@@ -23,6 +17,12 @@
     },
     {
       "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/utils/tsconfig.lib.json"
     },
     {
       "path": "../configuration/tsconfig.lib.json"

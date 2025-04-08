@@ -7,7 +7,11 @@
     "useUnknownInCatchVariables": false
   },
   "exclude": ["out-tsc", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "include": ["**/*.ts"],
+  "include": [
+    "**/*.ts",
+    "../../shared/nx-cloud/src/lib/get-nx-cloud-terminal-output.ts",
+    "../../shared/nx-cloud/src/lib/get-recent-cipe-data.ts"
+  ],
   "references": [
     {
       "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
@@ -23,6 +27,9 @@
     },
     {
       "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-cloud/tsconfig.lib.json"
     },
     {
       "path": "../../shared/types/tsconfig.lib.json"

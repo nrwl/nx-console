@@ -4,12 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
       "path": "../../shared/npm"
     },
     {
@@ -17,6 +11,12 @@
     },
     {
       "path": "../../shared/schema"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../../shared/utils"
     },
     {
       "path": "../configuration"

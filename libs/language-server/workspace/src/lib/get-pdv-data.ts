@@ -1,5 +1,5 @@
 import { directoryExists } from '@nx-console/shared-file-system';
-import { readNxJson, workspaceDependencyPath } from '@nx-console/shared-npm';
+import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { gte } from '@nx-console/nx-version';
 import { PDVData } from '@nx-console/shared-types';
 import type {
@@ -15,6 +15,7 @@ import {
 import { getProjectByPath } from './get-project-by-path';
 import { getSourceMapFilesToProjectsMap } from './get-source-map';
 import { lspLogger } from '@nx-console/language-server-utils';
+import { readNxJson } from '@nx-console/shared-utils';
 export async function getPDVData(
   workspacePath: string,
   filePath: string,

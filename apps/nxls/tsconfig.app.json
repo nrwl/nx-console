@@ -43,6 +43,9 @@
       "path": "../../libs/language-server/capabilities/definition/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/nx-cloud/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/language-server/capabilities/code-completion/tsconfig.lib.json"
     }
   ]

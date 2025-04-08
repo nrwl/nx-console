@@ -11,12 +11,18 @@ import {
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { getNxMcpPort, vscodeLogger } from '@nx-console/vscode-utils';
-import { commands } from 'vscode';
+import {
+  getGitDiffs,
+  getNxMcpPort,
+  GitExtension,
+  vscodeLogger,
+} from '@nx-console/vscode-utils';
+import { commands, extensions } from 'vscode';
 import express from 'express';
 import { window } from 'vscode';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { findMatchingProject } from '@nx-console/shared-npm';
+import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -26,14 +32,19 @@ export interface McpServerReturn {
 
 let mcpServerReturn: McpServerReturn | undefined;
 
-export function tryStartMcpServer(workspacePath: string) {
+export async function tryStartMcpServer(workspacePath: string) {
   const port = getNxMcpPort();
   if (!port) {
     return;
   }
+
   const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
     nxWorkspace: async (_, __, reset) => await getNxWorkspace(reset),
     getGenerators: async (_, options) => await getGenerators(options),
+    getGitDiffs: async (workspacePath, baseSha, headSha) => {
+      return getGitDiffs(workspacePath, baseSha, headSha);
+    },
+    isNxCloudEnabled: await isNxCloudUsed(workspacePath, vscodeLogger),
   };
   const server = new NxMcpServerWrapper(
     workspacePath,
@@ -67,7 +78,7 @@ export function tryStartMcpServer(workspacePath: string) {
 
 export async function restartMcpServer() {
   stopMcpServer();
-  tryStartMcpServer(getNxWorkspacePath());
+  await tryStartMcpServer(getNxWorkspacePath());
 }
 
 export function stopMcpServer() {

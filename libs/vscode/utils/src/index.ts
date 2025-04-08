@@ -8,3 +8,5 @@ export { resolveDependencyVersioning } from './lib/dependency-versioning';
 export * from './lib/register-codelens';
 export * from './lib/mcp-json';
 export * from './lib/logger';
+export * from './lib/git';
+export type { GitExtension, API as GitAPI } from './lib/git-extension';

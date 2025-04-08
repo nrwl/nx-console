@@ -28,6 +28,9 @@
       "path": "../utils/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/nx-cloud/tsconfig.lib.json"
+    },
+    {
       "path": "../tasks/tsconfig.lib.json"
     },
     {

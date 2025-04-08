@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/nx-cloud"
+    },
+    {
       "path": "../../shared/nx-version"
     },
     {

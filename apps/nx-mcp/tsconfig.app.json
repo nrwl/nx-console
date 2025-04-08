@@ -8,13 +8,13 @@
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
   "references": [
     {
+      "path": "../../libs/shared/telemetry/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/nx-workspace-info/tsconfig.lib.json"
     },
     {
       "path": "../../libs/nx-mcp/nx-mcp-server/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/telemetry/tsconfig.lib.json"
     }
   ]
 }

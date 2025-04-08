@@ -37,6 +37,9 @@
       "path": "../../libs/language-server/capabilities/definition"
     },
     {
+      "path": "../../libs/shared/nx-cloud"
+    },
+    {
       "path": "../../libs/language-server/capabilities/code-completion"
     },
     {

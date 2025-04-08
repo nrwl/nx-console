@@ -19,6 +19,9 @@
       "path": "../../shared/schema"
     },
     {
+      "path": "../../shared/nx-cloud"
+    },
+    {
       "path": "../../shared/types"
     },
     {

@@ -1,9 +1,8 @@
-import { readNxJson } from '@nx-console/shared-npm';
 import {
   DocsPageSection,
   getDocsContext as getSharedDocsContext,
 } from '@nx-console/shared-llm-context';
-import { withTimeout } from '@nx-console/shared-utils';
+import { readNxJson, withTimeout } from '@nx-console/shared-utils';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';

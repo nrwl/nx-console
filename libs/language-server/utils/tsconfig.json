@@ -4,7 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/npm"
+      "path": "../../shared/nx-cloud"
     },
     {
       "path": "../../shared/utils"

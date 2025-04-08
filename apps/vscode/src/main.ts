@@ -5,7 +5,9 @@ import {
   ExtensionContext,
   ProgressLocation,
   RelativePattern,
+  Uri,
   commands,
+  extensions,
   tasks,
   window,
   workspace,
@@ -23,6 +25,7 @@ import {
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import {
+  GitExtension,
   vscodeLogger,
   watchCodeLensConfigChange,
   watchFile,

@@ -1,7 +1,6 @@
 export * from './lib/workspace-dependencies';
 export * from './lib/find-nx-package-path';
 export * from './lib/package-details';
-export * from './lib/nx-json';
 export * from './lib/pnp-dependencies';
 export { checkIsNxWorkspace } from './lib/check-is-nx-workspace';
 export { getNxExecutionCommand } from './lib/get-nx-execution-command';

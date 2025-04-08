@@ -1,27 +1,26 @@
 import { listFiles } from '@nx-console/shared-file-system';
 import { existsSync, readFileSync } from 'fs';
-import * as os from 'node:os';
 import { join } from 'path';
 
 import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
+import { CloudOnboardingInfo } from '@nx-console/shared-types';
+import { xhr } from 'request-light';
 import {
   getNxAccessToken,
+  getNxCloudConfigIni,
   getNxCloudId,
   getNxCloudUrl,
-} from '@nx-console/shared-npm';
-import { CloudOnboardingInfo } from '@nx-console/shared-types';
-import { parse } from 'ini';
-import { xhr } from 'request-light';
+} from '@nx-console/shared-nx-cloud';
 
 export async function getCloudOnboardingInfo(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<CloudOnboardingInfo> {
   const commonCIFileContents = getCommonCIFileContents(workspacePath);
   const hasNxInCI = commonCIFileContents.some((content) =>
-    content.includes('nx ')
+    content.includes('nx '),
   );
   const hasAffectedCommandsInCI = commonCIFileContents.some((content) =>
-    content.includes('nx affected')
+    content.includes('nx affected'),
   );
 
   if (!(await isNxCloudUsed(workspacePath))) {
@@ -48,7 +47,7 @@ export async function getCloudOnboardingInfo(
       personalAccessToken,
       nxCloudUrl,
       accessToken,
-      nxCloudId
+      nxCloudId,
     )) ?? false;
 
   return {
@@ -101,89 +100,17 @@ function getCommonCIFileContents(workspacePath: string): string[] {
   return fileContents;
 }
 
-export function getNxCloudConfigIni(): any | undefined {
-  const iniLocation = findExistingNxCloudConfigFile();
-
-  if (iniLocation && existsSync(iniLocation)) {
-    try {
-      const data = readFileSync(iniLocation, 'utf-8');
-      return parse(data);
-    } catch (e) {
-      return;
-    }
-  }
-}
-
-const NX_CLOUD_CONFIG_DIR_NAME = 'nxcloud';
-const NX_CLOUD_CONFIG_FILE_NAME = 'nxcloud.ini';
-const DOT_NX_CLOUD_CONFIG_FILE_NAME = `.${NX_CLOUD_CONFIG_FILE_NAME}`;
-
-/*
-On Windows, we first check to see if the user has a config file in either
-- %LOCALAPPDATA%\nxcloud\nxcloud.ini
-- %USERPROFILE%\.nxcloud.ini
-
-For Unix-based systems, we check to see if the user has configured a config either
-- $XDG_CONFIG_HOME/nxcloud/nxcloud.ini
-- $HOME/.config/nxcloud/nxcloud.ini
-- $HOME/.nxcloud.ini
-*/
-function findExistingNxCloudConfigFile() {
-  if (process.platform === 'win32') {
-    const homePath = join(os.homedir(), DOT_NX_CLOUD_CONFIG_FILE_NAME);
-    if (existsSync(homePath)) {
-      return homePath;
-    }
-    if (process.env.LOCALAPPDATA) {
-      const localAppDataPath = join(
-        process.env.LOCALAPPDATA,
-        NX_CLOUD_CONFIG_DIR_NAME,
-        NX_CLOUD_CONFIG_FILE_NAME
-      );
-      if (existsSync(localAppDataPath)) {
-        return localAppDataPath;
-      }
-    }
-  } else {
-    if (process.env.XDG_CONFIG_HOME) {
-      const xdgPath = join(
-        process.env.XDG_CONFIG_HOME,
-        NX_CLOUD_CONFIG_DIR_NAME,
-        NX_CLOUD_CONFIG_FILE_NAME
-      );
-      if (existsSync(xdgPath)) {
-        return xdgPath;
-      }
-    }
-    const homeDir = os.homedir();
-    const homeDotPath = join(homeDir, DOT_NX_CLOUD_CONFIG_FILE_NAME);
-    if (existsSync(homeDotPath)) {
-      return homeDotPath;
-    }
-    const homeConfigPath = join(
-      homeDir,
-      '.config',
-      NX_CLOUD_CONFIG_DIR_NAME,
-      NX_CLOUD_CONFIG_FILE_NAME
-    );
-    if (existsSync(homeConfigPath)) {
-      return homeConfigPath;
-    }
-  }
-  return null;
-}
-
 async function getNxCloudWorkspaceClaimed(
   pat: string | undefined,
   nxCloudUrl: string,
   accessToken: string | undefined,
-  nxCloudId: string | undefined
+  nxCloudId: string | undefined,
 ): Promise<boolean | undefined> {
   if (!nxCloudId && !accessToken) {
     return undefined;
   }
   const data = JSON.stringify(
-    nxCloudId ? { nxCloudId } : { nxCloudAccessToken: accessToken }
+    nxCloudId ? { nxCloudId } : { nxCloudAccessToken: accessToken },
   );
 
   const url = `${nxCloudUrl}/nx-cloud/is-workspace-claimed`;
@@ -208,7 +135,7 @@ async function getNxCloudWorkspaceClaimed(
   } catch (e) {
     e;
     lspLogger.log(
-      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${e.responseText}`
+      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${e.responseText}`,
     );
     return undefined;
   }

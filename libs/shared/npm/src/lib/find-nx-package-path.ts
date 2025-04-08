@@ -1,9 +1,9 @@
 import { fileExists } from '@nx-console/shared-file-system';
 import { platform } from 'os';
 import { join } from 'path';
-import { readNxJson } from './nx-json';
 import { isWorkspaceInPnp } from './pnp-dependencies';
 import { workspaceDependencyPath } from './workspace-dependencies';
+import { readNxJson } from '@nx-console/shared-utils';
 
 /**
  * Finds the local Nx package in the workspace.

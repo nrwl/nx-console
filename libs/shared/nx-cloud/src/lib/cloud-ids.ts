@@ -1,23 +1,7 @@
-import { parse } from 'dotenv';
-import { existsSync, readFileSync } from 'fs';
-import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
 import { join } from 'path';
-import { readJsonFile } from './local-nx-utils/read-json';
-
-export async function readNxJson(
-  workspacePath: string,
-): Promise<NxJsonConfiguration> {
-  return await readJsonFile<NxJsonConfiguration>('nx.json', workspacePath);
-}
-
-export async function canReadNxJson(workspacePath: string): Promise<boolean> {
-  try {
-    await readNxJson(workspacePath);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
+import { existsSync, readFileSync } from 'fs';
+import { parse } from 'dotenv';
+import { readNxJson } from '@nx-console/shared-utils';
 
 export async function getNxAccessToken(
   workspacePath: string,
@@ -59,7 +43,6 @@ export async function getNxCloudId(
     return undefined;
   }
 }
-// helpers
 
 function getAccessTokenFromTaskRunnerOptions(nxJson: any): string | undefined {
   if (!nxJson.tasksRunnerOptions) {

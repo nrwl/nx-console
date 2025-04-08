@@ -9,9 +9,11 @@ import {
   CancellationToken,
   chat,
   ChatContext,
+  ChatFollowup,
   ChatRequest,
   ChatRequestHandler,
   ChatResponseStream,
+  ChatResult,
   ChatResultFeedbackKind,
   commands,
   ExtensionContext,
@@ -34,10 +36,14 @@ import { getGenerators } from '@nx-console/vscode-nx-workspace';
 import { ProjectDetailsTool } from './tools/project-details-tool';
 import { VisualizeProjectGraphTool } from './tools/visualize-project-graph-tool';
 import { VisualizeTaskGraphTool } from './tools/visualize-task-graph-tool';
+import { explainCipe } from './commands/explain-cipe';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
-  const nxParticipant = chat.createChatParticipant('nx-console.nx', handler);
+  const nxParticipant = chat.createChatParticipant(
+    'nx-console.nx',
+    handler(context),
+  );
   nxParticipant.iconPath = Uri.joinPath(
     context.extensionUri,
     'assets',
@@ -50,6 +56,22 @@ export function initCopilot(context: ExtensionContext) {
         : 'ai.feedback-bad',
     );
   });
+  nxParticipant.followupProvider = {
+    provideFollowups(
+      result: ChatResult,
+      context: ChatContext,
+      token: CancellationToken,
+    ) {
+      if (result.metadata.command === 'explain-cipe') {
+        return [
+          {
+            prompt: 'Can you fix the error?',
+            command: 'fix-cipe',
+          } satisfies ChatFollowup,
+        ];
+      }
+    },
+  };
 
   context.subscriptions.push(
     nxParticipant,
@@ -74,141 +96,149 @@ export function initCopilot(context: ExtensionContext) {
   );
 }
 
-const handler: ChatRequestHandler = async (
-  request: ChatRequest,
-  context: ChatContext,
-  stream: ChatResponseStream,
-  token: CancellationToken,
-) => {
-  const telemetry = getTelemetry();
-  telemetry.logUsage('ai.chat-message');
-  const intent = await determineIntent(request);
-  const workspacePath = getNxWorkspacePath();
+const handler: (context: ExtensionContext) => ChatRequestHandler =
+  (extensionContext: ExtensionContext) =>
+  async (
+    request: ChatRequest,
+    context: ChatContext,
+    stream: ChatResponseStream,
+    token: CancellationToken,
+  ) => {
+    const telemetry = getTelemetry();
+    telemetry.logUsage('ai.chat-message');
 
-  stream.progress('Retrieving workspace information...');
-  const projectGraph = await getProjectGraph(stream);
+    if (request.command === 'explain-cipe') {
+      await explainCipe(request, context, stream, token, extensionContext);
+      return;
+    }
 
-  stream.progress('Retrieving relevant documentation...');
-  const docsPages = await getDocsContext(request.prompt, context.history);
+    const intent = await determineIntent(request);
+    const workspacePath = getNxWorkspacePath();
 
-  const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
-  const nxJson = await tryReadNxJson(workspacePath);
+    stream.progress('Retrieving workspace information...');
+    const projectGraph = await getProjectGraph(stream);
 
-  let generators: GeneratorCollectionInfo[];
-  try {
-    generators = await withTimeout<GeneratorCollectionInfo[]>(
-      async () => await getGenerators(),
-      3000,
-    );
-  } catch (e) {
-    generators = [];
-  }
-  const generatorNamesAndDescriptions =
-    await getGeneratorNamesAndDescriptions(generators);
+    stream.progress('Retrieving relevant documentation...');
+    const docsPages = await getDocsContext(request.prompt, context.history);
 
-  const baseProps: NxCopilotPromptProps = {
-    userQuery: request.prompt,
-    history: context.history,
-    packageManagerExecCommand: pmExec,
-    projectGraph,
-    nxJson,
-    docsPages,
-  };
+    const pmExec = (await getPackageManagerCommand(workspacePath)).exec;
+    const nxJson = await tryReadNxJson(workspacePath);
 
-  let promptElementAndProps: PromptElementAndProps<
-    NxCopilotPrompt | GeneratePrompt
-  >;
+    let generators: GeneratorCollectionInfo[];
+    try {
+      generators = await withTimeout<GeneratorCollectionInfo[]>(
+        async () => await getGenerators(),
+        3000,
+      );
+    } catch (e) {
+      generators = [];
+    }
+    const generatorNamesAndDescriptions =
+      await getGeneratorNamesAndDescriptions(generators);
 
-  if (request.command === 'generate' || intent === 'generate') {
-    stream.progress('Retrieving generator schemas...');
-
-    promptElementAndProps = {
-      promptElement: GeneratePrompt,
-      props: {
-        ...baseProps,
-        generators: generatorNamesAndDescriptions,
-      },
+    const baseProps: NxCopilotPromptProps = {
+      userQuery: request.prompt,
+      history: context.history,
+      packageManagerExecCommand: pmExec,
+      projectGraph,
+      nxJson,
+      docsPages,
     };
-  } else {
-    promptElementAndProps = {
-      promptElement: NxCopilotPrompt,
-      props: baseProps,
-    };
-  }
 
-  stream.progress('Thinking...');
+    let promptElementAndProps: PromptElementAndProps<
+      NxCopilotPrompt | GeneratePrompt
+    >;
 
-  const chatParticipantRequest = sendChatParticipantRequest(
-    request,
-    context,
-    {
-      prompt: promptElementAndProps,
-      responseStreamOptions: {
-        stream,
-      },
-      tools: lm.tools,
-    },
-    token,
-  );
+    if (request.command === 'generate' || intent === 'generate') {
+      stream.progress('Retrieving generator schemas...');
 
-  const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
-  const endMarker = `"""`;
-
-  let pendingText = '';
-  let codeBuffer: string | null = null;
-
-  for await (const fragment of chatParticipantRequest.stream) {
-    if (fragment instanceof LanguageModelToolResult) {
-      stream.markdown(JSON.stringify(fragment));
-      continue;
+      promptElementAndProps = {
+        promptElement: GeneratePrompt,
+        props: {
+          ...baseProps,
+          generators: generatorNamesAndDescriptions,
+        },
+      };
     } else {
-      if (codeBuffer !== null) {
-        codeBuffer += fragment.value;
+      promptElementAndProps = {
+        promptElement: NxCopilotPrompt,
+        props: baseProps,
+      };
+    }
+
+    stream.progress('Thinking...');
+
+    const chatParticipantRequest = sendChatParticipantRequest(
+      request,
+      context,
+      {
+        prompt: promptElementAndProps,
+        responseStreamOptions: {
+          stream,
+        },
+        tools: lm.tools,
+      },
+      token,
+    );
+
+    const startMarker = new RegExp(`"""\\s*${pmExec}\\s+nx\\s*`);
+    const endMarker = `"""`;
+
+    let pendingText = '';
+    let codeBuffer: string | null = null;
+
+    for await (const fragment of chatParticipantRequest.stream) {
+      if (fragment instanceof LanguageModelToolResult) {
+        stream.markdown(JSON.stringify(fragment));
+        continue;
       } else {
-        pendingText += fragment.value;
-      }
-
-      // Process when we're not in a code block: look for a start marker.
-      while (codeBuffer === null) {
-        const match = pendingText.match(startMarker);
-        const startIndex = match ? match.index : -1;
-        if (startIndex === -1) {
-          break;
+        if (codeBuffer !== null) {
+          codeBuffer += fragment.value;
+        } else {
+          pendingText += fragment.value;
         }
-        if (startIndex > 0) {
-          stream.markdown(pendingText.slice(0, startIndex));
+
+        // Process when we're not in a code block: look for a start marker.
+        while (codeBuffer === null) {
+          const match = pendingText.match(startMarker);
+          const startIndex = match ? match.index : -1;
+          if (startIndex === -1) {
+            break;
+          }
+          if (startIndex > 0) {
+            stream.markdown(pendingText.slice(0, startIndex));
+          }
+          // Switch to code mode.
+          codeBuffer = '';
+          pendingText = pendingText.slice(startIndex + match[0].length);
+          codeBuffer += pendingText;
+          pendingText = '';
         }
-        // Switch to code mode.
-        codeBuffer = '';
-        pendingText = pendingText.slice(startIndex + match[0].length);
-        codeBuffer += pendingText;
-        pendingText = '';
-      }
 
-      // If we are in a code block, look for the end marker.
-      while (codeBuffer !== null) {
-        const endIndex = codeBuffer.indexOf(endMarker);
-        if (endIndex === -1) {
-          break;
+        // If we are in a code block, look for the end marker.
+        while (codeBuffer !== null) {
+          const endIndex = codeBuffer.indexOf(endMarker);
+          if (endIndex === -1) {
+            break;
+          }
+          const codeSnippet = codeBuffer.slice(0, endIndex);
+
+          renderCommandSnippet(codeSnippet, stream, pmExec);
+          codeBuffer = codeBuffer.slice(endIndex + endMarker.length);
+
+          // switch back to normal mode.
+          pendingText += codeBuffer;
+          codeBuffer = null;
         }
-        const codeSnippet = codeBuffer.slice(0, endIndex);
-
-        renderCommandSnippet(codeSnippet, stream, pmExec);
-        codeBuffer = codeBuffer.slice(endIndex + endMarker.length);
-
-        // switch back to normal mode.
-        pendingText += codeBuffer;
-        codeBuffer = null;
       }
     }
-  }
 
-  if (codeBuffer === null && pendingText) {
-    stream.markdown(pendingText);
-  }
+    if (codeBuffer === null && pendingText) {
+      stream.markdown(pendingText);
+    }
 
-  return await chatParticipantRequest.result;
-};
+    return await chatParticipantRequest.result;
+  };
 
 async function renderCommandSnippet(
   snippet: string,

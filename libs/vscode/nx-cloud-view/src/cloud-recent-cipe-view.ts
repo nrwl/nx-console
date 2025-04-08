@@ -23,7 +23,7 @@ import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 
 abstract class BaseRecentCIPETreeItem extends TreeItem {
-  abstract type: 'CIPE' | 'runGroup' | 'run' | 'label';
+  abstract type: 'CIPE' | 'runGroup' | 'run' | 'label' | 'failedTask';
 
   abstract getChildren(): ProviderResult<BaseRecentCIPETreeItem[]>;
 
@@ -37,6 +37,10 @@ abstract class BaseRecentCIPETreeItem extends TreeItem {
 
   isRunTreeItem(): this is RunTreeItem {
     return this.type === 'run';
+  }
+
+  isFailedTaskTreeItem(): this is FailedTaskTreeItem {
+    return this.type === 'failedTask';
   }
 }
 
@@ -62,6 +66,11 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
 
     if (this.cipe.status === 'SUCCEEDED') {
       this.collapsibleState = TreeItemCollapsibleState.None;
+    } else if (
+      this.cipe.status === 'FAILED' ||
+      this.cipe.status === 'TIMED_OUT'
+    ) {
+      this.collapsibleState = TreeItemCollapsibleState.Expanded;
     } else {
       this.collapsibleState = TreeItemCollapsibleState.Collapsed;
     }
@@ -205,7 +214,9 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
   ) {
     super(run.command);
 
-    this.collapsibleState = TreeItemCollapsibleState.None;
+    this.collapsibleState = this.run.numFailedTasks
+      ? TreeItemCollapsibleState.Expanded
+      : TreeItemCollapsibleState.None;
     this.id = `${cipeId}-${run.linkId ?? run.executionId}`;
     this.setIcon();
     this.contextValue = 'run';
@@ -232,6 +243,35 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
         new ThemeColor('notebookStatusErrorIcon.foreground'),
       );
     }
+  }
+
+  override getChildren(): ProviderResult<FailedTaskTreeItem[]> {
+    if (this.run.failedTasks && this.run.failedTasks.length > 0) {
+      return this.run.failedTasks.map((taskId) => {
+        return new FailedTaskTreeItem(
+          taskId,
+          this.run.linkId,
+          this.run.executionId,
+        );
+      });
+    }
+
+    return [];
+  }
+}
+
+class FailedTaskTreeItem extends BaseRecentCIPETreeItem {
+  type = 'failedTask' as const;
+
+  constructor(
+    public taskId: string,
+    public linkId?: string,
+    public executionId?: string,
+  ) {
+    super(taskId);
+    this.collapsibleState = TreeItemCollapsibleState.None;
+    this.iconPath = new ThemeIcon('error');
+    this.contextValue = 'failedTask';
   }
 
   override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
@@ -384,6 +424,26 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           }
         }
       }),
+      commands.registerCommand(
+        'nxCloud.explainCipeTaskFailure',
+        async (treeItem: BaseRecentCIPETreeItem) => {
+          if (!treeItem.isFailedTaskTreeItem()) {
+            return;
+          }
+
+          let idPrompt = '';
+          if (treeItem.linkId) {
+            idPrompt = `linkId ${treeItem.linkId}`;
+          } else {
+            idPrompt = `executionId ${treeItem.executionId}`;
+          }
+
+          commands.executeCommand(
+            'workbench.action.chat.open',
+            `@nx /explain-cipe help me understand the failed output for ${treeItem.taskId} with the ${idPrompt} `,
+          );
+        },
+      ),
     );
   }
 }

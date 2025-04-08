@@ -19,10 +19,10 @@
       "path": "../configuration"
     },
     {
-      "path": "../output-channels"
+      "path": "../../shared/npm"
     },
     {
-      "path": "../nx-workspace"
+      "path": "../output-channels"
     },
     {
       "path": "../../shared/utils"
@@ -31,7 +31,10 @@
       "path": "../../shared/llm-context"
     },
     {
-      "path": "../../shared/npm"
+      "path": "../utils"
+    },
+    {
+      "path": "../nx-workspace"
     },
     {
       "path": "./tsconfig.lib.json"

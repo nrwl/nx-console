@@ -45,7 +45,7 @@ export async function initCursor(context: ExtensionContext) {
 
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
-  tryStartMcpServer(getNxWorkspacePath());
+  await tryStartMcpServer(getNxWorkspacePath());
 
   showMCPNotification();
 
