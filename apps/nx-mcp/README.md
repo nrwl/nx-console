@@ -18,8 +18,24 @@ There are two ways to use this MCP server:
 
 Simply invoke the MCP server via `npx` or your package manager's equivalent.
 
-```bash
-npx nx-mcp /path/to/nx/workspace
+Here's an example of a `mcp.json` configuration:
+
+```json
+{
+  "servers": {
+    "nx-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["nx-mcp@latest", "/path/to/your/workspace"]
+    }
+  }
+}
+```
+
+For VSCode you can also run:
+
+```
+code --add-mcp '{"name":"nx-mcp","command":"npx","args":["nx-mcp", "/path/to/your/workspace"]}'
 ```
 
 Refer to your AI tool's documentation for how to register an MCP server. For example, [Cursor](https://docs.cursor.com/context/model-context-protocol) or [Claude Desktop](https://modelcontextprotocol.io/quickstart/user) support MCP.
