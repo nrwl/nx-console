@@ -113,7 +113,11 @@ const nxCloudFixCipeSchema = z.object({
     .string()
     .optional()
     .describe('The link ID of the CI pipeline execution'),
-  taskId: z.string().describe('The task ID of the failed task'),
+  taskId: z
+    .string()
+    .describe(
+      'The task ID of the failed task, which is a nx task that was executed',
+    ),
 });
 
 type NxCloudFixCipeParams = z.infer<typeof nxCloudFixCipeSchema>;
@@ -157,22 +161,26 @@ const nxCloudCipeAffectedFilesAndTerminalOutput =
       text: `Terminal Output: ${terminalOutput.terminalOutput}`,
     });
 
-    const changedFiles = await getGitDiffs(
-      workspacePath,
-      params.executionId,
-      params.linkId,
-    );
-    if (changedFiles) {
-      for (const file of changedFiles) {
-        content.push({
-          type: 'text',
-          text: `Changed File: ${file.path}`,
-        });
-        content.push({
-          type: 'text',
-          text: `Diff: ${file.diffContent}`,
-        });
+    try {
+      const changedFiles = await getGitDiffs?.(workspacePath);
+      if (changedFiles) {
+        for (const file of changedFiles) {
+          content.push({
+            type: 'text',
+            text: `Changed File: ${file.path}`,
+          });
+          content.push({
+            type: 'text',
+            text: `Diff: ${file.diffContent}`,
+          });
+        }
       }
+    } catch (e) {
+      logger.log(`Error getting git diffs: ${e}`);
+      content.push({
+        type: 'text',
+        text: 'Unable to get git diffs',
+      });
     }
 
     return { content };

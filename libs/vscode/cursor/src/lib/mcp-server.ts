@@ -3,6 +3,8 @@ import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
+import { findMatchingProject } from '@nx-console/shared-npm';
+import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { IdeCallbackMessage } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
@@ -11,18 +13,14 @@ import {
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
   getNxMcpPort,
-  GitExtension,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
-import { commands, extensions } from 'vscode';
 import express from 'express';
-import { window } from 'vscode';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { findMatchingProject } from '@nx-console/shared-npm';
-import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
+import { commands, window } from 'vscode';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;

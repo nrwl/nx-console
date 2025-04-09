@@ -28,19 +28,24 @@ export async function getGitDiffs(
       )
     ).hash;
   const head = headSha ?? (await repo.getCommit(repo.state.HEAD.name)).hash;
-  const fileDiffs = await Promise.all(
-    (await repo.diffBetween(base, head)).map(async (changedFile) => {
-      const fileDiff = await repo.diffBetween(
-        base,
-        head,
-        changedFile.uri.fsPath,
-      );
+
+  const changedFiles = (await repo.diffBetween(base, head)).map(
+    (changedFile) => {
       return {
-        path: changedFile.uri.fsPath,
+        value: changedFile.uri,
+      };
+    },
+  );
+
+  const fileDiffs = await Promise.all(
+    changedFiles.map(async (file) => {
+      const fileDiff = await repo.diffBetween(base, head, file.value.fsPath);
+      return {
+        path: file.value.fsPath,
         diffContent: fileDiff,
       };
     }),
   );
 
-  return fileDiffs;
+  return fileDiffs.filter((fileDiff) => fileDiff !== null);
 }
