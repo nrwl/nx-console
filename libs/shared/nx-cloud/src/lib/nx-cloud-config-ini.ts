@@ -40,7 +40,7 @@ function findExistingNxCloudConfigFile() {
       const localAppDataPath = join(
         process.env.LOCALAPPDATA,
         NX_CLOUD_CONFIG_DIR_NAME,
-        NX_CLOUD_CONFIG_FILE_NAME
+        NX_CLOUD_CONFIG_FILE_NAME,
       );
       if (existsSync(localAppDataPath)) {
         return localAppDataPath;
@@ -51,7 +51,7 @@ function findExistingNxCloudConfigFile() {
       const xdgPath = join(
         process.env.XDG_CONFIG_HOME,
         NX_CLOUD_CONFIG_DIR_NAME,
-        NX_CLOUD_CONFIG_FILE_NAME
+        NX_CLOUD_CONFIG_FILE_NAME,
       );
       if (existsSync(xdgPath)) {
         return xdgPath;
@@ -66,7 +66,7 @@ function findExistingNxCloudConfigFile() {
       homeDir,
       '.config',
       NX_CLOUD_CONFIG_DIR_NAME,
-      NX_CLOUD_CONFIG_FILE_NAME
+      NX_CLOUD_CONFIG_FILE_NAME,
     );
     if (existsSync(homeConfigPath)) {
       return homeConfigPath;
