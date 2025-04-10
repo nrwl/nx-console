@@ -25,6 +25,8 @@ export type TelemetryEvents =
   | 'cloud.view-cipe'
   | 'cloud.view-cipe-commit'
   | 'cloud.view-run'
+  | 'cloud.explain-cipe-error'
+  | 'cloud.fix-cipe-error'
   // graph
   | 'graph.show-all'
   | 'graph.show-affected'

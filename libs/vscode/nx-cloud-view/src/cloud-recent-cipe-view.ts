@@ -5,6 +5,7 @@ import { isDeepStrictEqual } from 'util';
 import {
   commands,
   Disposable,
+  env,
   ExtensionContext,
   FileDecoration,
   FileDecorationProvider,
@@ -431,6 +432,8 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
             return;
           }
 
+          getTelemetry().logUsage('cloud.explain-cipe-error');
+
           let idPrompt = '';
           if (treeItem.linkId) {
             idPrompt = `linkId ${treeItem.linkId}`;
@@ -444,6 +447,17 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           );
         },
       ),
+      commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
+        getTelemetry().logUsage('cloud.fix-cipe-error');
+        commands.executeCommand('composer.newAgentChat');
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        const originalClipboard = await env.clipboard.readText();
+        await env.clipboard.writeText(
+          'help me fix the latest ci pipeline error',
+        );
+        await commands.executeCommand('editor.action.clipboardPasteAction');
+        await env.clipboard.writeText(originalClipboard);
+      }),
     );
   }
 }

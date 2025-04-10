@@ -10,3 +10,4 @@ export * from './lib/mcp-json';
 export * from './lib/logger';
 export * from './lib/git';
 export type { GitExtension, API as GitAPI } from './lib/git-extension';
+export { isInCursor } from './lib/is-in-cursor';

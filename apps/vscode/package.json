@@ -211,6 +211,11 @@
           "group": "inline@1"
         },
         {
+          "command": "nxCloud.helpMeFixCipeError",
+          "when": "view == nxCloudRecentCIPE && viewItem == failedTask && isInCursor",
+          "group": "inline@1"
+        },
+        {
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
@@ -319,6 +324,10 @@
         },
         {
           "command": "nxCloud.explainCipeTaskFailure",
+          "when": "false"
+        },
+        {
+          "command": "nxCloud.helpMeFixCipeError",
           "when": "false"
         },
         {
@@ -840,6 +849,14 @@
         "title": "Explain CIPE Task Failure",
         "command": "nxCloud.explainCipeTaskFailure",
         "icon": "$(copilot)"
+      },
+      {
+        "title": "Help me fix the latest CIPE error",
+        "command": "nxCloud.helpMeFixCipeError",
+        "icon": {
+          "dark": "assets/cursor-dark.svg",
+          "light": "assets/cursor-light.svg"
+        }
       },
       {
         "category": "Nx",

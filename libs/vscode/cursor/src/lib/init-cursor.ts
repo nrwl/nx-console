@@ -13,7 +13,6 @@ import {
 } from '@nx-console/vscode-utils';
 import {
   commands,
-  env,
   ExtensionContext,
   FileSystemWatcher,
   window,
@@ -23,6 +22,7 @@ import { restartMcpServer, tryStartMcpServer } from './mcp-server';
 import { findAvailablePort } from './ports';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { isInCursor } from '@nx-console/vscode-utils';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
@@ -165,8 +165,4 @@ async function updateMcpJson() {
   }
 
   return true;
-}
-
-export function isInCursor() {
-  return env.appName.toLowerCase().includes('cursor');
 }
