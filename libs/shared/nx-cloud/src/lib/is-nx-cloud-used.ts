@@ -1,5 +1,5 @@
-import { importNxPackagePath } from '@nx-console/shared-npm';
-import { consoleLogger, readNxJson } from '@nx-console/shared-utils';
+import { importNxPackagePath, readNxJson } from '@nx-console/shared-npm';
+import { consoleLogger } from '@nx-console/shared-utils';
 import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
 
 export async function isNxCloudUsed(

@@ -7,7 +7,7 @@
     "noImplicitReturns": false
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
-  "include": ["**/*.ts", "src/lib/git-extension.d.ts", "src/lib/git.ts"],
+  "include": ["**/*.ts"],
   "references": [
     {
       "path": "../../shared/npm/tsconfig.lib.json"

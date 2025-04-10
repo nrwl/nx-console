@@ -1,5 +1,5 @@
-import { readJsonFile } from '@nx-console/shared-npm';
 import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
+import { readJsonFile } from './local-nx-utils/read-json';
 
 export async function readNxJson(
   workspacePath: string,

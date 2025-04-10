@@ -1,6 +1,6 @@
-import { readJsonFile } from '@nx-console/shared-npm';
+import { readJsonFile, readNxJson } from '@nx-console/shared-npm';
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { Logger, readNxJson } from '@nx-console/shared-utils';
+import { Logger } from '@nx-console/shared-utils';
 import { NxError } from '@nx-console/shared-types';
 import type {
   NxJsonConfiguration,

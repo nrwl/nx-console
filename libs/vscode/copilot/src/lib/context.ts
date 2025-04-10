@@ -2,7 +2,7 @@ import {
   DocsPageSection,
   getDocsContext as getSharedDocsContext,
 } from '@nx-console/shared-llm-context';
-import { readNxJson, withTimeout } from '@nx-console/shared-utils';
+import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import type { NxJsonConfiguration, ProjectGraph } from 'nx/src/devkit-exports';
@@ -13,6 +13,7 @@ import {
   MarkdownString,
 } from 'vscode';
 import { chatResponseToString } from './prompts/history';
+import { readNxJson } from '@nx-console/shared-npm';
 
 export async function getProjectGraph(
   stream: ChatResponseStream,

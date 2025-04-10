@@ -3,7 +3,7 @@ import { platform } from 'os';
 import { join } from 'path';
 import { isWorkspaceInPnp } from './pnp-dependencies';
 import { workspaceDependencyPath } from './workspace-dependencies';
-import { readNxJson } from '@nx-console/shared-utils';
+import { readNxJson } from './nx-json';
 
 /**
  * Finds the local Nx package in the workspace.

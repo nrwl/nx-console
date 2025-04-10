@@ -12,7 +12,7 @@ import {
 } from 'vscode-json-languageservice';
 import { URI } from 'vscode-uri';
 import { createRange } from './create-range';
-import { readNxJson } from '@nx-console/shared-utils';
+import { readNxJson } from '@nx-console/shared-npm';
 
 let versionNumber = 0;
 

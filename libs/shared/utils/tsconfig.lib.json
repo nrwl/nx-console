@@ -13,9 +13,6 @@
   ],
   "references": [
     {
-      "path": "../npm/tsconfig.lib.json"
-    },
-    {
       "path": "../nx-version/tsconfig.lib.json"
     },
     {

@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { parse } from 'dotenv';
-import { readNxJson } from '@nx-console/shared-utils';
+import { readNxJson } from '@nx-console/shared-npm';
 
 export async function getNxAccessToken(
   workspacePath: string,
