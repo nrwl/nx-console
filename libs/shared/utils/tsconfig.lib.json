@@ -6,11 +6,7 @@
     "noImplicitReturns": false
   },
   "exclude": ["out-tsc", "**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
-  "include": [
-    "**/*.ts",
-    "../../vscode/utils/src/lib/git.ts",
-    "../../vscode/utils/src/lib/git-extension.d.ts"
-  ],
+  "include": ["**/*.ts"],
   "references": [
     {
       "path": "../nx-version/tsconfig.lib.json"
