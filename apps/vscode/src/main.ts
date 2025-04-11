@@ -5,7 +5,9 @@ import {
   ExtensionContext,
   ProgressLocation,
   RelativePattern,
+  Uri,
   commands,
+  extensions,
   tasks,
   window,
   workspace,
@@ -23,12 +25,13 @@ import {
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import {
+  GitExtension,
   vscodeLogger,
   watchCodeLensConfigChange,
   watchFile,
 } from '@nx-console/vscode-utils';
 
-import { initCursor, updateMcpServerWorkspacePath } from '@nx-console/cursor';
+import { initMcp, updateMcpServerWorkspacePath } from '@nx-console/mcp';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
@@ -90,7 +93,7 @@ export async function activate(c: ExtensionContext) {
 
     createNxlsClient(context);
     initTelemetry(context);
-    initCursor(context);
+    initMcp(context);
 
     initNxInit(context);
 
@@ -291,7 +294,7 @@ async function setWorkspace(workspacePath: string) {
     initVscodeProjectGraph(context);
     initErrorDiagnostics(context);
     initCopilot(context);
-    initCursor(context);
+    initMcp(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

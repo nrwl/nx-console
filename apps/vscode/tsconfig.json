@@ -7,9 +7,6 @@
       "path": "../../libs/vscode/graph-base"
     },
     {
-      "path": "../../libs/shared/npm"
-    },
-    {
       "path": "../../libs/vscode/telemetry"
     },
     {
@@ -28,13 +25,10 @@
       "path": "../../libs/vscode/error-diagnostics"
     },
     {
+      "path": "../../libs/shared/npm"
+    },
+    {
       "path": "../../libs/language-server/types"
-    },
-    {
-      "path": "../../libs/vscode/cursor"
-    },
-    {
-      "path": "../../libs/vscode/copilot"
     },
     {
       "path": "../../libs/vscode/typescript-plugin"
@@ -58,10 +52,16 @@
       "path": "../../libs/vscode/generate-ui-webview"
     },
     {
+      "path": "../../libs/vscode/copilot"
+    },
+    {
       "path": "../../libs/vscode/add-dependency"
     },
     {
       "path": "../../libs/shared/file-system"
+    },
+    {
+      "path": "../../libs/vscode/mcp"
     },
     {
       "path": "../../libs/vscode/utils"

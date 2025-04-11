@@ -5,7 +5,7 @@ import {
   writeMcpJson,
 } from '@nx-console/vscode-utils';
 
-import { isInCursor } from './init-cursor';
+import { isInCursor } from '@nx-console/vscode-utils';
 
 export function refreshMcp() {
   if (!isInCursor()) {

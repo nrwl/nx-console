@@ -6,10 +6,10 @@ import {
   getNxAccessToken,
   getNxCloudId,
   getNxCloudUrl,
-} from '@nx-console/shared-npm';
+} from '@nx-console/shared-nx-cloud';
 
 export async function getNxCloudStatus(
-  workspaceRoot: string
+  workspaceRoot: string,
 ): Promise<{ isConnected: boolean; nxCloudUrl: string; nxCloudId?: string }> {
   const nxJsonPath = join(workspaceRoot, 'nx.json');
   if (!existsSync(nxJsonPath)) {

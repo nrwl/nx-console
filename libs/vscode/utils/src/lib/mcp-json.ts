@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import * as path from 'path';
 import { workspace, window } from 'vscode';
+import { isInCursor } from './is-in-cursor';
 
 /**
  * Gets the path to the mcp.json file.
@@ -14,14 +15,21 @@ export function getMcpJsonPath(): string | null {
     return null;
   }
 
-  return path.join(vscodeWorkspacePath, '.cursor', 'mcp.json');
+  if (isInCursor()) {
+    // If in cursor, use the .cursor directory
+    return path.join(vscodeWorkspacePath, '.cursor', 'mcp.json');
+  } else {
+    // If not in cursor, use the workspace root
+    return path.join(vscodeWorkspacePath, '.vscode', 'mcp.json');
+  }
 }
 
 /**
- * Gets the directory path for the .cursor folder.
- * @returns The path to the .cursor directory or null if the workspace path cannot be determined.
+ * Gets the directory path for the editor folder.
+ * @returns The path to the editor directory or null if the workspace path cannot be determined.
+ * Return `${workspaceRoot}/.cursor` if in cursor  otherwise `${workspaceRoot}/.vscode`.
  */
-export function getCursorDirPath(): string | null {
+export function getEditorDirPath(): string | null {
   const vscodeWorkspacePath =
     workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
@@ -29,7 +37,13 @@ export function getCursorDirPath(): string | null {
     return null;
   }
 
-  return path.join(vscodeWorkspacePath, '.cursor');
+  if (isInCursor()) {
+    // If in cursor, use the .cursor directory
+    return path.join(vscodeWorkspacePath, '.cursor');
+  } else {
+    // If not in cursor, use use the .vscode directory
+    return path.join(vscodeWorkspacePath, '.vscode');
+  }
 }
 
 /**
@@ -45,7 +59,7 @@ export function hasNxMcpEntry(): boolean {
 
   try {
     const mcpJson = JSON.parse(readFileSync(mcpJsonPath, 'utf8'));
-    return !!mcpJson.mcpServers?.['nx-mcp'];
+    return !!(mcpJson.mcpServers?.['nx-mcp'] ?? mcpJson.servers?.['nx-mcp']);
   } catch (e) {
     return false;
   }
@@ -99,19 +113,19 @@ export function writeMcpJson(content: any): boolean {
  * Ensures the .cursor directory exists.
  * @returns true if the directory exists or was created successfully, false otherwise.
  */
-export function ensureCursorDirExists(): boolean {
-  const cursorDirPath = getCursorDirPath();
+export function ensureEditorDirExists(): boolean {
+  const editorDirPath = getEditorDirPath();
 
-  if (!cursorDirPath) {
+  if (!editorDirPath) {
     return false;
   }
 
-  if (!existsSync(cursorDirPath)) {
+  if (!existsSync(editorDirPath)) {
     try {
-      mkdirSync(cursorDirPath, { recursive: true });
+      mkdirSync(editorDirPath, { recursive: true });
     } catch (error) {
       window.showErrorMessage(
-        `Failed to create .cursor directory: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to create editor directory: ${error instanceof Error ? error.message : String(error)}`,
       );
       return false;
     }
@@ -130,12 +144,13 @@ export function getNxMcpPort(): number | undefined {
   }
 
   const mcpJson = readMcpJson();
-  if (!mcpJson || !mcpJson.mcpServers || !mcpJson.mcpServers['nx-mcp']) {
+  if (!mcpJson?.mcpServers?.['nx-mcp'] && !mcpJson?.servers?.['nx-mcp']) {
     return undefined;
   }
 
   try {
-    const url = mcpJson.mcpServers['nx-mcp'].url;
+    const url =
+      mcpJson.mcpServers?.['nx-mcp']?.url ?? mcpJson.servers?.['nx-mcp']?.url;
     if (!url) {
       return undefined;
     }

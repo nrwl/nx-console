@@ -5,6 +5,10 @@ import {
   projectSchemaIsRegistered,
   resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server-capabilities-code-completion';
+import {
+  getNxCloudTerminalOutput,
+  getRecentCIPEData,
+} from '@nx-console/shared-nx-cloud';
 import { getDefinition } from '@nx-console/language-server-capabilities-definition';
 import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
 import { getHover } from '@nx-console/language-server-capabilities-hover';
@@ -12,6 +16,7 @@ import {
   NxChangeWorkspace,
   NxCloudOnboardingInfoRequest,
   NxCloudStatusRequest,
+  NxCloudTerminalOutputRequest,
   NxCreateProjectGraphRequest,
   NxGeneratorContextV2Request,
   NxGeneratorOptionsRequest,
@@ -61,7 +66,6 @@ import {
   getProjectFolderTree,
   getProjectGraphOutput,
   getProjectsByPaths,
-  getRecentCIPEData,
   getSourceMapFilesToProjectsMap,
   getStartupMessage,
   getTargetsForConfigFile,
@@ -533,8 +537,25 @@ connection.onRequest(NxRecentCIPEDataRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  return await getRecentCIPEData(WORKING_PATH);
+  return await getRecentCIPEData(WORKING_PATH, lspLogger);
 });
+
+connection.onRequest(
+  NxCloudTerminalOutputRequest,
+  async (args: {
+    ciPipelineExecutionId?: string;
+    taskId: string;
+    linkId?: string;
+  }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path',
+      );
+    }
+    return getNxCloudTerminalOutput(args, WORKING_PATH, lspLogger);
+  },
+);
 
 connection.onRequest(
   NxParseTargetStringRequest,

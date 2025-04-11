@@ -3,6 +3,8 @@ import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
+import { findMatchingProject } from '@nx-console/shared-npm';
+import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { IdeCallbackMessage } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
@@ -11,12 +13,14 @@ import {
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { getNxMcpPort, vscodeLogger } from '@nx-console/vscode-utils';
-import { commands } from 'vscode';
-import express from 'express';
-import { window } from 'vscode';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { findMatchingProject } from '@nx-console/shared-npm';
+import {
+  getGitDiffs,
+  getNxMcpPort,
+  vscodeLogger,
+} from '@nx-console/vscode-utils';
+import express from 'express';
+import { commands, window } from 'vscode';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -26,14 +30,19 @@ export interface McpServerReturn {
 
 let mcpServerReturn: McpServerReturn | undefined;
 
-export function tryStartMcpServer(workspacePath: string) {
+export async function tryStartMcpServer(workspacePath: string) {
   const port = getNxMcpPort();
   if (!port) {
     return;
   }
+
   const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
     nxWorkspace: async (_, __, reset) => await getNxWorkspace(reset),
     getGenerators: async (_, options) => await getGenerators(options),
+    getGitDiffs: async (workspacePath, baseSha, headSha) => {
+      return getGitDiffs(workspacePath, baseSha, headSha);
+    },
+    isNxCloudEnabled: await isNxCloudUsed(workspacePath, vscodeLogger),
   };
   const server = new NxMcpServerWrapper(
     workspacePath,
@@ -67,7 +76,7 @@ export function tryStartMcpServer(workspacePath: string) {
 
 export async function restartMcpServer() {
   stopMcpServer();
-  tryStartMcpServer(getNxWorkspacePath());
+  await tryStartMcpServer(getNxWorkspacePath());
 }
 
 export function stopMcpServer() {

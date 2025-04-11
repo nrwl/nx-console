@@ -9,6 +9,9 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../../shared/nx-cloud/tsconfig.lib.json"
+    },
+    {
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {

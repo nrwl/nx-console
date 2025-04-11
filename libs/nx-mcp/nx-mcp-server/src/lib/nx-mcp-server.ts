@@ -33,6 +33,7 @@ import {
 import { gte, NxVersion } from '@nx-console/nx-version';
 import { join } from 'path';
 import { readFile } from 'fs/promises';
+import { registerNxCloudTools } from './tools/nx-cloud';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -45,6 +46,12 @@ export interface NxWorkspaceInfoProvider {
     options?: NxGeneratorsRequestOptions,
     logger?: Logger,
   ) => Promise<GeneratorCollectionInfo[] | undefined>;
+  getGitDiffs: (
+    workspacePath: string,
+    baseSha?: string,
+    headSha?: string,
+  ) => Promise<{ path: string; diffContent: string }[] | null>;
+  isNxCloudEnabled: boolean;
 }
 
 export class NxMcpServerWrapper {
@@ -238,6 +245,16 @@ export class NxMcpServerWrapper {
 
     if (this._nxWorkspacePath) {
       this.registerWorkspaceTools();
+
+      if (this.nxWorkspaceInfoProvider.isNxCloudEnabled) {
+        registerNxCloudTools(
+          this._nxWorkspacePath,
+          this.server,
+          this.logger,
+          this.telemetry,
+          this.nxWorkspaceInfoProvider.getGitDiffs,
+        );
+      }
     }
 
     if (this.ideCallback) {

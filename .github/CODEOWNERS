@@ -82,13 +82,13 @@
 
 /libs/intellij/models/ @MaxKless
 
+/libs/shared/nx-cloud/ @MaxKless
+
 /apps/generate-ui-v2/ @MaxKless
 
 /libs/vscode/copilot/ @MaxKless
 
 /libs/vscode/nvm-tip/ @MaxKless
-
-/libs/vscode/cursor/ @MaxKless
 
 /libs/shared/schema/ @MaxKless
 
@@ -101,6 +101,8 @@
 /libs/vscode/tasks/ @MaxKless
 
 /libs/vscode/utils/ @MaxKless
+
+/libs/vscode/mcp/ @MaxKless
 
 /libs/shared/npm/ @MaxKless
 

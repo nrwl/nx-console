@@ -1,7 +1,5 @@
 import {
   findNxPackagePath,
-  getNxAccessToken,
-  getNxCloudUrl,
   importWorkspaceDependency,
 } from '@nx-console/shared-npm';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
@@ -27,6 +25,7 @@ import { join } from 'path';
 import { isDeepStrictEqual } from 'util';
 import { ActorRef, EventObject } from 'xstate';
 import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
+import { getNxAccessToken, getNxCloudUrl } from '@nx-console/shared-nx-cloud';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -40,11 +39,11 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
   constructor(
     private extensionContext: ExtensionContext,
-    private actor: ActorRef<any, EventObject>
+    private actor: ActorRef<any, EventObject>,
   ) {
     this._webviewSourceUri = Uri.joinPath(
       this.extensionContext.extensionUri,
-      'nx-cloud-onboarding-webview'
+      'nx-cloud-onboarding-webview',
     );
 
     this.ensureStateSubscription();
@@ -53,7 +52,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
   async resolveWebviewView(
     webviewView: WebviewView,
     context: WebviewViewResolveContext,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<void> {
     this.ensureStateSubscription();
 
@@ -66,7 +65,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
     webviewView.webview.html = this.getWebviewContent(
       webviewView,
-      this.onboardingInfo
+      this.onboardingInfo,
     );
 
     webviewView.webview.onDidReceiveMessage((event) => {
@@ -82,7 +81,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
     if (this._view) {
       this._view.webview.html = this.getWebviewContent(
         this._view,
-        this.onboardingInfo
+        this.onboardingInfo,
       );
     }
   }
@@ -114,7 +113,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         getTelemetry().logUsage('cloud.show-affected-docs');
         commands.executeCommand(
           'vscode.open',
-          Uri.parse('https://nx.dev/ci/features/affected?utm_source=nxconsole')
+          Uri.parse('https://nx.dev/ci/features/affected?utm_source=nxconsole'),
         );
         break;
       }
@@ -130,10 +129,10 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
   private getWebviewContent(
     webviewView: WebviewView,
-    cloudOnboardingInfo: CloudOnboardingInfo | undefined
+    cloudOnboardingInfo: CloudOnboardingInfo | undefined,
   ) {
     const webviewScriptUri = webviewView.webview.asWebviewUri(
-      Uri.joinPath(this._webviewSourceUri, 'main.js')
+      Uri.joinPath(this._webviewSourceUri, 'main.js'),
     );
 
     const codiconsUri = webviewView.webview.asWebviewUri(
@@ -142,8 +141,8 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         '@vscode',
         'codicons',
         'dist',
-        'codicon.css'
-      )
+        'codicon.css',
+      ),
     );
 
     const vscodeElementsUri = webviewView.webview.asWebviewUri(
@@ -153,14 +152,14 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
         '@vscode-elements',
         'elements',
         'dist',
-        'bundled.js'
-      )
+        'bundled.js',
+      ),
     );
 
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
-				
+
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${codiconsUri}" rel="stylesheet">
 
@@ -173,7 +172,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
 				<root-element cloudOnboardingInfo='${JSON.stringify(
-          cloudOnboardingInfo
+          cloudOnboardingInfo,
         )}'></root-element>
 			</body>
 			</html>`;
@@ -204,17 +203,17 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
   static create(
     extensionContext: ExtensionContext,
-    actor: ActorRef<any, EventObject>
+    actor: ActorRef<any, EventObject>,
   ) {
     const onboardingProvider = new CloudOnboardingViewProvider(
       extensionContext,
-      actor
+      actor,
     );
     extensionContext.subscriptions.push(
       window.registerWebviewViewProvider(
         CloudOnboardingViewProvider.viewId,
-        onboardingProvider
-      )
+        onboardingProvider,
+      ),
     );
   }
 }
@@ -236,7 +235,7 @@ async function finishCloudSetup() {
   await withTimeout(async () => {
     const importPath = await findNxPackagePath(
       workspacePath,
-      join('src', 'nx-cloud', 'utilities', 'url-shorten.js')
+      join('src', 'nx-cloud', 'utilities', 'url-shorten.js'),
     );
 
     const nxPackage = importPath
@@ -247,7 +246,7 @@ async function finishCloudSetup() {
     if (nxPackage && nxPackage.createNxCloudOnboardingURL) {
       url = await nxPackage.createNxCloudOnboardingURL(
         'nx-console',
-        accessToken
+        accessToken,
       );
     } else {
       url = await createNxCloudOnboardingURL(accessToken);
