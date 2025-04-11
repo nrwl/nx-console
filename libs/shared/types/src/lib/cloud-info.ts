@@ -42,6 +42,7 @@ export type CIPERun = {
   executionId?: string;
   command: string;
   status?: CIPEExecutionStatus;
+  failedTasks?: string[];
   numFailedTasks?: number;
   numTasks?: number;
   runUrl: string;

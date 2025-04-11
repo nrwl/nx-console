@@ -82,6 +82,8 @@
 
 /libs/intellij/models/ @MaxKless
 
+/libs/shared/nx-cloud/ @MaxKless
+
 /apps/generate-ui-v2/ @MaxKless
 
 /libs/vscode/copilot/ @MaxKless

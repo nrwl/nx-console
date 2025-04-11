@@ -164,6 +164,9 @@
     },
     {
       "path": "./libs/vscode/typescript-import-plugin"
+    },
+    {
+      "path": "./libs/shared/nx-cloud"
     }
   ]
 }

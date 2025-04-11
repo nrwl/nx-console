@@ -2,14 +2,15 @@ import { CIPEInfo } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { commands, window } from 'vscode';
+import { isInCursor } from '@nx-console/vscode-utils';
+import { commands, env, window } from 'vscode';
 
 export function compareCIPEDataAndSendNotification(
   oldInfo: CIPEInfo[] | null,
-  newInfo: CIPEInfo[]
+  newInfo: CIPEInfo[],
 ) {
   const nxCloudNotificationsSetting = GlobalConfigurationStore.instance.get(
-    'nxCloudNotifications'
+    'nxCloudNotifications',
   );
 
   if (nxCloudNotificationsSetting === 'none') {
@@ -27,7 +28,7 @@ export function compareCIPEDataAndSendNotification(
   newInfo.forEach((newCIPE) => {
     const oldCIPE = oldInfo.find(
       (oldCIPE) =>
-        newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId
+        newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId,
     );
 
     const newCipeIsSucceeded = newCIPE.status === 'SUCCEEDED';
@@ -37,7 +38,7 @@ export function compareCIPEDataAndSendNotification(
       .find(
         (run) =>
           (run.status && isFailedStatus(run.status)) ||
-          (run.numFailedTasks && run.numFailedTasks > 0)
+          (run.numFailedTasks && run.numFailedTasks > 0),
       );
 
     const oldCIPEFailedRun = oldCIPE?.runGroups
@@ -45,7 +46,7 @@ export function compareCIPEDataAndSendNotification(
       .find(
         (run) =>
           (run.status && isFailedStatus(run.status)) ||
-          (run.numFailedTasks && run.numFailedTasks > 0)
+          (run.numFailedTasks && run.numFailedTasks > 0),
       );
 
     // if the cipe has completed somehow or had a failed run before the latest update,
@@ -59,7 +60,7 @@ export function compareCIPEDataAndSendNotification(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
-        'error'
+        'error',
       );
     } else if (newCIPEFailedRun) {
       const command =
@@ -70,13 +71,13 @@ export function compareCIPEDataAndSendNotification(
         `"${command}" has failed on #${newCIPE.branch}`,
         newCIPEFailedRun.runUrl,
         newCIPE.commitUrl,
-        'error'
+        'error',
       );
     } else if (newCipeIsSucceeded && nxCloudNotificationsSetting === 'all') {
       showMessageWithResultAndCommit(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
-        newCIPE.commitUrl
+        newCIPE.commitUrl,
       );
     }
   });
@@ -86,7 +87,7 @@ function showMessageWithResultAndCommit(
   message: string,
   resultUrl: string,
   commitUrl: string | undefined | null,
-  type: 'information' | 'error' = 'information'
+  type: 'information' | 'error' = 'information',
 ) {
   const telemetry = getTelemetry();
   telemetry.logUsage('cloud.show-cipe-notification');
@@ -95,9 +96,23 @@ function showMessageWithResultAndCommit(
       ? window.showInformationMessage
       : window.showErrorMessage;
 
-  const handleResults = (
-    selection: 'View Results' | 'View Commit' | undefined
-  ) => {
+  type MessageCommand =
+    | 'View Results'
+    | 'Help me fix this error'
+    | 'View Commit';
+  const messageCommands: MessageCommand[] = [];
+
+  // todo(cammisuli): once mcp is working with vscode, we can remove the isInCursor check
+  if (isInCursor() && type === 'error') {
+    messageCommands.push('Help me fix this error');
+  }
+  if (commitUrl) {
+    messageCommands.push('View Commit');
+  }
+
+  messageCommands.push('View Results');
+
+  const handleResults = async (selection: MessageCommand | undefined) => {
     if (selection === 'View Results') {
       telemetry.logUsage('cloud.view-cipe', {
         source: 'notification',
@@ -108,11 +123,13 @@ function showMessageWithResultAndCommit(
         source: 'notification',
       });
       commands.executeCommand('vscode.open', commitUrl);
+    } else if (selection === 'Help me fix this error') {
+      telemetry.logUsage('cloud.fix-cipe-error', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.helpMeFixCipeError');
     }
   };
-  if (commitUrl) {
-    show(message, 'View Results', 'View Commit').then(handleResults);
-  } else {
-    show(message, 'View Results').then(handleResults);
-  }
+
+  show(message, ...messageCommands).then(handleResults);
 }

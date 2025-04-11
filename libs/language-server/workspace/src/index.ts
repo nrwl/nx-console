@@ -12,5 +12,4 @@ export * from './lib/nx-stop-daemon';
 export * from './lib/get-nx-cloud-status';
 export * from './lib/get-cloud-onboarding-info';
 export * from './lib/get-pdv-data';
-export * from './lib/get-recent-cipe-data';
 export * from './lib/parse-target-string';

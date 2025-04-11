@@ -1,4 +1,3 @@
-import { readNxJson } from '@nx-console/shared-npm';
 import {
   DocsPageSection,
   getDocsContext as getSharedDocsContext,
@@ -14,6 +13,7 @@ import {
   MarkdownString,
 } from 'vscode';
 import { chatResponseToString } from './prompts/history';
+import { readNxJson } from '@nx-console/shared-npm';
 
 export async function getProjectGraph(
   stream: ChatResponseStream,

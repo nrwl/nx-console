@@ -7,6 +7,9 @@
       "path": "../../../shared/schema"
     },
     {
+      "path": "../../workspace"
+    },
+    {
       "path": "../../../shared/npm"
     },
     {
@@ -14,9 +17,6 @@
     },
     {
       "path": "../../../shared/types"
-    },
-    {
-      "path": "../../workspace"
     },
     {
       "path": "../../../shared/json-schema"

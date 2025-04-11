@@ -209,3 +209,9 @@ export const NxParseTargetStringRequest: RequestType<
   Target | undefined,
   unknown
 > = new RequestType('nx/parseTargetString');
+
+export const NxCloudTerminalOutputRequest: RequestType<
+  { ciPipelineExecutionId?: string; linkId?: string; taskId: string },
+  { terminalOutput?: string; error?: string },
+  unknown
+> = new RequestType('nx/cloudTerminalOutput');

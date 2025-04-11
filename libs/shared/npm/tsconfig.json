@@ -7,10 +7,10 @@
       "path": "../nx-version"
     },
     {
-      "path": "../utils"
+      "path": "../types"
     },
     {
-      "path": "../types"
+      "path": "../utils"
     },
     {
       "path": "../file-system"

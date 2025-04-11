@@ -206,6 +206,16 @@
           "group": "inline@1"
         },
         {
+          "command": "nxCloud.explainCipeTaskFailure",
+          "when": "view == nxCloudRecentCIPE && viewItem == failedTask && github.copilot-chat.activated",
+          "group": "inline@1"
+        },
+        {
+          "command": "nxCloud.helpMeFixCipeError",
+          "when": "view == nxCloudRecentCIPE && viewItem == failedTask && isInCursor",
+          "group": "inline@1"
+        },
+        {
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
@@ -313,6 +323,14 @@
           "when": "false"
         },
         {
+          "command": "nxCloud.explainCipeTaskFailure",
+          "when": "false"
+        },
+        {
+          "command": "nxCloud.helpMeFixCipeError",
+          "when": "false"
+        },
+        {
           "command": "nx.run-many",
           "when": "isNxWorkspace"
         },
@@ -413,6 +431,10 @@
           {
             "name": "generate",
             "description": "Run Nx generators"
+          },
+          {
+            "name": "explain-cipe",
+            "description": "Explain the CI pipeline execution failure"
           }
         ],
         "disambiguation": [
@@ -433,6 +455,50 @@
       }
     ],
     "languageModelTools": [
+      {
+        "name": "nx_cipe-details",
+        "canBeReferencedInPrompt": false,
+        "displayName": "CI Pipeline Execution Detail Extractor",
+        "tags": [
+          "nx"
+        ],
+        "toolReferenceName": "nxCipeDetails",
+        "modelDescription": "Extracts runId and taskId from a users prompt",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "linkId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The link ID of the CI pipeline."
+            },
+            "executionId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "The execution ID of the CI pipeline."
+            },
+            "taskId": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "An error message if the runId or taskId cannot be determined, or null if they can be determined."
+            }
+          },
+          "required": [
+            "runId",
+            "taskId",
+            "error"
+          ]
+        }
+      },
       {
         "name": "nx_generator-details",
         "tags": [
@@ -780,6 +846,19 @@
         "icon": "$(cloud)"
       },
       {
+        "title": "Explain CIPE Task Failure",
+        "command": "nxCloud.explainCipeTaskFailure",
+        "icon": "$(copilot)"
+      },
+      {
+        "title": "Help me fix the latest CIPE error",
+        "command": "nxCloud.helpMeFixCipeError",
+        "icon": {
+          "dark": "assets/cursor-dark.svg",
+          "light": "assets/cursor-light.svg"
+        }
+      },
+      {
         "category": "Nx",
         "title": "Show Nx Errors in Problems View",
         "command": "nxConsole.showProblems",
@@ -1107,5 +1186,8 @@
         }
       ]
     }
-  }
+  },
+  "extensionDependencies": [
+    "vscode.git"
+  ]
 }

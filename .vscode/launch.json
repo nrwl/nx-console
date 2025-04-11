@@ -8,7 +8,6 @@
     {
       "name": "Launch Extension",
       "args": [
-        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
       "outFiles": [
@@ -17,16 +16,10 @@
         "${workspaceFolder}/node_modules"
       ],
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**",
-        "/Applications/Visual Studio Code.app/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "type": "extensionHost",
-      "enableTurboSourcemaps": true,
-      "resolveSourceMapLocations": [
-        "${workspaceFolder}/**",
-        "!**/node_modules/**"
-      ]
+      "sourceMaps": true,
+      "resolveSourceMapLocations": null
     },
     {
       "name": "Launch Extension (with other extensions)",

@@ -9,6 +9,9 @@ jest.mock('vscode', () => ({
     showInformationMessage: jest.fn().mockResolvedValue(undefined),
     showErrorMessage: jest.fn().mockResolvedValue(undefined),
   },
+  env: {
+    appName: 'vscode',
+  },
   commands: {
     executeCommand: jest.fn(),
   },
@@ -27,7 +30,7 @@ describe('CIPE Notifications', () => {
         //nx-ignore-next-line
         require('@nx-console/vscode-configuration').GlobalConfigurationStore, // eslint-disable-line @typescript-eslint/no-var-requires
         'instance',
-        'get'
+        'get',
       )
       .mockReturnValue({
         get: globalConfigMock,
@@ -157,27 +160,27 @@ describe('CIPE Notifications', () => {
 
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.success
+        pipelineExamples.success,
       );
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.fail
+        pipelineExamples.fail,
       );
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.progressFailedRun
+        pipelineExamples.progressFailedRun,
       );
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.success
+        pipelineExamples.success,
       );
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.fail
+        pipelineExamples.fail,
       );
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.progressFailedRun
+        pipelineExamples.progressFailedRun,
       );
 
       expect(window.showInformationMessage).not.toHaveBeenCalled();
@@ -187,7 +190,7 @@ describe('CIPE Notifications', () => {
     const cases: [
       PipelineExamples | null,
       PipelineExamples,
-      NotificationResults
+      NotificationResults,
     ][] = [
       [null, 'progress', 'no'],
       [null, 'success', 'no'],
@@ -221,7 +224,7 @@ describe('CIPE Notifications', () => {
       (
         oldInfo: PipelineExamples | null,
         newInfo: PipelineExamples,
-        result: NotificationResults
+        result: NotificationResults,
       ) => {
         const oldPipeline = oldInfo ? pipelineExamples[oldInfo] : null;
         const newPipeline = pipelineExamples[newInfo];
@@ -236,18 +239,18 @@ describe('CIPE Notifications', () => {
           expect(window.showErrorMessage).not.toHaveBeenCalled();
           expect(window.showInformationMessage).not.toHaveBeenCalled();
         }
-      }
+      },
     );
 
     it('should not show success notifications when setting is "error"', () => {
       globalConfigMock.mockReturnValue('error');
       compareCIPEDataAndSendNotification(
         pipelineExamples.empty,
-        pipelineExamples.success
+        pipelineExamples.success,
       );
       compareCIPEDataAndSendNotification(
         pipelineExamples.progress,
-        pipelineExamples.success
+        pipelineExamples.success,
       );
       expect(window.showInformationMessage).not.toHaveBeenCalled();
       expect(window.showErrorMessage).not.toHaveBeenCalled();

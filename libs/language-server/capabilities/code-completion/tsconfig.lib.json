@@ -11,6 +11,9 @@
       "path": "../../../shared/schema/tsconfig.lib.json"
     },
     {
+      "path": "../../workspace/tsconfig.lib.json"
+    },
+    {
       "path": "../../../shared/npm/tsconfig.lib.json"
     },
     {
@@ -18,9 +21,6 @@
     },
     {
       "path": "../../../shared/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../workspace/tsconfig.lib.json"
     },
     {
       "path": "../../../shared/json-schema/tsconfig.lib.json"

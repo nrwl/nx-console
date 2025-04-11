@@ -7,10 +7,10 @@
       "path": "../utils"
     },
     {
-      "path": "../../shared/utils"
+      "path": "../output-channels"
     },
     {
-      "path": "../output-channels"
+      "path": "../../shared/utils"
     },
     {
       "path": "../../language-server/types"

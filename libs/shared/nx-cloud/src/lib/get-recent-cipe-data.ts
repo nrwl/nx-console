@@ -1,20 +1,21 @@
-import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
-import {
-  getNxAccessToken,
-  getNxCloudId,
-  getNxCloudUrl,
-} from '@nx-console/shared-npm';
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { execSync } from 'child_process';
 import { xhr } from 'request-light';
-import { getNxCloudConfigIni } from './get-cloud-onboarding-info';
+import { isNxCloudUsed } from './is-nx-cloud-used';
 
-export async function getRecentCIPEData(workspacePath: string): Promise<{
+import { Logger } from '@nx-console/shared-utils';
+import { getNxCloudUrl } from './cloud-ids';
+import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+
+export async function getRecentCIPEData(
+  workspacePath: string,
+  logger: Logger,
+): Promise<{
   info?: CIPEInfo[];
   error?: CIPEInfoError;
   workspaceUrl?: string;
 }> {
-  if (!(await isNxCloudUsed(workspacePath))) {
+  if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
       error: {
         type: 'other',
@@ -25,35 +26,18 @@ export async function getRecentCIPEData(workspacePath: string): Promise<{
 
   const branches = getRecentlyCommittedGitBranches(workspacePath);
 
-  const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const nxCloudId = await getNxCloudId(workspacePath);
-  const nxCloudConfigIni = getNxCloudConfigIni();
-
-  const personalAccessToken =
-    nxCloudConfigIni?.[nxCloudUrl]?.personalAccessToken;
-
   const data = JSON.stringify({
     branches: branches.map((branch) => branch.name),
   });
-
+  const nxCloudUrl = await getNxCloudUrl(workspacePath);
   const url = `${nxCloudUrl}/nx-cloud/nx-console/ci-pipeline-executions`;
+
   const headers: any = {
     'Content-Type': 'application/json',
+    ...(await nxCloudAuthHeaders(workspacePath)),
   };
 
-  if (nxCloudId) {
-    headers['Nx-Cloud-Id'] = nxCloudId;
-  }
-  if (personalAccessToken) {
-    headers['Nx-Cloud-Personal-Access-Token'] = personalAccessToken;
-  }
-
-  const accessToken = await getNxAccessToken(workspacePath);
-  if (accessToken) {
-    headers['Authorization'] = accessToken;
-  }
-
-  lspLogger.log(`Making recent CIPE request`);
+  logger.log(`Making recent CIPE request`);
   try {
     const response = await xhr({
       type: 'POST',
@@ -72,7 +56,7 @@ export async function getRecentCIPEData(workspacePath: string): Promise<{
     };
   } catch (e) {
     if (e.status === 401) {
-      lspLogger.log(`Authentication error: ${e.responseText}`);
+      logger.log(`Authentication error: ${e.responseText}`);
       return {
         error: {
           type: 'authentication',
@@ -80,7 +64,7 @@ export async function getRecentCIPEData(workspacePath: string): Promise<{
         },
       };
     }
-    lspLogger.log(`Error: ${JSON.stringify(e)}`);
+    logger.log(`Error: ${JSON.stringify(e)}`);
     return {
       error: {
         type: 'other',
@@ -91,12 +75,12 @@ export async function getRecentCIPEData(workspacePath: string): Promise<{
 }
 
 function getRecentlyCommittedGitBranches(
-  workspacePath: string
+  workspacePath: string,
 ): { name: string; time: string }[] {
   try {
     const localUserEmail = execSync('git config user.email').toString().trim();
     const oneWeekAgo = new Date(
-      Date.now() - 60 * 60 * 24 * 7 * 1000
+      Date.now() - 60 * 60 * 24 * 7 * 1000,
     ).toISOString();
     const defaultBranch = getDefaultBranch(workspacePath);
 
@@ -104,7 +88,7 @@ function getRecentlyCommittedGitBranches(
       'git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname) - %(committerdate:iso-strict) - %(authoremail)"',
       {
         cwd: workspacePath,
-      }
+      },
     ).toString();
 
     const branches = res
@@ -141,7 +125,7 @@ export function getDefaultBranch(workspacePath: string) {
       {
         cwd: workspacePath,
         stdio: 'pipe',
-      }
+      },
     )
       .toString()
       .trim();
