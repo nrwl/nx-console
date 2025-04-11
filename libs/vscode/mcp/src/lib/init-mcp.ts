@@ -15,6 +15,7 @@ import {
   commands,
   ExtensionContext,
   FileSystemWatcher,
+  Uri,
   window,
   workspace,
 } from 'vscode';
@@ -28,7 +29,7 @@ const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
 
-export async function initCursor(context: ExtensionContext) {
+export async function initMcp(context: ExtensionContext) {
   if (hasInitializedMcp) {
     return;
   }
@@ -172,6 +173,9 @@ async function updateMcpJson() {
     window.showErrorMessage('Failed to write to mcp.json');
     return false;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  commands.executeCommand('vscode.open', Uri.file(getMcpJsonPath()!));
 
   return true;
 }

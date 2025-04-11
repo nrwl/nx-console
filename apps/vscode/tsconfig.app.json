@@ -67,7 +67,7 @@
       "path": "../../libs/shared/file-system/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/cursor/tsconfig.lib.json"
+      "path": "../../libs/vscode/mcp/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/utils/tsconfig.lib.json"

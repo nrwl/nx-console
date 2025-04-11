@@ -90,8 +90,6 @@
 
 /libs/vscode/nvm-tip/ @MaxKless
 
-/libs/vscode/cursor/ @MaxKless
-
 /libs/shared/schema/ @MaxKless
 
 /libs/vscode/verify/ @MaxKless
@@ -103,6 +101,8 @@
 /libs/vscode/tasks/ @MaxKless
 
 /libs/vscode/utils/ @MaxKless
+
+/libs/vscode/mcp/ @MaxKless
 
 /libs/shared/npm/ @MaxKless
 
