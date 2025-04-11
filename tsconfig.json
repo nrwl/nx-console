@@ -160,7 +160,7 @@
       "path": "./libs/nx-mcp/nx-mcp-server"
     },
     {
-      "path": "./libs/vscode/cursor"
+      "path": "./libs/vscode/mcp"
     },
     {
       "path": "./libs/vscode/typescript-import-plugin"

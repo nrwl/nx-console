@@ -4,7 +4,7 @@ import {
 } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import {
-  ensureCursorDirExists,
+  ensureEditorDirExists,
   getMcpJsonPath,
   getNxMcpPort,
   hasNxMcpEntry,
@@ -15,6 +15,7 @@ import {
   commands,
   ExtensionContext,
   FileSystemWatcher,
+  Uri,
   window,
   workspace,
 } from 'vscode';
@@ -26,22 +27,19 @@ import { isInCursor } from '@nx-console/vscode-utils';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
-let hasInitializedCursor = false;
+let hasInitializedMcp = false;
 
-export async function initCursor(context: ExtensionContext) {
-  if (hasInitializedCursor) {
+export async function initMcp(context: ExtensionContext) {
+  if (hasInitializedMcp) {
     return;
   }
-  if (!isInCursor()) {
-    commands.executeCommand('setContext', 'isInCursor', false);
-    return;
-  }
-  commands.executeCommand('setContext', 'isInCursor', true);
+
+  commands.executeCommand('setContext', 'isInCursor', isInCursor());
 
   if (!(await checkIsNxWorkspace(getNxWorkspacePath()))) {
     return;
   }
-  hasInitializedCursor = true;
+  hasInitializedMcp = true;
 
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
@@ -113,12 +111,12 @@ async function showMCPNotification() {
     return;
   }
 
+  const msg = isInCursor()
+    ? 'Improve Cursor Agents with Nx-specific context?'
+    : 'Improve Copilot Agents with Nx-specific context?';
+
   window
-    .showInformationMessage(
-      'Improve Cursor Agents with Nx-specific context?',
-      'Yes',
-      "Don't ask again",
-    )
+    .showInformationMessage(msg, 'Yes', "Don't ask again")
     .then((answer) => {
       if (answer === "Don't ask again") {
         WorkspaceConfigurationStore.instance.set(MCP_DONT_ASK_AGAIN_KEY, true);
@@ -131,7 +129,7 @@ async function showMCPNotification() {
 }
 
 async function updateMcpJson() {
-  if (!ensureCursorDirExists()) {
+  if (!ensureEditorDirExists()) {
     return false;
   }
 
@@ -149,20 +147,35 @@ async function updateMcpJson() {
     return false;
   }
 
-  const mcpJson = readMcpJson() || { mcpServers: {} };
+  const mcpJson =
+    readMcpJson() || (isInCursor() ? { mcpServers: {} } : { servers: {} });
 
-  if (!mcpJson.mcpServers) {
-    mcpJson.mcpServers = {};
+  if (isInCursor()) {
+    if (!mcpJson.mcpServers) {
+      mcpJson.mcpServers = {};
+    }
+
+    mcpJson.mcpServers['nx-mcp'] = {
+      url: `http://localhost:${port}/sse`,
+    };
+  } else {
+    if (!mcpJson.servers) {
+      mcpJson.servers = {};
+    }
+
+    mcpJson.servers['nx-mcp'] = {
+      type: 'sse',
+      url: `http://localhost:${port}/sse`,
+    };
   }
-
-  mcpJson.mcpServers['nx-mcp'] = {
-    url: `http://localhost:${port}/sse`,
-  };
 
   if (!writeMcpJson(mcpJson)) {
     window.showErrorMessage('Failed to write to mcp.json');
     return false;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  commands.executeCommand('vscode.open', Uri.file(getMcpJsonPath()!));
 
   return true;
 }

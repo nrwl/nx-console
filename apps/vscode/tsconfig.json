@@ -61,7 +61,7 @@
       "path": "../../libs/shared/file-system"
     },
     {
-      "path": "../../libs/vscode/cursor"
+      "path": "../../libs/vscode/mcp"
     },
     {
       "path": "../../libs/vscode/utils"

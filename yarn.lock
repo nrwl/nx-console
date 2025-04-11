@@ -2789,12 +2789,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx-console/cursor@workspace:libs/vscode/cursor":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/cursor@workspace:libs/vscode/cursor"
-  languageName: unknown
-  linkType: soft
-
 "@nx-console/language-server-capabilities-code-completion@workspace:libs/language-server/capabilities/code-completion":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-capabilities-code-completion@workspace:libs/language-server/capabilities/code-completion"
@@ -2840,6 +2834,12 @@ __metadata:
 "@nx-console/language-server-workspace@workspace:libs/language-server/workspace":
   version: 0.0.0-use.local
   resolution: "@nx-console/language-server-workspace@workspace:libs/language-server/workspace"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/mcp@workspace:libs/vscode/mcp":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/mcp@workspace:libs/vscode/mcp"
   languageName: unknown
   linkType: soft
 
