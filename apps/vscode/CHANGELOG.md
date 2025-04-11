@@ -1,3 +1,17 @@
+# [18.45.0](https://github.com/nrwl/nx-console/compare/vscode-v18.44.2...vscode-v18.45.0) (2025-04-11)
+
+
+### Bug Fixes
+
+* handle aliases and windows paths for getGeneratorSchema ([#2472](https://github.com/nrwl/nx-console/issues/2472)) ([ec2d480](https://github.com/nrwl/nx-console/commit/ec2d4800323b5ce5df033217db8cc285f060711f))
+* **vscode:** catch more errors when checking yarn version ([#2467](https://github.com/nrwl/nx-console/issues/2467)) ([04bad34](https://github.com/nrwl/nx-console/commit/04bad344e1a3193dc0af466dc56e3673bccc0a57))
+
+
+### Features
+
+* add mcp and copilot support for cipe details ([#2469](https://github.com/nrwl/nx-console/issues/2469)) ([47ea625](https://github.com/nrwl/nx-console/commit/47ea625098e659f720b318b3b8f8b29abff8ff93))
+* **vscode:** enable mcp support for vscode ([#2471](https://github.com/nrwl/nx-console/issues/2471)) ([77dfb46](https://github.com/nrwl/nx-console/commit/77dfb4692e67ec5183f2a61cd961d2f5e0732e46))
+
 ## [18.44.2](https://github.com/nrwl/nx-console/compare/vscode-v18.44.1...vscode-v18.44.2) (2025-04-01)
 
 
