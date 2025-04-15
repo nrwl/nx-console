@@ -123,13 +123,9 @@
           "dependentTasksOutputFiles": "**/*",
           "transitive": true
         },
-<<<<<<< HEAD
-        "{projectRoot}/package.json"
-=======
         "{projectRoot}/package.json",
         "{workspaceRoot}/dist/apps/nxls/**",
         "scripts"
->>>>>>> 91a33ac9 (feat: add migrate ui)
       ],
       "dependsOn": ["^build"],
       "cache": false

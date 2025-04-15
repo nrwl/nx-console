@@ -1,4 +1,4 @@
-import { html, LitElement, TemplateResult } from 'lit';
+import { html, LitElement, TemplateResult, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { MigrateViewData } from '@nx-console/shared-types';
@@ -6,6 +6,15 @@ import type { WebviewApi } from 'vscode-webview';
 
 @customElement('root-element')
 export class Root extends LitElement {
+  static override styles = css`
+    a {
+      color: var(--vscode-textLink-foreground);
+    }
+    a:hover {
+      color: var(--vscode-textLink-activeForeground);
+    }
+  `;
+
   @property({ converter: (value) => JSON.parse(value) })
   protected state:
     | 'default'

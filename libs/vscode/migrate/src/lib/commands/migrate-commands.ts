@@ -136,6 +136,7 @@ export async function cancelMigration() {
     .then(async (result) => {
       if (result === 'Abort migration') {
         execSync(`git reset --hard ${data.ref}`, { cwd: nxWorkspacePath });
+        execSync(`git clean -fd`, { cwd: nxWorkspacePath });
         const pm = await getPackageManagerCommand(nxWorkspacePath);
         commands.executeCommand('nxMigrate.close');
         window.withProgress(

@@ -37,18 +37,9 @@
       "path": "../../libs/language-server/types/tsconfig.lib.json"
     },
     {
-<<<<<<< HEAD
-=======
-      "path": "../../libs/vscode/cursor/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/vscode/migrate/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/copilot/tsconfig.lib.json"
-    },
-    {
->>>>>>> 91a33ac9 (feat: add migrate ui)
       "path": "../../libs/vscode/typescript-plugin/tsconfig.lib.json"
     },
     {
