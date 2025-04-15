@@ -29,6 +29,7 @@ import {
   ViewColumn,
   WebviewPanel,
   window,
+  workspace,
 } from 'vscode';
 import { fillWithGenerateUi } from './fill-with-generate-ui';
 
@@ -102,8 +103,8 @@ export class GenerateUiWebview {
             <meta charset="UTF-8">
             <title>Generate UI</title>
             <link href="${stylesUri}" rel="stylesheet">
-            <link 
-            href="${codiconsUri}" 
+            <link
+            href="${codiconsUri}"
             rel="stylesheet"
             id="vscode-codicon-stylesheet"
             >

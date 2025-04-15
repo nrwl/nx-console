@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-cloud"
-    },
-    {
       "path": "../tasks"
     },
     {
@@ -17,6 +14,9 @@
     },
     {
       "path": "../generate-ui-webview"
+    },
+    {
+      "path": "../../shared/nx-cloud"
     },
     {
       "path": "../../shared/llm-context"
