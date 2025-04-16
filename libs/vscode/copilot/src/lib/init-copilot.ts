@@ -166,22 +166,25 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
       NxCopilotPrompt | GeneratePrompt | FillGenerateUIPrompt
     >;
 
-  if (request.command === 'fill-generate-ui') {
-    const fillInfo = getFillWithGenerateUiService().getFillInfo();
-    const generators = await getGenerators();
-    const schema = await getGeneratorSchema(fillInfo.generatorName, generators);
+    if (request.command === 'fill-generate-ui') {
+      const fillInfo = getFillWithGenerateUiService().getFillInfo();
+      const generators = await getGenerators();
+      const schema = await getGeneratorSchema(
+        fillInfo.generatorName,
+        generators,
+      );
 
-    promptElementAndProps = {
-      promptElement: FillGenerateUIPrompt,
-      props: {
-        formValues: fillInfo.formValues,
-        generatorName: fillInfo.generatorName,
-        generatorSchema: schema,
-        ...baseProps,
-      },
-    };
-  } else if (request.command === 'generate' || intent === 'generate') {
-    stream.progress('Retrieving generator schemas...');
+      promptElementAndProps = {
+        promptElement: FillGenerateUIPrompt,
+        props: {
+          formValues: fillInfo.formValues,
+          generatorName: fillInfo.generatorName,
+          generatorSchema: schema,
+          ...baseProps,
+        },
+      };
+    } else if (request.command === 'generate' || intent === 'generate') {
+      stream.progress('Retrieving generator schemas...');
 
       promptElementAndProps = {
         promptElement: GeneratePrompt,
@@ -264,39 +267,39 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
       }
     }
 
-  if (codeBuffer === null && pendingText) {
-    if (request.command === 'fill-generate-ui') {
-      // we don't want to just output everything, instead we want to send code blocks back to the UI
-      if (pendingText.startsWith('```')) {
-        const codeBlockPattern = /^```(?:json)?\s*\n([\s\S]*?)\n```$/;
-        const trimmedText = pendingText.trim();
-        const match = trimmedText.match(codeBlockPattern);
-        if (match) {
-          const codeContent = match[1].trim();
-          try {
-            const parsed = JSON.parse(codeContent);
-            updateGenerateUIValues(parsed);
-            getFillWithGenerateUiService().clearFillInfo();
-            stream.markdown('Updated Generate UI \n');
-            const updatedValues = Object.entries(parsed);
-            if (updatedValues.length) {
-              const bulletList = updatedValues
-                .map(([key, value]) => `- ${key}: ${value}`)
-                .join('\n');
-              stream.markdown(bulletList);
+    if (codeBuffer === null && pendingText) {
+      if (request.command === 'fill-generate-ui') {
+        // we don't want to just output everything, instead we want to send code blocks back to the UI
+        if (pendingText.startsWith('```')) {
+          const codeBlockPattern = /^```(?:json)?\s*\n([\s\S]*?)\n```$/;
+          const trimmedText = pendingText.trim();
+          const match = trimmedText.match(codeBlockPattern);
+          if (match) {
+            const codeContent = match[1].trim();
+            try {
+              const parsed = JSON.parse(codeContent);
+              updateGenerateUIValues(parsed);
+              getFillWithGenerateUiService().clearFillInfo();
+              stream.markdown('Updated Generate UI \n');
+              const updatedValues = Object.entries(parsed);
+              if (updatedValues.length) {
+                const bulletList = updatedValues
+                  .map(([key, value]) => `- ${key}: ${value}`)
+                  .join('\n');
+                stream.markdown(bulletList);
+              }
+            } catch (error) {
+              stream.markdown(trimmedText);
+              return;
             }
-          } catch (error) {
+          } else {
             stream.markdown(trimmedText);
-            return;
           }
-        } else {
-          stream.markdown(trimmedText);
         }
+      } else {
+        stream.markdown(pendingText);
       }
-    } else {
-      stream.markdown(pendingText);
     }
-  }
 
     return await chatParticipantRequest.result;
   };
