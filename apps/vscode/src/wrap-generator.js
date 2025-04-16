@@ -7,8 +7,8 @@ const args = process.argv.slice(2);
 let generatorName = args[3] || 'unknown-generator';
 
 generatorName = generatorName.startsWith('@')
-  ? generatorName.substring(1).replace(/\//g, '-')
-  : generatorName.replace(/[@/]/g, '-');
+  ? generatorName.substring(1).replace(/[/:]/g, '-')
+  : generatorName.replace(/[@/:]/g, '-');
 
 let cacheDir = './.nx/workspace-data';
 try {
