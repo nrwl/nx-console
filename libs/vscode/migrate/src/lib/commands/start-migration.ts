@@ -68,10 +68,6 @@ export async function startMigration(custom = false) {
     command: 'migrate',
     positional: versionToMigrateTo,
     flags,
-    // TODO: remove this once actual version is released
-    env: {
-      NX_MIGRATE_CLI_VERSION: '0.0.0-pr-29720-06f67e5',
-    },
   });
   await tasks.executeTask(task);
 
