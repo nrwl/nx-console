@@ -145,7 +145,7 @@ export async function cancelMigration() {
             title: 'Installing original dependencies',
           },
           async () => {
-            execSync(`${pm.exec} install`, { cwd: nxWorkspacePath });
+            execSync(`${pm.install}`, { cwd: nxWorkspacePath });
             commands.executeCommand('nxMigrate.refresh');
           },
         );

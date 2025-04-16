@@ -54,6 +54,7 @@ export class Root extends LitElement {
           >
           <vscode-button
             icon="edit"
+            secondary
             style="padding-right: 0px; padding-left: 3px; display: flex; ${this
               .migrateViewData?.hasPendingChanges
               ? 'cursor: not-allowed;'
@@ -74,7 +75,7 @@ export class Root extends LitElement {
       return html` <p>You're up to date!</p> `;
     } else if (this.state['in-progress'] === 'default') {
       return html`
-        <p>Migration in progress...</p>
+        <p>Migration in progress. Continue in the Migrate UI.</p>
         <vscode-button
           @click="${() => this.vscodeApi.postMessage({ type: 'open' })}"
           >Open Migrate UI</vscode-button
@@ -83,28 +84,31 @@ export class Root extends LitElement {
     } else if (this.state['in-progress'] === 'pending-package-updates') {
       console.log('pending-package-updates');
 
-      return html`<p>Waiting for package updates to be confirmed...</p>
+      return html`<p>Updates were made to package.json. Please review them and confirm the changes.</p>
         <div style="display: flex; padding-bottom: 0.5rem;">
           <vscode-button
+            secondary
             style="width: 100%"
             @click="${() => this.vscodeApi.postMessage({ type: 'view-diff' })}"
-            >View diff</vscode-button
+            >View package.json changes</vscode-button
           >
         </div>
+        <p>If the changes look good, then confirm continue the migration.</p>
         <div style="display: flex; flex-direction: row; gap: 2px; width: 100%;">
           <vscode-button
-            icon="check"
-            style="flex-grow: 1;"
-            @click="${() =>
-              this.vscodeApi.postMessage({ type: 'confirm-changes' })}"
-            >Confirm</vscode-button
-          >
-          <vscode-button
+            secondary
             icon="close"
             style="flex-grow: 1;"
             @click="${() =>
               this.vscodeApi.postMessage({ type: 'cancel-migration' })}"
             >Cancel</vscode-button
+          >
+          <vscode-button
+            icon="check"
+            style="flex-grow: 1;"
+            @click="${() =>
+              this.vscodeApi.postMessage({ type: 'confirm-changes' })}"
+            >Yes, install and continue</vscode-button
           >
         </div> `;
     }

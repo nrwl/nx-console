@@ -136,7 +136,7 @@ export class MigrateWebview {
     const graphHtmlLocation = await getGraphHtmlLocation(this.context);
 
     if (!graphHtmlLocation) {
-      return '<div>CANNOT LOAD MIGRATE UI</div>';
+      return '<div>Migrate UI failed to load. Please create an issue at <a href="https://github.com/nrwl/nx-console/issues">https://github.com/nrwl/nx-console/issues</a>.</div>';
     }
 
     const initialData = this.getMigrateUIData();
