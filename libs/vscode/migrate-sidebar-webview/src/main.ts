@@ -84,7 +84,10 @@ export class Root extends LitElement {
     } else if (this.state['in-progress'] === 'pending-package-updates') {
       console.log('pending-package-updates');
 
-      return html`<p>Updates were made to package.json. Please review them and confirm the changes.</p>
+      return html`<p>
+          Updates were made to package.json. Please review them and confirm the
+          changes.
+        </p>
         <div style="display: flex; padding-bottom: 0.5rem;">
           <vscode-button
             secondary
