@@ -86,14 +86,19 @@
         "runtime": "node -p '`${process.platform}_${process.arch}`'"
       },
       "{workspaceRoot}/.env"
-    ]
+    ],
+    "scripts": ["{workspaceRoot}/tools/scripts/**"]
   },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
       "options": {
         "build": true
-      }
+      },
+      "exclude": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*"
+      ]
     },
     {
       "plugin": "@nx/eslint/plugin",
@@ -134,7 +139,23 @@
       }
     },
     "@nx/powerpack-enterprise-cloud",
-    "@nx/powerpack-owners"
+    "@nx/powerpack-owners",
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json"
+        }
+      }
+    }
   ],
   "sync": {
     "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],
