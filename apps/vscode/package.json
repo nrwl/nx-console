@@ -1208,16 +1208,16 @@
     "vscode.git"
   ],
   "dependencies": {
-    "@nx/nx-darwin-arm64": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-darwin-x64": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-freebsd-x64": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-linux-arm-gnueabihf": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-linux-arm64-gnu": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-linux-arm64-musl": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-linux-x64-gnu": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-linux-x64-musl": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-win32-arm64-msvc": "0.0.0-pr-30762-23d89a3",
-    "@nx/nx-win32-x64-msvc": "0.0.0-pr-30762-23d89a3",
-    "nx": "0.0.0-pr-30762-23d89a3"
+    "@nx/nx-darwin-arm64": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-darwin-x64": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-freebsd-x64": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-linux-arm-gnueabihf": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-linux-arm64-gnu": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-linux-arm64-musl": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-linux-x64-gnu": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-linux-x64-musl": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-win32-arm64-msvc": "21.0.0-canary.20250422-8619c1d ",
+    "@nx/nx-win32-x64-msvc": "21.0.0-canary.20250422-8619c1d ",
+    "nx": "21.0.0-canary.20250422-8619c1d "
   }
 }
