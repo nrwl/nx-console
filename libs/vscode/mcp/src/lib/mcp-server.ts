@@ -58,6 +58,24 @@ export async function tryStartMcpServer(workspacePath: string) {
     vscodeLogger.log('SSE connection established');
     transport = new SSEServerTransport('/messages', res);
     await server.getMcpServer().connect(transport);
+
+    // Set up a keep-alive interval to prevent timeout
+    const keepAliveInterval = setInterval(() => {
+      // Check if the connection is still open using the socket's writable state
+      if (!res.writableEnded && !res.writableFinished) {
+        // Send a heart beat
+        res.write(':beat\n\n');
+      } else {
+        clearInterval(keepAliveInterval);
+        vscodeLogger.log('SSE connection closed, clearing keep-alive interval');
+      }
+    }, 20000);
+
+    // Clean up interval if the client disconnects
+    req.on('close', () => {
+      clearInterval(keepAliveInterval);
+      vscodeLogger.log('SSE connection closed by client');
+    });
   });
 
   app.post('/messages', async (req, res) => {
