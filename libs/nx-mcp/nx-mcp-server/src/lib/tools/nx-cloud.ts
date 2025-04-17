@@ -21,7 +21,7 @@ export function registerNxCloudTools(
 ) {
   server.tool(
     'nx_cloud_cipe_details',
-    'Returns a list of CIPE (CI pipeline execution) details for the current workspace and branch from Nx Cloud. This includes the status, and execution ID or link ID. If there are failed tasks, it will also include the task ID.',
+    'Returns a list of CIPE (CI pipeline execution) details for the current workspace and branch from Nx Cloud. This includes the status, and execution ID or link ID. If there are failed tasks, it will also include the task ID. If this returns text that contains "canceled", that means that there were no failures, and additional help and details are not needed.',
     nxCloudCipeDetails(workspacePath, logger, telemetry),
   );
   server.tool(
@@ -63,7 +63,7 @@ const nxCloudCipeDetails =
       text: `Nx Cloud Workspace Url: ${recentData.workspaceUrl}`,
     });
 
-    if (recentData.info) {
+    if (recentData.info && recentData.info.length > 0) {
       content.push({
         type: 'text',
         text: `Recent CI Pipeline Executions:`,
@@ -79,14 +79,30 @@ const nxCloudCipeDetails =
             text: `  -- Run Group: ${runGroup.runGroup} (Run Group Status: ${runGroup.status})`,
           });
           for (const run of runGroup.runs) {
+            let runPrompt = '    --- Run';
+            if (run.executionId) {
+              runPrompt += ` Execution ID: ${run.executionId}`;
+            }
+            if (run.linkId) {
+              runPrompt += ` Link ID: ${run.linkId}`;
+            }
+
+            runPrompt += ` (Run Status: ${run.status})`;
+
             content.push({
               type: 'text',
-              text: `    --- Run LinkId: ${run.executionId ?? run.linkId} (Run Status: ${run.status})`,
+              text: runPrompt,
             });
             for (const task of run.failedTasks ?? []) {
               content.push({
                 type: 'text',
                 text: `      ---- Failed Task: ${task}`,
+              });
+            }
+            if (run.status === 'CANCELED') {
+              content.push({
+                type: 'text',
+                text: `      ---- Note: This run was canceled, indicating no failures occurred.`,
               });
             }
           }
@@ -108,11 +124,11 @@ const nxCloudFixCipeSchema = z.object({
   executionId: z
     .string()
     .optional()
-    .describe('The execution ID of the CI pipeline execution'),
+    .describe('The execution ID of the run in the CI pipeline execution'),
   linkId: z
     .string()
     .optional()
-    .describe('The link ID of the CI pipeline execution'),
+    .describe('The link ID of the run in the CI pipeline execution'),
   taskId: z
     .string()
     .describe(
