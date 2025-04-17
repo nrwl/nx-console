@@ -1,6 +1,5 @@
 import { html, LitElement, TemplateResult, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-
 import type { MigrateViewData } from '@nx-console/shared-types';
 import type { WebviewApi } from 'vscode-webview';
 
@@ -72,7 +71,7 @@ export class Root extends LitElement {
         </div>
       `;
     } else if (this.state === 'default') {
-      return html` <p>You're up to date!</p> `;
+      return html` <p>You're on the latest Nx version.</p> `;
     } else if (this.state['in-progress'] === 'default') {
       return html`
         <p>Migration in progress. Continue in the Migrate UI.</p>

@@ -182,7 +182,7 @@ export class MigrateWebview {
 
           // messages from the extension
           window.addEventListener('message', event => {
-            const message = event.data; 
+            const message = event.data;
             console.log('message', message);
             if(message.type === 'reload') {
               migrateService.send({
@@ -191,7 +191,7 @@ export class MigrateWebview {
               });
             }
           });
-            
+
         </script>
     </body>
     </html>`;
@@ -213,14 +213,14 @@ async function getGraphHtmlLocation(
 ): Promise<Uri | undefined> {
   const nxVersion = await getNxVersion();
 
-  // TODO: replace this with proper nx version check once released
   if (nxVersion && gte(nxVersion, '21.0.0')) {
+    // Graph UI is first released in v21.
     const graphBasePath = await getGraphBasePath();
-    if (!graphBasePath) {
-      return undefined;
+    if (graphBasePath) {
+      return Uri.file(graphBasePath);
     }
-    return Uri.file(graphBasePath);
   } else {
+    // Otherwise, use bundled version
     return Uri.joinPath(
       context.extensionUri,
       'node_modules',
