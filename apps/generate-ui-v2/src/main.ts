@@ -63,6 +63,16 @@ export class Root extends LitElement {
     document.body.removeChild(a);
   }
 
+  fillWithCopilot() {
+    this.icc.postMessageToIde({
+      payloadType: 'fill-with-copilot',
+      payload: {
+        generatorName: `${this.icc.generatorSchema?.collectionName}:${this.icc.generatorSchema?.generatorName}`,
+        formValues: this.formValuesService.getFormValues(),
+      },
+    });
+  }
+
   protected createRenderRoot() {
     return this;
   }
@@ -100,6 +110,20 @@ export class Root extends LitElement {
           </div>
 
           <div class="flex shrink-0">
+            ${when(
+              this.icc.editor === 'vscode' &&
+                this.icc.configuration?.hasCopilot,
+              () => html`
+                <button-element
+                  @click="${() => this.fillWithCopilot()}"
+                  title="Fill Generate UI with Copilot"
+                  appearance="icon"
+                  text="copilot"
+                  class="self-center py-2 pl-3"
+                >
+                </button-element>
+              `,
+            )}
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
               () => html`

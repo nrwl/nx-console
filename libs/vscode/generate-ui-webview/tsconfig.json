@@ -10,9 +10,6 @@
       "path": "../configuration"
     },
     {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
       "path": "../telemetry"
     },
     {
@@ -26,6 +23,9 @@
     },
     {
       "path": "../nx-cli-quickpicks"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
     },
     {
       "path": "./tsconfig.lib.json"

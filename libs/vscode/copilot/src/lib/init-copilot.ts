@@ -1,6 +1,10 @@
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
+import {
+  getFillWithGenerateUiService,
+  openGenerateUIPrefilled,
+  updateGenerateUIValues,
+} from '@nx-console/vscode-generate-ui-webview';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { sendChatParticipantRequest } from '@vscode/chat-extension-utils';
@@ -29,7 +33,10 @@ import { GeneratePrompt } from './prompts/generate-prompt';
 import { NxCopilotPrompt, NxCopilotPromptProps } from './prompts/prompt';
 import { GeneratorDetailsTool } from './tools/generator-details-tool';
 import yargs = require('yargs');
-import { getGeneratorNamesAndDescriptions } from '@nx-console/shared-llm-context';
+import {
+  getGeneratorNamesAndDescriptions,
+  getGeneratorSchema,
+} from '@nx-console/shared-llm-context';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { withTimeout } from '@nx-console/shared-utils';
 import { getGenerators } from '@nx-console/vscode-nx-workspace';
@@ -37,6 +44,10 @@ import { ProjectDetailsTool } from './tools/project-details-tool';
 import { VisualizeProjectGraphTool } from './tools/visualize-project-graph-tool';
 import { VisualizeTaskGraphTool } from './tools/visualize-task-graph-tool';
 import { explainCipe } from './commands/explain-cipe';
+import { AvailablePluginsTool } from './tools/available-plugins-tool';
+import { OpenGenerateUiTool } from './tools/open-generate-ui-tool';
+import { VisualizeFullProjectGraphTool } from './tools/visualize-full-project-graph-tool';
+import { FillGenerateUIPrompt } from './prompts/fill-generate-ui-prompt';
 
 export function initCopilot(context: ExtensionContext) {
   const telemetry = getTelemetry();
@@ -78,10 +89,16 @@ export function initCopilot(context: ExtensionContext) {
     lm.registerTool('nx_generator-details', new GeneratorDetailsTool()),
     lm.registerTool('nx_project-details', new ProjectDetailsTool()),
     lm.registerTool(
-      'nx_visualize_project_graph_project',
+      'nx_visualize-project-graph-project',
       new VisualizeProjectGraphTool(),
     ),
-    lm.registerTool('nx_visualize_task_graph', new VisualizeTaskGraphTool()),
+    lm.registerTool('nx_visualize-task-graph', new VisualizeTaskGraphTool()),
+    lm.registerTool('nx_available-plugins', new AvailablePluginsTool()),
+    lm.registerTool('nx_open-generate-ui', new OpenGenerateUiTool()),
+    lm.registerTool(
+      'nx_visualize-full-project-graph',
+      new VisualizeFullProjectGraphTool(),
+    ),
   );
 
   context.subscriptions.push(
@@ -146,10 +163,27 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
     };
 
     let promptElementAndProps: PromptElementAndProps<
-      NxCopilotPrompt | GeneratePrompt
+      NxCopilotPrompt | GeneratePrompt | FillGenerateUIPrompt
     >;
 
-    if (request.command === 'generate' || intent === 'generate') {
+    if (request.command === 'fill-generate-ui') {
+      const fillInfo = getFillWithGenerateUiService().getFillInfo();
+      const generators = await getGenerators();
+      const schema = await getGeneratorSchema(
+        fillInfo.generatorName,
+        generators,
+      );
+
+      promptElementAndProps = {
+        promptElement: FillGenerateUIPrompt,
+        props: {
+          formValues: fillInfo.formValues,
+          generatorName: fillInfo.generatorName,
+          generatorSchema: schema,
+          ...baseProps,
+        },
+      };
+    } else if (request.command === 'generate' || intent === 'generate') {
       stream.progress('Retrieving generator schemas...');
 
       promptElementAndProps = {
@@ -234,7 +268,37 @@ const handler: (context: ExtensionContext) => ChatRequestHandler =
     }
 
     if (codeBuffer === null && pendingText) {
-      stream.markdown(pendingText);
+      if (request.command === 'fill-generate-ui') {
+        // we don't want to just output everything, instead we want to send code blocks back to the UI
+        if (pendingText.startsWith('```')) {
+          const codeBlockPattern = /^```(?:json)?\s*\n([\s\S]*?)\n```$/;
+          const trimmedText = pendingText.trim();
+          const match = trimmedText.match(codeBlockPattern);
+          if (match) {
+            const codeContent = match[1].trim();
+            try {
+              const parsed = JSON.parse(codeContent);
+              updateGenerateUIValues(parsed);
+              getFillWithGenerateUiService().clearFillInfo();
+              stream.markdown('Updated Generate UI \n');
+              const updatedValues = Object.entries(parsed);
+              if (updatedValues.length) {
+                const bulletList = updatedValues
+                  .map(([key, value]) => `- ${key}: ${value}`)
+                  .join('\n');
+                stream.markdown(bulletList);
+              }
+            } catch (error) {
+              stream.markdown(trimmedText);
+              return;
+            }
+          } else {
+            stream.markdown(trimmedText);
+          }
+        }
+      } else {
+        stream.markdown(pendingText);
+      }
     }
 
     return await chatParticipantRequest.result;

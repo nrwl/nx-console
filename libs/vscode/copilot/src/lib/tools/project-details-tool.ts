@@ -48,7 +48,7 @@ export class ProjectDetailsTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: 'Reading project configuration...',
+      invocationMessage: 'Reading project configuration',
     };
   }
 }

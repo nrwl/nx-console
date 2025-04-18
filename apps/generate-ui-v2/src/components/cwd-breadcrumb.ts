@@ -7,14 +7,15 @@ import {
   intellijFieldPadding,
   intellijFocusRing,
 } from '../utils/ui-utils';
+import { FormValueSubscriber } from './fields/mixins/form-value-subscriber-mixin';
 
 const pathSeparator = window?.navigator?.userAgent?.includes('Win')
   ? '\\'
   : '/';
 
 @customElement('cwd-breadcrumb')
-export class CwdBreadcrumb extends GeneratorContextContext(
-  EditorContext(LitElement)
+export class CwdBreadcrumb extends FormValueSubscriber(
+  GeneratorContextContext(EditorContext(LitElement)),
 ) {
   @state() _path = '';
   @state() isEditable = false;
@@ -27,13 +28,34 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     return this._path;
   }
 
+  getFieldNameForSubscription(): string | undefined {
+    return 'cwd';
+  }
+
+  setFieldValue(value: any) {
+    console.log('setting cwd value', value);
+    this.path = value;
+  }
+
+  protected updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('generatorContext')) {
+      const prefillValue = this.generatorContext?.prefillValues?.cwd;
+      if (prefillValue) {
+        this.path = prefillValue;
+        this.dispatchValue();
+      }
+    }
+  }
+
   toggleEdit() {
     this.isEditable = !this.isEditable;
     if (this.isEditable) {
       setTimeout(() => {
         this.renderRoot
           .querySelector<HTMLInputElement>(
-            this.editor === 'vscode' ? 'vscode-textfield' : 'input'
+            this.editor === 'vscode' ? 'vscode-textfield' : 'input',
           )
           ?.focus();
       }, 0);
@@ -43,7 +65,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   confirmEdit() {
     this.path =
       this.renderRoot.querySelector(
-        this.editor === 'vscode' ? 'vscode-textfield' : 'input'
+        this.editor === 'vscode' ? 'vscode-textfield' : 'input',
       )?.value || '';
     this.isEditable = false;
     this.dispatchValue();
@@ -111,12 +133,12 @@ export class CwdBreadcrumb extends GeneratorContextContext(
                   ${index < pathArray.length - 1
                     ? html`<span class="mx-2">${pathSeparator}</span>`
                     : ''}
-                `
+                `,
               )}
               <button-element
                 @click="${this.toggleEdit}"
                 color="var(--muted-foreground-color)"
-                ?applyFillColor="false"
+                .applyFillColor=${false}
                 appearance="icon"
                 text="edit"
                 class="self-center"
@@ -160,25 +182,13 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     }
   }
 
-  protected updated(_changedProperties: Map<PropertyKey, unknown>): void {
-    super.updated(_changedProperties);
-
-    if (_changedProperties.has('generatorContext')) {
-      const prefillValue = this.generatorContext?.prefillValues?.cwd;
-      if (prefillValue) {
-        this.path = prefillValue;
-        this.dispatchValue();
-      }
-    }
-  }
-
   private dispatchValue() {
     this.dispatchEvent(
       new CustomEvent<string>('cwd-changed', {
         bubbles: true,
         composed: true,
         detail: this.path,
-      })
+      }),
     );
   }
 

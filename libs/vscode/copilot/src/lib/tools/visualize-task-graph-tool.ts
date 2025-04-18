@@ -1,5 +1,6 @@
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { getTaskGraphVisualizationMessage } from '@nx-console/shared-llm-context';
 import {
   CancellationToken,
   commands,
@@ -43,7 +44,7 @@ export class VisualizeTaskGraphTool
 
     return new LanguageModelToolResult([
       new LanguageModelTextPart(
-        `Opening the Nx task graph focused on task "${taskName}" for project "${projectName}". There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+        getTaskGraphVisualizationMessage(projectName, taskName),
       ),
     ]);
   }
@@ -53,7 +54,7 @@ export class VisualizeTaskGraphTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: `Opening task graph visualization for "${options.input.taskName}" in project "${options.input.projectName}"...`,
+      invocationMessage: `Opening task graph visualization for "${options.input.taskName}" in project "${options.input.projectName}"`,
     };
   }
 }

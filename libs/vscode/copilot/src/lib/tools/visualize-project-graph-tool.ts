@@ -1,5 +1,6 @@
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { getProjectGraphVisualizationMessage } from '@nx-console/shared-llm-context';
 import {
   CancellationToken,
   commands,
@@ -37,7 +38,7 @@ export class VisualizeProjectGraphTool
 
     return new LanguageModelToolResult([
       new LanguageModelTextPart(
-        `Opening the Nx project graph focused on project "${projectName}". There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.`,
+        getProjectGraphVisualizationMessage(projectName),
       ),
     ]);
   }
@@ -47,7 +48,7 @@ export class VisualizeProjectGraphTool
     token: CancellationToken,
   ): PreparedToolInvocation {
     return {
-      invocationMessage: `Opening project graph visualization for "${options.input.projectName}"...`,
+      invocationMessage: `Opening project graph visualization for "${options.input.projectName}"`,
     };
   }
 }

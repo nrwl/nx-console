@@ -13,7 +13,7 @@ import { selectFlags } from './select-flags';
 
 export async function selectGeneratorAndPromptForFlags(
   preselectedGenerator?: string,
-  preselectedFlags?: Record<string, string>
+  preselectedFlags?: Record<string, string>,
 ): Promise<
   | {
       generator: GeneratorSchema;
@@ -27,9 +27,8 @@ export async function selectGeneratorAndPromptForFlags(
     return;
   }
 
-  const selection: GeneratorSchema | undefined = await getOrSelectGenerator(
-    preselectedGenerator
-  );
+  const selection: GeneratorSchema | undefined =
+    await getOrSelectGenerator(preselectedGenerator);
 
   if (!selection) {
     return;
@@ -38,7 +37,7 @@ export async function selectGeneratorAndPromptForFlags(
   const flags = await selectFlags(
     `generate ${selection.collectionName}:${selection.generatorName}`,
     selection.options,
-    preselectedFlags
+    preselectedFlags,
   );
 
   if (!flags) {
@@ -52,7 +51,7 @@ export async function selectGeneratorAndPromptForFlags(
 }
 
 export async function getOrSelectGenerator(
-  generatorName?: string
+  generatorName?: string,
 ): Promise<GeneratorSchema | undefined> {
   if (generatorName) {
     const generatorInfo = {
@@ -62,7 +61,8 @@ export async function getOrSelectGenerator(
     const foundGenerator = ((await getGenerators()) ?? []).find(
       (gen) =>
         generatorInfo.collection === gen.data?.collection &&
-        generatorInfo.name === gen.data?.name
+        (generatorInfo.name === gen.data?.name ||
+          gen.data?.aliases?.includes(generatorInfo.name)),
     );
     if (foundGenerator) {
       const options = await getGeneratorOptions({
@@ -111,9 +111,9 @@ async function selectGenerator(): Promise<GeneratorSchema | undefined> {
         allowlist.find((rule) =>
           matchWithWildcards(
             `${item.generator.data?.collection}:${item.generator.data?.name}`,
-            rule
-          )
-        )
+            rule,
+          ),
+        ),
       );
     }
 
@@ -123,9 +123,9 @@ async function selectGenerator(): Promise<GeneratorSchema | undefined> {
           !blocklist.find((rule) =>
             matchWithWildcards(
               `${item.generator.data?.collection}:${item.generator.data?.name}`,
-              rule
-            )
-          )
+              rule,
+            ),
+          ),
       );
     }
   }

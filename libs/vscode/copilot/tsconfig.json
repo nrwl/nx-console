@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
       "path": "../../shared/schema"
     },
     {

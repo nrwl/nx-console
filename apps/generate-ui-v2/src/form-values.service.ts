@@ -18,7 +18,7 @@ import { Root } from './main';
 import { submittedContext } from './contexts/submitted-context';
 
 export const formValuesServiceContext = createContext<FormValuesService>(
-  Symbol('form-values')
+  Symbol('form-values'),
 );
 
 export class FormValuesService {
@@ -46,7 +46,7 @@ export class FormValuesService {
       (e: CustomEventInit<OptionChangedDetails>) => {
         if (!e.detail) return;
         this.handleOptionChange(e.detail);
-      }
+      },
     );
     window.addEventListener(
       'cwd-changed',
@@ -60,13 +60,13 @@ export class FormValuesService {
         ) {
           this.validationResults = await this.validate(
             this.formValues,
-            this.icc.generatorSchema
+            this.icc.generatorSchema,
           );
           if (Object.keys(this.validationResults).length === 0) {
             this.debouncedRunGenerator(true);
           }
         }
-      }
+      },
     );
   }
 
@@ -82,7 +82,7 @@ export class FormValuesService {
 
     this.validationResults = await this.validate(
       this.formValues,
-      this.icc.generatorSchema
+      this.icc.generatorSchema,
     );
 
     // notify consumers of changes
@@ -97,20 +97,20 @@ export class FormValuesService {
         }
       }
       this.touchedListeners[details.name]?.forEach((callback) =>
-        callback(true)
+        callback(true),
       );
     }
 
     if (this.defaultValueListeners[details.name]) {
       this.defaultValueListeners[details.name]?.forEach((callback) =>
-        callback(details.isDefaultValue)
+        callback(details.isDefaultValue),
       );
     }
   }
 
   private async validate(
     formValues: FormValues,
-    schema: GeneratorSchema | undefined
+    schema: GeneratorSchema | undefined,
   ): Promise<ValidationResults> {
     if (!schema) return {};
     const options = schema.options;
@@ -135,7 +135,7 @@ export class FormValuesService {
 
     const pluginValidationResults = await this.icc.getValidationResults(
       formValues,
-      schema
+      schema,
     );
 
     return { ...errors, ...pluginValidationResults };
@@ -160,7 +160,7 @@ export class FormValuesService {
 
   private debouncedRunGenerator = debounce(
     (dryRun: boolean) => this.runGenerator(dryRun),
-    500
+    500,
   );
 
   copyCommandToClipboard() {
@@ -171,7 +171,7 @@ export class FormValuesService {
       navigator.clipboard.writeText(command);
     } else {
       this.icc.postMessageToIde(
-        new GenerateUiCopyToClipboardOutputMessage(command)
+        new GenerateUiCopyToClipboardOutputMessage(command),
       );
     }
   }
@@ -184,7 +184,7 @@ export class FormValuesService {
     };
     Object.entries(formValues).forEach(([key, value]) => {
       const option = this.icc.generatorSchema?.options.find(
-        (option) => option.name === key
+        (option) => option.name === key,
       );
 
       const defaultValue = extractDefaultValue(option);
@@ -219,11 +219,13 @@ export class FormValuesService {
   private touchedListeners: Record<string, ((isTouched: boolean) => void)[]> =
     {};
 
+  private valueChangeListeners: Record<string, ((value: any) => void)[]> = {};
+
   private formValueListeners: ((formValues: FormValues) => void)[] = [];
 
   registerValidationListener(
     key: string,
-    listener: (value: string | boolean | undefined) => void
+    listener: (value: string | boolean | undefined) => void,
   ) {
     if (!this.validationListeners[key]) this.validationListeners[key] = [];
     this.validationListeners[key].push(listener);
@@ -231,7 +233,7 @@ export class FormValuesService {
 
   registerDefaultValueListener(
     key: string,
-    listener: (isDefault: boolean) => void
+    listener: (isDefault: boolean) => void,
   ) {
     if (!this.defaultValueListeners[key]) this.defaultValueListeners[key] = [];
     this.defaultValueListeners[key].push(listener);
@@ -242,7 +244,33 @@ export class FormValuesService {
     this.touchedListeners[key].push(listener);
   }
 
+  registerValueChangeListener(key: string, listener: (value: any) => void) {
+    if (!this.valueChangeListeners[key]) this.valueChangeListeners[key] = [];
+    this.valueChangeListeners[key].push(listener);
+  }
+
   registerFormValueListener(listener: (formValues: FormValues) => void) {
     this.formValueListeners.push(listener);
+  }
+
+  /**
+   * Update form values from IDE and notify components
+   */
+  updateFormValuesFromIde(updatedValues: FormValues) {
+    this.formValues = { ...this.formValues, ...updatedValues };
+
+    // Notify all affected field components
+    Object.entries(updatedValues).forEach(([key, value]) => {
+      // Update cwd if included in updated values
+      if (key === 'cwd' && typeof value === 'string') {
+        this.cwdValue = value;
+      }
+
+      // Notify any listeners for this field
+      this.valueChangeListeners[key]?.forEach((listener) => listener(value));
+    });
+
+    // Notify form value listeners about the complete form state
+    this.formValueListeners.forEach((listener) => listener(this.formValues));
   }
 }
