@@ -451,24 +451,21 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
 
-        async function insertPrompt() {
-          const fixMePrompt = 'help me fix the latest ci pipeline error';
+        const fixMePrompt = 'help me fix the latest ci pipeline error';
+
+        if (isInCursor()) {
+          commands.executeCommand('composer.newAgentChat');
           await new Promise((resolve) => setTimeout(resolve, 150));
           const originalClipboard = await env.clipboard.readText();
           await env.clipboard.writeText(fixMePrompt);
           await commands.executeCommand('editor.action.clipboardPasteAction');
           await env.clipboard.writeText(originalClipboard);
-        }
-
-        if (isInCursor()) {
-          commands.executeCommand('composer.newAgentChat');
-          await insertPrompt();
         } else {
-          commands.executeCommand('workbench.action.chat.open');
-          commands.executeCommand('workbench.action.chat.toggleAgentMode', {
+          commands.executeCommand('workbench.action.chat.open', {
             mode: 'agent',
+            query: fixMePrompt,
+            isPartialQuery: true,
           });
-          await insertPrompt();
           await commands.executeCommand('workbench.action.chat.sendToNewChat');
         }
       }),
