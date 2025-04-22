@@ -95,7 +95,7 @@ export class Root extends LitElement {
             >View package.json changes</vscode-button
           >
         </div>
-        <p>If the changes look good, then confirm continue the migration.</p>
+        <p>If the changes look good, then confirm to update packages and continue the migration.</p>
         <div style="display: flex; flex-direction: row; gap: 2px; width: 100%;">
           <vscode-button
             secondary
@@ -110,7 +110,7 @@ export class Root extends LitElement {
             style="flex-grow: 1;"
             @click="${() =>
               this.vscodeApi.postMessage({ type: 'confirm-changes' })}"
-            >Yes, install and continue</vscode-button
+            >Yes, continue</vscode-button
           >
         </div> `;
     }
