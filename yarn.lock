@@ -3105,7 +3105,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nx/cypress@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/cypress@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/cypress@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3163,7 +3163,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/devkit@npm:21.0.0-canary.20250422-8619c1d, @nx/devkit@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/devkit@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/devkit@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3181,7 +3181,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/esbuild@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/esbuild@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/esbuild@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3200,7 +3200,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/eslint-plugin@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/eslint-plugin@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/eslint-plugin@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3224,7 +3224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:21.0.0-canary.20250422-8619c1d, @nx/eslint@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/eslint@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/eslint@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3243,7 +3243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/gradle@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/gradle@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/gradle@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3252,7 +3252,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.0.0-canary.20250422-8619c1d, @nx/jest@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/jest@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/jest@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3275,7 +3275,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/js@npm:21.0.0-canary.20250422-8619c1d, @nx/js@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/js@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/js@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3317,7 +3317,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/node@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/node@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/node@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3332,70 +3332,70 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/nx-darwin-arm64@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-darwin-arm64@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-darwin-arm64@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-darwin-arm64@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/nx-darwin-x64@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-darwin-x64@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-darwin-x64@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-darwin-x64@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/nx-freebsd-x64@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-freebsd-x64@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-freebsd-x64@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-freebsd-x64@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-arm-gnueabihf@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-linux-arm-gnueabihf@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-linux-arm-gnueabihf@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-linux-arm-gnueabihf@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-arm64-gnu@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-linux-arm64-gnu@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-linux-arm64-gnu@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-linux-arm64-gnu@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-arm64-musl@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-linux-arm64-musl@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-linux-arm64-musl@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-linux-arm64-musl@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-x64-gnu@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-linux-x64-gnu@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-linux-x64-gnu@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-linux-x64-gnu@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-x64-musl@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-linux-x64-musl@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-linux-x64-musl@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-linux-x64-musl@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/nx-win32-arm64-msvc@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-win32-arm64-msvc@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-win32-arm64-msvc@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-win32-arm64-msvc@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/nx-win32-x64-msvc@npm:21.0.0-canary.20250422-8619c1d, @nx/nx-win32-x64-msvc@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/nx-win32-x64-msvc@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/nx-win32-x64-msvc@npm:21.0.0-canary.20250422-8619c1d"
   conditions: os=win32 & cpu=x64
@@ -3550,7 +3550,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/web@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/web@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/web@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3564,7 +3564,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/webpack@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/webpack@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/webpack@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -3610,7 +3610,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/workspace@npm:21.0.0-canary.20250422-8619c1d, @nx/workspace@npm:21.0.0-canary.20250422-8619c1d ":
+"@nx/workspace@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "@nx/workspace@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:
@@ -5917,17 +5917,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "angular-console@workspace:apps/vscode"
   dependencies:
-    "@nx/nx-darwin-arm64": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-darwin-x64": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-freebsd-x64": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-linux-arm-gnueabihf": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-linux-arm64-gnu": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-linux-arm64-musl": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-linux-x64-gnu": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-linux-x64-musl": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-win32-arm64-msvc": "21.0.0-canary.20250422-8619c1d "
-    "@nx/nx-win32-x64-msvc": "21.0.0-canary.20250422-8619c1d "
-    nx: "21.0.0-canary.20250422-8619c1d "
+    "@napi-rs/wasm-runtime": 0.2.4
   languageName: unknown
   linkType: soft
 
@@ -14074,21 +14064,21 @@ __metadata:
     "@microsoft/fast-foundation": ^2.49.0
     "@modelcontextprotocol/sdk": ^1.5.0
     "@monodon/typescript-nx-imports-plugin": 0.3.0
-    "@nx/cypress": "21.0.0-canary.20250422-8619c1d "
-    "@nx/devkit": "21.0.0-canary.20250422-8619c1d "
-    "@nx/esbuild": "21.0.0-canary.20250422-8619c1d "
-    "@nx/eslint": "21.0.0-canary.20250422-8619c1d "
-    "@nx/eslint-plugin": "21.0.0-canary.20250422-8619c1d "
-    "@nx/gradle": "21.0.0-canary.20250422-8619c1d "
-    "@nx/jest": "21.0.0-canary.20250422-8619c1d "
-    "@nx/js": "21.0.0-canary.20250422-8619c1d "
-    "@nx/node": "21.0.0-canary.20250422-8619c1d "
+    "@nx/cypress": 21.0.0-canary.20250422-8619c1d
+    "@nx/devkit": 21.0.0-canary.20250422-8619c1d
+    "@nx/esbuild": 21.0.0-canary.20250422-8619c1d
+    "@nx/eslint": 21.0.0-canary.20250422-8619c1d
+    "@nx/eslint-plugin": 21.0.0-canary.20250422-8619c1d
+    "@nx/gradle": 21.0.0-canary.20250422-8619c1d
+    "@nx/jest": 21.0.0-canary.20250422-8619c1d
+    "@nx/js": 21.0.0-canary.20250422-8619c1d
+    "@nx/node": 21.0.0-canary.20250422-8619c1d
     "@nx/powerpack-conformance": 1.2.5
     "@nx/powerpack-enterprise-cloud": 1.2.5
     "@nx/powerpack-owners": 1.2.5
-    "@nx/web": "21.0.0-canary.20250422-8619c1d "
-    "@nx/webpack": "21.0.0-canary.20250422-8619c1d "
-    "@nx/workspace": "21.0.0-canary.20250422-8619c1d "
+    "@nx/web": 21.0.0-canary.20250422-8619c1d
+    "@nx/webpack": 21.0.0-canary.20250422-8619c1d
+    "@nx/workspace": 21.0.0-canary.20250422-8619c1d
     "@open-wc/lit-helpers": ^0.6.0
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -14143,7 +14133,7 @@ __metadata:
     memfs: ^3.4.7
     minimatch: ^9.0.3
     mocha: ^10.0.0
-    nx: "21.0.0-canary.20250422-8619c1d "
+    nx: 21.0.0-canary.20250422-8619c1d
     ovsx: ^0.10.1
     prettier: ^3.5.1
     prettier-plugin-tailwindcss: ^0.6.11
@@ -14183,7 +14173,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"nx@npm:21.0.0-canary.20250422-8619c1d, nx@npm:21.0.0-canary.20250422-8619c1d ":
+"nx@npm:21.0.0-canary.20250422-8619c1d":
   version: 21.0.0-canary.20250422-8619c1d
   resolution: "nx@npm:21.0.0-canary.20250422-8619c1d"
   dependencies:

@@ -95,7 +95,10 @@ export class Root extends LitElement {
             >View package.json changes</vscode-button
           >
         </div>
-        <p>If the changes look good, then confirm to update packages and continue the migration.</p>
+        <p>
+          If the changes look good, then confirm to update packages and continue
+          the migration.
+        </p>
         <div style="display: flex; flex-direction: row; gap: 2px; width: 100%;">
           <vscode-button
             secondary

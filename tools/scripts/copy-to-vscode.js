@@ -78,11 +78,29 @@ fs.copySync(
   join(codiconsDestFolder, 'codicon.ttf'),
 );
 
-// copy nx
-// const nxGraphDestFolder = normalize(
-//   './dist/apps/vscode/node_modules/nx/src/core/graph'
-// );
-// if (!fs.existsSync(nxGraphDestFolder)) {
-//   fs.mkdirSync(nxGraphDestFolder, { recursive: true });
-// }
-// fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
+// TODO(max): we should remove the extra logic around native-bindings and default-tasks-runner -- it might require small refactors in nx
+// copy migrate ui, the rest of nx is bundled
+const nxGraphDestFolder = normalize(
+  './dist/apps/vscode/node_modules/nx/src/core/graph',
+);
+if (!fs.existsSync(nxGraphDestFolder)) {
+  fs.mkdirSync(nxGraphDestFolder, { recursive: true });
+}
+fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
+// this file is required at runtime in the bundle
+fs.copyFileSync(
+  normalize('./node_modules/nx/src/native/native-bindings.js'),
+  './dist/apps/vscode/native-bindings.js',
+);
+// need the wasi bindings for the above native-bindings.js to load
+// it does not really matter what we use since console does not use them anyway
+fs.copyFileSync(
+  normalize('./node_modules/nx/src/native/nx.wasi.cjs'),
+  './dist/apps/vscode/nx.wasi.cjs',
+);
+fs.copyFileSync(
+  normalize('./node_modules/nx/src/native/nx.wasm32-wasi.wasm'),
+  './dist/apps/vscode/nx.wasm32-wasi.wasm',
+);
+// this file just need to work when using require.resolve('./default-tasks-runner.js')
+fs.writeFileSync('./dist/apps/vscode/default-tasks-runner.js', '');

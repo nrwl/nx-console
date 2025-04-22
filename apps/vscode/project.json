@@ -23,8 +23,8 @@
           "pnpapi",
           "webpack",
           "@angular-devkit/*",
-          "@nx/nx*",
-          "nx"
+          "@nx/key",
+          "@nx/nx*"
         ],
         "thirdParty": true,
         "minify": true,
