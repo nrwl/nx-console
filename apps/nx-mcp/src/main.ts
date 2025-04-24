@@ -23,6 +23,7 @@ interface ArgvType {
   sse: boolean;
   port?: number;
   disableTelemetry: boolean;
+  keepAliveInterval: number;
   _: (string | number)[];
   $0: string;
   [x: string]: unknown;
@@ -55,6 +56,12 @@ async function main() {
       describe: 'Disable sending of telemetry data',
       type: 'boolean',
       default: false,
+    })
+    .option('keepAliveInterval', {
+      describe:
+        'Interval in milliseconds to send SSE keep-alive messages (default: 30000, 0 to disable)',
+      type: 'number',
+      default: 30000,
     })
     .check((argv) => {
       if (argv.port !== undefined && !argv.sse) {
@@ -116,6 +123,25 @@ async function main() {
       console.log('Configuring SSE transport');
       transport = new SSEServerTransport('/messages', res);
       await server.getMcpServer().connect(transport);
+
+      // Set up keep-alive interval if enabled
+      if (argv.keepAliveInterval > 0) {
+        const keepAliveInterval = setInterval(() => {
+          // Check if the connection is still open using the socket's writable state
+          if (!res.writableEnded && !res.writableFinished) {
+            res.write(':beat\n\n');
+          } else {
+            clearInterval(keepAliveInterval);
+            console.log('SSE connection closed, clearing keep-alive interval');
+          }
+        }, argv.keepAliveInterval);
+
+        // Clean up interval if the client disconnects
+        req.on('close', () => {
+          clearInterval(keepAliveInterval);
+          console.log('SSE connection closed by client');
+        });
+      }
     });
 
     app.post('/messages', async (req, res) => {

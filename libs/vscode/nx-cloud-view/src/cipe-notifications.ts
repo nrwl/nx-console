@@ -102,8 +102,7 @@ function showMessageWithResultAndCommit(
     | 'View Commit';
   const messageCommands: MessageCommand[] = [];
 
-  // todo(cammisuli): once mcp is working with vscode, we can remove the isInCursor check
-  if (isInCursor() && type === 'error') {
+  if (type === 'error') {
     messageCommands.push('Help me fix this error');
   }
   if (commitUrl) {

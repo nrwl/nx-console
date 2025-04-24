@@ -1,6 +1,6 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
-import { AbstractTreeProvider } from '@nx-console/vscode-utils';
+import { AbstractTreeProvider, isInCursor } from '@nx-console/vscode-utils';
 import { isDeepStrictEqual } from 'util';
 import {
   commands,
@@ -436,27 +436,38 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
 
           let idPrompt = '';
           if (treeItem.linkId) {
-            idPrompt = `linkId ${treeItem.linkId}`;
-          } else {
-            idPrompt = `executionId ${treeItem.executionId}`;
+            idPrompt += `linkId ${treeItem.linkId}`;
+          }
+          if (treeItem.executionId) {
+            idPrompt += ` executionId ${treeItem.executionId}`;
           }
 
           commands.executeCommand(
             'workbench.action.chat.open',
-            `@nx /explain-cipe help me understand the failed output for ${treeItem.taskId} with the ${idPrompt} `,
+            `@nx /explain-cipe help me understand the failed output for ${treeItem.taskId} with the following ids ${idPrompt}`,
           );
         },
       ),
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
-        commands.executeCommand('composer.newAgentChat');
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        const originalClipboard = await env.clipboard.readText();
-        await env.clipboard.writeText(
-          'help me fix the latest ci pipeline error',
-        );
-        await commands.executeCommand('editor.action.clipboardPasteAction');
-        await env.clipboard.writeText(originalClipboard);
+
+        const fixMePrompt = 'help me fix the latest ci pipeline error';
+
+        if (isInCursor()) {
+          commands.executeCommand('composer.newAgentChat');
+          await new Promise((resolve) => setTimeout(resolve, 150));
+          const originalClipboard = await env.clipboard.readText();
+          await env.clipboard.writeText(fixMePrompt);
+          await commands.executeCommand('editor.action.clipboardPasteAction');
+          await env.clipboard.writeText(originalClipboard);
+        } else {
+          commands.executeCommand('workbench.action.chat.open', {
+            mode: 'agent',
+            query: fixMePrompt,
+            isPartialQuery: true,
+          });
+          await commands.executeCommand('workbench.action.chat.sendToNewChat');
+        }
       }),
     );
   }
