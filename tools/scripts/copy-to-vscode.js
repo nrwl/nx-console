@@ -88,19 +88,12 @@ if (!fs.existsSync(nxGraphDestFolder)) {
 }
 fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
 // this file is required at runtime in the bundle
-fs.copyFileSync(
-  normalize('./node_modules/nx/src/native/native-bindings.js'),
+fs.writeFileSync(
   './dist/apps/vscode/native-bindings.js',
-);
-// need the wasi bindings for the above native-bindings.js to load
-// it does not really matter what we use since console does not use them anyway
-fs.copyFileSync(
-  normalize('./node_modules/nx/src/native/nx.wasi.cjs'),
-  './dist/apps/vscode/nx.wasi.cjs',
-);
-fs.copyFileSync(
-  normalize('./node_modules/nx/src/native/nx.wasm32-wasi.wasm'),
-  './dist/apps/vscode/nx.wasm32-wasi.wasm',
+  'module.exports = {};',
 );
 // this file just need to work when using require.resolve('./default-tasks-runner.js')
-fs.writeFileSync('./dist/apps/vscode/default-tasks-runner.js', '');
+fs.writeFileSync(
+  './dist/apps/vscode/default-tasks-runner.js',
+  'module.exports = {};',
+);
