@@ -1,3 +1,12 @@
+## [18.45.1](https://github.com/nrwl/nx-console/compare/vscode-v18.45.0...vscode-v18.45.1) (2025-04-24)
+
+
+### Bug Fixes
+
+* enable copilot to help fix cipe errors with agent mode, enhanced cipe tool description ([#2474](https://github.com/nrwl/nx-console/issues/2474)) ([5c9a60d](https://github.com/nrwl/nx-console/commit/5c9a60d70e6e733d90df4dc2880aef0f37174b12))
+* keep mcp alive by implementing heart beat functionality ([#2473](https://github.com/nrwl/nx-console/issues/2473)) ([9d7fc57](https://github.com/nrwl/nx-console/commit/9d7fc572c5862b529b4d01d601a97eb5ef83789d))
+* **vscode:** clean up agent prompt command ([#2475](https://github.com/nrwl/nx-console/issues/2475)) ([bc58d3a](https://github.com/nrwl/nx-console/commit/bc58d3a5c5c661e3d1fe00248e160cb19575e7aa))
+
 # [18.45.0](https://github.com/nrwl/nx-console/compare/vscode-v18.44.2...vscode-v18.45.0) (2025-04-11)
 
 
