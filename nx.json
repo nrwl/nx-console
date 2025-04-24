@@ -138,8 +138,8 @@
         "includeSubprojectsTasks": true
       }
     },
-    "@nx/powerpack-enterprise-cloud",
-    "@nx/powerpack-owners",
+    "@nx/enterprise-cloud",
+    "@nx/owners",
     {
       "plugin": "@nx/js/typescript",
       "include": [
@@ -158,7 +158,7 @@
     }
   ],
   "sync": {
-    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],
+    "globalGenerators": ["@nx/owners:sync-codeowners-file"],
     "applyChanges": true
   },
   "owners": {
@@ -173,7 +173,7 @@
   "conformance": {
     "rules": [
       {
-        "rule": "@nx/powerpack-conformance/ensure-owners",
+        "rule": "@nx/conformance/ensure-owners",
         "status": "enforced"
       }
     ]

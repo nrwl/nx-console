@@ -3555,36 +3555,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/powerpack-conformance@npm:1.3.2":
-  version: 1.3.2
-  resolution: "@nx/powerpack-conformance@npm:1.3.2"
-  dependencies:
-    "@nx/conformance": 1.3.2
-  bin:
-    nx-conformance: bin/conformance.js
-    nx-conformance-check: bin/conformance-check.js
-  checksum: ce36f97d510b682f8374747f15d932d1c27629b03b335091fe6c4717c91ec1d3da02850c65366a9f871086c572f3200dad7423f2f9580238f81ebb9a8934e08a
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-enterprise-cloud@npm:1.3.2":
-  version: 1.3.2
-  resolution: "@nx/powerpack-enterprise-cloud@npm:1.3.2"
-  dependencies:
-    "@nx/enterprise-cloud": 1.3.2
-  checksum: 98474523320e19b505ba17d6b47256ed09b91347af570b8527f5bb99d6ff42777e91ac3a2c07a85942e97a33de271a9292bc3b48e5f7080a4d96beeba8ef525d
-  languageName: node
-  linkType: hard
-
-"@nx/powerpack-owners@npm:1.3.2":
-  version: 1.3.2
-  resolution: "@nx/powerpack-owners@npm:1.3.2"
-  dependencies:
-    "@nx/owners": 1.3.2
-  checksum: d74562905d3a4f1444e5b5f2d5a6917fa4b36b60956dc0b4197f8fc7cdba52774c32aaebf4cd96c3a28c23f8682f0d1bf657b975bb003fecceb34ce07a0053a7
-  languageName: node
-  linkType: hard
-
 "@nx/web@npm:21.0.0-beta.7":
   version: 21.0.0-beta.7
   resolution: "@nx/web@npm:21.0.0-beta.7"
@@ -14117,8 +14087,10 @@ __metadata:
     "@microsoft/fast-foundation": ^2.49.0
     "@modelcontextprotocol/sdk": ^1.5.0
     "@monodon/typescript-nx-imports-plugin": 0.3.0
+    "@nx/conformance": 1.3.2
     "@nx/cypress": 21.0.0-beta.7
     "@nx/devkit": 21.0.0-beta.7
+    "@nx/enterprise-cloud": 1.3.2
     "@nx/esbuild": 21.0.0-beta.7
     "@nx/eslint": 21.0.0-beta.7
     "@nx/eslint-plugin": 21.0.0-beta.7
@@ -14126,9 +14098,7 @@ __metadata:
     "@nx/jest": 21.0.0-beta.7
     "@nx/js": 21.0.0-beta.7
     "@nx/node": 21.0.0-beta.7
-    "@nx/powerpack-conformance": 1.3.2
-    "@nx/powerpack-enterprise-cloud": 1.3.2
-    "@nx/powerpack-owners": 1.3.2
+    "@nx/owners": 1.3.2
     "@nx/web": 21.0.0-beta.7
     "@nx/webpack": 21.0.0-beta.7
     "@nx/workspace": 21.0.0-beta.7
