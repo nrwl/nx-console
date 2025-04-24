@@ -127,8 +127,7 @@
         "{workspaceRoot}/dist/apps/nxls/**",
         "scripts"
       ],
-      "dependsOn": ["^build"],
-      "cache": false
+      "dependsOn": ["^build"]
     },
     "prune-readme": {
       "command": "node ./tools/scripts/prune-vscode-readme.js"
