@@ -70,7 +70,7 @@ jobs:
       - name: Check project graph creation
         # TODO: remove the reset
         run: |
-          yarn nx reset
+          rm .nx/workspace-data/gradle-report.hash
           yarn nx show projects --verbose
 
       - name: Check formatting of other files
@@ -135,7 +135,7 @@ jobs:
       # There's no need to check formatting, linting & typecheck again on windows
       # TODO: remove the reset
       - run: |
-          yarn nx reset
+          rm .nx/workspace-data/gradle-report.hash
           yarn nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3 --verbose
         timeout-minutes: 45
         env:
