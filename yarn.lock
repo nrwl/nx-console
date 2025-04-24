@@ -3555,6 +3555,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/powerpack-license@npm:1.3.2":
+  version: 1.3.2
+  resolution: "@nx/powerpack-license@npm:1.3.2"
+  dependencies:
+    "@nx/key": 1.3.2
+  checksum: 27f67c7ffb7456d128d0479c131190b01cc3ebe3193009b5177742395523161c4212db9ad71b94cea40866dfcc0e64aa208d603cce6805bd7d308a5908d50cb1
+  languageName: node
+  linkType: hard
+
 "@nx/web@npm:21.0.0-beta.7":
   version: 21.0.0-beta.7
   resolution: "@nx/web@npm:21.0.0-beta.7"
@@ -14099,6 +14108,7 @@ __metadata:
     "@nx/js": 21.0.0-beta.7
     "@nx/node": 21.0.0-beta.7
     "@nx/owners": 1.3.2
+    "@nx/powerpack-license": 1.3.2
     "@nx/web": 21.0.0-beta.7
     "@nx/webpack": 21.0.0-beta.7
     "@nx/workspace": 21.0.0-beta.7

@@ -68,7 +68,7 @@ jobs:
           yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
 
       - name: Check project graph creation
-        # TODO: remove the reset
+        # TODO: remove the `rm` command once `gradle-report.hash` is not causing issues (@nx/gradle needs a patch to use a different file path)
         run: |
           rm .nx/workspace-data/gradle-report.hash
           yarn nx show projects --verbose
@@ -133,7 +133,7 @@ jobs:
           cache: gradle
 
       # There's no need to check formatting, linting & typecheck again on windows
-      # TODO: remove the reset
+      # TODO: remove the `rm` command once `gradle-report.hash` is not causing issues (@nx/gradle needs a patch to use a different file path)
       - run: |
           rm .nx/workspace-data/gradle-report.hash
           yarn nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3 --verbose

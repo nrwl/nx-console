@@ -1,7 +1,6 @@
 import { findNxPackagePath } from '@nx-console/shared-npm';
 import { NxVersion } from '@nx-console/nx-version';
 import { coerce, SemVer } from 'semver';
-import { lspLogger } from '@nx-console/language-server-utils';
 import { readFileSync } from 'node:fs';
 
 let nxWorkspacePackageJsonVersion: string | undefined;
@@ -13,7 +12,6 @@ export async function getNxVersion(
   workspacePath: string,
   reset = false,
 ): Promise<NxVersion> {
-  lspLogger.log(`reset: ${reset}`);
   if (!loadedNxPackage || reset) {
     const packagePath = await findNxPackagePath(workspacePath, 'package.json');
 
@@ -27,7 +25,6 @@ export async function getNxVersion(
 
     nxWorkspacePackageJsonVersion = readVersionFromPackageJson(packagePath);
     loadedNxPackage = true;
-    lspLogger.log(`nxWorkspacePackageJson: ${nxWorkspacePackageJsonVersion}`);
   }
 
   if (!nxWorkspacePackageJsonVersion) {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { gte as semverGte } from 'semver';
 import { NxVersion } from './nx-version';
 
