@@ -180,7 +180,6 @@ async function main() {
   });
 
   // Keep the process alive
-  console.log('Nx MCP server is running...');
   process.stdin.resume();
 }
 
