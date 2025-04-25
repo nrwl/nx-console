@@ -1,10 +1,10 @@
 import { importNxPackagePath, readNxJson } from '@nx-console/shared-npm';
-import { consoleLogger } from '@nx-console/shared-utils';
+import { Logger } from '@nx-console/shared-utils';
 import type { NxJsonConfiguration } from 'nx/src/devkit-exports';
 
 export async function isNxCloudUsed(
   workspacePath: string,
-  logger = consoleLogger,
+  logger?: Logger,
 ): Promise<boolean> {
   let nxJson: NxJsonConfiguration;
   try {
