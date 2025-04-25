@@ -1,3 +1,10 @@
+## [18.45.2](https://github.com/nrwl/nx-console/compare/vscode-v18.45.1...vscode-v18.45.2) (2025-04-25)
+
+
+### Bug Fixes
+
+* **nx-mcp:** dont call console.log directly in stdio mode ([#2480](https://github.com/nrwl/nx-console/issues/2480)) ([7878892](https://github.com/nrwl/nx-console/commit/78788920814e1b6598b4060c480d88774293c21f))
+
 ## [18.45.1](https://github.com/nrwl/nx-console/compare/vscode-v18.45.0...vscode-v18.45.1) (2025-04-24)
 
 
