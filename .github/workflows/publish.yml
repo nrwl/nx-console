@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Use Node.js ${{ env.node_version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
           check-latest: true
