@@ -3,7 +3,6 @@ import { directoryExists } from '@nx-console/shared-file-system';
 import { workspaceDependencyPath } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { readFileSync } from 'fs';
 import type { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
 import { join } from 'path';
@@ -17,6 +16,7 @@ import {
 import {
   cancelMigration,
   skipMigration,
+  undoMigration,
   viewDocumentation,
   viewImplementation,
 } from './commands/migrate-commands';
@@ -26,7 +26,7 @@ import {
   runManyMigrations,
   runSingleMigration,
 } from './commands/run-migration';
-import { viewDiff, viewDiffForMigration } from './git-extension/view-diff';
+import { viewDiffForMigration } from './git-extension/view-diff';
 
 export class MigrateWebview {
   private _webviewPanel: WebviewPanel | undefined;
@@ -91,6 +91,9 @@ export class MigrateWebview {
           break;
         case 'skip-migration':
           skipMigration(message.payload.migration);
+          break;
+        case 'undo-migration':
+          undoMigration(message.payload.migration);
           break;
         case 'view-implementation':
           viewImplementation(message.payload.migration);

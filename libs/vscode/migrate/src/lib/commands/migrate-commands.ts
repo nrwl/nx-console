@@ -52,6 +52,19 @@ export async function skipMigration(migration: MigrationDetailsWithId) {
   );
 }
 
+export async function undoMigration(migration: MigrationDetailsWithId) {
+  const workspacePath = getNxWorkspacePath();
+  const migrateUIApi = await importMigrateUIApi(workspacePath);
+  migrateUIApi.modifyMigrationsJsonMetadata(
+    workspacePath,
+    // TODO: Once Nx is updated with the `undoMigration` API we can remove the ts-ignore.
+    // This is safe to call, since this code path only happens if the bundled or local version of Nx exposes the "Undo" button.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    migrateUIApi.undoMigration(workspacePath, migration.id),
+  );
+}
+
 export async function confirmPackageChanges() {
   window.withProgress(
     {
@@ -93,10 +106,9 @@ export async function confirmPackageChanges() {
             );
           });
 
-        repository.add(filesToAdd);
+        await repository.add(filesToAdd);
 
-        repository.commit('chore: start nx migration', {
-          signCommit: true,
+        await repository.commit('chore: start nx migration', {
           noVerify: true,
         });
 
