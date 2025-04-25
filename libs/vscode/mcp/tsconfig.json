@@ -4,16 +4,13 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-cloud"
-    },
-    {
       "path": "../nx-workspace"
     },
     {
-      "path": "../nx-cli-quickpicks"
+      "path": "../generate-ui-webview"
     },
     {
-      "path": "../generate-ui-webview"
+      "path": "../../shared/nx-cloud"
     },
     {
       "path": "../../shared/llm-context"

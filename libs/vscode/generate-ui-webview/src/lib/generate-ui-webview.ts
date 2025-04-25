@@ -29,6 +29,7 @@ import {
   ViewColumn,
   WebviewPanel,
   window,
+  EventEmitter,
 } from 'vscode';
 import { fillWithGenerateUi } from './fill-with-generate-ui';
 
@@ -43,6 +44,10 @@ export class GenerateUiWebview {
     | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
     | undefined;
 
+  private openedFromAI = false;
+
+  private readonly _onDispose = new EventEmitter<void>();
+
   constructor(private context: ExtensionContext) {
     this._webviewSourceUri = Uri.joinPath(
       this.context.extensionUri,
@@ -50,10 +55,16 @@ export class GenerateUiWebview {
     );
   }
 
-  async openGenerateUi(generator: GeneratorSchema) {
+  get onDispose() {
+    return this._onDispose.event;
+  }
+
+  async openGenerateUi(generator: GeneratorSchema, openedFromAI = false) {
     if (this.webviewPanel !== undefined) {
       this.webviewPanel.dispose();
     }
+
+    this.openedFromAI = openedFromAI;
 
     this.generatorToDisplay = generator;
     this.webviewPanel = window.createWebviewPanel(
@@ -136,6 +147,7 @@ export class GenerateUiWebview {
     this.webviewPanel.onDidDispose(() => {
       this.webviewPanel = undefined;
       this.generatorToDisplay = undefined;
+      this._onDispose.fire();
     });
 
     this.plugins = await this.loadPlugins();
@@ -162,7 +174,7 @@ export class GenerateUiWebview {
   private async handleMessageFromWebview(message: GenerateUiOutputMessage) {
     switch (message.payloadType) {
       case 'run-generator': {
-        if (message.payload.flags.includes('--dry-run')) {
+        if (message.payload.flags.includes('--dry-run') || !this.openedFromAI) {
           CliTaskProvider.instance.executeTask({
             command: 'generate',
             ...message.payload,
@@ -182,7 +194,7 @@ export class GenerateUiWebview {
               ...message.payload.flags,
             ],
           });
-          tasks.executeTask(task);
+          await tasks.executeTask(task);
         }
         break;
       }

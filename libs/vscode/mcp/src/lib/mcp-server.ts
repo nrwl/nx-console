@@ -8,7 +8,10 @@ import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { openGenerateUIPrefilled } from '@nx-console/vscode-generate-ui-webview';
+import {
+  onGeneratorUiDispose,
+  openGenerateUIPrefilled,
+} from '@nx-console/vscode-generate-ui-webview';
 import {
   getGenerators,
   getNxWorkspace,
@@ -19,10 +22,12 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
   getNxMcpPort,
+  isInCursor,
+  sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express from 'express';
-import { commands, window } from 'vscode';
+import { commands, tasks, window } from 'vscode';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -107,16 +112,37 @@ export async function tryStartMcpServer(workspacePath: string) {
         window.showErrorMessage(`Could not find generator "${generatorName}"`);
         throw new Error(`Could not find generator "${generatorName}"`);
       }
-      await openGenerateUIPrefilled({
-        $0: 'nx',
-        _: ['generate', foundGenerator.name],
-        ...options,
-        cwd: cwd,
-      });
+      await openGenerateUIPrefilled(
+        {
+          $0: 'nx',
+          _: ['generate', foundGenerator.name],
+          ...options,
+          cwd: cwd,
+        },
+        true,
+      );
       const finalFileName = await createGeneratorLogFileName(
         getNxWorkspacePath(),
         foundGenerator.name,
       );
+
+      if (!isInCursor()) {
+        const subscription = tasks.onDidEndTaskProcess((event) => {
+          if (event.execution.task.name.includes('wrap-generator.js')) {
+            sendMessageToAgent(
+              `The generator has finished running. Please review the output in "${finalFileName}" and continue.`,
+              false,
+            );
+            subscription.dispose();
+          }
+        });
+
+        const onDisposeDisposable = onGeneratorUiDispose(() => {
+          subscription.dispose();
+          onDisposeDisposable.dispose();
+        });
+      }
+
       return finalFileName;
     },
   };

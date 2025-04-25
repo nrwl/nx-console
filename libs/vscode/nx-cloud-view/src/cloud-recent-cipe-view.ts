@@ -1,6 +1,10 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
-import { AbstractTreeProvider, isInCursor } from '@nx-console/vscode-utils';
+import {
+  AbstractTreeProvider,
+  isInCursor,
+  sendMessageToAgent,
+} from '@nx-console/vscode-utils';
 import { isDeepStrictEqual } from 'util';
 import {
   commands,
@@ -453,21 +457,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
 
         const fixMePrompt = 'help me fix the latest ci pipeline error';
 
-        if (isInCursor()) {
-          commands.executeCommand('composer.newAgentChat');
-          await new Promise((resolve) => setTimeout(resolve, 150));
-          const originalClipboard = await env.clipboard.readText();
-          await env.clipboard.writeText(fixMePrompt);
-          await commands.executeCommand('editor.action.clipboardPasteAction');
-          await env.clipboard.writeText(originalClipboard);
-        } else {
-          commands.executeCommand('workbench.action.chat.open', {
-            mode: 'agent',
-            query: fixMePrompt,
-            isPartialQuery: true,
-          });
-          await commands.executeCommand('workbench.action.chat.sendToNewChat');
-        }
+        sendMessageToAgent(fixMePrompt);
       }),
     );
   }

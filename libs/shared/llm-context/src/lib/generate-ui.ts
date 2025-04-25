@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { getWorkspaceDataDirectory } from '@nx-console/shared-npm';
 
 /**
@@ -31,7 +31,9 @@ export async function createGeneratorLogFileName(
     } while (existsSync(finalFileName));
   }
 
-  return finalFileName;
+  const relativeFileName = relative(workspacePath, finalFileName);
+
+  return relativeFileName;
 }
 
 /**
