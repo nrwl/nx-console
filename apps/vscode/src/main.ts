@@ -49,6 +49,7 @@ import { initNxConversion } from '@nx-console/vscode-nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
+import { initMigrate } from '@nx-console/vscode-migrate';
 
 import {
   NxWorkspaceRefreshNotification,
@@ -289,6 +290,7 @@ async function setWorkspace(workspacePath: string) {
 
     initNxCommandsView(context);
     initNxCloudView(context);
+    initMigrate(context);
     initNvmTip(context);
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);

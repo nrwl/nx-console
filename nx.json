@@ -86,14 +86,19 @@
         "runtime": "node -p '`${process.platform}_${process.arch}`'"
       },
       "{workspaceRoot}/.env"
-    ]
+    ],
+    "scripts": ["{workspaceRoot}/tools/scripts/**"]
   },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
       "options": {
         "build": true
-      }
+      },
+      "exclude": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*"
+      ]
     },
     {
       "plugin": "@nx/eslint/plugin",
@@ -125,7 +130,7 @@
       }
     },
     {
-      "plugin": "@nx/gradle",
+      "plugin": "@nx/gradle/plugin-v1",
       "options": {
         "testTargetName": "test",
         "classesTargetName": "classes",
@@ -133,11 +138,27 @@
         "includeSubprojectsTasks": true
       }
     },
-    "@nx/powerpack-enterprise-cloud",
-    "@nx/powerpack-owners"
+    "@nx/enterprise-cloud",
+    "@nx/owners",
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json"
+        }
+      }
+    }
   ],
   "sync": {
-    "globalGenerators": ["@nx/powerpack-owners:sync-codeowners-file"],
+    "globalGenerators": ["@nx/owners:sync-codeowners-file"],
     "applyChanges": true
   },
   "owners": {
@@ -152,7 +173,7 @@
   "conformance": {
     "rules": [
       {
-        "rule": "@nx/powerpack-conformance/ensure-owners",
+        "rule": "@nx/conformance/ensure-owners",
         "status": "enforced"
       }
     ]

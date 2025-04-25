@@ -19,7 +19,9 @@
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
+    // "noImplicitReturns": true,
     "noImplicitReturns": false,
+    // "noUnusedLocals": true,
     "noUnusedLocals": false,
     "pretty": true,
     "removeComments": false,
@@ -27,6 +29,7 @@
     "skipDefaultLibCheck": false,
     "skipLibCheck": true,
     "sourceMap": false,
+    // "strict": true,
     "strict": false,
     "target": "es2022",
     "verbatimModuleSyntax": false,
@@ -42,7 +45,7 @@
     // "skipLibCheck": true,
     // "strictNullChecks": true,
     // "allowUnreachableCode": false,
-    // "allowUnusedLabels": true,
+    // "allowUnusedLabels": true
     // "noImplicitAny": true,
     // "noImplicitThis": true,
     // "strictFunctionTypes": true,
@@ -51,6 +54,6 @@
     // "types": ["node", "jest"],
     // "module": "commonjs",
     // "baseUrl": ".",
-    // "rootDir": "."
+    // "rootDir": ".",
   }
 }

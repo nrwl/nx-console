@@ -39,7 +39,7 @@ const pollingMachine = setup({
       ({ event }) => ({
         type: 'UPDATE_RECENT_CIPE',
         value: event['output'],
-      })
+      }),
     ),
     setPollingFrequency: assign(({ context, event }) => {
       const recentCIPEData = event['output'] as
@@ -155,7 +155,7 @@ export const machine = setup({
       params: {
         oldData: CIPEInfo[];
         newData: CIPEInfo[];
-      }
+      },
     ) => {
       throw new Error('Not implemented');
     },
@@ -184,7 +184,7 @@ export const machine = setup({
         context.onboardingInfo?.isWorkspaceClaimed &&
           context.onboardingInfo?.isConnectedToCloud &&
           context.onboardingInfo?.hasNxInCI &&
-          context.onboardingInfo?.hasAffectedCommandsInCI
+          context.onboardingInfo?.hasAffectedCommandsInCI,
       );
     },
     hasOnboardingInfo: ({ context }) => {
@@ -196,7 +196,7 @@ export const machine = setup({
     hasRunningCIPEs: ({ context }) => {
       return Boolean(
         context.recentCIPEs &&
-          context.recentCIPEs.some((cipe) => cipe.status === 'IN_PROGRESS')
+          context.recentCIPEs.some((cipe) => cipe.status === 'IN_PROGRESS'),
       );
     },
   },

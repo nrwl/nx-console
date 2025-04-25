@@ -51,6 +51,11 @@
           {
             "name": "@nx/devkit",
             "message": "Please use nx/src/devkit-exports instead, or import function directly from @nx/devkit/src/*"
+          },
+          {
+            "name": "semver",
+            "importNames": ["gte"],
+            "message": "Please use @nx-console/nx-version instead"
           }
         ]
       }
