@@ -86,7 +86,8 @@
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
   </extensions>
   <extensions defaultExtensionNs="JavaScript">
-    <scanningFileListenerContributor implementation="dev.nx.console.ide.DotNxFolderExcludeContributor"/>
+    <scanningFileListenerContributor implementation="dev.nx.console.ide.NxCacheFolderExcludeContributor"/>
+    <scanningFileListenerContributor implementation="dev.nx.console.ide.NxWorkspaceDataFolderExcludeContributor"/>
   </extensions>
   <applicationListeners>
     <listener class="dev.nx.console.listeners.ProjectManagerListener"
