@@ -3072,6 +3072,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-terminal@workspace:libs/vscode/terminal":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-terminal@workspace:libs/vscode/terminal"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-typescript-import-plugin@workspace:libs/vscode/typescript-import-plugin":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-typescript-import-plugin@workspace:libs/vscode/typescript-import-plugin"
@@ -14482,6 +14488,7 @@ __metadata:
     jest: 29.7.0
     jest-environment-jsdom: 29.7.0
     jest-environment-node: ^29.7.0
+    jsonc-eslint-parser: ^2.1.0
     jsonc-parser: ^3.0.0
     lit: ^2.4.1
     memfs: ^3.4.7

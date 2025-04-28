@@ -10,6 +10,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../libs/vscode/terminal/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
     },
     {
