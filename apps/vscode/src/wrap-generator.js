@@ -1,21 +1,30 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const mkdirp = require('mkdirp');
 
 const args = process.argv.slice(2);
 
 let generatorName = args[3] || 'unknown-generator';
 
 generatorName = generatorName.startsWith('@')
-  ? generatorName.substring(1).replace(/\//g, '-')
-  : generatorName.replace(/[@/]/g, '-');
+  ? generatorName.substring(1).replace(/[/:]/g, '-')
+  : generatorName.replace(/[@/:]/g, '-');
 
-const cacheDirModule = require('nx/src/utils/cache-directory');
-const cacheDir = cacheDirModule.workspaceDataDirectory;
+let cacheDir = './.nx/workspace-data';
+try {
+  const cacheDirModulePath = require.resolve('nx/src/utils/cache-directory', {
+    paths: [process.cwd()],
+  });
+  if (cacheDirModulePath) {
+    const cacheDirModule = require(cacheDirModulePath);
+    cacheDir = cacheDirModule.workspaceDataDirectory;
+  }
+} catch (e) {
+  // do nothing
+}
 
 const outputDir = path.join(cacheDir, 'console-generators');
-mkdirp.sync(outputDir);
+fs.mkdirSync(outputDir, { recursive: true });
 
 const findNextAvailableFileName = (baseName) => {
   const baseFileName = path.join(outputDir, `${baseName}.log`);
