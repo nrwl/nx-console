@@ -27,7 +27,8 @@ import {
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express from 'express';
-import { commands, tasks, window } from 'vscode';
+import { commands, ProgressLocation, tasks, window } from 'vscode';
+import { Disposable } from 'vscode-languageserver';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -127,20 +128,46 @@ export async function tryStartMcpServer(workspacePath: string) {
       );
 
       if (!isInCursor()) {
-        const subscription = tasks.onDidEndTaskProcess((event) => {
-          if (event.execution.task.name.includes('wrap-generator.js')) {
-            sendMessageToAgent(
-              `The generator has finished running. Please review the output in "${finalFileName}" and continue.`,
-              false,
-            );
-            subscription.dispose();
-          }
-        });
+        window.withProgress(
+          {
+            location: ProgressLocation.Notification,
+            title:
+              'The Agent will continue running after the generator has finished...',
+            cancellable: true,
+          },
+          async (_, cancellationToken) => {
+            await new Promise<void>((resolve) => {
+              let finished = false;
 
-        const onDisposeDisposable = onGeneratorUiDispose(() => {
-          subscription.dispose();
-          onDisposeDisposable.dispose();
-        });
+              const finish = () => {
+                if (!finished) {
+                  finished = true;
+                  taskSubscription.dispose();
+                  onGenerateUiDisposable.dispose();
+                  resolve();
+                }
+              };
+
+              const taskSubscription = tasks.onDidEndTaskProcess((event) => {
+                if (event.execution.task.name.includes('wrap-generator.js')) {
+                  sendMessageToAgent(
+                    `The generator has finished running. Please review the output in "${finalFileName}" and continue.`,
+                    false,
+                  );
+                  finish();
+                }
+              });
+
+              const onGenerateUiDisposable = onGeneratorUiDispose(() => {
+                finish();
+              });
+
+              cancellationToken.onCancellationRequested(() => {
+                finish();
+              });
+            });
+          },
+        );
       }
 
       return finalFileName;

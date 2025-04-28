@@ -10,8 +10,8 @@ export async function createGeneratorLogFileName(
   generatorName: string,
 ): Promise<string> {
   const sanitizedGeneratorName = generatorName.startsWith('@')
-    ? generatorName.substring(1).replace(/\//g, '-')
-    : generatorName.replace(/[@/]/g, '-');
+    ? generatorName.substring(1).replace(/[/:]/g, '-')
+    : generatorName.replace(/[@/:]/g, '-');
 
   const outputDir = join(
     await getWorkspaceDataDirectory(workspacePath),

@@ -398,7 +398,10 @@ export class NxMcpServerWrapper {
 Found generator schema for ${generatorName}: ${JSON.stringify(
                 generatorDetails,
               )}.
-**IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
+              ${
+                this.ideProvider
+                  ? `Follow up by using the nx_run_generator tool. When generating libraries, apps or components, use the cwd option to specify the parent directory where you want to create the item.`
+                  : `**IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
 
 1. FIRST navigate to the parent directory where you want to create the item:
 - Example: 'cd libs/shared' to create a library in libs/shared
@@ -410,7 +413,9 @@ Found generator schema for ${generatorName}: ${JSON.stringify(
 - Use 'cd' to change directories and specify the positional arg instead
 
 This approach provides better clarity about where new code will be generated
-and follows the Nx workspace convention for project organization.
+and follows the Nx workspace convention for project organization.`
+              }
+
             `,
             },
             {
@@ -520,8 +525,8 @@ and follows the Nx workspace convention for project organization.
     );
 
     this.server.tool(
-      'nx_open_generate_ui',
-      'Opens the generate ui WITH WHATEVER OPTIONS YOU PROVIDE PREFILLED. This allows the user to tweak the generator options before running it. ALWAYS use this instead of running a generator directly via the CLI. You can also call this tool to overwrite the options for an existing generator invocation.',
+      'nx_run_generator',
+      'Opens the generate ui with whatever options you provide prefilled. ALWAYS USE THIS to run nx generators. Use the nx_generators and nx_generator_schema tools to learn about the available options BEFORE using this tool. ALWAYS use this when the user wants to generate something and ALWAYS use this instead of running a generator directly via the CLI. You can also call this tool to overwrite the options for an existing generator invocation.',
       {
         generatorName: z.string().describe('The name of the generator to run'),
         options: z
