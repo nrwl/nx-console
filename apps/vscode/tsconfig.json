@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/terminal"
+    },
+    {
       "path": "../../libs/vscode/graph-base"
     },
     {
