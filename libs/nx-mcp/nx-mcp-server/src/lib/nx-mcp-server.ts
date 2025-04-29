@@ -541,7 +541,7 @@ and follows the Nx workspace convention for project organization.`
       },
       async ({ generatorName, options, cwd }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_open_generate_ui',
+          tool: 'nx_run_generator',
         });
         if (!this._nxWorkspacePath) {
           return {
