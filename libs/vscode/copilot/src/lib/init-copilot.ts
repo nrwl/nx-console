@@ -73,7 +73,7 @@ export function initCopilot(context: ExtensionContext) {
       context: ChatContext,
       token: CancellationToken,
     ) {
-      if (result.metadata.command === 'explain-cipe') {
+      if (result.metadata?.command === 'explain-cipe') {
         return [
           {
             prompt: 'Can you fix the error?',
