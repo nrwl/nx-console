@@ -87,7 +87,7 @@ if (!fs.existsSync(nxGraphDestFolder)) {
   fs.mkdirSync(nxGraphDestFolder, { recursive: true });
 }
 fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
-// this file is required at runtime in the bundle
+// // this file is required at runtime in the bundle
 fs.writeFileSync(
   './dist/apps/vscode/native-bindings.js',
   'module.exports = {};',
@@ -97,3 +97,5 @@ fs.writeFileSync(
   './dist/apps/vscode/default-tasks-runner.js',
   'module.exports = {};',
 );
+//
+fs.writeFileSync('./dist/apps/vscode/nx.wasi.cjs', 'module.exports = {};');
