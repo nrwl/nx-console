@@ -171,9 +171,11 @@
     ]
   },
   "conformance": {
-    "rules": [ {
+    "rules": [
+      {
         "rule": "@nx/conformance/ensure-owners",
-        "status": "enforced"}
+        "status": "enforced"
+      }
     ]
   },
   "defaultBase": "master",

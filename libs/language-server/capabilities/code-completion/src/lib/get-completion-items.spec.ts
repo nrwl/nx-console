@@ -58,7 +58,7 @@ jest.mock(
               type: 'app',
               data: {
                 root: 'apps/project2',
-                tags: ['tag2', 'tag3'],
+                tags: ['tag2', 'tag3', '!!new-tag-with-special-chars'],
                 targets: {
                   build: {
                     executor: 'noop',
