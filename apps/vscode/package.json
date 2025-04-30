@@ -440,6 +440,12 @@
           {
             "name": "explain-cipe",
             "description": "Explain the CI pipeline execution failure"
+          },
+          {
+            "name": "fill-generate-ui",
+            "description": "Fill the Nx generate UI with options",
+            "isSticky": false,
+            "when": "nxConsole.isFillingGenerateUi == true"
           }
         ],
         "disambiguation": [
@@ -506,13 +512,11 @@
       },
       {
         "name": "nx_generator-details",
+        "modelDescription": "View detailed information about an Nx generator",
+        "displayName": "Generator Details",
         "tags": [
           "nx"
         ],
-        "toolReferenceName": "nxGeneratorDetails",
-        "displayName": "Generator Details",
-        "modelDescription": "The detailed JSON schema for an nx generator",
-        "icon": "$(code-oss)",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -549,7 +553,7 @@
         }
       },
       {
-        "name": "nx_visualize_project_graph_project",
+        "name": "nx_visualize-project-graph-project",
         "tags": [
           "nx"
         ],
@@ -571,7 +575,7 @@
         }
       },
       {
-        "name": "nx_visualize_task_graph",
+        "name": "nx_visualize-task-graph",
         "tags": [
           "nx"
         ],
@@ -595,6 +599,67 @@
             "projectName",
             "taskName"
           ]
+        }
+      },
+      {
+        "name": "nx_available-plugins",
+        "modelDescription": "Lists available Nx plugins, including official and local workspace plugins. Use this to answer questions about nx plugins or integrations.",
+        "displayName": "Available Nx Plugins",
+        "icon": "$(plug)",
+        "toolReferenceName": "nxAvailablePlugins",
+        "tags": [
+          "nx"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "nx_open-generate-ui",
+        "modelDescription": "Opens the Nx generate UI with prefilled options",
+        "displayName": "Nx Generate UI",
+        "icon": "$(window)",
+        "tags": [
+          "nx"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "generatorName": {
+              "type": "string",
+              "description": "The name of the generator to open in the UI."
+            },
+            "options": {
+              "type": "object",
+              "description": "The options to prefill in the UI.",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "cwd": {
+              "type": "string",
+              "description": "The current working directory to use for the generator. Relative to the nx workspace root. If not specified, will default to the nx workspace root."
+            }
+          },
+          "required": [
+            "generatorName",
+            "options"
+          ]
+        }
+      },
+      {
+        "name": "nx_visualize-full-project-graph",
+        "tags": [
+          "nx"
+        ],
+        "modelDescription": "Visualizes the entire Nx project graph for the workspace",
+        "icon": "$(source-control)",
+        "displayName": "Nx Full Project Graph",
+        "toolReferenceName": "nxVisualizeFullProjectGraph",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
         }
       }
     ],

@@ -106,9 +106,9 @@
 
 /libs/vscode/utils/ @MaxKless
 
-/libs/vscode/mcp/ @MaxKless
-
 /libs/shared/npm/ @MaxKless
+
+/libs/vscode/mcp/ @MaxKless
 
 /apps/intellij/ @MaxKless
 

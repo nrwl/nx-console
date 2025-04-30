@@ -1,12 +1,17 @@
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import {
+  NxIdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
+import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
-import { IdeCallbackMessage } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import {
+  onGeneratorUiDispose,
+  openGenerateUIPrefilled,
+} from '@nx-console/vscode-generate-ui-webview';
 import {
   getGenerators,
   getNxWorkspace,
@@ -17,10 +22,13 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
   getNxMcpPort,
+  isInCursor,
+  sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express from 'express';
-import { commands, window } from 'vscode';
+import { commands, ProgressLocation, tasks, window } from 'vscode';
+import { Disposable } from 'vscode-languageserver';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -44,10 +52,132 @@ export async function tryStartMcpServer(workspacePath: string) {
     },
     isNxCloudEnabled: await isNxCloudUsed(workspacePath, vscodeLogger),
   };
+
+  const ideProvider: NxIdeProvider = {
+    focusProject: (projectName: string) => {
+      getNxWorkspaceProjects().then(async (workspaceProjects) => {
+        const project = await findMatchingProject(
+          projectName,
+          workspaceProjects,
+          getNxWorkspacePath(),
+        );
+        if (!project) {
+          window.showErrorMessage(`Cannot find project "${projectName}"`);
+          return;
+        }
+        commands.executeCommand('nx.graph.focus', project.name);
+      });
+    },
+    focusTask: (projectName: string, taskName: string) => {
+      getNxWorkspaceProjects().then(async (workspaceProjects) => {
+        const project = await findMatchingProject(
+          projectName,
+          workspaceProjects,
+          getNxWorkspacePath(),
+        );
+        if (!project) {
+          window.showErrorMessage(`Cannot find project "${projectName}"`);
+          return;
+        }
+        if (!project.data.targets?.[taskName]) {
+          window.showErrorMessage(
+            `Cannot find task "${taskName}" in project "${projectName}"`,
+          );
+          return;
+        }
+        commands.executeCommand('nx.graph.task', {
+          projectName: project.name,
+          taskName: taskName,
+        });
+      });
+    },
+    showFullProjectGraph: () => {
+      commands.executeCommand('nx.graph.showAll');
+    },
+    openGenerateUi: async (
+      generatorName: string,
+      options: Record<string, unknown>,
+      cwd?: string,
+    ): Promise<string> => {
+      const generatorInfo = {
+        collection: generatorName.split(':')[0],
+        name: generatorName.split(':')[1],
+      };
+      const foundGenerator = ((await getGenerators()) ?? []).find(
+        (gen) =>
+          generatorInfo.collection === gen.data?.collection &&
+          (generatorInfo.name === gen.data?.name ||
+            gen.data?.aliases?.includes(generatorInfo.name)),
+      );
+      if (!foundGenerator) {
+        window.showErrorMessage(`Could not find generator "${generatorName}"`);
+        throw new Error(`Could not find generator "${generatorName}"`);
+      }
+      await openGenerateUIPrefilled(
+        {
+          $0: 'nx',
+          _: ['generate', foundGenerator.name],
+          ...options,
+          cwd: cwd,
+        },
+        true,
+      );
+      const finalFileName = await createGeneratorLogFileName(
+        getNxWorkspacePath(),
+        foundGenerator.name,
+      );
+
+      if (!isInCursor()) {
+        window.withProgress(
+          {
+            location: ProgressLocation.Notification,
+            title:
+              'The Agent will continue running after the generator has finished...',
+            cancellable: true,
+          },
+          async (_, cancellationToken) => {
+            await new Promise<void>((resolve) => {
+              let finished = false;
+
+              const finish = () => {
+                if (!finished) {
+                  finished = true;
+                  taskSubscription.dispose();
+                  onGenerateUiDisposable.dispose();
+                  resolve();
+                }
+              };
+
+              const taskSubscription = tasks.onDidEndTaskProcess((event) => {
+                if (event.execution.task.name.includes('wrap-generator.js')) {
+                  sendMessageToAgent(
+                    `The generator has finished running. Please review the output in "${finalFileName}" and continue.`,
+                    false,
+                  );
+                  finish();
+                }
+              });
+
+              const onGenerateUiDisposable = onGeneratorUiDispose(() => {
+                finish();
+              });
+
+              cancellationToken.onCancellationRequested(() => {
+                finish();
+              });
+            });
+          },
+        );
+      }
+
+      return finalFileName;
+    },
+  };
+
   const server = new NxMcpServerWrapper(
     workspacePath,
     nxWorkspaceInfoProvider,
-    mcpIdeCallback,
+    ideProvider,
     getTelemetry(),
     vscodeLogger,
   );
@@ -107,50 +237,5 @@ export function stopMcpServer() {
 export function updateMcpServerWorkspacePath(workspacePath: string) {
   if (mcpServerReturn) {
     mcpServerReturn.server.setNxWorkspacePath(workspacePath);
-  }
-}
-
-async function mcpIdeCallback(callbackMessage: IdeCallbackMessage) {
-  const type = callbackMessage.type;
-  if (type === 'focus-project') {
-    const payload = callbackMessage.payload;
-
-    const workspaceProjects = await getNxWorkspaceProjects();
-    const project = await findMatchingProject(
-      payload.projectName,
-      workspaceProjects,
-      getNxWorkspacePath(),
-    );
-    if (!project) {
-      window.showErrorMessage(`Cannot find project "${payload.projectName}"`);
-      return;
-    }
-    commands.executeCommand('nx.graph.focus', project.name);
-  } else if (type === 'focus-task') {
-    const payload = callbackMessage.payload;
-
-    const workspaceProjects = await getNxWorkspaceProjects();
-    const project = await findMatchingProject(
-      payload.projectName,
-      workspaceProjects,
-      getNxWorkspacePath(),
-    );
-    if (!project) {
-      window.showErrorMessage(`Cannot find project "${payload.projectName}"`);
-      return;
-    }
-    if (!project.data.targets?.[payload.taskName]) {
-      window.showErrorMessage(
-        `Cannot find task "${payload.taskName}" in project "${payload.projectName}"`,
-      );
-      return;
-    }
-
-    commands.executeCommand('nx.graph.task', {
-      projectName: project.name,
-      taskName: payload.taskName,
-    });
-  } else if (type === 'full-project-graph') {
-    commands.executeCommand('nx.graph.showAll');
   }
 }

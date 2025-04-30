@@ -16,9 +16,6 @@
       "path": "../output-channels"
     },
     {
-      "path": "../utils"
-    },
-    {
       "path": "../../shared/nx-cloud"
     },
     {
@@ -26,6 +23,9 @@
     },
     {
       "path": "../../shared/npm"
+    },
+    {
+      "path": "../utils"
     },
     {
       "path": "../telemetry"

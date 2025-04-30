@@ -31,7 +31,7 @@ import {
   watchFile,
 } from '@nx-console/vscode-utils';
 
-import { initMcp, updateMcpServerWorkspacePath } from '@nx-console/mcp';
+import { initMcp, updateMcpServerWorkspacePath } from '@nx-console/vscode-mcp';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,

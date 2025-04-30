@@ -2844,12 +2844,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nx-console/mcp@workspace:libs/vscode/mcp":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/mcp@workspace:libs/vscode/mcp"
-  languageName: unknown
-  linkType: soft
-
 "@nx-console/nx-mcp-server@workspace:libs/nx-mcp/nx-mcp-server":
   version: 0.0.0-use.local
   resolution: "@nx-console/nx-mcp-server@workspace:libs/nx-mcp/nx-mcp-server"
@@ -2973,6 +2967,12 @@ __metadata:
 "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-lsp-client@workspace:libs/vscode/lsp-client"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/vscode-mcp@workspace:libs/vscode/mcp":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-mcp@workspace:libs/vscode/mcp"
   languageName: unknown
   linkType: soft
 
@@ -5001,10 +5001,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/vscode@npm:^1.85.0":
-  version: 1.96.0
-  resolution: "@types/vscode@npm:1.96.0"
-  checksum: c7d65dd681fcf933048cbbfe24705ba8c8d89e82f8a7c5e7077e198f52d6b5ae39592eb0f48f87e3f9ef4a7a64eaa51ccbdcba93ffb838be69a6003b42cec5db
+"@types/vscode@npm:^1.96.0":
+  version: 1.98.0
+  resolution: "@types/vscode@npm:1.98.0"
+  checksum: 32f25d6d14dbbe92aac8862a2e3ebdc18cc2457e65dbe65d14cfe6fb39149e31b24d24ee88ce19dd83f02512a8f47c313267c306295e05fd4481207ecf8b1c6d
   languageName: node
   linkType: hard
 
@@ -14128,7 +14128,7 @@ __metadata:
     "@types/tar-stream": ^3.1.3
     "@types/universal-analytics": 0.4.5
     "@types/uuid": ^8.3.4
-    "@types/vscode": ^1.85.0
+    "@types/vscode": ^1.96.0
     "@types/vscode-webview": ^1.57.0
     "@typescript-eslint/eslint-plugin": 7.16.1
     "@typescript-eslint/parser": 7.16.1

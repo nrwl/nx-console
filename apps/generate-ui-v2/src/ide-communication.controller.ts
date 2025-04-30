@@ -79,12 +79,12 @@ export class IdeCommunicationController implements ReactiveController {
   }
 
   private pendingPluginValidationQueue: ((
-    results: ValidationResults
+    results: ValidationResults,
   ) => void)[] = [];
 
   async getValidationResults(
     formValues: FormValues,
-    schema: GeneratorSchema
+    schema: GeneratorSchema,
   ): Promise<ValidationResults> {
     // send request and wait until handleInputMessage resolves the promise
     const promise = new Promise<ValidationResults>((resolve) => {
@@ -92,7 +92,7 @@ export class IdeCommunicationController implements ReactiveController {
     });
 
     this.postMessageToIde(
-      new GenerateUiRequestValidationOutputMessage({ formValues, schema })
+      new GenerateUiRequestValidationOutputMessage({ formValues, schema }),
     );
 
     return await promise;
@@ -112,7 +112,7 @@ export class IdeCommunicationController implements ReactiveController {
         }
 
         this.handleInputMessage(data);
-      }
+      },
     );
 
     this.postToIde = (message) => vscode.postMessage(message);
@@ -127,7 +127,7 @@ export class IdeCommunicationController implements ReactiveController {
         }
 
         this.handleInputMessage(message);
-      }
+      },
     );
 
     this.postToIde = (message) => {
@@ -141,7 +141,7 @@ export class IdeCommunicationController implements ReactiveController {
       case 'generator': {
         this.generatorSchema = message.payload;
         this.generatorContextContextProvider.setValue(
-          this.generatorSchema.context
+          this.generatorSchema.context,
         );
 
         this.host.requestUpdate();
@@ -171,6 +171,21 @@ export class IdeCommunicationController implements ReactiveController {
           resolve(message.payload);
         }
 
+        break;
+      }
+      case 'update-form-values': {
+        // Get the Root element cast to access its formValuesService
+        const root = this.host as unknown as {
+          formValuesService: {
+            updateFormValuesFromIde: (values: FormValues) => void;
+          };
+        };
+
+        if (root.formValuesService) {
+          root.formValuesService.updateFormValuesFromIde(message.payload);
+        }
+
+        this.host.requestUpdate();
         break;
       }
     }

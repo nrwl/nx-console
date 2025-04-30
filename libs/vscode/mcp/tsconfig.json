@@ -4,13 +4,16 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-cloud"
-    },
-    {
       "path": "../nx-workspace"
     },
     {
-      "path": "../../shared/types"
+      "path": "../generate-ui-webview"
+    },
+    {
+      "path": "../../shared/nx-cloud"
+    },
+    {
+      "path": "../../shared/llm-context"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"
