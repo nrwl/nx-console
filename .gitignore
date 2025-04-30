@@ -50,6 +50,7 @@ testem.log
 /typings
 **/test-output
 .cursor/mcp.json
+.cursor/rules/nx-rules.mdc
 
 # System Files
 .DS_Store
