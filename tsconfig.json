@@ -175,7 +175,7 @@
       "path": "./libs/shared/nx-cloud"
     },
     {
-      "path": "./libs/vscode/terminal"
+      "path": "./libs/vscode/messaging"
     }
   ]
 }
