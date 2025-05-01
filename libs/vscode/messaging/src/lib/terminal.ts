@@ -1,7 +1,6 @@
 import { commands, ExtensionContext, window } from 'vscode';
 export function initTerminal(context: ExtensionContext): void {
   setTimeout(async () => {
-    debugger;
     const commandsAvailable = await commands.getCommands();
     console.log(commandsAvailable);
   }, 1000);
@@ -13,13 +12,16 @@ export function initTerminal(context: ExtensionContext): void {
         let match;
         while ((match = regex.exec(text)) !== null) {
           const content = JSON.parse(match[1]);
-          commands.executeCommand('workbench.action.chat.open', {
-            mode: 'agent',
-            query: content.key,
-            isPartialQuery: false,
-          });
+          if (content.key === 'ai') {
+            // commands.executeCommand('workbench.action.chat.open', {
+            //   mode: 'agent',
+            //   query: content.value,
+            //   isPartialQuery: false,
+            // });
+          }
         }
       }
     }),
   );
 }
+

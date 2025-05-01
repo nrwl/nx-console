@@ -2961,6 +2961,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/vscode-messaging@workspace:libs/vscode/messaging":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-messaging@workspace:libs/vscode/messaging"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-mcp@workspace:libs/vscode/mcp":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-mcp@workspace:libs/vscode/mcp"
@@ -3069,12 +3075,6 @@ __metadata:
 "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-telemetry@workspace:libs/vscode/telemetry"
-  languageName: unknown
-  linkType: soft
-
-"@nx-console/vscode-terminal@workspace:libs/vscode/terminal":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/vscode-terminal@workspace:libs/vscode/terminal"
   languageName: unknown
   linkType: soft
 
