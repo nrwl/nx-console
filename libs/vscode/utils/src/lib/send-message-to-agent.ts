@@ -1,5 +1,5 @@
 import { commands, env } from 'vscode';
-import { isInCursor } from './is-in-cursor';
+import { isInCursor } from './editor-name-helpers';
 
 export async function sendMessageToAgent(message: string, newChat = true) {
   if (isInCursor()) {

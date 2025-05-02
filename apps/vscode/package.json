@@ -114,7 +114,7 @@
         },
         {
           "command": "nx.configureMcpServer",
-          "when": "view == nxProjects && isInCursor && isNxWorkspace && !hasNxMcpConfigured",
+          "when": "view == nxProjects && (isInCursor || isInVSCode) && isNxWorkspace && !hasNxMcpConfigured",
           "group": "navigation@0",
           "title": "Add Nx to Cursor Agent"
         },
@@ -421,7 +421,7 @@
         },
         {
           "command": "nx.configureMcpServer",
-          "when": "isNxWorkspace && !hasNxMcpConfigured"
+          "when": "isNxWorkspace && !hasNxMcpConfigured && (isInCursor || isInVSCode)"
         }
       ]
     },
