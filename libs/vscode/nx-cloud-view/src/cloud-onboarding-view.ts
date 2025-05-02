@@ -25,7 +25,11 @@ import { join } from 'path';
 import { isDeepStrictEqual } from 'util';
 import { ActorRef, EventObject } from 'xstate';
 import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
-import { getNxAccessToken, getNxCloudUrl } from '@nx-console/shared-nx-cloud';
+import {
+  getNxAccessToken,
+  getNxCloudId,
+  getNxCloudUrl,
+} from '@nx-console/shared-nx-cloud';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -224,6 +228,7 @@ async function finishCloudSetup() {
   const workspacePath = getNxWorkspacePath();
 
   const accessToken = await getNxAccessToken(workspacePath);
+  const nxCloudId = await getNxCloudId(workspacePath);
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
 
@@ -247,10 +252,10 @@ async function finishCloudSetup() {
     if (nxPackage && nxPackage.createNxCloudOnboardingURL) {
       url = await nxPackage.createNxCloudOnboardingURL(
         'nx-console',
-        accessToken,
+        accessToken || nxCloudId,
       );
     } else {
-      url = await createNxCloudOnboardingURL(accessToken);
+      url = await createNxCloudOnboardingURL(accessToken || nxCloudId);
     }
   }, 5000);
 
