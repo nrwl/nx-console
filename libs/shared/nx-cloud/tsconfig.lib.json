@@ -1,6 +1,7 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
+    "outDir": "out-tsc/nx-cloud",
     "types": ["node"],
     "noImplicitReturns": false
   },

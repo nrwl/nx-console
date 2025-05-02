@@ -22,10 +22,10 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
   getNxMcpPort,
+  isInVSCode,
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
-import { isInVSCode } from '@nx-console/vscode-utils/src/lib/is-in-cursor';
 import express from 'express';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
 
