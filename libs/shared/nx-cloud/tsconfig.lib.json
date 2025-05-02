@@ -2,9 +2,11 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "outDir": "out-tsc/nx-cloud"
   },
   "include": ["src/**/*.ts"],
+  "exclude": ["out-tsc"],
   "references": [
     {
       "path": "../npm/tsconfig.lib.json"

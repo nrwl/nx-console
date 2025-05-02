@@ -6,8 +6,10 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["DOM", "esnext.asynciterable"],
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "outDir": "out-tsc/vscode/migrate-sidebar-webview"
   },
   "include": ["src/**/*.ts"],
+  "exclude": ["out-tsc"],
   "references": []
 }
