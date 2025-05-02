@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "out-tsc/nx-mcp-server",
     "strict": true,
     "noImplicitReturns": true,
     "types": ["node"]
@@ -36,5 +36,10 @@
       "path": "../../shared/utils/tsconfig.lib.json"
     }
   ],
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "out-tsc"
+  ]
 }

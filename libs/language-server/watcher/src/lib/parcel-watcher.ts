@@ -1,11 +1,15 @@
 import { lspLogger } from '@nx-console/language-server-utils';
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { platform } from 'os';
+import { join } from 'path';
 
 export class ParcelWatcher {
   private subscription: import('@parcel/watcher').AsyncSubscription | undefined;
   private stopped = false;
-  constructor(private workspacePath: string, private callback: () => unknown) {
+  constructor(
+    private workspacePath: string,
+    private callback: () => unknown,
+  ) {
     this.initWatcher();
   }
 
@@ -34,16 +38,16 @@ export class ParcelWatcher {
               e.path.endsWith('package.json') ||
               e.path.endsWith('nx.json') ||
               e.path.endsWith('workspace.json') ||
-              e.path.endsWith('tsconfig.base.json')
+              e.path.endsWith('tsconfig.base.json'),
           )
         ) {
           lspLogger.log(
-            `Project configuration changed, ${events.map((e) => e.path)}`
+            `Project configuration changed, ${events.map((e) => e.path)}`,
           );
           this.callback();
         }
       },
-      await this.watcherOptions()
+      await this.watcherOptions(),
     );
     lspLogger.log('Parcel watcher initialized');
   }
@@ -51,11 +55,15 @@ export class ParcelWatcher {
   private async watcherOptions(): Promise<
     import('@parcel/watcher').Options | undefined
   > {
-    const { getIgnoredGlobs } = await importNxPackagePath<
-      typeof import('nx/src/utils/ignore')
-    >(this.workspacePath, 'src/utils/ignore', lspLogger);
-    const ingoredGlobs = getIgnoredGlobs(this.workspacePath).filter(
-      (glob) => !glob.startsWith('!')
+    const { readFileIfExisting } = await importNxPackagePath<
+      typeof import('nx/src/utils/fileutils')
+    >(this.workspacePath, 'src/utils/fileutils', lspLogger);
+    const nxIgnore = readFileIfExisting(join(this.workspacePath, '.nxignore'));
+    const gitIgnore = readFileIfExisting(
+      join(this.workspacePath, '.gitignore'),
+    );
+    const ingoredGlobs = [...nxIgnore, ...gitIgnore].filter(
+      (glob) => !glob.startsWith('!'),
     );
     const options: import('@parcel/watcher').Options = {
       ignore: ingoredGlobs,

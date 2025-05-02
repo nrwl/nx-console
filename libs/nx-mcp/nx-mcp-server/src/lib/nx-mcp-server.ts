@@ -107,7 +107,7 @@ export class NxMcpServerWrapper {
             'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
           ),
       },
-      async ({ userQuery }: { userQuery: string }) => {
+      async ({ userQuery }) => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: 'nx_docs',
         });
