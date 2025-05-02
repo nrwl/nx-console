@@ -22,13 +22,12 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
   getNxMcpPort,
-  isInCursor,
+  isInVSCode,
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express from 'express';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
-import { Disposable } from 'vscode-languageserver';
 
 export interface McpServerReturn {
   server: NxMcpServerWrapper;
@@ -127,7 +126,7 @@ export async function tryStartMcpServer(workspacePath: string) {
         foundGenerator.name,
       );
 
-      if (!isInCursor()) {
+      if (isInVSCode()) {
         window.withProgress(
           {
             location: ProgressLocation.Notification,

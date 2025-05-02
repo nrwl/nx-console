@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import * as path from 'path';
 import { workspace, window } from 'vscode';
-import { isInCursor } from './is-in-cursor';
+import { isInCursor, isInWindsurf } from './editor-name-helpers';
 
 /**
  * Gets the path to the mcp.json file.
@@ -18,7 +18,10 @@ export function getMcpJsonPath(): string | null {
   if (isInCursor()) {
     // If in cursor, use the .cursor directory
     return path.join(vscodeWorkspacePath, '.cursor', 'mcp.json');
-  } else {
+  } // else if (isInWindsurf()) {
+  //   TODO: do once windsurf supports project-level mcp servers
+  // }
+  else {
     // If not in cursor, use the workspace root
     return path.join(vscodeWorkspacePath, '.vscode', 'mcp.json');
   }
