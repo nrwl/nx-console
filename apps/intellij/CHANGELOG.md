@@ -1,3 +1,27 @@
+## 1.40.0 (2025-05-05)
+
+### Bug Fixes
+
+* **intellij:** only hide .nx/cache & .nx/workspace-data instead of all .nx ([#2479](https://github.com/nrwl/nx-console/issues/2479)) ([a025453](https://github.com/nrwl/nx-console/commit/a025453986e2717c2d1b36d2dc1a270065e3cb65))
+* **intellij:** repair pluginVerifier & misc issues ([#2439](https://github.com/nrwl/nx-console/issues/2439)) ([de21bc8](https://github.com/nrwl/nx-console/commit/de21bc8c75b2581dd6eb794caa1b7f8ced9d5945))
+* **nx-mcp:** dont call console.log directly in stdio mode ([#2480](https://github.com/nrwl/nx-console/issues/2480)) ([7878892](https://github.com/nrwl/nx-console/commit/78788920814e1b6598b4060c480d88774293c21f))
+* **nxls:** make runLinkId nullable for cloud future compat ([#2455](https://github.com/nrwl/nx-console/issues/2455)) ([be05f23](https://github.com/nrwl/nx-console/commit/be05f23a18b0f6e0f79e1bfc92173cda4c9e2fee))
+* **vscode:** catch potential errors importing from nx paths ([#2461](https://github.com/nrwl/nx-console/issues/2461)) ([bffb4c2](https://github.com/nrwl/nx-console/commit/bffb4c2b11728ed30a3521c8e90cf03310f9fd6d))
+* **vscode:** include local plugins in tool result & hide community plugins for now ([#2454](https://github.com/nrwl/nx-console/issues/2454)) ([7271fc5](https://github.com/nrwl/nx-console/commit/7271fc5ff834a930ed90ed73ae68a27ac2d032e5))
+* **vscode:** remove false dichotomy between vscode & cursor. make sure windsurf doesn't get notifications for now ([#2490](https://github.com/nrwl/nx-console/issues/2490)) ([48f0eee](https://github.com/nrwl/nx-console/commit/48f0eee4f8ee3137ffca607af763d7cc80dcf339))
+
+
+### Features
+
+* add generate-ui mcp tool & add more tools to copilot ([#2456](https://github.com/nrwl/nx-console/issues/2456)) ([6ddf5d1](https://github.com/nrwl/nx-console/commit/6ddf5d1fe973427d4d73dc3adc66a00d481b612a))
+* add mcp and copilot support for cipe details ([#2469](https://github.com/nrwl/nx-console/issues/2469)) ([47ea625](https://github.com/nrwl/nx-console/commit/47ea625098e659f720b318b3b8f8b29abff8ff93))
+* add mcp tool with for available plugins ([#2448](https://github.com/nrwl/nx-console/issues/2448)) ([bf08385](https://github.com/nrwl/nx-console/commit/bf083852de7af7a56f3161b5c87a99d075ae464a))
+* add migrate ui to vscode ([#2463](https://github.com/nrwl/nx-console/issues/2463)) ([2e1be98](https://github.com/nrwl/nx-console/commit/2e1be98a1295330a629423beeed8745375291e7b))
+* added collapsible state option to project view plugin ([#2438](https://github.com/nrwl/nx-console/issues/2438)) ([50236a3](https://github.com/nrwl/nx-console/commit/50236a3ec5adac776d53449ca7822155e87a0555))
+* **intellij:** update platform version to 2025.1 and fix issues ([#2495](https://github.com/nrwl/nx-console/issues/2495)) ([9fcfa3f](https://github.com/nrwl/nx-console/commit/9fcfa3f87ca2b25ad95d8442b6649874e08719fd))
+* **vscode:** enable mcp support for vscode ([#2471](https://github.com/nrwl/nx-console/issues/2471)) ([77dfb46](https://github.com/nrwl/nx-console/commit/77dfb4692e67ec5183f2a61cd961d2f5e0732e46))
+* **vscode:** provide completion info for workspace projects using package manager workspaces ([#2447](https://github.com/nrwl/nx-console/issues/2447)) ([ebc6423](https://github.com/nrwl/nx-console/commit/ebc6423b2de2396e9bda78ee823cdd1d5da5da7b))
+
 ## 1.39.0 (2025-03-10)
 
 ### Bug Fixes
