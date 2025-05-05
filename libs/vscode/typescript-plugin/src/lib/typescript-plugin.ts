@@ -176,74 +176,77 @@ async function enableTypescriptServerPlugin(
   const isTsSolutionSetup = await isUsingTsSolutionSetup(workspaceRoot);
   let projectGraph: ProjectGraph | undefined;
   if (isTsSolutionSetup) {
-    ({ projectGraph } = await getNxWorkspace());
+    const nxWorkspace = await getNxWorkspace();
+    if (nxWorkspace) {
+      ({ projectGraph } = nxWorkspace);
+
+      disposables.push(
+        onWorkspaceRefreshed(async () => {
+          ({ projectGraph } = await getNxWorkspace());
+          await configurePlugin(
+            workspaceRoot,
+            projectGraph,
+            api,
+            pluginConfigurationCache,
+          );
+        }),
+      );
+    }
 
     disposables.push(
-      onWorkspaceRefreshed(async () => {
-        ({ projectGraph } = await getNxWorkspace());
-        await configurePlugin(
-          workspaceRoot,
-          projectGraph,
-          api,
-          pluginConfigurationCache,
-        );
-      }),
+      vscode.workspace.onDidOpenTextDocument(
+        (document) => {
+          if (
+            document.uri.fsPath.endsWith('.ts') ||
+            document.uri.fsPath.endsWith('.tsx')
+          ) {
+            configurePlugin(
+              workspaceRoot,
+              projectGraph,
+              api,
+              pluginConfigurationCache,
+            );
+          }
+        },
+        undefined,
+        context.subscriptions,
+      ),
+      watchFile(
+        `${workspaceRoot}/tsconfig.base.json`,
+        () => {
+          clearJsonCache(TSCONFIG_BASE, workspaceRoot);
+          configurePlugin(
+            workspaceRoot,
+            projectGraph,
+            api,
+            pluginConfigurationCache,
+          );
+        },
+        context.subscriptions,
+      ),
+      vscode.workspace.onDidChangeTextDocument(
+        ({ document }) => {
+          if (document.uri.fsPath.endsWith(TSCONFIG_BASE)) {
+            configurePlugin(
+              workspaceRoot,
+              projectGraph,
+              api,
+              pluginConfigurationCache,
+            );
+          }
+        },
+        undefined,
+        context.subscriptions,
+      ),
+    );
+
+    await configurePlugin(
+      workspaceRoot,
+      projectGraph,
+      api,
+      pluginConfigurationCache,
     );
   }
-
-  disposables.push(
-    vscode.workspace.onDidOpenTextDocument(
-      (document) => {
-        if (
-          document.uri.fsPath.endsWith('.ts') ||
-          document.uri.fsPath.endsWith('.tsx')
-        ) {
-          configurePlugin(
-            workspaceRoot,
-            projectGraph,
-            api,
-            pluginConfigurationCache,
-          );
-        }
-      },
-      undefined,
-      context.subscriptions,
-    ),
-    watchFile(
-      `${workspaceRoot}/tsconfig.base.json`,
-      () => {
-        clearJsonCache(TSCONFIG_BASE, workspaceRoot);
-        configurePlugin(
-          workspaceRoot,
-          projectGraph,
-          api,
-          pluginConfigurationCache,
-        );
-      },
-      context.subscriptions,
-    ),
-    vscode.workspace.onDidChangeTextDocument(
-      ({ document }) => {
-        if (document.uri.fsPath.endsWith(TSCONFIG_BASE)) {
-          configurePlugin(
-            workspaceRoot,
-            projectGraph,
-            api,
-            pluginConfigurationCache,
-          );
-        }
-      },
-      undefined,
-      context.subscriptions,
-    ),
-  );
-
-  await configurePlugin(
-    workspaceRoot,
-    projectGraph,
-    api,
-    pluginConfigurationCache,
-  );
 }
 
 async function disableTypescriptServerPlugin() {
