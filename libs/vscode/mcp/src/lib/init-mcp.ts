@@ -56,8 +56,6 @@ export async function initMcp(context: ExtensionContext) {
     writeMcpJson(readMcpJson());
   }
 
-  showMCPNotification();
-
   setupMcpJsonWatcher(context);
 
   context.subscriptions.push(
@@ -65,6 +63,8 @@ export async function initMcp(context: ExtensionContext) {
       await updateMcpJson();
     }),
   );
+
+  await showMCPNotification();
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {

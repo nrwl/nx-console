@@ -33,6 +33,7 @@ export interface McpServerReturn {
   server: NxMcpServerWrapper;
   app: express.Application;
   server_instance: ReturnType<express.Application['listen']>;
+  clearKeepAliveInterval: () => void;
 }
 
 let mcpServerReturn: McpServerReturn | undefined;
@@ -182,14 +183,23 @@ export async function tryStartMcpServer(workspacePath: string) {
   );
 
   const app = express();
-  let transport: SSEServerTransport;
+  let transport: SSEServerTransport | undefined = undefined;
+  let keepAliveInterval: NodeJS.Timeout | undefined;
+  const clearKeepAliveInterval: () => void = () => {
+    if (keepAliveInterval) {
+      clearInterval(keepAliveInterval);
+    }
+  };
+
   app.get('/sse', async (req, res) => {
-    vscodeLogger.log('SSE connection established');
+    vscodeLogger.log(
+      `SSE connection established, ${JSON.stringify(req.headers)}`,
+    );
     transport = new SSEServerTransport('/messages', res);
     await server.getMcpServer().connect(transport);
 
     // Set up a keep-alive interval to prevent timeout
-    const keepAliveInterval = setInterval(() => {
+    keepAliveInterval = setInterval(() => {
       // Check if the connection is still open using the socket's writable state
       if (!res.writableEnded && !res.writableFinished) {
         // Send a heart beat
@@ -208,6 +218,7 @@ export async function tryStartMcpServer(workspacePath: string) {
   });
 
   app.post('/messages', async (req, res) => {
+    vscodeLogger.log(`Message received, ${JSON.stringify(req.headers)}`);
     if (!transport) {
       res.status(400).send('No transport found');
       return;
@@ -218,10 +229,11 @@ export async function tryStartMcpServer(workspacePath: string) {
   const server_instance = app.listen(port);
   vscodeLogger.log(`MCP server started on port ${port}`);
 
-  mcpServerReturn = { server, app, server_instance };
+  mcpServerReturn = { server, app, server_instance, clearKeepAliveInterval };
 }
 
 export async function restartMcpServer() {
+  vscodeLogger.log('Restarting MCP server');
   stopMcpServer();
   await tryStartMcpServer(getNxWorkspacePath());
 }
@@ -230,6 +242,8 @@ export function stopMcpServer() {
   if (mcpServerReturn) {
     getOutputChannel().appendLine('Stopping MCP server');
     mcpServerReturn.server_instance.close();
+    mcpServerReturn.server.getMcpServer().close();
+    mcpServerReturn.clearKeepAliveInterval();
   }
 }
 
