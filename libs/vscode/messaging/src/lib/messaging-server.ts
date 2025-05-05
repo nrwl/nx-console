@@ -15,9 +15,7 @@ export class NxMessagingServer {
     this.#fullSocketPath = getFullOsSocketPath(workspacePath);
 
     this.#server = net.createServer((socket) => {
-      console.log(
-        `Client connected from ${socket.remoteAddress}:${socket.remotePort}`,
-      );
+      console.log(`Client connected`);
 
       // Create a connection for the server over this socket
       const connection = createMessageConnection(
@@ -34,7 +32,7 @@ export class NxMessagingServer {
       connection.listen();
 
       socket.on('close', () => {
-        // connection.dispose();
+        connection.dispose();
         console.log('Client disconnected');
       });
     });
