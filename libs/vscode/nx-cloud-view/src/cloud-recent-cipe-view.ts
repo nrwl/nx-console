@@ -1,11 +1,16 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
-import { AbstractTreeProvider, isInCursor } from '@nx-console/vscode-utils';
+import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
+import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
+import {
+  AbstractTreeProvider,
+  sendMessageToAgent,
+} from '@nx-console/vscode-utils';
 import { isDeepStrictEqual } from 'util';
 import {
   commands,
   Disposable,
-  env,
   ExtensionContext,
   FileDecoration,
   FileDecorationProvider,
@@ -19,9 +24,6 @@ import {
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
 import { formatMillis } from './format-time';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
-import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 
 abstract class BaseRecentCIPETreeItem extends TreeItem {
   abstract type: 'CIPE' | 'runGroup' | 'run' | 'label' | 'failedTask';
@@ -453,21 +455,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
 
         const fixMePrompt = 'help me fix the latest ci pipeline error';
 
-        if (isInCursor()) {
-          commands.executeCommand('composer.newAgentChat');
-          await new Promise((resolve) => setTimeout(resolve, 150));
-          const originalClipboard = await env.clipboard.readText();
-          await env.clipboard.writeText(fixMePrompt);
-          await commands.executeCommand('editor.action.clipboardPasteAction');
-          await env.clipboard.writeText(originalClipboard);
-        } else {
-          commands.executeCommand('workbench.action.chat.open', {
-            mode: 'agent',
-            query: fixMePrompt,
-            isPartialQuery: true,
-          });
-          await commands.executeCommand('workbench.action.chat.sendToNewChat');
-        }
+        sendMessageToAgent(fixMePrompt);
       }),
     );
   }

@@ -1,0 +1,46 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../shared/file-system"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "../../language-server/types"
+    },
+    {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../tasks"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../output-channels"
+    },
+    {
+      "path": "../configuration"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

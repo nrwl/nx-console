@@ -25,9 +25,6 @@
       "path": "../output-channels/tsconfig.lib.json"
     },
     {
-      "path": "../utils/tsconfig.lib.json"
-    },
-    {
       "path": "../../shared/nx-cloud/tsconfig.lib.json"
     },
     {
@@ -35,6 +32,9 @@
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
+      "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../telemetry/tsconfig.lib.json"

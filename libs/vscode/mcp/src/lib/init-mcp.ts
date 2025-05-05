@@ -8,6 +8,8 @@ import {
   getMcpJsonPath,
   getNxMcpPort,
   hasNxMcpEntry,
+  isInVSCode,
+  isInWindsurf,
   readMcpJson,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
@@ -35,6 +37,8 @@ export async function initMcp(context: ExtensionContext) {
   }
 
   commands.executeCommand('setContext', 'isInCursor', isInCursor());
+  commands.executeCommand('setContext', 'isInWindsurf', isInWindsurf());
+  commands.executeCommand('setContext', 'isInVSCode', isInVSCode());
 
   if (!(await checkIsNxWorkspace(getNxWorkspacePath()))) {
     return;
@@ -111,9 +115,16 @@ async function showMCPNotification() {
     return;
   }
 
+  if (isInWindsurf()) {
+    // TODO: do once windsurf supports project-level mcp servers
+    return;
+  }
+
   const msg = isInCursor()
     ? 'Improve Cursor Agents with Nx-specific context?'
-    : 'Improve Copilot Agents with Nx-specific context?';
+    : isInWindsurf()
+      ? 'Improve Cascade with Nx-specific context?'
+      : 'Improve Copilot Agents with Nx-specific context?';
 
   window
     .showInformationMessage(msg, 'Yes', "Don't ask again")

@@ -20,7 +20,7 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
 
     init {
         val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        inputField = textFieldWithBrowseButton(project, "Nx workspace root", descriptor)
+        inputField = textFieldWithBrowseButton(project, descriptor.withTitle("Nx Workspace Root"))
     }
 
     override fun render(panel: Panel) {
@@ -31,7 +31,7 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
                         .align(AlignX.FILL)
                         .comment(
                             "Set this if your Nx workspace is not at the root of the currently opened project.",
-                            MAX_LINE_LENGTH_WORD_WRAP
+                            MAX_LINE_LENGTH_WORD_WRAP,
                         )
                         .apply { component.emptyText.text = project.basePath ?: "" }
                 }

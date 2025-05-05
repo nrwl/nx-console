@@ -14,7 +14,8 @@ export type GenerateUiOutputMessage =
   | GenerateUiFormInitOutputMessage
   | GenerateUiRunGeneratorOutputMessage
   | GenerateUiRequestValidationOutputMessage
-  | GenerateUiCopyToClipboardOutputMessage;
+  | GenerateUiCopyToClipboardOutputMessage
+  | GenerateUiFillWithCopilotOutputMessage;
 
 export class GenerateUiFormInitOutputMessage {
   readonly payloadType = 'output-init';
@@ -36,7 +37,10 @@ export class GenerateUiRequestValidationOutputMessage {
   readonly payloadType = 'request-validation';
 
   constructor(
-    public readonly payload: { formValues: FormValues; schema: GeneratorSchema }
+    public readonly payload: {
+      formValues: FormValues;
+      schema: GeneratorSchema;
+    },
   ) {}
 }
 
@@ -44,6 +48,16 @@ export class GenerateUiCopyToClipboardOutputMessage {
   readonly payloadType = 'copy-to-clipboard';
 
   constructor(public readonly payload: string) {}
+}
+
+export class GenerateUiFillWithCopilotOutputMessage {
+  readonly payloadType = 'fill-with-copilot';
+  constructor(
+    public readonly payload: {
+      generatorName: string;
+      formValues: FormValues;
+    },
+  ) {}
 }
 
 /**
@@ -55,8 +69,8 @@ export type GenerateUiInputMessage =
   | GenerateUiConfigurationInputMessage
   | GenerateUiStylesInputMessage
   | GenerateUiBannerInputMessage
-  | GenerateUiValidationResultsInputMessage;
-
+  | GenerateUiValidationResultsInputMessage
+  | GenerateUiUpdateFormValuesInputMessage;
 export class GenerateUiGeneratorSchemaInputMessage {
   readonly payloadType = 'generator';
 
@@ -71,6 +85,7 @@ export class GenerateUiConfigurationInputMessage {
 
 export type GenerateUiConfiguration = {
   enableTaskExecutionDryRunOnChange: boolean;
+  hasCopilot: boolean;
 };
 
 export class GenerateUiStylesInputMessage {
@@ -107,7 +122,7 @@ export class GenerateUiBannerInputMessage {
     public readonly payload: {
       message: string;
       type: 'warning' | 'error';
-    }
+    },
   ) {}
 }
 
@@ -115,4 +130,10 @@ export class GenerateUiValidationResultsInputMessage {
   readonly payloadType = 'validation-results';
 
   constructor(public readonly payload: ValidationResults) {}
+}
+
+export class GenerateUiUpdateFormValuesInputMessage {
+  readonly payloadType = 'update-form-values';
+
+  constructor(public readonly payload: FormValues) {}
 }

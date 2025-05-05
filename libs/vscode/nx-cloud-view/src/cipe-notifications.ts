@@ -2,8 +2,7 @@ import { CIPEInfo } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { isInCursor } from '@nx-console/vscode-utils';
-import { commands, env, window } from 'vscode';
+import { commands, window } from 'vscode';
 
 export function compareCIPEDataAndSendNotification(
   oldInfo: CIPEInfo[] | null,

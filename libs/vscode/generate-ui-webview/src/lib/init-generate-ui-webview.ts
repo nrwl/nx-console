@@ -8,6 +8,7 @@ import { registerGenerateCommands } from './generate-commands';
 import { GenerateUiWebview } from './generate-ui-webview';
 import yargs = require('yargs');
 import { Option } from '@nx-console/shared-schema';
+import { FormValues } from '@nx-console/shared-generate-ui-types';
 
 let generateUIWebview: GenerateUiWebview;
 
@@ -39,7 +40,8 @@ export async function openGenerateUi(contextUri?: Uri, projectName?: string) {
 }
 
 export async function openGenerateUIPrefilled(
-  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>
+  parsedArgs: Awaited<ReturnType<typeof yargs.parse>>,
+  openedFromAI = false,
 ) {
   const generatorName = parsedArgs['_'][1];
   const generator = await getOrSelectGenerator(generatorName.toString());
@@ -51,21 +53,32 @@ export async function openGenerateUIPrefilled(
 
   const generatorContext = await getGeneratorContextV2(undefined);
 
-  generateUIWebview.openGenerateUi({
-    ...generator,
-    context: {
-      ...generatorContext,
-      prefillValues: {
-        ...generatorContext.prefillValues,
-        ...parseIntoPrefillValues(parsedArgs, generator.options),
+  generateUIWebview.openGenerateUi(
+    {
+      ...generator,
+      context: {
+        ...generatorContext,
+        prefillValues: {
+          ...generatorContext.prefillValues,
+          ...parseIntoPrefillValues(parsedArgs, generator.options),
+        },
       },
     },
-  });
+    openedFromAI,
+  );
+}
+
+export async function updateGenerateUIValues(formValues: FormValues) {
+  generateUIWebview.updateFormValues(formValues);
+}
+
+export function onGeneratorUiDispose(callback: () => void) {
+  return generateUIWebview.onDispose(callback);
 }
 
 function parseIntoPrefillValues(
   yargsParseResult: Awaited<ReturnType<typeof yargs.parse>>,
-  options: Option[]
+  options: Option[],
 ): Record<string, string> {
   const positionals = yargsParseResult['_'].slice(2);
 
@@ -85,7 +98,7 @@ function parseIntoPrefillValues(
   }
 
   for (const [key, value] of Object.entries(yargsParseResult)) {
-    if (key !== '_' && key !== '$0') {
+    if (key !== '_' && key !== '$0' && value !== undefined) {
       prefillValues[key] = value.toString();
     }
   }

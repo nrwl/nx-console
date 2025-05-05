@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../utils"
+    },
+    {
+      "path": "../../shared/generate-ui-types"
+    },
+    {
       "path": "../../shared/schema"
     },
     {

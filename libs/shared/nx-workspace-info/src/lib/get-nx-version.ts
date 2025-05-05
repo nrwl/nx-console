@@ -1,14 +1,18 @@
 import { findNxPackagePath } from '@nx-console/shared-npm';
 import { NxVersion } from '@nx-console/nx-version';
 import { coerce, SemVer } from 'semver';
+import { readFileSync } from 'node:fs';
 
-let nxWorkspacePackageJson: { version: string } | undefined;
+let nxWorkspacePackageJsonVersion: string | undefined;
 let loadedNxPackage = false;
 
 const defaultSemver = new SemVer('0.0.0');
 
-export async function getNxVersion(workspacePath: string): Promise<NxVersion> {
-  if (!loadedNxPackage) {
+export async function getNxVersion(
+  workspacePath: string,
+  reset = false,
+): Promise<NxVersion> {
+  if (!loadedNxPackage || reset) {
     const packagePath = await findNxPackagePath(workspacePath, 'package.json');
 
     if (!packagePath) {
@@ -19,18 +23,18 @@ export async function getNxVersion(workspacePath: string): Promise<NxVersion> {
       };
     }
 
-    nxWorkspacePackageJson = require(packagePath);
+    nxWorkspacePackageJsonVersion = readVersionFromPackageJson(packagePath);
     loadedNxPackage = true;
   }
 
-  if (!nxWorkspacePackageJson) {
+  if (!nxWorkspacePackageJsonVersion) {
     return {
       major: defaultSemver.major,
       minor: defaultSemver.minor,
       full: defaultSemver.version,
     };
   }
-  const nxVersion = coerce(nxWorkspacePackageJson.version, {
+  const nxVersion = coerce(nxWorkspacePackageJsonVersion, {
     includePrerelease: true,
   });
   if (!nxVersion) {
@@ -50,5 +54,14 @@ export async function getNxVersion(workspacePath: string): Promise<NxVersion> {
 
 export async function resetNxVersionCache() {
   loadedNxPackage = false;
-  nxWorkspacePackageJson = undefined;
+  nxWorkspacePackageJsonVersion = undefined;
+}
+
+function readVersionFromPackageJson(packagePath: string) {
+  try {
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+    return packageJson.version;
+  } catch (error) {
+    return undefined;
+  }
 }

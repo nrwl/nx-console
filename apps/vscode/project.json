@@ -8,7 +8,8 @@
   "implicitDependencies": [
     "generate-ui-v2",
     "nxls",
-    "nx-cloud-onboarding-webview"
+    "nx-cloud-onboarding-webview",
+    "vscode-migrate-sidebar-webview"
   ],
   "targets": {
     "build": {
@@ -22,8 +23,9 @@
           "pnpapi",
           "webpack",
           "@angular-devkit/*",
+          "@nx/key",
           "@nx/nx*",
-          "nx"
+          "*/nx.wasi.cjs"
         ],
         "thirdParty": true,
         "minify": true,
@@ -34,6 +36,11 @@
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "assets": [
+          {
+            "glob": "wrap-generator.js",
+            "input": "apps/vscode/src",
+            "output": "/"
+          },
           {
             "glob": "nx-schema.json",
             "input": "apps/vscode/src",
@@ -118,12 +125,13 @@
       },
       "inputs": [
         "default",
-        "{workspaceRoot}/tools/scripts/copy-to-vscode.js",
         {
           "dependentTasksOutputFiles": "**/*",
           "transitive": true
         },
-        "{projectRoot}/package.json"
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/dist/apps/nxls/**",
+        "scripts"
       ],
       "dependsOn": ["^build"]
     },

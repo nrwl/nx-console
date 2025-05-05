@@ -1,7 +1,7 @@
 import { gte, NxVersion } from '@nx-console/nx-version';
 import { xhr, XHRResponse } from 'request-light';
 
-type AvailableNxPlugin = {
+export type AvailableNxPlugin = {
   name: string;
   description: string;
   url?: string;
