@@ -49,6 +49,13 @@ export async function initMcp(context: ExtensionContext) {
 
   await tryStartMcpServer(getNxWorkspacePath());
 
+  if (hasNxMcpEntry() && isInCursor()) {
+    // cursor is *very* timing-sensitive to the mcp server being available on startup
+    // the mcp client creation will often fail
+    // we make sure to force a refresh by saving the mcp.json file
+    writeMcpJson(readMcpJson());
+  }
+
   showMCPNotification();
 
   setupMcpJsonWatcher(context);

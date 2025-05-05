@@ -9,7 +9,6 @@ import {
   getOutputChannel,
   logAndShowError,
 } from '@nx-console/vscode-output-channels';
-import { getNxMcpPort } from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
