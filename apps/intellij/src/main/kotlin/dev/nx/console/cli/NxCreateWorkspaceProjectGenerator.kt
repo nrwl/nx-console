@@ -29,11 +29,11 @@ internal class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() 
     override fun getDescription(): String =
         NxConsoleBundle.message("create.nx.workspace.description")
 
-    override fun filters(project: Project, baseDir: VirtualFile): Array<Filter> = Filter.EMPTY_ARRAY
-
-    override fun customizeModule(baseDir: VirtualFile, entry: ContentEntry) {
+    override fun customizeModule(baseDir: VirtualFile, entry: ContentEntry?) {
         // exclude some folders ?
     }
+
+    override fun filters(project: Project, baseDir: VirtualFile): Array<Filter> = Filter.EMPTY_ARRAY
 
     override fun getNpxCommands(): List<NpxPackageDescriptor.NpxCommand> {
         return listOf(NpxPackageDescriptor.NpxCommand(PACKAGE_NAME, CREATE_COMMAND))

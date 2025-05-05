@@ -21,7 +21,7 @@ class NxWorkspaceDataFolderExcludeContributor : JsExcludeContributor() {
             object : ScanningFileListener {
                 override fun fileFound(project: Project, file: VirtualFile) {
                     if (file.parent.name == ".nx") {
-                        JsExcludeManager.getInstance(project).exclude(file)
+                        JsExcludeManager.getInstance(project).exclude(listOf(file))
                     }
                 }
             },
