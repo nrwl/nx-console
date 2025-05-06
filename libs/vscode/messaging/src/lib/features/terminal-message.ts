@@ -1,10 +1,6 @@
 import { commands } from 'vscode';
-import { NotificationHandler, NotificationType } from 'vscode-jsonrpc/node';
-
-interface MessagingNotification<T> {
-  type: NotificationType<T>;
-  handler: NotificationHandler<T>;
-}
+import { NotificationType } from 'vscode-jsonrpc/node';
+import { MessagingNotification } from '../messaging-notification';
 
 export const NxTerminalMessage: MessagingNotification<string> = {
   type: new NotificationType('nx/terminalMessage'),

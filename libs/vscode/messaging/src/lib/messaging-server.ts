@@ -4,6 +4,19 @@ import { getFullOsSocketPath, killSocketOrPath } from './pipe';
 import { NxTerminalMessage } from './features/terminal-message';
 
 import { createMessageConnection } from 'vscode-jsonrpc/node';
+import {
+  NxEndedRunningTasks,
+  NxStartedRunningTasks,
+  NxUpdatedRunningTasks,
+} from './features/running-tasks';
+import { MessagingNotification } from './messaging-notification';
+
+const notifications: Array<MessagingNotification> = [
+  NxTerminalMessage,
+  NxStartedRunningTasks,
+  NxEndedRunningTasks,
+  NxUpdatedRunningTasks,
+];
 
 export class NxMessagingServer {
   #server: net.Server;
@@ -23,12 +36,10 @@ export class NxMessagingServer {
         socket,
       );
 
-      connection.onNotification(
-        NxTerminalMessage.type,
-        NxTerminalMessage.handler,
-      );
+      notifications.forEach((notification) => {
+        connection.onNotification(notification.type, notification.handler);
+      });
 
-      // Initialize the connection
       connection.listen();
 
       socket.on('close', () => {
