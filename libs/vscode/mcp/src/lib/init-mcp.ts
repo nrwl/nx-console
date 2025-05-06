@@ -49,8 +49,6 @@ export async function initMcp(context: ExtensionContext) {
 
   await tryStartMcpServer(getNxWorkspacePath());
 
-  showMCPNotification();
-
   setupMcpJsonWatcher(context);
 
   context.subscriptions.push(
@@ -58,6 +56,8 @@ export async function initMcp(context: ExtensionContext) {
       await updateMcpJson();
     }),
   );
+
+  await showMCPNotification();
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {

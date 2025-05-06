@@ -5,9 +5,7 @@ import {
   ExtensionContext,
   ProgressLocation,
   RelativePattern,
-  Uri,
   commands,
-  extensions,
   tasks,
   window,
   workspace,
@@ -25,13 +23,11 @@ import {
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
 import {
-  GitExtension,
   vscodeLogger,
   watchCodeLensConfigChange,
   watchFile,
 } from '@nx-console/vscode-utils';
 
-import { initMcp, updateMcpServerWorkspacePath } from '@nx-console/vscode-mcp';
 import { fileExists } from '@nx-console/shared-file-system';
 import {
   AddDependencyCodelensProvider,
@@ -44,12 +40,17 @@ import {
   getNxlsClient,
   showRefreshLoadingAtLocation,
 } from '@nx-console/vscode-lsp-client';
+import {
+  initMcp,
+  stopMcpServer,
+  updateMcpServerWorkspacePath,
+} from '@nx-console/vscode-mcp';
+import { initMigrate } from '@nx-console/vscode-migrate';
 import { initNxConfigDecoration } from '@nx-console/vscode-nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode-nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode-nx-help-and-feedback-view';
 import { initVscodeProjectGraph } from '@nx-console/vscode-project-graph';
 import { initTypeScriptServerPlugin } from '@nx-console/vscode-typescript-plugin';
-import { initMigrate } from '@nx-console/vscode-migrate';
 
 import {
   NxWorkspaceRefreshNotification,
@@ -57,6 +58,11 @@ import {
 } from '@nx-console/language-server-types';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { initErrorDiagnostics } from '@nx-console/vscode-error-diagnostics';
+import {
+  getNxGraphServer,
+  hasNxGraphServer,
+  hasNxGraphServerAffected,
+} from '@nx-console/vscode-graph-base';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
 import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
 import {
@@ -68,11 +74,6 @@ import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
-import {
-  hasNxGraphServerAffected,
-  hasNxGraphServer,
-  getNxGraphServer,
-} from '@nx-console/vscode-graph-base';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -145,6 +146,8 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
+  stopMcpServer();
+
   if (hasNxGraphServer()) {
     getNxGraphServer(context).dispose();
   }
