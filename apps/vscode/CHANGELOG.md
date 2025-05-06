@@ -1,3 +1,21 @@
+# [18.46.0](https://github.com/nrwl/nx-console/compare/vscode-v18.45.2...vscode-v18.46.0) (2025-05-06)
+
+
+### Bug Fixes
+
+* **vscode:** fix wasi loading mock when requiring nx ([#2486](https://github.com/nrwl/nx-console/issues/2486)) ([2931051](https://github.com/nrwl/nx-console/commit/293105194b3e8867b05f83e3c48b1101e947622b))
+* **vscode:** handle undefined nxWorkspace in typescript plugin ([#2493](https://github.com/nrwl/nx-console/issues/2493)) ([9bd0fdc](https://github.com/nrwl/nx-console/commit/9bd0fdcb258dea41010a6f27d98f555f163225a0))
+* **vscode:** properly shut down mcp on deactivation & fix cursor client error ([#2494](https://github.com/nrwl/nx-console/issues/2494)) ([b3f698b](https://github.com/nrwl/nx-console/commit/b3f698ba16129c011b62e263d1087edf9079a822))
+* **vscode:** remove false dichotomy between vscode & cursor. make sure windsurf doesn't get notifications for now ([#2490](https://github.com/nrwl/nx-console/issues/2490)) ([48f0eee](https://github.com/nrwl/nx-console/commit/48f0eee4f8ee3137ffca607af763d7cc80dcf339))
+* **vscode:** repair finish setup in nx cloud action with nxCloudId set ([#2489](https://github.com/nrwl/nx-console/issues/2489)) ([c319aa3](https://github.com/nrwl/nx-console/commit/c319aa322ac89a34ca24ed5758a44d5e2d041537))
+
+
+### Features
+
+* add generate-ui mcp tool & add more tools to copilot ([#2456](https://github.com/nrwl/nx-console/issues/2456)) ([6ddf5d1](https://github.com/nrwl/nx-console/commit/6ddf5d1fe973427d4d73dc3adc66a00d481b612a))
+* add migrate ui to vscode ([#2463](https://github.com/nrwl/nx-console/issues/2463)) ([2e1be98](https://github.com/nrwl/nx-console/commit/2e1be98a1295330a629423beeed8745375291e7b))
+* **vscode:** add undo-migration action when approving current migration ([#2483](https://github.com/nrwl/nx-console/issues/2483)) ([eba26d7](https://github.com/nrwl/nx-console/commit/eba26d7227ec2713e6c12cfbae2c587c1fbeb896))
+
 ## [18.45.2](https://github.com/nrwl/nx-console/compare/vscode-v18.45.1...vscode-v18.45.2) (2025-04-25)
 
 
