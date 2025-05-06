@@ -192,9 +192,7 @@ export async function tryStartMcpServer(workspacePath: string) {
   };
 
   app.get('/sse', async (req, res) => {
-    vscodeLogger.log(
-      `SSE connection established, ${JSON.stringify(req.headers)}`,
-    );
+    vscodeLogger.log(`SSE connection established`);
     transport = new SSEServerTransport('/messages', res);
     await server.getMcpServer().connect(transport);
 
@@ -218,7 +216,7 @@ export async function tryStartMcpServer(workspacePath: string) {
   });
 
   app.post('/messages', async (req, res) => {
-    vscodeLogger.log(`Message received, ${JSON.stringify(req.headers)}`);
+    vscodeLogger.log(`Message received`);
     if (!transport) {
       res.status(400).send('No transport found');
       return;
