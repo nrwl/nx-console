@@ -27,7 +27,7 @@ import {
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
 
 export interface McpServerReturn {
@@ -38,7 +38,7 @@ export interface McpServerReturn {
 
 let mcpServerReturn: McpServerReturn | undefined;
 
-const streamableServers = new Map<string, NxMcpServerWrapper>();
+const streamableServers = new Set<NxMcpServerWrapper>();
 
 export async function tryStartMcpServer(workspacePath: string) {
   const port = getNxMcpPort();
@@ -178,45 +178,73 @@ export async function tryStartMcpServer(workspacePath: string) {
 
   const app = express();
 
-  // Streamable HTTP Transport Section
-  app.all('/mcp', async (req, res) => {
-    vscodeLogger.log('Streamable HTTP connection established');
-
-    // Generate a unique ID for this connection
-    const connectionId = Math.random().toString(36).substring(7);
-
-    // Create a new server instance for this connection
-    const server = new NxMcpServerWrapper(
-      workspacePath,
-      nxWorkspaceInfoProvider,
-      ideProvider,
-      getTelemetry(),
-      vscodeLogger,
-    );
-
-    // Store the server instance
-    streamableServers.set(connectionId, server);
-
-    // Create a new transport for this connection
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => connectionId,
-    });
-
+  // Streamable HTTP Transport
+  app.post('/mcp', async (req: Request, res: Response) => {
     try {
+      const server = new NxMcpServerWrapper(
+        workspacePath,
+        nxWorkspaceInfoProvider,
+        ideProvider,
+        getTelemetry(),
+        vscodeLogger,
+      );
+      const transport: StreamableHTTPServerTransport =
+        new StreamableHTTPServerTransport({
+          sessionIdGenerator: undefined,
+        });
+
+      streamableServers.add(server);
+      res.on('close', () => {
+        console.log('Request closed');
+        transport.close();
+        server.getMcpServer().close();
+      });
       await server.getMcpServer().connect(transport);
-      vscodeLogger.log(
-        `Streamable HTTP connection ${connectionId} successfully established`,
-      );
+      await transport.handleRequest(req, res, req.body);
     } catch (error) {
-      streamableServers.delete(connectionId);
-      vscodeLogger.log(
-        `Error establishing Streamable HTTP connection: ${error}`,
-      );
-      res.status(500).send('Failed to establish connection');
+      console.error('Error handling MCP request:', error);
+      if (!res.headersSent) {
+        res.status(500).json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32603,
+            message: 'Internal server error',
+          },
+          id: null,
+        });
+      }
     }
   });
 
-  // SSE Transport Section
+  app.get('/mcp', async (req: Request, res: Response) => {
+    console.log('Received GET MCP request');
+    res.writeHead(405).end(
+      JSON.stringify({
+        jsonrpc: '2.0',
+        error: {
+          code: -32000,
+          message: 'Method not allowed.',
+        },
+        id: null,
+      }),
+    );
+  });
+
+  app.delete('/mcp', async (req: Request, res: Response) => {
+    console.log('Received DELETE MCP request');
+    res.writeHead(405).end(
+      JSON.stringify({
+        jsonrpc: '2.0',
+        error: {
+          code: -32000,
+          message: 'Method not allowed.',
+        },
+        id: null,
+      }),
+    );
+  });
+
+  // SSE Transport
   let transport: SSEServerTransport | undefined = undefined;
   let keepAliveInterval: NodeJS.Timeout | undefined;
   const clearKeepAliveInterval: () => void = () => {
