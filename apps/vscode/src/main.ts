@@ -42,6 +42,7 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import {
   initMcp,
+  startMcpServer,
   stopMcpServer,
   updateMcpServerWorkspacePath,
 } from '@nx-console/vscode-mcp';
@@ -88,6 +89,9 @@ export async function activate(c: ExtensionContext) {
   try {
     vscodeLogger.log(`Activating Nx Console (pid ${process.pid})`);
     const startTime = Date.now();
+
+    startMcpServer();
+
     context = c;
 
     GlobalConfigurationStore.fromContext(context);
@@ -192,7 +196,7 @@ function manuallySelectWorkspaceDefinition() {
         canSelectMany: false,
         openLabel: 'Select workspace directory',
       })
-      .then((value) => {
+      .then(async (value) => {
         if (value && value[0]) {
           const selectedDirectory = value[0].fsPath;
           const workspaceRoot =
@@ -205,7 +209,7 @@ function manuallySelectWorkspaceDefinition() {
             'nxWorkspacePath',
             selectedDirectoryRelativePath,
           );
-          updateMcpServerWorkspacePath(selectedDirectory);
+          await updateMcpServerWorkspacePath(selectedDirectory);
           setWorkspace(selectedDirectory);
         }
       });

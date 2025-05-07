@@ -2474,7 +2474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.5.0":
+"@modelcontextprotocol/sdk@npm:^1.11.0":
   version: 1.11.0
   resolution: "@modelcontextprotocol/sdk@npm:1.11.0"
   dependencies:
@@ -14407,7 +14407,7 @@ __metadata:
     "@microsoft/fast-components": ^2.30.6
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
-    "@modelcontextprotocol/sdk": ^1.5.0
+    "@modelcontextprotocol/sdk": ^1.11.0
     "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/conformance": 21.0.0-beta.0
     "@nx/cypress": 21.0.0
