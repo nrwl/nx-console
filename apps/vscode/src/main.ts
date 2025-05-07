@@ -196,7 +196,7 @@ function manuallySelectWorkspaceDefinition() {
         canSelectMany: false,
         openLabel: 'Select workspace directory',
       })
-      .then((value) => {
+      .then(async (value) => {
         if (value && value[0]) {
           const selectedDirectory = value[0].fsPath;
           const workspaceRoot =
@@ -209,7 +209,7 @@ function manuallySelectWorkspaceDefinition() {
             'nxWorkspacePath',
             selectedDirectoryRelativePath,
           );
-          updateMcpServerWorkspacePath(selectedDirectory);
+          await selectedDirectory;
           setWorkspace(selectedDirectory);
         }
       });

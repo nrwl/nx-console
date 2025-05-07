@@ -84,11 +84,31 @@ export class NxMcpServerWrapper {
     });
 
     this.logger = logger ?? getMcpLogger(this.server);
-    this.registerTools();
   }
 
-  setNxWorkspacePath(path: string) {
+  static async create(
+    initialWorkspacePath: string | undefined,
+    nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
+    ideProvider?: NxIdeProvider,
+    telemetry?: NxConsoleTelemetryLogger,
+    logger?: Logger,
+  ): Promise<NxMcpServerWrapper> {
+    const server = new NxMcpServerWrapper(
+      initialWorkspacePath,
+      nxWorkspaceInfoProvider,
+      ideProvider,
+      telemetry,
+      logger,
+    );
+    await server.registerTools();
+    return server;
+  }
+
+  async setNxWorkspacePath(path: string) {
     this.logger.log(`Setting nx workspace path to ${path}`);
+    if (!this._nxWorkspacePath && !!path) {
+      await this.registerWorkspaceTools();
+    }
     this._nxWorkspacePath = path;
   }
 
@@ -157,17 +177,7 @@ export class NxMcpServerWrapper {
     );
 
     if (this._nxWorkspacePath) {
-      this.registerWorkspaceTools();
-
-      if (await this.nxWorkspaceInfoProvider.isNxCloudEnabled()) {
-        registerNxCloudTools(
-          this._nxWorkspacePath,
-          this.server,
-          this.logger,
-          this.telemetry,
-          this.nxWorkspaceInfoProvider.getGitDiffs,
-        );
-      }
+      await this.registerWorkspaceTools();
     }
 
     if (this.ideProvider) {
@@ -175,7 +185,7 @@ export class NxMcpServerWrapper {
     }
   }
 
-  private registerWorkspaceTools(): void {
+  private async registerWorkspaceTools(): Promise<void> {
     this.server.tool(
       'nx_workspace',
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
@@ -426,6 +436,19 @@ and follows the Nx workspace convention for project organization.`
         };
       },
     );
+
+    if (
+      (await this.nxWorkspaceInfoProvider.isNxCloudEnabled()) &&
+      this._nxWorkspacePath
+    ) {
+      registerNxCloudTools(
+        this._nxWorkspacePath,
+        this.server,
+        this.logger,
+        this.telemetry,
+        this.nxWorkspaceInfoProvider.getGitDiffs,
+      );
+    }
   }
 
   private registerIdeTools(): void {

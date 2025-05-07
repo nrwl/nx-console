@@ -43,8 +43,8 @@ export function stopMcpServer() {
   McpWebServer.Instance.stopMcpServer();
 }
 
-export function updateMcpServerWorkspacePath(workspacePath: string) {
-  McpWebServer.Instance.updateMcpServerWorkspacePath(workspacePath);
+export async function updateMcpServerWorkspacePath(workspacePath: string) {
+  await McpWebServer.Instance.updateMcpServerWorkspacePath(workspacePath);
 }
 
 export async function initMcp(context: ExtensionContext) {

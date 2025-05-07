@@ -55,7 +55,7 @@ export class McpWebServer {
       this.sseTransport = new SSEServerTransport('/messages', res);
 
       if (this.fullSseSetupReady) {
-        await this.doCompleteMcpServerSetup();
+        await this.doCompleteSseServerSetup();
       }
 
       // Set up a keep-alive interval to prevent timeout
@@ -87,7 +87,7 @@ export class McpWebServer {
 
     this.app.post('/mcp', async (req: Request, res: Response) => {
       try {
-        const server = new NxMcpServerWrapper(
+        const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
           nxWorkspaceInfoProvider,
           ideProvider,
@@ -165,11 +165,11 @@ export class McpWebServer {
       return;
     }
 
-    await this.doCompleteMcpServerSetup();
+    await this.doCompleteSseServerSetup();
   }
 
-  private async doCompleteMcpServerSetup() {
-    const server = new NxMcpServerWrapper(
+  private async doCompleteSseServerSetup() {
+    const server = await NxMcpServerWrapper.create(
       getNxWorkspacePath(),
       nxWorkspaceInfoProvider,
       ideProvider,
@@ -194,11 +194,11 @@ export class McpWebServer {
     }
   }
 
-  public updateMcpServerWorkspacePath(workspacePath: string) {
+  public async updateMcpServerWorkspacePath(workspacePath: string) {
     for (const server of this.streamableServers.values()) {
       server.setNxWorkspacePath(workspacePath);
     }
-    this.sseServer?.setNxWorkspacePath(workspacePath);
+    await this.sseServer?.setNxWorkspacePath(workspacePath);
   }
 }
 
