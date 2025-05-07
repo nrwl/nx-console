@@ -73,6 +73,10 @@ export async function initMcp(context: ExtensionContext) {
     }),
   );
 
+  if (!isInCursor()) {
+    ensureMcpEndpoint();
+  }
+
   await showMCPNotification();
 }
 
@@ -194,8 +198,8 @@ async function updateMcpJson() {
     }
 
     mcpJson.servers['nx-mcp'] = {
-      type: 'sse',
-      url: `http://localhost:${port}/sse`,
+      type: 'http',
+      url: `http://localhost:${port}/mcp`,
     };
   }
 
@@ -208,4 +212,22 @@ async function updateMcpJson() {
   commands.executeCommand('vscode.open', Uri.file(getMcpJsonPath()!));
 
   return true;
+}
+
+function ensureMcpEndpoint() {
+  const mcpJson = readMcpJson();
+  if (!mcpJson) {
+    return;
+  }
+
+  const mcpServer = mcpJson.servers?.['nx-mcp'];
+  if (!mcpServer) {
+    return;
+  }
+
+  if (mcpServer.url && mcpServer.url.endsWith('/sse')) {
+    mcpServer.url = mcpServer.url.replace('/sse', '/mcp');
+    mcpServer.type = 'http';
+    writeMcpJson(mcpJson);
+  }
 }
