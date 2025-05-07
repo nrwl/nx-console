@@ -14,7 +14,6 @@ import {
   isInVSCode,
   isInWindsurf,
   readMcpJson,
-  vscodeLogger,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
 import {
@@ -25,51 +24,27 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { ActorRefFrom, createActor, fromPromise, waitFor } from 'xstate';
 import { McpWebServer } from './mcp-server';
-import { mcpServerMachine } from './mcp-server-machine';
 import { findAvailablePort } from './ports';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
 
-const mcpWebServer = new McpWebServer();
-let mcpActor: ActorRefFrom<typeof mcpServerMachine> | undefined;
-
-export function startMcpMachine() {
-  vscodeLogger.log('Starting MCP machine');
-  mcpActor = createActor(
-    mcpServerMachine.provide({
-      actors: {
-        startSkeletonServer: fromPromise(
-          async ({ input }: { input: { port: number | undefined } }) => {
-            if (!input.port) {
-              throw new Error('Port is required');
-            }
-            vscodeLogger.log('Starting skeleton server');
-            mcpWebServer.startSkeletonMcpServer(input.port);
-          },
-        ),
-        enhanceSkeletonServer: fromPromise(async () => {
-          vscodeLogger.log('Enhancing skeleton server');
-          mcpWebServer.enhanceSkeletonMcpServer();
-        }),
-      },
-    }),
-  );
-  mcpActor.start();
-  mcpActor.send({ type: 'START' });
+export function startMcpServer() {
+  const port = getNxMcpPort();
+  if (!port) {
+    return;
+  }
+  McpWebServer.Instance.startSkeletonMcpServer(port);
 }
 
-export function stopMcpMachine() {
-  if (mcpActor) {
-    mcpActor.send({ type: 'STOP' });
-  }
+export function stopMcpServer() {
+  McpWebServer.Instance.stopMcpServer();
 }
 
 export function updateMcpServerWorkspacePath(workspacePath: string) {
-  mcpWebServer.updateMcpServerWorkspacePath(workspacePath);
+  McpWebServer.Instance.updateMcpServerWorkspacePath(workspacePath);
 }
 
 export async function initMcp(context: ExtensionContext) {
@@ -88,8 +63,7 @@ export async function initMcp(context: ExtensionContext) {
 
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
-  mcpActor?.send({ type: 'ENHANCE' });
-  // await tryStartMcpServer(getNxWorkspacePath());
+  McpWebServer.Instance.completeMcpServerSetup();
 
   setupMcpJsonWatcher(context);
 
@@ -117,10 +91,9 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
     const port = getNxMcpPort();
     if (port !== lastPort) {
       lastPort = port;
-      if (mcpActor) {
-        mcpActor.send({ type: 'STOP' });
-        await waitFor(mcpActor, (snapshot) => snapshot.matches('idle'));
-        mcpActor.send({ type: 'START' });
+      McpWebServer.Instance.stopMcpServer();
+      if (port) {
+        McpWebServer.Instance.startSkeletonMcpServer(port);
       }
     }
 

@@ -42,8 +42,8 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import {
   initMcp,
-  startMcpMachine,
-  stopMcpMachine,
+  startMcpServer,
+  stopMcpServer,
   updateMcpServerWorkspacePath,
 } from '@nx-console/vscode-mcp';
 import { initMigrate } from '@nx-console/vscode-migrate';
@@ -90,7 +90,7 @@ export async function activate(c: ExtensionContext) {
     vscodeLogger.log(`Activating Nx Console (pid ${process.pid})`);
     const startTime = Date.now();
 
-    startMcpMachine();
+    startMcpServer();
 
     context = c;
 
@@ -150,7 +150,7 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
-  stopMcpMachine();
+  stopMcpServer();
 
   if (hasNxGraphServer()) {
     getNxGraphServer(context).dispose();

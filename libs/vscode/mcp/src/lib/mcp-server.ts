@@ -22,23 +22,29 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
-  getNxMcpPort,
   isInVSCode,
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
-import { setTimeout } from 'timers/promises';
 
 export class McpWebServer {
-  private app: express.Application = express();
+  private static instance: McpWebServer;
+  public static get Instance() {
+    if (!McpWebServer.instance) {
+      McpWebServer.instance = new McpWebServer();
+    }
+    return McpWebServer.instance;
+  }
 
+  private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
 
-  private keepAliveInterval?: NodeJS.Timeout;
+  private sseKeepAliveInterval?: NodeJS.Timeout;
   private sseTransport?: SSEServerTransport;
   private sseServer?: NxMcpServerWrapper;
+  private fullSseSetupReady = false;
 
   private streamableServers = new Set<NxMcpServerWrapper>();
 
@@ -48,23 +54,24 @@ export class McpWebServer {
 
       this.sseTransport = new SSEServerTransport('/messages', res);
 
+      if (this.fullSseSetupReady) {
+        await this.doCompleteMcpServerSetup();
+      }
+
       // Set up a keep-alive interval to prevent timeout
-      this.keepAliveInterval = setInterval(() => {
-        // Check if the connection is still open using the socket's writable state
+      this.sseKeepAliveInterval = setInterval(() => {
         if (!res.writableEnded && !res.writableFinished) {
-          // Send a heart beat
           res.write(':beat\n\n');
         } else {
-          clearInterval(this.keepAliveInterval);
+          clearInterval(this.sseKeepAliveInterval);
           vscodeLogger.log(
             'SSE connection closed, clearing keep-alive interval',
           );
         }
       }, 20000);
 
-      // Clean up interval if the client disconnects
       req.on('close', () => {
-        clearInterval(this.keepAliveInterval);
+        clearInterval(this.sseKeepAliveInterval);
         vscodeLogger.log('SSE connection closed by client');
       });
     });
@@ -147,22 +154,32 @@ export class McpWebServer {
     vscodeLogger.log(`MCP server started on port ${port}`);
   }
 
-  public async enhanceSkeletonMcpServer() {
-    let counter = 0;
-    while (!this.sseTransport && counter < 20) {
-      await setTimeout(500);
-      counter++;
+  public async completeMcpServerSetup() {
+    if (this.fullSseSetupReady) {
+      return;
     }
-    if (this.sseTransport) {
-      const server = new NxMcpServerWrapper(
-        getNxWorkspacePath(),
-        nxWorkspaceInfoProvider,
-        ideProvider,
-        getTelemetry(),
-        vscodeLogger,
-      );
-      await server.getMcpServer().connect(this.sseTransport);
+
+    this.fullSseSetupReady = true;
+
+    if (!this.sseTransport) {
+      return;
     }
+
+    await this.doCompleteMcpServerSetup();
+  }
+
+  private async doCompleteMcpServerSetup() {
+    const server = new NxMcpServerWrapper(
+      getNxWorkspacePath(),
+      nxWorkspaceInfoProvider,
+      ideProvider,
+      getTelemetry(),
+      vscodeLogger,
+    );
+
+    await server.getMcpServer().connect(this.sseTransport!);
+
+    this.sseServer = server;
   }
 
   public stopMcpServer() {
@@ -172,10 +189,11 @@ export class McpWebServer {
     });
     this.streamableServers.clear();
     this.appInstance?.close();
-    if (this.keepAliveInterval) {
-      clearInterval(this.keepAliveInterval);
+    if (this.sseKeepAliveInterval) {
+      clearInterval(this.sseKeepAliveInterval);
     }
   }
+
   public updateMcpServerWorkspacePath(workspacePath: string) {
     for (const server of this.streamableServers.values()) {
       server.setNxWorkspacePath(workspacePath);
@@ -183,144 +201,6 @@ export class McpWebServer {
     this.sseServer?.setNxWorkspacePath(workspacePath);
   }
 }
-
-// export async function tryStartMcpServer(workspacePath: string) {
-//   const port = getNxMcpPort();
-//   if (!port) {
-//     return;
-//   }
-
-//   const app = express();
-
-//   // Streamable HTTP Transport
-//   app.post('/mcp', async (req: Request, res: Response) => {
-//     try {
-//       const server = new NxMcpServerWrapper(
-//         workspacePath,
-//         nxWorkspaceInfoProvider,
-//         ideProvider,
-//         getTelemetry(),
-//         vscodeLogger,
-//       );
-//       const transport: StreamableHTTPServerTransport =
-//         new StreamableHTTPServerTransport({
-//           sessionIdGenerator: undefined,
-//         });
-
-//       streamableServers.add(server);
-//       res.on('close', () => {
-//         console.log('Request closed');
-//         transport.close();
-//         server.getMcpServer().close();
-//       });
-//       await server.getMcpServer().connect(transport);
-//       await transport.handleRequest(req, res, req.body);
-//     } catch (error) {
-//       console.error('Error handling MCP request:', error);
-//       if (!res.headersSent) {
-//         res.status(500).json({
-//           jsonrpc: '2.0',
-//           error: {
-//             code: -32603,
-//             message: 'Internal server error',
-//           },
-//           id: null,
-//         });
-//       }
-//     }
-//   });
-
-//   app.get('/mcp', async (req: Request, res: Response) => {
-//     console.log('Received GET MCP request');
-//     res.writeHead(405).end(
-//       JSON.stringify({
-//         jsonrpc: '2.0',
-//         error: {
-//           code: -32000,
-//           message: 'Method not allowed.',
-//         },
-//         id: null,
-//       }),
-//     );
-//   });
-
-//   app.delete('/mcp', async (req: Request, res: Response) => {
-//     console.log('Received DELETE MCP request');
-//     res.writeHead(405).end(
-//       JSON.stringify({
-//         jsonrpc: '2.0',
-//         error: {
-//           code: -32000,
-//           message: 'Method not allowed.',
-//         },
-//         id: null,
-//       }),
-//     );
-//   });
-
-//   // SSE Transport
-//   let transport: SSEServerTransport | undefined = undefined;
-//   let keepAliveInterval: NodeJS.Timeout | undefined;
-//   const clearKeepAliveInterval: () => void = () => {
-//     if (keepAliveInterval) {
-//       clearInterval(keepAliveInterval);
-//     }
-//   };
-
-//   app.get('/sse', async (req, res) => {
-//     vscodeLogger.log('SSE connection established');
-
-//     // Create a new server instance for SSE
-//     const server = new NxMcpServerWrapper(
-//       workspacePath,
-//       nxWorkspaceInfoProvider,
-//       ideProvider,
-//       getTelemetry(),
-//       vscodeLogger,
-//     );
-
-//     transport = new SSEServerTransport('/messages', res);
-//     await server.getMcpServer().connect(transport);
-
-//     // Set up a keep-alive interval to prevent timeout
-//     keepAliveInterval = setInterval(() => {
-//       // Check if the connection is still open using the socket's writable state
-//       if (!res.writableEnded && !res.writableFinished) {
-//         // Send a heart beat
-//         res.write(':beat\n\n');
-//       } else {
-//         clearInterval(keepAliveInterval);
-//         vscodeLogger.log('SSE connection closed, clearing keep-alive interval');
-//       }
-//     }, 20000);
-
-//     // Clean up interval if the client disconnects
-//     req.on('close', () => {
-//       clearInterval(keepAliveInterval);
-//       vscodeLogger.log('SSE connection closed by client');
-//     });
-//   });
-
-//   app.post('/messages', async (req, res) => {
-//     vscodeLogger.log(`Message received`);
-//     if (!transport) {
-//       res.status(400).send('No transport found');
-//       return;
-//     }
-//     await transport.handlePostMessage(req, res);
-//   });
-
-//   const server_instance = app.listen(port);
-//   vscodeLogger.log(`MCP server started on port ${port}`);
-
-//   mcpServerReturn = { app, server_instance, clearKeepAliveInterval };
-// }
-
-// export async function restartMcpServer() {
-//   vscodeLogger.log('Restarting MCP server');
-//   stopMcpServer();
-//   await tryStartMcpServer(getNxWorkspacePath());
-// }
 
 const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   nxWorkspace: async (_, __, reset) => await getNxWorkspace(reset),
