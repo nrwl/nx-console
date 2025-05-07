@@ -18,6 +18,7 @@ import {
 } from '@nx-console/vscode-utils';
 import {
   commands,
+  env,
   ExtensionContext,
   FileSystemWatcher,
   Uri,
@@ -73,9 +74,9 @@ export async function initMcp(context: ExtensionContext) {
     }),
   );
 
-  if (!isInCursor()) {
-    ensureMcpEndpoint();
-  }
+  // if (!isInCursor()) {
+  //   ensureMcpEndpoint();
+  // }
 
   await showMCPNotification();
 }
@@ -214,20 +215,20 @@ async function updateMcpJson() {
   return true;
 }
 
-function ensureMcpEndpoint() {
-  const mcpJson = readMcpJson();
-  if (!mcpJson) {
-    return;
-  }
+// function ensureMcpEndpoint() {
+//   const mcpJson = readMcpJson();
+//   if (!mcpJson) {
+//     return;
+//   }
 
-  const mcpServer = mcpJson.servers?.['nx-mcp'];
-  if (!mcpServer) {
-    return;
-  }
+//   const mcpServer = mcpJson.servers?.['nx-mcp'];
+//   if (!mcpServer) {
+//     return;
+//   }
 
-  if (mcpServer.url && mcpServer.url.endsWith('/sse')) {
-    mcpServer.url = mcpServer.url.replace('/sse', '/mcp');
-    mcpServer.type = 'http';
-    writeMcpJson(mcpJson);
-  }
-}
+//   if (mcpServer.url && mcpServer.url.endsWith('/sse')) {
+//     mcpServer.url = mcpServer.url.replace('/sse', '/mcp');
+//     mcpServer.type = 'http';
+//     writeMcpJson(mcpJson);
+//   }
+// }
