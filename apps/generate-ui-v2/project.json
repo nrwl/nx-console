@@ -20,6 +20,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/generate-ui-v2",
+        "declaration": false,
         "format": ["esm"],
         "bundle": true,
         "thirdParty": true,

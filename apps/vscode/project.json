@@ -73,6 +73,7 @@
           }
         ],
         "deleteOutputPath": false,
+        "declaration": false,
         "platform": "node",
         "esbuildOptions": {
           "mainFields": ["module", "main"],
