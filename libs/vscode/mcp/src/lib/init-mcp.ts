@@ -25,7 +25,7 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { McpWebServer } from './mcp-server';
+import { McpWebServer } from './mcp-web-server';
 import { findAvailablePort } from './ports';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 

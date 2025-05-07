@@ -38,6 +38,10 @@ export class McpWebServer {
     return McpWebServer.instance;
   }
 
+  private constructor() {
+    // Singleton pattern
+  }
+
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
 
@@ -86,6 +90,7 @@ export class McpWebServer {
     });
 
     this.app.post('/mcp', async (req: Request, res: Response) => {
+      vscodeLogger.log('Connecting to MCP via streamable http');
       try {
         const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
@@ -101,14 +106,14 @@ export class McpWebServer {
 
         this.streamableServers.add(server);
         res.on('close', () => {
-          console.log('Request closed');
+          vscodeLogger.log('Request closed');
           transport.close();
           server.getMcpServer().close();
         });
         await server.getMcpServer().connect(transport);
         await transport.handleRequest(req, res, req.body);
       } catch (error) {
-        console.error('Error handling MCP request:', error);
+        vscodeLogger.log('Error handling MCP request:', error);
         if (!res.headersSent) {
           res.status(500).json({
             jsonrpc: '2.0',
@@ -123,7 +128,7 @@ export class McpWebServer {
     });
 
     this.app.get('/mcp', async (req: Request, res: Response) => {
-      console.log('Received GET MCP request');
+      vscodeLogger.log('Received GET MCP request');
       res.writeHead(405).end(
         JSON.stringify({
           jsonrpc: '2.0',
@@ -137,7 +142,7 @@ export class McpWebServer {
     });
 
     this.app.delete('/mcp', async (req: Request, res: Response) => {
-      console.log('Received DELETE MCP request');
+      vscodeLogger.log('Received DELETE MCP request');
       res.writeHead(405).end(
         JSON.stringify({
           jsonrpc: '2.0',

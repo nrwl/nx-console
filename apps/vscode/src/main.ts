@@ -209,7 +209,7 @@ function manuallySelectWorkspaceDefinition() {
             'nxWorkspacePath',
             selectedDirectoryRelativePath,
           );
-          await selectedDirectory;
+          await updateMcpServerWorkspacePath(selectedDirectory);
           setWorkspace(selectedDirectory);
         }
       });
