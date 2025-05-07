@@ -1,4 +1,5 @@
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   NxIdeProvider,
   NxMcpServerWrapper,
@@ -30,13 +31,14 @@ import express from 'express';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
 
 export interface McpServerReturn {
-  server: NxMcpServerWrapper;
   app: express.Application;
   server_instance: ReturnType<express.Application['listen']>;
   clearKeepAliveInterval: () => void;
 }
 
 let mcpServerReturn: McpServerReturn | undefined;
+
+const streamableServers = new Map<string, NxMcpServerWrapper>();
 
 export async function tryStartMcpServer(workspacePath: string) {
   const port = getNxMcpPort();
@@ -174,15 +176,47 @@ export async function tryStartMcpServer(workspacePath: string) {
     },
   };
 
-  const server = new NxMcpServerWrapper(
-    workspacePath,
-    nxWorkspaceInfoProvider,
-    ideProvider,
-    getTelemetry(),
-    vscodeLogger,
-  );
-
   const app = express();
+
+  // Streamable HTTP Transport Section
+  app.all('/mcp', async (req, res) => {
+    vscodeLogger.log('Streamable HTTP connection established');
+
+    // Generate a unique ID for this connection
+    const connectionId = Math.random().toString(36).substring(7);
+
+    // Create a new server instance for this connection
+    const server = new NxMcpServerWrapper(
+      workspacePath,
+      nxWorkspaceInfoProvider,
+      ideProvider,
+      getTelemetry(),
+      vscodeLogger,
+    );
+
+    // Store the server instance
+    streamableServers.set(connectionId, server);
+
+    // Create a new transport for this connection
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => connectionId,
+    });
+
+    try {
+      await server.getMcpServer().connect(transport);
+      vscodeLogger.log(
+        `Streamable HTTP connection ${connectionId} successfully established`,
+      );
+    } catch (error) {
+      streamableServers.delete(connectionId);
+      vscodeLogger.log(
+        `Error establishing Streamable HTTP connection: ${error}`,
+      );
+      res.status(500).send('Failed to establish connection');
+    }
+  });
+
+  // SSE Transport Section
   let transport: SSEServerTransport | undefined = undefined;
   let keepAliveInterval: NodeJS.Timeout | undefined;
   const clearKeepAliveInterval: () => void = () => {
@@ -192,7 +226,17 @@ export async function tryStartMcpServer(workspacePath: string) {
   };
 
   app.get('/sse', async (req, res) => {
-    vscodeLogger.log(`SSE connection established`);
+    vscodeLogger.log('SSE connection established');
+
+    // Create a new server instance for SSE
+    const server = new NxMcpServerWrapper(
+      workspacePath,
+      nxWorkspaceInfoProvider,
+      ideProvider,
+      getTelemetry(),
+      vscodeLogger,
+    );
+
     transport = new SSEServerTransport('/messages', res);
     await server.getMcpServer().connect(transport);
 
@@ -227,7 +271,7 @@ export async function tryStartMcpServer(workspacePath: string) {
   const server_instance = app.listen(port);
   vscodeLogger.log(`MCP server started on port ${port}`);
 
-  mcpServerReturn = { server, app, server_instance, clearKeepAliveInterval };
+  mcpServerReturn = { app, server_instance, clearKeepAliveInterval };
 }
 
 export async function restartMcpServer() {
@@ -239,14 +283,18 @@ export async function restartMcpServer() {
 export function stopMcpServer() {
   if (mcpServerReturn) {
     getOutputChannel().appendLine('Stopping MCP server');
+    streamableServers.forEach((server) => {
+      server.getMcpServer().close();
+    });
+    streamableServers.clear();
     mcpServerReturn.server_instance.close();
-    mcpServerReturn.server.getMcpServer().close();
     mcpServerReturn.clearKeepAliveInterval();
   }
 }
 
 export function updateMcpServerWorkspacePath(workspacePath: string) {
-  if (mcpServerReturn) {
-    mcpServerReturn.server.setNxWorkspacePath(workspacePath);
+  // Update workspace path for all active Streamable HTTP servers
+  for (const server of streamableServers.values()) {
+    server.setNxWorkspacePath(workspacePath);
   }
 }
