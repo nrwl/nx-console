@@ -1,13 +1,16 @@
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import {
   getNxWorkspacePath,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   ensureEditorDirExists,
   getMcpJsonPath,
   getNxMcpPort,
   hasNxMcpEntry,
+  isInCursor,
   isInVSCode,
   isInWindsurf,
   readMcpJson,
@@ -15,21 +18,35 @@ import {
 } from '@nx-console/vscode-utils';
 import {
   commands,
+  env,
   ExtensionContext,
   FileSystemWatcher,
   Uri,
   window,
   workspace,
 } from 'vscode';
-import { restartMcpServer, tryStartMcpServer } from './mcp-server';
+import { McpWebServer } from './mcp-web-server';
 import { findAvailablePort } from './ports';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import { isInCursor } from '@nx-console/vscode-utils';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
+
+export function startMcpServer() {
+  const port = getNxMcpPort();
+  if (!port) {
+    return;
+  }
+  McpWebServer.Instance.startSkeletonMcpServer(port);
+}
+
+export function stopMcpServer() {
+  McpWebServer.Instance.stopMcpServer();
+}
+
+export async function updateMcpServerWorkspacePath(workspacePath: string) {
+  await McpWebServer.Instance.updateMcpServerWorkspacePath(workspacePath);
+}
 
 export async function initMcp(context: ExtensionContext) {
   if (hasInitializedMcp) {
@@ -47,7 +64,7 @@ export async function initMcp(context: ExtensionContext) {
 
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
-  await tryStartMcpServer(getNxWorkspacePath());
+  McpWebServer.Instance.completeMcpServerSetup();
 
   setupMcpJsonWatcher(context);
 
@@ -56,6 +73,10 @@ export async function initMcp(context: ExtensionContext) {
       await updateMcpJson();
     }),
   );
+
+  // if (!isInCursor()) {
+  //   ensureMcpEndpoint();
+  // }
 
   await showMCPNotification();
 }
@@ -75,7 +96,10 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
     const port = getNxMcpPort();
     if (port !== lastPort) {
       lastPort = port;
-      await restartMcpServer();
+      McpWebServer.Instance.stopMcpServer();
+      if (port) {
+        McpWebServer.Instance.startSkeletonMcpServer(port);
+      }
     }
 
     commands.executeCommand(
@@ -175,8 +199,8 @@ async function updateMcpJson() {
     }
 
     mcpJson.servers['nx-mcp'] = {
-      type: 'sse',
-      url: `http://localhost:${port}/sse`,
+      type: 'http',
+      url: `http://localhost:${port}/mcp`,
     };
   }
 
@@ -190,3 +214,21 @@ async function updateMcpJson() {
 
   return true;
 }
+
+// function ensureMcpEndpoint() {
+//   const mcpJson = readMcpJson();
+//   if (!mcpJson) {
+//     return;
+//   }
+
+//   const mcpServer = mcpJson.servers?.['nx-mcp'];
+//   if (!mcpServer) {
+//     return;
+//   }
+
+//   if (mcpServer.url && mcpServer.url.endsWith('/sse')) {
+//     mcpServer.url = mcpServer.url.replace('/sse', '/mcp');
+//     mcpServer.type = 'http';
+//     writeMcpJson(mcpJson);
+//   }
+// }

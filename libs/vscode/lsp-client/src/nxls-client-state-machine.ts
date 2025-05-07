@@ -33,7 +33,7 @@ export const nxlsClientStateMachine = setup({
         input: { workspacePath: string | undefined };
       }): Promise<number | undefined> => {
         throw Error('Not implemented - should be overridden.');
-      }
+      },
     ),
     stopClient: fromPromise(
       async ({
@@ -42,7 +42,7 @@ export const nxlsClientStateMachine = setup({
         input: { isNxlsProcessAlive?: boolean };
       }): Promise<void> => {
         throw Error('Not implemented - should be overridden.');
-      }
+      },
     ),
   },
 }).createMachine({

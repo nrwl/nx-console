@@ -1,11 +1,15 @@
 import { lspLogger } from '@nx-console/language-server-utils';
 import { importNxPackagePath } from '@nx-console/shared-npm';
+import { xfs } from '@yarnpkg/fslib';
 import { platform } from 'os';
 
 export class ParcelWatcher {
   private subscription: import('@parcel/watcher').AsyncSubscription | undefined;
   private stopped = false;
-  constructor(private workspacePath: string, private callback: () => unknown) {
+  constructor(
+    private workspacePath: string,
+    private callback: () => unknown,
+  ) {
     this.initWatcher();
   }
 
@@ -34,16 +38,16 @@ export class ParcelWatcher {
               e.path.endsWith('package.json') ||
               e.path.endsWith('nx.json') ||
               e.path.endsWith('workspace.json') ||
-              e.path.endsWith('tsconfig.base.json')
+              e.path.endsWith('tsconfig.base.json'),
           )
         ) {
           lspLogger.log(
-            `Project configuration changed, ${events.map((e) => e.path)}`
+            `Project configuration changed, ${events.map((e) => e.path)}`,
           );
           this.callback();
         }
       },
-      await this.watcherOptions()
+      await this.watcherOptions(),
     );
     lspLogger.log('Parcel watcher initialized');
   }
@@ -51,14 +55,22 @@ export class ParcelWatcher {
   private async watcherOptions(): Promise<
     import('@parcel/watcher').Options | undefined
   > {
-    const { getIgnoredGlobs } = await importNxPackagePath<
-      typeof import('nx/src/utils/ignore')
-    >(this.workspacePath, 'src/utils/ignore', lspLogger);
-    const ingoredGlobs = getIgnoredGlobs(this.workspacePath).filter(
-      (glob) => !glob.startsWith('!')
-    );
+    let ignoredGlobs: string[] = [];
+    try {
+      const { getIgnoredGlobs } = await importNxPackagePath<any>(
+        this.workspacePath,
+        'src/utils/ignore',
+        lspLogger,
+      );
+      ignoredGlobs = getIgnoredGlobs(this.workspacePath).filter(
+        (glob) => !glob.startsWith('!'),
+      );
+    } catch (e) {
+      // do nothing as parcel is only used for Nx < 16.4.0, and this function was removed in Nx 21
+    }
+
     const options: import('@parcel/watcher').Options = {
-      ignore: ingoredGlobs,
+      ignore: ignoredGlobs,
     };
 
     if (platform() === 'win32') {

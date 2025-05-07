@@ -104,10 +104,10 @@ async function main() {
       // todo(cammisuli): implement this using standard git commands
       return undefined;
     },
-    isNxCloudEnabled: await isNxCloudUsed(nxWorkspacePath),
+    isNxCloudEnabled: async () => await isNxCloudUsed(nxWorkspacePath),
   };
 
-  const server = new NxMcpServerWrapper(
+  const server = await NxMcpServerWrapper.create(
     nxWorkspacePath,
     nxWorkspaceInfoProvider,
     undefined,
