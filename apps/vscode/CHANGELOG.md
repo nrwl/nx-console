@@ -1,3 +1,15 @@
+# [18.47.0](https://github.com/nrwl/nx-console/compare/vscode-v18.46.0...vscode-v18.47.0) (2025-05-07)
+
+
+### Bug Fixes
+
+* **vscode:** rework how dependencies are shown in quickpick ([#2498](https://github.com/nrwl/nx-console/issues/2498)) ([f9dd5dc](https://github.com/nrwl/nx-console/commit/f9dd5dce7869b991c27e7736da37a295988a9843))
+
+
+### Features
+
+* **vscode:** enable support for streamable http transport in vscode mcp ([#2500](https://github.com/nrwl/nx-console/issues/2500)) ([c53d7e4](https://github.com/nrwl/nx-console/commit/c53d7e4e5d37fcd05a9689c90d18bedb5d20f804))
+
 # [18.46.0](https://github.com/nrwl/nx-console/compare/vscode-v18.45.2...vscode-v18.46.0) (2025-05-06)
 
 
