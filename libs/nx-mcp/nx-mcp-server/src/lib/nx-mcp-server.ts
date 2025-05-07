@@ -47,7 +47,7 @@ export interface NxWorkspaceInfoProvider {
     baseSha?: string,
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>;
-  isNxCloudEnabled: boolean;
+  isNxCloudEnabled: () => Promise<boolean>;
 }
 
 export interface NxIdeProvider {
@@ -96,7 +96,7 @@ export class NxMcpServerWrapper {
     return this.server;
   }
 
-  private registerTools(): void {
+  private async registerTools(): Promise<void> {
     this.server.tool(
       'nx_docs',
       'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
@@ -159,7 +159,7 @@ export class NxMcpServerWrapper {
     if (this._nxWorkspacePath) {
       this.registerWorkspaceTools();
 
-      if (this.nxWorkspaceInfoProvider.isNxCloudEnabled) {
+      if (await this.nxWorkspaceInfoProvider.isNxCloudEnabled()) {
         registerNxCloudTools(
           this._nxWorkspacePath,
           this.server,

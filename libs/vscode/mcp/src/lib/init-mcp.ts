@@ -1,16 +1,20 @@
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import {
   getNxWorkspacePath,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   ensureEditorDirExists,
   getMcpJsonPath,
   getNxMcpPort,
   hasNxMcpEntry,
+  isInCursor,
   isInVSCode,
   isInWindsurf,
   readMcpJson,
+  vscodeLogger,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
 import {
@@ -21,15 +25,52 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { restartMcpServer, tryStartMcpServer } from './mcp-server';
+import { ActorRefFrom, createActor, fromPromise, waitFor } from 'xstate';
+import { McpWebServer } from './mcp-server';
+import { mcpServerMachine } from './mcp-server-machine';
 import { findAvailablePort } from './ports';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import { isInCursor } from '@nx-console/vscode-utils';
 const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
+
+const mcpWebServer = new McpWebServer();
+let mcpActor: ActorRefFrom<typeof mcpServerMachine> | undefined;
+
+export function startMcpMachine() {
+  vscodeLogger.log('Starting MCP machine');
+  mcpActor = createActor(
+    mcpServerMachine.provide({
+      actors: {
+        startSkeletonServer: fromPromise(
+          async ({ input }: { input: { port: number | undefined } }) => {
+            if (!input.port) {
+              throw new Error('Port is required');
+            }
+            vscodeLogger.log('Starting skeleton server');
+            mcpWebServer.startSkeletonMcpServer(input.port);
+          },
+        ),
+        enhanceSkeletonServer: fromPromise(async () => {
+          vscodeLogger.log('Enhancing skeleton server');
+          mcpWebServer.enhanceSkeletonMcpServer();
+        }),
+      },
+    }),
+  );
+  mcpActor.start();
+  mcpActor.send({ type: 'START' });
+}
+
+export function stopMcpMachine() {
+  if (mcpActor) {
+    mcpActor.send({ type: 'STOP' });
+  }
+}
+
+export function updateMcpServerWorkspacePath(workspacePath: string) {
+  mcpWebServer.updateMcpServerWorkspacePath(workspacePath);
+}
 
 export async function initMcp(context: ExtensionContext) {
   if (hasInitializedMcp) {
@@ -47,7 +88,8 @@ export async function initMcp(context: ExtensionContext) {
 
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
-  await tryStartMcpServer(getNxWorkspacePath());
+  mcpActor?.send({ type: 'ENHANCE' });
+  // await tryStartMcpServer(getNxWorkspacePath());
 
   setupMcpJsonWatcher(context);
 
@@ -75,7 +117,11 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
     const port = getNxMcpPort();
     if (port !== lastPort) {
       lastPort = port;
-      await restartMcpServer();
+      if (mcpActor) {
+        mcpActor.send({ type: 'STOP' });
+        await waitFor(mcpActor, (snapshot) => snapshot.matches('idle'));
+        mcpActor.send({ type: 'START' });
+      }
     }
 
     commands.executeCommand(
