@@ -18,89 +18,50 @@ export async function resolveDependencyVersioning(
   }
 
   // Special handling for Nx packages
-  if (depInput.includes('@nx')) {
+  if (depInput.startsWith('@nx/')) {
     try {
       const nxVersion = await getNxVersionFromPackageJson();
       if (nxVersion) {
-        const result = await promptForNxVersion(depInput, nxVersion);
-        if (result) {
-          return { dep: depInput, version: result };
+        const options: QuickPickItem[] = [
+          {
+            label: nxVersion,
+            description: "matches 'nx' package",
+          },
+          {
+            label: 'Choose another version',
+            description: '',
+          },
+        ];
+
+        const selection = await window.showQuickPick(options, {
+          placeHolder: `Select version for ${depInput}`,
+        });
+
+        if (!selection) {
+          return undefined;
+        }
+
+        if (selection.label === nxVersion) {
+          return { dep: depInput, version: nxVersion };
         }
       }
     } catch (e) {
       console.error('Error finding Nx version:', e);
-      // Fall back to standard behavior if there's an error
     }
   }
 
-  let packageInfo: PackageInformationResponse;
-  try {
-    packageInfo = await getPackageInfo(depInput);
-  } catch (e) {
-    window.showErrorMessage(
-      `Package ${depInput} couldn't be found. Are you sure it exists?`,
-    );
-    return { dep: depInput, version: undefined };
-  }
-
+  // Get package info and show the full version picker
+  const packageInfo = await getPackageInfo(depInput);
   const versionMap = createVersionMap(packageInfo);
   const versionQuickPickOptions = createVersionQuickPickItems(
     packageInfo,
     versionMap,
   );
-
   const version = await promptForVersion(versionQuickPickOptions, versionMap);
-
-  return { dep: depInput, version };
-}
-
-async function promptForNxVersion(
-  depInput: string,
-  nxVersion: string,
-): Promise<string | undefined> {
-  // Skip if the nx version is a canary version
-  if (nxVersion.includes('canary')) {
-    // Fall back to regular version selection
-    const packageInfo = await getPackageInfo(depInput);
-    const versionMap = createVersionMap(packageInfo);
-    const versionQuickPickOptions = createVersionQuickPickItems(
-      packageInfo,
-      versionMap,
-    );
-    return promptForVersion(versionQuickPickOptions, versionMap);
-  }
-
-  const options: QuickPickItem[] = [
-    {
-      label: nxVersion,
-      description: "matches 'nx' package",
-    },
-    {
-      label: 'Choose another version',
-      description: '',
-    },
-  ];
-
-  const selection = await window.showQuickPick(options, {
-    placeHolder: `Select version for ${depInput}`,
-  });
-
-  if (!selection) {
+  if (!version) {
     return undefined;
   }
-
-  if (selection.label === nxVersion) {
-    return nxVersion;
-  } else {
-    // Get package info and show the full version picker
-    const packageInfo = await getPackageInfo(depInput);
-    const versionMap = createVersionMap(packageInfo);
-    const versionQuickPickOptions = createVersionQuickPickItems(
-      packageInfo,
-      versionMap,
-    );
-    return promptForVersion(versionQuickPickOptions, versionMap);
-  }
+  return { dep: depInput, version };
 }
 
 async function getNxVersionFromPackageJson(): Promise<string | undefined> {
@@ -187,6 +148,9 @@ export function createVersionMap(
       return;
     }
     const major = versionNum.split('.')[0];
+    if (major === '0') {
+      return;
+    }
     if (!versionMap[major]) {
       versionMap[major] = { latest: versionNum, all: [] };
     }
