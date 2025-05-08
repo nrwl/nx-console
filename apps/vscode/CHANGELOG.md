@@ -1,3 +1,10 @@
+## [18.47.1](https://github.com/nrwl/nx-console/compare/vscode-v18.47.0...vscode-v18.47.1) (2025-05-08)
+
+
+### Bug Fixes
+
+* **vscode:** fix destructuring from undefined again ([#2502](https://github.com/nrwl/nx-console/issues/2502)) ([67e44cb](https://github.com/nrwl/nx-console/commit/67e44cbfccbfb9c75337753df49de89d93e79042))
+
 # [18.47.0](https://github.com/nrwl/nx-console/compare/vscode-v18.46.0...vscode-v18.47.0) (2025-05-07)
 
 
