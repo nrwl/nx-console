@@ -1,6 +1,9 @@
+import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { execSync } from 'child_process';
+import { existsSync } from 'fs';
+import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
 import {
   commands,
   ExtensionContext,
@@ -9,19 +12,15 @@ import {
   window,
   workspace,
 } from 'vscode';
+import { GitExtension } from '../git-extension/git';
+import { viewPackageJsonDiff } from '../git-extension/view-diff';
+import { MigrateWebview } from '../migrate-webview';
 import { startMigration } from './start-migration';
 import {
   importMigrateUIApi,
   modifyMigrationsJsonMetadata,
   readMigrationsJsonMetadata,
 } from './utils';
-import { GitExtension } from '../git-extension/git';
-import { viewPackageJsonDiff } from '../git-extension/view-diff';
-import { MigrateWebview } from '../migrate-webview';
-import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
-import { join } from 'path';
-import { existsSync } from 'fs';
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
 
 export function registerCommands(
   context: ExtensionContext,
