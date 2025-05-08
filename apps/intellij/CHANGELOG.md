@@ -1,3 +1,14 @@
+## 1.41.0 (2025-05-08)
+
+### Bug Fixes
+
+* **intellij:** use bundled ktor & verify plugin in CI ([#2501](https://github.com/nrwl/nx-console/issues/2501)) ([c383693](https://github.com/nrwl/nx-console/commit/c383693ee346b13286e56e3d21ec762a1bd30dbe))
+
+
+### Features
+
+* **vscode:** enable support for streamable http transport in vscode mcp ([#2500](https://github.com/nrwl/nx-console/issues/2500)) ([c53d7e4](https://github.com/nrwl/nx-console/commit/c53d7e4e5d37fcd05a9689c90d18bedb5d20f804))
+
 ## 1.40.0 (2025-05-05)
 
 ### Bug Fixes
