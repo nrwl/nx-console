@@ -11,9 +11,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": [
-    {
-      "path": "../../shared/running-tasks/tsconfig.lib.json"
-    }
-  ]
+  "references": []
 }

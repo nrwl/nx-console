@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/running-tasks"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

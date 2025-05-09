@@ -2895,6 +2895,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-running-tasks@workspace:libs/shared/running-tasks":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-running-tasks@workspace:libs/shared/running-tasks"
+  dependencies:
+    tslib: ^2.3.0
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-schema@workspace:libs/shared/schema":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-schema@workspace:libs/shared/schema"
@@ -2961,15 +2969,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nx-console/vscode-messaging@workspace:libs/vscode/messaging":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/vscode-messaging@workspace:libs/vscode/messaging"
-  languageName: unknown
-  linkType: soft
-
 "@nx-console/vscode-mcp@workspace:libs/vscode/mcp":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-mcp@workspace:libs/vscode/mcp"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/vscode-messaging@workspace:libs/vscode/messaging":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-messaging@workspace:libs/vscode/messaging"
   languageName: unknown
   linkType: soft
 
