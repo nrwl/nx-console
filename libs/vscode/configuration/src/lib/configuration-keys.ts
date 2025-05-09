@@ -15,6 +15,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'nxWorkspacePath',
   'nxCloudNotifications',
   'debugMode',
+  'generateAiAgentRules',
 ] as const;
 
 export type GlobalConfig = {
@@ -34,6 +35,7 @@ export type GlobalConfig = {
   nxWorkspacePath: string;
   nxCloudNotifications: 'all' | 'errors' | 'none';
   debugMode: boolean;
+  generateAiAgentRules: boolean;
 };
 
 /**

@@ -18,16 +18,15 @@ import {
 } from '@nx-console/vscode-utils';
 import {
   commands,
-  env,
   ExtensionContext,
   FileSystemWatcher,
   Uri,
   window,
   workspace,
 } from 'vscode';
+import { AgentRulesManager } from './agent-rules-manager';
 import { McpWebServer } from './mcp-web-server';
 import { findAvailablePort } from './ports';
-const MCP_DONT_ASK_AGAIN_KEY = 'mcpDontAskAgain';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
@@ -66,19 +65,24 @@ export async function initMcp(context: ExtensionContext) {
 
   McpWebServer.Instance.completeMcpServerSetup();
 
+  const rulesManager = new AgentRulesManager(context);
+  await rulesManager.initialize();
+
   setupMcpJsonWatcher(context);
 
   context.subscriptions.push(
     commands.registerCommand('nx.configureMcpServer', async () => {
       await updateMcpJson();
+      await rulesManager.addAgentRulesToWorkspace();
+    }),
+    commands.registerCommand('nx.addAgentRules', async () => {
+      await rulesManager.addAgentRulesToWorkspace();
     }),
   );
 
-  // if (!isInCursor()) {
-  //   ensureMcpEndpoint();
-  // }
-
-  await showMCPNotification();
+  // Wait a bit before showing notification
+  await new Promise((resolve) => setTimeout(resolve, 20000));
+  await showMCPNotification(rulesManager);
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {
@@ -124,10 +128,9 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
   context.subscriptions.push(mcpJsonWatcher);
 }
 
-async function showMCPNotification() {
-  await new Promise((resolve) => setTimeout(resolve, 20000));
+async function showMCPNotification(rulesManager: AgentRulesManager) {
   const dontAskAgain = WorkspaceConfigurationStore.instance.get(
-    MCP_DONT_ASK_AGAIN_KEY,
+    'mcpDontAskAgain',
     false,
   );
 
@@ -135,12 +138,14 @@ async function showMCPNotification() {
     return;
   }
 
-  if (hasNxMcpEntry()) {
+  if (isInWindsurf()) {
+    // TODO: do once windsurf supports project-level mcp servers
     return;
   }
 
-  if (isInWindsurf()) {
-    // TODO: do once windsurf supports project-level mcp servers
+  if (hasNxMcpEntry()) {
+    // if mcp is already configured but the rules file isn't, prompt for rules setup
+    await rulesManager.showAgentRulesNotification();
     return;
   }
 
@@ -152,13 +157,14 @@ async function showMCPNotification() {
 
   window
     .showInformationMessage(msg, 'Yes', "Don't ask again")
-    .then((answer) => {
+    .then(async (answer) => {
       if (answer === "Don't ask again") {
-        WorkspaceConfigurationStore.instance.set(MCP_DONT_ASK_AGAIN_KEY, true);
+        WorkspaceConfigurationStore.instance.set('mcpDontAskAgain', true);
       }
 
       if (answer === 'Yes') {
-        updateMcpJson();
+        await updateMcpJson();
+        await rulesManager.addAgentRulesToWorkspace();
       }
     });
 }
@@ -215,6 +221,9 @@ async function updateMcpJson() {
   return true;
 }
 
+// Functions removed and moved to AgentRulesManager class
+
+// Rules update handling is now managed by AgentRulesManager.setupUpdates
 // function ensureMcpEndpoint() {
 //   const mcpJson = readMcpJson();
 //   if (!mcpJson) {

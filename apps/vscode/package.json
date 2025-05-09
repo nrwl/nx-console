@@ -119,6 +119,12 @@
           "title": "Add Nx to Cursor Agent"
         },
         {
+          "command": "nx.addAgentRules",
+          "when": "view == nxProjects && (isInCursor || isInVSCode) && isNxWorkspace && hasNxMcpConfigured && !config.nxConsole.generateAiAgentRules",
+          "group": "navigation@0",
+          "title": "Add Nx Agent Rules"
+        },
+        {
           "command": "nxMigrate.refresh",
           "when": "view == nxMigrate",
           "group": "navigation"
@@ -418,6 +424,10 @@
         {
           "command": "nx.configureMcpServer",
           "when": "isNxWorkspace && !hasNxMcpConfigured && (isInCursor || isInVSCode)"
+        },
+        {
+          "command": "nx.addAgentRules",
+          "when": "isNxWorkspace && hasNxMcpConfigured && !config.nxConsole.generateAiAgentRules && (isInCursor || isInVSCode)"
         }
       ]
     },
@@ -936,6 +946,12 @@
         "command": "nxMigrate.refresh",
         "icon": "$(refresh)",
         "when": "isNxWorkspace"
+      },
+      {
+        "title": "Add Nx Agent Rules",
+        "command": "nx.addAgentRules",
+        "icon": "$(wand)",
+        "when": "isNxWorkspace"
       }
     ],
     "configuration": {
@@ -1051,6 +1067,11 @@
           ],
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
+        },
+        "nxConsole.generateAiAgentRules": {
+          "type": "boolean",
+          "default": false,
+          "description": "Autogenerate Nx-specific AI agent rules for the workspace if the Nx MCP is configured."
         }
       }
     },
