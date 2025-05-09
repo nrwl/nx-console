@@ -9,16 +9,19 @@
   "include": ["src/**/*.ts", "../../shared/llm-context/src/lib/tool-names.ts"],
   "references": [
     {
-      "path": "../../shared/nx-cloud/tsconfig.lib.json"
+      "path": "../../shared/running-tasks/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/nx-version/tsconfig.lib.json"
+      "path": "../../shared/nx-cloud/tsconfig.lib.json"
     },
     {
       "path": "../../shared/types/tsconfig.lib.json"
     },
     {
       "path": "../../shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
     },
     {
       "path": "../../language-server/types/tsconfig.lib.json"

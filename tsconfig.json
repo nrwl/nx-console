@@ -176,6 +176,9 @@
     },
     {
       "path": "./libs/vscode/messaging"
+    },
+    {
+      "path": "./libs/shared/running-tasks"
     }
   ]
 }

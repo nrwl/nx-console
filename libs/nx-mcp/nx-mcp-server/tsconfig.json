@@ -4,16 +4,19 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-cloud"
+      "path": "../../shared/running-tasks"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../../shared/nx-cloud"
     },
     {
       "path": "../../shared/types"
     },
     {
       "path": "../../shared/schema"
+    },
+    {
+      "path": "../../shared/nx-version"
     },
     {
       "path": "../../language-server/types"

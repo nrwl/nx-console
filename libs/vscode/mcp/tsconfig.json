@@ -4,7 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../generate-ui-webview"
+      "path": "../../shared/types"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"

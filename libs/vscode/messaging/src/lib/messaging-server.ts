@@ -9,9 +9,12 @@ import {
   NxStartedRunningTasks,
   NxUpdatedRunningTasks,
 } from './features/running-tasks';
-import { MessagingNotification } from './messaging-notification';
+import {
+  MessagingNotification,
+  MessagingNotification2,
+} from './messaging-notification';
 
-const notifications: Array<MessagingNotification> = [
+const notifications: Array<MessagingNotification | MessagingNotification2> = [
   NxTerminalMessage,
   NxStartedRunningTasks,
   NxEndedRunningTasks,
@@ -37,7 +40,12 @@ export class NxMessagingServer {
       );
 
       notifications.forEach((notification) => {
-        connection.onNotification(notification.type, notification.handler);
+        if ('type' in notification) {
+          connection.onNotification(
+            notification.type.method,
+            notification.handler,
+          );
+        }
       });
 
       connection.listen();
