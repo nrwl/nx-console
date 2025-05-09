@@ -75,6 +75,7 @@ import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import { initMessagingServer } from '@nx-console/vscode-messaging';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -304,6 +305,7 @@ async function setWorkspace(workspacePath: string) {
     initErrorDiagnostics(context);
     initCopilot(context);
     initMcp(context);
+    initMessagingServer(context, workspacePath);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/vscode/messaging"
+    },
+    {
       "path": "../../libs/vscode/graph-base"
     },
     {

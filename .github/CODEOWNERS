@@ -78,6 +78,8 @@
 
 /libs/vscode/lsp-client/ @MaxKless
 
+/libs/vscode/messaging/ @MaxKless
+
 /libs/shared/telemetry/ @MaxKless
 
 /libs/vscode/telemetry/ @MaxKless
