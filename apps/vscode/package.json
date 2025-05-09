@@ -1051,6 +1051,11 @@
           ],
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
+        },
+        "nxConsole.generateAiAgentRules": {
+          "type": "boolean",
+          "default": false,
+          "description": "Autogenerate Nx-specific AI agent rules for the workspace if the Nx MCP is configured."
         }
       }
     },
