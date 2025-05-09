@@ -73,6 +73,10 @@ export async function initMcp(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand('nx.configureMcpServer', async () => {
       await updateMcpJson();
+      await rulesManager.addAgentRulesToWorkspace();
+    }),
+    commands.registerCommand('nx.addAgentRules', async () => {
+      await rulesManager.addAgentRulesToWorkspace();
     }),
   );
 
