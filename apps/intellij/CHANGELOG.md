@@ -1,3 +1,9 @@
+## <small>1.41.1 (2025-05-12)</small>
+
+### Bug Fixes
+
+* **intellij:** remove MessagePool listener ([#2508](https://github.com/nrwl/nx-console/issues/2508)) ([55f86b0](https://github.com/nrwl/nx-console/commit/55f86b0bc5833a659eee34f7090879ebb235ca51))
+
 ## 1.41.0 (2025-05-08)
 
 ### Bug Fixes
