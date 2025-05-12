@@ -30,6 +30,16 @@ import { NxWorkspace } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { registerNxCloudTools } from './tools/nx-cloud';
+import {
+  NX_AVAILABLE_PLUGINS,
+  NX_DOCS,
+  NX_GENERATOR_SCHEMA,
+  NX_GENERATORS,
+  NX_PROJECT_DETAILS,
+  NX_RUN_GENERATOR,
+  NX_VISUALIZE_GRAPH,
+  NX_WORKSPACE,
+} from '@nx-console/shared-llm-context';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -118,7 +128,7 @@ export class NxMcpServerWrapper {
 
   private async registerTools(): Promise<void> {
     this.server.tool(
-      'nx_docs',
+      NX_DOCS,
       'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
       {
         userQuery: z
@@ -129,7 +139,7 @@ export class NxMcpServerWrapper {
       },
       async ({ userQuery }: { userQuery: string }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_docs',
+          tool: NX_DOCS,
         });
         const docsPages = await getDocsContext(userQuery);
         return {
@@ -139,11 +149,11 @@ export class NxMcpServerWrapper {
     );
 
     this.server.tool(
-      'nx_available_plugins',
+      NX_AVAILABLE_PLUGINS,
       'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_available_plugins',
+          tool: NX_AVAILABLE_PLUGINS,
         });
 
         let nxVersion: NxVersion | undefined = undefined;
@@ -187,11 +197,11 @@ export class NxMcpServerWrapper {
 
   private async registerWorkspaceTools(): Promise<void> {
     this.server.tool(
-      'nx_workspace',
+      NX_WORKSPACE,
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_workspace',
+          tool: NX_WORKSPACE,
         });
         try {
           if (!this._nxWorkspacePath) {
@@ -262,7 +272,7 @@ export class NxMcpServerWrapper {
     );
 
     this.server.tool(
-      'nx_project_details',
+      NX_PROJECT_DETAILS,
       'Returns the complete project configuration in JSON format for a given nx project.',
       {
         projectName: z
@@ -271,7 +281,7 @@ export class NxMcpServerWrapper {
       },
       async ({ projectName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_project_details',
+          tool: NX_PROJECT_DETAILS,
         });
         if (!this._nxWorkspacePath) {
           return {
@@ -316,11 +326,11 @@ export class NxMcpServerWrapper {
     );
 
     this.server.tool(
-      'nx_generators',
+      NX_GENERATORS,
       'Returns a list of generators that could be relevant to the user query.',
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_generators',
+          tool: NX_GENERATORS,
         });
         if (!this._nxWorkspacePath) {
           return {
@@ -354,7 +364,7 @@ export class NxMcpServerWrapper {
     );
 
     this.server.tool(
-      'nx_generator_schema',
+      NX_GENERATOR_SCHEMA,
       'Returns the detailed JSON schema for an nx generator',
       {
         generatorName: z
@@ -365,7 +375,7 @@ export class NxMcpServerWrapper {
       },
       async ({ generatorName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_generator_schema',
+          tool: NX_GENERATOR_SCHEMA,
         });
         if (!this._nxWorkspacePath) {
           return {
@@ -453,7 +463,7 @@ and follows the Nx workspace convention for project organization.`
 
   private registerIdeTools(): void {
     this.server.tool(
-      'nx_visualize_graph',
+      NX_VISUALIZE_GRAPH,
       'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
       {
         visualizationType: z
@@ -476,7 +486,7 @@ and follows the Nx workspace convention for project organization.`
       },
       async ({ visualizationType, projectName, taskName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_visualize_graph',
+          tool: NX_VISUALIZE_GRAPH,
           kind: visualizationType,
         });
 
@@ -548,7 +558,7 @@ and follows the Nx workspace convention for project organization.`
     );
 
     this.server.tool(
-      'nx_run_generator',
+      NX_RUN_GENERATOR,
       'Opens the generate ui with whatever options you provide prefilled. ALWAYS USE THIS to run nx generators. Use the nx_generators and nx_generator_schema tools to learn about the available options BEFORE using this tool. ALWAYS use this when the user wants to generate something and ALWAYS use this instead of running a generator directly via the CLI. You can also call this tool to overwrite the options for an existing generator invocation.',
       {
         generatorName: z.string().describe('The name of the generator to run'),
@@ -564,7 +574,7 @@ and follows the Nx workspace convention for project organization.`
       },
       async ({ generatorName, options, cwd }) => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: 'nx_run_generator',
+          tool: NX_RUN_GENERATOR,
         });
         if (!this._nxWorkspacePath) {
           return {
