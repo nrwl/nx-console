@@ -23,7 +23,7 @@ interface RuleInfo {
   notificationMessage: string;
 }
 
-const cursorRuleInfo = {
+const cursorRuleInfo: RuleInfo = {
   path: (workspacePath: string) =>
     join(workspacePath, '.cursor', 'rules', 'nx-rules.mdc'),
   wrapContent: (content: string) => `---
@@ -37,7 +37,7 @@ ${content}
     'Improve Cursor Agents by setting up a file with Nx-specific rules?',
 };
 
-const vscodeRuleInfo = {
+const vscodeRuleInfo: RuleInfo = {
   path: (workspacePath: string) =>
     join(workspacePath, '.github', 'instructions', 'nx.instructions.md'),
   wrapContent: (content: string) => `---
@@ -46,7 +46,7 @@ applyTo: '**'
 ${content}
 `,
   notificationMessage:
-    'Improve Copilot Agent by setting up a file with Nx-specific instructions?',
+    'Improve Copilot Agents by setting up a file with Nx-specific instructions?',
 };
 
 export class AgentRulesManager {

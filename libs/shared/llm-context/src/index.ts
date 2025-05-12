@@ -7,3 +7,4 @@ export * from './lib/plugins';
 export * from './lib/generate-ui';
 export * from './lib/graph-visualization';
 export * from './lib/nx-console-rules';
+export * from './lib/tool-names';

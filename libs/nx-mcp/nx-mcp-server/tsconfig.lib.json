@@ -6,7 +6,7 @@
     "noImplicitReturns": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "../../shared/llm-context/src/lib/tool-names.ts"],
   "references": [
     {
       "path": "../../shared/nx-cloud/tsconfig.lib.json"
