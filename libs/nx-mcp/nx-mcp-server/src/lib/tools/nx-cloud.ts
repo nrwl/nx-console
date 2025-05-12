@@ -7,6 +7,10 @@ import {
   getRecentCIPEData,
 } from '@nx-console/shared-nx-cloud';
 import { z } from 'zod';
+import {
+  NX_CLOUD_CIPE_DETAILS,
+  NX_CLOUD_CIPE_FAILURE,
+} from '@nx-console/shared-llm-context/src/lib/tool-names';
 
 export function registerNxCloudTools(
   workspacePath: string,
@@ -20,12 +24,12 @@ export function registerNxCloudTools(
   ) => Promise<{ path: string; diffContent: string }[] | null>,
 ) {
   server.tool(
-    'nx_cloud_cipe_details',
+    NX_CLOUD_CIPE_DETAILS,
     'Returns a list of CIPE (CI pipeline execution) details for the current workspace and branch from Nx Cloud. This includes the status, and execution ID or link ID. If there are failed tasks, it will also include the task ID. If this returns text that contains "canceled", that means that there were no failures, and additional help and details are not needed.',
     nxCloudCipeDetails(workspacePath, logger, telemetry),
   );
   server.tool(
-    'nx_cloud_fix_cipe_failure',
+    NX_CLOUD_CIPE_FAILURE,
     'Returns details about the failure of a CI pipeline execution. When given a execution ID or link ID and a task ID, the terminal output and affected git files will be returned.',
     nxCloudFixCipeSchema.shape,
     nxCloudCipeAffectedFilesAndTerminalOutput(

@@ -4,34 +4,37 @@
   "include": [],
   "references": [
     {
-      "path": "../nx-workspace"
-    },
-    {
       "path": "../generate-ui-webview"
-    },
-    {
-      "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../../shared/llm-context"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"
     },
     {
-      "path": "../../shared/npm"
-    },
-    {
       "path": "../telemetry"
-    },
-    {
-      "path": "../utils"
     },
     {
       "path": "../output-channels"
     },
     {
+      "path": "../utils"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
       "path": "../configuration"
+    },
+    {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../../shared/nx-cloud"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/llm-context"
     },
     {
       "path": "./tsconfig.lib.json"
