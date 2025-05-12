@@ -1,3 +1,16 @@
+# [18.48.0](https://github.com/nrwl/nx-console/compare/vscode-v18.47.1...vscode-v18.48.0) (2025-05-12)
+
+
+### Bug Fixes
+
+* **vscode:** remove legacy migrate command ([#2505](https://github.com/nrwl/nx-console/issues/2505)) ([67ee4c0](https://github.com/nrwl/nx-console/commit/67ee4c0936b446ef04cf20d11e1a05803b642285))
+* **vscode:** wait before executing the new chat command ([#2509](https://github.com/nrwl/nx-console/issues/2509)) ([69a60e1](https://github.com/nrwl/nx-console/commit/69a60e1cd380603541f55ef57302c542bc87b308))
+
+
+### Features
+
+* **vscode:** add agent rules file handling ([#2506](https://github.com/nrwl/nx-console/issues/2506)) ([c44704b](https://github.com/nrwl/nx-console/commit/c44704b2968c8b97beb5e8cb4822676f2cc2891c))
+
 ## [18.47.1](https://github.com/nrwl/nx-console/compare/vscode-v18.47.0...vscode-v18.47.1) (2025-05-08)
 
 
