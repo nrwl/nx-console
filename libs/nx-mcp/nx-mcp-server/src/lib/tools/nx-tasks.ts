@@ -4,6 +4,10 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { getRunningTasks } from '@nx-console/shared-running-tasks';
 import z from 'zod';
+import {
+  NX_CURRENT_RUNNING_TASK_OUTPUT,
+  NX_CURRENT_RUNNING_TASKS_DETAILS,
+} from '@nx-console/shared-llm-context';
 export function registerNxTaskTools(
   workspacePath: string,
   server: McpServer,
@@ -11,8 +15,8 @@ export function registerNxTaskTools(
   telemetry?: NxConsoleTelemetryLogger,
 ) {
   server.tool(
-    'nx-currently_running_tasks_details',
-    `Returns a list of running tasks from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
+    NX_CURRENT_RUNNING_TASKS_DETAILS,
+    `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
     There will be scenarios where the current process is not running anymore (as denoted by Stopped).
     Use this tool for assisting with debugging and getting details about the current running tasks.
 
@@ -21,7 +25,7 @@ export function registerNxTaskTools(
     nxCurrentlyRunningTasksDetails(telemetry),
   );
   server.tool(
-    'nx-currently_running_task_output',
+    NX_CURRENT_RUNNING_TASK_OUTPUT,
     `Returns the terminal output for a specific task from currently running Nx CLI processes`,
     NxCurrentlyRunningTaskOutputSchema.shape,
     nxCurrentlyRunningTaskOutput(telemetry),

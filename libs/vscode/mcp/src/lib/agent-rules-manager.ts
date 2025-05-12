@@ -1,3 +1,4 @@
+import { NxVersion } from '@nx-console/nx-version';
 import { nxConsoleRules } from '@nx-console/shared-llm-context';
 import { detectPackageManager } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
@@ -51,7 +52,7 @@ ${content}
 
 export class AgentRulesManager {
   private packageManager?: PackageManager;
-  private nxVersion?: string;
+  private nxVersion?: NxVersion;
   private usingCloud = false;
 
   constructor(private context: ExtensionContext) {}
@@ -63,7 +64,7 @@ export class AgentRulesManager {
       workspacePath,
       vscodeLogger,
     );
-    this.nxVersion = (await getNxVersion())?.full;
+    this.nxVersion = await getNxVersion();
 
     if (GlobalConfigurationStore.instance.get(GENERATE_RULES_KEY, false)) {
       await this.writeAgentRules();
@@ -126,12 +127,12 @@ export class AgentRulesManager {
       workspacePath,
       vscodeLogger,
     );
-    const newNxVersion = (await getNxVersion())?.full;
+    const newNxVersion = await getNxVersion();
 
     const shouldUpdate =
       newUsingCloud !== this.usingCloud ||
       newPackageManager !== this.packageManager ||
-      newNxVersion !== this.nxVersion;
+      newNxVersion?.full !== this.nxVersion?.full;
 
     if (shouldUpdate) {
       this.usingCloud = newUsingCloud;

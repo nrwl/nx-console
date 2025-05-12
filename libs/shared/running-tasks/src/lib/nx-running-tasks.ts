@@ -39,6 +39,13 @@ export function endRunningTasks(taskId: number) {
   const runningTask = runningTasks.get(taskId);
   if (runningTask) {
     runningTask.status = TaskStatus.Stopped;
+    runningTask.tasks.forEach((task) => {
+      // If the task is still in progress, mark it as stopped
+      // Nx could have updated other tasks that were completed in the setUpdatingRunningTasks
+      if (task.status === TaskStatus.InProgress) {
+        task.status = TaskStatus.Stopped;
+      }
+    });
   }
 }
 

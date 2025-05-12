@@ -4,13 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../nx-workspace"
-    },
-    {
       "path": "../generate-ui-webview"
-    },
-    {
-      "path": "../../shared/llm-context"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"
@@ -28,10 +22,10 @@
       "path": "../nx-workspace"
     },
     {
-      "path": "../configuration"
+      "path": "../lsp-client"
     },
     {
-      "path": "../lsp-client"
+      "path": "../configuration"
     },
     {
       "path": "../../shared/nx-cloud"
@@ -41,6 +35,9 @@
     },
     {
       "path": "../../shared/llm-context"
+    },
+    {
+      "path": "../../shared/nx-version"
     },
     {
       "path": "./tsconfig.lib.json"
