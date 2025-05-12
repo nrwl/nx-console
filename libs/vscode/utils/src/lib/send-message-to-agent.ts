@@ -21,6 +21,7 @@ export async function sendMessageToAgent(message: string, newChat = true) {
       isPartialQuery: newChat ? true : false,
     });
     if (newChat) {
+      await new Promise((resolve) => setTimeout(resolve, 150));
       await commands.executeCommand('workbench.action.chat.sendToNewChat');
     }
   }
