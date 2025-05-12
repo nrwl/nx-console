@@ -4,7 +4,13 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/types"
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../generate-ui-webview"
+    },
+    {
+      "path": "../../shared/llm-context"
     },
     {
       "path": "../../nx-mcp/nx-mcp-server"

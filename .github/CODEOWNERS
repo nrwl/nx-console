@@ -52,6 +52,8 @@
 
 /libs/vscode/add-dependency/ @MaxKless
 
+/libs/shared/running-tasks/ @MaxKless
+
 /libs/nx-mcp/nx-mcp-server/ @MaxKless
 
 /libs/vscode/configuration/ @MaxKless
