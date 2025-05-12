@@ -18,10 +18,36 @@ import { ExtensionContext, window } from 'vscode';
 const GENERATE_RULES_KEY = 'generateAiAgentRules';
 
 interface RuleInfo {
-  path: string;
+  path: (workspacePath: string) => string;
   wrapContent: (content: string) => string;
   notificationMessage: string;
 }
+
+const cursorRuleInfo = {
+  path: (workspacePath: string) =>
+    join(workspacePath, '.cursor', 'rules', 'nx-rules.mdc'),
+  wrapContent: (content: string) => `---
+description: 
+globs: 
+alwaysApply: true
+---
+${content}
+`,
+  notificationMessage:
+    'Improve Cursor Agents by setting up a file with Nx-specific rules?',
+};
+
+const vscodeRuleInfo = {
+  path: (workspacePath: string) =>
+    join(workspacePath, '.github', 'instructions', 'nx.instructions.md'),
+  wrapContent: (content: string) => `---
+applyTo: '**'
+---
+${content}
+`,
+  notificationMessage:
+    'Improve Copilot Agent by setting up a file with Nx-specific instructions?',
+};
 
 export class AgentRulesManager {
   private packageManager?: PackageManager;
@@ -56,47 +82,21 @@ export class AgentRulesManager {
       nxConsoleRules(this.packageManager, this.nxVersion, this.usingCloud),
     );
 
-    const dir = dirname(ruleInfo.path);
+    const rulePath = ruleInfo.path(getNxWorkspacePath());
+    const dir = dirname(rulePath);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
 
-    writeFileSync(ruleInfo.path, wrappedContent);
+    writeFileSync(rulePath, wrappedContent);
   }
 
   // how and where to write rules for each editor
   public getRuleInfo(): RuleInfo | null {
-    const workspacePath = getNxWorkspacePath();
-
     if (isInCursor()) {
-      return {
-        path: join(workspacePath, '.cursor', 'rules', 'nx-rules.mdc'),
-        wrapContent: (content: string) => `---
-description: 
-globs: 
-alwaysApply: true
----
-${content}
-`,
-        notificationMessage:
-          'Improve Cursor Agents by setting up a file with Nx-specific rules?',
-      };
+      return cursorRuleInfo;
     } else if (isInVSCode()) {
-      return {
-        path: join(
-          workspacePath,
-          '.github',
-          'instructions',
-          'nx.instructions.md',
-        ),
-        wrapContent: (content: string) => `---
-applyTo: '**'
----
-${content}
-`,
-        notificationMessage:
-          'Improve Copilot Agent by setting up a file with Nx-specific instructions?',
-      };
+      return vscodeRuleInfo;
     }
 
     return null;
@@ -151,21 +151,23 @@ ${content}
   }
 
   public ensureRulesAreGitignored(): void {
-    const ruleInfo = this.getRuleInfo();
-    if (!ruleInfo) {
-      return;
-    }
-
     const workspacePath = getNxWorkspacePath();
     const gitIgnorePath = join(workspacePath, '.gitignore');
-    const relativeRulePath = relative(workspacePath, ruleInfo.path);
-    const ig = ignore({}).add(gitIgnorePath);
+    let newContent = `\n`;
+    for (const ruleInfo of [cursorRuleInfo, vscodeRuleInfo]) {
+      const relativeRulePath = relative(
+        workspacePath,
+        ruleInfo.path(workspacePath),
+      );
+      const ig = ignore({}).add(gitIgnorePath);
 
-    if (ig.ignores(relativeRulePath)) {
-      return;
-    } else {
-      appendFileSync(gitIgnorePath, `\n${relativeRulePath}\n`);
+      if (ig.ignores(relativeRulePath)) {
+        return;
+      } else {
+        newContent += `${relativeRulePath}\n`;
+      }
     }
+    appendFileSync(gitIgnorePath, newContent);
   }
 
   public async showAgentRulesNotification(): Promise<void> {
