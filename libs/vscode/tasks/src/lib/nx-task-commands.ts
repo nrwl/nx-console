@@ -1,25 +1,14 @@
-import { join } from 'path';
-import {
-  commands,
-  ExtensionContext,
-  QuickPickItem,
-  QuickPickItemKind,
-  tasks,
-  window,
-} from 'vscode';
+import { commands, ExtensionContext, tasks, window } from 'vscode';
 
-import { readAndParseJson } from '@nx-console/shared-file-system';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { resolveDependencyVersioning } from '@nx-console/vscode-utils';
 
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   selectAffectedFlags,
   selectRunManyFlags,
 } from '@nx-console/vscode-nx-cli-quickpicks';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
-import { NxTask } from './nx-task';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { NxTask } from './nx-task';
 
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(
@@ -35,29 +24,22 @@ export function registerNxCommands(context: ExtensionContext) {
       commands.registerCommand(`nx.affected.${target}`, () => {
         getTelemetry().logUsage(`cli.affected`);
         promptForAffectedFlags(target);
-      })
-    )
+      }),
+    ),
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.run-many', () => {
       getTelemetry().logUsage('tasks.run-many');
       promptForRunMany();
-    })
+    }),
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.list', () => {
       getTelemetry().logUsage('cli.list');
       promptForList();
-    })
-  );
-
-  context.subscriptions.push(
-    commands.registerCommand('nx.migrate', () => {
-      getTelemetry().logUsage('cli.migrate');
-      promptForMigrate();
-    })
+    }),
   );
 }
 
@@ -76,13 +58,13 @@ async function promptForTarget(): Promise<string | undefined> {
     new Set(
       Object.entries(projectGraph.nodes)
         .map(([, project]) => Object.keys(project.data.targets || {}))
-        .flat()
-    )
+        .flat(),
+    ),
   ).sort();
 
   if (!validTargets.length) {
     window.showErrorMessage(
-      'None of your workspace projects have an architect or targets command'
+      'None of your workspace projects have an architect or targets command',
     );
     return;
   }
@@ -101,7 +83,7 @@ async function promptForAffectedFlags(target: string) {
     });
     if (!task) {
       logAndShowError(
-        'Error while creating task. Please see the logs for more information.'
+        'Error while creating task. Please see the logs for more information.',
       );
       return;
     }
@@ -124,7 +106,7 @@ async function promptForRunMany() {
     });
     if (!task) {
       logAndShowError(
-        'Error while creating task. Please see the logs for more information.'
+        'Error while creating task. Please see the logs for more information.',
       );
       return;
     }
@@ -139,94 +121,9 @@ async function promptForList() {
   });
   if (!task) {
     logAndShowError(
-      'Error while creating task. Please see the logs for more information.'
+      'Error while creating task. Please see the logs for more information.',
     );
     return;
   }
   tasks.executeTask(task);
-}
-
-async function promptForMigrate() {
-  const workspacePath = getNxWorkspacePath();
-
-  if (!workspacePath) {
-    return;
-  }
-
-  const isEncapsulatedNx = (await getNxWorkspace())?.isEncapsulatedNx ?? false;
-  const packageJson = await readAndParseJson(
-    join(
-      workspacePath,
-      isEncapsulatedNx
-        ? join('.nx', 'installation', 'package.json')
-        : 'package.json'
-    )
-  );
-
-  const dependencyToMigrate = await window.showQuickPick(
-    buildQuickPickItems(packageJson),
-    {
-      title: 'Select dependency',
-      placeHolder: 'Select the dependency you want to migrate.',
-    }
-  );
-
-  if (dependencyToMigrate === undefined) {
-    return;
-  }
-
-  const depVersioningInfo = await resolveDependencyVersioning(
-    dependencyToMigrate.label
-  );
-
-  if (depVersioningInfo !== undefined) {
-    const { dep, version } = depVersioningInfo;
-
-    const task = await NxTask.create({
-      command: 'migrate',
-      flags: [`${dep}@${version}`],
-    });
-
-    if (!task) {
-      window.showErrorMessage('Error while creating task, ');
-      return;
-    }
-    tasks.executeTask(task);
-  }
-}
-
-function buildQuickPickItems({
-  dependencies = {},
-  devDependencies = {},
-}: {
-  dependencies: { [key: string]: string };
-  devDependencies: { [key: string]: string };
-}): QuickPickItem[] {
-  const depsQuickPickItems: QuickPickItem[] =
-    Object.keys(dependencies).length > 0
-      ? [
-          {
-            label: 'dependencies',
-            kind: QuickPickItemKind.Separator,
-          },
-          ...Object.keys(dependencies).map((item) => ({
-            label: item,
-          })),
-        ]
-      : [];
-
-  const devDepsQuickPickItems: QuickPickItem[] =
-    Object.keys(devDependencies).length > 0
-      ? [
-          {
-            label: 'devDependencies',
-            kind: QuickPickItemKind.Separator,
-          },
-          ...Object.keys(devDependencies).map((item) => ({
-            label: item,
-          })),
-        ]
-      : [];
-
-  return [...depsQuickPickItems, ...devDepsQuickPickItems];
 }

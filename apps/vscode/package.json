@@ -368,10 +368,6 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.migrate",
-          "when": "isNxWorkspace"
-        },
-        {
           "command": "nx.generate.ui",
           "when": "isNxWorkspace"
         },
@@ -813,11 +809,6 @@
       },
       {
         "category": "Nx",
-        "title": "migrate",
-        "command": "nx.migrate"
-      },
-      {
-        "category": "Nx",
         "title": "Generate (UI)",
         "command": "nx.generate.ui",
         "icon": "$(browser)"
@@ -961,8 +952,7 @@
             "run-many",
             "affected",
             "affected --graph",
-            "list",
-            "migrate"
+            "list"
           ],
           "markdownDescription": "Common Nx commands that will be available in the sidebar view. You can specify either \n - Arbitrary Nx commands, like `build:example-app` or `nx run my-lib:test` (note that you can omit the prefixed `nx`) or  \n - Nx commands that are available through Nx Console, like `run-many`. They will be executed using the Nx Console UI."
         },
