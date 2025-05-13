@@ -52,7 +52,7 @@ ${content}
 
 export class AgentRulesManager {
   private packageManager?: PackageManager;
-  private nxVersion?: NxVersion;
+  private nxVersion?: string;
   private usingCloud = false;
 
   constructor(private context: ExtensionContext) {}
@@ -64,7 +64,7 @@ export class AgentRulesManager {
       workspacePath,
       vscodeLogger,
     );
-    this.nxVersion = await getNxVersion();
+    this.nxVersion = (await getNxVersion())?.full;
 
     if (GlobalConfigurationStore.instance.get(GENERATE_RULES_KEY, false)) {
       await this.writeAgentRules();
@@ -127,12 +127,12 @@ export class AgentRulesManager {
       workspacePath,
       vscodeLogger,
     );
-    const newNxVersion = await getNxVersion();
+    const newNxVersion = (await getNxVersion())?.full;
 
     const shouldUpdate =
       newUsingCloud !== this.usingCloud ||
       newPackageManager !== this.packageManager ||
-      newNxVersion?.full !== this.nxVersion?.full;
+      newNxVersion !== this.nxVersion;
 
     if (shouldUpdate) {
       this.usingCloud = newUsingCloud;
