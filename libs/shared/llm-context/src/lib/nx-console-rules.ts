@@ -32,7 +32,7 @@ You have access to the Nx MCP server and the tools it provides. Use them. Follow
 - To help answer questions about the workspace structure or simply help with demonstrating how tasks depend on each other, use the '${NX_VISUALIZE_GRAPH}' tool
 
 # Generation Guidelines
-If the user wants to generate something, use the following flow: 
+If the user wants to generate something, use the following flow:
 
 - learn about the nx workspace and any specifics the user needs by using the '${NX_WORKSPACE}' tool and the '${NX_PROJECT_DETAILS}' tool if applicable
 - get the available generators using the '${NX_GENERATORS}' tool
@@ -73,9 +73,10 @@ function runningTasksGuidelines(nxVersion: NxVersion | undefined) {
 
   return `
 # Running Tasks Guidelines
-If the user wants help with running tasks or running commands, use the following flow:
-- Use the '${NX_CURRENT_RUNNING_TASKS_DETAILS} ' tool to get the list of running tasks. 
-- If there are any running tasks, ask the user if they would like help with a specific task then use the '${NX_CURRENT_RUNNING_TASK_OUTPUT}' tool to get the terminal output for that task/command
+If the user wants help with tasks or commands (which include keywords like "test", "build", "lint", or other similar actions), use the following flow:
+- Use the '${NX_CURRENT_RUNNING_TASKS_DETAILS}' tool to get the list of tasks (this can include tasks that were completed, stopped or failed).
+- If there are any tasks, ask the user if they would like help with a specific task then use the '${NX_CURRENT_RUNNING_TASK_OUTPUT}' tool to get the terminal output for that task/command
 - Use the terminal output from '${NX_CURRENT_RUNNING_TASK_OUTPUT}' to see what's wrong and help the user fix their problem. Use the appropriate tools if necessary
+- If the user would like to rerun the task or command, always use \`nx run <taskId>\` to rerun in the terminal. This will ensure that the task will run in the nx context and will be run the same way it originally executed
 `;
 }

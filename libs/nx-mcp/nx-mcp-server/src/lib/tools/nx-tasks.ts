@@ -18,9 +18,10 @@ export function registerNxTaskTools(
     NX_CURRENT_RUNNING_TASKS_DETAILS,
     `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
     There will be scenarios where the current process is not running anymore (as denoted by Stopped).
+    Use this tool if users ask for information about recently run tests, builds or other commands.
     Use this tool for assisting with debugging and getting details about the current running tasks.
 
-    Use nx-currently_running_task_output to get the terminal output for specific tasks.
+    Use ${NX_CURRENT_RUNNING_TASK_OUTPUT} to get the terminal output for specific tasks.
     `,
     nxCurrentlyRunningTasksDetails(telemetry),
   );
