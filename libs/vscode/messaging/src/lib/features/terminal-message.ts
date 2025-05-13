@@ -1,6 +1,7 @@
 import { commands } from 'vscode';
 import { NotificationType } from 'vscode-jsonrpc/node';
 import { MessagingNotification } from '../messaging-notification';
+import { sendMessageToAgent } from '@nx-console/vscode-utils';
 
 export const NxTerminalMessage: MessagingNotification<string> = {
   type: new NotificationType('nx/terminalMessage'),
@@ -10,10 +11,9 @@ export const NxTerminalMessage: MessagingNotification<string> = {
     Can you help with the following terminal output?
     \`\`\`${msg}\`\`\`
     `;
-    commands.executeCommand('workbench.action.chat.open', {
-      mode: 'agent',
-      query,
-      isPartialQuery: false,
-    });
+
+    sendMessageToAgent(query);
+
+   
   },
 };

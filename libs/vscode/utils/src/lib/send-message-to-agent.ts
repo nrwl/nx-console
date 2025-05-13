@@ -15,14 +15,17 @@ export async function sendMessageToAgent(message: string, newChat = true) {
     await commands.executeCommand('editor.action.clipboardPasteAction');
     await env.clipboard.writeText(originalClipboard);
   } else {
-    commands.executeCommand('workbench.action.chat.open', {
-      mode: 'agent',
-      query: message,
-      isPartialQuery: newChat ? true : false,
-    });
     if (newChat) {
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      await commands.executeCommand('workbench.action.chat.sendToNewChat');
+      commands.executeCommand('workbench.action.chat.newChat', {
+        agentMode: true,
+        inputValue: message,
+        isPartialQuery: false,
+      });
+    } else {
+      commands.executeCommand('workbench.action.chat.open', {
+        mode: 'agent',
+        query: message,
+      });
     }
   }
 }

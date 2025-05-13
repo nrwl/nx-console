@@ -16,6 +16,9 @@
       "path": "../../shared/npm/tsconfig.lib.json"
     },
     {
+      "path": "../utils/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/running-tasks/tsconfig.lib.json"
     }
   ]
