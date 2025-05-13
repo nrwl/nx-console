@@ -80,3 +80,6 @@ apps/vscode-e2e/.screenshots
 migrations.json
 
 test-output
+
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md

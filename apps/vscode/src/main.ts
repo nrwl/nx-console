@@ -305,7 +305,7 @@ async function setWorkspace(workspacePath: string) {
     initErrorDiagnostics(context);
     initCopilot(context);
     initMcp(context);
-    initMessagingServer(context, workspacePath);
+    await initMessagingServer(context, workspacePath);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

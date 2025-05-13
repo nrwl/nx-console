@@ -13,6 +13,9 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/running-tasks/tsconfig.lib.json"
     }
   ]

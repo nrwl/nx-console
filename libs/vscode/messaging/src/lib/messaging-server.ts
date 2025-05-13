@@ -1,6 +1,6 @@
 import net from 'net';
 import { ExtensionContext } from 'vscode';
-import { getFullOsSocketPath, killSocketOrPath } from './pipe';
+import { getFullOsSocketPath, killSocketOnPath } from './pipe';
 import { NxTerminalMessage } from './features/terminal-message';
 
 import { createMessageConnection } from 'vscode-jsonrpc/node';
@@ -25,11 +25,8 @@ export class NxMessagingServer {
   #server: net.Server;
   #fullSocketPath: string;
 
-  constructor(workspacePath: string) {
-    killSocketOrPath(workspacePath);
-
-    this.#fullSocketPath = getFullOsSocketPath(workspacePath);
-
+  constructor(workspacePath: string, socketPath: string) {
+    this.#fullSocketPath = socketPath;
     this.#server = net.createServer((socket) => {
       console.log(`Client connected`);
 
@@ -58,6 +55,7 @@ export class NxMessagingServer {
   }
 
   listen() {
+    killSocketOnPath(this.#fullSocketPath);
     this.#server.listen(this.#fullSocketPath, () => {
       console.log(
         `Nx Console Messaging JSON-RPC server listening on ${this.#fullSocketPath}`,
@@ -80,16 +78,16 @@ export class NxMessagingServer {
 
 let existingServer: NxMessagingServer | null = null;
 
-export function initMessagingServer(
+export async function initMessagingServer(
   context: ExtensionContext,
   workspacePath: string,
 ) {
   if (existingServer) {
     existingServer.dispose();
   }
-
-  const messagingServer = new NxMessagingServer(workspacePath);
-  messagingServer.listen();
+  const socketPath = await getFullOsSocketPath(workspacePath);
+  const messagingServer = new NxMessagingServer(workspacePath, socketPath);
+  await messagingServer.listen();
 
   context.subscriptions.push(messagingServer);
 

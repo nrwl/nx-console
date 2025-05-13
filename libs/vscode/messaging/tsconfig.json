@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../../shared/running-tasks"
     },
     {
