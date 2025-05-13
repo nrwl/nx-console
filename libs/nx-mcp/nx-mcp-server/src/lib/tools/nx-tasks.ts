@@ -51,7 +51,9 @@ const nxCurrentlyRunningTasksDetails =
       for (const taskDetail of task.tasks) {
         content.push({
           type: 'text',
-          text: `-- taskId: ${taskDetail.name} (${taskDetail.status})`,
+          text: `-- taskId: ${taskDetail.name} (${taskDetail.status}) ${
+            taskDetail.continuous ? '(continuous)' : ''
+          }`,
         });
       }
     }
@@ -111,7 +113,7 @@ const nxCurrentlyRunningTaskOutput =
 
       content.push({
         type: 'text',
-        text: `Task output for process ID ${processId} and task ID ${taskId} (status: ${taskDetail.status}):`,
+        text: `Task output for process ID ${processId} and task ID ${taskId} with status: ${taskDetail.status} ${taskDetail.continuous ? '(continuous)' : ''}:`,
       });
       content.push({ type: 'text', text: taskDetail.output });
     }

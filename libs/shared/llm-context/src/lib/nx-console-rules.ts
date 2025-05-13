@@ -78,5 +78,6 @@ If the user wants help with tasks or commands (which include keywords like "test
 - If there are any tasks, ask the user if they would like help with a specific task then use the '${NX_CURRENT_RUNNING_TASK_OUTPUT}' tool to get the terminal output for that task/command
 - Use the terminal output from '${NX_CURRENT_RUNNING_TASK_OUTPUT}' to see what's wrong and help the user fix their problem. Use the appropriate tools if necessary
 - If the user would like to rerun the task or command, always use \`nx run <taskId>\` to rerun in the terminal. This will ensure that the task will run in the nx context and will be run the same way it originally executed
+- If the task was marked as "continuous" do not offer to rerun the task. This task is already running and the user can see the output in the terminal. You can use '${NX_CURRENT_RUNNING_TASK_OUTPUT}' to get the output of the task to verify the output. 
 `;
 }

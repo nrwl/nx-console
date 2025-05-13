@@ -16,4 +16,5 @@ export interface UpdatedRunningTask {
   name: string;
   status: TaskStatus;
   output: string;
+  continuous: boolean;
 }
