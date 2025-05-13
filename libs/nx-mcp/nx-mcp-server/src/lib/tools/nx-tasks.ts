@@ -82,14 +82,12 @@ const nxCurrentlyRunningTaskOutput =
       tool: 'nx-currently_running_task_output',
     });
 
-    const running_tasks = getRunningTasks();
+    const runningTasks = getRunningTasks();
     const content: CallToolResult['content'] = [];
 
     // If processId is specified, look for task within that specific process
     if (processId) {
-      const process = running_tasks.find(
-        (task) => task.processId === processId,
-      );
+      const process = runningTasks.find((task) => task.processId === processId);
 
       if (!process) {
         content.push({
@@ -118,7 +116,7 @@ const nxCurrentlyRunningTaskOutput =
     // If no processId specified, search across all processes
     else {
       let foundTask = null;
-      for (const runningTask of running_tasks) {
+      for (const runningTask of runningTasks) {
         const matchingTask = runningTask.tasks.find(
           (task) => task.name === taskId,
         );

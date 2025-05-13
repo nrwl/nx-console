@@ -13,6 +13,8 @@ export function startRunningTasks(taskId: number) {
   if (runningTask) {
     runningTask.status = TaskStatus.InProgress;
   } else {
+    // clear all previous tasks if a new run has started
+    runningTasks.clear();
     runningTasks.set(taskId, {
       status: TaskStatus.InProgress,
       tasks: [],
