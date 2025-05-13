@@ -110,7 +110,7 @@ const nxCurrentlyRunningTaskOutput =
 
       content.push({
         type: 'text',
-        text: `Task output for process ID ${processId} and task ID ${taskId}:`,
+        text: `Task output for process ID ${processId} and task ID ${taskId} (status: ${taskDetail.status}):`,
       });
       content.push({ type: 'text', text: taskDetail.output });
     }
@@ -135,7 +135,7 @@ const nxCurrentlyRunningTaskOutput =
       } else {
         content.push({
           type: 'text',
-          text: `Task output for task ID ${taskId}`,
+          text: `Task output for task ID ${taskId} (status: ${foundTask.status}):`,
         });
         content.push({ type: 'text', text: foundTask.output });
       }
