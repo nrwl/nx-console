@@ -97,7 +97,9 @@ const nxCurrentlyRunningTaskOutput =
         return { content };
       }
 
-      const taskDetail = process.tasks.find((task) => task.name === taskId);
+      const taskDetail = process.tasks.find((task) =>
+        task.name.includes(taskId),
+      );
 
       if (!taskDetail) {
         content.push({
@@ -117,8 +119,8 @@ const nxCurrentlyRunningTaskOutput =
     else {
       let foundTask = null;
       for (const runningTask of runningTasks) {
-        const matchingTask = runningTask.tasks.find(
-          (task) => task.name === taskId,
+        const matchingTask = runningTask.tasks.find((task) =>
+          task.name.includes(taskId),
         );
         if (matchingTask) {
           foundTask = matchingTask;
