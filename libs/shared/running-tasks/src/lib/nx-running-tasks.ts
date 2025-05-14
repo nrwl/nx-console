@@ -1,59 +1,58 @@
 import { TaskStatus, UpdatedRunningTask } from './running-tasks-types';
 
-const runningTasks = new Map<
-  number,
-  {
-    status: TaskStatus;
-    tasks: Array<UpdatedRunningTask>;
-  }
+const runningTasksByTaskId = new Map<
+  string,
+  UpdatedRunningTask & { connectionId: string; overallRunStatus: TaskStatus }
 >();
 
-export function startRunningTasks(taskId: number) {
-  const runningTask = runningTasks.get(taskId);
-  if (runningTask) {
-    runningTask.status = TaskStatus.InProgress;
-  } else {
-    // clear all previous tasks if a new run has started
-    runningTasks.clear();
-    runningTasks.set(taskId, {
-      status: TaskStatus.InProgress,
-      tasks: [],
-    });
-  }
+export function startRunningTasks(_connectionId: string, _processId: number) {
+  // empty for now
 }
 
 export function setUpdatingRunningTasks(
-  taskId: number,
+  connectionId: string,
   updatedTasks: Array<UpdatedRunningTask>,
 ) {
-  const runningTask = runningTasks.get(taskId);
-  if (runningTask) {
-    runningTask.tasks = updatedTasks;
-  } else {
-    runningTasks.set(taskId, {
-      status: TaskStatus.InProgress,
-      tasks: updatedTasks,
-    });
+  for (const task of updatedTasks) {
+    const currentlyRunningTask = runningTasksByTaskId.get(task.name);
+    if (currentlyRunningTask) {
+      currentlyRunningTask.status = task.status;
+      currentlyRunningTask.output = task.output;
+    } else {
+      const newRunningTask = {
+        ...task,
+        connectionId,
+        overallRunStatus: TaskStatus.InProgress,
+      };
+      runningTasksByTaskId.set(task.name, newRunningTask);
+    }
   }
 }
 
-export function endRunningTasks(taskId: number) {
-  const runningTask = runningTasks.get(taskId);
-  if (runningTask) {
-    runningTask.status = TaskStatus.Stopped;
-    runningTask.tasks.forEach((task) => {
+export function endRunningTasks(connectionId: string) {
+  for (const task of runningTasksByTaskId.values()) {
+    if (task.connectionId === connectionId) {
+      task.overallRunStatus = TaskStatus.Stopped;
       // If the task is still in progress, mark it as stopped
       // Nx could have updated other tasks that were completed in the setUpdatingRunningTasks
       if (task.status === TaskStatus.InProgress) {
         task.status = TaskStatus.Stopped;
       }
-    });
+    }
   }
 }
 
 export function getRunningTasks() {
-  return Array.from(runningTasks.entries()).map(([processId, task]) => ({
-    processId,
-    ...task,
-  }));
+  return runningTasksByTaskId.values();
+}
+
+export function getRunningTaskById(taskId: string) {
+  let task = runningTasksByTaskId.get(taskId);
+  if (!task) {
+    task = Array.from(runningTasksByTaskId.values()).find((t) =>
+      t.name.includes(taskId),
+    );
+  }
+
+  return task;
 }

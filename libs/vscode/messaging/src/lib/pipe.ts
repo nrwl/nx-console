@@ -2,6 +2,7 @@ import { mkdirSync, unlinkSync } from 'fs';
 import { platform, tmpdir } from 'os';
 import { join, resolve } from 'path';
 import { importNxPackagePath } from '@nx-console/shared-npm';
+import { vscodeLogger } from '@nx-console/vscode-utils';
 
 const DAEMON_DIR_FOR_CURRENT_WORKSPACE = join('.nx', 'workspace-data', 'd');
 
@@ -43,7 +44,7 @@ export async function killSocketOnPath(socketPath: string): Promise<void> {
     unlinkSync(socketPath);
   } catch (error: any) {
     if (error.code !== 'ENOENT') {
-      console.error('Error removing existing socket file:', error);
+      vscodeLogger.log('Error removing existing socket file:', error);
     }
   }
 }

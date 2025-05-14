@@ -13,8 +13,12 @@ import {
   MessagingNotification,
   MessagingNotification2,
 } from './messaging-notification';
+import crypto from 'crypto';
+import { vscodeLogger } from '@nx-console/vscode-utils';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { gte } from '@nx-console/nx-version';
 
-const notifications: Array<MessagingNotification | MessagingNotification2> = [
+const messages: Array<MessagingNotification | MessagingNotification2> = [
   NxTerminalMessage,
   NxStartedRunningTasks,
   NxEndedRunningTasks,
@@ -25,22 +29,20 @@ export class NxMessagingServer {
   #server: net.Server;
   #fullSocketPath: string;
 
-  constructor(workspacePath: string, socketPath: string) {
+  constructor(socketPath: string) {
     this.#fullSocketPath = socketPath;
     this.#server = net.createServer((socket) => {
-      console.log(`Client connected`);
+      const socketId = crypto.randomUUID().toString();
+      (socket as any).__socketId = socketId;
+      vscodeLogger.log(`Client connected: ${socketId}`);
 
-      // Create a connection for the server over this socket
-      const connection = createMessageConnection(
-        socket, // Use the TCP socket for communication
-        socket,
-      );
+      const connection = createMessageConnection(socket, socket);
 
-      notifications.forEach((notification) => {
+      messages.forEach((notification) => {
         if ('type' in notification) {
           connection.onNotification(
             notification.type.method,
-            notification.handler,
+            notification.handler(socketId),
           );
         }
       });
@@ -49,7 +51,10 @@ export class NxMessagingServer {
 
       socket.on('close', () => {
         connection.dispose();
-        console.log('Client disconnected');
+        vscodeLogger.log(`Client disconnected: ${socketId}`);
+        messages.forEach((messageHandler) => {
+          messageHandler.onClose?.(socketId);
+        });
       });
     });
   }
@@ -57,7 +62,7 @@ export class NxMessagingServer {
   listen() {
     killSocketOnPath(this.#fullSocketPath);
     this.#server.listen(this.#fullSocketPath, () => {
-      console.log(
+      vscodeLogger.log(
         `Nx Console Messaging JSON-RPC server listening on ${this.#fullSocketPath}`,
       );
     });
@@ -66,12 +71,12 @@ export class NxMessagingServer {
   dispose() {
     try {
       this.#server.close(() => {
-        console.log(
+        vscodeLogger.log(
           `Nx Console Messaging JSON-RPC server closed on ${this.#fullSocketPath}`,
         );
       });
     } catch (error) {
-      console.error('Error closing server:', error);
+      vscodeLogger.log('Error closing server:', error);
     }
   }
 }
@@ -85,8 +90,14 @@ export async function initMessagingServer(
   if (existingServer) {
     existingServer.dispose();
   }
+
+  const version = await getNxVersion();
+  if (!version || !gte(version, '21.1.0')) {
+    return;
+  }
+
   const socketPath = await getFullOsSocketPath(workspacePath);
-  const messagingServer = new NxMessagingServer(workspacePath, socketPath);
+  const messagingServer = new NxMessagingServer(socketPath);
   await messagingServer.listen();
 
   context.subscriptions.push(messagingServer);

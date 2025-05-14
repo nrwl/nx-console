@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "nx": {
+    "name": "vscode-messaging",
     "projectType": "library",
     "tags": [
       "type:vscode"

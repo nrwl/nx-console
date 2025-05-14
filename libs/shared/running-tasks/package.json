@@ -7,6 +7,7 @@
     "tslib": "^2.3.0"
   },
   "nx": {
+    "name": "shared-running-tasks",
     "projectType": "library",
     "tags": [
       "type:shared"

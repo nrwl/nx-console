@@ -2,7 +2,10 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
-import { getRunningTasks } from '@nx-console/shared-running-tasks';
+import {
+  getRunningTaskById,
+  getRunningTasks,
+} from '@nx-console/shared-running-tasks';
 import z from 'zod';
 import {
   NX_CURRENT_RUNNING_TASK_OUTPUT,
@@ -37,25 +40,17 @@ const nxCurrentlyRunningTasksDetails =
   (telemetry: NxConsoleTelemetryLogger | undefined) =>
   async (): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: 'nx-currently_running_tasks_details',
+      tool: NX_CURRENT_RUNNING_TASKS_DETAILS,
     });
 
-    const running_tasks = getRunningTasks();
+    const runningTasks = getRunningTasks();
 
     const content: CallToolResult['content'] = [];
-    for (const task of running_tasks) {
+    for (const task of runningTasks) {
       content.push({
         type: 'text',
-        text: `processId: ${task.processId} (${task.status})`,
+        text: `TaskId: ${task.name} (status: ${task.status}) ${task.continuous ? '(continuous)' : ''}`,
       });
-      for (const taskDetail of task.tasks) {
-        content.push({
-          type: 'text',
-          text: `-- taskId: ${taskDetail.name} (${taskDetail.status}) ${
-            taskDetail.continuous ? '(continuous)' : ''
-          }`,
-        });
-      }
     }
 
     return {
@@ -64,10 +59,6 @@ const nxCurrentlyRunningTasksDetails =
   };
 
 const NxCurrentlyRunningTaskOutputSchema = z.object({
-  processId: z
-    .number()
-    .optional()
-    .describe('The process ID of the Nx CLI process'),
   taskId: z.string().describe('The task ID of the task to get the output for'),
 });
 
@@ -77,72 +68,31 @@ type NxCurrentlyRunningTaskOutputType = z.infer<
 const nxCurrentlyRunningTaskOutput =
   (telemetry: NxConsoleTelemetryLogger | undefined) =>
   async ({
-    processId,
     taskId,
   }: NxCurrentlyRunningTaskOutputType): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: 'nx-currently_running_task_output',
+      tool: NX_CURRENT_RUNNING_TASK_OUTPUT,
     });
 
-    const runningTasks = getRunningTasks();
-    const content: CallToolResult['content'] = [];
-
-    // If processId is specified, look for task within that specific process
-    if (processId) {
-      const process = runningTasks.find((task) => task.processId === processId);
-
-      if (!process) {
-        content.push({
-          type: 'text',
-          text: `No task found with process ID ${processId}`,
-        });
-        return { content };
-      }
-
-      const taskDetail = process.tasks.find((task) =>
-        task.name.includes(taskId),
-      );
-
-      if (!taskDetail) {
-        content.push({
-          type: 'text',
-          text: `No task found with task ID ${taskId} in process ID ${processId}`,
-        });
-        return { content };
-      }
-
-      content.push({
-        type: 'text',
-        text: `Task output for process ID ${processId} and task ID ${taskId} with status: ${taskDetail.status} ${taskDetail.continuous ? '(continuous)' : ''}:`,
-      });
-      content.push({ type: 'text', text: taskDetail.output });
-    }
-    // If no processId specified, search across all processes
-    else {
-      let foundTask = null;
-      for (const runningTask of runningTasks) {
-        const matchingTask = runningTask.tasks.find((task) =>
-          task.name.includes(taskId),
-        );
-        if (matchingTask) {
-          foundTask = matchingTask;
-          break;
-        }
-      }
-
-      if (!foundTask) {
-        content.push({
-          type: 'text',
-          text: `No task found with task ID ${taskId}`,
-        });
-      } else {
-        content.push({
-          type: 'text',
-          text: `Task output for task ID ${taskId} (status: ${foundTask.status}):`,
-        });
-        content.push({ type: 'text', text: foundTask.output });
-      }
+    const task = getRunningTaskById(taskId);
+    if (!task) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `No task found with ID ${taskId}`,
+          },
+        ],
+      };
     }
 
-    return { content };
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `TaskId: ${task.name} (status: ${task.status}) ${task.continuous ? '(continuous)' : ''} Output: 
+${task.output}`,
+        },
+      ],
+    };
   };

@@ -16,6 +16,12 @@
       "path": "../../shared/npm/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../nx-workspace/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {

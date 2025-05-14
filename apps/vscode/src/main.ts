@@ -305,7 +305,6 @@ async function setWorkspace(workspacePath: string) {
     initErrorDiagnostics(context);
     initCopilot(context);
     initMcp(context);
-    await initMessagingServer(context, workspacePath);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 
@@ -328,6 +327,7 @@ async function setWorkspace(workspacePath: string) {
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
 
   initNxConversion(context, isAngularWorkspace, isNxWorkspace);
+  await initMessagingServer(context, workspacePath);
 }
 
 async function registerWorkspaceFileWatcher(
