@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/nrwl-nx-console-badge.png)](https://mseep.ai/app/nrwl-nx-console)
+
 <p align="center">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-dark.png">
