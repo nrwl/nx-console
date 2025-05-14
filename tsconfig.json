@@ -173,6 +173,12 @@
     },
     {
       "path": "./libs/shared/nx-cloud"
+    },
+    {
+      "path": "./libs/vscode/messaging"
+    },
+    {
+      "path": "./libs/shared/running-tasks"
     }
   ]
 }

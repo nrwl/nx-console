@@ -1,0 +1,25 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../shared/npm"
+    },
+    {
+      "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../nx-workspace"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../../shared/running-tasks"
+    },
+    {
+      "path": "./tsconfig.lib.json"
+    }
+  ]
+}

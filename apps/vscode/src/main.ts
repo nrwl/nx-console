@@ -75,6 +75,7 @@ import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import { initMessagingServer } from '@nx-console/vscode-messaging';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
@@ -326,6 +327,7 @@ async function setWorkspace(workspacePath: string) {
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
 
   initNxConversion(context, isAngularWorkspace, isNxWorkspace);
+  await initMessagingServer(context, workspacePath);
 }
 
 async function registerWorkspaceFileWatcher(

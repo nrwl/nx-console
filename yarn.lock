@@ -2895,6 +2895,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-running-tasks@workspace:libs/shared/running-tasks":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-running-tasks@workspace:libs/shared/running-tasks"
+  dependencies:
+    tslib: ^2.3.0
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-schema@workspace:libs/shared/schema":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-schema@workspace:libs/shared/schema"
@@ -2964,6 +2972,12 @@ __metadata:
 "@nx-console/vscode-mcp@workspace:libs/vscode/mcp":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-mcp@workspace:libs/vscode/mcp"
+  languageName: unknown
+  linkType: soft
+
+"@nx-console/vscode-messaging@workspace:libs/vscode/messaging":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/vscode-messaging@workspace:libs/vscode/messaging"
   languageName: unknown
   linkType: soft
 
@@ -14482,6 +14496,7 @@ __metadata:
     jest: 29.7.0
     jest-environment-jsdom: 29.7.0
     jest-environment-node: ^29.7.0
+    jsonc-eslint-parser: ^2.1.0
     jsonc-parser: ^3.0.0
     lit: ^2.4.1
     memfs: ^3.4.7

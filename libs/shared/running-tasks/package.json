@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "private": true,
+  "name": "@nx-console/shared-running-tasks",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "nx": {
+    "name": "shared-running-tasks",
+    "projectType": "library",
+    "tags": [
+      "type:shared"
+    ]
+  }
+}

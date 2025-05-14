@@ -3,6 +3,8 @@ import {
   NX_AVAILABLE_PLUGINS,
   NX_CLOUD_CIPE_DETAILS,
   NX_CLOUD_CIPE_FAILURE,
+  NX_CURRENT_RUNNING_TASK_OUTPUT,
+  NX_CURRENT_RUNNING_TASKS_DETAILS,
   NX_DOCS,
   NX_GENERATOR_SCHEMA,
   NX_GENERATORS,
@@ -10,6 +12,7 @@ import {
   NX_VISUALIZE_GRAPH,
   NX_WORKSPACE,
 } from './tool-names';
+import { gte } from '@nx-console/nx-version';
 
 export const nxConsoleRules = (
   packageManager: PackageManager | undefined,
@@ -29,7 +32,7 @@ You have access to the Nx MCP server and the tools it provides. Use them. Follow
 - To help answer questions about the workspace structure or simply help with demonstrating how tasks depend on each other, use the '${NX_VISUALIZE_GRAPH}' tool
 
 # Generation Guidelines
-If the user wants to generate something, use the following flow: 
+If the user wants to generate something, use the following flow:
 
 - learn about the nx workspace and any specifics the user needs by using the '${NX_WORKSPACE}' tool and the '${NX_PROJECT_DETAILS}' tool if applicable
 - get the available generators using the '${NX_GENERATORS}' tool
@@ -41,7 +44,7 @@ If the user wants to generate something, use the following flow:
 - wait for the user to finish the generator
 - read the generator log file using the 'nx_read_generator_log' tool
 - use the information provided in the log file to answer the user's question or continue with what they were doing
-
+${runningTasksGuidelines(nxVersion)}
 ${
   isUsingNxCloud
     ? `
@@ -55,3 +58,23 @@ If the user wants help with fixing an error in their CI pipeline, use the follow
     : ''
 }
 `;
+
+function runningTasksGuidelines(nxVersion: string | undefined) {
+  if (!nxVersion) {
+    return undefined;
+  }
+
+  if (!gte(nxVersion, '21.1.0')) {
+    return undefined;
+  }
+
+  return `
+# Running Tasks Guidelines
+If the user wants help with tasks or commands (which include keywords like "test", "build", "lint", or other similar actions), use the following flow:
+- Use the '${NX_CURRENT_RUNNING_TASKS_DETAILS}' tool to get the list of tasks (this can include tasks that were completed, stopped or failed).
+- If there are any tasks, ask the user if they would like help with a specific task then use the '${NX_CURRENT_RUNNING_TASK_OUTPUT}' tool to get the terminal output for that task/command
+- Use the terminal output from '${NX_CURRENT_RUNNING_TASK_OUTPUT}' to see what's wrong and help the user fix their problem. Use the appropriate tools if necessary
+- If the user would like to rerun the task or command, always use \`nx run <taskId>\` to rerun in the terminal. This will ensure that the task will run in the nx context and will be run the same way it originally executed
+- If the task was marked as "continuous" do not offer to rerun the task. This task is already running and the user can see the output in the terminal. You can use '${NX_CURRENT_RUNNING_TASK_OUTPUT}' to get the output of the task to verify the output. 
+`;
+}
