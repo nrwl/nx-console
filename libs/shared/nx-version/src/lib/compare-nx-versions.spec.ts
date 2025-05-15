@@ -55,4 +55,12 @@ describe('gte', () => {
   it('should return true if string version a starts with 0.0.0-pr- and string version b starts with 0.0.0-pr- ', () => {
     expect(gte('0.0.0-pr-412', '0.0.0-pr-123')).toBe(true);
   });
+
+  it('should check for preleases', () => {
+    expect(gte('1.0.0', '1.0.0-beta.1')).toBe(true);
+    expect(gte('1.0.0', '1.0.0-rc.1')).toBe(true);
+    expect(gte('1.0.0-beta.1', '1.0.0')).toBe(false);
+    expect(gte('1.0.0-beta.2', '1.0.0-rc.1')).toBe(false);
+    expect(gte('1.0.0-rc.1', '1.0.0-rc.1')).toBe(true);
+  });
 });

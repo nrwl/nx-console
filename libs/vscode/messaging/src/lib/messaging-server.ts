@@ -92,7 +92,7 @@ export async function initMessagingServer(
   }
 
   const version = await getNxVersion();
-  if (!version || !gte(version, '21.1.0')) {
+  if (!version || !gte(version, '21.1.0-beta.1')) {
     return;
   }
 
