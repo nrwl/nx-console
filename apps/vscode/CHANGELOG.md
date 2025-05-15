@@ -1,3 +1,10 @@
+# [18.49.0](https://github.com/nrwl/nx-console/compare/vscode-v18.48.0...vscode-v18.49.0) (2025-05-15)
+
+
+### Features
+
+* add messenging service and add more nx mcp tools ([#2507](https://github.com/nrwl/nx-console/issues/2507)) ([0cc901b](https://github.com/nrwl/nx-console/commit/0cc901b9fd2712a64c5240a9cf9df09e6add0896))
+
 # [18.48.0](https://github.com/nrwl/nx-console/compare/vscode-v18.47.1...vscode-v18.48.0) (2025-05-12)
 
 
