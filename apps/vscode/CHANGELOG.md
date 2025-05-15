@@ -1,3 +1,10 @@
+## [18.49.1](https://github.com/nrwl/nx-console/compare/vscode-v18.49.0...vscode-v18.49.1) (2025-05-15)
+
+
+### Bug Fixes
+
+* **vscode:** include prerelease version when comparing versions for enabling console socket and rules ([f793c0e](https://github.com/nrwl/nx-console/commit/f793c0e1e20333c3536b17875b3ceca0ba044102))
+
 # [18.49.0](https://github.com/nrwl/nx-console/compare/vscode-v18.48.0...vscode-v18.49.0) (2025-05-15)
 
 
