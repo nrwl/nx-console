@@ -1,4 +1,4 @@
-import { NxVersion } from '@nx-console/nx-version';
+import { gte } from '@nx-console/nx-version';
 import { nxConsoleRules } from '@nx-console/shared-llm-context';
 import { detectPackageManager } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
@@ -152,6 +152,10 @@ export class AgentRulesManager {
   }
 
   public ensureRulesAreGitignored(): void {
+    if (gte(this.nxVersion ?? '', '21.1.0-beta.2')) {
+      return;
+    }
+
     const workspacePath = getNxWorkspacePath();
     const gitIgnorePath = join(workspacePath, '.gitignore');
     let newContent = `\n`;
