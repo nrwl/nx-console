@@ -10,11 +10,6 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
-      "outFiles": [
-        "${workspaceFolder}/dist/apps/vscode",
-        "${workspaceFolder}/dist/apps/generate-ui-v2",
-        "${workspaceFolder}/node_modules"
-      ],
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "extensionHost",

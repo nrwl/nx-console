@@ -40,6 +40,7 @@ import {
   NX_VISUALIZE_GRAPH,
   NX_WORKSPACE,
 } from '@nx-console/shared-llm-context';
+import { registerNxTaskTools } from './tools/nx-tasks';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -61,6 +62,7 @@ export interface NxWorkspaceInfoProvider {
 }
 
 export interface NxIdeProvider {
+  ideName: 'vscode' | 'cursor' | 'windsurf';
   focusProject: (projectName: string) => void;
   focusTask: (projectName: string, taskName: string) => void;
   showFullProjectGraph: () => void;
@@ -457,6 +459,15 @@ and follows the Nx workspace convention for project organization.`
         this.logger,
         this.telemetry,
         this.nxWorkspaceInfoProvider.getGitDiffs,
+      );
+    }
+
+    if (this._nxWorkspacePath) {
+      registerNxTaskTools(
+        this._nxWorkspacePath,
+        this.server,
+        this.logger,
+        this.telemetry,
       );
     }
   }

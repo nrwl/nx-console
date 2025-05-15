@@ -22,12 +22,14 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
+  isInCursor,
   isInVSCode,
+  isInWindsurf,
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
-import { commands, ProgressLocation, tasks, window } from 'vscode';
+import { commands, env, ProgressLocation, tasks, window } from 'vscode';
 
 export class McpWebServer {
   private static instance: McpWebServer;
@@ -218,6 +220,7 @@ const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
 };
 
 const ideProvider: NxIdeProvider = {
+  ideName: isInCursor() ? 'cursor' : isInWindsurf() ? 'windsurf' : 'vscode',
   focusProject: (projectName: string) => {
     getNxWorkspaceProjects().then(async (workspaceProjects) => {
       const project = await findMatchingProject(

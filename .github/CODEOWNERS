@@ -54,6 +54,8 @@
 
 /libs/nx-mcp/nx-mcp-server/ @MaxKless
 
+/libs/shared/running-tasks/ @MaxKless
+
 /libs/vscode/configuration/ @MaxKless
 
 /libs/vscode/nx-cloud-view/ @MaxKless
@@ -79,6 +81,8 @@
 /libs/vscode/lsp-client/ @MaxKless
 
 /libs/shared/telemetry/ @MaxKless
+
+/libs/vscode/messaging/ @MaxKless
 
 /libs/vscode/telemetry/ @MaxKless
 
