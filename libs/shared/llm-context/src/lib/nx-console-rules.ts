@@ -64,7 +64,7 @@ function runningTasksGuidelines(nxVersion: string | undefined) {
     return undefined;
   }
 
-  if (!gte(nxVersion, '21.1.0')) {
+  if (!gte(nxVersion, '21.1.0-beta.1')) {
     return undefined;
   }
 
