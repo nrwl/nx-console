@@ -10,7 +10,7 @@ async function socketDirName(workspaceRoot: string): Promise<string> {
   const { hashArray } = await importNxPackagePath<
     typeof import('nx/src/native')
   >(workspaceRoot, 'src/native');
-  const unique = hashArray([workspaceRoot, 'nx-console']);
+  const unique = hashArray([workspaceRoot.toLowerCase(), 'nx-console']);
   return join(tmpdir(), unique);
 }
 
