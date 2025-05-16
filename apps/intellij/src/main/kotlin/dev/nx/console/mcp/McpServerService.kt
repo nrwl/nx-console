@@ -49,7 +49,7 @@ class McpServerService(private val project: Project) {
         Notifier.notifyMCPSettingNeedsRefresh(project)
     }
 
-    private fun isMcpServerSetup(): Boolean {
+    fun isMcpServerSetup(): Boolean {
         val workspaceFile = getWorkspaceXmlFile()
 
         if (!workspaceFile.exists()) {

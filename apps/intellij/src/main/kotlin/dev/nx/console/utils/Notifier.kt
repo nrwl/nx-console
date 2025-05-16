@@ -181,7 +181,7 @@ class Notifier {
         fun notifyMCPSettingNeedsRefresh(project: Project) {
             getGroup()
                 .createNotification(
-                    "MCP server registered. Please restart the IDE to apply the setting.",
+                    "MCP server installed. Please restart the IDE to apply the setting and start the server.",
                     NotificationType.INFORMATION,
                 )
                 .setTitle("Nx Console")
@@ -201,6 +201,42 @@ class Notifier {
             type: NotificationType = NotificationType.INFORMATION,
         ) {
             getGroup().createNotification(message, type).setTitle("Nx Console").notify(project)
+        }
+
+        fun notifyMcpServerInstall(project: Project) {
+            val hideNotificationPropertyKey = "nx.console.mcp.server.install.notification.hide"
+
+            if (
+                PropertiesComponent.getInstance(project)
+                    .getBoolean(hideNotificationPropertyKey, false)
+            ) {
+                return
+            }
+
+            val notification =
+                getGroup()
+                    .createNotification(
+                        "Install the Nx MCP Server to enhance AI assistant with Nx-specific knowledge?",
+                        NotificationType.INFORMATION,
+                    )
+                    .setTitle("Nx Console")
+
+            notification.addActions(
+                setOf(
+                    NotificationAction.createSimpleExpiring("Install") {
+                        notification.expire()
+                        val mcpService = dev.nx.console.mcp.McpServerService.getInstance(project)
+                        mcpService.setupMcpServer()
+                    },
+                    NotificationAction.createSimpleExpiring("Don't ask again") {
+                        notification.expire()
+                        PropertiesComponent.getInstance(project)
+                            .setValue(hideNotificationPropertyKey, true)
+                    },
+                )
+            )
+
+            notification.notify(project)
         }
     }
 }
