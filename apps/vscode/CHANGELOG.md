@@ -1,3 +1,10 @@
+## [18.49.3](https://github.com/nrwl/nx-console/compare/vscode-v18.49.2...vscode-v18.49.3) (2025-05-16)
+
+
+### Bug Fixes
+
+* **vscode:** do not edit gitignore when greater or equal to 21.1.0 ([#2513](https://github.com/nrwl/nx-console/issues/2513)) ([e8b8e5b](https://github.com/nrwl/nx-console/commit/e8b8e5b7bbea212e3767ea4fc376434960f73555))
+
 ## [18.49.2](https://github.com/nrwl/nx-console/compare/vscode-v18.49.1...vscode-v18.49.2) (2025-05-16)
 
 
