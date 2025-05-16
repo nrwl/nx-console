@@ -7,7 +7,9 @@ import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.util.ui.RestartDialogImpl
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNotificationAction
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
@@ -174,6 +176,23 @@ class Notifier {
                 notification.addAction(ActionManager.getInstance().getAction("OpenLog"))
             }
             notification.notify(project)
+        }
+
+        fun notifyMCPSettingNeedsRefresh(project: Project) {
+            getGroup()
+                .createNotification(
+                    "MCP server registered. Please restart the IDE to apply the setting.",
+                    NotificationType.INFORMATION,
+                )
+                .setTitle("Nx Console")
+                .addAction(
+                    object : AnAction("Restart IDE"), DumbAware {
+                        override fun actionPerformed(e: AnActionEvent) {
+                            RestartDialogImpl.restartWithConfirmation()
+                        }
+                    }
+                )
+                .notify(project)
         }
 
         fun notifyAnything(
