@@ -56,7 +56,7 @@ export async function initMcp(context: ExtensionContext) {
   commands.executeCommand('setContext', 'isInWindsurf', isInWindsurf());
   commands.executeCommand('setContext', 'isInVSCode', isInVSCode());
 
-  if (!(await checkIsNxWorkspace(getNxWorkspacePath()))) {
+  if (!(await checkIsNxWorkspace(getNxWorkspacePath(), false))) {
     return;
   }
   hasInitializedMcp = true;
