@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import * as path from 'path';
 import { workspace, window } from 'vscode';
+import { parse } from 'jsonc-parser';
 import { isInCursor, isInWindsurf } from './editor-name-helpers';
 
 /**
@@ -61,7 +62,7 @@ export function hasNxMcpEntry(): boolean {
   }
 
   try {
-    const mcpJson = JSON.parse(readFileSync(mcpJsonPath, 'utf8'));
+    const mcpJson = parse(readFileSync(mcpJsonPath, 'utf8'));
     return !!(mcpJson.mcpServers?.['nx-mcp'] ?? mcpJson.servers?.['nx-mcp']);
   } catch (e) {
     return false;
@@ -84,7 +85,7 @@ export function readMcpJson(): any | null {
     if (fileContent.trim() === '') {
       return {};
     }
-    return JSON.parse(fileContent);
+    return parse(fileContent);
   } catch (error) {
     console.error('Error reading mcp.json:', error);
     return null;
