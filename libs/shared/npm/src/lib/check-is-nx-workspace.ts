@@ -8,10 +8,11 @@ import { workspaceDependencyPath } from './workspace-dependencies';
 
 export async function checkIsNxWorkspace(
   workspacePath: string,
+  supportLerna = true,
 ): Promise<boolean> {
   let isNxWorkspace = await fileExists(join(workspacePath, 'nx.json'));
 
-  if (!isNxWorkspace) {
+  if (!isNxWorkspace && supportLerna) {
     const lernaPath = await workspaceDependencyPath(workspacePath, 'lerna');
     if (!lernaPath) {
       return false;
