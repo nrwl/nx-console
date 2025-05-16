@@ -1,3 +1,10 @@
+## [18.49.2](https://github.com/nrwl/nx-console/compare/vscode-v18.49.1...vscode-v18.49.2) (2025-05-16)
+
+
+### Bug Fixes
+
+* **vscode:** lowercase workspace path when hashing for the pipe directory ([#2514](https://github.com/nrwl/nx-console/issues/2514)) ([e0b93e9](https://github.com/nrwl/nx-console/commit/e0b93e9538c2dfa2c4d4339e8ddfb78796f90fa5))
+
 ## [18.49.1](https://github.com/nrwl/nx-console/compare/vscode-v18.49.0...vscode-v18.49.1) (2025-05-15)
 
 
