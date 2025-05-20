@@ -26,12 +26,22 @@ export function registerNxTaskTools(
 
     Use ${NX_CURRENT_RUNNING_TASK_OUTPUT} to get the terminal output for specific tasks.
     `,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
     nxCurrentlyRunningTasksDetails(telemetry),
   );
   server.tool(
     NX_CURRENT_RUNNING_TASK_OUTPUT,
     `Returns the terminal output for a specific task from currently running Nx CLI processes`,
     NxCurrentlyRunningTaskOutputSchema.shape,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
     nxCurrentlyRunningTaskOutput(telemetry),
   );
 }

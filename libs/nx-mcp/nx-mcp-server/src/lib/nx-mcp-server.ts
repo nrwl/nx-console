@@ -139,6 +139,11 @@ export class NxMcpServerWrapper {
             'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
           ),
       },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
       async ({ userQuery }: { userQuery: string }) => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_DOCS,
@@ -153,6 +158,11 @@ export class NxMcpServerWrapper {
     this.server.tool(
       NX_AVAILABLE_PLUGINS,
       'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_AVAILABLE_PLUGINS,
@@ -201,6 +211,11 @@ export class NxMcpServerWrapper {
     this.server.tool(
       NX_WORKSPACE,
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_WORKSPACE,
@@ -281,6 +296,11 @@ export class NxMcpServerWrapper {
           .string()
           .describe('The name of the project to get details for'),
       },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
       async ({ projectName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_PROJECT_DETAILS,
@@ -330,6 +350,11 @@ export class NxMcpServerWrapper {
     this.server.tool(
       NX_GENERATORS,
       'Returns a list of generators that could be relevant to the user query.',
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_GENERATORS,
@@ -374,6 +399,11 @@ export class NxMcpServerWrapper {
           .describe(
             'The name of the generator to get schema for. Use the generator name from the nx_generators tool.',
           ),
+      },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
       },
       async ({ generatorName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
@@ -495,6 +525,10 @@ and follows the Nx workspace convention for project organization.`
             'The name of the task to focus the graph on. Only used if visualizationType is "project-task".',
           ),
       },
+      {
+        readOnlyHint: false,
+        openWorldHint: false,
+      },
       async ({ visualizationType, projectName, taskName }) => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_VISUALIZE_GRAPH,
@@ -582,6 +616,11 @@ and follows the Nx workspace convention for project organization.`
           .describe(
             'The current working directory to run the generator from. This is always relative to the workspace root. If not specified, the workspace root will be used.',
           ),
+      },
+      {
+        readOnlyHint: false,
+        openWorldHint: false,
+        destructiveHint: false,
       },
       async ({ generatorName, options, cwd }) => {
         this.telemetry?.logUsage('ai.tool-call', {
