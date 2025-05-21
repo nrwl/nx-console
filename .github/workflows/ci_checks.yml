@@ -64,8 +64,9 @@ jobs:
       # and we do not want to give the false impression that the artifact download time is part of nx commands.
       - name: Gradle artifacts and formatting
         run: |
-          yarn nx-cloud record -- ./gradlew projectReportAll
-          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
+          yarn nx-cloud record -- ./gradlew :intellij:clean --info
+          yarn nx-cloud record -- ./gradlew nxProjectGraph --info
+          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
 
       - name: Check project graph creation
         run: yarn nx show projects --verbose
