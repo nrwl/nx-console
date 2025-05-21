@@ -61,11 +61,11 @@ If the user wants help with fixing an error in their CI pipeline, use the follow
 
 function runningTasksGuidelines(nxVersion: string | undefined) {
   if (!nxVersion) {
-    return undefined;
+    return '';
   }
 
   if (!gte(nxVersion, '21.1.0-beta.1')) {
-    return undefined;
+    return '';
   }
 
   return `
