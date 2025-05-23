@@ -1,5 +1,6 @@
 import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
 import { packageDetails } from './package-details';
+import { normalize } from 'node:path';
 
 jest.mock('@nx-console/shared-file-system');
 
@@ -27,7 +28,9 @@ describe('packageDetails', () => {
         types: 'dist/index.d.ts',
       },
     });
-    expect(readAndCacheJsonFileMock).toBeCalledWith('libs/utils/package.json');
+    expect(readAndCacheJsonFileMock).toBeCalledWith(
+      normalize('libs/utils/package.json'),
+    );
   });
 
   it('should return undefined package name if JSON is empty', async () => {
