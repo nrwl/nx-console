@@ -66,9 +66,6 @@ export async function initMcp(context: ExtensionContext) {
   McpWebServer.Instance.completeMcpServerSetup();
 
   const rulesManager = new AgentRulesManager(context);
-  await rulesManager.initialize();
-
-  setupMcpJsonWatcher(context);
 
   context.subscriptions.push(
     commands.registerCommand('nx.configureMcpServer', async () => {
@@ -79,6 +76,10 @@ export async function initMcp(context: ExtensionContext) {
       await rulesManager.addAgentRulesToWorkspace();
     }),
   );
+
+  await rulesManager.initialize();
+
+  setupMcpJsonWatcher(context);
 
   // Wait a bit before showing notification
   await new Promise((resolve) => setTimeout(resolve, 20000));
