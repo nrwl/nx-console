@@ -7,7 +7,9 @@ import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.util.ui.RestartDialogImpl
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNotificationAction
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
@@ -176,12 +178,65 @@ class Notifier {
             notification.notify(project)
         }
 
+        fun notifyMCPSettingNeedsRefresh(project: Project) {
+            getGroup()
+                .createNotification(
+                    "MCP server installed. Please restart the IDE to apply the setting and start the server.",
+                    NotificationType.INFORMATION,
+                )
+                .setTitle("Nx Console")
+                .addAction(
+                    object : AnAction("Restart IDE"), DumbAware {
+                        override fun actionPerformed(e: AnActionEvent) {
+                            RestartDialogImpl.restartWithConfirmation()
+                        }
+                    }
+                )
+                .notify(project)
+        }
+
         fun notifyAnything(
             project: Project,
             message: String,
             type: NotificationType = NotificationType.INFORMATION,
         ) {
             getGroup().createNotification(message, type).setTitle("Nx Console").notify(project)
+        }
+
+        fun notifyMcpServerInstall(project: Project) {
+            val hideNotificationPropertyKey = "nx.console.mcp.server.install.notification.hide"
+
+            if (
+                PropertiesComponent.getInstance(project)
+                    .getBoolean(hideNotificationPropertyKey, false)
+            ) {
+                return
+            }
+
+            val notification =
+                getGroup()
+                    .createNotification(
+                        "Install the Nx MCP Server to enhance AI assistant with Nx-specific knowledge?",
+                        NotificationType.INFORMATION,
+                    )
+                    .setTitle("Nx Console")
+
+            notification.addActions(
+                setOf(
+                    NotificationAction.createSimpleExpiring("Install") {
+                        notification.expire()
+                        val mcpService = dev.nx.console.mcp.McpServerService.getInstance(project)
+                        mcpService.setupMcpServer()
+                    },
+                    NotificationAction.createSimpleExpiring("Don't ask again") {
+                        notification.expire()
+                        PropertiesComponent.getInstance(project)
+                            .setValue(hideNotificationPropertyKey, true)
+                    },
+                )
+            )
+
+            notification.notify(project)
         }
     }
 }

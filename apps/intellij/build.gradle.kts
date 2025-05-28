@@ -157,7 +157,7 @@ intellijPlatform {
 intellijPlatformTesting {
     runIde {
         create("runIntelliJLatest") {
-            version = "251.23536.34"
+            version = "2025.1.1.1"
             prepareSandboxTask {
                 from(nxlsRoot) {
                     include("**")

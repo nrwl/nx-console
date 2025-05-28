@@ -84,6 +84,9 @@
                 icon="dev.nx.console.NxIcons.Action"/>
 
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
+
+    <!-- MCP Server -->
+    <projectService serviceImplementation="dev.nx.console.mcp.McpServerService"/>
   </extensions>
   <extensions defaultExtensionNs="JavaScript">
     <scanningFileListenerContributor implementation="dev.nx.console.ide.NxCacheFolderExcludeContributor"/>
@@ -178,6 +181,15 @@
     <action id="dev.nx.console.settings.MarkDirectoryAsNxWorkspace"
             class="dev.nx.console.settings.MarkDirectoryAsNxWorkspace" text="MarkDirectoryAsNxWorkspace">
       <add-to-group group-id="MarkRootGroup" anchor="first"/>
+    </action>
+
+    <!-- MCP Server -->
+    <action id="dev.nx.console.mcp.SetupMcpServerAction"
+            class="dev.nx.console.mcp.SetupMcpServerAction"
+            text="Nx: Setup MCP Server"
+            description="Set up the MCP server for this project"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
   </actions>
 
