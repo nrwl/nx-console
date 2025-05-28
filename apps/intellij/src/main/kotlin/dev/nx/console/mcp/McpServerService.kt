@@ -4,6 +4,7 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VfsUtil
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nxBasePath
@@ -126,11 +127,15 @@ class McpServerService(private val project: Project) {
             // Add options
             addOption(doc, mcpServerCommand, "enabled", "true")
             addOption(doc, mcpServerCommand, "name", "nx-mcp")
-            addOption(doc, mcpServerCommand, "programPath", "npx")
+            if (SystemInfo.isWindows) {
+                addOption(doc, mcpServerCommand, "programPath", "npx.cmd")
+            } else {
+                addOption(doc, mcpServerCommand, "programPath", "npx")
+            }
 
             // Use the current workspace path
             val workspacePath = project.nxBasePath
-            addOption(doc, mcpServerCommand, "arguments", "nx-mcp@latest $workspacePath")
+            addOption(doc, mcpServerCommand, "arguments", "-y nx-mcp@latest $workspacePath")
             addOption(doc, mcpServerCommand, "workingDirectory", "")
 
             // Add empty envs element
