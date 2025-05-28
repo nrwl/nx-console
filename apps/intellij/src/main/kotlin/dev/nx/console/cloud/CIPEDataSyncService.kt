@@ -31,18 +31,16 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
 
     private val notificationListeners = mutableListOf<CIPENotificationListener>()
 
-    /**
-     * Update the CIPE data and check if notifications should be shown
-     */
+    /** Update the CIPE data and check if notifications should be shown */
     fun updateData(newData: CIPEDataResponse) {
         val oldInfo = lastValidInfo
-        
+
         _currentData.value = newData
-        
+
         // Update lastValidInfo if we have new info data
-        newData.info?.let { 
+        newData.info?.let {
             lastValidInfo = it
-            
+
             // Check for notification events if we have previous data to compare
             if (oldInfo != null) {
                 checkForNotifications(oldInfo, it)
@@ -60,38 +58,38 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
         notificationListeners.remove(listener)
     }
 
-    /**
-     * Check for notification events following VSCode logic
-     */
+    /** Check for notification events following VSCode logic */
     private fun checkForNotifications(oldInfo: List<CIPEInfo>, newInfo: List<CIPEInfo>) {
         newInfo.forEach { newCIPE ->
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
-            
+
             // Following VSCode logic: if the CIPE has completed or had a failed run before,
             // we've already shown a notification and should return
-            if (oldCIPE != null && (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))) {
+            if (
+                oldCIPE != null &&
+                    (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))
+            ) {
                 return@forEach
             }
-            
+
             // Check what type of notification to emit
             when {
                 // CIPE just failed
                 newCIPE.status.isFailedStatus() -> {
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
-                
+
                 // Run failed while CIPE is in progress
                 hasAnyFailedRun(newCIPE) -> {
                     // Find the first failed run for the notification
-                    val failedRun = newCIPE.runGroups
-                        .flatMap { it.runs }
-                        .firstOrNull { isRunFailed(it) }
-                    
+                    val failedRun =
+                        newCIPE.runGroups.flatMap { it.runs }.firstOrNull { isRunFailed(it) }
+
                     failedRun?.let {
                         emitNotification(CIPENotificationEvent.RunFailed(newCIPE, it))
                     }
                 }
-                
+
                 // CIPE succeeded (only notify if settings allow)
                 newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
                     emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
@@ -100,18 +98,15 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
         }
     }
 
-
     private fun isRunFailed(run: CIPERun): Boolean {
         return (run.status?.isFailedStatus() == true) ||
             (run.numFailedTasks?.let { it > 0 } == true)
     }
 
     private fun hasAnyFailedRun(cipe: CIPEInfo): Boolean {
-        return cipe.runGroups.any { runGroup ->
-            runGroup.runs.any { run -> isRunFailed(run) }
-        }
+        return cipe.runGroups.any { runGroup -> runGroup.runs.any { run -> isRunFailed(run) } }
     }
-    
+
     private fun emitNotification(event: CIPENotificationEvent) {
         notificationListeners.forEach { listener ->
             try {
@@ -142,6 +137,6 @@ fun interface CIPENotificationListener {
 // Extension function to check if a status represents failure
 private fun CIPEExecutionStatus.isFailedStatus(): Boolean {
     return this == CIPEExecutionStatus.FAILED ||
-           this == CIPEExecutionStatus.CANCELED ||
-           this == CIPEExecutionStatus.TIMED_OUT
+        this == CIPEExecutionStatus.CANCELED ||
+        this == CIPEExecutionStatus.TIMED_OUT
 }

@@ -24,12 +24,12 @@ class NxCloudNotificationsSetting : NxConsoleSettingBase<NxCloudNotificationsLev
     override fun render(panel: Panel) {
         panel.apply {
             row {
-                label("Nx Cloud Notifications")
-                cell(comboBoxField)
-                    .comment(
-                        "Choose when to show notifications for CI Pipeline Executions from Nx Cloud"
-                    )
-            }
+                    label("Nx Cloud Notifications")
+                    cell(comboBoxField)
+                        .comment(
+                            "Choose when to show notifications for CI Pipeline Executions from Nx Cloud"
+                        )
+                }
                 .layout(RowLayout.PARENT_GRID)
         }
     }

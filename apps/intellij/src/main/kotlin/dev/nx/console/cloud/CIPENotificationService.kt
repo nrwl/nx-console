@@ -15,8 +15,8 @@ import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 
 /**
- * Service responsible for showing CIPE notifications. 
- * Simply displays notification events emitted by CIPEDataSyncService.
+ * Service responsible for showing CIPE notifications. Simply displays notification events emitted
+ * by CIPEDataSyncService.
  */
 @Service(Service.Level.PROJECT)
 class CIPENotificationService(private val project: Project) : CIPENotificationListener {
@@ -40,9 +40,12 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         if (notificationSetting == NxCloudNotificationsLevel.NONE) {
             return
         }
-        
+
         // For success notifications, only show if settings allow
-        if (event is CIPENotificationEvent.CIPESucceeded && notificationSetting != NxCloudNotificationsLevel.ALL) {
+        if (
+            event is CIPENotificationEvent.CIPESucceeded &&
+                notificationSetting != NxCloudNotificationsLevel.ALL
+        ) {
             return
         }
 
@@ -64,14 +67,15 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             showHelp = true
         )
     }
-    
+
     private fun showRunFailedNotification(cipe: CIPEInfo, run: CIPERun) {
-        val command = if (run.command.length > 70) {
-            run.command.substring(0, 60) + "[...]"
-        } else {
-            run.command
-        }
-        
+        val command =
+            if (run.command.length > 70) {
+                run.command.substring(0, 60) + "[...]"
+            } else {
+                run.command
+            }
+
         showNotification(
             title = "Run Failed",
             content = "\"$command\" has failed on #${cipe.branch}",
@@ -81,7 +85,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             showHelp = true
         )
     }
-    
+
     private fun showCIPESucceededNotification(cipe: CIPEInfo) {
         showNotification(
             title = "CI Pipeline Succeeded",

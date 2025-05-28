@@ -34,10 +34,7 @@ data class CIPERun(
     val runUrl: String
 )
 
-data class CIPEInfoError(
-    val message: String,
-    val type: CIPEInfoErrorType
-)
+data class CIPEInfoError(val message: String, val type: CIPEInfoErrorType)
 
 enum class CIPEInfoErrorType {
     authentication,
