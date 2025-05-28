@@ -45,7 +45,7 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
                     val notificationService = CIPENotificationService.getInstance(project)
 
                     // Connect notification service to data sync
-                    dataSyncService.addChangeListener(notificationService)
+                    dataSyncService.addNotificationListener(notificationService)
 
                     // Start polling
                     pollingService.startPolling()

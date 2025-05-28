@@ -6,7 +6,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import dev.nx.console.models.CIPEExecutionStatus
+import dev.nx.console.models.CIPEInfo
+import dev.nx.console.models.CIPERun
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
@@ -14,11 +15,11 @@ import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 
 /**
- * Service responsible for showing CIPE notifications based on data changes. Implements the same
- * notification logic as VSCode.
+ * Service responsible for showing CIPE notifications. 
+ * Simply displays notification events emitted by CIPEDataSyncService.
  */
 @Service(Service.Level.PROJECT)
-class CIPENotificationService(private val project: Project) : CIPEChangeListener {
+class CIPENotificationService(private val project: Project) : CIPENotificationListener {
 
     companion object {
         private const val NOTIFICATION_GROUP_ID = "Nx Cloud CIPE"
@@ -32,84 +33,64 @@ class CIPENotificationService(private val project: Project) : CIPEChangeListener
     private val logger = thisLogger()
     private val telemetryService = TelemetryService.getInstance(project)
 
-    override fun onCIPEChange(change: CIPEChange) {
+    override fun onNotificationEvent(event: CIPENotificationEvent) {
         val notificationSetting = getCIPENotificationSetting()
 
+        // Check settings before showing any notification
         if (notificationSetting == NxCloudNotificationsLevel.NONE) {
             return
         }
+        
+        // For success notifications, only show if settings allow
+        if (event is CIPENotificationEvent.CIPESucceeded && notificationSetting != NxCloudNotificationsLevel.ALL) {
+            return
+        }
 
-        when (change) {
-            is CIPEChange.StatusChanged -> handleStatusChange(change, notificationSetting)
-            is CIPEChange.RunFailed -> handleRunFailed(change)
-            is CIPEChange.CIPECompleted -> handleCIPECompleted(change, notificationSetting)
-            is CIPEChange.NewCIPE -> {}
+        // Show the appropriate notification
+        when (event) {
+            is CIPENotificationEvent.CIPEFailed -> showCIPEFailedNotification(event.cipe)
+            is CIPENotificationEvent.RunFailed -> showRunFailedNotification(event.cipe, event.run)
+            is CIPENotificationEvent.CIPESucceeded -> showCIPESucceededNotification(event.cipe)
         }
     }
 
-    private fun handleStatusChange(
-        change: CIPEChange.StatusChanged,
-        setting: NxCloudNotificationsLevel,
-    ) {
-        val newCIPE = change.newCIPE
-        val oldCIPE = change.oldCIPE
-
-        // Only notify if the CIPE just failed (was in progress before)
-        if (oldCIPE.status == CIPEExecutionStatus.IN_PROGRESS && isFailedStatus(newCIPE.status)) {
-            showNotification(
-                title = "CI Pipeline Failed",
-                content = "CI Pipeline Execution for #${newCIPE.branch} has completed",
-                type = NotificationType.ERROR,
-                cipeUrl = newCIPE.cipeUrl,
-                commitUrl = newCIPE.commitUrl,
-                showHelp = true,
-            )
-        }
+    private fun showCIPEFailedNotification(cipe: CIPEInfo) {
+        showNotification(
+            title = "CI Pipeline Failed",
+            content = "CI Pipeline Execution for #${cipe.branch} has completed",
+            type = NotificationType.ERROR,
+            cipeUrl = cipe.cipeUrl,
+            commitUrl = cipe.commitUrl,
+            showHelp = true
+        )
     }
-
-    private fun handleRunFailed(change: CIPEChange.RunFailed) {
-        val cipe = change.cipe
-        val run = change.run
-
-        val command =
-            if (run.command.length > 70) {
-                run.command.substring(0, 60) + "[...]"
-            } else {
-                run.command
-            }
-
+    
+    private fun showRunFailedNotification(cipe: CIPEInfo, run: CIPERun) {
+        val command = if (run.command.length > 70) {
+            run.command.substring(0, 60) + "[...]"
+        } else {
+            run.command
+        }
+        
         showNotification(
             title = "Run Failed",
             content = "\"$command\" has failed on #${cipe.branch}",
             type = NotificationType.ERROR,
             cipeUrl = run.runUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = true,
+            showHelp = true
         )
     }
-
-    private fun handleCIPECompleted(
-        change: CIPEChange.CIPECompleted,
-        setting: NxCloudNotificationsLevel,
-    ) {
-        val cipe = change.cipe
-
-        when {
-            isFailedStatus(cipe.status) -> {
-                // Already handled by status change
-            }
-            cipe.status == CIPEExecutionStatus.SUCCEEDED &&
-                setting == NxCloudNotificationsLevel.ALL -> {
-                showNotification(
-                    title = "CI Pipeline Succeeded",
-                    content = "CI Pipeline Execution for #${cipe.branch} has completed",
-                    type = NotificationType.INFORMATION,
-                    cipeUrl = cipe.cipeUrl,
-                    commitUrl = cipe.commitUrl,
-                    showHelp = false,
-                )
-            }
-        }
+    
+    private fun showCIPESucceededNotification(cipe: CIPEInfo) {
+        showNotification(
+            title = "CI Pipeline Succeeded",
+            content = "CI Pipeline Execution for #${cipe.branch} has completed",
+            type = NotificationType.INFORMATION,
+            cipeUrl = cipe.cipeUrl,
+            commitUrl = cipe.commitUrl,
+            showHelp = false
+        )
     }
 
     private fun showNotification(
@@ -142,12 +123,6 @@ class CIPENotificationService(private val project: Project) : CIPEChangeListener
 
     private fun getCIPENotificationSetting(): NxCloudNotificationsLevel {
         return NxConsoleSettingsProvider.getInstance().nxCloudNotifications
-    }
-
-    private fun isFailedStatus(status: CIPEExecutionStatus): Boolean {
-        return status == CIPEExecutionStatus.FAILED ||
-            status == CIPEExecutionStatus.CANCELED ||
-            status == CIPEExecutionStatus.TIMED_OUT
     }
 
     // Notification Actions

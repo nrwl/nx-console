@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Service responsible for managing CIPE data state and detecting changes. Compares old and new CIPE
- * data to identify what changed and notifies listeners.
+ * Service responsible for managing CIPE data state and determining when to show notifications.
+ * Compares old and new CIPE data and emits notification events based on VSCode logic.
  */
 @Service(Service.Level.PROJECT)
 class CIPEDataSyncService(private val project: Project) : Disposable {
@@ -29,157 +29,119 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
     // Keep track of the last valid info data for comparison
     private var lastValidInfo: List<CIPEInfo>? = null
 
-    private val changeListeners = mutableListOf<CIPEChangeListener>()
+    private val notificationListeners = mutableListOf<CIPENotificationListener>()
 
     /**
-     * Update the CIPE data and detect changes
-     *
-     * @return List of changes detected
+     * Update the CIPE data and check if notifications should be shown
      */
-    fun updateData(newData: CIPEDataResponse): List<CIPEChange> {
-        val oldData = _currentData.value
-        val changes = detectChanges(oldData, newData)
-
+    fun updateData(newData: CIPEDataResponse) {
+        val oldInfo = lastValidInfo
+        
         _currentData.value = newData
-
+        
         // Update lastValidInfo if we have new info data
-        newData.info?.let { lastValidInfo = it }
-
-        // Notify all listeners of changes
-        changes.forEach { change -> notifyListeners(change) }
-
-        return changes
+        newData.info?.let { 
+            lastValidInfo = it
+            
+            // Check for notification events if we have previous data to compare
+            if (oldInfo != null) {
+                checkForNotifications(oldInfo, it)
+            }
+        }
     }
 
-    /** Add a listener for CIPE changes */
-    fun addChangeListener(listener: CIPEChangeListener) {
-        changeListeners.add(listener)
+    /** Add a listener for notification events */
+    fun addNotificationListener(listener: CIPENotificationListener) {
+        notificationListeners.add(listener)
     }
 
-    /** Remove a change listener */
-    fun removeChangeListener(listener: CIPEChangeListener) {
-        changeListeners.remove(listener)
+    /** Remove a notification listener */
+    fun removeNotificationListener(listener: CIPENotificationListener) {
+        notificationListeners.remove(listener)
     }
 
-    /** Detect changes between old and new CIPE data */
-    private fun detectChanges(old: CIPEDataResponse?, new: CIPEDataResponse): List<CIPEChange> {
-        val changes = mutableListOf<CIPEChange>()
-
-        // If we don't have new info data, nothing to check
-        val newInfo = new.info ?: return changes
-
-        // On initial load (lastValidInfo is null), we don't send notifications
-        // This matches VSCode behavior
-        val oldInfo = lastValidInfo ?: return changes
-
-        // Check each CIPE for status changes
+    /**
+     * Check for notification events following VSCode logic
+     */
+    private fun checkForNotifications(oldInfo: List<CIPEInfo>, newInfo: List<CIPEInfo>) {
         newInfo.forEach { newCIPE ->
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
-
+            
+            // Following VSCode logic: if the CIPE has completed or had a failed run before,
+            // we've already shown a notification and should return
+            if (oldCIPE != null && (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))) {
+                return@forEach
+            }
+            
+            // Check what type of notification to emit
             when {
-                // New CIPE
-                oldCIPE == null -> {
-                    changes.add(CIPEChange.NewCIPE(newCIPE))
+                // CIPE just failed
+                newCIPE.status.isFailedStatus() -> {
+                    emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
-
-                // Status changed
-                oldCIPE.status != newCIPE.status -> {
-                    changes.add(CIPEChange.StatusChanged(oldCIPE, newCIPE))
-
-                    // Check if it just completed
-                    if (!isCompleteStatus(oldCIPE.status) && isCompleteStatus(newCIPE.status)) {
-                        changes.add(CIPEChange.CIPECompleted(newCIPE))
+                
+                // Run failed while CIPE is in progress
+                hasAnyFailedRun(newCIPE) -> {
+                    // Find the first failed run for the notification
+                    val failedRun = newCIPE.runGroups
+                        .flatMap { it.runs }
+                        .firstOrNull { isRunFailed(it) }
+                    
+                    failedRun?.let {
+                        emitNotification(CIPENotificationEvent.RunFailed(newCIPE, it))
                     }
                 }
-
-                // Check for new failed runs
-                else -> {
-                    val newFailedRuns = findNewFailedRuns(oldCIPE, newCIPE)
-                    newFailedRuns.forEach { run -> changes.add(CIPEChange.RunFailed(newCIPE, run)) }
+                
+                // CIPE succeeded (only notify if settings allow)
+                newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
+                    emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
                 }
             }
         }
-
-        return changes
     }
 
-    /** Find runs that have newly failed */
-    private fun findNewFailedRuns(old: CIPEInfo, new: CIPEInfo): List<CIPERun> {
-        val newFailedRuns = mutableListOf<CIPERun>()
-
-        new.runGroups.forEach { newRunGroup ->
-            val oldRunGroup =
-                old.runGroups.find {
-                    it.runGroup == newRunGroup.runGroup &&
-                        it.ciExecutionEnv == newRunGroup.ciExecutionEnv
-                }
-
-            newRunGroup.runs.forEach { newRun ->
-                val oldRun =
-                    oldRunGroup?.runs?.find {
-                        it.linkId == newRun.linkId || it.executionId == newRun.executionId
-                    }
-
-                val newRunFailed = isRunFailed(newRun)
-                val oldRunFailed = oldRun?.let { isRunFailed(it) } ?: false
-
-                if (newRunFailed && !oldRunFailed) {
-                    newFailedRuns.add(newRun)
-                }
-            }
-        }
-
-        return newFailedRuns
-    }
 
     private fun isRunFailed(run: CIPERun): Boolean {
-        return (run.status.let { it != null && isFailedStatus((it)) }) ||
-            (run.numFailedTasks.let { it != null && it > 0 })
+        return (run.status?.isFailedStatus() == true) ||
+            (run.numFailedTasks?.let { it > 0 } == true)
     }
 
-    private fun isCompleteStatus(status: CIPEExecutionStatus): Boolean {
-        return when (status) {
-            CIPEExecutionStatus.SUCCEEDED,
-            CIPEExecutionStatus.FAILED,
-            CIPEExecutionStatus.CANCELED,
-            CIPEExecutionStatus.TIMED_OUT -> true
-            else -> false
+    private fun hasAnyFailedRun(cipe: CIPEInfo): Boolean {
+        return cipe.runGroups.any { runGroup ->
+            runGroup.runs.any { run -> isRunFailed(run) }
         }
     }
-
-    private fun isFailedStatus(status: CIPEExecutionStatus): Boolean {
-        return status == CIPEExecutionStatus.FAILED ||
-            status == CIPEExecutionStatus.CANCELED ||
-            status == CIPEExecutionStatus.TIMED_OUT
-    }
-
-    private fun notifyListeners(change: CIPEChange) {
-        changeListeners.forEach { listener ->
+    
+    private fun emitNotification(event: CIPENotificationEvent) {
+        notificationListeners.forEach { listener ->
             try {
-                listener.onCIPEChange(change)
+                listener.onNotificationEvent(event)
             } catch (e: Exception) {
-                logger.error("Error notifying CIPE change listener", e)
+                logger.error("Error notifying CIPE notification listener", e)
             }
         }
     }
 
     override fun dispose() {
-        changeListeners.clear()
+        notificationListeners.clear()
     }
 }
 
-/** Represents different types of CIPE changes */
-sealed class CIPEChange {
-    data class NewCIPE(val cipe: CIPEInfo) : CIPEChange()
-
-    data class StatusChanged(val oldCIPE: CIPEInfo, val newCIPE: CIPEInfo) : CIPEChange()
-
-    data class CIPECompleted(val cipe: CIPEInfo) : CIPEChange()
-
-    data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPEChange()
+/** Represents notification events that should be displayed to the user */
+sealed class CIPENotificationEvent {
+    data class CIPEFailed(val cipe: CIPEInfo) : CIPENotificationEvent()
+    data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
+    data class CIPESucceeded(val cipe: CIPEInfo) : CIPENotificationEvent()
 }
 
-/** Interface for listening to CIPE changes */
-fun interface CIPEChangeListener {
-    fun onCIPEChange(change: CIPEChange)
+/** Interface for listening to notification events */
+fun interface CIPENotificationListener {
+    fun onNotificationEvent(event: CIPENotificationEvent)
+}
+
+// Extension function to check if a status represents failure
+private fun CIPEExecutionStatus.isFailedStatus(): Boolean {
+    return this == CIPEExecutionStatus.FAILED ||
+           this == CIPEExecutionStatus.CANCELED ||
+           this == CIPEExecutionStatus.TIMED_OUT
 }
