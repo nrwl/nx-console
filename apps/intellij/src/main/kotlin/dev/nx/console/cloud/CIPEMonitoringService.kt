@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import dev.nx.console.utils.sync_services.NxCloudStatusSyncAccessService
+import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -34,7 +34,7 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
         cs.launch {
             try {
                 // Check if workspace is connected to Nx Cloud
-                val cloudStatus = NxCloudStatusSyncAccessService.getInstance(project).cloudStatus
+                val cloudStatus = NxlsService.getInstance(project).cloudStatus()
 
                 if (cloudStatus?.isConnected == true) {
                     logger.info("Nx Cloud is connected, initializing CIPE monitoring")
