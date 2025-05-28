@@ -134,4 +134,9 @@ interface NxService {
     fun parseTargetString(targetString: String): CompletableFuture<TargetInfo> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun recentCIPEData(): CompletableFuture<CIPEDataResponse> {
+        throw UnsupportedOperationException()
+    }
 }
