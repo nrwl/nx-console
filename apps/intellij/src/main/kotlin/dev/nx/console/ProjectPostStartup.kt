@@ -2,6 +2,7 @@ package dev.nx.console
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
@@ -31,6 +32,7 @@ internal class ProjectPostStartup : ProjectActivity {
                         NxProjectJsonToProjectMap.getInstance(project).init()
                         ProjectGraphErrorProblemProvider.getInstance(project).init()
                         NxVersionUtil.getInstance(project).listen()
+                        CIPEMonitoringService.getInstance(project).init()
                     }
                 }
                 break

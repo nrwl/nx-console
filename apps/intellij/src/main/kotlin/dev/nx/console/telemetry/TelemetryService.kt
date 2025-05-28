@@ -43,4 +43,19 @@ class TelemetryService(private val cs: CoroutineScope) {
         }
         cs.launch { service.featureUsed(feature.eventName, data) }
     }
+    
+    // String-based method for compatibility with VSCode telemetry patterns
+    fun featureUsed(feature: String, data: Map<String, Any>? = null) {
+        val source = data?.get("source")
+        if (
+            source != null &&
+                source is String &&
+                !TelemetryEventSource.isValidSource(source) &&
+                isDevelopmentInstance
+        ) {
+            logger.error("Invalid telemetry source: $source")
+            return
+        }
+        cs.launch { service.featureUsed(feature, data) }
+    }
 }

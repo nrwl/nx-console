@@ -4,6 +4,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
+import dev.nx.console.settings.options.NxCloudNotificationsLevel
 
 @State(name = "NxConsoleSettingsProvider", storages = [Storage("nx-console.xml")])
 internal class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsState> {
@@ -42,6 +43,12 @@ internal class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSet
             state.showProjectDetailsView = value
         }
 
+    var nxCloudNotifications: NxCloudNotificationsLevel
+        get() = state.nxCloudNotifications
+        set(value) {
+            state.nxCloudNotifications = value
+        }
+
     companion object {
         fun getInstance(): NxConsoleSettingsProvider {
             return service()
@@ -53,5 +60,6 @@ data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
-    var showProjectDetailsView: Boolean = true
+    var showProjectDetailsView: Boolean = true,
+    var nxCloudNotifications: NxCloudNotificationsLevel = NxCloudNotificationsLevel.ALL,
 )
