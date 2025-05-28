@@ -133,8 +133,8 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
     }
 
     private fun isRunFailed(run: CIPERun): Boolean {
-        return (run.status != null && isFailedStatus(run.status)) ||
-            (run.numFailedTasks != null && run.numFailedTasks > 0)
+        return (run.status.let { it != null && isFailedStatus((it)) }) ||
+            (run.numFailedTasks.let { it != null && it > 0 })
     }
 
     private fun isCompleteStatus(status: CIPEExecutionStatus): Boolean {
