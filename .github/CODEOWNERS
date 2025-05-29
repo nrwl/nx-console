@@ -112,7 +112,7 @@
 
 /libs/vscode/utils/ @MaxKless
 
-/apps/nx-mcp-e2e/ @MaxKless
+/apps/nx-mcp-e2e/ @MaxKless @JamesHenry
 
 /libs/shared/npm/ @MaxKless
 
