@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -111,10 +111,15 @@ export function isWindows() {
   return process.platform === 'win32';
 }
 
-export async function createInvokeMCPInspectorCLI(
+export type MCPServerForE2E = {
+  invokeMCPInspectorCLI: (testWorkspacePath: string, ...args: string[]) => any;
+  killMCPServer: () => void;
+};
+
+export async function createMCPServerForE2E(
   e2eCwd: string,
   mcpProjectName = 'nx-mcp',
-) {
+): Promise<MCPServerForE2E> {
   const graph = await createProjectGraphAsync();
   const nxMcp = graph.nodes[mcpProjectName];
   if (
@@ -148,19 +153,33 @@ export async function createInvokeMCPInspectorCLI(
       cwd: e2eCwd,
     },
   );
-  const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
 
-  return (testWorkspacePath: string, ...args: string[]) => {
-    const command = `${mcpInspectorCommand} --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
-    if (process.env['NX_VERBOSE_LOGGING']) {
-      console.log(`Executing command: ${command}`);
-    }
-    return JSON.parse(
-      execSync(command, {
-        encoding: 'utf8',
-        maxBuffer: 1024 * 1024 * 10, // 10MB
-        cwd: testWorkspacePath,
-      }),
-    );
+  // Run the server for the test workspace in the background but keep a reference to the process so we can kill it later
+  const mcpServerProcess = spawn(
+    'node',
+    [serverPath, '--sse', '--disableTelemetry', '--workspacePath', e2eCwd],
+    {
+      cwd: workspaceRoot,
+    },
+  );
+  const mcpServerUrl = `http://localhost:9921`;
+
+  return {
+    killMCPServer: () => {
+      mcpServerProcess.kill();
+    },
+    invokeMCPInspectorCLI: (testWorkspacePath: string, ...args: string[]) => {
+      const command = `npx mcp-inspector --cli ${mcpServerUrl} ${args.join(' ')}`;
+      if (process.env['NX_VERBOSE_LOGGING']) {
+        console.log(`Executing command: ${command}`);
+      }
+      return JSON.parse(
+        execSync(command, {
+          encoding: 'utf8',
+          maxBuffer: 1024 * 1024 * 10, // 10MB
+          cwd: testWorkspacePath,
+        }),
+      );
+    },
   };
 }

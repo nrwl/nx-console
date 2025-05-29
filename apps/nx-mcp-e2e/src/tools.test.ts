@@ -1,6 +1,7 @@
 import {
-  createInvokeMCPInspectorCLI,
+  createMCPServerForE2E,
   e2eCwd,
+  MCPServerForE2E,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
@@ -9,9 +10,7 @@ import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('tools', () => {
-  let invokeMCPInspectorCLI: (
-    ...args: string[]
-  ) => ReturnType<typeof JSON.parse>;
+  let mcpServer: MCPServerForE2E;
   const workspaceName = uniq('nx-mcp-smoke-test');
   const testWorkspacePath = join(e2eCwd, workspaceName);
 
@@ -20,15 +19,16 @@ describe('tools', () => {
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
     });
-    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(e2eCwd);
+    mcpServer = await createMCPServerForE2E(e2eCwd);
   });
 
   afterAll(() => {
+    mcpServer.killMCPServer();
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
 
   it('should ensure that the server starts and lists the expected tools for an Nx workspace', () => {
-    const result = invokeMCPInspectorCLI(
+    const result = mcpServer.invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/list',
     );
