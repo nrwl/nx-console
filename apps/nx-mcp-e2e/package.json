@@ -9,7 +9,7 @@
       "type:mcp"
     ],
     "implicitDependencies": [
-      "nx-mcp-server"
+      "nx-mcp"
     ],
     "namedInputs": {
       "sharedGlobals": [
