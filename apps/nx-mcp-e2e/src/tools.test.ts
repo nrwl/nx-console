@@ -1,6 +1,7 @@
 import {
   createInvokeMCPInspectorCLI,
   e2eCwd,
+  InvokeMCPInspectorCLI,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
@@ -9,9 +10,7 @@ import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('tools', () => {
-  let invokeMCPInspectorCLI: (
-    ...args: string[]
-  ) => ReturnType<typeof JSON.parse>;
+  let invokeMCPInspectorCLI: InvokeMCPInspectorCLI;
   const workspaceName = uniq('nx-mcp-smoke-test');
   const testWorkspacePath = join(e2eCwd, workspaceName);
 

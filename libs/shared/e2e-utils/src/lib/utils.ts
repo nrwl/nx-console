@@ -111,6 +111,11 @@ export function isWindows() {
   return process.platform === 'win32';
 }
 
+export type InvokeMCPInspectorCLI = (
+  testWorkspacePath: string,
+  ...args: string[]
+) => ReturnType<typeof JSON.parse>;
+
 export async function createInvokeMCPInspectorCLI(
   e2eCwd: string,
   mcpProjectName = 'nx-mcp',
@@ -122,7 +127,9 @@ export async function createInvokeMCPInspectorCLI(
     !nxMcp.data.targets?.build?.options?.outputPath ||
     !nxMcp.data.targets.build.options.outputFileName
   ) {
-    throw new Error('NX MCP project not found');
+    throw new Error(
+      `No build output configuration found for project "${mcpProjectName}" on the project graph`,
+    );
   }
   const serverPath = join(
     workspaceRoot,
@@ -148,10 +155,9 @@ export async function createInvokeMCPInspectorCLI(
       cwd: e2eCwd,
     },
   );
-  const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
 
   return (testWorkspacePath: string, ...args: string[]) => {
-    const command = `${mcpInspectorCommand} --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
+    const command = `npx mcp-inspector --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
     if (process.env['NX_VERBOSE_LOGGING']) {
       console.log(`Executing command: ${command}`);
     }
