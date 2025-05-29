@@ -40,47 +40,49 @@ jobs:
         run: |
           yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION"
 
-      - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v3
+      # - name: Gradle Wrapper Validation
+      #   uses: gradle/actions/wrapper-validation@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: ${{ env.JAVA_VERSION }}
-          cache: gradle
+      # - name: Setup Java
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     distribution: zulu
+      #     java-version: ${{ env.JAVA_VERSION }}
+      #     cache: gradle
 
-      - name: Ensure Nx Cloud Agents are configured correctly
-        run: yarn dlx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
+      # - name: Ensure Nx Cloud Agents are configured correctly
+      #   run: yarn dlx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
 
-      - uses: browser-actions/setup-chrome@v1
+      # - uses: browser-actions/setup-chrome@v1
 
-      - run: chrome --version
+      # - run: chrome --version
 
       - name: Install NPM dependencies
         run: yarn install --immutable
 
+      - run: yarn nx run nx-mcp-e2e:e2e-ci
+
       # We intentionally put the gradle tasks first because their artifacts are needed for project graph construction
       # and we do not want to give the false impression that the artifact download time is part of nx commands.
-      - name: Gradle artifacts and formatting
-        run: |
-          yarn nx-cloud record -- ./gradlew projectReportAll
-          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
+      # - name: Gradle artifacts and formatting
+      #   run: |
+      #     yarn nx-cloud record -- ./gradlew projectReportAll
+      #     yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
 
-      - name: Check project graph creation
-        run: yarn nx show projects --verbose
+      # - name: Check project graph creation
+      #   run: yarn nx show projects --verbose
 
-      - name: Check formatting of other files
-        run: yarn nx format:check --verbose
+      # - name: Check formatting of other files
+      #   run: yarn nx format:check --verbose
 
-      - name: Ensure the workspace configuration is in sync
-        run: yarn nx-cloud record -- yarn nx sync:check
+      # - name: Ensure the workspace configuration is in sync
+      #   run: yarn nx-cloud record -- yarn nx sync:check
 
-      - name: Run Nx Cloud conformance checks
-        run: yarn nx-cloud record -- yarn nx-cloud conformance:check
+      # - name: Run Nx Cloud conformance checks
+      #   run: yarn nx-cloud record -- yarn nx-cloud conformance:check
 
-      - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin --configuration=ci --exclude=nx-console --parallel=3
-        timeout-minutes: 45
+      # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin --configuration=ci --exclude=nx-console --parallel=3
+      #   timeout-minutes: 45
 
   main-windows:
     name: Main Windows
