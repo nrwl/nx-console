@@ -3,7 +3,12 @@ import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, modifyJsonFile, newWorkspace, uniq } from '../utils';
+import {
+  e2eCwd,
+  modifyJsonFile,
+  newWorkspace,
+  uniq,
+} from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -13,7 +18,7 @@ const projectJsonPath = join(
   workspaceName,
   'apps',
   workspaceName,
-  'project.json'
+  'project.json',
 );
 
 describe('namedInput link completion - default', () => {

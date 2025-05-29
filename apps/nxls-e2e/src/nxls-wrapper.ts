@@ -1,3 +1,5 @@
+import { defaultVersion } from '@nx-console/shared-e2e-utils';
+import { killGroup } from '@nx-console/shared-utils';
 import { ChildProcess, execSync, spawn } from 'child_process';
 import { join } from 'path';
 import {
@@ -10,9 +12,6 @@ import {
   StreamMessageReader,
   StreamMessageWriter,
 } from 'vscode-languageserver/node';
-
-import { killGroup } from '@nx-console/shared-utils';
-import { defaultVersion } from './utils';
 
 export class NxlsWrapper {
   private cwd?: string;
@@ -34,7 +33,10 @@ export class NxlsWrapper {
     console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
   };
 
-  constructor(private verbose?: boolean, private env?: NodeJS.ProcessEnv) {
+  constructor(
+    private verbose?: boolean,
+    private env?: NodeJS.ProcessEnv,
+  ) {
     if (verbose === undefined) {
       this.verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
     }
@@ -53,7 +55,7 @@ export class NxlsWrapper {
         'dist',
         'apps',
         'nxls',
-        'main.js'
+        'main.js',
       );
 
       const p = spawn('node', [nxlsPath, '--stdio'], {
@@ -81,7 +83,7 @@ export class NxlsWrapper {
             },
           },
         },
-        10
+        10,
       );
 
       if (this.verbose) {
@@ -156,18 +158,21 @@ export class NxlsWrapper {
 
   async sendRequest(
     request: Omit<RequestMessage, 'jsonrpc' | 'id'>,
-    customTimeoutMinutes?: number
+    customTimeoutMinutes?: number,
   ): Promise<ResponseMessage> {
     let timeout: NodeJS.Timeout;
     return await new Promise<ResponseMessage>((resolve, reject) => {
-      timeout = setTimeout(() => {
-        this.pendingRequestMap.delete(id);
-        reject(
-          new Error(
-            `Request ${request.method} timed out at ${new Date().toISOString()}`
-          )
-        );
-      }, (customTimeoutMinutes ?? 3) * 60 * 1000);
+      timeout = setTimeout(
+        () => {
+          this.pendingRequestMap.delete(id);
+          reject(
+            new Error(
+              `Request ${request.method} timed out at ${new Date().toISOString()}`,
+            ),
+          );
+        },
+        (customTimeoutMinutes ?? 3) * 60 * 1000,
+      );
 
       const id = this.idCounter++;
       this.pendingRequestMap.set(id, [resolve, timeout]);
@@ -181,7 +186,7 @@ export class NxlsWrapper {
         console.log(
           'sending request',
           JSON.stringify(fullRequest, null, 2),
-          `at ${new Date().toISOString()}`
+          `at ${new Date().toISOString()}`,
         );
       }
       this.messageWriter?.write(fullRequest);
@@ -194,7 +199,7 @@ export class NxlsWrapper {
     if (this.verbose) {
       console.log(
         'sending notification',
-        JSON.stringify(notification, null, 2)
+        JSON.stringify(notification, null, 2),
       );
     }
     this.messageWriter?.write({
@@ -204,17 +209,20 @@ export class NxlsWrapper {
   }
 
   async waitForNotification(
-    method: string
+    method: string,
   ): Promise<object | any[] | undefined> {
     let timeout: NodeJS.Timeout;
     if (this.verbose) {
       console.log(`waiting for ${method}`, this.pendingNotificationMap);
     }
     return await new Promise<any>((resolve, reject) => {
-      timeout = setTimeout(() => {
-        this.pendingNotificationMap.delete(method);
-        reject(new Error(`Timed out while waiting for ${method}`));
-      }, 3 * 60 * 1000);
+      timeout = setTimeout(
+        () => {
+          this.pendingNotificationMap.delete(method);
+          reject(new Error(`Timed out while waiting for ${method}`));
+        },
+        3 * 60 * 1000,
+      );
 
       this.pendingNotificationMap.set(method, [resolve, timeout]);
     }).finally(() => {
@@ -280,7 +288,7 @@ export class NxlsWrapper {
 }
 
 function isNotificationMessage(
-  message: Message
+  message: Message,
 ): message is NotificationMessage {
   return !('id' in message);
 }

@@ -1,4 +1,7 @@
-import { simpleReactWorkspaceOptions, uniq } from '../utils';
+import {
+  simpleReactWorkspaceOptions,
+  uniq,
+} from '@nx-console/shared-e2e-utils';
 import { testNxWorkspace } from './nx-workspace-base';
 
 const workspaceName = uniq('workspace');
@@ -22,5 +25,5 @@ testNxWorkspace(
         'test',
       ],
     },
-  ]
+  ],
 );

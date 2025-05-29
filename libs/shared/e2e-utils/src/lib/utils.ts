@@ -1,14 +1,15 @@
-import { execSync } from 'child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { execSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createProjectGraphAsync, workspaceRoot } from 'nx/src/devkit-exports';
 
 export const defaultVersion =
   process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '20.0.3';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
-  'nxls-e2e'
+  'nx-console-e2e',
 );
 export type NewWorkspaceOptions = {
   preset?: string;
@@ -63,7 +64,7 @@ export function newWorkspace({
 
   if (verbose) {
     console.log(
-      `setting up new workspace ${name} with ${command} at ${new Date().toISOString()}`
+      `Creating new workspace ${name} with ${command} at ${new Date().toISOString()}`,
     );
   }
 
@@ -104,4 +105,41 @@ export async function waitFor(ms: number) {
 
 export function isWindows() {
   return process.platform === 'win32';
+}
+
+export async function createInvokeMCPInspectorCLI(mcpProjectName = 'nx-mcp') {
+  const graph = await createProjectGraphAsync();
+  const nxMcp = graph.nodes[mcpProjectName];
+  if (
+    !nxMcp ||
+    !nxMcp.data.targets?.build?.options?.outputPath ||
+    !nxMcp.data.targets.build.options.outputFileName
+  ) {
+    throw new Error('NX MCP project not found');
+  }
+  const serverPath = join(
+    workspaceRoot,
+    nxMcp.data.targets.build.options.outputPath,
+    nxMcp.data.targets.build.options.outputFileName,
+  );
+  const mcpInspectorPath = join(
+    workspaceRoot,
+    'node_modules',
+    '.bin',
+    'mcp-inspector',
+  );
+
+  return (testWorkspacePath: string, ...args: string[]) => {
+    const command = `${mcpInspectorPath} --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
+    if (process.env['NX_VERBOSE_LOGGING']) {
+      console.log(`Executing command: ${command}`);
+    }
+    return JSON.parse(
+      execSync(command, {
+        encoding: 'utf8',
+        maxBuffer: 1024 * 1024 * 10, // 10MB
+        cwd: testWorkspacePath,
+      }),
+    );
+  };
 }

@@ -1,4 +1,8 @@
-import { defaultVersion, simpleReactWorkspaceOptions, uniq } from '../utils';
+import {
+  defaultVersion,
+  simpleReactWorkspaceOptions,
+  uniq,
+} from '@nx-console/shared-e2e-utils';
 import { testNxWorkspace } from './nx-workspace-base';
 
 const workspaceName = uniq('workspace');
@@ -28,5 +32,5 @@ testNxWorkspace(
         'typecheck',
       ],
     },
-  ]
+  ],
 );

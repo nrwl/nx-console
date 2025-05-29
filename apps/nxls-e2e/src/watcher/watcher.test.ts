@@ -13,7 +13,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
   waitFor,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
@@ -42,25 +42,25 @@ describe('watcher', () => {
     await waitFor(500);
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     await waitFor(500);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     await waitFor(500);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     await waitFor(500);
     appendFileSync(cypressConfig, 'console.log("hello")');
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 
@@ -81,7 +81,7 @@ describe('watcher', () => {
 
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 
@@ -92,16 +92,16 @@ describe('watcher', () => {
       encoding: 'utf-8',
     });
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     // we need to wait until the daemon watcher ultimately fails
@@ -109,7 +109,7 @@ describe('watcher', () => {
     await waitFor(8000);
     writeFileSync(projectJsonPath, oldContents);
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 
@@ -130,7 +130,7 @@ describe('watcher', () => {
 
     await waitFor(11000);
     nxlsWrapper.cancelWaitingForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 
@@ -148,7 +148,7 @@ describe('watcher', () => {
           {
             cwd: join(e2eCwd, workspaceName),
             env: process.env,
-          }
+          },
         );
       } catch (e) {
         console.log('Error: ', e);
@@ -158,10 +158,10 @@ describe('watcher', () => {
     await waitFor(1000);
 
     addRandomTargetToFile(
-      join(e2eCwd, workspaceName, 'react-app1', 'project.json')
+      join(e2eCwd, workspaceName, 'react-app1', 'project.json'),
     );
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 });

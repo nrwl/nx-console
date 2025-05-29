@@ -19,7 +19,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
   waitFor,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import { Position } from 'vscode-json-languageservice';
 import { CompletionList } from 'vscode-languageserver';
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
@@ -119,7 +119,7 @@ describe('nx.json completion - default', () => {
     expect(
       (autocompleteResponse.result as CompletionList).items
         .map((item) => item.label)
-        .sort()
+        .sort(),
     ).toMatchInlineSnapshot(`
       Array [
         "affected",
@@ -160,7 +160,7 @@ describe('nx.json completion - default', () => {
     });
 
     const labels = (autocompleteResponse.result as CompletionList).items.map(
-      (item) => item.label
+      (item) => item.label,
     );
     expect(labels).not.toContain('npmScope');
     expect(labels).not.toContain('targetDependencies');
@@ -208,8 +208,8 @@ describe('nx.json completion - default', () => {
         'node_modules',
         'nx',
         'schemas',
-        'nx-schema.json'
-      )
+        'nx-schema.json',
+      ),
     );
 
     nxlsWrapper.sendNotification({
@@ -217,7 +217,7 @@ describe('nx.json completion - default', () => {
       params: {},
     });
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const autocompleteResponse = await nxlsWrapper.sendRequest({
@@ -256,13 +256,13 @@ function getPluginAutocompletePosition(filePath: string): {
 } {
   const jsonFile = parseJsonText(filePath, readFileSync(filePath, 'utf-8'));
   const properties = isObjectLiteralExpression(
-    jsonFile.statements[0].expression
+    jsonFile.statements[0].expression,
   )
     ? jsonFile.statements[0].expression.properties
     : [];
   const pluginsProperty = properties.find(
     (prop) =>
-      prop.name && isStringLiteral(prop.name) && prop.name.text === 'plugins'
+      prop.name && isStringLiteral(prop.name) && prop.name.text === 'plugins',
   );
   const pluginDefinition =
     pluginsProperty && isPropertyAssignment(pluginsProperty)
@@ -273,11 +273,11 @@ function getPluginAutocompletePosition(filePath: string): {
   const pluginPropertyValue = (
     pluginDefinition?.properties.find(
       (prop) =>
-        prop.name && isStringLiteral(prop.name) && prop.name.text === 'plugin'
+        prop.name && isStringLiteral(prop.name) && prop.name.text === 'plugin',
     ) as PropertyAssignment
   ).initializer;
 
   return jsonFile.getLineAndCharacterOfPosition(
-    pluginPropertyValue.getStart(jsonFile)
+    pluginPropertyValue.getStart(jsonFile),
   );
 }

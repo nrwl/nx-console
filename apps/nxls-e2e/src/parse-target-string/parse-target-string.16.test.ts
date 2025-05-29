@@ -5,7 +5,13 @@ import {
 import type { Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, modifyJsonFile, newWorkspace, uniq, waitFor } from '../utils';
+import {
+  e2eCwd,
+  modifyJsonFile,
+  newWorkspace,
+  uniq,
+  waitFor,
+} from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -33,7 +39,7 @@ describe('parse target string - default', () => {
       workspaceName,
       'apps',
       workspaceName,
-      'project.json'
+      'project.json',
     );
 
     await waitFor(1000);
@@ -93,7 +99,7 @@ describe('parse target string - default', () => {
     }));
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 

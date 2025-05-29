@@ -8,7 +8,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -37,7 +37,7 @@ describe('project by path - standalone', () => {
     });
 
     expect((projectInfo.result as ProjectConfiguration).name).toEqual(
-      workspaceName
+      workspaceName,
     );
 
     const mainTsx = join(e2eCwd, workspaceName, 'src', 'main.tsx');
@@ -50,7 +50,7 @@ describe('project by path - standalone', () => {
     });
 
     expect((projectInfo2.result as ProjectConfiguration).name).toEqual(
-      workspaceName
+      workspaceName,
     );
   });
 
@@ -70,7 +70,7 @@ describe('project by path - standalone', () => {
       e2eCwd,
       workspaceName,
       'e2e',
-      'cypress.config.ts'
+      'cypress.config.ts',
     );
 
     const projectInfo2 = await nxlsWrapper.sendRequest({
@@ -93,7 +93,7 @@ describe('project by path - standalone', () => {
     });
 
     expect((projectInfo.result as ProjectConfiguration).name).toEqual(
-      workspaceName
+      workspaceName,
     );
   });
 

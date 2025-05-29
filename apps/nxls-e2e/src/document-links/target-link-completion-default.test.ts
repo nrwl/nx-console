@@ -6,7 +6,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 import { readFileSync } from 'fs';
 import { URI } from 'vscode-uri';
@@ -21,7 +21,7 @@ const projectJsonPath = join(
   workspaceName,
   'apps',
   workspaceName,
-  'project.json'
+  'project.json',
 );
 
 describe('document link completion - default', () => {
@@ -100,7 +100,7 @@ describe('document link completion - default', () => {
       const targetLink = (linkResponse.result as any[])[0].target;
       expect(targetLink).toMatch(new RegExp(`#${buildLine}$`));
       expect(decodeURI(targetLink)).toContain(
-        join('apps', workspaceName, 'project.json')
+        join('apps', workspaceName, 'project.json'),
       );
     });
     it('should return correct target link for x-completion-type:projectTarget if no build target is specified in project.json', async () => {
@@ -142,7 +142,7 @@ describe('document link completion - default', () => {
       const targetLink = (linkResponse.result as any[])[0].target;
       expect(targetLink).toMatch(new RegExp(`#${targetsLine}$`));
       expect(decodeURI(targetLink)).toContain(
-        join('apps', workspaceName, 'project.json')
+        join('apps', workspaceName, 'project.json'),
       );
     });
   });

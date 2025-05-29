@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, newWorkspace, uniq } from '../utils';
+import { e2eCwd, newWorkspace, uniq } from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -12,7 +12,7 @@ const packageJsonPath = join(
   workspaceName,
   'apps',
   workspaceName,
-  'package.json'
+  'package.json',
 );
 
 describe('package.json nx property completion - default', () => {
@@ -39,7 +39,7 @@ describe('package.json nx property completion - default', () => {
         "nx": {
 
         }
-        }`
+        }`,
     );
 
     nxlsWrapper.sendNotification({
@@ -96,7 +96,7 @@ describe('package.json nx property completion - default', () => {
     ]
   }
 }
-        `
+        `,
     );
 
     nxlsWrapper.sendNotification({
