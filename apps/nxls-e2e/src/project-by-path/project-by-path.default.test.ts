@@ -6,7 +6,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import { NxProjectByPathRequest } from '@nx-console/language-server-types';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 
@@ -36,7 +36,7 @@ describe('project by path', () => {
       workspaceName,
       'apps',
       workspaceName,
-      'project.json'
+      'project.json',
     );
 
     const projectInfo = await nxlsWrapper.sendRequest({
@@ -47,7 +47,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo.result as ProjectConfiguration).name).toEqual(
-      workspaceName
+      workspaceName,
     );
 
     const mainTsx = join(
@@ -56,7 +56,7 @@ describe('project by path', () => {
       'apps',
       workspaceName,
       'src',
-      'main.tsx'
+      'main.tsx',
     );
 
     const projectInfo2 = await nxlsWrapper.sendRequest({
@@ -67,7 +67,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo2.result as ProjectConfiguration).name).toEqual(
-      workspaceName
+      workspaceName,
     );
   });
 
@@ -77,7 +77,7 @@ describe('project by path', () => {
       workspaceName,
       'apps',
       `${workspaceName}-e2e`,
-      'project.json'
+      'project.json',
     );
 
     const projectInfo = await nxlsWrapper.sendRequest({
@@ -88,7 +88,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo.result as ProjectConfiguration).name).toEqual(
-      `${workspaceName}-e2e`
+      `${workspaceName}-e2e`,
     );
 
     const cypressConfig = join(
@@ -96,7 +96,7 @@ describe('project by path', () => {
       workspaceName,
       'apps',
       `${workspaceName}-e2e`,
-      'cypress.config.ts'
+      'cypress.config.ts',
     );
 
     const projectInfo2 = await nxlsWrapper.sendRequest({
@@ -107,7 +107,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo2.result as ProjectConfiguration).name).toEqual(
-      `${workspaceName}-e2e`
+      `${workspaceName}-e2e`,
     );
   });
 

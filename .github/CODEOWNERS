@@ -80,6 +80,8 @@
 
 /libs/vscode/lsp-client/ @MaxKless
 
+/libs/shared/e2e-utils/ @MaxKless
+
 /libs/shared/telemetry/ @MaxKless
 
 /libs/vscode/messaging/ @MaxKless
@@ -109,6 +111,8 @@
 /libs/vscode/tasks/ @MaxKless
 
 /libs/vscode/utils/ @MaxKless
+
+/apps/nx-mcp-e2e/ @MaxKless
 
 /libs/shared/npm/ @MaxKless
 
