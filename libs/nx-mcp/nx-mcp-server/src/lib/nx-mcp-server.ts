@@ -10,6 +10,7 @@ import {
   getPluginsInformation,
   getProjectGraphErrorsPrompt,
   getProjectGraphPrompt,
+  getFilteredProjectGraphPrompt,
   getProjectGraphVisualizationMessage,
   getTaskGraphVisualizationMessage,
 } from '@nx-console/shared-llm-context';
@@ -212,11 +213,44 @@ export class NxMcpServerWrapper {
       NX_WORKSPACE,
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
       {
+        includeProjectGraph: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe('Include the project graph in the response'),
+        includeNxJson: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe('Include nx.json configuration in the response'),
+        includeErrors: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe('Include project graph errors if any'),
+        projectLimit: z
+          .number()
+          .optional()
+          .describe('Maximum number of projects to include (default: all)'),
+        projectFilter: z
+          .string()
+          .optional()
+          .describe('Glob pattern to filter projects (e.g., "libs/*")'),
+      },
+      {
         destructiveHint: false,
         readOnlyHint: true,
         openWorldHint: false,
       },
-      async () => {
+      async (params) => {
+        const {
+          includeProjectGraph = true,
+          includeNxJson = true,
+          includeErrors = true,
+          projectLimit,
+          projectFilter,
+        } = params || {};
+
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_WORKSPACE,
         });
@@ -252,23 +286,42 @@ export class NxMcpServerWrapper {
             };
           }
           const content: CallToolResult['content'] = [];
-          if (workspace.nxJson) {
+
+          if (includeNxJson && workspace.nxJson) {
             content.push({
               type: 'text',
               text: getNxJsonPrompt(workspace.nxJson),
             });
           }
+
           const hasProjects =
             workspace.projectGraph &&
             Object.keys(workspace.projectGraph.nodes).length > 0;
 
-          if (hasProjects) {
-            content.push({
-              type: 'text',
-              text: getProjectGraphPrompt(workspace.projectGraph),
-            });
+          if (includeProjectGraph && hasProjects && workspace.projectGraph) {
+            // Use filtered version if filters are provided
+            if (projectLimit || projectFilter) {
+              const filteredResult = getFilteredProjectGraphPrompt(
+                workspace.projectGraph,
+                {
+                  projectLimit,
+                  projectFilter,
+                },
+              );
+              content.push({
+                type: 'text',
+                text: filteredResult.content,
+              });
+            } else {
+              // Use original unfiltered version for backward compatibility
+              content.push({
+                type: 'text',
+                text: getProjectGraphPrompt(workspace.projectGraph),
+              });
+            }
           }
-          if (workspace.errors) {
+
+          if (includeErrors && workspace.errors) {
             content.push({
               type: 'text',
               text: getProjectGraphErrorsPrompt(
@@ -277,6 +330,7 @@ export class NxMcpServerWrapper {
               ),
             });
           }
+
           return {
             content,
           };
