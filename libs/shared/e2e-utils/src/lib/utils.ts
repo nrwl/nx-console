@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createProjectGraphAsync, workspaceRoot } from 'nx/src/devkit-exports';
+import { createProjectGraphAsync, readJsonFile, workspaceRoot, ensurePackage } from 'nx/src/devkit-exports';
 
 export const defaultVersion =
   process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '20.0.3';
@@ -107,7 +107,7 @@ export function isWindows() {
   return process.platform === 'win32';
 }
 
-export async function createInvokeMCPInspectorCLI(mcpProjectName = 'nx-mcp') {
+export async function createInvokeMCPInspectorCLI(e2eCwd: string, mcpProjectName = 'nx-mcp') {
   const graph = await createProjectGraphAsync();
   const nxMcp = graph.nodes[mcpProjectName];
   if (
@@ -122,15 +122,25 @@ export async function createInvokeMCPInspectorCLI(mcpProjectName = 'nx-mcp') {
     nxMcp.data.targets.build.options.outputPath,
     nxMcp.data.targets.build.options.outputFileName,
   );
-  const mcpInspectorPath = join(
-    workspaceRoot,
-    'node_modules',
-    '.bin',
-    'mcp-inspector',
-  );
+  
+  /**
+   * We have a HUGE range of major versionss of commander that are dependend upon by our dev dependencies. The mcp-inspector package
+   * cannot run currently based on our dep tree.
+   * 
+   * I tried multiple combinations of yarn resolution configurations to try and get this to work but the only way was to ensure that the
+   * main commander package that is installed at the root of node_modules is correct for mcp-inspector and that then breaks other things
+   * like cypress.
+   * 
+   * Ultimately, I am giving up and going with installing the mcp inspector package into the test workspace directly and invoking it from there.
+   */
+  const mcpInspectorVersion = readJsonFile(join(workspaceRoot, 'package.json')).devDependencies['@modelcontextprotocol/inspector'];
+  execSync(`npm install -D @modelcontextprotocol/inspector@${mcpInspectorVersion}`, {
+    cwd: e2eCwd,
+  });
+  const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
 
   return (testWorkspacePath: string, ...args: string[]) => {
-    const command = `${mcpInspectorPath} --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
+    const command = `${mcpInspectorCommand} --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
     if (process.env['NX_VERBOSE_LOGGING']) {
       console.log(`Executing command: ${command}`);
     }

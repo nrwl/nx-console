@@ -132,9 +132,6 @@
   "nx": {
     "includedScripts": []
   },
-  "resolutions": {
-    "commander": "^13.1.0"
-  },
   "workspaces": [
     "libs/**",
     "apps/**"

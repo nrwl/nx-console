@@ -16,11 +16,11 @@ describe('tools', () => {
   const testWorkspacePath = join(e2eCwd, workspaceName);
 
   beforeAll(async () => {
-    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI();
     newWorkspace({
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
     });
+    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(e2eCwd);
   });
 
   afterAll(() => {
