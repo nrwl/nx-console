@@ -74,8 +74,8 @@ async function main() {
     .help()
     .parseSync() as ArgvType;
 
-  const nxWorkspacePath: string | undefined =
-    argv.workspacePath || (argv._[0] as string);
+  const nxWorkspacePath: string =
+    (argv.workspacePath || (argv._[0] as string) || process.cwd()) as string;
 
   let googleAnalytics: GoogleAnalytics | undefined;
 
