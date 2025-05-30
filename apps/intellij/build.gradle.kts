@@ -220,15 +220,10 @@ tasks {
 
     withType<RunIdeTask> { maxHeapSize = "6g" }
     
-    // Configure test task for IntelliJ Platform
     test {
-        // Use JUnit 4 for IntelliJ Platform tests
         useJUnit()
-        
-        // Include all test classes
         include("**/*Test.class")
         
-        // Configure test logging
         testLogging {
             events("passed", "skipped", "failed", "standardOut", "standardError")
             showExceptions = true
