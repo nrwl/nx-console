@@ -76,6 +76,11 @@ dependencies {
     implementation("io.github.nsk90:kstatemachine:0.31.0")
     implementation("io.github.nsk90:kstatemachine-coroutines:0.31.0")
 
+    // Add Kotlin test dependency
+    testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("junit:junit:4.13.2")
+
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
 
@@ -86,6 +91,8 @@ dependencies {
         )
         pluginVerifier()
         zipSigner()
+        // Add test framework configuration
+        testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
     implementation(project(":libs:intellij:models"))
 }
@@ -212,6 +219,19 @@ tasks {
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts") }
 
     withType<RunIdeTask> { maxHeapSize = "6g" }
+    
+    test {
+        useJUnit()
+        include("**/*Test.class")
+        
+        testLogging {
+            events("passed", "skipped", "failed", "standardOut", "standardError")
+            showExceptions = true
+            showStackTraces = true
+            showCauses = true
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
