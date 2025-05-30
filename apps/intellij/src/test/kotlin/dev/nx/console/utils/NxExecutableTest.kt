@@ -17,7 +17,7 @@ class NxExecutableTest : BasePlatformTestCase() {
         val binDir = File(nodeModulesDir, ".bin")
         binDir.mkdirs()
 
-        val nxExecutableName = if (SystemInfo.isWindows) "nx.cmd" else "nx"
+        val nxExecutableName = if (SystemInfo.isWindows) "nx.bat" else "nx"
         val nxExecutable = File(binDir, nxExecutableName)
         nxExecutable.createNewFile()
         nxExecutable.setExecutable(true)
@@ -77,7 +77,7 @@ class NxExecutableTest : BasePlatformTestCase() {
         assertEquals(
             "Should return correct nx package path for dot nx installation",
             expectedPath,
-            actualPath
+            actualPath,
         )
 
         tempDir.deleteRecursively()
@@ -97,7 +97,7 @@ class NxExecutableTest : BasePlatformTestCase() {
         assertEquals(
             "Should return correct nx package path for standard installation",
             expectedPath,
-            actualPath
+            actualPath,
         )
 
         tempDir.deleteRecursively()

@@ -33,8 +33,7 @@ class ThrottlerTest : BasePlatformTestCase() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun testThrottlerCreation() = runTest {
-        val scope = kotlinx.coroutines.MainScope()
-        val throttler = Throttler(1000, this@runTest)
+        Throttler(1000, this@runTest)
 
         assertTrue(true, "Throttler should be created successfully")
     }
