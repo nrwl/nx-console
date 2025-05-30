@@ -13,6 +13,9 @@
     "runIde": {
       "dependsOn": ["^build"]
     },
+    "verifyPlugin": {
+      "cache": true
+    },
     "test": {
       "command": "yarn nx run intellij:check"
     },

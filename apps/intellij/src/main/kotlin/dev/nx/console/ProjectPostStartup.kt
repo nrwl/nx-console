@@ -4,6 +4,7 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.mcp.McpServerService
 import dev.nx.console.nxls.NxlsService
@@ -35,6 +36,7 @@ internal class ProjectPostStartup : ProjectActivity {
                         NxProjectJsonToProjectMap.getInstance(project).init()
                         ProjectGraphErrorProblemProvider.getInstance(project).init()
                         NxVersionUtil.getInstance(project).listen()
+                        CIPEMonitoringService.getInstance(project).init()
                     }
                 }
                 break

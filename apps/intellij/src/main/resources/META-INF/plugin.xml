@@ -15,6 +15,7 @@
     <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
 
     <notificationGroup displayType="STICKY_BALLOON" id="Nx Console"/>
+    <notificationGroup displayType="BALLOON" id="Nx Cloud CIPE"/>
 
     <!-- works in WebStorm and other SmallIDEs -->
     <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
