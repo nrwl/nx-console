@@ -45,9 +45,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                 if (mode == "move") TelemetryEvent.GENERATE_MOVE
                 else TelemetryEvent.GENERATE_REMOVE,
                 mapOf(
-                    "source" to
-                        if (ActionPlaces.isPopupPlace(e.place)) "explorer-context-menu"
-                        else "command"
+                    "source" to if (e.isFromContextMenu()) "explorer-context-menu" else "command"
                 ),
             )
 
@@ -61,7 +59,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
             }
 
         val path =
-            if (ActionPlaces.isPopupPlace(e.place)) {
+            if (e.isFromContextMenu()) {
                 e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
             } else {
                 null
@@ -145,7 +143,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
 class NxMoveProjectAction() : NxReMoveProjectActionBase("move") {
     override fun update(e: AnActionEvent) {
         super.update(e)
-        if (ActionPlaces.isPopupPlace(e.place) || e.place == "NxToolWindow") {
+        if (e.isFromContextMenu() || e.place == "NxToolWindow") {
             e.presentation.icon = null
         }
     }
@@ -154,7 +152,7 @@ class NxMoveProjectAction() : NxReMoveProjectActionBase("move") {
 class NxRemoveProjectAction() : NxReMoveProjectActionBase("remove") {
     override fun update(e: AnActionEvent) {
         super.update(e)
-        if (ActionPlaces.isPopupPlace(e.place) || e.place == "NxToolWindow") {
+        if (e.isFromContextMenu() || e.place == "NxToolWindow") {
             e.presentation.icon = AllIcons.Actions.GC
         }
     }

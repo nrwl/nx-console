@@ -45,8 +45,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
                 mapOf(
                     "source" to
                         if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
-                        else if (ActionPlaces.isPopupPlace(e.place))
-                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        else if (e.isFromContextMenu()) TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
                 )
             )
@@ -82,7 +81,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
             }
         }
 
-        if (ActionPlaces.isPopupPlace(e.place)) {
+        if (e.isFromContextMenu()) {
             return currentlyOpenedProject
         }
 

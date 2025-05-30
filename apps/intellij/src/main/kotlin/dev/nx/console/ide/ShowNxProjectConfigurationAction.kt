@@ -60,8 +60,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                 mapOf(
                     "source" to
                         if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
-                        else if (ActionPlaces.isPopupPlace(e.place))
-                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        else if (e.isFromContextMenu()) TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
                 ),
             )
@@ -75,7 +74,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                 if (e.place === "NxToolWindow") {
                     e.getData(NxTreeNodeProjectKey) ?: return@launch
                 } else
-                    if (ActionPlaces.isPopupPlace(e.place)) {
+                    if (e.isFromContextMenu()) {
                         if (currentlyOpenedProject == null) {
                             Notifier.notifyNoProject(project, path)
                             return@launch
