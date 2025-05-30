@@ -65,7 +65,7 @@ jobs:
       - name: Gradle artifacts and formatting
         run: |
           yarn nx-cloud record -- ./gradlew projectReportAll
-          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
+          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
 
       - name: Check project graph creation
         run: yarn nx show projects --verbose
@@ -78,6 +78,8 @@ jobs:
 
       - name: Run Nx Cloud conformance checks
         run: yarn nx-cloud record -- yarn nx-cloud conformance:check
+
+      - run: yarn nx run intellij:verifyPlugin --verbose --batch
 
       - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 45
