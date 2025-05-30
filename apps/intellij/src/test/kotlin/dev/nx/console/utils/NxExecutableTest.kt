@@ -97,13 +97,15 @@ class NxExecutableTest {
             "Should not be a dot nx installation"
         )
 
+
         val expectedPath = Paths.get(tempDir.absolutePath, "node_modules", "nx").toString()
-        val actualPath = Paths.get(tempDir.absolutePath, "node_modules", "nx").toString()
+        val actualPath = getNxPackagePath(tempDir.absolutePath)
 
         assertEquals(
             expectedPath,
             actualPath,
             "Should return correct nx package path for standard installation"
+
         )
 
         tempDir.deleteRecursively()
