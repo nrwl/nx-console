@@ -152,7 +152,7 @@ export async function createInvokeMCPInspectorCLI(
   const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
 
   return (...args: string[]) => {
-    let command = `${mcpInspectorCommand} ${args.join(' ')}`;
+    const command = `${mcpInspectorCommand} ${args.join(' ')}`;
 
     if (process.env['NX_VERBOSE_LOGGING']) {
       console.log(`Executing command: ${command}`);
@@ -162,6 +162,10 @@ export async function createInvokeMCPInspectorCLI(
         encoding: 'utf8',
         maxBuffer: 1024 * 1024 * 10, // 10MB
         cwd: join(e2eCwd, workspaceName),
+        env: {
+          ...process.env,
+          NX_NO_CLOUD: 'true',
+        },
       }),
     );
   };
