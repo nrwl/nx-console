@@ -11,7 +11,6 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
-import com.intellij.ui.jcef.executeJavaScriptAsync
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
@@ -31,7 +30,6 @@ import java.util.regex.Matcher
 import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.jetbrains.concurrency.await
 
 private val logger = logger<OldNxGraphService>()
 
@@ -59,11 +57,21 @@ class OldNxGraphBrowser(
             lastCommand = Command.SelectAll
             val nxVersion = nxVersion.await()
             if (nxVersion == null || nxVersion.gte(15)) {
-                browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
+                browser
+                    .getCefBrowser()
+                    .executeJavaScript(
+                        "window.externalApi?.selectAllProjects()",
+                        browser.getCefBrowser().url,
+                        0
+                    )
             } else if (nxVersion.major == 14) {
-                browser.executeJavaScriptAsync(
-                    "window.externalApi.depGraphService.send({type: 'selectAll'})"
-                )
+                browser
+                    .getCefBrowser()
+                    .executeJavaScript(
+                        "window.externalApi.depGraphService.send({type: 'selectAll'})",
+                        browser.getCefBrowser().url,
+                        0
+                    )
             } else {
                 loadOldVersionHtml()
             }
@@ -75,11 +83,21 @@ class OldNxGraphBrowser(
             lastCommand = Command.FocusProject(projectName)
             val nxVersion = nxVersion.await()
             if (nxVersion == null || nxVersion.gte(15)) {
-                browser.executeJavaScriptAsync("window.externalApi.focusProject('$projectName')")
+                browser
+                    .getCefBrowser()
+                    .executeJavaScript(
+                        "window.externalApi.focusProject('$projectName')",
+                        browser.getCefBrowser().url,
+                        0
+                    )
             } else if (nxVersion.major == 14) {
-                browser.executeJavaScriptAsync(
-                    "window.externalApi.depGraphService.send({type: 'focusProject', projectName: '$projectName'})"
-                )
+                browser
+                    .getCefBrowser()
+                    .executeJavaScript(
+                        "window.externalApi.depGraphService.send({type: 'focusProject', projectName: '$projectName'})",
+                        browser.getCefBrowser().url,
+                        0
+                    )
             } else {
                 loadOldVersionHtml()
             }
@@ -89,25 +107,33 @@ class OldNxGraphBrowser(
     fun focusTaskGroup(taskGroupName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTaskGroup(taskGroupName)
-            browser.executeJavaScriptAsync(
-                "window.externalApi?.router?.navigate('/tasks/$taskGroupName/all')"
-            )
+            browser
+                .getCefBrowser()
+                .executeJavaScript(
+                    "window.externalApi?.router?.navigate('/tasks/$taskGroupName/all')",
+                    browser.getCefBrowser().url,
+                    0
+                )
         }
     }
 
     fun focusTask(nxProject: String, nxTarget: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTask(nxProject, nxTarget)
-            cs.launch {
-                browser
-                    .executeJavaScriptAsync(
-                        "window.externalApi?.router?.navigate('/tasks/$nxTarget')"
-                    )
-                    .await()
-                browser.executeJavaScriptAsync(
-                    "document.querySelector('label[data-project=\"$nxProject\"]')?.click()"
+            browser
+                .getCefBrowser()
+                .executeJavaScript(
+                    "window.externalApi?.router?.navigate('/tasks/$nxTarget')",
+                    browser.getCefBrowser().url,
+                    0
                 )
-            }
+            browser
+                .getCefBrowser()
+                .executeJavaScript(
+                    "document.querySelector('label[data-project=\"$nxProject\"]')?.click()",
+                    browser.getCefBrowser().url,
+                    0
+                )
         }
     }
 
@@ -422,7 +448,7 @@ class OldNxGraphBrowser(
                     ${query.inject("message")}
             })
             """
-            browser.executeJavaScriptAsync(js)
+            browser.getCefBrowser().executeJavaScript(js, browser.getCefBrowser().url, 0)
         }
     }
 
@@ -455,7 +481,7 @@ class OldNxGraphBrowser(
                     ${query.inject("message")}
             })
             """
-            browser.executeJavaScriptAsync(js)
+            browser.getCefBrowser().executeJavaScript(js, browser.getCefBrowser().url, 0)
         }
     }
 
@@ -481,7 +507,7 @@ class OldNxGraphBrowser(
                     ${query.inject("message")}
             })
             """
-            browser.executeJavaScriptAsync(js)
+            browser.getCefBrowser().executeJavaScript(js, browser.getCefBrowser().url, 0)
         }
     }
 
