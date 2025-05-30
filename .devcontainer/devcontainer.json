@@ -1,0 +1,35 @@
+{
+  "name": "Nx Console Development",
+  "dockerFile": "Dockerfile",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "lts/hydrogen"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installGradle": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "updateContentCommand": "./.devcontainer/update-content.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "nrwl.angular-console",
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  },
+  "forwardPorts": [4200, 3000],
+  "portsAttributes": {
+    "4200": {
+      "label": "Angular Dev Server"
+    },
+    "3000": {
+      "label": "Express Server"
+    }
+  }
+}
