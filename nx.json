@@ -167,6 +167,10 @@
       {
         "projects": ["*"],
         "owners": ["@MaxKless"]
+      },
+      {
+        "projects": ["nx-mcp-e2e"],
+        "owners": ["@JamesHenry"]
       }
     ]
   },
