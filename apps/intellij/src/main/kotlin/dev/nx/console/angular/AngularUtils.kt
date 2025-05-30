@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.findFile
@@ -26,7 +27,9 @@ fun findFileUpHierarchy(project: Project?, context: VirtualFile?, fileName: Stri
         }
         current = current.parent
     }
-    @Suppress("DEPRECATION") return project?.baseDir?.findFile(fileName)
+    return project?.basePath?.let {
+        LocalFileSystem.getInstance().findFileByPath(it)?.findFile(fileName)
+    }
 }
 
 fun getNxAngularProject(name: String, projectJson: VirtualFile): AngularProject? {
@@ -45,7 +48,7 @@ fun getNxAngularProject(name: String, projectJson: VirtualFile): AngularProject?
                 loadProjectJson(
                     name,
                     document?.charsSequence ?: VfsUtilCore.loadText(projectJson),
-                    projectJson
+                    projectJson,
                 )
             } catch (e: ProcessCanceledException) {
                 throw e
@@ -88,5 +91,5 @@ private val NX_ANGULAR_PROJECT_KEY =
 private data class CachedAngularProjectConfig(
     val config: AngularProject?,
     val docTimestamp: Long,
-    val fileTimestamp: Long
+    val fileTimestamp: Long,
 )
