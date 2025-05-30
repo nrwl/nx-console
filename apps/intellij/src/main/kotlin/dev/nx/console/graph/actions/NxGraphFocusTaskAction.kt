@@ -49,8 +49,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
                 mapOf(
                     "source" to
                         if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
-                        else if (ActionPlaces.isPopupPlace(e.place))
-                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        else if (e.isFromContextMenu()) TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
                 )
             )
@@ -66,7 +65,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
                         getTargetDescriptorFromDataContext(e.dataContext)
                     } else {
                         val nxProject =
-                            if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
+                            if (e.isFromContextMenu()) currentlyOpenedProject
                             else selectNxProject(project, e.dataContext, currentlyOpenedProject)
 
                         if (nxProject == null) {

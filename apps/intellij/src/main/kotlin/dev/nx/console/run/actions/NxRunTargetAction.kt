@@ -27,11 +27,11 @@ class NxRunTargetAction : AnAction() {
             val currentlyOpenedProject =
                 path?.let { NxlsService.getInstance(project).projectByPath(path = it)?.name }
             val nxProject =
-                if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
+                if (e.isFromContextMenu()) currentlyOpenedProject
                 else selectNxProject(project, e.dataContext, currentlyOpenedProject)
 
             if (nxProject == null) {
-                if (ActionPlaces.isPopupPlace(e.place)) {
+                if (e.isFromContextMenu()) {
                     Notifier.notifyNoProject(project, path)
                 }
                 return@launch

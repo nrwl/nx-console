@@ -8,10 +8,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.ui.jcef.JBCefBrowser
-import com.intellij.ui.jcef.JBCefBrowserBase
-import com.intellij.ui.jcef.JBCefJSQuery
-import com.intellij.ui.jcef.executeJavaScriptAsync
+import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
@@ -31,7 +28,6 @@ import java.util.regex.Matcher
 import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.jetbrains.concurrency.await
 
 private val logger = logger<OldNxGraphService>()
 
@@ -59,9 +55,9 @@ class OldNxGraphBrowser(
             lastCommand = Command.SelectAll
             val nxVersion = nxVersion.await()
             if (nxVersion == null || nxVersion.gte(15)) {
-                browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
+                browser.executeJavaScript("window.externalApi?.selectAllProjects()")
             } else if (nxVersion.major == 14) {
-                browser.executeJavaScriptAsync(
+                browser.executeJavaScript(
                     "window.externalApi.depGraphService.send({type: 'selectAll'})"
                 )
             } else {
@@ -75,9 +71,9 @@ class OldNxGraphBrowser(
             lastCommand = Command.FocusProject(projectName)
             val nxVersion = nxVersion.await()
             if (nxVersion == null || nxVersion.gte(15)) {
-                browser.executeJavaScriptAsync("window.externalApi.focusProject('$projectName')")
+                browser.executeJavaScript("window.externalApi.focusProject('$projectName')")
             } else if (nxVersion.major == 14) {
-                browser.executeJavaScriptAsync(
+                browser.executeJavaScript(
                     "window.externalApi.depGraphService.send({type: 'focusProject', projectName: '$projectName'})"
                 )
             } else {
@@ -89,7 +85,7 @@ class OldNxGraphBrowser(
     fun focusTaskGroup(taskGroupName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTaskGroup(taskGroupName)
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.externalApi?.router?.navigate('/tasks/$taskGroupName/all')"
             )
         }
@@ -98,16 +94,10 @@ class OldNxGraphBrowser(
     fun focusTask(nxProject: String, nxTarget: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTask(nxProject, nxTarget)
-            cs.launch {
-                browser
-                    .executeJavaScriptAsync(
-                        "window.externalApi?.router?.navigate('/tasks/$nxTarget')"
-                    )
-                    .await()
-                browser.executeJavaScriptAsync(
-                    "document.querySelector('label[data-project=\"$nxProject\"]')?.click()"
-                )
-            }
+            browser.executeJavaScript("window.externalApi?.router?.navigate('/tasks/$nxTarget')")
+            browser.executeJavaScript(
+                "document.querySelector('label[data-project=\"$nxProject\"]')?.click()"
+            )
         }
     }
 
@@ -422,7 +412,9 @@ class OldNxGraphBrowser(
                     ${query.inject("message")}
             })
             """
-            browser.executeJavaScriptAsync(js)
+            coroutineScope.launch {
+                browser.getCefBrowser().executeJavaScript(js, browser.getCefBrowser().url, 0)
+            }
         }
     }
 
@@ -455,7 +447,7 @@ class OldNxGraphBrowser(
                     ${query.inject("message")}
             })
             """
-            browser.executeJavaScriptAsync(js)
+            coroutineScope.launch { browser.executeJavaScript(js) }
         }
     }
 
@@ -481,7 +473,7 @@ class OldNxGraphBrowser(
                     ${query.inject("message")}
             })
             """
-            browser.executeJavaScriptAsync(js)
+            coroutineScope.launch { browser.executeJavaScript(js) }
         }
     }
 
