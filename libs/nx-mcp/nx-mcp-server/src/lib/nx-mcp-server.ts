@@ -217,7 +217,7 @@ export class NxMcpServerWrapper {
       },
       async () => {
         this.telemetry?.logUsage('ai.tool-call', {
-          tool: NX_WORKSPACE,
+          tool: NX_WORKSPACE_PATH,
         });
 
         return {
