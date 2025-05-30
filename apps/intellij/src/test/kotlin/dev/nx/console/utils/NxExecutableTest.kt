@@ -1,17 +1,16 @@
 package dev.nx.console.utils
 
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.junit.Test
 
-class NxExecutableTest {
+class NxExecutableTest : BasePlatformTestCase() {
 
-    @Test
     fun testExecutablePathDetectionForStandardInstallation() {
         val tempDir = Files.createTempDirectory("nx-test").toFile()
         val nodeModulesDir = File(tempDir, "node_modules")
@@ -28,13 +27,12 @@ class NxExecutableTest {
 
         assertFalse(
             isDotNxInstallation(tempDir.absolutePath),
-            "Should not be a dot nx installation"
+            "Should not be a dot nx installation",
         )
 
         tempDir.deleteRecursively()
     }
 
-    @Test
     fun testIsDotNxInstallation() {
         val tempDirWithNx = Files.createTempDirectory("nx-test-dot").toFile()
         val nxExecutableName = if (SystemInfo.isWindows) "nx.bat" else "nx"
@@ -43,14 +41,14 @@ class NxExecutableTest {
 
         assertTrue(
             isDotNxInstallation(tempDirWithNx.absolutePath),
-            "Should detect dot nx installation when nx executable exists at root"
+            "Should detect dot nx installation when nx executable exists at root",
         )
 
         nxExecutable.delete()
 
         assertFalse(
             isDotNxInstallation(tempDirWithNx.absolutePath),
-            "Should not detect dot nx installation when nx executable doesn't exist"
+            "Should not detect dot nx installation when nx executable doesn't exist",
         )
 
         val nxDir = File(tempDirWithNx, nxExecutableName)
@@ -58,13 +56,12 @@ class NxExecutableTest {
 
         assertFalse(
             isDotNxInstallation(tempDirWithNx.absolutePath),
-            "Should not detect dot nx installation when nx is a directory"
+            "Should not detect dot nx installation when nx is a directory",
         )
 
         tempDirWithNx.deleteRecursively()
     }
 
-    @Test
     fun testGetNxPackagePathForDotNxInstallation() {
         val tempDir = Files.createTempDirectory("nx-test-pkg").toFile()
         val nxExecutableName = if (SystemInfo.isWindows) "nx.bat" else "nx"
@@ -76,32 +73,31 @@ class NxExecutableTest {
 
         assertTrue(isDotNxInstallation(tempDir.absolutePath), "Should be a dot nx installation")
 
-        val actualPath = getNxPackagePath(tempDir.absolutePath)
+        val actualPath = getNxPackagePath(project, tempDir.absolutePath)
         assertEquals(
+            "Should return correct nx package path for dot nx installation",
             expectedPath,
-            actualPath,
-            "Should return correct nx package path for dot nx installation"
+            actualPath
         )
 
         tempDir.deleteRecursively()
     }
 
-    @Test
     fun testGetNxPackagePathForStandardInstallation() {
         val tempDir = Files.createTempDirectory("nx-test-std").toFile()
 
         assertFalse(
             isDotNxInstallation(tempDir.absolutePath),
-            "Should not be a dot nx installation"
+            "Should not be a dot nx installation",
         )
 
         val expectedPath = Paths.get(tempDir.absolutePath, "node_modules", "nx").toString()
-        val actualPath = getNxPackagePath(tempDir.absolutePath)
+        val actualPath = getNxPackagePath(project, tempDir.absolutePath)
 
         assertEquals(
+            "Should return correct nx package path for standard installation",
             expectedPath,
-            actualPath,
-            "Should return correct nx package path for standard installation"
+            actualPath
         )
 
         tempDir.deleteRecursively()
