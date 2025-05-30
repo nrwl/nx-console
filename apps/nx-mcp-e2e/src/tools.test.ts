@@ -9,9 +9,9 @@ import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('tools', () => {
-  let invokeMCPInspectorCLI: (
-    ...args: string[]
-  ) => ReturnType<typeof JSON.parse>;
+  let invokeMCPInspectorCLI: Awaited<
+    ReturnType<typeof createInvokeMCPInspectorCLI>
+  >;
   const workspaceName = uniq('nx-mcp-smoke-test');
   const testWorkspacePath = join(e2eCwd, workspaceName);
 
@@ -20,7 +20,10 @@ describe('tools', () => {
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
     });
-    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(e2eCwd);
+    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(
+      e2eCwd,
+      workspaceName,
+    );
   });
 
   afterAll(() => {
@@ -36,6 +39,7 @@ describe('tools', () => {
     expect(toolNames).toEqual([
       'nx_docs',
       'nx_available_plugins',
+      'nx_workspace_path',
       'nx_workspace',
       'nx_project_details',
       'nx_generators',
