@@ -12,6 +12,7 @@ import {
   getProjectGraphPrompt,
   getProjectGraphVisualizationMessage,
   getTaskGraphVisualizationMessage,
+  NX_WORKSPACE_PATH,
 } from '@nx-console/shared-llm-context';
 import {
   checkIsNxWorkspace,
@@ -208,6 +209,28 @@ export class NxMcpServerWrapper {
   }
 
   private async registerWorkspaceTools(): Promise<void> {
+    this.server.tool(
+      NX_WORKSPACE_PATH,
+      'Returns the path to the Nx workspace root',
+      {
+        readOnlyHint: true,
+      },
+      async () => {
+        this.telemetry?.logUsage('ai.tool-call', {
+          tool: NX_WORKSPACE_PATH,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this._nxWorkspacePath ?? 'No workspace path set',
+            },
+          ],
+        };
+      },
+    );
+
     this.server.tool(
       NX_WORKSPACE,
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',

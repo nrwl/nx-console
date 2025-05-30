@@ -113,6 +113,7 @@ export function isWindows() {
 
 export async function createInvokeMCPInspectorCLI(
   e2eCwd: string,
+  workspaceName: string,
   mcpProjectName = 'nx-mcp',
 ) {
   const graph = await createProjectGraphAsync();
@@ -150,8 +151,9 @@ export async function createInvokeMCPInspectorCLI(
   );
   const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
 
-  return (testWorkspacePath: string, ...args: string[]) => {
-    const command = `${mcpInspectorCommand} --cli node ${serverPath} ${testWorkspacePath} ${args.join(' ')}`;
+  return (...args: string[]) => {
+    const command = `${mcpInspectorCommand} ${args.join(' ')}`;
+
     if (process.env['NX_VERBOSE_LOGGING']) {
       console.log(`Executing command: ${command}`);
     }
@@ -159,7 +161,11 @@ export async function createInvokeMCPInspectorCLI(
       execSync(command, {
         encoding: 'utf8',
         maxBuffer: 1024 * 1024 * 10, // 10MB
-        cwd: testWorkspacePath,
+        cwd: join(e2eCwd, workspaceName),
+        env: {
+          ...process.env,
+          NX_NO_CLOUD: 'true',
+        },
       }),
     );
   };
