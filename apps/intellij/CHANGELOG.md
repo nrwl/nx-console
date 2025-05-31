@@ -1,3 +1,19 @@
+## 1.42.0 (2025-05-31)
+
+### Bug Fixes
+
+* **vscode:** do not edit gitignore when greater or equal to 21.1.0 ([#2513](https://github.com/nrwl/nx-console/issues/2513)) ([e8b8e5b](https://github.com/nrwl/nx-console/commit/e8b8e5b7bbea212e3767ea4fc376434960f73555))
+* **vscode:** include prerelease version when comparing versions for enabling console socket and rules ([f793c0e](https://github.com/nrwl/nx-console/commit/f793c0e1e20333c3536b17875b3ceca0ba044102))
+* **vscode:** parse jsonc mcp.json file ([#2516](https://github.com/nrwl/nx-console/issues/2516)) ([bb2b70d](https://github.com/nrwl/nx-console/commit/bb2b70d97f5085754c140da438f77bec60c0afd4))
+
+
+### Features
+
+* add messenging service and add more nx mcp tools ([#2507](https://github.com/nrwl/nx-console/issues/2507)) ([0cc901b](https://github.com/nrwl/nx-console/commit/0cc901b9fd2712a64c5240a9cf9df09e6add0896))
+* **intellij:** add automatic mcp server configuration action ([#2515](https://github.com/nrwl/nx-console/issues/2515)) ([53a0f76](https://github.com/nrwl/nx-console/commit/53a0f76c593005fabf311b08df0e27f07df6f554))
+* **intellij:** add CIPE notification feature ([#2527](https://github.com/nrwl/nx-console/issues/2527)) ([c929a94](https://github.com/nrwl/nx-console/commit/c929a94868fee54eca97386f08e4744cf9780e89))
+* **vscode:** add agent rules file handling ([#2506](https://github.com/nrwl/nx-console/issues/2506)) ([c44704b](https://github.com/nrwl/nx-console/commit/c44704b2968c8b97beb5e8cb4822676f2cc2891c))
+
 ## <small>1.41.1 (2025-05-12)</small>
 
 ### Bug Fixes
