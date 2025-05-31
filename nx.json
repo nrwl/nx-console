@@ -108,14 +108,14 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "exclude": ["apps/nxls-e2e/**/*"],
+      "exclude": ["apps/nxls-e2e/**/*", "apps/nx-mcp-e2e/**/*"],
       "options": {
         "targetName": "test"
       }
     },
     {
       "plugin": "@nx/jest/plugin",
-      "include": ["apps/nxls-e2e/**/*"],
+      "include": ["apps/nxls-e2e/**/*", "apps/nx-mcp-e2e/**/*"],
       "options": {
         "targetName": "e2e-local",
         "ciTargetName": "e2e-ci"

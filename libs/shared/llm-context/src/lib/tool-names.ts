@@ -8,6 +8,8 @@ export const NX_AVAILABLE_PLUGINS = 'nx_available_plugins';
 
 export const NX_WORKSPACE = 'nx_workspace';
 
+export const NX_WORKSPACE_PATH = 'nx_workspace_path';
+
 export const NX_PROJECT_DETAILS = 'nx_project_details';
 
 export const NX_GENERATORS = 'nx_generators';

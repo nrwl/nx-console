@@ -7,7 +7,7 @@ import {
   simpleReactWorkspaceOptions,
   defaultVersion,
   modifyJsonFile,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import { NxCloudOnboardingInfoRequest } from '@nx-console/language-server-types';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { readFileSync, writeFileSync } from 'fs';

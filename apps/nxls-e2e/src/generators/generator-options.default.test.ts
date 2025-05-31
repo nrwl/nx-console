@@ -1,6 +1,11 @@
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { defaultVersion, e2eCwd, newWorkspace, uniq } from '../utils';
+import {
+  defaultVersion,
+  e2eCwd,
+  newWorkspace,
+  uniq,
+} from '@nx-console/shared-e2e-utils';
 import {
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,

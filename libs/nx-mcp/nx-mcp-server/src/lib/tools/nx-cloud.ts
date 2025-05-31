@@ -26,12 +26,22 @@ export function registerNxCloudTools(
   server.tool(
     NX_CLOUD_CIPE_DETAILS,
     'Returns a list of CIPE (CI pipeline execution) details for the current workspace and branch from Nx Cloud. This includes the status, and execution ID or link ID. If there are failed tasks, it will also include the task ID. If this returns text that contains "canceled", that means that there were no failures, and additional help and details are not needed.',
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
     nxCloudCipeDetails(workspacePath, logger, telemetry),
   );
   server.tool(
     NX_CLOUD_CIPE_FAILURE,
     'Returns details about the failure of a CI pipeline execution. When given a execution ID or link ID and a task ID, the terminal output and affected git files will be returned.',
     nxCloudFixCipeSchema.shape,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
     nxCloudCipeAffectedFilesAndTerminalOutput(
       workspacePath,
       logger,

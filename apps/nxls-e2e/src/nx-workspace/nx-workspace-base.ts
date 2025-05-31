@@ -1,16 +1,20 @@
 import { NxWorkspaceRequest } from '@nx-console/language-server-types';
+import {
+  e2eCwd,
+  newWorkspace,
+  NewWorkspaceOptions,
+} from '@nx-console/shared-e2e-utils';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, newWorkspace, NewWorkspaceOptions } from '../utils';
 
 export function testNxWorkspace(
   version: string,
   options: NewWorkspaceOptions,
   workspaceName: string,
   expectedProjects: string[],
-  expectedTargets: Record<string, string[]>[]
+  expectedTargets: Record<string, string[]>[],
 ) {
   let nxlsWrapper: NxlsWrapper;
 
@@ -35,8 +39,8 @@ export function testNxWorkspace(
 
       expect(
         Object.keys(
-          (workspaceResponse.result as NxWorkspace).projectGraph.nodes
-        )
+          (workspaceResponse.result as NxWorkspace).projectGraph.nodes,
+        ),
       ).toEqual(expectedProjects);
     });
 
@@ -49,10 +53,10 @@ export function testNxWorkspace(
       });
       expect(
         Object.entries(
-          (workspaceResponse.result as NxWorkspace).projectGraph.nodes
+          (workspaceResponse.result as NxWorkspace).projectGraph.nodes,
         ).map(([projectName, project]) => ({
           [projectName]: Object.keys(project.data.targets ?? {}).sort(),
-        }))
+        })),
       ).toEqual(expectedTargets);
     });
 
@@ -64,7 +68,7 @@ export function testNxWorkspace(
         oldContents.replace('{', '{ // test comment \n'),
         {
           encoding: 'utf-8',
-        }
+        },
       );
 
       const workspaceResponse = await nxlsWrapper.sendRequest({
@@ -75,10 +79,10 @@ export function testNxWorkspace(
       });
       expect(
         Object.entries(
-          (workspaceResponse.result as NxWorkspace).projectGraph.nodes
+          (workspaceResponse.result as NxWorkspace).projectGraph.nodes,
         ).map(([projectName, project]) => ({
           [projectName]: Object.keys(project.data.targets ?? {}).sort(),
-        }))
+        })),
       ).toEqual(expectedTargets);
     });
 

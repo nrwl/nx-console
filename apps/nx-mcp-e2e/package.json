@@ -1,0 +1,22 @@
+{
+  "name": "nx-mcp-e2e",
+  "private": true,
+  "nx": {
+    "name": "nx-mcp-e2e",
+    "sourceRoot": "apps/nx-mcp-e2e/src",
+    "projectType": "application",
+    "tags": [
+      "type:mcp"
+    ],
+    "implicitDependencies": [
+      "nx-mcp"
+    ],
+    "namedInputs": {
+      "sharedGlobals": [
+        {
+          "runtime": "node -p '`${process.platform}_${process.arch}`'"
+        }
+      ]
+    }
+  }
+}

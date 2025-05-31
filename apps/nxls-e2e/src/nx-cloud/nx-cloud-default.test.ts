@@ -8,7 +8,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import { NxCloudStatusRequest } from '@nx-console/language-server-types';
 import { readFileSync, writeFileSync } from 'fs';
 
@@ -44,7 +44,7 @@ describe('nx cloud', () => {
 
     expect((cloudStatusResponse.result as any).isConnected).toEqual(false);
     expect((cloudStatusResponse.result as any).nxCloudUrl).toEqual(
-      'https://cloud.nx.app'
+      'https://cloud.nx.app',
     );
   });
 
@@ -59,14 +59,14 @@ describe('nx cloud', () => {
 
       expect((cloudStatusResponse.result as any).isConnected).toEqual(true);
       expect((cloudStatusResponse.result as any).nxCloudUrl).toEqual(
-        'https://cloud.nx.app'
+        'https://cloud.nx.app',
       );
     });
 
     it('should return true & custom cloud url after setting NX_CLOUD_AUTH_TOKEN', async () => {
       writeFileSync(
         nxCloudEnvPath,
-        'NX_CLOUD_AUTH_TOKEN="fake-token"\nNX_CLOUD_API="https://staging.nx.app"'
+        'NX_CLOUD_AUTH_TOKEN="fake-token"\nNX_CLOUD_API="https://staging.nx.app"',
       );
 
       const cloudStatusResponse = await nxlsWrapper.sendRequest({
@@ -76,7 +76,7 @@ describe('nx cloud', () => {
 
       expect((cloudStatusResponse.result as any).isConnected).toEqual(true);
       expect((cloudStatusResponse.result as any).nxCloudUrl).toEqual(
-        'https://staging.nx.app'
+        'https://staging.nx.app',
       );
     });
 
@@ -104,7 +104,7 @@ describe('nx cloud', () => {
       });
       expect((cloudStatusResponse.result as any).isConnected).toEqual(true);
       expect((cloudStatusResponse.result as any).nxCloudUrl).toEqual(
-        'https://cloud.nx.app'
+        'https://cloud.nx.app',
       );
     });
 
@@ -121,7 +121,7 @@ describe('nx cloud', () => {
       });
       expect((cloudStatusResponse.result as any).isConnected).toEqual(true);
       expect((cloudStatusResponse.result as any).nxCloudUrl).toEqual(
-        'https://staging.nx.app'
+        'https://staging.nx.app',
       );
     });
   });

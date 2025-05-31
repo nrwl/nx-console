@@ -7,7 +7,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
   waitFor,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import {
   NxProjectFolderTreeRequest,
   NxWorkspaceRefreshNotification,
@@ -49,7 +49,7 @@ describe('project folder tree', () => {
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const projectFolderTree = await getProjectFolderTree();
@@ -88,16 +88,16 @@ describe('project folder tree', () => {
       workspaceName,
       'subfolder',
       'project',
-      'nested'
+      'nested',
     );
     mkdirSync(nestedProjectFolder, { recursive: true });
     writeFileSync(
       join(nestedProjectFolder, 'project.json'),
-      '{ "name": "nested" }'
+      '{ "name": "nested" }',
     );
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const projectFolderTree = await getProjectFolderTree();
@@ -113,11 +113,11 @@ describe('project folder tree', () => {
     expect(subfolderProjectNode?.dir).toEqual('subfolder/project');
     expect(subfolderProjectNode?.children.length).toEqual(1);
     expect(subfolderProjectNode?.children[0]).toEqual(
-      'subfolder/project/nested'
+      'subfolder/project/nested',
     );
 
     const subfolderNestedProjectNode = projectFolderTree.treeMap.get(
-      'subfolder/project/nested'
+      'subfolder/project/nested',
     );
 
     expect(subfolderNestedProjectNode).toBeDefined();
@@ -141,16 +141,16 @@ describe('project folder tree', () => {
       'subfolder',
       'project',
       'subsubfolder',
-      'deeplynested'
+      'deeplynested',
     );
     mkdirSync(deeplyNestedProjectFolder, { recursive: true });
     writeFileSync(
       join(deeplyNestedProjectFolder, 'project.json'),
-      '{ "name": "deeplynested" }'
+      '{ "name": "deeplynested" }',
     );
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const projectFolderTree = await getProjectFolderTree();
@@ -158,11 +158,11 @@ describe('project folder tree', () => {
     expect(projectFolderTree.treeMap.size).toEqual(7);
 
     expect(
-      projectFolderTree.treeMap.get('subfolder/project')?.children
+      projectFolderTree.treeMap.get('subfolder/project')?.children,
     ).toEqual(['subfolder/project/subsubfolder', 'subfolder/project/nested']);
 
     const subsubfolderNode = projectFolderTree.treeMap.get(
-      'subfolder/project/subsubfolder'
+      'subfolder/project/subsubfolder',
     );
     expect(subsubfolderNode?.children).toEqual([
       'subfolder/project/subsubfolder/deeplynested',
@@ -171,13 +171,13 @@ describe('project folder tree', () => {
     expect(subsubfolderNode?.projectConfiguration).toBeUndefined();
 
     const deeplyNested = projectFolderTree.treeMap.get(
-      'subfolder/project/subsubfolder/deeplynested'
+      'subfolder/project/subsubfolder/deeplynested',
     );
     expect(deeplyNested).toBeDefined();
     expect(deeplyNested?.projectName).toEqual('deeplynested');
     expect(deeplyNested?.projectConfiguration).toBeDefined();
     expect(deeplyNested?.dir).toEqual(
-      'subfolder/project/subsubfolder/deeplynested'
+      'subfolder/project/subsubfolder/deeplynested',
     );
     expect(deeplyNested?.children.length).toEqual(0);
   });

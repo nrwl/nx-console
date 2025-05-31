@@ -14,7 +14,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
   waitFor,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -58,7 +58,7 @@ describe('pdv data', () => {
     const pdvDataParsed = JSON.parse(pdvData.pdvDataSerialized ?? '');
     expect(pdvDataParsed.project.name).toEqual(workspaceName);
     expect(Object.keys(pdvDataParsed.sourceMap ?? {}).length).toBeGreaterThan(
-      0
+      0,
     );
   });
 
@@ -73,7 +73,7 @@ describe('pdv data', () => {
     });
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const pdvData = (
@@ -86,7 +86,7 @@ describe('pdv data', () => {
     ).result as PDVData;
 
     expect(pdvData.pdvDataSerialized).toContain(
-      '"disabledTaskSyncGenerators":["@nx/foo:bar"]'
+      '"disabledTaskSyncGenerators":["@nx/foo:bar"]',
     );
   });
 
@@ -97,7 +97,7 @@ describe('pdv data', () => {
     appendFileSync(viteFilePath, '{');
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const pdvData = (
@@ -116,7 +116,7 @@ describe('pdv data', () => {
     const pdvDataParsed = JSON.parse(pdvData.pdvDataSerialized ?? '');
     expect(pdvDataParsed.project.name).toEqual(workspaceName);
     expect(Object.keys(pdvDataParsed.sourceMap ?? {}).length).toBeGreaterThan(
-      0
+      0,
     );
     expect(pdvDataParsed.errors.length).toBeGreaterThan(0);
   });
@@ -130,7 +130,7 @@ describe('pdv data', () => {
     writeFileSync(projectJsonPath, '{');
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const e2ePdvData = (
@@ -147,7 +147,7 @@ describe('pdv data', () => {
     expect(e2ePdvData.pdvDataSerialized).toBeUndefined();
     expect(e2ePdvData.errorsSerialized).toBeDefined();
     expect(
-      JSON.parse(e2ePdvData.errorsSerialized ?? '').length
+      JSON.parse(e2ePdvData.errorsSerialized ?? '').length,
     ).toBeGreaterThan(0);
   });
 
@@ -160,7 +160,7 @@ describe('pdv data', () => {
     writeFileSync(nxJsonPath, '{');
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const e2ePdvData = (
@@ -178,7 +178,7 @@ describe('pdv data', () => {
 
     expect(e2ePdvData.errorsSerialized).toBeDefined();
     expect(
-      JSON.parse(e2ePdvData.errorsSerialized ?? '').length
+      JSON.parse(e2ePdvData.errorsSerialized ?? '').length,
     ).toBeGreaterThan(0);
   });
 

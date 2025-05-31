@@ -21,6 +21,10 @@ enum class TelemetryEvent(val eventName: String) {
     CLOUD_GENERATE_CI_WORKFLOW("cloud.generate-ci-workflow"),
     CLOUD_FINISH_SETUP("cloud.finish-setup"),
     CLOUD_SHOW_AFFECTED_DOCS("cloud.show-affected-docs"),
+    CLOUD_SHOW_CIPE_NOTIFICATION("cloud.show-cipe-notification"),
+    CLOUD_VIEW_CIPE("cloud.view-cipe"),
+    CLOUD_VIEW_CIPE_COMMIT("cloud.view-cipe-commit"),
+    CLOUD_FIX_CIPE_ERROR("cloud.fix-cipe-error"),
 
     // Graph
     GRAPH_SHOW_ALL("graph.show-all"),
@@ -62,6 +66,7 @@ class TelemetryEventSource(val source: String) {
         val WELCOME_VIEW = "welcome-view"
         val MIGRATE_ANGULAR_PROMPT = "migrate-angular-prompt"
         val EDITOR_TOOLBAR = "editor-toolbar"
+        val NOTIFICATION = "notification"
 
         // Function to get all sources using reflection
         private fun getAllSources(): List<String> {

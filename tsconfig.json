@@ -179,6 +179,12 @@
     },
     {
       "path": "./libs/shared/running-tasks"
+    },
+    {
+      "path": "./libs/shared/e2e-utils"
+    },
+    {
+      "path": "./apps/nx-mcp-e2e"
     }
   ]
 }

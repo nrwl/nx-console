@@ -1,5 +1,6 @@
-import { commands, env } from 'vscode';
+import { commands, env, window } from 'vscode';
 import { isInCursor } from './editor-name-helpers';
+import { vscodeLogger } from './logger';
 
 export async function sendMessageToAgent(message: string, newChat = true) {
   if (isInCursor()) {
@@ -15,17 +16,24 @@ export async function sendMessageToAgent(message: string, newChat = true) {
     await commands.executeCommand('editor.action.clipboardPasteAction');
     await env.clipboard.writeText(originalClipboard);
   } else {
-    if (newChat) {
-      commands.executeCommand('workbench.action.chat.newChat', {
-        agentMode: true,
-        inputValue: message,
-        isPartialQuery: false,
-      });
-    } else {
-      commands.executeCommand('workbench.action.chat.open', {
-        mode: 'agent',
-        query: message,
-      });
+    try {
+      if (newChat) {
+        commands.executeCommand('workbench.action.chat.newChat', {
+          agentMode: true,
+          inputValue: message,
+          isPartialQuery: false,
+        });
+      } else {
+        commands.executeCommand('workbench.action.chat.open', {
+          mode: 'agent',
+          query: message,
+        });
+      }
+    } catch (error) {
+      vscodeLogger.log('Error sending message to agent:', error);
+      window.showErrorMessage(
+        'Please update VSCode to the latest version to send messages to the agent.',
+      );
     }
   }
 }

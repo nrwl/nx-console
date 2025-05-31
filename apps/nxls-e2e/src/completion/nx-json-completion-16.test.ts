@@ -6,7 +6,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   modifyJsonFile,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 import { readFileSync, rmSync } from 'fs';
 import { URI } from 'vscode-uri';
 import { CompletionList, Position } from 'vscode-languageserver';
@@ -75,7 +75,7 @@ describe('nx.json completion - 16', () => {
     expect(
       (autocompleteResponse.result as CompletionList).items
         .map((item) => item.label)
-        .sort()
+        .sort(),
     ).toMatchInlineSnapshot(`
       Array [
         "affected",
@@ -106,7 +106,7 @@ describe('nx.json completion - 16', () => {
     });
 
     const labels = (autocompleteResponse.result as CompletionList).items.map(
-      (item) => item.label
+      (item) => item.label,
     );
     expect(labels).not.toContain('nxCloudUrl');
     expect(labels).not.toContain('nxCloudAccessToken');
@@ -121,15 +121,15 @@ describe('nx.json completion - 16', () => {
         'node_modules',
         'nx',
         'schemas',
-        'nx-schema.json'
-      )
+        'nx-schema.json',
+      ),
     );
 
     nxlsWrapper.sendNotification({
       ...NxWorkspaceRefreshNotification,
     });
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
 
     const autocompleteResponse = await nxlsWrapper.sendRequest({

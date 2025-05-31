@@ -29,7 +29,7 @@ internal class NxGeneratorSearchEverywhereContributorFactory :
 class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
     SearchEverywhereContributor<NxGenerator>, PossibleSlowContributor {
 
-    private val project = event.getRequiredData(CommonDataKeys.PROJECT)
+    private val project = event.project!!
 
     override fun getSearchProviderId(): String = javaClass.name
 
@@ -52,7 +52,7 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
     override fun processSelectedItem(
         selected: NxGenerator,
         modifiers: Int,
-        searchText: String
+        searchText: String,
     ): Boolean {
         val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
@@ -64,7 +64,7 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
     override fun fetchElements(
         pattern: String,
         progressIndicator: ProgressIndicator,
-        consumer: Processor<in NxGenerator>
+        consumer: Processor<in NxGenerator>,
     ) {
 
         if (StringUtil.isEmptyOrSpaces(pattern)) {

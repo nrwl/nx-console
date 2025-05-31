@@ -248,6 +248,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         wrapper.awaitStarted().await()
     }
 
+    suspend fun recentCIPEData(): CIPEDataResponse? {
+        return withMessageIssueCatch("nx/recentCIPEData") {
+            server()?.getNxService()?.recentCIPEData()?.await()
+        }()
+    }
+
     private fun <T> withMessageIssueCatch(
         requestName: String,
         block: suspend () -> T,

@@ -12,7 +12,7 @@ import {
   newWorkspace,
   uniq,
   waitFor,
-} from '../utils';
+} from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -39,7 +39,7 @@ describe('parse target string - default', () => {
       workspaceName,
       'apps',
       workspaceName,
-      'project.json'
+      'project.json',
     );
 
     await waitFor(1000);
@@ -99,7 +99,7 @@ describe('parse target string - default', () => {
     }));
 
     await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method
+      NxWorkspaceRefreshNotification.method,
     );
   });
 

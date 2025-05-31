@@ -34,8 +34,7 @@ class NxGenerateUiAction : AnAction(), DumbAware {
                 TelemetryEvent.GENERATE_UI,
                 mapOf(
                     "source" to
-                        if (ActionPlaces.isPopupPlace(e.place))
-                            TelemetryEventSource.EXPLORER_CONTEXT_MENU
+                        if (e.isFromContextMenu()) TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
                 ),
             )
@@ -43,7 +42,7 @@ class NxGenerateUiAction : AnAction(), DumbAware {
         val generateService = project.service<NxGenerateService>()
 
         val path =
-            if (ActionPlaces.isPopupPlace(e.place)) {
+            if (e.isFromContextMenu()) {
                 e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
             } else {
                 null

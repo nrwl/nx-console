@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { e2eCwd, uniq, waitFor } from '../utils';
+import { e2eCwd, uniq, waitFor } from '@nx-console/shared-e2e-utils';
 import { mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { NxWorkspaceRequest } from '@nx-console/language-server-types';
@@ -27,7 +27,7 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
             "scripts": {
                 "echo-1": "echo 1"
             }
-        }`
+        }`,
     );
     mkdirSync(join(packagesDir, 'project-2'));
     writeFileSync(
@@ -37,7 +37,7 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
         "scripts": {
             "echo-2": "echo 2"
         }
-    }`
+    }`,
     );
     mkdirSync(join(packagesDir, 'project-3'));
     writeFileSync(
@@ -47,7 +47,7 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
         "scripts": {
             "echo-3": "echo 3"
         }
-    }`
+    }`,
     );
     await waitFor(1000);
 
@@ -68,7 +68,7 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
     });
 
     expect(
-      Object.keys((workspaceResponse.result as NxWorkspace).projectGraph.nodes)
+      Object.keys((workspaceResponse.result as NxWorkspace).projectGraph.nodes),
     ).toEqual(['project-1', 'project-2', 'project-3']);
   });
   it('should return correct targets for lerna workspace', async () => {
