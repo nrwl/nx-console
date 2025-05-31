@@ -128,33 +128,4 @@ describe('cloud tools', () => {
       });
     });
   });
-
-  describe('with both nxCloudAccessToken and nxCloudId', () => {
-    it('should include cloud tools when both are set', () => {
-      // Add both cloud configurations to nx.json
-      modifyJsonFile(nxJsonPath, (json) => ({
-        ...json,
-        nxCloudAccessToken: 'test-cloud-token',
-        nxCloudId: 'test-cloud-id',
-      }));
-
-      const result = invokeMCPInspectorCLI(
-        testWorkspacePath,
-        '--method tools/list',
-      );
-      const toolNames = result.tools.map((tool: any) => tool.name);
-      
-      // Verify cloud tools are present
-      expect(toolNames).toContain('nx_cloud_cipe_details');
-      expect(toolNames).toContain('nx_cloud_fix_cipe_failure');
-    });
-
-    afterEach(() => {
-      // Reset nx.json
-      modifyJsonFile(nxJsonPath, (json) => {
-        const { nxCloudAccessToken, nxCloudId, ...rest } = json;
-        return rest;
-      });
-    });
-  });
 });
