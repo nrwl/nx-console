@@ -8,13 +8,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.util.ui.JBUI
 import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.generate.ui.NxGenerateUiRenderer
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.generate.ui.file.NxGenerateUiFileRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.Notifier
@@ -112,15 +112,19 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
     ) {
         val generatorOptions =
             options
-                ?: project
-                    .service<NxlsService>()
-                    .generatorOptions(
-                        NxGeneratorOptionsRequestOptions(
-                            generator.data.collection,
-                            generator.data.name,
-                            generator.schemaPath,
+                ?: run {
+                    val inputSchema =
+                        GeneratorSchema(
+                            collectionName = generator.data.collection,
+                            generatorName = generator.data.name,
+                            description = generator.data.description ?: "",
+                            options = emptyList(),
+                            context = null
                         )
-                    )
+                    val transformedSchema =
+                        project.service<NxlsService>().transformedGeneratorSchema(inputSchema)
+                    transformedSchema?.options ?: emptyList()
+                }
 
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
 
