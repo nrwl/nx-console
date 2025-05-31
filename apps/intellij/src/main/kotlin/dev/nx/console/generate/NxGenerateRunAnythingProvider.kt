@@ -11,10 +11,10 @@ import com.intellij.openapi.project.Project
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
 
@@ -122,14 +122,17 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
         val generator = findGenerator(commandLine, generators) ?: return emptySequence()
         if (generatorOptions.containsKey(generator.name).not()) {
             val opts = runBlocking {
-                NxlsService.getInstance(project)
-                    .generatorOptions(
-                        NxGeneratorOptionsRequestOptions(
-                            collection = generator.data.collection,
-                            name = generator.data.name,
-                            path = generator.schemaPath
-                        )
+                val inputSchema =
+                    GeneratorSchema(
+                        collectionName = generator.data.collection,
+                        generatorName = generator.data.name,
+                        description = generator.data.description ?: "",
+                        options = emptyList(),
+                        context = null
                     )
+                val transformedSchema =
+                    NxlsService.getInstance(project).transformedGeneratorSchema(inputSchema)
+                transformedSchema?.options ?: emptyList()
             }
             generatorOptions.putAll(
                 (generator.data.fullNamesWithAliases + generator.name).map { it to opts }

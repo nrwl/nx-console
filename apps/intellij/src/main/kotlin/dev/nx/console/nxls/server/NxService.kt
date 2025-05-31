@@ -41,6 +41,13 @@ interface NxService {
     }
 
     @JsonRequest
+    fun transformedGeneratorSchema(
+        transformedGeneratorSchemaRequest: NxTransformedGeneratorSchemaRequest
+    ): CompletableFuture<GeneratorSchema> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun generatorContextV2(
         generatorContextFromPathRequest: NxGetGeneratorContextFromPathRequest
     ): CompletableFuture<NxGeneratorContext> {
