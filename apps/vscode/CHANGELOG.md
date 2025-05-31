@@ -1,3 +1,19 @@
+# [18.50.0](https://github.com/nrwl/nx-console/compare/vscode-v18.49.3...vscode-v18.50.0) (2025-05-31)
+
+
+### Bug Fixes
+
+* **nx-mcp:** add addtl tool annotations ([#2512](https://github.com/nrwl/nx-console/issues/2512)) ([0c80507](https://github.com/nrwl/nx-console/commit/0c805074d352de54ea9094cf9bfa09e89fe2e356))
+* stop writing 'undefined' into instructions ([#2526](https://github.com/nrwl/nx-console/issues/2526)) ([8cc3798](https://github.com/nrwl/nx-console/commit/8cc379833207054f6221b47a9185f89f08ea7b9e)), closes [#2525](https://github.com/nrwl/nx-console/issues/2525)
+* **vscode:** parse jsonc mcp.json file ([#2516](https://github.com/nrwl/nx-console/issues/2516)) ([bb2b70d](https://github.com/nrwl/nx-console/commit/bb2b70d97f5085754c140da438f77bec60c0afd4))
+* **vscode:** register rules commands before initializing rules manager ([#2511](https://github.com/nrwl/nx-console/issues/2511)) ([9432b41](https://github.com/nrwl/nx-console/commit/9432b418584847438c9f0ca76a07d0fdf2ec98a5))
+* **vscode:** repair gitignore detection & downgrade version req ([#2536](https://github.com/nrwl/nx-console/issues/2536)) ([db48467](https://github.com/nrwl/nx-console/commit/db4846792493e5cc2e38258977b230cc6e8f6de7))
+
+
+### Features
+
+* **nx-mcp:** default workspace path ([#2531](https://github.com/nrwl/nx-console/issues/2531)) ([27037f7](https://github.com/nrwl/nx-console/commit/27037f75368ee411997728d1958e87c536d2d7f9))
+
 ## [18.49.3](https://github.com/nrwl/nx-console/compare/vscode-v18.49.2...vscode-v18.49.3) (2025-05-16)
 
 
