@@ -35,11 +35,11 @@ describe('cloud tools', () => {
       '--method tools/list',
     );
     const toolNames = result.tools.map((tool: any) => tool.name);
-    
+
     // Verify cloud tools are not present
     expect(toolNames).not.toContain('nx_cloud_cipe_details');
     expect(toolNames).not.toContain('nx_cloud_fix_cipe_failure');
-    
+
     // Verify other tools are still present
     expect(toolNames).toContain('nx_workspace');
     expect(toolNames).toContain('nx_project_details');
@@ -58,11 +58,11 @@ describe('cloud tools', () => {
         '--method tools/list',
       );
       const toolNames = result.tools.map((tool: any) => tool.name);
-      
+
       // Verify cloud tools are present
       expect(toolNames).toContain('nx_cloud_cipe_details');
       expect(toolNames).toContain('nx_cloud_fix_cipe_failure');
-      
+
       // Verify all expected tools are present
       expect(toolNames).toEqual([
         'nx_docs',
@@ -100,11 +100,11 @@ describe('cloud tools', () => {
         '--method tools/list',
       );
       const toolNames = result.tools.map((tool: any) => tool.name);
-      
+
       // Verify cloud tools are present
       expect(toolNames).toContain('nx_cloud_cipe_details');
       expect(toolNames).toContain('nx_cloud_fix_cipe_failure');
-      
+
       // Verify all expected tools are present
       expect(toolNames).toEqual([
         'nx_docs',
