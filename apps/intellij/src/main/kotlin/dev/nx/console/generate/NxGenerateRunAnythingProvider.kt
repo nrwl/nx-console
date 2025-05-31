@@ -14,6 +14,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
+import dev.nx.console.models.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.NxlsService
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
@@ -122,17 +123,24 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
         val generator = findGenerator(commandLine, generators) ?: return emptySequence()
         if (generatorOptions.containsKey(generator.name).not()) {
             val opts = runBlocking {
+                val requestOptions =
+                    NxGeneratorOptionsRequestOptions(
+                        collection = generator.data.collection,
+                        generator = generator.data.name,
+                    )
+                val rawOptions =
+                    NxlsService.getInstance(project).generatorOptions(requestOptions)
                 val inputSchema =
                     GeneratorSchema(
                         collectionName = generator.data.collection,
                         generatorName = generator.data.name,
                         description = generator.data.description ?: "",
-                        options = emptyList(),
+                        options = rawOptions,
                         context = null
                     )
                 val transformedSchema =
                     NxlsService.getInstance(project).transformedGeneratorSchema(inputSchema)
-                transformedSchema?.options ?: emptyList()
+                transformedSchema?.options ?: rawOptions
             }
             generatorOptions.putAll(
                 (generator.data.fullNamesWithAliases + generator.name).map { it to opts }
