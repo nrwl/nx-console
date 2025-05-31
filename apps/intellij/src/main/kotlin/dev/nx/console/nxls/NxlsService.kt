@@ -118,7 +118,7 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
             val request = NxTransformedGeneratorSchemaRequest(generatorSchema)
             server()?.getNxService()?.transformedGeneratorSchema(request)?.await()
-        }()
+        }() ?: generatorSchema
     }
 
     suspend fun generatorContextFromPath(
