@@ -10,7 +10,13 @@ import {
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { isInCursor, isInVSCode, vscodeLogger } from '@nx-console/vscode-utils';
-import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'fs';
 import ignore from 'ignore';
 import type { PackageManager } from 'nx/src/devkit-exports';
 import { dirname, join, relative } from 'path';
@@ -158,13 +164,14 @@ export class AgentRulesManager {
 
     const workspacePath = getNxWorkspacePath();
     const gitIgnorePath = join(workspacePath, '.gitignore');
+    const gitIgnoreContent = readFileSync(gitIgnorePath, 'utf-8');
     let newContent = `\n`;
     for (const ruleInfo of [cursorRuleInfo, vscodeRuleInfo]) {
       const relativeRulePath = relative(
         workspacePath,
         ruleInfo.path(workspacePath),
       );
-      const ig = ignore({}).add(gitIgnorePath);
+      const ig = ignore({}).add(gitIgnoreContent);
 
       if (ig.ignores(relativeRulePath)) {
         return;
