@@ -2,12 +2,12 @@ package dev.nx.console.nx_toolwindow
 
 import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.icons.AllIcons
+import com.intellij.ide.DefaultTreeExpander
+import com.intellij.ide.TreeExpander
+import com.intellij.ide.actions.RefreshAction
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.ex.ActionUtil
-import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.HyperlinkLabel
@@ -15,6 +15,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBUI
+import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.run.actions.NxInitService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
@@ -97,7 +98,7 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createNoNxWorkspacePanel(): JPanel {
+    fun createNoNxWorkspacePanel(onRefresh: () -> Unit): JPanel {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
@@ -168,6 +169,12 @@ class NxToolMainComponents(private val project: Project) {
                         JButton("Refresh").apply {
                             alignmentX = Component.CENTER_ALIGNMENT
                             addActionListener {
+                                TelemetryService.getInstance(project)
+                                    .featureUsed(
+                                        TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                                        mapOf("source" to TelemetryEventSource.PROJECTS_VIEW),
+                                    )
+                                onRefresh()
                                 NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
                             }
                         }
@@ -208,7 +215,7 @@ class NxToolMainComponents(private val project: Project) {
             indent {
                 row {
                     text(
-                        "<h3> Nx caught ${if (errorCount == 1) "an error" else "$errorCount errors"} while computing the project graph.</h3>"
+                        "<h3> Nx caught ${if(errorCount == 1) "an error" else "$errorCount errors"} while computing the project graph.</h3>"
                     )
                 }
                 row {
@@ -219,30 +226,21 @@ class NxToolMainComponents(private val project: Project) {
                     text(
                         "If the problems persist, you can try running <code>nx reset</code> and then <a href='refresh'>refresh the workspace</a><br /> For more information, look for errors in <a href='open-idea-log'>idea.log</a> and refer to the <a href='https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole'>Nx Troubleshooting Guide </a> and the <a href='https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole'>Nx Console Troubleshooting Guide</a>."
                     ) {
-                        when (it.description) {
-                            "refresh" -> {
-                                NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
-                            }
-                            "open-idea-log" -> {
-                                val action = ActionManager.getInstance().getAction("OpenLog")
+                        if (it.description == "refresh") {
+                            NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+                        } else if (it.description == "open-idea-log") {
+                            val action = ActionManager.getInstance().getAction("OpenLog")
 
-                                val dataContext =
-                                    SimpleDataContext.getSimpleContext(
-                                        CommonDataKeys.PROJECT,
-                                        project
-                                    )
-
-                                ActionUtil.invokeAction(
+                            ActionManager.getInstance()
+                                .tryToExecute(
                                     action,
-                                    dataContext,
+                                    null,
+                                    null,
                                     NxToolWindowPanel.NX_TOOLBAR_PLACE,
-                                    null,
-                                    null,
+                                    true
                                 )
-                            }
-                            else -> {
-                                BrowserLauncher.instance.browse(URI.create(it.description))
-                            }
+                        } else {
+                            BrowserLauncher.instance.browse(URI.create(it.description))
                         }
                     }
                 }
@@ -250,7 +248,7 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createNoNodeInterpreterComponent(): JComponent {
+    fun createNoNodeInterpreterComponent(onRefresh: () -> Unit): JComponent {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
@@ -292,6 +290,14 @@ class NxToolMainComponents(private val project: Project) {
                                     "Please configure the Node interpreter and then <a href='refresh'>refresh the workspace</a>"
                                 ) {
                                     if (it.description == "refresh") {
+                                        TelemetryService.getInstance(project)
+                                            .featureUsed(
+                                                TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                                                mapOf(
+                                                    "source" to TelemetryEventSource.PROJECTS_VIEW
+                                                ),
+                                            )
+                                        onRefresh()
                                         NxRefreshWorkspaceService.getInstance(project)
                                             .refreshWorkspace()
                                     }
@@ -409,6 +415,79 @@ class NxToolMainComponents(private val project: Project) {
                     )
                 }
             )
+        }
+    }
+
+    fun createToolbar(tree: NxProjectsTree, onRefresh: () -> Unit): ActionToolbar {
+        return run {
+            val actionManager = ActionManager.getInstance()
+            val actionGroup =
+                object : DefaultActionGroup() {
+                        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+                    }
+                    .apply { templatePresentation.text = "Nx Toolwindow" }
+
+            val refreshAction =
+                object :
+                    RefreshAction(
+                        "Reload Nx Projects",
+                        "Reload Nx projects",
+                        AllIcons.Actions.Refresh,
+                    ) {
+                    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                    override fun update(e: AnActionEvent) {
+                        e.presentation.isEnabled = true
+                    }
+
+                    override fun actionPerformed(e: AnActionEvent) {
+                        TelemetryService.getInstance(project)
+                            .featureUsed(
+                                TelemetryEvent.MISC_REFRESH_WORKSPACE,
+                                mapOf("source" to TelemetryEventSource.PROJECTS_VIEW),
+                            )
+                        onRefresh()
+                        NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+                    }
+                }
+
+            refreshAction.registerShortcutOn(tree)
+
+            actionGroup.addAction(refreshAction)
+            actionGroup.addSeparator()
+            actionGroup.add(
+                actionManager.getAction("dev.nx.console.generate.actions.NxGenerateUiAction")
+            )
+            actionGroup.add(
+                actionManager.getAction("dev.nx.console.graph.actions.NxGraphSelectAllAction")
+            )
+            actionGroup.addSeparator()
+
+            val expander: TreeExpander = DefaultTreeExpander(tree)
+
+            val expandAllAction =
+                object : AnAction("Expand All", "Expand all items", AllIcons.Actions.Expandall) {
+                    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                    override fun actionPerformed(e: AnActionEvent) {
+                        expander.expandAll()
+                    }
+                }
+
+            val collapseAllAction =
+                object :
+                    AnAction("Collapse All", "Collapse all items", AllIcons.Actions.Collapseall) {
+                    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                    override fun actionPerformed(e: AnActionEvent) {
+                        expander.collapseAll()
+                    }
+                }
+
+            actionGroup.add(expandAllAction)
+            actionGroup.add(collapseAllAction)
+
+            actionManager.createActionToolbar(NxToolWindowPanel.NX_TOOLBAR_PLACE, actionGroup, true)
         }
     }
 }

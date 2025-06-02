@@ -1,12 +1,15 @@
 package dev.nx.console.nx_toolwindow
 
+import com.intellij.openapi.application.EDT
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import java.awt.event.ActionListener
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.JProgressBar
 import javax.swing.JScrollPane
-import org.jetbrains.plugins.groovy.lang.resolve.initialState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.nsk.kstatemachine.event.DataEvent
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
@@ -56,9 +59,19 @@ sealed interface RefreshEvents : Event {
     class Refreshed : RefreshEvents
 }
 
-fun createRefreshStateGroup(refreshedState: DefaultState, refreshingState: DefaultState) {
-    refreshedState { transition<RefreshEvents.Refreshing> { targetState = refreshingState } }
-    refreshingState { transition<RefreshEvents.Refreshed> { targetState = refreshedState } }
+fun createRefreshStateGroup(
+    refreshedState: DefaultState,
+    refreshingState: DefaultState,
+    progressBar: JProgressBar
+) {
+    refreshedState {
+        onEntry { withContext(Dispatchers.EDT) { progressBar.isIndeterminate = false } }
+        transition<RefreshEvents.Refreshing> { targetState = refreshingState }
+    }
+    refreshingState {
+        onEntry { withContext(Dispatchers.EDT) { progressBar.isIndeterminate = true } }
+        transition<RefreshEvents.Refreshed> { targetState = refreshedState }
+    }
 }
 
 class MutableRef<T>(var value: T)
@@ -74,10 +87,13 @@ fun createMainContentStateGroup(
     nxToolMainComponents: NxToolMainComponents,
     errorCountAndComponent: MutableRef<Pair<Int, JComponent>?>,
     projectTreeComponent: JScrollPane,
-    projectStructure: NxTreeStructure
+    projectStructure: NxTreeStructure,
+    onRefresh: () -> Unit
 ) {
     noNodeInterpreter {
-        onEntry { mainContent.value = nxToolMainComponents.createNoNodeInterpreterComponent() }
+        onEntry {
+            mainContent.value = nxToolMainComponents.createNoNodeInterpreterComponent(onRefresh)
+        }
     }
 
     showError {
@@ -102,7 +118,7 @@ fun createMainContentStateGroup(
     }
 
     showNoNxWorkspace {
-        onEntry { mainContent.value = nxToolMainComponents.createNoNxWorkspacePanel() }
+        onEntry { mainContent.value = nxToolMainComponents.createNoNxWorkspacePanel(onRefresh) }
     }
 
     showProjectTree {
@@ -127,6 +143,7 @@ fun createMainContentStateGroup(
 fun createNxCloudStateGroup(
     showConnectedNxCloudPanel: DataState<String>,
     showConnectNxCloudPanel: DefaultState,
+    initializeNxCloud: DefaultState,
     openNxCloudPanel: MutableRef<JPanel?>,
     connectToNxCloudPanel: MutableRef<JPanel?>,
     nxToolMainComponents: NxToolMainComponents,
@@ -158,6 +175,13 @@ fun createNxCloudStateGroup(
     }
 
     showConnectNxCloudPanel {
+        dataTransition<NxCloudEvents.ShowOpenNxCloud, String> {
+            targetState = showConnectedNxCloudPanel
+        }
+    }
+
+    initializeNxCloud {
+        transition<NxCloudEvents.ShowConnectToNxCloud> { targetState = showConnectNxCloudPanel }
         dataTransition<NxCloudEvents.ShowOpenNxCloud, String> {
             targetState = showConnectedNxCloudPanel
         }
