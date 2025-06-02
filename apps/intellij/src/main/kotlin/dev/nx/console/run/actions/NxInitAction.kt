@@ -5,6 +5,9 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.terminal.ui.TerminalWidget
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager
 
@@ -24,18 +27,22 @@ class NxInitAction : AnAction() {
 @Service(Service.Level.PROJECT)
 class NxInitService(private val project: Project, private val cs: CoroutineScope) {
 
-    @Suppress("DEPRECATION")
     fun runNxInit() {
         val terminalManager = TerminalToolWindowManager.getInstance(project)
         val workingDirectory = project.basePath ?: "."
 
-        // @Suppress("DEPRECATION")
-        val shellWidget = terminalManager.createLocalShellWidget(workingDirectory, "Nx Init")
+        // Use the non-deprecated createShellWidget
+        // This returns a TerminalWidget, which is the new common interface
+        val terminalWidget: TerminalWidget =
+            terminalManager.createShellWidget(workingDirectory, "Nx Init", true, false)
 
         // Optionally show the terminal tool window
         terminalManager.getToolWindow()?.show(null)
 
-        shellWidget.executeCommand("npx nx@latest init")
+        // Execute command using the new TerminalWidget interface
+        terminalWidget.sendCommandToExecute("npx nx@latest init")
+
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.TASK_INIT)
     }
 
     companion object {

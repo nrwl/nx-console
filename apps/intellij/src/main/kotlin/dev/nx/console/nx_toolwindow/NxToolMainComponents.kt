@@ -29,6 +29,7 @@ import javax.swing.*
 import javax.swing.border.CompoundBorder
 
 class NxToolMainComponents(private val project: Project) {
+
     fun createNoProjectsComponent(): JComponent {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -304,13 +305,6 @@ class NxToolMainComponents(private val project: Project) {
     }
 
     fun createSpinnerPanel(): JPanel {
-        val spinner =
-            JProgressBar().apply {
-                isIndeterminate = true // Continuous animation
-                border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
-                alignmentX = Component.CENTER_ALIGNMENT // Center horizontally
-            }
-
         val loadingLabel =
             JLabel("Loading...").apply {
                 alignmentX = Component.CENTER_ALIGNMENT // Center horizontally
@@ -319,6 +313,12 @@ class NxToolMainComponents(private val project: Project) {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
+            val spinner =
+                JProgressBar().apply {
+                    isIndeterminate = true
+                    border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                    alignmentX = Component.CENTER_ALIGNMENT
+                }
             add(Box.createVerticalGlue()) // Push content to the center vertically
             add(spinner)
             add(Box.createRigidArea(Dimension(0, 10))) // Add spacing between spinner and label

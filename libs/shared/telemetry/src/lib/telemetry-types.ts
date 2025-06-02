@@ -38,6 +38,7 @@ export type TelemetryEvents =
   | 'graph.interaction-run-help'
   // tasks
   | 'tasks.run'
+  | 'tasks.init'
   | 'tasks.copy-to-clipboard'
   | 'tasks.run-many'
   // generate

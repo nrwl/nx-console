@@ -5,12 +5,12 @@ import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ScrollPaneFactory
-import com.intellij.util.messages.Topic
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
@@ -26,22 +26,30 @@ import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nodeInterpreter
+import java.awt.BorderLayout
 import java.awt.EventQueue.invokeLater
 import java.awt.event.ActionEvent
 import javax.swing.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.createStateMachine
+import ru.nsk.kstatemachine.statemachine.stop
 import ru.nsk.kstatemachine.transition.TransitionParams
 
-class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(true, true) {
+class NxToolWindowPanel(private val project: Project) :
+    SimpleToolWindowPanel(true, true), Disposable {
 
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
+
+    // Declare the channel to serialize all KStateMachine events
+    private val eventChannel = Channel<Event>(Channel.UNLIMITED)
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val nxToolMainComponents = NxToolMainComponents(project)
@@ -50,11 +58,32 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     private var errorCountAndComponent: MutableRef<Pair<Int, JComponent>?> = MutableRef(null)
     private var openNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
     private var connectToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
+    private val progressBar = JProgressBar()
+
+    private var mainPanel: JPanel =
+        JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            add(Box.createVerticalGlue()) // Glue stays
+        }
+    private var loadingPanel: JPanel = JPanel(BorderLayout())
 
     private lateinit var stateMachine: StateMachine
 
+    private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
+
     init {
-        val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
+        loadingPanel.add(progressBar, BorderLayout.NORTH) // Add progressBar once if it's static
+        loadingPanel.add(mainPanel, BorderLayout.CENTER) // Add mainPanel once
+        setContent(loadingPanel)
+
+        // LAUNCH THE EVENT CONSUMER COROUTINE ONCE
+        // This coroutine will serially process all events sent to eventChannel
+        scope.launch {
+            for (event in eventChannel) {
+                stateMachine.processEvent(event)
+            }
+        }
+
         scope.launch {
             stateMachine =
                 createStateMachine(scope, childMode = ChildMode.PARALLEL, start = true) {
@@ -98,7 +127,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                         )
 
                         initializeNxCloud {
-                            onEntry { loadToolwindowContent(this@createStateMachine) }
+                            // Ensure loadToolwindowContent is called on EDT
+                            onEntry { withContext(Dispatchers.EDT) { loadToolwindowContent() } }
                             transition<NxCloudEvents.ShowConnectToNxCloud> {
                                 targetState = showConnectNxCloudPanel
                             }
@@ -121,12 +151,20 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                 state: IState,
                                 transitionParams: TransitionParams<*>
                             ) {
+                                println(state)
                                 when (state.name) {
                                     RefreshStates.Refreshing -> {
-                                        setContent(nxToolMainComponents.createSpinnerPanel())
+                                        withContext(Dispatchers.EDT) {
+                                            progressBar.isIndeterminate = true
+                                        }
+                                    }
+                                    RefreshStates.Refreshed -> {
+                                        withContext(Dispatchers.EDT) {
+                                            progressBar.isIndeterminate = false
+                                        }
                                     }
                                     else -> {
-                                        setContent(showContentWithCloud())
+                                        updateMainPanelContent()
                                     }
                                 }
                             }
@@ -138,25 +176,28 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
                     NxWorkspaceRefreshStartedListener {
-                        invokeLater {
-                            scope.launch { stateMachine.processEvent(RefreshEvents.Refreshing()) }
-                        }
+                        // SEND EVENT TO CHANNEL INSTEAD OF DIRECTLY CALLING processEvent
+                        scope.launch { eventChannel.send(RefreshEvents.Refreshing()) }
+                        // scope.launch {  showProgressBarLoading() }
                     },
                 )
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                     NxWorkspaceRefreshListener {
-                        invokeLater {
-                            scope.launch { stateMachine.processEvent(RefreshEvents.Refreshed()) }
-                            loadToolwindowContent(stateMachine)
-                        }
+                        // loadToolwindowContent still needs to manage its own threading,
+                        // especially for UI updates
+                        invokeLater { loadToolwindowContent() }
+                        // SEND EVENT TO CHANNEL INSTEAD
+                        scope.launch { eventChannel.send(RefreshEvents.Refreshed()) }
                     },
                 )
                 subscribe(
                     NX_TOOLWINDOW_STYLE_SETTING_TOPIC,
                     object : NxToolWindowStyleSettingListener {
                         override fun onNxToolWindowStyleChange() {
-                            invokeLater { loadToolwindowContent(stateMachine) }
+                            // If this triggers a state machine event, send it to the channel.
+                            // If it just updates UI, ensure it's on EDT.
+                            invokeLater { loadToolwindowContent() }
                         }
                     },
                 )
@@ -164,7 +205,9 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                     ToggleNxCloudViewAction.NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC,
                     object : ToggleNxCloudViewAction.NxToolwindowCloudViewCollapsedListener {
                         override fun onCloudViewCollapsed() {
-                            invokeLater { loadToolwindowContent(stateMachine) }
+                            // If this triggers a state machine event, send it to the channel.
+                            // If it just updates UI, ensure it's on EDT.
+                            invokeLater { loadToolwindowContent() }
                         }
                     },
                 )
@@ -172,7 +215,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         }
     }
 
-    private fun loadToolwindowContent(stateMachine: StateMachine) {
+    private fun loadToolwindowContent() {
         if (project.isDisposed) return
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxlsService = NxlsService.getInstance(project)
@@ -188,21 +231,22 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                         false
                     }
 
+                // SEND EVENTS TO CHANNEL INSTEAD OF DIRECTLY CALLING processEvent
                 if (!hasNodeInterpreter) {
-                    stateMachine.processEvent(MainContentEvents.ShowNoNodeInterpreter())
+                    eventChannel.send(MainContentEvents.ShowNoNodeInterpreter())
                 } else if (
                     workspace?.let {
                         !it.errors.isNullOrEmpty() && (it.isPartial != true || !hasProjects)
                     } == true
                 ) {
                     val errorCount = workspace.errors!!.size
-                    stateMachine.processEvent(MainContentEvents.ShowErrors(errorCount))
+                    eventChannel.send(MainContentEvents.ShowErrors(errorCount))
                 } else if (workspace == null) {
-                    stateMachine.processEvent(MainContentEvents.ShowNoNxWorkspace())
+                    eventChannel.send(MainContentEvents.ShowNoNxWorkspace())
                 } else if (workspace.projectGraph.nodes.isEmpty()) {
-                    stateMachine.processEvent(MainContentEvents.ShowNoProject())
+                    eventChannel.send(MainContentEvents.ShowNoProject())
                 } else {
-                    stateMachine.processEvent(MainContentEvents.ShowProjectTree(workspace))
+                    eventChannel.send(MainContentEvents.ShowProjectTree(workspace))
                 }
 
                 toolBar.targetComponent = this@NxToolWindowPanel
@@ -211,14 +255,15 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
             val cloudStatus = nxlsService.cloudStatus()
             cloudStatus?.let {
+                // THESE EVENTS ALSO NEED TO BE SENT TO THE CHANNEL
                 if (cloudStatus.isConnected) {
-                    stateMachine.processEvent(
+                    eventChannel.send(
                         NxCloudEvents.ShowOpenNxCloud(
                             cloudStatus.nxCloudUrl ?: "https://cloud.nx.app"
                         )
                     )
                 } else {
-                    stateMachine.processEvent(NxCloudEvents.ShowConnectToNxCloud())
+                    eventChannel.send(NxCloudEvents.ShowConnectToNxCloud())
                 }
             }
         }
@@ -457,14 +502,16 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             }
         }
 
-    private fun showContentWithCloud(): JComponent {
-        return JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            mainContent.value?.let { add(mainContent.value) }
-            add(Box.createVerticalGlue())
-            openNxCloudPanel.value?.let { add(openNxCloudPanel.value) }
-            connectToNxCloudPanel.value?.let { add(connectToNxCloudPanel.value) }
-        }
+    private fun updateMainPanelContent() {
+        mainPanel.removeAll() // Clear existing content
+
+        mainContent.value?.let { mainPanel.add(it) } // Add new content
+        mainPanel.add(Box.createVerticalGlue())
+        openNxCloudPanel.value?.let { mainPanel.add(it) }
+        connectToNxCloudPanel.value?.let { mainPanel.add(it) }
+
+        mainPanel.revalidate() // Recalculate layout
+        mainPanel.repaint() // Redraw
     }
 
     companion object {
@@ -484,43 +531,17 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                 .setValue(CLOUD_PANEL_COLLAPSED_PROPERTY_KEY, collapsed)
         }
     }
-}
 
-class ToggleNxCloudViewAction : ToggleAction("Show Nx Cloud Panel") {
+    override fun dispose() {
+        if (::stateMachine.isInitialized) {
+            scope.launch { stateMachine.stop() }
+        }
+        mainContent.value = null
+        errorCountAndComponent.value = null
+        openNxCloudPanel.value = null
+        connectToNxCloudPanel.value = null
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
-
-    override fun actionPerformed(e: AnActionEvent) {
-        val project = e.project ?: return
-        NxToolWindowPanel.setCloudPanelCollapsed(
-            project,
-            !NxToolWindowPanel.getCloudPanelCollapsed(project),
-        )
-        project.messageBus
-            .syncPublisher(NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC)
-            .onCloudViewCollapsed()
-    }
-
-    override fun isSelected(e: AnActionEvent): Boolean {
-        val project = e.project ?: return true
-        return !NxToolWindowPanel.getCloudPanelCollapsed(project)
-    }
-
-    override fun setSelected(e: AnActionEvent, state: Boolean) {
-        val project = e.project ?: return
-        NxToolWindowPanel.setCloudPanelCollapsed(project, !state)
-    }
-
-    companion object {
-        val NX_TOOLWINDOW_CLOUD_VIEW_COLLAPSED_TOPIC:
-            Topic<NxToolwindowCloudViewCollapsedListener> =
-            Topic(
-                "NxToolwindowCloudViewCollapsedTopic",
-                NxToolwindowCloudViewCollapsedListener::class.java,
-            )
-    }
-
-    interface NxToolwindowCloudViewCollapsedListener {
-        fun onCloudViewCollapsed()
+        // It's good practice to close the channel when the Disposable is disposed
+        eventChannel.close()
     }
 }

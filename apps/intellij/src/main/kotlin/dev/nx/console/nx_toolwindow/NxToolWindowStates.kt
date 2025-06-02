@@ -6,6 +6,7 @@ import java.awt.event.ActionListener
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import org.jetbrains.plugins.groovy.lang.resolve.initialState
 import ru.nsk.kstatemachine.event.DataEvent
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
@@ -55,10 +56,7 @@ sealed interface RefreshEvents : Event {
     class Refreshed : RefreshEvents
 }
 
-fun createRefreshStateGroup(
-    refreshedState: DefaultState,
-    refreshingState: DefaultState,
-) {
+fun createRefreshStateGroup(refreshedState: DefaultState, refreshingState: DefaultState) {
     refreshedState { transition<RefreshEvents.Refreshing> { targetState = refreshingState } }
     refreshingState { transition<RefreshEvents.Refreshed> { targetState = refreshedState } }
 }
@@ -116,7 +114,6 @@ fun createMainContentStateGroup(
 
     initialState {
         onEntry { mainContent.value = nxToolMainComponents.createSpinnerPanel() }
-
         transition<MainContentEvents.ShowNoNodeInterpreter> { targetState = noNodeInterpreter }
         transition<MainContentEvents.ShowNoProject> { targetState = showNoProject }
         transition<MainContentEvents.ShowNoNxWorkspace> { targetState = showNoNxWorkspace }
