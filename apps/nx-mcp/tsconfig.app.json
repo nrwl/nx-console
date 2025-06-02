@@ -8,6 +8,9 @@
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
   "references": [
     {
+      "path": "../../libs/shared/npm/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/nx-cloud/tsconfig.lib.json"
     },
     {

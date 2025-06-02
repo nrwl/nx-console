@@ -40,19 +40,19 @@ describe('workspace path', () => {
 
   it('should return the workspace path when provided as a positional', () => {
     const result = invokeMCPInspectorCLI(
-      'my/workspace/path/positional',
+      testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_workspace_path',
     );
-    expect(result.content[0].text).toBe('my/workspace/path/positional');
+    expect(result.content[0].text).toBe(testWorkspacePath);
   });
 
   it('should return the workspace path when provided as an option', () => {
     const result = invokeMCPInspectorCLI(
-      '--workspace-path my/workspace/path/named-arg',
+      `--workspace-path ${testWorkspacePath}`,
       '--method tools/call',
       '--tool-name nx_workspace_path',
     );
-    expect(result.content[0].text).toBe('my/workspace/path/named-arg');
+    expect(result.content[0].text).toBe(testWorkspacePath);
   });
 });
