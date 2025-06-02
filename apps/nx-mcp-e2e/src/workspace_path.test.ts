@@ -55,4 +55,14 @@ describe('workspace path', () => {
     );
     expect(result.content[0].text).toBe(testWorkspacePath);
   });
+
+  it('should resolve "." to the current working directory when passed as workspace path', () => {
+    const result = invokeMCPInspectorCLI(
+      '.',
+      '--method tools/call',
+      '--tool-name nx_workspace_path',
+    );
+    // Since we're running from within the test workspace, "." should resolve to the test workspace path
+    expect(result.content[0].text).toBe(testWorkspacePath);
+  });
 });
