@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/npm"
+    },
+    {
       "path": "../../libs/shared/nx-cloud"
     },
     {
