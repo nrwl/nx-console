@@ -19,6 +19,7 @@ import {
   confirmPackageChanges,
 } from './commands/migrate-commands';
 import { isUpdateAvailable } from './migrate-state-machine';
+import { vscodeLogger } from '@nx-console/vscode-utils';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';
@@ -57,6 +58,13 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
     webviewView.onDidDispose(() => {
       this._refreshSubscription?.dispose();
+    });
+
+    webviewView.onDidChangeVisibility((event) => {
+      vscodeLogger.log('onDidChangeVisibility');
+      if (webviewView.visible) {
+        commands.executeCommand('nxMigrate.refresh');
+      }
     });
 
     webviewView.webview.onDidReceiveMessage((message) => {
