@@ -300,6 +300,7 @@ export class NxMcpServerWrapper {
               ),
             });
           }
+
           return {
             content,
           };
