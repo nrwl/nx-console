@@ -21,8 +21,13 @@ export const migrateMachine = setup({
   actors: {},
   guards: {
     isMigrationInProgress: ({ context }) => !!context.migrationsJsonSection,
-    isUpdateAvailable: ({ context }) =>
-      isUpdateAvailable(context.currentNxVersion, context.latestNxVersion),
+    isUpdateAvailable: ({ context }) => {
+      return (
+        !!context.currentNxVersion &&
+        !!context.latestNxVersion &&
+        gte(context.latestNxVersion, context.currentNxVersion)
+      );
+    },
     hasConfirmedPackageUpdates: ({ context }) =>
       context.migrationsJsonSection &&
       context.migrationsJsonSection.confirmedPackageUpdates,
@@ -89,16 +94,3 @@ export const migrateMachine = setup({
     },
   },
 });
-
-export function isUpdateAvailable(
-  currentNxVersion: NxVersion,
-  latestNxVersion: NxVersion,
-): boolean {
-  return (
-    !!currentNxVersion &&
-    !!latestNxVersion &&
-    gte(latestNxVersion, currentNxVersion) &&
-    (latestNxVersion.major > currentNxVersion.major ||
-      latestNxVersion.minor > currentNxVersion.minor)
-  );
-}

@@ -29,7 +29,8 @@ export class Root extends LitElement {
     if (this.state === 'update-available') {
       return html`
         <p>
-          A newer version of Nx is available. <br />
+          A newer version of Nx is available:
+          ${this.migrateViewData?.latestNxVersion.full} <br />
           Use the button below to start a guided migration using the Migrate UI.
           <a href="https://nx.dev/latest/react/cli/migrate">Learn more</a>
         </p>

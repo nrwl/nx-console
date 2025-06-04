@@ -18,7 +18,8 @@ import {
   cancelMigration,
   confirmPackageChanges,
 } from './commands/migrate-commands';
-import { isUpdateAvailable } from './migrate-state-machine';
+
+import { gte, NxVersion } from '@nx-console/nx-version';
 import { vscodeLogger } from '@nx-console/vscode-utils';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
@@ -149,7 +150,6 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     this._migrateViewData = this.actor.getSnapshot().context;
     const sub = this.actor.subscribe((state) => {
       const newState = state.context;
-
       if (newState && !isDeepStrictEqual(this._migrateViewData, newState)) {
         this._migrateViewData = newState;
         this.refresh();
@@ -167,18 +167,19 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       !this._migrateViewData.currentNxVersion ||
       !this._migrateViewData.latestNxVersion
     ) {
-      this._view.badge = undefined;
+      this._view.badge = { value: 0, tooltip: '' };
       return;
     }
     if (
-      !isUpdateAvailable(
+      !isNonPatchUpdateAvailable(
         this._migrateViewData.currentNxVersion,
         this._migrateViewData.latestNxVersion,
       )
     ) {
-      this._view.badge = undefined;
+      this._view.badge = { value: 0, tooltip: '' };
       return;
     }
+
     const latestMajor = this._migrateViewData.latestNxVersion.major;
     const latestMinor = this._migrateViewData.latestNxVersion.minor;
     const currentMajor = this._migrateViewData.currentNxVersion.major;
@@ -216,4 +217,17 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       ),
     );
   }
+}
+
+function isNonPatchUpdateAvailable(
+  currentNxVersion: NxVersion,
+  latestNxVersion: NxVersion,
+): boolean {
+  return (
+    !!currentNxVersion &&
+    !!latestNxVersion &&
+    gte(latestNxVersion, currentNxVersion) &&
+    (latestNxVersion.major > currentNxVersion.major ||
+      latestNxVersion.minor > currentNxVersion.minor)
+  );
 }
