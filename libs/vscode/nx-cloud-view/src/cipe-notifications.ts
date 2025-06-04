@@ -36,7 +36,7 @@ export function compareCIPEDataAndSendNotification(
     const oldCIPERuns =
       oldCIPE?.runGroups?.flatMap((runGroup) => runGroup.runs) || [];
 
-    // Check if any run has an AI fix (for hiding "Help me fix this error")
+    // Check if any run has an AI fix (to skip failure notifications)
     const hasAiTaskFix = newCIPERuns.some((run) => !!run.aiTaskFix);
 
     for (const newRun of newCIPERuns) {
@@ -76,15 +76,14 @@ export function compareCIPEDataAndSendNotification(
       return;
     }
 
-    if (newCIPEIsFailed) {
+    if (newCIPEIsFailed && !hasAiTaskFix) {
       showMessageWithResultAndCommit(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
-        hasAiTaskFix,
       );
-    } else if (newCIPEFailedRun) {
+    } else if (newCIPEFailedRun && !hasAiTaskFix) {
       const command =
         newCIPEFailedRun.command.length > 70
           ? newCIPEFailedRun.command.substring(0, 60) + '[...]'
@@ -94,7 +93,6 @@ export function compareCIPEDataAndSendNotification(
         newCIPEFailedRun.runUrl,
         newCIPE.commitUrl,
         'error',
-        hasAiTaskFix,
       );
     } else if (newCipeIsSucceeded && nxCloudNotificationsSetting === 'all') {
       showMessageWithResultAndCommit(
@@ -102,7 +100,6 @@ export function compareCIPEDataAndSendNotification(
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'information',
-        hasAiTaskFix,
       );
     }
   }
@@ -113,7 +110,6 @@ function showMessageWithResultAndCommit(
   resultUrl: string,
   commitUrl: string | undefined | null,
   type: 'information' | 'error' = 'information',
-  hasAiTaskFix = false,
 ) {
   const telemetry = getTelemetry();
   telemetry.logUsage('cloud.show-cipe-notification');
@@ -128,8 +124,7 @@ function showMessageWithResultAndCommit(
     | 'View Commit';
   const messageCommands: MessageCommand[] = [];
 
-  // Only show "Help me fix this error" if there's no AI task fix
-  if (type === 'error' && !hasAiTaskFix) {
+  if (type === 'error') {
     messageCommands.push('Help me fix this error');
   }
   if (commitUrl) {
@@ -137,11 +132,6 @@ function showMessageWithResultAndCommit(
   }
 
   messageCommands.push('View Results');
-
-  // Update the message if AI fix is being created
-  if (type === 'error' && hasAiTaskFix) {
-    message = `${message} - Nx Cloud is creating a fix for this issue`;
-  }
 
   const handleResults = async (selection: MessageCommand | undefined) => {
     if (selection === 'View Results') {
