@@ -1,4 +1,4 @@
-import { CIPEInfo } from '@nx-console/shared-types';
+import { CIPEInfo, CIPERun } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -24,11 +24,33 @@ export function compareCIPEDataAndSendNotification(
   }
 
   // Completed & Task Failed Notifications
-  newInfo.forEach((newCIPE) => {
+  for (const newCIPE of newInfo) {
     const oldCIPE = oldInfo.find(
       (oldCIPE) =>
         newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId,
     );
+
+    // Check if aiTaskFix is newly available on any run
+    const newCIPERuns =
+      newCIPE.runGroups?.flatMap((runGroup) => runGroup.runs) || [];
+    const oldCIPERuns =
+      oldCIPE?.runGroups?.flatMap((runGroup) => runGroup.runs) || [];
+
+    // Check if any run has an AI fix (for hiding "Help me fix this error")
+    const hasAiTaskFix = newCIPERuns.some((run) => !!run.aiTaskFix);
+
+    for (const newRun of newCIPERuns) {
+      if (newRun.aiTaskFix?.suggestedFix) {
+        const oldRun = oldCIPERuns.find(
+          (run) =>
+            run.linkId === newRun.linkId ||
+            run.executionId === newRun.executionId,
+        );
+        if (!oldRun?.aiTaskFix?.suggestedFix) {
+          showAiTaskFixNotification(newCIPE, newRun);
+        }
+      }
+    }
 
     const newCipeIsSucceeded = newCIPE.status === 'SUCCEEDED';
     const newCIPEIsFailed = isFailedStatus(newCIPE.status);
@@ -60,6 +82,7 @@ export function compareCIPEDataAndSendNotification(
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
+        hasAiTaskFix,
       );
     } else if (newCIPEFailedRun) {
       const command =
@@ -71,15 +94,18 @@ export function compareCIPEDataAndSendNotification(
         newCIPEFailedRun.runUrl,
         newCIPE.commitUrl,
         'error',
+        hasAiTaskFix,
       );
     } else if (newCipeIsSucceeded && nxCloudNotificationsSetting === 'all') {
       showMessageWithResultAndCommit(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
+        'information',
+        hasAiTaskFix,
       );
     }
-  });
+  }
 }
 
 function showMessageWithResultAndCommit(
@@ -87,6 +113,7 @@ function showMessageWithResultAndCommit(
   resultUrl: string,
   commitUrl: string | undefined | null,
   type: 'information' | 'error' = 'information',
+  hasAiTaskFix = false,
 ) {
   const telemetry = getTelemetry();
   telemetry.logUsage('cloud.show-cipe-notification');
@@ -101,7 +128,8 @@ function showMessageWithResultAndCommit(
     | 'View Commit';
   const messageCommands: MessageCommand[] = [];
 
-  if (type === 'error') {
+  // Only show "Help me fix this error" if there's no AI task fix
+  if (type === 'error' && !hasAiTaskFix) {
     messageCommands.push('Help me fix this error');
   }
   if (commitUrl) {
@@ -109,6 +137,11 @@ function showMessageWithResultAndCommit(
   }
 
   messageCommands.push('View Results');
+
+  // Update the message if AI fix is being created
+  if (type === 'error' && hasAiTaskFix) {
+    message = `${message} - Nx Cloud is creating a fix for this issue`;
+  }
 
   const handleResults = async (selection: MessageCommand | undefined) => {
     if (selection === 'View Results') {
@@ -130,4 +163,43 @@ function showMessageWithResultAndCommit(
   };
 
   show(message, ...messageCommands).then(handleResults);
+}
+
+function showAiTaskFixNotification(cipe: CIPEInfo, run: CIPERun) {
+  const telemetry = getTelemetry();
+  telemetry.logUsage('cloud.show-ai-task-fix-notification');
+
+  type MessageCommand = 'Show Fix' | 'Apply Fix' | 'Ignore';
+  const messageCommands: MessageCommand[] = ['Show Fix', 'Apply Fix', 'Ignore'];
+
+  const handleResults = async (selection: MessageCommand | undefined) => {
+    if (selection === 'Show Fix') {
+      telemetry.logUsage('cloud.show-ai-task-fix', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.showAiTaskFix', { cipe, run });
+    } else if (selection === 'Apply Fix') {
+      telemetry.logUsage('cloud.apply-ai-task-fix', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.applyAiTaskFix', { cipe, run });
+    } else if (selection === 'Ignore') {
+      telemetry.logUsage('cloud.ignore-ai-task-fix', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.ignoreAiTaskFix', { cipe, run });
+    }
+  };
+
+  const commandDisplay =
+    run.command.length > 40
+      ? run.command.substring(0, 37) + '...'
+      : run.command;
+
+  window
+    .showInformationMessage(
+      `Nx Cloud suggested a fix for "${commandDisplay}" in #${cipe.branch}`,
+      ...messageCommands,
+    )
+    .then(handleResults);
 }

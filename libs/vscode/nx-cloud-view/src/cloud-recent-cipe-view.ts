@@ -1,4 +1,9 @@
-import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
+import {
+  AITaskFixValidationStatus,
+  CIPEInfo,
+  CIPERun,
+  CIPERunGroup,
+} from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
@@ -6,24 +11,31 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   AbstractTreeProvider,
   sendMessageToAgent,
+  getWorkspacePath,
 } from '@nx-console/vscode-utils';
+import { xhr } from 'request-light';
+import { join } from 'path';
 import { isDeepStrictEqual } from 'util';
 import {
+  CancellationToken,
   commands,
   Disposable,
   ExtensionContext,
   FileDecoration,
   FileDecorationProvider,
   ProviderResult,
+  TextDocumentContentProvider,
   ThemeColor,
   ThemeIcon,
   TreeItem,
   TreeItemCollapsibleState,
   Uri,
   window,
+  workspace,
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
 import { formatMillis } from './format-time';
+import { nxCloudAuthHeaders } from '@nx-console/shared-nx-cloud';
 
 abstract class BaseRecentCIPETreeItem extends TreeItem {
   abstract type: 'CIPE' | 'runGroup' | 'run' | 'label' | 'failedTask';
@@ -88,7 +100,13 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
 
     this.id = cipe.ciPipelineExecutionId;
     this.setIcon();
-    this.contextValue = cipe.commitUrl ? 'cipe-commit' : 'cipe';
+
+    // Set context value based on available features
+    let contextValue = 'cipe';
+    if (cipe.commitUrl) {
+      contextValue = 'cipe-commit';
+    }
+    this.contextValue = contextValue;
   }
 
   private updateItemAfterSecond() {
@@ -222,6 +240,7 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
       : TreeItemCollapsibleState.None;
     this.id = `${cipeId}-${run.linkId ?? run.executionId}`;
     this.setIcon();
+
     this.contextValue = 'run';
   }
 
@@ -255,6 +274,8 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
           taskId,
           this.run.linkId,
           this.run.executionId,
+          this.run,
+          this.cipeId,
         );
       });
     }
@@ -270,11 +291,125 @@ class FailedTaskTreeItem extends BaseRecentCIPETreeItem {
     public taskId: string,
     public linkId?: string,
     public executionId?: string,
+    public run?: CIPERun,
+    public cipeId?: string,
   ) {
     super(taskId);
     this.collapsibleState = TreeItemCollapsibleState.None;
-    this.iconPath = new ThemeIcon('error');
     this.contextValue = 'failedTask';
+
+    // Set context value based on AI fix state
+    const aiTaskFix = this.run?.aiTaskFix;
+    if (aiTaskFix) {
+      this.contextValue += '-aifix';
+
+      // Check user action first
+      const userAction = aiTaskFix.userAction;
+      if (userAction === 'APPLIED') {
+        this.contextValue += '-applied';
+        this.description = 'Fix Applied';
+        this.tooltip = `${this.taskId}\nNx Cloud Fix Applied`;
+        this.iconPath = new ThemeIcon(
+          'check',
+          new ThemeColor('notebookStatusSuccessIcon.foreground'),
+        );
+        return;
+      } else if (userAction === 'REJECTED') {
+        this.contextValue += '-rejected';
+        this.description = 'Fix Ignored';
+        this.tooltip = `${this.taskId}\nNx Cloud Fix Ignored`;
+        this.iconPath = new ThemeIcon(
+          'close',
+          new ThemeColor('notebookStatusErrorIcon.foreground'),
+        );
+        return;
+      }
+
+      // If userAction is NONE, proceed with normal validation status logic
+      // Determine the specific state based on fix creation and validation flow
+      const hasFix = !!aiTaskFix.suggestedFix;
+      const validationStatus = aiTaskFix.validationStatus;
+
+      if (hasFix) {
+        // Fix has been created - show different states based on validation
+        this.contextValue += '-hasFix';
+        switch (validationStatus) {
+          case 'NOT_STARTED':
+            this.contextValue += '-notValidated';
+            this.description = 'Fix Ready';
+            break;
+          case 'IN_PROGRESS':
+            this.contextValue += '-validating';
+            this.description = 'Validating Fix';
+            break;
+          case 'COMPLETED':
+            this.contextValue += '-validated';
+            this.description = 'Fix Validated';
+            break;
+          case 'FAILED':
+            this.contextValue += '-validationFailed';
+            this.description = 'Validation Failed';
+            break;
+        }
+      } else {
+        // No fix yet - we're still creating it
+        switch (validationStatus) {
+          case 'NOT_STARTED':
+            this.contextValue += '-creatingFix';
+            this.description = 'Creating Fix';
+            break;
+          case 'IN_PROGRESS':
+            this.contextValue += '-creatingFix';
+            this.description = 'Creating Fix';
+            break;
+          case 'COMPLETED':
+            // This shouldn't happen - if fix creation completed, there should be a suggested fix
+            this.contextValue += '-fixFailed';
+            this.description = 'Fix Failed';
+            break;
+          case 'FAILED':
+            this.contextValue += '-fixFailed';
+            this.description = 'Fix Failed';
+            break;
+        }
+      }
+
+      // Set tooltip with detailed status
+      const statusLabels: Record<AITaskFixValidationStatus, string> = {
+        NOT_STARTED: hasFix
+          ? 'Nx Cloud Fix Created - Ready for Validation'
+          : 'Nx Cloud Creating Fix',
+        IN_PROGRESS: hasFix
+          ? 'Nx Cloud Validating Fix'
+          : 'Nx Cloud Creating Fix',
+        COMPLETED: 'Nx Cloud validated the fix Successfully',
+        FAILED: 'Nx Cloud Fix Validation Failed',
+      };
+
+      const statusLabel = statusLabels[validationStatus] || validationStatus;
+      this.tooltip = `${this.taskId}\n${statusLabel}`;
+
+      // Set icon based on AI fix state
+      if (!hasFix) {
+        // Show loading spinner when creating fix
+        this.iconPath = new ThemeIcon(
+          'loading~spin',
+          new ThemeColor('notebookStatusRunningIcon.foreground'),
+        );
+      } else if (validationStatus === 'IN_PROGRESS') {
+        // Show loading spinner when validating fix
+        this.iconPath = new ThemeIcon(
+          'loading~spin',
+          new ThemeColor('notebookStatusRunningIcon.foreground'),
+        );
+      } else {
+        // Default error icon for all other states
+        this.iconPath = new ThemeIcon('error');
+      }
+    } else {
+      // No AI fix - use default error icon
+      this.iconPath = new ThemeIcon('error');
+    }
   }
 
   override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
@@ -294,6 +429,250 @@ class LabelTreeItem extends BaseRecentCIPETreeItem {
   override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
     return [];
   }
+}
+
+class AiFixDiffContentProvider implements TextDocumentContentProvider {
+  private static diffContent = new Map<string, string>();
+
+  static setContent(uri: string, content: string): void {
+    this.diffContent.set(uri, content);
+  }
+
+  static clearContent(uri: string): void {
+    this.diffContent.delete(uri);
+  }
+
+  async provideTextDocumentContent(
+    uri: Uri,
+    _: CancellationToken,
+  ): Promise<string | undefined> {
+    const key = uri.toString();
+    return AiFixDiffContentProvider.diffContent.get(key);
+  }
+}
+
+async function showAiFixDiff(gitDiff: string): Promise<void> {
+  // Parse the git diff to extract file changes
+  const parsedDiff = parseGitDiff(gitDiff);
+
+  if (parsedDiff.length === 0) {
+    // If we can't parse the diff, fall back to showing raw diff
+    const doc = await workspace.openTextDocument({
+      content: gitDiff,
+      language: 'diff',
+    });
+    await window.showTextDocument(doc, { preview: false });
+    return;
+  }
+
+  // Try to use VS Code's MultiDiffEditor via the vscode.changes command
+  const timestamp = Date.now();
+  const changeUris: [Uri, Uri, Uri][] = [];
+
+  // Get the workspace path for constructing real file URIs
+  const workspacePath = getWorkspacePath();
+
+  if (!workspacePath) {
+    return;
+  }
+
+  for (const fileDiff of parsedDiff) {
+    // Create unique identifiers for the virtual content
+    const fileId = `${fileDiff.fileName.replace(/[^a-zA-Z0-9]/g, '_')}_${timestamp}`;
+
+    // Create virtual URIs for before and after content with clean paths
+    const beforeUri = Uri.parse(`nx-cloud-fix-before:${fileId}`).with({
+      path: `${fileDiff.fileName}`,
+      query: `before-${timestamp}`,
+    });
+    const afterUri = Uri.parse(`nx-cloud-fix-after:${fileId}`).with({
+      path: `${fileDiff.fileName}`,
+      query: `after-${timestamp}`,
+    });
+
+    // Store content in the provider
+    AiFixDiffContentProvider.setContent(
+      beforeUri.toString(),
+      fileDiff.beforeContent,
+    );
+    AiFixDiffContentProvider.setContent(
+      afterUri.toString(),
+      fileDiff.afterContent,
+    );
+
+    // Create the resource URI that points to the REAL workspace file
+    // This is the key fix - ensure we're using the correct absolute path
+    const absoluteFilePath = join(workspacePath, fileDiff.fileName);
+    const resourceUri = Uri.file(absoluteFilePath);
+
+    // Add to the changes array: [resourceUri, originalUri, modifiedUri]
+    // The resourceUri should be the actual file that will open when clicking "open file"
+    changeUris.push([resourceUri, beforeUri, afterUri]);
+  }
+
+  // Try to open with the MultiDiffEditor command
+  try {
+    const title = `Nx Cloud Fix (${parsedDiff.length} file${parsedDiff.length === 1 ? '' : 's'})`;
+    await commands.executeCommand('vscode.changes', title, changeUris);
+  } catch (error) {
+    // If the command doesn't exist or fails, fall back to unified diff
+    console.log(
+      'MultiDiffEditor not available, falling back to unified diff',
+      error,
+    );
+
+    // Create a unified diff view showing all files
+    const unifiedDiff = createUnifiedDiffView(parsedDiff);
+
+    // Create virtual URIs for the unified before and after content
+    const beforeUri = Uri.parse(
+      `nx-cloud-fix-before:unified_${timestamp}/Nx Cloud Fix (Before)`,
+    );
+    const afterUri = Uri.parse(
+      `nx-cloud-fix-after:unified_${timestamp}/Nx Cloud Fix (After)`,
+    );
+
+    // Store the unified content in the provider
+    AiFixDiffContentProvider.setContent(
+      beforeUri.toString(),
+      unifiedDiff.beforeContent,
+    );
+    AiFixDiffContentProvider.setContent(
+      afterUri.toString(),
+      unifiedDiff.afterContent,
+    );
+
+    // Show the unified diff
+    const title = `Nx Cloud Fix (${parsedDiff.length} file${parsedDiff.length === 1 ? '' : 's'})`;
+    await commands.executeCommand('vscode.diff', beforeUri, afterUri, title, {
+      preview: false,
+      preserveFocus: false,
+    });
+  }
+}
+
+function createUnifiedDiffView(fileDiffs: FileDiff[]): {
+  beforeContent: string;
+  afterContent: string;
+} {
+  const beforeSections: string[] = [];
+  const afterSections: string[] = [];
+
+  for (const fileDiff of fileDiffs) {
+    // Add file header separator
+    const fileHeader = `${'='.repeat(80)}\n${fileDiff.fileName}\n${'='.repeat(80)}`;
+
+    beforeSections.push(fileHeader);
+    afterSections.push(fileHeader);
+
+    // Add the file content
+    beforeSections.push(fileDiff.beforeContent);
+    afterSections.push(fileDiff.afterContent);
+
+    // Add spacing between files
+    beforeSections.push('\n\n');
+    afterSections.push('\n\n');
+  }
+
+  return {
+    beforeContent: beforeSections.join('\n'),
+    afterContent: afterSections.join('\n'),
+  };
+}
+
+interface FileDiff {
+  fileName: string;
+  beforeContent: string;
+  afterContent: string;
+}
+
+function parseGitDiff(gitDiff: string): FileDiff[] {
+  const lines = gitDiff.split('\n');
+  const fileDiffs: FileDiff[] = [];
+  let currentFile: Partial<FileDiff> | null = null;
+  let beforeContent: string[] = [];
+  let afterContent: string[] = [];
+  let inHunk = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Start of new file diff
+    if (line.startsWith('diff --git')) {
+      // Save the previous file if it exists
+      if (currentFile && currentFile.fileName) {
+        fileDiffs.push({
+          fileName: currentFile.fileName,
+          beforeContent: beforeContent.join('\n'),
+          afterContent: afterContent.join('\n'),
+        });
+      }
+
+      // Reset for new file
+      currentFile = {};
+      beforeContent = [];
+      afterContent = [];
+      inHunk = false;
+
+      // Extract file name from the diff line if possible
+      // Format: diff --git a/path/to/file b/path/to/file
+      const matches = line.match(/diff --git a\/(.+) b\/(.+)/);
+      if (matches && currentFile) {
+        currentFile.fileName = matches[1]; // Use the "a/" path
+      }
+    }
+    // File name detection (more reliable)
+    else if (line.startsWith('--- ')) {
+      if (line.startsWith('--- a/') && currentFile) {
+        currentFile.fileName = line.substring(6);
+      } else if (line.startsWith('--- /dev/null')) {
+        // New file, name will come from +++ line
+      }
+    } else if (line.startsWith('+++ ')) {
+      if (line.startsWith('+++ b/') && currentFile) {
+        // Use this as the file name if we don't have one yet
+        if (!currentFile.fileName) {
+          currentFile.fileName = line.substring(6);
+        }
+      } else if (line.startsWith('+++ /dev/null')) {
+        // Deleted file, we should already have the name from --- line
+      }
+    }
+    // Hunk header: @@ -start,count +start,count @@
+    else if (line.startsWith('@@')) {
+      inHunk = true;
+    }
+    // Content lines within a hunk
+    else if (inHunk && currentFile) {
+      if (line.startsWith('-')) {
+        // Line removed from original
+        beforeContent.push(line.substring(1));
+      } else if (line.startsWith('+')) {
+        // Line added to new version
+        afterContent.push(line.substring(1));
+      } else if (line.startsWith(' ')) {
+        // Context line (present in both versions)
+        const contextLine = line.substring(1);
+        beforeContent.push(contextLine);
+        afterContent.push(contextLine);
+      } else if (line === '') {
+        // Empty line
+        beforeContent.push('');
+        afterContent.push('');
+      }
+    }
+  }
+
+  // Add the last file if it exists
+  if (currentFile && currentFile.fileName) {
+    fileDiffs.push({
+      fileName: currentFile.fileName,
+      beforeContent: beforeContent.join('\n'),
+      afterContent: afterContent.join('\n'),
+    });
+  }
+
+  return fileDiffs;
 }
 
 export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPETreeItem> {
@@ -344,7 +723,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     return element.getChildren();
   }
   override getParent(
-    element: BaseRecentCIPETreeItem,
+    _: BaseRecentCIPETreeItem,
   ): ProviderResult<BaseRecentCIPETreeItem | null | undefined> {
     return undefined;
   }
@@ -357,6 +736,19 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     const recentCIPEProvider = new CloudRecentCIPEProvider(
       actor,
       fileDecorationProvider,
+    );
+
+    // Register content providers for virtual diff documents
+    const aiFixDiffContentProvider = new AiFixDiffContentProvider();
+    extensionContext.subscriptions.push(
+      workspace.registerTextDocumentContentProvider(
+        'nx-cloud-fix-before',
+        aiFixDiffContentProvider,
+      ),
+      workspace.registerTextDocumentContentProvider(
+        'nx-cloud-fix-after',
+        aiFixDiffContentProvider,
+      ),
     );
 
     extensionContext.subscriptions.push(
@@ -450,6 +842,72 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           );
         },
       ),
+      commands.registerCommand(
+        'nxCloud.showAiTaskFixFromTree',
+        async (treeItem: BaseRecentCIPETreeItem) => {
+          if (!treeItem.isFailedTaskTreeItem() || !treeItem.run?.aiTaskFix) {
+            return;
+          }
+
+          // Find the parent CIPE
+          const cipe = recentCIPEProvider.recentCIPEInfo?.find(
+            (c) => c.ciPipelineExecutionId === treeItem.cipeId,
+          );
+          if (!cipe) return;
+
+          getTelemetry().logUsage('cloud.show-ai-task-fix', {
+            source: 'cloud-view',
+          });
+          commands.executeCommand('nxCloud.showAiTaskFix', {
+            cipe,
+            run: treeItem.run,
+          });
+        },
+      ),
+      commands.registerCommand(
+        'nxCloud.applyAiTaskFixFromTree',
+        async (treeItem: BaseRecentCIPETreeItem) => {
+          if (!treeItem.isFailedTaskTreeItem() || !treeItem.run?.aiTaskFix) {
+            return;
+          }
+
+          // Find the parent CIPE
+          const cipe = recentCIPEProvider.recentCIPEInfo?.find(
+            (c) => c.ciPipelineExecutionId === treeItem.cipeId,
+          );
+          if (!cipe) return;
+
+          getTelemetry().logUsage('cloud.apply-ai-task-fix', {
+            source: 'cloud-view',
+          });
+          commands.executeCommand('nxCloud.applyAiTaskFix', {
+            cipe,
+            run: treeItem.run,
+          });
+        },
+      ),
+      commands.registerCommand(
+        'nxCloud.ignoreAiTaskFixFromTree',
+        async (treeItem: BaseRecentCIPETreeItem) => {
+          if (!treeItem.isFailedTaskTreeItem() || !treeItem.run?.aiTaskFix) {
+            return;
+          }
+
+          // Find the parent CIPE
+          const cipe = recentCIPEProvider.recentCIPEInfo?.find(
+            (c) => c.ciPipelineExecutionId === treeItem.cipeId,
+          );
+          if (!cipe) return;
+
+          getTelemetry().logUsage('cloud.ignore-ai-task-fix', {
+            source: 'cloud-view',
+          });
+          commands.executeCommand('nxCloud.ignoreAiTaskFix', {
+            cipe,
+            run: treeItem.run,
+          });
+        },
+      ),
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
 
@@ -457,6 +915,70 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
 
         sendMessageToAgent(fixMePrompt);
       }),
+      commands.registerCommand(
+        'nxCloud.showAiTaskFix',
+        async (data: { cipe: CIPEInfo; run: CIPERun }) => {
+          if (!data.run.aiTaskFix) {
+            window.showErrorMessage('No Nx Cloud fix available');
+            return;
+          }
+
+          if (!data.run.aiTaskFix.suggestedFix) {
+            window.showErrorMessage(
+              'Nx Cloud is still creating the fix. Please wait a moment and try again.',
+            );
+            return;
+          }
+
+          try {
+            await showAiFixDiff(data.run.aiTaskFix.suggestedFix);
+          } catch (error) {
+            window.showErrorMessage(`Failed to show AI fix: ${error}`);
+          }
+        },
+      ),
+      commands.registerCommand(
+        'nxCloud.applyAiTaskFix',
+        async (data: { cipe: CIPEInfo; run: CIPERun }) => {
+          if (!data.run.aiTaskFix?.suggestedFix) {
+            window.showErrorMessage('No AI fix available to apply');
+            return;
+          }
+
+          const aiTaskFixId = data.run.aiTaskFix.aiTaskFixId;
+          if (!aiTaskFixId) {
+            window.showErrorMessage('AI fix ID not found');
+            return;
+          }
+
+          const success = await updateSuggestedFix(aiTaskFixId, 'APPLIED');
+          if (success) {
+            window.showInformationMessage('Nx Cloud fix applied successfully');
+            commands.executeCommand('nxCloud.refresh');
+          }
+        },
+      ),
+      commands.registerCommand(
+        'nxCloud.ignoreAiTaskFix',
+        async (data: { cipe: CIPEInfo; run: CIPERun }) => {
+          if (!data.run.aiTaskFix) {
+            window.showErrorMessage('No AI fix available to ignore');
+            return;
+          }
+
+          const aiTaskFixId = data.run.aiTaskFix.aiTaskFixId;
+          if (!aiTaskFixId) {
+            window.showErrorMessage('AI fix ID not found');
+            return;
+          }
+
+          const success = await updateSuggestedFix(aiTaskFixId, 'REJECTED');
+          if (success) {
+            window.showInformationMessage('Nx Cloud fix ignored');
+            commands.executeCommand('nxCloud.refresh');
+          }
+        },
+      ),
     );
   }
 }
@@ -492,5 +1014,44 @@ class CIPEFileDecorationProvider implements FileDecorationProvider {
     }
 
     return undefined;
+  }
+}
+
+async function updateSuggestedFix(
+  aiTaskFixId: string,
+  action: 'APPLIED' | 'REJECTED',
+): Promise<boolean> {
+  try {
+    const nxCloudInfo = await getNxCloudStatus();
+    if (!nxCloudInfo?.nxCloudUrl) {
+      window.showErrorMessage('Nx Cloud URL not found');
+      return false;
+    }
+
+    const workspacePath = getWorkspacePath();
+    const response = await xhr({
+      url: `${nxCloudInfo.nxCloudUrl}/nx-cloud/update-suggested-fix`,
+      type: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(await nxCloudAuthHeaders(workspacePath)),
+      },
+      data: JSON.stringify({
+        aiTaskFixId,
+        action,
+      }),
+    });
+
+    if (response.status >= 200 && response.status < 300) {
+      return true;
+    } else {
+      throw new Error(`HTTP ${response.status}: ${response.responseText}`);
+    }
+  } catch (error) {
+    console.error('Failed to update suggested fix:', error);
+    window.showErrorMessage(
+      `Failed to ${action.toLowerCase()} AI fix: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+    return false;
   }
 }
