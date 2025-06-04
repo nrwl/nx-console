@@ -1,5 +1,5 @@
 import { setup, assign, not } from 'xstate';
-import { NxVersion, gte } from '@nx-console/nx-version';
+import { NxVersion, gt, gte } from '@nx-console/nx-version';
 
 // need this import for type inference
 import type { Guard } from 'xstate/guards';
@@ -25,7 +25,7 @@ export const migrateMachine = setup({
       return (
         !!context.currentNxVersion &&
         !!context.latestNxVersion &&
-        gte(context.latestNxVersion, context.currentNxVersion)
+        gt(context.latestNxVersion, context.currentNxVersion)
       );
     },
     hasConfirmedPackageUpdates: ({ context }) =>

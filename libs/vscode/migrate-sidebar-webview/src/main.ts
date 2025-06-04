@@ -72,7 +72,22 @@ export class Root extends LitElement {
         </div>
       `;
     } else if (this.state === 'default') {
-      return html` <p>You're on the latest Nx version.</p> `;
+      return html` <p>
+          You're on the latest Nx version:
+          ${this.migrateViewData.currentNxVersion?.full}
+        </p>
+        <p>
+          <a
+            href=""
+            @click="${() => {
+              this.vscodeApi.postMessage({
+                type: 'start-migration',
+                custom: true,
+              });
+            }}"
+            >Manually select a version to migrate to anyways
+          </a>
+        </p>`;
     } else if (this.state['in-progress'] === 'default') {
       return html`
         <p>Migration in progress. Continue in the Migrate UI.</p>
