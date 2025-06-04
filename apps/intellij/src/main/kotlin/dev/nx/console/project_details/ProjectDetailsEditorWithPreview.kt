@@ -10,27 +10,17 @@ import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.sync_services.NxVersionUtil
 import java.util.function.Supplier
 
 class ProjectDetailsEditorWithPreview(private val project: Project, file: VirtualFile) :
     TextEditorWithPreview(createEditor(project, file), createPreviewComponent(project, file)),
     DumbAware {
     init {
-        setLayout(
-            NxVersionUtil.getInstance(project).getNxVersionSynchronously().let {
-                if (it == null || !it.gte(NxVersion(major = 17, minor = 13, full = "17.13.0"))) {
-                    Layout.SHOW_EDITOR
-                } else {
-                    Layout.SHOW_EDITOR_AND_PREVIEW
-                }
-            }
-        )
+        setLayout(Layout.SHOW_EDITOR)
     }
 
     fun showWithPreview() {
