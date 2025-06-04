@@ -5,6 +5,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import dev.nx.console.cloud.CIPEMonitoringService
+import dev.nx.console.cloud.CIPENotificationService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.mcp.McpServerService
 import dev.nx.console.nxls.NxlsService
@@ -65,9 +66,14 @@ internal class ProjectPostStartup : ProjectActivity {
                     Notifier.notifyMcpServerInstall(project)
                 }
             }
+
+            delay(5000)
+            CIPENotificationService.getInstance(project).demoFailedNotification()
         }
 
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.EXTENSION_ACTIVATE, mapOf("timing" to 0))
+
+
     }
 }

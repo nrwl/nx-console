@@ -1,13 +1,20 @@
 package dev.nx.console.cloud
 
+import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.ide.BrowserUtil
+import com.intellij.ml.llm.intentions.editor.AIIntentionsActionGroup
 import com.intellij.notification.*
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
+import dev.nx.console.models.CIPERunGroup
+import dev.nx.console.nx_toolwindow.NxToolWindowPanel.Companion.NX_TOOLBAR_PLACE
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
@@ -32,6 +39,24 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
 
     private val logger = thisLogger()
     private val telemetryService = TelemetryService.getInstance(project)
+
+    fun demoFailedNotification() {
+        // This is a demo method to show how a failed notification would look like
+        val cipe = CIPEInfo(
+            cipeUrl = "https://example.com/cipe/123",
+            commitUrl = "https://example.com/commit/456",
+            branch = "main",
+            ciPipelineExecutionId = "cipe-123",
+            status = CIPEExecutionStatus.FAILED,
+            createdAt = 1112321L,
+            completedAt = 33213231L,
+            commitTitle = "Fix critical bug",
+            author = "John Doe",
+            authorAvatarUrl = "https://example.com/avatar/johndoe.png",
+            runGroups = emptyList<CIPERunGroup>()
+        )
+        showCIPEFailedNotification(cipe)
+    }
 
     override fun onNotificationEvent(event: CIPENotificationEvent) {
         val notificationSetting = getCIPENotificationSetting()
@@ -111,10 +136,9 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             NOTIFICATION_GROUP.createNotification(title = title, content = content, type = type)
 
         // Add actions in order: Help (if error), View Commit (if available), View Results
-        // TODO: Implement help action later
-        // if (showHelp && type == NotificationType.ERROR) {
-        //     notification.addAction(HelpMeFixErrorAction())
-        // }
+        if (showHelp && type == NotificationType.ERROR) {
+            notification.addAction(CIPEAutoFixAction(project))
+        }
 
         if (commitUrl != null) {
             notification.addAction(ViewCommitAction(commitUrl))
@@ -155,16 +179,26 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         }
     }
 
-    // TODO: Implement help action later
-    // private inner class HelpMeFixErrorAction : NotificationAction("Help me fix this error") {
-    //     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-    //         telemetryService.featureUsed(
-    //             TelemetryEvent.CLOUD_FIX_CIPE_ERROR,
-    //             mapOf("source" to TelemetryEventSource.NOTIFICATION),
-    //         )
-    //         // TODO: Integrate with AI assistance when available
-    //         logger.info("Help me fix error action triggered")
-    //         notification.expire()
-    //     }
-    // }
+    private inner class CIPEAutoFixAction(private val project: Project) : AnAction("Help me fix this") {
+        override fun actionPerformed(event: AnActionEvent) {
+            TelemetryService.getInstance(project).featureUsed(
+                TelemetryEvent.CLOUD_FIX_CIPE_ERROR,
+                mapOf("source" to TelemetryEventSource.NOTIFICATION),
+            )
+
+            val actionIds = ActionManager.getInstance().getActionIdList("com.intellij.ml.llm")
+            thisLogger().info("Available LLM actions: $actionIds")
+            @Suppress("UnresolvedPluginConfigReference")
+            val llmAction = ActionManager.getInstance().getAction("com.intellij.ml.llm.intentions.editor.IntentionWrapperAction")
+           thisLogger().info(llmAction?.toString() ?: "")
+
+        }
+    }
+
+}
+
+class CustomGroup : AIIntentionsActionGroup() {
+    override fun filterIntentions(e: AnActionEvent, intentions: List<IntentionAction>): List<IntentionAction> {
+        return super.filterIntentions(e, intentions)
+    }
 }

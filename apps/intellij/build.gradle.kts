@@ -83,7 +83,7 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-
+        plugin("com.intellij.ml.llm:252.18003.43")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
@@ -219,11 +219,11 @@ tasks {
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts") }
 
     withType<RunIdeTask> { maxHeapSize = "6g" }
-    
+
     test {
         useJUnit()
         include("**/*Test.class")
-        
+
         testLogging {
             events("passed", "skipped", "failed", "standardOut", "standardError")
             showExceptions = true
