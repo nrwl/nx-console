@@ -15,11 +15,11 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
     // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
     // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.3.0"
+    id("org.jetbrains.intellij.platform") version "2.6.0"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
@@ -83,7 +83,7 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-        plugin("com.intellij.ml.llm:252.18003.43")
+        plugin("com.intellij.ml.llm:251.26094.80.11")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
@@ -103,6 +103,7 @@ kotlin { jvmToolchain(21) }
 
 intellijPlatform {
     projectName = providers.gradleProperty("pluginName").get()
+
 
     pluginConfiguration {
         version = providers.gradleProperty("version").get()
@@ -164,7 +165,7 @@ intellijPlatform {
 intellijPlatformTesting {
     runIde {
         create("runIntelliJLatest") {
-            version = "2025.1.1.1"
+            version = "252.18003.27"
             prepareSandboxTask {
                 from(nxlsRoot) {
                     include("**")

@@ -89,8 +89,6 @@
 
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
 
-    <!-- MCP Server -->
-    <projectService serviceImplementation="dev.nx.console.mcp.McpServerService"/>
   </extensions>
   <extensions defaultExtensionNs="JavaScript">
     <scanningFileListenerContributor implementation="dev.nx.console.ide.NxCacheFolderExcludeContributor"/>
@@ -113,11 +111,11 @@
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
 
-    <action id="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
-            class="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
-            icon="dev.nx.console.NxIcons.Action"
-            text="Nx: Analyze Nx Configuration Files"
-            description="Makes sure project.json and nx.json files conform to the schema"/>
+<!--    <action id="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"-->
+<!--            class="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"-->
+<!--            icon="dev.nx.console.NxIcons.Action"-->
+<!--            text="Nx: Analyze Nx Configuration Files"-->
+<!--            description="Makes sure project.json and nx.json files conform to the schema"/>-->
 
     <action id="dev.nx.console.run.actions.NxConnectAction" class="dev.nx.console.run.actions.NxConnectAction"
             text="Nx: Connect to Nx Cloud" icon="dev.nx.console.NxIcons.Action"/>

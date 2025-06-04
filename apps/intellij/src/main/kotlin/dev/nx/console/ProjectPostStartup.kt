@@ -73,7 +73,5 @@ internal class ProjectPostStartup : ProjectActivity {
 
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.EXTENSION_ACTIVATE, mapOf("timing" to 0))
-
-
     }
 }
