@@ -1,4 +1,4 @@
-import { CIPEInfo, CIPERun } from '@nx-console/shared-types';
+import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -30,24 +30,20 @@ export function compareCIPEDataAndSendNotification(
         newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId,
     );
 
-    // Check if aiTaskFix is newly available on any run
-    const newCIPERuns =
-      newCIPE.runGroups?.flatMap((runGroup) => runGroup.runs) || [];
-    const oldCIPERuns =
-      oldCIPE?.runGroups?.flatMap((runGroup) => runGroup.runs) || [];
+    // Check if aiFix is newly available on any runGroup
+    const newCIPERunGroups = newCIPE.runGroups || [];
+    const oldCIPERunGroups = oldCIPE?.runGroups || [];
 
-    // Check if any run has an AI fix (to skip failure notifications)
-    const hasAiTaskFix = newCIPERuns.some((run) => !!run.aiTaskFix);
+    // Check if any runGroup has an AI fix (to skip failure notifications)
+    const hasAiFix = newCIPERunGroups.some((runGroup) => !!runGroup.aiFix);
 
-    for (const newRun of newCIPERuns) {
-      if (newRun.aiTaskFix?.suggestedFix) {
-        const oldRun = oldCIPERuns.find(
-          (run) =>
-            run.linkId === newRun.linkId ||
-            run.executionId === newRun.executionId,
+    for (const newRunGroup of newCIPERunGroups) {
+      if (newRunGroup.aiFix?.suggestedFix) {
+        const oldRunGroup = oldCIPERunGroups.find(
+          (runGroup) => runGroup.runGroup === newRunGroup.runGroup,
         );
-        if (!oldRun?.aiTaskFix?.suggestedFix) {
-          showAiTaskFixNotification(newCIPE, newRun);
+        if (!oldRunGroup?.aiFix?.suggestedFix) {
+          showAiFixNotification(newCIPE, newRunGroup);
         }
       }
     }
@@ -76,14 +72,14 @@ export function compareCIPEDataAndSendNotification(
       return;
     }
 
-    if (newCIPEIsFailed && !hasAiTaskFix) {
+    if (newCIPEIsFailed && !hasAiFix) {
       showMessageWithResultAndCommit(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
       );
-    } else if (newCIPEFailedRun && !hasAiTaskFix) {
+    } else if (newCIPEFailedRun && !hasAiFix) {
       const command =
         newCIPEFailedRun.command.length > 70
           ? newCIPEFailedRun.command.substring(0, 60) + '[...]'
@@ -155,40 +151,36 @@ function showMessageWithResultAndCommit(
   show(message, ...messageCommands).then(handleResults);
 }
 
-function showAiTaskFixNotification(cipe: CIPEInfo, run: CIPERun) {
+function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
   const telemetry = getTelemetry();
-  telemetry.logUsage('cloud.show-ai-task-fix-notification');
+  telemetry.logUsage('cloud.show-ai-fix-notification');
 
   type MessageCommand = 'Show Fix' | 'Apply Fix' | 'Ignore';
   const messageCommands: MessageCommand[] = ['Show Fix', 'Apply Fix', 'Ignore'];
 
   const handleResults = async (selection: MessageCommand | undefined) => {
     if (selection === 'Show Fix') {
-      telemetry.logUsage('cloud.show-ai-task-fix', {
+      telemetry.logUsage('cloud.show-ai-fix', {
         source: 'notification',
       });
-      commands.executeCommand('nxCloud.showAiTaskFix', { cipe, run });
+      commands.executeCommand('nxCloud.showAiFix', { cipe, runGroup });
     } else if (selection === 'Apply Fix') {
-      telemetry.logUsage('cloud.apply-ai-task-fix', {
+      telemetry.logUsage('cloud.apply-ai-fix', {
         source: 'notification',
       });
-      commands.executeCommand('nxCloud.applyAiTaskFix', { cipe, run });
+      commands.executeCommand('nxCloud.applyAiFix', { cipe, runGroup });
     } else if (selection === 'Ignore') {
-      telemetry.logUsage('cloud.ignore-ai-task-fix', {
+      telemetry.logUsage('cloud.ignore-ai-fix', {
         source: 'notification',
       });
-      commands.executeCommand('nxCloud.ignoreAiTaskFix', { cipe, run });
+      commands.executeCommand('nxCloud.ignoreAiFix', { cipe, runGroup });
     }
   };
 
-  const commandDisplay =
-    run.command.length > 40
-      ? run.command.substring(0, 37) + '...'
-      : run.command;
-
+  const taskDisplay = runGroup.aiFix?.taskIds[0];
   window
     .showInformationMessage(
-      `Nx Cloud suggested a fix for "${commandDisplay}" in #${cipe.branch}`,
+      `Nx Cloud suggested a fix for ${taskDisplay} in #${cipe.branch}`,
       ...messageCommands,
     )
     .then(handleResults);
