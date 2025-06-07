@@ -227,6 +227,21 @@
           "group": "inline@1"
         },
         {
+          "command": "nxCloud.showAiFixFromTree",
+          "when": "view == nxCloudRecentCIPE && (viewItem =~ /nxCloudFix-aifix.*-hasFix/ || viewItem =~ /nxCloudFix-aifix-applied$/)",
+          "group": "inline@2"
+        },
+        {
+          "command": "nxCloud.applyAiFixFromTree",
+          "when": "view == nxCloudRecentCIPE && viewItem =~ /nxCloudFix-aifix.*-hasFix.*-(notValidated|validated)$/ && !(viewItem =~ /nxCloudFix-aifix-(applied|rejected)$/)",
+          "group": "inline@3"
+        },
+        {
+          "command": "nxCloud.ignoreAiFixFromTree",
+          "when": "view == nxCloudRecentCIPE && viewItem =~ /nxCloudFix-aifix.*-hasFix/ && !(viewItem =~ /nxCloudFix-aifix-(applied|rejected)$/)",
+          "group": "inline@4"
+        },
+        {
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
@@ -339,6 +354,18 @@
         },
         {
           "command": "nxCloud.helpMeFixCipeError",
+          "when": "false"
+        },
+        {
+          "command": "nxCloud.showAiFixFromTree",
+          "when": "false"
+        },
+        {
+          "command": "nxCloud.applyAiFixFromTree",
+          "when": "false"
+        },
+        {
+          "command": "nxCloud.ignoreAiFixFromTree",
           "when": "false"
         },
         {
@@ -928,6 +955,21 @@
           "dark": "assets/cursor-dark.svg",
           "light": "assets/cursor-light.svg"
         }
+      },
+      {
+        "title": "View AI Suggested Fix",
+        "command": "nxCloud.showAiFixFromTree",
+        "icon": "$(diff)"
+      },
+      {
+        "title": "Apply AI Fix",
+        "command": "nxCloud.applyAiFixFromTree",
+        "icon": "$(check)"
+      },
+      {
+        "title": "Ignore AI Fix",
+        "command": "nxCloud.ignoreAiFixFromTree",
+        "icon": "$(close)"
       },
       {
         "category": "Nx",
