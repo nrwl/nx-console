@@ -227,18 +227,18 @@
           "group": "inline@1"
         },
         {
-          "command": "nxCloud.showAiTaskFixFromTree",
-          "when": "view == nxCloudRecentCIPE && (viewItem =~ /failedTask-aifix.*-hasFix/ || viewItem =~ /failedTask-aifix-applied$/)",
+          "command": "nxCloud.showAiFixFromTree",
+          "when": "view == nxCloudRecentCIPE && (viewItem =~ /nxCloudFix-aifix.*-hasFix/ || viewItem =~ /nxCloudFix-aifix-applied$/)",
           "group": "inline@2"
         },
         {
-          "command": "nxCloud.applyAiTaskFixFromTree",
-          "when": "view == nxCloudRecentCIPE && viewItem =~ /failedTask-aifix.*-hasFix.*-(notValidated|validated)$/ && !(viewItem =~ /failedTask-aifix-(applied|rejected)$/)",
+          "command": "nxCloud.applyAiFixFromTree",
+          "when": "view == nxCloudRecentCIPE && viewItem =~ /nxCloudFix-aifix.*-hasFix.*-(notValidated|validated)$/ && !(viewItem =~ /nxCloudFix-aifix-(applied|rejected)$/)",
           "group": "inline@3"
         },
         {
-          "command": "nxCloud.ignoreAiTaskFixFromTree",
-          "when": "view == nxCloudRecentCIPE && viewItem =~ /failedTask-aifix.*-hasFix/ && !(viewItem =~ /failedTask-aifix-(applied|rejected)$/)",
+          "command": "nxCloud.ignoreAiFixFromTree",
+          "when": "view == nxCloudRecentCIPE && viewItem =~ /nxCloudFix-aifix.*-hasFix/ && !(viewItem =~ /nxCloudFix-aifix-(applied|rejected)$/)",
           "group": "inline@4"
         },
         {
@@ -357,15 +357,15 @@
           "when": "false"
         },
         {
-          "command": "nxCloud.showAiTaskFixFromTree",
+          "command": "nxCloud.showAiFixFromTree",
           "when": "false"
         },
         {
-          "command": "nxCloud.applyAiTaskFixFromTree",
+          "command": "nxCloud.applyAiFixFromTree",
           "when": "false"
         },
         {
-          "command": "nxCloud.ignoreAiTaskFixFromTree",
+          "command": "nxCloud.ignoreAiFixFromTree",
           "when": "false"
         },
         {
@@ -958,17 +958,17 @@
       },
       {
         "title": "View AI Suggested Fix",
-        "command": "nxCloud.showAiTaskFixFromTree",
+        "command": "nxCloud.showAiFixFromTree",
         "icon": "$(diff)"
       },
       {
-        "title": "Apply AI Task Fix",
-        "command": "nxCloud.applyAiTaskFixFromTree",
+        "title": "Apply AI Fix",
+        "command": "nxCloud.applyAiFixFromTree",
         "icon": "$(check)"
       },
       {
-        "title": "Ignore AI Task Fix",
-        "command": "nxCloud.ignoreAiTaskFixFromTree",
+        "title": "Ignore AI Fix",
+        "command": "nxCloud.ignoreAiFixFromTree",
         "icon": "$(close)"
       },
       {

@@ -35,6 +35,13 @@ export type CIPERunGroup = {
   completedAt: number | null;
   status: CIPEExecutionStatus;
   runs: CIPERun[];
+  aiFix?: {
+    aiFixId: string;
+    taskIds: string[];
+    suggestedFix: string;
+    validationStatus: AITaskFixValidationStatus;
+    userAction: AITaskFixUserAction;
+  };
 };
 
 export type AITaskFixValidationStatus =
@@ -54,12 +61,6 @@ export type CIPERun = {
   numFailedTasks?: number;
   numTasks?: number;
   runUrl: string;
-  aiTaskFix?: {
-    aiTaskFixId: string;
-    suggestedFix: string;
-    validationStatus: AITaskFixValidationStatus;
-    userAction: AITaskFixUserAction;
-  };
 };
 
 export type CIPEInfoError = {
