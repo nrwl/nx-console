@@ -17,6 +17,8 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import express from 'express';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { resolve } from 'path';
 
 interface ArgvType {
   workspacePath?: string;
@@ -74,9 +76,13 @@ async function main() {
     .help()
     .parseSync() as ArgvType;
 
-  const nxWorkspacePath: string = (argv.workspacePath ||
-    (argv._[0] as string) ||
-    process.cwd()) as string;
+  const providedPath: string = resolve(
+    argv.workspacePath || (argv._[0] as string) || process.cwd(),
+  ) as string;
+
+  // Check if the provided path is an Nx workspace
+  const isNxWorkspace = await checkIsNxWorkspace(providedPath);
+  const nxWorkspacePath = isNxWorkspace ? providedPath : undefined;
 
   let googleAnalytics: GoogleAnalytics | undefined;
 
@@ -105,7 +111,8 @@ async function main() {
       // todo(cammisuli): implement this using standard git commands
       return undefined;
     },
-    isNxCloudEnabled: async () => await isNxCloudUsed(nxWorkspacePath),
+    isNxCloudEnabled: async () =>
+      nxWorkspacePath ? await isNxCloudUsed(nxWorkspacePath) : false,
   };
 
   const server = await NxMcpServerWrapper.create(

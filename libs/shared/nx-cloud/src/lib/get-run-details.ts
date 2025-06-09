@@ -1,0 +1,126 @@
+import { Logger } from '@nx-console/shared-utils';
+import { xhr } from 'request-light';
+import { isNxCloudUsed } from './is-nx-cloud-used';
+import { getNxCloudUrl } from './cloud-ids';
+import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+
+export interface TaskSummary {
+  taskId: string;
+  runId?: string;
+  projectName: string;
+  target: string;
+  startTimeMs: number;
+  endTimeMs: number;
+  durationMs: number;
+  status: string;
+  cacheStatus: string;
+  isCacheable: boolean;
+  hash: string;
+}
+
+export interface MMachineInfo {
+  // Define based on your actual MMachineInfo type
+  [key: string]: any;
+}
+
+export interface MRunMeta {
+  // Define based on your actual MRunMeta type
+  [key: string]: any;
+}
+
+export interface RunDetails {
+  id: string;
+  workspaceId: string;
+  urlSlug: string;
+  command: string;
+  startTimeMs: number;
+  endTimeMs: number;
+  durationMs: number;
+  status: string;
+  taskCount: number;
+  branch?: string;
+  runGroup?: string;
+  commitSha?: string;
+  createdAtMs: number;
+  updatedAtMs: number;
+  cacheEnabled: boolean;
+  nxVersion?: string;
+  tasks: TaskSummary[];
+  machineInfo?: MMachineInfo;
+  meta?: MRunMeta;
+  inner?: boolean;
+  distributedExecutionId?: string;
+  clientInstanceId?: string;
+}
+
+export interface RunDetailsError {
+  type: 'authentication' | 'network' | 'not_found' | 'other';
+  message: string;
+}
+
+export async function getRunDetails(
+  workspacePath: string,
+  logger: Logger,
+  runId: string,
+): Promise<{
+  data?: RunDetails;
+  error?: RunDetailsError;
+}> {
+  if (!(await isNxCloudUsed(workspacePath, logger))) {
+    return {
+      error: {
+        type: 'other',
+        message: 'Nx Cloud is not used in this workspace',
+      },
+    };
+  }
+
+  const nxCloudUrl = await getNxCloudUrl(workspacePath);
+  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}`;
+
+  const headers: any = {
+    'Content-Type': 'application/json',
+    ...(await nxCloudAuthHeaders(workspacePath)),
+  };
+
+  logger.log(`Making run details request for ID: ${runId}`);
+  try {
+    const response = await xhr({
+      type: 'GET',
+      url,
+      headers,
+      timeout: 10000,
+    });
+
+    const responseData = JSON.parse(response.responseText) as RunDetails;
+    return {
+      data: responseData,
+    };
+  } catch (e) {
+    if (e.status === 401) {
+      logger.log(`Authentication error: ${e.responseText}`);
+      return {
+        error: {
+          type: 'authentication',
+          message: e.responseText,
+        },
+      };
+    }
+    if (e.status === 404) {
+      logger.log(`Run not found: ${e.responseText}`);
+      return {
+        error: {
+          type: 'not_found',
+          message: `Run with ID ${runId} not found`,
+        },
+      };
+    }
+    logger.log(`Error: ${JSON.stringify(e)}`);
+    return {
+      error: {
+        type: 'other',
+        message: e.responseText ?? e.message,
+      },
+    };
+  }
+}

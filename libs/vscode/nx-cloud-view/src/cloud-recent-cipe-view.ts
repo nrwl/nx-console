@@ -17,37 +17,30 @@ import {
   ProviderResult,
   ThemeColor,
   ThemeIcon,
-  TreeItem,
   TreeItemCollapsibleState,
   Uri,
   window,
+  workspace,
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
 import { formatMillis } from './format-time';
+import {
+  BaseRecentCIPETreeItem,
+  CIPETreeItem as CIPETreeItemInterface,
+  RunGroupTreeItem as RunGroupTreeItemInterface,
+  RunTreeItem as RunTreeItemInterface,
+  FailedTaskTreeItem as FailedTaskTreeItemInterface,
+} from './base-tree-item';
+import {
+  AiFixDiffContentProvider,
+  NxCloudFixTreeItem,
+  registerNxCloudFixCommands,
+} from './nx-cloud-fix-tree-item';
 
-abstract class BaseRecentCIPETreeItem extends TreeItem {
-  abstract type: 'CIPE' | 'runGroup' | 'run' | 'label' | 'failedTask';
-
-  abstract getChildren(): ProviderResult<BaseRecentCIPETreeItem[]>;
-
-  isCIPETreeItem(): this is CIPETreeItem {
-    return this.type === 'CIPE';
-  }
-
-  isRunGroupTreeItem(): this is RunGroupTreeItem {
-    return this.type === 'runGroup';
-  }
-
-  isRunTreeItem(): this is RunTreeItem {
-    return this.type === 'run';
-  }
-
-  isFailedTaskTreeItem(): this is FailedTaskTreeItem {
-    return this.type === 'failedTask';
-  }
-}
-
-class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
+export class CIPETreeItem
+  extends BaseRecentCIPETreeItem
+  implements CIPETreeItemInterface, Disposable
+{
   type = 'CIPE' as const;
 
   private timeoutDisposable?: Disposable;
@@ -88,7 +81,13 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
 
     this.id = cipe.ciPipelineExecutionId;
     this.setIcon();
-    this.contextValue = cipe.commitUrl ? 'cipe-commit' : 'cipe';
+
+    // Set context value based on available features
+    let contextValue = 'cipe';
+    if (cipe.commitUrl) {
+      contextValue = 'cipe-commit';
+    }
+    this.contextValue = contextValue;
   }
 
   private updateItemAfterSecond() {
@@ -142,8 +141,19 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
             ? `${failedTasks}/${totalTasks} tasks failed. Failed Runs:`
             : 'Failed Runs:';
 
-        return [
-          new LabelTreeItem(label),
+        const items: BaseRecentCIPETreeItem[] = [new LabelTreeItem(label)];
+
+        // Add NxCloudFixTreeItem for runGroups that have AI fixes
+        this.cipe.runGroups.forEach((runGroup) => {
+          if (runGroup.aiFix) {
+            items.push(
+              new NxCloudFixTreeItem(runGroup, this.cipe.ciPipelineExecutionId),
+            );
+          }
+        });
+
+        // Add failed runs
+        items.push(
           ...this.cipe.runGroups.flatMap((runGroup) =>
             runGroup.runs
               .filter((run) => run.status && isFailedStatus(run.status))
@@ -151,7 +161,9 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
                 (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId),
               ),
           ),
-        ];
+        );
+
+        return items;
       }
     }
 
@@ -178,7 +190,10 @@ class CIPETreeItem extends BaseRecentCIPETreeItem implements Disposable {
   }
 }
 
-class RunGroupTreeItem extends BaseRecentCIPETreeItem {
+export class RunGroupTreeItem
+  extends BaseRecentCIPETreeItem
+  implements RunGroupTreeItemInterface
+{
   type = 'runGroup' as const;
 
   constructor(
@@ -208,7 +223,10 @@ class RunGroupTreeItem extends BaseRecentCIPETreeItem {
   }
 }
 
-class RunTreeItem extends BaseRecentCIPETreeItem {
+export class RunTreeItem
+  extends BaseRecentCIPETreeItem
+  implements RunTreeItemInterface
+{
   type = 'run' as const;
 
   constructor(
@@ -222,6 +240,7 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
       : TreeItemCollapsibleState.None;
     this.id = `${cipeId}-${run.linkId ?? run.executionId}`;
     this.setIcon();
+
     this.contextValue = 'run';
   }
 
@@ -255,6 +274,8 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
           taskId,
           this.run.linkId,
           this.run.executionId,
+          this.run,
+          this.cipeId,
         );
       });
     }
@@ -263,18 +284,23 @@ class RunTreeItem extends BaseRecentCIPETreeItem {
   }
 }
 
-class FailedTaskTreeItem extends BaseRecentCIPETreeItem {
+export class FailedTaskTreeItem
+  extends BaseRecentCIPETreeItem
+  implements FailedTaskTreeItemInterface
+{
   type = 'failedTask' as const;
 
   constructor(
     public taskId: string,
     public linkId?: string,
     public executionId?: string,
+    public run?: CIPERun,
+    public cipeId?: string,
   ) {
     super(taskId);
     this.collapsibleState = TreeItemCollapsibleState.None;
-    this.iconPath = new ThemeIcon('error');
     this.contextValue = 'failedTask';
+    this.iconPath = new ThemeIcon('error');
   }
 
   override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
@@ -297,7 +323,7 @@ class LabelTreeItem extends BaseRecentCIPETreeItem {
 }
 
 export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPETreeItem> {
-  private recentCIPEInfo: CIPEInfo[] | undefined;
+  public recentCIPEInfo: CIPEInfo[] | undefined;
   private workspaceUrl: string | undefined;
 
   private cipeElements?: CIPETreeItem[];
@@ -344,7 +370,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     return element.getChildren();
   }
   override getParent(
-    element: BaseRecentCIPETreeItem,
+    _: BaseRecentCIPETreeItem,
   ): ProviderResult<BaseRecentCIPETreeItem | null | undefined> {
     return undefined;
   }
@@ -357,6 +383,19 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     const recentCIPEProvider = new CloudRecentCIPEProvider(
       actor,
       fileDecorationProvider,
+    );
+
+    // Register content providers for virtual diff documents
+    const aiFixDiffContentProvider = new AiFixDiffContentProvider();
+    extensionContext.subscriptions.push(
+      workspace.registerTextDocumentContentProvider(
+        'nx-cloud-fix-before',
+        aiFixDiffContentProvider,
+      ),
+      workspace.registerTextDocumentContentProvider(
+        'nx-cloud-fix-after',
+        aiFixDiffContentProvider,
+      ),
     );
 
     extensionContext.subscriptions.push(
@@ -450,6 +489,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           );
         },
       ),
+      ...registerNxCloudFixCommands(recentCIPEProvider),
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
 

@@ -23,3 +23,13 @@ export const NX_RUN_GENERATOR = 'nx_run_generator';
 export const NX_CURRENT_RUNNING_TASKS_DETAILS =
   'nx_current_running_tasks_details';
 export const NX_CURRENT_RUNNING_TASK_OUTPUT = 'nx_current_running_task_output';
+
+export const NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH =
+  'nx_cloud_pipeline_executions_search';
+export const NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS =
+  'nx_cloud_pipeline_executions_details';
+// Coming soon
+export const NX_CLOUD_RUNS_SEARCH = 'nx_cloud_runs_search';
+export const NX_CLOUD_RUNS_DETAILS = 'nx_cloud_runs_details';
+export const NX_CLOUD_TASKS_SEARCH = 'nx_cloud_tasks_search';
+export const NX_CLOUD_TASKS_DETAILS = 'nx_cloud_tasks_details';
