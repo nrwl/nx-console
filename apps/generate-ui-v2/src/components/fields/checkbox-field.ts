@@ -1,7 +1,7 @@
 import { spread } from '@open-wc/lit-helpers';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
+import { intellijFieldColors, intellijFocusRing } from '@nx-console/shared-ui-components';
 import { CheckboxWrapper } from './mixins/checkbox-wrapper-mixin';
 import { Field } from './mixins/field-mixin';
 

@@ -2,7 +2,7 @@ import { Option } from '@nx-console/shared-schema';
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { extractItemOptions } from '../utils/generator-schema-utils';
-import { EditorContext } from '../contexts/editor-context';
+import { EditorContext } from '@nx-console/shared-ui-components';
 import { GeneratorContextContext } from '../contexts/generator-context-context';
 
 type OptionWithMetadata = {

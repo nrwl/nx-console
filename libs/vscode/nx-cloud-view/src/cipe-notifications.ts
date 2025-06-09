@@ -155,25 +155,23 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
   const telemetry = getTelemetry();
   telemetry.logUsage('cloud.show-ai-fix-notification');
 
-  type MessageCommand = 'Show Fix' | 'Apply Fix' | 'Ignore';
-  const messageCommands: MessageCommand[] = ['Show Fix', 'Apply Fix', 'Ignore'];
+  type MessageCommand = 'Show Error Details' | 'Reject';
+  const messageCommands: MessageCommand[] = ['Show Error Details', 'Reject'];
 
   const handleResults = async (selection: MessageCommand | undefined) => {
-    if (selection === 'Show Fix') {
+    if (selection === 'Show Error Details') {
       telemetry.logUsage('cloud.show-ai-fix', {
         source: 'notification',
       });
-      commands.executeCommand('nxCloud.showAiFix', { cipe, runGroup });
-    } else if (selection === 'Apply Fix') {
-      telemetry.logUsage('cloud.apply-ai-fix', {
+      commands.executeCommand('nxCloud.openFixDetails', {
+        cipeId: cipe.ciPipelineExecutionId,
+        runGroup,
+      });
+    } else if (selection === 'Reject') {
+      telemetry.logUsage('cloud.reject-ai-fix', {
         source: 'notification',
       });
-      commands.executeCommand('nxCloud.applyAiFix', { cipe, runGroup });
-    } else if (selection === 'Ignore') {
-      telemetry.logUsage('cloud.ignore-ai-fix', {
-        source: 'notification',
-      });
-      commands.executeCommand('nxCloud.ignoreAiFix', { cipe, runGroup });
+      commands.executeCommand('nxCloud.rejectAiFix', { cipe, runGroup });
     }
   };
 

@@ -6,7 +6,7 @@ import {
   intellijFieldColors,
   intellijFieldPadding,
   intellijFocusRing,
-} from '../../utils/ui-utils';
+} from '@nx-console/shared-ui-components';
 import { Field } from './mixins/field-mixin';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 

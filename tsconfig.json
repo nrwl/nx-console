@@ -185,6 +185,18 @@
     },
     {
       "path": "./apps/nx-mcp-e2e"
+    },
+    {
+      "path": "./libs/shared/ui-components"
+    },
+    {
+      "path": "./libs/vscode/nx-cloud-fix-webview"
     }
-  ]
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node10"
+    }
+  }
 }

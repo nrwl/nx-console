@@ -1,7 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { EditorContext } from '../contexts/editor-context';
-import { intellijFieldColors, intellijFocusRing } from '../utils/ui-utils';
+import { EditorContext, intellijFieldColors, intellijFocusRing } from '@nx-console/shared-ui-components';
 
 @customElement('search-bar')
 export class SearchBar extends EditorContext(LitElement) {

@@ -18,6 +18,8 @@
 
 /libs/vscode/migrate-sidebar-webview/ @MaxKless
 
+/libs/vscode/nx-cloud-fix-webview/ @MaxKless
+
 /libs/vscode/nx-config-decoration/ @MaxKless
 
 /libs/vscode/generate-ui-webview/ @MaxKless
@@ -55,6 +57,8 @@
 /libs/nx-mcp/nx-mcp-server/ @MaxKless
 
 /libs/shared/running-tasks/ @MaxKless
+
+/libs/shared/ui-components/ @MaxKless
 
 /libs/vscode/configuration/ @MaxKless
 

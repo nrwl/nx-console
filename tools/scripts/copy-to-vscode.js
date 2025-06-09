@@ -18,6 +18,10 @@ fs.copySync(
   './dist/libs/vscode/migrate-sidebar-webview',
   './dist/apps/vscode/migrate-sidebar-webview',
 );
+fs.copySync(
+  './dist/libs/vscode/nx-cloud-fix-webview',
+  './dist/apps/vscode/nx-cloud-fix-webview',
+);
 
 // copy package.json
 fs.copySync('./apps/vscode/package.json', './dist/apps/vscode/package.json');

@@ -8,7 +8,7 @@ import {
   intellijFieldPadding,
   intellijFocusRing,
   vscodeErrorStyleOverrides,
-} from '../../utils/ui-utils';
+} from '@nx-console/shared-ui-components';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('array-field')

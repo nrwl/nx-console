@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { EditorContext } from '../contexts/editor-context';
+import { EditorContext } from '@nx-console/shared-ui-components';
 import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('show-more-divider')

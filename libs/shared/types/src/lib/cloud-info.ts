@@ -28,6 +28,14 @@ export type CIPEInfo = {
   runGroups: CIPERunGroup[];
 };
 
+export type NxAiFix = {
+  aiFixId: string;
+  taskIds: string[];
+  suggestedFix?: string;
+  validationStatus: AITaskFixValidationStatus;
+  userAction: AITaskFixUserAction;
+};
+
 export type CIPERunGroup = {
   ciExecutionEnv: string;
   runGroup: string;
@@ -35,13 +43,7 @@ export type CIPERunGroup = {
   completedAt: number | null;
   status: CIPEExecutionStatus;
   runs: CIPERun[];
-  aiFix?: {
-    aiFixId: string;
-    taskIds: string[];
-    suggestedFix: string;
-    validationStatus: AITaskFixValidationStatus;
-    userAction: AITaskFixUserAction;
-  };
+  aiFix?: NxAiFix;
 };
 
 export type AITaskFixValidationStatus =

@@ -13,7 +13,7 @@ export class Icon extends EditorContext(LitElement) {
   @property({ type: Boolean })
   applyFillColor = false;
 
-  render() {
+  override render() {
     if (this.editor === 'intellij') {
       return html`<img
         src="./icons/${this.icon}.svg"
@@ -55,7 +55,7 @@ export class Icon extends EditorContext(LitElement) {
     this.appendChild(parsedSvg.documentElement);
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected override createRenderRoot(): Element | ShadowRoot {
     return this;
   }
 }

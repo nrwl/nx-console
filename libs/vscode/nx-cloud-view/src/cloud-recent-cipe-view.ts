@@ -1,7 +1,13 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
-import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
-import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
+import {
+  getNxCloudStatus,
+  getNxCloudTerminalOutput,
+} from '@nx-console/vscode-nx-workspace';
+import {
+  outputLogger,
+  showErrorMessageWithOpenLogs,
+} from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   AbstractTreeProvider,
@@ -32,10 +38,10 @@ import {
   FailedTaskTreeItem as FailedTaskTreeItemInterface,
 } from './base-tree-item';
 import {
-  AiFixDiffContentProvider,
   NxCloudFixTreeItem,
   registerNxCloudFixCommands,
 } from './nx-cloud-fix-tree-item';
+import { NxCloudFixWebview } from './nx-cloud-fix-webview';
 
 export class CIPETreeItem
   extends BaseRecentCIPETreeItem
@@ -385,19 +391,6 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       fileDecorationProvider,
     );
 
-    // Register content providers for virtual diff documents
-    const aiFixDiffContentProvider = new AiFixDiffContentProvider();
-    extensionContext.subscriptions.push(
-      workspace.registerTextDocumentContentProvider(
-        'nx-cloud-fix-before',
-        aiFixDiffContentProvider,
-      ),
-      workspace.registerTextDocumentContentProvider(
-        'nx-cloud-fix-after',
-        aiFixDiffContentProvider,
-      ),
-    );
-
     extensionContext.subscriptions.push(
       window.registerFileDecorationProvider(fileDecorationProvider),
       window.createTreeView('nxCloudRecentCIPE', {
@@ -489,7 +482,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           );
         },
       ),
-      ...registerNxCloudFixCommands(recentCIPEProvider),
+      ...registerNxCloudFixCommands(extensionContext, recentCIPEProvider),
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
 

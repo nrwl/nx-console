@@ -3,7 +3,7 @@ import { FieldInterface } from './field-mixin';
 import { when } from 'lit/directives/when.js';
 
 import { FieldValueConsumerInterface } from '../../field-value-consumer-mixin';
-import { EditorContextInterface } from '../../../contexts/editor-context';
+import { EditorContextInterface } from '@nx-console/shared-ui-components';
 
 export const CheckboxWrapper = <
   T extends new (...args: any[]) => FieldInterface &
