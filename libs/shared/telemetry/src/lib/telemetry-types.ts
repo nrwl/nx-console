@@ -27,6 +27,10 @@ export type TelemetryEvents =
   | 'cloud.view-run'
   | 'cloud.explain-cipe-error'
   | 'cloud.fix-cipe-error'
+  | 'cloud.show-ai-fix-notification'
+  | 'cloud.show-ai-fix'
+  | 'cloud.apply-ai-fix'
+  | 'cloud.ignore-ai-fix'
   // graph
   | 'graph.show-all'
   | 'graph.show-affected'

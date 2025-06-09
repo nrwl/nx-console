@@ -1,4 +1,4 @@
-import { CIPEInfo } from '@nx-console/shared-types';
+import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -24,11 +24,29 @@ export function compareCIPEDataAndSendNotification(
   }
 
   // Completed & Task Failed Notifications
-  newInfo.forEach((newCIPE) => {
+  for (const newCIPE of newInfo) {
     const oldCIPE = oldInfo.find(
       (oldCIPE) =>
         newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId,
     );
+
+    // Check if aiFix is newly available on any runGroup
+    const newCIPERunGroups = newCIPE.runGroups || [];
+    const oldCIPERunGroups = oldCIPE?.runGroups || [];
+
+    // Check if any runGroup has an AI fix (to skip failure notifications)
+    const hasAiFix = newCIPERunGroups.some((runGroup) => !!runGroup.aiFix);
+
+    for (const newRunGroup of newCIPERunGroups) {
+      if (newRunGroup.aiFix?.suggestedFix) {
+        const oldRunGroup = oldCIPERunGroups.find(
+          (runGroup) => runGroup.runGroup === newRunGroup.runGroup,
+        );
+        if (!oldRunGroup?.aiFix?.suggestedFix) {
+          showAiFixNotification(newCIPE, newRunGroup);
+        }
+      }
+    }
 
     const newCipeIsSucceeded = newCIPE.status === 'SUCCEEDED';
     const newCIPEIsFailed = isFailedStatus(newCIPE.status);
@@ -54,14 +72,14 @@ export function compareCIPEDataAndSendNotification(
       return;
     }
 
-    if (newCIPEIsFailed) {
+    if (newCIPEIsFailed && !hasAiFix) {
       showMessageWithResultAndCommit(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
       );
-    } else if (newCIPEFailedRun) {
+    } else if (newCIPEFailedRun && !hasAiFix) {
       const command =
         newCIPEFailedRun.command.length > 70
           ? newCIPEFailedRun.command.substring(0, 60) + '[...]'
@@ -77,9 +95,10 @@ export function compareCIPEDataAndSendNotification(
         `CI Pipeline Execution for #${newCIPE.branch} has completed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
+        'information',
       );
     }
-  });
+  }
 }
 
 function showMessageWithResultAndCommit(
@@ -130,4 +149,39 @@ function showMessageWithResultAndCommit(
   };
 
   show(message, ...messageCommands).then(handleResults);
+}
+
+function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
+  const telemetry = getTelemetry();
+  telemetry.logUsage('cloud.show-ai-fix-notification');
+
+  type MessageCommand = 'Show Fix' | 'Apply Fix' | 'Ignore';
+  const messageCommands: MessageCommand[] = ['Show Fix', 'Apply Fix', 'Ignore'];
+
+  const handleResults = async (selection: MessageCommand | undefined) => {
+    if (selection === 'Show Fix') {
+      telemetry.logUsage('cloud.show-ai-fix', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.showAiFix', { cipe, runGroup });
+    } else if (selection === 'Apply Fix') {
+      telemetry.logUsage('cloud.apply-ai-fix', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.applyAiFix', { cipe, runGroup });
+    } else if (selection === 'Ignore') {
+      telemetry.logUsage('cloud.ignore-ai-fix', {
+        source: 'notification',
+      });
+      commands.executeCommand('nxCloud.ignoreAiFix', { cipe, runGroup });
+    }
+  };
+
+  const taskDisplay = runGroup.aiFix?.taskIds[0];
+  window
+    .showInformationMessage(
+      `Nx Cloud suggested a fix for ${taskDisplay} in #${cipe.branch}`,
+      ...messageCommands,
+    )
+    .then(handleResults);
 }

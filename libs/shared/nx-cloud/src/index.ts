@@ -5,3 +5,4 @@ export * from './lib/get-nx-cloud-terminal-output';
 export * from './lib/get-recent-cipe-data';
 export * from './lib/get-pipeline-executions-search';
 export * from './lib/get-pipeline-execution-details';
+export * from './lib/nx-cloud-auth-headers';
