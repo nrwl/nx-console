@@ -1,3 +1,17 @@
+# [18.51.0](https://github.com/nrwl/nx-console/compare/vscode-v18.50.0...vscode-v18.51.0) (2025-06-09)
+
+
+### Bug Fixes
+
+* **vscode:** automatically refresh migrate data when the view is opened ([#2548](https://github.com/nrwl/nx-console/issues/2548)) ([29050f8](https://github.com/nrwl/nx-console/commit/29050f84e2c097e839b3f21d05c57b807a2f52c2))
+
+
+### Features
+
+* **nx-mcp:** additional tools for Nx Cloud integration ([#2554](https://github.com/nrwl/nx-console/issues/2554)) ([0b277ff](https://github.com/nrwl/nx-console/commit/0b277ff52f1c54106047271b1805d0501ca67152))
+* **nx-mcp:** optimize nx_workspace tool to reduce token count ([#2545](https://github.com/nrwl/nx-console/issues/2545)) ([aec6519](https://github.com/nrwl/nx-console/commit/aec65199f09f5d3eae6e094ed7beec991bd2a01f))
+* **vscode:** add cipe fix notification and support ([#2556](https://github.com/nrwl/nx-console/issues/2556)) ([7c7d404](https://github.com/nrwl/nx-console/commit/7c7d40447071fbf801dc3537bbf6c0560cca7f75))
+
 # [18.50.0](https://github.com/nrwl/nx-console/compare/vscode-v18.49.3...vscode-v18.50.0) (2025-05-31)
 
 
