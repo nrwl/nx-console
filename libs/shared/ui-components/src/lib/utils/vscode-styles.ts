@@ -4,7 +4,7 @@ export function getVscodeStyleMappings() {
   // note that --vscode-settings-dropdownListBorder is the color used for the webview ui toolkit divider
   // refer to https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/design-tokens.ts
   return css`
-    host: {
+    :host {
       --foreground-color: var(--vscode-editor-foreground);
       --muted-foreground-color: var(--vscode-input-placeholderForeground);
       --background-color: var(--vscode-editor-background);

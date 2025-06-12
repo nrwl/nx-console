@@ -44,6 +44,8 @@ const runGroup: NxCloudFixData['runGroup'] = {
     suggestedFix:
       'npm install some-missing-module\n\n// Add the following import:\nimport { SomeClass } from "some-missing-module";\n\n// Update the configuration:\nexport default {\n  // ... existing config\n  dependencies: {\n    "some-missing-module": "^1.0.0"\n  }\n};',
     validationStatus: 'COMPLETED',
+    suggestedFixDescription:
+      'Install missing dependencies and update imports, and more configuration changes.',
     userAction: undefined,
     taskIds: ['task-1', 'task-2'],
   },

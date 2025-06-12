@@ -33,11 +33,13 @@ export class NxCloudFixComponent extends LitElement {
       initialValue: 'vscode',
     });
   }
+
   static override styles = [
     getVscodeStyleMappings(),
     css`
       :host {
-        display: block;
+        display: flex;
+        height: 100vh;
         --foreground-color: var(--vscode-editor-foreground);
         --background-color: var(--vscode-editor-background);
         --border-color: var(--vscode-panel-border, #2d2d30);
@@ -63,20 +65,18 @@ export class NxCloudFixComponent extends LitElement {
       }
 
       .container {
-        max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
+        min-height: 100vh;
+        max-width: 100vw;
         display: flex;
         flex-direction: column;
-        gap: 24px;
       }
 
       .header {
-        padding: 20px;
-        border-bottom: 1px solid var(--border-color);
+        padding: 12px;
+        margin: 0 12px;
         background-color: var(--background-color);
         display: flex;
-        align-items: center;
         justify-content: space-between;
       }
 
@@ -98,21 +98,21 @@ export class NxCloudFixComponent extends LitElement {
       }
 
       .subtitle {
-        font-size: 1rem;
+        font-size: 0.8rem;
         color: var(--foreground-color);
         font-weight: 400;
-        margin: 0;
+        margin: 10px 0;
       }
 
       .actions {
         display: flex;
-        gap: 12px;
+        gap: 8px;
       }
 
       .main-content {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 24px;
+        display: flex;
+        min-height: 0;
+        flex: 1 1 100%;
       }
 
       .left-column {
@@ -228,14 +228,13 @@ export class NxCloudFixComponent extends LitElement {
       }
 
       .terminal-section {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
         overflow: hidden;
+        flex: 1;
         background-color: var(--background-color);
       }
 
       .terminal-header {
-        padding: 16px 20px;
+        padding: 6px 21px;
         background-color: var(--hover-color);
         border-bottom: 1px solid var(--border-color);
         display: flex;
@@ -244,15 +243,22 @@ export class NxCloudFixComponent extends LitElement {
       }
 
       .terminal-header-title {
-        font-size: 1.1rem;
-        font-weight: 600;
+        font-size: 0.9rem;
+        font-weight: 300;
         margin: 0;
         color: var(--foreground-color);
+        font-family: var(
+          --vscode-editor-font-family,
+          'Menlo',
+          'Monaco',
+          'Courier New',
+          monospace
+        );
       }
 
       terminal-component {
         display: block;
-        height: 500px;
+        height: 100%;
       }
 
       .loading {
@@ -267,7 +273,6 @@ export class NxCloudFixComponent extends LitElement {
       .header-info {
         display: flex;
         align-items: center;
-        gap: 24px;
         margin-top: 8px;
         font-size: 0.875rem;
         color: var(--foreground-color);
@@ -276,7 +281,7 @@ export class NxCloudFixComponent extends LitElement {
       .header-info-item {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
       }
 
       .header-info-label {
@@ -406,22 +411,6 @@ export class NxCloudFixComponent extends LitElement {
       .expand-icon.expanded {
         transform: rotate(90deg);
       }
-
-      @media (max-width: 1024px) {
-        .main-content {
-          grid-template-columns: 1fr;
-        }
-
-        .header {
-          flex-direction: column;
-          gap: 16px;
-          align-items: flex-start;
-        }
-
-        .actions {
-          align-self: stretch;
-        }
-      }
     `,
   ];
 
@@ -451,14 +440,7 @@ export class NxCloudFixComponent extends LitElement {
         ${this.renderHeader(cipe, runGroup)}
 
         <div class="main-content">
-          <div class="left-column">
-            ${this.renderAiFixStatus(aiFix)}
-            ${this.renderFailedTasks(runGroup.aiFix.taskIds || [])}
-          </div>
-
-          <div class="right-column">
-            ${this.getTerminalSection(terminalOutput)}
-          </div>
+          ${this.getTerminalSection(aiFix.taskIds[0], terminalOutput)}
         </div>
       </div>
     `;
@@ -469,165 +451,81 @@ export class NxCloudFixComponent extends LitElement {
       <div class="header">
         <div class="header-content">
           <div class="title-section">
-            <h1 class="title">Nx Cloud Task Fix</h1>
-            <p class="subtitle">Commit: ${cipe.commitTitle || 'N/A'}</p>
+            <h1 class="title">
+              ${runGroup.aiFix.suggestedFixDescription ||
+              'Nx Cloud suggested fix'}
+              <p class="subtitle">
+                Nx Cloud automatically generates a fix for this error.
+              </p>
+            </h1>
             <div class="header-info">
               <div class="header-info-item">
-                <span class="header-info-label">Branch:</span>
-                <span>${cipe.branch}</span>
+                <span class="header-info-label">
+                  <pill-element>
+                    <icon-element icon="git-branch"></icon-element>
+                    <a href="${cipe.commitUrl}" target="_blank">
+                      ${cipe.branch}
+                    </a>
+                  </pill-element>
+                </span>
               </div>
               <div class="header-info-item">
-                <span class="header-info-label">Created:</span>
-                <span
-                  >${new Date(cipe.createdAt).toLocaleDateString() ||
-                  'N/A'}</span
-                >
+                <span class="header-info-label">
+                  ${this.getAiFixStatusInfo(runGroup.aiFix, cipe.branch)}
+                </span>
               </div>
             </div>
           </div>
         </div>
-        ${this.getActionButtons(runGroup.aiFix)}
+        <div>${this.getActionButtons(runGroup.aiFix)}</div>
       </div>
     `;
   }
 
-  private renderAiFixStatus(aiFix: NxAiFix): TemplateResult {
-    const userActionStatusInfo = this.getUserActionStatusInfo(aiFix.userAction);
-    const statusInfo = this.getAiFixStatusInfo(aiFix);
-
-    return html`
-      <div class="section">
-        <div class="section-header">
-          <div class="status-icon success">✓</div>
-          <h3 class="section-title">AI Fix Status</h3>
-        </div>
-        <div class="section-content">
-          <div class="status-item">
-            <span class="status-label">User Action:</span>
-            <div class="status-value">
-              <span class="status-badge ${userActionStatusInfo.iconClass}">
-                ${userActionStatusInfo.title.toLowerCase()}
-              </span>
-            </div>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Status:</span>
-            <div class="status-value">
-              <span class="status-badge ${statusInfo.iconClass}">
-                ${statusInfo.title.toLowerCase()}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  private getAiFixStatusInfo(aiFix: NxAiFix): {
-    title: string;
-    iconClass: 'success' | 'error' | 'warning';
-  } {
+  private getAiFixStatusInfo(aiFix: NxAiFix, branch: string): TemplateResult {
     const hasFix = !!aiFix.suggestedFix;
     const validationStatus = aiFix.validationStatus;
 
     if (hasFix) {
       switch (validationStatus) {
         case 'NOT_STARTED':
-          return {
-            title: 'Fix is available, but has not been validated',
-            iconClass: 'warning',
-          };
+          return html`<pill-element type="info">
+            <icon-element icon="sync"></icon-element>
+            <span>Fix available</span>
+          </pill-element>`;
         case 'IN_PROGRESS':
-          return { title: 'Fix is being validated', iconClass: 'warning' };
+          return html`<pill-element type="info">
+            <icon-element icon="loading~spin"></icon-element>
+            <span>Validating fix...</span>
+          </pill-element>`;
         case 'COMPLETED':
-          return { title: 'Fix is ready, and validated', iconClass: 'success' };
+          return html`<pill-element type="success">
+            <icon-element icon="check"></icon-element>
+            <span>Validated Fix</span>
+          </pill-element>`;
         case 'FAILED':
-          return {
-            title: 'Fix is available, but validation failed',
-            iconClass: 'error',
-          };
+          return html`<pill-element type="error">
+            <icon-element icon="error"></icon-element>
+            <span>Validation Failed</span>
+          </pill-element>`;
       }
     } else {
       // no fix yet - we're still creating it
       switch (validationStatus) {
         case 'NOT_STARTED':
         case 'IN_PROGRESS':
-          return {
-            title:
-              'No suggested fix available - AI fix is still being generated',
-            iconClass: 'warning',
-          };
+          return html`<pill-element type="info">
+            <icon-element icon="sync~spin"></icon-element>
+            <span>Generating fix...</span>
+          </pill-element>`;
         case 'COMPLETED':
         case 'FAILED':
-          return {
-            title: 'No suggested fix available - AI fix generation failed',
-            iconClass: 'error',
-          };
+          return html`<pill-element type="error">
+            <icon-element icon="error"></icon-element>
+            <span>Fix generation failed</span>
+          </pill-element>`;
       }
     }
-  }
-
-  private getUserActionStatusInfo(status: AITaskFixUserAction): {
-    emoji: string;
-    icon: string;
-    iconClass: string;
-    title: string;
-    description: string;
-  } {
-    switch (status) {
-      case 'APPLIED':
-        return {
-          emoji: '✅',
-          icon: '✓',
-          iconClass: 'success',
-          title: 'Fix Applied',
-          description: 'Nx Cloud has successfully applied this fix',
-        };
-      case 'REJECTED':
-        return {
-          emoji: '❌',
-          icon: '✗',
-          iconClass: 'error',
-          title: 'Fix Rejected',
-          description: 'This fix has been rejected by the user',
-        };
-      default:
-      case 'NONE':
-        return {
-          emoji: '⏳',
-          icon: '⟳',
-          iconClass: 'warning',
-          title: 'Waiting to apply or reject this fix',
-          description:
-            'This fix is available but has not been applied or ignored yet',
-        };
-    }
-  }
-
-  private renderFailedTasks(failedTasks: string[]): TemplateResult {
-    return html`
-      <div class="section">
-        <div class="section-header">
-          <div class="status-icon error">✗</div>
-          <h3 class="section-title">Failed Tasks (${failedTasks.length})</h3>
-        </div>
-        <div class="section-content">
-          <div class="failed-tasks-list">
-            ${failedTasks.length > 0
-              ? failedTasks.map(
-                  (task) => html`
-                    <div class="task-item">
-                      <div class="task-info">
-                        <div class="task-name">${task}</div>
-                      </div>
-                    </div>
-                  `,
-                )
-              : html`<div>No failed tasks found</div>`}
-          </div>
-        </div>
-      </div>
-    `;
   }
 
   private getActionButtons(aiFix: NxAiFix): TemplateResult {
@@ -667,14 +565,95 @@ export class NxCloudFixComponent extends LitElement {
     }
   }
 
-  private getTerminalSection(terminalOutput: string): TemplateResult {
+  private getTerminalSection(
+    taskId: string,
+    terminalOutput: string,
+  ): TemplateResult {
     return html`
       <div class="terminal-section">
         <div class="terminal-header">
-          <h2 class="terminal-header-title">Terminal Output</h2>
+          <!-- <div class="status-icon error">x</div> -->
+          <h2 class="terminal-header-title">$> nx run ${taskId}</h2>
         </div>
         <terminal-component .content="${terminalOutput}"></terminal-component>
       </div>
     `;
+  }
+}
+
+@customElement('pill-element')
+class PillElement extends LitElement {
+  static override styles = [
+    css`
+      :host {
+        background-color: var(--badge-background);
+        color: var(--badge-foreground);
+        font-size: 0.75rem;
+        font-weight: 500;
+        box-sizing: border-box;
+        border-radius: 18px;
+        padding: 4px 12px;
+        margin-right: 10px;
+        font-weight: 600;
+        display: flex;
+      }
+
+      .pill-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 4px;
+      }
+
+      :host(.success) {
+        background-color: rgba(115, 201, 145, 0.1);
+        color: var(--success-color);
+      }
+
+      :host(.warning) {
+        background-color: rgba(255, 204, 2, 0.1);
+        color: var(--warning-color);
+      }
+
+      :host(.error) {
+        background-color: rgba(241, 76, 76, 0.1);
+        color: var(--error-color);
+      }
+
+      :host(.info) {
+        background-color: rgba(14, 99, 156, 0.1);
+        color: var(--primary-color);
+      }
+    `,
+  ];
+
+  constructor() {
+    super();
+    const codiconsLink = document.createElement('link');
+    codiconsLink.rel = 'stylesheet';
+    codiconsLink.href =
+      'https://unpkg.com/@vscode/codicons@0.0.36/dist/codicon.css';
+    this.appendChild(codiconsLink);
+  }
+
+  @property({ type: String }) text;
+  @property({ type: String }) type = 'info';
+
+  override render(): TemplateResult {
+    if (!this.text) {
+      return html`<div class="pill-content"><slot></slot></div>`; // Return nothing if no text is provided
+    }
+    return html`<span>${this.text}</span>`;
+  }
+
+  override updated() {
+    // Clear existing state classes
+    this.classList.remove('success', 'warning', 'error', 'info');
+
+    // Add class based on variant if it's one of the supported types
+    if (['success', 'warning', 'error', 'info'].includes(this.type)) {
+      this.classList.add(this.type);
+    }
   }
 }

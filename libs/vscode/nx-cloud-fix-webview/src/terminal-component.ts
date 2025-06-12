@@ -27,6 +27,7 @@ export class TerminalComponent extends LitElement {
       height: 100%;
       overflow: hidden;
       position: relative;
+      padding: 10px 20px;
     }
 
     .xterm {
@@ -309,7 +310,7 @@ export class TerminalComponent extends LitElement {
   fontSize = 14;
 
   @property({ type: Number })
-  rows = 100;
+  rows = 20;
 
   @property({ type: Number })
   cols = 80;

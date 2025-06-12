@@ -24,6 +24,10 @@ export class Root extends LitElement {
     super();
   }
 
+  protected override createRenderRoot(): Element | ShadowRoot {
+    return this;
+  }
+
   private vscodeApi: WebviewApi<undefined> = acquireVsCodeApi();
 
   override connectedCallback() {

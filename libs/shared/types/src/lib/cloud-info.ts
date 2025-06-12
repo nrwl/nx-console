@@ -32,6 +32,7 @@ export type NxAiFix = {
   aiFixId: string;
   taskIds: string[];
   suggestedFix?: string;
+  suggestedFixDescription?: string;
   validationStatus: AITaskFixValidationStatus;
   userAction: AITaskFixUserAction;
 };
