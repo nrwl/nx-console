@@ -109,6 +109,23 @@ export const Default: Story = {
   },
 };
 
+export const WaitingForFix: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          suggestedFix: undefined,
+          suggestedFixDescription: undefined,
+          validationStatus: 'NOT_STARTED',
+        },
+      },
+    },
+  },
+};
+
 export const Applied: Story = {
   args: {
     details: {

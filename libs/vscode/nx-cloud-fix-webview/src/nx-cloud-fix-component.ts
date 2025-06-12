@@ -453,10 +453,12 @@ export class NxCloudFixComponent extends LitElement {
           <div class="title-section">
             <h1 class="title">
               ${runGroup.aiFix.suggestedFixDescription ||
-              'Nx Cloud suggested fix'}
-              <p class="subtitle">
-                Nx Cloud automatically generates a fix for this error.
-              </p>
+              'Nx Cloud is creating a fix for this error.'}
+              ${runGroup.aiFix.suggestedFix
+                ? html`<p class="subtitle">
+                    Nx Cloud automatically created a fix for this error.
+                  </p>`
+                : ''}
             </h1>
             <div class="header-info">
               <div class="header-info-item">
@@ -490,18 +492,18 @@ export class NxCloudFixComponent extends LitElement {
       switch (validationStatus) {
         case 'NOT_STARTED':
           return html`<pill-element type="info">
-            <icon-element icon="sync"></icon-element>
+            <icon-element icon="check"></icon-element>
             <span>Fix available</span>
           </pill-element>`;
         case 'IN_PROGRESS':
           return html`<pill-element type="info">
-            <icon-element icon="loading~spin"></icon-element>
-            <span>Validating fix...</span>
+            <icon-element icon="loading codicon-modifier-spin"></icon-element>
+            <span>Validating...</span>
           </pill-element>`;
         case 'COMPLETED':
           return html`<pill-element type="success">
             <icon-element icon="check"></icon-element>
-            <span>Validated Fix</span>
+            <span>Validated</span>
           </pill-element>`;
         case 'FAILED':
           return html`<pill-element type="error">
@@ -515,14 +517,14 @@ export class NxCloudFixComponent extends LitElement {
         case 'NOT_STARTED':
         case 'IN_PROGRESS':
           return html`<pill-element type="info">
-            <icon-element icon="sync~spin"></icon-element>
-            <span>Generating fix...</span>
+            <icon-element icon="loading codicon-modifier-spin"></icon-element>
+            <span>Creating fix</span>
           </pill-element>`;
         case 'COMPLETED':
         case 'FAILED':
           return html`<pill-element type="error">
             <icon-element icon="error"></icon-element>
-            <span>Fix generation failed</span>
+            <span>Fix creation failed</span>
           </pill-element>`;
       }
     }
@@ -540,12 +542,12 @@ export class NxCloudFixComponent extends LitElement {
     return html`
       <div class="actions">
         <button-element
-          text="Apply Fix"
+          text="Apply"
           appearance="primary"
           @click="${() => this.handleApply()}"
         ></button-element>
         <button-element
-          text="Reject Fix"
+          text="Reject"
           appearance="secondary"
           @click="${() => this.handleReject()}"
         ></button-element>

@@ -36,14 +36,6 @@ export class NxCloudFixWebview {
   }
 
   async showFixDetails(details: NxCloudFixDetails) {
-    console.log('showFixDetails called with details:', {
-      branch: details.cipe.branch,
-      runGroup: details.runGroup.runGroup,
-      hasAiFix: !!details.runGroup.aiFix,
-      hasSuggestedFix: !!details.runGroup.aiFix?.suggestedFix,
-      validationStatus: details.runGroup.aiFix?.validationStatus,
-    });
-
     this.currentFixDetails = details;
 
     if (!this.webviewPanel) {
@@ -55,19 +47,7 @@ export class NxCloudFixWebview {
 
     // Open the diff view in a split panel only if the fix is ready
     if (details.runGroup.aiFix?.suggestedFix) {
-      console.log('AI fix has suggested fix, calling showDiffInSplitPanel');
       await this.showDiffInSplitPanel(details.runGroup.aiFix.suggestedFix);
-    } else {
-      console.log(
-        'No suggested fix available - AI fix is still being generated or failed:',
-        {
-          hasAiFix: !!details.runGroup.aiFix,
-          validationStatus: details.runGroup.aiFix?.validationStatus,
-          suggestedFix: details.runGroup.aiFix?.suggestedFix
-            ? 'exists'
-            : 'missing',
-        },
-      );
     }
   }
 
@@ -185,12 +165,6 @@ export class NxCloudFixWebview {
   }
 
   private async showDiffInSplitPanel(gitDiff: string) {
-    console.log(
-      'showDiffInSplitPanel called with diff length:',
-      gitDiff.length,
-    );
-    console.log('First 200 chars of diff:', gitDiff.substring(0, 200));
-
     // Parse the git diff to extract file changes
     const parsedDiff = parseGitDiff(gitDiff);
 
