@@ -40,7 +40,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
                 text="${element}"
                 fieldId="${this.fieldId}"
                 @remove="${() => this.removeValue(index)}"
-              ></badge-element>`
+              ></badge-element>`,
           )}
         </div>
       </div>
@@ -51,7 +51,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
     if (this.editor === 'intellij') {
       return html` <input
         class="${intellijFieldColors} ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
-          this.shouldRenderError()
+          this.shouldRenderError(),
         )})} grow rounded"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
@@ -60,7 +60,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
     } else {
       return html`<vscode-textfield
         type="text"
-        class="focus:border-focusBorder grow "
+        class="focus:border-focusBorder grow"
         @keydown="${this.handleEnterKeyAdd}"
         style="border-width: calc(var(--border-width) * 1px);"
         ?invalid=${this.shouldRenderError()}

@@ -26,7 +26,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         <div class="mt-2">
           ${when(
             this.selectedElements.length > 0,
-            () => html`<p>Selected:</p>`
+            () => html`<p>Selected:</p>`,
           )}
           <div class="mt-2 flex flex-row gap-4">
             ${this.selectedElements.map(
@@ -35,7 +35,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
                   text="${element}"
                   fieldId="${this.fieldId}"
                   @remove="${() => this.removeValue(index)}"
-                ></badge-element>`
+                ></badge-element>`,
             )}
           </div>
         </div>
@@ -47,7 +47,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
       return html`<select
         @change="${this.addValue}"
         class="bg-selectFieldBackground border-fieldBorder ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
-          this.shouldRenderError()
+          this.shouldRenderError(),
         )})} grow rounded border"
         ${spread(this.ariaAttributes)}
       >
@@ -59,7 +59,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         ${map(
           this.extractItemOptions(this.option),
           (item) =>
-            html`<option value="${item}" title="${item}">${item}</option>`
+            html`<option value="${item}" title="${item}">${item}</option>`,
         )}
       </select>`;
     } else {
@@ -80,7 +80,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
           (item) =>
             html`<vscode-option value="${item}" title="${item}"
               >${item}</vscode-option
-            >`
+            >`,
         )}
       </vscode-single-select>`;
     }
@@ -115,7 +115,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
 
     const possibleOptions = this.extractItemOptions(this.option);
     this.selectedElements = values.filter((value) =>
-      possibleOptions.includes(value)
+      possibleOptions.includes(value),
     );
     this.dispatchValue(this.selectedElements);
   }

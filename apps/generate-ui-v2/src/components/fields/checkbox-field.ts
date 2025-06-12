@@ -1,7 +1,10 @@
 import { spread } from '@open-wc/lit-helpers';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { intellijFieldColors, intellijFocusRing } from '@nx-console/shared-ui-components';
+import {
+  intellijFieldColors,
+  intellijFocusRing,
+} from '@nx-console/shared-ui-components';
 import { CheckboxWrapper } from './mixins/checkbox-wrapper-mixin';
 import { Field } from './mixins/field-mixin';
 
@@ -29,7 +32,7 @@ export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {
 
   setFieldValue(value: string | number | boolean | string[] | undefined): void {
     const inputElement = this.renderRoot.querySelector(
-      this.editor === 'intellij' ? 'input' : 'vscode-checkbox'
+      this.editor === 'intellij' ? 'input' : 'vscode-checkbox',
     );
     if (!inputElement) {
       return;

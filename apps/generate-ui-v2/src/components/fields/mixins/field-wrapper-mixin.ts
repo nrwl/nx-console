@@ -5,11 +5,11 @@ import { FieldValueConsumerInterface } from '../../field-value-consumer-mixin';
 import { EditorContextInterface } from '@nx-console/shared-ui-components';
 
 export const FieldWrapper = <
-  T extends new (...args: any[]) => FieldInterface &
-    EditorContextInterface &
-    FieldValueConsumerInterface
+  T extends new (
+    ...args: any[]
+  ) => FieldInterface & EditorContextInterface & FieldValueConsumerInterface,
 >(
-  base: T
+  base: T,
 ) => {
   return class extends base {
     render() {
@@ -18,8 +18,8 @@ export const FieldWrapper = <
           class="${this.shouldRenderError()
             ? 'border-error'
             : this.shouldRenderChanged()
-            ? 'border-primary'
-            : 'border-transparent'} flex flex-col border-l-4 py-2 pl-3"
+              ? 'border-primary'
+              : 'border-transparent'} flex flex-col border-l-4 py-2 pl-3"
         >
           <div class="flex items-center gap-3">
             <label for="${this.fieldId}"
@@ -27,16 +27,15 @@ export const FieldWrapper = <
             >
             ${when(
               this.option['x-hint'],
-              () =>
-                html`
-                  <popover-element
-                    class="flex items-start"
-                    .content="${this.option['x-hint']}"
-                  >
-                    <icon-element class="flex items-start" icon="question">
-                    </icon-element>
-                  </popover-element>
-                `
+              () => html`
+                <popover-element
+                  class="flex items-start"
+                  .content="${this.option['x-hint']}"
+                >
+                  <icon-element class="flex items-start" icon="question">
+                  </icon-element>
+                </popover-element>
+              `,
             )}
           </div>
           <p class="text-mutedForeground mb-2">${this.option.description}</p>
@@ -47,13 +46,13 @@ export const FieldWrapper = <
               html`<p
                 class="text-error ${when(
                   this.editor === 'intellij',
-                  () => 'mt-1'
+                  () => 'mt-1',
                 )} text-sm"
                 id="${this.fieldId}-error"
                 aria-live="polite"
               >
                 ${this.validation}
-              </p>`
+              </p>`,
           )}
         </div>
       `;

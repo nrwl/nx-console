@@ -1,6 +1,11 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { EditorContext, intellijFieldColors, intellijFieldPadding, intellijFocusRing } from '@nx-console/shared-ui-components';
+import {
+  EditorContext,
+  intellijFieldColors,
+  intellijFieldPadding,
+  intellijFocusRing,
+} from '@nx-console/shared-ui-components';
 import { GeneratorContextContext } from '../contexts/generator-context-context';
 import { FormValueSubscriber } from './fields/mixins/form-value-subscriber-mixin';
 

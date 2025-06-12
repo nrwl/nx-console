@@ -33,5 +33,5 @@ provideFASTDesignSystem().register(
         class="h-[1.25rem]"
       ></img>`,
   }),
-  fastOption({ prefix: 'intellij', styles: intellijOptionStyles })
+  fastOption({ prefix: 'intellij', styles: intellijOptionStyles }),
 );

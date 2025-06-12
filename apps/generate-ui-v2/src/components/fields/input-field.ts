@@ -18,7 +18,7 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
       return html`
         <input
           class="${intellijFieldColors} ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
-            error
+            error,
           )} rounded"
           type="text"
           @input="${this.handleChange}"
@@ -47,7 +47,7 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
 
   setFieldValue(value: string | boolean | number | string[] | undefined) {
     const inputNode = this.renderRoot.querySelector(
-      this.editor === 'intellij' ? 'input' : 'vscode-textfield'
+      this.editor === 'intellij' ? 'input' : 'vscode-textfield',
     );
     if (!inputNode) {
       return;

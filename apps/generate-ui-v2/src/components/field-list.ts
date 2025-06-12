@@ -13,7 +13,7 @@ type OptionWithMetadata = {
 
 @customElement('field-list')
 export class FieldList extends GeneratorContextContext(
-  EditorContext(LitElement)
+  EditorContext(LitElement),
 ) {
   @property()
   options: Option[];
@@ -44,7 +44,7 @@ export class FieldList extends GeneratorContextContext(
         <div
           class="border-separator ${this.editor === 'intellij'
             ? 'hidden md:block'
-            : 'max-sm:hidden md:w-64'} fixed h-full w-52 overflow-y-auto border-r-2  p-6"
+            : 'max-sm:hidden md:w-64'} fixed h-full w-52 overflow-y-auto border-r-2 p-6"
         >
           ${this.renderOptionNav(optionsWithMetadata, shouldShowMoreOptions)}
         </div>
@@ -56,7 +56,7 @@ export class FieldList extends GeneratorContextContext(
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
             shouldShowMoreOptions,
-            shouldHideShowMoreButton
+            shouldHideShowMoreButton,
           )}
         </div>
       </div>
@@ -65,7 +65,7 @@ export class FieldList extends GeneratorContextContext(
 
   private renderOptionNav(
     optionsWithMetadata: OptionWithMetadata[],
-    shouldShowMoreOptions: boolean
+    shouldShowMoreOptions: boolean,
   ): TemplateResult {
     return html`
       <ul>
@@ -89,12 +89,12 @@ export class FieldList extends GeneratorContextContext(
   private renderOptionsWithDivider(
     optionsWithMetadata: OptionWithMetadata[],
     shouldShowMoreOptions: boolean,
-    shouldHideShowMoreButton: boolean
+    shouldHideShowMoreButton: boolean,
   ): TemplateResult {
     // we need to render all options but hide some so the component instances are persisted
     const renderOption = (
       optionWithMetadata: OptionWithMetadata,
-      hidden = false
+      hidden = false,
     ) => {
       const componentTag = getFieldComponent(optionWithMetadata.option);
       return html` <div
@@ -128,13 +128,13 @@ export class FieldList extends GeneratorContextContext(
     if (this.searchValue) {
       return html`<div>
         ${optionsWithMetadata.map((opt) =>
-          renderOption(opt, !opt.isInSearchResults)
+          renderOption(opt, !opt.isInSearchResults),
         )}
       </div>`;
     }
 
     const importantOptions = optionsWithMetadata.filter(
-      (opt) => opt.isImportant
+      (opt) => opt.isImportant,
     );
 
     const otherOptions = optionsWithMetadata.filter((opt) => !opt.isImportant);
@@ -153,7 +153,7 @@ export class FieldList extends GeneratorContextContext(
     this.updateComplete.then(() => {
       const field = Array.from(this.renderRoot.querySelectorAll('*')).find(
         (el) =>
-          el.id.toLowerCase().endsWith('-field') && el instanceof HTMLElement
+          el.id.toLowerCase().endsWith('-field') && el instanceof HTMLElement,
       );
       if (field) {
         (field as HTMLElement).focus();
@@ -185,7 +185,7 @@ export class FieldList extends GeneratorContextContext(
             observer.disconnect();
           }
         },
-        { rootMargin: '0px', threshold: 1.0 }
+        { rootMargin: '0px', threshold: 1.0 },
       );
 
       observer.observe(element);
@@ -225,7 +225,7 @@ const getFieldComponent = (option: Option) => {
 
 const getOptionsWithMetadata = (
   options: Option[],
-  searchValue: string | undefined
+  searchValue: string | undefined,
 ): {
   optionsWithMetadata: OptionWithMetadata[];
   numOfImportantOptions: number;
@@ -239,10 +239,10 @@ const getOptionsWithMetadata = (
   return {
     optionsWithMetadata,
     numOfImportantOptions: optionsWithMetadata.filter(
-      (option) => option.isImportant
+      (option) => option.isImportant,
     ).length,
     numOfOtherOptions: optionsWithMetadata.filter(
-      (option) => !option.isImportant
+      (option) => !option.isImportant,
     ).length,
   };
 };
