@@ -74,7 +74,7 @@ export function compareCIPEDataAndSendNotification(
 
     if (newCIPEIsFailed && !hasAiFix) {
       showMessageWithResultAndCommit(
-        `CI Pipeline Execution for #${newCIPE.branch} has completed`,
+        `CI Pipeline Execution for #${newCIPE.branch} has failed`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
