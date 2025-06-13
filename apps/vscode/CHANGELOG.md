@@ -1,3 +1,10 @@
+## [18.52.1](https://github.com/nrwl/nx-console/compare/vscode-v18.52.0...vscode-v18.52.1) (2025-06-13)
+
+
+### Bug Fixes
+
+* **vscode:** use the terminal urls from response instead of getting it manually in the Nx Cloud fix feature ([#2560](https://github.com/nrwl/nx-console/issues/2560)) ([8de9758](https://github.com/nrwl/nx-console/commit/8de97580d06e28562e62543ff0b2abbe4921bfa4))
+
 # [18.52.0](https://github.com/nrwl/nx-console/compare/vscode-v18.51.0...vscode-v18.52.0) (2025-06-13)
 
 
