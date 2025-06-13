@@ -1,0 +1,20 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../shared/ui-components"
+    },
+    {
+      "path": "../../shared/types"
+    },
+    {
+      "path": "./tsconfig.webview.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
+    }
+  ],
+  "exclude": ["**/*.stories.ts", "**/*.stories.js"]
+}

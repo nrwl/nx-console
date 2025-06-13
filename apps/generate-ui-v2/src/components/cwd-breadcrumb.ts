@@ -1,12 +1,12 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { EditorContext } from '../contexts/editor-context';
-import { GeneratorContextContext } from '../contexts/generator-context-context';
 import {
+  EditorContext,
   intellijFieldColors,
   intellijFieldPadding,
   intellijFocusRing,
-} from '../utils/ui-utils';
+} from '@nx-console/shared-ui-components';
+import { GeneratorContextContext } from '../contexts/generator-context-context';
 import { FormValueSubscriber } from './fields/mixins/form-value-subscriber-mixin';
 
 const pathSeparator = window?.navigator?.userAgent?.includes('Win')

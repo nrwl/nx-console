@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { EditorContext } from '../contexts/editor-context';
+import { EditorContext } from '@nx-console/shared-ui-components';
 import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('show-more-divider')
@@ -28,10 +28,10 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
         <div tabindex="0" aria-role="button" class="flex flex-row gap-2 leading-none focus:ring-1 focus:ring-focusBorder focus:outline-none" @keydown="${
           this.handleKeyEvent
         }">${
-      this.showMore ? 'Show fewer options' : 'Show all options'
-    } <icon-element icon="${
-      this.showMore ? 'chevron-up' : 'chevron-down'
-    }" class="self-center"></div>
+          this.showMore ? 'Show fewer options' : 'Show all options'
+        } <icon-element icon="${
+          this.showMore ? 'chevron-up' : 'chevron-down'
+        }" class="self-center"></div>
       </div>
     `;
   }

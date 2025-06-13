@@ -11,7 +11,7 @@ import {
   intellijErrorRingStyles,
   intellijFieldPadding,
   intellijFocusRing,
-} from '../../utils/ui-utils';
+} from '@nx-console/shared-ui-components';
 import { Field } from './mixins/field-mixin';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
@@ -30,18 +30,18 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
       <select
         @change="${this.handleChange}"
         class="form-select bg-selectFieldBackground border-fieldBorder ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
-          this.shouldRenderError()
+          this.shouldRenderError(),
         )} rounded border"
         ${spread(this.ariaAttributes)}
       >
         ${when(
           extractDefaultValue(this.option) === undefined,
-          () => html`<option value="">--</option>`
+          () => html`<option value="">--</option>`,
         )}
         ${map(
           extractItemOptions(this.option),
           (item) =>
-            html`<option value="${item}" title="${item}">${item}</option>`
+            html`<option value="${item}" title="${item}">${item}</option>`,
         )}
       </select>
     `;
@@ -60,14 +60,14 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
       >
         ${when(
           defaultValue === undefined,
-          () => html`<vscode-option value="">--</vscode-option>`
+          () => html`<vscode-option value="">--</vscode-option>`,
         )}
         ${map(
           itemOptions,
           (item) =>
             html`<vscode-option value="${item}" title="${item}"
               >${item}</vscode-option
-            >`
+            >`,
         )}
       </vscode-single-select>
     `;
@@ -75,7 +75,7 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
 
   setFieldValue(value: string | number | boolean | string[] | undefined): void {
     const selectNode = this.renderRoot.querySelector(
-      this.editor === 'intellij' ? 'select' : 'vscode-single-select'
+      this.editor === 'intellij' ? 'select' : 'vscode-single-select',
     );
     if (!selectNode) {
       return;

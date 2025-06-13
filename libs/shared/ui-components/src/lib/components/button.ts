@@ -17,7 +17,7 @@ export class Button extends EditorContext(LitElement) {
   @property({ type: Boolean })
   applyFillColor = false;
 
-  render() {
+  override render() {
     return this.editor === 'vscode'
       ? this.renderVSCode()
       : this.renderIntellij();
@@ -64,7 +64,7 @@ export class Button extends EditorContext(LitElement) {
     </button>`;
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected override createRenderRoot(): Element | ShadowRoot {
     return this;
   }
 }

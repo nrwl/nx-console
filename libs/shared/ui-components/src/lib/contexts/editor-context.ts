@@ -4,7 +4,7 @@ import { state } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit-labs/context';
 
 export const editorContext = createContext<'vscode' | 'intellij'>(
-  Symbol('editor')
+  Symbol('editor'),
 );
 
 export declare class EditorContextInterface {
@@ -14,7 +14,7 @@ export declare class EditorContextInterface {
 type Constructor<T> = new (...args: any[]) => T;
 
 export const EditorContext = <T extends Constructor<LitElement>>(
-  superClass: T
+  superClass: T,
 ) => {
   class EditorContextElement extends superClass {
     @state() editor: 'vscode' | 'intellij';

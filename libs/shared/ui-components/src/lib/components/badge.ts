@@ -3,14 +3,14 @@ import { customElement, property } from 'lit/decorators.js';
 import { EditorContext } from '../contexts/editor-context';
 
 @customElement('badge-element')
-export class Banner extends EditorContext(LitElement) {
+export class Badge extends EditorContext(LitElement) {
   @property()
   text: string;
 
   @property()
   fieldId: string;
 
-  render() {
+  override render() {
     return html`
       <div
         tabindex="0"
@@ -46,7 +46,7 @@ export class Banner extends EditorContext(LitElement) {
     this.dispatchEvent(new CustomEvent('remove'));
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected override createRenderRoot(): Element | ShadowRoot {
     return this;
   }
 }

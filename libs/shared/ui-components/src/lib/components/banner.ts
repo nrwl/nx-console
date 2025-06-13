@@ -14,7 +14,7 @@ export class Banner extends EditorContext(LitElement) {
     this.dismissed = true;
   }
 
-  render() {
+  override render() {
     const bannerClass =
       this.type === 'error' ? 'bg-bannerError' : 'bg-bannerWarning';
 
@@ -31,7 +31,7 @@ export class Banner extends EditorContext(LitElement) {
             ? html`<icon-element
                 icon="close"
                 color="${getComputedStyle(this).getPropertyValue(
-                  '--banner-text-color'
+                  '--banner-text-color',
                 )}"
               ></icon-element>`
             : html`<icon-element icon="close"></icon-element>`}
@@ -40,7 +40,7 @@ export class Banner extends EditorContext(LitElement) {
     `;
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected override createRenderRoot(): Element | ShadowRoot {
     return this;
   }
 }

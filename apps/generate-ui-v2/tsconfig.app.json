@@ -23,6 +23,9 @@
     },
     {
       "path": "../../libs/shared/schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/ui-components/tsconfig.lib.json"
     }
   ]
 }

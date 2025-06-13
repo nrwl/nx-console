@@ -227,21 +227,6 @@
           "group": "inline@1"
         },
         {
-          "command": "nxCloud.showAiFixFromTree",
-          "when": "view == nxCloudRecentCIPE && (viewItem =~ /nxCloudFix-aifix.*-hasFix/ || viewItem =~ /nxCloudFix-aifix-applied$/)",
-          "group": "inline@2"
-        },
-        {
-          "command": "nxCloud.applyAiFixFromTree",
-          "when": "view == nxCloudRecentCIPE && viewItem =~ /nxCloudFix-aifix.*-hasFix.*-(notValidated|validated)$/ && !(viewItem =~ /nxCloudFix-aifix-(applied|rejected)$/)",
-          "group": "inline@3"
-        },
-        {
-          "command": "nxCloud.ignoreAiFixFromTree",
-          "when": "view == nxCloudRecentCIPE && viewItem =~ /nxCloudFix-aifix.*-hasFix/ && !(viewItem =~ /nxCloudFix-aifix-(applied|rejected)$/)",
-          "group": "inline@4"
-        },
-        {
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
@@ -357,15 +342,15 @@
           "when": "false"
         },
         {
-          "command": "nxCloud.showAiFixFromTree",
+          "command": "nxCloud.applyAiFix",
           "when": "false"
         },
         {
-          "command": "nxCloud.applyAiFixFromTree",
+          "command": "nxCloud.rejectAiFix",
           "when": "false"
         },
         {
-          "command": "nxCloud.ignoreAiFixFromTree",
+          "command": "nxCloud.openFixDetails",
           "when": "false"
         },
         {
@@ -957,19 +942,17 @@
         }
       },
       {
-        "title": "View AI Suggested Fix",
-        "command": "nxCloud.showAiFixFromTree",
-        "icon": "$(diff)"
-      },
-      {
         "title": "Apply AI Fix",
-        "command": "nxCloud.applyAiFixFromTree",
-        "icon": "$(check)"
+        "command": "nxCloud.applyAiFix"
       },
       {
-        "title": "Ignore AI Fix",
-        "command": "nxCloud.ignoreAiFixFromTree",
-        "icon": "$(close)"
+        "title": "Reject AI Fix",
+        "command": "nxCloud.rejectAiFix"
+      },
+      {
+        "title": "Open Fix Details",
+        "command": "nxCloud.openFixDetails",
+        "category": "Nx Cloud"
       },
       {
         "category": "Nx",

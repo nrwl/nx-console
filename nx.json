@@ -79,7 +79,9 @@
       "!{projectRoot}/.eslintrc.json",
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/src/test/**/*"
+      "!{projectRoot}/src/test/**/*",
+      "!{projectRoot}/.storybook/**/*",
+      "!{projectRoot}/tsconfig.storybook.json"
     ],
     "sharedGlobals": [
       {
@@ -123,6 +125,8 @@
     },
     {
       "plugin": "@nx/cypress/plugin",
+      "//": "Temporary disable e2e tests for generate-ui-v2",
+      "exclude": ["apps/generate-ui-v2-e2e/**/*"],
       "options": {
         "targetName": "e2e-local",
         "openTargetName": "open-cypress",
@@ -154,6 +158,15 @@
           "targetName": "build",
           "configName": "tsconfig.lib.json"
         }
+      }
+    },
+    {
+      "plugin": "@nx/storybook/plugin",
+      "options": {
+        "serveStorybookTargetName": "storybook",
+        "buildStorybookTargetName": "build-storybook",
+        "testStorybookTargetName": "test-storybook",
+        "staticStorybookTargetName": "static-storybook"
       }
     }
   ],
