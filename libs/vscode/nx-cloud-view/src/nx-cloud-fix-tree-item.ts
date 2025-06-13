@@ -1,23 +1,19 @@
 import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import {
-  getNxCloudStatus,
-  getNxCloudTerminalOutput,
-} from '@nx-console/vscode-nx-workspace';
+import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
-import { nxCloudAuthHeaders } from '@nx-console/shared-nx-cloud';
-import { xhr } from 'request-light';
-import { join } from 'path';
 import {
-  CancellationToken,
+  downloadAndExtractArtifact,
+  nxCloudAuthHeaders,
+} from '@nx-console/shared-nx-cloud';
+import { xhr } from 'request-light';
+import {
   commands,
   ExtensionContext,
   ProviderResult,
-  TextDocumentContentProvider,
   ThemeColor,
   ThemeIcon,
   TreeItemCollapsibleState,
-  Uri,
   window,
   workspace,
 } from 'vscode';
@@ -283,12 +279,6 @@ export function registerNxCloudFixCommands(
     commands.registerCommand(
       'nxCloud.openFixDetails',
       async (args: { cipeId: string; runGroup: CIPERunGroup }) => {
-        console.log('nxCloud.openFixDetails command called with treeItem:', {
-          cipeId: args.cipeId,
-          runGroup: args.runGroup.runGroup,
-          hasAiFix: !!args.runGroup.aiFix,
-        });
-
         if (!args.runGroup.aiFix) {
           console.log('No AI fix available on tree item');
           return;
@@ -308,16 +298,21 @@ export function registerNxCloudFixCommands(
           source: 'cloud-view',
         });
 
-        const { terminalOutput, error } = await getNxCloudTerminalOutput(
-          args.runGroup.aiFix.taskIds[0],
-          cipe.ciPipelineExecutionId,
-          args.runGroup.runs[0].linkId,
-        );
-
-        if (error) {
-          outputLogger.log(
-            `Failed to retrieve terminal output for CIPE ${cipe.ciPipelineExecutionId} and run group ${args.runGroup.runGroup}: ${error}`,
+        let terminalOutput: string | undefined;
+        const failedTaskId = args.runGroup.aiFix.taskIds[0];
+        try {
+          const terminalOutputUrl =
+            args.runGroup.aiFix.terminalLogsUrls[failedTaskId];
+          terminalOutput = await downloadAndExtractArtifact(
+            terminalOutputUrl,
+            outputLogger,
           );
+        } catch (error) {
+          outputLogger.log(
+            `Failed to retrieve terminal output for task ${failedTaskId}: ${error}`,
+          );
+          terminalOutput =
+            'Failed to retrieve terminal output. Please check the Nx Console output for more details.';
         }
 
         await nxCloudFixWebview.showFixDetails({

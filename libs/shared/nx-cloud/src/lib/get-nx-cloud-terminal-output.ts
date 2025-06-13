@@ -68,7 +68,7 @@ export async function getNxCloudTerminalOutput(
   }
 }
 
-async function downloadAndExtractArtifact(
+export async function downloadAndExtractArtifact(
   artifactUrl: string,
   logger: Logger,
 ): Promise<string> {
