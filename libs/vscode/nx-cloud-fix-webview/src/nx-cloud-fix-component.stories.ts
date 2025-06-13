@@ -48,6 +48,7 @@ const runGroup: NxCloudFixData['runGroup'] = {
       'Install missing dependencies and update imports, and more configuration changes.',
     userAction: undefined,
     taskIds: ['task-1', 'task-2'],
+    terminalLogsUrls: {},
   },
 };
 
