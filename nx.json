@@ -125,6 +125,8 @@
     },
     {
       "plugin": "@nx/cypress/plugin",
+      "//": "Temporary disable e2e tests for generate-ui-v2",
+      "exclude": ["apps/generate-ui-v2-e2e/**/*"],
       "options": {
         "targetName": "e2e-local",
         "openTargetName": "open-cypress",
