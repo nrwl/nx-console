@@ -1,3 +1,15 @@
+# [18.52.0](https://github.com/nrwl/nx-console/compare/vscode-v18.51.0...vscode-v18.52.0) (2025-06-13)
+
+
+### Bug Fixes
+
+* **vscode:** update failed CI notification message ([#2557](https://github.com/nrwl/nx-console/issues/2557)) ([2a2fb41](https://github.com/nrwl/nx-console/commit/2a2fb412596193030378ea678c39aca0c225db0b))
+
+
+### Features
+
+* **vscode:** add new ui to show Nx Cloud fix ([#2558](https://github.com/nrwl/nx-console/issues/2558)) ([d12d96a](https://github.com/nrwl/nx-console/commit/d12d96a6953e870971f0a532f24bd732cf873fff))
+
 # [18.51.0](https://github.com/nrwl/nx-console/compare/vscode-v18.50.0...vscode-v18.51.0) (2025-06-09)
 
 
