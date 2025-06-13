@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "nx": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "nx-mcp@latest", "."],
+      "env": {}
+    }
+  }
+}

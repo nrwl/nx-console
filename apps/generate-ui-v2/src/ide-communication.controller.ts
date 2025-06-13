@@ -13,7 +13,7 @@ import {
 import { ReactiveController, ReactiveElement } from 'lit';
 
 import type { WebviewApi } from 'vscode-webview';
-import { editorContext } from './contexts/editor-context';
+import { editorContext } from '@nx-console/shared-ui-components';
 import { generatorContextContext } from './contexts/generator-context-context';
 
 export class IdeCommunicationController implements ReactiveController {

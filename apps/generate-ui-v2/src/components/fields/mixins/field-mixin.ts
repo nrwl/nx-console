@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js';
 import {
   EditorContext,
   EditorContextInterface,
-} from '../../../contexts/editor-context';
+} from '@nx-console/shared-ui-components';
 import {
   compareWithDefaultValue,
   extractDefaultValue,

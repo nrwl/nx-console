@@ -9,7 +9,8 @@
     "generate-ui-v2",
     "nxls",
     "nx-cloud-onboarding-webview",
-    "vscode-migrate-sidebar-webview"
+    "vscode-migrate-sidebar-webview",
+    "vscode-nx-cloud-fix-webview"
   ],
   "targets": {
     "build": {

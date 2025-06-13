@@ -1,0 +1,20 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/nx-cloud-fix-webview",
+
+    "emitDeclarationOnly": false,
+    "types": ["node"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["DOM", "esnext.asynciterable"],
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../shared/ui-components"
+    }
+  ]
+}
