@@ -31,6 +31,7 @@ export type CIPEInfo = {
 export type NxAiFix = {
   aiFixId: string;
   taskIds: string[];
+  terminalLogsUrls: Record<string, string>;
   suggestedFix?: string;
   suggestedFixDescription?: string;
   validationStatus: AITaskFixValidationStatus;
