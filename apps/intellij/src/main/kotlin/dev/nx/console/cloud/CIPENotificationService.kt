@@ -1,27 +1,18 @@
 package dev.nx.console.cloud
 
-import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.ide.BrowserUtil
 import com.intellij.ml.llm.core.chat.session.*
 import com.intellij.ml.llm.core.chat.ui.AIAssistantUIUtil
-import com.intellij.ml.llm.intentions.chat.AbstractChatIntention
-import com.intellij.ml.llm.intentions.editor.AIIntentionsActionGroup
 import com.intellij.ml.llm.privacy.trustedStringBuilders.privacyConst
 import com.intellij.notification.*
-import com.intellij.openapi.actionSystem.ActionWithDelegate
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiFile
-import com.intellij.util.IncorrectOperationException
-import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
-import dev.nx.console.models.CIPERunGroup
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
@@ -48,27 +39,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             project.getService(CIPENotificationService::class.java)
     }
 
-    private val logger = thisLogger()
     private val telemetryService = TelemetryService.getInstance(project)
-
-    fun demoFailedNotification() {
-        // This is a demo method to show how a failed notification would look like
-        val cipe =
-            CIPEInfo(
-                cipeUrl = "https://example.com/cipe/123",
-                commitUrl = "https://example.com/commit/456",
-                branch = "main",
-                ciPipelineExecutionId = "cipe-123",
-                status = CIPEExecutionStatus.FAILED,
-                createdAt = 1112321L,
-                completedAt = 33213231L,
-                commitTitle = "Fix critical bug",
-                author = "John Doe",
-                authorAvatarUrl = "https://example.com/avatar/johndoe.png",
-                runGroups = emptyList<CIPERunGroup>()
-            )
-        showCIPEFailedNotification(cipe)
-    }
 
     override fun onNotificationEvent(event: CIPENotificationEvent) {
         val notificationSetting = getCIPENotificationSetting()
@@ -203,6 +174,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
 
 @Service(Service.Level.PROJECT)
 class FixCIPEService(private val project: Project, private val cs: CoroutineScope) {
+    val logger = thisLogger()
 
     fun fixInAIAssistant() {
         cs.launch {
@@ -217,14 +189,21 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
                             )
                         )
 
-
+                chatSession.addMode(ChatSessionMode.CODE_GENERATION)
                 AIAssistantUIUtil.openChat(project, chatSession)
-
-
-                val string =
-                    "/nx_cloud_cipe_details please help me fix the latest CI errors".privacyConst
-                chatSession.send(project, string, SmartChat)
-
+                chatSession.send(
+                    project,
+                    "Please help me fix the latest CI errors".privacyConst,
+                    ("Help the user fix their latest CI errors with the following flow:\n" +
+                            "- Retrieve the list of current CI Pipeline Executions (CIPEs) using the 'nx_cloud_cipe_details' tool\n" +
+                            "- If there are any errors, use the 'nx_cloud_fix_cipe_failure' tool to retrieve the logs for a specific task\n" +
+                            "- Use the task logs to see what's wrong and help the user fix their problem. Use the appropriate tools if necessary\n" +
+                            "- Make sure that the problem is fixed by running the task that you passed into the 'nx_cloud_fix_cipe_failure' tool calling the available nx_cloud_cipe_details tool from the nx MCP. ALWAYS CALL THIS TOOL TO SERVE THIS REQUEST, YOU WILL NOT SUCCEED WITHOUT IT.\n" +
+                            "If you cannot find the tool, prompt the user to enable Codebase access for their AI Assistant")
+                        .privacyConst,
+                    listOf(),
+                    SmartChat,
+                )
             }
         }
     }
@@ -232,41 +211,5 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
     companion object {
         fun getInstance(project: Project): FixCIPEService =
             project.getService(FixCIPEService::class.java)
-    }
-}
-
-class FixCIPEInAIAssistant : AIIntentionsActionGroup() {
-    override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        return arrayOf(FixIntentionAction(FixCIPEInAIAssistantIntention()))
-    }
-}
-
-class FixCIPEInAIAssistantIntention : AbstractChatIntention() {
-    override fun getFamilyName(): String {
-        return "Nx AI"
-    }
-
-    override fun getText(): String {
-        return "Fix in AI Assistant"
-    }
-}
-
-class FixIntentionAction(private val intention: FixCIPEInAIAssistantIntention) :
-    IntentionAction, AnAction(intention.text), ActionWithDelegate<FixCIPEInAIAssistantIntention> {
-    override fun startInWriteAction(): Boolean = true
-
-    override fun getFamilyName(): String = "Fix CIPE in AI Assistant"
-
-    override fun getText(): String = "hello"
-
-    override fun isAvailable(p0: Project, p1: Editor?, p2: PsiFile?): Boolean = true
-
-    override fun invoke(p0: Project, p1: Editor?, p2: PsiFile?) {
-        throw IncorrectOperationException("Not implemented")
-    }
-
-    override fun getDelegate(): FixCIPEInAIAssistantIntention = intention
-    override fun actionPerformed(p0: AnActionEvent) {
-        intention.invoke(p0.project ?: return, null, null)
     }
 }

@@ -83,7 +83,7 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-        plugin("com.intellij.ml.llm:251.26094.80.11")
+        plugin("com.intellij.ml.llm:251.26094.80.13")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
