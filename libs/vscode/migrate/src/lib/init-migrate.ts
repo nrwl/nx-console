@@ -1,35 +1,43 @@
-import { commands, ExtensionContext, window } from 'vscode';
-import { migrateMachine } from './migrate-state-machine';
-import { ActorRef, createActor } from 'xstate';
-import { MigrateSidebarViewProvider } from './migrate-sidebar-view-provider';
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server-types';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   getNxlsClient,
   onWorkspaceRefreshed,
 } from '@nx-console/vscode-lsp-client';
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { coerce } from 'semver';
-import { MigrateWebview } from './migrate-webview';
-import { registerCommands } from './commands/migrate-commands';
-import { NxWorkspaceRefreshStartedNotification } from '@nx-console/language-server-types';
+import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+import { coerce } from 'semver';
+import { commands, ExtensionContext, window } from 'vscode';
+import { ActorRef, createActor } from 'xstate';
+import { registerCommands } from './commands/migrate-commands';
 import { DiffEditorTerminalLinkProvider } from './diff-editor-terminal-link-provider';
+import { MigrateSidebarViewProvider } from './migrate-sidebar-view-provider';
+import { migrateMachine } from './migrate-state-machine';
+import { MigrateWebview } from './migrate-webview';
 export function initMigrate(context: ExtensionContext): void {
   const actor = createActor(migrateMachine);
   actor.start();
 
   updateWorkspaceData(actor);
   context.subscriptions.push(
-    getNxlsClient().onNotification(NxWorkspaceRefreshStartedNotification, () =>
-      updateWorkspaceData(actor),
+    getNxlsClient().onNotification(
+      NxWorkspaceRefreshStartedNotification,
+      () => {
+        updateWorkspaceData(actor);
+        refreshNxVersionInfo(actor);
+      },
     ),
+    onWorkspaceRefreshed(() => {
+      updateWorkspaceData(actor);
+      refreshNxVersionInfo(actor);
+    }),
   );
 
-  updateLatestNxVersion(actor);
+  refreshNxVersionInfo(actor);
 
   MigrateSidebarViewProvider.create(context, actor);
 
@@ -39,7 +47,7 @@ export function initMigrate(context: ExtensionContext): void {
   context.subscriptions.push(
     commands.registerCommand('nxMigrate.refresh', () => {
       updateWorkspaceData(actor);
-      updateLatestNxVersion(actor);
+      refreshNxVersionInfo(actor);
     }),
     commands.registerCommand('nxMigrate.refreshWebview', () => {
       migrateWebview.refresh();
@@ -99,7 +107,7 @@ function checkHasMigrationsSection(
   }
 }
 
-async function updateLatestNxVersion(actor: ActorRef<any, any>) {
+async function refreshNxVersionInfo(actor: ActorRef<any, any>) {
   const nxVersion = await getNxVersion(true);
   const latestNxVersion = await getLatestNxVersion();
   actor.send({
