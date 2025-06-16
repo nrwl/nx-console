@@ -15,6 +15,14 @@ enum class TelemetryEvent(val eventName: String) {
     MISC_OPEN_PROJECT_DETAILS_CODELENS("misc.open-project-details-codelens"),
     MISC_EXCEPTION("misc.exception"),
 
+    // AI
+    AI_ADD_MCP("ai.add-mcp"),
+    AI_CHAT_MESSAGE("ai.chat-message"),
+    AI_FEEDBACK_BAD("ai.feedback-bad"),
+    AI_FEEDBACK_GOOD("ai.feedback-good"),
+    AI_RESPONSE_INTERACTION("ai.response-interaction"),
+    AI_TOOL_CALL("ai.tool-call"),
+
     // Cloud
     CLOUD_CONNECT("cloud.connect"),
     CLOUD_OPEN_APP("cloud.open-app"),
@@ -25,6 +33,13 @@ enum class TelemetryEvent(val eventName: String) {
     CLOUD_VIEW_CIPE("cloud.view-cipe"),
     CLOUD_VIEW_CIPE_COMMIT("cloud.view-cipe-commit"),
     CLOUD_FIX_CIPE_ERROR("cloud.fix-cipe-error"),
+    CLOUD_APPLY_AI_FIX("cloud.apply-ai-fix"),
+    CLOUD_EXPLAIN_CIPE_ERROR("cloud.explain-cipe-error"),
+    CLOUD_OPEN_FIX_DETAILS("cloud.open-fix-details"),
+    CLOUD_REJECT_AI_FIX("cloud.reject-ai-fix"),
+    CLOUD_SHOW_AI_FIX("cloud.show-ai-fix"),
+    CLOUD_SHOW_AI_FIX_NOTIFICATION("cloud.show-ai-fix-notification"),
+    CLOUD_VIEW_RUN("cloud.view-run"),
 
     // Graph
     GRAPH_SHOW_ALL("graph.show-all"),

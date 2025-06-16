@@ -73,6 +73,9 @@ jobs:
       - name: Check formatting of other files
         run: yarn nx format:check --verbose
 
+      - name: Check telemetry event synchronization
+        run: yarn nx run telemetry-check
+
       - name: Ensure the workspace configuration is in sync
         run: yarn nx-cloud record -- yarn nx sync:check
 
