@@ -112,6 +112,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         telemetryService.featureUsed(TelemetryEvent.CLOUD_SHOW_CIPE_NOTIFICATION)
 
         val notification =
+        
             NOTIFICATION_GROUP.createNotification(title = title, content = content, type = type)
 
         // Add actions in order: Help (if error), View Commit (if available), View Results
