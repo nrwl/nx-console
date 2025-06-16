@@ -195,12 +195,12 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
                 chatSession.send(
                     project,
                     "Please help me fix the latest CI errors".privacyConst,
-                    ("Help the user fix their latest CI errors with the following flow:\n" +
-                            "- Retrieve the list of current CI Pipeline Executions (CIPEs) using the 'nx_cloud_cipe_details' tool\n" +
-                            "- If there are any errors, use the 'nx_cloud_fix_cipe_failure' tool to retrieve the logs for a specific task\n" +
-                            "- Use the task logs to see what's wrong and help the user fix their problem. Use the appropriate tools if necessary\n" +
+                    ("/nx_cloud_cipe_details Help the user fix their latest CI errors with the following flow:\n" +
+                            "- Retrieve the list of current CI Pipeline Executions (CIPEs) - YOU HAVE TO call the 'nx_cloud_cipe_details' MCP tool to do this\n" +
+                            "- If there are any errors, YOU HAVE TO call the 'nx_cloud_fix_cipe_failure' MCP tool to retrieve the logs for a specific task\n" +
+                            "- Use the task logs to see what's wrong and help the user fix their problem. \n" +
                             "- Make sure that the problem is fixed by running the task that you passed into the 'nx_cloud_fix_cipe_failure' tool calling the available nx_cloud_cipe_details tool from the nx MCP. ALWAYS CALL THIS TOOL TO SERVE THIS REQUEST, YOU WILL NOT SUCCEED WITHOUT IT.\n" +
-                            "If you cannot find the tool, prompt the user to enable Codebase access for their AI Assistant")
+                            "If you cannot find the corresponding MCP tool, prompt the user to enable Codebase access for their AI Assistant")
                         .privacyConst,
                     listOf(),
                     SmartChat,
