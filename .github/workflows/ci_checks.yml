@@ -73,16 +73,13 @@ jobs:
       - name: Check formatting of other files
         run: yarn nx format:check --verbose
 
-      - name: Check telemetry event synchronization
-        run: yarn nx run telemetry-check
-
       - name: Ensure the workspace configuration is in sync
         run: yarn nx-cloud record -- yarn nx sync:check
 
       # - name: Run Nx Cloud conformance checks
       #   run: yarn nx-cloud record -- yarn nx-cloud conformance:check
 
-      - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin --configuration=ci --exclude=nx-console --parallel=3
+      - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 45
 
   main-windows:
