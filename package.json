@@ -13,8 +13,7 @@
     "watch": "nx run vscode:watch:debug",
     "e2e": "nx e2e vscode-e2e",
     "update": "nx migrate latest",
-    "prepare": "husky",
-    "telemetry:check": "nx run telemetry-check"
+    "prepare": "husky"
   },
   "dependencies": {
     "@lit-labs/context": "^0.3.1",
