@@ -22,14 +22,5 @@
         "bradlc.vscode-tailwindcss"
       ]
     }
-  },
-  "forwardPorts": [4200, 3000],
-  "portsAttributes": {
-    "4200": {
-      "label": "Angular Dev Server"
-    },
-    "3000": {
-      "label": "Express Server"
-    }
   }
 }
