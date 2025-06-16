@@ -14,8 +14,8 @@ import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.generate.ui.file.NxGenerateUiFileRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.models.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.Notifier
@@ -117,17 +117,17 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
                     val requestOptions =
                         NxGeneratorOptionsRequestOptions(
                             collection = generator.data.collection,
-                            generator = generator.data.name,
+                            name = generator.data.name,
+                            path = generator.schemaPath,
                         )
-                    val rawOptions =
-                        project.service<NxlsService>().generatorOptions(requestOptions)
+                    val rawOptions = project.service<NxlsService>().generatorOptions(requestOptions)
                     val inputSchema =
                         GeneratorSchema(
                             collectionName = generator.data.collection,
                             generatorName = generator.data.name,
                             description = generator.data.description ?: "",
                             options = rawOptions,
-                            context = null
+                            context = null,
                         )
                     val transformedSchema =
                         project.service<NxlsService>().transformedGeneratorSchema(inputSchema)
