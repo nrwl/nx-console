@@ -10,9 +10,9 @@ import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('cloud tools', () => {
-  let invokeMCPInspectorCLI: (
-    ...args: string[]
-  ) => ReturnType<typeof JSON.parse>;
+  let invokeMCPInspectorCLI: Awaited<
+    ReturnType<typeof createInvokeMCPInspectorCLI>
+  >;
   const workspaceName = uniq('nx-mcp-cloud-test');
   const testWorkspacePath = join(e2eCwd, workspaceName);
   const nxJsonPath = join(testWorkspacePath, 'nx.json');
@@ -22,7 +22,10 @@ describe('cloud tools', () => {
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
     });
-    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(e2eCwd);
+    invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(
+      e2eCwd,
+      workspaceName,
+    );
   });
 
   afterAll(() => {
@@ -30,10 +33,7 @@ describe('cloud tools', () => {
   });
 
   it('should not include cloud tools when cloud is not enabled', () => {
-    const result = invokeMCPInspectorCLI(
-      testWorkspacePath,
-      '--method tools/list',
-    );
+    const result = invokeMCPInspectorCLI('--method tools/list');
     const toolNames = result.tools.map((tool: any) => tool.name);
 
     // Verify cloud tools are not present
@@ -53,10 +53,7 @@ describe('cloud tools', () => {
         nxCloudAccessToken: 'test-cloud-token',
       }));
 
-      const result = invokeMCPInspectorCLI(
-        testWorkspacePath,
-        '--method tools/list',
-      );
+      const result = invokeMCPInspectorCLI('--method tools/list');
       const toolNames = result.tools.map((tool: any) => tool.name);
 
       // Verify cloud tools are present
@@ -95,10 +92,7 @@ describe('cloud tools', () => {
         nxCloudId: 'test-cloud-id',
       }));
 
-      const result = invokeMCPInspectorCLI(
-        testWorkspacePath,
-        '--method tools/list',
-      );
+      const result = invokeMCPInspectorCLI('--method tools/list');
       const toolNames = result.tools.map((tool: any) => tool.name);
 
       // Verify cloud tools are present
