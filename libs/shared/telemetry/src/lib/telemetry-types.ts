@@ -2,6 +2,9 @@
  * Telemetry Events are defined here. They are
  * - grouped by namespace, separated with dots
  * - kebab-cased
+ * these are compared to apps/intellij/src/main/kotlin/dev/nx/console/telemetry/TelemetryTypes.kt
+ * through the @nx-console/workspace:telemetry-check target
+ * keep them in sync with IntelliJ!
  */
 
 export type TelemetryEvents =
