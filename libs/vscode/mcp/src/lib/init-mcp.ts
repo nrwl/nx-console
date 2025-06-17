@@ -36,7 +36,10 @@ export function startMcpServer() {
   if (!port) {
     return;
   }
-  McpWebServer.Instance.startSkeletonMcpServer(port);
+  McpWebServer.Instance.startSkeletonMcpServer(port).catch((error) => {
+    getOutputChannel().appendLine(`Failed to start MCP server: ${error.message}`);
+    console.error('MCP Server startup error:', error);
+  });
 }
 
 export function stopMcpServer() {
@@ -103,7 +106,12 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
       lastPort = port;
       McpWebServer.Instance.stopMcpServer();
       if (port) {
-        McpWebServer.Instance.startSkeletonMcpServer(port);
+        try {
+          await McpWebServer.Instance.startSkeletonMcpServer(port);
+        } catch (error: any) {
+          getOutputChannel().appendLine(`Failed to restart MCP server on port ${port}: ${error.message}`);
+          console.error('MCP Server restart error:', error);
+        }
       }
     }
 

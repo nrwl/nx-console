@@ -27,9 +27,11 @@ import {
   isInWindsurf,
   sendMessageToAgent,
   vscodeLogger,
+  getMcpJsonPath,
 } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
-import { commands, env, ProgressLocation, tasks, window } from 'vscode';
+import { commands, env, ProgressLocation, tasks, window, Uri } from 'vscode';
+import { findAvailablePort, isSpecificPortAvailable } from './ports';
 
 export class McpWebServer {
   private static instance: McpWebServer;
@@ -51,114 +53,251 @@ export class McpWebServer {
   private sseTransport?: SSEServerTransport;
   private sseServer?: NxMcpServerWrapper;
   private fullSseSetupReady = false;
+  private isServerRunning = false;
+  private currentPort?: number;
 
   private streamableServers = new Set<NxMcpServerWrapper>();
 
-  public startSkeletonMcpServer(port: number) {
-    this.app.get('/sse', async (req, res) => {
-      vscodeLogger.log('SSE connection established');
+  public async startSkeletonMcpServer(port: number): Promise<void> {
+    // If server is already running, stop it first
+    if (this.isServerRunning) {
+      vscodeLogger.log(`MCP server is already running on port ${this.currentPort}, stopping it first`);
+      this.stopMcpServer();
+      // Give it a moment to fully stop
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
 
-      this.sseTransport = new SSEServerTransport('/messages', res);
+    // Check if port is available before attempting to start
+    const isPortAvailable = await isSpecificPortAvailable(port);
+    if (!isPortAvailable) {
+      vscodeLogger.log(`Port ${port} is already in use, finding alternative port`);
+      await this.handlePortConflict(port);
+      return;
+    }
 
-      if (this.fullSseSetupReady) {
-        await this.doCompleteSseServerSetup();
-      }
+    return new Promise(async (resolve, reject) => {
+      this.app.get('/sse', async (req, res) => {
+        vscodeLogger.log('SSE connection established');
 
-      // Set up a keep-alive interval to prevent timeout
-      this.sseKeepAliveInterval = setInterval(() => {
-        if (!res.writableEnded && !res.writableFinished) {
-          res.write(':beat\n\n');
-        } else {
-          clearInterval(this.sseKeepAliveInterval);
-          vscodeLogger.log(
-            'SSE connection closed, clearing keep-alive interval',
-          );
+        this.sseTransport = new SSEServerTransport('/messages', res);
+
+        if (this.fullSseSetupReady) {
+          await this.doCompleteSseServerSetup();
         }
-      }, 20000);
 
-      req.on('close', () => {
-        clearInterval(this.sseKeepAliveInterval);
-        vscodeLogger.log('SSE connection closed by client');
-      });
-    });
+        // Set up a keep-alive interval to prevent timeout
+        this.sseKeepAliveInterval = setInterval(() => {
+          if (!res.writableEnded && !res.writableFinished) {
+            res.write(':beat\n\n');
+          } else {
+            clearInterval(this.sseKeepAliveInterval);
+            vscodeLogger.log(
+              'SSE connection closed, clearing keep-alive interval',
+            );
+          }
+        }, 20000);
 
-    this.app.post('/messages', async (req, res) => {
-      vscodeLogger.log(`Message received`);
-      if (!this.sseTransport) {
-        res.status(400).send('No transport found');
-        return;
-      }
-      await this.sseTransport.handlePostMessage(req, res);
-    });
-
-    this.app.post('/mcp', async (req: Request, res: Response) => {
-      vscodeLogger.log('Connecting to MCP via streamable http');
-      try {
-        const server = await NxMcpServerWrapper.create(
-          getNxWorkspacePath(),
-          nxWorkspaceInfoProvider,
-          ideProvider,
-          getTelemetry(),
-          vscodeLogger,
-        );
-        const transport: StreamableHTTPServerTransport =
-          new StreamableHTTPServerTransport({
-            sessionIdGenerator: undefined,
-          });
-
-        this.streamableServers.add(server);
-        res.on('close', () => {
-          vscodeLogger.log('Request closed');
-          transport.close();
-          server.getMcpServer().close();
+        req.on('close', () => {
+          clearInterval(this.sseKeepAliveInterval);
+          vscodeLogger.log('SSE connection closed by client');
         });
-        await server.getMcpServer().connect(transport);
-        await transport.handleRequest(req, res, req.body);
-      } catch (error) {
-        vscodeLogger.log('Error handling MCP request:', error);
-        if (!res.headersSent) {
-          res.status(500).json({
+      });
+
+      this.app.post('/messages', async (req, res) => {
+        vscodeLogger.log(`Message received`);
+        if (!this.sseTransport) {
+          res.status(400).send('No transport found');
+          return;
+        }
+        await this.sseTransport.handlePostMessage(req, res);
+      });
+
+      this.app.post('/mcp', async (req: Request, res: Response) => {
+        vscodeLogger.log('Connecting to MCP via streamable http');
+        try {
+          const server = await NxMcpServerWrapper.create(
+            getNxWorkspacePath(),
+            nxWorkspaceInfoProvider,
+            ideProvider,
+            getTelemetry(),
+            vscodeLogger,
+          );
+          const transport: StreamableHTTPServerTransport =
+            new StreamableHTTPServerTransport({
+              sessionIdGenerator: undefined,
+            });
+
+          this.streamableServers.add(server);
+          res.on('close', () => {
+            vscodeLogger.log('Request closed');
+            transport.close();
+            server.getMcpServer().close();
+          });
+          await server.getMcpServer().connect(transport);
+          await transport.handleRequest(req, res, req.body);
+        } catch (error) {
+          vscodeLogger.log('Error handling MCP request:', error);
+          if (!res.headersSent) {
+            res.status(500).json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32603,
+                message: 'Internal server error',
+              },
+              id: null,
+            });
+          }
+        }
+      });
+
+      this.app.get('/mcp', async (req: Request, res: Response) => {
+        vscodeLogger.log('Received GET MCP request');
+        res.writeHead(405).end(
+          JSON.stringify({
             jsonrpc: '2.0',
             error: {
-              code: -32603,
-              message: 'Internal server error',
+              code: -32000,
+              message: 'Method not allowed.',
             },
             id: null,
-          });
-        }
+          }),
+        );
+      });
+
+      this.app.delete('/mcp', async (req: Request, res: Response) => {
+        vscodeLogger.log('Received DELETE MCP request');
+        res.writeHead(405).end(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            error: {
+              code: -32000,
+              message: 'Method not allowed.',
+            },
+            id: null,
+          }),
+        );
+      });
+
+      try {
+        this.appInstance = this.app.listen(port);
+        
+        this.appInstance.on('listening', () => {
+          vscodeLogger.log(`MCP server started on port ${port}`);
+          this.isServerRunning = true;
+          this.currentPort = port;
+          resolve();
+        });
+        
+        this.appInstance.on('error', async (error: any) => {
+          if (error.code === 'EADDRINUSE') {
+            vscodeLogger.log(`Port ${port} is already in use, attempting to find alternative port`);
+            try {
+              await this.handlePortConflict(port);
+              resolve();
+            } catch (conflictError) {
+              reject(conflictError);
+            }
+          } else {
+            vscodeLogger.log('Error starting MCP server:', error);
+            reject(error);
+          }
+        });
+        
+      } catch (error: any) {
+        vscodeLogger.log('Error starting MCP server:', error);
+        reject(error);
       }
     });
+  }
 
-    this.app.get('/mcp', async (req: Request, res: Response) => {
-      vscodeLogger.log('Received GET MCP request');
-      res.writeHead(405).end(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          error: {
-            code: -32000,
-            message: 'Method not allowed.',
-          },
-          id: null,
-        }),
-      );
+  private async handlePortConflict(originalPort: number): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      const availablePort = await findAvailablePort();
+      
+      if (!availablePort) {
+        const errorMessage = `Unable to start MCP server: port ${originalPort} is in use and no alternative ports are available`;
+        vscodeLogger.log(errorMessage);
+        window.showErrorMessage(errorMessage);
+        reject(new Error(errorMessage));
+        return;
+      }
+
+      vscodeLogger.log(`Found alternative port ${availablePort}, starting MCP server`);
+      
+      try {
+        // Close the previous failed instance if it exists
+        if (this.appInstance) {
+          this.appInstance.close();
+        }
+        
+        this.appInstance = this.app.listen(availablePort);
+        
+        this.appInstance.on('listening', async () => {
+          vscodeLogger.log(`MCP server started successfully on alternative port ${availablePort}`);
+          
+          // Update the MCP configuration with the new port
+          try {
+            await this.updateMcpConfigWithNewPort(availablePort);
+          } catch (configError) {
+            vscodeLogger.log('Failed to update MCP configuration, but server is running:', configError);
+          }
+          
+          window.showInformationMessage(
+            `MCP server started on port ${availablePort} (original port ${originalPort} was in use)`,
+            'View Configuration'
+          ).then((action) => {
+            if (action === 'View Configuration') {
+              const mcpJsonPath = getMcpJsonPath();
+              if (mcpJsonPath) {
+                commands.executeCommand('vscode.open', Uri.file(mcpJsonPath));
+              }
+            }
+          });
+          
+          this.isServerRunning = true;
+          this.currentPort = availablePort;
+          resolve();
+        });
+        
+        this.appInstance.on('error', (error: any) => {
+          if (error.code === 'EADDRINUSE') {
+            const errorMessage = `Alternative port ${availablePort} also became unavailable. Please check for other MCP servers running.`;
+            vscodeLogger.log(errorMessage);
+            window.showErrorMessage(errorMessage);
+            reject(new Error(errorMessage));
+          } else {
+            reject(error);
+          }
+        });
+        
+      } catch (error: any) {
+        reject(error);
+      }
     });
+  }
 
-    this.app.delete('/mcp', async (req: Request, res: Response) => {
-      vscodeLogger.log('Received DELETE MCP request');
-      res.writeHead(405).end(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          error: {
-            code: -32000,
-            message: 'Method not allowed.',
-          },
-          id: null,
-        }),
-      );
-    });
-
-    this.appInstance = this.app.listen(port);
-    vscodeLogger.log(`MCP server started on port ${port}`);
+  private async updateMcpConfigWithNewPort(newPort: number) {
+    try {
+      const { writeMcpJson, readMcpJson, isInCursor } = await import('@nx-console/vscode-utils');
+      
+      const mcpJson = readMcpJson() || (isInCursor() ? { mcpServers: {} } : { servers: {} });
+      
+      if (isInCursor()) {
+        if (mcpJson.mcpServers?.['nx-mcp']) {
+          mcpJson.mcpServers['nx-mcp'].url = `http://localhost:${newPort}/sse`;
+        }
+      } else {
+        if (mcpJson.servers?.['nx-mcp']) {
+          mcpJson.servers['nx-mcp'].url = `http://localhost:${newPort}/mcp`;
+        }
+      }
+      
+      writeMcpJson(mcpJson);
+      vscodeLogger.log(`Updated MCP configuration with new port ${newPort}`);
+    } catch (error) {
+      vscodeLogger.log('Failed to update MCP configuration with new port:', error);
+      // Don't throw here as the server is already running successfully
+    }
   }
 
   public async completeMcpServerSetup() {
@@ -199,6 +338,8 @@ export class McpWebServer {
     if (this.sseKeepAliveInterval) {
       clearInterval(this.sseKeepAliveInterval);
     }
+    this.isServerRunning = false;
+    this.currentPort = undefined;
   }
 
   public async updateMcpServerWorkspacePath(workspacePath: string) {
