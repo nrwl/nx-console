@@ -1,7 +1,4 @@
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { execSync } from 'child_process';
-import { existsSync, readFileSync, rmSync } from 'fs';
-import { join } from 'path';
 import { window, commands } from 'vscode';
 import { importMigrateUIApi, readMigrationsJsonMetadata } from './utils';
 import { logAndShowError } from '@nx-console/vscode-output-channels';

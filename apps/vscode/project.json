@@ -25,6 +25,8 @@
           "@angular-devkit/*",
           "@nx/key",
           "@nx/nx*",
+          "nx",
+          "nx/*",
           "*/nx.wasi.cjs"
         ],
         "thirdParty": true,

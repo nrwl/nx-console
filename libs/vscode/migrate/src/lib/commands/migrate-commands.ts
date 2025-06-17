@@ -200,3 +200,27 @@ export async function viewDocumentation(migration: MigrationDetailsWithId) {
 
   commands.executeCommand('vscode.open', url);
 }
+
+export async function stopMigration(migration: MigrationDetailsWithId) {
+  try {
+    const workspacePath = getNxWorkspacePath();
+    const migrateUIApi = await importMigrateUIApi(workspacePath);
+
+    const isStopped = migrateUIApi.killMigrationProcess(
+      migration.id,
+      workspacePath,
+    );
+
+    if (isStopped) {
+      window.showInformationMessage(
+        `Migration "${migration.name}" has been stopped.`,
+      );
+    } else {
+      window.showWarningMessage(
+        `Migration "${migration.name}" was not running or could not be stopped.`,
+      );
+    }
+  } catch (error) {
+    window.showErrorMessage(`Failed to stop migration: ${error.message}`);
+  }
+}
