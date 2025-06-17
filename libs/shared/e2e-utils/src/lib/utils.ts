@@ -115,6 +115,7 @@ export async function createInvokeMCPInspectorCLI(
   e2eCwd: string,
   workspaceName: string,
   mcpProjectName = 'nx-mcp',
+  env?: NodeJS.ProcessEnv,
 ) {
   const graph = await createProjectGraphAsync();
   const nxMcp = graph.nodes[mcpProjectName];
@@ -162,7 +163,7 @@ export async function createInvokeMCPInspectorCLI(
         encoding: 'utf8',
         maxBuffer: 1024 * 1024 * 10, // 10MB
         cwd: join(e2eCwd, workspaceName),
-        env: {
+        env: env ?? {
           ...process.env,
           NX_NO_CLOUD: 'true',
         },

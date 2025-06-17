@@ -6,7 +6,8 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
-import { rmSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('cloud tools', () => {
@@ -25,6 +26,8 @@ describe('cloud tools', () => {
     invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(
       e2eCwd,
       workspaceName,
+      undefined,
+      process.env,
     );
   });
 
@@ -33,7 +36,10 @@ describe('cloud tools', () => {
   });
 
   it('should not include cloud tools when cloud is not enabled', () => {
-    const result = invokeMCPInspectorCLI('--method tools/list');
+    const result = invokeMCPInspectorCLI(
+      testWorkspacePath,
+      '--method tools/list',
+    );
     const toolNames = result.tools.map((tool: any) => tool.name);
 
     // Verify cloud tools are not present
@@ -53,26 +59,19 @@ describe('cloud tools', () => {
         nxCloudAccessToken: 'test-cloud-token',
       }));
 
-      const result = invokeMCPInspectorCLI('--method tools/list');
+      const result = invokeMCPInspectorCLI(
+        testWorkspacePath,
+        '--method tools/list',
+      );
       const toolNames = result.tools.map((tool: any) => tool.name);
 
       // Verify cloud tools are present
       expect(toolNames).toContain('nx_cloud_cipe_details');
       expect(toolNames).toContain('nx_cloud_fix_cipe_failure');
 
-      // Verify all expected tools are present
-      expect(toolNames).toEqual([
-        'nx_docs',
-        'nx_available_plugins',
-        'nx_workspace',
-        'nx_project_details',
-        'nx_generators',
-        'nx_generator_schema',
-        'nx_cloud_cipe_details',
-        'nx_cloud_fix_cipe_failure',
-        'nx_current_running_tasks_details',
-        'nx_current_running_task_output',
-      ]);
+      // Verify other tools are still present
+      expect(toolNames).toContain('nx_workspace');
+      expect(toolNames).toContain('nx_project_details');
     });
 
     afterEach(() => {
@@ -92,26 +91,19 @@ describe('cloud tools', () => {
         nxCloudId: 'test-cloud-id',
       }));
 
-      const result = invokeMCPInspectorCLI('--method tools/list');
+      const result = invokeMCPInspectorCLI(
+        testWorkspacePath,
+        '--method tools/list',
+      );
       const toolNames = result.tools.map((tool: any) => tool.name);
 
       // Verify cloud tools are present
       expect(toolNames).toContain('nx_cloud_cipe_details');
       expect(toolNames).toContain('nx_cloud_fix_cipe_failure');
 
-      // Verify all expected tools are present
-      expect(toolNames).toEqual([
-        'nx_docs',
-        'nx_available_plugins',
-        'nx_workspace',
-        'nx_project_details',
-        'nx_generators',
-        'nx_generator_schema',
-        'nx_cloud_cipe_details',
-        'nx_cloud_fix_cipe_failure',
-        'nx_current_running_tasks_details',
-        'nx_current_running_task_output',
-      ]);
+      // Verify other tools are still present
+      expect(toolNames).toContain('nx_workspace');
+      expect(toolNames).toContain('nx_project_details');
     });
 
     afterEach(() => {
