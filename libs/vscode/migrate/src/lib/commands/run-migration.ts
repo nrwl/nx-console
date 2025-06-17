@@ -17,8 +17,22 @@ export async function runSingleMigration(
     async () => {
       commands.executeCommand('nxMigrate.refreshWebview');
 
-      const migrateUiApi = await importMigrateUIApi(workspacePath);
-      migrateUiApi.runSingleMigration(workspacePath, migration, configuration);
+      // Make sure we are in the workspace so module resolution works correctly.
+      // Angular 20 has a migration, for example, that won't work unless CWD is set to the workspace root.
+      const originalCwd = process.cwd();
+      process.chdir(workspacePath);
+
+      try {
+        const migrateUiApi = await importMigrateUIApi(workspacePath);
+        await migrateUiApi.runSingleMigration(
+          workspacePath,
+          migration,
+          configuration,
+        );
+      } finally {
+        // Ensure we switch back since the extension host can be shared.
+        process.chdir(originalCwd);
+      }
     },
   );
 }
