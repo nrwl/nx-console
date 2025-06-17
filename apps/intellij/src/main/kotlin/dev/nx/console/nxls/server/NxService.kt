@@ -41,9 +41,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun transformedGeneratorSchema(
-        transformedGeneratorSchemaRequest: NxTransformedGeneratorSchemaRequest
-    ): CompletableFuture<GeneratorSchema> {
+    fun transformedGeneratorSchema(schema: GeneratorSchema): CompletableFuture<GeneratorSchema> {
         throw UnsupportedOperationException()
     }
 
@@ -80,11 +78,6 @@ interface NxService {
 
     @JsonRequest
     fun projectFolderTree(): CompletableFuture<SerializedNxFolderTreeData> {
-        throw UnsupportedOperationException()
-    }
-
-    @JsonRequest
-    fun transformedGeneratorSchema(schema: GeneratorSchema): CompletableFuture<GeneratorSchema> {
         throw UnsupportedOperationException()
     }
 

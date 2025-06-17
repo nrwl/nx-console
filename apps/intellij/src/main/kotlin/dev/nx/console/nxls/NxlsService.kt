@@ -100,7 +100,8 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
             server()?.getNxService()?.generators()?.await()
-        }() ?: emptyList()
+        }()
+            ?: emptyList()
     }
 
     suspend fun generatorOptions(
@@ -109,14 +110,15 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         return withMessageIssueCatch("nx/generatorOptions") {
             val request = NxGeneratorOptionsRequest(requestOptions)
             server()?.getNxService()?.generatorOptions(request)?.await()
-        }() ?: emptyList()
+        }()
+            ?: emptyList()
     }
 
     suspend fun transformedGeneratorSchema(generatorSchema: GeneratorSchema): GeneratorSchema {
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
-            val request = NxTransformedGeneratorSchemaRequest(generatorSchema)
-            server()?.getNxService()?.transformedGeneratorSchema(request)?.await()
-        }() ?: generatorSchema
+            server()?.getNxService()?.transformedGeneratorSchema(generatorSchema)?.await()
+        }()
+            ?: generatorSchema
     }
 
     suspend fun generatorContextFromPath(
@@ -140,7 +142,8 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         val request = NxProjectsByPathsRequest(paths)
         return withMessageIssueCatch("nx/projectsByPaths") {
             server()?.getNxService()?.projectsByPaths(request)?.await()
-        }() ?: emptyMap()
+        }()
+            ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
@@ -184,7 +187,8 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     suspend fun sourceMapFilesToProjectsMap(): Map<String, Array<String>> {
         return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
             server()?.getNxService()?.sourceMapFilesToProjectsMap()?.await()
-        }() ?: emptyMap()
+        }()
+            ?: emptyMap()
     }
 
     suspend fun targetsForConfigFile(
@@ -194,7 +198,8 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         return withMessageIssueCatch("nx/targetsForConfigFile") {
             val request = NxTargetsForConfigFileRequest(projectName, configFilePath)
             server()?.getNxService()?.targetsForConfigFile(request)?.await()
-        }() ?: emptyMap()
+        }()
+            ?: emptyMap()
     }
 
     suspend fun cloudStatus(): NxCloudStatus? {

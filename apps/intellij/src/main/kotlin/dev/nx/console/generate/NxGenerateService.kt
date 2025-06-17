@@ -131,7 +131,7 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
                         )
                     val transformedSchema =
                         project.service<NxlsService>().transformedGeneratorSchema(inputSchema)
-                    transformedSchema?.options ?: rawOptions
+                    transformedSchema.options
                 }
 
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
