@@ -9,8 +9,11 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import dev.nx.console.mcp.McpServerService
+import dev.nx.console.mcp.hasAIAssistantInstalled
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
 import dev.nx.console.settings.NxConsoleSettingsProvider
@@ -114,8 +117,9 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         val notification =
             NOTIFICATION_GROUP.createNotification(title = title, content = content, type = type)
 
-        // Add actions in order: Help (if error), View Commit (if available), View Results
-        if (type == NotificationType.ERROR) {
+        val assistantReady =
+            hasAIAssistantInstalled() && project.service<McpServerService>().isMcpServerSetup()
+        if (type == NotificationType.ERROR && assistantReady) {
             notification.addAction(CIPEAutoFixAction(project))
         }
 

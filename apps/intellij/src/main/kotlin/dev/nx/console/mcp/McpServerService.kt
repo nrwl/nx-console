@@ -22,9 +22,8 @@ class McpServerService(private val project: Project) {
     private val logger = thisLogger()
 
     fun setupMcpServer() {
-        val aiAssistantPlugin =
-            PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" }
-        if (aiAssistantPlugin == null) {
+
+        if (!hasAIAssistantInstalled()) {
             return
         }
         if (isMcpServerSetup()) {
@@ -193,4 +192,8 @@ class McpServerService(private val project: Project) {
             return project.getService(McpServerService::class.java)
         }
     }
+}
+
+fun hasAIAssistantInstalled(): Boolean {
+    return PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" } != null
 }
