@@ -27,11 +27,10 @@ import {
   isInWindsurf,
   sendMessageToAgent,
   vscodeLogger,
-  getMcpJsonPath,
 } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
-import { commands, env, ProgressLocation, tasks, window, Uri } from 'vscode';
-import { findAvailablePort, isSpecificPortAvailable } from './ports';
+import { commands, env, ProgressLocation, tasks, window } from 'vscode';
+import { isSpecificPortAvailable } from './ports';
 
 export class McpWebServer {
   private static instance: McpWebServer;
@@ -59,19 +58,19 @@ export class McpWebServer {
   private streamableServers = new Set<NxMcpServerWrapper>();
 
   public async startSkeletonMcpServer(port: number): Promise<void> {
-    // If server is already running, stop it first
+    // If server is already running in this process, don't start another one
     if (this.isServerRunning) {
-      vscodeLogger.log(`MCP server is already running on port ${this.currentPort}, stopping it first`);
-      this.stopMcpServer();
-      // Give it a moment to fully stop
-      await new Promise(resolve => setTimeout(resolve, 100));
+      vscodeLogger.log(`MCP server is already running in this process on port ${this.currentPort}`);
+      return;
     }
 
-    // Check if port is available before attempting to start
+    // Check if port is already in use (likely by another extension process)
     const isPortAvailable = await isSpecificPortAvailable(port);
     if (!isPortAvailable) {
-      vscodeLogger.log(`Port ${port} is already in use, finding alternative port`);
-      await this.handlePortConflict(port);
+      vscodeLogger.log(`Port ${port} is already in use, likely by another MCP server instance. Skipping startup.`);
+      window.showInformationMessage(
+        `MCP server is already running on port ${port}. Using existing instance.`
+      );
       return;
     }
 
@@ -182,21 +181,19 @@ export class McpWebServer {
         this.appInstance = this.app.listen(port);
         
         this.appInstance.on('listening', () => {
-          vscodeLogger.log(`MCP server started on port ${port}`);
+          vscodeLogger.log(`MCP server started successfully on port ${port}`);
           this.isServerRunning = true;
           this.currentPort = port;
           resolve();
         });
         
-        this.appInstance.on('error', async (error: any) => {
+        this.appInstance.on('error', (error: any) => {
           if (error.code === 'EADDRINUSE') {
-            vscodeLogger.log(`Port ${port} is already in use, attempting to find alternative port`);
-            try {
-              await this.handlePortConflict(port);
-              resolve();
-            } catch (conflictError) {
-              reject(conflictError);
-            }
+            vscodeLogger.log(`Port ${port} became unavailable during startup. Another process may have claimed it.`);
+            window.showInformationMessage(
+              `MCP server port ${port} is in use. Using existing instance.`
+            );
+            resolve(); // Don't treat this as an error, just skip startup
           } else {
             vscodeLogger.log('Error starting MCP server:', error);
             reject(error);
@@ -208,96 +205,6 @@ export class McpWebServer {
         reject(error);
       }
     });
-  }
-
-  private async handlePortConflict(originalPort: number): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      const availablePort = await findAvailablePort();
-      
-      if (!availablePort) {
-        const errorMessage = `Unable to start MCP server: port ${originalPort} is in use and no alternative ports are available`;
-        vscodeLogger.log(errorMessage);
-        window.showErrorMessage(errorMessage);
-        reject(new Error(errorMessage));
-        return;
-      }
-
-      vscodeLogger.log(`Found alternative port ${availablePort}, starting MCP server`);
-      
-      try {
-        // Close the previous failed instance if it exists
-        if (this.appInstance) {
-          this.appInstance.close();
-        }
-        
-        this.appInstance = this.app.listen(availablePort);
-        
-        this.appInstance.on('listening', async () => {
-          vscodeLogger.log(`MCP server started successfully on alternative port ${availablePort}`);
-          
-          // Update the MCP configuration with the new port
-          try {
-            await this.updateMcpConfigWithNewPort(availablePort);
-          } catch (configError) {
-            vscodeLogger.log('Failed to update MCP configuration, but server is running:', configError);
-          }
-          
-          window.showInformationMessage(
-            `MCP server started on port ${availablePort} (original port ${originalPort} was in use)`,
-            'View Configuration'
-          ).then((action) => {
-            if (action === 'View Configuration') {
-              const mcpJsonPath = getMcpJsonPath();
-              if (mcpJsonPath) {
-                commands.executeCommand('vscode.open', Uri.file(mcpJsonPath));
-              }
-            }
-          });
-          
-          this.isServerRunning = true;
-          this.currentPort = availablePort;
-          resolve();
-        });
-        
-        this.appInstance.on('error', (error: any) => {
-          if (error.code === 'EADDRINUSE') {
-            const errorMessage = `Alternative port ${availablePort} also became unavailable. Please check for other MCP servers running.`;
-            vscodeLogger.log(errorMessage);
-            window.showErrorMessage(errorMessage);
-            reject(new Error(errorMessage));
-          } else {
-            reject(error);
-          }
-        });
-        
-      } catch (error: any) {
-        reject(error);
-      }
-    });
-  }
-
-  private async updateMcpConfigWithNewPort(newPort: number) {
-    try {
-      const { writeMcpJson, readMcpJson, isInCursor } = await import('@nx-console/vscode-utils');
-      
-      const mcpJson = readMcpJson() || (isInCursor() ? { mcpServers: {} } : { servers: {} });
-      
-      if (isInCursor()) {
-        if (mcpJson.mcpServers?.['nx-mcp']) {
-          mcpJson.mcpServers['nx-mcp'].url = `http://localhost:${newPort}/sse`;
-        }
-      } else {
-        if (mcpJson.servers?.['nx-mcp']) {
-          mcpJson.servers['nx-mcp'].url = `http://localhost:${newPort}/mcp`;
-        }
-      }
-      
-      writeMcpJson(mcpJson);
-      vscodeLogger.log(`Updated MCP configuration with new port ${newPort}`);
-    } catch (error) {
-      vscodeLogger.log('Failed to update MCP configuration with new port:', error);
-      // Don't throw here as the server is already running successfully
-    }
   }
 
   public async completeMcpServerSetup() {
