@@ -114,6 +114,13 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
             ?: emptyList()
     }
 
+    suspend fun transformedGeneratorSchema(generatorSchema: GeneratorSchema): GeneratorSchema {
+        return withMessageIssueCatch("nx/transformedGeneratorSchema") {
+            server()?.getNxService()?.transformedGeneratorSchema(generatorSchema)?.await()
+        }()
+            ?: generatorSchema
+    }
+
     suspend fun generatorContextFromPath(
         generator: NxGenerator? = null,
         path: String?,
@@ -163,13 +170,6 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         return withMessageIssueCatch("nx/projectFolderTree") {
             server()?.getNxService()?.projectFolderTree()?.await()?.toFolderTreeData()
         }()
-    }
-
-    suspend fun transformedGeneratorSchema(schema: GeneratorSchema): GeneratorSchema {
-        return withMessageIssueCatch("nx/transformedGeneratorSchema") {
-            server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
-        }()
-            ?: schema
     }
 
     suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
