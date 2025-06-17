@@ -159,10 +159,10 @@ export class CIPETreeItem
                   new RunTreeItem(
                     run,
                     this.cipe.ciPipelineExecutionId,
-                    runGroup
-                  )
-              )
-          )
+                    runGroup,
+                  ),
+              ),
+          ),
         );
 
         return items;
@@ -178,7 +178,12 @@ export class CIPETreeItem
 
     if (this.cipe.runGroups.length === 1) {
       return this.cipe.runGroups[0].runs.map(
-        (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId, this.cipe.runGroups[0]),
+        (run) =>
+          new RunTreeItem(
+            run,
+            this.cipe.ciPipelineExecutionId,
+            this.cipe.runGroups[0],
+          ),
       );
     } else {
       return this.cipe.runGroups.map((runGroup) => {
@@ -221,7 +226,9 @@ export class RunGroupTreeItem
     if (this.runGroup.runs.length === 0) {
       return [new LabelTreeItem('Waiting for Nx tasks...')];
     }
-    return this.runGroup.runs.map((run) => new RunTreeItem(run, this.cipeId, this.runGroup));
+    return this.runGroup.runs.map(
+      (run) => new RunTreeItem(run, this.cipeId, this.runGroup),
+    );
   }
 }
 
@@ -234,7 +241,7 @@ export class RunTreeItem
   constructor(
     public run: CIPERun,
     public cipeId: string,
-    public runGroup: CIPERunGroup
+    public runGroup: CIPERunGroup,
   ) {
     super(run.command);
 
@@ -281,13 +288,14 @@ export class RunTreeItem
     let isFirstRunWithFixTask = false;
     if (primaryFixTaskId && failedTasks.includes(primaryFixTaskId)) {
       // Find the first run that contains this task ID
-      const firstRunWithTask = this.runGroup.runs.find(run => 
-        run.failedTasks?.includes(primaryFixTaskId)
+      const firstRunWithTask = this.runGroup.runs.find((run) =>
+        run.failedTasks?.includes(primaryFixTaskId),
       );
       // Only show the fix if this is the first run with the task
-      isFirstRunWithFixTask = firstRunWithTask && 
-        (firstRunWithTask.linkId === this.run.linkId || 
-         firstRunWithTask.executionId === this.run.executionId);
+      isFirstRunWithFixTask =
+        firstRunWithTask &&
+        (firstRunWithTask.linkId === this.run.linkId ||
+          firstRunWithTask.executionId === this.run.executionId);
     }
 
     for (const taskId of failedTasks) {
@@ -296,7 +304,7 @@ export class RunTreeItem
         this.run.linkId,
         this.run.executionId,
         this.run,
-        this.cipeId
+        this.cipeId,
       );
 
       // Only add the fix to the first run that contains this task
@@ -331,7 +339,7 @@ export class FailedTaskTreeItem
     public linkId?: string,
     public executionId?: string,
     public run?: CIPERun,
-    public cipeId?: string
+    public cipeId?: string,
   ) {
     super(taskId);
     this.collapsibleState = TreeItemCollapsibleState.None;
