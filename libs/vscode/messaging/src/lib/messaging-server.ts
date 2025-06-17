@@ -36,6 +36,10 @@ export class NxMessagingServer {
       (socket as any).__socketId = socketId;
       vscodeLogger.log(`Client connected: ${socketId}`);
 
+      socket.on('error', (error) => {
+        vscodeLogger.log(`Socket error for client ${socketId}:`, error);
+      });
+
       const connection = createMessageConnection(socket, socket);
 
       messages.forEach((notification) => {
@@ -50,12 +54,20 @@ export class NxMessagingServer {
       connection.listen();
 
       socket.on('close', () => {
-        connection.dispose();
+        try {
+          connection.dispose();
+        } catch (disposeError) {
+          vscodeLogger.log(`Connection disposal error for client ${socketId} (non-fatal):`, disposeError);
+        }
         vscodeLogger.log(`Client disconnected: ${socketId}`);
         messages.forEach((messageHandler) => {
           messageHandler.onClose?.(socketId);
         });
       });
+    });
+
+    this.#server.on('error', (error) => {
+      vscodeLogger.log('Server error:', error);
     });
   }
 
@@ -70,11 +82,17 @@ export class NxMessagingServer {
 
   dispose() {
     try {
-      this.#server.close(() => {
-        vscodeLogger.log(
-          `Nx Console Messaging JSON-RPC server closed on ${this.#fullSocketPath}`,
-        );
-      });
+      if (this.#server && typeof this.#server.close === 'function') {
+        this.#server.close((closeError) => {
+          if (closeError) {
+            vscodeLogger.log('Error during server close:', closeError);
+          } else {
+            vscodeLogger.log(
+              `Nx Console Messaging JSON-RPC server closed on ${this.#fullSocketPath}`,
+            );
+          }
+        });
+      }
     } catch (error) {
       vscodeLogger.log('Error closing server:', error);
     }

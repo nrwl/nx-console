@@ -102,10 +102,20 @@ import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
 
 process.on('unhandledRejection', (e: any) => {
+  // Check if this is the setNoDelay socket error we're trying to prevent
+  if (e && e.message && e.message.includes('setNoDelay')) {
+    connection.console.error(formatError(`Socket disposal error (handled)`, e));
+    return;
+  }
   connection.console.error(formatError(`Unhandled exception`, e));
 });
 
 process.on('uncaughtException', (e) => {
+  // Check if this is the setNoDelay socket error we're trying to prevent  
+  if (e && e.message && e.message.includes('setNoDelay')) {
+    connection.console.error(formatError('Socket disposal error (handled)', e));
+    return;
+  }
   connection.console.error(formatError('Unhandled exception', e));
 });
 
@@ -686,16 +696,36 @@ const exitHandler = () => {
   process.off('SIGTERM', exitHandler);
 
   try {
-    connection.dispose();
+    if (connection && typeof connection.dispose === 'function') {
+      const disposeTimeout = setTimeout(() => {
+        lspLogger?.log('Connection disposal timed out, forcing exit');
+      }, 2000);
+
+      try {
+        connection.dispose();
+        clearTimeout(disposeTimeout);
+      } catch (disposeError) {
+        lspLogger?.log(`Connection disposal error (non-fatal): ${disposeError}`);
+        clearTimeout(disposeTimeout);
+      }
+    }
   } catch (e) {
-    // noop
+    lspLogger?.log(`Exit handler error (non-fatal): ${e}`);
   }
 
-  if (process.connected) {
-    process.disconnect();
+  try {
+    if (process.connected) {
+      process.disconnect();
+    }
+  } catch (disconnectError) {
+    lspLogger?.log(`Process disconnect error (non-fatal): ${disconnectError}`);
   }
 
-  killGroup(process.pid);
+  try {
+    killGroup(process.pid);
+  } catch (killError) {
+    lspLogger?.log(`Kill group error (non-fatal): ${killError}`);
+  }
 };
 process.on('SIGTERM', exitHandler);
 
