@@ -2,6 +2,9 @@ package dev.nx.console.telemetry
 
 import kotlin.reflect.full.companionObject
 
+// these are compared to libs/shared/telemetry/src/lib/telemetry-types.ts
+// through the @nx-console/workspace:telemetry-check target
+// keep them in sync with VSCode!
 enum class TelemetryEvent(val eventName: String) {
     // Activation
     EXTENSION_ACTIVATE("extension-activate"),
