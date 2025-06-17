@@ -63,13 +63,13 @@ export class NxCloudFixTreeItem
   constructor(
     public runGroup: CIPERunGroup,
     public cipeId: string,
+    public taskId: string,
   ) {
-    // Initialize with a default label
-    super('Nx Cloud Fix');
-
+    super('Nx Cloud verified a fix');
     this.collapsibleState = TreeItemCollapsibleState.None;
-    this.id = `${cipeId}-${runGroup.runGroup}-aifix`;
+    this.iconPath = new ThemeIcon('wrench');
     this.contextValue = 'nxCloudFix';
+    this.id = `${cipeId}-${runGroup.runGroup}-${taskId}-aifix`;
 
     // Make the tree item clickable - it will open the webview
     this.command = {
@@ -93,9 +93,9 @@ export class NxCloudFixTreeItem
         );
       } else if (userAction === 'REJECTED') {
         this.contextValue += '-rejected';
-        this.label = 'This fix has been ignored';
+        this.label = 'Fix rejected by user';
         this.iconPath = new ThemeIcon(
-          'close',
+          'circle-slash',
           new ThemeColor('notebookStatusErrorIcon.foreground'),
         );
       } else {
@@ -109,7 +109,7 @@ export class NxCloudFixTreeItem
           switch (validationStatus) {
             case 'NOT_STARTED':
               this.contextValue += '-notValidated';
-              this.label = 'The fix is ready';
+              this.label = 'Nx Cloud AI fix ready to verify';
               this.iconPath = new ThemeIcon(
                 'wrench',
                 new ThemeColor('editorInfo.foreground'),
@@ -117,7 +117,7 @@ export class NxCloudFixTreeItem
               break;
             case 'IN_PROGRESS':
               this.contextValue += '-validating';
-              this.label = 'Nx Cloud is validating the fix';
+              this.label = 'Nx Cloud is verifying the AI fix';
               this.iconPath = new ThemeIcon(
                 'loading~spin',
                 new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -125,7 +125,7 @@ export class NxCloudFixTreeItem
               break;
             case 'COMPLETED':
               this.contextValue += '-validated';
-              this.label = 'Nx Cloud has validated the fix';
+              this.label = 'Nx Cloud AI verified a fix';
               this.iconPath = new ThemeIcon(
                 'wrench',
                 new ThemeColor('charts.green'),
@@ -133,7 +133,7 @@ export class NxCloudFixTreeItem
               break;
             case 'FAILED':
               this.contextValue += '-validationFailed';
-              this.label = 'The fix validation failed';
+              this.label = 'Failed Nx Cloud AI fix verification';
               this.iconPath = new ThemeIcon(
                 'warning',
                 new ThemeColor('list.warningForeground'),
@@ -146,7 +146,7 @@ export class NxCloudFixTreeItem
             case 'NOT_STARTED':
             case 'IN_PROGRESS':
               this.contextValue += '-creatingFix';
-              this.label = 'Nx Cloud is creating a fix';
+              this.label = 'Nx Cloud AI is creating a fix';
               this.iconPath = new ThemeIcon(
                 'loading~spin',
                 new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -155,7 +155,7 @@ export class NxCloudFixTreeItem
             case 'COMPLETED':
             case 'FAILED':
               this.contextValue += '-fixFailed';
-              this.label = 'The fix failed';
+              this.label = 'Failed Nx Cloud AI fix creation';
               this.iconPath = new ThemeIcon(
                 'error',
                 new ThemeColor('notebookStatusErrorIcon.foreground'),

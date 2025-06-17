@@ -157,7 +157,7 @@ export const Ignored: Story = {
   },
 };
 
-export const ValidationFailed: Story = {
+export const VerificationFailed: Story = {
   args: {
     details: {
       ...mockDetails,

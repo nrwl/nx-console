@@ -149,24 +149,20 @@ export class CIPETreeItem
 
         const items: BaseRecentCIPETreeItem[] = [new LabelTreeItem(label)];
 
-        // Add NxCloudFixTreeItem for runGroups that have AI fixes
-        this.cipe.runGroups.forEach((runGroup) => {
-          if (runGroup.aiFix) {
-            items.push(
-              new NxCloudFixTreeItem(runGroup, this.cipe.ciPipelineExecutionId),
-            );
-          }
-        });
-
         // Add failed runs
         items.push(
           ...this.cipe.runGroups.flatMap((runGroup) =>
             runGroup.runs
               .filter((run) => run.status && isFailedStatus(run.status))
               .map(
-                (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId),
-              ),
-          ),
+                (run) =>
+                  new RunTreeItem(
+                    run,
+                    this.cipe.ciPipelineExecutionId,
+                    runGroup
+                  )
+              )
+          )
         );
 
         return items;
@@ -182,7 +178,7 @@ export class CIPETreeItem
 
     if (this.cipe.runGroups.length === 1) {
       return this.cipe.runGroups[0].runs.map(
-        (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId),
+        (run) => new RunTreeItem(run, this.cipe.ciPipelineExecutionId, this.cipe.runGroups[0]),
       );
     } else {
       return this.cipe.runGroups.map((runGroup) => {
@@ -225,7 +221,7 @@ export class RunGroupTreeItem
     if (this.runGroup.runs.length === 0) {
       return [new LabelTreeItem('Waiting for Nx tasks...')];
     }
-    return this.runGroup.runs.map((run) => new RunTreeItem(run, this.cipeId));
+    return this.runGroup.runs.map((run) => new RunTreeItem(run, this.cipeId, this.runGroup));
   }
 }
 
@@ -238,6 +234,7 @@ export class RunTreeItem
   constructor(
     public run: CIPERun,
     public cipeId: string,
+    public runGroup: CIPERunGroup
   ) {
     super(run.command);
 
@@ -273,20 +270,53 @@ export class RunTreeItem
     }
   }
 
-  override getChildren(): ProviderResult<FailedTaskTreeItem[]> {
-    if (this.run.failedTasks && this.run.failedTasks.length > 0) {
-      return this.run.failedTasks.map((taskId) => {
-        return new FailedTaskTreeItem(
-          taskId,
-          this.run.linkId,
-          this.run.executionId,
-          this.run,
-          this.cipeId,
-        );
-      });
+  override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
+    const children: BaseRecentCIPETreeItem[] = [];
+
+    const fix = this.runGroup.aiFix;
+    const primaryFixTaskId = fix?.taskIds[0]; // The first task ID is the primary one
+    const failedTasks = this.run.failedTasks ?? [];
+
+    // Check if this is the first run in the runGroup that has the fix task
+    let isFirstRunWithFixTask = false;
+    if (primaryFixTaskId && failedTasks.includes(primaryFixTaskId)) {
+      // Find the first run that contains this task ID
+      const firstRunWithTask = this.runGroup.runs.find(run => 
+        run.failedTasks?.includes(primaryFixTaskId)
+      );
+      // Only show the fix if this is the first run with the task
+      isFirstRunWithFixTask = firstRunWithTask && 
+        (firstRunWithTask.linkId === this.run.linkId || 
+         firstRunWithTask.executionId === this.run.executionId);
     }
 
-    return [];
+    for (const taskId of failedTasks) {
+      const taskItem = new FailedTaskTreeItem(
+        taskId,
+        this.run.linkId,
+        this.run.executionId,
+        this.run,
+        this.cipeId
+      );
+
+      // Only add the fix to the first run that contains this task
+      if (isFirstRunWithFixTask && taskId === primaryFixTaskId) {
+        taskItem.collapsibleState = TreeItemCollapsibleState.Expanded;
+        taskItem.getChildren = () => [
+          new NxCloudFixTreeItem(this.runGroup, this.cipeId, taskId),
+        ];
+      }
+
+      children.push(taskItem);
+    }
+
+    // Adjust collapsible state based on children having tasks
+    this.collapsibleState =
+      failedTasks.length > 0
+        ? TreeItemCollapsibleState.Expanded
+        : TreeItemCollapsibleState.None;
+
+    return children;
   }
 }
 
@@ -301,7 +331,7 @@ export class FailedTaskTreeItem
     public linkId?: string,
     public executionId?: string,
     public run?: CIPERun,
-    public cipeId?: string,
+    public cipeId?: string
   ) {
     super(taskId);
     this.collapsibleState = TreeItemCollapsibleState.None;
