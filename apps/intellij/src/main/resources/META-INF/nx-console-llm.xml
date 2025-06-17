@@ -1,5 +1,11 @@
 <idea-plugin>
-  <extensions defaultExtensionNs="com.intellij.ml.llm">
+  <extensions defaultExtensionNs="com.intellij">
+    <projectService serviceImplementation="dev.nx.console.llm.FixCIPEService"/>
 
   </extensions>
+  <actions>
+    <action class="dev.nx.console.llm.CIPEAutoFixAction"
+            id="dev.nx.console.llm.CIPEAutoFixAction"
+            text="Help me fix this"/>
+  </actions>
 </idea-plugin>

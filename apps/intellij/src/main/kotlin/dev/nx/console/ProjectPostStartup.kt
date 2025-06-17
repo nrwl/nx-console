@@ -65,8 +65,6 @@ internal class ProjectPostStartup : ProjectActivity {
                     Notifier.notifyMcpServerInstall(project)
                 }
             }
-
-            delay(5000)
         }
 
         TelemetryService.getInstance(project)
