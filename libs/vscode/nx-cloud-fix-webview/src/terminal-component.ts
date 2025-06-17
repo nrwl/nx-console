@@ -301,6 +301,18 @@ export class TerminalComponent extends LitElement {
     .xterm .xterm-scrollable-element > .shadow.top.left {
       box-shadow: var(--vscode-scrollbar-shadow, #000) 6px 0 6px -6px inset;
     }
+
+    .xterm .xterm-viewport::-webkit-scrollbar-thumb:active {
+      background-color: var(--vscode-scrollbarSlider-activeBackground, #5a5a5a);
+    }
+
+    /* Hide the cursor */
+    .xterm .xterm-cursor,
+    .xterm .xterm-cursor-outline,
+    .xterm .xterm-cursor-block {
+      display: none !important;
+      visibility: hidden !important;
+    }
   `;
 
   @property({ type: String })
@@ -318,6 +330,7 @@ export class TerminalComponent extends LitElement {
   private terminal: Terminal | null = null;
   private fitAddon: FitAddon | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private themeObserver: MutationObserver | null = null;
 
   override render(): TemplateResult {
     return html`<div id="terminal-container"></div>`;
@@ -341,99 +354,21 @@ export class TerminalComponent extends LitElement {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+    }
   }
 
   private initializeTerminal(): void {
     const container = this.shadowRoot?.getElementById('terminal-container');
     if (!container) return;
 
-    // Get VS Code theme colors
-    const computedStyle = getComputedStyle(this);
-    const backgroundColor =
-      computedStyle.getPropertyValue('--vscode-panel-background') || '#1e1e1e';
-    const foregroundColor =
-      computedStyle.getPropertyValue('--vscode-terminal-foreground') ||
-      '#cccccc';
-    const cursorColor =
-      computedStyle.getPropertyValue('--vscode-terminalCursor-foreground') ||
-      '#cccccc';
-    const selectionColor =
-      computedStyle.getPropertyValue('--vscode-terminal-selectionBackground') ||
-      '#264f78';
+    // Create terminal with theme
+    this.createTerminalWithTheme();
 
-    this.terminal = new Terminal({
-      fontSize: this.fontSize,
-      fontFamily:
-        'var(--vscode-editor-font-family, "Menlo", "Monaco", "Courier New", monospace)',
-      theme: {
-        background: backgroundColor,
-        foreground: foregroundColor,
-        cursor: cursorColor,
-        selectionBackground: selectionColor,
-        black:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBlack') ||
-          '#000000',
-        red:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiRed') ||
-          '#cd3131',
-        green:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiGreen') ||
-          '#0dbc79',
-        yellow:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiYellow') ||
-          '#e5e510',
-        blue:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBlue') ||
-          '#2472c8',
-        magenta:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiMagenta') ||
-          '#bc3fbc',
-        cyan:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiCyan') ||
-          '#11a8cd',
-        white:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiWhite') ||
-          '#e5e5e5',
-        brightBlack:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBrightBlack') ||
-          '#666666',
-        brightRed:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBrightRed') ||
-          '#f14c4c',
-        brightGreen:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBrightGreen') ||
-          '#23d18b',
-        brightYellow:
-          computedStyle.getPropertyValue(
-            '--vscode-terminal-ansiBrightYellow',
-          ) || '#f5f543',
-        brightBlue:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBrightBlue') ||
-          '#3b8eea',
-        brightMagenta:
-          computedStyle.getPropertyValue(
-            '--vscode-terminal-ansiBrightMagenta',
-          ) || '#d670d6',
-        brightCyan:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBrightCyan') ||
-          '#29b8db',
-        brightWhite:
-          computedStyle.getPropertyValue('--vscode-terminal-ansiBrightWhite') ||
-          '#e5e5e5',
-      },
-      rows: this.rows,
-      cols: this.cols,
-      lineHeight: 1.4,
-      scrollback: 5000,
-      convertEol: true,
-      cursorBlink: true,
-    });
-
-    this.fitAddon = new FitAddon();
-    this.terminal.loadAddon(this.fitAddon);
-
-    this.terminal.open(container);
+    this.terminal!.open(container);
     this.setupResizeObserver();
+    this.setupThemeObserver();
 
     // Initial fit to ensure proper sizing
     setTimeout(() => {
@@ -442,7 +377,245 @@ export class TerminalComponent extends LitElement {
       if (this.content) {
         this.updateContent();
       }
-    }, 0);
+    }, 100);
+  }
+
+  private createTerminalWithTheme(): void {
+    const isDarkTheme = this.isDarkTheme();
+    const theme = isDarkTheme ? this.getDarkTheme() : this.getLightTheme();
+
+    this.terminal = new Terminal({
+      fontSize: this.fontSize,
+      fontFamily:
+        'var(--vscode-editor-font-family, "Menlo", "Monaco", "Courier New", monospace)',
+      theme: theme,
+      rows: this.rows,
+      cols: this.cols,
+      lineHeight: 2,
+      scrollback: 5000,
+      convertEol: true,
+      cursorBlink: false,
+      cursorStyle: 'block',
+      cursorInactiveStyle: 'none',
+    });
+
+    this.fitAddon = new FitAddon();
+    this.terminal.loadAddon(this.fitAddon);
+  }
+
+  private isDarkTheme(): boolean {
+    // Check VS Code theme by looking at the background color
+    const computedStyle = getComputedStyle(this);
+    const bgColor =
+      computedStyle.getPropertyValue('--vscode-editor-background') || '#1e1e1e';
+
+    // Parse the color and check brightness
+    const rgb = this.parseColor(bgColor);
+    if (rgb) {
+      // Calculate relative luminance
+      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+      return luminance < 0.5;
+    }
+
+    // Default to dark theme
+    return true;
+  }
+
+  private parseColor(
+    color: string,
+  ): { r: number; g: number; b: number } | null {
+    // Handle hex colors
+    const hexMatch = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+    if (hexMatch) {
+      return {
+        r: parseInt(hexMatch[1], 16),
+        g: parseInt(hexMatch[2], 16),
+        b: parseInt(hexMatch[3], 16),
+      };
+    }
+
+    // Handle rgb colors
+    const rgbMatch = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (rgbMatch) {
+      return {
+        r: parseInt(rgbMatch[1]),
+        g: parseInt(rgbMatch[2]),
+        b: parseInt(rgbMatch[3]),
+      };
+    }
+
+    return null;
+  }
+
+  private getDarkTheme() {
+    const computedStyle = getComputedStyle(this);
+    return {
+      background:
+        computedStyle.getPropertyValue('--vscode-panel-background') ||
+        '#1e1e1e',
+      foreground:
+        computedStyle.getPropertyValue('--vscode-terminal-foreground') ||
+        '#cccccc',
+      cursor:
+        computedStyle.getPropertyValue('--vscode-terminalCursor-foreground') ||
+        '#cccccc',
+      selectionBackground:
+        computedStyle.getPropertyValue(
+          '--vscode-terminal-selectionBackground',
+        ) || '#264f78',
+      black:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBlack') ||
+        '#000000',
+      red:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiRed') ||
+        '#cd3131',
+      green:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiGreen') ||
+        '#0dbc79',
+      yellow:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiYellow') ||
+        '#e5e510',
+      blue:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBlue') ||
+        '#2472c8',
+      magenta:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiMagenta') ||
+        '#bc3fbc',
+      cyan:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiCyan') ||
+        '#11a8cd',
+      white:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiWhite') ||
+        '#e5e5e5',
+      brightBlack:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightBlack') ||
+        '#666666',
+      brightRed:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightRed') ||
+        '#f14c4c',
+      brightGreen:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightGreen') ||
+        '#23d18b',
+      brightYellow:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightYellow') ||
+        '#f5f543',
+      brightBlue:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightBlue') ||
+        '#3b8eea',
+      brightMagenta:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightMagenta') ||
+        '#d670d6',
+      brightCyan:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightCyan') ||
+        '#29b8db',
+      brightWhite:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightWhite') ||
+        '#e5e5e5',
+    };
+  }
+
+  private getLightTheme() {
+    const computedStyle = getComputedStyle(this);
+    return {
+      background:
+        computedStyle.getPropertyValue('--vscode-panel-background') ||
+        '#ffffff',
+      foreground:
+        computedStyle.getPropertyValue('--vscode-terminal-foreground') ||
+        '#333333',
+      cursor:
+        computedStyle.getPropertyValue('--vscode-terminalCursor-foreground') ||
+        '#333333',
+      selectionBackground:
+        computedStyle.getPropertyValue(
+          '--vscode-terminal-selectionBackground',
+        ) || '#add6ff',
+      black:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBlack') ||
+        '#000000',
+      red:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiRed') ||
+        '#cd3131',
+      green:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiGreen') ||
+        '#00bc00',
+      yellow:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiYellow') ||
+        '#949800',
+      blue:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBlue') ||
+        '#0451a5',
+      magenta:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiMagenta') ||
+        '#bc05bc',
+      cyan:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiCyan') ||
+        '#0598bc',
+      white:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiWhite') ||
+        '#555555',
+      brightBlack:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightBlack') ||
+        '#666666',
+      brightRed:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightRed') ||
+        '#cd3131',
+      brightGreen:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightGreen') ||
+        '#14ce14',
+      brightYellow:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightYellow') ||
+        '#b5ba00',
+      brightBlue:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightBlue') ||
+        '#0451a5',
+      brightMagenta:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightMagenta') ||
+        '#bc05bc',
+      brightCyan:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightCyan') ||
+        '#0598bc',
+      brightWhite:
+        computedStyle.getPropertyValue('--vscode-terminal-ansiBrightWhite') ||
+        '#a5a5a5',
+    };
+  }
+
+  private setupThemeObserver(): void {
+    // Watch for changes to the body's class attribute (VS Code adds theme classes)
+    this.themeObserver = new MutationObserver(() => {
+      this.updateTerminalTheme();
+    });
+
+    // Observe document body for class changes
+    if (document.body) {
+      this.themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'data-vscode-theme-kind'],
+      });
+    }
+
+    // Also listen for style changes on the host element
+    const hostObserver = new MutationObserver(() => {
+      this.updateTerminalTheme();
+    });
+    hostObserver.observe(this, {
+      attributes: true,
+      attributeFilter: ['style'],
+    });
+  }
+
+  private updateTerminalTheme(): void {
+    if (!this.terminal) return;
+
+    const isDarkTheme = this.isDarkTheme();
+    const theme = isDarkTheme ? this.getDarkTheme() : this.getLightTheme();
+
+    // Update terminal theme
+    this.terminal.options.theme = theme;
+
+    // Force a refresh
+    this.terminal.refresh(0, this.terminal.rows - 1);
   }
 
   private setupResizeObserver(): void {
