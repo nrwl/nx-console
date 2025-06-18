@@ -19,7 +19,12 @@ export class TerminalComponent extends LitElement {
         'Monaco',
         'Courier New',
         monospace
-      );
+      ) !important;
+      font-size: var(--vscode-editor-font-size) !important;
+    }
+
+    .xterm-rows {
+      font-size: var(--vscode-editor-font-size) !important;
     }
 
     #terminal-container {
@@ -319,9 +324,6 @@ export class TerminalComponent extends LitElement {
   content = '';
 
   @property({ type: Number })
-  fontSize = 14;
-
-  @property({ type: Number })
   rows = 20;
 
   @property({ type: Number })
@@ -385,13 +387,10 @@ export class TerminalComponent extends LitElement {
     const theme = isDarkTheme ? this.getDarkTheme() : this.getLightTheme();
 
     this.terminal = new Terminal({
-      fontSize: this.fontSize,
-      fontFamily:
-        'var(--vscode-editor-font-family, "Menlo", "Monaco", "Courier New", monospace)',
       theme: theme,
       rows: this.rows,
       cols: this.cols,
-      lineHeight: 2,
+      lineHeight: 1.5,
       scrollback: 5000,
       convertEol: true,
       cursorBlink: false,
