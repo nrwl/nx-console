@@ -2,10 +2,13 @@ package dev.nx.console.cloud
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.*
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import dev.nx.console.mcp.McpServerService
+import dev.nx.console.mcp.hasAIAssistantInstalled
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
 import dev.nx.console.settings.NxConsoleSettingsProvider
@@ -30,7 +33,6 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             project.getService(CIPENotificationService::class.java)
     }
 
-    private val logger = thisLogger()
     private val telemetryService = TelemetryService.getInstance(project)
 
     override fun onNotificationEvent(event: CIPENotificationEvent) {
@@ -64,7 +66,6 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             type = NotificationType.ERROR,
             cipeUrl = cipe.cipeUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = true,
         )
     }
 
@@ -82,7 +83,6 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             type = NotificationType.ERROR,
             cipeUrl = run.runUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = true,
         )
     }
 
@@ -93,7 +93,6 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             type = NotificationType.INFORMATION,
             cipeUrl = cipe.cipeUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = false,
         )
     }
 
@@ -103,18 +102,24 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         type: NotificationType,
         cipeUrl: String,
         commitUrl: String?,
-        showHelp: Boolean,
     ) {
         telemetryService.featureUsed(TelemetryEvent.CLOUD_SHOW_CIPE_NOTIFICATION)
 
         val notification =
             NOTIFICATION_GROUP.createNotification(title = title, content = content, type = type)
 
-        // Add actions in order: Help (if error), View Commit (if available), View Results
-        // TODO: Implement help action later
-        // if (showHelp && type == NotificationType.ERROR) {
-        //     notification.addAction(HelpMeFixErrorAction())
-        // }
+        val assistantReady =
+            hasAIAssistantInstalled() && project.service<McpServerService>().isMcpServerSetup()
+
+        if (type == NotificationType.ERROR && assistantReady) {
+            try {
+                ActionManager.getInstance().getAction("dev.nx.console.llm.CIPEAutoFixAction")?.let {
+                    notification.addAction(it)
+                }
+            } catch (e: Throwable) {
+                //
+            }
+        }
 
         if (commitUrl != null) {
             notification.addAction(ViewCommitAction(commitUrl))
@@ -154,17 +159,4 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             notification.expire()
         }
     }
-
-    // TODO: Implement help action later
-    // private inner class HelpMeFixErrorAction : NotificationAction("Help me fix this error") {
-    //     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-    //         telemetryService.featureUsed(
-    //             TelemetryEvent.CLOUD_FIX_CIPE_ERROR,
-    //             mapOf("source" to TelemetryEventSource.NOTIFICATION),
-    //         )
-    //         // TODO: Integrate with AI assistance when available
-    //         logger.info("Help me fix error action triggered")
-    //         notification.expire()
-    //     }
-    // }
 }

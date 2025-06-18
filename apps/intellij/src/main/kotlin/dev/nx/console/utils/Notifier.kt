@@ -1,5 +1,6 @@
 package dev.nx.console.utils
 
+// import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNotificationAction
 import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
@@ -11,7 +12,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.RestartDialogImpl
 import dev.nx.console.NxConsoleBundle
-import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNotificationAction
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.telemetry.actions.TelemetryOptInAction
 import dev.nx.console.telemetry.actions.TelemetryOptOutAction
@@ -103,7 +103,7 @@ class Notifier {
                     NotificationType.ERROR,
                 )
                 .setTitle("Nx Console")
-                .addAction(AnalyzeNxConfigurationFilesNotificationAction())
+                //                .addAction(AnalyzeNxConfigurationFilesNotificationAction())
                 .notify(project)
         }
 
