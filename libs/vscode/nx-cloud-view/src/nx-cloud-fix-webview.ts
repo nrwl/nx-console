@@ -9,7 +9,7 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { join } from 'path';
 import { xhr } from 'request-light';
-import {
+import vscode, {
   commands,
   EventEmitter,
   ExtensionContext,
@@ -111,6 +111,10 @@ export class NxCloudFixWebview {
       this.webviewPanel = undefined;
       this.currentFixDetails = undefined;
       this._onDispose.fire();
+
+      vscode.workspace.textDocuments.forEach((doc) => {
+        console.log(doc);
+      });
     });
 
     this.webviewPanel.webview.html = this.getWebviewHtml(
