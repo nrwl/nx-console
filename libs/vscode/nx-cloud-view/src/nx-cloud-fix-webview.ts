@@ -204,7 +204,11 @@ export class NxCloudFixWebview {
 
   async updateFixDetailsFromRecentCIPEs(recentCIPEs: CIPEInfo[]) {
     if (!this.currentFixDetails) return;
-    console.log('update triggered');
+
+    console.log('updateFixDetailsFromRecentCIPEs called', {
+      currentCipeId: this.currentFixDetails.cipe.ciPipelineExecutionId,
+      currentRunGroup: this.currentFixDetails.runGroup.runGroup,
+    });
 
     const updatedDetails = recentCIPEs.find(
       (cipe) =>
@@ -212,12 +216,22 @@ export class NxCloudFixWebview {
         this.currentFixDetails.cipe.ciPipelineExecutionId,
     );
 
-    console.log('found update cipe details', updatedDetails);
     if (updatedDetails) {
-      this.currentFixDetails = {
-        ...this.currentFixDetails,
-        cipe: updatedDetails,
-      };
+      // Find the corresponding runGroup in the updated CIPE
+      const updatedRunGroup = updatedDetails.runGroups.find(
+        (rg) => rg.runGroup === this.currentFixDetails.runGroup.runGroup,
+      );
+
+      if (updatedRunGroup) {
+        console.log('Found updated runGroup', {
+          aiFix: updatedRunGroup.aiFix,
+        });
+        this.currentFixDetails = {
+          ...this.currentFixDetails,
+          cipe: updatedDetails,
+          runGroup: updatedRunGroup,
+        };
+      }
     }
 
     if (this.webviewPanel) {
@@ -288,6 +302,10 @@ export class NxCloudFixWebview {
 
   private updateWebviewContent() {
     if (!this.webviewPanel || !this.currentFixDetails) return;
+
+    console.log('Sending update-details message to webview', {
+      aiFix: this.currentFixDetails.runGroup.aiFix,
+    });
 
     this.webviewPanel.webview.postMessage({
       type: 'update-details',
@@ -453,11 +471,19 @@ export class NxCloudFixWebview {
 
       // Show the unified diff in the beside column
       const title = `Nx Cloud Fix (${parsedDiff.length} file${parsedDiff.length === 1 ? '' : 's'})`;
-      await commands.executeCommand('vscode.diff', beforeUri, afterUri, title, {
-        preview: false,
-        preserveFocus: false,
-        viewColumn: ViewColumn.Beside,
-      });
+      const diffReturn = await commands.executeCommand(
+        'vscode.diff',
+        beforeUri,
+        afterUri,
+        title,
+        {
+          preview: false,
+          preserveFocus: false,
+          viewColumn: ViewColumn.Beside,
+        },
+      );
+
+      console.log(diffReturn);
     }
   }
 }
