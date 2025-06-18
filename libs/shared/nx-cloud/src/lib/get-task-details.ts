@@ -79,7 +79,7 @@ export async function getTaskDetails(
   );
   try {
     const response = await xhr({
-      type: 'GET',
+      type: 'POST',
       url,
       headers,
       timeout: 10000,
@@ -117,4 +117,25 @@ export async function getTaskDetails(
       },
     };
   }
+}
+
+export function formatTaskDetailsContent(task: TaskDetails): string[] {
+  const content: string[] = [];
+
+  let taskDetailsText = `Task Details for ID: ${task.taskId}\n`;
+  taskDetailsText += `Project: ${task.projectName}, Target: ${task.target}\n`;
+  taskDetailsText += `Status: ${task.status}, Cache Status: ${task.cacheStatus}\n`;
+  taskDetailsText += `Duration: ${Math.round(task.durationMs / 1000)}s\n`;
+  taskDetailsText += `Hash: ${task.hash}\n`;
+  taskDetailsText += `Cacheable: ${task.isCacheable}`;
+  if (task.params) {
+    taskDetailsText += `\nParameters: ${task.params}`;
+  }
+  if (task.priorAttempts && task.priorAttempts.length > 0) {
+    taskDetailsText += `\nPrior Attempts: ${task.priorAttempts.length}`;
+  }
+
+  content.push(taskDetailsText);
+
+  return content;
 }

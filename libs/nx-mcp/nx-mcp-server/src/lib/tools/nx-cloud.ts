@@ -6,7 +6,17 @@ import {
   getNxCloudTerminalOutput,
   getRecentCIPEData,
   getPipelineExecutionsSearch,
+  formatPipelineExecutionsSearchContent,
   getPipelineExecutionDetails,
+  formatPipelineExecutionDetailsContent,
+  getRunsSearch,
+  formatRunsSearchContent,
+  getRunDetails,
+  formatRunDetailsContent,
+  getTasksDetailsSearch,
+  formatTasksDetailsSearchContent,
+  getTasksSearch,
+  formatTasksSearchContent,
 } from '@nx-console/shared-nx-cloud';
 import { z } from 'zod';
 import {
@@ -14,6 +24,10 @@ import {
   NX_CLOUD_CIPE_FAILURE,
   NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
   NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS,
+  NX_CLOUD_RUNS_DETAILS,
+  NX_CLOUD_RUNS_SEARCH,
+  NX_CLOUD_TASKS_DETAILS,
+  NX_CLOUD_TASKS_SEARCH,
 } from '@nx-console/shared-llm-context/src/lib/tool-names';
 
 export function registerNxCloudTools(
@@ -57,7 +71,7 @@ export function registerNxCloudTools(
   // Pipeline Executions Search
   server.tool(
     NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
-    'Search for pipeline executions in Nx Cloud. Returns a list of pipeline executions matching the search criteria.',
+    'Search for pipeline executions in Nx Cloud. Pipeline executions are the top-level CI/CD workflow containers that contain zero-to-many runs. Use this to find executions by branch, status, author, or time range. Each execution represents a complete CI/CD pipeline run triggered by commits or other events. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
     pipelineExecutionSearchSchema.shape,
     {
       destructiveHint: false,
@@ -70,7 +84,7 @@ export function registerNxCloudTools(
   // Pipeline Execution Details
   server.tool(
     NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS,
-    'Get detailed information about a specific pipeline execution in Nx Cloud.',
+    'Get detailed information about a specific pipeline execution in Nx Cloud. Pipeline executions are the top-level containers that include run groups and their associated runs. Use this to understand the structure and status of a complete CI/CD pipeline execution, including all its child runs.',
     pipelineExecutionDetailsSchema.shape,
     {
       destructiveHint: false,
@@ -78,6 +92,58 @@ export function registerNxCloudTools(
       openWorldHint: true,
     },
     nxCloudPipelineExecutionDetails(workspacePath, logger, telemetry),
+  );
+
+  // Runs Search
+  server.tool(
+    NX_CLOUD_RUNS_SEARCH,
+    'Search for runs in Nx Cloud. Runs are mid-level containers within pipeline executions that contain zero-to-many tasks. Each run represents execution of a specific command (like "nx affected:build"). Use this to find runs by pipeline execution, branch, command, or status. Runs belong to pipeline executions and contain individual tasks. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    runSearchSchema.shape,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
+    nxCloudRunsSearch(workspacePath, logger, telemetry),
+  );
+
+  // Run Details
+  server.tool(
+    NX_CLOUD_RUNS_DETAILS,
+    'Get detailed information about a specific run in Nx Cloud. Runs sit between pipeline executions and tasks in the hierarchy. Use this to see the command executed, duration, status, and all tasks that were part of this run. Each run contains zero-to-many individual tasks.',
+    runDetailsSchema.shape,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
+    nxCloudRunDetails(workspacePath, logger, telemetry),
+  );
+
+  // Tasks Search
+  server.tool(
+    NX_CLOUD_TASKS_SEARCH,
+    'Search for task statistics in Nx Cloud. Returns aggregated statistics for tasks including success rates, cache hit rates, and average durations. Use this to analyze performance patterns across multiple executions of the same task (project + target combination). If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    taskSearchSchema.shape,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
+    nxCloudTasksSearch(workspacePath, logger, telemetry),
+  );
+
+  // Task Details
+  server.tool(
+    NX_CLOUD_TASKS_DETAILS,
+    'Search for detailed task execution information in Nx Cloud. Returns individual task execution details including project, target, duration, cache status, and parameters. Use filters to find specific task executions. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    taskDetailsSchema.shape,
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
+    nxCloudTaskDetails(workspacePath, logger, telemetry),
   );
 }
 
@@ -255,17 +321,23 @@ const pipelineExecutionSearchSchema = z.object({
   statuses: z
     .array(z.string())
     .optional()
-    .describe('Filter by execution statuses'),
+    .describe(
+      'Filter by execution statuses (e.g., "NOT_STARTED", "IN_PROGRESS", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT")',
+    ),
   authors: z.array(z.string()).optional().describe('Filter by commit authors'),
   repositoryUrl: z.string().optional().describe('Filter by repository URL'),
-  minCreatedAtMs: z
-    .number()
+  minCreatedAt: z
+    .string()
     .optional()
-    .describe('Minimum creation timestamp in milliseconds'),
-  maxCreatedAtMs: z
-    .number()
+    .describe(
+      'Minimum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
+  maxCreatedAt: z
+    .string()
     .optional()
-    .describe('Maximum creation timestamp in milliseconds'),
+    .describe(
+      'Maximum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   vcsTitleContains: z
     .string()
     .optional()
@@ -298,20 +370,24 @@ const runSearchSchema = z.object({
     .optional()
     .describe('Filter by run group names'),
   commitShas: z.array(z.string()).optional().describe('Filter by commit SHAs'),
-  statuses: z.array(z.string()).optional().describe('Filter by run statuses'),
-  minStartTimeMs: z
-    .number()
+  statuses: z
+    .array(z.string())
     .optional()
-    .describe('Minimum start time in milliseconds'),
-  maxStartTimeMs: z
-    .number()
-    .optional()
-    .describe('Maximum start time in milliseconds'),
-  commandContains: z
+    .describe(
+      'Filter by run statuses (e.g., "NOT_STARTED", "IN_PROGRESS", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT")',
+    ),
+  minStartTime: z
     .string()
     .optional()
-    .describe('Filter by command containing this text'),
-  urlSlug: z.string().optional().describe('Filter by specific URL slug'),
+    .describe(
+      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
+  maxStartTime: z
+    .string()
+    .optional()
+    .describe(
+      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   limit: z
     .number()
     .optional()
@@ -325,11 +401,6 @@ const runDetailsSchema = z.object({
 });
 
 const taskSearchSchema = z.object({
-  runIds: z.array(z.string()).optional().describe('Filter by specific run IDs'),
-  pipelineExecutionIds: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by pipeline execution IDs'),
   taskIds: z
     .array(z.string())
     .optional()
@@ -343,31 +414,70 @@ const taskSearchSchema = z.object({
     .array(z.string())
     .optional()
     .describe('Filter by configurations'),
-  hashes: z.array(z.string()).optional().describe('Filter by task hashes'),
-  statuses: z.array(z.string()).optional().describe('Filter by task statuses'),
-  cacheStatuses: z
-    .array(z.string())
+  minStartTime: z
+    .string()
     .optional()
-    .describe('Filter by cache statuses'),
-  minStartTimeMs: z
-    .number()
+    .describe(
+      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
+  maxStartTime: z
+    .string()
     .optional()
-    .describe('Minimum start time in milliseconds'),
-  maxStartTimeMs: z
-    .number()
-    .optional()
-    .describe('Maximum start time in milliseconds'),
+    .describe(
+      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   limit: z
     .number()
     .optional()
     .default(100)
     .describe('Maximum number of results to return'),
   pageToken: z.string().optional().describe('Token for pagination'),
+  includeLocal: z
+    .boolean()
+    .optional()
+    .describe(
+      'Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.',
+    ),
 });
 
 const taskDetailsSchema = z.object({
-  runId: z.string().describe('The ID of the run containing the task'),
-  encodedTaskId: z.string().describe('The URL-encoded task ID to retrieve'),
+  taskIds: z
+    .array(z.string())
+    .optional()
+    .describe('Filter by specific task IDs'),
+  projectNames: z
+    .array(z.string())
+    .optional()
+    .describe('Filter by project names'),
+  targets: z.array(z.string()).optional().describe('Filter by target names'),
+  configurations: z
+    .array(z.string())
+    .optional()
+    .describe('Filter by configurations'),
+  minStartTime: z
+    .string()
+    .optional()
+    .describe(
+      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
+  maxStartTime: z
+    .string()
+    .optional()
+    .describe(
+      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
+  limit: z
+    .number()
+    .optional()
+    .default(100)
+    .describe('Maximum number of results to return'),
+  pageToken: z.string().optional().describe('Token for pagination'),
+  includeLocal: z
+    .boolean()
+    .optional()
+    .describe(
+      'Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.',
+    ),
 });
 
 // Implementation functions
@@ -387,7 +497,7 @@ const nxCloudPipelineExecutionsSearch =
     const result = await getPipelineExecutionsSearch(
       workspacePath,
       logger,
-      params as any,
+      params,
     );
 
     if (result.error) {
@@ -396,53 +506,11 @@ const nxCloudPipelineExecutionsSearch =
       );
     }
 
-    const content: CallToolResult['content'] = [];
-
-    if (result.data?.items && result.data.items.length > 0) {
-      content.push({
-        type: 'text',
-        text: `Found ${result.data.items.length} pipeline executions:`,
-      });
-
-      for (const execution of result.data.items) {
-        content.push({
-          type: 'text',
-          text: `- Pipeline Execution ID: ${execution.id}`,
-        });
-        content.push({
-          type: 'text',
-          text: `  Branch: ${execution.branch}, Status: ${execution.status}`,
-        });
-        content.push({
-          type: 'text',
-          text: `  Created: ${new Date(execution.createdAtMs).toISOString()}`,
-        });
-        if (execution.vcsTitle) {
-          content.push({
-            type: 'text',
-            text: `  Title: ${execution.vcsTitle}`,
-          });
-        }
-        if (execution.author) {
-          content.push({
-            type: 'text',
-            text: `  Author: ${execution.author}`,
-          });
-        }
-      }
-
-      if (result.data.nextPageToken) {
-        content.push({
-          type: 'text',
-          text: `Next page token: ${result.data.nextPageToken}`,
-        });
-      }
-    } else {
-      content.push({
-        type: 'text',
-        text: 'No pipeline executions found matching the criteria.',
-      });
-    }
+    const textContent = formatPipelineExecutionsSearchContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map((text) => ({
+      type: 'text',
+      text,
+    }));
 
     return { content };
   };
@@ -472,308 +540,120 @@ const nxCloudPipelineExecutionDetails =
       );
     }
 
-    const content: CallToolResult['content'] = [];
-    const execution = result.data!;
-
-    content.push({
+    const textContent = formatPipelineExecutionDetailsContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map((text) => ({
       type: 'text',
-      text: `Pipeline Execution Details for ID: ${execution.id}`,
-    });
-    content.push({
-      type: 'text',
-      text: `Branch: ${execution.branch}, Status: ${execution.status}`,
-    });
-    content.push({
-      type: 'text',
-      text: `Created: ${new Date(execution.createdAtMs).toISOString()}`,
-    });
-    if (execution.completedAtMs) {
-      content.push({
-        type: 'text',
-        text: `Completed: ${new Date(execution.completedAtMs).toISOString()}`,
-      });
-    }
-    if (execution.durationMs) {
-      content.push({
-        type: 'text',
-        text: `Duration: ${Math.round(execution.durationMs / 1000)}s`,
-      });
-    }
-
-    content.push({
-      type: 'text',
-      text: `Run Groups (${execution.runGroups.length}):`,
-    });
-    for (const runGroup of execution.runGroups) {
-      content.push({
-        type: 'text',
-        text: `- ${runGroup.runGroupName}: ${runGroup.status}`,
-      });
-    }
+      text,
+    }));
 
     return { content };
   };
 
 // In Progress
-// const nxCloudRunsSearch =
-//   (
-//     workspacePath: string,
-//     logger: Logger,
-//     telemetry: NxConsoleTelemetryLogger | undefined,
-//   ) =>
-//   async (params: z.infer<typeof runSearchSchema>): Promise<CallToolResult> => {
-//     telemetry?.logUsage('ai.tool-call', {
-//       tool: NX_CLOUD_RUNS_SEARCH,
-//     });
-//
-//     const result = await getRunsSearch(workspacePath, logger, params as any);
-//
-//     if (result.error) {
-//       throw new Error(`Error searching runs: ${result.error.message}`);
-//     }
-//
-//     const content: CallToolResult['content'] = [];
-//
-//     if (result.data?.items && result.data.items.length > 0) {
-//       content.push({
-//         type: 'text',
-//         text: `Found ${result.data.items.length} runs:`,
-//       });
-//
-//       for (const run of result.data.items) {
-//         content.push({
-//           type: 'text',
-//           text: `- Run ID: ${run.id}`,
-//         });
-//         content.push({
-//           type: 'text',
-//           text: `  Command: ${run.command}`,
-//         });
-//         content.push({
-//           type: 'text',
-//           text: `  Status: ${run.status}, Tasks: ${run.taskCount}`,
-//         });
-//         content.push({
-//           type: 'text',
-//           text: `  Duration: ${Math.round(run.durationMs / 1000)}s`,
-//         });
-//         if (run.branch) {
-//           content.push({
-//             type: 'text',
-//             text: `  Branch: ${run.branch}`,
-//           });
-//         }
-//       }
-//
-//       if (result.data.nextPageToken) {
-//         content.push({
-//           type: 'text',
-//           text: `Next page token: ${result.data.nextPageToken}`,
-//         });
-//       }
-//     } else {
-//       content.push({
-//         type: 'text',
-//         text: 'No runs found matching the criteria.',
-//       });
-//     }
-//
-//     return { content };
-//   };
-//
-// const nxCloudRunDetails =
-//   (
-//     workspacePath: string,
-//     logger: Logger,
-//     telemetry: NxConsoleTelemetryLogger | undefined,
-//   ) =>
-//   async (params: z.infer<typeof runDetailsSchema>): Promise<CallToolResult> => {
-//     telemetry?.logUsage('ai.tool-call', {
-//       tool: NX_CLOUD_RUNS_DETAILS,
-//     });
-//
-//     const result = await getRunDetails(workspacePath, logger, params.runId);
-//
-//     if (result.error) {
-//       throw new Error(`Error getting run details: ${result.error.message}`);
-//     }
-//
-//     const content: CallToolResult['content'] = [];
-//     const run = result.data!;
-//
-//     content.push({
-//       type: 'text',
-//       text: `Run Details for ID: ${run.id}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Command: ${run.command}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Status: ${run.status}, Task Count: ${run.taskCount}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Duration: ${Math.round(run.durationMs / 1000)}s`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Started: ${new Date(run.startTimeMs).toISOString()}`,
-//     });
-//
-//     if (run.tasks && run.tasks.length > 0) {
-//       content.push({
-//         type: 'text',
-//         text: `Tasks (${run.tasks.length}):`,
-//       });
-//       for (const task of run.tasks.slice(0, 10)) {
-//         // Limit to first 10 tasks
-//         content.push({
-//           type: 'text',
-//           text: `- ${task.projectName}:${task.target} (${task.status}) - ${Math.round(task.durationMs / 1000)}s`,
-//         });
-//       }
-//       if (run.tasks.length > 10) {
-//         content.push({
-//           type: 'text',
-//           text: `... and ${run.tasks.length - 10} more tasks`,
-//         });
-//       }
-//     }
-//
-//     return { content };
-//   };
-//
-// const nxCloudTasksSearch =
-//   (
-//     workspacePath: string,
-//     logger: Logger,
-//     telemetry: NxConsoleTelemetryLogger | undefined,
-//   ) =>
-//   async (params: z.infer<typeof taskSearchSchema>): Promise<CallToolResult> => {
-//     telemetry?.logUsage('ai.tool-call', {
-//       tool: NX_CLOUD_TASKS_SEARCH,
-//     });
-//
-//     const result = await getTasksSearch(workspacePath, logger, params as any);
-//
-//     if (result.error) {
-//       throw new Error(`Error searching tasks: ${result.error.message}`);
-//     }
-//
-//     const content: CallToolResult['content'] = [];
-//
-//     if (result.data?.items && result.data.items.length > 0) {
-//       content.push({
-//         type: 'text',
-//         text: `Found ${result.data.items.length} tasks:`,
-//       });
-//
-//       for (const task of result.data.items) {
-//         content.push({
-//           type: 'text',
-//           text: `- Task ID: ${task.taskId}`,
-//         });
-//         content.push({
-//           type: 'text',
-//           text: `  Project: ${task.projectName}, Target: ${task.target}`,
-//         });
-//         content.push({
-//           type: 'text',
-//           text: `  Status: ${task.status}, Cache: ${task.cacheStatus}`,
-//         });
-//         content.push({
-//           type: 'text',
-//           text: `  Duration: ${Math.round(task.durationMs / 1000)}s`,
-//         });
-//         if (task.runId) {
-//           content.push({
-//             type: 'text',
-//             text: `  Run ID: ${task.runId}`,
-//           });
-//         }
-//       }
-//
-//       if (result.data.nextPageToken) {
-//         content.push({
-//           type: 'text',
-//           text: `Next page token: ${result.data.nextPageToken}`,
-//         });
-//       }
-//     } else {
-//       content.push({
-//         type: 'text',
-//         text: 'No tasks found matching the criteria.',
-//       });
-//     }
-//
-//     return { content };
-//   };
-//
-// const nxCloudTaskDetails =
-//   (
-//     workspacePath: string,
-//     logger: Logger,
-//     telemetry: NxConsoleTelemetryLogger | undefined,
-//   ) =>
-//   async (
-//     params: z.infer<typeof taskDetailsSchema>,
-//   ): Promise<CallToolResult> => {
-//     telemetry?.logUsage('ai.tool-call', {
-//       tool: NX_CLOUD_TASKS_DETAILS,
-//     });
-//
-//     const result = await getTaskDetails(
-//       workspacePath,
-//       logger,
-//       params.runId,
-//       params.encodedTaskId,
-//     );
-//
-//     if (result.error) {
-//       throw new Error(`Error getting task details: ${result.error.message}`);
-//     }
-//
-//     const content: CallToolResult['content'] = [];
-//     const task = result.data!;
-//
-//     content.push({
-//       type: 'text',
-//       text: `Task Details for ID: ${task.taskId}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Project: ${task.projectName}, Target: ${task.target}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Status: ${task.status}, Cache Status: ${task.cacheStatus}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Duration: ${Math.round(task.durationMs / 1000)}s`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Hash: ${task.hash}`,
-//     });
-//     content.push({
-//       type: 'text',
-//       text: `Cacheable: ${task.isCacheable}`,
-//     });
-//     if (task.params) {
-//       content.push({
-//         type: 'text',
-//         text: `Parameters: ${task.params}`,
-//       });
-//     }
-//     if (task.priorAttempts && task.priorAttempts.length > 0) {
-//       content.push({
-//         type: 'text',
-//         text: `Prior Attempts: ${task.priorAttempts.length}`,
-//       });
-//     }
-//
-//     return { content };
-//   };
+const nxCloudRunsSearch =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (params: z.infer<typeof runSearchSchema>): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: NX_CLOUD_RUNS_SEARCH,
+    });
+
+    const result = await getRunsSearch(workspacePath, logger, params);
+
+    if (result.error) {
+      throw new Error(`Error searching runs: ${result.error.message}`);
+    }
+
+    const textContent = formatRunsSearchContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map((text) => ({
+      type: 'text',
+      text,
+    }));
+
+    return { content };
+  };
+
+const nxCloudRunDetails =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (params: z.infer<typeof runDetailsSchema>): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: NX_CLOUD_RUNS_DETAILS,
+    });
+
+    const result = await getRunDetails(workspacePath, logger, params.runId);
+
+    if (result.error) {
+      throw new Error(`Error getting run details: ${result.error.message}`);
+    }
+
+    const textContent = formatRunDetailsContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map((text) => ({
+      type: 'text',
+      text,
+    }));
+
+    return { content };
+  };
+
+const nxCloudTasksSearch =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (params: z.infer<typeof taskSearchSchema>): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: NX_CLOUD_TASKS_SEARCH,
+    });
+
+    const result = await getTasksSearch(workspacePath, logger, params);
+
+    if (result.error) {
+      throw new Error(`Error searching tasks: ${result.error.message}`);
+    }
+
+    const textContent = formatTasksSearchContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map((text) => ({
+      type: 'text',
+      text,
+    }));
+
+    return { content };
+  };
+
+const nxCloudTaskDetails =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (
+    params: z.infer<typeof taskDetailsSchema>,
+  ): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: NX_CLOUD_TASKS_DETAILS,
+    });
+
+    const result = await getTasksDetailsSearch(workspacePath, logger, params);
+
+    if (result.error) {
+      throw new Error(`Error searching task details: ${result.error.message}`);
+    }
+
+    const textContent = formatTasksDetailsSearchContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map(
+      (text: string) => ({
+        type: 'text',
+        text,
+      }),
+    );
+
+    return { content };
+  };

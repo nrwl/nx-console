@@ -5,16 +5,13 @@ import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 
 export interface RunSearchRequest {
-  workspaceId: string;
   pipelineExecutionId?: string;
   branches?: string[];
   runGroups?: string[];
   commitShas?: string[];
   statuses?: string[];
-  minStartTimeMs?: number;
-  maxStartTimeMs?: number;
-  commandContains?: string;
-  urlSlug?: string;
+  minStartTime?: string;
+  maxStartTime?: string;
   limit?: number;
   pageToken?: string;
 }
@@ -106,4 +103,31 @@ export async function getRunsSearch(
       },
     };
   }
+}
+
+export function formatRunsSearchContent(data: RunSearchResponse): string[] {
+  const content: string[] = [];
+
+  if (data.items && data.items.length > 0) {
+    content.push(`Found ${data.items.length} runs:`);
+
+    for (const run of data.items) {
+      let runText = `- Run ID: ${run.id}\n`;
+      runText += `  Command: ${run.command}\n`;
+      runText += `  Status: ${run.status}, Tasks: ${run.taskCount}\n`;
+      runText += `  Duration: ${Math.round(run.durationMs / 1000)}s`;
+      if (run.branch) {
+        runText += `\n  Branch: ${run.branch}`;
+      }
+      content.push(runText);
+    }
+
+    if (data.nextPageToken) {
+      content.push(`Next page token: ${data.nextPageToken}`);
+    }
+  } else {
+    content.push('No runs found matching the criteria.');
+  }
+
+  return content;
 }
