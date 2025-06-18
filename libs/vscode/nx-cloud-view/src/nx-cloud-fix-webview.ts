@@ -46,7 +46,6 @@ export class NxCloudFixWebview {
     if (!NxCloudFixWebview.INSTANCE) {
       const nxCloudFixWebview = new NxCloudFixWebview(extensionContext);
 
-      // Register content providers for virtual diff documents
       const diffContentProvider = new DiffContentProvider();
       extensionContext.subscriptions.push(
         workspace.registerTextDocumentContentProvider(
