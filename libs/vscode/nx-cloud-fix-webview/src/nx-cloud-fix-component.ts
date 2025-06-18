@@ -689,7 +689,7 @@ export class NxCloudFixComponent extends LitElement {
       }
 
       .codicon-modifier-spin {
-        animation: spin 1s linear infinite;
+        animation: spin 2s linear infinite;
       }
 
       .task-id {

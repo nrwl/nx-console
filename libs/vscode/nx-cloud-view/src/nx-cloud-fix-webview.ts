@@ -1,5 +1,14 @@
+import {
+  downloadAndExtractArtifact,
+  nxCloudAuthHeaders,
+} from '@nx-console/shared-nx-cloud';
 import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
+import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
+import { outputLogger } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
+import { join } from 'path';
+import { xhr } from 'request-light';
 import {
   commands,
   EventEmitter,
@@ -10,9 +19,9 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
-import { join } from 'path';
+import { ActorRef, EventObject } from 'xstate';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
+import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
 
 export interface NxCloudFixWebviewMessage {
   type: 'apply' | 'reject' | 'webview-ready' | 'show-diff';
@@ -29,7 +38,152 @@ export class NxCloudFixWebview {
   private readonly _onDispose = new EventEmitter<void>();
   private currentFixDetails: NxCloudFixDetails | undefined;
 
-  constructor(private context: ExtensionContext) {}
+  static INSTANCE: NxCloudFixWebview | undefined;
+  static create(
+    extensionContext: ExtensionContext,
+    actor: ActorRef<any, EventObject>,
+  ): NxCloudFixWebview {
+    if (!NxCloudFixWebview.INSTANCE) {
+      const nxCloudFixWebview = new NxCloudFixWebview(extensionContext, actor);
+
+      // Register content providers for virtual diff documents
+      const diffContentProvider = new DiffContentProvider();
+      extensionContext.subscriptions.push(
+        workspace.registerTextDocumentContentProvider(
+          'nx-cloud-fix-before',
+          diffContentProvider,
+        ),
+        workspace.registerTextDocumentContentProvider(
+          'nx-cloud-fix-after',
+          diffContentProvider,
+        ),
+      );
+
+      const subscription = actor.subscribe((state) => {
+        const recentCIPEs = state.context.recentCIPEs;
+        if (recentCIPEs) {
+          nxCloudFixWebview.updateFixDetailsFromRecentCIPEs(recentCIPEs);
+        }
+      });
+      extensionContext.subscriptions.push({
+        dispose: () => {
+          subscription.unsubscribe();
+        },
+      });
+
+      extensionContext.subscriptions.push(
+        commands.registerCommand(
+          'nxCloud.applyAiFix',
+          async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+            if (!data.runGroup.aiFix?.suggestedFix) {
+              window.showErrorMessage('No AI fix available to apply');
+              return;
+            }
+
+            const aiFixId = data.runGroup.aiFix.aiFixId;
+            if (!aiFixId) {
+              window.showErrorMessage('AI fix ID not found');
+              return;
+            }
+
+            const success = await updateSuggestedFix(aiFixId, 'APPLIED');
+            if (success) {
+              window.showInformationMessage(
+                'Nx Cloud fix applied successfully',
+              );
+              commands.executeCommand('nxCloud.refresh');
+            }
+          },
+        ),
+        commands.registerCommand(
+          'nxCloud.rejectAiFix',
+          async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+            if (!data.runGroup.aiFix) {
+              window.showErrorMessage('No AI fix available to ignore');
+              return;
+            }
+
+            const aiFixId = data.runGroup.aiFix.aiFixId;
+            if (!aiFixId) {
+              window.showErrorMessage('AI fix ID not found');
+              return;
+            }
+
+            const success = await updateSuggestedFix(aiFixId, 'REJECTED');
+            if (success) {
+              window.showInformationMessage('Nx Cloud fix ignored');
+              commands.executeCommand('nxCloud.refresh');
+            }
+          },
+        ),
+        commands.registerCommand(
+          'nxCloud.openFixDetails',
+          async (args: { cipeId: string; runGroupId: string }) => {
+            const recentCIPEs = actor.getSnapshot().context.recentCIPEs;
+
+            // Find the parent CIPE
+            const cipe = recentCIPEs?.find(
+              (c) => c.ciPipelineExecutionId === args.cipeId,
+            );
+
+            const runGroup = cipe?.runGroups.find(
+              (rg) => rg.runGroup === args.runGroupId,
+            );
+
+            if (!cipe) {
+              outputLogger.log(`CIPE ${args.cipeId} not found`);
+              return;
+            } else if (!runGroup) {
+              outputLogger.log(
+                `Run group ${args.runGroupId} not found in CIPE ${args.cipeId}`,
+              );
+              return;
+            }
+
+            if (!runGroup.aiFix) {
+              outputLogger.log('No AI fix available on tree item');
+              return;
+            }
+
+            console.log('Found CIPE, calling webview.showFixDetails');
+            getTelemetry().logUsage('cloud.open-fix-details', {
+              source: 'cloud-view',
+            });
+
+            let terminalOutput: string | undefined;
+            const failedTaskId = runGroup.aiFix.taskIds[0];
+            try {
+              const terminalOutputUrl =
+                runGroup.aiFix.terminalLogsUrls[failedTaskId];
+              terminalOutput = await downloadAndExtractArtifact(
+                terminalOutputUrl,
+                outputLogger,
+              );
+            } catch (error) {
+              outputLogger.log(
+                `Failed to retrieve terminal output for task ${failedTaskId}: ${error}`,
+              );
+              terminalOutput =
+                'Failed to retrieve terminal output. Please check the Nx Console output for more details.';
+            }
+
+            await nxCloudFixWebview.showFixDetails({
+              cipe,
+              runGroup: runGroup,
+              terminalOutput,
+            });
+          },
+        ),
+      );
+      NxCloudFixWebview.INSTANCE = nxCloudFixWebview;
+    }
+    return NxCloudFixWebview.INSTANCE;
+  }
+
+  constructor(
+    private context: ExtensionContext,
+    private actor: ActorRef<any, EventObject>,
+  ) {}
 
   get onDispose() {
     return this._onDispose.event;
@@ -188,7 +342,10 @@ export class NxCloudFixWebview {
       </head>
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
-        <root-nx-cloud-fix-element .details=${JSON.stringify(details)}></root-nx-cloud-fix-element>
+        <script>
+          globalThis.fixDetails = ${JSON.stringify(details)};
+        </script>
+        <root-nx-cloud-fix-element></root-nx-cloud-fix-element>
       </body>
       </html>`;
   }
@@ -299,5 +456,44 @@ export class NxCloudFixWebview {
         viewColumn: ViewColumn.Beside,
       });
     }
+  }
+}
+
+async function updateSuggestedFix(
+  aiFixId: string,
+  action: 'APPLIED' | 'REJECTED',
+): Promise<boolean> {
+  try {
+    const nxCloudInfo = await getNxCloudStatus();
+    if (!nxCloudInfo?.nxCloudUrl) {
+      window.showErrorMessage('Nx Cloud URL not found');
+      return false;
+    }
+
+    const workspacePath = getWorkspacePath();
+    const response = await xhr({
+      url: `${nxCloudInfo.nxCloudUrl}/nx-cloud/update-suggested-fix`,
+      type: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(await nxCloudAuthHeaders(workspacePath)),
+      },
+      data: JSON.stringify({
+        aiFixId,
+        action,
+      }),
+    });
+
+    if (response.status >= 200 && response.status < 300) {
+      return true;
+    } else {
+      throw new Error(`HTTP ${response.status}: ${response.responseText}`);
+    }
+  } catch (error) {
+    console.error('Failed to update suggested fix:', error);
+    window.showErrorMessage(
+      `Failed to ${action.toLowerCase()} AI fix: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+    return false;
   }
 }

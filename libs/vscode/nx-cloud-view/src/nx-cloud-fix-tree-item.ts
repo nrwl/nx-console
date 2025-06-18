@@ -1,30 +1,15 @@
-import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
-import { getWorkspacePath } from '@nx-console/vscode-utils';
+import { CIPERunGroup } from '@nx-console/shared-types';
 import {
-  downloadAndExtractArtifact,
-  nxCloudAuthHeaders,
-} from '@nx-console/shared-nx-cloud';
-import { xhr } from 'request-light';
-import {
-  commands,
-  ExtensionContext,
   ProviderResult,
   ThemeColor,
   ThemeIcon,
   TreeItemCollapsibleState,
-  window,
-  workspace,
 } from 'vscode';
 import {
   BaseRecentCIPETreeItem,
   NxCloudFixTreeItem as NxCloudFixTreeItemInterface,
 } from './base-tree-item';
-import { outputLogger } from '@nx-console/vscode-output-channels';
-import { NxCloudFixWebview } from './nx-cloud-fix-webview';
-import { DiffContentProvider, FileDiff } from './diffs/diff-provider';
-import { ActorRef, EventObject } from 'xstate';
+import { FileDiff } from './diffs/diff-provider';
 
 export function createUnifiedDiffView(fileDiffs: FileDiff[]): {
   beforeContent: string;
@@ -171,170 +156,4 @@ export class NxCloudFixTreeItem
   override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
     return [];
   }
-}
-
-async function updateSuggestedFix(
-  aiFixId: string,
-  action: 'APPLIED' | 'REJECTED',
-): Promise<boolean> {
-  try {
-    const nxCloudInfo = await getNxCloudStatus();
-    if (!nxCloudInfo?.nxCloudUrl) {
-      window.showErrorMessage('Nx Cloud URL not found');
-      return false;
-    }
-
-    const workspacePath = getWorkspacePath();
-    const response = await xhr({
-      url: `${nxCloudInfo.nxCloudUrl}/nx-cloud/update-suggested-fix`,
-      type: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(await nxCloudAuthHeaders(workspacePath)),
-      },
-      data: JSON.stringify({
-        aiFixId,
-        action,
-      }),
-    });
-
-    if (response.status >= 200 && response.status < 300) {
-      return true;
-    } else {
-      throw new Error(`HTTP ${response.status}: ${response.responseText}`);
-    }
-  } catch (error) {
-    console.error('Failed to update suggested fix:', error);
-    window.showErrorMessage(
-      `Failed to ${action.toLowerCase()} AI fix: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    );
-    return false;
-  }
-}
-
-export function registerNxCloudFixCommands(
-  extensionContext: ExtensionContext,
-  recentCIPEProvider: {
-    recentCIPEInfo?: CIPEInfo[];
-  },
-  actor: ActorRef<any, EventObject>,
-) {
-  // Register content providers for virtual diff documents
-  const diffContentProvider = new DiffContentProvider();
-  extensionContext.subscriptions.push(
-    workspace.registerTextDocumentContentProvider(
-      'nx-cloud-fix-before',
-      diffContentProvider,
-    ),
-    workspace.registerTextDocumentContentProvider(
-      'nx-cloud-fix-after',
-      diffContentProvider,
-    ),
-  );
-
-  // Create the webview instance for CI Fix details
-  const nxCloudFixWebview = new NxCloudFixWebview(extensionContext);
-
-  const subscription = actor.subscribe((state) => {
-    const recentCIPEs = state.context.recentCIPEs;
-    if (recentCIPEs) {
-      nxCloudFixWebview.updateFixDetailsFromRecentCIPEs(recentCIPEs);
-    }
-  });
-  extensionContext.subscriptions.push({
-    dispose: () => {
-      subscription.unsubscribe();
-    },
-  });
-
-  return [
-    commands.registerCommand(
-      'nxCloud.applyAiFix',
-      async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
-        if (!data.runGroup.aiFix?.suggestedFix) {
-          window.showErrorMessage('No AI fix available to apply');
-          return;
-        }
-
-        const aiFixId = data.runGroup.aiFix.aiFixId;
-        if (!aiFixId) {
-          window.showErrorMessage('AI fix ID not found');
-          return;
-        }
-
-        const success = await updateSuggestedFix(aiFixId, 'APPLIED');
-        if (success) {
-          window.showInformationMessage('Nx Cloud fix applied successfully');
-          commands.executeCommand('nxCloud.refresh');
-        }
-      },
-    ),
-    commands.registerCommand(
-      'nxCloud.rejectAiFix',
-      async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
-        if (!data.runGroup.aiFix) {
-          window.showErrorMessage('No AI fix available to ignore');
-          return;
-        }
-
-        const aiFixId = data.runGroup.aiFix.aiFixId;
-        if (!aiFixId) {
-          window.showErrorMessage('AI fix ID not found');
-          return;
-        }
-
-        const success = await updateSuggestedFix(aiFixId, 'REJECTED');
-        if (success) {
-          window.showInformationMessage('Nx Cloud fix ignored');
-          commands.executeCommand('nxCloud.refresh');
-        }
-      },
-    ),
-    commands.registerCommand(
-      'nxCloud.openFixDetails',
-      async (args: { cipeId: string; runGroup: CIPERunGroup }) => {
-        if (!args.runGroup.aiFix) {
-          console.log('No AI fix available on tree item');
-          return;
-        }
-
-        // Find the parent CIPE
-        const cipe = recentCIPEProvider.recentCIPEInfo?.find(
-          (c) => c.ciPipelineExecutionId === args.cipeId,
-        );
-        if (!cipe) {
-          console.log('No CIPE found for ID:', args.cipeId);
-          return;
-        }
-
-        console.log('Found CIPE, calling webview.showFixDetails');
-        getTelemetry().logUsage('cloud.open-fix-details', {
-          source: 'cloud-view',
-        });
-
-        let terminalOutput: string | undefined;
-        const failedTaskId = args.runGroup.aiFix.taskIds[0];
-        try {
-          const terminalOutputUrl =
-            args.runGroup.aiFix.terminalLogsUrls[failedTaskId];
-          terminalOutput = await downloadAndExtractArtifact(
-            terminalOutputUrl,
-            outputLogger,
-          );
-        } catch (error) {
-          outputLogger.log(
-            `Failed to retrieve terminal output for task ${failedTaskId}: ${error}`,
-          );
-          terminalOutput =
-            'Failed to retrieve terminal output. Please check the Nx Console output for more details.';
-        }
-
-        await nxCloudFixWebview.showFixDetails({
-          cipe,
-          runGroup: args.runGroup,
-          terminalOutput,
-        });
-      },
-    ),
-  ];
 }

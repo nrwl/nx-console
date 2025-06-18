@@ -12,9 +12,6 @@ export interface NxCloudFixWebviewMessage {
 
 @customElement('root-nx-cloud-fix-element')
 export class Root extends LitElement {
-  @property({ type: Object })
-  details: NxCloudFixData | undefined;
-
   static override styles = css`
     :host {
       display: block;
@@ -38,8 +35,8 @@ export class Root extends LitElement {
     // Listen for messages from the extension
     window.addEventListener('message', (event) => {
       if (event.type === 'update-details') {
-        const data = event.data as NxCloudFixData;
-        this.details = data;
+        globalThis.fixDetails = event.data as NxCloudFixData;
+        this.requestUpdate();
       }
     });
   }
@@ -47,7 +44,7 @@ export class Root extends LitElement {
   override render(): TemplateResult {
     return html`
       <nx-cloud-fix-component
-        .details=${this.details}
+        .details=${globalThis.fixDetails as NxCloudFixData}
         .onApply=${() => this.handleApply()}
         .onReject=${() => this.handleReject()}
         .onShowDiff=${() => this.handleShowDiff()}
