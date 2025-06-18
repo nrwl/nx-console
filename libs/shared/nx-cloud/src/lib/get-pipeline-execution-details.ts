@@ -161,3 +161,27 @@ export async function getPipelineExecutionDetails(
     };
   }
 }
+
+export function formatPipelineExecutionDetailsContent(execution: PipelineExecutionDetails): string[] {
+  const content: string[] = [];
+  
+  let detailsText = `Pipeline Execution Details for ID: ${execution.id}\n`;
+  detailsText += `Branch: ${execution.branch}, Status: ${execution.status}\n`;
+  detailsText += `Created: ${new Date(execution.createdAtMs).toISOString()}`;
+  if (execution.completedAtMs) {
+    detailsText += `\nCompleted: ${new Date(execution.completedAtMs).toISOString()}`;
+  }
+  if (execution.durationMs) {
+    detailsText += `\nDuration: ${Math.round(execution.durationMs / 1000)}s`;
+  }
+  
+  content.push(detailsText);
+
+  let runGroupsText = `Run Groups (${execution.runGroups.length}):`;
+  for (const runGroup of execution.runGroups) {
+    runGroupsText += `\n- ${runGroup.runGroupName}: ${runGroup.status}`;
+  }
+  content.push(runGroupsText);
+  
+  return content;
+}

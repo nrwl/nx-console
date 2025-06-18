@@ -124,3 +124,29 @@ export async function getRunDetails(
     };
   }
 }
+
+export function formatRunDetailsContent(run: RunDetails): string[] {
+  const content: string[] = [];
+  
+  let runDetailsText = `Run Details for ID: ${run.id}\n`;
+  runDetailsText += `Command: ${run.command}\n`;
+  runDetailsText += `Status: ${run.status}, Task Count: ${run.taskCount}\n`;
+  runDetailsText += `Duration: ${Math.round(run.durationMs / 1000)}s\n`;
+  runDetailsText += `Started: ${new Date(run.startTimeMs).toISOString()}`;
+  
+  content.push(runDetailsText);
+
+  if (run.tasks && run.tasks.length > 0) {
+    let tasksText = `Tasks (${run.tasks.length}):`;
+    for (const task of run.tasks.slice(0, 10)) {
+      // Limit to first 10 tasks
+      tasksText += `\n- ${task.projectName}:${task.target} (${task.status}) - ${Math.round(task.durationMs / 1000)}s`;
+    }
+    if (run.tasks.length > 10) {
+      tasksText += `\n... and ${run.tasks.length - 10} more tasks`;
+    }
+    content.push(tasksText);
+  }
+  
+  return content;
+}

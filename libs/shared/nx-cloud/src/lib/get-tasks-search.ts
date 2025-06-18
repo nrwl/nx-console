@@ -3,27 +3,36 @@ import { xhr } from 'request-light';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
-import { TaskSummary } from './get-run-details';
 
 export interface TaskSearchRequest {
-  workspaceId: string;
-  runIds?: string[];
-  pipelineExecutionIds?: string[];
   taskIds?: string[];
   projectNames?: string[];
   targets?: string[];
   configurations?: string[];
-  hashes?: string[];
-  statuses?: string[];
-  cacheStatuses?: string[];
-  minStartTimeMs?: number;
-  maxStartTimeMs?: number;
+  minStartTime?: string;
+  maxStartTime?: string;
   limit?: number;
   pageToken?: string;
+  includeLocal?: boolean;
+}
+
+export interface TaskStatisticSummary {
+  projectName: string;
+  target: string;
+  avgRemoteCacheHitDurationMs: number;
+  avgLocalCacheHitDurationMs: number;
+  avgCacheMissDurationMs: number;
+  avgRemoteCacheHitRate: number;
+  avgLocalCacheHitRate: number;
+  avgCacheMissRate: number;
+  totalCount: number;
+  avgSuccessRate: number;
+  avgFailureRate: number;
+  isCI: boolean;
 }
 
 export interface TaskSearchResponse {
-  items: TaskSummary[];
+  items: TaskStatisticSummary[];
   nextPageToken?: string;
 }
 
@@ -93,4 +102,30 @@ export async function getTasksSearch(
       },
     };
   }
+}
+
+export function formatTasksSearchContent(data: TaskSearchResponse): string[] {
+  const content: string[] = [];
+  
+  if (data.items && data.items.length > 0) {
+    content.push(`Found ${data.items.length} task statistics:`);
+    
+    for (const task of data.items) {
+      let taskText = `- ${task.projectName}:${task.target}\n`;
+      taskText += `  Total Runs: ${task.totalCount} (${task.isCI ? 'CI' : 'Local'})\n`;
+      taskText += `  Success Rate: ${(task.avgSuccessRate * 100).toFixed(1)}%, Failure Rate: ${(task.avgFailureRate * 100).toFixed(1)}%\n`;
+      taskText += `  Cache Hit Rates - Remote: ${(task.avgRemoteCacheHitRate * 100).toFixed(1)}%, Local: ${(task.avgLocalCacheHitRate * 100).toFixed(1)}%, Miss: ${(task.avgCacheMissRate * 100).toFixed(1)}%\n`;
+      taskText += `  Avg Durations - Remote Hit: ${Math.round(task.avgRemoteCacheHitDurationMs / 1000)}s, Local Hit: ${Math.round(task.avgLocalCacheHitDurationMs / 1000)}s, Cache Miss: ${Math.round(task.avgCacheMissDurationMs / 1000)}s`;
+      
+      content.push(taskText);
+    }
+    
+    if (data.nextPageToken) {
+      content.push(`Next page token: ${data.nextPageToken}`);
+    }
+  } else {
+    content.push('No task statistics found matching the criteria.');
+  }
+  
+  return content;
 }

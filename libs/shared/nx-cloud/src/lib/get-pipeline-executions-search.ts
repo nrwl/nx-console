@@ -5,13 +5,12 @@ import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 
 export interface PipelineExecutionSearchRequest {
-  workspaceId: string;
   branches?: string[];
   statuses?: string[];
   authors?: string[];
   repositoryUrl?: string;
-  minCreatedAtMs?: number;
-  maxCreatedAtMs?: number;
+  minCreatedAt?: string;
+  maxCreatedAt?: string;
   vcsTitleContains?: string;
   limit?: number;
   pageToken?: string;
@@ -125,4 +124,33 @@ export async function getPipelineExecutionsSearch(
       },
     };
   }
+}
+
+export function formatPipelineExecutionsSearchContent(data: PipelineExecutionSearchResponse): string[] {
+  const content: string[] = [];
+  
+  if (data.items && data.items.length > 0) {
+    content.push(`Found ${data.items.length} pipeline executions:`);
+    
+    for (const execution of data.items) {
+      let executionText = `- Pipeline Execution ID: ${execution.id}\n`;
+      executionText += `  Branch: ${execution.branch}, Status: ${execution.status}\n`;
+      executionText += `  Created: ${new Date(execution.createdAtMs).toISOString()}`;
+      if (execution.vcsTitle) {
+        executionText += `\n  Title: ${execution.vcsTitle}`;
+      }
+      if (execution.author) {
+        executionText += `\n  Author: ${execution.author}`;
+      }
+      content.push(executionText);
+    }
+    
+    if (data.nextPageToken) {
+      content.push(`Next page token: ${data.nextPageToken}`);
+    }
+  } else {
+    content.push('No pipeline executions found matching the criteria.');
+  }
+  
+  return content;
 }
