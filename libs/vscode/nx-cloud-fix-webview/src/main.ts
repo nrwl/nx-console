@@ -35,8 +35,13 @@ export class Root extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    // Notify the extension that the webview is ready
-    this.vscodeApi.postMessage({ type: 'webview-ready' });
+    // Listen for messages from the extension
+    window.addEventListener('message', (event) => {
+      if (event.type === 'update-details') {
+        const data = event.data as NxCloudFixData;
+        this.details = data;
+      }
+    });
   }
 
   override render(): TemplateResult {

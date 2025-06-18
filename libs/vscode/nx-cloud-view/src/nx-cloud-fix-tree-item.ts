@@ -24,6 +24,7 @@ import {
 import { outputLogger } from '@nx-console/vscode-output-channels';
 import { NxCloudFixWebview } from './nx-cloud-fix-webview';
 import { DiffContentProvider, FileDiff } from './diffs/diff-provider';
+import { ActorRef, EventObject } from 'xstate';
 
 export function createUnifiedDiffView(fileDiffs: FileDiff[]): {
   beforeContent: string;
@@ -216,6 +217,7 @@ export function registerNxCloudFixCommands(
   recentCIPEProvider: {
     recentCIPEInfo?: CIPEInfo[];
   },
+  actor: ActorRef<any, EventObject>,
 ) {
   // Register content providers for virtual diff documents
   const diffContentProvider = new DiffContentProvider();
@@ -232,6 +234,18 @@ export function registerNxCloudFixCommands(
 
   // Create the webview instance for CI Fix details
   const nxCloudFixWebview = new NxCloudFixWebview(extensionContext);
+
+  const subscription = actor.subscribe((state) => {
+    const recentCIPEs = state.context.recentCIPEs;
+    if (recentCIPEs) {
+      nxCloudFixWebview.updateFixDetailsFromRecentCIPEs(recentCIPEs);
+    }
+  });
+  extensionContext.subscriptions.push({
+    dispose: () => {
+      subscription.unsubscribe();
+    },
+  });
 
   return [
     commands.registerCommand(

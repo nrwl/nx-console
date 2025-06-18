@@ -51,6 +51,27 @@ export class NxCloudFixWebview {
     }
   }
 
+  async updateFixDetailsFromRecentCIPEs(recentCIPEs: CIPEInfo[]) {
+    if (!this.currentFixDetails) return;
+
+    const updatedDetails = recentCIPEs.find(
+      (cipe) =>
+        cipe.ciPipelineExecutionId ===
+        this.currentFixDetails.cipe.ciPipelineExecutionId,
+    );
+
+    if (updatedDetails) {
+      this.currentFixDetails = {
+        ...this.currentFixDetails,
+        cipe: updatedDetails,
+      };
+    }
+
+    if (this.webviewPanel) {
+      this.updateWebviewContent();
+    }
+  }
+
   private createWebviewPanel() {
     this.webviewPanel = window.createWebviewPanel(
       'nxCloudFix',
@@ -74,6 +95,10 @@ export class NxCloudFixWebview {
       this.currentFixDetails = undefined;
       this._onDispose.fire();
     });
+
+    this.webviewPanel.webview.html = this.getWebviewHtml(
+      this.currentFixDetails,
+    );
   }
 
   private async handleWebviewMessage(message: NxCloudFixWebviewMessage) {
@@ -94,9 +119,6 @@ export class NxCloudFixWebview {
         );
         this.webviewPanel?.dispose();
         break;
-      case 'webview-ready':
-        this.updateWebviewContent();
-        break;
       case 'show-diff':
         if (this.currentFixDetails.runGroup.aiFix?.suggestedFix) {
           await this.showDiffInSplitPanel(
@@ -109,8 +131,11 @@ export class NxCloudFixWebview {
 
   private updateWebviewContent() {
     if (!this.webviewPanel || !this.currentFixDetails) return;
-    const html = this.getWebviewHtml(this.currentFixDetails);
-    this.webviewPanel.webview.html = html;
+
+    this.webviewPanel.webview.postMessage({
+      type: 'update-details',
+      details: this.currentFixDetails,
+    });
   }
 
   private getWebviewHtml(details: NxCloudFixDetails): string {
