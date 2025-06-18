@@ -248,7 +248,7 @@ export class NxCloudFixWebview {
       this.currentFixDetails = undefined;
       this._onDispose.fire();
 
-      window.visibleTextEditors.forEach((editor) => {
+      window.visibleNotebookEditors.forEach((editor) => {
         console.log(editor);
       });
     });
