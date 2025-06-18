@@ -163,10 +163,7 @@ export class NxCloudFixWebview {
       </head>
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
-        <script>
-          globalThis.fixDetails = ${JSON.stringify(details)};
-        </script>
-        <root-nx-cloud-fix-element></root-nx-cloud-fix-element>
+        <root-nx-cloud-fix-element .details=${JSON.stringify(details)}></root-nx-cloud-fix-element>
       </body>
       </html>`;
   }

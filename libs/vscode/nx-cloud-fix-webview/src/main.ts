@@ -12,6 +12,9 @@ export interface NxCloudFixWebviewMessage {
 
 @customElement('root-nx-cloud-fix-element')
 export class Root extends LitElement {
+  @property({ type: Object })
+  details: NxCloudFixData | undefined;
+
   static override styles = css`
     :host {
       display: block;
@@ -39,7 +42,7 @@ export class Root extends LitElement {
   override render(): TemplateResult {
     return html`
       <nx-cloud-fix-component
-        .details=${globalThis.fixDetails as NxCloudFixData}
+        .details=${this.details}
         .onApply=${() => this.handleApply()}
         .onReject=${() => this.handleReject()}
         .onShowDiff=${() => this.handleShowDiff()}
