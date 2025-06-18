@@ -1,4 +1,4 @@
-import { gte, NxVersion } from '@nx-console/nx-version';
+import { gt, gte, NxVersion } from '@nx-console/nx-version';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
@@ -7,13 +7,11 @@ import {
   getPackageInfo,
   PackageInformationResponse,
 } from '@nx-console/vscode-utils';
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { major, rcompare } from 'semver';
 import { QuickPickItem, tasks, window } from 'vscode';
-import { importMigrateUIApi } from './utils';
 import { viewPackageJsonDiff } from '../git-extension/view-diff';
+import { importMigrateUIApi } from './utils';
 
 export async function startMigration(custom = false) {
   const nxVersion = await getNxVersion();
@@ -131,14 +129,17 @@ async function promptForVersion(
 ) {
   const quickpickOptions: QuickPickItem[] = [];
 
-  quickpickOptions.push({ label: 'latest' });
+  if (pkgInfo['dist-tags']?.['latest'] !== nxVersion.full) {
+    quickpickOptions.push({ label: 'latest' });
+  }
+
   quickpickOptions.push({ label: 'next' });
 
   const possibleVersions = Object.entries(pkgInfo.versions)
     .filter(
       ([versionNum, versionInfo]) =>
         !versionInfo.deprecated &&
-        gte(versionNum, nxVersion) &&
+        gt(versionNum, nxVersion) &&
         !versionNum.startsWith('9999') &&
         !versionNum.startsWith('0.0.0-pr') &&
         !versionNum.includes('canary') &&

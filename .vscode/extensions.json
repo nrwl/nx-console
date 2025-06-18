@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "nrwl.angular-console",
+    "runem.lit-plugin",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ]
+}

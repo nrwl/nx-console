@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.util.ui.JBUI
 import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.generate.ui.NxGenerateUiRenderer
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.generate.ui.file.NxGenerateUiFileRenderer
@@ -112,15 +113,26 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
     ) {
         val generatorOptions =
             options
-                ?: project
-                    .service<NxlsService>()
-                    .generatorOptions(
+                ?: run {
+                    val requestOptions =
                         NxGeneratorOptionsRequestOptions(
-                            generator.data.collection,
-                            generator.data.name,
-                            generator.schemaPath,
+                            collection = generator.data.collection,
+                            name = generator.data.name,
+                            path = generator.schemaPath,
                         )
-                    )
+                    val rawOptions = project.service<NxlsService>().generatorOptions(requestOptions)
+                    val inputSchema =
+                        GeneratorSchema(
+                            collectionName = generator.data.collection,
+                            generatorName = generator.data.name,
+                            description = generator.data.description ?: "",
+                            options = rawOptions,
+                            context = null,
+                        )
+                    val transformedSchema =
+                        project.service<NxlsService>().transformedGeneratorSchema(inputSchema)
+                    transformedSchema.options
+                }
 
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
 

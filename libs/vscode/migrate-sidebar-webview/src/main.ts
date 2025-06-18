@@ -29,7 +29,8 @@ export class Root extends LitElement {
     if (this.state === 'update-available') {
       return html`
         <p>
-          A newer version of Nx is available. <br />
+          A newer version of Nx is available:
+          ${this.migrateViewData?.latestNxVersion.full} <br />
           Use the button below to start a guided migration using the Migrate UI.
           <a href="https://nx.dev/latest/react/cli/migrate">Learn more</a>
         </p>
@@ -71,7 +72,22 @@ export class Root extends LitElement {
         </div>
       `;
     } else if (this.state === 'default') {
-      return html` <p>You're on the latest Nx version.</p> `;
+      return html` <p>
+          You're on the latest Nx version:
+          ${this.migrateViewData.currentNxVersion?.full}
+        </p>
+        <p>
+          <a
+            href=""
+            @click="${() => {
+              this.vscodeApi.postMessage({
+                type: 'start-migration',
+                custom: true,
+              });
+            }}"
+            >Manually select a version to migrate to anyways
+          </a>
+        </p>`;
     } else if (this.state['in-progress'] === 'default') {
       return html`
         <p>Migration in progress. Continue in the Migrate UI.</p>

@@ -59,6 +59,9 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "storybook": {
+      "dependsOn": ["^build"]
     }
   },
   "namedInputs": {

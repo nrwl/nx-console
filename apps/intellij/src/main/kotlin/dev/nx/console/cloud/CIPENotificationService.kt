@@ -64,7 +64,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             type = NotificationType.ERROR,
             cipeUrl = cipe.cipeUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = true
+            showHelp = true,
         )
     }
 
@@ -82,7 +82,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             type = NotificationType.ERROR,
             cipeUrl = run.runUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = true
+            showHelp = true,
         )
     }
 
@@ -93,7 +93,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             type = NotificationType.INFORMATION,
             cipeUrl = cipe.cipeUrl,
             commitUrl = cipe.commitUrl,
-            showHelp = false
+            showHelp = false,
         )
     }
 

@@ -54,7 +54,7 @@
           },
           {
             "name": "semver",
-            "importNames": ["gte"],
+            "importNames": ["gte", "gt"],
             "message": "Please use @nx-console/nx-version instead"
           }
         ]

@@ -15,7 +15,7 @@ import { join } from 'path';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 
 export interface NxCloudFixWebviewMessage {
-  type: 'apply' | 'reject' | 'webview-ready';
+  type: 'apply' | 'reject' | 'webview-ready' | 'show-diff';
 }
 
 export interface NxCloudFixDetails {
@@ -96,6 +96,13 @@ export class NxCloudFixWebview {
         break;
       case 'webview-ready':
         this.updateWebviewContent();
+        break;
+      case 'show-diff':
+        if (this.currentFixDetails.runGroup.aiFix?.suggestedFix) {
+          await this.showDiffInSplitPanel(
+            this.currentFixDetails.runGroup.aiFix.suggestedFix,
+          );
+        }
         break;
     }
   }
