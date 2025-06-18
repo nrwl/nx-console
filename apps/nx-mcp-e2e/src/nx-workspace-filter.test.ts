@@ -52,19 +52,19 @@ describe('nx_workspace filter', () => {
 
   // WHY IS THE INSPECTOR HANGING? IT RETURNS THE RIGHT TOOL BUT THEN JUST IDLES AROUND...
 
-  // it('should return all projects when no filter is provided', () => {
-  //   const result = invokeMCPInspectorCLI(
-  //     testWorkspacePath,
-  //     '--method tools/call',
-  //     '--tool-name nx_workspace',
-  //   );
+  it.skip('should return all projects when no filter is provided', () => {
+    const result = invokeMCPInspectorCLI(
+      testWorkspacePath,
+      '--method tools/call',
+      '--tool-name nx_workspace',
+    );
 
-  //   const content = result.content[1]?.text || '';
-  //   expect(content).toContain(`<${workspaceName}>`);
-  //   expect(content).toContain('<admin-app>');
-  //   expect(content).toContain('<shared-ui>');
-  //   expect(content).toContain('<e2e-app>');
-  // });
+    const content = result.content[1]?.text || '';
+    expect(content).toContain(`<${workspaceName}>`);
+    expect(content).toContain('<admin-app>');
+    expect(content).toContain('<shared-ui>');
+    expect(content).toContain('<e2e-app>');
+  });
 
   // it('should filter by specific project names', () => {
   //   const result = invokeMCPInspectorCLI(
