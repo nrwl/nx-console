@@ -1,3 +1,11 @@
+# [18.53.0](https://github.com/nrwl/nx-console/compare/vscode-v18.52.1...vscode-v18.53.0) (2025-06-18)
+
+
+### Features
+
+* nx cloud fix webview updates ([#2566](https://github.com/nrwl/nx-console/issues/2566)) ([b6e10bc](https://github.com/nrwl/nx-console/commit/b6e10bc3407d7a81fd68f1605234ba5e610d5662))
+* **vscode:** add ability to migrate even when on latest version & fixes ([#2552](https://github.com/nrwl/nx-console/issues/2552)) ([130660c](https://github.com/nrwl/nx-console/commit/130660cc9a2c390c1a8bcff8ae917d8ae93c4a79))
+
 ## [18.52.1](https://github.com/nrwl/nx-console/compare/vscode-v18.52.0...vscode-v18.52.1) (2025-06-13)
 
 
