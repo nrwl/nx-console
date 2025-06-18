@@ -329,11 +329,15 @@ const pipelineExecutionSearchSchema = z.object({
   minCreatedAt: z
     .string()
     .optional()
-    .describe('Minimum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")'),
+    .describe(
+      'Minimum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
   maxCreatedAt: z
     .string()
     .optional()
-    .describe('Maximum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")'),
+    .describe(
+      'Maximum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   vcsTitleContains: z
     .string()
     .optional()
@@ -375,11 +379,15 @@ const runSearchSchema = z.object({
   minStartTime: z
     .string()
     .optional()
-    .describe('Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")'),
+    .describe(
+      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
   maxStartTime: z
     .string()
     .optional()
-    .describe('Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")'),
+    .describe(
+      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   limit: z
     .number()
     .optional()
@@ -409,11 +417,15 @@ const taskSearchSchema = z.object({
   minStartTime: z
     .string()
     .optional()
-    .describe('Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")'),
+    .describe(
+      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
   maxStartTime: z
     .string()
     .optional()
-    .describe('Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")'),
+    .describe(
+      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   limit: z
     .number()
     .optional()
@@ -423,7 +435,9 @@ const taskSearchSchema = z.object({
   includeLocal: z
     .boolean()
     .optional()
-    .describe('Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.'),
+    .describe(
+      'Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.',
+    ),
 });
 
 const taskDetailsSchema = z.object({
@@ -443,11 +457,15 @@ const taskDetailsSchema = z.object({
   minStartTime: z
     .string()
     .optional()
-    .describe('Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")'),
+    .describe(
+      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
+    ),
   maxStartTime: z
     .string()
     .optional()
-    .describe('Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")'),
+    .describe(
+      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
   limit: z
     .number()
     .optional()
@@ -457,7 +475,9 @@ const taskDetailsSchema = z.object({
   includeLocal: z
     .boolean()
     .optional()
-    .describe('Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.'),
+    .describe(
+      'Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.',
+    ),
 });
 
 // Implementation functions
@@ -628,10 +648,12 @@ const nxCloudTaskDetails =
     }
 
     const textContent = formatTasksDetailsSearchContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map((text: string) => ({
-      type: 'text',
-      text,
-    }));
+    const content: CallToolResult['content'] = textContent.map(
+      (text: string) => ({
+        type: 'text',
+        text,
+      }),
+    );
 
     return { content };
   };

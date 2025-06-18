@@ -107,10 +107,10 @@ export async function getRunsSearch(
 
 export function formatRunsSearchContent(data: RunSearchResponse): string[] {
   const content: string[] = [];
-  
+
   if (data.items && data.items.length > 0) {
     content.push(`Found ${data.items.length} runs:`);
-    
+
     for (const run of data.items) {
       let runText = `- Run ID: ${run.id}\n`;
       runText += `  Command: ${run.command}\n`;
@@ -121,13 +121,13 @@ export function formatRunsSearchContent(data: RunSearchResponse): string[] {
       }
       content.push(runText);
     }
-    
+
     if (data.nextPageToken) {
       content.push(`Next page token: ${data.nextPageToken}`);
     }
   } else {
     content.push('No runs found matching the criteria.');
   }
-  
+
   return content;
 }

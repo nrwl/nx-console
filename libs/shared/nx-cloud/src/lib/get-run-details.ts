@@ -127,13 +127,13 @@ export async function getRunDetails(
 
 export function formatRunDetailsContent(run: RunDetails): string[] {
   const content: string[] = [];
-  
+
   let runDetailsText = `Run Details for ID: ${run.id}\n`;
   runDetailsText += `Command: ${run.command}\n`;
   runDetailsText += `Status: ${run.status}, Task Count: ${run.taskCount}\n`;
   runDetailsText += `Duration: ${Math.round(run.durationMs / 1000)}s\n`;
   runDetailsText += `Started: ${new Date(run.startTimeMs).toISOString()}`;
-  
+
   content.push(runDetailsText);
 
   if (run.tasks && run.tasks.length > 0) {
@@ -147,6 +147,6 @@ export function formatRunDetailsContent(run: RunDetails): string[] {
     }
     content.push(tasksText);
   }
-  
+
   return content;
 }

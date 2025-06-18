@@ -126,12 +126,14 @@ export async function getPipelineExecutionsSearch(
   }
 }
 
-export function formatPipelineExecutionsSearchContent(data: PipelineExecutionSearchResponse): string[] {
+export function formatPipelineExecutionsSearchContent(
+  data: PipelineExecutionSearchResponse,
+): string[] {
   const content: string[] = [];
-  
+
   if (data.items && data.items.length > 0) {
     content.push(`Found ${data.items.length} pipeline executions:`);
-    
+
     for (const execution of data.items) {
       let executionText = `- Pipeline Execution ID: ${execution.id}\n`;
       executionText += `  Branch: ${execution.branch}, Status: ${execution.status}\n`;
@@ -144,13 +146,13 @@ export function formatPipelineExecutionsSearchContent(data: PipelineExecutionSea
       }
       content.push(executionText);
     }
-    
+
     if (data.nextPageToken) {
       content.push(`Next page token: ${data.nextPageToken}`);
     }
   } else {
     content.push('No pipeline executions found matching the criteria.');
   }
-  
+
   return content;
 }
