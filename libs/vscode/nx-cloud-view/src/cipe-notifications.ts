@@ -165,7 +165,7 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
       });
       commands.executeCommand('nxCloud.openFixDetails', {
         cipeId: cipe.ciPipelineExecutionId,
-        runGroup,
+        runGroupId: runGroup.runGroup,
       });
     } else if (selection === 'Reject') {
       telemetry.logUsage('cloud.reject-ai-fix', {

@@ -23,7 +23,7 @@ const defaultImplementation = {
       params: {
         oldData: CIPEInfo[];
         newData: CIPEInfo[];
-      }
+      },
     ) => {
       compareCIPEDataAndSendNotificationMock(params.oldData, params.newData);
     },
