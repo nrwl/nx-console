@@ -204,11 +204,6 @@ export class NxCloudFixWebview {
   async updateFixDetailsFromRecentCIPEs(recentCIPEs: CIPEInfo[]) {
     if (!this.currentFixDetails) return;
 
-    console.log('updateFixDetailsFromRecentCIPEs called', {
-      currentCipeId: this.currentFixDetails.cipe.ciPipelineExecutionId,
-      currentRunGroup: this.currentFixDetails.runGroup.runGroup,
-    });
-
     const updatedDetails = recentCIPEs.find(
       (cipe) =>
         cipe.ciPipelineExecutionId ===
@@ -222,9 +217,6 @@ export class NxCloudFixWebview {
       );
 
       if (updatedRunGroup) {
-        console.log('Found updated runGroup', {
-          aiFix: updatedRunGroup.aiFix,
-        });
         this.currentFixDetails = {
           ...this.currentFixDetails,
           cipe: updatedDetails,
@@ -301,10 +293,6 @@ export class NxCloudFixWebview {
 
   private updateWebviewContent() {
     if (!this.webviewPanel || !this.currentFixDetails) return;
-
-    console.log('Sending update-details message to webview', {
-      aiFix: this.currentFixDetails.runGroup.aiFix,
-    });
 
     this.webviewPanel.webview.postMessage({
       type: 'update-details',
@@ -470,19 +458,11 @@ export class NxCloudFixWebview {
 
       // Show the unified diff in the beside column
       const title = `Nx Cloud Fix (${parsedDiff.length} file${parsedDiff.length === 1 ? '' : 's'})`;
-      const diffReturn = await commands.executeCommand(
-        'vscode.diff',
-        beforeUri,
-        afterUri,
-        title,
-        {
-          preview: false,
-          preserveFocus: false,
-          viewColumn: ViewColumn.Beside,
-        },
-      );
-
-      console.log(diffReturn);
+      await commands.executeCommand('vscode.diff', beforeUri, afterUri, title, {
+        preview: false,
+        preserveFocus: false,
+        viewColumn: ViewColumn.Beside,
+      });
     }
   }
 }
