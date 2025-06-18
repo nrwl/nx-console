@@ -44,7 +44,7 @@ export class NxCloudFixWebview {
     actor: ActorRef<any, EventObject>,
   ): NxCloudFixWebview {
     if (!NxCloudFixWebview.INSTANCE) {
-      const nxCloudFixWebview = new NxCloudFixWebview(extensionContext, actor);
+      const nxCloudFixWebview = new NxCloudFixWebview(extensionContext);
 
       // Register content providers for virtual diff documents
       const diffContentProvider = new DiffContentProvider();
@@ -180,10 +180,7 @@ export class NxCloudFixWebview {
     return NxCloudFixWebview.INSTANCE;
   }
 
-  constructor(
-    private context: ExtensionContext,
-    private actor: ActorRef<any, EventObject>,
-  ) {}
+  constructor(private context: ExtensionContext) {}
 
   get onDispose() {
     return this._onDispose.event;
@@ -207,6 +204,7 @@ export class NxCloudFixWebview {
 
   async updateFixDetailsFromRecentCIPEs(recentCIPEs: CIPEInfo[]) {
     if (!this.currentFixDetails) return;
+    console.log('update triggered');
 
     const updatedDetails = recentCIPEs.find(
       (cipe) =>
@@ -214,6 +212,7 @@ export class NxCloudFixWebview {
         this.currentFixDetails.cipe.ciPipelineExecutionId,
     );
 
+    console.log('found update cipe details', updatedDetails);
     if (updatedDetails) {
       this.currentFixDetails = {
         ...this.currentFixDetails,
@@ -248,6 +247,10 @@ export class NxCloudFixWebview {
       this.webviewPanel = undefined;
       this.currentFixDetails = undefined;
       this._onDispose.fire();
+
+      window.visibleTextEditors.forEach((editor) => {
+        console.log(editor);
+      });
     });
 
     this.webviewPanel.webview.html = this.getWebviewHtml(

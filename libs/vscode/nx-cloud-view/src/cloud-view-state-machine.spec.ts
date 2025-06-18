@@ -23,7 +23,7 @@ const defaultImplementation = {
       params: {
         oldData: CIPEInfo[];
         newData: CIPEInfo[];
-      }
+      },
     ) => {
       compareCIPEDataAndSendNotificationMock(params.oldData, params.newData);
     },
@@ -79,6 +79,7 @@ describe('Cloud View State Machine', () => {
     actor.start();
 
     expect(actor.getSnapshot().matches('loading')).toBe(true);
+    expect(false).toBe(true);
   });
 
   it('should show onboarding view if there are no recent CIPEs and onboarding isnt complete', () => {

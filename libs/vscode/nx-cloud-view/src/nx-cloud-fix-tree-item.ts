@@ -61,7 +61,7 @@ export class NxCloudFixTreeItem
     this.command = {
       command: 'nxCloud.openFixDetails',
       title: 'Open Fix Details',
-      arguments: [{ cipeId: this.cipeId, runGroup: this.runGroup }],
+      arguments: [{ cipeId: this.cipeId, runGroupId: this.runGroup.runGroup }],
     };
 
     const aiFix = this.runGroup.aiFix;
