@@ -1,3 +1,17 @@
+# [18.54.0](https://github.com/nrwl/nx-console/compare/vscode-v18.53.0...vscode-v18.54.0) (2025-06-19)
+
+
+### Bug Fixes
+
+* make terminal font size match IDE ([#2572](https://github.com/nrwl/nx-console/issues/2572)) ([269c53e](https://github.com/nrwl/nx-console/commit/269c53eed485455c40ad24a993e2cd5a660bcc87))
+* **vscode:** refactor ai fix webview & automatically update it ([#2571](https://github.com/nrwl/nx-console/issues/2571)) ([53d40a8](https://github.com/nrwl/nx-console/commit/53d40a8d9373ae18245a51b64066df1dbe16079f))
+
+
+### Features
+
+* **nx-mcp:** more nx cloud tools ([#2568](https://github.com/nrwl/nx-console/issues/2568)) ([da23c12](https://github.com/nrwl/nx-console/commit/da23c12ddb36ce6c337a849fc1c2ebd39108469c))
+* **vscode:** Add support to edit Nx Cloud fixes locally ([#2575](https://github.com/nrwl/nx-console/issues/2575)) ([eb5d4fa](https://github.com/nrwl/nx-console/commit/eb5d4fac4253144dac2d7596c18e53d2e517239c))
+
 # [18.53.0](https://github.com/nrwl/nx-console/compare/vscode-v18.52.1...vscode-v18.53.0) (2025-06-18)
 
 
