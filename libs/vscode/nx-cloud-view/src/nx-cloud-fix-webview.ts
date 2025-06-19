@@ -435,7 +435,7 @@ export class NxCloudFixWebview {
             );
           } catch (error) {
             outputLogger.log(
-              `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message})}`,
+              `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message}`,
             );
             window.showErrorMessage(
               'Failed to apply Nx Cloud fix locally. Please check the output for more details.',
