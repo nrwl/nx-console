@@ -37,11 +37,7 @@ import {
   RunTreeItem as RunTreeItemInterface,
   FailedTaskTreeItem as FailedTaskTreeItemInterface,
 } from './base-tree-item';
-import {
-  NxCloudFixTreeItem,
-  registerNxCloudFixCommands,
-} from './nx-cloud-fix-tree-item';
-import { NxCloudFixWebview } from './nx-cloud-fix-webview';
+import { NxCloudFixTreeItem } from './nx-cloud-fix-tree-item';
 
 export class CIPETreeItem
   extends BaseRecentCIPETreeItem
@@ -520,7 +516,6 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           );
         },
       ),
-      ...registerNxCloudFixCommands(extensionContext, recentCIPEProvider),
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
 

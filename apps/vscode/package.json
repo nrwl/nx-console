@@ -346,6 +346,10 @@
           "when": "false"
         },
         {
+          "command": "nxCloud.applyAiFixLocally",
+          "when": "false"
+        },
+        {
           "command": "nxCloud.rejectAiFix",
           "when": "false"
         },
@@ -944,6 +948,10 @@
       {
         "title": "Apply AI Fix",
         "command": "nxCloud.applyAiFix"
+      },
+      {
+        "title": "Apply AI Fix Locally",
+        "command": "nxCloud.applyAiFixLocally"
       },
       {
         "title": "Reject AI Fix",

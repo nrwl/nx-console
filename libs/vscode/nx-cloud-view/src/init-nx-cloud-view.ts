@@ -29,6 +29,7 @@ import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
 import { TelemetryEventSource } from '@nx-console/shared-telemetry';
+import { NxCloudFixWebview } from './nx-cloud-fix-webview';
 
 export function initNxCloudView(context: ExtensionContext) {
   // set up state machine & listeners
@@ -59,6 +60,7 @@ export function initNxCloudView(context: ExtensionContext) {
   ).start();
   CloudOnboardingViewProvider.create(context, actor);
   CloudRecentCIPEProvider.create(context, actor);
+  NxCloudFixWebview.create(context, actor);
 
   async function updateOnboarding() {
     const onboardingInfo = await getCloudOnboardingInfo();
