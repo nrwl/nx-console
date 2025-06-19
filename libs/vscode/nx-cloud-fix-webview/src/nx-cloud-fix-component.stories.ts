@@ -188,6 +188,23 @@ export const InProgress: Story = {
   },
 };
 
+export const FixCreationFailed: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          validationStatus: 'FAILED',
+          suggestedFix: undefined,
+          suggestedFixDescription: undefined,
+        },
+      },
+    },
+  },
+};
+
 export const NoTerminalOutput: Story = {
   args: {
     details: {
