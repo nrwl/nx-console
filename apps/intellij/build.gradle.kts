@@ -19,7 +19,7 @@ plugins {
     // Kotlin serialization
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
     // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.5.0"
+    id("org.jetbrains.intellij.platform") version "2.6.0"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
