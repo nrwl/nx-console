@@ -2,17 +2,22 @@ import {
   downloadAndExtractArtifact,
   nxCloudAuthHeaders,
 } from '@nx-console/shared-nx-cloud';
-import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
+import {
+  CIPEInfo,
+  CIPERunGroup,
+  NxCloudFixMessage,
+} from '@nx-console/shared-types';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { outputLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { getWorkspacePath } from '@nx-console/vscode-utils';
+import { getWorkspacePath, GitExtension } from '@nx-console/vscode-utils';
 import { join } from 'path';
 import { xhr } from 'request-light';
 import {
   commands,
   EventEmitter,
   ExtensionContext,
+  extensions,
   Uri,
   ViewColumn,
   WebviewPanel,
@@ -22,10 +27,8 @@ import {
 import { ActorRef, EventObject } from 'xstate';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
-
-export interface NxCloudFixWebviewMessage {
-  type: 'apply' | 'reject' | 'webview-ready' | 'show-diff';
-}
+import { unlink, writeFile } from 'fs/promises';
+import { tmpdir } from 'os';
 
 export interface NxCloudFixDetails {
   cipe: CIPEInfo;
@@ -102,7 +105,7 @@ export class NxCloudFixWebview {
     );
 
     this.webviewPanel.webview.onDidReceiveMessage(
-      async (message: NxCloudFixWebviewMessage) => {
+      async (message: NxCloudFixMessage) => {
         await this.handleWebviewMessage(message);
       },
     );
@@ -118,7 +121,7 @@ export class NxCloudFixWebview {
     );
   }
 
-  private async handleWebviewMessage(message: NxCloudFixWebviewMessage) {
+  private async handleWebviewMessage(message: NxCloudFixMessage) {
     if (!this.currentFixDetails) return;
 
     switch (message.type) {
@@ -142,6 +145,12 @@ export class NxCloudFixWebview {
             this.currentFixDetails.runGroup.aiFix.suggestedFix,
           );
         }
+        break;
+      case 'apply-locally':
+        await commands.executeCommand(
+          'nxCloud.applyAiFixLocally',
+          this.currentFixDetails,
+        );
         break;
     }
   }
@@ -374,6 +383,68 @@ export class NxCloudFixWebview {
         },
       ),
       commands.registerCommand(
+        'nxCloud.applyAiFixLocally',
+        async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+          if (!data.runGroup.aiFix?.suggestedFix) {
+            window.showErrorMessage('No AI fix available to apply locally');
+            return;
+          }
+
+          const gitExtension =
+            extensions.getExtension<GitExtension>('vscode.git')?.exports;
+          if (!gitExtension) {
+            window.showErrorMessage(
+              'Unable to utilize Git for this instance of VS Code',
+            );
+            return;
+          }
+
+          const api = gitExtension.getAPI(1);
+          const repo = api.getRepository(Uri.file(getWorkspacePath()));
+          if (!repo) {
+            window.showErrorMessage('No Git repository found');
+            return;
+          }
+
+          try {
+            const tempFilePath = join(
+              tmpdir(),
+              `nx-cloud-fix-${Date.now()}.patch`,
+            );
+
+            try {
+              const suggestedFix = data.runGroup.aiFix.suggestedFix;
+              if (suggestedFix.lastIndexOf('\n') !== suggestedFix.length - 1) {
+                // Ensure the suggested fix ends with a newline
+                data.runGroup.aiFix.suggestedFix += '\n';
+              }
+
+              await writeFile(tempFilePath, data.runGroup.aiFix.suggestedFix);
+              await repo.apply(tempFilePath);
+            } finally {
+              await unlink(tempFilePath);
+            }
+
+            window.showInformationMessage(
+              'Nx Cloud fix applied locally. Please review and modify any changes before committing.',
+            );
+
+            await updateSuggestedFix(
+              data.runGroup.aiFix.aiFixId,
+              'APPLIED_LOCALLY',
+            );
+          } catch (error) {
+            outputLogger.log(
+              `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message}`,
+            );
+            window.showErrorMessage(
+              'Failed to apply Nx Cloud fix locally. Please check the output for more details.',
+            );
+            return;
+          }
+        },
+      ),
+      commands.registerCommand(
         'nxCloud.rejectAiFix',
         async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
           if (!data.runGroup.aiFix) {
@@ -459,7 +530,7 @@ export class NxCloudFixWebview {
 
 async function updateSuggestedFix(
   aiFixId: string,
-  action: 'APPLIED' | 'REJECTED',
+  action: 'APPLIED' | 'REJECTED' | 'APPLIED_LOCALLY',
 ): Promise<boolean> {
   try {
     const nxCloudInfo = await getNxCloudStatus();

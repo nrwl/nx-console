@@ -14,10 +14,6 @@ import {
 } from '@nx-console/shared-ui-components';
 import './terminal-component';
 
-export interface NxCloudFixWebviewMessage {
-  type: 'apply' | 'ignore' | 'webview-ready' | 'show-diff';
-}
-
 export type NxCloudFixData = {
   cipe: CIPEInfo;
   runGroup: CIPERunGroup;
@@ -708,6 +704,9 @@ export class NxCloudFixComponent extends LitElement {
   onReject: ((details: NxCloudFixData) => void) | undefined;
 
   @property({ type: Function })
+  onApplyLocally: ((details: NxCloudFixData) => void) | undefined;
+
+  @property({ type: Function })
   onShowDiff: (() => void) | undefined;
 
   @state()
@@ -798,34 +797,15 @@ export class NxCloudFixComponent extends LitElement {
     `;
   }
 
-  private getActionButtons(aiFix: NxAiFix): TemplateResult {
-    if (aiFix.userAction === 'APPLIED' || aiFix.userAction === 'REJECTED') {
-      return html``;
-    }
-
-    if (!aiFix.suggestedFix) {
-      return html``;
-    }
-
-    return html`
-      <div class="actions">
-        <button-element
-          text="Apply"
-          appearance="primary"
-          @click="${() => this.handleApply()}"
-        ></button-element>
-        <button-element
-          text="Reject"
-          appearance="secondary"
-          @click="${() => this.handleReject()}"
-        ></button-element>
-      </div>
-    `;
-  }
-
   private handleApply() {
     if (this.details && this.onApply) {
       this.onApply(this.details);
+    }
+  }
+
+  private handleApplyLocally() {
+    if (this.details && this.onApplyLocally) {
+      this.onApplyLocally(this.details);
     }
   }
 
@@ -971,6 +951,11 @@ export class NxCloudFixComponent extends LitElement {
                     text="Apply Fix"
                     appearance="primary"
                     @click="${() => this.handleApply()}"
+                  ></button-element>
+                  <button-element
+                    text="Apply Fix Locally"
+                    appearance="secondary"
+                    @click="${() => this.handleApplyLocally()}"
                   ></button-element>
                   <button-element
                     text="Reject"
