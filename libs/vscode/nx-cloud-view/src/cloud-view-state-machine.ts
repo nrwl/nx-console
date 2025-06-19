@@ -23,6 +23,7 @@ import type { Guard } from 'xstate/guards';
 const SLEEP_POLLING_TIME = 3_600_000;
 const COLD_POLLING_TIME = 180_000;
 const HOT_POLLING_TIME = 10_000;
+const AI_FIX_POLLING_TIME = 3_000;
 
 const pollingMachine = setup({
   types: {
@@ -62,6 +63,15 @@ const pollingMachine = setup({
         return {
           ...context,
           pollingFrequency: HOT_POLLING_TIME,
+        };
+      } else if (
+        recentCIPEData?.info?.some((cipe) =>
+          cipe.runGroups.some((rg) => rg.aiFix),
+        )
+      ) {
+        return {
+          ...context,
+          pollingFrequency: AI_FIX_POLLING_TIME,
         };
       } else {
         return {
