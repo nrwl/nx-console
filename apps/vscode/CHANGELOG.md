@@ -1,3 +1,10 @@
+## [18.54.1](https://github.com/nrwl/nx-console/compare/vscode-v18.54.0...vscode-v18.54.1) (2025-06-20)
+
+
+### Bug Fixes
+
+* **vscode:** add 'Fix Creation Failed' state and improve UI elements ([#2576](https://github.com/nrwl/nx-console/issues/2576)) ([cf230eb](https://github.com/nrwl/nx-console/commit/cf230eb7de6df13f9edc921d250619d031e2af76))
+
 # [18.54.0](https://github.com/nrwl/nx-console/compare/vscode-v18.53.0...vscode-v18.54.0) (2025-06-19)
 
 
