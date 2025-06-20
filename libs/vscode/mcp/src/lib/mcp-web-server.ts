@@ -167,10 +167,8 @@ export class McpWebServer {
       this.appInstance.on('error', (error: NodeJS.ErrnoException) => {
         if (error.code === 'EADDRINUSE') {
           vscodeLogger.log(`Port ${port} is already in use. Another VS Code/Cursor instance likely has an MCP server running on this port.`);
-          getOutputChannel().appendLine(`MCP server port ${port} is already in use. This is expected if you have multiple VS Code/Cursor instances open.`);
         } else {
           vscodeLogger.log(`Failed to start MCP server: ${error.message}`);
-          getOutputChannel().appendLine(`Failed to start MCP server: ${error.message}`);
         }
         this.isServerRunning = false;
       });
