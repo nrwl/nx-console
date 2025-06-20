@@ -117,6 +117,11 @@ export class NxCloudFixComponent extends LitElement {
         flex-shrink: 0;
       }
 
+      .cipe-link {
+        cursor: pointer;
+        color: var(--vscode-button-primaryForeground);
+      }
+
       .branch-badge {
         background-color: var(--vscode-button-secondaryBackground);
         color: var(--vscode-button-secondaryForeground);
@@ -649,6 +654,8 @@ export class NxCloudFixComponent extends LitElement {
       }
 
       .loading-dots {
+        width: 24px;
+        text-align: left;
         display: inline-block;
       }
 
@@ -741,7 +748,7 @@ export class NxCloudFixComponent extends LitElement {
             <p class="explanation-text" style="margin-top: 8px;">
               You can
               <span class="diff-link" @click="${() => this.handleShowDiff()}">
-                review the resulting git diff of the suggested changes </span
+                review the resulting git diff of the suggested changes</span
               >&nbsp;and choose to apply or reject them.
             </p>
           </div>
@@ -786,6 +793,14 @@ export class NxCloudFixComponent extends LitElement {
                 ></path>
               </svg>
               Nx Cloud AI Fix
+              <a
+                class="cipe-link"
+                target="_blank"
+                href="${cipe.cipeUrl}"
+                title="View CI Pipeline Execution"
+              >
+                <icon-element icon="link-external"></icon-element>
+              </a>
             </h1>
             <div class="branch-badge">
               <icon-element icon="git-branch"></icon-element>
@@ -861,19 +876,7 @@ export class NxCloudFixComponent extends LitElement {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">
-          <svg
-            class="codicon-modifier-spin"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="currentColor"
-            fill="none"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.364-6.364l-2.828 2.828M9.464 14.536l-2.828 2.828m12.728 0l-2.828-2.828M9.464 9.464L6.636 6.636"
-            />
-          </svg>
+          <i class="codicon codicon-loading codicon-modifier-spin"></i>
         </div>
         <h2 class="creating-fix-title">
           Creating Fix<span class="loading-dots"></span>
@@ -971,9 +974,31 @@ export class NxCloudFixComponent extends LitElement {
   }
 
   private getStatusSection(aiFix: NxAiFix): TemplateResult {
-    if (!aiFix.suggestedFix) {
+    const hasAiFix = !!aiFix.suggestedFix;
+
+    if (!hasAiFix && aiFix.validationStatus === 'NOT_STARTED') {
       // Show creating fix state
       return this.getCreatingFixSection();
+    }
+
+    // if the fix creation failed, show the proper error state
+    if (!hasAiFix && aiFix.validationStatus === 'FAILED') {
+      return html`
+        <div class="creating-fix-section">
+          <div class="creating-fix-icon">
+            <i
+              class="codicon codicon-error"
+              style="color: var(--error-color);"
+            ></i>
+          </div>
+          <h2 class="creating-fix-title">Fix Creation Failed</h2>
+          <p class="creating-fix-description">
+            Nx Cloud was unable to generate a fix for the error. You can try
+            running the task again or investigate the issue manually on the Nx
+            Cloud UI
+          </p>
+        </div>
+      `;
     }
 
     // Fix exists, show verification status
@@ -982,19 +1007,7 @@ export class NxCloudFixComponent extends LitElement {
         return html`
           <div class="creating-fix-section">
             <div class="creating-fix-icon">
-              <svg
-                class="codicon-modifier-spin"
-                role="img"
-                xmlns="http://www.w3.org/2000/svg"
-                stroke="currentColor"
-                fill="none"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.364-6.364l-2.828 2.828M9.464 14.536l-2.828 2.828m12.728 0l-2.828-2.828M9.464 9.464L6.636 6.636"
-                />
-              </svg>
+              <i class="codicon codicon-loading codicon-modifier-spin"></i>
             </div>
             <h2 class="creating-fix-title">
               Verifying Fix<span class="loading-dots"></span>

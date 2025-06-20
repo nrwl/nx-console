@@ -151,6 +151,7 @@ export class NxCloudFixWebview {
           'nxCloud.applyAiFixLocally',
           this.currentFixDetails,
         );
+        this.webviewPanel?.dispose();
         break;
     }
   }
