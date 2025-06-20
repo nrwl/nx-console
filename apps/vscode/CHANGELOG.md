@@ -1,3 +1,11 @@
+## [18.54.2](https://github.com/nrwl/nx-console/compare/vscode-v18.54.1...vscode-v18.54.2) (2025-06-20)
+
+
+### Bug Fixes
+
+* **vscode:** make sure diff is closed alongside the ai fix view ([#2578](https://github.com/nrwl/nx-console/issues/2578)) ([fa60de4](https://github.com/nrwl/nx-console/commit/fa60de490c2c8c1812b3f029b150346b81b5c91e))
+* **vscode:** mention MCP server & rules file in notification prompt ([#2573](https://github.com/nrwl/nx-console/issues/2573)) ([8431a77](https://github.com/nrwl/nx-console/commit/8431a776e6ba587ae7112b77ff071ab650068ecb))
+
 ## [18.54.1](https://github.com/nrwl/nx-console/compare/vscode-v18.54.0...vscode-v18.54.1) (2025-06-20)
 
 
