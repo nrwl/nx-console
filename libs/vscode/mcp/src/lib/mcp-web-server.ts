@@ -46,6 +46,7 @@ export class McpWebServer {
 
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
+  private isServerRunning = false;
 
   private sseKeepAliveInterval?: NodeJS.Timeout;
   private sseTransport?: SSEServerTransport;
@@ -157,12 +158,31 @@ export class McpWebServer {
       );
     });
 
-    this.appInstance = this.app.listen(port);
-    vscodeLogger.log(`MCP server started on port ${port}`);
+    try {
+      this.appInstance = this.app.listen(port, () => {
+        vscodeLogger.log(`MCP server started on port ${port}`);
+        this.isServerRunning = true;
+      });
+      
+      this.appInstance.on('error', (error: NodeJS.ErrnoException) => {
+        if (error.code === 'EADDRINUSE') {
+          vscodeLogger.log(`Port ${port} is already in use. Another VS Code/Cursor instance likely has an MCP server running on this port.`);
+          getOutputChannel().appendLine(`MCP server port ${port} is already in use. This is expected if you have multiple VS Code/Cursor instances open.`);
+        } else {
+          vscodeLogger.log(`Failed to start MCP server: ${error.message}`);
+          getOutputChannel().appendLine(`Failed to start MCP server: ${error.message}`);
+        }
+        this.isServerRunning = false;
+      });
+    } catch (error) {
+      // This catch might not be necessary with the error event handler, but keeping for safety
+      vscodeLogger.log(`Failed to start MCP server: ${error}`);
+      this.isServerRunning = false;
+    }
   }
 
   public async completeMcpServerSetup() {
-    if (this.fullSseSetupReady) {
+    if (this.fullSseSetupReady || !this.isServerRunning) {
       return;
     }
 
@@ -195,10 +215,13 @@ export class McpWebServer {
       server.getMcpServer().close();
     });
     this.streamableServers.clear();
-    this.appInstance?.close();
+    if (this.appInstance) {
+      this.appInstance.close();
+    }
     if (this.sseKeepAliveInterval) {
       clearInterval(this.sseKeepAliveInterval);
     }
+    this.isServerRunning = false;
   }
 
   public async updateMcpServerWorkspacePath(workspacePath: string) {
