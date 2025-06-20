@@ -18,6 +18,9 @@ import {
   EventEmitter,
   ExtensionContext,
   extensions,
+  Range,
+  TextDocument,
+  TextEditorRevealType,
   Uri,
   ViewColumn,
   WebviewPanel,
@@ -114,6 +117,20 @@ export class NxCloudFixWebview {
       this.webviewPanel = undefined;
       this.currentFixDetails = undefined;
       this._onDispose.fire();
+
+      const editor = window.visibleTextEditors.find(async (editor) => {
+        if (
+          editor.document.uri.scheme === 'nx-cloud-fix-before' ||
+          editor.document.uri.scheme === 'nx-cloud-fix-after'
+        ) {
+          return true;
+        }
+      });
+
+      if (editor) {
+        console.log('found editor');
+        commands.executeCommand('workbench.action.closeActiveEditor');
+      }
     });
 
     this.webviewPanel.webview.html = this.getWebviewHtml(
