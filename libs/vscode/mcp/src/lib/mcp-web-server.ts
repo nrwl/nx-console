@@ -46,7 +46,7 @@ export class McpWebServer {
 
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
-  private isServerRunning = false;
+  private serverStartupFailed = false;
 
   private sseKeepAliveInterval?: NodeJS.Timeout;
   private sseTransport?: SSEServerTransport;
@@ -161,26 +161,28 @@ export class McpWebServer {
     try {
       this.appInstance = this.app.listen(port, () => {
         vscodeLogger.log(`MCP server started on port ${port}`);
-        this.isServerRunning = true;
+        this.serverStartupFailed = false;
       });
       
       this.appInstance.on('error', (error: NodeJS.ErrnoException) => {
         if (error.code === 'EADDRINUSE') {
           vscodeLogger.log(`Port ${port} is already in use. Another VS Code/Cursor instance likely has an MCP server running on this port.`);
+          getOutputChannel().appendLine(`MCP server port ${port} is already in use. This is expected if you have multiple VS Code/Cursor instances open.`);
         } else {
           vscodeLogger.log(`Failed to start MCP server: ${error.message}`);
+          getOutputChannel().appendLine(`Failed to start MCP server: ${error.message}`);
         }
-        this.isServerRunning = false;
+        this.serverStartupFailed = true;
       });
     } catch (error) {
       // This catch might not be necessary with the error event handler, but keeping for safety
       vscodeLogger.log(`Failed to start MCP server: ${error}`);
-      this.isServerRunning = false;
+      this.serverStartupFailed = true;
     }
   }
 
   public async completeMcpServerSetup() {
-    if (this.fullSseSetupReady || !this.isServerRunning) {
+    if (this.fullSseSetupReady || this.serverStartupFailed) {
       return;
     }
 
@@ -219,7 +221,7 @@ export class McpWebServer {
     if (this.sseKeepAliveInterval) {
       clearInterval(this.sseKeepAliveInterval);
     }
-    this.isServerRunning = false;
+    this.serverStartupFailed = false;
   }
 
   public async updateMcpServerWorkspacePath(workspacePath: string) {
