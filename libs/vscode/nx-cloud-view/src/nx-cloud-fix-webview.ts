@@ -11,6 +11,8 @@ import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { outputLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath, GitExtension } from '@nx-console/vscode-utils';
+import { unlink, writeFile } from 'fs/promises';
+import { tmpdir } from 'os';
 import { join } from 'path';
 import { xhr } from 'request-light';
 import {
@@ -18,6 +20,7 @@ import {
   EventEmitter,
   ExtensionContext,
   extensions,
+  Tab,
   Uri,
   ViewColumn,
   WebviewPanel,
@@ -27,8 +30,6 @@ import {
 import { ActorRef, EventObject } from 'xstate';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
-import { unlink, writeFile } from 'fs/promises';
-import { tmpdir } from 'os';
 
 export interface NxCloudFixDetails {
   cipe: CIPEInfo;
@@ -110,10 +111,13 @@ export class NxCloudFixWebview {
       },
     );
 
-    this.webviewPanel.onDidDispose(() => {
+    this.webviewPanel.onDidDispose(async () => {
       this.webviewPanel = undefined;
       this.currentFixDetails = undefined;
       this._onDispose.fire();
+
+      // Close the diff tab associated with this fix
+      await closeCloudFixDiffTab();
     });
 
     this.webviewPanel.webview.html = this.getWebviewHtml(
@@ -566,4 +570,21 @@ async function updateSuggestedFix(
     );
     return false;
   }
+}
+
+export async function closeCloudFixDiffTab() {
+  const diffTab = window.tabGroups.all
+    .flatMap((g) => g.tabs)
+    .find((t) => isCloudFixTab(t));
+
+  if (diffTab) {
+    await window.tabGroups.close(diffTab, true);
+  }
+}
+
+function isCloudFixTab(tab: Tab): boolean {
+  return (
+    (tab as any)?.input?.textDiffs?.[0]?.original?.scheme ===
+    'nx-cloud-fix-before'
+  );
 }

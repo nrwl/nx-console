@@ -151,10 +151,10 @@ async function showMCPNotification(rulesManager: AgentRulesManager) {
   }
 
   const msg = isInCursor()
-    ? 'Improve Cursor Agents with Nx-specific context?'
+    ? 'Improve Cursor Agents with Nx-specific context? (MCP server & rules file)'
     : isInWindsurf()
-      ? 'Improve Cascade with Nx-specific context?'
-      : 'Improve Copilot Agents with Nx-specific context?';
+      ? 'Improve Cascade with Nx-specific context? (MCP server & rules file)'
+      : 'Improve Copilot Agents with Nx-specific context? (MCP server & conventions file)';
 
   window
     .showInformationMessage(msg, 'Yes', "Don't ask again")
