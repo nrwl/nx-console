@@ -30,7 +30,6 @@ export class Root extends LitElement {
     super.connectedCallback();
     // Listen for messages from the extension
     window.addEventListener('message', (event) => {
-      console.log('Received message from extension:', event);
       if (event.data.type === 'update-details') {
         globalThis.fixDetails = event.data.details as NxCloudFixData;
         this.requestUpdate();

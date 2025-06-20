@@ -29,9 +29,14 @@ import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
 import { TelemetryEventSource } from '@nx-console/shared-telemetry';
-import { NxCloudFixWebview } from './nx-cloud-fix-webview';
+import {
+  closeCloudFixDiffTab,
+  NxCloudFixWebview,
+} from './nx-cloud-fix-webview';
 
 export function initNxCloudView(context: ExtensionContext) {
+  closeCloudFixDiffTab();
+
   // set up state machine & listeners
   const actor = createActor(
     machine.provide({
