@@ -56,6 +56,7 @@ enum class TelemetryEvent(val eventName: String) {
 
     // Tasks
     TASKS_RUN("tasks.run"),
+    TASK_INIT("task.init"),
     TASKS_COPY_TO_CLIPBOARD("tasks.copy-to-clipboard"),
     TASKS_RUN_MANY("tasks.run-many"),
 
