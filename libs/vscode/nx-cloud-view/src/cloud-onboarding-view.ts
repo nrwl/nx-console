@@ -55,8 +55,8 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 
   async resolveWebviewView(
     webviewView: WebviewView,
-    context: WebviewViewResolveContext,
-    token: CancellationToken,
+    _context: WebviewViewResolveContext,
+    _token: CancellationToken,
   ): Promise<void> {
     this.ensureStateSubscription();
 
@@ -111,14 +111,6 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
       }
       case 'generate-ci': {
         generateCI();
-        break;
-      }
-      case 'show-affected-docs': {
-        getTelemetry().logUsage('cloud.show-affected-docs');
-        commands.executeCommand(
-          'vscode.open',
-          Uri.parse('https://nx.dev/ci/features/affected?utm_source=nxconsole'),
-        );
         break;
       }
       case 'open-cloud-app': {

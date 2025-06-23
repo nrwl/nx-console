@@ -44,7 +44,6 @@ describe('nx cloud onboarding - default', () => {
     });
     expect(onboardingInfoResponse.result).toMatchInlineSnapshot(`
       Object {
-        "hasAffectedCommandsInCI": false,
         "hasNxInCI": false,
         "isConnectedToCloud": false,
         "isWorkspaceClaimed": false,
@@ -120,7 +119,6 @@ describe('nx cloud onboarding - default', () => {
 
     const info = onboardingInfoResponse.result as CloudOnboardingInfo;
 
-    expect(info.hasAffectedCommandsInCI).toEqual(true);
     expect(info.hasNxInCI).toEqual(true);
   });
 });
