@@ -1,3 +1,23 @@
+## 1.43.0 (2025-06-23)
+
+### Bug Fixes
+
+* **intellij:** use transformed generator schema to match VSCode filte… ([#2539](https://github.com/nrwl/nx-console/issues/2539)) ([ae781e3](https://github.com/nrwl/nx-console/commit/ae781e36c2a64e4ae2a783d73effe7883e68fba3))
+* **vscode:** use the terminal urls from response instead of getting it manually in the Nx Cloud fix feature ([#2560](https://github.com/nrwl/nx-console/issues/2560)) ([8de9758](https://github.com/nrwl/nx-console/commit/8de97580d06e28562e62543ff0b2abbe4921bfa4))
+
+
+### Features
+
+* **intellij:** change default PDV behaviour - show only editor by default instead of split pane ([#2551](https://github.com/nrwl/nx-console/issues/2551)) ([fd6131c](https://github.com/nrwl/nx-console/commit/fd6131c9282b8774e6dc57cf1874266e2c6a6976))
+* **intellij:** enable fixing CI errors from notification ([#2553](https://github.com/nrwl/nx-console/issues/2553)) ([98fa5ff](https://github.com/nrwl/nx-console/commit/98fa5fff1c6aaa6c27afa0310ca8bccf09c92ce5))
+* nx cloud fix webview updates ([#2566](https://github.com/nrwl/nx-console/issues/2566)) ([b6e10bc](https://github.com/nrwl/nx-console/commit/b6e10bc3407d7a81fd68f1605234ba5e610d5662))
+* **nx-mcp:** additional tools for Nx Cloud integration ([#2554](https://github.com/nrwl/nx-console/issues/2554)) ([0b277ff](https://github.com/nrwl/nx-console/commit/0b277ff52f1c54106047271b1805d0501ca67152))
+* **nx-mcp:** more nx cloud tools ([#2568](https://github.com/nrwl/nx-console/issues/2568)) ([da23c12](https://github.com/nrwl/nx-console/commit/da23c12ddb36ce6c337a849fc1c2ebd39108469c))
+* **vscode:** add ability to migrate even when on latest version & fixes ([#2552](https://github.com/nrwl/nx-console/issues/2552)) ([130660c](https://github.com/nrwl/nx-console/commit/130660cc9a2c390c1a8bcff8ae917d8ae93c4a79))
+* **vscode:** add cipe fix notification and support ([#2556](https://github.com/nrwl/nx-console/issues/2556)) ([7c7d404](https://github.com/nrwl/nx-console/commit/7c7d40447071fbf801dc3537bbf6c0560cca7f75))
+* **vscode:** add new ui to show Nx Cloud fix ([#2558](https://github.com/nrwl/nx-console/issues/2558)) ([d12d96a](https://github.com/nrwl/nx-console/commit/d12d96a6953e870971f0a532f24bd732cf873fff))
+* **vscode:** Add support to edit Nx Cloud fixes locally ([#2575](https://github.com/nrwl/nx-console/issues/2575)) ([eb5d4fa](https://github.com/nrwl/nx-console/commit/eb5d4fac4253144dac2d7596c18e53d2e517239c))
+
 ## 1.42.0 (2025-05-31)
 
 ### Bug Fixes
