@@ -160,19 +160,13 @@ export const machine = setup({
         type: 'setErrorContext',
       } as any);
     }),
-    compareCIPEDataAndSendNotification: (
-      _,
-      params: {
-        oldData: CIPEInfo[];
-        newData: CIPEInfo[];
-      },
-    ) => {
+    compareCIPEDataAndSendNotification: () => {
       throw new Error('Not implemented');
     },
-    setViewVisible: (_, params: { viewId: string }) => {
+    setViewVisible: () => {
       throw new Error('Not implemented');
     },
-    setErrorContext: ({ context }) => {
+    setErrorContext: () => {
       throw new Error('Not implemented');
     },
     requestRecentCIPEData: emit({
@@ -193,8 +187,7 @@ export const machine = setup({
       return Boolean(
         context.onboardingInfo?.isWorkspaceClaimed &&
           context.onboardingInfo?.isConnectedToCloud &&
-          context.onboardingInfo?.hasNxInCI &&
-          context.onboardingInfo?.hasAffectedCommandsInCI,
+          context.onboardingInfo?.hasNxInCI,
       );
     },
     hasOnboardingInfo: ({ context }) => {

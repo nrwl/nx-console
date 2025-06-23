@@ -19,14 +19,10 @@ export async function getCloudOnboardingInfo(
   const hasNxInCI = commonCIFileContents.some((content) =>
     content.includes('nx '),
   );
-  const hasAffectedCommandsInCI = commonCIFileContents.some((content) =>
-    content.includes('nx affected'),
-  );
 
   if (!(await isNxCloudUsed(workspacePath))) {
     return {
       hasNxInCI,
-      hasAffectedCommandsInCI,
       isConnectedToCloud: false,
       isWorkspaceClaimed: false,
       personalAccessToken: undefined,
@@ -52,7 +48,6 @@ export async function getCloudOnboardingInfo(
 
   return {
     hasNxInCI,
-    hasAffectedCommandsInCI,
     isConnectedToCloud,
     isWorkspaceClaimed,
     personalAccessToken,

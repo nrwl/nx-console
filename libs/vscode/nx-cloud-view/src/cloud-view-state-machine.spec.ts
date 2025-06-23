@@ -91,7 +91,6 @@ describe('Cloud View State Machine', () => {
       type: 'UPDATE_ONBOARDING',
       value: {
         hasNxInCI: true,
-        hasAffectedCommandsInCI: true,
         isConnectedToCloud: false,
         isWorkspaceClaimed: false,
         personalAccessToken: undefined,
@@ -111,7 +110,6 @@ describe('Cloud View State Machine', () => {
       type: 'UPDATE_ONBOARDING',
       value: {
         hasNxInCI: true,
-        hasAffectedCommandsInCI: true,
         isConnectedToCloud: true,
         isWorkspaceClaimed: true,
         personalAccessToken: undefined,
@@ -148,7 +146,6 @@ describe('Cloud View State Machine', () => {
       type: 'UPDATE_ONBOARDING',
       value: {
         hasNxInCI: true,
-        hasAffectedCommandsInCI: true,
         isConnectedToCloud: true,
         isWorkspaceClaimed: false,
         personalAccessToken: undefined,
