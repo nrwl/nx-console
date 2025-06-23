@@ -155,11 +155,11 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
   const telemetry = getTelemetry();
   telemetry.logUsage('cloud.show-ai-fix-notification');
 
-  type MessageCommand = 'Show Error Details' | 'Reject';
-  const messageCommands: MessageCommand[] = ['Show Error Details', 'Reject'];
+  type MessageCommand = 'Show Suggested Fix' | 'Reject';
+  const messageCommands: MessageCommand[] = ['Show Suggested Fix', 'Reject'];
 
   const handleResults = async (selection: MessageCommand | undefined) => {
-    if (selection === 'Show Error Details') {
+    if (selection === 'Show Suggested Fix') {
       telemetry.logUsage('cloud.show-ai-fix', {
         source: 'notification',
       });
