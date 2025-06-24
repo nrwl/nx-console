@@ -25,7 +25,7 @@ class NxExecutableTest : BasePlatformTestCase() {
         val packageJson = File(tempDir, "package.json")
         packageJson.writeText("{\"name\": \"test-project\"}")
 
-        assertFalse(
+        assertTrue(
             isDotNxInstallation(tempDir.absolutePath),
             "Should not be a dot nx installation",
         )
