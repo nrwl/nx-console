@@ -10,7 +10,7 @@ import type {
 } from 'nx/src/devkit-exports';
 import * as path from 'path';
 
-import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
+import { readJsonFile } from '@nx-console/shared-file-system';
 import {
   localDependencyPath,
   workspaceDependencyPath,
@@ -22,7 +22,7 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 export function readTargetDef(
   targetName: string,
   targetsDef: NxTargetConfiguration,
-  project: string
+  project: string,
 ): Targets {
   const configurations: TargetConfiguration[] = targetsDef.configurations
     ? Object.keys(targetsDef.configurations).map((name) => ({
@@ -54,7 +54,7 @@ function readDefaultValues(configurations: any, name: string): DefaultValue[] {
   if (!config) return defaults;
   return Object.keys(config).reduce(
     (m, k) => [...m, { name: k, defaultValue: getPrimitiveValue(config[k]) }],
-    defaults
+    defaults,
   );
 }
 
@@ -62,7 +62,7 @@ export async function readBuilderSchema(
   basedir: string,
   builder: string,
   projects: Record<string, ProjectGraphProjectNode>,
-  projectDefaults?: { [name: string]: string }
+  projectDefaults?: { [name: string]: string },
 ): Promise<Option[] | undefined> {
   try {
     const [packageName, builderName] = builder.split(':');
@@ -76,23 +76,23 @@ export async function readBuilderSchema(
       return undefined;
     }
 
-    const packageJson = await readAndCacheJsonFile(
-      path.join(packagePath, 'package.json')
+    const packageJson = await readJsonFile(
+      path.join(packagePath, 'package.json'),
     );
     const b = packageJson.json.builders || packageJson.json.executors;
     const buildersPath = b.startsWith('.') ? b : `./${b}`;
-    const buildersJson = await readAndCacheJsonFile(
+    const buildersJson = await readJsonFile(
       buildersPath,
-      path.dirname(packageJson.path)
+      path.dirname(packageJson.path),
     );
 
     const builderDef = {
       ...buildersJson.json.builders,
       ...buildersJson.json.executors,
     }[builderName];
-    const builderSchema = await readAndCacheJsonFile(
+    const builderSchema = await readJsonFile(
       builderDef.schema,
-      path.dirname(buildersJson.path)
+      path.dirname(buildersJson.path),
     );
 
     return await normalizeSchema(builderSchema.json, projectDefaults);

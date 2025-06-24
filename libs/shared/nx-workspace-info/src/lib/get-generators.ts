@@ -3,7 +3,7 @@ import {
   directoryExists,
   fileExists,
   listFiles,
-  readAndCacheJsonFile,
+  readJsonFile,
 } from '@nx-console/shared-file-system';
 import {
   GeneratorCollectionInfo,
@@ -26,7 +26,6 @@ export async function getGenerators(
   const collections = await readCollections(
     workspacePath,
     {
-      clearPackageJsonCache: false,
       includeHidden: options.includeHidden,
       includeNgAdd: options.includeNgAdd,
     },
@@ -77,9 +76,7 @@ async function readWorkspaceGeneratorsCollection(
   }`;
   const collectionPath = join(collectionDir, 'collection.json');
   if (await fileExists(collectionPath)) {
-    const collection = await readAndCacheJsonFile(
-      `${collectionDir}/collection.json`,
-    );
+    const collection = await readJsonFile(`${collectionDir}/collection.json`);
 
     return getCollectionInfo(
       basedir,
@@ -97,7 +94,7 @@ async function readWorkspaceGeneratorsCollection(
       listFiles(collectionDir)
         .filter((f) => basename(f) === 'schema.json')
         .map(async (schemaJsonPath) => {
-          const schemaJson = await readAndCacheJsonFile(schemaJsonPath, '');
+          const schemaJson = await readJsonFile(schemaJsonPath, '');
           const name = schemaJson.json.id || schemaJson.json.$id;
           const type: GeneratorType =
             schemaJson.json['x-type'] ?? GeneratorType.Other;

@@ -1,9 +1,7 @@
 export { fileExists } from './lib/file-exists';
 export { directoryExists } from './lib/directory-exists';
-export { cacheJson } from './lib/cache-json';
-export { readAndCacheJsonFile } from './lib/cache-json';
-export { clearJsonCache } from './lib/cache-json';
-export { readAndParseJson } from './lib/cache-json';
+export { readJsonFile } from './lib/read-json-file';
+export { readAndParseJson } from './lib/read-json-file';
 export { listFiles } from './lib/list-files';
 export { readDirectory } from './lib/read-directory';
 export { readFile } from './lib/read-file';
