@@ -289,10 +289,7 @@ async function resolveDelegatedExecutor(
     packagePath,
   } = await packageDetails(dependencyPath);
 
-  const collection = await readAndCacheJsonFile(
-    executors || builders,
-    packagePath,
-  );
+  const collection = await readJsonFile(executors || builders, packagePath);
 
   if (!collection.json?.[executor]) {
     return null;
