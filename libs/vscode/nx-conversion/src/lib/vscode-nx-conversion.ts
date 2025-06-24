@@ -43,7 +43,7 @@ export async function initNxConversion(
 
   WorkspaceConfigurationStore.instance.set('nxConversionDate', now.getTime());
   const answer = await window.showInformationMessage(
-    "It's time to migrate! \n To keep using Nx Console's powerful capabilities, please transition your Angular workspace to Nx. ",
+    `Want to migrate? Migrate your Angular workspace to Nx and get features like remote caching, distributed builds, and atomized tests out of the box.`,
     'Migrate Now',
     'Learn More'
   );
