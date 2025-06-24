@@ -178,7 +178,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         if (nxWorkspace == null) {
             return emptyArray()
         }
-        return nxWorkspace.projectGraph.nodes
+        return (nxWorkspace.projectGraph?.nodes ?: return emptyArray())
             .filter { it.value.data.targets?.contains(targetsListNode.targetName) ?: false }
             .map {
                 NxSimpleNode.Target(

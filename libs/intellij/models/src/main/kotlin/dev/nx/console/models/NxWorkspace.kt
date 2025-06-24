@@ -4,7 +4,7 @@ import kotlinx.serialization.*
 
 data class NxWorkspace(
     val validWorkspaceJson: Boolean,
-    val projectGraph: NxProjectGraph,
+    val projectGraph: NxProjectGraph?,
     val daemonEnabled: Boolean?,
     val workspacePath: String,
     val errors: Array<NxError>?,
@@ -53,7 +53,7 @@ data class NxWorkspace(
 
 data class WorkspaceLayout(val appsDir: String?, val libsDir: String?)
 
-data class NxProjectGraph(val nodes: Map<String, NxProjectGraphProjectNode>)
+data class NxProjectGraph(val nodes: Map<String, NxProjectGraphProjectNode>?)
 
 data class NxProjectGraphProjectNode(val name: String, val type: String, val data: NxProject)
 

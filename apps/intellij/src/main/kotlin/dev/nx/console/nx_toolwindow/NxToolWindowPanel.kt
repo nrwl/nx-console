@@ -115,7 +115,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                                 it.second
                             }
                         }
-                    } else if (workspace == null || workspace.projectGraph.nodes.isEmpty()) {
+                    } else if (workspace == null || workspace.projectGraph?.nodes.isNullOrEmpty()) {
                         noProjectsComponent
                     } else {
                         projectTreeComponent
