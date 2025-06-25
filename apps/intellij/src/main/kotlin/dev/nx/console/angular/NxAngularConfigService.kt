@@ -76,7 +76,8 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
             return
         }
         val projectFiles =
-            workspace.projectGraph.nodes.values
+            (workspace.projectGraph?.nodes ?: return)
+                .values
                 .asSequence()
                 // TODO: use framework metadata in the future, for now just register all projects
                 //                .filter { project ->
