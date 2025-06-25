@@ -204,7 +204,8 @@ export async function viewDocumentation(migration: MigrationDetailsWithId) {
 export async function stopMigration(migration: MigrationDetailsWithId) {
   try {
     const workspacePath = getNxWorkspacePath();
-    const migrateUIApi = await importMigrateUIApi(workspacePath);
+    // TODO: Remove the `as any` cast once the repository is updated to use the latest Nx version that exports the `killMigrationProcess` function.
+    const migrateUIApi = (await importMigrateUIApi(workspacePath)) as any;
 
     const isStopped = migrateUIApi.killMigrationProcess(
       migration.id,
