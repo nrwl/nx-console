@@ -200,3 +200,28 @@ export async function viewDocumentation(migration: MigrationDetailsWithId) {
 
   commands.executeCommand('vscode.open', url);
 }
+
+export async function stopMigration(migration: MigrationDetailsWithId) {
+  try {
+    const workspacePath = getNxWorkspacePath();
+    // TODO: Remove the `as any` cast once the repository is updated to use the latest Nx version that exports the `killMigrationProcess` function.
+    const migrateUIApi = (await importMigrateUIApi(workspacePath)) as any;
+
+    const isStopped = migrateUIApi.killMigrationProcess(
+      migration.id,
+      workspacePath,
+    );
+
+    if (isStopped) {
+      window.showInformationMessage(
+        `Migration "${migration.name}" has been stopped.`,
+      );
+    } else {
+      window.showWarningMessage(
+        `Migration "${migration.name}" was not running or could not be stopped.`,
+      );
+    }
+  } catch (error) {
+    window.showErrorMessage(`Failed to stop migration: ${error.message}`);
+  }
+}
