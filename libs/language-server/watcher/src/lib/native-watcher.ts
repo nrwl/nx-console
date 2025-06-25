@@ -26,7 +26,10 @@ export class NativeWatcher {
   private watcher: Watcher | undefined;
   private stopped = false;
 
-  constructor(private workspacePath: string, private callback: () => unknown) {
+  constructor(
+    private workspacePath: string,
+    private callback: () => unknown,
+  ) {
     this.initWatcher();
   }
 
@@ -39,7 +42,7 @@ export class NativeWatcher {
     const native = await importNxPackagePath<typeof import('nx/src/native')>(
       this.workspacePath,
       'src/native/index.js',
-      lspLogger
+      lspLogger,
     );
     this.watcher = new native.Watcher(this.workspacePath);
 
@@ -57,13 +60,13 @@ export class NativeWatcher {
                 path.endsWith('workspace.json') ||
                 path.endsWith('tsconfig.base.json') ||
                 NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-                  minimatch([path], pattern, { dot: true })
+                  minimatch([path], pattern, { dot: true }),
                 ) ||
                 NativeWatcher.openDocuments.has(path)) &&
               !path.startsWith('node_modules') &&
               !path.startsWith(normalize('.nx/cache')) &&
               !path.startsWith(normalize('.yarn/cache')) &&
-              !path.startsWith(normalize('.nx/workspace-data'))
+              !path.startsWith(normalize('.nx/workspace-data')),
           )
       ) {
         if (this.stopped) {
@@ -73,7 +76,7 @@ export class NativeWatcher {
         lspLogger.log(
           `native watcher detected project changes in files ${events
             .map((e) => normalize(e.path))
-            .join(', ')}`
+            .join(', ')}`,
         );
         this.callback();
       }

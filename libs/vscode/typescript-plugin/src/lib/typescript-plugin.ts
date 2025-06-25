@@ -1,5 +1,4 @@
 import { gte } from '@nx-console/nx-version';
-import { clearJsonCache } from '@nx-console/shared-file-system';
 import {
   importWorkspaceDependency,
   workspaceDependencyPath,
@@ -214,7 +213,6 @@ async function enableTypescriptServerPlugin(
     watchFile(
       `${workspaceRoot}/tsconfig.base.json`,
       () => {
-        clearJsonCache(TSCONFIG_BASE, workspaceRoot);
         configurePlugin(
           workspaceRoot,
           projectGraph,

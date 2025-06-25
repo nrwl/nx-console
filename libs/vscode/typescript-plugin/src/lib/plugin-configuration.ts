@@ -1,7 +1,4 @@
-import {
-  findConfig,
-  readAndCacheJsonFile,
-} from '@nx-console/shared-file-system';
+import { findConfig, readJsonFile } from '@nx-console/shared-file-system';
 import {
   detectPackageManager,
   getPackageManagerVersion,
@@ -35,16 +32,14 @@ export const TSCONFIG_BASE = 'tsconfig.base.json';
 async function getAdditionalRootFiles(
   workspaceRoot: string,
 ): Promise<RootFileInfo[]> {
-  let tsconfig = (await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot))
-    .json;
+  let tsconfig = (await readJsonFile(TSCONFIG_BASE, workspaceRoot)).json;
 
   if (!tsconfig) {
     return [];
   }
 
   if (!('compilerOptions' in tsconfig)) {
-    tsconfig = (await readAndCacheJsonFile('tsconfig.json', workspaceRoot))
-      .json;
+    tsconfig = (await readJsonFile('tsconfig.json', workspaceRoot)).json;
     if (!tsconfig) {
       return [];
     }

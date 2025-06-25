@@ -1,7 +1,4 @@
-import {
-  findConfig,
-  readAndCacheJsonFile,
-} from '@nx-console/shared-file-system';
+import { findConfig, readJsonFile } from '@nx-console/shared-file-system';
 import { dirname, join, posix, sep } from 'node:path';
 import {
   getPluginConfiguration,
@@ -10,7 +7,7 @@ import {
 } from './plugin-configuration';
 
 jest.mock('@nx-console/shared-file-system', () => ({
-  readAndCacheJsonFile: jest.fn(),
+  readJsonFile: jest.fn(),
   listFiles: jest.fn(),
   findConfig: jest.fn(),
 }));
@@ -29,7 +26,7 @@ describe('getPluginConfiguration', () => {
 
   describe('additionalRootFiles', () => {
     it('should return an empty array if tsconfig.base.json and tsconfig.json do not exist', async () => {
-      (readAndCacheJsonFile as jest.Mock).mockImplementation(async (file) => {
+      (readJsonFile as jest.Mock).mockImplementation(async (file) => {
         if (file === 'tsconfig.base.json') {
           return { json: {} };
         }
@@ -48,7 +45,7 @@ describe('getPluginConfiguration', () => {
     });
 
     it('should return an empty array if compilerOptions is missing in tsconfig.base.json and tsconfig.json', async () => {
-      (readAndCacheJsonFile as jest.Mock).mockImplementation(async (file) => {
+      (readJsonFile as jest.Mock).mockImplementation(async (file) => {
         if (file === 'tsconfig.base.json') {
           return { json: { someOtherProperty: 'value' } };
         }
@@ -67,7 +64,7 @@ describe('getPluginConfiguration', () => {
     });
 
     it('should return additional root files for simple path entries in tsconfig.base.json', async () => {
-      (readAndCacheJsonFile as jest.Mock).mockImplementation(async (file) => {
+      (readJsonFile as jest.Mock).mockImplementation(async (file) => {
         if (file === 'tsconfig.base.json') {
           return {
             json: {
@@ -102,7 +99,7 @@ describe('getPluginConfiguration', () => {
     });
 
     it('should return additional root files for simple path entries in tsconfig.json', async () => {
-      (readAndCacheJsonFile as jest.Mock).mockImplementation((file) => {
+      (readJsonFile as jest.Mock).mockImplementation((file) => {
         if (file === 'tsconfig.json') {
           return {
             json: {

@@ -1,7 +1,4 @@
-import {
-  clearJsonCache,
-  readAndCacheJsonFile,
-} from '@nx-console/shared-file-system';
+import { readJsonFile } from '@nx-console/shared-file-system';
 import {
   packageDetails,
   workspaceDependencies,
@@ -20,7 +17,6 @@ import { nxWorkspace } from './workspace';
 import { Logger } from '@nx-console/shared-utils';
 
 export type ReadCollectionsOptions = {
-  clearPackageJsonCache?: boolean;
   includeHidden?: boolean;
   includeNgAdd?: boolean;
 };
@@ -30,10 +26,6 @@ export async function readCollections(
   options: ReadCollectionsOptions,
   logger?: Logger,
 ): Promise<CollectionInfo[]> {
-  if (options?.clearPackageJsonCache) {
-    clearJsonCache('package.json', workspacePath);
-  }
-
   const { projectGraph, nxVersion } = await nxWorkspace(workspacePath, logger);
 
   const packages = await workspaceDependencies(
@@ -93,8 +85,8 @@ async function readCollection(
 ): Promise<CollectionInfo[] | null> {
   try {
     const [executorCollections, generatorCollections] = await Promise.all([
-      readAndCacheJsonFile(json.executors || json.builders, packagePath),
-      readAndCacheJsonFile(json.generators || json.schematics, packagePath),
+      readJsonFile(json.executors || json.builders, packagePath),
+      readJsonFile(json.generators || json.schematics, packagePath),
     ]);
 
     return getCollectionInfo(
@@ -297,10 +289,7 @@ async function resolveDelegatedExecutor(
     packagePath,
   } = await packageDetails(dependencyPath);
 
-  const collection = await readAndCacheJsonFile(
-    executors || builders,
-    packagePath,
-  );
+  const collection = await readJsonFile(executors || builders, packagePath);
 
   if (!collection.json?.[executor]) {
     return null;
