@@ -225,12 +225,14 @@ export function hideAiFixStatusBarItem() {
 }
 
 export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
-  // Find the first available AI fix
   let foundFix: { cipe: CIPEInfo; runGroup: CIPERunGroup } | null = null;
 
   for (const cipe of cipeData) {
     for (const runGroup of cipe.runGroups || []) {
-      if (runGroup.aiFix?.suggestedFix && runGroup.aiFix.userAction === 'NONE') {
+      if (
+        runGroup.aiFix?.suggestedFix &&
+        runGroup.aiFix.userAction === 'NONE'
+      ) {
         foundFix = { cipe, runGroup };
         break;
       }
@@ -239,7 +241,6 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
   }
 
   if (foundFix) {
-    // Show status bar with the first available fix
     if (!aiFixStatusBarItem) {
       aiFixStatusBarItem = window.createStatusBarItem(
         StatusBarAlignment.Left,
@@ -250,7 +251,7 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
     const taskDisplay = foundFix.runGroup.aiFix?.taskIds[0];
     const message = `Nx Cloud suggested a fix for ${taskDisplay} in #${foundFix.cipe.branch}`;
 
-    aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix: ${taskDisplay}`;
+    aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix`;
     aiFixStatusBarItem.tooltip = message;
     aiFixStatusBarItem.command = {
       command: 'nxCloud.openFixDetails',
