@@ -2,12 +2,17 @@ import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { commands, window } from 'vscode';
+import { commands, window, StatusBarItem, StatusBarAlignment } from 'vscode';
+
+let aiFixStatusBarItem: StatusBarItem | undefined;
 
 export function compareCIPEDataAndSendNotification(
   oldInfo: CIPEInfo[] | null,
   newInfo: CIPEInfo[],
 ) {
+  // Always update status bar regardless of notification settings
+  updateAiFixStatusBar(newInfo);
+
   const nxCloudNotificationsSetting = GlobalConfigurationStore.instance.get(
     'nxCloudNotifications',
   );
@@ -176,10 +181,90 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
   };
 
   const taskDisplay = runGroup.aiFix?.taskIds[0];
+  const message = `Nx Cloud suggested a fix for ${taskDisplay} in #${cipe.branch}`;
+
+  // Show notification
   window
-    .showInformationMessage(
-      `Nx Cloud suggested a fix for ${taskDisplay} in #${cipe.branch}`,
-      ...messageCommands,
-    )
+    .showInformationMessage(message, ...messageCommands)
     .then(handleResults);
+
+  // Update status bar
+  if (!aiFixStatusBarItem) {
+    aiFixStatusBarItem = window.createStatusBarItem(
+      StatusBarAlignment.Left,
+      100,
+    );
+  }
+
+  aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix: ${taskDisplay}`;
+  aiFixStatusBarItem.tooltip = message;
+  aiFixStatusBarItem.command = {
+    command: 'nxCloud.openFixDetails',
+    title: 'Show Error Details',
+    arguments: [
+      {
+        cipeId: cipe.ciPipelineExecutionId,
+        runGroupId: runGroup.runGroup,
+      },
+    ],
+  };
+  aiFixStatusBarItem.show();
+}
+
+export function disposeAiFixStatusBarItem() {
+  if (aiFixStatusBarItem) {
+    aiFixStatusBarItem.dispose();
+    aiFixStatusBarItem = undefined;
+  }
+}
+
+export function hideAiFixStatusBarItem() {
+  if (aiFixStatusBarItem) {
+    aiFixStatusBarItem.hide();
+  }
+}
+
+export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
+  // Find the first available AI fix
+  let foundFix: { cipe: CIPEInfo; runGroup: CIPERunGroup } | null = null;
+
+  for (const cipe of cipeData) {
+    for (const runGroup of cipe.runGroups || []) {
+      if (runGroup.aiFix?.suggestedFix && runGroup.aiFix.userAction === 'NONE') {
+        foundFix = { cipe, runGroup };
+        break;
+      }
+    }
+    if (foundFix) break;
+  }
+
+  if (foundFix) {
+    // Show status bar with the first available fix
+    if (!aiFixStatusBarItem) {
+      aiFixStatusBarItem = window.createStatusBarItem(
+        StatusBarAlignment.Left,
+        100,
+      );
+    }
+
+    const taskDisplay = foundFix.runGroup.aiFix?.taskIds[0];
+    const message = `Nx Cloud suggested a fix for ${taskDisplay} in #${foundFix.cipe.branch}`;
+
+    aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix: ${taskDisplay}`;
+    aiFixStatusBarItem.tooltip = message;
+    aiFixStatusBarItem.command = {
+      command: 'nxCloud.openFixDetails',
+      title: 'Show Error Details',
+      arguments: [
+        {
+          cipeId: foundFix.cipe.ciPipelineExecutionId,
+          runGroupId: foundFix.runGroup.runGroup,
+        },
+      ],
+    };
+    aiFixStatusBarItem.show();
+  } else {
+    // Hide status bar if no fixes available
+    hideAiFixStatusBarItem();
+  }
 }
