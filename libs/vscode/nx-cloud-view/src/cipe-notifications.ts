@@ -10,7 +10,7 @@ export function compareCIPEDataAndSendNotification(
   oldInfo: CIPEInfo[] | null,
   newInfo: CIPEInfo[],
 ) {
-  // Always update status bar regardless of notification settings
+  // Always update status bar
   updateAiFixStatusBar(newInfo);
 
   const nxCloudNotificationsSetting = GlobalConfigurationStore.instance.get(
@@ -187,28 +187,6 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
   window
     .showInformationMessage(message, ...messageCommands)
     .then(handleResults);
-
-  // Update status bar
-  if (!aiFixStatusBarItem) {
-    aiFixStatusBarItem = window.createStatusBarItem(
-      StatusBarAlignment.Left,
-      100,
-    );
-  }
-
-  aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix: ${taskDisplay}`;
-  aiFixStatusBarItem.tooltip = message;
-  aiFixStatusBarItem.command = {
-    command: 'nxCloud.openFixDetails',
-    title: 'Show Error Details',
-    arguments: [
-      {
-        cipeId: cipe.ciPipelineExecutionId,
-        runGroupId: runGroup.runGroup,
-      },
-    ],
-  };
-  aiFixStatusBarItem.show();
 }
 
 export function disposeAiFixStatusBarItem() {
