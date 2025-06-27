@@ -24,7 +24,10 @@ import {
   window,
 } from 'vscode';
 import { createActor } from 'xstate';
-import { compareCIPEDataAndSendNotification } from './cipe-notifications';
+import {
+  compareCIPEDataAndSendNotification,
+  disposeAiFixStatusBarItem,
+} from './cipe-notifications';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
@@ -86,6 +89,7 @@ export function initNxCloudView(context: ExtensionContext) {
     showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' }),
+    { dispose: () => disposeAiFixStatusBarItem() },
   );
 
   // register commands
