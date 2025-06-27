@@ -89,7 +89,8 @@ export class NxCloudFixTreeItem
         const hasFix = !!aiFix.suggestedFix;
         // TODO: Remove this once all environments have been migrated after deployment
         // Fall back to original validationStatus field for backwards compatibility
-        const verificationStatus = aiFix.verificationStatus || (aiFix as any).validationStatus;
+        const verificationStatus =
+          aiFix.verificationStatus || (aiFix as any).validationStatus;
 
         if (hasFix) {
           // Fix has been created - show different states based on verification status

@@ -977,7 +977,8 @@ export class NxCloudFixComponent extends LitElement {
     const hasAiFix = !!aiFix.suggestedFix;
     // TODO: Remove this once all environments have been migrated after deployment
     // Fall back to original validationStatus field for backwards compatibility
-    const verificationStatus = aiFix.verificationStatus || (aiFix as any).validationStatus;
+    const verificationStatus =
+      aiFix.verificationStatus || (aiFix as any).validationStatus;
 
     if (!hasAiFix && verificationStatus === 'NOT_STARTED') {
       // Show creating fix state
