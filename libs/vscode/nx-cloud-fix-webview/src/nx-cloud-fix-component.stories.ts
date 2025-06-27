@@ -43,7 +43,7 @@ const runGroup: NxCloudFixData['runGroup'] = {
     aiFixId: 'fix-789',
     suggestedFix:
       'npm install some-missing-module\n\n// Add the following import:\nimport { SomeClass } from "some-missing-module";\n\n// Update the configuration:\nexport default {\n  // ... existing config\n  dependencies: {\n    "some-missing-module": "^1.0.0"\n  }\n};',
-    validationStatus: 'COMPLETED',
+    verificationStatus: 'COMPLETED',
     suggestedFixDescription:
       'Install missing dependencies and update imports, and more configuration changes.',
     userAction: undefined,
@@ -120,7 +120,7 @@ export const WaitingForFix: Story = {
           ...mockDetails.runGroup.aiFix!,
           suggestedFix: undefined,
           suggestedFixDescription: undefined,
-          validationStatus: 'NOT_STARTED',
+          verificationStatus: 'NOT_STARTED',
         },
       },
     },
@@ -165,7 +165,7 @@ export const VerificationFailed: Story = {
         ...mockDetails.runGroup,
         aiFix: {
           ...mockDetails.runGroup.aiFix!,
-          validationStatus: 'FAILED',
+          verificationStatus: 'FAILED',
         },
       },
     },
@@ -180,7 +180,7 @@ export const InProgress: Story = {
         ...mockDetails.runGroup,
         aiFix: {
           ...mockDetails.runGroup.aiFix!,
-          validationStatus: 'IN_PROGRESS',
+          verificationStatus: 'IN_PROGRESS',
           suggestedFix: 'some diff',
         },
       },
@@ -196,7 +196,7 @@ export const FixCreationFailed: Story = {
         ...mockDetails.runGroup,
         aiFix: {
           ...mockDetails.runGroup.aiFix!,
-          validationStatus: 'FAILED',
+          verificationStatus: 'FAILED',
           suggestedFix: undefined,
           suggestedFixDescription: undefined,
         },
