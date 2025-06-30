@@ -1,3 +1,19 @@
+# [18.55.0](https://github.com/nrwl/nx-console/compare/vscode-v18.54.2...vscode-v18.55.0) (2025-06-30)
+
+
+### Bug Fixes
+
+* handle ai fix verification fields ([#2590](https://github.com/nrwl/nx-console/issues/2590)) ([1fd576f](https://github.com/nrwl/nx-console/commit/1fd576f5b176722f4e6c21f6f56e1d52ab1a059a))
+* **vscode:** remove affected condition from onboarding checks ([#2583](https://github.com/nrwl/nx-console/issues/2583)) ([a92b965](https://github.com/nrwl/nx-console/commit/a92b965ee6fb9a0627b4bd25d327e96c927ad7c7))
+* **vscode:** remove json caching in various places ([#2587](https://github.com/nrwl/nx-console/issues/2587)) ([d30d99a](https://github.com/nrwl/nx-console/commit/d30d99a705b3425ed0af753e95f116dcf33b9f01))
+* **vscode:** update angular migration message ([#2586](https://github.com/nrwl/nx-console/issues/2586)) ([cf01be2](https://github.com/nrwl/nx-console/commit/cf01be28309d31f2728f48fa065e5ff912e3d480))
+* **vscode:** update self-healing ci notification wording ([#2582](https://github.com/nrwl/nx-console/issues/2582)) ([09b1480](https://github.com/nrwl/nx-console/commit/09b148034df44ac16907b9acc5ba374fe4c44046))
+
+
+### Features
+
+* **migrate:** add stop migration functionality and update commands ([#2567](https://github.com/nrwl/nx-console/issues/2567)) ([18de342](https://github.com/nrwl/nx-console/commit/18de342f29b96fb0a955f2dcfb1c4f6ff35be51d))
+
 ## [18.54.2](https://github.com/nrwl/nx-console/compare/vscode-v18.54.1...vscode-v18.54.2) (2025-06-20)
 
 
