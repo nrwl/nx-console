@@ -9,6 +9,7 @@ build/
 /.angular
 /cypress
 **/out-tsc
+*.dxt
 
 # dependencies
 **/node_modules

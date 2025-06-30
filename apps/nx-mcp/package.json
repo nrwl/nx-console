@@ -30,6 +30,9 @@
     "main.js",
     "README.md"
   ],
+  "devDependencies": {
+    "archiver": "^7.0.0"
+  },
   "nx": {
     "name": "nx-mcp",
     "projectType": "application",
@@ -57,7 +60,8 @@
           "sourcemap": false,
           "minify": true,
           "assets": [
-            "apps/nx-mcp/README.md"
+            "apps/nx-mcp/README.md",
+            "apps/nx-mcp/DXT-README.md"
           ],
           "esbuildOptions": {
             "mainFields": [
