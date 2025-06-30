@@ -1,3 +1,10 @@
+# [18.56.0](https://github.com/nrwl/nx-console/compare/vscode-v18.55.0...vscode-v18.56.0) (2025-06-30)
+
+
+### Features
+
+* **vscode:** add status bar item whenever there is a fix available ([#2591](https://github.com/nrwl/nx-console/issues/2591)) ([2b746db](https://github.com/nrwl/nx-console/commit/2b746db135e12687a2f123e18c388d5e4b18d7a1))
+
 # [18.55.0](https://github.com/nrwl/nx-console/compare/vscode-v18.54.2...vscode-v18.55.0) (2025-06-30)
 
 
