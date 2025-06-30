@@ -1,6 +1,6 @@
 package dev.nx.console.nx_toolwindow
 
-import com.intellij.ide.actions.RefreshAction
+import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
@@ -8,10 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
-import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
-import com.intellij.ui.JBColor
 import com.intellij.util.ui.UIUtil
-import java.awt.Color
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
@@ -24,7 +21,9 @@ import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nodeInterpreter
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.event.ActionEvent
+import javax.swing.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -36,7 +35,6 @@ import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.createStateMachine
 import ru.nsk.kstatemachine.statemachine.stop
 import ru.nsk.kstatemachine.transition.TransitionParams
-import javax.swing.*
 
 class NxToolWindowPanel(private val project: Project) :
     SimpleToolWindowPanel(true, true), Disposable {
@@ -49,23 +47,23 @@ class NxToolWindowPanel(private val project: Project) :
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val nxToolMainComponents = NxToolMainComponents(project)
-    private val toolBar =
-        nxToolMainComponents.createToolbar(projectTree)
+    private val toolBar = nxToolMainComponents.createToolbar(projectTree)
     private var mainContent: MutableRef<JComponent?> = MutableRef(null)
     private var errorCountAndComponent: MutableRef<Pair<Int, JComponent>?> = MutableRef(null)
     private var openNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
     private var connectToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
 
-    private val progressBar = JProgressBar().apply {
-        isIndeterminate = false
-        setUI(
-            object : DarculaProgressBarUI() {
-                override fun getRemainderColor(): Color {
-                    return UIUtil.getPanelBackground()
+    private val progressBar =
+        JProgressBar().apply {
+            isIndeterminate = false
+            setUI(
+                object : DarculaProgressBarUI() {
+                    override fun getRemainderColor(): Color {
+                        return UIUtil.getPanelBackground()
+                    }
                 }
-            }
-        )
-    }
+            )
+        }
 
     private var mainPanel: JPanel =
         JPanel().apply {
@@ -103,14 +101,11 @@ class NxToolWindowPanel(private val project: Project) :
                         val showNoNxWorkspace = state(MainContentStates.ShowNoNxWorkspace)
                         val showProjectTree =
                             dataState<NxWorkspace>(MainContentStates.ShowProjectTree)
-                        val initialState = initialState(MainContentStates.InitialLoading) {
-                            onEntry {
-                                loadingPanel.startLoading()
+                        val initialState =
+                            initialState(MainContentStates.InitialLoading) {
+                                onEntry { loadingPanel.startLoading() }
+                                onExit { loadingPanel.stopLoading() }
                             }
-                            onExit {
-                                loadingPanel.stopLoading()
-                            }
-                        }
 
                         createMainContentStateGroup(
                             noNodeInterpreter,
@@ -167,7 +162,8 @@ class NxToolWindowPanel(private val project: Project) :
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
                     object : NxWorkspaceRefreshStartedListener {
-                        // for the PDV, we send a manual started event on startup, let's ignore it here
+                        // for the PDV, we send a manual started event on startup, let's ignore it
+                        // here
                         private var isFirst = true
                         override fun onWorkspaceRefreshStarted() {
                             if (!isFirst) {
@@ -212,7 +208,8 @@ class NxToolWindowPanel(private val project: Project) :
             val workspace = nxlsService.workspace()
 
             withContext(Dispatchers.EDT) {
-                val hasProjects = workspace != null && !(workspace.projectGraph?.nodes.isNullOrEmpty())
+                val hasProjects =
+                    workspace != null && !(workspace.projectGraph?.nodes.isNullOrEmpty())
                 val hasNodeInterpreter =
                     try {
                         project.nodeInterpreter

@@ -308,7 +308,6 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-
     fun createConnectedToNxCloudPanel(nxCloudUrl: String): JPanel {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)

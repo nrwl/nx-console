@@ -66,19 +66,11 @@ fun createRefreshStateGroup(
     progressBar: JProgressBar
 ) {
     refreshedState {
-        onEntry { 
-            withContext(Dispatchers.EDT) { 
-                progressBar.isIndeterminate = false
-            } 
-        }
+        onEntry { withContext(Dispatchers.EDT) { progressBar.isIndeterminate = false } }
         transition<RefreshEvents.Refreshing> { targetState = refreshingState }
     }
     refreshingState {
-        onEntry { 
-            withContext(Dispatchers.EDT) { 
-                progressBar.isIndeterminate = true
-            } 
-        }
+        onEntry { withContext(Dispatchers.EDT) { progressBar.isIndeterminate = true } }
         transition<RefreshEvents.Refreshed> { targetState = refreshedState }
     }
 }
@@ -99,9 +91,7 @@ fun createMainContentStateGroup(
     projectStructure: NxTreeStructure
 ) {
     noNodeInterpreter {
-        onEntry {
-            mainContent.value = nxToolMainComponents.createNoNodeInterpreterComponent()
-        }
+        onEntry { mainContent.value = nxToolMainComponents.createNoNodeInterpreterComponent() }
     }
 
     showError {
@@ -135,23 +125,35 @@ fun createMainContentStateGroup(
             projectStructure.updateNxProjects(data)
         }
     }
-    
+
     initialState {
-        onEntry { 
+        onEntry {
             mainContent.value = null // No explicit spinner component needed
         }
     }
-    
+
     // Add common transitions to all states
-    listOf(initialState, noNodeInterpreter, showError, showNoProject, showNoNxWorkspace, showProjectTree).forEach { state ->
-        state.apply {
-            transition<MainContentEvents.ShowNoNodeInterpreter> { targetState = noNodeInterpreter }
-            transition<MainContentEvents.ShowNoProject> { targetState = showNoProject }
-            transition<MainContentEvents.ShowNoNxWorkspace> { targetState = showNoNxWorkspace }
-            dataTransition<MainContentEvents.ShowErrors, Int> { targetState = showError }
-            dataTransition<MainContentEvents.ShowProjectTree, NxWorkspace> { targetState = showProjectTree }
+    listOf(
+            initialState,
+            noNodeInterpreter,
+            showError,
+            showNoProject,
+            showNoNxWorkspace,
+            showProjectTree
+        )
+        .forEach { state ->
+            state.apply {
+                transition<MainContentEvents.ShowNoNodeInterpreter> {
+                    targetState = noNodeInterpreter
+                }
+                transition<MainContentEvents.ShowNoProject> { targetState = showNoProject }
+                transition<MainContentEvents.ShowNoNxWorkspace> { targetState = showNoNxWorkspace }
+                dataTransition<MainContentEvents.ShowErrors, Int> { targetState = showError }
+                dataTransition<MainContentEvents.ShowProjectTree, NxWorkspace> {
+                    targetState = showProjectTree
+                }
+            }
         }
-    }
 }
 
 fun createNxCloudStateGroup(
@@ -173,7 +175,7 @@ fun createNxCloudStateGroup(
             targetState = showConnectedNxCloudPanel
         }
     }
-    
+
     showConnectedNxCloudPanel {
         onEntry {
             openNxCloudPanel.value?.let { panel -> panel.isVisible = true }
