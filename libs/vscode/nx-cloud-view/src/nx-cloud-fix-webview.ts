@@ -30,6 +30,7 @@ import {
 import { ActorRef, EventObject } from 'xstate';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
+import { hideAiFixStatusBarItem } from './cipe-notifications';
 
 export interface NxCloudFixDetails {
   cipe: CIPEInfo;
@@ -384,6 +385,7 @@ export class NxCloudFixWebview {
           if (success) {
             window.showInformationMessage('Nx Cloud fix applied successfully');
             commands.executeCommand('nxCloud.refresh');
+            hideAiFixStatusBarItem();
           }
         },
       ),
@@ -438,6 +440,7 @@ export class NxCloudFixWebview {
               data.runGroup.aiFix.aiFixId,
               'APPLIED_LOCALLY',
             );
+            hideAiFixStatusBarItem();
           } catch (error) {
             outputLogger.log(
               `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message}`,
@@ -467,6 +470,7 @@ export class NxCloudFixWebview {
           if (success) {
             window.showInformationMessage('Nx Cloud fix ignored');
             commands.executeCommand('nxCloud.refresh');
+            hideAiFixStatusBarItem();
           }
         },
       ),
@@ -526,6 +530,7 @@ export class NxCloudFixWebview {
             runGroup: runGroup,
             terminalOutput,
           });
+          hideAiFixStatusBarItem();
         },
       ),
     );

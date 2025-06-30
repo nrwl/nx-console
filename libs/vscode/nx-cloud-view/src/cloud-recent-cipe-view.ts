@@ -24,6 +24,7 @@ import {
   ThemeColor,
   ThemeIcon,
   TreeItemCollapsibleState,
+  TreeView,
   Uri,
   window,
   workspace,
@@ -367,6 +368,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
   private workspaceUrl: string | undefined;
 
   private cipeElements?: CIPETreeItem[];
+  private static treeView: TreeView<BaseRecentCIPETreeItem> | undefined;
 
   constructor(
     actor: ActorRef<any, EventObject>,
@@ -384,6 +386,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       ) {
         this.recentCIPEInfo = updatedCIPEs;
         this.refresh();
+        CloudRecentCIPEProvider.updateTreeViewBadge(updatedCIPEs);
       }
     });
   }
@@ -415,6 +418,38 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     return undefined;
   }
 
+  static updateTreeViewBadge(cipeData: CIPEInfo[] | null) {
+    if (!CloudRecentCIPEProvider.treeView) {
+      return;
+    }
+
+    // Count AI fixes that haven't been acted upon
+    let aiFixCount = 0;
+    if (cipeData) {
+      for (const cipe of cipeData) {
+        for (const runGroup of cipe.runGroups || []) {
+          if (
+            runGroup.aiFix?.suggestedFix &&
+            runGroup.aiFix.userAction === 'NONE'
+          ) {
+            aiFixCount++;
+          }
+        }
+      }
+    }
+
+    CloudRecentCIPEProvider.treeView.badge =
+      aiFixCount > 0
+        ? {
+            value: aiFixCount,
+            tooltip:
+              aiFixCount === 1
+                ? '1 AI fix available'
+                : `${aiFixCount} AI fixes available`,
+          }
+        : undefined;
+  }
+
   static create(
     extensionContext: ExtensionContext,
     actor: ActorRef<any, EventObject>,
@@ -425,11 +460,17 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       fileDecorationProvider,
     );
 
+    // Store tree view reference for badge updates
+    CloudRecentCIPEProvider.treeView = window.createTreeView(
+      'nxCloudRecentCIPE',
+      {
+        treeDataProvider: recentCIPEProvider,
+      },
+    );
+
     extensionContext.subscriptions.push(
       window.registerFileDecorationProvider(fileDecorationProvider),
-      window.createTreeView('nxCloudRecentCIPE', {
-        treeDataProvider: recentCIPEProvider,
-      }),
+      CloudRecentCIPEProvider.treeView,
       commands.registerCommand(
         'nxCloud.showCIPEInApp',
         async (treeItem: BaseRecentCIPETreeItem) => {
