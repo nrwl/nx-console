@@ -1,6 +1,6 @@
 import { formatError } from '@nx-console/shared-utils';
 
-import { clearJsonCache, fileExists } from '@nx-console/shared-file-system';
+import { fileExists } from '@nx-console/shared-file-system';
 import { Logger } from '@nx-console/shared-utils';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { join } from 'path';
@@ -28,9 +28,6 @@ let status: Status = Status.not_started;
 function resetStatus(workspacePath: string) {
   status = Status.not_started;
   cachedReplay = new ReplaySubject<NxWorkspace>();
-  // Clear out the workspace config path, needed for older nx workspaces
-  clearJsonCache('workspace.json', workspacePath);
-  clearJsonCache('nx.json', workspacePath);
 }
 
 export async function nxWorkspace(

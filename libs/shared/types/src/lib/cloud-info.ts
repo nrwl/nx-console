@@ -1,6 +1,5 @@
 export type CloudOnboardingInfo = {
   hasNxInCI: boolean;
-  hasAffectedCommandsInCI: boolean;
   isConnectedToCloud: boolean;
   isWorkspaceClaimed: boolean;
   personalAccessToken: string | undefined;
@@ -34,7 +33,7 @@ export type NxAiFix = {
   terminalLogsUrls: Record<string, string>;
   suggestedFix?: string;
   suggestedFixDescription?: string;
-  validationStatus: AITaskFixValidationStatus;
+  verificationStatus: AITaskFixVerificationStatus;
   userAction: AITaskFixUserAction;
 };
 
@@ -48,7 +47,7 @@ export type CIPERunGroup = {
   aiFix?: NxAiFix;
 };
 
-export type AITaskFixValidationStatus =
+export type AITaskFixVerificationStatus =
   | 'NOT_STARTED'
   | 'IN_PROGRESS'
   | 'COMPLETED'

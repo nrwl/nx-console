@@ -1,4 +1,4 @@
-import { readAndCacheJsonFile } from '@nx-console/shared-file-system';
+import { readJsonFile } from '@nx-console/shared-file-system';
 import { Option } from '@nx-console/shared-schema';
 import { normalizeSchema } from '@nx-console/shared-schema';
 import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
@@ -10,7 +10,7 @@ export async function getGeneratorOptions(
   generatorName: string,
   generatorPath: string,
 ): Promise<Option[]> {
-  const generatorSchema = await readAndCacheJsonFile(
+  const generatorSchema = await readJsonFile(
     generatorPath,
     undefined,
     lspLogger,

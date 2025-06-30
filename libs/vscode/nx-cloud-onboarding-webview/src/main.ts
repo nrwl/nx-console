@@ -21,11 +21,11 @@ export class Root extends LitElement {
       <div style="font-size: var(--vscode-font-size)">
         ${completed.map(
           (text) =>
-            html`<list-entry .text=${text} .completed=${true}></list-entry>`
+            html`<list-entry .text=${text} .completed=${true}></list-entry>`,
         )}
         ${notCompleted.map(
           (text) =>
-            html`<list-entry .text=${text} .completed=${false}></list-entry>`
+            html`<list-entry .text=${text} .completed=${false}></list-entry>`,
         )}
       </div>
 
@@ -51,13 +51,8 @@ export class Root extends LitElement {
     const notCompleted: string[] = [];
 
     (this.cloudOnboardingInfo?.hasNxInCI ? completed : notCompleted).push(
-      'Use Nx in your CI configuration'
+      'Use Nx in your CI configuration',
     );
-
-    (this.cloudOnboardingInfo?.hasAffectedCommandsInCI
-      ? completed
-      : notCompleted
-    ).push('Use affected commands in your CI configuration');
 
     (this.cloudOnboardingInfo?.isConnectedToCloud
       ? completed
@@ -88,8 +83,6 @@ export class Root extends LitElement {
       return 'Finish Nx Cloud Setup';
     } else if (!this.cloudOnboardingInfo.hasNxInCI) {
       return 'Generate CI configuration';
-    } else if (!this.cloudOnboardingInfo.hasAffectedCommandsInCI) {
-      return 'Learn about affected commands';
     } else {
       return 'Open Nx Cloud App';
     }
@@ -119,14 +112,6 @@ export class Root extends LitElement {
           >Learn more about Nx Cloud</vscode-link
         >
       </p>`;
-    } else if (!this.cloudOnboardingInfo.hasAffectedCommandsInCI) {
-      return html`<p>
-        Affected commands are a powerful feature of Nx and allow you to skip any
-        unnecessary computation in your CI pipeline.
-        <vscode-link href="https://nx.dev/ci/intro/why-nx-cloud"
-          >Learn more about Nx Cloud</vscode-link
-        >
-      </p>`;
     } else {
       return html``;
     }
@@ -141,8 +126,6 @@ export class Root extends LitElement {
       });
     } else if (!this.cloudOnboardingInfo.hasNxInCI) {
       this.vscodeApi.postMessage({ type: 'generate-ci' });
-    } else if (!this.cloudOnboardingInfo.hasAffectedCommandsInCI) {
-      this.vscodeApi.postMessage({ type: 'show-affected-docs' });
     } else {
       this.vscodeApi.postMessage({ type: 'open-cloud-app' });
     }

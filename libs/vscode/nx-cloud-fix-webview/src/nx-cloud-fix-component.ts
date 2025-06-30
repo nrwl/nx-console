@@ -975,14 +975,18 @@ export class NxCloudFixComponent extends LitElement {
 
   private getStatusSection(aiFix: NxAiFix): TemplateResult {
     const hasAiFix = !!aiFix.suggestedFix;
+    // TODO: Remove this once all environments have been migrated after deployment
+    // Fall back to original validationStatus field for backwards compatibility
+    const verificationStatus =
+      aiFix.verificationStatus || (aiFix as any).validationStatus;
 
-    if (!hasAiFix && aiFix.validationStatus === 'NOT_STARTED') {
+    if (!hasAiFix && verificationStatus === 'NOT_STARTED') {
       // Show creating fix state
       return this.getCreatingFixSection();
     }
 
     // if the fix creation failed, show the proper error state
-    if (!hasAiFix && aiFix.validationStatus === 'FAILED') {
+    if (!hasAiFix && verificationStatus === 'FAILED') {
       return html`
         <div class="creating-fix-section">
           <div class="creating-fix-icon">
@@ -1002,7 +1006,7 @@ export class NxCloudFixComponent extends LitElement {
     }
 
     // Fix exists, show verification status
-    switch (aiFix.validationStatus) {
+    switch (verificationStatus) {
       case 'IN_PROGRESS':
         return html`
           <div class="creating-fix-section">

@@ -87,14 +87,17 @@ export class NxCloudFixTreeItem
       } else {
         // If userAction is NONE, proceed with normal validation status logic
         const hasFix = !!aiFix.suggestedFix;
-        const validationStatus = aiFix.validationStatus;
+        // TODO: Remove this once all environments have been migrated after deployment
+        // Fall back to original validationStatus field for backwards compatibility
+        const verificationStatus =
+          aiFix.verificationStatus || (aiFix as any).validationStatus;
 
         if (hasFix) {
-          // Fix has been created - show different states based on validation
+          // Fix has been created - show different states based on verification status
           this.contextValue += '-hasFix';
-          switch (validationStatus) {
+          switch (verificationStatus) {
             case 'NOT_STARTED':
-              this.contextValue += '-notValidated';
+              this.contextValue += '-notVerified';
               this.label = 'Nx Cloud AI fix ready to verify';
               this.iconPath = new ThemeIcon(
                 'wrench',
@@ -102,7 +105,7 @@ export class NxCloudFixTreeItem
               );
               break;
             case 'IN_PROGRESS':
-              this.contextValue += '-validating';
+              this.contextValue += '-verifying';
               this.label = 'Nx Cloud is verifying the AI fix';
               this.iconPath = new ThemeIcon(
                 'loading~spin',
@@ -110,7 +113,7 @@ export class NxCloudFixTreeItem
               );
               break;
             case 'COMPLETED':
-              this.contextValue += '-validated';
+              this.contextValue += '-verified';
               this.label = 'Nx Cloud AI verified a fix';
               this.iconPath = new ThemeIcon(
                 'wrench',
@@ -118,7 +121,7 @@ export class NxCloudFixTreeItem
               );
               break;
             case 'FAILED':
-              this.contextValue += '-validationFailed';
+              this.contextValue += '-verificationFailed';
               this.label = 'Failed Nx Cloud AI fix verification';
               this.iconPath = new ThemeIcon(
                 'warning',
@@ -128,7 +131,7 @@ export class NxCloudFixTreeItem
           }
         } else {
           // No fix yet - we're still creating it
-          switch (validationStatus) {
+          switch (verificationStatus) {
             case 'NOT_STARTED':
             case 'IN_PROGRESS':
               this.contextValue += '-creatingFix';

@@ -6,7 +6,7 @@ let run = false;
 export async function initNxConversion(
   context: ExtensionContext,
   isAngularWorkspace: boolean,
-  isNxWorkspace: boolean
+  isNxWorkspace: boolean,
 ) {
   let workspaceType: 'nx' | 'angular' | 'angularWithNx' = 'nx';
   if (isNxWorkspace && isAngularWorkspace) {
@@ -33,7 +33,7 @@ export async function initNxConversion(
     'nxConsole.migrateAngularCliToNx',
     () => {
       commands.executeCommand('nx.init', true);
-    }
+    },
   );
   context.subscriptions.push(command);
 
@@ -43,9 +43,9 @@ export async function initNxConversion(
 
   WorkspaceConfigurationStore.instance.set('nxConversionDate', now.getTime());
   const answer = await window.showInformationMessage(
-    "It's time to migrate! \n To keep using Nx Console's powerful capabilities, please transition your Angular workspace to Nx. ",
+    `Want to migrate? Migrate your Angular workspace to Nx and get features like remote caching, distributed builds, and atomized tests out of the box.`,
     'Migrate Now',
-    'Learn More'
+    'Learn More',
   );
   if (answer === 'Migrate Now') {
     commands.executeCommand('nxConsole.migrateAngularCliToNx');
@@ -54,7 +54,7 @@ export async function initNxConversion(
   if (answer === 'Learn More') {
     commands.executeCommand(
       'vscode.open',
-      'https://nx.dev/recipes/adopting-nx/migration-angular'
+      'https://nx.dev/technologies/angular/migration/angular#migrating-an-angular-cli-project-to-nx?utm_source=nx-console',
     );
     return;
   }

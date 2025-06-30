@@ -15,10 +15,15 @@ export async function runSingleMigration(
       title: `Running ${migration.name}`,
     },
     async () => {
-      commands.executeCommand('nxMigrate.refreshWebview');
-
       const migrateUiApi = await importMigrateUIApi(workspacePath);
-      migrateUiApi.runSingleMigration(workspacePath, migration, configuration);
+      await migrateUiApi.runSingleMigration(
+        workspacePath,
+        migration,
+        configuration,
+      );
+
+      // Refresh after migration completes and writes to migrations.json
+      commands.executeCommand('nxMigrate.refreshWebview');
     },
   );
 }

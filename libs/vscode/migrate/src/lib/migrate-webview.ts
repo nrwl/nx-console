@@ -16,6 +16,7 @@ import {
 import {
   cancelMigration,
   skipMigration,
+  stopMigration,
   undoMigration,
   viewDocumentation,
   viewImplementation,
@@ -100,6 +101,9 @@ export class MigrateWebview {
           break;
         case 'view-documentation':
           viewDocumentation(message.payload.migration);
+          break;
+        case 'stop-migration':
+          stopMigration(message.payload.migration);
           break;
       }
     });
