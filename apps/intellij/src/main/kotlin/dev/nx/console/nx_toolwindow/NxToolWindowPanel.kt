@@ -212,7 +212,7 @@ class NxToolWindowPanel(private val project: Project) :
             val workspace = nxlsService.workspace()
 
             withContext(Dispatchers.EDT) {
-                val hasProjects = workspace == null || workspace.projectGraph?.nodes.isNullOrEmpty()
+                val hasProjects = workspace != null && !(workspace.projectGraph?.nodes.isNullOrEmpty())
                 val hasNodeInterpreter =
                     try {
                         project.nodeInterpreter
@@ -233,7 +233,7 @@ class NxToolWindowPanel(private val project: Project) :
                     scope.launch { eventChannel.send(MainContentEvents.ShowErrors(errorCount)) }
                 } else if (workspace == null) {
                     scope.launch { eventChannel.send(MainContentEvents.ShowNoNxWorkspace()) }
-                } else if (workspace.projectGraph.nodes.isEmpty()) {
+                } else if (!hasProjects) {
                     scope.launch { eventChannel.send(MainContentEvents.ShowNoProject()) }
                 } else {
                     scope.launch { eventChannel.send(MainContentEvents.ShowProjectTree(workspace)) }
