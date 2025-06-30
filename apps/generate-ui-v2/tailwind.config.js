@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['apps/generate-ui-v2/src/**/*.{html,js,ts}'],
+  content: [
+    'apps/generate-ui-v2/src/**/*.{html,js,ts}',
+    'libs/shared/ui-components/src/**/*.{html,js,ts}',
+  ],
   theme: {
     extend: {
       colors: {
