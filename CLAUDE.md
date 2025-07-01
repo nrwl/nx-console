@@ -2,6 +2,7 @@
 
 - Always verify changes by running tasks through nx (e.g. `yarn nx run ...`) instead of running the tools directly
 - Use the `nx_workspace` MCP tool to learn about the workspace if applicable. Default to using other nx MCP tools for answering questions and learning about anything in this workspace or the nx docs when answering questions and solving problems
+- always run nx tasks with NX_TUI=false so that you can read the outputs more easily
 
 ## Code style & development
 
