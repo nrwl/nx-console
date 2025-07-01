@@ -17,6 +17,7 @@ import {
 import {
   checkIsNxWorkspace,
   findMatchingProject,
+  findMatchingProjects,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
@@ -235,11 +236,19 @@ export class NxMcpServerWrapper {
       NX_WORKSPACE,
       'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
       {
+        filter: z
+          .string()
+          .optional()
+          .describe(
+            'Optional filter to select specific projects. Supports patterns like: project names (app1,app2), glob patterns (*-app), tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). Multiple patterns can be combined with commas.',
+          ),
+      },
+      {
         destructiveHint: false,
         readOnlyHint: true,
         openWorldHint: false,
       },
-      async () => {
+      async ({ filter }) => {
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_WORKSPACE,
         });
@@ -281,14 +290,42 @@ export class NxMcpServerWrapper {
               text: getNxJsonPrompt(workspace.nxJson),
             });
           }
+
+          let projectGraph = workspace.projectGraph;
+
+          // Apply filter if provided
+          if (filter && projectGraph) {
+            const filterPatterns = filter.split(',').map((p) => p.trim());
+            const matchingProjectNames = await findMatchingProjects(
+              filterPatterns,
+              projectGraph.nodes,
+              this._nxWorkspacePath,
+            );
+
+            // Create a filtered project graph
+            const filteredNodes: typeof projectGraph.nodes = {};
+            const filteredDeps: typeof projectGraph.dependencies = {};
+
+            for (const projectName of matchingProjectNames) {
+              filteredNodes[projectName] = projectGraph.nodes[projectName];
+              filteredDeps[projectName] =
+                projectGraph.dependencies[projectName] || [];
+            }
+
+            projectGraph = {
+              ...projectGraph,
+              nodes: filteredNodes,
+              dependencies: filteredDeps,
+            };
+          }
+
           const hasProjects =
-            workspace.projectGraph &&
-            Object.keys(workspace.projectGraph.nodes).length > 0;
+            projectGraph && Object.keys(projectGraph.nodes).length > 0;
 
           if (hasProjects) {
             content.push({
               type: 'text',
-              text: getProjectGraphPrompt(workspace.projectGraph),
+              text: getProjectGraphPrompt(projectGraph),
             });
           }
           if (workspace.errors) {
