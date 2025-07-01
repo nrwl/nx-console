@@ -1,9 +1,9 @@
 {
-  "name": "@nx-console/vscode-nx-cloud-fix-webview",
+  "name": "@nx-console/shared-cloud-fix-webview",
   "version": "0.0.1",
   "private": true,
   "nx": {
-    "sourceRoot": "libs/vscode/nx-cloud-fix-webview/src",
+    "sourceRoot": "libs/shared/cloud-fix-webview/src",
     "projectType": "library",
     "targets": {
       "build": {
@@ -15,9 +15,9 @@
           "default"
         ],
         "options": {
-          "outputPath": "dist/libs/vscode/nx-cloud-fix-webview",
-          "main": "libs/vscode/nx-cloud-fix-webview/src/main.ts",
-          "tsConfig": "libs/vscode/nx-cloud-fix-webview/tsconfig.webview.json",
+          "outputPath": "dist/libs/shared/cloud-fix-webview",
+          "main": "libs/shared/cloud-fix-webview/src/main.ts",
+          "tsConfig": "libs/shared/cloud-fix-webview/tsconfig.webview.json",
           "format": [
             "esm"
           ],
@@ -30,7 +30,7 @@
         "executor": "@nx/storybook:storybook",
         "continuous": true,
         "options": {
-          "configDir": "libs/vscode/nx-cloud-fix-webview/.storybook"
+          "configDir": "libs/shared/cloud-fix-webview/.storybook"
         }
       },
       "build-storybook": {
@@ -39,11 +39,11 @@
           "{options.outputDir}"
         ],
         "options": {
-          "configDir": "libs/vscode/nx-cloud-fix-webview/.storybook",
+          "configDir": "libs/shared/cloud-fix-webview/.storybook",
           "outputDir": "dist/storybook/vscode-nx-cloud-fix-webview"
         }
       }
     },
-    "name": "vscode-nx-cloud-fix-webview"
+    "name": "shared-cloud-fix-webview"
   }
 }
