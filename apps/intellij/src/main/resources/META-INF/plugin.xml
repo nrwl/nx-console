@@ -49,6 +49,9 @@
     <!-- Generate -->
     <fileEditorProvider implementation="dev.nx.console.generate.ui.file.NxGenerateUiFileEditorProvider"/>
 
+    <!-- Cloud Fix UI -->
+    <fileEditorProvider implementation="dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileEditorProvider"/>
+
     <!-- Graph -->
     <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
     <fileEditorProvider implementation="dev.nx.console.project_details.ProjectDetailsFileEditorProvider"/>
