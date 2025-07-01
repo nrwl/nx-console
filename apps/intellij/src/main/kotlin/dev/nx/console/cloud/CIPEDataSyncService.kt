@@ -63,6 +63,14 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
         newInfo.forEach { newCIPE ->
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
 
+            // Check if any runGroup has an AI fix (to skip failure notifications)
+            val hasAiFix = newCIPE.runGroups.any { it.aiFix != null }
+
+            // Check for newly available AI fixes and show proactive notifications
+            if (oldCIPE != null) {
+                checkForNewAiFixNotifications(oldCIPE, newCIPE)
+            }
+
             // Following VSCode logic: if the CIPE has completed or had a failed run before,
             // we've already shown a notification and should return
             if (
@@ -74,13 +82,13 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
 
             // Check what type of notification to emit
             when {
-                // CIPE just failed
-                newCIPE.status.isFailedStatus() -> {
+                // CIPE just failed - skip if AI fix available
+                newCIPE.status.isFailedStatus() && !hasAiFix -> {
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
 
-                // Run failed while CIPE is in progress
-                hasAnyFailedRun(newCIPE) -> {
+                // Run failed while CIPE is in progress - skip if AI fix available
+                hasAnyFailedRun(newCIPE) && !hasAiFix -> {
                     // Find the first failed run for the notification
                     val failedRun =
                         newCIPE.runGroups.flatMap { it.runs }.firstOrNull { isRunFailed(it) }
@@ -93,6 +101,22 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
                 // CIPE succeeded (only notify if settings allow)
                 newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
                     emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
+                }
+            }
+        }
+    }
+
+    /** Check for newly available AI fixes following VSCode logic */
+    private fun checkForNewAiFixNotifications(oldCIPE: CIPEInfo, newCIPE: CIPEInfo) {
+        val newCIPERunGroups = newCIPE.runGroups
+        val oldCIPERunGroups = oldCIPE.runGroups
+
+        newCIPERunGroups.forEach { newRunGroup ->
+            if (newRunGroup.aiFix?.suggestedFix != null) {
+                val oldRunGroup = oldCIPERunGroups.find { it.runGroup == newRunGroup.runGroup }
+                if (oldRunGroup?.aiFix?.suggestedFix == null) {
+                    // AI fix newly available - emit proactive notification
+                    emitNotification(CIPENotificationEvent.AiFixAvailable(newCIPE, newRunGroup))
                 }
             }
         }
@@ -127,6 +151,8 @@ sealed class CIPENotificationEvent {
     data class CIPEFailed(val cipe: CIPEInfo) : CIPENotificationEvent()
     data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
     data class CIPESucceeded(val cipe: CIPEInfo) : CIPENotificationEvent()
+    data class AiFixAvailable(val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
+        CIPENotificationEvent()
 }
 
 /** Interface for listening to notification events */
