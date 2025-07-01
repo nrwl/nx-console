@@ -1,5 +1,7 @@
 package dev.nx.console.models
 
+import kotlinx.serialization.*
+
 data class CIPEInfo(
     val ciPipelineExecutionId: String,
     val branch: String,
@@ -20,7 +22,8 @@ data class CIPERunGroup(
     val createdAt: Long,
     val completedAt: Long?,
     val status: CIPEExecutionStatus,
-    val runs: List<CIPERun>
+    val runs: List<CIPERun>,
+    val aiFix: NxAiFix? = null
 )
 
 data class CIPERun(
@@ -56,3 +59,30 @@ data class CIPEDataResponse(
     val error: CIPEInfoError? = null,
     val workspaceUrl: String? = null
 )
+
+@Serializable
+data class NxAiFix(
+    val aiFixId: String,
+    val taskIds: List<String>,
+    val terminalLogsUrls: Map<String, String>,
+    val suggestedFix: String? = null,
+    val suggestedFixDescription: String? = null,
+    val verificationStatus: AITaskFixVerificationStatus,
+    val userAction: AITaskFixUserAction
+)
+
+@Serializable
+enum class AITaskFixVerificationStatus {
+    NOT_STARTED,
+    IN_PROGRESS,
+    COMPLETED,
+    FAILED
+}
+
+@Serializable
+enum class AITaskFixUserAction {
+    NONE,
+    APPLIED,
+    REJECTED,
+    APPLIED_LOCALLY
+}
