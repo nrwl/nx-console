@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.AITaskFixVerificationStatus
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfoErrorType
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Service responsible for polling CIPE data at dynamic intervals. Implements the same polling logic
  * as VSCode:
+ * - AI_FIX (3s): When AI fixes are being created/verified (highest priority)
  * - HOT (10s): When CIPEs are in progress
  * - COLD (180s): Normal polling
  * - SLEEP (3600s): When authentication errors occur
@@ -28,6 +30,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
         private const val SLEEP_POLLING_TIME_MS = 3_600_000L // 1 hour
         private const val COLD_POLLING_TIME_MS = 180_000L // 3 minutes
         private const val HOT_POLLING_TIME_MS = 10_000L // 10 seconds
+        private const val AI_FIX_POLLING_TIME_MS = 3_000L // 3 seconds
 
         fun getInstance(project: Project): CIPEPollingService =
             project.getService(CIPEPollingService::class.java)
@@ -120,6 +123,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     /**
      * Update polling interval based on CIPE data state Following the same logic as VSCode:
      * - SLEEP if authentication error
+     * - AI_FIX if any AI fixes are being created/verified (takes precedence)
      * - HOT if any CIPE is in progress
      * - COLD otherwise
      */
@@ -131,14 +135,30 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                     logger.debug("Authentication error detected, switching to SLEEP polling")
                     SLEEP_POLLING_TIME_MS
                 }
+
+                // AI fixes in progress - ultra-fast polling
+                data.info?.any { cipe ->
+                    cipe.runGroups.any { rg ->
+                        rg.aiFix?.let { aiFix ->
+                            aiFix.verificationStatus == AITaskFixVerificationStatus.NOT_STARTED ||
+                                aiFix.verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS
+                        }
+                            ?: false
+                    }
+                } == true -> {
+                    logger.debug("AI fixes in progress detected, switching to AI_FIX polling")
+                    AI_FIX_POLLING_TIME_MS
+                }
+
                 // Any CIPE in progress - speed up polling
                 data.info?.any { it.status == CIPEExecutionStatus.IN_PROGRESS } == true -> {
                     logger.debug("Active CIPEs detected, switching to HOT polling")
                     HOT_POLLING_TIME_MS
                 }
+
                 // Normal state
                 else -> {
-                    logger.debug("No active CIPEs, switching to COLD polling")
+                    logger.debug("No active CIPEs or AI fixes, switching to COLD polling")
                     COLD_POLLING_TIME_MS
                 }
             }
