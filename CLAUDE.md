@@ -10,3 +10,4 @@
   - Keep only complex logic explanations - hard-to-understand algorithms or business rules
 - Follow existing patterns exactly - Some things to build in one editor integration might already exist in the other. Always check similar implementations in the codebase and match their structure/naming.
 - before creating a commit, run `yarn nx format --fix` and if kotlin files were touched, `yarn nx ktfmtFormat intellij` to make sure formatting is applied
+- when working from a plan and creating a set of commits, always pause after you have implemented one section or one commit worth of code. Ask me for feedback and wait for me to confirm your code is right. I will commit the code myself and prompt you to continue
