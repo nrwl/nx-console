@@ -4,10 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/ui-components"
+      "path": "../types"
     },
     {
-      "path": "../../shared/types"
+      "path": "../ui-components"
     },
     {
       "path": "./tsconfig.webview.json"

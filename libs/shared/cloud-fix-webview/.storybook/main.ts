@@ -18,7 +18,7 @@ const config: StorybookConfig = {
         postcss: {
           plugins: [
             // require('tailwindcss')({
-            //   config: './libs/vscode/nx-cloud-fix-webview/tailwind.config.js',
+            //   config: './libs/shared/cloud-fix-webview/tailwind.config.js',
             // }),
           ],
         },

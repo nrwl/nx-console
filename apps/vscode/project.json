@@ -4,14 +4,15 @@
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",
-  "generators": {},
+  "tags": ["type:vscode"],
   "implicitDependencies": [
     "generate-ui-v2",
     "nxls",
     "nx-cloud-onboarding-webview",
     "vscode-migrate-sidebar-webview",
-    "vscode-nx-cloud-fix-webview"
+    "shared-cloud-fix-webview"
   ],
+  "generators": {},
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -156,6 +157,5 @@
         "commitMessage": "chore(release-${PROJECT_NAME}): ${nextRelease.version}"
       }
     }
-  },
-  "tags": ["type:vscode"]
+  }
 }

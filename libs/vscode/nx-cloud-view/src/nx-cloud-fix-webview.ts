@@ -171,11 +171,7 @@ export class NxCloudFixWebview {
 
   private getWebviewHtml(details: NxCloudFixDetails): string {
     const webviewScriptUri = this.webviewPanel?.webview.asWebviewUri(
-      Uri.joinPath(
-        this.context.extensionUri,
-        'nx-cloud-fix-webview',
-        'main.js',
-      ),
+      Uri.joinPath(this.context.extensionUri, 'cloud-fix-webview', 'main.js'),
     );
 
     const codiconsUri = this.webviewPanel?.webview.asWebviewUri(

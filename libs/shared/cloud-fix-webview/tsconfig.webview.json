@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "out-tsc/nx-cloud-fix-webview",
+    "outDir": "out-tsc/cloud-fix-webview",
 
     "emitDeclarationOnly": false,
     "types": ["node"],
