@@ -36,7 +36,6 @@ abstract class NxCloudFixFile(
                 val domainName = "nxcloudfix"
                 CefApp.getInstance()
                     .registerSchemeHandlerFactory("http", domainName, CustomSchemeHandlerFactory())
-                browser.loadURL("http://$domainName/index.html")
             }
         }
 
@@ -63,8 +62,7 @@ abstract class NxCloudFixFile(
 
     abstract fun createMainComponent(project: Project): JComponent
 
-    // Will be implemented in later commits when NxCloudFixDetails is defined
-    // abstract fun showFixDetails(details: NxCloudFixDetails): Unit
+    abstract fun showFixDetails(details: NxCloudFixDetails): Unit
 
     override fun hashCode(): Int = name.hashCode()
 }

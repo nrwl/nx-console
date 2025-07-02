@@ -4,9 +4,13 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
+import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
 import dev.nx.console.mcp.McpServerService
 import dev.nx.console.mcp.hasAIAssistantInstalled
 import dev.nx.console.models.CIPEInfo
@@ -17,6 +21,10 @@ import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Service responsible for showing CIPE notifications. Simply displays notification events emitted
@@ -191,8 +199,11 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         private val runGroupId: String
     ) : NotificationAction("View AI Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-            // Will open AI fix webview (implement in later commit)
             telemetryService.featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS)
+
+            // Open the cloud fix webview
+            openCloudFixWebview(cipeId, runGroupId)
+
             notification.expire()
         }
     }
@@ -202,11 +213,14 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
         private val runGroupId: String
     ) : NotificationAction("Show Suggested Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-            // Will open AI fix webview (implement in later commit)
             telemetryService.featureUsed(
                 TelemetryEvent.CLOUD_SHOW_AI_FIX,
                 mapOf("source" to TelemetryEventSource.NOTIFICATION)
             )
+
+            // Open the cloud fix webview
+            openCloudFixWebview(cipeId, runGroupId)
+
             notification.expire()
         }
     }
@@ -247,6 +261,47 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
             }
 
             notification.expire()
+        }
+    }
+
+    private fun openCloudFixWebview(cipeId: String, runGroupId: String) {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            // Find the fix data from current CIPE data
+            val dataSyncService = CIPEDataSyncService.getInstance(project)
+            val currentData = dataSyncService.currentData.value
+
+            val cipe = currentData?.info?.find { it.ciPipelineExecutionId == cipeId }
+            val runGroup = cipe?.runGroups?.find { it.runGroup == runGroupId }
+
+            if (cipe == null || runGroup == null) {
+                withContext(Dispatchers.EDT) {
+                    NOTIFICATION_GROUP.createNotification(
+                            "AI Fix Not Found",
+                            "Could not find the AI fix data",
+                            NotificationType.ERROR
+                        )
+                        .notify(project)
+                }
+                return@launch
+            }
+
+            val fixDetails =
+                NxCloudFixDetails(
+                    cipe = cipe,
+                    runGroup = runGroup,
+                    terminalOutput = "Sample terminal output for testing"
+                )
+
+            // UI operations must happen on EDT
+            withContext(Dispatchers.EDT) {
+                // Create and open the webview
+                val fixFile = NxCloudFixFileImpl("AI Fix", project)
+                val fileEditorManager = FileEditorManager.getInstance(project)
+                fileEditorManager.openFile(fixFile, true)
+
+                // Show fix details once editor is open
+                fixFile.showFixDetails(fixDetails)
+            }
         }
     }
 }
