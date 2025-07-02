@@ -243,7 +243,7 @@ tasks.register<Copy>("copyGenerateUiV2Artifacts") {
 
 tasks.register<Copy>("copyCloudFixWebviewArtifacts") {
     from("${rootDir}/../../dist/libs/shared/cloud-fix-webview")
-    include("*.js", "*.css")
+    include("*.js", "*.css", "*.html", "assets/**")
     into(layout.buildDirectory.file("resources/main/cloud_fix_webview"))
 }
 

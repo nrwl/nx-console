@@ -2,6 +2,7 @@ package dev.nx.console.models
 
 import kotlinx.serialization.*
 
+@Serializable
 data class CIPEInfo(
     val ciPipelineExecutionId: String,
     val branch: String,
@@ -16,6 +17,7 @@ data class CIPEInfo(
     val runGroups: List<CIPERunGroup>
 )
 
+@Serializable
 data class CIPERunGroup(
     val ciExecutionEnv: String,
     val runGroup: String,
@@ -26,6 +28,7 @@ data class CIPERunGroup(
     val aiFix: NxAiFix? = null
 )
 
+@Serializable
 data class CIPERun(
     val linkId: String? = null,
     val executionId: String? = null,
@@ -45,6 +48,7 @@ enum class CIPEInfoErrorType {
     other
 }
 
+@Serializable
 enum class CIPEExecutionStatus {
     NOT_STARTED,
     IN_PROGRESS,

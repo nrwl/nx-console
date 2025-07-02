@@ -7,6 +7,12 @@
     "projectType": "library",
     "targets": {
       "build": {
+        "command": "node -e \"const fs=require('fs'); const file='dist/libs/shared/cloud-fix-webview/main.js'; fs.writeFileSync(file, fs.readFileSync(file,'utf8').replace(/export\\s*{[^}]*};?\\s*$/gm, ''));\"",
+        "dependsOn": [
+          "_build"
+        ]
+      },
+      "_build": {
         "executor": "@nx/esbuild:esbuild",
         "outputs": [
           "{options.outputPath}"
@@ -21,6 +27,7 @@
           "format": [
             "esm"
           ],
+          "bundle": true,
           "declaration": false,
           "deleteOutputPath": true,
           "thirdParty": true

@@ -1,17 +1,11 @@
-import { html, LitElement, TemplateResult, css } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import type {
-  AITaskFixUserAction,
-  CIPEInfo,
-  CIPERun,
-  CIPERunGroup,
-  NxAiFix,
-} from '@nx-console/shared-types';
 import { ContextProvider } from '@lit-labs/context';
+import type { CIPEInfo, CIPERunGroup, NxAiFix } from '@nx-console/shared-types';
 import {
   editorContext,
   getVscodeStyleMappings,
 } from '@nx-console/shared-ui-components';
+import { css, html, LitElement, TemplateResult } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import './terminal-component';
 
 export type NxCloudFixData = {
