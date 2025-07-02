@@ -144,4 +144,9 @@ interface NxService {
     fun cloudAuthHeaders(): CompletableFuture<NxCloudAuthHeaders> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun downloadAndExtractArtifact(request: NxDownloadAndExtractArtifactRequest): CompletableFuture<NxDownloadAndExtractArtifactResponse> {
+        throw UnsupportedOperationException()
+    }
 }

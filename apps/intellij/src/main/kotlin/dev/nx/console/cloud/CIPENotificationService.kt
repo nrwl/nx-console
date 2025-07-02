@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
@@ -44,6 +45,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             project.getService(CIPENotificationService::class.java)
     }
 
+    private val logger = thisLogger()
     private val telemetryService = TelemetryService.getInstance(project)
 
     override fun onNotificationEvent(event: CIPENotificationEvent) {
@@ -285,11 +287,35 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
                 return@launch
             }
 
+            // Fetch terminal output
+            var terminalOutput: String? = null
+            val aiFix = runGroup.aiFix
+            if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
+                val failedTaskId = aiFix.taskIds.first()
+                val terminalOutputUrl = aiFix.terminalLogsUrls[failedTaskId]
+                
+                if (terminalOutputUrl != null) {
+                    try {
+                        val response = NxlsService.getInstance(project).downloadAndExtractArtifact(terminalOutputUrl)
+                        
+                        if (response?.error != null) {
+                            logger.warn("Failed to download terminal output: ${response.error}")
+                            terminalOutput = "Failed to retrieve terminal output. Please check the Nx Console output for more details."
+                        } else {
+                            terminalOutput = response?.content
+                        }
+                    } catch (e: Exception) {
+                        logger.error("Failed to download terminal output for task $failedTaskId", e)
+                        terminalOutput = "Failed to retrieve terminal output. Please check the Nx Console output for more details."
+                    }
+                }
+            }
+
             val fixDetails =
                 NxCloudFixDetails(
                     cipe = cipe,
                     runGroup = runGroup,
-                    terminalOutput = "Sample terminal output for testing"
+                    terminalOutput = terminalOutput
                 )
 
             // UI operations must happen on EDT
