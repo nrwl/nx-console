@@ -1,6 +1,8 @@
 package dev.nx.console.cloud.cloud_fix_ui
 
 import com.intellij.icons.AllIcons
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
@@ -14,6 +16,8 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.cloud.CIPEPollingService
+import dev.nx.console.cloud.NxCloudApiService
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
@@ -27,7 +31,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
@@ -201,20 +204,168 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         cs.launch { browser.executeJavascriptWithCatch(js) }
     }
 
-    // Stub implementations - will be implemented in later commits
     private fun handleApply() {
         logger<NxCloudFixFileImpl>().info("Apply action received")
-        // TODO: Implement in commit 9
+
+        val fixDetails = currentFixDetails ?: return
+        val aiFixId =
+            fixDetails.runGroup.aiFix?.aiFixId
+                ?: run {
+                    showErrorNotification("No AI fix ID found")
+                    return
+                }
+
+        cs.launch {
+            logger<NxCloudFixFileImpl>().info("Starting coroutine to apply fix")
+            try {
+                val cloudApiService = NxCloudApiService.getInstance(project)
+                logger<NxCloudFixFileImpl>()
+                    .info("Got cloud API service, calling updateSuggestedFix")
+                val success = cloudApiService.updateSuggestedFix(aiFixId, "APPLIED")
+
+                if (success) {
+                    showSuccessNotification("Nx Cloud fix applied successfully")
+                    // Refresh CIPE data
+                    CIPEPollingService.getInstance(project).forcePoll()
+                } else {
+
+                    showErrorNotification("Failed to apply AI fix")
+                }
+            } catch (e: Exception) {
+                logger<NxCloudFixFileImpl>().error("Failed to apply AI fix", e)
+                showErrorNotification("Failed to apply AI fix: ${e.message}")
+            }
+        }
     }
 
     private fun handleApplyLocally() {
         logger<NxCloudFixFileImpl>().info("Apply locally action received")
-        // TODO: Implement in commit 9
+        //
+        //        val fixDetails = currentFixDetails ?: return
+        //        val suggestedFix =
+        //            fixDetails.runGroup.aiFix?.suggestedFix
+        //                ?: run {
+        //                    showErrorNotification("No AI fix available to apply locally")
+        //                    return
+        //                }
+        //        val aiFixId =
+        //            fixDetails.runGroup.aiFix?.aiFixId
+        //                ?: run {
+        //                    showErrorNotification("No AI fix ID found")
+        //                    return
+        //                }
+        //
+        //        cs.launch {
+        //            try {
+        //                // Create a temporary patch file
+        //                val tempFile =
+        //                    withContext(Dispatchers.IO) {
+        //                        val temp = Files.createTempFile("nx-cloud-fix-", ".patch")
+        //
+        //                        // Ensure the patch ends with a newline
+        //                        val patchContent =
+        //                            if (suggestedFix.endsWith("\n")) {
+        //                                suggestedFix
+        //                            } else {
+        //                                suggestedFix + "\n"
+        //                            }
+        //
+        //                        Files.write(temp, patchContent.toByteArray(),
+        // StandardOpenOption.WRITE)
+        //                        temp.toFile()
+        //                    }
+        //
+        //                try {
+        //                    // Apply the git patch
+        //                    val projectRoot =
+        //                        project.basePath ?: throw Exception("Project base path not found")
+        //
+        //                    val commandLine =
+        //                        GeneralCommandLine()
+        //                            .withWorkDirectory(projectRoot)
+        //                            .withExePath("git")
+        //                            .withParameters("apply", tempFile.absolutePath)
+        //
+        //                    val exitCode =
+        //                        withContext(Dispatchers.IO) {
+        //                            try {
+        //                                val process = commandLine.createProcess()
+        //                                process.waitFor()
+        //                            } catch (e: Exception) {
+        //                                logger<NxCloudFixFileImpl>().error("Failed to execute git
+        // apply", e)
+        //                                -1
+        //                            }
+        //                        }
+        //
+        //                    if (exitCode == 0) {
+        //                        showSuccessNotification(
+        //                            "Nx Cloud fix applied locally. Please review and modify any
+        // changes before committing."
+        //                        )
+        //
+        //                        // Update the fix status
+        //                        val cloudApiService = NxCloudApiService.getInstance(project)
+        //                        val updateSuccess =
+        //                            cloudApiService.updateSuggestedFix(aiFixId, "APPLIED_LOCALLY")
+        //
+        //                        if (!updateSuccess) {
+        //                            logger<NxCloudFixFileImpl>()
+        //                                .warn("Failed to update fix status in Nx Cloud")
+        //                        }
+        //
+        //                        // Refresh CIPE data
+        //                        CIPEPollingService.getInstance(project).forcePoll()
+        //                    } else {
+        //                        logger<NxCloudFixFileImpl>()
+        //                            .error("Failed to apply patch: git apply exited with code
+        // $exitCode")
+        //                        showErrorNotification(
+        //                            "Failed to apply Nx Cloud fix locally. Please check the IDE
+        // logs for more details."
+        //                        )
+        //                    }
+        //                } finally {
+        //                    // Clean up temp file
+        //                    withContext(Dispatchers.IO) { tempFile.delete() }
+        //                }
+        //            } catch (e: Exception) {
+        //                logger<NxCloudFixFileImpl>().error("Failed to apply Nx Cloud fix locally",
+        // e)
+        //                showErrorNotification("Failed to apply Nx Cloud fix locally:
+        // ${e.message}")
+        //            }
+        //        }
     }
 
     private fun handleReject() {
         logger<NxCloudFixFileImpl>().info("Reject action received")
-        // TODO: Implement in commit 9
+
+        val fixDetails = currentFixDetails ?: return
+        val aiFixId =
+            fixDetails.runGroup.aiFix?.aiFixId
+                ?: run {
+                    showErrorNotification("No AI fix ID found")
+                    return
+                }
+
+        cs.launch {
+            try {
+                val cloudApiService = NxCloudApiService.getInstance(project)
+                val success = cloudApiService.updateSuggestedFix(aiFixId, "REJECTED")
+
+                if (success) {
+                    showSuccessNotification("Nx Cloud fix ignored")
+                    // Refresh CIPE data
+                    CIPEPollingService.getInstance(project).forcePoll()
+                } else {
+                    showErrorNotification("Failed to reject AI fix")
+                }
+            } catch (e: Exception) {
+                logger<NxCloudFixFileImpl>().error("Failed to reject AI fix", e)
+                showErrorNotification("Failed to reject AI fix: ${e.message}")
+            }
+        }
     }
 
     private fun handleShowDiff() {
@@ -247,18 +398,24 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     }
 
     private fun createToolbar(): JComponent {
-        val toggleDiffAction = object : AnAction("Toggle Diff", "Toggle diff preview", AllIcons.Actions.Diff), DumbAware {
-            override fun actionPerformed(e: AnActionEvent) {
-                togglePreview()
-            }
+        val toggleDiffAction =
+            object :
+                AnAction("Toggle Diff", "Toggle diff preview", AllIcons.Actions.Diff), DumbAware {
+                override fun actionPerformed(e: AnActionEvent) {
+                    togglePreview()
+                }
 
-            override fun update(e: AnActionEvent) {
-                e.presentation.icon = if (isShowingPreview) AllIcons.Actions.PreviewDetails else AllIcons.Actions.Diff
+                override fun update(e: AnActionEvent) {
+                    e.presentation.icon =
+                        if (isShowingPreview) AllIcons.Actions.PreviewDetails
+                        else AllIcons.Actions.Diff
+                }
             }
-        }
 
         val actionGroup = DefaultActionGroup(toggleDiffAction)
-        val toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, actionGroup, true)
+        val toolbar =
+            ActionManager.getInstance()
+                .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, actionGroup, true)
         toolbar.targetComponent = mainPanel
         return toolbar.component
     }
@@ -292,6 +449,20 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun handleWebviewReady() {
         logger<NxCloudFixFileImpl>().info("Webview ready")
         // Not needed anymore since we set initial data via HTML
+    }
+
+    private fun showSuccessNotification(message: String) {
+        NotificationGroupManager.getInstance()
+            .getNotificationGroup("Nx Cloud CIPE")
+            .createNotification("", message, NotificationType.INFORMATION)
+            .notify(project)
+    }
+
+    private fun showErrorNotification(message: String) {
+        NotificationGroupManager.getInstance()
+            .getNotificationGroup("Nx Cloud CIPE")
+            .createNotification("", message, NotificationType.ERROR)
+            .notify(project)
     }
 }
 

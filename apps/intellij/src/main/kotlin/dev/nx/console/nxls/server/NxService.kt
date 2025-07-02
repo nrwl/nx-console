@@ -139,4 +139,9 @@ interface NxService {
     fun recentCIPEData(): CompletableFuture<CIPEDataResponse> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun cloudAuthHeaders(): CompletableFuture<NxCloudAuthHeaders> {
+        throw UnsupportedOperationException()
+    }
 }

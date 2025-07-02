@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import dev.nx.console.cloud.CIPEDataSyncService
 import dev.nx.console.cloud.CIPEMonitoringService
-import dev.nx.console.cloud.CIPENotificationService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.mcp.McpServerService
 import dev.nx.console.nxls.NxlsService
@@ -72,13 +71,12 @@ internal class ProjectPostStartup : ProjectActivity {
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.EXTENSION_ACTIVATE, mapOf("timing" to 0))
 
-        // Trigger sample AI fix notification after 10 seconds for testing
-        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            delay(10000) // 10 seconds
-
-            val dataSyncService = CIPEDataSyncService.getInstance(project)
-
-            dataSyncService.triggerSampleAiFixNotification()
-        }
+        // Check for AI fixes on startup (temporary for debugging)
+//        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+//            delay(10000) // 10 seconds to ensure NXLS is ready
+//
+//            val dataSyncService = CIPEDataSyncService.getInstance(project)
+//            dataSyncService.checkForAiFixesOnStartup()
+//        }
     }
 }
