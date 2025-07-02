@@ -5,6 +5,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.*
+import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -217,6 +218,39 @@ index 1234567..abcdefg 100644
         val newData = CIPEDataResponse(info = listOf(sampleCIPE), error = null)
         _currentData.value = newData
         lastValidInfo = newData.info
+    }
+
+    /** Check for AI fixes on startup and show notifications */
+    suspend fun checkForAiFixesOnStartup() {
+        logger.info("Checking for AI fixes on startup")
+
+        try {
+            // Get recent CIPE data from NXLS
+            val cipeData = NxlsService.getInstance(project).recentCIPEData()
+            if (cipeData == null) {
+                logger.info("No CIPE data available from NXLS")
+                return
+            }
+
+            logger.info("Retrieved CIPE data: ${cipeData.info?.size ?: 0} CIPEs")
+
+            // Update our data
+            updateData(cipeData)
+
+            // Check for any AI fixes and emit notifications
+            cipeData.info?.forEach { cipe ->
+                cipe.runGroups.forEach { runGroup ->
+                    if (runGroup.aiFix?.suggestedFix != null) {
+                        logger.info(
+                            "Found AI fix for CIPE ${cipe.ciPipelineExecutionId}, run group ${runGroup.runGroup}"
+                        )
+                        emitNotification(CIPENotificationEvent.AiFixAvailable(cipe, runGroup))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            logger.error("Failed to check for AI fixes on startup", e)
+        }
     }
 }
 

@@ -8,12 +8,14 @@ import {
 import {
   getNxCloudTerminalOutput,
   getRecentCIPEData,
+  nxCloudAuthHeaders,
 } from '@nx-console/shared-nx-cloud';
 import { getDefinition } from '@nx-console/language-server-capabilities-definition';
 import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
 import { getHover } from '@nx-console/language-server-capabilities-hover';
 import {
   NxChangeWorkspace,
+  NxCloudAuthHeadersRequest,
   NxCloudOnboardingInfoRequest,
   NxCloudStatusRequest,
   NxCloudTerminalOutputRequest,
@@ -569,6 +571,13 @@ connection.onRequest(
     return await parseTargetString(targetString, WORKING_PATH);
   },
 );
+
+connection.onRequest(NxCloudAuthHeadersRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return await nxCloudAuthHeaders(WORKING_PATH);
+});
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {

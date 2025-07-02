@@ -16,12 +16,14 @@ import dev.nx.console.mcp.hasAIAssistantInstalled
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
 import dev.nx.console.models.CIPERunGroup
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +33,7 @@ import kotlinx.coroutines.withContext
  * by CIPEDataSyncService.
  */
 @Service(Service.Level.PROJECT)
-class CIPENotificationService(private val project: Project) : CIPENotificationListener {
+class CIPENotificationService(private val project: Project, private val cs: CoroutineScope) : CIPENotificationListener {
 
     companion object {
         private const val NOTIFICATION_GROUP_ID = "Nx Cloud CIPE"
@@ -266,9 +268,7 @@ class CIPENotificationService(private val project: Project) : CIPENotificationLi
 
     private fun openCloudFixWebview(cipeId: String, runGroupId: String) {
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            // Find the fix data from current CIPE data
-            val dataSyncService = CIPEDataSyncService.getInstance(project)
-            val currentData = dataSyncService.currentData.value
+            val currentData = NxlsService.getInstance(project).recentCIPEData()
 
             val cipe = currentData?.info?.find { it.ciPipelineExecutionId == cipeId }
             val runGroup = cipe?.runGroups?.find { it.runGroup == runGroupId }
