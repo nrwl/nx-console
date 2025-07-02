@@ -33,7 +33,8 @@ export type NxAiFix = {
   terminalLogsUrls: Record<string, string>;
   suggestedFix?: string;
   suggestedFixDescription?: string;
-  verificationStatus: AITaskFixVerificationStatus;
+  suggestedFixStatus: AITaskFixStatus;
+  verificationStatus: AITaskFixStatus;
   userAction: AITaskFixUserAction;
 };
 
@@ -47,7 +48,7 @@ export type CIPERunGroup = {
   aiFix?: NxAiFix;
 };
 
-export type AITaskFixVerificationStatus =
+export type AITaskFixStatus =
   | 'NOT_STARTED'
   | 'IN_PROGRESS'
   | 'COMPLETED'

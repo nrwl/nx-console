@@ -116,7 +116,7 @@ export class NxCloudFixTreeItem
               this.contextValue += '-verified';
               this.label = 'Nx Cloud AI verified a fix';
               this.iconPath = new ThemeIcon(
-                'wrench',
+                'verified',
                 new ThemeColor('charts.green'),
               );
               break;
@@ -130,27 +130,58 @@ export class NxCloudFixTreeItem
               break;
           }
         } else {
-          // No fix yet - we're still creating it
-          switch (verificationStatus) {
-            case 'NOT_STARTED':
-            case 'IN_PROGRESS':
-              this.contextValue += '-creatingFix';
-              this.label = 'Nx Cloud AI is creating a fix';
-              this.iconPath = new ThemeIcon(
-                'loading~spin',
-                new ThemeColor('notebookStatusRunningIcon.foreground'),
-              );
-              break;
-            case 'COMPLETED':
-            case 'FAILED':
-              this.contextValue += '-fixFailed';
-              this.label = 'Failed Nx Cloud AI fix creation';
-              this.iconPath = new ThemeIcon(
-                'error',
-                new ThemeColor('notebookStatusErrorIcon.foreground'),
-              );
-              break;
+          if (aiFix.suggestedFixStatus) {
+            switch (aiFix.suggestedFixStatus) {
+              case 'NOT_STARTED':
+                this.contextValue += '-noFixYet';
+                this.label = 'Nx Cloud AI is preparing to create a fix';
+                this.iconPath = new ThemeIcon(
+                  'info',
+                  new ThemeColor('notebookStatusRunningIcon.foreground'),
+                );
+                break;
+              case 'IN_PROGRESS':
+                this.contextValue += '-creatingFix';
+                this.label = 'Nx Cloud AI is creating a fix';
+                this.iconPath = new ThemeIcon(
+                  'loading~spin',
+                  new ThemeColor('notebookStatusRunningIcon.foreground'),
+                );
+                break;
+              case 'COMPLETED':
+              case 'FAILED':
+                this.contextValue += '-fixFailed';
+                this.label = 'Failed Nx Cloud AI fix creation';
+                this.iconPath = new ThemeIcon(
+                  'error',
+                  new ThemeColor('notebookStatusErrorIcon.foreground'),
+                );
+                break;
+            }
+          } else {
+            // TODO: this branch can be eventually removed once all nx Cloud environments are updated
+            switch (verificationStatus) {
+              case 'NOT_STARTED':
+              case 'IN_PROGRESS':
+                this.contextValue += '-creatingFix';
+                this.label = 'Nx Cloud AI is creating a fix';
+                this.iconPath = new ThemeIcon(
+                  'loading~spin',
+                  new ThemeColor('notebookStatusRunningIcon.foreground'),
+                );
+                break;
+              case 'COMPLETED':
+              case 'FAILED':
+                this.contextValue += '-fixFailed';
+                this.label = 'Failed Nx Cloud AI fix creation';
+                this.iconPath = new ThemeIcon(
+                  'error',
+                  new ThemeColor('notebookStatusErrorIcon.foreground'),
+                );
+                break;
+            }
           }
+          // No fix yet - we're still creating it
         }
       }
     }
