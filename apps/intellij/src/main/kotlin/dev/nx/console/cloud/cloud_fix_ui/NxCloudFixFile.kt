@@ -17,7 +17,7 @@ import org.cef.browser.CefBrowser
 import org.cef.handler.CefLifeSpanHandlerAdapter
 
 val json = Json {
-    classDiscriminator = "payloadType"
+    classDiscriminator = "type"
     ignoreUnknownKeys = true
     isLenient = true
 }

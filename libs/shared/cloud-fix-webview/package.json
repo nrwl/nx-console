@@ -7,6 +7,7 @@
     "projectType": "library",
     "targets": {
       "build": {
+        "//": "JCEF can't handle exports somehow so this removes them. Hacky but works for now.",
         "command": "node -e \"const fs=require('fs'); const file='dist/libs/shared/cloud-fix-webview/main.js'; fs.writeFileSync(file, fs.readFileSync(file,'utf8').replace(/export\\s*{[^}]*};?\\s*$/gm, ''));\"",
         "dependsOn": [
           "_build"
