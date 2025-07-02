@@ -20,6 +20,8 @@ val json = Json {
     classDiscriminator = "type"
     ignoreUnknownKeys = true
     isLenient = true
+    coerceInputValues = true // This will use default values for nulls in non-nullable fields
+    encodeDefaults = true // This ensures default values are always encoded
 }
 
 abstract class NxCloudFixFile(

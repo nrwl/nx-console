@@ -76,12 +76,8 @@ internal class ProjectPostStartup : ProjectActivity {
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             delay(10000) // 10 seconds
 
-            // Register the notification listener first
-            val notificationService = CIPENotificationService.getInstance(project)
             val dataSyncService = CIPEDataSyncService.getInstance(project)
-            dataSyncService.addNotificationListener(notificationService)
 
-            // Trigger the sample notification
             dataSyncService.triggerSampleAiFixNotification()
         }
     }
