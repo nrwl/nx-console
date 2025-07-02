@@ -6,6 +6,7 @@ import {
   resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server-capabilities-code-completion';
 import {
+  downloadAndExtractArtifact,
   getNxCloudTerminalOutput,
   getRecentCIPEData,
   nxCloudAuthHeaders,
@@ -20,6 +21,7 @@ import {
   NxCloudStatusRequest,
   NxCloudTerminalOutputRequest,
   NxCreateProjectGraphRequest,
+  NxDownloadAndExtractArtifactRequest,
   NxGeneratorContextV2Request,
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,
@@ -577,6 +579,18 @@ connection.onRequest(NxCloudAuthHeadersRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return await nxCloudAuthHeaders(WORKING_PATH);
+});
+
+connection.onRequest(NxDownloadAndExtractArtifactRequest, async ({ artifactUrl }) => {
+  try {
+    const content = await downloadAndExtractArtifact(artifactUrl, lspLogger);
+    // Strip ANSI codes (same as getNxCloudTerminalOutput does)
+    const strippedOutput = content.replace(/\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, '');
+    return { content: strippedOutput };
+  } catch (e) {
+    lspLogger.log(`Error downloading artifact: ${e.message}`);
+    return { error: e.message };
+  }
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {

@@ -228,3 +228,9 @@ export const NxCloudAuthHeadersRequest: RequestType<
   },
   unknown
 > = new RequestType('nx/cloudAuthHeaders');
+
+export const NxDownloadAndExtractArtifactRequest: RequestType<
+  { artifactUrl: string },
+  { content?: string; error?: string },
+  unknown
+> = new RequestType('nx/downloadAndExtractArtifact');
