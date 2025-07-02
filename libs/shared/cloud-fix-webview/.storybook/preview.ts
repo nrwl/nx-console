@@ -4,7 +4,7 @@ import { html } from 'lit';
 // Import and register shared UI components
 import '@nx-console/shared-ui-components';
 import '@vscode/codicons/dist/codicon.css';
-// import '../src/tailwind.css';
+import '../src/tailwind.css';
 import '@vscode-elements/elements/dist/bundled.js';
 
 // Add VSCode theme CSS variables

@@ -4,6 +4,7 @@ import type { NxCloudFixMessage } from '@nx-console/shared-types';
 import type { WebviewApi } from 'vscode-webview';
 import '@nx-console/shared-ui-components';
 import './nx-cloud-fix-component';
+import './tailwind.css';
 import type { NxCloudFixData } from './nx-cloud-fix-component';
 
 @customElement('root-nx-cloud-fix-element')

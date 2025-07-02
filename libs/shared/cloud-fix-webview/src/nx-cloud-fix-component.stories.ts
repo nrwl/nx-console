@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import './nx-cloud-fix-component';
+import './tailwind.css';
+import '@nx-console/shared-ui-components';
 import type {
   NxCloudFixComponent,
   NxCloudFixData,

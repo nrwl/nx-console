@@ -10,7 +10,8 @@
         "//": "JCEF can't handle exports somehow so this removes them. Hacky but works for now.",
         "command": "node -e \"const fs=require('fs'); const file='dist/libs/shared/cloud-fix-webview/main.js'; fs.writeFileSync(file, fs.readFileSync(file,'utf8').replace(/export\\s*{[^}]*};?\\s*$/gm, ''));\"",
         "dependsOn": [
-          "_build"
+          "_build",
+          "build-css"
         ]
       },
       "_build": {
@@ -31,8 +32,24 @@
           "bundle": true,
           "declaration": false,
           "deleteOutputPath": true,
-          "thirdParty": true
+          "thirdParty": true,
+          "assets": [
+            {
+              "input": "libs/shared/cloud-fix-webview/src",
+              "glob": "*.css",
+              "output": "/"
+            }
+          ]
         }
+      },
+      "build-css": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npx tailwindcss -i libs/shared/cloud-fix-webview/src/tailwind.css -o dist/libs/shared/cloud-fix-webview/tailwind.css -c libs/shared/cloud-fix-webview/tailwind.config.js"
+        },
+        "dependsOn": [
+          "_build"
+        ]
       },
       "storybook": {
         "executor": "@nx/storybook:storybook",
