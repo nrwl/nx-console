@@ -1,17 +1,28 @@
 package dev.nx.console.cloud.cloud_fix_ui
 
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.ui.JBColor
+import com.intellij.ui.JBSplitter
+import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
 import dev.nx.console.utils.jcef.getHexColor
+import java.awt.BorderLayout
+import java.awt.Font
 import javax.swing.JComponent
+import javax.swing.JPanel
+import javax.swing.SwingConstants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +36,14 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private val cs = NxCloudFixFileCoroutineHolder.getInstance(project).cs
     private var currentFixDetails: NxCloudFixDetails? = null
 
+    // UI Components
+    private val mainPanel = JPanel(BorderLayout())
+    private val toolbar = createToolbar()
+    private val splitter = JBSplitter(false, 0.6f) // 60% webview, 40% diff
+    private val diffPanel = JPanel(BorderLayout())
+    private var isShowingPreview = false
+    private var currentDiff: String? = null
+
     override fun createMainComponent(project: Project): JComponent {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
@@ -32,12 +51,39 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             OpenDevToolsContextMenuHandler(),
             browser.cefBrowser
         )
-        return browser.component
+
+        // Setup the main UI
+        mainPanel.add(toolbar, BorderLayout.NORTH)
+        mainPanel.add(splitter, BorderLayout.CENTER)
+
+        // Start with webview only
+        showWebviewOnly()
+
+        return mainPanel
     }
 
     override fun showFixDetails(details: NxCloudFixDetails) {
+        // Test serialization first to catch any issues early
+        try {
+            json.encodeToString(details)
+        } catch (e: Exception) {
+            logger<NxCloudFixFileImpl>().error("Failed to serialize fix details", e)
+
+            // Show error notification
+            com.intellij.notification.NotificationGroupManager.getInstance()
+                .getNotificationGroup("Nx Cloud CIPE")
+                .createNotification(
+                    "Failed to Load AI Fix",
+                    "Could not parse AI fix data: ${e.message}",
+                    com.intellij.notification.NotificationType.ERROR
+                )
+                .notify(project)
+
+            return
+        }
+
         currentFixDetails = details
-        cs.launch { 
+        cs.launch {
             loadHtmlWithInitialData(details)
             // Update diff preview if available
             updateDiffPreview(details.runGroup.aiFix?.suggestedFix)
@@ -45,16 +91,15 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     }
 
     private fun updateDiffPreview(gitDiff: String?) {
-        // Find the associated editor and update its diff preview
-        val fileEditorManager = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(project)
-        val editors = fileEditorManager.getEditors(this)
-        
-        for (editor in editors) {
-            when (editor) {
-                is NxCloudFixEditorWithPreview -> {
-                    editor.updateDiff(gitDiff)
-                }
+        currentDiff = gitDiff
+        if (gitDiff != null && gitDiff.isNotBlank()) {
+            showGitDiff(gitDiff)
+            // Automatically show preview if there's a diff
+            if (!isShowingPreview) {
+                showWithPreview()
             }
+        } else {
+            showDiffPlaceholder()
         }
     }
 
@@ -173,19 +218,75 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     }
 
     private fun handleShowDiff() {
-        logger<NxCloudFixFileImpl>().info("Show diff action received")
-        // Toggle the diff preview panel
-        val fileEditorManager = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(project)
-        val editors = fileEditorManager.getEditors(this)
-        
-        for (editor in editors) {
-            when (editor) {
-                is NxCloudFixEditorWithPreview -> {
-                    // Toggle is handled by the toolbar action
-                    editor.showWithPreview()
-                }
+        togglePreview()
+    }
+
+    // UI Helper Methods
+    private fun showWithPreview() {
+        if (!isShowingPreview) {
+            splitter.firstComponent = browser.component
+            splitter.secondComponent = diffPanel
+            splitter.isShowDividerControls = true
+            splitter.isShowDividerIcon = true
+            isShowingPreview = true
+        }
+    }
+
+    private fun showWebviewOnly() {
+        splitter.firstComponent = browser.component
+        splitter.secondComponent = null
+        isShowingPreview = false
+    }
+
+    private fun togglePreview() {
+        if (isShowingPreview) {
+            showWebviewOnly()
+        } else {
+            showWithPreview()
+        }
+    }
+
+    private fun createToolbar(): JComponent {
+        val toggleDiffAction = object : AnAction("Toggle Diff", "Toggle diff preview", AllIcons.Actions.Diff), DumbAware {
+            override fun actionPerformed(e: AnActionEvent) {
+                togglePreview()
+            }
+
+            override fun update(e: AnActionEvent) {
+                e.presentation.icon = if (isShowingPreview) AllIcons.Actions.PreviewDetails else AllIcons.Actions.Diff
             }
         }
+
+        val actionGroup = DefaultActionGroup(toggleDiffAction)
+        val toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, actionGroup, true)
+        toolbar.targetComponent = mainPanel
+        return toolbar.component
+    }
+
+    private fun showGitDiff(gitDiff: String) {
+        diffPanel.removeAll()
+
+        // For now, show raw diff in a text area
+        // In a later commit, this will be replaced with proper IntelliJ diff viewer
+        val textArea = JBTextArea(gitDiff)
+        textArea.isEditable = false
+        textArea.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
+
+        val scrollPane = JBScrollPane(textArea)
+        diffPanel.add(scrollPane, BorderLayout.CENTER)
+
+        diffPanel.revalidate()
+        diffPanel.repaint()
+    }
+
+    private fun showDiffPlaceholder() {
+        diffPanel.removeAll()
+        diffPanel.add(
+            JBLabel("Git diff will appear here when an AI fix is available", SwingConstants.CENTER),
+            BorderLayout.CENTER
+        )
+        diffPanel.revalidate()
+        diffPanel.repaint()
     }
 
     private fun handleWebviewReady() {
