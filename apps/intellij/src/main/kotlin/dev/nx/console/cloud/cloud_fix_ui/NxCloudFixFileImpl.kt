@@ -37,7 +37,25 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     override fun showFixDetails(details: NxCloudFixDetails) {
         currentFixDetails = details
-        cs.launch { loadHtmlWithInitialData(details) }
+        cs.launch { 
+            loadHtmlWithInitialData(details)
+            // Update diff preview if available
+            updateDiffPreview(details.runGroup.aiFix?.suggestedFix)
+        }
+    }
+
+    private fun updateDiffPreview(gitDiff: String?) {
+        // Find the associated editor and update its diff preview
+        val fileEditorManager = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(project)
+        val editors = fileEditorManager.getEditors(this)
+        
+        for (editor in editors) {
+            when (editor) {
+                is NxCloudFixEditorWithPreview -> {
+                    editor.updateDiff(gitDiff)
+                }
+            }
+        }
     }
 
     private suspend fun loadHtmlWithInitialData(details: NxCloudFixDetails) {
@@ -156,7 +174,18 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private fun handleShowDiff() {
         logger<NxCloudFixFileImpl>().info("Show diff action received")
-        // TODO: Implement in commit 7
+        // Toggle the diff preview panel
+        val fileEditorManager = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(project)
+        val editors = fileEditorManager.getEditors(this)
+        
+        for (editor in editors) {
+            when (editor) {
+                is NxCloudFixEditorWithPreview -> {
+                    // Toggle is handled by the toolbar action
+                    editor.showWithPreview()
+                }
+            }
+        }
     }
 
     private fun handleWebviewReady() {

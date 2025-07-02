@@ -11,9 +11,8 @@ internal class NxCloudFixFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean = file is NxCloudFixFile
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {
-        // For now, assume all NxCloudFixFiles are the concrete implementation
-        // In commit 7, we'll update this for the split view
-        return NxCloudFixFileEditor(project, file as NxCloudFixFile)
+        // Create TextEditorWithPreview for split view
+        return NxCloudFixEditorWithPreview(project, file)
     }
 
     override fun getEditorTypeId(): String = "NxCloudFixEditor"
