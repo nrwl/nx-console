@@ -134,7 +134,7 @@ export class NxCloudFixTreeItem
             switch (aiFix.suggestedFixStatus) {
               case 'NOT_STARTED':
                 this.contextValue += '-noFixYet';
-                this.label = 'Nx Cloud AI is preparing to create a fix';
+                this.label = 'Nx Cloud AI is preparing to generate a fix';
                 this.iconPath = new ThemeIcon(
                   'info',
                   new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -148,10 +148,25 @@ export class NxCloudFixTreeItem
                   new ThemeColor('notebookStatusRunningIcon.foreground'),
                 );
                 break;
+              case 'NOT_EXECUTABLE':
+                this.contextValue += '-cancelledFix';
+                this.label = 'Nx Cloud AI is not able to generate a fix';
+                this.iconPath = new ThemeIcon(
+                  'circle-slash',
+                  new ThemeColor('notebookStatusRunningIcon.foreground'),
+                );
+                break;
               case 'COMPLETED':
+                this.contextValue += '-completedFix';
+                this.label = 'Nx Cloud AI has generated a fix';
+                this.iconPath = new ThemeIcon(
+                  'check',
+                  new ThemeColor('charts.green'),
+                );
+                break;
               case 'FAILED':
                 this.contextValue += '-fixFailed';
-                this.label = 'Failed Nx Cloud AI fix creation';
+                this.label = 'Failed Nx Cloud AI fix generation';
                 this.iconPath = new ThemeIcon(
                   'error',
                   new ThemeColor('notebookStatusErrorIcon.foreground'),
@@ -181,7 +196,6 @@ export class NxCloudFixTreeItem
                 break;
             }
           }
-          // No fix yet - we're still creating it
         }
       }
     }

@@ -872,7 +872,7 @@ export class NxCloudFixComponent extends LitElement {
     `;
   }
 
-  private getCreatingFixSection(): TemplateResult {
+  private createCreatingFixSection(): TemplateResult {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">
@@ -986,20 +986,22 @@ export class NxCloudFixComponent extends LitElement {
       if (suggestedFixStatus === 'NOT_STARTED') {
         return this.createWaitingForFixSection();
       } else if (suggestedFixStatus === 'IN_PROGRESS') {
-        return this.getCreatingFixSection();
+        return this.createCreatingFixSection();
       } else if (suggestedFixStatus === 'FAILED') {
-        return this.renderFixCreationFailedSection();
+        return this.createFixCreationFailedSection();
+      } else if (suggestedFixStatus === 'NOT_EXECUTABLE') {
+        return this.createCancelledFixSection();
       }
     } else {
       // todo: remove this once all environments have been updated
       if (!hasAiFix && verificationStatus === 'NOT_STARTED') {
         // Show creating fix state
-        return this.getCreatingFixSection();
+        return this.createCreatingFixSection();
       }
 
       // if the fix creation failed, show the proper error state
       if (!hasAiFix && verificationStatus == 'FAILED') {
-        return this.renderFixCreationFailedSection();
+        return this.createFixCreationFailedSection();
       }
     }
 
@@ -1059,6 +1061,20 @@ export class NxCloudFixComponent extends LitElement {
         return html``;
     }
   }
+  createCancelledFixSection(): TemplateResult {
+    return html`
+      <div class="creating-fix-section">
+        <div class="creating-fix-icon">
+          <i class="codicon codicon-circle-slash"></i>
+        </div>
+        <h2 class="creating-fix-title">Fix Creation Cancelled</h2>
+        <p class="creating-fix-description">
+          There were no fixes that were generated for this error.
+        </p>
+      </div>
+    `;
+  }
+
   createWaitingForFixSection(): TemplateResult {
     return html`
       <div class="creating-fix-section">
@@ -1066,17 +1082,17 @@ export class NxCloudFixComponent extends LitElement {
           <i class="codicon codicon-info"></i>
         </div>
         <h2 class="creating-fix-title">
-          Nx Cloud is preparing to create a fix
+          Nx Cloud is preparing to generate a fix
         </h2>
         <p class="creating-fix-description">
-          Nx Cloud has not yet started creating a fix for the error. Please
-          wait.
+          Nx Cloud is analyzing this run to see if a fix can be generated. This
+          may take a moment. Please wait.
         </p>
       </div>
     `;
   }
 
-  private renderFixCreationFailedSection(): TemplateResult {
+  private createFixCreationFailedSection(): TemplateResult {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">

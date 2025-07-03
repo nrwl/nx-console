@@ -225,6 +225,23 @@ export const FixCreationFailed: Story = {
   },
 };
 
+export const FixCreationCancelled: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          suggestedFixStatus: 'NOT_EXECUTABLE',
+          suggestedFix: undefined,
+          suggestedFixDescription: undefined,
+        },
+      },
+    },
+  },
+};
+
 export const NoTerminalOutput: Story = {
   args: {
     details: {

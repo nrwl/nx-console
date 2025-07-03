@@ -52,7 +52,8 @@ export type AITaskFixStatus =
   | 'NOT_STARTED'
   | 'IN_PROGRESS'
   | 'COMPLETED'
-  | 'FAILED';
+  | 'FAILED'
+  | 'NOT_EXECUTABLE';
 
 export type AITaskFixUserAction = 'NONE' | 'APPLIED' | 'REJECTED';
 
