@@ -15,6 +15,10 @@
   --badge-foreground: var(--vscode-badge-foreground, #ffffff);
   --primary-color: var(--vscode-button-background, #0e639c);
   --secondary-color: var(--vscode-button-secondaryBackground, #3a3d41);
+  --secondary-foreground-color: var(--vscode-button-secondaryForeground, #ffffff);
+  --field-background-color: var(--vscode-input-background, #3c3c3c);
+  --field-border-color: var(--vscode-input-border, #3c3c3c);
+  --focus-border-color: var(--vscode-focusBorder, #007acc);
 }
 
 @layer components {

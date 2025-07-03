@@ -7,6 +7,7 @@ import {
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import './terminal-component';
+import './components';
 
 export type NxCloudFixData = {
   cipe: CIPEInfo;
@@ -155,7 +156,7 @@ export class NxCloudFixComponent extends LitElement {
               </a>
             </h1>
             <div
-              class="bg-secondary text-secondary-foreground flex items-center gap-1.5 rounded-[18px] px-4 py-2 text-sm font-semibold"
+              class="bg-secondary text-secondaryForeground flex items-center gap-1.5 rounded-[18px] px-4 py-2 text-sm font-semibold"
             >
               <icon-element icon="git-branch"></icon-element>
               <a
@@ -316,15 +317,15 @@ export class NxCloudFixComponent extends LitElement {
           </div>
         </div>
         <div class="px-4 py-1 pb-4">
-          <vscode-form-group variant="vertical">
-            <vscode-label for="commit-message">Commit message</vscode-label>
-            <vscode-textarea
+          <form-group-element variant="vertical">
+            <label-element for="commit-message">Commit message</label-element>
+            <textarea-element
               value="${aiFix.suggestedFixDescription ||
               'fix: nx cloud AI suggested fix'}"
               disabled
               rows="3"
-            ></vscode-textarea>
-          </vscode-form-group>
+            ></textarea-element>
+          </form-group-element>
           ${showActions
             ? html`
                 <div class="mt-4 flex justify-end gap-2">

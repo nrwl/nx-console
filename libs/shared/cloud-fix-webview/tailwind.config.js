@@ -27,6 +27,8 @@ module.exports = {
         warning: 'var(--warning-color)',
         hover: 'var(--hover-color)',
         border: 'var(--border-color)',
+        secondary: 'var(--secondary-color)',
+        secondaryForeground: 'var(--secondary-foreground-color)',
       },
     },
   },
