@@ -1,3 +1,16 @@
+# [18.57.0](https://github.com/nrwl/nx-console/compare/vscode-v18.56.0...vscode-v18.57.0) (2025-07-03)
+
+
+### Bug Fixes
+
+* **generate-ui:** fix tailwind after lib breakout ([#2592](https://github.com/nrwl/nx-console/issues/2592)) ([d8529b1](https://github.com/nrwl/nx-console/commit/d8529b12f3060baa91212f741e448250e70d9eae))
+* **vscode:** update AI suggested fix status handling ([#2595](https://github.com/nrwl/nx-console/issues/2595)) ([f22e902](https://github.com/nrwl/nx-console/commit/f22e902c650deed1379636065c4633f2aa51fe43))
+
+
+### Features
+
+* add spinner to nx tool window panel ([#2424](https://github.com/nrwl/nx-console/issues/2424)) ([cea32fb](https://github.com/nrwl/nx-console/commit/cea32fb7ce1cd0c998ca5959f8ffcfbafcd839ad))
+
 # [18.56.0](https://github.com/nrwl/nx-console/compare/vscode-v18.55.0...vscode-v18.56.0) (2025-06-30)
 
 
