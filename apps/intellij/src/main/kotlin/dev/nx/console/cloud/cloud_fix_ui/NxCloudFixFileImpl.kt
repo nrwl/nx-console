@@ -16,6 +16,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diff.impl.patch.PatchReader
 import com.intellij.openapi.diff.impl.patch.PatchSyntaxException
 import com.intellij.openapi.diff.impl.patch.TextFilePatch
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
@@ -239,8 +240,11 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                     showSuccessNotification("Nx Cloud fix applied successfully")
                     // Refresh CIPE data
                     CIPEPollingService.getInstance(project).forcePoll()
+                    // Close the AI fix editor
+                    withContext(Dispatchers.EDT) {
+                        FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
+                    }
                 } else {
-
                     showErrorNotification("Failed to apply AI fix")
                 }
             } catch (e: Exception) {
@@ -370,6 +374,10 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                     showSuccessNotification("Nx Cloud fix ignored")
                     // Refresh CIPE data
                     CIPEPollingService.getInstance(project).forcePoll()
+                    // Close the AI fix editor
+                    withContext(Dispatchers.EDT) {
+                        FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
+                    }
                 } else {
                     showErrorNotification("Failed to reject AI fix")
                 }
