@@ -34,7 +34,8 @@ import kotlinx.coroutines.withContext
  * by CIPEDataSyncService.
  */
 @Service(Service.Level.PROJECT)
-class CIPENotificationService(private val project: Project, private val cs: CoroutineScope) : CIPENotificationListener {
+class CIPENotificationService(private val project: Project, private val cs: CoroutineScope) :
+    CIPENotificationListener {
 
     companion object {
         private const val NOTIFICATION_GROUP_ID = "Nx Cloud CIPE"
@@ -293,30 +294,30 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
                 val failedTaskId = aiFix.taskIds.first()
                 val terminalOutputUrl = aiFix.terminalLogsUrls[failedTaskId]
-                
+
                 if (terminalOutputUrl != null) {
                     try {
-                        val response = NxlsService.getInstance(project).downloadAndExtractArtifact(terminalOutputUrl)
-                        
+                        val response =
+                            NxlsService.getInstance(project)
+                                .downloadAndExtractArtifact(terminalOutputUrl)
+
                         if (response?.error != null) {
                             logger.warn("Failed to download terminal output: ${response.error}")
-                            terminalOutput = "Failed to retrieve terminal output. Please check the Nx Console output for more details."
+                            terminalOutput =
+                                "Failed to retrieve terminal output. Please check the Nx Console output for more details."
                         } else {
                             terminalOutput = response?.content
                         }
                     } catch (e: Exception) {
                         logger.error("Failed to download terminal output for task $failedTaskId", e)
-                        terminalOutput = "Failed to retrieve terminal output. Please check the Nx Console output for more details."
+                        terminalOutput =
+                            "Failed to retrieve terminal output. Please check the Nx Console output for more details."
                     }
                 }
             }
 
             val fixDetails =
-                NxCloudFixDetails(
-                    cipe = cipe,
-                    runGroup = runGroup,
-                    terminalOutput = terminalOutput
-                )
+                NxCloudFixDetails(cipe = cipe, runGroup = runGroup, terminalOutput = terminalOutput)
 
             // UI operations must happen on EDT
             withContext(Dispatchers.EDT) {

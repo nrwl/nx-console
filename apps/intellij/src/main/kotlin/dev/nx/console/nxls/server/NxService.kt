@@ -146,7 +146,9 @@ interface NxService {
     }
 
     @JsonRequest
-    fun downloadAndExtractArtifact(request: NxDownloadAndExtractArtifactRequest): CompletableFuture<NxDownloadAndExtractArtifactResponse> {
+    fun downloadAndExtractArtifact(
+        request: NxDownloadAndExtractArtifactRequest
+    ): CompletableFuture<NxDownloadAndExtractArtifactResponse> {
         throw UnsupportedOperationException()
     }
 }

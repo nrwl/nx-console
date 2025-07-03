@@ -8,6 +8,8 @@
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.json</depends>
 
+  <depends>Git4Idea</depends>
+
   <depends optional="true" config-file="nx-console-llm.xml">com.intellij.ml.llm</depends>
 
 

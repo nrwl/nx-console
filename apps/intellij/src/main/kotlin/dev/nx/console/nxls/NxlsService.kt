@@ -262,7 +262,9 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         }()
     }
 
-    suspend fun downloadAndExtractArtifact(artifactUrl: String): NxDownloadAndExtractArtifactResponse? {
+    suspend fun downloadAndExtractArtifact(
+        artifactUrl: String
+    ): NxDownloadAndExtractArtifactResponse? {
         return withMessageIssueCatch("nx/downloadAndExtractArtifact") {
             val request = NxDownloadAndExtractArtifactRequest(artifactUrl = artifactUrl)
             server()?.getNxService()?.downloadAndExtractArtifact(request)?.await()

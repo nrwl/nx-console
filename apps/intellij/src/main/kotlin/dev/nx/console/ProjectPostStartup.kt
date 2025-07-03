@@ -71,12 +71,12 @@ internal class ProjectPostStartup : ProjectActivity {
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.EXTENSION_ACTIVATE, mapOf("timing" to 0))
 
-//         Check for AI fixes on startup (temporary for debugging)
-//        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-//            delay(10000) // 10 seconds to ensure NXLS is ready
-//
-//            val dataSyncService = CIPEDataSyncService.getInstance(project)
-//            dataSyncService.checkForAiFixesOnStartup()
-//        }
+//                 Check for AI fixes on startup (temporary for debugging)
+                ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+                    delay(10000) // 10 seconds to ensure NXLS is ready
+
+                    val dataSyncService = CIPEDataSyncService.getInstance(project)
+                    dataSyncService.checkForAiFixesOnStartup()
+                }
     }
 }
