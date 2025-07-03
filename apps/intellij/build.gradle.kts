@@ -109,7 +109,6 @@ intellijPlatform {
         version = providers.gradleProperty("version").get()
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild").get()
-            untilBuild = providers.gradleProperty("pluginUntilBuild").get()
         }
         description =
             providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
