@@ -872,7 +872,7 @@ export class NxCloudFixComponent extends LitElement {
     `;
   }
 
-  private getCreatingFixSection(): TemplateResult {
+  private createCreatingFixSection(): TemplateResult {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">
@@ -980,29 +980,29 @@ export class NxCloudFixComponent extends LitElement {
     const verificationStatus =
       aiFix.verificationStatus || (aiFix as any).validationStatus;
 
-    if (!hasAiFix && verificationStatus === 'NOT_STARTED') {
-      // Show creating fix state
-      return this.getCreatingFixSection();
-    }
+    const suggestedFixStatus = aiFix.suggestedFixStatus;
 
-    // if the fix creation failed, show the proper error state
-    if (!hasAiFix && verificationStatus === 'FAILED') {
-      return html`
-        <div class="creating-fix-section">
-          <div class="creating-fix-icon">
-            <i
-              class="codicon codicon-error"
-              style="color: var(--error-color);"
-            ></i>
-          </div>
-          <h2 class="creating-fix-title">Fix Creation Failed</h2>
-          <p class="creating-fix-description">
-            Nx Cloud was unable to generate a fix for the error. You can try
-            running the task again or investigate the issue manually on the Nx
-            Cloud UI
-          </p>
-        </div>
-      `;
+    if (suggestedFixStatus) {
+      if (suggestedFixStatus === 'NOT_STARTED') {
+        return this.createWaitingForFixSection();
+      } else if (suggestedFixStatus === 'IN_PROGRESS') {
+        return this.createCreatingFixSection();
+      } else if (suggestedFixStatus === 'FAILED') {
+        return this.createFixCreationFailedSection();
+      } else if (suggestedFixStatus === 'NOT_EXECUTABLE') {
+        return this.createCancelledFixSection();
+      }
+    } else {
+      // todo: remove this once all environments have been updated
+      if (!hasAiFix && verificationStatus === 'NOT_STARTED') {
+        // Show creating fix state
+        return this.createCreatingFixSection();
+      }
+
+      // if the fix creation failed, show the proper error state
+      if (!hasAiFix && verificationStatus == 'FAILED') {
+        return this.createFixCreationFailedSection();
+      }
     }
 
     // Fix exists, show verification status
@@ -1027,7 +1027,7 @@ export class NxCloudFixComponent extends LitElement {
           <div class="creating-fix-section">
             <div class="creating-fix-icon">
               <i
-                class="codicon codicon-pass"
+                class="codicon codicon-verified"
                 style="color: var(--success-color);"
               ></i>
             </div>
@@ -1060,6 +1060,55 @@ export class NxCloudFixComponent extends LitElement {
         // NOT_STARTED or other states
         return html``;
     }
+  }
+  createCancelledFixSection(): TemplateResult {
+    return html`
+      <div class="creating-fix-section">
+        <div class="creating-fix-icon">
+          <i class="codicon codicon-circle-slash"></i>
+        </div>
+        <h2 class="creating-fix-title">Fix Creation Cancelled</h2>
+        <p class="creating-fix-description">
+          There were no fixes that were generated for this error.
+        </p>
+      </div>
+    `;
+  }
+
+  createWaitingForFixSection(): TemplateResult {
+    return html`
+      <div class="creating-fix-section">
+        <div class="creating-fix-icon">
+          <i class="codicon codicon-info"></i>
+        </div>
+        <h2 class="creating-fix-title">
+          Nx Cloud is preparing to generate a fix
+        </h2>
+        <p class="creating-fix-description">
+          Nx Cloud is analyzing this run to see if a fix can be generated. This
+          may take a moment. Please wait.
+        </p>
+      </div>
+    `;
+  }
+
+  private createFixCreationFailedSection(): TemplateResult {
+    return html`
+      <div class="creating-fix-section">
+        <div class="creating-fix-icon">
+          <i
+            class="codicon codicon-error"
+            style="color: var(--error-color);"
+          ></i>
+        </div>
+        <h2 class="creating-fix-title">Fix Creation Failed</h2>
+        <p class="creating-fix-description">
+          Nx Cloud was unable to generate a fix for the error. You can try
+          running the task again or investigate the issue manually on the Nx
+          Cloud UI
+        </p>
+      </div>
+    `;
   }
 }
 

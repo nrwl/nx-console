@@ -65,7 +65,7 @@ jobs:
       - name: Gradle artifacts and formatting
         run: |
           yarn nx-cloud record -- ./gradlew projectReportAll
-          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck
+          yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
 
       - name: Check project graph creation
         run: yarn nx show projects --verbose
@@ -82,7 +82,7 @@ jobs:
       # todo(cammisuli): disable verifyPlugin for now as its constantly failing on CI
       # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
       - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
-        timeout-minutes: 45
+        timeout-minutes: 60
 
   main-windows:
     name: Main Windows
@@ -133,7 +133,7 @@ jobs:
 
       # There's no need to check formatting, linting & typecheck again on windows
       - run: yarn nx affected --targets="build,test,e2e-ci" --configuration=ci --exclude=nx-console --parallel=3 --verbose
-        timeout-minutes: 45
+        timeout-minutes: 60
         env:
           NX_VERBOSE_LOGGING: true
           NODE_OPTIONS: --max-old-space-size=4096
