@@ -224,7 +224,7 @@ export const NxCloudAuthHeadersRequest: RequestType<
   {
     'Nx-Cloud-Id'?: string;
     'Nx-Cloud-Personal-Access-Token'?: string;
-    'Authorization'?: string;
+    Authorization?: string;
   },
   unknown
 > = new RequestType('nx/cloudAuthHeaders');

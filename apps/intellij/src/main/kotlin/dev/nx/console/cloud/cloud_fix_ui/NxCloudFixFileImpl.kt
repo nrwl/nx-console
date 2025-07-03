@@ -1,20 +1,29 @@
 package dev.nx.console.cloud.cloud_fix_ui
 
+import com.intellij.diff.chains.SimpleDiffRequestChain
+import com.intellij.diff.impl.CacheDiffRequestChainProcessor
+import com.intellij.diff.requests.DiffRequest
+import com.intellij.diff.util.DiffUserDataKeys
+import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diff.impl.patch.PatchReader
+import com.intellij.openapi.diff.impl.patch.PatchSyntaxException
+import com.intellij.openapi.diff.impl.patch.TextFilePatch
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.ui.JBColor
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vcs.changes.patch.tool.PatchDiffRequest
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.jcef.*
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.cloud.NxCloudApiService
@@ -22,11 +31,8 @@ import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
 import dev.nx.console.utils.jcef.getHexColor
-import java.awt.BorderLayout
-import java.awt.Font
-import javax.swing.JComponent
-import javax.swing.JPanel
-import javax.swing.SwingConstants
+import java.awt.*
+import javax.swing.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,9 +49,16 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private val mainPanel = JPanel(BorderLayout())
     private val toolbar = createToolbar()
     private val splitter = JBSplitter(false, 0.6f) // 60% webview, 40% diff
-    private val diffPanel = JPanel(BorderLayout())
+    private val diffContainer = JPanel(BorderLayout())
+    private var diffProcessor: CacheDiffRequestChainProcessor? = null
     private var isShowingPreview = false
     private var currentDiff: String? = null
+
+    init {
+        // Initialize diff container
+        diffContainer.background = UIUtil.getPanelBackground()
+        showDiffPlaceholder()
+    }
 
     override fun createMainComponent(project: Project): JComponent {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
@@ -95,14 +108,13 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private fun updateDiffPreview(gitDiff: String?) {
         currentDiff = gitDiff
-        if (gitDiff != null && gitDiff.isNotBlank()) {
-            showGitDiff(gitDiff)
-            // Automatically show preview if there's a diff
-            if (!isShowingPreview) {
-                showWithPreview()
-            }
-        } else {
-            showDiffPlaceholder()
+        cs.launch {
+            updateDiff(gitDiff)
+        }
+
+        // Automatically show preview if there's a diff
+        if (gitDiff != null && gitDiff.isNotBlank() && !isShowingPreview) {
+            showWithPreview()
         }
     }
 
@@ -124,7 +136,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                         background-color: ${getHexColor(UIUtil.getPanelBackground())};
                         font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
                         font-size: ${UIUtil.getLabelFont().size}px;
-                        color: ${getHexColor(if (!JBColor.isBright()) UIUtil.getActiveTextColor() else UIUtil.getLabelForeground())};
+                        color: ${getHexColor(if (!com.intellij.ui.JBColor.isBright()) UIUtil.getActiveTextColor() else UIUtil.getLabelForeground())};
                     }
                 </style>
             </head>
@@ -376,7 +388,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun showWithPreview() {
         if (!isShowingPreview) {
             splitter.firstComponent = browser.component
-            splitter.secondComponent = diffPanel
+            splitter.secondComponent = diffContainer
             splitter.isShowDividerControls = true
             splitter.isShowDividerIcon = true
             isShowingPreview = true
@@ -420,32 +432,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         return toolbar.component
     }
 
-    private fun showGitDiff(gitDiff: String) {
-        diffPanel.removeAll()
-
-        // For now, show raw diff in a text area
-        // In a later commit, this will be replaced with proper IntelliJ diff viewer
-        val textArea = JBTextArea(gitDiff)
-        textArea.isEditable = false
-        textArea.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-
-        val scrollPane = JBScrollPane(textArea)
-        diffPanel.add(scrollPane, BorderLayout.CENTER)
-
-        diffPanel.revalidate()
-        diffPanel.repaint()
-    }
-
-    private fun showDiffPlaceholder() {
-        diffPanel.removeAll()
-        diffPanel.add(
-            JBLabel("Git diff will appear here when an AI fix is available", SwingConstants.CENTER),
-            BorderLayout.CENTER
-        )
-        diffPanel.revalidate()
-        diffPanel.repaint()
-    }
-
     private fun handleWebviewReady() {
         logger<NxCloudFixFileImpl>().info("Webview ready")
         // Not needed anymore since we set initial data via HTML
@@ -463,6 +449,133 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             .getNotificationGroup("Nx Cloud CIPE")
             .createNotification("", message, NotificationType.ERROR)
             .notify(project)
+    }
+
+    // Diff Preview Methods using IntelliJ's PatchReader and PatchDiffRequest
+    private suspend fun updateDiff(gitDiffText: String?) {
+        if (gitDiffText.isNullOrBlank()) {
+            withContext(Dispatchers.EDT) {
+                showDiffPlaceholder()
+            }
+            return
+        }
+
+        // Parse the git diff using IntelliJ's PatchReader
+        val patches = try {
+            logger<NxCloudFixFileImpl>().info("Parsing git diff, length: ${gitDiffText.length}")
+            val patchReader = PatchReader(gitDiffText)
+            val result = patchReader.readTextPatches()
+            logger<NxCloudFixFileImpl>().info("Successfully parsed ${result.size} patches")
+            result
+        } catch (e: PatchSyntaxException) {
+            logger<NxCloudFixFileImpl>().error("PatchSyntaxException: ${e.message}", e)
+            withContext(Dispatchers.EDT) {
+                showDiffError("Failed to parse git diff: ${e.message}")
+            }
+            return
+        } catch (e: Exception) {
+            logger<NxCloudFixFileImpl>().error("Exception parsing diff: ${e.message}", e)
+            withContext(Dispatchers.EDT) {
+                showDiffError("Failed to parse git diff: ${e.message}")
+            }
+            return
+        }
+
+        if (patches.isEmpty()) {
+            withContext(Dispatchers.EDT) {
+                showDiffPlaceholder()
+            }
+            return
+        }
+
+        displayDiff(patches)
+    }
+
+    private suspend fun displayDiff(patches: List<TextFilePatch>) {
+        withContext(Dispatchers.EDT) {
+            // Clear existing diff processor
+            diffContainer.removeAll()
+            diffProcessor?.let { Disposer.dispose(it) }
+            diffProcessor = null
+
+            try {
+                logger<NxCloudFixFileImpl>().info("Creating diff viewer for ${patches.size} patches")
+
+                // Build a SimpleDiffRequestChain from patches
+                val requests: List<DiffRequest> = patches.map { patch ->
+                    logger<NxCloudFixFileImpl>().debug("Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}")
+                    PatchDiffRequest(patch)
+                }
+
+                if (requests.isEmpty()) {
+                    logger<NxCloudFixFileImpl>().warn("No diff requests created")
+                    showDiffPlaceholder()
+                    return@withContext
+                }
+
+                val chain = SimpleDiffRequestChain(requests)
+
+                // Configure the diff viewer for read-only patch viewing
+                chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false)
+                chain.putUserData(DiffUserDataKeys.DO_NOT_IGNORE_WHITESPACES, true)
+                chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false);
+//                chain.putUserData(DiffUserDataKeysEx.LEFT_TOOLBAR, null)
+
+                // Create the chain processor
+                val processor = CacheDiffRequestChainProcessor(project, chain)
+
+                diffProcessor = processor
+
+                // Add the processor component to the container
+                diffContainer.add(processor.component, BorderLayout.CENTER)
+
+                // Force the processor to update
+                processor.updateRequest()
+
+                logger<NxCloudFixFileImpl>().info("Diff viewer created successfully")
+            } catch (e: Exception) {
+                logger<NxCloudFixFileImpl>().error("Failed to create diff viewer", e)
+                diffContainer.add(createErrorPanel("Could not create diff viewer: ${e.message}"), BorderLayout.CENTER)
+            }
+
+            diffContainer.revalidate()
+            diffContainer.repaint()
+        }
+    }
+
+    private fun createErrorPanel(message: String): JComponent {
+        return JPanel(BorderLayout()).apply {
+            preferredSize = Dimension(0, 100)
+            background = UIUtil.getPanelBackground()
+            border = JBUI.Borders.empty(16)
+
+            add(
+                JBLabel(message, AllIcons.General.Error, SwingConstants.CENTER),
+                BorderLayout.CENTER
+            )
+        }
+    }
+
+    private fun showDiffPlaceholder() {
+        diffContainer.removeAll()
+        diffContainer.add(
+            JBLabel("No diff to display", SwingConstants.CENTER).apply {
+                foreground = UIUtil.getInactiveTextColor()
+            },
+            BorderLayout.CENTER
+        )
+        diffContainer.revalidate()
+        diffContainer.repaint()
+    }
+
+    private fun showDiffError(message: String) {
+        diffContainer.removeAll()
+        diffContainer.add(
+            JBLabel(message, AllIcons.General.Error, SwingConstants.CENTER),
+            BorderLayout.CENTER
+        )
+        diffContainer.revalidate()
+        diffContainer.repaint()
     }
 }
 
