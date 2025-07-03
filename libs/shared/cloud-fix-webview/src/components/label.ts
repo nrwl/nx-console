@@ -26,9 +26,9 @@ export class LabelElement extends EditorContext(LitElement) {
 
   private renderIntellij(): TemplateResult {
     return html`
-      <label 
-        for="${this.for}" 
-        class="text-foreground text-sm font-medium block"
+      <label
+        for="${this.for}"
+        class="text-foreground block text-sm font-medium"
       >
         <slot></slot>
       </label>

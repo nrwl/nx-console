@@ -32,17 +32,17 @@ export class TextareaElement extends EditorContext(LitElement) {
   }
 
   private renderIntellij(): TemplateResult {
-    const disabledClasses = this.disabled 
-      ? 'opacity-50 cursor-not-allowed' 
+    const disabledClasses = this.disabled
+      ? 'opacity-50 cursor-not-allowed'
       : '';
-    
+
     return html`
       <textarea
         .value="${this.value}"
         ?disabled="${this.disabled}"
         rows="${this.rows}"
         placeholder="${this.placeholder}"
-        class="w-full px-3 py-2 text-foreground bg-fieldBackground border border-fieldBorder rounded focus:outline-none focus:ring-1 focus:ring-focusBorder resize-vertical font-mono text-sm ${disabledClasses}"
+        class="text-foreground bg-fieldBackground border-fieldBorder focus:ring-focusBorder resize-vertical ${disabledClasses} w-full rounded border px-3 py-2 font-mono text-sm focus:outline-none focus:ring-1"
         @input="${this.handleInput}"
       ></textarea>
     `;
@@ -51,10 +51,12 @@ export class TextareaElement extends EditorContext(LitElement) {
   private handleInput(e: Event) {
     const textarea = e.target as HTMLTextAreaElement;
     this.value = textarea.value;
-    this.dispatchEvent(new CustomEvent('value-changed', {
-      detail: { value: this.value },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent('value-changed', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 }

@@ -8,7 +8,6 @@ import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
@@ -21,6 +20,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.changes.patch.tool.PatchDiffRequest
+import com.intellij.ui.JBColor
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.jcef.*
@@ -34,12 +34,44 @@ import dev.nx.console.utils.jcef.awaitLoad
 import dev.nx.console.utils.jcef.getHexColor
 import java.awt.*
 import javax.swing.*
+import javax.swing.UIManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+
+@Serializable
+data class NxCloudFixStyles(
+    val foregroundColor: String,
+    val mutedForegroundColor: String,
+    val backgroundColor: String,
+    val primaryColor: String,
+    val errorColor: String,
+    val fieldBackgroundColor: String,
+    val fieldBorderColor: String,
+    val selectFieldBackgroundColor: String,
+    val activeSelectionBackgroundColor: String,
+    val focusBorderColor: String,
+    val bannerWarningBackgroundColor: String,
+    val bannerTextColor: String,
+    val badgeBackgroundColor: String,
+    val badgeForegroundColor: String,
+    val separatorColor: String,
+    val fieldNavHoverColor: String,
+    val scrollbarThumbColor: String,
+    val fontFamily: String,
+    val fontSize: String,
+    // Cloud fix specific colors
+    val successColor: String,
+    val warningColor: String,
+    val hoverColor: String,
+    val borderColor: String,
+    val secondaryColor: String,
+    val secondaryForegroundColor: String
+)
 
 class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFixFile(name) {
 
@@ -109,9 +141,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private fun updateDiffPreview(gitDiff: String?) {
         currentDiff = gitDiff
-        cs.launch {
-            updateDiff(gitDiff)
-        }
+        cs.launch { updateDiff(gitDiff) }
 
         // Automatically show preview if there's a diff
         if (gitDiff != null && gitDiff.isNotBlank() && !isShowingPreview) {
@@ -130,6 +160,8 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <base href="http://nxcloudfix/">
+                <link href="main.css" rel="stylesheet">
+                <link href="tailwind.css" rel="stylesheet">
                 <style>
                     body {
                         margin: 0;
@@ -180,7 +212,21 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             })
         """
 
-        cs.launch { browser.executeJavascriptWithCatch(js) }
+        cs.launch {
+            browser.executeJavascriptWithCatch(js)
+
+            // Send styles to webview
+            val styles = extractIntellijStyles()
+            val stylesJson = json.encodeToString(styles)
+            val stylesJs =
+                """
+                window.intellijApi.postToWebview({
+                    type: 'styles',
+                    payload: $stylesJson
+                })
+            """
+            browser.executeJavascriptWithCatch(stylesJs)
+        }
     }
 
     private fun handleMessageFromBrowser(message: String) {
@@ -194,7 +240,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 is NxCloudFixMessage.ApplyLocally -> handleApplyLocally()
                 is NxCloudFixMessage.Reject -> handleReject()
                 is NxCloudFixMessage.ShowDiff -> handleShowDiff()
-                is NxCloudFixMessage.WebviewReady -> handleWebviewReady()
             }
         } catch (e: Exception) {
             logger.error("Failed to parse message from webview", e)
@@ -440,11 +485,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         return toolbar.component
     }
 
-    private fun handleWebviewReady() {
-        logger<NxCloudFixFileImpl>().info("Webview ready")
-        // Not needed anymore since we set initial data via HTML
-    }
-
     private fun showSuccessNotification(message: String) {
         NotificationGroupManager.getInstance()
             .getNotificationGroup("Nx Cloud CIPE")
@@ -462,37 +502,34 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     // Diff Preview Methods using IntelliJ's PatchReader and PatchDiffRequest
     private suspend fun updateDiff(gitDiffText: String?) {
         if (gitDiffText.isNullOrBlank()) {
-            withContext(Dispatchers.EDT) {
-                showDiffPlaceholder()
-            }
+            withContext(Dispatchers.EDT) { showDiffPlaceholder() }
             return
         }
 
         // Parse the git diff using IntelliJ's PatchReader
-        val patches = try {
-            logger<NxCloudFixFileImpl>().info("Parsing git diff, length: ${gitDiffText.length}")
-            val patchReader = PatchReader(gitDiffText)
-            val result = patchReader.readTextPatches()
-            logger<NxCloudFixFileImpl>().info("Successfully parsed ${result.size} patches")
-            result
-        } catch (e: PatchSyntaxException) {
-            logger<NxCloudFixFileImpl>().error("PatchSyntaxException: ${e.message}", e)
-            withContext(Dispatchers.EDT) {
-                showDiffError("Failed to parse git diff: ${e.message}")
+        val patches =
+            try {
+                logger<NxCloudFixFileImpl>().info("Parsing git diff, length: ${gitDiffText.length}")
+                val patchReader = PatchReader(gitDiffText)
+                val result = patchReader.readTextPatches()
+                logger<NxCloudFixFileImpl>().info("Successfully parsed ${result.size} patches")
+                result
+            } catch (e: PatchSyntaxException) {
+                logger<NxCloudFixFileImpl>().error("PatchSyntaxException: ${e.message}", e)
+                withContext(Dispatchers.EDT) {
+                    showDiffError("Failed to parse git diff: ${e.message}")
+                }
+                return
+            } catch (e: Exception) {
+                logger<NxCloudFixFileImpl>().error("Exception parsing diff: ${e.message}", e)
+                withContext(Dispatchers.EDT) {
+                    showDiffError("Failed to parse git diff: ${e.message}")
+                }
+                return
             }
-            return
-        } catch (e: Exception) {
-            logger<NxCloudFixFileImpl>().error("Exception parsing diff: ${e.message}", e)
-            withContext(Dispatchers.EDT) {
-                showDiffError("Failed to parse git diff: ${e.message}")
-            }
-            return
-        }
 
         if (patches.isEmpty()) {
-            withContext(Dispatchers.EDT) {
-                showDiffPlaceholder()
-            }
+            withContext(Dispatchers.EDT) { showDiffPlaceholder() }
             return
         }
 
@@ -507,13 +544,18 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             diffProcessor = null
 
             try {
-                logger<NxCloudFixFileImpl>().info("Creating diff viewer for ${patches.size} patches")
+                logger<NxCloudFixFileImpl>()
+                    .info("Creating diff viewer for ${patches.size} patches")
 
                 // Build a SimpleDiffRequestChain from patches
-                val requests: List<DiffRequest> = patches.map { patch ->
-                    logger<NxCloudFixFileImpl>().debug("Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}")
-                    PatchDiffRequest(patch)
-                }
+                val requests: List<DiffRequest> =
+                    patches.map { patch ->
+                        logger<NxCloudFixFileImpl>()
+                            .debug(
+                                "Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}"
+                            )
+                        PatchDiffRequest(patch)
+                    }
 
                 if (requests.isEmpty()) {
                     logger<NxCloudFixFileImpl>().warn("No diff requests created")
@@ -526,8 +568,8 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 // Configure the diff viewer for read-only patch viewing
                 chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false)
                 chain.putUserData(DiffUserDataKeys.DO_NOT_IGNORE_WHITESPACES, true)
-                chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false);
-//                chain.putUserData(DiffUserDataKeysEx.LEFT_TOOLBAR, null)
+                chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false)
+                //                chain.putUserData(DiffUserDataKeysEx.LEFT_TOOLBAR, null)
 
                 // Create the chain processor
                 val processor = CacheDiffRequestChainProcessor(project, chain)
@@ -543,7 +585,10 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 logger<NxCloudFixFileImpl>().info("Diff viewer created successfully")
             } catch (e: Exception) {
                 logger<NxCloudFixFileImpl>().error("Failed to create diff viewer", e)
-                diffContainer.add(createErrorPanel("Could not create diff viewer: ${e.message}"), BorderLayout.CENTER)
+                diffContainer.add(
+                    createErrorPanel("Could not create diff viewer: ${e.message}"),
+                    BorderLayout.CENTER
+                )
             }
 
             diffContainer.revalidate()
@@ -584,6 +629,76 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         )
         diffContainer.revalidate()
         diffContainer.repaint()
+    }
+
+    private fun extractIntellijStyles(): NxCloudFixStyles {
+        val backgroundColor = getHexColor(UIUtil.getPanelBackground())
+        val foregroundColor =
+            getHexColor(
+                if (!JBColor.isBright()) {
+                    UIUtil.getActiveTextColor()
+                } else {
+                    UIUtil.getLabelForeground()
+                }
+            )
+        val mutedForegroundColor = getHexColor(UIManager.getColor("Component.infoForeground"))
+        val primaryColor = getHexColor(UIManager.getColor("Button.default.endBackground"))
+        val errorColor = getHexColor(UIManager.getColor("Component.errorFocusColor"))
+        val fieldBackgroundColor = getHexColor(UIManager.getColor("TextField.background"))
+        val fieldBorderColor = getHexColor(UIManager.getColor("Component.borderColor"))
+        val selectFieldBackgroundColor =
+            getHexColor(UIManager.getColor("ComboBox.nonEditableBackground"))
+        val activeSelectionBackgroundColor =
+            getHexColor(UIManager.getColor("ComboBox.selectionBackground"))
+        val focusBorderColor = getHexColor(UIManager.getColor("Component.focusColor"))
+        val badgeBackgroundColor = selectFieldBackgroundColor
+        val badgeForegroundColor = foregroundColor
+        val bannerWarningBackgroundColor =
+            getHexColor(UIManager.getColor("Component.warningFocusColor"))
+        val bannerTextColor = getHexColor(UIManager.getColor("Button.foreground"))
+        val separatorColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
+        val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
+        val scrollbarThumbColor = selectFieldBackgroundColor
+
+        // Cloud fix specific colors
+        val successColor = getHexColor(UIManager.getColor("Actions.Green") ?: JBColor.GREEN)
+        val warningColor = getHexColor(UIManager.getColor("Actions.Yellow") ?: JBColor.YELLOW)
+        val hoverColor = getHexColor(UIManager.getColor("ActionButton.hoverBackground"))
+        val borderColor = getHexColor(UIManager.getColor("Borders.color"))
+        val secondaryColor = getHexColor(UIManager.getColor("Button.startBackground"))
+        val secondaryForegroundColor = getHexColor(UIManager.getColor("Label.infoForeground"))
+
+        val fontFamily =
+            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif"
+        val fontSize = "${UIUtil.getLabelFont().size}px"
+
+        return NxCloudFixStyles(
+            backgroundColor = backgroundColor,
+            foregroundColor = foregroundColor,
+            mutedForegroundColor = mutedForegroundColor,
+            primaryColor = primaryColor,
+            errorColor = errorColor,
+            fieldBackgroundColor = fieldBackgroundColor,
+            fieldBorderColor = fieldBorderColor,
+            selectFieldBackgroundColor = selectFieldBackgroundColor,
+            activeSelectionBackgroundColor = activeSelectionBackgroundColor,
+            focusBorderColor = focusBorderColor,
+            badgeBackgroundColor = badgeBackgroundColor,
+            badgeForegroundColor = badgeForegroundColor,
+            bannerWarningBackgroundColor = bannerWarningBackgroundColor,
+            bannerTextColor = bannerTextColor,
+            separatorColor = separatorColor,
+            fieldNavHoverColor = fieldNavHoverColor,
+            scrollbarThumbColor = scrollbarThumbColor,
+            fontFamily = fontFamily,
+            fontSize = fontSize,
+            successColor = successColor,
+            warningColor = warningColor,
+            hoverColor = hoverColor,
+            borderColor = borderColor,
+            secondaryColor = secondaryColor,
+            secondaryForegroundColor = secondaryForegroundColor
+        )
     }
 }
 

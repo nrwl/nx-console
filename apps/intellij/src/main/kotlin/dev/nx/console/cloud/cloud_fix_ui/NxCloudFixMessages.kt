@@ -14,8 +14,6 @@ sealed class NxCloudFixMessage {
     @Serializable @SerialName("reject") object Reject : NxCloudFixMessage()
 
     @Serializable @SerialName("show-diff") object ShowDiff : NxCloudFixMessage()
-
-    @Serializable @SerialName("webview-ready") object WebviewReady : NxCloudFixMessage()
 }
 
 @Serializable

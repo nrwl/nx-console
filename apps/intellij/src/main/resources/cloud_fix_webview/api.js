@@ -28,16 +28,7 @@ window.intellijApi = {
   }
 };
 
-// Mock the VS Code API that the webview expects
-window.acquireVsCodeApi = () => {
-  return {
-    postMessage: (message) => {
-      console.log('vscode postMessage called with:', message);
-      window.intellijApi.postToIde(message);
-    },
-    getState: () => undefined,
-    setState: () => {}
-  };
-};
+// Don't provide acquireVsCodeApi so the webview correctly detects IntelliJ
+// The ide-communication.controller will catch the error and set editor = 'intellij'
 
-console.log('registered IntelliJ-VSCode bridge API');
+console.log('registered IntelliJ API');

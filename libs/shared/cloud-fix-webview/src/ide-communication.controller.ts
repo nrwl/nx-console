@@ -41,10 +41,6 @@ export class IdeCommunicationController implements ReactiveController {
     if (globalThis.fixDetails) {
       this.details = globalThis.fixDetails as NxCloudFixData;
     }
-
-    this.postMessageToIde({
-      type: 'output-init',
-    });
   }
 
   hostConnected(): void {
@@ -66,7 +62,7 @@ export class IdeCommunicationController implements ReactiveController {
         }
         console.log('received message from vscode', data);
         this.handleInputMessage(data);
-      }
+      },
     );
 
     this.postToIde = (message) => vscode.postMessage(message);
@@ -81,7 +77,7 @@ export class IdeCommunicationController implements ReactiveController {
         }
 
         this.handleInputMessage(message);
-      }
+      },
     );
 
     this.postToIde = (message) => {
@@ -94,7 +90,6 @@ export class IdeCommunicationController implements ReactiveController {
     switch (message.type) {
       case 'update-details': {
         this.details = message.details;
-        globalThis.fixDetails = message.details;
         this.host.requestUpdate();
         break;
       }

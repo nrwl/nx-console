@@ -243,9 +243,10 @@ export class NxCloudFixComponent extends LitElement {
         class="border-border bg-background relative m-0 border p-6 text-center"
       >
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-          <i
-            class="codicon codicon-loading animate-spin-slow text-[64px] leading-none"
-          ></i>
+          <icon-element
+            icon="loading"
+            class="animate-spin-slow leading-none"
+          ></icon-element>
         </div>
         <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
           Creating Fix<span
@@ -267,9 +268,10 @@ export class NxCloudFixComponent extends LitElement {
           class="border-border bg-background relative m-0 border p-6 text-center"
         >
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-            <i
-              class="codicon codicon-circle-slash text-foreground text-[64px] leading-none opacity-70"
-            ></i>
+            <icon-element
+              icon="circle-slash"
+              class="text-foreground leading-none opacity-70"
+            ></icon-element>
           </div>
           <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
             Fix Rejected
@@ -288,9 +290,10 @@ export class NxCloudFixComponent extends LitElement {
           class="border-border bg-background relative m-0 border p-6 text-center"
         >
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-            <i
-              class="codicon codicon-git-branch text-success text-[64px] leading-none"
-            ></i>
+            <icon-element
+              icon="git-branch"
+              class="text-success leading-none"
+            ></icon-element>
           </div>
           <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
             Fix Applied
@@ -390,7 +393,10 @@ export class NxCloudFixComponent extends LitElement {
         return html`
           <div class="creating-fix-section">
             <div class="creating-fix-icon">
-              <i class="codicon codicon-loading codicon-modifier-spin"></i>
+              <icon-element
+                icon="loading"
+                class="animate-spin-slow leading-none"
+              ></icon-element>
             </div>
             <h2 class="creating-fix-title">
               Verifying Fix<span class="loading-dots"></span>
@@ -407,9 +413,10 @@ export class NxCloudFixComponent extends LitElement {
             class="border-border bg-background relative m-0 border p-6 text-center"
           >
             <div class="mb-2 flex items-center justify-center gap-3">
-              <i
-                class="codicon codicon-verified text-success text-2xl leading-none"
-              ></i>
+              <icon-element
+                icon="verified"
+                class="text-success leading-none"
+              ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
                 Fix Verified on Nx Cloud
               </h2>
@@ -426,9 +433,10 @@ export class NxCloudFixComponent extends LitElement {
         return html`
           <div class="creating-fix-section">
             <div class="creating-fix-icon">
-              <i
-                class="codicon codicon-error text-error text-[64px] leading-none"
-              ></i>
+              <icon-element
+                icon="error"
+                class="text-error leading-none"
+              ></icon-element>
             </div>
             <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
               Fix Verification Failed
