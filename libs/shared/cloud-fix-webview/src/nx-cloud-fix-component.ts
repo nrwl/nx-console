@@ -18,10 +18,6 @@ export type NxCloudFixData = {
 export class NxCloudFixComponent extends LitElement {
   constructor() {
     super();
-    new ContextProvider(this, {
-      context: editorContext,
-      initialValue: 'vscode',
-    });
 
     // Add codicons CSS
     if (!document.querySelector('link[href*="codicon.css"]')) {

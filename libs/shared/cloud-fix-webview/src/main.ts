@@ -1,47 +1,28 @@
-import { html, LitElement, TemplateResult, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import type { NxCloudFixMessage } from '@nx-console/shared-types';
-import type { WebviewApi } from 'vscode-webview';
+import { html, LitElement, TemplateResult } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import '@nx-console/shared-ui-components';
 import './nx-cloud-fix-component';
 import './tailwind.css';
-import type { NxCloudFixData } from './nx-cloud-fix-component';
+import './intellij-api.d.ts';
+import { IdeCommunicationController } from './ide-communication.controller';
 
 @customElement('root-nx-cloud-fix-element')
 export class Root extends LitElement {
-  static override styles = css`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  `;
+  private icc: IdeCommunicationController;
 
   constructor() {
     super();
+    this.icc = new IdeCommunicationController(this);
   }
 
   protected override createRenderRoot(): Element | ShadowRoot {
     return this;
   }
 
-  private vscodeApi: WebviewApi<undefined> = acquireVsCodeApi();
-
-  override connectedCallback() {
-    super.connectedCallback();
-    // Listen for messages from the extension
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'update-details') {
-        globalThis.fixDetails = event.data.details as NxCloudFixData;
-        this.requestUpdate();
-      }
-    });
-  }
-
   override render(): TemplateResult {
     return html`
       <nx-cloud-fix-component
-        .details=${globalThis.fixDetails as NxCloudFixData}
+        .details=${this.icc.details}
         .onApply=${() => this.handleApply()}
         .onApplyLocally=${() => this.handleApplyLocally()}
         .onReject=${() => this.handleReject()}
@@ -51,20 +32,18 @@ export class Root extends LitElement {
   }
 
   private handleApply() {
-    this.vscodeApi.postMessage({ type: 'apply' } as NxCloudFixMessage);
+    this.icc.postMessageToIde({ type: 'apply' });
   }
 
   private handleApplyLocally() {
-    this.vscodeApi.postMessage({
-      type: 'apply-locally',
-    } as NxCloudFixMessage);
+    this.icc.postMessageToIde({ type: 'apply-locally' });
   }
 
   private handleReject() {
-    this.vscodeApi.postMessage({ type: 'reject' } as NxCloudFixMessage);
+    this.icc.postMessageToIde({ type: 'reject' });
   }
 
   private handleShowDiff() {
-    this.vscodeApi.postMessage({ type: 'show-diff' } as NxCloudFixMessage);
+    this.icc.postMessageToIde({ type: 'show-diff' });
   }
 }
