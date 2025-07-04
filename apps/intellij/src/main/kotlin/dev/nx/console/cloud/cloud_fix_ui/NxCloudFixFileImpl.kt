@@ -8,6 +8,7 @@ import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
@@ -28,6 +29,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.cloud.NxCloudApiService
+import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
@@ -40,7 +42,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 @Serializable
@@ -70,7 +71,7 @@ data class NxCloudFixStyles(
     val hoverColor: String,
     val borderColor: String,
     val secondaryColor: String,
-    val secondaryForegroundColor: String
+    val secondaryForegroundColor: String,
 )
 
 class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFixFile(name) {
@@ -98,7 +99,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         browser.jbCefClient.addContextMenuHandler(
             OpenDevToolsContextMenuHandler(),
-            browser.cefBrowser
+            browser.cefBrowser,
         )
 
         // Setup the main UI
@@ -108,6 +109,35 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         // Start with webview only
         showWebviewOnly()
 
+        val listener = { cipeDataResponse: CIPEDataResponse ->
+            if (currentFixDetails != null) {
+                val cipe =
+                    cipeDataResponse.info?.find {
+                        it.ciPipelineExecutionId == currentFixDetails?.cipe?.ciPipelineExecutionId
+                    }
+                val runGroup =
+                    cipe?.runGroups?.find { it.runGroup == currentFixDetails?.runGroup?.runGroup }
+                if (cipe != null && runGroup != null) {
+                    currentFixDetails =
+                        NxCloudFixDetails(
+                            cipe = cipe,
+                            runGroup = runGroup,
+                            terminalOutput = currentFixDetails?.terminalOutput,
+                        )
+                    currentFixDetails?.let { this.sendFixDetailsToWebview(it) }
+                }
+            }
+        }
+
+        CIPEPollingService.getInstance(project).addDataUpdateListener(listener)
+
+        val disposable = object: Disposable {
+            override fun dispose() {
+                CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
+            }
+        }
+
+        Disposer.register(browser, disposable)
         return mainPanel
     }
 
@@ -124,7 +154,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 .createNotification(
                     "Failed to Load AI Fix",
                     "Could not parse AI fix data: ${e.message}",
-                    com.intellij.notification.NotificationType.ERROR
+                    com.intellij.notification.NotificationType.ERROR,
                 )
                 .notify(project)
 
@@ -150,7 +180,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     }
 
     private suspend fun loadHtmlWithInitialData(details: NxCloudFixDetails) {
-        val mockDetails = json.encodeToString(details)
+        val detailsString = json.encodeToString(details)
 
         val html =
             """
@@ -169,14 +199,14 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                         background-color: ${getHexColor(UIUtil.getPanelBackground())};
                         font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
                         font-size: ${UIUtil.getLabelFont().size}px;
-                        color: ${getHexColor(if (!com.intellij.ui.JBColor.isBright()) UIUtil.getActiveTextColor() else UIUtil.getLabelForeground())};
+                        color: ${getHexColor(if (!JBColor.isBright()) UIUtil.getActiveTextColor() else UIUtil.getLabelForeground())};
                     }
                 </style>
             </head>
             <body>
                 <script>
                     // Set initial data before any scripts load
-                    globalThis.fixDetails = $mockDetails;
+                    globalThis.fixDetails = $detailsString;
                 </script>
 
                 <script src="api.js"></script>
@@ -193,7 +223,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             browser.awaitLoad()
         }
 
-        // Setup message handling after the browser loads
         setupMessageHandling()
     }
 
@@ -587,7 +616,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 logger<NxCloudFixFileImpl>().error("Failed to create diff viewer", e)
                 diffContainer.add(
                     createErrorPanel("Could not create diff viewer: ${e.message}"),
-                    BorderLayout.CENTER
+                    BorderLayout.CENTER,
                 )
             }
 
@@ -604,7 +633,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
             add(
                 JBLabel(message, AllIcons.General.Error, SwingConstants.CENTER),
-                BorderLayout.CENTER
+                BorderLayout.CENTER,
             )
         }
     }
@@ -615,7 +644,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             JBLabel("No diff to display", SwingConstants.CENTER).apply {
                 foreground = UIUtil.getInactiveTextColor()
             },
-            BorderLayout.CENTER
+            BorderLayout.CENTER,
         )
         diffContainer.revalidate()
         diffContainer.repaint()
@@ -625,7 +654,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         diffContainer.removeAll()
         diffContainer.add(
             JBLabel(message, AllIcons.General.Error, SwingConstants.CENTER),
-            BorderLayout.CENTER
+            BorderLayout.CENTER,
         )
         diffContainer.revalidate()
         diffContainer.repaint()
@@ -697,7 +726,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             hoverColor = hoverColor,
             borderColor = borderColor,
             secondaryColor = secondaryColor,
-            secondaryForegroundColor = secondaryForegroundColor
+            secondaryForegroundColor = secondaryForegroundColor,
         )
     }
 }

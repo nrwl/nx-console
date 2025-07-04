@@ -89,7 +89,10 @@ export class IdeCommunicationController implements ReactiveController {
   private handleInputMessage(message: NxCloudFixInputMessage) {
     switch (message.type) {
       case 'update-details': {
-        this.details = message.details;
+        this.details = {
+          ...this.details,
+          ...(message.details ?? {}),
+        };
         this.host.requestUpdate();
         break;
       }

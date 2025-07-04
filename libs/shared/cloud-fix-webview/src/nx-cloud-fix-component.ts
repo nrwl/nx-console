@@ -1,6 +1,7 @@
 import { ContextProvider } from '@lit-labs/context';
 import type { CIPEInfo, CIPERunGroup, NxAiFix } from '@nx-console/shared-types';
 import {
+  EditorContext,
   editorContext,
   getVscodeStyleMappings,
 } from '@nx-console/shared-ui-components';
@@ -16,17 +17,19 @@ export type NxCloudFixData = {
 };
 
 @customElement('nx-cloud-fix-component')
-export class NxCloudFixComponent extends LitElement {
+export class NxCloudFixComponent extends EditorContext(LitElement) {
   constructor() {
     super();
 
-    // Add codicons CSS
-    if (!document.querySelector('link[href*="codicon.css"]')) {
-      const codiconsLink = document.createElement('link');
-      codiconsLink.rel = 'stylesheet';
-      codiconsLink.href =
-        'https://unpkg.com/@vscode/codicons@0.0.36/dist/codicon.css';
-      document.head.appendChild(codiconsLink);
+    if (this.editor === 'vscode') {
+      // Add codicons CSS
+      if (!document.querySelector('link[href*="codicon.css"]')) {
+        const codiconsLink = document.createElement('link');
+        codiconsLink.rel = 'stylesheet';
+        codiconsLink.href =
+          'https://unpkg.com/@vscode/codicons@0.0.36/dist/codicon.css';
+        document.head.appendChild(codiconsLink);
+      }
     }
   }
 
@@ -356,6 +359,7 @@ export class NxCloudFixComponent extends LitElement {
   }
 
   private getStatusSection(aiFix: NxAiFix): TemplateResult {
+    console.log('aiFix', aiFix);
     const hasAiFix = !!aiFix.suggestedFix;
     // TODO: Remove this once all environments have been migrated after deployment
     // Fall back to original validationStatus field for backwards compatibility

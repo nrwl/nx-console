@@ -2,7 +2,7 @@ import type { NxCloudFixData } from './nx-cloud-fix-component';
 
 // Input messages (from IDE to webview)
 export type NxCloudFixInputMessage =
-  | { type: 'update-details'; details: NxCloudFixData }
+  | { type: 'update-details'; details: Partial<NxCloudFixData> }
   | { type: 'styles'; payload: NxCloudFixStyles };
 
 // Output messages (from webview to IDE)
