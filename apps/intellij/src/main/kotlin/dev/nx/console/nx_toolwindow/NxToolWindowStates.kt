@@ -2,6 +2,7 @@ package dev.nx.console.nx_toolwindow
 
 import com.intellij.openapi.application.EDT
 import dev.nx.console.models.NxWorkspace
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import java.awt.event.ActionListener
 import javax.swing.JComponent
@@ -163,7 +164,8 @@ fun createNxCloudStateGroup(
     openNxCloudPanel: MutableRef<JPanel?>,
     connectToNxCloudPanel: MutableRef<JPanel?>,
     nxToolMainComponents: NxToolMainComponents,
-    nxConnectActionListener: ActionListener
+    nxConnectActionListener: ActionListener,
+    cipeTreeStructure: CIPETreeStructure
 ) {
     hidden {
         onEntry {
@@ -181,7 +183,7 @@ fun createNxCloudStateGroup(
             openNxCloudPanel.value?.let { panel -> panel.isVisible = true }
                 ?: run {
                     openNxCloudPanel.value =
-                        nxToolMainComponents.createConnectedToNxCloudPanel(data)
+                        nxToolMainComponents.createConnectedToNxCloudPanel(data, cipeTreeStructure)
                 }
             connectToNxCloudPanel.value?.let { panel -> panel.isVisible = false }
         }

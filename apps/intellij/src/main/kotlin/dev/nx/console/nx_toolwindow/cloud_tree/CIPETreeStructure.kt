@@ -6,7 +6,6 @@ import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import dev.nx.console.models.*
-import dev.nx.console.nx_toolwindow.cloud_tree.models.MockCIPEDataProvider
 import dev.nx.console.nx_toolwindow.cloud_tree.models.getDurationString
 import dev.nx.console.nx_toolwindow.cloud_tree.models.getTimeAgoString
 import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
@@ -19,8 +18,8 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure(), D
     private var childrenCache: MutableMap<CIPESimpleNode, Array<CIPESimpleNode>> = mutableMapOf()
 
     init {
-        // Load initial mock data
-        updateCIPEData(MockCIPEDataProvider.getMockCIPEData())
+        // Start with empty data - will be populated by real API data
+        updateCIPEData(emptyList())
     }
 
     override fun getRootElement(): Any = rootNode

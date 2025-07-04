@@ -314,12 +314,13 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createConnectedToNxCloudPanel(nxCloudUrl: String): JPanel {
-        // Create CIPE tree component and check if it has data
-        val cipeTreeComponent = createCIPETreeComponent()
-        val cipeTreeStructure =
-            cipeTreeComponent.getClientProperty("cipeTreeStructure") as? CIPETreeStructure
-        val hasCIPEData = cipeTreeStructure?.hasCIPEData() ?: false
+    fun createConnectedToNxCloudPanel(
+        nxCloudUrl: String,
+        cipeTreeStructure: CIPETreeStructure
+    ): JPanel {
+        // Create CIPE tree component with the provided structure
+        val cipeTreeComponent = createCIPETreeComponent(cipeTreeStructure)
+        val hasCIPEData = cipeTreeStructure.hasCIPEData()
 
         return JPanel().apply {
             layout = BorderLayout()
@@ -482,8 +483,7 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createCIPETreeComponent(): JComponent {
-        val cipeTreeStructure = CIPETreeStructure(project)
+    fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
         val treeModel = cipeTreeStructure.createTreeModel()
 
         val tree =
@@ -525,8 +525,6 @@ class NxToolMainComponents(private val project: Project) {
         return ScrollPaneFactory.createScrollPane(tree, 0).apply {
             preferredSize = Dimension(300, 400)
             minimumSize = Dimension(200, 200)
-            // Store the tree structure as a client property for access
-            putClientProperty("cipeTreeStructure", cipeTreeStructure)
         }
     }
 }
