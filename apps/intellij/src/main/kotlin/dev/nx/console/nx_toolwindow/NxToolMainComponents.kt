@@ -315,47 +315,55 @@ class NxToolMainComponents(private val project: Project) {
     }
 
     fun createConnectedToNxCloudPanel(nxCloudUrl: String): JPanel {
+        // Create CIPE tree component and check if it has data
+        val cipeTreeComponent = createCIPETreeComponent()
+        val cipeTreeStructure =
+            cipeTreeComponent.getClientProperty("cipeTreeStructure") as? CIPETreeStructure
+        val hasCIPEData = cipeTreeStructure?.hasCIPEData() ?: false
+
         return JPanel().apply {
             layout = BorderLayout()
             border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
 
-            // Header panel with connection status
-            val headerPanel =
-                JPanel().apply {
-                    layout = BoxLayout(this, BoxLayout.X_AXIS)
-                    border = JBUI.Borders.empty(5, 10)
+            // Only show header if there's no CIPE data
+            if (!hasCIPEData) {
+                // Header panel with connection status
+                val headerPanel =
+                    JPanel().apply {
+                        layout = BoxLayout(this, BoxLayout.X_AXIS)
+                        border = JBUI.Borders.empty(5, 10)
 
-                    add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
-                    add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
-                    add(
-                        JLabel("Connected to Nx Cloud").apply {
-                            font = Font(font.name, Font.BOLD, font.size)
-                            alignmentX = Component.LEFT_ALIGNMENT
-                        }
-                    )
-                    add(Box.createHorizontalGlue())
-                    add(
-                        JButton().apply {
-                            icon = AllIcons.ToolbarDecorator.Export
-                            toolTipText = "Open Nx Cloud"
-
-                            isContentAreaFilled = false
-                            isBorderPainted = false
-                            isFocusPainted = false
-                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                            addActionListener {
-                                TelemetryService.getInstance(project)
-                                    .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                                BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
+                        add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
+                        add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
+                        add(
+                            JLabel("Connected to Nx Cloud").apply {
+                                font = Font(font.name, Font.BOLD, font.size)
+                                alignmentX = Component.LEFT_ALIGNMENT
                             }
-                        }
-                    )
-                }
+                        )
+                        add(Box.createHorizontalGlue())
+                        add(
+                            JButton().apply {
+                                icon = AllIcons.ToolbarDecorator.Export
+                                toolTipText = "Open Nx Cloud"
 
-            add(headerPanel, BorderLayout.NORTH)
+                                isContentAreaFilled = false
+                                isBorderPainted = false
+                                isFocusPainted = false
+                                cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                                addActionListener {
+                                    TelemetryService.getInstance(project)
+                                        .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+                                    BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
+                                }
+                            }
+                        )
+                    }
+
+                add(headerPanel, BorderLayout.NORTH)
+            }
 
             // Add CIPE tree component
-            val cipeTreeComponent = createCIPETreeComponent()
             add(cipeTreeComponent, BorderLayout.CENTER)
         }
     }
@@ -517,6 +525,8 @@ class NxToolMainComponents(private val project: Project) {
         return ScrollPaneFactory.createScrollPane(tree, 0).apply {
             preferredSize = Dimension(300, 400)
             minimumSize = Dimension(200, 200)
+            // Store the tree structure as a client property for access
+            putClientProperty("cipeTreeStructure", cipeTreeStructure)
         }
     }
 }

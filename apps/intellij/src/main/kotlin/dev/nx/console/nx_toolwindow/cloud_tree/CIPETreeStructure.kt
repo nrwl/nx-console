@@ -196,6 +196,10 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure(), D
         childrenCache.clear()
     }
 
+    fun hasCIPEData(): Boolean {
+        return cipeData.isNotEmpty()
+    }
+
     fun createTreeModel(): TreeModel {
         val structureModel = StructureTreeModel(this, project)
         return AsyncTreeModel(structureModel, project)
