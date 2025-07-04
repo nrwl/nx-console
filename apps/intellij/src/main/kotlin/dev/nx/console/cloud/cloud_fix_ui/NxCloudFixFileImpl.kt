@@ -9,7 +9,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
@@ -17,7 +16,6 @@ import com.intellij.openapi.diff.impl.patch.PatchReader
 import com.intellij.openapi.diff.impl.patch.PatchSyntaxException
 import com.intellij.openapi.diff.impl.patch.TextFilePatch
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.changes.patch.tool.PatchDiffRequest
@@ -81,7 +79,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     // UI Components
     private val mainPanel = JPanel(BorderLayout())
-    private val toolbar = createToolbar()
     private val splitter = JBSplitter(false, 0.6f) // 60% webview, 40% diff
     private val diffContainer = JPanel(BorderLayout())
     private var diffProcessor: CacheDiffRequestChainProcessor? = null
@@ -103,7 +100,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         )
 
         // Setup the main UI
-        mainPanel.add(toolbar, BorderLayout.NORTH)
         mainPanel.add(splitter, BorderLayout.CENTER)
 
         // Start with webview only
@@ -490,29 +486,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         } else {
             showWithPreview()
         }
-    }
-
-    private fun createToolbar(): JComponent {
-        val toggleDiffAction =
-            object :
-                AnAction("Toggle Diff", "Toggle diff preview", AllIcons.Actions.Diff), DumbAware {
-                override fun actionPerformed(e: AnActionEvent) {
-                    togglePreview()
-                }
-
-                override fun update(e: AnActionEvent) {
-                    e.presentation.icon =
-                        if (isShowingPreview) AllIcons.Actions.PreviewDetails
-                        else AllIcons.Actions.Diff
-                }
-            }
-
-        val actionGroup = DefaultActionGroup(toggleDiffAction)
-        val toolbar =
-            ActionManager.getInstance()
-                .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, actionGroup, true)
-        toolbar.targetComponent = mainPanel
-        return toolbar.component
     }
 
     private fun showSuccessNotification(message: String) {
