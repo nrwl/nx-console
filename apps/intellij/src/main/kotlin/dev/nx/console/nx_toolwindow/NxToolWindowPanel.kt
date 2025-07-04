@@ -45,10 +45,8 @@ class NxToolWindowPanel(private val project: Project) :
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
 
-    // Create CIPE tree structure following the same pattern as project tree
     private val cipeTreeStructure = CIPETreeStructure(project)
 
-    // Declare the channel to serialize all KStateMachine events
     private val eventChannel = Channel<Event>(capacity = 100)
 
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
@@ -117,9 +115,14 @@ class NxToolWindowPanel(private val project: Project) :
             }
         }
 
-        // Set up CIPE polling service listener
         val cipePollingService = CIPEPollingService.getInstance(project)
         cipePollingService.addDataUpdateListener(cipeDataListener)
+
+        scope.launch {
+            NxlsService.getInstance(project).awaitStarted()
+            CIPEPollingService.getInstance(project).forcePoll()
+        }
+
 
         scope.launch {
             stateMachine =

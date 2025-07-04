@@ -133,48 +133,80 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             presentation.tooltip = getFixTooltip()
         }
 
-        override fun getName(): String =
-            when (aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED) {
-                AITaskFixVerificationStatus.NOT_STARTED -> "Generating fix..."
-                AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
-                AITaskFixVerificationStatus.COMPLETED ->
-                    when (aiFix.userAction ?: AITaskFixUserAction.NONE) {
-                        AITaskFixUserAction.APPLIED -> "Fix applied"
-                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
-                        AITaskFixUserAction.REJECTED -> "Fix rejected"
-                        AITaskFixUserAction.NONE -> "Fix ready to apply"
-                    }
-                AITaskFixVerificationStatus.FAILED -> "Fix generation failed"
+        override fun getName(): String {
+            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            
+            return when {
+                // Check fix generation status first
+                fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> "Waiting for fix..."
+                fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Creating fix..."
+                fixStatus == AITaskFixVerificationStatus.FAILED -> "Fix creation failed"
+                fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> "Fix not executable"
+                
+                // If fix is generated, check verification/user action
+                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
+                verificationStatus == AITaskFixVerificationStatus.FAILED -> "Fix verification failed"
+                
+                // Check user actions
+                else -> when (aiFix.userAction ?: AITaskFixUserAction.NONE) {
+                    AITaskFixUserAction.APPLIED -> "Fix applied"
+                    AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
+                    AITaskFixUserAction.REJECTED -> "Fix rejected"
+                    AITaskFixUserAction.NONE -> "Fix ready to apply"
+                }
             }
+        }
 
         private fun getFixIcon(): Icon {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
+            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
             val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            
             return when {
+                // User actions take precedence
                 userAction == AITaskFixUserAction.APPLIED ||
                     userAction == AITaskFixUserAction.APPLIED_LOCALLY -> AllIcons.Actions.Checked
                 userAction == AITaskFixUserAction.REJECTED -> AllIcons.Actions.Cancel
-                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS ->
-                    AnimatedIcon.Default()
+                
+                // Fix generation status
+                fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default()
+                fixStatus == AITaskFixVerificationStatus.FAILED || 
+                    fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> AllIcons.General.Error
+                fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> AllIcons.General.Information
+                
+                // Verification status
+                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default()
                 verificationStatus == AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error
+                
+                // Default for completed fix
                 else -> AllIcons.Actions.QuickfixBulb
             }
         }
 
         private fun getFixTooltip(): String {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
+            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
             val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            return when (verificationStatus) {
-                AITaskFixVerificationStatus.NOT_STARTED -> "Generating AI fix..."
-                AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying AI fix..."
-                AITaskFixVerificationStatus.COMPLETED ->
-                    when (userAction) {
-                        AITaskFixUserAction.APPLIED -> "Fix has been applied"
-                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
-                        AITaskFixUserAction.REJECTED -> "Fix was rejected"
-                        AITaskFixUserAction.NONE -> "Click to view and apply fix"
-                    }
-                AITaskFixVerificationStatus.FAILED -> "Failed to generate fix"
+            
+            return when {
+                // Check fix generation status first
+                fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> "Waiting for AI fix generation..."
+                fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Creating AI fix..."
+                fixStatus == AITaskFixVerificationStatus.FAILED -> "Failed to create AI fix"
+                fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> "Fix cannot be executed"
+                
+                // Check verification status
+                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying AI fix..."
+                verificationStatus == AITaskFixVerificationStatus.FAILED -> "Failed to verify fix"
+                
+                // Check user actions for completed fixes
+                else -> when (userAction) {
+                    AITaskFixUserAction.APPLIED -> "Fix has been applied"
+                    AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
+                    AITaskFixUserAction.REJECTED -> "Fix was rejected"
+                    AITaskFixUserAction.NONE -> "Click to view and apply fix"
+                }
             }
         }
     }

@@ -135,6 +135,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             }
 
         Disposer.register(browser, disposable)
+
         return mainPanel
     }
 
