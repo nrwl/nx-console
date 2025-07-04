@@ -23,16 +23,14 @@ import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nodeInterpreter
+import kotlinx.coroutines.*
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.ActionEvent
 import javax.swing.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.nsk.kstatemachine.event.Event
+import com.intellij.openapi.diagnostic.thisLogger
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.createStateMachine
@@ -42,6 +40,7 @@ import ru.nsk.kstatemachine.transition.TransitionParams
 class NxToolWindowPanel(private val project: Project) :
     SimpleToolWindowPanel(true, true), Disposable {
 
+    private val logger = thisLogger()
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
 
@@ -59,20 +58,36 @@ class NxToolWindowPanel(private val project: Project) :
 
     // CIPE data update listener
     private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeData ->
+        logger.info("[NX_TOOLWINDOW] CIPE data listener triggered - " +
+            "received ${cipeData.info?.size ?: 0} CIPEs, error: ${cipeData.error?.type ?: "none"}")
+
         scope.launch {
             withContext(Dispatchers.EDT) {
                 // Update tree with real CIPE data
                 cipeData.info?.let { cipeInfoList ->
+                    logger.debug("[NX_TOOLWINDOW] Updating CIPE tree with ${cipeInfoList.size} CIPEs")
                     cipeTreeStructure.updateCIPEData(cipeInfoList)
+
+                    // Log details about each CIPE
+                    cipeInfoList.forEach { cipe ->
+                        logger.debug("[NX_TOOLWINDOW] CIPE ${cipe.ciPipelineExecutionId}: " +
+                            "status=${cipe.status}, branch=${cipe.branch ?: "unknown"}, " +
+                            "runGroups=${cipe.runGroups.size}")
+                    }
                 }
                     ?: run {
                         // Clear data if no CIPEs
+                        logger.debug("[NX_TOOLWINDOW] No CIPE data received, clearing tree")
                         cipeTreeStructure.updateCIPEData(emptyList())
                     }
 
                 // Force tree refresh
+                logger.debug("[NX_TOOLWINDOW] Forcing tree UI refresh")
                 openNxCloudPanel.value?.revalidate()
                 openNxCloudPanel.value?.repaint()
+                connectToNxCloudPanel.value?.revalidate()
+                connectToNxCloudPanel.value?.repaint()
+                loadToolwindowContent()
             }
         }
     }
@@ -117,12 +132,6 @@ class NxToolWindowPanel(private val project: Project) :
 
         val cipePollingService = CIPEPollingService.getInstance(project)
         cipePollingService.addDataUpdateListener(cipeDataListener)
-
-        scope.launch {
-            NxlsService.getInstance(project).awaitStarted()
-            CIPEPollingService.getInstance(project).forcePoll()
-        }
-
 
         scope.launch {
             stateMachine =

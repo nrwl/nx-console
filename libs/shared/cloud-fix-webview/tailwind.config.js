@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['libs/shared/cloud-fix-webview/src/**/*.{html,js,ts}'],
+  content: [
+    'libs/shared/cloud-fix-webview/src/**/*.{html,js,ts}',
+    'libs/shared/ui-components/src/**/*.{html,js,ts}',
+  ],
   theme: {
     extend: {
       colors: {
