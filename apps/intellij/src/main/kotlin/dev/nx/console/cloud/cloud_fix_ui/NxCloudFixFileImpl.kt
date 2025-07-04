@@ -131,11 +131,12 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
         CIPEPollingService.getInstance(project).addDataUpdateListener(listener)
 
-        val disposable = object: Disposable {
-            override fun dispose() {
-                CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
+        val disposable =
+            object : Disposable {
+                override fun dispose() {
+                    CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
+                }
             }
-        }
 
         Disposer.register(browser, disposable)
         return mainPanel

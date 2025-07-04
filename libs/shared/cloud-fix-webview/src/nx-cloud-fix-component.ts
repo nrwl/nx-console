@@ -377,6 +377,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         return this.createFixCreationFailedSection();
       } else if (suggestedFixStatus === 'NOT_EXECUTABLE') {
         return this.createCancelledFixSection();
+      } else if (suggestedFixStatus === 'COMPLETED' && hasAiFix) {
+        // Fix has been created, now check verification status
+        // Continue to the verification status check below
       }
     } else {
       // todo: remove this once all environments have been updated
@@ -392,6 +395,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     }
 
     // Fix exists, show verification status
+    // If there's no verification status but we have a fix, it means verification hasn't started yet
+    if (!verificationStatus && hasAiFix) {
+      return html``; // Don't show any status section if fix is ready but no verification info
+    }
+    
     switch (verificationStatus) {
       case 'IN_PROGRESS':
         return html`
@@ -460,7 +468,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">
-          <i class="codicon codicon-circle-slash"></i>
+          <icon-element
+            icon="circle-slash"
+            class="text-foreground leading-none opacity-70"
+          ></icon-element>
         </div>
         <h2 class="creating-fix-title">Fix Creation Cancelled</h2>
         <p class="creating-fix-description">
@@ -474,7 +485,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">
-          <i class="codicon codicon-info"></i>
+          <icon-element
+            icon="info"
+            class="text-primary leading-none"
+          ></icon-element>
         </div>
         <h2 class="creating-fix-title">
           Nx Cloud is preparing to generate a fix
@@ -491,10 +505,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     return html`
       <div class="creating-fix-section">
         <div class="creating-fix-icon">
-          <i
-            class="codicon codicon-error"
-            style="color: var(--error-color);"
-          ></i>
+          <icon-element
+            icon="error"
+            class="text-error leading-none"
+          ></icon-element>
         </div>
         <h2 class="creating-fix-title">Fix Creation Failed</h2>
         <p class="creating-fix-description">

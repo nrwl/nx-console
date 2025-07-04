@@ -50,6 +50,7 @@ export async function getRecentCIPEData(
       ciPipelineExecutions: CIPEInfo[];
       workspaceUrl: string;
     };
+    logger.log(`Recent CIPE data: ${JSON.stringify(responseData)}`);
     return {
       info: responseData.ciPipelineExecutions,
       workspaceUrl: responseData.workspaceUrl,

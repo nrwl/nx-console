@@ -71,7 +71,10 @@ data class NxAiFix(
     val terminalLogsUrls: Map<String, String>,
     val suggestedFix: String? = null,
     val suggestedFixDescription: String? = null,
+    val suggestedFixStatus: AITaskFixVerificationStatus? = null,
     val verificationStatus: AITaskFixVerificationStatus? = null,
+    @Deprecated("Use verificationStatus instead")
+    val validationStatus: AITaskFixVerificationStatus? = null,
     val userAction: AITaskFixUserAction? = null
 )
 
@@ -80,7 +83,8 @@ enum class AITaskFixVerificationStatus {
     NOT_STARTED,
     IN_PROGRESS,
     COMPLETED,
-    FAILED
+    FAILED,
+    NOT_EXECUTABLE
 }
 
 @Serializable
