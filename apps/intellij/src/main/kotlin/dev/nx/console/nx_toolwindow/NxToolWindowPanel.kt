@@ -9,7 +9,10 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.cloud.CIPEPollingService
+import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.NxWorkspace
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
@@ -42,6 +45,9 @@ class NxToolWindowPanel(private val project: Project) :
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
 
+    // Create CIPE tree structure following the same pattern as project tree
+    private val cipeTreeStructure = CIPETreeStructure(project)
+
     // Declare the channel to serialize all KStateMachine events
     private val eventChannel = Channel<Event>(capacity = 100)
 
@@ -52,6 +58,26 @@ class NxToolWindowPanel(private val project: Project) :
     private var errorCountAndComponent: MutableRef<Pair<Int, JComponent>?> = MutableRef(null)
     private var openNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
     private var connectToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
+
+    // CIPE data update listener
+    private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeData ->
+        scope.launch {
+            withContext(Dispatchers.EDT) {
+                // Update tree with real CIPE data
+                cipeData.info?.let { cipeInfoList ->
+                    cipeTreeStructure.updateCIPEData(cipeInfoList)
+                }
+                    ?: run {
+                        // Clear data if no CIPEs
+                        cipeTreeStructure.updateCIPEData(emptyList())
+                    }
+
+                // Force tree refresh
+                openNxCloudPanel.value?.revalidate()
+                openNxCloudPanel.value?.repaint()
+            }
+        }
+    }
 
     private val progressBar =
         JProgressBar().apply {
@@ -90,6 +116,10 @@ class NxToolWindowPanel(private val project: Project) :
                 stateMachine.processEvent(event)
             }
         }
+
+        // Set up CIPE polling service listener
+        val cipePollingService = CIPEPollingService.getInstance(project)
+        cipePollingService.addDataUpdateListener(cipeDataListener)
 
         scope.launch {
             stateMachine =
@@ -135,7 +165,8 @@ class NxToolWindowPanel(private val project: Project) :
                             openNxCloudPanel,
                             connectToNxCloudPanel,
                             nxToolMainComponents,
-                            nxConnectActionListener
+                            nxConnectActionListener,
+                            cipeTreeStructure
                         )
                     }
 
@@ -310,6 +341,10 @@ class NxToolWindowPanel(private val project: Project) :
         errorCountAndComponent.value = null
         openNxCloudPanel.value = null
         connectToNxCloudPanel.value = null
+
+        // Clean up CIPE polling listener
+        val cipePollingService = CIPEPollingService.getInstance(project)
+        cipePollingService.removeDataUpdateListener(cipeDataListener)
 
         // It's good practice to close the channel when the Disposable is disposed
         eventChannel.close()

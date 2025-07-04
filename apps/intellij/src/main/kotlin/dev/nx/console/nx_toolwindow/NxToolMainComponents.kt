@@ -7,14 +7,28 @@ import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
+import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.TreeUIHelper
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
+import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
+import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
+import dev.nx.console.models.CIPEInfo
+import dev.nx.console.nxls.NxlsService
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
+import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.run.actions.NxInitService
@@ -22,12 +36,20 @@ import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.*
 import javax.swing.border.CompoundBorder
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.TreePath
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NxToolMainComponents(private val project: Project) {
 
@@ -308,46 +330,58 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createConnectedToNxCloudPanel(nxCloudUrl: String): JPanel {
+    fun createConnectedToNxCloudPanel(
+        nxCloudUrl: String,
+        cipeTreeStructure: CIPETreeStructure
+    ): JPanel {
+        // Create CIPE tree component with the provided structure
+        val cipeTreeComponent = createCIPETreeComponent(cipeTreeStructure)
+        val hasCIPEData = cipeTreeStructure.hasCIPEData()
+
         return JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border =
-                CompoundBorder(
-                    JBUI.Borders.empty(0, 10),
-                    BorderFactory.createMatteBorder(
-                        1,
-                        0,
-                        0,
-                        0,
-                        JBColor.border(),
-                    ),
-                )
+            layout = BorderLayout()
+            border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
 
-            add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
-            add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
-            add(
-                JLabel("Connected to Nx Cloud").apply {
-                    font = Font(font.name, Font.BOLD, font.size)
-                    alignmentX = Component.LEFT_ALIGNMENT
-                }
-            )
-            add(Box.createHorizontalGlue())
-            add(
-                JButton().apply {
-                    icon = AllIcons.ToolbarDecorator.Export
-                    toolTipText = "Open Nx Cloud"
+            // Only show header if there's no CIPE data
+            if (!hasCIPEData) {
+                // Header panel with connection status
+                val headerPanel =
+                    JPanel().apply {
+                        layout = BoxLayout(this, BoxLayout.X_AXIS)
+                        border = JBUI.Borders.empty(5, 10)
 
-                    isContentAreaFilled = false
-                    isBorderPainted = false
-                    isFocusPainted = false
-                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                    addActionListener {
-                        TelemetryService.getInstance(project)
-                            .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                        BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
+                        add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
+                        add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
+                        add(
+                            JLabel("Connected to Nx Cloud").apply {
+                                font = Font(font.name, Font.BOLD, font.size)
+                                alignmentX = Component.LEFT_ALIGNMENT
+                            }
+                        )
+                        add(Box.createHorizontalGlue())
+                        add(
+                            JButton().apply {
+                                icon = AllIcons.ToolbarDecorator.Export
+                                toolTipText = "Open Nx Cloud"
+
+                                isContentAreaFilled = false
+                                isBorderPainted = false
+                                isFocusPainted = false
+                                cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                                addActionListener {
+                                    TelemetryService.getInstance(project)
+                                        .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+                                    BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
+                                }
+                            }
+                        )
                     }
-                }
-            )
+
+                add(headerPanel, BorderLayout.NORTH)
+            }
+
+            // Add CIPE tree component
+            add(cipeTreeComponent, BorderLayout.CENTER)
         }
     }
 
@@ -462,6 +496,159 @@ class NxToolMainComponents(private val project: Project) {
             actionGroup.add(collapseAllAction)
 
             actionManager.createActionToolbar(NxToolWindowPanel.NX_TOOLBAR_PLACE, actionGroup, true)
+        }
+    }
+
+    private fun handleAIFixClick(fixNode: CIPESimpleNode.NxCloudFixNode) {
+        // Track telemetry event
+        TelemetryService.getInstance(project).featureUsed(
+            TelemetryEvent.CLOUD_OPEN_FIX_DETAILS,
+            mapOf("source" to "cipe_tree")
+        )
+        
+        // Find the parent CIPE and run group info
+        var currentNode: CIPESimpleNode? = fixNode
+        var cipeId: String? = null
+        var runGroupName: String? = null
+        
+        while (currentNode != null) {
+            when (currentNode) {
+                is CIPESimpleNode.CIPENode -> cipeId = currentNode.cipeInfo.ciPipelineExecutionId
+                is CIPESimpleNode.RunGroupNode -> runGroupName = currentNode.runGroup.runGroup
+                else -> {}
+            }
+            currentNode = currentNode.parent as? CIPESimpleNode
+        }
+        
+        if (cipeId != null && runGroupName != null) {
+            // Open the cloud fix webview using the same pattern as CIPENotificationService
+            openCloudFixWebview(cipeId, runGroupName)
+        }
+    }
+    
+    private fun openCloudFixWebview(cipeId: String, runGroupId: String) {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            val currentData = NxlsService.getInstance(project).recentCIPEData()
+
+            val cipe = currentData?.info?.find { it.ciPipelineExecutionId == cipeId }
+            val runGroup = cipe?.runGroups?.find { it.runGroup == runGroupId }
+
+            if (cipe == null || runGroup == null) {
+                withContext(Dispatchers.EDT) {
+                    Notification(
+                        "Nx Cloud CIPE",
+                        "AI Fix Not Found",
+                        "Could not find the AI fix data",
+                        NotificationType.ERROR
+                    ).notify(project)
+                }
+                return@launch
+            }
+
+            // Fetch terminal output
+            var terminalOutput: String? = null
+            val aiFix = runGroup.aiFix
+            if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
+                val failedTaskId = aiFix.taskIds.first()
+                val terminalOutputUrl = aiFix.terminalLogsUrls[failedTaskId]
+
+                if (terminalOutputUrl != null) {
+                    try {
+                        val response =
+                            NxlsService.getInstance(project)
+                                .downloadAndExtractArtifact(terminalOutputUrl)
+
+                        if (response?.error != null) {
+                            terminalOutput =
+                                "Failed to retrieve terminal output. Please check the Nx Console output for more details."
+                        } else {
+                            terminalOutput = response?.content
+                        }
+                    } catch (e: Exception) {
+                        terminalOutput =
+                            "Failed to retrieve terminal output. Please check the Nx Console output for more details."
+                    }
+                }
+            }
+
+            val fixDetails =
+                NxCloudFixDetails(cipe = cipe, runGroup = runGroup, terminalOutput = terminalOutput)
+
+            // UI operations must happen on EDT
+            withContext(Dispatchers.EDT) {
+                // Create and open the webview
+                val fixFile = NxCloudFixFileImpl("AI Fix", project)
+                val fileEditorManager = FileEditorManager.getInstance(project)
+                fileEditorManager.openFile(fixFile, true)
+
+                // Show fix details once editor is open
+                fixFile.showFixDetails(fixDetails)
+            }
+        }
+    }
+
+    fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
+        val treeModel = cipeTreeStructure.createTreeModel()
+
+        val tree =
+            Tree(treeModel).apply {
+                isRootVisible = false
+                cellRenderer = CIPETreeCellRenderer()
+                TreeUIHelper.getInstance().installTreeSpeedSearch(this)
+
+                // Auto-expand failed pipelines
+                addTreeExpansionListener(
+                    object : javax.swing.event.TreeExpansionListener {
+                        override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
+                            val path = event.path
+                            val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                            val userObject = lastNode?.userObject
+
+                            if (
+                                userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)
+                            ) {
+                                // Expand children that should be auto-expanded
+                                for (i in 0 until lastNode.childCount) {
+                                    val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
+                                    val childObject = child?.userObject
+                                    if (
+                                        childObject != null &&
+                                            cipeTreeStructure.shouldAutoExpand(childObject)
+                                    ) {
+                                        expandPath(path.pathByAddingChild(child))
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
+                    }
+                )
+
+                // Add mouse listener for AI fix clicks
+                addMouseListener(
+                    object : MouseAdapter() {
+                        override fun mouseClicked(e: MouseEvent) {
+                            if (e.clickCount == 1) {
+                                val path = getPathForLocation(e.x, e.y)
+                                if (path != null) {
+                                    val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                                    val userObject = lastNode?.userObject
+                                    
+                                    // Check if clicked on AI fix node
+                                    if (userObject is CIPESimpleNode.NxCloudFixNode) {
+                                        handleAIFixClick(userObject)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+
+        return ScrollPaneFactory.createScrollPane(tree, 0).apply {
+            preferredSize = Dimension(300, 400)
+            minimumSize = Dimension(200, 200)
         }
     }
 }
