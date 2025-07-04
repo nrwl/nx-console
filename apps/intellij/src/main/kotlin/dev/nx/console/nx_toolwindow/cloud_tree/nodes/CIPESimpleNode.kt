@@ -3,9 +3,9 @@ package dev.nx.console.nx_toolwindow.cloud_tree.nodes
 import com.intellij.icons.AllIcons
 import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.treeStructure.CachingSimpleNode
-import dev.nx.console.models.AITaskFixUserAction
-import dev.nx.console.models.AITaskFixVerificationStatus
-import dev.nx.console.models.CIPEExecutionStatus
+import dev.nx.console.models.*
+import dev.nx.console.nx_toolwindow.cloud_tree.models.getDurationString
+import dev.nx.console.nx_toolwindow.cloud_tree.models.getTimeAgoString
 import javax.swing.Icon
 
 sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent) {
@@ -24,29 +24,26 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
     }
 
     class CIPENode(
-        val cipeId: String,
-        val branch: String,
-        val status: CIPEExecutionStatus,
-        val timeAgo: String,
-        val duration: String?,
+        val cipeInfo: CIPEInfo,
         parent: CIPESimpleNode
     ) : CIPESimpleNode(parent) {
-        override val nodeId = "cipe_$cipeId"
+        override val nodeId = "cipe_${cipeInfo.ciPipelineExecutionId}"
 
         init {
-            icon = getStatusIcon(status)
-            presentation.tooltip = "Pipeline execution on branch: $branch"
+            icon = getStatusIcon(cipeInfo.status)
+            presentation.tooltip = "Pipeline execution on branch: ${cipeInfo.branch}"
         }
 
         override fun getName(): String = buildString {
-            append(branch)
-            if (duration != null && status.isCompleted()) {
+            append(cipeInfo.branch)
+            val duration = cipeInfo.getDurationString()
+            if (duration != null && cipeInfo.status.isCompleted()) {
                 append(" (")
                 append(duration)
                 append(")")
             }
             append(" - ")
-            append(timeAgo)
+            append(cipeInfo.getTimeAgoString())
         }
 
         private fun getStatusIcon(status: CIPEExecutionStatus): Icon =
@@ -60,40 +57,34 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             }
     }
 
-    class RunGroupNode(val groupName: String, val hasAIFixes: Boolean, parent: CIPESimpleNode) :
+    class RunGroupNode(val runGroup: CIPERunGroup, parent: CIPESimpleNode) :
         CIPESimpleNode(parent) {
-        override val nodeId = "rungroup_$groupName"
+        override val nodeId = "rungroup_${runGroup.runGroup}"
 
         init {
             icon = AllIcons.Nodes.Folder
-            presentation.tooltip = if (hasAIFixes) "$groupName (AI fixes available)" else groupName
+            val hasAIFixes = runGroup.aiFix != null
+            val displayName = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
+            presentation.tooltip = if (hasAIFixes) "$displayName (AI fixes available)" else displayName
         }
 
-        override fun getName(): String = groupName
+        override fun getName(): String = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
     }
 
     class RunNode(
-        val runId: String,
-        val command: String,
-        val status: CIPEExecutionStatus,
-        val duration: String?,
-        val failedTaskCount: Int,
+        val run: CIPERun,
         parent: CIPESimpleNode
     ) : CIPESimpleNode(parent) {
-        override val nodeId = "run_$runId"
+        override val nodeId = "run_${run.linkId ?: run.executionId ?: "unknown"}"
 
         init {
-            icon = getStatusIcon(status)
-            presentation.tooltip = command
+            icon = getStatusIcon(run.status ?: CIPEExecutionStatus.NOT_STARTED)
+            presentation.tooltip = run.command
         }
 
         override fun getName(): String = buildString {
-            append(command)
-            if (duration != null && status.isCompleted()) {
-                append(" (")
-                append(duration)
-                append(")")
-            }
+            append(run.command)
+            val failedTaskCount = run.numFailedTasks ?: 0
             if (failedTaskCount > 0) {
                 append(" - ")
                 append(failedTaskCount)
@@ -111,28 +102,31 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
     }
 
     class FailedTaskNode(
-        val taskId: String,
-        val projectName: String,
-        val targetName: String,
+        val taskName: String,
         parent: CIPESimpleNode
     ) : CIPESimpleNode(parent) {
-        override val nodeId = "task_$taskId"
-
+        override val nodeId = "task_$taskName"
+        
+        val projectName: String
+        val targetName: String
+        
         init {
+            val parts = taskName.split(":")
+            projectName = parts.getOrNull(0) ?: taskName
+            targetName = parts.getOrNull(1) ?: ""
+            
             icon = AllIcons.RunConfigurations.TestError
-            presentation.tooltip = "Failed task: $projectName:$targetName"
+            presentation.tooltip = "Failed task: $taskName"
         }
 
-        override fun getName(): String = "$projectName:$targetName"
+        override fun getName(): String = taskName
     }
 
     class NxCloudFixNode(
-        val fixId: String,
-        val verificationStatus: AITaskFixVerificationStatus,
-        val userAction: AITaskFixUserAction,
+        val aiFix: NxAiFix,
         parent: CIPESimpleNode
     ) : CIPESimpleNode(parent) {
-        override val nodeId = "fix_$fixId"
+        override val nodeId = "fix_${aiFix.aiFixId}"
 
         init {
             icon = getFixIcon()
@@ -140,11 +134,11 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         }
 
         override fun getName(): String =
-            when (verificationStatus) {
+            when (aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED) {
                 AITaskFixVerificationStatus.NOT_STARTED -> "Generating fix..."
                 AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
                 AITaskFixVerificationStatus.COMPLETED ->
-                    when (userAction) {
+                    when (aiFix.userAction ?: AITaskFixUserAction.NONE) {
                         AITaskFixUserAction.APPLIED -> "Fix applied"
                         AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
                         AITaskFixUserAction.REJECTED -> "Fix rejected"
@@ -153,8 +147,10 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
                 AITaskFixVerificationStatus.FAILED -> "Fix generation failed"
             }
 
-        private fun getFixIcon(): Icon =
-            when {
+        private fun getFixIcon(): Icon {
+            val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
+            val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            return when {
                 userAction == AITaskFixUserAction.APPLIED ||
                     userAction == AITaskFixUserAction.APPLIED_LOCALLY -> AllIcons.Actions.Checked
                 userAction == AITaskFixUserAction.REJECTED -> AllIcons.Actions.Cancel
@@ -163,9 +159,12 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
                 verificationStatus == AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error
                 else -> AllIcons.Actions.QuickfixBulb
             }
+        }
 
-        private fun getFixTooltip(): String =
-            when (verificationStatus) {
+        private fun getFixTooltip(): String {
+            val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
+            val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            return when (verificationStatus) {
                 AITaskFixVerificationStatus.NOT_STARTED -> "Generating AI fix..."
                 AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying AI fix..."
                 AITaskFixVerificationStatus.COMPLETED ->
@@ -177,6 +176,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
                     }
                 AITaskFixVerificationStatus.FAILED -> "Failed to generate fix"
             }
+        }
     }
 
     class LabelNode(val labelText: String, parent: CIPESimpleNode) : CIPESimpleNode(parent) {

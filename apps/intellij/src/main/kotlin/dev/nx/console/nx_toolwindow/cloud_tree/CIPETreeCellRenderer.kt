@@ -4,6 +4,8 @@ import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.JBColor
 import com.intellij.ui.SimpleTextAttributes
 import dev.nx.console.models.CIPEExecutionStatus
+import dev.nx.console.nx_toolwindow.cloud_tree.models.getDurationString
+import dev.nx.console.nx_toolwindow.cloud_tree.models.getTimeAgoString
 import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import java.awt.Color
 import javax.swing.JTree
@@ -33,43 +35,40 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
             }
             is CIPESimpleNode.CIPENode -> {
                 // Branch name
-                append(userObject.branch, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
+                append(userObject.cipeInfo.branch, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
 
                 // Duration if completed
-                if (userObject.duration != null && userObject.status.isCompleted()) {
-                    append(" (${userObject.duration})", SimpleTextAttributes.GRAY_ATTRIBUTES)
+                val duration = userObject.cipeInfo.getDurationString()
+                if (duration != null && userObject.cipeInfo.status.isCompleted()) {
+                    append(" ($duration)", SimpleTextAttributes.GRAY_ATTRIBUTES)
                 }
 
                 // Time ago
-                append(" - ${userObject.timeAgo}", SimpleTextAttributes.GRAY_ATTRIBUTES)
+                append(" - ${userObject.cipeInfo.getTimeAgoString()}", SimpleTextAttributes.GRAY_ATTRIBUTES)
 
                 // Status color indicator
-                val statusColor = getStatusColor(userObject.status)
+                val statusColor = getStatusColor(userObject.cipeInfo.status)
                 if (statusColor != null && !selected) {
                     background = statusColor
                 }
             }
             is CIPESimpleNode.RunGroupNode -> {
                 append(userObject.name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-                if (userObject.hasAIFixes) {
+                if (userObject.runGroup.aiFix != null) {
                     append(" ", SimpleTextAttributes.REGULAR_ATTRIBUTES)
                     append("(AI fixes available)", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES)
                 }
             }
             is CIPESimpleNode.RunNode -> {
                 // Command
-                append(userObject.command, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-
-                // Duration if available
-                if (userObject.duration != null && userObject.status.isCompleted()) {
-                    append(" (${userObject.duration})", SimpleTextAttributes.GRAY_ATTRIBUTES)
-                }
+                append(userObject.run.command, SimpleTextAttributes.REGULAR_ATTRIBUTES)
 
                 // Failed task count
-                if (userObject.failedTaskCount > 0) {
+                val failedTaskCount = userObject.run.numFailedTasks ?: 0
+                if (failedTaskCount > 0) {
                     append(" - ", SimpleTextAttributes.GRAY_ATTRIBUTES)
                     append(
-                        "${userObject.failedTaskCount} failed",
+                        "$failedTaskCount failed",
                         SimpleTextAttributes.ERROR_ATTRIBUTES
                     )
                 }
@@ -78,12 +77,14 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
                 append(userObject.name, SimpleTextAttributes.ERROR_ATTRIBUTES)
             }
             is CIPESimpleNode.NxCloudFixNode -> {
+                val userAction = userObject.aiFix.userAction ?: dev.nx.console.models.AITaskFixUserAction.NONE
+                val verificationStatus = userObject.aiFix.verificationStatus ?: dev.nx.console.models.AITaskFixVerificationStatus.NOT_STARTED
                 val textAttributes =
                     when {
-                        userObject.userAction.isApplied() ->
+                        userAction.isApplied() ->
                             SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES
-                        userObject.userAction.isRejected() -> SimpleTextAttributes.GRAY_ATTRIBUTES
-                        userObject.verificationStatus.isFailed() ->
+                        userAction.isRejected() -> SimpleTextAttributes.GRAY_ATTRIBUTES
+                        verificationStatus.isFailed() ->
                             SimpleTextAttributes.ERROR_ATTRIBUTES
                         else -> SimpleTextAttributes.REGULAR_ATTRIBUTES
                     }
