@@ -1,8 +1,6 @@
 package dev.nx.console.nx_toolwindow.cloud_tree.models
 
 import dev.nx.console.models.CIPEInfo
-import dev.nx.console.models.CIPERun
-import dev.nx.console.models.CIPERunGroup
 
 fun CIPEInfo.getDurationString(): String? {
     return completedAt?.let { end ->

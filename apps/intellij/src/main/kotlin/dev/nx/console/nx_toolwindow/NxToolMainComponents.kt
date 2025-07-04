@@ -12,9 +12,14 @@ import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
+import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.TreeUIHelper
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.run.actions.NxInitService
@@ -28,6 +33,7 @@ import java.awt.event.ActionListener
 import java.net.URI
 import javax.swing.*
 import javax.swing.border.CompoundBorder
+import javax.swing.tree.DefaultMutableTreeNode
 
 class NxToolMainComponents(private val project: Project) {
 
@@ -310,44 +316,47 @@ class NxToolMainComponents(private val project: Project) {
 
     fun createConnectedToNxCloudPanel(nxCloudUrl: String): JPanel {
         return JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border =
-                CompoundBorder(
-                    JBUI.Borders.empty(0, 10),
-                    BorderFactory.createMatteBorder(
-                        1,
-                        0,
-                        0,
-                        0,
-                        JBColor.border(),
-                    ),
-                )
+            layout = BorderLayout()
+            border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
 
-            add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
-            add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
-            add(
-                JLabel("Connected to Nx Cloud").apply {
-                    font = Font(font.name, Font.BOLD, font.size)
-                    alignmentX = Component.LEFT_ALIGNMENT
-                }
-            )
-            add(Box.createHorizontalGlue())
-            add(
-                JButton().apply {
-                    icon = AllIcons.ToolbarDecorator.Export
-                    toolTipText = "Open Nx Cloud"
+            // Header panel with connection status
+            val headerPanel =
+                JPanel().apply {
+                    layout = BoxLayout(this, BoxLayout.X_AXIS)
+                    border = JBUI.Borders.empty(5, 10)
 
-                    isContentAreaFilled = false
-                    isBorderPainted = false
-                    isFocusPainted = false
-                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                    addActionListener {
-                        TelemetryService.getInstance(project)
-                            .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                        BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
-                    }
+                    add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
+                    add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
+                    add(
+                        JLabel("Connected to Nx Cloud").apply {
+                            font = Font(font.name, Font.BOLD, font.size)
+                            alignmentX = Component.LEFT_ALIGNMENT
+                        }
+                    )
+                    add(Box.createHorizontalGlue())
+                    add(
+                        JButton().apply {
+                            icon = AllIcons.ToolbarDecorator.Export
+                            toolTipText = "Open Nx Cloud"
+
+                            isContentAreaFilled = false
+                            isBorderPainted = false
+                            isFocusPainted = false
+                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                            addActionListener {
+                                TelemetryService.getInstance(project)
+                                    .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+                                BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
+                            }
+                        }
+                    )
                 }
-            )
+
+            add(headerPanel, BorderLayout.NORTH)
+
+            // Add CIPE tree component
+            val cipeTreeComponent = createCIPETreeComponent()
+            add(cipeTreeComponent, BorderLayout.CENTER)
         }
     }
 
@@ -462,6 +471,52 @@ class NxToolMainComponents(private val project: Project) {
             actionGroup.add(collapseAllAction)
 
             actionManager.createActionToolbar(NxToolWindowPanel.NX_TOOLBAR_PLACE, actionGroup, true)
+        }
+    }
+
+    fun createCIPETreeComponent(): JComponent {
+        val cipeTreeStructure = CIPETreeStructure(project)
+        val treeModel = cipeTreeStructure.createTreeModel()
+
+        val tree =
+            Tree(treeModel).apply {
+                isRootVisible = false
+                cellRenderer = CIPETreeCellRenderer()
+                TreeUIHelper.getInstance().installTreeSpeedSearch(this)
+
+                // Auto-expand failed pipelines
+                addTreeExpansionListener(
+                    object : javax.swing.event.TreeExpansionListener {
+                        override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
+                            val path = event.path
+                            val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                            val userObject = lastNode?.userObject
+
+                            if (
+                                userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)
+                            ) {
+                                // Expand children that should be auto-expanded
+                                for (i in 0 until lastNode.childCount) {
+                                    val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
+                                    val childObject = child?.userObject
+                                    if (
+                                        childObject != null &&
+                                            cipeTreeStructure.shouldAutoExpand(childObject)
+                                    ) {
+                                        expandPath(path.pathByAddingChild(child))
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
+                    }
+                )
+            }
+
+        return ScrollPaneFactory.createScrollPane(tree, 0).apply {
+            preferredSize = Dimension(300, 400)
+            minimumSize = Dimension(200, 200)
         }
     }
 }

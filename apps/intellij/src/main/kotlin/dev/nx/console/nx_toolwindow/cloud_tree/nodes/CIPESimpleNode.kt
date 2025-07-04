@@ -49,21 +49,19 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             append(timeAgo)
         }
 
-        private fun getStatusIcon(status: CIPEExecutionStatus): Icon = when (status) {
-            CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
-            CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestFailed
-            CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
-            CIPEExecutionStatus.NOT_STARTED -> AllIcons.RunConfigurations.TestNotRan
-            CIPEExecutionStatus.CANCELED -> AllIcons.RunConfigurations.TestTerminated
-            CIPEExecutionStatus.TIMED_OUT -> AllIcons.RunConfigurations.TestError
-        }
+        private fun getStatusIcon(status: CIPEExecutionStatus): Icon =
+            when (status) {
+                CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
+                CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestFailed
+                CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
+                CIPEExecutionStatus.NOT_STARTED -> AllIcons.RunConfigurations.TestNotRan
+                CIPEExecutionStatus.CANCELED -> AllIcons.RunConfigurations.TestTerminated
+                CIPEExecutionStatus.TIMED_OUT -> AllIcons.RunConfigurations.TestError
+            }
     }
 
-    class RunGroupNode(
-        val groupName: String,
-        val hasAIFixes: Boolean,
-        parent: CIPESimpleNode
-    ) : CIPESimpleNode(parent) {
+    class RunGroupNode(val groupName: String, val hasAIFixes: Boolean, parent: CIPESimpleNode) :
+        CIPESimpleNode(parent) {
         override val nodeId = "rungroup_$groupName"
 
         init {
@@ -103,12 +101,13 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             }
         }
 
-        private fun getStatusIcon(status: CIPEExecutionStatus): Icon = when (status) {
-            CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
-            CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestFailed
-            CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
-            else -> AllIcons.RunConfigurations.TestNotRan
-        }
+        private fun getStatusIcon(status: CIPEExecutionStatus): Icon =
+            when (status) {
+                CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
+                CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestFailed
+                CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
+                else -> AllIcons.RunConfigurations.TestNotRan
+            }
     }
 
     class FailedTaskNode(
@@ -140,43 +139,47 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             presentation.tooltip = getFixTooltip()
         }
 
-        override fun getName(): String = when (verificationStatus) {
-            AITaskFixVerificationStatus.NOT_STARTED -> "Generating fix..."
-            AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
-            AITaskFixVerificationStatus.COMPLETED -> when (userAction) {
-                AITaskFixUserAction.APPLIED -> "Fix applied"
-                AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
-                AITaskFixUserAction.REJECTED -> "Fix rejected"
-                AITaskFixUserAction.NONE -> "Fix ready to apply"
+        override fun getName(): String =
+            when (verificationStatus) {
+                AITaskFixVerificationStatus.NOT_STARTED -> "Generating fix..."
+                AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
+                AITaskFixVerificationStatus.COMPLETED ->
+                    when (userAction) {
+                        AITaskFixUserAction.APPLIED -> "Fix applied"
+                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
+                        AITaskFixUserAction.REJECTED -> "Fix rejected"
+                        AITaskFixUserAction.NONE -> "Fix ready to apply"
+                    }
+                AITaskFixVerificationStatus.FAILED -> "Fix generation failed"
             }
-            AITaskFixVerificationStatus.FAILED -> "Fix generation failed"
-        }
 
-        private fun getFixIcon(): Icon = when {
-            userAction == AITaskFixUserAction.APPLIED || userAction == AITaskFixUserAction.APPLIED_LOCALLY -> AllIcons.Actions.Checked
-            userAction == AITaskFixUserAction.REJECTED -> AllIcons.Actions.Cancel
-            verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default()
-            verificationStatus == AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error
-            else -> AllIcons.Actions.QuickfixBulb
-        }
-
-        private fun getFixTooltip(): String = when (verificationStatus) {
-            AITaskFixVerificationStatus.NOT_STARTED -> "Generating AI fix..."
-            AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying AI fix..."
-            AITaskFixVerificationStatus.COMPLETED -> when (userAction) {
-                AITaskFixUserAction.APPLIED -> "Fix has been applied"
-                AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
-                AITaskFixUserAction.REJECTED -> "Fix was rejected"
-                AITaskFixUserAction.NONE -> "Click to view and apply fix"
+        private fun getFixIcon(): Icon =
+            when {
+                userAction == AITaskFixUserAction.APPLIED ||
+                    userAction == AITaskFixUserAction.APPLIED_LOCALLY -> AllIcons.Actions.Checked
+                userAction == AITaskFixUserAction.REJECTED -> AllIcons.Actions.Cancel
+                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS ->
+                    AnimatedIcon.Default()
+                verificationStatus == AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error
+                else -> AllIcons.Actions.QuickfixBulb
             }
-            AITaskFixVerificationStatus.FAILED -> "Failed to generate fix"
-        }
+
+        private fun getFixTooltip(): String =
+            when (verificationStatus) {
+                AITaskFixVerificationStatus.NOT_STARTED -> "Generating AI fix..."
+                AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying AI fix..."
+                AITaskFixVerificationStatus.COMPLETED ->
+                    when (userAction) {
+                        AITaskFixUserAction.APPLIED -> "Fix has been applied"
+                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
+                        AITaskFixUserAction.REJECTED -> "Fix was rejected"
+                        AITaskFixUserAction.NONE -> "Click to view and apply fix"
+                    }
+                AITaskFixVerificationStatus.FAILED -> "Failed to generate fix"
+            }
     }
 
-    class LabelNode(
-        val labelText: String,
-        parent: CIPESimpleNode
-    ) : CIPESimpleNode(parent) {
+    class LabelNode(val labelText: String, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
         override val nodeId = "label_${labelText.hashCode()}"
 
         init {
@@ -188,9 +191,11 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 }
 
 // Extension function for CIPEExecutionStatus
-fun CIPEExecutionStatus.isCompleted(): Boolean = this in setOf(
-    CIPEExecutionStatus.SUCCEEDED,
-    CIPEExecutionStatus.FAILED,
-    CIPEExecutionStatus.CANCELED,
-    CIPEExecutionStatus.TIMED_OUT
-)
+fun CIPEExecutionStatus.isCompleted(): Boolean =
+    this in
+        setOf(
+            CIPEExecutionStatus.SUCCEEDED,
+            CIPEExecutionStatus.FAILED,
+            CIPEExecutionStatus.CANCELED,
+            CIPEExecutionStatus.TIMED_OUT
+        )

@@ -10,14 +10,10 @@ import dev.nx.console.nx_toolwindow.cloud_tree.models.MockCIPEDataProvider
 import dev.nx.console.nx_toolwindow.cloud_tree.models.getDurationString
 import dev.nx.console.nx_toolwindow.cloud_tree.models.getTimeAgoString
 import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
-import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeModel
 
-class CIPETreeStructure(
-    private val project: Project
-) : SimpleTreeStructure(), Disposable {
+class CIPETreeStructure(private val project: Project) : SimpleTreeStructure(), Disposable {
 
-    private val treeBuilder = CIPETreeBuilder()
     private val rootNode = CIPESimpleNode.CIPERootNode()
     private var cipeData: List<CIPEInfo> = emptyList()
     private var childrenCache: MutableMap<CIPESimpleNode, Array<CIPESimpleNode>> = mutableMapOf()
@@ -33,107 +29,130 @@ class CIPETreeStructure(
         if (element !is CIPESimpleNode) return emptyArray()
 
         // Check cache first
-        childrenCache[element]?.let { return it as Array<Any> }
-
-        val children = when (element) {
-            is CIPESimpleNode.CIPERootNode -> {
-                buildChildrenForRoot(element, cipeData)
-            }
-            is CIPESimpleNode.CIPENode -> {
-                buildChildrenForCIPE(element)
-            }
-            is CIPESimpleNode.RunGroupNode -> {
-                buildChildrenForRunGroup(element)
-            }
-            is CIPESimpleNode.RunNode -> {
-                buildChildrenForRun(element)
-            }
-            is CIPESimpleNode.FailedTaskNode -> {
-                buildChildrenForFailedTask(element)
-            }
-            else -> emptyArray()
+        childrenCache[element]?.let {
+            return it as Array<Any>
         }
+
+        val children =
+            when (element) {
+                is CIPESimpleNode.CIPERootNode -> {
+                    buildChildrenForRoot(element, cipeData)
+                }
+                is CIPESimpleNode.CIPENode -> {
+                    buildChildrenForCIPE(element)
+                }
+                is CIPESimpleNode.RunGroupNode -> {
+                    buildChildrenForRunGroup(element)
+                }
+                is CIPESimpleNode.RunNode -> {
+                    buildChildrenForRun(element)
+                }
+                is CIPESimpleNode.FailedTaskNode -> {
+                    buildChildrenForFailedTask(element)
+                }
+                else -> emptyArray()
+            }
 
         // Cache the result
         childrenCache[element] = children
         return children as Array<Any>
     }
 
-    private fun buildChildrenForRoot(rootNode: CIPESimpleNode.CIPERootNode, cipeData: List<CIPEInfo>): Array<CIPESimpleNode> {
+    private fun buildChildrenForRoot(
+        rootNode: CIPESimpleNode.CIPERootNode,
+        cipeData: List<CIPEInfo>
+    ): Array<CIPESimpleNode> {
         if (cipeData.isEmpty()) {
             return arrayOf(CIPESimpleNode.LabelNode("No recent CI pipeline executions", rootNode))
         }
 
-        return cipeData.map { cipeInfo ->
-            CIPESimpleNode.CIPENode(
-                cipeId = cipeInfo.ciPipelineExecutionId,
-                branch = cipeInfo.branch,
-                status = cipeInfo.status,
-                timeAgo = cipeInfo.getTimeAgoString(),
-                duration = cipeInfo.getDurationString(),
-                parent = rootNode
-            )
-        }.toTypedArray()
+        return cipeData
+            .map { cipeInfo ->
+                CIPESimpleNode.CIPENode(
+                    cipeId = cipeInfo.ciPipelineExecutionId,
+                    branch = cipeInfo.branch,
+                    status = cipeInfo.status,
+                    timeAgo = cipeInfo.getTimeAgoString(),
+                    duration = cipeInfo.getDurationString(),
+                    parent = rootNode
+                )
+            }
+            .toTypedArray()
     }
 
     private fun buildChildrenForCIPE(cipeNode: CIPESimpleNode.CIPENode): Array<CIPESimpleNode> {
-        val cipeInfo = cipeData.find { it.ciPipelineExecutionId == cipeNode.cipeId } ?: return emptyArray()
+        val cipeInfo =
+            cipeData.find { it.ciPipelineExecutionId == cipeNode.cipeId } ?: return emptyArray()
 
-        return cipeInfo.runGroups.map { runGroup ->
-            CIPESimpleNode.RunGroupNode(
-                groupName = runGroup.runGroup,
-                hasAIFixes = runGroup.aiFix != null,
-                parent = cipeNode
-            )
-        }.toTypedArray()
+        return cipeInfo.runGroups
+            .map { runGroup ->
+                CIPESimpleNode.RunGroupNode(
+                    groupName = runGroup.runGroup,
+                    hasAIFixes = runGroup.aiFix != null,
+                    parent = cipeNode
+                )
+            }
+            .toTypedArray()
     }
 
-    private fun buildChildrenForRunGroup(runGroupNode: CIPESimpleNode.RunGroupNode): Array<CIPESimpleNode> {
+    private fun buildChildrenForRunGroup(
+        runGroupNode: CIPESimpleNode.RunGroupNode
+    ): Array<CIPESimpleNode> {
         val parentCIPE = findParentCIPE(runGroupNode) ?: return emptyArray()
-        val cipeInfo = cipeData.find { it.ciPipelineExecutionId == parentCIPE.cipeId } ?: return emptyArray()
-        val runGroup = cipeInfo.runGroups.find { it.runGroup == runGroupNode.groupName } ?: return emptyArray()
+        val cipeInfo =
+            cipeData.find { it.ciPipelineExecutionId == parentCIPE.cipeId } ?: return emptyArray()
+        val runGroup =
+            cipeInfo.runGroups.find { it.runGroup == runGroupNode.groupName } ?: return emptyArray()
 
-        return runGroup.runs.map { run ->
-            CIPESimpleNode.RunNode(
-                runId = run.linkId ?: run.executionId ?: "unknown",
-                command = run.command,
-                status = run.status ?: CIPEExecutionStatus.NOT_STARTED,
-                duration = null, // CIPERun doesn't have timing info
-                failedTaskCount = run.numFailedTasks ?: 0,
-                parent = runGroupNode
-            )
-        }.toTypedArray()
+        return runGroup.runs
+            .map { run ->
+                CIPESimpleNode.RunNode(
+                    runId = run.linkId ?: run.executionId ?: "unknown",
+                    command = run.command,
+                    status = run.status ?: CIPEExecutionStatus.NOT_STARTED,
+                    duration = null, // CIPERun doesn't have timing info
+                    failedTaskCount = run.numFailedTasks ?: 0,
+                    parent = runGroupNode
+                )
+            }
+            .toTypedArray()
     }
 
     private fun buildChildrenForRun(runNode: CIPESimpleNode.RunNode): Array<CIPESimpleNode> {
         val parentCIPE = findParentCIPE(runNode) ?: return emptyArray()
-        val cipeInfo = cipeData.find { it.ciPipelineExecutionId == parentCIPE.cipeId } ?: return emptyArray()
+        val cipeInfo =
+            cipeData.find { it.ciPipelineExecutionId == parentCIPE.cipeId } ?: return emptyArray()
 
         for (runGroup in cipeInfo.runGroups) {
             val run = runGroup.runs.find { (it.linkId ?: it.executionId) == runNode.runId }
             if (run != null) {
                 val failedTasks = run.failedTasks ?: emptyList()
-                return failedTasks.map { taskName ->
-                    val parts = taskName.split(":")
-                    val projectName = parts.getOrNull(0) ?: taskName
-                    val targetName = parts.getOrNull(1) ?: ""
+                return failedTasks
+                    .map { taskName ->
+                        val parts = taskName.split(":")
+                        val projectName = parts.getOrNull(0) ?: taskName
+                        val targetName = parts.getOrNull(1) ?: ""
 
-                    CIPESimpleNode.FailedTaskNode(
-                        taskId = taskName,
-                        projectName = projectName,
-                        targetName = targetName,
-                        parent = runNode
-                    )
-                }.toTypedArray()
+                        CIPESimpleNode.FailedTaskNode(
+                            taskId = taskName,
+                            projectName = projectName,
+                            targetName = targetName,
+                            parent = runNode
+                        )
+                    }
+                    .toTypedArray()
             }
         }
 
         return emptyArray()
     }
 
-    private fun buildChildrenForFailedTask(taskNode: CIPESimpleNode.FailedTaskNode): Array<CIPESimpleNode> {
+    private fun buildChildrenForFailedTask(
+        taskNode: CIPESimpleNode.FailedTaskNode
+    ): Array<CIPESimpleNode> {
         val parentCIPE = findParentCIPE(taskNode) ?: return emptyArray()
-        val cipeInfo = cipeData.find { it.ciPipelineExecutionId == parentCIPE.cipeId } ?: return emptyArray()
+        val cipeInfo =
+            cipeData.find { it.ciPipelineExecutionId == parentCIPE.cipeId } ?: return emptyArray()
 
         for (runGroup in cipeInfo.runGroups) {
             val aiFix = runGroup.aiFix
@@ -141,7 +160,8 @@ class CIPETreeStructure(
                 return arrayOf(
                     CIPESimpleNode.NxCloudFixNode(
                         fixId = aiFix.aiFixId,
-                        verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED,
+                        verificationStatus = aiFix.verificationStatus
+                                ?: AITaskFixVerificationStatus.NOT_STARTED,
                         userAction = aiFix.userAction ?: AITaskFixUserAction.NONE,
                         parent = taskNode
                     )
@@ -182,7 +202,7 @@ class CIPETreeStructure(
     }
 
     fun shouldAutoExpand(element: Any): Boolean {
-        if(element !is CIPESimpleNode) return false
+        if (element !is CIPESimpleNode) return false
         return when (element) {
             is CIPESimpleNode.CIPENode -> element.status == CIPEExecutionStatus.FAILED
             is CIPESimpleNode.RunGroupNode -> true // Always expand run groups
