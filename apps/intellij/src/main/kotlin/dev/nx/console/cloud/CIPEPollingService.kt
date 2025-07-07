@@ -101,46 +101,23 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 
     private suspend fun pollCIPEData() {
-        logger.debug("[CIPE_POLL] Starting poll cycle")
         try {
             val nxlsService = NxlsService.getInstance(project)
-            logger.debug("[CIPE_POLL] Calling nxlsService.recentCIPEData()")
             val cipeData = nxlsService.recentCIPEData()
 
             if (cipeData != null) {
-                logger.info(
-                    "[CIPE_POLL] Received CIPE data - " +
-                        "total CIPEs: ${cipeData.info?.size ?: 0}, " +
-                        "error: ${cipeData.error?.type ?: "none"}"
-                )
-
-                // Log detailed CIPE info
-                cipeData.info?.forEach { cipe ->
-                    logger.debug(
-                        "[CIPE_POLL] CIPE ${cipe.ciPipelineExecutionId}: " +
-                            "status=${cipe.status}, " +
-                            "runGroups=${cipe.runGroups.size}, " +
-                            "branch=${cipe.branch ?: "unknown"}"
-                    )
-                }
-
                 _latestCIPEData.value = cipeData
                 updatePollingInterval(cipeData)
 
                 // Update data sync service
-                logger.debug("[CIPE_POLL] Updating CIPEDataSyncService")
                 val dataSyncService = CIPEDataSyncService.getInstance(project)
                 dataSyncService.updateData(cipeData)
 
-                logger.debug("[CIPE_POLL] Notifying ${dataUpdateListeners.size} listeners")
                 notifyListeners(cipeData)
-            } else {
-                logger.warn("[CIPE_POLL] Received null CIPE data from nxlsService")
             }
         } catch (e: Exception) {
             logger.error("[CIPE_POLL] Failed to poll CIPE data: ${e.message}", e)
         }
-        logger.debug("[CIPE_POLL] Poll cycle complete")
     }
 
     /**
@@ -195,19 +172,9 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 
     private fun notifyListeners(data: CIPEDataResponse) {
-        logger.debug("[CIPE_POLL] Starting notification of ${dataUpdateListeners.size} listeners")
-        dataUpdateListeners.forEachIndexed { index, listener ->
-            try {
-                logger.debug("[CIPE_POLL] Notifying listener #$index")
+        dataUpdateListeners.forEach { listener ->
                 listener(data)
-            } catch (e: Exception) {
-                logger.error(
-                    "[CIPE_POLL] Error notifying CIPE data listener #$index: ${e.message}",
-                    e
-                )
-            }
         }
-        logger.debug("[CIPE_POLL] Completed notifying all listeners")
     }
 
     override fun dispose() {
