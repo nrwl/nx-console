@@ -6,10 +6,10 @@ import com.intellij.diff.requests.DiffRequest
 import com.intellij.diff.util.DiffUserDataKeys
 import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
+import com.intellij.ide.ui.UISettingsListener
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
@@ -22,7 +22,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.changes.patch.ApplyPatchDefaultExecutor
 import com.intellij.openapi.vcs.changes.patch.ApplyPatchDifferentiatedDialog
-import com.intellij.openapi.vcs.changes.patch.ApplyPatchExecutor
 import com.intellij.openapi.vcs.changes.patch.ApplyPatchMode
 import com.intellij.openapi.vcs.changes.patch.PatchFileType
 import com.intellij.openapi.vcs.changes.patch.tool.PatchDiffRequest
@@ -31,6 +30,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.jcef.*
+import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.cloud.CIPEPollingService
@@ -71,7 +71,6 @@ data class NxCloudFixStyles(
     val scrollbarThumbColor: String,
     val fontFamily: String,
     val fontSize: String,
-    // Cloud fix specific colors
     val successColor: String,
     val warningColor: String,
     val hoverColor: String,
@@ -84,8 +83,8 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private val cs = NxCloudFixFileCoroutineHolder.getInstance(project).cs
     private var currentFixDetails: NxCloudFixDetails? = null
+    private var messageBusConnection: MessageBusConnection? = null
 
-    // UI Components
     private val mainPanel = JPanel(BorderLayout())
     private val splitter = JBSplitter(false, 0.6f) // 60% webview, 40% diff
     private val diffContainer = JPanel(BorderLayout())
@@ -94,7 +93,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private var currentDiff: String? = null
 
     init {
-        // Initialize diff container
         diffContainer.background = UIUtil.getPanelBackground()
         showDiffPlaceholder()
     }
@@ -107,11 +105,11 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             browser.cefBrowser,
         )
 
-        // Setup the main UI
         mainPanel.add(splitter, BorderLayout.CENTER)
 
-        // Start with webview only
         showWebviewOnly()
+
+        registerThemeChangeListener()
 
         val listener = { cipeDataResponse: CIPEDataResponse ->
             if (currentFixDetails != null) {
@@ -136,10 +134,10 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         CIPEPollingService.getInstance(project).addDataUpdateListener(listener)
 
         val disposable =
-            object : Disposable {
-                override fun dispose() {
-                    CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
-                }
+            Disposable {
+                CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
+                messageBusConnection?.disconnect()
+                messageBusConnection = null
             }
 
         Disposer.register(browser, disposable)
@@ -154,13 +152,12 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         } catch (e: Exception) {
             logger<NxCloudFixFileImpl>().error("Failed to serialize fix details", e)
 
-            // Show error notification
-            com.intellij.notification.NotificationGroupManager.getInstance()
+            NotificationGroupManager.getInstance()
                 .getNotificationGroup("Nx Cloud CIPE")
                 .createNotification(
                     "Failed to Load AI Fix",
                     "Could not parse AI fix data: ${e.message}",
-                    com.intellij.notification.NotificationType.ERROR,
+                    NotificationType.ERROR,
                 )
                 .notify(project)
 
@@ -170,7 +167,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         currentFixDetails = details
         cs.launch {
             loadHtmlWithInitialData(details)
-            // Update diff preview if available
             updateDiffPreview(details.runGroup.aiFix?.suggestedFix)
         }
     }
@@ -179,7 +175,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         currentDiff = gitDiff
         cs.launch { updateDiff(gitDiff) }
 
-        // Automatically show preview if there's a diff
         if (gitDiff != null && gitDiff.isNotBlank() && !isShowingPreview) {
             showWithPreview()
         }
@@ -249,8 +244,24 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
         cs.launch {
             browser.executeJavascriptWithCatch(js)
+            updateWebviewStyles()
+        }
+    }
 
-            // Send styles to webview
+    private fun registerThemeChangeListener() {
+        messageBusConnection = ApplicationManager.getApplication().messageBus.connect()
+        messageBusConnection?.subscribe(
+            UISettingsListener.TOPIC,
+            UISettingsListener {
+                updateWebviewStyles()
+            }
+        )
+    }
+
+    private fun updateWebviewStyles() {
+        cs.launch {
+            browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
+
             val styles = extractIntellijStyles()
             val stylesJson = json.encodeToString(styles)
             val stylesJs =
@@ -267,7 +278,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun handleMessageFromBrowser(message: String) {
         val logger = logger<NxCloudFixFileImpl>()
         try {
-            // Remove surrounding quotes if present (from JavaScript string injection)
             val cleanMessage =
                 if (message.startsWith("\"") && message.endsWith("\"")) {
                     message.substring(1, message.length - 1).replace("\\\"", "\"")
@@ -325,9 +335,9 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
                 if (success) {
                     showSuccessNotification("Nx Cloud fix applied successfully")
-                    // Refresh CIPE data
+
                     CIPEPollingService.getInstance(project).forcePoll()
-                    // Close the AI fix editor
+
                     withContext(Dispatchers.EDT) {
                         FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
                     }
@@ -344,119 +354,19 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun handleApplyLocally() {
         logger<NxCloudFixFileImpl>().info("Apply locally action received")
         currentFixDetails?.runGroup?.aiFix?.suggestedFix?.let {
-            val patchFile = LightVirtualFile(
-                "nx-cloud-fix",
-                PatchFileType.INSTANCE,
-                it
-            )
+            val patchFile = LightVirtualFile("nx-cloud-fix", PatchFileType.INSTANCE, it)
             ApplicationManager.getApplication().invokeLater {
-        val executor = ApplyPatchDefaultExecutor(project)
-        ApplyPatchDifferentiatedDialog(
-            project,
-            executor,
-            listOf(executor),
-            ApplyPatchMode.APPLY,
-            patchFile
-        ).show()
-
+                val executor = ApplyPatchDefaultExecutor(project)
+                ApplyPatchDifferentiatedDialog(
+                        project,
+                        executor,
+                        listOf(executor),
+                        ApplyPatchMode.APPLY,
+                        patchFile
+                    )
+                    .show()
             }
         }
-        //
-        //        val fixDetails = currentFixDetails ?: return
-        //        val suggestedFix =
-        //            fixDetails.runGroup.aiFix?.suggestedFix
-        //                ?: run {
-        //                    showErrorNotification("No AI fix available to apply locally")
-        //                    return
-        //                }
-        //        val aiFixId =
-        //            fixDetails.runGroup.aiFix?.aiFixId
-        //                ?: run {
-        //                    showErrorNotification("No AI fix ID found")
-        //                    return
-        //                }
-        //
-        //        cs.launch {
-        //            try {
-        //                // Create a temporary patch file
-        //                val tempFile =
-        //                    withContext(Dispatchers.IO) {
-        //                        val temp = Files.createTempFile("nx-cloud-fix-", ".patch")
-        //
-        //                        // Ensure the patch ends with a newline
-        //                        val patchContent =
-        //                            if (suggestedFix.endsWith("\n")) {
-        //                                suggestedFix
-        //                            } else {
-        //                                suggestedFix + "\n"
-        //                            }
-        //
-        //                        Files.write(temp, patchContent.toByteArray(),
-        // StandardOpenOption.WRITE)
-        //                        temp.toFile()
-        //                    }
-        //
-        //                try {
-        //                    // Apply the git patch
-        //                    val projectRoot =
-        //                        project.basePath ?: throw Exception("Project base path not found")
-        //
-        //                    val commandLine =
-        //                        GeneralCommandLine()
-        //                            .withWorkDirectory(projectRoot)
-        //                            .withExePath("git")
-        //                            .withParameters("apply", tempFile.absolutePath)
-        //
-        //                    val exitCode =
-        //                        withContext(Dispatchers.IO) {
-        //                            try {
-        //                                val process = commandLine.createProcess()
-        //                                process.waitFor()
-        //                            } catch (e: Exception) {
-        //                                logger<NxCloudFixFileImpl>().error("Failed to execute git
-        // apply", e)
-        //                                -1
-        //                            }
-        //                        }
-        //
-        //                    if (exitCode == 0) {
-        //                        showSuccessNotification(
-        //                            "Nx Cloud fix applied locally. Please review and modify any
-        // changes before committing."
-        //                        )
-        //
-        //                        // Update the fix status
-        //                        val cloudApiService = NxCloudApiService.getInstance(project)
-        //                        val updateSuccess =
-        //                            cloudApiService.updateSuggestedFix(aiFixId, "APPLIED_LOCALLY")
-        //
-        //                        if (!updateSuccess) {
-        //                            logger<NxCloudFixFileImpl>()
-        //                                .warn("Failed to update fix status in Nx Cloud")
-        //                        }
-        //
-        //                        // Refresh CIPE data
-        //                        CIPEPollingService.getInstance(project).forcePoll()
-        //                    } else {
-        //                        logger<NxCloudFixFileImpl>()
-        //                            .error("Failed to apply patch: git apply exited with code
-        // $exitCode")
-        //                        showErrorNotification(
-        //                            "Failed to apply Nx Cloud fix locally. Please check the IDE
-        // logs for more details."
-        //                        )
-        //                    }
-        //                } finally {
-        //                    // Clean up temp file
-        //                    withContext(Dispatchers.IO) { tempFile.delete() }
-        //                }
-        //            } catch (e: Exception) {
-        //                logger<NxCloudFixFileImpl>().error("Failed to apply Nx Cloud fix locally",
-        // e)
-        //                showErrorNotification("Failed to apply Nx Cloud fix locally:
-        // ${e.message}")
-        //            }
-        //        }
     }
 
     private fun handleReject() {
@@ -497,21 +407,24 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         togglePreview()
     }
 
-    // UI Helper Methods
     private fun showWithPreview() {
         if (!isShowingPreview) {
-            splitter.firstComponent = browser.component
-            splitter.secondComponent = diffContainer
-            splitter.isShowDividerControls = true
-            splitter.isShowDividerIcon = true
-            isShowingPreview = true
+            ApplicationManager.getApplication().invokeLater {
+                splitter.firstComponent = browser.component
+                splitter.secondComponent = diffContainer
+                splitter.isShowDividerControls = true
+                splitter.isShowDividerIcon = true
+                isShowingPreview = true
+            }
         }
     }
 
     private fun showWebviewOnly() {
-        splitter.firstComponent = browser.component
-        splitter.secondComponent = null
-        isShowingPreview = false
+        ApplicationManager.getApplication().invokeLater {
+            splitter.firstComponent = browser.component
+            splitter.secondComponent = null
+            isShowingPreview = false
+        }
     }
 
     private fun togglePreview() {
@@ -536,14 +449,12 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             .notify(project)
     }
 
-    // Diff Preview Methods using IntelliJ's PatchReader and PatchDiffRequest
     private suspend fun updateDiff(gitDiffText: String?) {
         if (gitDiffText.isNullOrBlank()) {
             withContext(Dispatchers.EDT) { showDiffPlaceholder() }
             return
         }
 
-        // Parse the git diff using IntelliJ's PatchReader
         val patches =
             try {
                 logger<NxCloudFixFileImpl>().info("Parsing git diff, length: ${gitDiffText.length}")
@@ -575,7 +486,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private suspend fun displayDiff(patches: List<TextFilePatch>) {
         withContext(Dispatchers.EDT) {
-            // Clear existing diff processor
             diffContainer.removeAll()
             diffProcessor?.let { Disposer.dispose(it) }
             diffProcessor = null
@@ -584,7 +494,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 logger<NxCloudFixFileImpl>()
                     .info("Creating diff viewer for ${patches.size} patches")
 
-                // Build a SimpleDiffRequestChain from patches
                 val requests: List<DiffRequest> =
                     patches.map { patch ->
                         logger<NxCloudFixFileImpl>()
@@ -602,21 +511,15 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
                 val chain = SimpleDiffRequestChain(requests)
 
-                // Configure the diff viewer for read-only patch viewing
                 chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false)
                 chain.putUserData(DiffUserDataKeys.DO_NOT_IGNORE_WHITESPACES, true)
-                chain.putUserData(DiffUserDataKeysEx.SHOW_READ_ONLY_LOCK, false)
-                //                chain.putUserData(DiffUserDataKeysEx.LEFT_TOOLBAR, null)
 
-                // Create the chain processor
                 val processor = CacheDiffRequestChainProcessor(project, chain)
 
                 diffProcessor = processor
 
-                // Add the processor component to the container
                 diffContainer.add(processor.component, BorderLayout.CENTER)
 
-                // Force the processor to update
                 processor.updateRequest()
 
                 logger<NxCloudFixFileImpl>().info("Diff viewer created successfully")
@@ -696,8 +599,6 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         val separatorColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
         val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
         val scrollbarThumbColor = selectFieldBackgroundColor
-
-        // Cloud fix specific colors
         val successColor = getHexColor(UIManager.getColor("Actions.Green") ?: JBColor.GREEN)
         val warningColor = getHexColor(UIManager.getColor("Actions.Yellow") ?: JBColor.YELLOW)
         val hoverColor = getHexColor(UIManager.getColor("ActionButton.hoverBackground"))

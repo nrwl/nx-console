@@ -71,11 +71,6 @@ export class IdeCommunicationController implements ReactiveController {
   private setupIntellijCommunication() {
     window.intellijApi?.registerPostToWebviewCallback(
       (message: NxCloudFixInputMessage) => {
-        if (message.type === 'styles') {
-          this.setIntellijStyles(message.payload);
-          return;
-        }
-
         this.handleInputMessage(message);
       },
     );
@@ -98,7 +93,8 @@ export class IdeCommunicationController implements ReactiveController {
       }
 
       case 'styles': {
-        // Handled in setupIntellijCommunication
+        this.setIntellijStyles(message.payload);
+        this.host.requestUpdate();
         break;
       }
     }
