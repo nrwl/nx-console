@@ -4,10 +4,8 @@ import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
@@ -97,7 +95,11 @@ class NxToolWindowPanel(private val project: Project) :
     private val loadingPanel = JBLoadingPanel(BorderLayout(), this)
     private val topPanel = JPanel(BorderLayout())
     private val contentSplitter =
-        JBSplitter(true,"NX_CONSOLE.TOOLWINDOW_SPLITTER", 0.7f) // Vertical splitter with 70% for main content
+        JBSplitter(
+            true,
+            "NX_CONSOLE.TOOLWINDOW_SPLITTER",
+            0.7f
+        ) // Vertical splitter with 70% for main content
 
     private lateinit var stateMachine: StateMachine
 

@@ -53,7 +53,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         private fun getStatusIcon(status: CIPEExecutionStatus): Icon =
             when (status) {
                 CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
-                CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestFailed
+                CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestError
                 CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
                 CIPEExecutionStatus.NOT_STARTED -> AllIcons.RunConfigurations.TestNotRan
                 CIPEExecutionStatus.CANCELED -> AllIcons.RunConfigurations.TestTerminated
@@ -97,7 +97,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         private fun getStatusIcon(status: CIPEExecutionStatus): Icon =
             when (status) {
                 CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
-                CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestFailed
+                CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestError
                 CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
                 else -> AllIcons.RunConfigurations.TestNotRan
             }
