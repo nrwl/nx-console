@@ -259,7 +259,14 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun handleMessageFromBrowser(message: String) {
         val logger = logger<NxCloudFixFileImpl>()
         try {
-            val parsed = json.decodeFromString<NxCloudFixMessage>(message)
+            // Remove surrounding quotes if present (from JavaScript string injection)
+            val cleanMessage =
+                if (message.startsWith("\"") && message.endsWith("\"")) {
+                    message.substring(1, message.length - 1).replace("\\\"", "\"")
+                } else {
+                    message
+                }
+            val parsed = json.decodeFromString<NxCloudFixMessage>(cleanMessage)
             logger.info("Received message from webview: $parsed")
 
             when (parsed) {
@@ -558,7 +565,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                             .debug(
                                 "Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}"
                             )
-                        PatchDiffRequest(patch)
+                        PatchDiffRequest(patch, patch.beforeFileName, patch.beforeFileName, null)
                     }
 
                 if (requests.isEmpty()) {

@@ -1,8 +1,7 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.Project
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
@@ -60,7 +59,7 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
         cipeData: List<CIPEInfo>
     ): Array<CIPESimpleNode> {
         logger.debug("[CIPE_TREE] Building root children with ${cipeData.size} CIPEs")
-        
+
         if (cipeData.isEmpty()) {
             logger.debug("[CIPE_TREE] No CIPE data, showing empty message")
             return arrayOf(CIPESimpleNode.LabelNode("No recent CI pipeline executions", rootNode))
@@ -68,24 +67,18 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
 
         return cipeData
             .map { cipeInfo ->
-                logger.debug("[CIPE_TREE] Creating node for CIPE ${cipeInfo.ciPipelineExecutionId}: " +
-                    "status=${cipeInfo.status}, branch=${cipeInfo.branch ?: "unknown"}")
-                CIPESimpleNode.CIPENode(
-                    cipeInfo = cipeInfo,
-                    parent = rootNode
+                logger.debug(
+                    "[CIPE_TREE] Creating node for CIPE ${cipeInfo.ciPipelineExecutionId}: " +
+                        "status=${cipeInfo.status}, branch=${cipeInfo.branch ?: "unknown"}"
                 )
+                CIPESimpleNode.CIPENode(cipeInfo = cipeInfo, parent = rootNode)
             }
             .toTypedArray()
     }
 
     private fun buildChildrenForCIPE(cipeNode: CIPESimpleNode.CIPENode): Array<CIPESimpleNode> {
         return cipeNode.cipeInfo.runGroups
-            .map { runGroup ->
-                CIPESimpleNode.RunGroupNode(
-                    runGroup = runGroup,
-                    parent = cipeNode
-                )
-            }
+            .map { runGroup -> CIPESimpleNode.RunGroupNode(runGroup = runGroup, parent = cipeNode) }
             .toTypedArray()
     }
 
@@ -93,27 +86,21 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
         runGroupNode: CIPESimpleNode.RunGroupNode
     ): Array<CIPESimpleNode> {
         return runGroupNode.runGroup.runs
-            .map { run ->
-                CIPESimpleNode.RunNode(
-                    run = run,
-                    parent = runGroupNode
-                )
-            }
+            .map { run -> CIPESimpleNode.RunNode(run = run, parent = runGroupNode) }
             .toTypedArray()
     }
 
     private fun buildChildrenForRun(runNode: CIPESimpleNode.RunNode): Array<CIPESimpleNode> {
         val failedTasks = runNode.run.failedTasks ?: emptyList()
-        logger.debug("[CIPE_TREE] Building children for run ${runNode.run.linkId}: " +
-            "failedTasks=${failedTasks.size}")
-        
+        logger.debug(
+            "[CIPE_TREE] Building children for run ${runNode.run.linkId}: " +
+                "failedTasks=${failedTasks.size}"
+        )
+
         return failedTasks
             .map { taskName ->
                 logger.debug("[CIPE_TREE] Creating failed task node for: $taskName")
-                CIPESimpleNode.FailedTaskNode(
-                    taskName = taskName,
-                    parent = runNode
-                )
+                CIPESimpleNode.FailedTaskNode(taskName = taskName, parent = runNode)
             }
             .toTypedArray()
     }
@@ -122,29 +109,28 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
         taskNode: CIPESimpleNode.FailedTaskNode
     ): Array<CIPESimpleNode> {
         logger.debug("[CIPE_TREE] Building children for failed task: ${taskNode.taskName}")
-        
+
         // Find the parent run group
         var current: CIPESimpleNode? = taskNode
         while (current != null && current !is CIPESimpleNode.RunGroupNode) {
             current = current.parent as? CIPESimpleNode
         }
 
-        val runGroupNode = current as? CIPESimpleNode.RunGroupNode ?: run {
-            logger.warn("[CIPE_TREE] Could not find parent run group for task ${taskNode.taskName}")
-            return emptyArray()
-        }
-        
+        val runGroupNode =
+            current as? CIPESimpleNode.RunGroupNode
+                ?: run {
+                    logger.warn(
+                        "[CIPE_TREE] Could not find parent run group for task ${taskNode.taskName}"
+                    )
+                    return emptyArray()
+                }
+
         val aiFix = runGroupNode.runGroup.aiFix
         logger.debug("[CIPE_TREE] Run group has AI fix: ${aiFix != null}")
 
         if (aiFix != null && taskNode.taskName in aiFix.taskIds) {
             logger.info("[CIPE_TREE] AI fix found for task ${taskNode.taskName}")
-            return arrayOf(
-                CIPESimpleNode.NxCloudFixNode(
-                    aiFix = aiFix,
-                    parent = taskNode
-                )
-            )
+            return arrayOf(CIPESimpleNode.NxCloudFixNode(aiFix = aiFix, parent = taskNode))
         }
 
         logger.debug("[CIPE_TREE] No AI fix available for task ${taskNode.taskName}")
@@ -160,26 +146,32 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
     override fun hasSomethingToCommit(): Boolean = false
 
     fun updateCIPEData(newData: List<CIPEInfo>) {
-        logger.info("[CIPE_TREE] Updating CIPE data - old count: ${cipeData.size}, new count: ${newData.size}")
-        
+        logger.info(
+            "[CIPE_TREE] Updating CIPE data - old count: ${cipeData.size}, new count: ${newData.size}"
+        )
+
         // Log details about the new data
         newData.forEach { cipe ->
-            logger.debug("[CIPE_TREE] CIPE ${cipe.ciPipelineExecutionId}: " +
-                "status=${cipe.status}, runGroups=${cipe.runGroups.size}, " +
-                "branch=${cipe.branch ?: "unknown"}")
-            
+            logger.debug(
+                "[CIPE_TREE] CIPE ${cipe.ciPipelineExecutionId}: " +
+                    "status=${cipe.status}, runGroups=${cipe.runGroups.size}, " +
+                    "branch=${cipe.branch ?: "unknown"}"
+            )
+
             // Log run groups with AI fixes
             cipe.runGroups.forEach { runGroup ->
                 val aiFix = runGroup.aiFix
                 if (aiFix != null) {
-                    logger.debug("[CIPE_TREE] Run group ${runGroup.runGroup} has AI fix: " +
-                        "taskIds=${aiFix.taskIds.joinToString(", ")}")
+                    logger.debug(
+                        "[CIPE_TREE] Run group ${runGroup.runGroup} has AI fix: " +
+                            "taskIds=${aiFix.taskIds.joinToString(", ")}"
+                    )
                 }
             }
         }
-        
+
         cipeData = newData
-        
+
         // Notify the tree model about the structure change
         treeModel?.invalidate()
     }
@@ -204,5 +196,4 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
             else -> false
         }
     }
-
 }

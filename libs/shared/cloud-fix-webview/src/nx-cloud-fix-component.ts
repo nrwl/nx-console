@@ -399,7 +399,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     if (!verificationStatus && hasAiFix) {
       return html``; // Don't show any status section if fix is ready but no verification info
     }
-    
+
     switch (verificationStatus) {
       case 'IN_PROGRESS':
         return html`

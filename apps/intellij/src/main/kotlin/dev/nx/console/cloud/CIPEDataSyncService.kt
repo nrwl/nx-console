@@ -46,14 +46,15 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
 
             // Check for notification events if we have previous data to compare
             if (oldInfo != null) {
-                logger.info("[CIPE_SYNC] Comparing ${oldInfo.size} old CIPEs with ${it.size} new CIPEs for notifications")
+                logger.info(
+                    "[CIPE_SYNC] Comparing ${oldInfo.size} old CIPEs with ${it.size} new CIPEs for notifications"
+                )
                 checkForNotifications(oldInfo, it)
             } else {
                 logger.debug("[CIPE_SYNC] No previous data to compare, skipping notification check")
             }
-        } ?: run {
-            logger.debug("[CIPE_SYNC] New data has no info, skipping update")
         }
+            ?: run { logger.debug("[CIPE_SYNC] New data has no info, skipping update") }
     }
 
     /** Add a listener for notification events */
@@ -69,14 +70,18 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
     /** Check for notification events following VSCode logic */
     private fun checkForNotifications(oldInfo: List<CIPEInfo>, newInfo: List<CIPEInfo>) {
         logger.debug("[CIPE_SYNC] Starting notification check for ${newInfo.size} CIPEs")
-        
+
         newInfo.forEach { newCIPE ->
-            logger.debug("[CIPE_SYNC] Checking CIPE ${newCIPE.ciPipelineExecutionId}: " +
-                "status=${newCIPE.status}, branch=${newCIPE.branch ?: "unknown"}")
-            
+            logger.debug(
+                "[CIPE_SYNC] Checking CIPE ${newCIPE.ciPipelineExecutionId}: " +
+                    "status=${newCIPE.status}, branch=${newCIPE.branch ?: "unknown"}"
+            )
+
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
-            logger.debug("[CIPE_SYNC] Old CIPE found: ${oldCIPE != null}, " +
-                "old status: ${oldCIPE?.status ?: "N/A"}")
+            logger.debug(
+                "[CIPE_SYNC] Old CIPE found: ${oldCIPE != null}, " +
+                    "old status: ${oldCIPE?.status ?: "N/A"}"
+            )
 
             // Check if any runGroup has an AI fix (to skip failure notifications)
             val hasAiFix = newCIPE.runGroups.any { it.aiFix != null }
@@ -93,7 +98,9 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
                 oldCIPE != null &&
                     (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))
             ) {
-                logger.debug("[CIPE_SYNC] Skipping notification - CIPE already completed/failed previously")
+                logger.debug(
+                    "[CIPE_SYNC] Skipping notification - CIPE already completed/failed previously"
+                )
                 return@forEach
             }
 
@@ -101,7 +108,9 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
             when {
                 // CIPE just failed - skip if AI fix available
                 newCIPE.status.isFailedStatus() && !hasAiFix -> {
-                    logger.info("[CIPE_SYNC] Emitting CIPEFailed notification for ${newCIPE.ciPipelineExecutionId}")
+                    logger.info(
+                        "[CIPE_SYNC] Emitting CIPEFailed notification for ${newCIPE.ciPipelineExecutionId}"
+                    )
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
 
@@ -112,20 +121,25 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
                         newCIPE.runGroups.flatMap { it.runs }.firstOrNull { isRunFailed(it) }
 
                     failedRun?.let {
-                        logger.info("[CIPE_SYNC] Emitting RunFailed notification for " +
-                            "CIPE ${newCIPE.ciPipelineExecutionId}, run ${it.linkId}")
+                        logger.info(
+                            "[CIPE_SYNC] Emitting RunFailed notification for " +
+                                "CIPE ${newCIPE.ciPipelineExecutionId}, run ${it.linkId}"
+                        )
                         emitNotification(CIPENotificationEvent.RunFailed(newCIPE, it))
                     }
                 }
 
                 // CIPE succeeded (only notify if settings allow)
                 newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
-                    logger.info("[CIPE_SYNC] Emitting CIPESucceeded notification for ${newCIPE.ciPipelineExecutionId}")
+                    logger.info(
+                        "[CIPE_SYNC] Emitting CIPESucceeded notification for ${newCIPE.ciPipelineExecutionId}"
+                    )
                     emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
                 }
-                
                 else -> {
-                    logger.debug("[CIPE_SYNC] No notification needed for CIPE ${newCIPE.ciPipelineExecutionId}")
+                    logger.debug(
+                        "[CIPE_SYNC] No notification needed for CIPE ${newCIPE.ciPipelineExecutionId}"
+                    )
                 }
             }
         }
@@ -133,23 +147,31 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
 
     /** Check for newly available AI fixes following VSCode logic */
     private fun checkForNewAiFixNotifications(oldCIPE: CIPEInfo, newCIPE: CIPEInfo) {
-        logger.debug("[CIPE_SYNC] Checking for new AI fixes in CIPE ${newCIPE.ciPipelineExecutionId}")
+        logger.debug(
+            "[CIPE_SYNC] Checking for new AI fixes in CIPE ${newCIPE.ciPipelineExecutionId}"
+        )
         val newCIPERunGroups = newCIPE.runGroups
         val oldCIPERunGroups = oldCIPE.runGroups
 
         newCIPERunGroups.forEach { newRunGroup ->
-            logger.debug("[CIPE_SYNC] Checking run group ${newRunGroup.runGroup}: " +
-                "has AI fix: ${newRunGroup.aiFix != null}")
-            
+            logger.debug(
+                "[CIPE_SYNC] Checking run group ${newRunGroup.runGroup}: " +
+                    "has AI fix: ${newRunGroup.aiFix != null}"
+            )
+
             if (newRunGroup.aiFix?.suggestedFix != null) {
                 val oldRunGroup = oldCIPERunGroups.find { it.runGroup == newRunGroup.runGroup }
-                logger.debug("[CIPE_SYNC] Old run group found: ${oldRunGroup != null}, " +
-                    "had AI fix: ${oldRunGroup?.aiFix?.suggestedFix != null}")
-                    
+                logger.debug(
+                    "[CIPE_SYNC] Old run group found: ${oldRunGroup != null}, " +
+                        "had AI fix: ${oldRunGroup?.aiFix?.suggestedFix != null}"
+                )
+
                 if (oldRunGroup?.aiFix?.suggestedFix == null) {
                     // AI fix newly available - emit proactive notification
-                    logger.info("[CIPE_SYNC] New AI fix available! Emitting AiFixAvailable notification " +
-                        "for CIPE ${newCIPE.ciPipelineExecutionId}, run group ${newRunGroup.runGroup}")
+                    logger.info(
+                        "[CIPE_SYNC] New AI fix available! Emitting AiFixAvailable notification " +
+                            "for CIPE ${newCIPE.ciPipelineExecutionId}, run group ${newRunGroup.runGroup}"
+                    )
                     emitNotification(CIPENotificationEvent.AiFixAvailable(newCIPE, newRunGroup))
                 }
             }
@@ -166,15 +188,20 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
     }
 
     private fun emitNotification(event: CIPENotificationEvent) {
-        logger.debug("[CIPE_SYNC] Emitting notification event: ${event::class.simpleName} " +
-            "to ${notificationListeners.size} listeners")
-        
+        logger.debug(
+            "[CIPE_SYNC] Emitting notification event: ${event::class.simpleName} " +
+                "to ${notificationListeners.size} listeners"
+        )
+
         notificationListeners.forEachIndexed { index, listener ->
             try {
                 logger.debug("[CIPE_SYNC] Notifying listener #$index")
                 listener.onNotificationEvent(event)
             } catch (e: Exception) {
-                logger.error("[CIPE_SYNC] Error notifying CIPE notification listener #$index: ${e.message}", e)
+                logger.error(
+                    "[CIPE_SYNC] Error notifying CIPE notification listener #$index: ${e.message}",
+                    e
+                )
             }
         }
     }

@@ -23,10 +23,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = "Recent CI Pipeline Executions"
     }
 
-    class CIPENode(
-        val cipeInfo: CIPEInfo,
-        parent: CIPESimpleNode
-    ) : CIPESimpleNode(parent) {
+    class CIPENode(val cipeInfo: CIPEInfo, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
         override val nodeId = "cipe_${cipeInfo.ciPipelineExecutionId}"
 
         init {
@@ -65,16 +62,14 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             icon = AllIcons.Nodes.Folder
             val hasAIFixes = runGroup.aiFix != null
             val displayName = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
-            presentation.tooltip = if (hasAIFixes) "$displayName (AI fixes available)" else displayName
+            presentation.tooltip =
+                if (hasAIFixes) "$displayName (AI fixes available)" else displayName
         }
 
         override fun getName(): String = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
     }
 
-    class RunNode(
-        val run: CIPERun,
-        parent: CIPESimpleNode
-    ) : CIPESimpleNode(parent) {
+    class RunNode(val run: CIPERun, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
         override val nodeId = "run_${run.linkId ?: run.executionId ?: "unknown"}"
 
         init {
@@ -101,20 +96,17 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             }
     }
 
-    class FailedTaskNode(
-        val taskName: String,
-        parent: CIPESimpleNode
-    ) : CIPESimpleNode(parent) {
+    class FailedTaskNode(val taskName: String, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
         override val nodeId = "task_$taskName"
-        
+
         val projectName: String
         val targetName: String
-        
+
         init {
             val parts = taskName.split(":")
             projectName = parts.getOrNull(0) ?: taskName
             targetName = parts.getOrNull(1) ?: ""
-            
+
             icon = AllIcons.RunConfigurations.TestError
             presentation.tooltip = "Failed task: $taskName"
         }
@@ -122,10 +114,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = taskName
     }
 
-    class NxCloudFixNode(
-        val aiFix: NxAiFix,
-        parent: CIPESimpleNode
-    ) : CIPESimpleNode(parent) {
+    class NxCloudFixNode(val aiFix: NxAiFix, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
         override val nodeId = "fix_${aiFix.aiFixId}"
 
         init {
@@ -135,50 +124,56 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 
         override fun getName(): String {
             val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            
+            val verificationStatus =
+                aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+
             return when {
                 // Check fix generation status first
                 fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> "Waiting for fix..."
                 fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Creating fix..."
                 fixStatus == AITaskFixVerificationStatus.FAILED -> "Fix creation failed"
                 fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> "Fix not executable"
-                
+
                 // If fix is generated, check verification/user action
                 verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
-                verificationStatus == AITaskFixVerificationStatus.FAILED -> "Fix verification failed"
-                
+                verificationStatus == AITaskFixVerificationStatus.FAILED ->
+                    "Fix verification failed"
+
                 // Check user actions
-                else -> when (aiFix.userAction ?: AITaskFixUserAction.NONE) {
-                    AITaskFixUserAction.APPLIED -> "Fix applied"
-                    AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
-                    AITaskFixUserAction.REJECTED -> "Fix rejected"
-                    AITaskFixUserAction.NONE -> "Fix ready to apply"
-                }
+                else ->
+                    when (aiFix.userAction ?: AITaskFixUserAction.NONE) {
+                        AITaskFixUserAction.APPLIED -> "Fix applied"
+                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
+                        AITaskFixUserAction.REJECTED -> "Fix rejected"
+                        AITaskFixUserAction.NONE -> "Fix ready to apply"
+                    }
             }
         }
 
         private fun getFixIcon(): Icon {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
             val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            
+            val verificationStatus =
+                aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+
             return when {
                 // User actions take precedence
                 userAction == AITaskFixUserAction.APPLIED ||
                     userAction == AITaskFixUserAction.APPLIED_LOCALLY -> AllIcons.Actions.Checked
                 userAction == AITaskFixUserAction.REJECTED -> AllIcons.Actions.Cancel
-                
+
                 // Fix generation status
                 fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default()
-                fixStatus == AITaskFixVerificationStatus.FAILED || 
-                    fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> AllIcons.General.Error
+                fixStatus == AITaskFixVerificationStatus.FAILED ||
+                    fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE ->
+                    AllIcons.General.Error
                 fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> AllIcons.General.Information
-                
+
                 // Verification status
-                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default()
+                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS ->
+                    AnimatedIcon.Default()
                 verificationStatus == AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error
-                
+
                 // Default for completed fix
                 else -> AllIcons.Actions.QuickfixBulb
             }
@@ -187,26 +182,30 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         private fun getFixTooltip(): String {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
             val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            val verificationStatus = aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            
+            val verificationStatus =
+                aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+
             return when {
                 // Check fix generation status first
-                fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> "Waiting for AI fix generation..."
+                fixStatus == AITaskFixVerificationStatus.NOT_STARTED ->
+                    "Waiting for AI fix generation..."
                 fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Creating AI fix..."
                 fixStatus == AITaskFixVerificationStatus.FAILED -> "Failed to create AI fix"
                 fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> "Fix cannot be executed"
-                
+
                 // Check verification status
-                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying AI fix..."
+                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS ->
+                    "Verifying AI fix..."
                 verificationStatus == AITaskFixVerificationStatus.FAILED -> "Failed to verify fix"
-                
+
                 // Check user actions for completed fixes
-                else -> when (userAction) {
-                    AITaskFixUserAction.APPLIED -> "Fix has been applied"
-                    AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
-                    AITaskFixUserAction.REJECTED -> "Fix was rejected"
-                    AITaskFixUserAction.NONE -> "Click to view and apply fix"
-                }
+                else ->
+                    when (userAction) {
+                        AITaskFixUserAction.APPLIED -> "Fix has been applied"
+                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
+                        AITaskFixUserAction.REJECTED -> "Fix was rejected"
+                        AITaskFixUserAction.NONE -> "Click to view and apply fix"
+                    }
             }
         }
     }

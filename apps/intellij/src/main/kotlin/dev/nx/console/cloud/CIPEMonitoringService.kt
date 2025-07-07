@@ -27,7 +27,7 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
     /** Initialize CIPE monitoring after Nxls has started */
     fun init() {
         logger.info("[CIPE_MONITOR] Init called - current initialized state: $isInitialized")
-        
+
         if (isInitialized) {
             logger.debug("[CIPE_MONITOR] CIPE monitoring already initialized, skipping")
             return
@@ -36,15 +36,19 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
         cs.launch {
             try {
                 logger.debug("[CIPE_MONITOR] Checking cloud connection status")
-                
+
                 // Check if workspace is connected to Nx Cloud
                 val cloudStatus = NxlsService.getInstance(project).cloudStatus()
-                logger.debug("[CIPE_MONITOR] Cloud status received - " +
-                    "isConnected: ${cloudStatus?.isConnected}, " +
-                    "nxCloudUrl: ${cloudStatus?.nxCloudUrl ?: "none"}")
+                logger.debug(
+                    "[CIPE_MONITOR] Cloud status received - " +
+                        "isConnected: ${cloudStatus?.isConnected}, " +
+                        "nxCloudUrl: ${cloudStatus?.nxCloudUrl ?: "none"}"
+                )
 
                 if (cloudStatus?.isConnected == true) {
-                    logger.info("[CIPE_MONITOR] Nx Cloud is connected, initializing CIPE monitoring")
+                    logger.info(
+                        "[CIPE_MONITOR] Nx Cloud is connected, initializing CIPE monitoring"
+                    )
 
                     // Get services
                     logger.debug("[CIPE_MONITOR] Getting service instances")
@@ -63,8 +67,10 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
                     isInitialized = true
                     logger.info("[CIPE_MONITOR] CIPE monitoring initialized successfully")
                 } else {
-                    logger.info("[CIPE_MONITOR] Nx Cloud not connected (isConnected=${cloudStatus?.isConnected}), " +
-                        "skipping CIPE monitoring initialization")
+                    logger.info(
+                        "[CIPE_MONITOR] Nx Cloud not connected (isConnected=${cloudStatus?.isConnected}), " +
+                            "skipping CIPE monitoring initialization"
+                    )
                 }
             } catch (e: Exception) {
                 logger.error("[CIPE_MONITOR] Failed to initialize CIPE monitoring: ${e.message}", e)
@@ -75,7 +81,7 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
     /** Stop CIPE monitoring */
     fun stop() {
         logger.info("[CIPE_MONITOR] Stop called - current initialized state: $isInitialized")
-        
+
         if (!isInitialized) {
             logger.debug("[CIPE_MONITOR] CIPE monitoring not initialized, nothing to stop")
             return

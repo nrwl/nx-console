@@ -4,6 +4,7 @@ import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ScrollPaneFactory
@@ -23,14 +24,13 @@ import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nodeInterpreter
-import kotlinx.coroutines.*
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.ActionEvent
 import javax.swing.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import ru.nsk.kstatemachine.event.Event
-import com.intellij.openapi.diagnostic.thisLogger
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.createStateMachine
@@ -58,21 +58,27 @@ class NxToolWindowPanel(private val project: Project) :
 
     // CIPE data update listener
     private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeData ->
-        logger.info("[NX_TOOLWINDOW] CIPE data listener triggered - " +
-            "received ${cipeData.info?.size ?: 0} CIPEs, error: ${cipeData.error?.type ?: "none"}")
+        logger.info(
+            "[NX_TOOLWINDOW] CIPE data listener triggered - " +
+                "received ${cipeData.info?.size ?: 0} CIPEs, error: ${cipeData.error?.type ?: "none"}"
+        )
 
         scope.launch {
             withContext(Dispatchers.EDT) {
                 // Update tree with real CIPE data
                 cipeData.info?.let { cipeInfoList ->
-                    logger.debug("[NX_TOOLWINDOW] Updating CIPE tree with ${cipeInfoList.size} CIPEs")
+                    logger.debug(
+                        "[NX_TOOLWINDOW] Updating CIPE tree with ${cipeInfoList.size} CIPEs"
+                    )
                     cipeTreeStructure.updateCIPEData(cipeInfoList)
 
                     // Log details about each CIPE
                     cipeInfoList.forEach { cipe ->
-                        logger.debug("[NX_TOOLWINDOW] CIPE ${cipe.ciPipelineExecutionId}: " +
-                            "status=${cipe.status}, branch=${cipe.branch ?: "unknown"}, " +
-                            "runGroups=${cipe.runGroups.size}")
+                        logger.debug(
+                            "[NX_TOOLWINDOW] CIPE ${cipe.ciPipelineExecutionId}: " +
+                                "status=${cipe.status}, branch=${cipe.branch ?: "unknown"}, " +
+                                "runGroups=${cipe.runGroups.size}"
+                        )
                     }
                 }
                     ?: run {

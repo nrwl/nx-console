@@ -7,13 +7,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class NxCloudFixMessage {
-    @Serializable @SerialName("apply") object Apply : NxCloudFixMessage()
+    @Serializable @SerialName("apply") data object Apply : NxCloudFixMessage()
 
-    @Serializable @SerialName("apply-locally") object ApplyLocally : NxCloudFixMessage()
+    @Serializable @SerialName("apply-locally") data object ApplyLocally : NxCloudFixMessage()
 
-    @Serializable @SerialName("reject") object Reject : NxCloudFixMessage()
+    @Serializable @SerialName("reject") data object Reject : NxCloudFixMessage()
 
-    @Serializable @SerialName("show-diff") object ShowDiff : NxCloudFixMessage()
+    @Serializable @SerialName("show-diff") data object ShowDiff : NxCloudFixMessage()
 }
 
 @Serializable

@@ -24,13 +24,12 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
-import dev.nx.console.models.CIPEInfo
-import dev.nx.console.nxls.NxlsService
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.actions.NxInitService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.telemetry.TelemetryEvent
@@ -46,7 +45,6 @@ import java.net.URI
 import javax.swing.*
 import javax.swing.border.CompoundBorder
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.TreePath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -501,16 +499,14 @@ class NxToolMainComponents(private val project: Project) {
 
     private fun handleAIFixClick(fixNode: CIPESimpleNode.NxCloudFixNode) {
         // Track telemetry event
-        TelemetryService.getInstance(project).featureUsed(
-            TelemetryEvent.CLOUD_OPEN_FIX_DETAILS,
-            mapOf("source" to "cipe_tree")
-        )
-        
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS, mapOf("source" to "cipe_tree"))
+
         // Find the parent CIPE and run group info
         var currentNode: CIPESimpleNode? = fixNode
         var cipeId: String? = null
         var runGroupName: String? = null
-        
+
         while (currentNode != null) {
             when (currentNode) {
                 is CIPESimpleNode.CIPENode -> cipeId = currentNode.cipeInfo.ciPipelineExecutionId
@@ -519,13 +515,13 @@ class NxToolMainComponents(private val project: Project) {
             }
             currentNode = currentNode.parent as? CIPESimpleNode
         }
-        
+
         if (cipeId != null && runGroupName != null) {
             // Open the cloud fix webview using the same pattern as CIPENotificationService
             openCloudFixWebview(cipeId, runGroupName)
         }
     }
-    
+
     private fun openCloudFixWebview(cipeId: String, runGroupId: String) {
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val currentData = NxlsService.getInstance(project).recentCIPEData()
@@ -536,11 +532,12 @@ class NxToolMainComponents(private val project: Project) {
             if (cipe == null || runGroup == null) {
                 withContext(Dispatchers.EDT) {
                     Notification(
-                        "Nx Cloud CIPE",
-                        "AI Fix Not Found",
-                        "Could not find the AI fix data",
-                        NotificationType.ERROR
-                    ).notify(project)
+                            "Nx Cloud CIPE",
+                            "AI Fix Not Found",
+                            "Could not find the AI fix data",
+                            NotificationType.ERROR
+                        )
+                        .notify(project)
                 }
                 return@launch
             }
@@ -634,7 +631,7 @@ class NxToolMainComponents(private val project: Project) {
                                 if (path != null) {
                                     val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
                                     val userObject = lastNode?.userObject
-                                    
+
                                     // Check if clicked on AI fix node
                                     if (userObject is CIPESimpleNode.NxCloudFixNode) {
                                         handleAIFixClick(userObject)

@@ -44,7 +44,10 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
                 }
 
                 // Time ago
-                append(" - ${userObject.cipeInfo.getTimeAgoString()}", SimpleTextAttributes.GRAY_ATTRIBUTES)
+                append(
+                    " - ${userObject.cipeInfo.getTimeAgoString()}",
+                    SimpleTextAttributes.GRAY_ATTRIBUTES
+                )
 
                 // Status color indicator
                 val statusColor = getStatusColor(userObject.cipeInfo.status)
@@ -67,25 +70,23 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
                 val failedTaskCount = userObject.run.numFailedTasks ?: 0
                 if (failedTaskCount > 0) {
                     append(" - ", SimpleTextAttributes.GRAY_ATTRIBUTES)
-                    append(
-                        "$failedTaskCount failed",
-                        SimpleTextAttributes.ERROR_ATTRIBUTES
-                    )
+                    append("$failedTaskCount failed", SimpleTextAttributes.ERROR_ATTRIBUTES)
                 }
             }
             is CIPESimpleNode.FailedTaskNode -> {
                 append(userObject.name, SimpleTextAttributes.ERROR_ATTRIBUTES)
             }
             is CIPESimpleNode.NxCloudFixNode -> {
-                val userAction = userObject.aiFix.userAction ?: dev.nx.console.models.AITaskFixUserAction.NONE
-                val verificationStatus = userObject.aiFix.verificationStatus ?: dev.nx.console.models.AITaskFixVerificationStatus.NOT_STARTED
+                val userAction =
+                    userObject.aiFix.userAction ?: dev.nx.console.models.AITaskFixUserAction.NONE
+                val verificationStatus =
+                    userObject.aiFix.verificationStatus
+                        ?: dev.nx.console.models.AITaskFixVerificationStatus.NOT_STARTED
                 val textAttributes =
                     when {
-                        userAction.isApplied() ->
-                            SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES
+                        userAction.isApplied() -> SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES
                         userAction.isRejected() -> SimpleTextAttributes.GRAY_ATTRIBUTES
-                        verificationStatus.isFailed() ->
-                            SimpleTextAttributes.ERROR_ATTRIBUTES
+                        verificationStatus.isFailed() -> SimpleTextAttributes.ERROR_ATTRIBUTES
                         else -> SimpleTextAttributes.REGULAR_ATTRIBUTES
                     }
                 append(userObject.name, textAttributes)

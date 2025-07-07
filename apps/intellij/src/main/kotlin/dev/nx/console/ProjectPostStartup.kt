@@ -4,7 +4,6 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import dev.nx.console.cloud.CIPEDataSyncService
 import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.mcp.McpServerService
@@ -72,11 +71,11 @@ internal class ProjectPostStartup : ProjectActivity {
             .featureUsed(TelemetryEvent.EXTENSION_ACTIVATE, mapOf("timing" to 0))
 
         //                 Check for AI fixes on startup (temporary for debugging)
-//        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-//            delay(10000) // 10 seconds to ensure NXLS is ready
-//
-//            val dataSyncService = CIPEDataSyncService.getInstance(project)
-//            dataSyncService.checkForAiFixesOnStartup()
-//        }
+        //        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+        //            delay(10000) // 10 seconds to ensure NXLS is ready
+        //
+        //            val dataSyncService = CIPEDataSyncService.getInstance(project)
+        //            dataSyncService.checkForAiFixesOnStartup()
+        //        }
     }
 }

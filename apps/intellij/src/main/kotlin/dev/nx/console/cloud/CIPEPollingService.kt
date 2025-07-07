@@ -108,16 +108,20 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
             val cipeData = nxlsService.recentCIPEData()
 
             if (cipeData != null) {
-                logger.info("[CIPE_POLL] Received CIPE data - " +
-                    "total CIPEs: ${cipeData.info?.size ?: 0}, " +
-                    "error: ${cipeData.error?.type ?: "none"}")
+                logger.info(
+                    "[CIPE_POLL] Received CIPE data - " +
+                        "total CIPEs: ${cipeData.info?.size ?: 0}, " +
+                        "error: ${cipeData.error?.type ?: "none"}"
+                )
 
                 // Log detailed CIPE info
                 cipeData.info?.forEach { cipe ->
-                    logger.debug("[CIPE_POLL] CIPE ${cipe.ciPipelineExecutionId}: " +
-                        "status=${cipe.status}, " +
-                        "runGroups=${cipe.runGroups.size}, " +
-                        "branch=${cipe.branch ?: "unknown"}")
+                    logger.debug(
+                        "[CIPE_POLL] CIPE ${cipe.ciPipelineExecutionId}: " +
+                            "status=${cipe.status}, " +
+                            "runGroups=${cipe.runGroups.size}, " +
+                            "branch=${cipe.branch ?: "unknown"}"
+                    )
                 }
 
                 _latestCIPEData.value = cipeData
@@ -197,7 +201,10 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                 logger.debug("[CIPE_POLL] Notifying listener #$index")
                 listener(data)
             } catch (e: Exception) {
-                logger.error("[CIPE_POLL] Error notifying CIPE data listener #$index: ${e.message}", e)
+                logger.error(
+                    "[CIPE_POLL] Error notifying CIPE data listener #$index: ${e.message}",
+                    e
+                )
             }
         }
         logger.debug("[CIPE_POLL] Completed notifying all listeners")
