@@ -18,7 +18,6 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
     private var treeModel: StructureTreeModel<*>? = null
 
     init {
-        // Start with empty data - will be populated by real API data
         updateCIPEData(emptyList())
     }
 
@@ -146,38 +145,9 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
     override fun hasSomethingToCommit(): Boolean = false
 
     fun updateCIPEData(newData: List<CIPEInfo>) {
-        logger.info(
-            "[CIPE_TREE] Updating CIPE data - old count: ${cipeData.size}, new count: ${newData.size}"
-        )
-
-        // Log details about the new data
-        newData.forEach { cipe ->
-            logger.debug(
-                "[CIPE_TREE] CIPE ${cipe.ciPipelineExecutionId}: " +
-                    "status=${cipe.status}, runGroups=${cipe.runGroups.size}, " +
-                    "branch=${cipe.branch ?: "unknown"}"
-            )
-
-            // Log run groups with AI fixes
-            cipe.runGroups.forEach { runGroup ->
-                val aiFix = runGroup.aiFix
-                if (aiFix != null) {
-                    logger.debug(
-                        "[CIPE_TREE] Run group ${runGroup.runGroup} has AI fix: " +
-                            "taskIds=${aiFix.taskIds.joinToString(", ")}"
-                    )
-                }
-            }
-        }
-
         cipeData = newData
-
         // Notify the tree model about the structure change
         treeModel?.invalidate()
-    }
-
-    fun hasCIPEData(): Boolean {
-        return cipeData.isNotEmpty()
     }
 
     fun createTreeModel(): TreeModel {

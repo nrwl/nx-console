@@ -172,9 +172,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 
     private fun notifyListeners(data: CIPEDataResponse) {
-        dataUpdateListeners.forEach { listener ->
-                listener(data)
-        }
+        dataUpdateListeners.forEach { listener -> listener(data) }
     }
 
     override fun dispose() {

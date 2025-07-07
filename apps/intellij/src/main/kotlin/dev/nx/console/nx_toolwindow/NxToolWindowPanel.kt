@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.cloud.CIPEDataSyncService
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.NxWorkspace
@@ -31,7 +32,6 @@ import kotlinx.coroutines.channels.Channel
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.StateMachine
-import ru.nsk.kstatemachine.statemachine.activeStatesFlow
 import ru.nsk.kstatemachine.statemachine.createStateMachine
 import ru.nsk.kstatemachine.statemachine.stop
 import ru.nsk.kstatemachine.transition.TransitionParams
@@ -59,7 +59,12 @@ class NxToolWindowPanel(private val project: Project) :
     private var notConnectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createNotConnectedToNxCloudPanel()
 
-    private val cipeDataListener: (CIPEDataResponse) -> Unit = { loadToolwindowContent() }
+    private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeInfoList ->
+        // I don't love that we update the tree view outside of the state machine but
+        // it's the easiest solution because everything is onEntry
+        cipeInfoList.info?.let { cipeTreeStructure.updateCIPEData(it) }
+        loadToolwindowContent()
+    }
 
     private val progressBar =
         JProgressBar().apply {
@@ -103,10 +108,12 @@ class NxToolWindowPanel(private val project: Project) :
 
         scope.launch {
             stateMachine =
-                createStateMachine(scope, childMode = ChildMode.PARALLEL, start = true) {
+                createStateMachine(
+                    scope + Dispatchers.EDT,
+                    childMode = ChildMode.PARALLEL,
+                    start = true
+                ) {
                     state(States.MainContent) {
-                        this@NxToolWindowPanel.logger.info("setting up state machine")
-
                         val noNodeInterpreter = state(MainContentStates.NoNodeInterpreter)
                         val showError = dataState<Int>(MainContentStates.ShowErrors)
                         val showNoProject = state(MainContentStates.ShowNoProject)
@@ -115,14 +122,8 @@ class NxToolWindowPanel(private val project: Project) :
                             dataState<NxWorkspace>(MainContentStates.ShowProjectTree)
                         val initialState =
                             initialState(MainContentStates.InitialLoading) {
-                                onEntry {
-                                    this@NxToolWindowPanel.logger.info("entering initial state")
-                                    loadingPanel.startLoading()
-                                }
-                                onExit {
-                                    this@NxToolWindowPanel.logger.info("exiting initial state")
-                                    loadingPanel.stopLoading()
-                                }
+                                onEntry { loadingPanel.startLoading() }
+                                onExit { loadingPanel.stopLoading() }
                             }
 
                         noNodeInterpreter {
@@ -168,7 +169,6 @@ class NxToolWindowPanel(private val project: Project) :
 
                         showProjectTree {
                             onEntry {
-                                this@NxToolWindowPanel.logger.info("showProjectTree $data")
                                 mainContent = projectTreeComponent
                                 projectStructure.updateNxProjects(data)
                             }
@@ -230,10 +230,7 @@ class NxToolWindowPanel(private val project: Project) :
                                 notConnectedToNxCloudPanel.isVisible = false
 
                                 val cipeInfoList =
-                                    CIPEPollingService.getInstance(project)
-                                        .latestCIPEData
-                                        .value
-                                        ?.info
+                                    CIPEDataSyncService.getInstance(project).currentData.value?.info
                                         ?: emptyList()
                                 if (cipeInfoList.isEmpty()) {
                                     cloudHeaderPanel.isVisible = true
@@ -278,7 +275,6 @@ class NxToolWindowPanel(private val project: Project) :
                                 state: IState,
                                 transitionParams: TransitionParams<*>
                             ) {
-                                this@NxToolWindowPanel.logger.info("stateEntry $state")
                                 updateMainPanelContent()
                             }
                         }
@@ -330,7 +326,6 @@ class NxToolWindowPanel(private val project: Project) :
     }
 
     private fun loadToolwindowContent() {
-        logger.info("loadToolwindowContent")
         if (project.isDisposed) return
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxlsService = NxlsService.getInstance(project)
@@ -347,8 +342,6 @@ class NxToolWindowPanel(private val project: Project) :
                         false
                     }
 
-                this@NxToolWindowPanel.logger.info("hasProjects $hasProjects")
-
                 // SEND EVENTS TO CHANNEL INSTEAD OF DIRECTLY CALLING processEvent
                 if (!hasNodeInterpreter) {
                     eventChannel.send(MainContentEvents.ShowNoNodeInterpreter())
@@ -364,11 +357,8 @@ class NxToolWindowPanel(private val project: Project) :
                 } else if (!hasProjects) {
                     eventChannel.send(MainContentEvents.ShowNoProject())
                 } else {
-                    this@NxToolWindowPanel.logger.info("showProjectTree event triggered")
-                    this@NxToolWindowPanel.logger.info(
-                        "states: ${stateMachine.activeStatesFlow().value}"
-                    )
-
+                    // same here, I don't love this but it's okay for now
+                    projectStructure.updateNxProjects(workspace)
                     eventChannel.send(MainContentEvents.ShowProjectTree(workspace))
                 }
 
@@ -381,7 +371,6 @@ class NxToolWindowPanel(private val project: Project) :
             } else {
                 val cloudStatus = withContext(Dispatchers.IO) { nxlsService.cloudStatus() }
                 cloudStatus?.let {
-                    // THESE EVENTS ALSO NEED TO BE SENT TO THE CHANNEL
                     if (cloudStatus.isConnected) {
                         eventChannel.send(
                             NxCloudEvents.ShowConnectedToNxCloud(
@@ -389,7 +378,6 @@ class NxToolWindowPanel(private val project: Project) :
                             )
                         )
                     } else {
-
                         eventChannel.send(NxCloudEvents.ShowNotConnectedToNxCloud())
                     }
                 }
