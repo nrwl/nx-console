@@ -7,6 +7,8 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.ui.Splitter
+import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.ui.UIUtil
@@ -39,7 +41,6 @@ import ru.nsk.kstatemachine.transition.TransitionParams
 class NxToolWindowPanel(private val project: Project) :
     SimpleToolWindowPanel(true, true), Disposable {
 
-    private val logger = thisLogger()
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
     private val cipeTreeStructure = CIPETreeStructure(project)
@@ -71,7 +72,8 @@ class NxToolWindowPanel(private val project: Project) :
             } else {
                 cipeTreeStructure.updateCIPEData(it)
                 cloudHeaderPanel.isVisible = false
-            } }
+            }
+        }
         loadToolwindowContent()
     }
 
@@ -91,9 +93,11 @@ class NxToolWindowPanel(private val project: Project) :
             )
         }
 
-    private var mainPanel: JPanel = JPanel().apply { layout = BoxLayout(this, BoxLayout.Y_AXIS) }
+    private var mainPanel: JPanel = JPanel().apply { layout = BorderLayout() }
     private val loadingPanel = JBLoadingPanel(BorderLayout(), this)
     private val topPanel = JPanel(BorderLayout())
+    private val contentSplitter =
+        JBSplitter(true,"NX_CONSOLE.TOOLWINDOW_SPLITTER", 0.7f) // Vertical splitter with 70% for main content
 
     private lateinit var stateMachine: StateMachine
 
@@ -107,6 +111,9 @@ class NxToolWindowPanel(private val project: Project) :
         loadingPanel.add(topPanel, BorderLayout.NORTH)
         loadingPanel.add(mainPanel, BorderLayout.CENTER)
         setContent(loadingPanel)
+
+        // Add splitter to main panel
+        mainPanel.add(contentSplitter, BorderLayout.CENTER)
 
         // LAUNCH THE EVENT CONSUMER COROUTINE ONCE
         // This coroutine will serially process all events sent to eventChannel
@@ -227,6 +234,7 @@ class NxToolWindowPanel(private val project: Project) :
                             onEntry {
                                 connectedToNxCloudPanel.isVisible = false
                                 notConnectedToNxCloudPanel.isVisible = false
+                                contentSplitter.secondComponent = null
                             }
                             transition<NxCloudEvents.ShowNotConnectedToNxCloud> {
                                 targetState = showNotConnectedToNxCloudPanel
@@ -240,6 +248,7 @@ class NxToolWindowPanel(private val project: Project) :
                             onEntry {
                                 connectedToNxCloudPanel.isVisible = true
                                 notConnectedToNxCloudPanel.isVisible = false
+                                contentSplitter.secondComponent = connectedToNxCloudPanel
 
                                 val cipeInfoList =
                                     CIPEDataSyncService.getInstance(project).currentData.value?.info
@@ -256,6 +265,7 @@ class NxToolWindowPanel(private val project: Project) :
                             onEntry {
                                 connectedToNxCloudPanel.isVisible = false
                                 notConnectedToNxCloudPanel.isVisible = true
+                                contentSplitter.secondComponent = notConnectedToNxCloudPanel
                             }
                         }
 
@@ -398,12 +408,10 @@ class NxToolWindowPanel(private val project: Project) :
     }
 
     private fun updateMainPanelContent() {
-        mainPanel.removeAll()
+        mainContent?.let { contentSplitter.firstComponent = it }
 
-        mainContent?.let { mainPanel.add(it) }
-        mainPanel.add(Box.createVerticalGlue())
-        mainPanel.add(connectedToNxCloudPanel)
-        mainPanel.add(notConnectedToNxCloudPanel)
+        // The cloud panel (second component) is managed by the state machine
+        // so we don't need to set it here
 
         mainPanel.revalidate() // Recalculate layout
         mainPanel.repaint() // Redraw
