@@ -30,15 +30,16 @@ import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.run.actions.NxConnectService
 import dev.nx.console.run.actions.NxInitService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.*
 import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
@@ -328,47 +329,11 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createConnectedToNxCloudPanel(
-        nxCloudUrl: String,
-        cipeTreeStructure: CIPETreeStructure
-    ): JPanel {
-        val cipeTreeComponent = createCIPETreeComponent(cipeTreeStructure)
+    fun createConnectedToNxCloudPanel(cipeTreeComponent: JComponent, headerPanel: JPanel): JPanel {
 
         return JPanel().apply {
             layout = BorderLayout()
             border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
-
-            val headerPanel =
-                JPanel().apply {
-                    layout = BoxLayout(this, BoxLayout.X_AXIS)
-                    border = JBUI.Borders.empty(5, 10)
-
-                    add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
-                    add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
-                    add(
-                        JLabel("Connected to Nx Cloud").apply {
-                            font = Font(font.name, Font.BOLD, font.size)
-                            alignmentX = Component.LEFT_ALIGNMENT
-                        }
-                    )
-                    add(Box.createHorizontalGlue())
-                    add(
-                        JButton().apply {
-                            icon = AllIcons.ToolbarDecorator.Export
-                            toolTipText = "Open Nx Cloud"
-
-                            isContentAreaFilled = false
-                            isBorderPainted = false
-                            isFocusPainted = false
-                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                            addActionListener {
-                                TelemetryService.getInstance(project)
-                                    .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                                BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
-                            }
-                        }
-                    )
-                }
 
             add(headerPanel, BorderLayout.NORTH)
 
@@ -377,7 +342,117 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createNotConnectedToNxCloudPanel(nxConnectActionListener: ActionListener): JPanel {
+    fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
+        val treeModel = cipeTreeStructure.createTreeModel()
+
+        val tree =
+            Tree(treeModel).apply {
+                isRootVisible = false
+                cellRenderer = CIPETreeCellRenderer()
+                TreeUIHelper.getInstance().installTreeSpeedSearch(this)
+
+                // Auto-expand failed pipelines
+                addTreeExpansionListener(
+                    object : javax.swing.event.TreeExpansionListener {
+                        override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
+                            val path = event.path
+                            val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                            val userObject = lastNode?.userObject
+
+                            if (
+                                userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)
+                            ) {
+                                // Expand children that should be auto-expanded
+                                for (i in 0 until lastNode.childCount) {
+                                    val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
+                                    val childObject = child?.userObject
+                                    if (
+                                        childObject != null &&
+                                            cipeTreeStructure.shouldAutoExpand(childObject)
+                                    ) {
+                                        expandPath(path.pathByAddingChild(child))
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
+                    }
+                )
+
+                // Add mouse listener for AI fix clicks
+                addMouseListener(
+                    object : MouseAdapter() {
+                        override fun mouseClicked(e: MouseEvent) {
+                            if (e.clickCount == 1) {
+                                val path = getPathForLocation(e.x, e.y)
+                                if (path != null) {
+                                    val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                                    val userObject = lastNode?.userObject
+
+                                    // Check if clicked on AI fix node
+                                    if (userObject is CIPESimpleNode.NxCloudFixNode) {
+                                        handleAIFixClick(userObject)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+
+        return ScrollPaneFactory.createScrollPane(tree, 0).apply {
+            preferredSize = Dimension(300, 400)
+            minimumSize = Dimension(200, 200)
+        }
+    }
+
+    fun createCloudHeaderPanel(): JPanel {
+        return JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            border = JBUI.Borders.empty(5, 10)
+
+            add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
+            add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
+            add(
+                JLabel("Connected to Nx Cloud").apply {
+                    font = Font(font.name, Font.BOLD, font.size)
+                    alignmentX = Component.LEFT_ALIGNMENT
+                }
+            )
+            add(Box.createHorizontalGlue())
+            add(
+                JButton().apply {
+                    icon = AllIcons.ToolbarDecorator.Export
+                    toolTipText = "Open Nx Cloud"
+
+                    isContentAreaFilled = false
+                    isBorderPainted = false
+                    isFocusPainted = false
+                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                    addActionListener {
+                        TelemetryService.getInstance(project)
+                            .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+                        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+                            NxlsService.getInstance(project).cloudStatus()?.nxCloudUrl.let {
+                                if (it != null) {
+                                    BrowserLauncher.instance.browse(URI.create(it))
+                                } else {
+                                    Notifier.notifyAnything(
+                                        project,
+                                        "Couldn't retrieve Nx Cloud URL",
+                                        NotificationType.ERROR
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    fun createNotConnectedToNxCloudPanel(): JPanel {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border =
@@ -401,7 +476,13 @@ class NxToolMainComponents(private val project: Project) {
                     layout = FlowLayout(FlowLayout.CENTER, 5, 5)
                     add(
                         JButton("Connect to Nx Cloud").apply {
-                            addActionListener(nxConnectActionListener)
+                            addActionListener(
+                                object : AbstractAction() {
+                                    override fun actionPerformed(e: ActionEvent?) {
+                                        NxConnectService.getInstance(project).connectToCloud()
+                                    }
+                                }
+                            )
                             alignmentX = Component.CENTER_ALIGNMENT
                         }
                     )
@@ -575,71 +656,6 @@ class NxToolMainComponents(private val project: Project) {
                 // Show fix details once editor is open
                 fixFile.showFixDetails(fixDetails)
             }
-        }
-    }
-
-    fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
-        val treeModel = cipeTreeStructure.createTreeModel()
-
-        val tree =
-            Tree(treeModel).apply {
-                isRootVisible = false
-                cellRenderer = CIPETreeCellRenderer()
-                TreeUIHelper.getInstance().installTreeSpeedSearch(this)
-
-                // Auto-expand failed pipelines
-                addTreeExpansionListener(
-                    object : javax.swing.event.TreeExpansionListener {
-                        override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
-                            val path = event.path
-                            val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
-                            val userObject = lastNode?.userObject
-
-                            if (
-                                userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)
-                            ) {
-                                // Expand children that should be auto-expanded
-                                for (i in 0 until lastNode.childCount) {
-                                    val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
-                                    val childObject = child?.userObject
-                                    if (
-                                        childObject != null &&
-                                            cipeTreeStructure.shouldAutoExpand(childObject)
-                                    ) {
-                                        expandPath(path.pathByAddingChild(child))
-                                    }
-                                }
-                            }
-                        }
-
-                        override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
-                    }
-                )
-
-                // Add mouse listener for AI fix clicks
-                addMouseListener(
-                    object : MouseAdapter() {
-                        override fun mouseClicked(e: MouseEvent) {
-                            if (e.clickCount == 1) {
-                                val path = getPathForLocation(e.x, e.y)
-                                if (path != null) {
-                                    val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
-                                    val userObject = lastNode?.userObject
-
-                                    // Check if clicked on AI fix node
-                                    if (userObject is CIPESimpleNode.NxCloudFixNode) {
-                                        handleAIFixClick(userObject)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                )
-            }
-
-        return ScrollPaneFactory.createScrollPane(tree, 0).apply {
-            preferredSize = Dimension(300, 400)
-            minimumSize = Dimension(200, 200)
         }
     }
 }

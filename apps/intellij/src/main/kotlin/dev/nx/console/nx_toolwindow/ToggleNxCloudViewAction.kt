@@ -7,7 +7,7 @@ import com.intellij.util.messages.Topic
 
 class ToggleNxCloudViewAction : ToggleAction("Show Nx Cloud Panel") {
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
