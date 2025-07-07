@@ -52,7 +52,10 @@ class NxToolWindowPanel(private val project: Project) :
     private val toolBar = nxToolMainComponents.createToolbar(projectTree)
     private var mainContent: JComponent? = null
     private var errorCountAndComponent: Pair<Int, JComponent>? = null
-    private val cipeTreeComponent = nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
+    private val cipeTreeAndPersistenceManager =
+        nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
+    private val cipeTreeComponent = cipeTreeAndPersistenceManager.first
+    private val cipeTreePersistenceManager = cipeTreeAndPersistenceManager.second
     private val cloudHeaderPanel = nxToolMainComponents.createCloudHeaderPanel()
     private var connectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createConnectedToNxCloudPanel(cipeTreeComponent, cloudHeaderPanel)
@@ -91,6 +94,9 @@ class NxToolWindowPanel(private val project: Project) :
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     init {
+        // Set persistence manager on tree structure
+        cipeTreeStructure.persistenceManager = cipeTreePersistenceManager
+
         topPanel.add(progressBar, BorderLayout.NORTH)
         loadingPanel.add(topPanel, BorderLayout.NORTH)
         loadingPanel.add(mainPanel, BorderLayout.CENTER)
@@ -386,10 +392,7 @@ class NxToolWindowPanel(private val project: Project) :
     }
 
     private fun updateMainPanelContent() {
-        logger.info("updateMainPanelContent")
         mainPanel.removeAll()
-
-        logger.info("mainContent $mainContent")
 
         mainContent?.let { mainPanel.add(it) }
         mainPanel.add(Box.createVerticalGlue())

@@ -25,6 +25,7 @@ import com.intellij.util.ui.JBUI
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreePersistenceManager
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
@@ -342,7 +343,9 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
+    fun createCIPETreeComponent(
+        cipeTreeStructure: CIPETreeStructure
+    ): Pair<JComponent, CIPETreePersistenceManager> {
         val treeModel = cipeTreeStructure.createTreeModel()
 
         val tree =
@@ -350,61 +353,71 @@ class NxToolMainComponents(private val project: Project) {
                 isRootVisible = false
                 cellRenderer = CIPETreeCellRenderer()
                 TreeUIHelper.getInstance().installTreeSpeedSearch(this)
-
-                // Auto-expand failed pipelines
-                addTreeExpansionListener(
-                    object : javax.swing.event.TreeExpansionListener {
-                        override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
-                            val path = event.path
-                            val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
-                            val userObject = lastNode?.userObject
-
-                            if (
-                                userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)
-                            ) {
-                                // Expand children that should be auto-expanded
-                                for (i in 0 until lastNode.childCount) {
-                                    val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
-                                    val childObject = child?.userObject
-                                    if (
-                                        childObject != null &&
-                                            cipeTreeStructure.shouldAutoExpand(childObject)
-                                    ) {
-                                        expandPath(path.pathByAddingChild(child))
-                                    }
-                                }
-                            }
-                        }
-
-                        override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
-                    }
-                )
-
-                // Add mouse listener for AI fix clicks
-                addMouseListener(
-                    object : MouseAdapter() {
-                        override fun mouseClicked(e: MouseEvent) {
-                            if (e.clickCount == 1) {
-                                val path = getPathForLocation(e.x, e.y)
-                                if (path != null) {
-                                    val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
-                                    val userObject = lastNode?.userObject
-
-                                    // Check if clicked on AI fix node
-                                    if (userObject is CIPESimpleNode.NxCloudFixNode) {
-                                        handleAIFixClick(userObject)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                )
             }
 
-        return ScrollPaneFactory.createScrollPane(tree, 0).apply {
-            preferredSize = Dimension(300, 400)
-            minimumSize = Dimension(200, 200)
+        // Create and install persistence manager
+        val persistenceManager = CIPETreePersistenceManager(tree)
+        persistenceManager.installPersistenceListeners()
+
+        // Set tree reference on the structure so it can restore expansion state
+        cipeTreeStructure.tree = tree
+
+        tree.apply {
+            // Auto-expand failed pipelines
+            addTreeExpansionListener(
+                object : javax.swing.event.TreeExpansionListener {
+                    override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
+                        val path = event.path
+                        val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                        val userObject = lastNode?.userObject
+
+                        if (userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)) {
+                            // Expand children that should be auto-expanded
+                            for (i in 0 until lastNode.childCount) {
+                                val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
+                                val childObject = child?.userObject
+                                if (
+                                    childObject != null &&
+                                        cipeTreeStructure.shouldAutoExpand(childObject)
+                                ) {
+                                    expandPath(path.pathByAddingChild(child))
+                                }
+                            }
+                        }
+                    }
+
+                    override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
+                }
+            )
+
+            // Add mouse listener for AI fix clicks
+            addMouseListener(
+                object : MouseAdapter() {
+                    override fun mouseClicked(e: MouseEvent) {
+                        if (e.clickCount == 1) {
+                            val path = getPathForLocation(e.x, e.y)
+                            if (path != null) {
+                                val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                                val userObject = lastNode?.userObject
+
+                                // Check if clicked on AI fix node
+                                if (userObject is CIPESimpleNode.NxCloudFixNode) {
+                                    handleAIFixClick(userObject)
+                                }
+                            }
+                        }
+                    }
+                }
+            )
         }
+
+        val scrollPane =
+            ScrollPaneFactory.createScrollPane(tree, 0).apply {
+                preferredSize = Dimension(300, 400)
+                minimumSize = Dimension(200, 200)
+            }
+
+        return Pair(scrollPane, persistenceManager)
     }
 
     fun createCloudHeaderPanel(): JPanel {

@@ -11,6 +11,13 @@ import javax.swing.Icon
 sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent) {
     abstract val nodeId: String
 
+    val idPath: List<String> by lazy {
+        when (parent) {
+            is CIPESimpleNode -> parent.idPath + nodeId
+            else -> listOf(nodeId)
+        }
+    }
+
     override fun buildChildren(): Array<out CIPESimpleNode> = emptyArray()
 
     class CIPERootNode : CIPESimpleNode(null) {

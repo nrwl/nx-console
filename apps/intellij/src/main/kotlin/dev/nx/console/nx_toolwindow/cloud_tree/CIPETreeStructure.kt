@@ -5,6 +5,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
+import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
@@ -16,6 +18,8 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
     private val rootNode = CIPESimpleNode.CIPERootNode()
     private var cipeData: List<CIPEInfo> = emptyList()
     private var treeModel: StructureTreeModel<*>? = null
+    var persistenceManager: CIPETreePersistenceManager? = null
+    var tree: Tree? = null
 
     init {
         updateCIPEData(emptyList())
@@ -147,7 +151,15 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
     fun updateCIPEData(newData: List<CIPEInfo>) {
         cipeData = newData
         // Notify the tree model about the structure change
-        treeModel?.invalidate()
+        treeModel?.invalidateAsync()?.thenRun {
+            // Restore expansion state after invalidation
+            persistenceManager?.let { pm ->
+                tree?.let { treeComponent ->
+                    val visitor = pm.CIPETreePersistenceVisitor()
+                    TreeUtil.promiseExpand(treeComponent, visitor)
+                }
+            }
+        }
     }
 
     fun createTreeModel(): TreeModel {
