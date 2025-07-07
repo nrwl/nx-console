@@ -51,8 +51,8 @@ sealed interface MainContentEvents : Event {
 }
 
 sealed interface NxCloudEvents : Event {
-    class ShowConnectToNxCloud : NxCloudEvents
-    class ShowOpenNxCloud(override val data: String) : DataEvent<String>, NxCloudEvents
+    class ShowNotConnectedToNxCloud : NxCloudEvents
+    class ShowConnectedToNxCloud(override val data: String) : DataEvent<String>, NxCloudEvents
     class Hide : NxCloudEvents
 }
 
@@ -172,8 +172,10 @@ fun createNxCloudStateGroup(
             openNxCloudPanel.value?.let { panel -> panel.isVisible = false }
             connectToNxCloudPanel.value?.let { panel -> panel.isVisible = false }
         }
-        transition<NxCloudEvents.ShowConnectToNxCloud> { targetState = showConnectNxCloudPanel }
-        dataTransition<NxCloudEvents.ShowOpenNxCloud, String> {
+        transition<NxCloudEvents.ShowNotConnectedToNxCloud> {
+            targetState = showConnectNxCloudPanel
+        }
+        dataTransition<NxCloudEvents.ShowConnectedToNxCloud, String> {
             targetState = showConnectedNxCloudPanel
         }
     }
@@ -193,19 +195,23 @@ fun createNxCloudStateGroup(
             connectToNxCloudPanel.value?.let { panel -> panel.isVisible = true }
                 ?: run {
                     connectToNxCloudPanel.value =
-                        nxToolMainComponents.createConnectToNxCloudPanel(nxConnectActionListener)
+                        nxToolMainComponents.createNotConnectedToNxCloudPanel(
+                            nxConnectActionListener
+                        )
                 }
             openNxCloudPanel.value?.let { panel -> panel.isVisible = false }
         }
     }
 
     showConnectedNxCloudPanel {
-        transition<NxCloudEvents.ShowConnectToNxCloud> { targetState = showConnectNxCloudPanel }
+        transition<NxCloudEvents.ShowNotConnectedToNxCloud> {
+            targetState = showConnectNxCloudPanel
+        }
         transition<NxCloudEvents.Hide> { targetState = hidden }
     }
 
     showConnectNxCloudPanel {
-        dataTransition<NxCloudEvents.ShowOpenNxCloud, String> {
+        dataTransition<NxCloudEvents.ShowConnectedToNxCloud, String> {
             targetState = showConnectedNxCloudPanel
         }
         transition<NxCloudEvents.Hide> { targetState = hidden }

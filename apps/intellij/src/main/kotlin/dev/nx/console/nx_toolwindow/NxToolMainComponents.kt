@@ -332,58 +332,52 @@ class NxToolMainComponents(private val project: Project) {
         nxCloudUrl: String,
         cipeTreeStructure: CIPETreeStructure
     ): JPanel {
-        // Create CIPE tree component with the provided structure
         val cipeTreeComponent = createCIPETreeComponent(cipeTreeStructure)
-        val hasCIPEData = cipeTreeStructure.hasCIPEData()
 
         return JPanel().apply {
             layout = BorderLayout()
             border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
 
-            // Only show header if there's no CIPE data
-            if (!hasCIPEData) {
-                // Header panel with connection status
-                val headerPanel =
-                    JPanel().apply {
-                        layout = BoxLayout(this, BoxLayout.X_AXIS)
-                        border = JBUI.Borders.empty(5, 10)
+            val headerPanel =
+                JPanel().apply {
+                    layout = BoxLayout(this, BoxLayout.X_AXIS)
+                    border = JBUI.Borders.empty(5, 10)
 
-                        add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
-                        add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
-                        add(
-                            JLabel("Connected to Nx Cloud").apply {
-                                font = Font(font.name, Font.BOLD, font.size)
-                                alignmentX = Component.LEFT_ALIGNMENT
+                    add(JLabel().apply { icon = AllIcons.RunConfigurations.TestPassed })
+                    add(Box.Filler(Dimension(5, 0), Dimension(5, 0), Dimension(5, 0)))
+                    add(
+                        JLabel("Connected to Nx Cloud").apply {
+                            font = Font(font.name, Font.BOLD, font.size)
+                            alignmentX = Component.LEFT_ALIGNMENT
+                        }
+                    )
+                    add(Box.createHorizontalGlue())
+                    add(
+                        JButton().apply {
+                            icon = AllIcons.ToolbarDecorator.Export
+                            toolTipText = "Open Nx Cloud"
+
+                            isContentAreaFilled = false
+                            isBorderPainted = false
+                            isFocusPainted = false
+                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                            addActionListener {
+                                TelemetryService.getInstance(project)
+                                    .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+                                BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
                             }
-                        )
-                        add(Box.createHorizontalGlue())
-                        add(
-                            JButton().apply {
-                                icon = AllIcons.ToolbarDecorator.Export
-                                toolTipText = "Open Nx Cloud"
+                        }
+                    )
+                }
 
-                                isContentAreaFilled = false
-                                isBorderPainted = false
-                                isFocusPainted = false
-                                cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                                addActionListener {
-                                    TelemetryService.getInstance(project)
-                                        .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                                    BrowserLauncher.instance.browse(URI.create(nxCloudUrl))
-                                }
-                            }
-                        )
-                    }
-
-                add(headerPanel, BorderLayout.NORTH)
-            }
+            add(headerPanel, BorderLayout.NORTH)
 
             // Add CIPE tree component
             add(cipeTreeComponent, BorderLayout.CENTER)
         }
     }
 
-    fun createConnectToNxCloudPanel(nxConnectActionListener: ActionListener): JPanel {
+    fun createNotConnectedToNxCloudPanel(nxConnectActionListener: ActionListener): JPanel {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border =

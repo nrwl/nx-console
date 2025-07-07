@@ -133,12 +133,11 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
         CIPEPollingService.getInstance(project).addDataUpdateListener(listener)
 
-        val disposable =
-            Disposable {
-                CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
-                messageBusConnection?.disconnect()
-                messageBusConnection = null
-            }
+        val disposable = Disposable {
+            CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
+            messageBusConnection?.disconnect()
+            messageBusConnection = null
+        }
 
         Disposer.register(browser, disposable)
 
@@ -252,9 +251,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         messageBusConnection = ApplicationManager.getApplication().messageBus.connect()
         messageBusConnection?.subscribe(
             UISettingsListener.TOPIC,
-            UISettingsListener {
-                updateWebviewStyles()
-            }
+            UISettingsListener { updateWebviewStyles() }
         )
     }
 

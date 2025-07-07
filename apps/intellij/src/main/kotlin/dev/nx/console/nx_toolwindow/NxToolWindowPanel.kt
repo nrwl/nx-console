@@ -53,8 +53,9 @@ class NxToolWindowPanel(private val project: Project) :
     private val toolBar = nxToolMainComponents.createToolbar(projectTree)
     private var mainContent: MutableRef<JComponent?> = MutableRef(null)
     private var errorCountAndComponent: MutableRef<Pair<Int, JComponent>?> = MutableRef(null)
-    private var openNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
-    private var connectToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
+    private val cipeTreeComponent = nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
+    private var connectedToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
+    private var notConnectedToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
 
     // CIPE data update listener
     private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeData ->
@@ -89,10 +90,10 @@ class NxToolWindowPanel(private val project: Project) :
 
                 // Force tree refresh
                 logger.debug("[NX_TOOLWINDOW] Forcing tree UI refresh")
-                openNxCloudPanel.value?.revalidate()
-                openNxCloudPanel.value?.repaint()
-                connectToNxCloudPanel.value?.revalidate()
-                connectToNxCloudPanel.value?.repaint()
+                connectedToNxCloudPanel.value?.revalidate()
+                connectedToNxCloudPanel.value?.repaint()
+                notConnectedToNxCloudPanel.value?.revalidate()
+                notConnectedToNxCloudPanel.value?.repaint()
                 loadToolwindowContent()
             }
         }
@@ -104,6 +105,10 @@ class NxToolWindowPanel(private val project: Project) :
             setUI(
                 object : DarculaProgressBarUI() {
                     override fun getRemainderColor(): Color {
+                        return UIUtil.getPanelBackground()
+                    }
+
+                    override fun getFinishedColor(c: JComponent): Color {
                         return UIUtil.getPanelBackground()
                     }
                 }
@@ -180,8 +185,8 @@ class NxToolWindowPanel(private val project: Project) :
                             hidden,
                             showConnectedNxCloudPanel,
                             showConnectNxCloudPanel,
-                            openNxCloudPanel,
-                            connectToNxCloudPanel,
+                            connectedToNxCloudPanel,
+                            notConnectedToNxCloudPanel,
                             nxToolMainComponents,
                             nxConnectActionListener,
                             cipeTreeStructure
@@ -301,13 +306,15 @@ class NxToolWindowPanel(private val project: Project) :
                     if (cloudStatus.isConnected) {
                         scope.launch {
                             eventChannel.send(
-                                NxCloudEvents.ShowOpenNxCloud(
+                                NxCloudEvents.ShowConnectedToNxCloud(
                                     cloudStatus.nxCloudUrl ?: "https://cloud.nx.app"
                                 )
                             )
                         }
                     } else {
-                        scope.launch { eventChannel.send(NxCloudEvents.ShowConnectToNxCloud()) }
+                        scope.launch {
+                            eventChannel.send(NxCloudEvents.ShowNotConnectedToNxCloud())
+                        }
                     }
                 }
             }
@@ -326,8 +333,8 @@ class NxToolWindowPanel(private val project: Project) :
 
         mainContent.value?.let { mainPanel.add(it) } // Add new content
         mainPanel.add(Box.createVerticalGlue())
-        openNxCloudPanel.value?.let { mainPanel.add(it) }
-        connectToNxCloudPanel.value?.let { mainPanel.add(it) }
+        connectedToNxCloudPanel.value?.let { mainPanel.add(it) }
+        notConnectedToNxCloudPanel.value?.let { mainPanel.add(it) }
 
         mainPanel.revalidate() // Recalculate layout
         mainPanel.repaint() // Redraw
@@ -335,8 +342,6 @@ class NxToolWindowPanel(private val project: Project) :
 
     companion object {
         const val NX_TOOLBAR_PLACE = "Nx Toolbar"
-        private const val NX_CLOUD_LEARN_MORE_TEXT =
-            "<html>To learn more about Nx Cloud, check out <a href='https://nx.dev/ci/intro/why-nx-cloud?utm_source=nxconsole'> Why Nx Cloud?</a> or get an overview of <a href='https://nx.dev/ci/features?utm_source=nxconsole'> Nx Cloud features </a>. </html>"
         private const val CLOUD_PANEL_COLLAPSED_PROPERTY_KEY =
             "dev.nx.console.toolwindow.cloud_panel_collapse"
 
@@ -357,8 +362,8 @@ class NxToolWindowPanel(private val project: Project) :
         }
         mainContent.value = null
         errorCountAndComponent.value = null
-        openNxCloudPanel.value = null
-        connectToNxCloudPanel.value = null
+        connectedToNxCloudPanel.value = null
+        notConnectedToNxCloudPanel.value = null
 
         // Clean up CIPE polling listener
         val cipePollingService = CIPEPollingService.getInstance(project)
