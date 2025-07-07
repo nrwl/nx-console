@@ -9,6 +9,8 @@ import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
@@ -18,7 +20,13 @@ import com.intellij.openapi.diff.impl.patch.TextFilePatch
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vcs.changes.patch.ApplyPatchDefaultExecutor
+import com.intellij.openapi.vcs.changes.patch.ApplyPatchDifferentiatedDialog
+import com.intellij.openapi.vcs.changes.patch.ApplyPatchExecutor
+import com.intellij.openapi.vcs.changes.patch.ApplyPatchMode
+import com.intellij.openapi.vcs.changes.patch.PatchFileType
 import com.intellij.openapi.vcs.changes.patch.tool.PatchDiffRequest
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBLabel
@@ -335,6 +343,24 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private fun handleApplyLocally() {
         logger<NxCloudFixFileImpl>().info("Apply locally action received")
+        currentFixDetails?.runGroup?.aiFix?.suggestedFix?.let {
+            val patchFile = LightVirtualFile(
+                "nx-cloud-fix",
+                PatchFileType.INSTANCE,
+                it
+            )
+            ApplicationManager.getApplication().invokeLater {
+        val executor = ApplyPatchDefaultExecutor(project)
+        ApplyPatchDifferentiatedDialog(
+            project,
+            executor,
+            listOf(executor),
+            ApplyPatchMode.APPLY,
+            patchFile
+        ).show()
+
+            }
+        }
         //
         //        val fixDetails = currentFixDetails ?: return
         //        val suggestedFix =
