@@ -65,7 +65,13 @@ class NxToolWindowPanel(private val project: Project) :
     private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeInfoList ->
         // I don't love that we update the tree view outside of the state machine but
         // it's the easiest solution because everything is onEntry
-        cipeInfoList.info?.let { cipeTreeStructure.updateCIPEData(it) }
+        cipeInfoList.info?.let {
+            if (it.isEmpty()) {
+                cloudHeaderPanel.isVisible = true
+            } else {
+                cipeTreeStructure.updateCIPEData(it)
+                cloudHeaderPanel.isVisible = false
+            } }
         loadToolwindowContent()
     }
 

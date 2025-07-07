@@ -15,6 +15,7 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
+import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.graph.ui.NxGraphFileType
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
@@ -100,6 +101,7 @@ class NxRefreshWorkspaceService(private val project: Project) {
                                     StandardNxGraphServer.getInstance(project).restart()
                                     indicator.fraction = 0.8
                                     NxlsService.getInstance(project).refreshWorkspace()
+                                    CIPEPollingService.getInstance(project).forcePoll()
                                     indicator.fraction = 1.0
 
                                     if (notification?.isExpired == false) {
