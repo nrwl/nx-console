@@ -54,10 +54,6 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
             }
             is CIPESimpleNode.RunGroupNode -> {
                 append(userObject.name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-                if (userObject.runGroup.aiFix != null) {
-                    append(" ", SimpleTextAttributes.REGULAR_ATTRIBUTES)
-                    append("(AI fixes available)", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES)
-                }
             }
             is CIPESimpleNode.RunNode -> {
                 // Command

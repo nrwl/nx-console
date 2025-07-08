@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

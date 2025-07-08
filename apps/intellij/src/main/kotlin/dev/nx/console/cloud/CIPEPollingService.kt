@@ -188,7 +188,6 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 }
 
-
 /** Event emitted when CIPE data changes */
 data class CIPEDataChangedEvent(val oldData: CIPEDataResponse?, val newData: CIPEDataResponse)
 
@@ -196,4 +195,3 @@ data class CIPEDataChangedEvent(val oldData: CIPEDataResponse?, val newData: CIP
 fun interface CIPEDataChangeListener {
     fun onDataChanged(event: CIPEDataChangedEvent)
 }
-

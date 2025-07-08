@@ -65,10 +65,8 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 
         init {
             icon = AllIcons.Nodes.Folder
-            val hasAIFixes = runGroup.aiFix != null
             val displayName = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
-            presentation.tooltip =
-                if (hasAIFixes) "$displayName (AI fixes available)" else displayName
+            presentation.tooltip = displayName
         }
 
         override fun getName(): String = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
@@ -128,30 +126,44 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         }
 
         override fun getName(): String {
+            val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
             val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
             val verificationStatus =
                 aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            val hasSuggestedFix = aiFix.suggestedFix != null
 
-            return when {
-                // Check fix generation status first
-                fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> "Waiting for fix..."
-                fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Creating fix..."
-                fixStatus == AITaskFixVerificationStatus.FAILED -> "Fix creation failed"
-                fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> "Fix not executable"
+            // User action takes precedence
+            if (
+                userAction == AITaskFixUserAction.APPLIED ||
+                    userAction == AITaskFixUserAction.APPLIED_LOCALLY
+            ) {
+                return "Nx Cloud has applied the fix"
+            }
+            if (userAction == AITaskFixUserAction.REJECTED) {
+                return "Fix rejected by user"
+            }
 
-                // If fix is generated, check verification/user action
-                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Verifying fix..."
-                verificationStatus == AITaskFixVerificationStatus.FAILED ->
-                    "Fix verification failed"
+            // If a fix exists, check verification status
+            if (hasSuggestedFix) {
+                return when (verificationStatus) {
+                    AITaskFixVerificationStatus.NOT_STARTED -> "Nx Cloud AI fix ready to verify"
+                    AITaskFixVerificationStatus.IN_PROGRESS -> "Nx Cloud is verifying the AI fix"
+                    AITaskFixVerificationStatus.COMPLETED -> "Nx Cloud AI verified a fix"
+                    AITaskFixVerificationStatus.FAILED -> "Failed Nx Cloud AI fix verification"
+                    else -> "Nx Cloud AI fix ready to verify"
+                }
+            }
 
-                // Check user actions
-                else ->
-                    when (aiFix.userAction ?: AITaskFixUserAction.NONE) {
-                        AITaskFixUserAction.APPLIED -> "Fix applied"
-                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix applied locally"
-                        AITaskFixUserAction.REJECTED -> "Fix rejected"
-                        AITaskFixUserAction.NONE -> "Fix ready to apply"
-                    }
+            // No fix exists yet, check generation status
+            return when (fixStatus) {
+                AITaskFixVerificationStatus.NOT_STARTED ->
+                    "Nx Cloud AI is preparing to generate a fix"
+                AITaskFixVerificationStatus.IN_PROGRESS -> "Nx Cloud AI is creating a fix"
+                AITaskFixVerificationStatus.NOT_EXECUTABLE ->
+                    "Nx Cloud AI is not able to generate a fix"
+                AITaskFixVerificationStatus.COMPLETED -> "Nx Cloud AI has generated a fix"
+                AITaskFixVerificationStatus.FAILED -> "Failed Nx Cloud AI fix generation"
+                else -> "Nx Cloud AI is preparing to generate a fix"
             }
         }
 
@@ -160,58 +172,50 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
             val verificationStatus =
                 aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            val hasSuggestedFix = aiFix.suggestedFix != null
 
-            return when {
-                // User actions take precedence
+            // User action takes precedence
+            if (
                 userAction == AITaskFixUserAction.APPLIED ||
-                    userAction == AITaskFixUserAction.APPLIED_LOCALLY -> AllIcons.Actions.Checked
-                userAction == AITaskFixUserAction.REJECTED -> AllIcons.Actions.Cancel
+                    userAction == AITaskFixUserAction.APPLIED_LOCALLY
+            ) {
+                return AllIcons.Actions.Checked // Green check mark
+            }
+            if (userAction == AITaskFixUserAction.REJECTED) {
+                return AllIcons.Actions.Cancel // Red circle slash
+            }
 
-                // Fix generation status
-                fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default()
-                fixStatus == AITaskFixVerificationStatus.FAILED ||
-                    fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE ->
-                    AllIcons.General.Error
-                fixStatus == AITaskFixVerificationStatus.NOT_STARTED -> AllIcons.General.Information
+            // If a fix exists, check verification status
+            if (hasSuggestedFix) {
+                return when (verificationStatus) {
+                    AITaskFixVerificationStatus.NOT_STARTED ->
+                        AllIcons.General.BalloonInformation // Info blue wrench
+                    AITaskFixVerificationStatus.IN_PROGRESS ->
+                        AnimatedIcon.Default() // Loading spinner
+                    AITaskFixVerificationStatus.COMPLETED ->
+                        AllIcons.Actions.Commit // Green verified badge
+                    AITaskFixVerificationStatus.FAILED ->
+                        AllIcons.General.BalloonWarning // Yellow/orange warning
+                    else -> AllIcons.General.BalloonInformation
+                }
+            }
 
-                // Verification status
-                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS ->
-                    AnimatedIcon.Default()
-                verificationStatus == AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error
-
-                // Default for completed fix
-                else -> AllIcons.Actions.QuickfixBulb
+            // No fix exists yet, check generation status
+            return when (fixStatus) {
+                AITaskFixVerificationStatus.NOT_STARTED -> AllIcons.General.Information // Info
+                AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default() // Loading spinner
+                AITaskFixVerificationStatus.NOT_EXECUTABLE ->
+                    AllIcons.Actions.Cancel // Circle slash
+                AITaskFixVerificationStatus.COMPLETED ->
+                    AllIcons.Actions.Checked // Green check mark
+                AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error // Red error
+                else -> AllIcons.General.Information
             }
         }
 
         private fun getFixTooltip(): String {
-            val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
-            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            val verificationStatus =
-                aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-
-            return when {
-                // Check fix generation status first
-                fixStatus == AITaskFixVerificationStatus.NOT_STARTED ->
-                    "Waiting for AI fix generation..."
-                fixStatus == AITaskFixVerificationStatus.IN_PROGRESS -> "Creating AI fix..."
-                fixStatus == AITaskFixVerificationStatus.FAILED -> "Failed to create AI fix"
-                fixStatus == AITaskFixVerificationStatus.NOT_EXECUTABLE -> "Fix cannot be executed"
-
-                // Check verification status
-                verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS ->
-                    "Verifying AI fix..."
-                verificationStatus == AITaskFixVerificationStatus.FAILED -> "Failed to verify fix"
-
-                // Check user actions for completed fixes
-                else ->
-                    when (userAction) {
-                        AITaskFixUserAction.APPLIED -> "Fix has been applied"
-                        AITaskFixUserAction.APPLIED_LOCALLY -> "Fix has been applied locally"
-                        AITaskFixUserAction.REJECTED -> "Fix was rejected"
-                        AITaskFixUserAction.NONE -> "Click to view and apply fix"
-                    }
-            }
+            // Simply return the same text as getName() for consistency with VSCode
+            return getName()
         }
     }
 

@@ -403,16 +403,18 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     switch (verificationStatus) {
       case 'IN_PROGRESS':
         return html`
-          <div class="creating-fix-section">
-            <div class="creating-fix-icon">
+          <div
+            class="border-border bg-background relative m-0 border p-6 text-center"
+          >
+            <div class="mb-2 flex items-center justify-center gap-3">
               <icon-element
                 icon="loading"
                 class="animate-spin-slow leading-none"
               ></icon-element>
+              <h2 class="text-foreground m-0 text-lg font-semibold">
+                Verifying Fix<span class="loading-dots"></span>
+              </h2>
             </div>
-            <h2 class="creating-fix-title">
-              Verifying Fix<span class="loading-dots"></span>
-            </h2>
             <p class="text-foreground m-0 text-sm opacity-80">
               Nx Cloud is verifying the fix. You can wait for verification to
               complete or apply the fix now if you're confident it's correct.
@@ -443,16 +445,18 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         `;
       case 'FAILED':
         return html`
-          <div class="creating-fix-section">
-            <div class="creating-fix-icon">
+          <div
+            class="border-border bg-background relative m-0 border p-6 text-center"
+          >
+            <div class="mb-2 flex items-center justify-center gap-3">
               <icon-element
                 icon="error"
                 class="text-error leading-none"
               ></icon-element>
+              <h2 class="text-foreground m-0 text-lg font-semibold">
+                Fix Verification Failed
+              </h2>
             </div>
-            <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
-              Fix Verification Failed
-            </h2>
             <p class="text-foreground m-0 text-sm opacity-80">
               The fix verification failed on Nx Cloud. You may still apply it if
               you believe it's correct/useful.
@@ -466,15 +470,19 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   }
   createCancelledFixSection(): TemplateResult {
     return html`
-      <div class="creating-fix-section">
-        <div class="creating-fix-icon">
+      <div
+        class="border-border bg-background relative m-0 border p-6 text-center"
+      >
+        <div class="mb-2 flex items-center justify-center gap-3">
           <icon-element
             icon="circle-slash"
             class="text-foreground leading-none opacity-70"
           ></icon-element>
+          <h2 class="text-foreground m-0 text-lg font-semibold">
+            Fix Creation Cancelled
+          </h2>
         </div>
-        <h2 class="creating-fix-title">Fix Creation Cancelled</h2>
-        <p class="creating-fix-description">
+        <p class="text-foreground m-0 text-sm opacity-80">
           There were no fixes that were generated for this error.
         </p>
       </div>
@@ -483,17 +491,19 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
 
   createWaitingForFixSection(): TemplateResult {
     return html`
-      <div class="creating-fix-section">
-        <div class="creating-fix-icon">
+      <div
+        class="border-border bg-background relative m-0 border p-6 text-center"
+      >
+        <div class="mb-2 flex items-center justify-center gap-3">
           <icon-element
             icon="info"
             class="text-primary leading-none"
           ></icon-element>
+          <h2 class="text-foreground m-0 text-lg font-semibold">
+            Nx Cloud is preparing to generate a fix
+          </h2>
         </div>
-        <h2 class="creating-fix-title">
-          Nx Cloud is preparing to generate a fix
-        </h2>
-        <p class="creating-fix-description">
+        <p class="text-foreground m-0 text-sm opacity-80">
           Nx Cloud is analyzing this run to see if a fix can be generated. This
           may take a moment. Please wait.
         </p>
@@ -503,15 +513,19 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
 
   private createFixCreationFailedSection(): TemplateResult {
     return html`
-      <div class="creating-fix-section">
-        <div class="creating-fix-icon">
+      <div
+        class="border-border bg-background relative m-0 border p-6 text-center"
+      >
+        <div class="mb-2 flex items-center justify-center gap-3">
           <icon-element
             icon="error"
             class="text-error leading-none"
           ></icon-element>
+          <h2 class="text-foreground m-0 text-lg font-semibold">
+            Fix Creation Failed
+          </h2>
         </div>
-        <h2 class="creating-fix-title">Fix Creation Failed</h2>
-        <p class="creating-fix-description">
+        <p class="text-foreground m-0 text-sm opacity-80">
           Nx Cloud was unable to generate a fix for the error. You can try
           running the task again or investigate the issue manually on the Nx
           Cloud UI

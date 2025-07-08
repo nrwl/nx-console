@@ -3,7 +3,6 @@ package dev.nx.console.cloud
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -251,15 +250,11 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
             if (assistantReady) {
                 try {
-                    val autofixAction = ActionManager.getInstance()
-                        .getAction("dev.nx.console.llm.CIPEAutoFixAction")
-                    ActionManager.getInstance().tryToExecute(
-                        autofixAction,
-                        null,
-                        null,
-                        e.place,
-                        true
-                    )
+                    val autofixAction =
+                        ActionManager.getInstance()
+                            .getAction("dev.nx.console.llm.CIPEAutoFixAction")
+                    ActionManager.getInstance()
+                        .tryToExecute(autofixAction, null, null, e.place, true)
                 } catch (e: Throwable) {
                     // Fallback: could show a message about setting up AI assistant
                 }
