@@ -14,11 +14,13 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.diff.impl.patch.PatchReader
 import com.intellij.openapi.diff.impl.patch.PatchSyntaxException
 import com.intellij.openapi.diff.impl.patch.TextFilePatch
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.changes.patch.ApplyPatchDefaultExecutor
 import com.intellij.openapi.vcs.changes.patch.ApplyPatchDifferentiatedDialog
@@ -36,6 +38,10 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.cloud.NxCloudApiService
 import dev.nx.console.models.CIPEDataResponse
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
+import dev.nx.console.nxls.NxlsService
+import dev.nx.console.project_details.browsers.Events
+import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
@@ -49,6 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
+import ru.nsk.kstatemachine.statemachine.processEventByLaunch
 
 @Serializable
 data class NxCloudFixStyles(
@@ -125,6 +132,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                             cipe = cipe,
                             runGroup = runGroup,
                             terminalOutput = currentFixDetails?.terminalOutput,
+                            hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
                         )
                     currentFixDetails?.let { this.sendFixDetailsToWebview(it) }
                 }
@@ -137,6 +145,19 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         cs.launch {
             pollingService.currentData.collect { cipeData -> cipeData?.let { listener(it) } }
         }
+
+        with(project.messageBus.connect(cs)) {
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener {
+                    if (project.isDisposed) {
+                        return@NxWorkspaceRefreshListener
+                    }
+                    updateUncommittedChangesFlag()
+                },
+            )}
+
+
 
         val disposable = Disposable {
             // StateFlow collection is cancelled when coroutine scope is cancelled
@@ -168,9 +189,10 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             return
         }
 
-        currentFixDetails = details
+        currentFixDetails =
+            details.copy(hasUncommittedChanges = GitUtils.hasUncommittedChanges(project))
         cs.launch {
-            loadHtmlWithInitialData(details)
+            loadHtmlWithInitialData(currentFixDetails!!)
             updateDiffPreview(details.runGroup.aiFix?.suggestedFix)
         }
     }
@@ -303,8 +325,12 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun sendFixDetailsToWebview(details: NxCloudFixDetails) {
         logger<NxCloudFixFileImpl>().info("Sending fix details to webview")
 
+        val hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
+        val updatedDetails = details.copy(hasUncommittedChanges = hasUncommittedChanges)
+
         val mockDetails = json.encodeToString(details)
 
+        this.currentFixDetails = updatedDetails
         val js =
             """
             window.intellijApi.postToWebview({
@@ -314,6 +340,15 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         """
 
         cs.launch { browser.executeJavascriptWithCatch(js) }
+    }
+
+    private fun updateUncommittedChangesFlag() {
+        currentFixDetails?.let { details ->
+            val updatedDetails =
+                details.copy(hasUncommittedChanges = GitUtils.hasUncommittedChanges(project))
+            currentFixDetails = updatedDetails
+            sendFixDetailsToWebview(updatedDetails)
+        }
     }
 
     private fun handleApply() {
@@ -355,19 +390,43 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
     private fun handleApplyLocally() {
         logger<NxCloudFixFileImpl>().info("Apply locally action received")
-        currentFixDetails?.runGroup?.aiFix?.suggestedFix?.let {
-            val patchFile = LightVirtualFile("nx-cloud-fix", PatchFileType.INSTANCE, it)
+
+        val fixDetails = currentFixDetails ?: return
+        val suggestedFix = fixDetails.runGroup.aiFix?.suggestedFix ?: return
+
+        val currentBranch = GitUtils.getCurrentBranch(project)
+        val cipeBranch = fixDetails.cipe.branch
+
+        if (currentBranch != null && currentBranch != cipeBranch) {
             ApplicationManager.getApplication().invokeLater {
-                val executor = ApplyPatchDefaultExecutor(project)
-                ApplyPatchDifferentiatedDialog(
+                val result =
+                    Messages.showYesNoDialog(
                         project,
-                        executor,
-                        listOf(executor),
-                        ApplyPatchMode.APPLY,
-                        patchFile
+                        "Your local branch '$currentBranch' does not match the branch '$cipeBranch' of the CI pipeline execution.",
+                        "Are you sure you want to apply the fix locally?",
+                        Messages.getWarningIcon()
                     )
-                    .show()
+                if (result == Messages.YES) {
+                    applyPatchLocally(suggestedFix)
+                }
             }
+        } else {
+            applyPatchLocally(suggestedFix)
+        }
+    }
+
+    private fun applyPatchLocally(suggestedFix: String) {
+        val patchFile = LightVirtualFile("nx-cloud-fix", PatchFileType.INSTANCE, suggestedFix)
+        ApplicationManager.getApplication().invokeLater {
+            val executor = ApplyPatchDefaultExecutor(project)
+            ApplyPatchDifferentiatedDialog(
+                    project,
+                    executor,
+                    listOf(executor),
+                    ApplyPatchMode.APPLY,
+                    patchFile
+                )
+                .show()
         }
     }
 

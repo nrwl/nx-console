@@ -149,7 +149,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
               </svg>
               Nx Cloud AI Fix
               <a
-                class="text-primary cursor-pointer"
+                class="text-primary cursor-pointer hover:opacity-80"
                 target="_blank"
                 href="${cipe.cipeUrl}"
                 title="View CI Pipeline Execution"
@@ -164,7 +164,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
               <a
                 href="${cipe.commitUrl}"
                 target="_blank"
-                class="text-inherit no-underline hover:underline"
+                class="text-inherit cursor-pointer no-underline hover:underline"
               >
                 ${cipe.branch}
               </a>
