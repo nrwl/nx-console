@@ -560,6 +560,7 @@ async function updateSuggestedFix(
       data: JSON.stringify({
         aiFixId,
         action,
+        actionOrigin: 'NX_CONSOLE_VSCODE',
       }),
     });
 
