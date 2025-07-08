@@ -3,35 +3,27 @@ package dev.nx.console.cloud
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
-import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
 import dev.nx.console.mcp.McpServerService
 import dev.nx.console.mcp.hasAIAssistantInstalled
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
 import dev.nx.console.models.CIPERunGroup
-import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Service responsible for showing CIPE notifications. Simply displays notification events emitted
- * by CIPEDataSyncService.
+ * by CIPENotificationProcessor.
  */
 @Service(Service.Level.PROJECT)
 class CIPENotificationService(private val project: Project, private val cs: CoroutineScope) :
@@ -50,14 +42,9 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
     private val telemetryService = TelemetryService.getInstance(project)
 
     override fun onNotificationEvent(event: CIPENotificationEvent) {
-        logger.info("[CIPE_NOTIF] Received notification event: ${event::class.simpleName}")
-
         val notificationSetting = getCIPENotificationSetting()
-        logger.debug("[CIPE_NOTIF] Current notification setting: $notificationSetting")
 
-        // Check settings before showing any notification
         if (notificationSetting == NxCloudNotificationsLevel.NONE) {
-            logger.debug("[CIPE_NOTIF] Notifications disabled, skipping")
             return
         }
 
@@ -66,36 +53,21 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             event is CIPENotificationEvent.CIPESucceeded &&
                 notificationSetting != NxCloudNotificationsLevel.ALL
         ) {
-            logger.debug("[CIPE_NOTIF] Success notifications not enabled, skipping")
             return
         }
 
         // Show the appropriate notification
         when (event) {
             is CIPENotificationEvent.CIPEFailed -> {
-                logger.info(
-                    "[CIPE_NOTIF] Showing CIPEFailed notification for ${event.cipe.ciPipelineExecutionId}"
-                )
                 showCIPEFailedNotification(event.cipe)
             }
             is CIPENotificationEvent.RunFailed -> {
-                logger.info(
-                    "[CIPE_NOTIF] Showing RunFailed notification for " +
-                        "CIPE ${event.cipe.ciPipelineExecutionId}, run ${event.run.linkId}"
-                )
                 showRunFailedNotification(event.cipe, event.run)
             }
             is CIPENotificationEvent.CIPESucceeded -> {
-                logger.info(
-                    "[CIPE_NOTIF] Showing CIPESucceeded notification for ${event.cipe.ciPipelineExecutionId}"
-                )
                 showCIPESucceededNotification(event.cipe)
             }
             is CIPENotificationEvent.AiFixAvailable -> {
-                logger.info(
-                    "[CIPE_NOTIF] Showing AiFixAvailable notification for " +
-                        "CIPE ${event.cipe.ciPipelineExecutionId}, run group ${event.runGroup.runGroup}"
-                )
                 showAiFixNotification(event.cipe, event.runGroup)
             }
         }
@@ -143,8 +115,6 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         telemetryService.featureUsed(TelemetryEvent.CLOUD_SHOW_AI_FIX_NOTIFICATION)
 
         val taskDisplay = runGroup.aiFix?.taskIds?.firstOrNull() ?: "task"
-        logger.debug("[CIPE_NOTIF] Creating AI fix notification for task: $taskDisplay")
-
         val notification =
             NOTIFICATION_GROUP.createNotification(
                 title = "AI Fix Available",
@@ -158,7 +128,6 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         notification.addAction(RejectAiFixAction(cipe, runGroup))
 
         notification.notify(project)
-        logger.info("[CIPE_NOTIF] AI fix notification displayed successfully")
     }
 
     private fun showNotification(
@@ -169,26 +138,19 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         commitUrl: String? = null,
         resultsUrl: String? = null
     ) {
-        logger.debug("[CIPE_NOTIF] Creating notification - title: $title, type: $type")
         telemetryService.featureUsed(TelemetryEvent.CLOUD_SHOW_CIPE_NOTIFICATION)
 
         val notification =
             NOTIFICATION_GROUP.createNotification(title = title, content = content, type = type)
 
         if (type == NotificationType.ERROR) {
-            // Check if any run group has an AI fix
             val runGroupWithFix = cipe.runGroups.find { it.aiFix != null }
-            logger.debug(
-                "[CIPE_NOTIF] Error notification - AI fix available: ${runGroupWithFix != null}"
-            )
 
             if (runGroupWithFix != null) {
-                // Self-healing AI fix available - show AI fix action
                 notification.addAction(
                     ViewAiFixAction(cipe.ciPipelineExecutionId, runGroupWithFix.runGroup)
                 )
             } else {
-                // No self-healing AI fix - show generic help action
                 notification.addAction(HelpMeFixErrorAction())
             }
         }
@@ -200,7 +162,6 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         notification.addAction(ViewResultsAction(resultsUrl ?: cipe.cipeUrl))
 
         notification.notify(project)
-        logger.info("[CIPE_NOTIF] Notification displayed: $title")
     }
 
     private fun getCIPENotificationSetting(): NxCloudNotificationsLevel {
@@ -240,8 +201,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             telemetryService.featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS)
 
-            // Open the cloud fix webview
-            openCloudFixWebview(cipeId, runGroupId)
+            CloudFixService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
 
             notification.expire()
         }
@@ -258,7 +218,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             )
 
             // Open the cloud fix webview
-            openCloudFixWebview(cipeId, runGroupId)
+            CloudFixService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
 
             notification.expire()
         }
@@ -291,9 +251,15 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
             if (assistantReady) {
                 try {
-                    ActionManager.getInstance()
+                    val autofixAction = ActionManager.getInstance()
                         .getAction("dev.nx.console.llm.CIPEAutoFixAction")
-                        ?.actionPerformed(e)
+                    ActionManager.getInstance().tryToExecute(
+                        autofixAction,
+                        null,
+                        null,
+                        e.place,
+                        true
+                    )
                 } catch (e: Throwable) {
                     // Fallback: could show a message about setting up AI assistant
                 }
@@ -302,77 +268,18 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             notification.expire()
         }
     }
+}
 
-    private fun openCloudFixWebview(cipeId: String, runGroupId: String) {
-        logger.info(
-            "[CIPE_NOTIF] Opening cloud fix webview for CIPE: $cipeId, runGroup: $runGroupId"
-        )
+/** Represents notification events that should be displayed to the user */
+sealed class CIPENotificationEvent {
+    data class CIPEFailed(val cipe: CIPEInfo) : CIPENotificationEvent()
+    data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
+    data class CIPESucceeded(val cipe: CIPEInfo) : CIPENotificationEvent()
+    data class AiFixAvailable(val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
+        CIPENotificationEvent()
+}
 
-        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            logger.debug("[CIPE_NOTIF] Fetching current CIPE data")
-            val currentData = NxlsService.getInstance(project).recentCIPEData()
-
-            val cipe = currentData?.info?.find { it.ciPipelineExecutionId == cipeId }
-            val runGroup = cipe?.runGroups?.find { it.runGroup == runGroupId }
-
-            if (cipe == null || runGroup == null) {
-                logger.error(
-                    "[CIPE_NOTIF] Failed to find CIPE or runGroup - " +
-                        "cipe found: ${cipe != null}, runGroup found: ${runGroup != null}"
-                )
-
-                withContext(Dispatchers.EDT) {
-                    NOTIFICATION_GROUP.createNotification(
-                            "AI Fix Not Found",
-                            "Could not find the AI fix data",
-                            NotificationType.ERROR
-                        )
-                        .notify(project)
-                }
-                return@launch
-            }
-
-            // Fetch terminal output
-            var terminalOutput: String? = null
-            val aiFix = runGroup.aiFix
-            if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
-                val failedTaskId = aiFix.taskIds.first()
-                val terminalOutputUrl = aiFix.terminalLogsUrls[failedTaskId]
-
-                if (terminalOutputUrl != null) {
-                    try {
-                        val response =
-                            NxlsService.getInstance(project)
-                                .downloadAndExtractArtifact(terminalOutputUrl)
-
-                        if (response?.error != null) {
-                            logger.warn("Failed to download terminal output: ${response.error}")
-                            terminalOutput =
-                                "Failed to retrieve terminal output. Please check the Nx Console output for more details."
-                        } else {
-                            terminalOutput = response?.content
-                        }
-                    } catch (e: Exception) {
-                        logger.error("Failed to download terminal output for task $failedTaskId", e)
-                        terminalOutput =
-                            "Failed to retrieve terminal output. Please check the Nx Console output for more details."
-                    }
-                }
-            }
-
-            val fixDetails =
-                NxCloudFixDetails(cipe = cipe, runGroup = runGroup, terminalOutput = terminalOutput)
-
-            // UI operations must happen on EDT
-            withContext(Dispatchers.EDT) {
-                // Create and open the webview
-                val fixFile = NxCloudFixFileImpl("AI Fix", project)
-                val fileEditorManager = FileEditorManager.getInstance(project)
-                fileEditorManager.openFile(fixFile, true)
-
-                // Show fix details once editor is open
-                fixFile.showFixDetails(fixDetails)
-            }
-        }
-    }
+/** Interface for listening to notification events */
+fun interface CIPENotificationListener {
+    fun onNotificationEvent(event: CIPENotificationEvent)
 }

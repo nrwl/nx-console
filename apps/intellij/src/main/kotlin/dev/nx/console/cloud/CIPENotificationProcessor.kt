@@ -5,57 +5,22 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.*
-import dev.nx.console.nxls.NxlsService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Service responsible for managing CIPE data state and determining when to show notifications.
- * Compares old and new CIPE data and emits notification events based on VSCode logic.
+ * Stateless service that processes CIPE data changes and determines which notifications to emit.
+ * This service contains the business logic for comparing old and new CIPE data and emitting
+ * appropriate notification events, following the same logic as VSCode.
  */
 @Service(Service.Level.PROJECT)
-class CIPEDataSyncService(private val project: Project) : Disposable {
+class CIPENotificationProcessor(private val project: Project) : Disposable, CIPEDataChangeListener {
 
     companion object {
-        fun getInstance(project: Project): CIPEDataSyncService =
-            project.getService(CIPEDataSyncService::class.java)
+        fun getInstance(project: Project): CIPENotificationProcessor =
+            project.getService(CIPENotificationProcessor::class.java)
     }
 
     private val logger = thisLogger()
-
-    private val _currentData = MutableStateFlow<CIPEDataResponse?>(null)
-    val currentData: StateFlow<CIPEDataResponse?> = _currentData.asStateFlow()
-
-    // Keep track of the last valid info data for comparison
-    private var lastValidInfo: List<CIPEInfo>? = null
-
     private val notificationListeners = mutableListOf<CIPENotificationListener>()
-
-    /** Update the CIPE data and check if notifications should be shown */
-    fun updateData(newData: CIPEDataResponse) {
-        logger.debug("[CIPE_SYNC] Updating CIPE data - new CIPEs: ${newData.info?.size ?: 0}")
-        val oldInfo = lastValidInfo
-        logger.debug("[CIPE_SYNC] Previous CIPEs: ${oldInfo?.size ?: 0}")
-
-        _currentData.value = newData
-
-        // Update lastValidInfo if we have new info data
-        newData.info?.let {
-            lastValidInfo = it
-
-            // Check for notification events if we have previous data to compare
-            if (oldInfo != null) {
-                logger.info(
-                    "[CIPE_SYNC] Comparing ${oldInfo.size} old CIPEs with ${it.size} new CIPEs for notifications"
-                )
-                checkForNotifications(oldInfo, it)
-            } else {
-                logger.debug("[CIPE_SYNC] No previous data to compare, skipping notification check")
-            }
-        }
-            ?: run { logger.debug("[CIPE_SYNC] New data has no info, skipping update") }
-    }
 
     /** Add a listener for notification events */
     fun addNotificationListener(listener: CIPENotificationListener) {
@@ -67,25 +32,49 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
         notificationListeners.remove(listener)
     }
 
+    override fun onDataChanged(event: CIPEDataChangedEvent) {
+        logger.debug("[CIPE_PROCESSOR] Processing CIPE data change")
+
+        val oldInfo = event.oldData?.info
+        val newInfo = event.newData.info
+
+        if (newInfo == null) {
+            logger.debug("[CIPE_PROCESSOR] New data has no info, skipping processing")
+            return
+        }
+
+        if (oldInfo == null) {
+            logger.debug(
+                "[CIPE_PROCESSOR] No previous data to compare, skipping notification check"
+            )
+            return
+        }
+
+        logger.info(
+            "[CIPE_PROCESSOR] Comparing ${oldInfo.size} old CIPEs with ${newInfo.size} new CIPEs for notifications"
+        )
+        checkForNotifications(oldInfo, newInfo)
+    }
+
     /** Check for notification events following VSCode logic */
     private fun checkForNotifications(oldInfo: List<CIPEInfo>, newInfo: List<CIPEInfo>) {
-        logger.debug("[CIPE_SYNC] Starting notification check for ${newInfo.size} CIPEs")
+        logger.debug("[CIPE_PROCESSOR] Starting notification check for ${newInfo.size} CIPEs")
 
         newInfo.forEach { newCIPE ->
             logger.debug(
-                "[CIPE_SYNC] Checking CIPE ${newCIPE.ciPipelineExecutionId}: " +
+                "[CIPE_PROCESSOR] Checking CIPE ${newCIPE.ciPipelineExecutionId}: " +
                     "status=${newCIPE.status}, branch=${newCIPE.branch ?: "unknown"}"
             )
 
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
             logger.debug(
-                "[CIPE_SYNC] Old CIPE found: ${oldCIPE != null}, " +
+                "[CIPE_PROCESSOR] Old CIPE found: ${oldCIPE != null}, " +
                     "old status: ${oldCIPE?.status ?: "N/A"}"
             )
 
             // Check if any runGroup has an AI fix (to skip failure notifications)
             val hasAiFix = newCIPE.runGroups.any { it.aiFix != null }
-            logger.debug("[CIPE_SYNC] CIPE has AI fix: $hasAiFix")
+            logger.debug("[CIPE_PROCESSOR] CIPE has AI fix: $hasAiFix")
 
             // Check for newly available AI fixes and show proactive notifications
             if (oldCIPE != null) {
@@ -99,7 +88,7 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
                     (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))
             ) {
                 logger.debug(
-                    "[CIPE_SYNC] Skipping notification - CIPE already completed/failed previously"
+                    "[CIPE_PROCESSOR] Skipping notification - CIPE already completed/failed previously"
                 )
                 return@forEach
             }
@@ -109,7 +98,7 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
                 // CIPE just failed - skip if AI fix available
                 newCIPE.status.isFailedStatus() && !hasAiFix -> {
                     logger.info(
-                        "[CIPE_SYNC] Emitting CIPEFailed notification for ${newCIPE.ciPipelineExecutionId}"
+                        "[CIPE_PROCESSOR] Emitting CIPEFailed notification for ${newCIPE.ciPipelineExecutionId}"
                     )
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
@@ -122,7 +111,7 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
 
                     failedRun?.let {
                         logger.info(
-                            "[CIPE_SYNC] Emitting RunFailed notification for " +
+                            "[CIPE_PROCESSOR] Emitting RunFailed notification for " +
                                 "CIPE ${newCIPE.ciPipelineExecutionId}, run ${it.linkId}"
                         )
                         emitNotification(CIPENotificationEvent.RunFailed(newCIPE, it))
@@ -132,13 +121,13 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
                 // CIPE succeeded (only notify if settings allow)
                 newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
                     logger.info(
-                        "[CIPE_SYNC] Emitting CIPESucceeded notification for ${newCIPE.ciPipelineExecutionId}"
+                        "[CIPE_PROCESSOR] Emitting CIPESucceeded notification for ${newCIPE.ciPipelineExecutionId}"
                     )
                     emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
                 }
                 else -> {
                     logger.debug(
-                        "[CIPE_SYNC] No notification needed for CIPE ${newCIPE.ciPipelineExecutionId}"
+                        "[CIPE_PROCESSOR] No notification needed for CIPE ${newCIPE.ciPipelineExecutionId}"
                     )
                 }
             }
@@ -148,28 +137,28 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
     /** Check for newly available AI fixes following VSCode logic */
     private fun checkForNewAiFixNotifications(oldCIPE: CIPEInfo, newCIPE: CIPEInfo) {
         logger.debug(
-            "[CIPE_SYNC] Checking for new AI fixes in CIPE ${newCIPE.ciPipelineExecutionId}"
+            "[CIPE_PROCESSOR] Checking for new AI fixes in CIPE ${newCIPE.ciPipelineExecutionId}"
         )
         val newCIPERunGroups = newCIPE.runGroups
         val oldCIPERunGroups = oldCIPE.runGroups
 
         newCIPERunGroups.forEach { newRunGroup ->
             logger.debug(
-                "[CIPE_SYNC] Checking run group ${newRunGroup.runGroup}: " +
+                "[CIPE_PROCESSOR] Checking run group ${newRunGroup.runGroup}: " +
                     "has AI fix: ${newRunGroup.aiFix != null}"
             )
 
             if (newRunGroup.aiFix?.suggestedFix != null) {
                 val oldRunGroup = oldCIPERunGroups.find { it.runGroup == newRunGroup.runGroup }
                 logger.debug(
-                    "[CIPE_SYNC] Old run group found: ${oldRunGroup != null}, " +
+                    "[CIPE_PROCESSOR] Old run group found: ${oldRunGroup != null}, " +
                         "had AI fix: ${oldRunGroup?.aiFix?.suggestedFix != null}"
                 )
 
                 if (oldRunGroup?.aiFix?.suggestedFix == null) {
                     // AI fix newly available - emit proactive notification
                     logger.info(
-                        "[CIPE_SYNC] New AI fix available! Emitting AiFixAvailable notification " +
+                        "[CIPE_PROCESSOR] New AI fix available! Emitting AiFixAvailable notification " +
                             "for CIPE ${newCIPE.ciPipelineExecutionId}, run group ${newRunGroup.runGroup}"
                     )
                     emitNotification(CIPENotificationEvent.AiFixAvailable(newCIPE, newRunGroup))
@@ -189,17 +178,17 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
 
     private fun emitNotification(event: CIPENotificationEvent) {
         logger.debug(
-            "[CIPE_SYNC] Emitting notification event: ${event::class.simpleName} " +
+            "[CIPE_PROCESSOR] Emitting notification event: ${event::class.simpleName} " +
                 "to ${notificationListeners.size} listeners"
         )
 
         notificationListeners.forEachIndexed { index, listener ->
             try {
-                logger.debug("[CIPE_SYNC] Notifying listener #$index")
+                logger.debug("[CIPE_PROCESSOR] Notifying listener #$index")
                 listener.onNotificationEvent(event)
             } catch (e: Exception) {
                 logger.error(
-                    "[CIPE_SYNC] Error notifying CIPE notification listener #$index: ${e.message}",
+                    "[CIPE_PROCESSOR] Error notifying CIPE notification listener #$index: ${e.message}",
                     e
                 )
             }
@@ -209,53 +198,6 @@ class CIPEDataSyncService(private val project: Project) : Disposable {
     override fun dispose() {
         notificationListeners.clear()
     }
-
-    /** THIS IS ONLY FOR DEBUGGING LOCALLY */
-    suspend fun checkForAiFixesOnStartup() {
-        logger.info("Checking for AI fixes on startup")
-
-        try {
-            // Get recent CIPE data from NXLS
-            val cipeData = NxlsService.getInstance(project).recentCIPEData()
-            if (cipeData == null) {
-                logger.info("No CIPE data available from NXLS")
-                return
-            }
-
-            logger.info("Retrieved CIPE data: ${cipeData.info?.size ?: 0} CIPEs")
-
-            // Update our data
-            updateData(cipeData)
-
-            // Check for any AI fixes and emit notifications
-            cipeData.info?.forEach { cipe ->
-                cipe.runGroups.forEach { runGroup ->
-                    if (runGroup.aiFix?.suggestedFix != null) {
-                        logger.info(
-                            "Found AI fix for CIPE ${cipe.ciPipelineExecutionId}, run group ${runGroup.runGroup}"
-                        )
-                        emitNotification(CIPENotificationEvent.AiFixAvailable(cipe, runGroup))
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            logger.error("Failed to check for AI fixes on startup", e)
-        }
-    }
-}
-
-/** Represents notification events that should be displayed to the user */
-sealed class CIPENotificationEvent {
-    data class CIPEFailed(val cipe: CIPEInfo) : CIPENotificationEvent()
-    data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
-    data class CIPESucceeded(val cipe: CIPEInfo) : CIPENotificationEvent()
-    data class AiFixAvailable(val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
-        CIPENotificationEvent()
-}
-
-/** Interface for listening to notification events */
-fun interface CIPENotificationListener {
-    fun onNotificationEvent(event: CIPENotificationEvent)
 }
 
 // Extension function to check if a status represents failure

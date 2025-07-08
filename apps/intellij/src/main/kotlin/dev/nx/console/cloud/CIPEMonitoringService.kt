@@ -53,12 +53,14 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
                     // Get services
                     logger.debug("[CIPE_MONITOR] Getting service instances")
                     val pollingService = CIPEPollingService.getInstance(project)
-                    val dataSyncService = CIPEDataSyncService.getInstance(project)
+                    val notificationProcessor = CIPENotificationProcessor.getInstance(project)
                     val notificationService = CIPENotificationService.getInstance(project)
 
-                    // Connect notification service to data sync
-                    logger.debug("[CIPE_MONITOR] Connecting notification service to data sync")
-                    dataSyncService.addNotificationListener(notificationService)
+                    // Wire up the data flow pipeline:
+                    // PollingService -> NotificationProcessor -> NotificationService
+                    logger.debug("[CIPE_MONITOR] Wiring up data flow pipeline")
+                    pollingService.addDataChangeListener(notificationProcessor)
+                    notificationProcessor.addNotificationListener(notificationService)
 
                     // Start polling
                     logger.info("[CIPE_MONITOR] Starting CIPE polling service")

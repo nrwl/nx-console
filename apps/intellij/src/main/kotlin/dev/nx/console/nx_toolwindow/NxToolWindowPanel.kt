@@ -10,7 +10,6 @@ import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.ui.UIUtil
-import dev.nx.console.cloud.CIPEDataSyncService
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.NxWorkspace
@@ -51,20 +50,17 @@ class NxToolWindowPanel(private val project: Project) :
     private val toolBar = nxToolMainComponents.createToolbar(projectTree)
     private var mainContent: JComponent? = null
     private var errorCountAndComponent: Pair<Int, JComponent>? = null
-    private val cipeTreeAndPersistenceManager =
-        nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
-    private val cipeTreeComponent = cipeTreeAndPersistenceManager.first
-    private val cipeTreePersistenceManager = cipeTreeAndPersistenceManager.second
+    private val cipeTreeComponent = nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
     private val cloudHeaderPanel = nxToolMainComponents.createCloudHeaderPanel()
     private var connectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createConnectedToNxCloudPanel(cipeTreeComponent, cloudHeaderPanel)
     private var notConnectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createNotConnectedToNxCloudPanel()
 
-    private val cipeDataListener: (CIPEDataResponse) -> Unit = { cipeInfoList ->
+    private val cipeDataListener: (CIPEDataResponse?) -> Unit = { cipeDataResponse ->
         // I don't love that we update the tree view outside of the state machine but
         // it's the easiest solution because everything is onEntry
-        cipeInfoList.info?.let {
+        cipeDataResponse?.info?.let {
             if (it.isEmpty()) {
                 cloudHeaderPanel.isVisible = true
             } else {
@@ -106,8 +102,6 @@ class NxToolWindowPanel(private val project: Project) :
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     init {
-        // Set persistence manager on tree structure
-        cipeTreeStructure.persistenceManager = cipeTreePersistenceManager
 
         topPanel.add(progressBar, BorderLayout.NORTH)
         loadingPanel.add(topPanel, BorderLayout.NORTH)
@@ -125,7 +119,12 @@ class NxToolWindowPanel(private val project: Project) :
             }
         }
 
-        CIPEPollingService.getInstance(project).addDataUpdateListener(cipeDataListener)
+        // Subscribe to CIPE data changes
+        scope.launch {
+            CIPEPollingService.getInstance(project).currentData.collect { cipeData ->
+                cipeDataListener(cipeData)
+            }
+        }
 
         scope.launch {
             stateMachine =
@@ -253,7 +252,7 @@ class NxToolWindowPanel(private val project: Project) :
                                 contentSplitter.secondComponent = connectedToNxCloudPanel
 
                                 val cipeInfoList =
-                                    CIPEDataSyncService.getInstance(project).currentData.value?.info
+                                    CIPEPollingService.getInstance(project).currentData.value?.info
                                         ?: emptyList()
                                 if (cipeInfoList.isEmpty()) {
                                     cloudHeaderPanel.isVisible = true
@@ -442,8 +441,7 @@ class NxToolWindowPanel(private val project: Project) :
         mainContent = null
         errorCountAndComponent = null
 
-        val cipePollingService = CIPEPollingService.getInstance(project)
-        cipePollingService.removeDataUpdateListener(cipeDataListener)
+        // No need to remove listener since we're using StateFlow collection
 
         eventChannel.close()
     }

@@ -131,10 +131,15 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             }
         }
 
-        CIPEPollingService.getInstance(project).addDataUpdateListener(listener)
+        val pollingService = CIPEPollingService.getInstance(project)
+
+        // Subscribe to polling service data changes
+        cs.launch {
+            pollingService.currentData.collect { cipeData -> cipeData?.let { listener(it) } }
+        }
 
         val disposable = Disposable {
-            CIPEPollingService.getInstance(project).removeDataUpdateListener(listener)
+            // StateFlow collection is cancelled when coroutine scope is cancelled
             messageBusConnection?.disconnect()
             messageBusConnection = null
         }

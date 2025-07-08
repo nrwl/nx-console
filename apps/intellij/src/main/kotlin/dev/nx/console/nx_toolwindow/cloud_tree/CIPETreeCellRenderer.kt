@@ -112,7 +112,6 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
     }
 }
 
-
 private fun dev.nx.console.models.AITaskFixUserAction.isApplied(): Boolean =
     this == dev.nx.console.models.AITaskFixUserAction.APPLIED ||
         this == dev.nx.console.models.AITaskFixUserAction.APPLIED_LOCALLY

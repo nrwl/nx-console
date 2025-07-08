@@ -5,39 +5,42 @@ import dev.nx.console.models.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CIPEDataSyncServiceTest : BasePlatformTestCase() {
+class CIPENotificationProcessorTest : BasePlatformTestCase() {
 
-    private lateinit var dataService: CIPEDataSyncService
+    private lateinit var processor: CIPENotificationProcessor
     private lateinit var mockListener: TestNotificationListener
 
     override fun setUp() {
         super.setUp()
-        dataService = CIPEDataSyncService(project)
+        processor = CIPENotificationProcessor(project)
         mockListener = TestNotificationListener()
-        dataService.addNotificationListener(mockListener)
+        processor.addNotificationListener(mockListener)
     }
 
     override fun tearDown() {
-        dataService.removeNotificationListener(mockListener)
+        processor.removeNotificationListener(mockListener)
         super.tearDown()
     }
 
     fun testNoNotificationOnInitialLoad() {
         // When comparing null (initial load) with any state, should not show notification
-        val newData = CIPEDataResponse(info = listOf(createSuccessfulCIPE()))
+        val event =
+            CIPEDataChangedEvent(
+                oldData = null,
+                newData = CIPEDataResponse(info = listOf(createSuccessfulCIPE()))
+            )
 
-        dataService.updateData(newData)
+        processor.onDataChanged(event)
 
         assertTrue(mockListener.events.isEmpty(), "Should not show notifications on initial load")
     }
 
     fun testNoNotificationForNoChange() {
-        // Set initial state
-        dataService.updateData(CIPEDataResponse(info = listOf(createSuccessfulCIPE())))
-        mockListener.reset()
+        // When old and new data are the same, should not show notifications
+        val cipeData = CIPEDataResponse(info = listOf(createSuccessfulCIPE()))
+        val event = CIPEDataChangedEvent(oldData = cipeData, newData = cipeData)
 
-        // Update with same state
-        dataService.updateData(CIPEDataResponse(info = listOf(createSuccessfulCIPE())))
+        processor.onDataChanged(event)
 
         assertTrue(
             mockListener.events.isEmpty(),
@@ -48,15 +51,19 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testSuccessNotification() {
         // Progress -> Success should show success notification
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
-
         val successCIPE =
             progressCIPE.copy(
                 status = CIPEExecutionStatus.SUCCEEDED,
                 completedAt = System.currentTimeMillis()
             )
-        dataService.updateData(CIPEDataResponse(info = listOf(successCIPE)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(successCIPE))
+            )
+
+        processor.onDataChanged(event)
 
         assertEquals(1, mockListener.events.size)
         assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPESucceeded)
@@ -65,15 +72,19 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testFailureNotificationWithoutAiFix() {
         // Progress -> Failed (without AI fix) should show error notification
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
-
         val failedCIPE =
             progressCIPE.copy(
                 status = CIPEExecutionStatus.FAILED,
                 completedAt = System.currentTimeMillis()
             )
-        dataService.updateData(CIPEDataResponse(info = listOf(failedCIPE)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedCIPE))
+            )
+
+        processor.onDataChanged(event)
 
         assertEquals(1, mockListener.events.size)
         assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
@@ -82,26 +93,34 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testRunFailureNotificationWithoutAiFix() {
         // Progress with failed run (without AI fix) should show error notification
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
-
         val failedRunCIPE = createProgressWithFailedRun()
-        dataService.updateData(CIPEDataResponse(info = listOf(failedRunCIPE)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedRunCIPE))
+            )
+
+        processor.onDataChanged(event)
 
         assertEquals(1, mockListener.events.size)
-        val event = mockListener.events[0]
-        assertTrue(event is CIPENotificationEvent.RunFailed)
-        assertEquals("nx test", (event as CIPENotificationEvent.RunFailed).run.command)
+        val notificationEvent = mockListener.events[0]
+        assertTrue(notificationEvent is CIPENotificationEvent.RunFailed)
+        assertEquals("nx test", (notificationEvent as CIPENotificationEvent.RunFailed).run.command)
     }
 
     fun testAiFixSuppressesFailureNotifications() {
         // Progress -> Failed with AI fix should NOT show error notification
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
-
         val failedWithAiFix = createFailedCIPEWithAiFix()
-        dataService.updateData(CIPEDataResponse(info = listOf(failedWithAiFix)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedWithAiFix))
+            )
+
+        processor.onDataChanged(event)
 
         // Should only show AI fix notification, not failure notification
         assertEquals(1, mockListener.events.size)
@@ -111,29 +130,40 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testAiFixNotificationWhenSuggestedFixBecomesAvailable() {
         // Progress -> Progress with AI fix (with suggestedFix) should show AI fix notification
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
-
         val progressWithAiFix = createProgressWithAiFixAndSuggestion()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressWithAiFix)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(progressWithAiFix))
+            )
+
+        processor.onDataChanged(event)
 
         assertEquals(1, mockListener.events.size)
-        val event = mockListener.events[0]
-        assertTrue(event is CIPENotificationEvent.AiFixAvailable)
+        val notificationEvent = mockListener.events[0]
+        assertTrue(notificationEvent is CIPENotificationEvent.AiFixAvailable)
         assertEquals(
             "test-task-1",
-            (event as CIPENotificationEvent.AiFixAvailable).runGroup.aiFix?.taskIds?.first()
+            (notificationEvent as CIPENotificationEvent.AiFixAvailable)
+                .runGroup
+                .aiFix
+                ?.taskIds
+                ?.first()
         )
     }
 
     fun testNoAiFixNotificationWhenSuggestedFixAlreadyExists() {
         // If AI fix with suggestedFix already existed, should not show notification
         val withAiFix = createProgressWithAiFixAndSuggestion()
-        dataService.updateData(CIPEDataResponse(info = listOf(withAiFix)))
-        mockListener.reset()
 
-        // Same state, should not notify
-        dataService.updateData(CIPEDataResponse(info = listOf(withAiFix)))
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(withAiFix)),
+                newData = CIPEDataResponse(info = listOf(withAiFix))
+            )
+
+        processor.onDataChanged(event)
 
         assertTrue(mockListener.events.isEmpty())
     }
@@ -141,11 +171,15 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testAiFixNotificationOnlyWhenSuggestedFixAppears() {
         // AI fix without suggestion -> AI fix with suggestion should notify
         val withoutSuggestion = createProgressWithAiFixNoSuggestion()
-        dataService.updateData(CIPEDataResponse(info = listOf(withoutSuggestion)))
-        mockListener.reset()
-
         val withSuggestion = createProgressWithAiFixAndSuggestion()
-        dataService.updateData(CIPEDataResponse(info = listOf(withSuggestion)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(withoutSuggestion)),
+                newData = CIPEDataResponse(info = listOf(withSuggestion))
+            )
+
+        processor.onDataChanged(event)
 
         assertEquals(1, mockListener.events.size)
         assertTrue(mockListener.events[0] is CIPENotificationEvent.AiFixAvailable)
@@ -154,19 +188,21 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testNoNotificationWhenAiFixWithoutSuggestion() {
         // Progress -> Progress with AI fix (without suggestedFix) should NOT notify
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
-
         val withAiFixNoSuggestion = createProgressWithAiFixNoSuggestion()
-        dataService.updateData(CIPEDataResponse(info = listOf(withAiFixNoSuggestion)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(withAiFixNoSuggestion))
+            )
+
+        processor.onDataChanged(event)
 
         assertTrue(mockListener.events.isEmpty())
     }
 
     fun testMultipleRunGroupsWithMixedAiFixStates() {
         val progressCIPE = createProgressCIPE()
-        dataService.updateData(CIPEDataResponse(info = listOf(progressCIPE)))
-        mockListener.reset()
 
         // Create CIPE with multiple run groups - one with AI fix, one without
         val mixedCIPE =
@@ -228,7 +264,13 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
                     )
             )
 
-        dataService.updateData(CIPEDataResponse(info = listOf(mixedCIPE)))
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(mixedCIPE))
+            )
+
+        processor.onDataChanged(event)
 
         // Should only show AI fix notification, not failure
         assertEquals(1, mockListener.events.size)
@@ -238,12 +280,17 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testNoNotificationWhenOldStateAlreadyCompleted() {
         // If old state was already completed, should not show notifications
         val completedCIPE = createFailedCIPEWithAiFix()
-        dataService.updateData(CIPEDataResponse(info = listOf(completedCIPE)))
-        mockListener.reset()
 
         // Any change after completion should not notify
         val stillCompleted = completedCIPE.copy(completedAt = System.currentTimeMillis() + 1000)
-        dataService.updateData(CIPEDataResponse(info = listOf(stillCompleted)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(completedCIPE)),
+                newData = CIPEDataResponse(info = listOf(stillCompleted))
+            )
+
+        processor.onDataChanged(event)
 
         assertTrue(mockListener.events.isEmpty())
     }
@@ -251,12 +298,17 @@ class CIPEDataSyncServiceTest : BasePlatformTestCase() {
     fun testNoNotificationWhenOldStateHadFailedRun() {
         // If old state had a failed run, should not show notifications
         val withFailedRun = createProgressWithFailedRun()
-        dataService.updateData(CIPEDataResponse(info = listOf(withFailedRun)))
-        mockListener.reset()
 
         // Change to failed CIPE should not notify (already notified for run failure)
         val failedCIPE = withFailedRun.copy(status = CIPEExecutionStatus.FAILED)
-        dataService.updateData(CIPEDataResponse(info = listOf(failedCIPE)))
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(withFailedRun)),
+                newData = CIPEDataResponse(info = listOf(failedCIPE))
+            )
+
+        processor.onDataChanged(event)
 
         assertTrue(mockListener.events.isEmpty())
     }

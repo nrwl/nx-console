@@ -41,14 +41,14 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     private var pollingJob: Job? = null
     private var currentPollingInterval = COLD_POLLING_TIME_MS
 
-    private val _latestCIPEData = MutableStateFlow<CIPEDataResponse?>(null)
-    val latestCIPEData: StateFlow<CIPEDataResponse?> = _latestCIPEData.asStateFlow()
+    private val _currentData = MutableStateFlow<CIPEDataResponse?>(null)
+    val currentData: StateFlow<CIPEDataResponse?> = _currentData.asStateFlow()
 
     private val _isPolling = MutableStateFlow(false)
     val isPolling: StateFlow<Boolean> = _isPolling.asStateFlow()
 
-    // Listeners for data updates
-    private val dataUpdateListeners = mutableListOf<(CIPEDataResponse) -> Unit>()
+    // Listeners for data changes
+    private val dataChangeListeners = mutableListOf<CIPEDataChangeListener>()
 
     /** Start polling for CIPE data */
     fun startPolling() {
@@ -90,30 +90,31 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
         pollCIPEData()
     }
 
-    /** Add a listener for CIPE data updates */
-    fun addDataUpdateListener(listener: (CIPEDataResponse) -> Unit) {
-        dataUpdateListeners.add(listener)
+    /** Add a listener for CIPE data changes */
+    fun addDataChangeListener(listener: CIPEDataChangeListener) {
+        dataChangeListeners.add(listener)
     }
 
-    /** Remove a data update listener */
-    fun removeDataUpdateListener(listener: (CIPEDataResponse) -> Unit) {
-        dataUpdateListeners.remove(listener)
+    /** Remove a data change listener */
+    fun removeDataChangeListener(listener: CIPEDataChangeListener) {
+        dataChangeListeners.remove(listener)
     }
 
     private suspend fun pollCIPEData() {
         try {
             val nxlsService = NxlsService.getInstance(project)
-            val cipeData = nxlsService.recentCIPEData()
+            val newData = nxlsService.recentCIPEData()
 
-            if (cipeData != null) {
-                _latestCIPEData.value = cipeData
-                updatePollingInterval(cipeData)
+            if (newData != null) {
+                val oldData = _currentData.value
+                _currentData.value = newData
+                updatePollingInterval(newData)
 
-                // Update data sync service
-                val dataSyncService = CIPEDataSyncService.getInstance(project)
-                dataSyncService.updateData(cipeData)
-
-                notifyListeners(cipeData)
+                // Emit data change event
+                if (oldData?.info != null || newData.info != null) {
+                    val event = CIPEDataChangedEvent(oldData, newData)
+                    notifyListeners(event)
+                }
             }
         } catch (e: Exception) {
             logger.error("[CIPE_POLL] Failed to poll CIPE data: ${e.message}", e)
@@ -171,12 +172,28 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
         }
     }
 
-    private fun notifyListeners(data: CIPEDataResponse) {
-        dataUpdateListeners.forEach { listener -> listener(data) }
+    private fun notifyListeners(event: CIPEDataChangedEvent) {
+        dataChangeListeners.forEach { listener ->
+            try {
+                listener.onDataChanged(event)
+            } catch (e: Exception) {
+                logger.error("[CIPE_POLL] Error notifying data change listener: ${e.message}", e)
+            }
+        }
     }
 
     override fun dispose() {
         stopPolling()
-        dataUpdateListeners.clear()
+        dataChangeListeners.clear()
     }
 }
+
+
+/** Event emitted when CIPE data changes */
+data class CIPEDataChangedEvent(val oldData: CIPEDataResponse?, val newData: CIPEDataResponse)
+
+/** Interface for listening to CIPE data changes */
+fun interface CIPEDataChangeListener {
+    fun onDataChanged(event: CIPEDataChangedEvent)
+}
+
