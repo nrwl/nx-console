@@ -28,9 +28,12 @@ class NxCloudApiService(private val project: Project) {
     private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
+        encodeDefaults= true
     }
 
-    @Serializable data class UpdateSuggestedFixRequest(val aiFixId: String, val action: String)
+    @Serializable data class UpdateSuggestedFixRequest(val aiFixId: String, val action: String) {
+        val actionOrigin: String = "NX_CONSOLE_INTELLIJ"
+    }
 
     suspend fun updateSuggestedFix(
         aiFixId: String,
@@ -60,6 +63,7 @@ class NxCloudApiService(private val project: Project) {
                     }
                     authHeaders.authorization?.let { header("Authorization", it) }
                     setBody(json.encodeToString(UpdateSuggestedFixRequest(aiFixId, action)))
+                    logger.info("suggested fix stringified ${json.encodeToString(UpdateSuggestedFixRequest(aiFixId, action))}")
                 }
 
             if (response.status.value == 401) {
