@@ -1,3 +1,10 @@
+## [18.57.1](https://github.com/nrwl/nx-console/compare/vscode-v18.57.0...vscode-v18.57.1) (2025-07-08)
+
+
+### Bug Fixes
+
+* **nxls:** make sure json file with windows paths can be read after update ([#2605](https://github.com/nrwl/nx-console/issues/2605)) ([1b149cc](https://github.com/nrwl/nx-console/commit/1b149ccdf4f5845d1a1f61340c2109e60a31cbe5))
+
 # [18.57.0](https://github.com/nrwl/nx-console/compare/vscode-v18.56.0...vscode-v18.57.0) (2025-07-03)
 
 
