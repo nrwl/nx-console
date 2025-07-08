@@ -36,6 +36,7 @@ export type NxAiFix = {
   suggestedFixStatus: AITaskFixStatus;
   verificationStatus: AITaskFixStatus;
   userAction: AITaskFixUserAction;
+  userActionOrigin?: AITaskFixUserActionOrigin;
 };
 
 export type CIPERunGroup = {
@@ -56,6 +57,11 @@ export type AITaskFixStatus =
   | 'NOT_EXECUTABLE';
 
 export type AITaskFixUserAction = 'NONE' | 'APPLIED' | 'REJECTED';
+
+export type AITaskFixUserActionOrigin =
+  | 'NX_CLOUD_APP'
+  | 'NX_CONSOLE_VSCODE'
+  | 'NX_CONSOLE_INTELLIJ';
 
 export type CIPERun = {
   linkId?: string;
