@@ -1,3 +1,20 @@
+## 1.44.0 (2025-07-08)
+
+### Bug Fixes
+
+* **generate-ui:** fix tailwind after lib breakout ([#2592](https://github.com/nrwl/nx-console/issues/2592)) ([d8529b1](https://github.com/nrwl/nx-console/commit/d8529b12f3060baa91212f741e448250e70d9eae))
+* handle ai fix verification fields ([#2590](https://github.com/nrwl/nx-console/issues/2590)) ([1fd576f](https://github.com/nrwl/nx-console/commit/1fd576f5b176722f4e6c21f6f56e1d52ab1a059a))
+* **intellij:** project graph or project graph nodes may be null if project is misconfigured ([#2584](https://github.com/nrwl/nx-console/issues/2584)) ([6d7484c](https://github.com/nrwl/nx-console/commit/6d7484cd1c127d5d283c27c2f42a7ed8def47221))
+* **nxls:** make sure json file with windows paths can be read after update ([#2605](https://github.com/nrwl/nx-console/issues/2605)) ([1b149cc](https://github.com/nrwl/nx-console/commit/1b149ccdf4f5845d1a1f61340c2109e60a31cbe5))
+* **vscode:** remove affected condition from onboarding checks ([#2583](https://github.com/nrwl/nx-console/issues/2583)) ([a92b965](https://github.com/nrwl/nx-console/commit/a92b965ee6fb9a0627b4bd25d327e96c927ad7c7))
+* **vscode:** remove json caching in various places ([#2587](https://github.com/nrwl/nx-console/issues/2587)) ([d30d99a](https://github.com/nrwl/nx-console/commit/d30d99a705b3425ed0af753e95f116dcf33b9f01))
+* **vscode:** update AI suggested fix status handling ([#2595](https://github.com/nrwl/nx-console/issues/2595)) ([f22e902](https://github.com/nrwl/nx-console/commit/f22e902c650deed1379636065c4633f2aa51fe43))
+
+
+### Features
+
+* add spinner to nx tool window panel ([#2424](https://github.com/nrwl/nx-console/issues/2424)) ([cea32fb](https://github.com/nrwl/nx-console/commit/cea32fb7ce1cd0c998ca5959f8ffcfbafcd839ad))
+
 ## 1.43.0 (2025-06-23)
 
 ### Bug Fixes
