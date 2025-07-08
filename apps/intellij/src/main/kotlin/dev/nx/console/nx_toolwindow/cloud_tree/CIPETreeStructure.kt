@@ -9,7 +9,6 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfo
-import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import javax.swing.tree.TreeModel
 
 class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {

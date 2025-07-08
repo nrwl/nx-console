@@ -36,10 +36,8 @@ class NxCloudApiService(private val project: Project) {
         aiFixId: String,
         action: String // "APPLIED", "REJECTED", or "APPLIED_LOCALLY"
     ): Boolean {
-        logger.info("Starting updateSuggestedFix: aiFixId=$aiFixId, action=$action")
         try {
             val cloudStatus = NxlsService.getInstance(project).cloudStatus()
-            logger.info("Cloud status retrieved: $cloudStatus")
             val nxCloudUrl = cloudStatus?.nxCloudUrl ?: DEFAULT_CLOUD_URL
 
             if (cloudStatus?.isConnected != true) {
@@ -48,21 +46,10 @@ class NxCloudApiService(private val project: Project) {
             }
 
             val authHeaders = NxlsService.getInstance(project).cloudAuthHeaders()
-            logger.info(
-                "Auth headers retrieved: ${authHeaders?.let { "Headers present" } ?: "null"}"
-            )
-            logger.info("Auth headers object: $authHeaders")
             if (authHeaders == null) {
                 logger.warn("Failed to get Nx Cloud auth headers")
                 return false
             }
-
-            logger.info("Sending request to: $nxCloudUrl/nx-cloud/update-suggested-fix")
-            logger.info(
-                "Request headers - Nx-Cloud-Id: ${authHeaders.nxCloudId}, " +
-                    "Nx-Cloud-Personal-Access-Token: ${authHeaders.nxCloudPersonalAccessToken?.let { "***" }}, " +
-                    "Authorization: ${authHeaders.authorization?.let { "***" }}"
-            )
 
             val response =
                 httpClient.post("$nxCloudUrl/nx-cloud/update-suggested-fix") {
@@ -74,10 +61,6 @@ class NxCloudApiService(private val project: Project) {
                     authHeaders.authorization?.let { header("Authorization", it) }
                     setBody(json.encodeToString(UpdateSuggestedFixRequest(aiFixId, action)))
                 }
-
-            logger.info(
-                "Update suggested fix response: status=${response.status}, success=${response.status.isSuccess()}"
-            )
 
             if (response.status.value == 401) {
                 logger.error("Authentication failed (401). Please check your Nx Cloud credentials.")

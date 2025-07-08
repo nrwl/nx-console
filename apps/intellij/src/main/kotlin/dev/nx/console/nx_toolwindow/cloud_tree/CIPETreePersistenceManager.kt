@@ -2,7 +2,6 @@ package dev.nx.console.nx_toolwindow.cloud_tree
 
 import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.Tree
-import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.tree.DefaultMutableTreeNode

@@ -4,9 +4,6 @@ import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.JBColor
 import com.intellij.ui.SimpleTextAttributes
 import dev.nx.console.models.CIPEExecutionStatus
-import dev.nx.console.nx_toolwindow.cloud_tree.models.getDurationString
-import dev.nx.console.nx_toolwindow.cloud_tree.models.getTimeAgoString
-import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
 import java.awt.Color
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -115,15 +112,6 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
     }
 }
 
-// Extension functions for status checks
-private fun CIPEExecutionStatus.isCompleted(): Boolean =
-    this in
-        setOf(
-            CIPEExecutionStatus.SUCCEEDED,
-            CIPEExecutionStatus.FAILED,
-            CIPEExecutionStatus.CANCELED,
-            CIPEExecutionStatus.TIMED_OUT
-        )
 
 private fun dev.nx.console.models.AITaskFixUserAction.isApplied(): Boolean =
     this == dev.nx.console.models.AITaskFixUserAction.APPLIED ||

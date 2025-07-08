@@ -1,11 +1,9 @@
-package dev.nx.console.nx_toolwindow.cloud_tree.nodes
+package dev.nx.console.nx_toolwindow.cloud_tree
 
 import com.intellij.icons.AllIcons
 import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.treeStructure.CachingSimpleNode
 import dev.nx.console.models.*
-import dev.nx.console.nx_toolwindow.cloud_tree.models.getDurationString
-import dev.nx.console.nx_toolwindow.cloud_tree.models.getTimeAgoString
 import javax.swing.Icon
 
 sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent) {

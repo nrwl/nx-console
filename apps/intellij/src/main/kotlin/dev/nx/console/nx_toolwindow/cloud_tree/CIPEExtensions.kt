@@ -1,4 +1,4 @@
-package dev.nx.console.nx_toolwindow.cloud_tree.models
+package dev.nx.console.nx_toolwindow.cloud_tree
 
 import dev.nx.console.models.CIPEInfo
 

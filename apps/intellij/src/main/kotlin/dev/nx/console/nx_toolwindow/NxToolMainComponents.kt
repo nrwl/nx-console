@@ -27,7 +27,7 @@ import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreePersistenceManager
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
-import dev.nx.console.nx_toolwindow.cloud_tree.nodes.CIPESimpleNode
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.nxls.NxlsService
