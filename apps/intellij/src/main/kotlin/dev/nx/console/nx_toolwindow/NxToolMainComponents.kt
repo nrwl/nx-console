@@ -9,6 +9,8 @@ import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.ex.ToolbarLabelAction
+import com.intellij.openapi.actionSystem.toolbarLayout.ToolbarLayoutStrategy
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.HyperlinkLabel
@@ -19,6 +21,7 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
+import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.cloud.CloudFixService
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
@@ -329,8 +332,89 @@ class NxToolMainComponents(private val project: Project) {
             layout = BorderLayout()
             border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
 
-            add(headerPanel, BorderLayout.NORTH)
-            add(cipeTreeComponent, BorderLayout.CENTER)
+            val actionGroup =
+                DefaultActionGroup().apply {
+                    add(
+                        object : ToolbarLabelAction() {
+                            override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                            override fun update(e: AnActionEvent) {
+                                super.update(e)
+                                e.presentation.text = "Recent CI Pipeline Executions"
+                            }
+                        }
+                    )
+
+                    addSeparator()
+
+                    add(
+                        object :
+                            AnAction(
+                                "Refresh",
+                                "Refresh CI Pipeline Executions",
+                                AllIcons.Actions.Refresh
+                            ) {
+                            override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                            override fun actionPerformed(e: AnActionEvent) {
+                                TelemetryService.getInstance(project)
+                                    .featureUsed(TelemetryEvent.MISC_REFRESH_WORKSPACE)
+                                // Trigger CIPE data refresh
+                                ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+                                    CIPEPollingService.getInstance(project).forcePoll()
+                                }
+                            }
+                        }
+                    )
+
+                    add(
+                        object :
+                            AnAction(
+                                "Open Nx Cloud App",
+                                "Open Nx Cloud in browser",
+                                AllIcons.ToolbarDecorator.Export
+                            ) {
+                            override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                            override fun actionPerformed(e: AnActionEvent) {
+                                TelemetryService.getInstance(project)
+                                    .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+                                ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+                                    NxlsService.getInstance(project).cloudStatus()?.nxCloudUrl.let {
+                                        if (it != null) {
+                                            BrowserLauncher.instance.browse(URI.create(it))
+                                        } else {
+                                            Notifier.notifyAnything(
+                                                project,
+                                                "Couldn't retrieve Nx Cloud URL",
+                                                NotificationType.ERROR
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
+            val toolbar =
+                ActionManager.getInstance()
+                    .createActionToolbar("NxCloudCIPEToolbar", actionGroup, true)
+                    .apply {
+                        targetComponent = cipeTreeComponent
+                        layoutStrategy = ToolbarLayoutStrategy.AUTOLAYOUT_STRATEGY
+                    }
+
+            add(toolbar.component, BorderLayout.NORTH)
+
+            // Create a panel to hold both the headerPanel and the tree
+            val contentPanel =
+                JPanel(BorderLayout()).apply {
+                    add(headerPanel, BorderLayout.NORTH)
+                    add(cipeTreeComponent, BorderLayout.CENTER)
+                }
+
+            add(contentPanel, BorderLayout.CENTER)
         }
     }
 
