@@ -34,6 +34,10 @@ export async function readJsonFile(
     fullFilePath = fullFilePath.replace('file://', '');
   }
 
+  if (process.platform === 'win32' && fullFilePath.match(/^\/[a-zA-Z]:\//)) {
+    fullFilePath = fullFilePath.substring(1);
+  }
+
   try {
     if (existsSync(fullFilePath)) {
       const json = await readAndParseJson(fullFilePath);
