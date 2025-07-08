@@ -8,12 +8,24 @@ jest.mock('vscode', () => ({
   window: {
     showInformationMessage: jest.fn().mockResolvedValue(undefined),
     showErrorMessage: jest.fn().mockResolvedValue(undefined),
+    createStatusBarItem: jest.fn().mockReturnValue({
+      text: '',
+      tooltip: '',
+      command: {},
+      show: jest.fn(),
+      hide: jest.fn(),
+      dispose: jest.fn(),
+    }),
   },
   env: {
     appName: 'vscode',
   },
   commands: {
     executeCommand: jest.fn(),
+  },
+  StatusBarAlignment: {
+    Left: 1,
+    Right: 2,
   },
 }));
 
@@ -186,6 +198,7 @@ describe('CIPE Notifications', () => {
                 terminalLogsUrls: { 'test-task-1': 'http://logs.url' },
                 suggestedFix: 'git diff content here...',
                 suggestedFixDescription: 'Fix the failing test',
+                suggestedFixStatus: 'COMPLETED',
                 verificationStatus: 'COMPLETED',
                 userAction: 'NONE',
               },
@@ -222,6 +235,7 @@ describe('CIPE Notifications', () => {
                 terminalLogsUrls: { 'test-task-2': 'http://logs.url' },
                 suggestedFix: 'git diff content here...',
                 suggestedFixDescription: 'Fix the failing test',
+                suggestedFixStatus: 'COMPLETED',
                 verificationStatus: 'COMPLETED',
                 userAction: 'NONE',
               },
@@ -260,6 +274,7 @@ describe('CIPE Notifications', () => {
                 terminalLogsUrls: { 'test-task-3': 'http://logs.url' },
                 suggestedFix: null,
                 suggestedFixDescription: null,
+                suggestedFixStatus: 'IN_PROGRESS',
                 verificationStatus: 'IN_PROGRESS',
                 userAction: 'NONE',
               },
@@ -298,6 +313,7 @@ describe('CIPE Notifications', () => {
                 terminalLogsUrls: { 'test-task-4': 'http://logs.url' },
                 suggestedFix: 'git diff content here...',
                 suggestedFixDescription: 'Fix the failing test',
+                suggestedFixStatus: 'COMPLETED',
                 verificationStatus: 'COMPLETED',
                 userAction: 'NONE',
               },
@@ -517,6 +533,7 @@ describe('CIPE Notifications', () => {
                   terminalLogsUrls: { 'test-task-1': 'http://logs.url' },
                   suggestedFix: 'git diff content...',
                   suggestedFixDescription: 'Fix test',
+                  suggestedFixStatus: 'COMPLETED',
                   verificationStatus: 'COMPLETED',
                   userAction: 'NONE',
                 },
@@ -577,7 +594,7 @@ describe('CIPE Notifications', () => {
           ], // Different AI fix with suggestion (no change)
         ];
 
-        transitions.forEach(([from, to, shouldNotify], index) => {
+        transitions.forEach(([from, to, shouldNotify]) => {
           jest.clearAllMocks();
 
           compareCIPEDataAndSendNotification(
