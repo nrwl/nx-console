@@ -1,5 +1,10 @@
 import { ContextProvider } from '@lit-labs/context';
-import type { CIPEInfo, CIPERunGroup, NxAiFix } from '@nx-console/shared-types';
+import type {
+  CIPEInfo,
+  CIPERunGroup,
+  NxAiFix,
+  NxCloudFixDetails,
+} from '@nx-console/shared-types';
 import {
   EditorContext,
   editorContext,
@@ -9,12 +14,6 @@ import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import './terminal-component';
 import './components';
-
-export type NxCloudFixData = {
-  cipe: CIPEInfo;
-  runGroup: CIPERunGroup;
-  terminalOutput?: string;
-};
 
 @customElement('nx-cloud-fix-component')
 export class NxCloudFixComponent extends EditorContext(LitElement) {
@@ -38,16 +37,16 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   }
 
   @property({ type: Object })
-  details: NxCloudFixData | undefined;
+  details: NxCloudFixDetails | undefined;
 
   @property({ type: Function })
-  onApply: ((details: NxCloudFixData) => void) | undefined;
+  onApply: ((details: NxCloudFixDetails) => void) | undefined;
 
   @property({ type: Function })
-  onReject: ((details: NxCloudFixData) => void) | undefined;
+  onReject: ((details: NxCloudFixDetails) => void) | undefined;
 
   @property({ type: Function })
-  onApplyLocally: ((details: NxCloudFixData) => void) | undefined;
+  onApplyLocally: ((details: NxCloudFixDetails) => void) | undefined;
 
   @property({ type: Function })
   onShowDiff: (() => void) | undefined;
@@ -343,6 +342,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                   <button-element
                     text="Apply Fix Locally"
                     appearance="secondary"
+                    ?disabled=${this.details?.hasUncommittedChanges}
+                    title=${this.details?.hasUncommittedChanges
+                      ? 'You have uncommitted changes. Please commit or stash them before applying the fix locally.'
+                      : ''}
                     @click="${() => this.handleApplyLocally()}"
                   ></button-element>
                   <button-element
@@ -359,7 +362,6 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   }
 
   private getStatusSection(aiFix: NxAiFix): TemplateResult {
-    console.log('aiFix', aiFix);
     const hasAiFix = !!aiFix.suggestedFix;
     // TODO: Remove this once all environments have been migrated after deployment
     // Fall back to original validationStatus field for backwards compatibility

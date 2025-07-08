@@ -2,10 +2,8 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import './nx-cloud-fix-component';
 import './tailwind.css';
 import '@nx-console/shared-ui-components';
-import type {
-  NxCloudFixComponent,
-  NxCloudFixData,
-} from './nx-cloud-fix-component';
+import type { NxCloudFixComponent } from './nx-cloud-fix-component';
+import { NxCloudFixDetails } from '@nx-console/shared-types';
 
 const meta: Meta<NxCloudFixComponent> = {
   title: 'NxCloudFixComponent',
@@ -23,7 +21,7 @@ const meta: Meta<NxCloudFixComponent> = {
 export default meta;
 type Story = StoryObj<NxCloudFixComponent>;
 
-const runGroup: NxCloudFixData['runGroup'] = {
+const runGroup: NxCloudFixDetails['runGroup'] = {
   runGroup: 'build-group-1',
   status: 'FAILED',
   ciExecutionEnv: 'nx-cloud',
@@ -55,7 +53,7 @@ const runGroup: NxCloudFixData['runGroup'] = {
   },
 };
 
-const mockDetails: NxCloudFixData = {
+const mockDetails: NxCloudFixDetails = {
   cipe: {
     id: 'cipe-123',
     status: 'FAILED',
@@ -103,7 +101,7 @@ Running tests for shared-lib...
 Test Suites: 1 failed, 0 passed
 Tests:       0 total
 Time:        2.345 s`,
-} as NxCloudFixData;
+} as NxCloudFixDetails;
 
 export const Default: Story = {
   args: {

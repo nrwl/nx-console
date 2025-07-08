@@ -1,14 +1,53 @@
 import { extensions, Uri } from 'vscode';
-import { GitExtension } from './git-extension';
+import type { GitExtension, API, Repository } from './git-extension';
+import { getWorkspacePath } from './get-workspace-path';
+
+export function getGitApi(): API | undefined {
+  const gitExt = extensions.getExtension<GitExtension>('vscode.git').exports;
+  const api = gitExt.getAPI(1);
+  if (!api) {
+    return undefined;
+  }
+  return api;
+}
+
+export function getGitRepository(): Repository | undefined {
+  const git = getGitApi();
+  if (!git) {
+    return undefined;
+  }
+  return git.getRepository(Uri.file(getWorkspacePath()));
+}
+
+export async function getGitBranch(): Promise<string | undefined> {
+  const repo = getGitRepository();
+  if (!repo) {
+    return undefined;
+  }
+  return repo.state.HEAD.name;
+}
+
+export async function getGitHasUncommittedChanges(): Promise<boolean> {
+  const repo = getGitRepository();
+  if (!repo) {
+    return false;
+  }
+  const s = repo.state;
+
+  return Boolean(
+    s.mergeChanges.length || // merge or conflict in progress
+      s.indexChanges.length || // staged but un-committed
+      s.workingTreeChanges.length || // modified / deleted / renamed files
+      s.untrackedChanges.length, // new, un-tracked files
+  );
+}
 
 export async function getGitDiffs(
   workspaceRoot: string,
   baseSha?: string,
   headSha?: string,
 ): Promise<{ path: string; diffContent: string }[] | null> {
-  const git = await extensions
-    .getExtension<GitExtension>('vscode.git')
-    ?.exports.getAPI(1);
+  const git = getGitApi();
 
   if (!git) {
     return null;

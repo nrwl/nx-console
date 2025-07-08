@@ -2,16 +2,16 @@ import { ContextProvider } from '@lit-labs/context';
 import { ReactiveController, ReactiveElement } from 'lit';
 import type { WebviewApi } from 'vscode-webview';
 import { editorContext } from '@nx-console/shared-ui-components';
-import type { NxCloudFixData } from './nx-cloud-fix-component';
 import type {
   NxCloudFixInputMessage,
   NxCloudFixOutputMessage,
   NxCloudFixStyles,
 } from './types';
+import { NxCloudFixDetails } from '@nx-console/shared-types';
 
 export class IdeCommunicationController implements ReactiveController {
   editor: 'vscode' | 'intellij';
-  details: NxCloudFixData | undefined;
+  details: NxCloudFixDetails | undefined;
 
   private postToIde: (message: unknown) => void;
 
@@ -39,7 +39,7 @@ export class IdeCommunicationController implements ReactiveController {
 
     // Set initial details from global if available
     if (globalThis.fixDetails) {
-      this.details = globalThis.fixDetails as NxCloudFixData;
+      this.details = globalThis.fixDetails as NxCloudFixDetails;
     }
   }
 
@@ -48,7 +48,6 @@ export class IdeCommunicationController implements ReactiveController {
   }
 
   postMessageToIde(message: NxCloudFixOutputMessage) {
-    console.log('sending message to ide', message);
     this.postToIde(message);
   }
 
@@ -60,7 +59,6 @@ export class IdeCommunicationController implements ReactiveController {
         if (!data) {
           return;
         }
-        console.log('received message from vscode', data);
         this.handleInputMessage(data);
       },
     );

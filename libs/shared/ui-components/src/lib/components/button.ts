@@ -17,6 +17,9 @@ export class Button extends EditorContext(LitElement) {
   @property({ type: Boolean })
   applyFillColor = false;
 
+  @property({ type: Boolean })
+  disabled = false;
+
   override render() {
     return this.editor === 'vscode'
       ? this.renderVSCode()
@@ -28,6 +31,8 @@ export class Button extends EditorContext(LitElement) {
       return html`
         <vscode-button
           icon="${this.text}"
+          ?disabled="${this.disabled}"
+          aria-disabled="${this.disabled}"
           style="
           --vscode-button-background: none;
           --vscode-button-foreground: ${this.color ??
@@ -38,7 +43,10 @@ export class Button extends EditorContext(LitElement) {
         </vscode-button>
       `;
     }
-    return html`<vscode-button ?secondary="${this.appearance === 'secondary'}"
+    return html`<vscode-button
+      ?secondary="${this.appearance === 'secondary'}"
+      ?disabled="${this.disabled}"
+      aria-disabled="${this.disabled}"
       >${this.text}</vscode-button
     >`;
   }
@@ -52,6 +60,8 @@ export class Button extends EditorContext(LitElement) {
           icon="${this.text}"
           color="${this.color}"
           ?applyFillColor="${this.applyFillColor}"
+          ?disabled="${this.disabled}"
+          aria-disabled="${this.disabled}"
         ></icon-element>
       </div>`;
     }
@@ -59,6 +69,8 @@ export class Button extends EditorContext(LitElement) {
       class="${intellijFocusRing} ${this.appearance === 'primary'
         ? 'bg-primary focus:!ring-offset-1 focus:!ring-offset-background'
         : 'border !border-fieldBorder focus:!border-focusBorder"}'} whitespace-nowrap rounded px-4 py-1"
+      ?disabled="${this.disabled}"
+      aria-disabled="${this.disabled}"
     >
       ${this.text}
     </button>`;
