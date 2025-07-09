@@ -327,11 +327,14 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createConnectedToNxCloudPanel(cipeTreeComponent: JComponent, cipeTreeToolbar: ActionToolbar, headerPanel: JPanel): JPanel {
+    fun createConnectedToNxCloudPanel(
+        cipeTreeComponent: JComponent,
+        cipeTreeToolbar: ActionToolbar,
+        headerPanel: JPanel
+    ): JPanel {
         return JPanel().apply {
             layout = BorderLayout()
             border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
-
 
             add(cipeTreeToolbar.component, BorderLayout.NORTH)
 
@@ -373,7 +376,6 @@ class NxToolMainComponents(private val project: Project) {
 
                         override fun actionPerformed(e: AnActionEvent) {
                             refreshCipeTree()
-
                         }
                     }
                 )
@@ -403,7 +405,6 @@ class NxToolMainComponents(private val project: Project) {
                 }
 
         return toolbar
-
     }
 
     fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
@@ -502,9 +503,7 @@ class NxToolMainComponents(private val project: Project) {
                     isBorderPainted = false
                     isFocusPainted = false
                     cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                    addActionListener {
-                        refreshCipeTree()
-                    }
+                    addActionListener { refreshCipeTree() }
                 }
             )
             add(
@@ -516,9 +515,7 @@ class NxToolMainComponents(private val project: Project) {
                     isBorderPainted = false
                     isFocusPainted = false
                     cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                    addActionListener {
-                        openNxCloud()
-                    }
+                    addActionListener { openNxCloud() }
                 }
             )
         }
@@ -667,8 +664,7 @@ class NxToolMainComponents(private val project: Project) {
     }
 
     private fun openNxCloud() {
-        TelemetryService.getInstance(project)
-            .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             NxlsService.getInstance(project).cloudStatus()?.nxCloudUrl.let {
                 if (it != null) {
@@ -685,8 +681,7 @@ class NxToolMainComponents(private val project: Project) {
     }
 
     private fun refreshCipeTree() {
-        TelemetryService.getInstance(project)
-            .featureUsed(TelemetryEvent.CLOUD_REFRESH_VIEW)
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_REFRESH_VIEW)
         CIPEPollingService.getInstance(project).forcePoll()
     }
 }

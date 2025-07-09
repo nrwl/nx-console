@@ -2,14 +2,12 @@ package dev.nx.console.cloud
 
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.intellij.util.messages.MessageBusConnection
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileImpl
 import dev.nx.console.models.CIPEDataResponse
@@ -51,35 +49,37 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
             }
         }
 
-            project.messageBus.connect().subscribe(
-            NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-            NxWorkspaceRefreshListener {
-                if (project.isDisposed) {
-                    return@NxWorkspaceRefreshListener
+        project.messageBus
+            .connect()
+            .subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener {
+                    if (project.isDisposed) {
+                        return@NxWorkspaceRefreshListener
+                    }
+                    updateUncommittedChangesFlag()
                 }
-                updateUncommittedChangesFlag()
-            }
-        )
+            )
     }
 
     private fun handleCIPEDataUpdate(cipeDataResponse: CIPEDataResponse) {
         val fixDetails = currentFixDetails ?: return
         val fixFile = currentFixFile ?: return
 
-        val cipe = cipeDataResponse.info?.find {
-            it.ciPipelineExecutionId == fixDetails.cipe.ciPipelineExecutionId
-        }
-        val runGroup = cipe?.runGroups?.find {
-            it.runGroup == fixDetails.runGroup.runGroup
-        }
+        val cipe =
+            cipeDataResponse.info?.find {
+                it.ciPipelineExecutionId == fixDetails.cipe.ciPipelineExecutionId
+            }
+        val runGroup = cipe?.runGroups?.find { it.runGroup == fixDetails.runGroup.runGroup }
 
         if (cipe != null && runGroup != null) {
-            val updatedDetails = NxCloudFixDetails(
-                cipe = cipe,
-                runGroup = runGroup,
-                terminalOutput = fixDetails.terminalOutput,
-                hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
-            )
+            val updatedDetails =
+                NxCloudFixDetails(
+                    cipe = cipe,
+                    runGroup = runGroup,
+                    terminalOutput = fixDetails.terminalOutput,
+                    hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
+                )
             currentFixDetails = updatedDetails
             fixFile.sendFixDetailsToWebview(updatedDetails)
         }
@@ -91,20 +91,16 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
     }
 
     fun openCloudFixWebview(cipeId: String, runGroupId: String) {
-        logger.info(
-            "Opening cloud fix webview for CIPE: $cipeId, runGroup: $runGroupId"
-        )
+        logger.info("Opening cloud fix webview for CIPE: $cipeId, runGroup: $runGroupId")
 
         val fixId = cipeId + runGroupId
 
         if (currentFixFile != null && currentFixDetails != null && currentFixId != null) {
             if (fixId === currentFixId) {
                 ApplicationManager.getApplication().invokeLater {
-                        val fileEditorManager = FileEditorManager.getInstance(project)
-                        currentFixFile?.let { file ->
-                            fileEditorManager.openFile(file, true)
-                        }
-                    }
+                    val fileEditorManager = FileEditorManager.getInstance(project)
+                    currentFixFile?.let { file -> fileEditorManager.openFile(file, true) }
+                }
                 return
             } else {
                 closeCurrentFixUI()
@@ -163,9 +159,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                 NxCloudFixDetails(cipe = cipe, runGroup = runGroup, terminalOutput = terminalOutput)
 
             withContext(Dispatchers.EDT) {
-                val fixFile = NxCloudFixFileImpl("AI Fix", project) {
-                    onFixFileClosed(it)
-                }
+                val fixFile = NxCloudFixFileImpl("AI Fix", project) { onFixFileClosed(it) }
                 val fileEditorManager = FileEditorManager.getInstance(project)
                 fileEditorManager.openFile(fixFile, true)
 
@@ -179,11 +173,9 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
 
     private fun closeCurrentFixUI() {
         ApplicationManager.getApplication().invokeLater {
-                currentFixFile?.let { file ->
-                    FileEditorManager.getInstance(project).closeFile(file)
-                }
-                currentFixFile = null
-                currentFixDetails = null
+            currentFixFile?.let { file -> FileEditorManager.getInstance(project).closeFile(file) }
+            currentFixFile = null
+            currentFixDetails = null
         }
     }
 
@@ -193,5 +185,4 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
             currentFixDetails = null
         }
     }
-
 }

@@ -54,7 +54,11 @@ class NxToolWindowPanel(private val project: Project) :
     private val cipeTreeToolbar = nxToolMainComponents.createRecentCipeToolbar(cipeTreeComponent)
     private val cloudHeaderPanel = nxToolMainComponents.createCloudHeaderPanel()
     private var connectedToNxCloudPanel: JPanel =
-        nxToolMainComponents.createConnectedToNxCloudPanel(cipeTreeComponent,cipeTreeToolbar, cloudHeaderPanel)
+        nxToolMainComponents.createConnectedToNxCloudPanel(
+            cipeTreeComponent,
+            cipeTreeToolbar,
+            cloudHeaderPanel
+        )
     private var notConnectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createNotConnectedToNxCloudPanel()
 

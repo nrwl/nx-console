@@ -6,7 +6,6 @@ import com.intellij.diff.requests.DiffRequest
 import com.intellij.diff.util.DiffUserDataKeys
 import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
-import com.intellij.ide.BrowserUtil
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.ide.ui.UISettingsListener
 import com.intellij.notification.NotificationGroupManager
@@ -47,6 +46,7 @@ import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
 import dev.nx.console.utils.jcef.getHexColor
 import java.awt.*
+import java.net.URI
 import javax.swing.*
 import javax.swing.UIManager
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +55,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import java.net.URI
 
 @Serializable
 data class NxCloudFixStyles(
@@ -86,7 +85,11 @@ data class NxCloudFixStyles(
     val secondaryForegroundColor: String,
 )
 
-class NxCloudFixFileImpl(name: String, private val project: Project, private val disposedCallback: (file: NxCloudFixFileImpl) -> Unit) : NxCloudFixFile(name) {
+class NxCloudFixFileImpl(
+    name: String,
+    private val project: Project,
+    private val disposedCallback: (file: NxCloudFixFileImpl) -> Unit
+) : NxCloudFixFile(name) {
 
     private val cs = NxCloudFixFileCoroutineHolder.getInstance(project).cs
     private var currentFixDetails: NxCloudFixDetails? = null
@@ -392,67 +395,78 @@ class NxCloudFixFileImpl(name: String, private val project: Project, private val
     private fun applyPatchLocally(suggestedFix: String) {
         val patchFile = LightVirtualFile("nx-cloud-fix", PatchFileType.INSTANCE, suggestedFix)
         ApplicationManager.getApplication().invokeLater {
-            val executor = object : ApplyPatchDefaultExecutor(project) {
-                override fun apply(
-                    remaining: MutableList<out FilePatch>,
-                    patchGroupsToApply: MultiMap<VirtualFile, AbstractFilePatchInProgress<*>>,
-                    localList: LocalChangeList?,
-                    fileName: String?,
-                    additionalInfo:
-                        ThrowableComputable<
-                            MutableMap<String, MutableMap<String, CharSequence>>,
-                            PatchSyntaxException
-                        >?
-                ) {
-                    try {
-                        logger<NxCloudFixFileImpl>().info("applying fix locally",)
-                        super.apply(
-                            remaining,
-                            patchGroupsToApply,
-                            localList,
-                            fileName,
-                            additionalInfo
-                        )
-                        logger<NxCloudFixFileImpl>().info("sending message to api",)
+            val executor =
+                object : ApplyPatchDefaultExecutor(project) {
+                    override fun apply(
+                        remaining: MutableList<out FilePatch>,
+                        patchGroupsToApply: MultiMap<VirtualFile, AbstractFilePatchInProgress<*>>,
+                        localList: LocalChangeList?,
+                        fileName: String?,
+                        additionalInfo:
+                            ThrowableComputable<
+                                MutableMap<String, MutableMap<String, CharSequence>>,
+                                PatchSyntaxException
+                            >?
+                    ) {
+                        try {
+                            logger<NxCloudFixFileImpl>()
+                                .info(
+                                    "applying fix locally",
+                                )
+                            super.apply(
+                                remaining,
+                                patchGroupsToApply,
+                                localList,
+                                fileName,
+                                additionalInfo
+                            )
+                            logger<NxCloudFixFileImpl>()
+                                .info(
+                                    "sending message to api",
+                                )
 
-                        val fixDetails = currentFixDetails ?: return
-                        val aiFixId =
-                            fixDetails.runGroup.aiFix?.aiFixId
-                                ?: run {
-                                    showErrorNotification("No AI fix ID found")
-                                    return
-                                }
-
-                        cs.launch {
-                            try {
-                                logger<NxCloudFixFileImpl>().info("actually doing send message to api",)
-
-                                val cloudApiService = NxCloudApiService.getInstance(project)
-                                val success =
-                                    cloudApiService.updateSuggestedFix(
-                                        aiFixId,
-                                        AITaskFixUserAction.APPLIED_LOCALLY
-                                    )
-
-                                if (success) {
-                                    showSuccessNotification("Nx Cloud applied locally")
-                                    // Refresh CIPE data
-                                    CIPEPollingService.getInstance(project).forcePoll()
-                                    // Close the AI fix editor
-                                    withContext(Dispatchers.EDT) {
-                                        FileEditorManager.getInstance(project)
-                                            .closeFile(this@NxCloudFixFileImpl)
+                            val fixDetails = currentFixDetails ?: return
+                            val aiFixId =
+                                fixDetails.runGroup.aiFix?.aiFixId
+                                    ?: run {
+                                        showErrorNotification("No AI fix ID found")
+                                        return
                                     }
+
+                            cs.launch {
+                                try {
+                                    logger<NxCloudFixFileImpl>()
+                                        .info(
+                                            "actually doing send message to api",
+                                        )
+
+                                    val cloudApiService = NxCloudApiService.getInstance(project)
+                                    val success =
+                                        cloudApiService.updateSuggestedFix(
+                                            aiFixId,
+                                            AITaskFixUserAction.APPLIED_LOCALLY
+                                        )
+
+                                    if (success) {
+                                        showSuccessNotification("Nx Cloud applied locally")
+                                        // Refresh CIPE data
+                                        CIPEPollingService.getInstance(project).forcePoll()
+                                        // Close the AI fix editor
+                                        withContext(Dispatchers.EDT) {
+                                            FileEditorManager.getInstance(project)
+                                                .closeFile(this@NxCloudFixFileImpl)
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    logger<NxCloudFixFileImpl>()
+                                        .error("Failed to apply AI fix locally", e)
                                 }
-                            } catch (e: Exception) {
-                                logger<NxCloudFixFileImpl>().error("Failed to apply AI fix locally", e)
                             }
+                        } catch (e: Throwable) {
+                            logger<NxCloudFixFileImpl>().error("Failed to apply AI fix locally", e)
                         }
-                    } catch (e: Throwable) {
-                        logger<NxCloudFixFileImpl>().error("Failed to apply AI fix locally", e)
                     }
                 }
-            }
             ApplyPatchDifferentiatedDialog(
                     project,
                     executor,
@@ -500,7 +514,7 @@ class NxCloudFixFileImpl(name: String, private val project: Project, private val
     }
 
     private fun handleOpenExternalLink(message: NxCloudFixMessage.OpenExternalLink) {
-            BrowserLauncher.instance.browse(URI.create(message.url))
+        BrowserLauncher.instance.browse(URI.create(message.url))
     }
 
     private fun showWithPreview() {

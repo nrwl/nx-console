@@ -172,7 +172,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
               class="bg-secondary text-secondaryForeground flex items-center gap-1.5 rounded-[18px] px-4 py-2 text-sm font-semibold"
             >
               <icon-element icon="git-branch"></icon-element>
-              ${this.editor === 'intellij' && this.onOpenExternalLink && cipe.commitUrl
+              ${this.editor === 'intellij' &&
+              this.onOpenExternalLink &&
+              cipe.commitUrl
                 ? html`<span
                     @click="${() => this.onOpenExternalLink!(cipe.commitUrl!)}"
                     class="cursor-pointer text-inherit no-underline hover:underline"
@@ -432,7 +434,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                 class="animate-spin-slow leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
-                Verifying Fix<span class="loading-dots inline-block w-6 text-left"></span>
+                Verifying Fix<span
+                  class="loading-dots inline-block w-6 text-left"
+                ></span>
               </h2>
             </div>
             <p class="text-foreground m-0 text-sm opacity-80">

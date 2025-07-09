@@ -85,11 +85,9 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 
     /** Force an immediate poll, useful for user-triggered refreshes */
-     fun forcePoll() {
+    fun forcePoll() {
         logger.debug("Force polling CIPE data")
-        cs.launch {
-        pollCIPEData()
-        }
+        cs.launch { pollCIPEData() }
     }
 
     /** Add a listener for CIPE data changes */
