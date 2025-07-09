@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.AITaskFixStatus
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfoErrorType
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Service responsible for polling CIPE data at dynamic intervals. Implements the same polling logic
  * as VSCode:
+ * - AI_FIX (3s): When AI fixes are being created/verified (highest priority)
  * - HOT (10s): When CIPEs are in progress
  * - COLD (180s): Normal polling
  * - SLEEP (3600s): When authentication errors occur
@@ -28,6 +30,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
         private const val SLEEP_POLLING_TIME_MS = 3_600_000L // 1 hour
         private const val COLD_POLLING_TIME_MS = 180_000L // 3 minutes
         private const val HOT_POLLING_TIME_MS = 10_000L // 10 seconds
+        private const val AI_FIX_POLLING_TIME_MS = 3_000L // 3 seconds
 
         fun getInstance(project: Project): CIPEPollingService =
             project.getService(CIPEPollingService::class.java)
@@ -38,14 +41,14 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     private var pollingJob: Job? = null
     private var currentPollingInterval = COLD_POLLING_TIME_MS
 
-    private val _latestCIPEData = MutableStateFlow<CIPEDataResponse?>(null)
-    val latestCIPEData: StateFlow<CIPEDataResponse?> = _latestCIPEData.asStateFlow()
+    private val _currentData = MutableStateFlow<CIPEDataResponse?>(null)
+    val currentData: StateFlow<CIPEDataResponse?> = _currentData.asStateFlow()
 
     private val _isPolling = MutableStateFlow(false)
     val isPolling: StateFlow<Boolean> = _isPolling.asStateFlow()
 
-    // Listeners for data updates
-    private val dataUpdateListeners = mutableListOf<(CIPEDataResponse) -> Unit>()
+    // Listeners for data changes
+    private val dataChangeListeners = mutableListOf<CIPEDataChangeListener>()
 
     /** Start polling for CIPE data */
     fun startPolling() {
@@ -54,7 +57,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
             return
         }
 
-        logger.info("Starting CIPE polling")
+        logger.info("Starting CIPE polling with initial interval: ${currentPollingInterval}ms")
         _isPolling.value = true
 
         pollingJob =
@@ -82,44 +85,46 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 
     /** Force an immediate poll, useful for user-triggered refreshes */
-    suspend fun forcePoll() {
+    fun forcePoll() {
         logger.debug("Force polling CIPE data")
-        pollCIPEData()
+        cs.launch { pollCIPEData() }
     }
 
-    /** Add a listener for CIPE data updates */
-    fun addDataUpdateListener(listener: (CIPEDataResponse) -> Unit) {
-        dataUpdateListeners.add(listener)
+    /** Add a listener for CIPE data changes */
+    fun addDataChangeListener(listener: CIPEDataChangeListener) {
+        dataChangeListeners.add(listener)
     }
 
-    /** Remove a data update listener */
-    fun removeDataUpdateListener(listener: (CIPEDataResponse) -> Unit) {
-        dataUpdateListeners.remove(listener)
+    /** Remove a data change listener */
+    fun removeDataChangeListener(listener: CIPEDataChangeListener) {
+        dataChangeListeners.remove(listener)
     }
 
     private suspend fun pollCIPEData() {
         try {
             val nxlsService = NxlsService.getInstance(project)
-            val cipeData = nxlsService.recentCIPEData()
+            val newData = nxlsService.recentCIPEData()
 
-            if (cipeData != null) {
-                _latestCIPEData.value = cipeData
-                updatePollingInterval(cipeData)
+            if (newData != null) {
+                val oldData = _currentData.value
+                _currentData.value = newData
+                updatePollingInterval(newData)
 
-                // Update data sync service
-                val dataSyncService = CIPEDataSyncService.getInstance(project)
-                dataSyncService.updateData(cipeData)
-
-                notifyListeners(cipeData)
+                // Emit data change event
+                if (oldData?.info != null || newData.info != null) {
+                    val event = CIPEDataChangedEvent(oldData, newData)
+                    notifyListeners(event)
+                }
             }
         } catch (e: Exception) {
-            logger.error("Failed to poll CIPE data", e)
+            logger.error("[CIPE_POLL] Failed to poll CIPE data: ${e.message}", e)
         }
     }
 
     /**
      * Update polling interval based on CIPE data state Following the same logic as VSCode:
      * - SLEEP if authentication error
+     * - AI_FIX if any AI fixes are being created/verified (takes precedence)
      * - HOT if any CIPE is in progress
      * - COLD otherwise
      */
@@ -131,14 +136,30 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                     logger.debug("Authentication error detected, switching to SLEEP polling")
                     SLEEP_POLLING_TIME_MS
                 }
+
+                // AI fixes in progress - ultra-fast polling
+                data.info?.any { cipe ->
+                    cipe.runGroups.any { rg ->
+                        rg.aiFix?.let { aiFix ->
+                            aiFix.verificationStatus == AITaskFixStatus.NOT_STARTED ||
+                                aiFix.verificationStatus == AITaskFixStatus.IN_PROGRESS
+                        }
+                            ?: false
+                    }
+                } == true -> {
+                    logger.debug("AI fixes in progress detected, switching to AI_FIX polling")
+                    AI_FIX_POLLING_TIME_MS
+                }
+
                 // Any CIPE in progress - speed up polling
                 data.info?.any { it.status == CIPEExecutionStatus.IN_PROGRESS } == true -> {
                     logger.debug("Active CIPEs detected, switching to HOT polling")
                     HOT_POLLING_TIME_MS
                 }
+
                 // Normal state
                 else -> {
-                    logger.debug("No active CIPEs, switching to COLD polling")
+                    logger.debug("No active CIPEs or AI fixes, switching to COLD polling")
                     COLD_POLLING_TIME_MS
                 }
             }
@@ -151,18 +172,26 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
         }
     }
 
-    private fun notifyListeners(data: CIPEDataResponse) {
-        dataUpdateListeners.forEach { listener ->
+    private fun notifyListeners(event: CIPEDataChangedEvent) {
+        dataChangeListeners.forEach { listener ->
             try {
-                listener(data)
+                listener.onDataChanged(event)
             } catch (e: Exception) {
-                logger.error("Error notifying CIPE data listener", e)
+                logger.error("[CIPE_POLL] Error notifying data change listener: ${e.message}", e)
             }
         }
     }
 
     override fun dispose() {
         stopPolling()
-        dataUpdateListeners.clear()
+        dataChangeListeners.clear()
     }
+}
+
+/** Event emitted when CIPE data changes */
+data class CIPEDataChangedEvent(val oldData: CIPEDataResponse?, val newData: CIPEDataResponse)
+
+/** Interface for listening to CIPE data changes */
+fun interface CIPEDataChangeListener {
+    fun onDataChanged(event: CIPEDataChangedEvent)
 }

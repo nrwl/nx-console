@@ -12,6 +12,8 @@ import org.cef.network.CefResponse
 
 const val urlSchemeV2 = "http://nxconsolev2"
 const val resourceFolderV2 = "generate_ui_v2"
+const val urlSchemeCloudFix = "http://nxcloudfix"
+const val resourceFolderCloudFix = "cloud_fix_webview"
 
 class CustomResourceHandler() : CefResourceHandler {
     private var state: ResourceHandlerState = ClosedConnection
@@ -21,8 +23,17 @@ class CustomResourceHandler() : CefResourceHandler {
         return if (url == null) {
             false
         } else {
-            val pathToResource = url.replace(urlSchemeV2, resourceFolderV2)
+            val pathToResource =
+                when {
+                    url.startsWith(urlSchemeV2) -> url.replace(urlSchemeV2, resourceFolderV2)
+                    url.startsWith(urlSchemeCloudFix) ->
+                        url.replace(urlSchemeCloudFix, resourceFolderCloudFix)
+                    else -> return false
+                }
             val newUrl = this.javaClass.classLoader.getResource(pathToResource)
+            if (newUrl == null) {
+                return false
+            }
             state = OpenedConnection(newUrl.openConnection())
             cefCallback.Continue()
             true

@@ -254,6 +254,22 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         }()
     }
 
+    suspend fun cloudAuthHeaders(): NxCloudAuthHeaders? {
+        return withMessageIssueCatch("nx/cloudAuthHeaders") {
+            val result = server()?.getNxService()?.cloudAuthHeaders()?.await()
+            result
+        }()
+    }
+
+    suspend fun downloadAndExtractArtifact(
+        artifactUrl: String
+    ): NxDownloadAndExtractArtifactResponse? {
+        return withMessageIssueCatch("nx/downloadAndExtractArtifact") {
+            val request = NxDownloadAndExtractArtifactRequest(artifactUrl = artifactUrl)
+            server()?.getNxService()?.downloadAndExtractArtifact(request)?.await()
+        }()
+    }
+
     private fun <T> withMessageIssueCatch(
         requestName: String,
         block: suspend () -> T,

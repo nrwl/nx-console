@@ -21,6 +21,7 @@ import {
   modifyMigrationsJsonMetadata,
   readMigrationsJsonMetadata,
 } from './utils';
+import { getGitApi } from '@nx-console/vscode-utils';
 
 export function registerCommands(
   context: ExtensionContext,
@@ -87,11 +88,7 @@ export async function confirmPackageChanges() {
 
         await commands.executeCommand('git.refresh');
 
-        const gitExtension =
-          extensions.getExtension<GitExtension>('vscode.git').exports;
-        const api = gitExtension.getAPI(1);
-
-        const repository = api.repositories[0];
+        const repository = getGitApi()?.repositories?.[0];
 
         const filesToAdd = repository.state.workingTreeChanges
           .map((change) => change.uri.fsPath)

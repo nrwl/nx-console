@@ -1,9 +1,16 @@
-import { commands, extensions, TextDocumentShowOptions, Uri } from 'vscode';
+import {
+  commands,
+  extensions,
+  TextDocumentShowOptions,
+  Uri,
+  window,
+} from 'vscode';
 import { GitExtension } from './git';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { join } from 'path';
 import { readMigrationsJsonMetadata } from '../commands/utils';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
+import { getGitApi, vscodeLogger } from '@nx-console/vscode-utils';
 
 export async function viewPackageJsonDiff() {
   await viewDiff('package.json', 'HEAD');
@@ -26,9 +33,15 @@ export async function viewDiff(path: string, fromRef?: string, toRef?: string) {
   if (!fromRef) {
     fromRef = readMigrationsJsonMetadata().initialGitRef.ref;
   }
-  const gitExtension =
-    extensions.getExtension<GitExtension>('vscode.git').exports;
-  const api = gitExtension.getAPI(1);
+
+  const api = getGitApi();
+
+  if (!api) {
+    window.showErrorMessage(
+      'Unable to utilize Git for this instance of VS Code',
+    );
+    return;
+  }
 
   const fullPath = join(getNxWorkspacePath(), path);
 
