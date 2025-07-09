@@ -257,7 +257,6 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     suspend fun cloudAuthHeaders(): NxCloudAuthHeaders? {
         return withMessageIssueCatch("nx/cloudAuthHeaders") {
             val result = server()?.getNxService()?.cloudAuthHeaders()?.await()
-            thisLogger().info("Raw cloudAuthHeaders response: $result")
             result
         }()
     }
