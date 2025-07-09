@@ -42,8 +42,6 @@ class CIPETreePersistenceManager(private val tree: Tree) {
         return null
     }
 
-    fun getExpandedPaths(): Set<List<String>> = expandedPaths.toSet()
-
     inner class CIPETreePersistenceVisitor : TreeVisitor {
         override fun visit(path: TreePath): TreeVisitor.Action {
             val node = getNodeFor(path) ?: return TreeVisitor.Action.INTERRUPT

@@ -424,33 +424,6 @@ class NxToolMainComponents(private val project: Project) {
         cipeTreeStructure.tree = tree
 
         tree.apply {
-            // Auto-expand failed pipelines
-            addTreeExpansionListener(
-                object : javax.swing.event.TreeExpansionListener {
-                    override fun treeExpanded(event: javax.swing.event.TreeExpansionEvent) {
-                        val path = event.path
-                        val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
-                        val userObject = lastNode?.userObject
-
-                        if (userObject != null && cipeTreeStructure.shouldAutoExpand(userObject)) {
-                            // Expand children that should be auto-expanded
-                            for (i in 0 until lastNode.childCount) {
-                                val child = lastNode.getChildAt(i) as? DefaultMutableTreeNode
-                                val childObject = child?.userObject
-                                if (
-                                    childObject != null &&
-                                        cipeTreeStructure.shouldAutoExpand(childObject)
-                                ) {
-                                    expandPath(path.pathByAddingChild(child))
-                                }
-                            }
-                        }
-                    }
-
-                    override fun treeCollapsed(event: javax.swing.event.TreeExpansionEvent) {}
-                }
-            )
-
             addMouseListener(
                 object : MouseAdapter() {
                     override fun mouseClicked(e: MouseEvent) {

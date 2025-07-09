@@ -160,7 +160,7 @@ class NxCloudFixFileImpl(
         }
     }
 
-    private fun updateDiffPreview(gitDiff: String?) {
+    fun updateDiffPreview(gitDiff: String?) {
         currentDiff = gitDiff
         cs.launch { updateDiff(gitDiff) }
 

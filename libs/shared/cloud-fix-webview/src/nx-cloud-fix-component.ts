@@ -311,7 +311,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div
           class="border-border bg-background relative m-0 border p-6 text-center"
         >
-          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+          <div
+            class="mx-auto mb-4 flex h-16 w-16 flex-col items-center justify-center"
+          >
             <icon-element
               icon="git-branch"
               class="text-success leading-none"
@@ -428,7 +430,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div
             class="border-border bg-background relative m-0 border p-6 text-center"
           >
-            <div class="mb-2 flex items-center justify-center gap-3">
+            <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="loading"
                 class="animate-spin-slow leading-none"
@@ -450,7 +452,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div
             class="border-border bg-background relative m-0 border p-6 text-center"
           >
-            <div class="mb-2 flex items-center justify-center gap-3">
+            <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="verified"
                 class="text-success leading-none"
@@ -497,7 +499,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       <div
         class="border-border bg-background relative m-0 border p-6 text-center"
       >
-        <div class="mb-2 flex items-center justify-center gap-3">
+        <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="circle-slash"
             class="text-foreground leading-none opacity-70"
@@ -518,7 +520,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       <div
         class="border-border bg-background relative m-0 border p-6 text-center"
       >
-        <div class="mb-2 flex items-center justify-center gap-3">
+        <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="info"
             class="text-primary leading-none"
@@ -540,7 +542,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       <div
         class="border-border bg-background relative m-0 border p-6 text-center"
       >
-        <div class="mb-2 flex items-center justify-center gap-3">
+        <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="error"
             class="text-error leading-none"

@@ -82,6 +82,9 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                 )
             currentFixDetails = updatedDetails
             fixFile.sendFixDetailsToWebview(updatedDetails)
+            if (runGroup.aiFix?.suggestedFix != null) {
+                fixFile.updateDiffPreview(runGroup.aiFix?.suggestedFix)
+            }
         }
     }
 

@@ -3,6 +3,8 @@ package dev.nx.console.nx_toolwindow.cloud_tree
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.JBColor
 import com.intellij.ui.SimpleTextAttributes
+import dev.nx.console.models.AITaskFixStatus
+import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.models.CIPEExecutionStatus
 import java.awt.Color
 import javax.swing.JTree
@@ -108,12 +110,9 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
     }
 }
 
-private fun dev.nx.console.models.AITaskFixUserAction.isApplied(): Boolean =
-    this == dev.nx.console.models.AITaskFixUserAction.APPLIED ||
-        this == dev.nx.console.models.AITaskFixUserAction.APPLIED_LOCALLY
+private fun AITaskFixUserAction.isApplied(): Boolean =
+    this == AITaskFixUserAction.APPLIED || this == AITaskFixUserAction.APPLIED_LOCALLY
 
-private fun dev.nx.console.models.AITaskFixUserAction.isRejected(): Boolean =
-    this == dev.nx.console.models.AITaskFixUserAction.REJECTED
+private fun AITaskFixUserAction.isRejected(): Boolean = this == AITaskFixUserAction.REJECTED
 
-private fun dev.nx.console.models.AITaskFixStatus.isFailed(): Boolean =
-    this == dev.nx.console.models.AITaskFixStatus.FAILED
+private fun AITaskFixStatus.isFailed(): Boolean = this == AITaskFixStatus.FAILED
