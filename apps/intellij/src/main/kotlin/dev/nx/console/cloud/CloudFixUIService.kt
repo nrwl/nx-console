@@ -35,6 +35,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
 
     private val logger = thisLogger()
 
+    private var currentFixId: String? = null
     private var currentFixFile: NxCloudFixFileImpl? = null
     private var currentFixDetails: NxCloudFixDetails? = null
 
@@ -94,23 +95,23 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
             "Opening cloud fix webview for CIPE: $cipeId, runGroup: $runGroupId"
         )
 
-        if (currentFixFile != null && currentFixDetails != null) {
-            val isSameFix = currentFixDetails?.cipe?.ciPipelineExecutionId == cipeId &&
-                           currentFixDetails?.runGroup?.runGroup == runGroupId
+        val fixId = cipeId + runGroupId
 
-            if (isSameFix) {
+        if (currentFixFile != null && currentFixDetails != null && currentFixId != null) {
+            if (fixId === currentFixId) {
                 ApplicationManager.getApplication().invokeLater {
                         val fileEditorManager = FileEditorManager.getInstance(project)
                         currentFixFile?.let { file ->
                             fileEditorManager.openFile(file, true)
                         }
                     }
-
                 return
             } else {
                 closeCurrentFixUI()
             }
         }
+
+        currentFixId = fixId
 
         cs.launch {
             val currentData = NxlsService.getInstance(project).recentCIPEData()

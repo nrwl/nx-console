@@ -432,7 +432,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                 class="animate-spin-slow leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
-                Verifying Fix<span class="loading-dots"></span>
+                Verifying Fix<span class="loading-dots inline-block w-6 text-left"></span>
               </h2>
             </div>
             <p class="text-foreground m-0 text-sm opacity-80">
