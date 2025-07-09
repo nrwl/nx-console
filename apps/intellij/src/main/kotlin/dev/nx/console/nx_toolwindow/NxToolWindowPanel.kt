@@ -51,9 +51,10 @@ class NxToolWindowPanel(private val project: Project) :
     private var mainContent: JComponent? = null
     private var errorCountAndComponent: Pair<Int, JComponent>? = null
     private val cipeTreeComponent = nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
+    private val cipeTreeToolbar = nxToolMainComponents.createRecentCipeToolbar(cipeTreeComponent)
     private val cloudHeaderPanel = nxToolMainComponents.createCloudHeaderPanel()
     private var connectedToNxCloudPanel: JPanel =
-        nxToolMainComponents.createConnectedToNxCloudPanel(cipeTreeComponent, cloudHeaderPanel)
+        nxToolMainComponents.createConnectedToNxCloudPanel(cipeTreeComponent,cipeTreeToolbar, cloudHeaderPanel)
     private var notConnectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createNotConnectedToNxCloudPanel()
 
@@ -63,8 +64,10 @@ class NxToolWindowPanel(private val project: Project) :
         cipeDataResponse?.info?.let {
             if (it.isEmpty()) {
                 cloudHeaderPanel.isVisible = true
+                cipeTreeToolbar.component.isVisible = false
             } else {
                 cipeTreeStructure.updateCIPEData(it)
+                cipeTreeToolbar.component.isVisible = true
                 cloudHeaderPanel.isVisible = false
             }
         }
@@ -256,9 +259,11 @@ class NxToolWindowPanel(private val project: Project) :
                                         ?: emptyList()
                                 if (cipeInfoList.isEmpty()) {
                                     cloudHeaderPanel.isVisible = true
+                                    cipeTreeToolbar.component.isVisible = false
                                 } else {
                                     cipeTreeStructure.updateCIPEData(cipeInfoList)
                                     cloudHeaderPanel.isVisible = false
+                                    cipeTreeToolbar.component.isVisible = true
                                 }
                             }
                         }

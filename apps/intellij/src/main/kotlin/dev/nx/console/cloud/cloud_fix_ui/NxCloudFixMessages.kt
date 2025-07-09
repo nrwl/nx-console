@@ -14,6 +14,8 @@ sealed class NxCloudFixMessage {
     @Serializable @SerialName("reject") data object Reject : NxCloudFixMessage()
 
     @Serializable @SerialName("show-diff") data object ShowDiff : NxCloudFixMessage()
+
+    @Serializable @SerialName("open-external-link") data class OpenExternalLink(val url: String) : NxCloudFixMessage()
 }
 
 @Serializable

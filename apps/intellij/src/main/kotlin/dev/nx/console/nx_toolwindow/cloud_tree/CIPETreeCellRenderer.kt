@@ -74,7 +74,7 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
                     userObject.aiFix.userAction ?: dev.nx.console.models.AITaskFixUserAction.NONE
                 val verificationStatus =
                     userObject.aiFix.verificationStatus
-                        ?: dev.nx.console.models.AITaskFixVerificationStatus.NOT_STARTED
+                        ?: dev.nx.console.models.AITaskFixStatus.NOT_STARTED
                 val textAttributes =
                     when {
                         userAction.isApplied() -> SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES
@@ -115,5 +115,5 @@ private fun dev.nx.console.models.AITaskFixUserAction.isApplied(): Boolean =
 private fun dev.nx.console.models.AITaskFixUserAction.isRejected(): Boolean =
     this == dev.nx.console.models.AITaskFixUserAction.REJECTED
 
-private fun dev.nx.console.models.AITaskFixVerificationStatus.isFailed(): Boolean =
-    this == dev.nx.console.models.AITaskFixVerificationStatus.FAILED
+private fun dev.nx.console.models.AITaskFixStatus.isFailed(): Boolean =
+    this == dev.nx.console.models.AITaskFixStatus.FAILED

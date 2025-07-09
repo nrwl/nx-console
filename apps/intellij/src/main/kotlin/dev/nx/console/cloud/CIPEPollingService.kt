@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import dev.nx.console.models.AITaskFixVerificationStatus
+import dev.nx.console.models.AITaskFixStatus
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfoErrorType
@@ -85,9 +85,11 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     }
 
     /** Force an immediate poll, useful for user-triggered refreshes */
-    suspend fun forcePoll() {
+     fun forcePoll() {
         logger.debug("Force polling CIPE data")
+        cs.launch {
         pollCIPEData()
+        }
     }
 
     /** Add a listener for CIPE data changes */
@@ -141,8 +143,8 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                 data.info?.any { cipe ->
                     cipe.runGroups.any { rg ->
                         rg.aiFix?.let { aiFix ->
-                            aiFix.verificationStatus == AITaskFixVerificationStatus.NOT_STARTED ||
-                                aiFix.verificationStatus == AITaskFixVerificationStatus.IN_PROGRESS
+                            aiFix.verificationStatus == AITaskFixStatus.NOT_STARTED ||
+                                aiFix.verificationStatus == AITaskFixStatus.IN_PROGRESS
                         }
                             ?: false
                     }

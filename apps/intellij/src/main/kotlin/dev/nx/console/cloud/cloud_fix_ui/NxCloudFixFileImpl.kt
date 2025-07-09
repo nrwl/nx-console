@@ -6,6 +6,8 @@ import com.intellij.diff.requests.DiffRequest
 import com.intellij.diff.util.DiffUserDataKeys
 import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
+import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.ide.ui.UISettingsListener
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
@@ -14,7 +16,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.diff.impl.patch.FilePatch
 import com.intellij.openapi.diff.impl.patch.PatchReader
 import com.intellij.openapi.diff.impl.patch.PatchSyntaxException
 import com.intellij.openapi.diff.impl.patch.TextFilePatch
@@ -22,25 +24,23 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.vcs.changes.patch.ApplyPatchDefaultExecutor
-import com.intellij.openapi.vcs.changes.patch.ApplyPatchDifferentiatedDialog
-import com.intellij.openapi.vcs.changes.patch.ApplyPatchMode
-import com.intellij.openapi.vcs.changes.patch.PatchFileType
+import com.intellij.openapi.util.ThrowableComputable
+import com.intellij.openapi.vcs.changes.LocalChangeList
+import com.intellij.openapi.vcs.changes.patch.*
 import com.intellij.openapi.vcs.changes.patch.tool.PatchDiffRequest
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.JBColor
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.jcef.*
+import com.intellij.util.containers.MultiMap
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.cloud.NxCloudApiService
-import dev.nx.console.models.CIPEDataResponse
-import dev.nx.console.nxls.NxWorkspaceRefreshListener
-import dev.nx.console.nxls.NxlsService
-import dev.nx.console.project_details.browsers.Events
+import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import ru.nsk.kstatemachine.statemachine.processEventByLaunch
+import java.net.URI
 
 @Serializable
 data class NxCloudFixStyles(
@@ -86,14 +86,15 @@ data class NxCloudFixStyles(
     val secondaryForegroundColor: String,
 )
 
-class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFixFile(name) {
+class NxCloudFixFileImpl(name: String, private val project: Project, private val disposedCallback: (file: NxCloudFixFileImpl) -> Unit) : NxCloudFixFile(name) {
 
     private val cs = NxCloudFixFileCoroutineHolder.getInstance(project).cs
     private var currentFixDetails: NxCloudFixDetails? = null
     private var messageBusConnection: MessageBusConnection? = null
 
     private val mainPanel = JPanel(BorderLayout())
-    private val splitter = JBSplitter(false, 0.6f) // 60% webview, 40% diff
+    private val splitter =
+        JBSplitter(false, "NX_CONSOLE.CLOUD_FIX_SPLITTER", 0.6f) // 60% webview, 40% diff
     private val diffContainer = JPanel(BorderLayout())
     private var diffProcessor: CacheDiffRequestChainProcessor? = null
     private var isShowingPreview = false
@@ -118,51 +119,10 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
 
         registerThemeChangeListener()
 
-        val listener = { cipeDataResponse: CIPEDataResponse ->
-            if (currentFixDetails != null) {
-                val cipe =
-                    cipeDataResponse.info?.find {
-                        it.ciPipelineExecutionId == currentFixDetails?.cipe?.ciPipelineExecutionId
-                    }
-                val runGroup =
-                    cipe?.runGroups?.find { it.runGroup == currentFixDetails?.runGroup?.runGroup }
-                if (cipe != null && runGroup != null) {
-                    currentFixDetails =
-                        NxCloudFixDetails(
-                            cipe = cipe,
-                            runGroup = runGroup,
-                            terminalOutput = currentFixDetails?.terminalOutput,
-                            hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
-                        )
-                    currentFixDetails?.let { this.sendFixDetailsToWebview(it) }
-                }
-            }
-        }
-
-        val pollingService = CIPEPollingService.getInstance(project)
-
-        // Subscribe to polling service data changes
-        cs.launch {
-            pollingService.currentData.collect { cipeData -> cipeData?.let { listener(it) } }
-        }
-
-        with(project.messageBus.connect(cs)) {
-            subscribe(
-                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener {
-                    if (project.isDisposed) {
-                        return@NxWorkspaceRefreshListener
-                    }
-                    updateUncommittedChangesFlag()
-                },
-            )}
-
-
-
         val disposable = Disposable {
-            // StateFlow collection is cancelled when coroutine scope is cancelled
             messageBusConnection?.disconnect()
             messageBusConnection = null
+            disposedCallback(this)
         }
 
         Disposer.register(browser, disposable)
@@ -316,19 +276,24 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 is NxCloudFixMessage.ApplyLocally -> handleApplyLocally()
                 is NxCloudFixMessage.Reject -> handleReject()
                 is NxCloudFixMessage.ShowDiff -> handleShowDiff()
+                is NxCloudFixMessage.OpenExternalLink -> handleOpenExternalLink(parsed)
             }
         } catch (e: Exception) {
             logger.error("Failed to parse message from webview", e)
         }
     }
 
-    private fun sendFixDetailsToWebview(details: NxCloudFixDetails) {
+    fun sendFixDetailsToWebview(details: NxCloudFixDetails) {
+        if (browser.isDisposed) {
+            return
+        }
+
         logger<NxCloudFixFileImpl>().info("Sending fix details to webview")
 
         val hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
         val updatedDetails = details.copy(hasUncommittedChanges = hasUncommittedChanges)
 
-        val mockDetails = json.encodeToString(details)
+        val mockDetails = json.encodeToString(updatedDetails)
 
         this.currentFixDetails = updatedDetails
         val js =
@@ -339,11 +304,19 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
             })
         """
 
-        cs.launch { browser.executeJavascriptWithCatch(js) }
+        cs.launch {
+            if (!browser.isDisposed) {
+                browser.executeJavascriptWithCatch(js)
+            }
+        }
     }
 
-    private fun updateUncommittedChangesFlag() {
-        currentFixDetails?.let { details ->
+    fun updateUncommittedChangesFlag() {
+        if (browser.isDisposed) {
+            return
+        }
+        val details = currentFixDetails
+        if (details != null) {
             val updatedDetails =
                 details.copy(hasUncommittedChanges = GitUtils.hasUncommittedChanges(project))
             currentFixDetails = updatedDetails
@@ -368,7 +341,8 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
                 val cloudApiService = NxCloudApiService.getInstance(project)
                 logger<NxCloudFixFileImpl>()
                     .info("Got cloud API service, calling updateSuggestedFix")
-                val success = cloudApiService.updateSuggestedFix(aiFixId, "APPLIED")
+                val success =
+                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.APPLIED)
 
                 if (success) {
                     showSuccessNotification("Nx Cloud fix applied successfully")
@@ -418,11 +392,71 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
     private fun applyPatchLocally(suggestedFix: String) {
         val patchFile = LightVirtualFile("nx-cloud-fix", PatchFileType.INSTANCE, suggestedFix)
         ApplicationManager.getApplication().invokeLater {
+            object : ApplyPatchDefaultExecutor(project) {
+                override fun apply(
+                    remaining: MutableList<out FilePatch>,
+                    patchGroupsToApply: MultiMap<VirtualFile, AbstractFilePatchInProgress<*>>,
+                    localList: LocalChangeList?,
+                    fileName: String?,
+                    additionalInfo:
+                        ThrowableComputable<
+                            MutableMap<String, MutableMap<String, CharSequence>>,
+                            PatchSyntaxException
+                        >?
+                ) {
+                    try {
+                        super.apply(
+                            remaining,
+                            patchGroupsToApply,
+                            localList,
+                            fileName,
+                            additionalInfo
+                        )
+                    } catch (e: Throwable) {
+                        logger<NxCloudFixFileImpl>().error("Failed to apply AI fix locally", e)
+                    } finally {
+                        val fixDetails = currentFixDetails ?: return
+                        val aiFixId =
+                            fixDetails.runGroup.aiFix?.aiFixId
+                                ?: run {
+                                    showErrorNotification("No AI fix ID found")
+                                    return
+                                }
+
+                        cs.launch {
+                            try {
+                                val cloudApiService = NxCloudApiService.getInstance(project)
+                                val success =
+                                    cloudApiService.updateSuggestedFix(
+                                        aiFixId,
+                                        AITaskFixUserAction.REJECTED
+                                    )
+
+                                if (success) {
+                                    showSuccessNotification("Nx Cloud fix ignored")
+                                    // Refresh CIPE data
+                                    CIPEPollingService.getInstance(project).forcePoll()
+                                    // Close the AI fix editor
+                                    withContext(Dispatchers.EDT) {
+                                        FileEditorManager.getInstance(project)
+                                            .closeFile(this@NxCloudFixFileImpl)
+                                    }
+                                } else {
+                                    showErrorNotification("Failed to reject AI fix")
+                                }
+                            } catch (e: Exception) {
+                                logger<NxCloudFixFileImpl>().error("Failed to reject AI fix", e)
+                                showErrorNotification("Failed to reject AI fix: ${e.message}")
+                            }
+                        }
+                    }
+                }
+            }
             val executor = ApplyPatchDefaultExecutor(project)
             ApplyPatchDifferentiatedDialog(
                     project,
                     executor,
-                    listOf(executor),
+                    listOf(),
                     ApplyPatchMode.APPLY,
                     patchFile
                 )
@@ -444,28 +478,29 @@ class NxCloudFixFileImpl(name: String, private val project: Project) : NxCloudFi
         cs.launch {
             try {
                 val cloudApiService = NxCloudApiService.getInstance(project)
-                val success = cloudApiService.updateSuggestedFix(aiFixId, "REJECTED")
+                val success =
+                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.APPLIED_LOCALLY)
 
                 if (success) {
-                    showSuccessNotification("Nx Cloud fix ignored")
-                    // Refresh CIPE data
                     CIPEPollingService.getInstance(project).forcePoll()
-                    // Close the AI fix editor
                     withContext(Dispatchers.EDT) {
                         FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
                     }
                 } else {
-                    showErrorNotification("Failed to reject AI fix")
+                    logger<NxCloudFixFileImpl>().error("Failed to reject AI fix")
                 }
             } catch (e: Exception) {
                 logger<NxCloudFixFileImpl>().error("Failed to reject AI fix", e)
-                showErrorNotification("Failed to reject AI fix: ${e.message}")
             }
         }
     }
 
     private fun handleShowDiff() {
         togglePreview()
+    }
+
+    private fun handleOpenExternalLink(message: NxCloudFixMessage.OpenExternalLink) {
+            BrowserLauncher.instance.browse(URI.create(message.url))
     }
 
     private fun showWithPreview() {

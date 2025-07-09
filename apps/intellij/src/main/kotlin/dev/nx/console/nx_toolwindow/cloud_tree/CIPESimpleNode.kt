@@ -127,9 +127,8 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 
         override fun getName(): String {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
-            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            val verificationStatus =
-                aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixStatus.NOT_STARTED
+            val verificationStatus = aiFix.verificationStatus ?: AITaskFixStatus.NOT_STARTED
             val hasSuggestedFix = aiFix.suggestedFix != null
 
             // User action takes precedence
@@ -146,32 +145,29 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             // If a fix exists, check verification status
             if (hasSuggestedFix) {
                 return when (verificationStatus) {
-                    AITaskFixVerificationStatus.NOT_STARTED -> "Nx Cloud AI fix ready to verify"
-                    AITaskFixVerificationStatus.IN_PROGRESS -> "Nx Cloud is verifying the AI fix"
-                    AITaskFixVerificationStatus.COMPLETED -> "Nx Cloud AI verified a fix"
-                    AITaskFixVerificationStatus.FAILED -> "Failed Nx Cloud AI fix verification"
+                    AITaskFixStatus.NOT_STARTED -> "Nx Cloud AI fix ready to verify"
+                    AITaskFixStatus.IN_PROGRESS -> "Nx Cloud is verifying the AI fix"
+                    AITaskFixStatus.COMPLETED -> "Nx Cloud AI verified a fix"
+                    AITaskFixStatus.FAILED -> "Failed Nx Cloud AI fix verification"
                     else -> "Nx Cloud AI fix ready to verify"
                 }
             }
 
             // No fix exists yet, check generation status
             return when (fixStatus) {
-                AITaskFixVerificationStatus.NOT_STARTED ->
-                    "Nx Cloud AI is preparing to generate a fix"
-                AITaskFixVerificationStatus.IN_PROGRESS -> "Nx Cloud AI is creating a fix"
-                AITaskFixVerificationStatus.NOT_EXECUTABLE ->
-                    "Nx Cloud AI is not able to generate a fix"
-                AITaskFixVerificationStatus.COMPLETED -> "Nx Cloud AI has generated a fix"
-                AITaskFixVerificationStatus.FAILED -> "Failed Nx Cloud AI fix generation"
+                AITaskFixStatus.NOT_STARTED -> "Nx Cloud AI is preparing to generate a fix"
+                AITaskFixStatus.IN_PROGRESS -> "Nx Cloud AI is creating a fix"
+                AITaskFixStatus.NOT_EXECUTABLE -> "Nx Cloud AI is not able to generate a fix"
+                AITaskFixStatus.COMPLETED -> "Nx Cloud AI has generated a fix"
+                AITaskFixStatus.FAILED -> "Failed Nx Cloud AI fix generation"
                 else -> "Nx Cloud AI is preparing to generate a fix"
             }
         }
 
         private fun getFixIcon(): Icon {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
-            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixVerificationStatus.NOT_STARTED
-            val verificationStatus =
-                aiFix.verificationStatus ?: AITaskFixVerificationStatus.NOT_STARTED
+            val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixStatus.NOT_STARTED
+            val verificationStatus = aiFix.verificationStatus ?: AITaskFixStatus.NOT_STARTED
             val hasSuggestedFix = aiFix.suggestedFix != null
 
             // User action takes precedence
@@ -188,13 +184,11 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             // If a fix exists, check verification status
             if (hasSuggestedFix) {
                 return when (verificationStatus) {
-                    AITaskFixVerificationStatus.NOT_STARTED ->
+                    AITaskFixStatus.NOT_STARTED ->
                         AllIcons.General.BalloonInformation // Info blue wrench
-                    AITaskFixVerificationStatus.IN_PROGRESS ->
-                        AnimatedIcon.Default() // Loading spinner
-                    AITaskFixVerificationStatus.COMPLETED ->
-                        AllIcons.Actions.Commit // Green verified badge
-                    AITaskFixVerificationStatus.FAILED ->
+                    AITaskFixStatus.IN_PROGRESS -> AnimatedIcon.Default() // Loading spinner
+                    AITaskFixStatus.COMPLETED -> AllIcons.Actions.Commit // Green verified badge
+                    AITaskFixStatus.FAILED ->
                         AllIcons.General.BalloonWarning // Yellow/orange warning
                     else -> AllIcons.General.BalloonInformation
                 }
@@ -202,13 +196,11 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 
             // No fix exists yet, check generation status
             return when (fixStatus) {
-                AITaskFixVerificationStatus.NOT_STARTED -> AllIcons.General.Information // Info
-                AITaskFixVerificationStatus.IN_PROGRESS -> AnimatedIcon.Default() // Loading spinner
-                AITaskFixVerificationStatus.NOT_EXECUTABLE ->
-                    AllIcons.Actions.Cancel // Circle slash
-                AITaskFixVerificationStatus.COMPLETED ->
-                    AllIcons.Actions.Checked // Green check mark
-                AITaskFixVerificationStatus.FAILED -> AllIcons.General.Error // Red error
+                AITaskFixStatus.NOT_STARTED -> AllIcons.General.Information // Info
+                AITaskFixStatus.IN_PROGRESS -> AnimatedIcon.Default() // Loading spinner
+                AITaskFixStatus.NOT_EXECUTABLE -> AllIcons.Actions.Cancel // Circle slash
+                AITaskFixStatus.COMPLETED -> AllIcons.Actions.Checked // Green check mark
+                AITaskFixStatus.FAILED -> AllIcons.General.Error // Red error
                 else -> AllIcons.General.Information
             }
         }

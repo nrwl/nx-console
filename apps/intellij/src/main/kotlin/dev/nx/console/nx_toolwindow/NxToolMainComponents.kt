@@ -22,7 +22,7 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
 import dev.nx.console.cloud.CIPEPollingService
-import dev.nx.console.cloud.CloudFixService
+import dev.nx.console.cloud.CloudFixUIService
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPESimpleNode
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreePersistenceManager
@@ -327,85 +327,13 @@ class NxToolMainComponents(private val project: Project) {
         }
     }
 
-    fun createConnectedToNxCloudPanel(cipeTreeComponent: JComponent, headerPanel: JPanel): JPanel {
+    fun createConnectedToNxCloudPanel(cipeTreeComponent: JComponent, cipeTreeToolbar: ActionToolbar, headerPanel: JPanel): JPanel {
         return JPanel().apply {
             layout = BorderLayout()
             border = BorderFactory.createMatteBorder(1, 0, 0, 0, JBColor.border())
 
-            val actionGroup =
-                DefaultActionGroup().apply {
-                    add(
-                        object : ToolbarLabelAction() {
-                            override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-                            override fun update(e: AnActionEvent) {
-                                super.update(e)
-                                e.presentation.text = "Recent CI Pipeline Executions"
-                            }
-                        }
-                    )
-
-                    addSeparator()
-
-                    add(
-                        object :
-                            AnAction(
-                                "Refresh",
-                                "Refresh CI Pipeline Executions",
-                                AllIcons.Actions.Refresh
-                            ) {
-                            override fun getActionUpdateThread() = ActionUpdateThread.BGT
-
-                            override fun actionPerformed(e: AnActionEvent) {
-                                TelemetryService.getInstance(project)
-                                    .featureUsed(TelemetryEvent.MISC_REFRESH_WORKSPACE)
-                                // Trigger CIPE data refresh
-                                ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-                                    CIPEPollingService.getInstance(project).forcePoll()
-                                }
-                            }
-                        }
-                    )
-
-                    add(
-                        object :
-                            AnAction(
-                                "Open Nx Cloud App",
-                                "Open Nx Cloud in browser",
-                                AllIcons.ToolbarDecorator.Export
-                            ) {
-                            override fun getActionUpdateThread() = ActionUpdateThread.BGT
-
-                            override fun actionPerformed(e: AnActionEvent) {
-                                TelemetryService.getInstance(project)
-                                    .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                                ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-                                    NxlsService.getInstance(project).cloudStatus()?.nxCloudUrl.let {
-                                        if (it != null) {
-                                            BrowserLauncher.instance.browse(URI.create(it))
-                                        } else {
-                                            Notifier.notifyAnything(
-                                                project,
-                                                "Couldn't retrieve Nx Cloud URL",
-                                                NotificationType.ERROR
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    )
-                }
-
-            val toolbar =
-                ActionManager.getInstance()
-                    .createActionToolbar("NxCloudCIPEToolbar", actionGroup, true)
-                    .apply {
-                        targetComponent = cipeTreeComponent
-                        layoutStrategy = ToolbarLayoutStrategy.AUTOLAYOUT_STRATEGY
-                    }
-
-            add(toolbar.component, BorderLayout.NORTH)
+            add(cipeTreeToolbar.component, BorderLayout.NORTH)
 
             // Create a panel to hold both the headerPanel and the tree
             val contentPanel =
@@ -416,6 +344,66 @@ class NxToolMainComponents(private val project: Project) {
 
             add(contentPanel, BorderLayout.CENTER)
         }
+    }
+
+    fun createRecentCipeToolbar(cipeTreeComponent: JComponent): ActionToolbar {
+        val actionGroup =
+            DefaultActionGroup().apply {
+                add(
+                    object : ToolbarLabelAction() {
+                        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                        override fun update(e: AnActionEvent) {
+                            super.update(e)
+                            e.presentation.text = "Recent CI Pipeline Executions"
+                        }
+                    }
+                )
+
+                addSeparator()
+
+                add(
+                    object :
+                        AnAction(
+                            "Refresh",
+                            "Refresh CI Pipeline Executions",
+                            AllIcons.Actions.Refresh
+                        ) {
+                        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                        override fun actionPerformed(e: AnActionEvent) {
+                            refreshCipeTree()
+
+                        }
+                    }
+                )
+
+                add(
+                    object :
+                        AnAction(
+                            "Open Nx Cloud App",
+                            "Open Nx Cloud in browser",
+                            AllIcons.ToolbarDecorator.Export
+                        ) {
+                        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                        override fun actionPerformed(e: AnActionEvent) {
+                            openNxCloud()
+                        }
+                    }
+                )
+            }
+
+        val toolbar =
+            ActionManager.getInstance()
+                .createActionToolbar("NxCloudCIPEToolbar", actionGroup, true)
+                .apply {
+                    targetComponent = cipeTreeComponent
+                    layoutStrategy = ToolbarLayoutStrategy.AUTOLAYOUT_STRATEGY
+                }
+
+        return toolbar
+
     }
 
     fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
@@ -507,6 +495,20 @@ class NxToolMainComponents(private val project: Project) {
             add(Box.createHorizontalGlue())
             add(
                 JButton().apply {
+                    icon = AllIcons.Actions.Refresh
+                    toolTipText = "Refresh Nx Cloud View"
+
+                    isContentAreaFilled = false
+                    isBorderPainted = false
+                    isFocusPainted = false
+                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                    addActionListener {
+                        refreshCipeTree()
+                    }
+                }
+            )
+            add(
+                JButton().apply {
                     icon = AllIcons.ToolbarDecorator.Export
                     toolTipText = "Open Nx Cloud"
 
@@ -515,21 +517,7 @@ class NxToolMainComponents(private val project: Project) {
                     isFocusPainted = false
                     cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
                     addActionListener {
-                        TelemetryService.getInstance(project)
-                            .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
-                        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-                            NxlsService.getInstance(project).cloudStatus()?.nxCloudUrl.let {
-                                if (it != null) {
-                                    BrowserLauncher.instance.browse(URI.create(it))
-                                } else {
-                                    Notifier.notifyAnything(
-                                        project,
-                                        "Couldn't retrieve Nx Cloud URL",
-                                        NotificationType.ERROR
-                                    )
-                                }
-                            }
-                        }
+                        openNxCloud()
                     }
                 }
             )
@@ -674,7 +662,31 @@ class NxToolMainComponents(private val project: Project) {
         }
 
         if (cipeId != null && runGroupName != null) {
-            CloudFixService.getInstance(project).openCloudFixWebview(cipeId, runGroupName)
+            CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupName)
         }
+    }
+
+    private fun openNxCloud() {
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_OPEN_APP)
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            NxlsService.getInstance(project).cloudStatus()?.nxCloudUrl.let {
+                if (it != null) {
+                    BrowserLauncher.instance.browse(URI.create(it))
+                } else {
+                    Notifier.notifyAnything(
+                        project,
+                        "Couldn't retrieve Nx Cloud URL",
+                        NotificationType.ERROR
+                    )
+                }
+            }
+        }
+    }
+
+    private fun refreshCipeTree() {
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_REFRESH_VIEW)
+        CIPEPollingService.getInstance(project).forcePoll()
     }
 }

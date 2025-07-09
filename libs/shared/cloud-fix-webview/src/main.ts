@@ -27,6 +27,7 @@ export class Root extends LitElement {
         .onApplyLocally=${() => this.handleApplyLocally()}
         .onReject=${() => this.handleReject()}
         .onShowDiff=${() => this.handleShowDiff()}
+        .onOpenExternalLink=${(url: string) => this.handleOpenExternalLink(url)}
       ></nx-cloud-fix-component>
     `;
   }
@@ -45,5 +46,9 @@ export class Root extends LitElement {
 
   private handleShowDiff() {
     this.icc.postMessageToIde({ type: 'show-diff' });
+  }
+
+  private handleOpenExternalLink(url: string) {
+    this.icc.postMessageToIde({ type: 'open-external-link', url });
   }
 }

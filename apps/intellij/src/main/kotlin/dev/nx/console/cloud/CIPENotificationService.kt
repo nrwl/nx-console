@@ -200,7 +200,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             telemetryService.featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS)
 
-            CloudFixService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
+            CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
 
             notification.expire()
         }
@@ -217,7 +217,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             )
 
             // Open the cloud fix webview
-            CloudFixService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
+            CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
 
             notification.expire()
         }

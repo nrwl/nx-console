@@ -2,7 +2,6 @@ package dev.nx.console.cloud
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.nx.console.models.*
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class CIPENotificationProcessorTest : BasePlatformTestCase() {
@@ -240,7 +239,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
                                     suggestedFix = "git diff content...",
                                     suggestedFixDescription = "Fix test",
-                                    verificationStatus = AITaskFixVerificationStatus.COMPLETED,
+                                    verificationStatus = AITaskFixStatus.COMPLETED,
                                     userAction = AITaskFixUserAction.NONE
                                 )
                         ),
@@ -423,7 +422,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
                                 suggestedFix = "git diff content here...",
                                 suggestedFixDescription = "Fix the failing test",
-                                verificationStatus = AITaskFixVerificationStatus.COMPLETED,
+                                verificationStatus = AITaskFixStatus.COMPLETED,
                                 userAction = AITaskFixUserAction.NONE
                             )
                     )
@@ -464,7 +463,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
                                 suggestedFix = "git diff content here...",
                                 suggestedFixDescription = "Fix the failing test",
-                                verificationStatus = AITaskFixVerificationStatus.COMPLETED,
+                                verificationStatus = AITaskFixStatus.COMPLETED,
                                 userAction = AITaskFixUserAction.NONE
                             )
                     )
@@ -505,7 +504,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
                                 suggestedFix = null,
                                 suggestedFixDescription = null,
-                                verificationStatus = AITaskFixVerificationStatus.IN_PROGRESS,
+                                verificationStatus = AITaskFixStatus.IN_PROGRESS,
                                 userAction = AITaskFixUserAction.NONE
                             )
                     )

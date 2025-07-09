@@ -16,7 +16,8 @@ object GitUtils {
     fun getGitRepository(project: Project): GitRepository? {
         val repositoryManager = GitRepositoryManager.getInstance(project)
         val basePath = project.basePath ?: return null
-        val virtualFile = VirtualFileManager.getInstance().findFileByNioPath(File(basePath).toPath())
+        val virtualFile =
+            VirtualFileManager.getInstance().findFileByNioPath(File(basePath).toPath())
         return repositoryManager.getRepositoryForRootQuick(virtualFile)
     }
 
@@ -43,7 +44,8 @@ object GitUtils {
         // Check for untracked files
         val vcsIgnoreManager = VcsIgnoreManager.getInstance(project)
         val untrackedFiles = changeListManager.unversionedFilesPaths
-        val hasUntrackedFiles = untrackedFiles.any { file -> !vcsIgnoreManager.isPotentiallyIgnoredFile(file) }
+        val hasUntrackedFiles =
+            untrackedFiles.any { file -> !vcsIgnoreManager.isPotentiallyIgnoredFile(file) }
 
         return hasTrackedChanges || hasUntrackedFiles
     }
@@ -96,15 +98,11 @@ object GitUtils {
     }
 
     /** Register a listener for Git state changes */
-    fun registerGitChangeListener(
-        project: Project,
-        listener: () -> Unit
-    ) {
+    fun registerGitChangeListener(project: Project, listener: () -> Unit) {
         ChangeListManager.getInstance(project).invokeAfterUpdate(true) {
             thisLogger().info("ChangeListManager Update triggered")
             listener()
         }
-
     }
 }
 

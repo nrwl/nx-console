@@ -11,7 +11,8 @@ export type NxCloudFixOutputMessage =
   | { type: 'apply-locally' }
   | { type: 'reject' }
   | { type: 'show-diff' }
-  | { type: 'output-init' };
+  | { type: 'output-init' }
+  | { type: 'open-external-link'; url: string };
 
 // Styles for IntelliJ theming
 export interface NxCloudFixStyles {

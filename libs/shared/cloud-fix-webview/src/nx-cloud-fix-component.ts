@@ -51,6 +51,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   @property({ type: Function })
   onShowDiff: (() => void) | undefined;
 
+  @property({ type: Function })
+  onOpenExternalLink: ((url: string) => void) | undefined;
+
   @state()
   private isTerminalExpanded = true;
 
@@ -148,26 +151,41 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                 ></path>
               </svg>
               Nx Cloud AI Fix
-              <a
-                class="text-primary cursor-pointer hover:opacity-80"
-                target="_blank"
-                href="${cipe.cipeUrl}"
-                title="View CI Pipeline Execution"
-              >
-                <icon-element icon="link-external"></icon-element>
-              </a>
+              ${this.editor === 'intellij' && this.onOpenExternalLink
+                ? html`<span
+                    class="text-primary cursor-pointer hover:opacity-80"
+                    @click="${() => this.onOpenExternalLink!(cipe.cipeUrl)}"
+                    title="View CI Pipeline Execution"
+                  >
+                    <icon-element icon="link-external"></icon-element>
+                  </span>`
+                : html`<a
+                    class="text-primary cursor-pointer hover:opacity-80"
+                    target="_blank"
+                    href="${cipe.cipeUrl}"
+                    title="View CI Pipeline Execution"
+                  >
+                    <icon-element icon="link-external"></icon-element>
+                  </a>`}
             </h1>
             <div
               class="bg-secondary text-secondaryForeground flex items-center gap-1.5 rounded-[18px] px-4 py-2 text-sm font-semibold"
             >
               <icon-element icon="git-branch"></icon-element>
-              <a
-                href="${cipe.commitUrl}"
-                target="_blank"
-                class="text-inherit cursor-pointer no-underline hover:underline"
-              >
-                ${cipe.branch}
-              </a>
+              ${this.editor === 'intellij' && this.onOpenExternalLink && cipe.commitUrl
+                ? html`<span
+                    @click="${() => this.onOpenExternalLink!(cipe.commitUrl!)}"
+                    class="cursor-pointer text-inherit no-underline hover:underline"
+                  >
+                    ${cipe.branch}
+                  </span>`
+                : html`<a
+                    href="${cipe.commitUrl}"
+                    target="_blank"
+                    class="cursor-pointer text-inherit no-underline hover:underline"
+                  >
+                    ${cipe.branch}
+                  </a>`}
             </div>
           </div>
         </div>

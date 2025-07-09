@@ -3,6 +3,7 @@ package dev.nx.console.cloud
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.nxls.NxlsService
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -32,14 +33,11 @@ class NxCloudApiService(private val project: Project) {
     }
 
     @Serializable
-    data class UpdateSuggestedFixRequest(val aiFixId: String, val action: String) {
+    data class UpdateSuggestedFixRequest(val aiFixId: String, val action: AITaskFixUserAction) {
         val actionOrigin: String = "NX_CONSOLE_INTELLIJ"
     }
 
-    suspend fun updateSuggestedFix(
-        aiFixId: String,
-        action: String // "APPLIED", "REJECTED", or "APPLIED_LOCALLY"
-    ): Boolean {
+    suspend fun updateSuggestedFix(aiFixId: String, action: AITaskFixUserAction): Boolean {
         try {
             val cloudStatus = NxlsService.getInstance(project).cloudStatus()
             val nxCloudUrl = cloudStatus?.nxCloudUrl ?: DEFAULT_CLOUD_URL
