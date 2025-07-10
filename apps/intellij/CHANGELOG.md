@@ -1,3 +1,10 @@
+## 1.45.0 (2025-07-10)
+
+### Features
+
+* **intellij:** add self-healing CI support ([#2604](https://github.com/nrwl/nx-console/issues/2604)) ([5727466](https://github.com/nrwl/nx-console/commit/5727466fb1136356b2ea79dafd7c131a49111629))
+* track ai fix action origin ([#2607](https://github.com/nrwl/nx-console/issues/2607)) ([418842d](https://github.com/nrwl/nx-console/commit/418842d501d3a294cea6f8f8e8d4936acfeb52a1))
+
 ## 1.44.0 (2025-07-08)
 
 ### Bug Fixes
