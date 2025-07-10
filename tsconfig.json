@@ -190,7 +190,7 @@
       "path": "./libs/shared/ui-components"
     },
     {
-      "path": "./libs/vscode/nx-cloud-fix-webview"
+      "path": "./libs/shared/cloud-fix-webview"
     }
   ],
   "ts-node": {

@@ -18,8 +18,6 @@
 
 /libs/vscode/migrate-sidebar-webview/ @MaxKless
 
-/libs/vscode/nx-cloud-fix-webview/ @MaxKless
-
 /libs/vscode/nx-config-decoration/ @MaxKless
 
 /libs/vscode/generate-ui-webview/ @MaxKless
@@ -27,6 +25,8 @@
 /libs/language-server/workspace/ @MaxKless
 
 /libs/shared/nx-console-plugins/ @MaxKless
+
+/libs/shared/cloud-fix-webview/ @MaxKless
 
 /libs/shared/generate-ui-types/ @MaxKless
 

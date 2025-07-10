@@ -5,12 +5,20 @@ import {
 import {
   CIPEInfo,
   CIPERunGroup,
+  NxCloudFixDetails,
   NxCloudFixMessage,
 } from '@nx-console/shared-types';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { outputLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { getWorkspacePath, GitExtension } from '@nx-console/vscode-utils';
+import {
+  getGitApi,
+  getGitBranch,
+  getGitHasUncommittedChanges,
+  getGitRepository,
+  getWorkspacePath,
+  GitExtension,
+} from '@nx-console/vscode-utils';
 import { unlink, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -31,12 +39,6 @@ import { ActorRef, EventObject } from 'xstate';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
 import { hideAiFixStatusBarItem } from './cipe-notifications';
-
-export interface NxCloudFixDetails {
-  cipe: CIPEInfo;
-  runGroup: CIPERunGroup;
-  terminalOutput?: string;
-}
 
 export class NxCloudFixWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -161,22 +163,23 @@ export class NxCloudFixWebview {
     }
   }
 
-  private updateWebviewContent() {
+  async updateWebviewContent() {
     if (!this.webviewPanel || !this.currentFixDetails) return;
+
+    const hasUncommittedChanges = await getGitHasUncommittedChanges();
 
     this.webviewPanel.webview.postMessage({
       type: 'update-details',
-      details: this.currentFixDetails,
+      details: {
+        ...this.currentFixDetails,
+        hasUncommittedChanges,
+      },
     });
   }
 
   private getWebviewHtml(details: NxCloudFixDetails): string {
     const webviewScriptUri = this.webviewPanel?.webview.asWebviewUri(
-      Uri.joinPath(
-        this.context.extensionUri,
-        'nx-cloud-fix-webview',
-        'main.js',
-      ),
+      Uri.joinPath(this.context.extensionUri, 'cloud-fix-webview', 'main.js'),
     );
 
     const codiconsUri = this.webviewPanel?.webview.asWebviewUri(
@@ -188,6 +191,18 @@ export class NxCloudFixWebview {
         'dist',
         'codicon.css',
       ),
+    );
+
+    const tailwindCssUri = this.webviewPanel?.webview.asWebviewUri(
+      Uri.joinPath(
+        this.context.extensionUri,
+        'cloud-fix-webview',
+        'tailwind.css',
+      ),
+    );
+
+    const mainCssUri = this.webviewPanel?.webview.asWebviewUri(
+      Uri.joinPath(this.context.extensionUri, 'cloud-fix-webview', 'main.css'),
     );
 
     const vscodeElementsUri = this.webviewPanel?.webview.asWebviewUri(
@@ -207,6 +222,8 @@ export class NxCloudFixWebview {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${codiconsUri}" rel="stylesheet" id="vscode-codicon-stylesheet">
+        <link href="${mainCssUri}" rel="stylesheet">
+        <link href="${tailwindCssUri}" rel="stylesheet">
          <style>
             :root {
               font-size: var(--vscode-font-size);
@@ -360,6 +377,17 @@ export class NxCloudFixWebview {
         nxCloudFixWebview.updateFixDetailsFromRecentCIPEs(recentCIPEs);
       }
     });
+
+    // listen to git branch changes
+    const repo = getGitApi().getRepository(Uri.file(getWorkspacePath()));
+    if (repo) {
+      extensionContext.subscriptions.push(
+        repo.state.onDidChange(async () => {
+          nxCloudFixWebview.updateWebviewContent();
+        }),
+      );
+    }
+
     extensionContext.subscriptions.push({
       dispose: () => {
         subscription.unsubscribe();
@@ -397,20 +425,25 @@ export class NxCloudFixWebview {
             return;
           }
 
-          const gitExtension =
-            extensions.getExtension<GitExtension>('vscode.git')?.exports;
-          if (!gitExtension) {
-            window.showErrorMessage(
-              'Unable to utilize Git for this instance of VS Code',
-            );
-            return;
-          }
-
-          const api = gitExtension.getAPI(1);
-          const repo = api.getRepository(Uri.file(getWorkspacePath()));
+          const repo = getGitRepository();
           if (!repo) {
             window.showErrorMessage('No Git repository found');
             return;
+          }
+
+          const branch = await getGitBranch();
+          if (branch && branch !== data.cipe.branch) {
+            const result = await window.showWarningMessage(
+              'Are you sure you want to apply the fix locally?',
+              {
+                modal: true,
+                detail: `Your local branch ${branch} does not match the branch ${data.cipe.branch} of the CI pipeline execution.`,
+              },
+              'Apply',
+            );
+            if (result !== 'Apply') {
+              return;
+            }
           }
 
           try {
@@ -560,6 +593,7 @@ async function updateSuggestedFix(
       data: JSON.stringify({
         aiFixId,
         action,
+        actionOrigin: 'NX_CONSOLE_VSCODE',
       }),
     });
 

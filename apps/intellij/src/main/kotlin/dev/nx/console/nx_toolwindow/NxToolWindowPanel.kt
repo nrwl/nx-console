@@ -6,29 +6,28 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.cloud.CIPEPollingService
+import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.NxWorkspace
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxWorkspaceRefreshStartedListener
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.run.actions.NxConnectService
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nodeInterpreter
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.event.ActionEvent
 import javax.swing.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.StateMachine
@@ -41,17 +40,43 @@ class NxToolWindowPanel(private val project: Project) :
 
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
+    private val cipeTreeStructure = CIPETreeStructure(project)
 
-    // Declare the channel to serialize all KStateMachine events
     private val eventChannel = Channel<Event>(capacity = 100)
 
+    // UI Components
     private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val nxToolMainComponents = NxToolMainComponents(project)
     private val toolBar = nxToolMainComponents.createToolbar(projectTree)
-    private var mainContent: MutableRef<JComponent?> = MutableRef(null)
-    private var errorCountAndComponent: MutableRef<Pair<Int, JComponent>?> = MutableRef(null)
-    private var openNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
-    private var connectToNxCloudPanel: MutableRef<JPanel?> = MutableRef(null)
+    private var mainContent: JComponent? = null
+    private var errorCountAndComponent: Pair<Int, JComponent>? = null
+    private val cipeTreeComponent = nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
+    private val cipeTreeToolbar = nxToolMainComponents.createRecentCipeToolbar(cipeTreeComponent)
+    private val cloudHeaderPanel = nxToolMainComponents.createCloudHeaderPanel()
+    private var connectedToNxCloudPanel: JPanel =
+        nxToolMainComponents.createConnectedToNxCloudPanel(
+            cipeTreeComponent,
+            cipeTreeToolbar,
+            cloudHeaderPanel
+        )
+    private var notConnectedToNxCloudPanel: JPanel =
+        nxToolMainComponents.createNotConnectedToNxCloudPanel()
+
+    private val cipeDataListener: (CIPEDataResponse?) -> Unit = { cipeDataResponse ->
+        // I don't love that we update the tree view outside of the state machine but
+        // it's the easiest solution because everything is onEntry
+        cipeDataResponse?.info?.let {
+            if (it.isEmpty()) {
+                cloudHeaderPanel.isVisible = true
+                cipeTreeToolbar.component.isVisible = false
+            } else {
+                cipeTreeStructure.updateCIPEData(it)
+                cipeTreeToolbar.component.isVisible = true
+                cloudHeaderPanel.isVisible = false
+            }
+        }
+        loadToolwindowContent()
+    }
 
     private val progressBar =
         JProgressBar().apply {
@@ -61,27 +86,37 @@ class NxToolWindowPanel(private val project: Project) :
                     override fun getRemainderColor(): Color {
                         return UIUtil.getPanelBackground()
                     }
+
+                    override fun getFinishedColor(c: JComponent): Color {
+                        return UIUtil.getPanelBackground()
+                    }
                 }
             )
         }
 
-    private var mainPanel: JPanel =
-        JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            add(Box.createVerticalGlue()) // Glue stays
-        }
+    private var mainPanel: JPanel = JPanel().apply { layout = BorderLayout() }
     private val loadingPanel = JBLoadingPanel(BorderLayout(), this)
     private val topPanel = JPanel(BorderLayout())
+    private val contentSplitter =
+        JBSplitter(
+            true,
+            "NX_CONSOLE.TOOLWINDOW_SPLITTER",
+            0.7f
+        ) // Vertical splitter with 70% for main content
 
     private lateinit var stateMachine: StateMachine
 
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     init {
+
         topPanel.add(progressBar, BorderLayout.NORTH)
         loadingPanel.add(topPanel, BorderLayout.NORTH)
         loadingPanel.add(mainPanel, BorderLayout.CENTER)
         setContent(loadingPanel)
+
+        // Add splitter to main panel
+        mainPanel.add(contentSplitter, BorderLayout.CENTER)
 
         // LAUNCH THE EVENT CONSUMER COROUTINE ONCE
         // This coroutine will serially process all events sent to eventChannel
@@ -91,9 +126,20 @@ class NxToolWindowPanel(private val project: Project) :
             }
         }
 
+        // Subscribe to CIPE data changes
+        scope.launch {
+            CIPEPollingService.getInstance(project).currentData.collect { cipeData ->
+                cipeDataListener(cipeData)
+            }
+        }
+
         scope.launch {
             stateMachine =
-                createStateMachine(scope, childMode = ChildMode.PARALLEL, start = true) {
+                createStateMachine(
+                    scope + Dispatchers.EDT,
+                    childMode = ChildMode.PARALLEL,
+                    start = true
+                ) {
                     state(States.MainContent) {
                         val noNodeInterpreter = state(MainContentStates.NoNodeInterpreter)
                         val showError = dataState<Int>(MainContentStates.ShowErrors)
@@ -107,36 +153,145 @@ class NxToolWindowPanel(private val project: Project) :
                                 onExit { loadingPanel.stopLoading() }
                             }
 
-                        createMainContentStateGroup(
-                            noNodeInterpreter,
-                            showError,
-                            showNoProject,
-                            showNoNxWorkspace,
-                            showProjectTree,
-                            initialState,
-                            mainContent,
-                            nxToolMainComponents,
-                            errorCountAndComponent,
-                            projectTreeComponent,
-                            projectStructure
-                        )
+                        noNodeInterpreter {
+                            onEntry {
+                                mainContent =
+                                    nxToolMainComponents.createNoNodeInterpreterComponent()
+                            }
+                        }
+
+                        showError {
+                            onEntry {
+                                val errorCount = data
+                                mainContent =
+                                    errorCountAndComponent.let { components ->
+                                        if (components == null || components.first != errorCount) {
+                                            val newPair =
+                                                Pair(
+                                                    errorCount,
+                                                    nxToolMainComponents.createErrorComponent(
+                                                        errorCount
+                                                    )
+                                                )
+                                            errorCountAndComponent = newPair
+                                            newPair.second
+                                        } else {
+                                            components.second
+                                        }
+                                    }
+                            }
+                        }
+
+                        showNoProject {
+                            onEntry {
+                                mainContent = nxToolMainComponents.createNoProjectsComponent()
+                            }
+                        }
+
+                        showNoNxWorkspace {
+                            onEntry {
+                                mainContent = nxToolMainComponents.createNoNxWorkspacePanel()
+                            }
+                        }
+
+                        showProjectTree {
+                            onEntry {
+                                mainContent = projectTreeComponent
+                                projectStructure.updateNxProjects(data)
+                            }
+                        }
+
+                        // Add common transitions to all states
+                        listOf(
+                                initialState,
+                                noNodeInterpreter,
+                                showError,
+                                showNoProject,
+                                showNoNxWorkspace,
+                                showProjectTree
+                            )
+                            .forEach { state ->
+                                state.apply {
+                                    transition<MainContentEvents.ShowNoNodeInterpreter> {
+                                        targetState = noNodeInterpreter
+                                    }
+                                    transition<MainContentEvents.ShowNoProject> {
+                                        targetState = showNoProject
+                                    }
+                                    transition<MainContentEvents.ShowNoNxWorkspace> {
+                                        targetState = showNoNxWorkspace
+                                    }
+                                    dataTransition<MainContentEvents.ShowErrors, Int> {
+                                        targetState = showError
+                                    }
+                                    dataTransition<MainContentEvents.ShowProjectTree, NxWorkspace> {
+                                        targetState = showProjectTree
+                                    }
+                                }
+                            }
                     }
 
                     state(States.NxCloud) {
                         val hidden = initialState(NxCloudStates.Hidden)
-                        val showConnectedNxCloudPanel =
+                        val showConnectedToNxCloudPanel =
                             dataState<String>(NxCloudStates.ShowConnectedNxCloudPanel)
-                        val showConnectNxCloudPanel = state(NxCloudStates.ShowConnectNxCloudPanel)
+                        val showNotConnectedToNxCloudPanel =
+                            state(NxCloudStates.ShowConnectNxCloudPanel)
 
-                        createNxCloudStateGroup(
-                            hidden,
-                            showConnectedNxCloudPanel,
-                            showConnectNxCloudPanel,
-                            openNxCloudPanel,
-                            connectToNxCloudPanel,
-                            nxToolMainComponents,
-                            nxConnectActionListener
-                        )
+                        hidden {
+                            onEntry {
+                                connectedToNxCloudPanel.isVisible = false
+                                notConnectedToNxCloudPanel.isVisible = false
+                                contentSplitter.secondComponent = null
+                            }
+                            transition<NxCloudEvents.ShowNotConnectedToNxCloud> {
+                                targetState = showNotConnectedToNxCloudPanel
+                            }
+                            dataTransition<NxCloudEvents.ShowConnectedToNxCloud, String> {
+                                targetState = showConnectedToNxCloudPanel
+                            }
+                        }
+
+                        showConnectedToNxCloudPanel {
+                            onEntry {
+                                connectedToNxCloudPanel.isVisible = true
+                                notConnectedToNxCloudPanel.isVisible = false
+                                contentSplitter.secondComponent = connectedToNxCloudPanel
+
+                                val cipeInfoList =
+                                    CIPEPollingService.getInstance(project).currentData.value?.info
+                                        ?: emptyList()
+                                if (cipeInfoList.isEmpty()) {
+                                    cloudHeaderPanel.isVisible = true
+                                    cipeTreeToolbar.component.isVisible = false
+                                } else {
+                                    cipeTreeStructure.updateCIPEData(cipeInfoList)
+                                    cloudHeaderPanel.isVisible = false
+                                    cipeTreeToolbar.component.isVisible = true
+                                }
+                            }
+                        }
+                        showNotConnectedToNxCloudPanel {
+                            onEntry {
+                                connectedToNxCloudPanel.isVisible = false
+                                notConnectedToNxCloudPanel.isVisible = true
+                                contentSplitter.secondComponent = notConnectedToNxCloudPanel
+                            }
+                        }
+
+                        showConnectedToNxCloudPanel {
+                            transition<NxCloudEvents.ShowNotConnectedToNxCloud> {
+                                targetState = showNotConnectedToNxCloudPanel
+                            }
+                            transition<NxCloudEvents.Hide> { targetState = hidden }
+                        }
+
+                        showNotConnectedToNxCloudPanel {
+                            dataTransition<NxCloudEvents.ShowConnectedToNxCloud, String> {
+                                targetState = showConnectedToNxCloudPanel
+                            }
+                            transition<NxCloudEvents.Hide> { targetState = hidden }
+                        }
                     }
 
                     state(States.Refresh) {
@@ -157,7 +312,6 @@ class NxToolWindowPanel(private val project: Project) :
                         }
                     )
                 }
-            loadToolwindowContent()
             with(project.messageBus.connect()) {
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
@@ -198,6 +352,8 @@ class NxToolWindowPanel(private val project: Project) :
                     },
                 )
             }
+
+            loadToolwindowContent()
         }
     }
 
@@ -220,65 +376,52 @@ class NxToolWindowPanel(private val project: Project) :
 
                 // SEND EVENTS TO CHANNEL INSTEAD OF DIRECTLY CALLING processEvent
                 if (!hasNodeInterpreter) {
-                    scope.launch { eventChannel.send(MainContentEvents.ShowNoNodeInterpreter()) }
+                    eventChannel.send(MainContentEvents.ShowNoNodeInterpreter())
                 } else if (
                     workspace?.let {
                         !it.errors.isNullOrEmpty() && (it.isPartial != true || !hasProjects)
                     } == true
                 ) {
                     val errorCount = workspace.errors!!.size
-                    scope.launch { eventChannel.send(MainContentEvents.ShowErrors(errorCount)) }
+                    eventChannel.send(MainContentEvents.ShowErrors(errorCount))
                 } else if (workspace == null) {
-                    scope.launch { eventChannel.send(MainContentEvents.ShowNoNxWorkspace()) }
+                    eventChannel.send(MainContentEvents.ShowNoNxWorkspace())
                 } else if (!hasProjects) {
-                    scope.launch { eventChannel.send(MainContentEvents.ShowNoProject()) }
+                    eventChannel.send(MainContentEvents.ShowNoProject())
                 } else {
-                    scope.launch { eventChannel.send(MainContentEvents.ShowProjectTree(workspace)) }
+                    // same here, I don't love this but it's okay for now
+                    projectStructure.updateNxProjects(workspace)
+                    eventChannel.send(MainContentEvents.ShowProjectTree(workspace))
                 }
 
                 toolBar.targetComponent = this@NxToolWindowPanel
                 toolbar = toolBar.component
             }
 
-            // Check cloud panel visibility
             if (getCloudPanelCollapsed(project)) {
-                // Send hide event when panel is collapsed
-                scope.launch { eventChannel.send(NxCloudEvents.Hide()) }
+                eventChannel.send(NxCloudEvents.Hide())
             } else {
-                // Load cloud status if panel is not collapsed
-                val cloudStatus = nxlsService.cloudStatus()
+                val cloudStatus = withContext(Dispatchers.IO) { nxlsService.cloudStatus() }
                 cloudStatus?.let {
-                    // THESE EVENTS ALSO NEED TO BE SENT TO THE CHANNEL
                     if (cloudStatus.isConnected) {
-                        scope.launch {
-                            eventChannel.send(
-                                NxCloudEvents.ShowOpenNxCloud(
-                                    cloudStatus.nxCloudUrl ?: "https://cloud.nx.app"
-                                )
+                        eventChannel.send(
+                            NxCloudEvents.ShowConnectedToNxCloud(
+                                cloudStatus.nxCloudUrl ?: "https://cloud.nx.app"
                             )
-                        }
+                        )
                     } else {
-                        scope.launch { eventChannel.send(NxCloudEvents.ShowConnectToNxCloud()) }
+                        eventChannel.send(NxCloudEvents.ShowNotConnectedToNxCloud())
                     }
                 }
             }
         }
     }
 
-    private val nxConnectActionListener =
-        object : AbstractAction() {
-            override fun actionPerformed(e: ActionEvent?) {
-                NxConnectService.getInstance(project).connectToCloud()
-            }
-        }
-
     private fun updateMainPanelContent() {
-        mainPanel.removeAll() // Clear existing content
+        mainContent?.let { contentSplitter.firstComponent = it }
 
-        mainContent.value?.let { mainPanel.add(it) } // Add new content
-        mainPanel.add(Box.createVerticalGlue())
-        openNxCloudPanel.value?.let { mainPanel.add(it) }
-        connectToNxCloudPanel.value?.let { mainPanel.add(it) }
+        // The cloud panel (second component) is managed by the state machine
+        // so we don't need to set it here
 
         mainPanel.revalidate() // Recalculate layout
         mainPanel.repaint() // Redraw
@@ -286,8 +429,6 @@ class NxToolWindowPanel(private val project: Project) :
 
     companion object {
         const val NX_TOOLBAR_PLACE = "Nx Toolbar"
-        private const val NX_CLOUD_LEARN_MORE_TEXT =
-            "<html>To learn more about Nx Cloud, check out <a href='https://nx.dev/ci/intro/why-nx-cloud?utm_source=nxconsole'> Why Nx Cloud?</a> or get an overview of <a href='https://nx.dev/ci/features?utm_source=nxconsole'> Nx Cloud features </a>. </html>"
         private const val CLOUD_PANEL_COLLAPSED_PROPERTY_KEY =
             "dev.nx.console.toolwindow.cloud_panel_collapse"
 
@@ -306,12 +447,11 @@ class NxToolWindowPanel(private val project: Project) :
         if (::stateMachine.isInitialized) {
             scope.launch { stateMachine.stop() }
         }
-        mainContent.value = null
-        errorCountAndComponent.value = null
-        openNxCloudPanel.value = null
-        connectToNxCloudPanel.value = null
+        mainContent = null
+        errorCountAndComponent = null
 
-        // It's good practice to close the channel when the Disposable is disposed
+        // No need to remove listener since we're using StateFlow collection
+
         eventChannel.close()
     }
 }

@@ -3180,6 +3180,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-cloud-fix-webview@workspace:libs/shared/cloud-fix-webview":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-cloud-fix-webview@workspace:libs/shared/cloud-fix-webview"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-e2e-utils@workspace:libs/shared/e2e-utils":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-e2e-utils@workspace:libs/shared/e2e-utils"
@@ -3353,12 +3359,6 @@ __metadata:
 "@nx-console/vscode-nx-cli-quickpicks@workspace:libs/vscode/nx-cli-quickpicks":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-nx-cli-quickpicks@workspace:libs/vscode/nx-cli-quickpicks"
-  languageName: unknown
-  linkType: soft
-
-"@nx-console/vscode-nx-cloud-fix-webview@workspace:libs/vscode/nx-cloud-fix-webview":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/vscode-nx-cloud-fix-webview@workspace:libs/vscode/nx-cloud-fix-webview"
   languageName: unknown
   linkType: soft
 

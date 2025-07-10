@@ -43,6 +43,7 @@ enum class TelemetryEvent(val eventName: String) {
     CLOUD_SHOW_AI_FIX("cloud.show-ai-fix"),
     CLOUD_SHOW_AI_FIX_NOTIFICATION("cloud.show-ai-fix-notification"),
     CLOUD_VIEW_RUN("cloud.view-run"),
+    CLOUD_REFRESH_VIEW("cloud.refresh-view"),
 
     // Graph
     GRAPH_SHOW_ALL("graph.show-all"),

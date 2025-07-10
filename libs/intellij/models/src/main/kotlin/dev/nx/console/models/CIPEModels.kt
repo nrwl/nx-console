@@ -1,5 +1,8 @@
 package dev.nx.console.models
 
+import kotlinx.serialization.*
+
+@Serializable
 data class CIPEInfo(
     val ciPipelineExecutionId: String,
     val branch: String,
@@ -14,15 +17,18 @@ data class CIPEInfo(
     val runGroups: List<CIPERunGroup>
 )
 
+@Serializable
 data class CIPERunGroup(
     val ciExecutionEnv: String,
     val runGroup: String,
     val createdAt: Long,
     val completedAt: Long?,
     val status: CIPEExecutionStatus,
-    val runs: List<CIPERun>
+    val runs: List<CIPERun>,
+    val aiFix: NxAiFix? = null
 )
 
+@Serializable
 data class CIPERun(
     val linkId: String? = null,
     val executionId: String? = null,
@@ -42,6 +48,7 @@ enum class CIPEInfoErrorType {
     other
 }
 
+@Serializable
 enum class CIPEExecutionStatus {
     NOT_STARTED,
     IN_PROGRESS,
@@ -56,3 +63,33 @@ data class CIPEDataResponse(
     val error: CIPEInfoError? = null,
     val workspaceUrl: String? = null
 )
+
+@Serializable
+data class NxAiFix(
+    val aiFixId: String,
+    val taskIds: List<String>,
+    val terminalLogsUrls: Map<String, String>,
+    val suggestedFix: String? = null,
+    val suggestedFixDescription: String? = null,
+    val suggestedFixStatus: AITaskFixStatus? = null,
+    val verificationStatus: AITaskFixStatus? = null,
+    @Deprecated("Use verificationStatus instead") val validationStatus: AITaskFixStatus? = null,
+    val userAction: AITaskFixUserAction? = null
+)
+
+@Serializable
+enum class AITaskFixStatus {
+    NOT_STARTED,
+    IN_PROGRESS,
+    COMPLETED,
+    FAILED,
+    NOT_EXECUTABLE
+}
+
+@Serializable
+enum class AITaskFixUserAction {
+    NONE,
+    APPLIED,
+    REJECTED,
+    APPLIED_LOCALLY
+}

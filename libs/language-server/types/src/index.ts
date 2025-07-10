@@ -218,3 +218,19 @@ export const NxCloudTerminalOutputRequest: RequestType<
   { terminalOutput?: string; error?: string },
   unknown
 > = new RequestType('nx/cloudTerminalOutput');
+
+export const NxCloudAuthHeadersRequest: RequestType<
+  undefined,
+  {
+    'Nx-Cloud-Id'?: string;
+    'Nx-Cloud-Personal-Access-Token'?: string;
+    Authorization?: string;
+  },
+  unknown
+> = new RequestType('nx/cloudAuthHeaders');
+
+export const NxDownloadAndExtractArtifactRequest: RequestType<
+  { artifactUrl: string },
+  { content?: string; error?: string },
+  unknown
+> = new RequestType('nx/downloadAndExtractArtifact');

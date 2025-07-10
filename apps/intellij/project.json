@@ -44,5 +44,5 @@
     }
   },
   "tags": ["type:intellij"],
-  "implicitDependencies": ["nxls", "generate-ui-v2"]
+  "implicitDependencies": ["nxls", "generate-ui-v2", "shared-cloud-fix-webview"]
 }

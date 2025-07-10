@@ -498,7 +498,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         )
     }
 
-    private suspend fun updateMultiDropdown(projects: Array<String>, selectedProject: String) {
+    private fun updateMultiDropdown(projects: Array<String>, selectedProject: String) {
         if (browser.isDisposed) {
             return
         }
@@ -752,7 +752,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         return query
     }
 
-    private suspend fun registerListeners(stateMachine: StateMachine) {
+    private fun registerListeners(stateMachine: StateMachine) {
         messageBusConnection = project.messageBus.connect(scope)
         with(messageBusConnection) {
             subscribe(
