@@ -73,7 +73,6 @@ data class NxAiFix(
     val suggestedFixDescription: String? = null,
     val suggestedFixStatus: AITaskFixStatus? = null,
     val verificationStatus: AITaskFixStatus? = null,
-    @Deprecated("Use verificationStatus instead") val validationStatus: AITaskFixStatus? = null,
     val userAction: AITaskFixUserAction? = null
 )
 

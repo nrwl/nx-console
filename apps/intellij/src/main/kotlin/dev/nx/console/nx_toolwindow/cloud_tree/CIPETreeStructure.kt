@@ -1,6 +1,5 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
@@ -13,7 +12,6 @@ import javax.swing.tree.TreePath
 
 class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
 
-    private val logger = thisLogger()
     private val rootNode = CIPESimpleNode.CIPERootNode()
     private var cipeData: List<CIPEInfo> = emptyList()
     private var treeModel: StructureTreeModel<*>? = null
@@ -28,9 +26,6 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
 
     override fun getChildElements(element: Any): Array<Any> {
         if (element !is CIPESimpleNode) return emptyArray()
-
-        val elementType = element::class.simpleName
-        logger.debug("[CIPE_TREE] Getting children for element type: $elementType")
 
         val children =
             when (element) {
@@ -52,7 +47,6 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
                 else -> emptyArray()
             }
 
-        logger.debug("[CIPE_TREE] Returning ${children.size} children for $elementType")
         return children as Array<Any>
     }
 
@@ -60,21 +54,12 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
         rootNode: CIPESimpleNode.CIPERootNode,
         cipeData: List<CIPEInfo>
     ): Array<CIPESimpleNode> {
-        logger.debug("[CIPE_TREE] Building root children with ${cipeData.size} CIPEs")
-
         if (cipeData.isEmpty()) {
-            logger.debug("[CIPE_TREE] No CIPE data, showing empty message")
-            return arrayOf(CIPESimpleNode.LabelNode("No recent CI pipeline executions", rootNode))
+            return arrayOf(CIPESimpleNode.LabelNode("No recent PRs from your branches", rootNode))
         }
 
         return cipeData
-            .map { cipeInfo ->
-                logger.debug(
-                    "[CIPE_TREE] Creating node for CIPE ${cipeInfo.ciPipelineExecutionId}: " +
-                        "status=${cipeInfo.status}, branch=${cipeInfo.branch ?: "unknown"}"
-                )
-                CIPESimpleNode.CIPENode(cipeInfo = cipeInfo, parent = rootNode)
-            }
+            .map { cipeInfo -> CIPESimpleNode.CIPENode(cipeInfo = cipeInfo, parent = rootNode) }
             .toTypedArray()
     }
 
@@ -94,14 +79,9 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
 
     private fun buildChildrenForRun(runNode: CIPESimpleNode.RunNode): Array<CIPESimpleNode> {
         val failedTasks = runNode.run.failedTasks ?: emptyList()
-        logger.debug(
-            "[CIPE_TREE] Building children for run ${runNode.run.linkId}: " +
-                "failedTasks=${failedTasks.size}"
-        )
 
         return failedTasks
             .map { taskName ->
-                logger.debug("[CIPE_TREE] Creating failed task node for: $taskName")
                 CIPESimpleNode.FailedTaskNode(taskName = taskName, parent = runNode)
             }
             .toTypedArray()
@@ -110,32 +90,56 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
     private fun buildChildrenForFailedTask(
         taskNode: CIPESimpleNode.FailedTaskNode
     ): Array<CIPESimpleNode> {
-        logger.debug("[CIPE_TREE] Building children for failed task: ${taskNode.taskName}")
-
-        // Find the parent run group
+        // Find the parent run and run group
+        var currentRunNode: CIPESimpleNode.RunNode? = null
+        var currentRunGroupNode: CIPESimpleNode.RunGroupNode? = null
         var current: CIPESimpleNode? = taskNode
-        while (current != null && current !is CIPESimpleNode.RunGroupNode) {
+
+        while (current != null) {
+            when (current) {
+                is CIPESimpleNode.RunNode -> currentRunNode = current
+                is CIPESimpleNode.RunGroupNode -> currentRunGroupNode = current
+                else -> {}
+            }
             current = current.parent as? CIPESimpleNode
         }
 
-        val runGroupNode =
-            current as? CIPESimpleNode.RunGroupNode
-                ?: run {
-                    logger.warn(
-                        "[CIPE_TREE] Could not find parent run group for task ${taskNode.taskName}"
-                    )
-                    return emptyArray()
+        if (currentRunGroupNode == null || currentRunNode == null) {
+            return emptyArray()
+        }
+
+        val aiFix = currentRunGroupNode.runGroup.aiFix
+
+        if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
+            // Match VSCode logic: use the first task ID as the primary one
+            val primaryFixTaskId = aiFix.taskIds.first()
+
+            // Check if current task is the primary task
+            if (taskNode.taskName != primaryFixTaskId) {
+                return emptyArray()
+            }
+
+            // Check if this is the first run that contains the primary task
+            val firstRunWithPrimaryTask =
+                currentRunGroupNode.runGroup.runs.firstOrNull { run ->
+                    run.failedTasks?.contains(primaryFixTaskId) == true
                 }
 
-        val aiFix = runGroupNode.runGroup.aiFix
-        logger.debug("[CIPE_TREE] Run group has AI fix: ${aiFix != null}")
+            if (firstRunWithPrimaryTask == null) {
+                return emptyArray()
+            }
 
-        if (aiFix != null && taskNode.taskName in aiFix.taskIds) {
-            logger.info("[CIPE_TREE] AI fix found for task ${taskNode.taskName}")
+            val isFirstRunWithTask =
+                (firstRunWithPrimaryTask.linkId == currentRunNode.run.linkId) ||
+                    (firstRunWithPrimaryTask.executionId == currentRunNode.run.executionId)
+
+            if (!isFirstRunWithTask) {
+                return emptyArray()
+            }
+
             return arrayOf(CIPESimpleNode.NxCloudFixNode(aiFix = aiFix, parent = taskNode))
         }
 
-        logger.debug("[CIPE_TREE] No AI fix available for task ${taskNode.taskName}")
         return emptyArray()
     }
 
@@ -157,6 +161,7 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
         val addedAIFixes = newAIFixes - oldAIFixes
 
         cipeData = newData
+
         treeModel?.invalidateAsync()?.thenRun {
             persistenceManager?.let { pm ->
                 tree?.let { treeComponent ->

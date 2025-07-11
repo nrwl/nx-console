@@ -114,10 +114,19 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         telemetryService.featureUsed(TelemetryEvent.CLOUD_SHOW_AI_FIX_NOTIFICATION)
 
         val taskDisplay = runGroup.aiFix?.taskIds?.firstOrNull() ?: "task"
+        val taskCount = runGroup.aiFix?.taskIds?.size ?: 0
+
+        val content =
+            if (taskCount > 1) {
+                "Nx Cloud suggested a fix for $taskDisplay and ${taskCount - 1} other task${if (taskCount > 2) "s" else ""} in #${cipe.branch}"
+            } else {
+                "Nx Cloud suggested a fix for $taskDisplay in #${cipe.branch}"
+            }
+
         val notification =
             NOTIFICATION_GROUP.createNotification(
                 title = "AI Fix Available",
-                content = "Nx Cloud suggested a fix for $taskDisplay in #${cipe.branch}",
+                content = content,
                 type = NotificationType.INFORMATION
             )
 

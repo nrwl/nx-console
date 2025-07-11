@@ -221,7 +221,7 @@ const nxCloudCipeDetails =
     } else {
       content.push({
         type: 'text',
-        text: `No recent CI pipeline executions found. This means that there were no recent runs in the last hour, or there are no runs on the current git branch`,
+        text: `No recent PRs found. This means that there were no recent PRs based on your local git branches.`,
       });
     }
 
