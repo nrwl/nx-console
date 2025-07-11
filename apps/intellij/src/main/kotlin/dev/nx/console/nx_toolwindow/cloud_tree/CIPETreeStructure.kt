@@ -55,7 +55,7 @@ class CIPETreeStructure(private val project: Project) : SimpleTreeStructure() {
         cipeData: List<CIPEInfo>
     ): Array<CIPESimpleNode> {
         if (cipeData.isEmpty()) {
-            return arrayOf(CIPESimpleNode.LabelNode("No recent CI pipeline executions", rootNode))
+            return arrayOf(CIPESimpleNode.LabelNode("No recent PRs from your branches", rootNode))
         }
 
         return cipeData

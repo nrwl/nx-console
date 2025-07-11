@@ -358,7 +358,7 @@ class NxToolMainComponents(private val project: Project) {
 
                         override fun update(e: AnActionEvent) {
                             super.update(e)
-                            e.presentation.text = "Recent CI Pipeline Executions"
+                            e.presentation.text = "Your PRs"
                         }
                     }
                 )
