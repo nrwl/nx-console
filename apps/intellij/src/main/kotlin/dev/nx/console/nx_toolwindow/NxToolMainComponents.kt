@@ -467,28 +467,37 @@ class NxToolMainComponents(private val project: Project) {
                 }
             )
             add(Box.createHorizontalGlue())
-            add(
-                JButton().apply {
-                    icon = AllIcons.Actions.Refresh
-                    toolTipText = "Refresh Nx Cloud View"
 
-                    isContentAreaFilled = false
-                    isBorderPainted = false
-                    isFocusPainted = false
-                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                    addActionListener { refreshCipeTree() }
-                }
-            )
+            // Button group panel
             add(
-                JButton().apply {
-                    icon = AllIcons.ToolbarDecorator.Export
-                    toolTipText = "Open Nx Cloud"
+                JPanel().apply {
+                    layout = FlowLayout(FlowLayout.RIGHT, 0, 0)
+                    isOpaque = false
 
-                    isContentAreaFilled = false
-                    isBorderPainted = false
-                    isFocusPainted = false
-                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                    addActionListener { openNxCloud() }
+                    add(
+                        JButton().apply {
+                            icon = AllIcons.Actions.Refresh
+                            toolTipText = "Refresh Nx Cloud View"
+
+                            isContentAreaFilled = false
+                            isBorderPainted = false
+                            isFocusPainted = false
+                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                            addActionListener { refreshCipeTree() }
+                        }
+                    )
+                    add(
+                        JButton().apply {
+                            icon = AllIcons.ToolbarDecorator.Export
+                            toolTipText = "Open Nx Cloud"
+
+                            isContentAreaFilled = false
+                            isBorderPainted = false
+                            isFocusPainted = false
+                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                            addActionListener { openNxCloud() }
+                        }
+                    )
                 }
             )
         }
@@ -617,6 +626,8 @@ class NxToolMainComponents(private val project: Project) {
     private fun handleAIFixClick(fixNode: CIPESimpleNode.NxCloudFixNode) {
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS, mapOf("source" to "cipe_tree"))
+
+        val parentTask = fixNode.parent as? CIPESimpleNode.FailedTaskNode
 
         var currentNode: CIPESimpleNode? = fixNode
         var cipeId: String? = null

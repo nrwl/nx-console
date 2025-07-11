@@ -32,6 +32,7 @@ let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
 
 export function startMcpServer() {
+  console.log('starting mcp server');
   const port = getNxMcpPort();
   if (!port) {
     return;

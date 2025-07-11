@@ -312,6 +312,57 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events.isEmpty())
     }
 
+    fun testNewCIPEWithCompletedAiFixShowsNotification() {
+        // When a new CIPE appears with an already-completed AI fix, should show notification
+        val oldCIPE = createProgressCIPE()
+        val newCIPEWithAiFix =
+            createFailedCIPEWithAiFix()
+                .copy(
+                    ciPipelineExecutionId = "2" // Different ID - new CIPE
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(oldCIPE)),
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFix))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        val notificationEvent = mockListener.events[0]
+        assertTrue(notificationEvent is CIPENotificationEvent.AiFixAvailable)
+        assertEquals(
+            "test-task-1",
+            (notificationEvent as CIPENotificationEvent.AiFixAvailable)
+                .runGroup
+                .aiFix
+                ?.taskIds
+                ?.first()
+        )
+    }
+
+    fun testNewCIPEWithAiFixInProgressDoesNotShowNotification() {
+        // When a new CIPE has AI fix without suggestedFix (still generating), should not notify
+        val oldCIPE = createProgressCIPE()
+        val newCIPEWithAiFixInProgress =
+            createProgressWithAiFixNoSuggestion()
+                .copy(
+                    ciPipelineExecutionId = "4" // Different ID - new CIPE
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(oldCIPE)),
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixInProgress))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification since suggestedFix is null
+        assertTrue(mockListener.events.isEmpty())
+    }
+
     // Helper functions to create test data
     private fun createSuccessfulCIPE() =
         CIPEInfo(
