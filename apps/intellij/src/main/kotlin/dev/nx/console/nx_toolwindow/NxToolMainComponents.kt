@@ -627,8 +627,6 @@ class NxToolMainComponents(private val project: Project) {
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS, mapOf("source" to "cipe_tree"))
 
-        val parentTask = fixNode.parent as? CIPESimpleNode.FailedTaskNode
-
         var currentNode: CIPESimpleNode? = fixNode
         var cipeId: String? = null
         var runGroupName: String? = null

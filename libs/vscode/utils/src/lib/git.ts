@@ -3,7 +3,6 @@ import type { GitExtension, API, Repository } from './git-extension';
 import { getWorkspacePath } from './get-workspace-path';
 
 export function getGitApi(): API | undefined {
-  console.log('getGitApi called');
   const gitExt = extensions.getExtension<GitExtension>('vscode.git').exports;
   const api = gitExt.getAPI(1);
   if (!api) {
