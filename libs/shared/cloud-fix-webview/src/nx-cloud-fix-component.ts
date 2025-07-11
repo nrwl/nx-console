@@ -344,6 +344,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           </div>
         </div>
         <div class="px-4 py-1 pb-4">
+          ${aiFix.suggestedFixReasoning
+            ? html`<p class="text-foreground m-0 mb-3 text-sm opacity-90">
+                ${aiFix.suggestedFixReasoning}
+              </p>`
+            : ''}
           <form-group-element variant="vertical">
             <label-element for="commit-message">Commit message</label-element>
             <textarea-element
