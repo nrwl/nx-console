@@ -1291,7 +1291,7 @@
         },
         {
           "id": "nxCloudRecentCIPE",
-          "name": "Nx Cloud :: Recent CI Pipeline Executions",
+          "name": "Nx Cloud :: Your PRs",
           "when": "isNxWorkspace && nxCloudView.visible.recent-cipe"
         },
         {

@@ -70,10 +70,10 @@ data class NxAiFix(
     val taskIds: List<String>,
     val terminalLogsUrls: Map<String, String>,
     val suggestedFix: String? = null,
+    val suggestedFixReasoning: String? = null,
     val suggestedFixDescription: String? = null,
     val suggestedFixStatus: AITaskFixStatus? = null,
     val verificationStatus: AITaskFixStatus? = null,
-    @Deprecated("Use verificationStatus instead") val validationStatus: AITaskFixStatus? = null,
     val userAction: AITaskFixUserAction? = null
 )
 
