@@ -104,12 +104,12 @@ class NxToolWindowPanel(private val project: Project) :
             0.7f
         ) // Vertical splitter with 70% for main content
 
-    private lateinit var stateMachine: StateMachine
+    private var stateMachine: StateMachine? = null
+    private val stateMachineInitialized = CompletableDeferred<Unit>()
 
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     init {
-
         topPanel.add(progressBar, BorderLayout.NORTH)
         loadingPanel.add(topPanel, BorderLayout.NORTH)
         loadingPanel.add(mainPanel, BorderLayout.CENTER)
@@ -121,8 +121,11 @@ class NxToolWindowPanel(private val project: Project) :
         // LAUNCH THE EVENT CONSUMER COROUTINE ONCE
         // This coroutine will serially process all events sent to eventChannel
         scope.launch {
+            // Wait for state machine to be initialized once before processing any events
+            stateMachineInitialized.await()
+
             for (event in eventChannel) {
-                stateMachine.processEvent(event)
+                stateMachine?.processEvent(event)
             }
         }
 
@@ -312,6 +315,10 @@ class NxToolWindowPanel(private val project: Project) :
                         }
                     )
                 }
+
+            // Signal that state machine is initialized
+            stateMachineInitialized.complete(Unit)
+
             with(project.messageBus.connect()) {
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
@@ -444,9 +451,7 @@ class NxToolWindowPanel(private val project: Project) :
     }
 
     override fun dispose() {
-        if (::stateMachine.isInitialized) {
-            scope.launch { stateMachine.stop() }
-        }
+        stateMachine?.let { scope.launch { it.stop() } }
         mainContent = null
         errorCountAndComponent = null
 
