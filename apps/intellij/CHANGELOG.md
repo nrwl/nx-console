@@ -1,3 +1,9 @@
+## <small>1.46.1 (2025-07-14)</small>
+
+### Bug Fixes
+
+* **intellij:** handle startup race condition error ([#2612](https://github.com/nrwl/nx-console/issues/2612)) ([cd0cdaf](https://github.com/nrwl/nx-console/commit/cd0cdaf38114abd92366a59e78c0f1b11c31338e))
+
 ## 1.46.0 (2025-07-14)
 
 ### Bug Fixes
