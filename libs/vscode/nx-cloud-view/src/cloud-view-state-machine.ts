@@ -50,11 +50,11 @@ const pollingMachine = setup({
             error?: CIPEInfoError;
           }
         | undefined;
-      
+
       const previousFrequency = context.pollingFrequency;
       let newFrequency: number;
       let reason: string;
-      
+
       if (
         recentCIPEData?.error &&
         recentCIPEData.error.type === 'authentication'
@@ -77,24 +77,29 @@ const pollingMachine = setup({
         newFrequency = COLD_POLLING_TIME;
         reason = 'default';
       }
-      
+
       // Log only when frequency changes
       if (previousFrequency !== newFrequency) {
         const getFrequencyName = (freq: number) => {
           switch (freq) {
-            case SLEEP_POLLING_TIME: return 'SLEEP (1 hour)';
-            case COLD_POLLING_TIME: return 'COLD (3 minutes)';
-            case HOT_POLLING_TIME: return 'HOT (10 seconds)';
-            case AI_FIX_POLLING_TIME: return 'AI FIX (3 seconds)';
-            default: return `${freq}ms`;
+            case SLEEP_POLLING_TIME:
+              return 'SLEEP (1 hour)';
+            case COLD_POLLING_TIME:
+              return 'COLD (3 minutes)';
+            case HOT_POLLING_TIME:
+              return 'HOT (10 seconds)';
+            case AI_FIX_POLLING_TIME:
+              return 'AI FIX (3 seconds)';
+            default:
+              return `${freq}ms`;
           }
         };
-        
+
         getOutputChannel().appendLine(
-          `Nx Cloud - Polling frequency changed from ${getFrequencyName(previousFrequency)} to ${getFrequencyName(newFrequency)} (reason: ${reason})`
+          `Nx Cloud - Polling frequency changed from ${getFrequencyName(previousFrequency)} to ${getFrequencyName(newFrequency)} (reason: ${reason})`,
         );
       }
-      
+
       return {
         ...context,
         pollingFrequency: newFrequency,
