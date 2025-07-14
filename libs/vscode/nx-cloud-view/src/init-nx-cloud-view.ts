@@ -185,7 +185,8 @@ const getStateMachineLogger = (context: ExtensionContext) =>
         if (
           event.type === '@xstate.snapshot' &&
           snapshot.value &&
-          (event.actorRef as any)['_systemId'] === 'cloud-view'
+          (event.actorRef as any)['_systemId'] === 'cloud-view' &&
+          snapshot.value !== 'recent-cipe'
         ) {
           getOutputChannel().appendLine(
             `Nx Cloud - ${JSON.stringify(snapshot.value)}`,

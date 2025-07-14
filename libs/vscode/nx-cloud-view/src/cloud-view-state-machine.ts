@@ -19,6 +19,7 @@ import {
 } from 'xstate';
 // need this import for type inference
 import type { Guard } from 'xstate/guards';
+import { getOutputChannel } from '@nx-console/vscode-output-channels';
 
 const SLEEP_POLLING_TIME = 3_600_000;
 const COLD_POLLING_TIME = 180_000;
@@ -49,36 +50,60 @@ const pollingMachine = setup({
             error?: CIPEInfoError;
           }
         | undefined;
+
+      const previousFrequency = context.pollingFrequency;
+      let newFrequency: number;
+      let reason: string;
+
       if (
         recentCIPEData?.error &&
         recentCIPEData.error.type === 'authentication'
       ) {
-        return {
-          ...context,
-          pollingFrequency: SLEEP_POLLING_TIME,
-        };
+        newFrequency = SLEEP_POLLING_TIME;
+        reason = 'authentication error';
       } else if (
         recentCIPEData?.info?.some((cipe) => cipe.status === 'IN_PROGRESS')
       ) {
-        return {
-          ...context,
-          pollingFrequency: HOT_POLLING_TIME,
-        };
+        newFrequency = HOT_POLLING_TIME;
+        reason = 'CIPE in progress';
       } else if (
         recentCIPEData?.info?.some((cipe) =>
           cipe.runGroups.some((rg) => rg.aiFix),
         )
       ) {
-        return {
-          ...context,
-          pollingFrequency: AI_FIX_POLLING_TIME,
-        };
+        newFrequency = AI_FIX_POLLING_TIME;
+        reason = 'AI fix available';
       } else {
-        return {
-          ...context,
-          pollingFrequency: COLD_POLLING_TIME,
-        };
+        newFrequency = COLD_POLLING_TIME;
+        reason = 'default';
       }
+
+      // Log only when frequency changes
+      if (previousFrequency !== newFrequency) {
+        const getFrequencyName = (freq: number) => {
+          switch (freq) {
+            case SLEEP_POLLING_TIME:
+              return 'SLEEP (1 hour)';
+            case COLD_POLLING_TIME:
+              return 'COLD (3 minutes)';
+            case HOT_POLLING_TIME:
+              return 'HOT (10 seconds)';
+            case AI_FIX_POLLING_TIME:
+              return 'AI FIX (3 seconds)';
+            default:
+              return `${freq}ms`;
+          }
+        };
+
+        getOutputChannel().appendLine(
+          `Nx Cloud - Polling frequency changed from ${getFrequencyName(previousFrequency)} to ${getFrequencyName(newFrequency)} (reason: ${reason})`,
+        );
+      }
+
+      return {
+        ...context,
+        pollingFrequency: newFrequency,
+      };
     }),
   },
   actors: {
