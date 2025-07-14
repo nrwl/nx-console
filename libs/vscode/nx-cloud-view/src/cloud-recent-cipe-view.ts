@@ -1,13 +1,7 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
-import {
-  getNxCloudStatus,
-  getNxCloudTerminalOutput,
-} from '@nx-console/vscode-nx-workspace';
-import {
-  outputLogger,
-  showErrorMessageWithOpenLogs,
-} from '@nx-console/vscode-output-channels';
+import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
+import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   AbstractTreeProvider,
@@ -27,17 +21,16 @@ import {
   TreeView,
   Uri,
   window,
-  workspace,
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
-import { formatMillis } from './format-time';
 import {
   BaseRecentCIPETreeItem,
   CIPETreeItem as CIPETreeItemInterface,
+  FailedTaskTreeItem as FailedTaskTreeItemInterface,
   RunGroupTreeItem as RunGroupTreeItemInterface,
   RunTreeItem as RunTreeItemInterface,
-  FailedTaskTreeItem as FailedTaskTreeItemInterface,
 } from './base-tree-item';
+import { formatMillis } from './format-time';
 import { NxCloudFixTreeItem } from './nx-cloud-fix-tree-item';
 
 export class CIPETreeItem

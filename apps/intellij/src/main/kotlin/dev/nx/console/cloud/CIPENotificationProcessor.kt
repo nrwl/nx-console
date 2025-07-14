@@ -79,6 +79,18 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             // Check for newly available AI fixes and show proactive notifications
             if (oldCIPE != null) {
                 checkForNewAiFixNotifications(oldCIPE, newCIPE)
+            } else {
+                // If this is a new CIPE but it has an AI fix that's already complete, show a
+                // notification
+                if (hasAiFix) {
+                    newCIPE.runGroups.forEach { runGroup ->
+                        if (runGroup.aiFix?.suggestedFix != null) {
+                            emitNotification(
+                                CIPENotificationEvent.AiFixAvailable(newCIPE, runGroup)
+                            )
+                        }
+                    }
+                }
             }
 
             // Following VSCode logic: if the CIPE has completed or had a failed run before,
@@ -182,13 +194,12 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 "to ${notificationListeners.size} listeners"
         )
 
-        notificationListeners.forEachIndexed { index, listener ->
+        notificationListeners.forEach { listener ->
             try {
-                logger.debug("[CIPE_PROCESSOR] Notifying listener #$index")
                 listener.onNotificationEvent(event)
             } catch (e: Exception) {
                 logger.error(
-                    "[CIPE_PROCESSOR] Error notifying CIPE notification listener #$index: ${e.message}",
+                    "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
                     e
                 )
             }
