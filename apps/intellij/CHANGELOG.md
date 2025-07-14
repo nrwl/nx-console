@@ -1,3 +1,14 @@
+## 1.46.0 (2025-07-14)
+
+### Bug Fixes
+
+* self-healing ui fixes ([#2610](https://github.com/nrwl/nx-console/issues/2610)) ([2f46e6b](https://github.com/nrwl/nx-console/commit/2f46e6b5260624f6b88c24996421775de8d692c5))
+
+
+### Features
+
+* add suggested fix reasoning to fix ui ([#2611](https://github.com/nrwl/nx-console/issues/2611)) ([1b3373e](https://github.com/nrwl/nx-console/commit/1b3373ed21ba8539896cf5d01e717097d2561b37))
+
 ## 1.45.0 (2025-07-10)
 
 ### Features
