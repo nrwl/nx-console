@@ -142,9 +142,6 @@
     "targets": {
       "telemetry-check": {
         "command": "node tools/scripts/check-telemetry-sync.js"
-      },
-      "build": {
-        "command": "echo build && exit 1"
       }
     }
   },

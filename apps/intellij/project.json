@@ -4,7 +4,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "command": "yarn nx run intellij:buildPlugin",
+      "command": "echo build && exit 1",
       "configurations": {
         "production-intellij": {}
       },
