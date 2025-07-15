@@ -20,6 +20,7 @@ val NxTreeNodeKey = DataKey.create<NxSimpleNode?>("NX_TREE_NODE")
 val NxTreeNodeProjectKey = DataKey.create<NxProject?>("NX_TREE_NODE_PROJECT")
 
 class NxProjectsTree(project: Project) : SimpleTree(), DataProvider {
+
     init {
         isRootVisible = false
         showsRootHandles = true

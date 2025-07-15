@@ -8,6 +8,7 @@ import javax.swing.Icon
 
 sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent) {
     abstract val nodeId: String
+    abstract val parent: CIPESimpleNode?
 
     val idPath: List<String> by lazy {
         when (parent) {
@@ -20,6 +21,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 
     class CIPERootNode : CIPESimpleNode(null) {
         override val nodeId = "cipe_root"
+        override val parent: CIPESimpleNode? = null
 
         init {
             icon = AllIcons.Vcs.History
@@ -28,7 +30,8 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = "Recent CI Pipeline Executions"
     }
 
-    class CIPENode(val cipeInfo: CIPEInfo, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
+    class CIPENode(val cipeInfo: CIPEInfo, override val parent: CIPESimpleNode) :
+        CIPESimpleNode(parent) {
         override val nodeId = "cipe_${cipeInfo.ciPipelineExecutionId}"
 
         init {
@@ -52,14 +55,14 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             when (status) {
                 CIPEExecutionStatus.SUCCEEDED -> AllIcons.RunConfigurations.TestPassed
                 CIPEExecutionStatus.FAILED -> AllIcons.RunConfigurations.TestError
-                CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default()
+                CIPEExecutionStatus.IN_PROGRESS -> AnimatedIcon.Default.INSTANCE
                 CIPEExecutionStatus.NOT_STARTED -> AllIcons.RunConfigurations.TestNotRan
                 CIPEExecutionStatus.CANCELED -> AllIcons.RunConfigurations.TestTerminated
                 CIPEExecutionStatus.TIMED_OUT -> AllIcons.RunConfigurations.TestError
             }
     }
 
-    class RunGroupNode(val runGroup: CIPERunGroup, parent: CIPESimpleNode) :
+    class RunGroupNode(val runGroup: CIPERunGroup, override val parent: CIPESimpleNode) :
         CIPESimpleNode(parent) {
         override val nodeId = "rungroup_${runGroup.runGroup}"
 
@@ -72,7 +75,11 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = runGroup.ciExecutionEnv.ifEmpty { runGroup.runGroup }
     }
 
-    class RunNode(val run: CIPERun, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
+    class RunNode(
+        val run: CIPERun,
+        val runGroup: CIPERunGroup,
+        override val parent: CIPESimpleNode
+    ) : CIPESimpleNode(parent) {
         override val nodeId = "run_${run.linkId ?: run.executionId ?: "unknown"}"
 
         init {
@@ -99,7 +106,8 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             }
     }
 
-    class FailedTaskNode(val taskName: String, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
+    class FailedTaskNode(val taskName: String, override val parent: RunNode) :
+        CIPESimpleNode(parent) {
         override val nodeId = "task_$taskName"
 
         val projectName: String
@@ -117,8 +125,13 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = taskName
     }
 
-    class NxCloudFixNode(val aiFix: NxAiFix, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
+    class NxCloudFixNode(val aiFix: NxAiFix, override val parent: FailedTaskNode) :
+        CIPESimpleNode(parent) {
         override val nodeId = "fix_${aiFix.aiFixId}"
+
+        override fun isAutoExpandNode(): Boolean {
+            return true
+        }
 
         init {
             icon = getFixIcon()
@@ -211,7 +224,8 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         }
     }
 
-    class LabelNode(val labelText: String, parent: CIPESimpleNode) : CIPESimpleNode(parent) {
+    class LabelNode(val labelText: String, override val parent: CIPESimpleNode) :
+        CIPESimpleNode(parent) {
         override val nodeId = "label_${labelText.hashCode()}"
 
         init {

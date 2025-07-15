@@ -13,6 +13,7 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.NxWorkspace
+import dev.nx.console.nx_toolwindow.cloud_tree.CIPETree
 import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
@@ -40,26 +41,31 @@ class NxToolWindowPanel(private val project: Project) :
 
     private val projectTree = NxProjectsTree(project)
     private val projectStructure = NxTreeStructure(projectTree, project)
-    private val cipeTreeStructure = CIPETreeStructure(project)
+    private val cipeTree = CIPETree(project)
+    private val cipeTreeStructure = CIPETreeStructure(cipeTree, project)
 
     private val eventChannel = Channel<Event>(capacity = 100)
 
     // UI Components
-    private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val nxToolMainComponents = NxToolMainComponents(project)
+
+    // Projects / Tasks UI
+    private val projectTreeComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
     private val toolBar = nxToolMainComponents.createToolbar(projectTree)
     private var mainContent: JComponent? = null
     private var errorCountAndComponent: Pair<Int, JComponent>? = null
-    private val cipeTreeComponent = nxToolMainComponents.createCIPETreeComponent(cipeTreeStructure)
+
+    // Cloud UI
+    private val cipeTreeComponent = ScrollPaneFactory.createScrollPane(cipeTree, 0)
     private val cipeTreeToolbar = nxToolMainComponents.createRecentCipeToolbar(cipeTreeComponent)
     private val cloudHeaderPanel = nxToolMainComponents.createCloudHeaderPanel()
-    private var connectedToNxCloudPanel: JPanel =
+    private val connectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createConnectedToNxCloudPanel(
             cipeTreeComponent,
             cipeTreeToolbar,
             cloudHeaderPanel
         )
-    private var notConnectedToNxCloudPanel: JPanel =
+    private val notConnectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createNotConnectedToNxCloudPanel()
 
     private val cipeDataListener: (CIPEDataResponse?) -> Unit = { cipeDataResponse ->
