@@ -1,16 +1,13 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
-import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.utils.NxConsolePluginDisposable
 import javax.swing.tree.TreeModel
-import javax.swing.tree.TreePath
 
 class CIPETreeStructure(val tree: CIPETree, private val project: Project) : SimpleTreeStructure() {
 
@@ -158,7 +155,6 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
 
     fun updateCIPEData(newData: List<CIPEInfo>) {
         val addedAIFixes = extractAIFixes(newData) - extractAIFixes(cipeData)
-        thisLogger().info(addedAIFixes.toString())
 
         cipeData = newData
 
@@ -166,37 +162,8 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
             persistenceManager.let { pm ->
                 tree.let { treeComponent ->
                     val persistenceVisitor = pm.CIPETreePersistenceVisitor()
-//                    val aiFixVisitor =
-//                        object : TreeVisitor {
-//                            override fun visit(path: TreePath): TreeVisitor.Action {
-//                                thisLogger().info("visiting path: $path")
-//                                val node =
-//                                    tree.getNodeFor(path)
-//
-//                                if(node == null) {
-//                                    thisLogger().info("node is null")
-//                                    return TreeVisitor.Action.SKIP_CHILDREN
-//                                }
-//
-//                                if (node !is CIPESimpleNode) {
-//                                    thisLogger().info("not a CIPESimpleNode: $node")
-//                                    return TreeVisitor.Action.SKIP_CHILDREN
-//                                }
-//                                thisLogger().info("visiting node: $node")
-//                                val isAiFixNode = addedAIFixes.find { node.nodeId.contains(it) } != null
-//                                if(isAiFixNode) {
-//                                    thisLogger().info("$node is ai fix node")
-//                                }
-//                                return when {
-//                                        isAiFixNode -> TreeVisitor.Action.INTERRUPT
-//                                    else -> TreeVisitor.Action.CONTINUE
-//                                }
-//                            }
-//                        }
-                    TreeUtil.promiseExpand(
-                        treeComponent,
-                        listOf(persistenceVisitor).stream()
-                    )
+
+                    TreeUtil.promiseExpand(treeComponent, listOf(persistenceVisitor).stream())
                 }
             }
         }
