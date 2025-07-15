@@ -219,6 +219,33 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     }
   }
 
+  private renderFormattedText(text: string): TemplateResult {
+    // Regular expression to match text between backticks
+    // This handles single backticks for inline code
+    const parts = text.split(/(`[^`]*`)/g);
+
+    return html`${parts.map((part) => {
+      // Check if this part is code (wrapped in backticks)
+      if (part.startsWith('`') && part.endsWith('`') && part.length > 1) {
+        // Remove the backticks and render as code
+        const code = part.slice(1, -1);
+        // Handle empty code blocks
+        if (code.length === 0) {
+          return html`<code
+            class="bg-fieldBackground rounded px-1 py-0.5 font-mono text-xs"
+            >&nbsp;</code
+          >`;
+        }
+        return html`<code
+          class="bg-fieldBackground rounded px-1 py-0.5 font-mono text-xs"
+          >${code}</code
+        >`;
+      }
+      // Otherwise, render as regular text
+      return part;
+    })}`;
+  }
+
   private getTerminalSection(
     taskId: string,
     terminalOutput: string,
@@ -346,7 +373,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="px-4 py-1 pb-4">
           ${aiFix.suggestedFixReasoning
             ? html`<p class="text-foreground m-0 mb-3 text-sm opacity-90">
-                ${aiFix.suggestedFixReasoning}
+                ${this.renderFormattedText(aiFix.suggestedFixReasoning)}
               </p>`
             : ''}
           <form-group-element variant="vertical">
