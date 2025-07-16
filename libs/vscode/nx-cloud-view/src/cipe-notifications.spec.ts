@@ -64,7 +64,8 @@ describe('CIPE Notifications', () => {
       | 'failWithAiFix'
       | 'progressFailedRunWithAiFix'
       | 'progressWithAiFixNoSuggestion'
-      | 'progressWithAiFixWithSuggestion';
+      | 'progressWithAiFixWithSuggestion'
+      | 'progressWithAiFixNotStarted';
     const pipelineExamples: Record<PipelineExamples, CIPEInfo[]> = {
       success: [
         {
@@ -323,6 +324,43 @@ describe('CIPE Notifications', () => {
           cipeUrl: 'https://cloud.nx.app/cipes/123',
         },
       ],
+      progressWithAiFixNotStarted: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'IN_PROGRESS',
+          createdAt: 100000,
+          completedAt: null,
+          commitTitle: 'fix: fix fix',
+          runGroups: [
+            {
+              createdAt: 10000,
+              completedAt: null,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'IN_PROGRESS',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'FAILED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+              aiFix: {
+                aiFixId: 'ai-fix-999',
+                suggestedFixStatus: 'NOT_STARTED',
+                taskIds: [],
+                terminalLogsUrls: {},
+                verificationStatus: 'NOT_STARTED',
+                userAction: 'NONE',
+              },
+            },
+          ],
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+        },
+      ],
     } as const;
 
     type NotificationResults = 'info' | 'error' | 'no';
@@ -410,6 +448,14 @@ describe('CIPE Notifications', () => {
       ], // No change, no notification
       ['failWithAiFix', 'failWithAiFix', 'no'], // Same state, no notification
       ['progressWithAiFixWithSuggestion', 'progressFailedRunWithAiFix', 'no'], // Both have suggestions, no notification
+      ['empty', 'progressWithAiFixNotStarted', 'no'], // AI fix not started, no notification
+      ['progressWithAiFixNotStarted', 'progressFailedRunWithAiFix', 'info'], // AI fix becomes available, notification
+      [
+        'progressWithAiFixNotStarted',
+        'progressWithAiFixWithSuggestion',
+        'info',
+      ], // AI fix becomes available, notification
+      ['progressWithAiFixNotStarted', 'failWithAiFix', 'info'], // AI fix becomes available, notification
     ] as const;
 
     test.each(cases)(

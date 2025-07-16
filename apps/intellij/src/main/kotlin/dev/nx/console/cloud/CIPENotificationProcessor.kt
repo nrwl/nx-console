@@ -33,48 +33,28 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     }
 
     override fun onDataChanged(event: CIPEDataChangedEvent) {
-        logger.debug("[CIPE_PROCESSOR] Processing CIPE data change")
-
         val oldInfo = event.oldData?.info
         val newInfo = event.newData.info
 
         if (newInfo == null) {
-            logger.debug("[CIPE_PROCESSOR] New data has no info, skipping processing")
             return
         }
 
         if (oldInfo == null) {
-            logger.debug(
-                "[CIPE_PROCESSOR] No previous data to compare, skipping notification check"
-            )
             return
         }
 
-        logger.info(
-            "[CIPE_PROCESSOR] Comparing ${oldInfo.size} old CIPEs with ${newInfo.size} new CIPEs for notifications"
-        )
         checkForNotifications(oldInfo, newInfo)
     }
 
     /** Check for notification events following VSCode logic */
     private fun checkForNotifications(oldInfo: List<CIPEInfo>, newInfo: List<CIPEInfo>) {
-        logger.debug("[CIPE_PROCESSOR] Starting notification check for ${newInfo.size} CIPEs")
 
         newInfo.forEach { newCIPE ->
-            logger.debug(
-                "[CIPE_PROCESSOR] Checking CIPE ${newCIPE.ciPipelineExecutionId}: " +
-                    "status=${newCIPE.status}, branch=${newCIPE.branch ?: "unknown"}"
-            )
-
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
-            logger.debug(
-                "[CIPE_PROCESSOR] Old CIPE found: ${oldCIPE != null}, " +
-                    "old status: ${oldCIPE?.status ?: "N/A"}"
-            )
 
             // Check if any runGroup has an AI fix (to skip failure notifications)
             val hasAiFix = newCIPE.runGroups.any { it.aiFix != null }
-            logger.debug("[CIPE_PROCESSOR] CIPE has AI fix: $hasAiFix")
 
             // Check for newly available AI fixes and show proactive notifications
             if (oldCIPE != null) {
@@ -148,31 +128,20 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
 
     /** Check for newly available AI fixes following VSCode logic */
     private fun checkForNewAiFixNotifications(oldCIPE: CIPEInfo, newCIPE: CIPEInfo) {
-        logger.debug(
-            "[CIPE_PROCESSOR] Checking for new AI fixes in CIPE ${newCIPE.ciPipelineExecutionId}"
-        )
+
         val newCIPERunGroups = newCIPE.runGroups
         val oldCIPERunGroups = oldCIPE.runGroups
 
         newCIPERunGroups.forEach { newRunGroup ->
-            logger.debug(
-                "[CIPE_PROCESSOR] Checking run group ${newRunGroup.runGroup}: " +
-                    "has AI fix: ${newRunGroup.aiFix != null}"
-            )
-
-            if (newRunGroup.aiFix?.suggestedFix != null) {
+            if (
+                newRunGroup.aiFix?.suggestedFix != null &&
+                    newRunGroup.aiFix?.suggestedFixStatus != AITaskFixStatus.NOT_STARTED
+            ) {
                 val oldRunGroup = oldCIPERunGroups.find { it.runGroup == newRunGroup.runGroup }
-                logger.debug(
-                    "[CIPE_PROCESSOR] Old run group found: ${oldRunGroup != null}, " +
-                        "had AI fix: ${oldRunGroup?.aiFix?.suggestedFix != null}"
-                )
 
                 if (oldRunGroup?.aiFix?.suggestedFix == null) {
                     // AI fix newly available - emit proactive notification
-                    logger.info(
-                        "[CIPE_PROCESSOR] New AI fix available! Emitting AiFixAvailable notification " +
-                            "for CIPE ${newCIPE.ciPipelineExecutionId}, run group ${newRunGroup.runGroup}"
-                    )
+
                     emitNotification(CIPENotificationEvent.AiFixAvailable(newCIPE, newRunGroup))
                 }
             }
