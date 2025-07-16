@@ -1276,28 +1276,33 @@
         {
           "id": "nxProjects",
           "name": "Projects",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace",
+          "visibility": "visible"
         },
         {
           "id": "nxCloudLoading",
           "name": "Nx Cloud",
-          "when": "isNxWorkspace && nxCloudView.visible.loading"
+          "when": "isNxWorkspace && nxCloudView.visible.loading",
+          "visibility": "visible"
         },
         {
           "id": "nxCloudOnboarding",
           "type": "webview",
           "name": "Nx Cloud :: CI Optimizations",
-          "when": "isNxWorkspace && nxCloudView.visible.onboarding"
+          "when": "isNxWorkspace && nxCloudView.visible.onboarding",
+          "visibility": "visible"
         },
         {
           "id": "nxCloudRecentCIPE",
           "name": "Nx Cloud :: Your PRs",
-          "when": "isNxWorkspace && nxCloudView.visible.recent-cipe"
+          "when": "isNxWorkspace && nxCloudView.visible.recent-cipe",
+          "visibility": "visible"
         },
         {
           "id": "nxCommands",
           "name": "Common Nx Commands",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace",
+          "visibility": "collapsed"
         },
         {
           "id": "nxHelpAndFeedback",
@@ -1308,7 +1313,8 @@
           "id": "nxMigrate",
           "type": "webview",
           "name": "Nx Migrate ",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace",
+          "visibility": "collapsed"
         }
       ]
     }
