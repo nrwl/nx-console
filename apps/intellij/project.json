@@ -4,7 +4,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "command": "echo build && exit 1",
+      "command": "echo build && throw error",
       "configurations": {
         "production-intellij": {}
       },
