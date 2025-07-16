@@ -183,10 +183,8 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
     }
   };
 
-  const taskDisplay = runGroup.aiFix?.taskIds[0];
-  const message = `Nx Cloud suggested a fix for ${taskDisplay} in #${cipe.branch}`;
+  const message = getAIFixMessage(runGroup.aiFix?.taskIds[0], cipe.branch);
 
-  // Show notification
   window
     .showInformationMessage(message, ...messageCommands)
     .then(handleResults);
@@ -229,8 +227,10 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
       );
     }
 
-    const taskDisplay = foundFix.runGroup.aiFix?.taskIds[0];
-    const message = `Nx Cloud suggested a fix for ${taskDisplay} in #${foundFix.cipe.branch}`;
+    const message = getAIFixMessage(
+      foundFix.runGroup.aiFix?.taskIds[0],
+      foundFix.cipe.branch,
+    );
 
     aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix`;
     aiFixStatusBarItem.tooltip = message;
@@ -249,4 +249,8 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
     // Hide status bar if no fixes available
     hideAiFixStatusBarItem();
   }
+}
+
+function getAIFixMessage(task: string, branch: string) {
+  return `New AI Fix available for ${task} in #${branch}`;
 }

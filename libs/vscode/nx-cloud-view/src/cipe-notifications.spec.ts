@@ -504,7 +504,7 @@ describe('CIPE Notifications', () => {
         );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'Nx Cloud suggested a fix for test-task-1 in #feature',
+          'New AI Fix available for test-task-1 in #feature',
           'Show Suggested Fix',
           'Reject',
         );
@@ -518,7 +518,7 @@ describe('CIPE Notifications', () => {
         );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'Nx Cloud suggested a fix for test-task-2 in #feature',
+          'New AI Fix available for test-task-2 in #feature',
           'Show Suggested Fix',
           'Reject',
         );
@@ -611,7 +611,7 @@ describe('CIPE Notifications', () => {
         );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'Nx Cloud suggested a fix for test-task-1 in #feature',
+          'New AI Fix available for test-task-1 in #feature',
           'Show Suggested Fix',
           'Reject',
         );
