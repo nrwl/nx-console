@@ -1,3 +1,21 @@
+# [18.58.0](https://github.com/nrwl/nx-console/compare/vscode-v18.57.1...vscode-v18.58.0) (2025-07-16)
+
+
+### Bug Fixes
+
+* dont show notifications & tree items for ai fixes with NOT_STARTED ([#2619](https://github.com/nrwl/nx-console/issues/2619)) ([33661e4](https://github.com/nrwl/nx-console/commit/33661e424b4f06c7b17d7f457837e79e8a794432))
+* render inline code blocks in cloud fix webview ([#2616](https://github.com/nrwl/nx-console/issues/2616)) ([f0b3886](https://github.com/nrwl/nx-console/commit/f0b3886c9ad82ec116d4cab6fe1c8251263ba66d))
+* self-healing ui fixes ([#2610](https://github.com/nrwl/nx-console/issues/2610)) ([2f46e6b](https://github.com/nrwl/nx-console/commit/2f46e6b5260624f6b88c24996421775de8d692c5))
+* **vscode:** don't throw error if MCP port is already in use ([#2579](https://github.com/nrwl/nx-console/issues/2579)) ([dbb8937](https://github.com/nrwl/nx-console/commit/dbb8937ef2b5114b8e3a873bcfff39fde237f205))
+* **vscode:** remove noisy logs from cloud polling ([#2597](https://github.com/nrwl/nx-console/issues/2597)) ([6a9e31c](https://github.com/nrwl/nx-console/commit/6a9e31c10430376dfb55bb41253d00bbff2b3aff))
+
+
+### Features
+
+* add suggested fix reasoning to fix ui ([#2611](https://github.com/nrwl/nx-console/issues/2611)) ([1b3373e](https://github.com/nrwl/nx-console/commit/1b3373ed21ba8539896cf5d01e717097d2561b37))
+* **intellij:** add self-healing CI support ([#2604](https://github.com/nrwl/nx-console/issues/2604)) ([5727466](https://github.com/nrwl/nx-console/commit/5727466fb1136356b2ea79dafd7c131a49111629))
+* track ai fix action origin ([#2607](https://github.com/nrwl/nx-console/issues/2607)) ([418842d](https://github.com/nrwl/nx-console/commit/418842d501d3a294cea6f8f8e8d4936acfeb52a1))
+
 ## [18.57.1](https://github.com/nrwl/nx-console/compare/vscode-v18.57.0...vscode-v18.57.1) (2025-07-08)
 
 
