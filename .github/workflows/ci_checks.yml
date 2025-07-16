@@ -66,7 +66,7 @@ jobs:
         run: |
           yarn nx-cloud record -- ./gradlew projectReportAll
           yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
-          yarn nx-cloud record -- ./gradlew :blub:nonexistent
+          yarn nx-cloud record -- ./gradlew :blub:nonexistenty
 
       - name: Check project graph creation
         run: yarn nx show projects --verbose
