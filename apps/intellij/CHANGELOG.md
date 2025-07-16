@@ -1,3 +1,11 @@
+## <small>1.46.2 (2025-07-16)</small>
+
+### Bug Fixes
+
+* dont show notifications & tree items for ai fixes with NOT_STARTED ([#2619](https://github.com/nrwl/nx-console/issues/2619)) ([33661e4](https://github.com/nrwl/nx-console/commit/33661e424b4f06c7b17d7f457837e79e8a794432))
+* **intellij:** remove runGroup when only one exists, refactor & fix loading animation ([#2614](https://github.com/nrwl/nx-console/issues/2614)) ([f985f32](https://github.com/nrwl/nx-console/commit/f985f32892df3f563ce4aff3184bbcccfd038d93))
+* render inline code blocks in cloud fix webview ([#2616](https://github.com/nrwl/nx-console/issues/2616)) ([f0b3886](https://github.com/nrwl/nx-console/commit/f0b3886c9ad82ec116d4cab6fe1c8251263ba66d))
+
 ## <small>1.46.1 (2025-07-14)</small>
 
 ### Bug Fixes
