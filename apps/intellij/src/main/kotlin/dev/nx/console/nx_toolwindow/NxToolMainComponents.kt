@@ -15,18 +15,11 @@ import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
-import com.intellij.ui.ScrollPaneFactory
-import com.intellij.ui.TreeUIHelper
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
 import dev.nx.console.cloud.CIPEPollingService
-import dev.nx.console.cloud.CloudFixUIService
-import dev.nx.console.nx_toolwindow.cloud_tree.CIPESimpleNode
-import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeCellRenderer
-import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreePersistenceManager
-import dev.nx.console.nx_toolwindow.cloud_tree.CIPETreeStructure
+import dev.nx.console.nx_toolwindow.cloud_tree.*
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.nxls.NxlsService
@@ -40,12 +33,9 @@ import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.*
 import java.awt.event.ActionEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.*
 import javax.swing.border.CompoundBorder
-import javax.swing.tree.DefaultMutableTreeNode
 import kotlinx.coroutines.launch
 
 class NxToolMainComponents(private val project: Project) {
@@ -407,52 +397,6 @@ class NxToolMainComponents(private val project: Project) {
         return toolbar
     }
 
-    fun createCIPETreeComponent(cipeTreeStructure: CIPETreeStructure): JComponent {
-        val treeModel = cipeTreeStructure.createTreeModel()
-
-        val tree =
-            Tree(treeModel).apply {
-                isRootVisible = false
-                cellRenderer = CIPETreeCellRenderer()
-                TreeUIHelper.getInstance().installTreeSpeedSearch(this)
-            }
-
-        val persistenceManager = CIPETreePersistenceManager(tree)
-        persistenceManager.installPersistenceListeners()
-
-        // Set tree reference on the structure so it can restore expansion state
-        cipeTreeStructure.tree = tree
-
-        tree.apply {
-            addMouseListener(
-                object : MouseAdapter() {
-                    override fun mouseClicked(e: MouseEvent) {
-                        if (e.clickCount == 1) {
-                            val path = getPathForLocation(e.x, e.y)
-                            if (path != null) {
-                                val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
-                                val userObject = lastNode?.userObject
-
-                                if (userObject is CIPESimpleNode.NxCloudFixNode) {
-                                    handleAIFixClick(userObject)
-                                }
-                            }
-                        }
-                    }
-                }
-            )
-        }
-
-        val scrollPane =
-            ScrollPaneFactory.createScrollPane(tree, 0).apply {
-                preferredSize = Dimension(300, 400)
-                minimumSize = Dimension(200, 200)
-            }
-
-        cipeTreeStructure.persistenceManager = persistenceManager
-        return scrollPane
-    }
-
     fun createCloudHeaderPanel(): JPanel {
         return JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
@@ -620,28 +564,6 @@ class NxToolMainComponents(private val project: Project) {
             actionGroup.add(collapseAllAction)
 
             actionManager.createActionToolbar(NxToolWindowPanel.NX_TOOLBAR_PLACE, actionGroup, true)
-        }
-    }
-
-    private fun handleAIFixClick(fixNode: CIPESimpleNode.NxCloudFixNode) {
-        TelemetryService.getInstance(project)
-            .featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS, mapOf("source" to "cipe_tree"))
-
-        var currentNode: CIPESimpleNode? = fixNode
-        var cipeId: String? = null
-        var runGroupName: String? = null
-
-        while (currentNode != null) {
-            when (currentNode) {
-                is CIPESimpleNode.CIPENode -> cipeId = currentNode.cipeInfo.ciPipelineExecutionId
-                is CIPESimpleNode.RunGroupNode -> runGroupName = currentNode.runGroup.runGroup
-                else -> {}
-            }
-            currentNode = currentNode.parent as? CIPESimpleNode
-        }
-
-        if (cipeId != null && runGroupName != null) {
-            CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupName)
         }
     }
 

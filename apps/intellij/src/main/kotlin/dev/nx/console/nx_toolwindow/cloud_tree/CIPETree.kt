@@ -1,14 +1,66 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
-import com.intellij.ui.ColoredTreeCellRenderer
-import com.intellij.ui.JBColor
-import com.intellij.ui.SimpleTextAttributes
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.project.Project
+import com.intellij.ui.*
+import com.intellij.ui.treeStructure.SimpleTree
+import dev.nx.console.cloud.CloudFixUIService
 import dev.nx.console.models.AITaskFixStatus
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.models.CIPEExecutionStatus
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.Notifier
 import java.awt.Color
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
+
+class CIPETree(private val project: Project) : SimpleTree() {
+    init {
+        isRootVisible = false
+        setCellRenderer(CIPETreeCellRenderer())
+        TreeUIHelper.getInstance().installTreeSpeedSearch(this)
+        putClientProperty(AnimatedIcon.ANIMATION_IN_RENDERER_ALLOWED, true)
+        addMouseListener(
+            object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent) {
+                    if (e.clickCount == 1) {
+                        val path = getPathForLocation(e.x, e.y)
+                        if (path != null) {
+                            val lastNode = path.lastPathComponent as? DefaultMutableTreeNode
+                            val userObject = lastNode?.userObject
+
+                            if (userObject is CIPESimpleNode.NxCloudFixNode) {
+                                handleAIFixClick(userObject)
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    private fun handleAIFixClick(fixNode: CIPESimpleNode.NxCloudFixNode) {
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS, mapOf("source" to "cipe_tree"))
+
+        val runGroupId = fixNode.parent.parent.runGroup.runGroup
+        val cipeId = findAncestor<CIPESimpleNode.CIPENode>(fixNode)?.cipeInfo?.ciPipelineExecutionId
+
+        if (cipeId == null) {
+            Notifier.notifyAnything(
+                project,
+                "Couldn't find CIPE for AI fix",
+                NotificationType.ERROR
+            )
+            return
+        }
+
+        CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
+    }
+}
 
 class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
 
