@@ -363,6 +363,44 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events.isEmpty())
     }
 
+    fun testNewCIPEWithAiFixNotStartedDoesNotShowNotification() {
+        // When a new CIPE has AI fix with status NOT_STARTED, should not notify
+        val oldCIPE = createProgressCIPE()
+        val newCIPEWithAiFixNotStarted =
+            createProgressWithAiFixNotStarted()
+                .copy(
+                    ciPipelineExecutionId = "4" // Different ID - new CIPE
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(oldCIPE)),
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixNotStarted))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification since suggestedFix is null
+        assertTrue(mockListener.events.isEmpty())
+    }
+
+    fun testCIPEWithAiFixNotStartedDoesNotShowNotification() {
+        // When an existing CIPE has AI fix with status NOT_STARTED, should not notify
+        val oldCIPE = createProgressCIPE()
+        val newCIPEWithAiFixNotStarted = createProgressWithAiFixNotStarted()
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(oldCIPE)),
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixNotStarted))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification since suggestedFix is null
+        assertTrue(mockListener.events.isEmpty())
+    }
+
     // Helper functions to create test data
     private fun createSuccessfulCIPE() =
         CIPEInfo(
@@ -556,6 +594,47 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 suggestedFix = null,
                                 suggestedFixDescription = null,
                                 verificationStatus = AITaskFixStatus.IN_PROGRESS,
+                                userAction = AITaskFixUserAction.NONE
+                            )
+                    )
+                )
+        )
+
+    private fun createProgressWithAiFixNotStarted() =
+        CIPEInfo(
+            ciPipelineExecutionId = "1",
+            branch = "feature",
+            status = CIPEExecutionStatus.IN_PROGRESS,
+            createdAt = 100000,
+            completedAt = null,
+            commitTitle = "fix: fix fix",
+            commitUrl = "https://github.com/commit/123",
+            cipeUrl = "https://cloud.nx.app/cipes/123",
+            runGroups =
+                listOf(
+                    CIPERunGroup(
+                        ciExecutionEnv = "123123",
+                        runGroup = "rungroup-123123",
+                        createdAt = 10000,
+                        completedAt = null,
+                        status = CIPEExecutionStatus.IN_PROGRESS,
+                        runs =
+                            listOf(
+                                CIPERun(
+                                    linkId = "123123",
+                                    command = "nx test",
+                                    status = CIPEExecutionStatus.FAILED,
+                                    runUrl = "http://test.url"
+                                )
+                            ),
+                        aiFix =
+                            NxAiFix(
+                                aiFixId = "ai-fix-789",
+                                taskIds = listOf(),
+                                terminalLogsUrls = mapOf(),
+                                suggestedFix = null,
+                                suggestedFixDescription = null,
+                                verificationStatus = AITaskFixStatus.NOT_STARTED,
                                 userAction = AITaskFixUserAction.NONE
                             )
                     )

@@ -298,7 +298,11 @@ export class RunTreeItem
       );
 
       // Only add the fix to the first run that contains this task
-      if (isFirstRunWithFixTask && taskId === primaryFixTaskId) {
+      if (
+        isFirstRunWithFixTask &&
+        taskId === primaryFixTaskId &&
+        this.runGroup.aiFix?.suggestedFixStatus !== 'NOT_STARTED'
+      ) {
         taskItem.collapsibleState = TreeItemCollapsibleState.Expanded;
         taskItem.getChildren = () => [
           new NxCloudFixTreeItem(this.runGroup, this.cipeId, taskId),

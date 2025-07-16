@@ -5,6 +5,7 @@ import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
+import dev.nx.console.models.AITaskFixStatus
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.utils.NxConsolePluginDisposable
 import javax.swing.tree.TreeModel
@@ -135,7 +136,7 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
                 (firstRunWithPrimaryTask.linkId == run.linkId) ||
                     (firstRunWithPrimaryTask.executionId == run.executionId)
 
-            if (!isFirstRunWithTask) {
+            if (!isFirstRunWithTask || aiFix.suggestedFixStatus == AITaskFixStatus.NOT_STARTED) {
                 return emptyArray()
             }
 

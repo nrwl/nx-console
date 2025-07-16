@@ -43,7 +43,10 @@ export function compareCIPEDataAndSendNotification(
     const hasAiFix = newCIPERunGroups.some((runGroup) => !!runGroup.aiFix);
 
     for (const newRunGroup of newCIPERunGroups) {
-      if (newRunGroup.aiFix?.suggestedFix) {
+      if (
+        newRunGroup.aiFix?.suggestedFix &&
+        newRunGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
+      ) {
         const oldRunGroup = oldCIPERunGroups.find(
           (runGroup) => runGroup.runGroup === newRunGroup.runGroup,
         );
