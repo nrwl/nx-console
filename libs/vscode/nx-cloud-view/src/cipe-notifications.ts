@@ -163,11 +163,11 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
   const telemetry = getTelemetry();
   telemetry.logUsage('cloud.show-ai-fix-notification');
 
-  type MessageCommand = 'Show Suggested Fix' | 'Reject';
-  const messageCommands: MessageCommand[] = ['Show Suggested Fix', 'Reject'];
+  type MessageCommand = 'Show Fix' | 'Reject';
+  const messageCommands: MessageCommand[] = ['Show Fix', 'Reject'];
 
   const handleResults = async (selection: MessageCommand | undefined) => {
-    if (selection === 'Show Suggested Fix') {
+    if (selection === 'Show Fix') {
       telemetry.logUsage('cloud.show-ai-fix', {
         source: 'notification',
       });
@@ -185,9 +185,7 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
 
   const message = getAIFixMessage(runGroup.aiFix?.taskIds[0], cipe.branch);
 
-  window
-    .showInformationMessage(message, ...messageCommands)
-    .then(handleResults);
+  window.showErrorMessage(message, ...messageCommands).then(handleResults);
 }
 
 export function disposeAiFixStatusBarItem() {
@@ -252,5 +250,5 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
 }
 
 function getAIFixMessage(task: string, branch: string) {
-  return `New AI Fix available for ${task} in #${branch}`;
+  return `CI failed. Nx AI suggested a fix for ${task} in #${branch}`;
 }

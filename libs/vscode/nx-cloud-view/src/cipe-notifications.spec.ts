@@ -504,7 +504,10 @@ describe('CIPE Notifications', () => {
         );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'New AI Fix available for test-task-1 in #feature',
+          '_7171214.JPG
+_7171216.JPG
+_7171223.JPG
+_7171228.JPG test-task-1 in #feature',
           'Show Suggested Fix',
           'Reject',
         );
@@ -518,7 +521,10 @@ describe('CIPE Notifications', () => {
         );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'New AI Fix available for test-task-2 in #feature',
+          '_7171214.JPG
+_7171216.JPG
+_7171223.JPG
+_7171228.JPG test-task-2 in #feature',
           'Show Suggested Fix',
           'Reject',
         );
@@ -611,7 +617,10 @@ describe('CIPE Notifications', () => {
         );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'New AI Fix available for test-task-1 in #feature',
+          '_7171214.JPG
+_7171216.JPG
+_7171223.JPG
+_7171228.JPG test-task-1 in #feature',
           'Show Suggested Fix',
           'Reject',
         );

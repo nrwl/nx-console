@@ -125,9 +125,9 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
         val notification =
             NOTIFICATION_GROUP.createNotification(
-                title = "AI Fix Available",
+                title = "CI Failed. Nx AI suggested a fix.",
                 content = content,
-                type = NotificationType.INFORMATION
+                type = NotificationType.ERROR
             )
 
         notification.addAction(
@@ -218,7 +218,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
     private inner class ShowSuggestedFixAction(
         private val cipeId: String,
         private val runGroupId: String
-    ) : NotificationAction("Show Suggested Fix") {
+    ) : NotificationAction("Show Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             telemetryService.featureUsed(
                 TelemetryEvent.CLOUD_SHOW_AI_FIX,
