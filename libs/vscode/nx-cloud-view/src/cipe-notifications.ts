@@ -82,7 +82,7 @@ export function compareCIPEDataAndSendNotification(
 
     if (newCIPEIsFailed && !hasAiFix) {
       showMessageWithResultAndCommit(
-        `CI Pipeline Execution for #${newCIPE.branch} has failed`,
+        `CI failed for #${newCIPE.branch}.`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
@@ -93,14 +93,14 @@ export function compareCIPEDataAndSendNotification(
           ? newCIPEFailedRun.command.substring(0, 60) + '[...]'
           : newCIPEFailedRun.command;
       showMessageWithResultAndCommit(
-        `"${command}" has failed on #${newCIPE.branch}`,
+        `"${command}" failed on #${newCIPE.branch}.`,
         newCIPEFailedRun.runUrl,
         newCIPE.commitUrl,
         'error',
       );
     } else if (newCipeIsSucceeded && nxCloudNotificationsSetting === 'all') {
       showMessageWithResultAndCommit(
-        `CI Pipeline Execution for #${newCIPE.branch} has completed`,
+        `CI succeeded for #${newCIPE.branch}.`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'information',
@@ -183,7 +183,7 @@ function showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
     }
   };
 
-  const message = getAIFixMessage(runGroup.aiFix?.taskIds[0], cipe.branch);
+  const message = getAIFixMessage(cipe.branch);
 
   window.showErrorMessage(message, ...messageCommands).then(handleResults);
 }
@@ -225,10 +225,7 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
       );
     }
 
-    const message = getAIFixMessage(
-      foundFix.runGroup.aiFix?.taskIds[0],
-      foundFix.cipe.branch,
-    );
+    const message = getAIFixMessage(foundFix.cipe.branch);
 
     aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix`;
     aiFixStatusBarItem.tooltip = message;
@@ -249,6 +246,6 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
   }
 }
 
-function getAIFixMessage(task: string, branch: string) {
-  return `CI failed. Nx AI suggested a fix for ${task} in #${branch}`;
+function getAIFixMessage(branch: string) {
+  return `CI failed. Nx Cloud AI has a fix for #${branch}`;
 }
