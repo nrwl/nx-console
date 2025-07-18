@@ -449,13 +449,13 @@ describe('CIPE Notifications', () => {
       ['failWithAiFix', 'failWithAiFix', 'no'], // Same state, no notification
       ['progressWithAiFixWithSuggestion', 'progressFailedRunWithAiFix', 'no'], // Both have suggestions, no notification
       ['empty', 'progressWithAiFixNotStarted', 'no'], // AI fix not started, no notification
-      ['progressWithAiFixNotStarted', 'progressFailedRunWithAiFix', 'info'], // AI fix becomes available, notification
+      ['progressWithAiFixNotStarted', 'progressFailedRunWithAiFix', 'error'], // AI fix becomes available, notification
       [
         'progressWithAiFixNotStarted',
         'progressWithAiFixWithSuggestion',
-        'info',
+        'error',
       ], // AI fix becomes available, notification
-      ['progressWithAiFixNotStarted', 'failWithAiFix', 'info'], // AI fix becomes available, notification
+      ['progressWithAiFixNotStarted', 'failWithAiFix', 'error'], // AI fix becomes available, notification
     ] as const;
 
     test.each(cases)(
