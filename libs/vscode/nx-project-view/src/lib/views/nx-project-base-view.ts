@@ -168,7 +168,7 @@ export abstract class BaseView {
     targetNames: string[],
   ): TargetGroupViewItem {
     return {
-      id: `${nxProject.project}:${targetGroupName}`,
+      id: `${nxProject.project}:targetGroup:${targetGroupName}`,
       contextValue: 'targetGroup',
       nxProject,
       nxTargets: [...new Set(targetNames)].map((name) => ({ name })),
