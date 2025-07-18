@@ -493,7 +493,7 @@ class NxCloudFixFileImpl(
             try {
                 val cloudApiService = NxCloudApiService.getInstance(project)
                 val success =
-                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.APPLIED_LOCALLY)
+                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.REJECTED)
 
                 if (success) {
                     CIPEPollingService.getInstance(project).forcePoll()
