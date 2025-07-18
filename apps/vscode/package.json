@@ -1188,7 +1188,7 @@
       },
       {
         "view": "nxCloudRecentCIPE",
-        "contents": "No CI Pipeline Executions from local branches have run in the past hour. You can view all CI Pipeline Executions in the Nx Cloud application. \n [Open Nx Cloud App](command:nxCloud.openApp)",
+        "contents": "No Pull Requests from local branches have run recently. You can view all PRs and their CI Pipelines in the Nx Cloud application. \n [Open Nx Cloud App](command:nxCloud.openApp)",
         "when": "nxCloudView.error == false"
       },
       {
@@ -1200,6 +1200,11 @@
         "view": "nxCloudRecentCIPE",
         "contents": "An error occured while accessing the Nx Cloud API. \n [View Error Output](command:nxCloud.viewRecentError)",
         "when": "nxCloudView.error == other"
+      },
+      {
+        "view": "nxCloudRecentCIPE",
+        "contents": "A network error occured while accessing the Nx Cloud API. \n Please check your internet connection and try again. \n [Refresh Nx Cloud View](command:nxCloud.refresh)",
+        "when": "nxCloudView.error == network"
       },
       {
         "view": "nxCloudLoading",

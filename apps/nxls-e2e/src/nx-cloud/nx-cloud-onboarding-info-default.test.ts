@@ -1,17 +1,17 @@
-import { join } from 'path';
-import { NxlsWrapper } from '../nxls-wrapper';
+import { NxCloudOnboardingInfoRequest } from '@nx-console/language-server-types';
 import {
-  uniq,
+  defaultVersion,
   e2eCwd,
+  modifyJsonFile,
   newWorkspace,
   simpleReactWorkspaceOptions,
-  defaultVersion,
-  modifyJsonFile,
+  uniq,
 } from '@nx-console/shared-e2e-utils';
-import { NxCloudOnboardingInfoRequest } from '@nx-console/language-server-types';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
+import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
-import { exec, execSync } from 'child_process';
+import { join } from 'path';
+import { NxlsWrapper } from '../nxls-wrapper';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -42,13 +42,11 @@ describe('nx cloud onboarding - default', () => {
       ...NxCloudOnboardingInfoRequest,
       params: {},
     });
-    expect(onboardingInfoResponse.result).toMatchInlineSnapshot(`
-      Object {
-        "hasNxInCI": false,
-        "isConnectedToCloud": false,
-        "isWorkspaceClaimed": false,
-      }
-    `);
+    const info = onboardingInfoResponse.result as CloudOnboardingInfo;
+
+    // we check everything except isWorkspaceClaimed becasue that depends on things outside of our control (the internet)
+    expect(info.isConnectedToCloud).toEqual(false);
+    expect(info.hasNxInCI).toEqual(false);
   });
 
   it('should return connected true with access token', async () => {

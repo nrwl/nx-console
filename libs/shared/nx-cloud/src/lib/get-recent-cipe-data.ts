@@ -64,6 +64,23 @@ export async function getRecentCIPEData(
         },
       };
     }
+    // Check for network errors
+    if (
+      (e.status === 404 || !e.status) &&
+      e.responseText &&
+      (e.responseText.includes('Unable to connect') ||
+        e.responseText.includes('ENOTFOUND') ||
+        e.responseText.includes('ETIMEDOUT') ||
+        e.responseText.includes('ECONNREFUSED'))
+    ) {
+      logger.log(`Network error: ${e.responseText}`);
+      return {
+        error: {
+          type: 'network',
+          message: e.responseText,
+        },
+      };
+    }
     logger.log(`Error: ${JSON.stringify(e)}`);
     return {
       error: {

@@ -1,7 +1,7 @@
 export type CloudOnboardingInfo = {
   hasNxInCI: boolean;
   isConnectedToCloud: boolean;
-  isWorkspaceClaimed: boolean;
+  isWorkspaceClaimed: boolean | undefined;
   personalAccessToken: string | undefined;
 };
 

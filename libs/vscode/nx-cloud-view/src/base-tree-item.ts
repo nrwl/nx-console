@@ -8,7 +8,8 @@ export abstract class BaseRecentCIPETreeItem extends TreeItem {
     | 'run'
     | 'label'
     | 'failedTask'
-    | 'nxCloudFix';
+    | 'nxCloudFix'
+    | 'connectionError';
 
   abstract getChildren(): ProviderResult<BaseRecentCIPETreeItem[]>;
 

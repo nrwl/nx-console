@@ -177,7 +177,10 @@ export const machine = setup({
       }
       enqueue.assign({
         ...context,
-        recentCIPEs: newCIPEData?.info ?? [],
+        // Preserve existing CIPEs if we have a network error and no new data
+        recentCIPEs:
+          newCIPEData?.info ??
+          (newCIPEData?.error.type === 'network' ? context.recentCIPEs : []),
         cipeError: newCIPEData?.error,
         workspaceUrl: newCIPEData?.workspaceUrl,
       });
@@ -209,10 +212,22 @@ export const machine = setup({
       and(['hasOnboardingInfo', 'isOnboardingComplete']),
     ]),
     isOnboardingComplete: ({ context }) => {
+      const info = context.onboardingInfo;
+      if (!info) return false;
+
+      // If claim check failed (undefined) but other conditions are met,
+      // assume onboarding is complete (optimistic approach)
+      if (
+        info.isWorkspaceClaimed === undefined &&
+        info.isConnectedToCloud &&
+        info.hasNxInCI
+      ) {
+        return true;
+      }
+
+      // Otherwise, check all conditions as before
       return Boolean(
-        context.onboardingInfo?.isWorkspaceClaimed &&
-          context.onboardingInfo?.isConnectedToCloud &&
-          context.onboardingInfo?.hasNxInCI,
+        info.isWorkspaceClaimed && info.isConnectedToCloud && info.hasNxInCI,
       );
     },
     hasOnboardingInfo: ({ context }) => {
