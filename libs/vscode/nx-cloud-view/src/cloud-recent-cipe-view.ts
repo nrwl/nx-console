@@ -360,9 +360,31 @@ class LabelTreeItem extends BaseRecentCIPETreeItem {
   }
 }
 
+class ConnectionErrorTreeItem extends BaseRecentCIPETreeItem {
+  type = 'connectionError' as const;
+
+  constructor() {
+    super('Unable to connect to Nx Cloud');
+    this.description = 'Check your connection';
+    this.collapsibleState = TreeItemCollapsibleState.None;
+    this.contextValue = 'connectionError';
+    this.iconPath = new ThemeIcon(
+      'warning',
+      new ThemeColor('list.warningForeground'),
+    );
+    this.tooltip =
+      'Could not connect to Nx Cloud API. Some features may be limited.';
+  }
+
+  override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
+    return [];
+  }
+}
+
 export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPETreeItem> {
   public recentCIPEInfo: CIPEInfo[] | undefined;
   private workspaceUrl: string | undefined;
+  private claimCheckFailed = false;
 
   private cipeElements?: CIPETreeItem[];
   private static treeView: TreeView<BaseRecentCIPETreeItem> | undefined;
@@ -376,12 +398,16 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     actor.subscribe((state) => {
       this.workspaceUrl = state.context.workspaceUrl;
       const updatedCIPEs = state.context.recentCIPEs;
+      const updatedClaimCheckFailed =
+        state.context.onboardingInfo?.isWorkspaceClaimed === undefined;
 
       if (
         (updatedCIPEs || this.recentCIPEInfo) &&
-        !isDeepStrictEqual(this.recentCIPEInfo, updatedCIPEs)
+        (!isDeepStrictEqual(this.recentCIPEInfo, updatedCIPEs) ||
+          updatedClaimCheckFailed !== this.claimCheckFailed)
       ) {
         this.recentCIPEInfo = updatedCIPEs;
+        this.claimCheckFailed = updatedClaimCheckFailed;
         this.refresh();
         CloudRecentCIPEProvider.updateTreeViewBadge(updatedCIPEs);
       }
@@ -404,6 +430,15 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
         .sort((a, b) => {
           return b.cipe.createdAt - a.cipe.createdAt;
         });
+
+      // Only show connection error if we have CIPEs to display
+      if (this.claimCheckFailed && this.cipeElements.length > 0) {
+        const items: BaseRecentCIPETreeItem[] = [];
+        items.push(new ConnectionErrorTreeItem());
+        items.push(...this.cipeElements);
+        return items;
+      }
+
       return this.cipeElements;
     }
 
