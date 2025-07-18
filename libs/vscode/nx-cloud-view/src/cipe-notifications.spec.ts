@@ -428,17 +428,17 @@ describe('CIPE Notifications', () => {
       ['success', 'progressFailedRun', 'no'],
       ['success', 'fail', 'no'],
       // AI fix test cases
-      ['empty', 'failWithAiFix', 'info'], // AI fix with suggestion appears
-      ['progress', 'failWithAiFix', 'info'], // AI fix with suggestion appears
-      ['empty', 'progressFailedRunWithAiFix', 'info'], // AI fix with suggestion appears
-      ['progress', 'progressFailedRunWithAiFix', 'info'], // AI fix with suggestion appears
-      ['progressWithAiFixNoSuggestion', 'progressFailedRunWithAiFix', 'info'], // Different AI fix with suggestion
-      ['progressWithAiFixNoSuggestion', 'failWithAiFix', 'info'], // Different AI fix with suggestion
-      ['progressFailedRun', 'progressWithAiFixWithSuggestion', 'info'], // Transition from no AI fix to AI fix with suggestion
+      ['empty', 'failWithAiFix', 'error'], // AI fix with suggestion appears
+      ['progress', 'failWithAiFix', 'error'], // AI fix with suggestion appears
+      ['empty', 'progressFailedRunWithAiFix', 'error'], // AI fix with suggestion appears
+      ['progress', 'progressFailedRunWithAiFix', 'error'], // AI fix with suggestion appears
+      ['progressWithAiFixNoSuggestion', 'progressFailedRunWithAiFix', 'error'], // Different AI fix with suggestion
+      ['progressWithAiFixNoSuggestion', 'failWithAiFix', 'error'], // Different AI fix with suggestion
+      ['progressFailedRun', 'progressWithAiFixWithSuggestion', 'error'], // Transition from no AI fix to AI fix with suggestion
       [
         'progressWithAiFixNoSuggestion',
         'progressWithAiFixWithSuggestion',
-        'info',
+        'error',
       ], // AI fix gets suggestion
       ['progressFailedRun', 'progressWithAiFixNoSuggestion', 'no'], // AI fix without suggestion doesn't notify
       [
@@ -449,13 +449,13 @@ describe('CIPE Notifications', () => {
       ['failWithAiFix', 'failWithAiFix', 'no'], // Same state, no notification
       ['progressWithAiFixWithSuggestion', 'progressFailedRunWithAiFix', 'no'], // Both have suggestions, no notification
       ['empty', 'progressWithAiFixNotStarted', 'no'], // AI fix not started, no notification
-      ['progressWithAiFixNotStarted', 'progressFailedRunWithAiFix', 'info'], // AI fix becomes available, notification
+      ['progressWithAiFixNotStarted', 'progressFailedRunWithAiFix', 'error'], // AI fix becomes available, notification
       [
         'progressWithAiFixNotStarted',
         'progressWithAiFixWithSuggestion',
-        'info',
+        'error',
       ], // AI fix becomes available, notification
-      ['progressWithAiFixNotStarted', 'failWithAiFix', 'info'], // AI fix becomes available, notification
+      ['progressWithAiFixNotStarted', 'failWithAiFix', 'error'], // AI fix becomes available, notification
     ] as const;
 
     test.each(cases)(
@@ -502,10 +502,10 @@ describe('CIPE Notifications', () => {
           pipelineExamples.progress,
           pipelineExamples.failWithAiFix,
         );
-        expect(window.showErrorMessage).not.toHaveBeenCalled();
-        expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'Nx Cloud suggested a fix for test-task-1 in #feature',
-          'Show Suggested Fix',
+        expect(window.showInformationMessage).not.toHaveBeenCalled();
+        expect(window.showErrorMessage).toHaveBeenCalledWith(
+          'CI failed. Nx Cloud AI has a fix for #feature',
+          'Show Fix',
           'Reject',
         );
 
@@ -516,10 +516,10 @@ describe('CIPE Notifications', () => {
           pipelineExamples.progress,
           pipelineExamples.progressFailedRunWithAiFix,
         );
-        expect(window.showErrorMessage).not.toHaveBeenCalled();
-        expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'Nx Cloud suggested a fix for test-task-2 in #feature',
-          'Show Suggested Fix',
+        expect(window.showInformationMessage).not.toHaveBeenCalled();
+        expect(window.showErrorMessage).toHaveBeenCalledWith(
+          'CI failed. Nx Cloud AI has a fix for #feature',
+          'Show Fix',
           'Reject',
         );
       });
@@ -609,10 +609,10 @@ describe('CIPE Notifications', () => {
           pipelineExamples.progress,
           mixedRunGroups,
         );
-        expect(window.showErrorMessage).not.toHaveBeenCalled();
-        expect(window.showInformationMessage).toHaveBeenCalledWith(
-          'Nx Cloud suggested a fix for test-task-1 in #feature',
-          'Show Suggested Fix',
+        expect(window.showInformationMessage).not.toHaveBeenCalled();
+        expect(window.showErrorMessage).toHaveBeenCalledWith(
+          'CI failed. Nx Cloud AI has a fix for #feature',
+          'Show Fix',
           'Reject',
         );
       });
@@ -649,11 +649,11 @@ describe('CIPE Notifications', () => {
           );
 
           if (shouldNotify) {
-            expect(window.showInformationMessage).toHaveBeenCalled();
+            expect(window.showErrorMessage).toHaveBeenCalled();
           } else {
-            expect(window.showInformationMessage).not.toHaveBeenCalled();
+            expect(window.showErrorMessage).not.toHaveBeenCalled();
           }
-          expect(window.showErrorMessage).not.toHaveBeenCalled();
+          expect(window.showInformationMessage).not.toHaveBeenCalled();
         });
       });
     });

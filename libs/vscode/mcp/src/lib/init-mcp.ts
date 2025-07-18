@@ -198,7 +198,7 @@ async function updateMcpJson() {
     }
 
     mcpJson.mcpServers['nx-mcp'] = {
-      url: `http://localhost:${port}/sse`,
+      url: `http://localhost:${port}/mcp`,
     };
   } else {
     if (!mcpJson.servers) {
@@ -210,7 +210,6 @@ async function updateMcpJson() {
       url: `http://localhost:${port}/mcp`,
     };
   }
-
   if (!writeMcpJson(mcpJson)) {
     window.showErrorMessage('Failed to write to mcp.json');
     return false;
@@ -221,24 +220,3 @@ async function updateMcpJson() {
 
   return true;
 }
-
-// Functions removed and moved to AgentRulesManager class
-
-// Rules update handling is now managed by AgentRulesManager.setupUpdates
-// function ensureMcpEndpoint() {
-//   const mcpJson = readMcpJson();
-//   if (!mcpJson) {
-//     return;
-//   }
-
-//   const mcpServer = mcpJson.servers?.['nx-mcp'];
-//   if (!mcpServer) {
-//     return;
-//   }
-
-//   if (mcpServer.url && mcpServer.url.endsWith('/sse')) {
-//     mcpServer.url = mcpServer.url.replace('/sse', '/mcp');
-//     mcpServer.type = 'http';
-//     writeMcpJson(mcpJson);
-//   }
-// }

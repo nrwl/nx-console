@@ -42,6 +42,7 @@ import {
   NX_WORKSPACE,
 } from '@nx-console/shared-llm-context';
 import { registerNxTaskTools } from './tools/nx-tasks';
+import { registerNxWorkspaceTool } from './tools/nx-workspace';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -231,86 +232,15 @@ export class NxMcpServerWrapper {
       },
     );
 
-    this.server.tool(
-      NX_WORKSPACE,
-      'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
-      {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: false,
-      },
-      async () => {
-        this.telemetry?.logUsage('ai.tool-call', {
-          tool: NX_WORKSPACE,
-        });
-        try {
-          if (!this._nxWorkspacePath) {
-            return {
-              isError: true,
-              content: [
-                { type: 'text', text: 'Error: Workspace path not set' },
-              ],
-            };
-          }
-          if (!(await checkIsNxWorkspace(this._nxWorkspacePath))) {
-            return {
-              isError: true,
-              content: [
-                {
-                  type: 'text',
-                  text: 'Error: The provided root is not a valid nx workspace.',
-                },
-              ],
-            };
-          }
-
-          const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
-            this._nxWorkspacePath,
-            this.logger,
-          );
-          if (!workspace) {
-            return {
-              isError: true,
-              content: [{ type: 'text', text: 'Error: Workspace not found' }],
-            };
-          }
-          const content: CallToolResult['content'] = [];
-          if (workspace.nxJson) {
-            content.push({
-              type: 'text',
-              text: getNxJsonPrompt(workspace.nxJson),
-            });
-          }
-          const hasProjects =
-            workspace.projectGraph &&
-            Object.keys(workspace.projectGraph.nodes).length > 0;
-
-          if (hasProjects) {
-            content.push({
-              type: 'text',
-              text: getProjectGraphPrompt(workspace.projectGraph),
-            });
-          }
-          if (workspace.errors) {
-            content.push({
-              type: 'text',
-              text: getProjectGraphErrorsPrompt(
-                workspace.errors,
-                !!workspace.isPartial,
-              ),
-            });
-          }
-
-          return {
-            content,
-          };
-        } catch (e) {
-          return {
-            content: [{ type: 'text', text: String(e) }],
-          };
-        }
-      },
-    );
+    if (this._nxWorkspacePath) {
+      registerNxWorkspaceTool(
+        this._nxWorkspacePath,
+        this.server,
+        this.logger,
+        this.nxWorkspaceInfoProvider,
+        this.telemetry,
+      );
+    }
 
     this.server.tool(
       NX_PROJECT_DETAILS,

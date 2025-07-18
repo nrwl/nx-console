@@ -79,9 +79,6 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 oldCIPE != null &&
                     (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))
             ) {
-                logger.debug(
-                    "[CIPE_PROCESSOR] Skipping notification - CIPE already completed/failed previously"
-                )
                 return@forEach
             }
 
@@ -89,9 +86,6 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             when {
                 // CIPE just failed - skip if AI fix available
                 newCIPE.status.isFailedStatus() && !hasAiFix -> {
-                    logger.info(
-                        "[CIPE_PROCESSOR] Emitting CIPEFailed notification for ${newCIPE.ciPipelineExecutionId}"
-                    )
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
 
@@ -102,33 +96,21 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                         newCIPE.runGroups.flatMap { it.runs }.firstOrNull { isRunFailed(it) }
 
                     failedRun?.let {
-                        logger.info(
-                            "[CIPE_PROCESSOR] Emitting RunFailed notification for " +
-                                "CIPE ${newCIPE.ciPipelineExecutionId}, run ${it.linkId}"
-                        )
                         emitNotification(CIPENotificationEvent.RunFailed(newCIPE, it))
                     }
                 }
 
                 // CIPE succeeded (only notify if settings allow)
                 newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
-                    logger.info(
-                        "[CIPE_PROCESSOR] Emitting CIPESucceeded notification for ${newCIPE.ciPipelineExecutionId}"
-                    )
                     emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
                 }
-                else -> {
-                    logger.debug(
-                        "[CIPE_PROCESSOR] No notification needed for CIPE ${newCIPE.ciPipelineExecutionId}"
-                    )
-                }
+                else -> {}
             }
         }
     }
 
     /** Check for newly available AI fixes following VSCode logic */
     private fun checkForNewAiFixNotifications(oldCIPE: CIPEInfo, newCIPE: CIPEInfo) {
-
         val newCIPERunGroups = newCIPE.runGroups
         val oldCIPERunGroups = oldCIPE.runGroups
 
@@ -158,11 +140,6 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     }
 
     private fun emitNotification(event: CIPENotificationEvent) {
-        logger.debug(
-            "[CIPE_PROCESSOR] Emitting notification event: ${event::class.simpleName} " +
-                "to ${notificationListeners.size} listeners"
-        )
-
         notificationListeners.forEach { listener ->
             try {
                 listener.onNotificationEvent(event)
