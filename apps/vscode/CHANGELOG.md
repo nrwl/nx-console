@@ -1,3 +1,17 @@
+# [18.59.0](https://github.com/nrwl/nx-console/compare/vscode-v18.58.0...vscode-v18.59.0) (2025-07-18)
+
+
+### Bug Fixes
+
+* **vscode:** handle project tree case where targetGroup & target have the same name ([#2623](https://github.com/nrwl/nx-console/issues/2623)) ([41d500b](https://github.com/nrwl/nx-console/commit/41d500bcf8022cf130677e47ebf5808a59643c90))
+* **vscode:** rename ai notifications to be stronger & other small fixes ([#2618](https://github.com/nrwl/nx-console/issues/2618)) ([8c46932](https://github.com/nrwl/nx-console/commit/8c469328be73bcf3695c2e0f6419adbb2ae4cfe5))
+* **vscode:** set up streamable http by default for cursor too ([#2624](https://github.com/nrwl/nx-console/issues/2624)) ([a64a59c](https://github.com/nrwl/nx-console/commit/a64a59c66fb2c1529d9f5f3559e1a7144a501645))
+
+
+### Features
+
+* **mcp:** optimize nx_workspace tool & gradually drop information if result is too large ([#2622](https://github.com/nrwl/nx-console/issues/2622)) ([2a8edaa](https://github.com/nrwl/nx-console/commit/2a8edaaa0b7f9df1bfbe0ce3f1eafae497c0ad91))
+
 # [18.58.0](https://github.com/nrwl/nx-console/compare/vscode-v18.57.1...vscode-v18.58.0) (2025-07-16)
 
 
