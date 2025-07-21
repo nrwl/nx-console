@@ -41,7 +41,7 @@ class NxProjectsTree(project: Project) : SimpleTree(), DataProvider {
         return null
     }
 
-    class AtomizerTreeCellRenderer(private val project: Project) : ColoredTreeCellRenderer() {
+    class AtomizerTreeCellRenderer(project: Project) : ColoredTreeCellRenderer() {
         private val nxCloudSyncService = NxCloudStatusSyncAccessService.getInstance(project)
 
         override fun customizeCellRenderer(

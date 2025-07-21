@@ -10,7 +10,7 @@ import dev.nx.console.project_details.browsers.NewProjectDetailsBrowser
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 
-class ProjectDetailsPreviewFileEditor(private val project: Project, file: VirtualFile) :
+class ProjectDetailsPreviewFileEditor(project: Project, file: VirtualFile) :
     UserDataHolderBase(), FileEditor {
     private val wrapper = NewProjectDetailsBrowser(project, file)
 
