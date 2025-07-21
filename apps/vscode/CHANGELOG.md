@@ -1,3 +1,10 @@
+## [18.59.1](https://github.com/nrwl/nx-console/compare/vscode-v18.59.0...vscode-v18.59.1) (2025-07-21)
+
+
+### Bug Fixes
+
+* **vscode:** handle network errors gracefully in nx cloud view ([#2626](https://github.com/nrwl/nx-console/issues/2626)) ([66588f8](https://github.com/nrwl/nx-console/commit/66588f8345bdac6cd3e8a60d3513a9e4c183c2b5))
+
 # [18.59.0](https://github.com/nrwl/nx-console/compare/vscode-v18.58.0...vscode-v18.59.0) (2025-07-18)
 
 
