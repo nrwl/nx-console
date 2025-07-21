@@ -38,13 +38,12 @@ export async function getCloudOnboardingInfo(
 
   const personalAccessToken = cloudConfigIni?.[nxCloudUrl]?.personalAccessToken;
 
-  const isWorkspaceClaimed =
-    (await getNxCloudWorkspaceClaimed(
-      personalAccessToken,
-      nxCloudUrl,
-      accessToken,
-      nxCloudId,
-    )) ?? false;
+  const isWorkspaceClaimed = await getNxCloudWorkspaceClaimed(
+    personalAccessToken,
+    nxCloudUrl,
+    accessToken,
+    nxCloudId,
+  );
 
   return {
     hasNxInCI,
@@ -127,10 +126,9 @@ async function getNxCloudWorkspaceClaimed(
       timeout: 5000,
     });
     return JSON.parse(response.responseText);
-  } catch (e) {
-    e;
+  } catch (error) {
     lspLogger.log(
-      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${e.responseText}`,
+      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${error.responseText}`,
     );
     return undefined;
   }

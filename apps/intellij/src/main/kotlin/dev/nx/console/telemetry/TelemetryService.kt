@@ -4,8 +4,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import dev.nx.console.utils.isDevelopmentInstance
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -27,7 +25,7 @@ class TelemetryService(private val cs: CoroutineScope) {
         if (isDevelopmentInstance) {
             LoggerTelemetryService()
         } else {
-            MeasurementProtocolService(HttpClient(OkHttp))
+            MeasurementProtocolService()
         }
 
     fun featureUsed(feature: TelemetryEvent, data: Map<String, Any>? = null) {

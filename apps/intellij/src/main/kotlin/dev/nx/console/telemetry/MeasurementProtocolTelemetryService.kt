@@ -5,18 +5,18 @@ import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.PermanentInstallationID
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.util.io.HttpRequests
 import dev.nx.console.settings.NxConsoleSettingsProvider
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
 import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
 
 val SESSION_ID = UUID.randomUUID().toString()
 
 private val logger = logger<MeasurementProtocolService>()
 
-class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
+class MeasurementProtocolService : Telemetry {
 
     override suspend fun featureUsed(feature: String, data: Map<String, Any>?) {
         val payload = this.buildPayload(feature, data)
@@ -30,27 +30,26 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
         }
     }
 
-    private suspend fun post(payload: String) {
-        if (!NxConsoleSettingsProvider.getInstance().enableTelemetry) return
+    private suspend fun post(payload: String) =
+        withContext(Dispatchers.IO) {
+            if (!NxConsoleSettingsProvider.getInstance().enableTelemetry) return@withContext
 
-        try {
-            client
-                .post {
-                    url(TelemetryValues.URL)
-                    setBody(payload)
-                }
-                .body<String>()
-                .run {
-                    if (isNotEmpty()) {
-                        logger.info(this)
+            try {
+                val response =
+                    HttpRequests.post(TelemetryValues.URL, "application/json").connect { request ->
+                        request.write(payload)
+                        request.readString()
                     }
+
+                if (response.isNotEmpty()) {
+                    logger.info(response)
                 }
-        } catch (e: Exception) {
-            logger.warn(e.toString())
-        } catch (e: Throwable) {
-            logger.warn(e.toString())
+            } catch (e: Exception) {
+                logger.warn(e.toString())
+            } catch (e: Throwable) {
+                logger.warn(e.toString())
+            }
         }
-    }
 
     private fun buildPayload(eventName: String, data: Map<String, Any>?): String {
         val payload = buildJsonObject {
