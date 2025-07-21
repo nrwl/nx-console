@@ -1,3 +1,11 @@
+## <small>1.46.3 (2025-07-21)</small>
+
+### Bug Fixes
+
+* **intellij:** use built-in HttpRequests class for http requests instead of ktor ([#2628](https://github.com/nrwl/nx-console/issues/2628)) ([aba22dc](https://github.com/nrwl/nx-console/commit/aba22dc590714c7d37c0b72f213fbc63250cf9e8))
+* **vscode:** handle network errors gracefully in nx cloud view ([#2626](https://github.com/nrwl/nx-console/issues/2626)) ([66588f8](https://github.com/nrwl/nx-console/commit/66588f8345bdac6cd3e8a60d3513a9e4c183c2b5))
+* **vscode:** rename ai notifications to be stronger & other small fixes ([#2618](https://github.com/nrwl/nx-console/issues/2618)) ([8c46932](https://github.com/nrwl/nx-console/commit/8c469328be73bcf3695c2e0f6419adbb2ae4cfe5))
+
 ## <small>1.46.2 (2025-07-16)</small>
 
 ### Bug Fixes
