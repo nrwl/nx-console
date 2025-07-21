@@ -31,7 +31,6 @@ class ThrottlerTest : BasePlatformTestCase() {
         assertEquals(1, executionCount, "Only first call should execute when called rapidly")
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun testThrottlerCreation() = runTest {
         Throttler(1000, this@runTest)
 

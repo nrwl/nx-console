@@ -48,38 +48,37 @@ fun onBrowserLoadEnd(browser: JBCefBrowser, onLoadEnd: () -> Unit) {
     )
 }
 
-suspend fun JBCefBrowser.awaitLoad() =
-    suspendCancellableCoroutine<Unit> { continuation ->
-        val loadHandler =
-            object : CefLoadHandlerAdapter() {
-                override fun onLoadEnd(
-                    browser: CefBrowser?,
-                    frame: CefFrame?,
-                    httpStatusCode: Int,
-                ) {
-                    this@awaitLoad.jbCefClient.removeLoadHandler(this, this@awaitLoad.cefBrowser)
-                    continuation.resume(Unit)
-                }
-
-                override fun onLoadError(
-                    browser: CefBrowser?,
-                    frame: CefFrame?,
-                    errorCode: CefLoadHandler.ErrorCode?,
-                    errorText: String?,
-                    failedUrl: String?,
-                ) {
-
-                    continuation.resumeWithException(
-                        Exception("browser failed to load, error code: $errorCode $errorText")
-                    )
-                }
+suspend fun JBCefBrowser.awaitLoad() = suspendCancellableCoroutine { continuation ->
+    val loadHandler =
+        object : CefLoadHandlerAdapter() {
+            override fun onLoadEnd(
+                browser: CefBrowser?,
+                frame: CefFrame?,
+                httpStatusCode: Int,
+            ) {
+                this@awaitLoad.jbCefClient.removeLoadHandler(this, this@awaitLoad.cefBrowser)
+                continuation.resume(Unit)
             }
 
-        // Register the handler to wait for the load event
-        this.jbCefClient.addLoadHandler(loadHandler, this.cefBrowser)
+            override fun onLoadError(
+                browser: CefBrowser?,
+                frame: CefFrame?,
+                errorCode: CefLoadHandler.ErrorCode?,
+                errorText: String?,
+                failedUrl: String?,
+            ) {
 
-        // If coroutine is cancelled, remove the handler
-        continuation.invokeOnCancellation {
-            this.jbCefClient.removeLoadHandler(loadHandler, this.cefBrowser)
+                continuation.resumeWithException(
+                    Exception("browser failed to load, error code: $errorCode $errorText")
+                )
+            }
         }
+
+    // Register the handler to wait for the load event
+    this.jbCefClient.addLoadHandler(loadHandler, this.cefBrowser)
+
+    // If coroutine is cancelled, remove the handler
+    continuation.invokeOnCancellation {
+        this.jbCefClient.removeLoadHandler(loadHandler, this.cefBrowser)
     }
+}

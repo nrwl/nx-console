@@ -5,10 +5,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.JComponent
 
-class NxCloudFixWebviewEditor(
-    private val project: Project,
-    private val nxCloudFixFile: NxCloudFixFile
-) : FileEditorBase() {
+class NxCloudFixWebviewEditor(project: Project, private val nxCloudFixFile: NxCloudFixFile) :
+    FileEditorBase() {
 
     private val mainComponent: JComponent = nxCloudFixFile.createMainComponent(project)
 
