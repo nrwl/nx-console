@@ -96,13 +96,13 @@ async function main() {
           undefined,
           telemetryLogger,
         );
-
         const connection = { transport, server: connectionServer };
         connections.add(connection);
 
         // Clean up on connection close
         res.on('close', () => {
           connections.delete(connection);
+          connectionServer.getMcpServer().close();
           console.log('Streamable HTTP connection closed');
         });
 
