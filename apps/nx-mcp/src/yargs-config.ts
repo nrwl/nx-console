@@ -54,6 +54,8 @@ export function createYargsConfig(args: string[]): Argv<any> {
       describe:
         'Interval in milliseconds to send SSE keep-alive messages (default: 30000, 0 to disable)',
       type: 'number',
+      deprecated: true,
+      hidden: true,
       default: 30000,
     })
     .check((argv) => {
