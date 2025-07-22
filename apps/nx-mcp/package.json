@@ -86,6 +86,12 @@
         "dependsOn": [
           "build"
         ]
+      },
+      "serve": {
+        "command": "npx @modelcontextprotocol/inspector@latest node dist/apps/nx-mcp/main.js",
+        "dependsOn": [
+          "build"
+        ]
       }
     }
   }
