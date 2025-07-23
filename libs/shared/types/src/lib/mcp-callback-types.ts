@@ -121,3 +121,20 @@ export interface IdeClientConfig {
   maxReconnectAttempts?: number;
   requestTimeout?: number;
 }
+
+/**
+ * Interface for IDE JSON-RPC client
+ */
+export interface IIdeJsonRpcClient {
+  connect(): Promise<void>;
+  disconnect(): void;
+  getStatus(): ConnectionStatus;
+  focusProject(projectName: string): Promise<void>;
+  focusTask(projectName: string, taskName: string): Promise<void>;
+  showFullProjectGraph(): Promise<void>;
+  openGenerateUi(
+    generatorName: string,
+    options: Record<string, unknown>,
+    cwd?: string
+  ): Promise<string>;
+}

@@ -6,16 +6,12 @@ import {
   getGeneratorNamesAndDescriptions,
   getGeneratorSchema,
   getGeneratorsPrompt,
-  getNxJsonPrompt,
   getPluginsInformation,
-  getProjectGraphErrorsPrompt,
-  getProjectGraphPrompt,
   getProjectGraphVisualizationMessage,
   getTaskGraphVisualizationMessage,
   NX_WORKSPACE_PATH,
 } from '@nx-console/shared-llm-context';
 import {
-  checkIsNxWorkspace,
   findMatchingProject,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
@@ -23,11 +19,10 @@ import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { getMcpLogger } from './mcp-logger';
 
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { NxVersion } from '@nx-console/nx-version';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import { NxWorkspace } from '@nx-console/shared-types';
+import { NxWorkspace, IIdeJsonRpcClient } from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { registerNxCloudTools } from './tools/nx-cloud';
@@ -39,7 +34,6 @@ import {
   NX_PROJECT_DETAILS,
   NX_RUN_GENERATOR,
   NX_VISUALIZE_GRAPH,
-  NX_WORKSPACE,
 } from '@nx-console/shared-llm-context';
 import { registerNxTaskTools } from './tools/nx-tasks';
 import { registerNxWorkspaceTool } from './tools/nx-workspace';
@@ -63,31 +57,26 @@ export interface NxWorkspaceInfoProvider {
   isNxCloudEnabled: () => Promise<boolean>;
 }
 
-export interface NxIdeProvider {
-  ideName: 'vscode' | 'cursor' | 'windsurf';
-  focusProject: (projectName: string) => void;
-  focusTask: (projectName: string, taskName: string) => void;
-  showFullProjectGraph: () => void;
-  openGenerateUi: (
-    generatorName: string,
-    options: Record<string, unknown>,
-    cwd?: string,
-  ) => Promise<string>;
-}
 
 export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
   private _nxWorkspacePath?: string;
+  private ideClient?: IIdeJsonRpcClient;
+  private ideAvailable = false;
 
   constructor(
     initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
-    private ideProvider?: NxIdeProvider,
     private telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
+    ideClient?: IIdeJsonRpcClient,
+    ideAvailable?: boolean,
   ) {
     this._nxWorkspacePath = initialWorkspacePath;
+    this.ideClient = ideClient;
+    this.ideAvailable = ideAvailable ?? false;
+
     this.server = new McpServer({
       name: 'Nx MCP',
       version: '0.0.1',
@@ -98,21 +87,38 @@ export class NxMcpServerWrapper {
     });
 
     this.logger = logger ?? getMcpLogger(this.server);
+
+    // Log IDE connection status
+    if (this.ideAvailable && this.ideClient) {
+      this.logger.log('IDE client available and connected');
+      
+      // Set up disconnection handler if the client supports it
+      if ('onDisconnection' in this.ideClient && typeof this.ideClient.onDisconnection === 'function') {
+        (this.ideClient as any).onDisconnection(() => {
+          this.logger.log('IDE client disconnected');
+          this.ideAvailable = false;
+        });
+      }
+    } else {
+      this.logger.log('Running in standalone mode (no IDE connection)');
+    }
   }
 
   static async create(
     initialWorkspacePath: string | undefined,
     nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
-    ideProvider?: NxIdeProvider,
     telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
+    ideClient?: IIdeJsonRpcClient,
+    ideAvailable?: boolean,
   ): Promise<NxMcpServerWrapper> {
     const server = new NxMcpServerWrapper(
       initialWorkspacePath,
       nxWorkspaceInfoProvider,
-      ideProvider,
       telemetry,
       logger,
+      ideClient,
+      ideAvailable,
     );
     await server.registerTools();
     return server;
@@ -128,6 +134,34 @@ export class NxMcpServerWrapper {
 
   getMcpServer(): McpServer {
     return this.server;
+  }
+
+  /**
+   * Check if IDE is available and connected
+   */
+  isIdeAvailable(): boolean {
+    return this.ideAvailable && this.ideClient !== undefined;
+  }
+
+  /**
+   * Get the IDE client instance (if available)
+   */
+  getIdeClient(): IIdeJsonRpcClient | undefined {
+    return this.ideClient;
+  }
+
+  /**
+   * Cleanup resources when server shuts down
+   */
+  cleanup(): void {
+    if (this.ideClient) {
+      try {
+        this.ideClient.disconnect();
+        this.logger.log('IDE client disconnected');
+      } catch (error) {
+        this.logger.log('Error disconnecting IDE client:', error);
+      }
+    }
   }
 
   private async registerTools(): Promise<void> {
@@ -204,7 +238,7 @@ export class NxMcpServerWrapper {
       await this.registerWorkspaceTools();
     }
 
-    if (this.ideProvider) {
+    if (this.isIdeAvailable()) {
       this.registerIdeTools();
     }
   }
@@ -337,7 +371,7 @@ export class NxMcpServerWrapper {
 
         const generatorNamesAndDescriptions =
           await getGeneratorNamesAndDescriptions(generators);
-        const prompt = await getGeneratorsPrompt(generatorNamesAndDescriptions);
+        const prompt = getGeneratorsPrompt(generatorNamesAndDescriptions);
         return {
           content: [{ type: 'text', text: prompt }],
         };
@@ -405,7 +439,7 @@ Found generator schema for ${generatorName}: ${JSON.stringify(
                 generatorDetails,
               )}.
               ${
-                this.ideProvider
+                this.isIdeAvailable()
                   ? `Follow up by using the nx_run_generator tool. When generating libraries, apps or components, use the cwd option to specify the parent directory where you want to create the item.`
                   : `**IMPORTANT FIRST STEP**: When generating libraries, apps, or components:
 
@@ -489,7 +523,14 @@ and follows the Nx workspace convention for project organization.`
           kind: visualizationType,
         });
 
-        if (this.ideProvider) {
+        if (!this.ideClient) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'No IDE client available' }],
+          };
+        }
+
+        try {
           switch (visualizationType) {
             case 'project':
               if (!projectName) {
@@ -498,7 +539,7 @@ and follows the Nx workspace convention for project organization.`
                   content: [{ type: 'text', text: 'Project name is required' }],
                 };
               }
-              this.ideProvider.focusProject(projectName);
+              await this.ideClient.focusProject(projectName);
               return {
                 content: [
                   {
@@ -525,7 +566,7 @@ and follows the Nx workspace convention for project organization.`
                   content: [{ type: 'text', text: 'Project name is required' }],
                 };
               }
-              this.ideProvider.focusTask(projectName, taskName);
+              await this.ideClient.focusTask(projectName, taskName);
               return {
                 content: [
                   {
@@ -538,7 +579,7 @@ and follows the Nx workspace convention for project organization.`
                 ],
               };
             case 'full-project-graph':
-              this.ideProvider.showFullProjectGraph();
+              await this.ideClient.showFullProjectGraph();
               return {
                 content: [
                   {
@@ -548,11 +589,12 @@ and follows the Nx workspace convention for project organization.`
                 ],
               };
           }
+        } catch (error) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: `IDE communication error: ${error}` }],
+          };
         }
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'No IDE provider available' }],
-        };
       },
     );
 
@@ -587,14 +629,15 @@ and follows the Nx workspace convention for project organization.`
           };
         }
 
-        if (!this.ideProvider) {
+        if (!this.ideClient) {
           return {
             isError: true,
-            content: [{ type: 'text', text: 'No IDE provider available' }],
+            content: [{ type: 'text', text: 'No IDE client available' }],
           };
         }
+
         try {
-          const logFileName = await this.ideProvider.openGenerateUi(
+          const logFileName = await this.ideClient.openGenerateUi(
             generatorName,
             options ?? {},
             cwd,
@@ -611,10 +654,10 @@ and follows the Nx workspace convention for project organization.`
               },
             ],
           };
-        } catch (e) {
+        } catch (error) {
           return {
             isError: true,
-            content: [{ type: 'text', text: String(e) }],
+            content: [{ type: 'text', text: `IDE communication error: ${error}` }],
           };
         }
       },

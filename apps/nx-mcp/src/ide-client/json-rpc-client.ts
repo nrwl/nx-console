@@ -3,8 +3,9 @@ import {
   IDE_RPC_METHODS,
   IdeClientConfig,
   OpenGenerateUiResponse,
+  IIdeJsonRpcClient,
 } from '@nx-console/shared-types';
-import { getNxConsoleSocketPath } from '@nx-console/shared-utils';
+import { getNxConsoleSocketPath, consoleLogger } from '@nx-console/shared-utils';
 import { Socket } from 'net';
 import { platform } from 'os';
 
@@ -24,7 +25,7 @@ interface JsonRpcMessage {
 /**
  * JSON-RPC client for communicating with the IDE using content-length framing
  */
-export class IdeJsonRpcClient {
+export class IdeJsonRpcClient implements IIdeJsonRpcClient {
   private socket: Socket | null = null;
   private status: ConnectionStatus = 'disconnected';
   private requestId = 0;
@@ -39,8 +40,16 @@ export class IdeJsonRpcClient {
   private reconnectAttempts = 0;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private buffer = '';
+  private disconnectionHandler?: (client: IdeJsonRpcClient) => void;
 
   constructor(private config: IdeClientConfig) {}
+
+  /**
+   * Set a handler to be called when the client disconnects
+   */
+  onDisconnection(handler: (client: IdeJsonRpcClient) => void): void {
+    this.disconnectionHandler = handler;
+  }
 
   /**
    * Connect to the IDE socket
@@ -62,7 +71,7 @@ export class IdeJsonRpcClient {
       this.socket.on('connect', () => {
         this.status = 'connected';
         this.reconnectAttempts = 0;
-        console.log(`Connected to IDE at ${socketPath}`);
+        consoleLogger.log(`Connected to IDE at ${socketPath}`);
       });
 
       this.socket.on('data', (data) => {
@@ -70,12 +79,12 @@ export class IdeJsonRpcClient {
       });
 
       this.socket.on('error', (error) => {
-        console.error('Socket error:', error);
+        consoleLogger.log('Socket error:', error);
         this.handleDisconnection();
       });
 
       this.socket.on('close', () => {
-        console.log('Socket closed');
+        consoleLogger.log('Socket closed');
         this.handleDisconnection();
       });
 
@@ -88,7 +97,7 @@ export class IdeJsonRpcClient {
         this.socket.connect(socketPath);
       }
     } catch (error) {
-      console.error('Failed to connect to IDE:', error);
+      consoleLogger.log('Failed to connect to IDE:', error);
       this.handleDisconnection();
       throw error;
     }
@@ -109,7 +118,7 @@ export class IdeJsonRpcClient {
     }
 
     // Reject all pending requests
-    for (const [id, request] of this.pendingRequests) {
+    for (const [, request] of this.pendingRequests) {
       clearTimeout(request.timeout);
       request.reject(new Error('Connection closed'));
     }
@@ -125,6 +134,7 @@ export class IdeJsonRpcClient {
   private handleIncomingData(data: Buffer): void {
     this.buffer += data.toString();
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // Look for complete messages with content-length header
       const headerEnd = this.buffer.indexOf('\r\n\r\n');
@@ -138,7 +148,7 @@ export class IdeJsonRpcClient {
       );
 
       if (!contentLengthMatch) {
-        console.error('Invalid message format: missing content-length header');
+        consoleLogger.log('Invalid message format: missing content-length header');
         this.buffer = this.buffer.substring(headerEnd + 4);
         continue;
       }
@@ -161,7 +171,7 @@ export class IdeJsonRpcClient {
         const message: JsonRpcMessage = JSON.parse(cleanMessage);
         this.handleJsonRpcMessage(message);
       } catch (error) {
-        console.error(
+        consoleLogger.log(
           'Failed to parse JSON-RPC message:',
           error,
           'Content:',
@@ -194,7 +204,7 @@ export class IdeJsonRpcClient {
       }
     } else {
       // This is a notification from IDE (if any)
-      console.log(
+      consoleLogger.log(
         `Received notification from IDE: ${message.method}`,
         message.params,
       );
@@ -280,7 +290,7 @@ export class IdeJsonRpcClient {
     this.buffer = '';
 
     // Reject all pending requests
-    for (const [id, request] of this.pendingRequests) {
+    for (const [, request] of this.pendingRequests) {
       clearTimeout(request.timeout);
       request.reject(new Error('Connection lost'));
     }
@@ -292,22 +302,27 @@ export class IdeJsonRpcClient {
 
     if (this.reconnectAttempts < maxAttempts) {
       this.reconnectAttempts++;
-      console.log(
+      consoleLogger.log(
         `Attempting to reconnect (${this.reconnectAttempts}/${maxAttempts})...`,
       );
 
       this.reconnectTimer = setTimeout(() => {
         this.connect().catch((error) => {
-          console.error('Reconnection failed:', error);
+          consoleLogger.log('Reconnection failed:', error);
           if (this.reconnectAttempts >= maxAttempts) {
             this.status = 'disconnected';
-            console.error('Max reconnection attempts reached. Giving up.');
+            consoleLogger.log('Max reconnection attempts reached. Giving up.');
           }
         });
       }, interval);
     } else {
       this.status = 'disconnected';
-      console.error('Max reconnection attempts reached. Connection lost.');
+      consoleLogger.log('Max reconnection attempts reached. Connection lost.');
+      
+      // Notify handler of permanent disconnection
+      if (this.disconnectionHandler) {
+        this.disconnectionHandler(this);
+      }
     }
   }
 

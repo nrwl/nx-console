@@ -20,9 +20,13 @@ import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { resolve } from 'path';
 import { createYargsConfig, ArgvType } from './yargs-config';
+import { createIdeClient } from './ide-client/create-ide-client';
+import { IIdeJsonRpcClient } from '@nx-console/shared-types';
+import { consoleLogger } from '@nx-console/shared-utils';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
+  const logger = consoleLogger;
 
   const providedPath: string = resolve(
     argv.workspacePath || (argv._[0] as string) || process.cwd(),
@@ -63,11 +67,30 @@ async function main() {
       nxWorkspacePath ? await isNxCloudUsed(nxWorkspacePath) : false,
   };
 
+  // Detect if IDE is running and create IDE client if available
+  let ideClient: IIdeJsonRpcClient | undefined;
+  let ideAvailable = false;
+
+  if (nxWorkspacePath) {
+    logger.log('Checking for IDE connection...');
+    const ideConnection = await createIdeClient(nxWorkspacePath);
+    ideClient = ideConnection.client;
+    ideAvailable = ideConnection.available;
+
+    if (ideAvailable) {
+      logger.log('Successfully connected to IDE');
+    } else {
+      logger.log('No IDE detected, running in standalone mode');
+    }
+  }
+
   const server = await NxMcpServerWrapper.create(
     nxWorkspacePath,
     nxWorkspaceInfoProvider,
-    undefined,
     telemetryLogger,
+    undefined, // logger
+    ideClient,
+    ideAvailable,
   );
 
   if (argv.transport === 'sse' || argv.transport === 'http') {
@@ -89,12 +112,23 @@ async function main() {
           sessionIdGenerator: undefined,
         });
 
-        // Create a new server instance for this connection
+        // Create a new server instance with its own IDE client for this connection
+        let connectionIdeClient: IIdeJsonRpcClient | undefined;
+        let connectionIdeAvailable = false;
+        
+        if (nxWorkspacePath) {
+          const ideConnection = await createIdeClient(nxWorkspacePath);
+          connectionIdeClient = ideConnection.client;
+          connectionIdeAvailable = ideConnection.available;
+        }
+        
         const connectionServer = await NxMcpServerWrapper.create(
           nxWorkspacePath,
           nxWorkspaceInfoProvider,
-          undefined,
           telemetryLogger,
+          undefined, // logger
+          connectionIdeClient,
+          connectionIdeAvailable,
         );
         const connection = { transport, server: connectionServer };
         connections.add(connection);
@@ -102,20 +136,22 @@ async function main() {
         // Clean up on connection close
         res.on('close', () => {
           connections.delete(connection);
+          connectionServer.cleanup();
+          connectionIdeClient?.disconnect();
           connectionServer.getMcpServer().close();
-          console.log('Streamable HTTP connection closed');
+          logger.log('Streamable HTTP connection closed');
         });
 
         await connectionServer.getMcpServer().connect(transport);
         await transport.handleRequest(req, res, req.body);
       });
 
-      console.log(`Nx MCP server (Streamable HTTP) listening on port ${port}`);
+      logger.log(`Nx MCP server (Streamable HTTP) listening on port ${port}`);
     } else {
       // SSE mode
       let transport: SSEServerTransport;
       app.get('/sse', async (req, res) => {
-        console.log('Configuring SSE transport');
+        logger.log('Configuring SSE transport');
         transport = new SSEServerTransport('/messages', res);
         await server.getMcpServer().connect(transport);
 
@@ -127,7 +163,7 @@ async function main() {
               res.write(':beat\n\n');
             } else {
               clearInterval(keepAliveInterval);
-              console.log(
+              logger.log(
                 'SSE connection closed, clearing keep-alive interval',
               );
             }
@@ -136,21 +172,21 @@ async function main() {
           // Clean up interval if the client disconnects
           req.on('close', () => {
             clearInterval(keepAliveInterval);
-            console.log('SSE connection closed by client');
+            logger.log('SSE connection closed by client');
           });
         }
       });
 
       app.post('/messages', async (req, res) => {
         if (!transport) {
-          console.log('No transport found.');
+          logger.log('No transport found.');
           res.status(400).send('No transport found');
           return;
         }
         await transport.handlePostMessage(req, res);
       });
 
-      console.log(`Nx MCP server (SSE) listening on port ${port}`);
+      logger.log(`Nx MCP server (SSE) listening on port ${port}`);
     }
 
     const server_instance = app.listen(port);
@@ -174,8 +210,14 @@ async function main() {
 
   // Prevent the Node.js process from exiting early
   process.on('SIGINT', () => {
-    console.log('Received SIGINT signal. Server shutting down...');
+    logger.log('Received SIGINT signal. Server shutting down...');
+    server.cleanup();
     process.exit(0);
+  });
+
+  // Cleanup on exit
+  process.on('exit', () => {
+    server.cleanup();
   });
 
   // Keep the process alive
@@ -183,6 +225,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('Fatal error:', err);
+  consoleLogger.log('Fatal error:', err);
   process.exit(1);
 });

@@ -3,6 +3,8 @@ import { access, constants } from 'fs/promises';
 import { platform, tmpdir } from 'os';
 import { join, resolve } from 'path';
 import { createHash } from 'crypto';
+import { Socket } from 'net';
+import { consoleLogger } from './logger';
 
 const DAEMON_DIR_FOR_CURRENT_WORKSPACE = join('.nx', 'workspace-data', 'd');
 
@@ -49,7 +51,7 @@ export async function killSocketOnPath(socketPath: string): Promise<void> {
     unlinkSync(socketPath);
   } catch (error: any) {
     if (error.code !== 'ENOENT') {
-      console.error('Error removing existing socket file:', error);
+      consoleLogger.log('Error removing existing socket file:', error);
     }
   }
 }
@@ -73,6 +75,39 @@ export async function testSocketConnection(
   } catch {
     return false;
   }
+}
+
+/**
+ * Test if an IDE is actually listening on the socket
+ */
+export async function testIdeConnection(
+  workspacePath: string,
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socketPath = getNxConsoleSocketPath(workspacePath);
+    const socket = new Socket();
+    
+    // Set a timeout for the connection attempt
+    const timeout = setTimeout(() => {
+      socket.destroy();
+      resolve(false);
+    }, 1000);
+    
+    socket.once('connect', () => {
+      clearTimeout(timeout);
+      socket.destroy();
+      resolve(true);
+    });
+    
+    socket.once('error', () => {
+      clearTimeout(timeout);
+      socket.destroy();
+      resolve(false);
+    });
+    
+    // Attempt to connect
+    socket.connect(socketPath);
+  });
 }
 
 /**
