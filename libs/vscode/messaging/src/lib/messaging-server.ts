@@ -1,6 +1,9 @@
 import net from 'net';
 import { ExtensionContext } from 'vscode';
-import { getFullOsSocketPath, killSocketOnPath } from './pipe';
+import {
+  getNxConsoleSocketPath,
+  killSocketOnPath,
+} from '@nx-console/shared-utils';
 import { NxTerminalMessage } from './features/terminal-message';
 
 import { createMessageConnection } from 'vscode-jsonrpc/node';
@@ -96,9 +99,9 @@ export async function initMessagingServer(
     return;
   }
 
-  const socketPath = await getFullOsSocketPath(workspacePath);
+  const socketPath = getNxConsoleSocketPath(workspacePath);
   const messagingServer = new NxMessagingServer(socketPath);
-  await messagingServer.listen();
+  messagingServer.listen();
 
   context.subscriptions.push(messagingServer);
 
