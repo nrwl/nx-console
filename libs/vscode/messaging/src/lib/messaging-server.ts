@@ -13,8 +13,17 @@ import {
   NxUpdatedRunningTasks,
 } from './features/running-tasks';
 import {
+  IdeFocusProject,
+  IdeFocusTask,
+  IdeShowFullProjectGraph,
+  IdeOpenGenerateUi,
+  initializeIdeRequestHandlers,
+} from './features/ide-requests';
+import {
   MessagingNotification,
   MessagingNotification2,
+  MessagingRequest,
+  MessagingRequest0,
 } from './messaging-notification';
 import crypto from 'crypto';
 import { vscodeLogger } from '@nx-console/vscode-utils';
@@ -28,12 +37,25 @@ const messages: Array<MessagingNotification | MessagingNotification2> = [
   NxUpdatedRunningTasks,
 ];
 
+const requests: Array<MessagingRequest<any, any> | MessagingRequest0<any>> = [
+  IdeFocusProject,
+  IdeFocusTask,
+  IdeShowFullProjectGraph,
+  IdeOpenGenerateUi,
+];
+
 export class NxMessagingServer {
   #server: net.Server;
   #fullSocketPath: string;
+  #context: ExtensionContext;
 
-  constructor(socketPath: string) {
+  constructor(socketPath: string, context: ExtensionContext) {
     this.#fullSocketPath = socketPath;
+    this.#context = context;
+    
+    // Initialize IDE request handlers
+    initializeIdeRequestHandlers(context);
+    
     this.#server = net.createServer((socket) => {
       const socketId = crypto.randomUUID().toString();
       (socket as any).__socketId = socketId;
@@ -41,6 +63,7 @@ export class NxMessagingServer {
 
       const connection = createMessageConnection(socket, socket);
 
+      // Register notification handlers
       messages.forEach((notification) => {
         if ('type' in notification) {
           connection.onNotification(
@@ -50,13 +73,28 @@ export class NxMessagingServer {
         }
       });
 
+      // Register request handlers
+      requests.forEach((request) => {
+        if ('type' in request) {
+          connection.onRequest(
+            request.type,
+            request.handler(socketId),
+          );
+        }
+      });
+
       connection.listen();
 
       socket.on('close', () => {
         connection.dispose();
         vscodeLogger.log(`Client disconnected: ${socketId}`);
+        
+        // Call onClose for both messages and requests
         messages.forEach((messageHandler) => {
           messageHandler.onClose?.(socketId);
+        });
+        requests.forEach((requestHandler) => {
+          requestHandler.onClose?.(socketId);
         });
       });
     });
@@ -100,7 +138,7 @@ export async function initMessagingServer(
   }
 
   const socketPath = getNxConsoleSocketPath(workspacePath);
-  const messagingServer = new NxMessagingServer(socketPath);
+  const messagingServer = new NxMessagingServer(socketPath, context);
   messagingServer.listen();
 
   context.subscriptions.push(messagingServer);

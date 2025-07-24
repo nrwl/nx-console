@@ -6,14 +6,33 @@ import {
   IdeProvider,
 } from '@nx-console/nx-mcp-server';
 import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
-import { openGenerateUi } from '@nx-console/vscode-generate-ui-webview';
+import {
+  onGeneratorUiDispose,
+  openGenerateUi,
+  openGenerateUIPrefilled,
+} from '@nx-console/vscode-generate-ui-webview';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import {
+  getGenerators,
+  getNxWorkspace,
+  getNxWorkspaceProjects,
+} from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { getGitDiffs, vscodeLogger } from '@nx-console/vscode-utils';
+import {
+  getGitDiffs,
+  isInCursor,
+  isInVSCode,
+  isInWindsurf,
+  sendMessageToAgent,
+  vscodeLogger,
+} from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
+import { commands, ProgressLocation, tasks, window } from 'vscode';
+import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
+import { findMatchingProject } from '@nx-console/shared-npm';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 export class McpWebServer {
   private static instance: McpWebServer;
@@ -31,6 +50,19 @@ export class McpWebServer {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
   private serverStartupFailed = false;
+  private mcpServer = new McpServer(
+    {
+      name: 'Nx MCP',
+      version: '0.0.1',
+    },
+    {
+      capabilities: {
+        tools: {
+          listChanged: true,
+        },
+      },
+    },
+  );
 
   private sseKeepAliveInterval?: NodeJS.Timeout;
   private sseTransport?: SSEServerTransport;
@@ -38,37 +70,6 @@ export class McpWebServer {
   private fullSseSetupReady = false;
 
   private streamableServers = new Set<NxMcpServerWrapper>();
-  ideProvider: IdeProvider = {
-    isAvailable: () => true,
-    focusProject: async (projectName: string) => {
-      const graphManager = getGraphWebviewManager();
-      await graphManager.focusProject(projectName);
-    },
-    focusTask: async (projectName: string, taskName: string) => {
-      const graphManager = getGraphWebviewManager();
-      await graphManager.focusTarget(projectName, taskName);
-    },
-    showFullProjectGraph: async () => {
-      const graphManager = getGraphWebviewManager();
-      await graphManager.showAllProjects();
-    },
-    openGenerateUi: async (
-      generatorName: string,
-      options: Record<string, unknown>,
-      cwd?: string,
-    ) => {
-      // VSCode generate UI doesn't return a log file name like the standalone version
-      // So we'll return a placeholder that indicates success
-      await openGenerateUi();
-      return 'generator-ui-opened';
-    },
-    onConnectionChange: () => () => {
-      // No-op for VSCode since it's always connected
-    },
-    dispose: () => {
-      // No-op cleanup
-    },
-  };
 
   public startSkeletonMcpServer(port: number) {
     this.app.get('/sse', async (req, res) => {
@@ -113,6 +114,7 @@ export class McpWebServer {
         const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
           nxWorkspaceInfoProvider,
+          this.mcpServer,
           ideProvider,
           getTelemetry(),
           vscodeLogger,
@@ -214,7 +216,8 @@ export class McpWebServer {
     const server = await NxMcpServerWrapper.create(
       getNxWorkspacePath(),
       nxWorkspaceInfoProvider,
-      this.ideProvider,
+      this.mcpServer,
+      ideProvider,
       getTelemetry(),
       vscodeLogger,
     );
@@ -255,4 +258,132 @@ const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   },
   isNxCloudEnabled: async () =>
     await isNxCloudUsed(getNxWorkspacePath(), vscodeLogger),
+};
+
+const ideProvider: IdeProvider = {
+  isAvailable: () => true,
+  onConnectionChange: () => () => {
+    // noop in vscode
+  },
+  dispose: () => {
+    // noop in vscode
+  },
+  focusProject: (projectName: string) => {
+    getNxWorkspaceProjects().then(async (workspaceProjects) => {
+      const project = await findMatchingProject(
+        projectName,
+        workspaceProjects,
+        getNxWorkspacePath(),
+      );
+      if (!project) {
+        window.showErrorMessage(`Cannot find project "${projectName}"`);
+        return;
+      }
+      commands.executeCommand('nx.graph.focus', project.name);
+    });
+  },
+  focusTask: (projectName: string, taskName: string) => {
+    getNxWorkspaceProjects().then(async (workspaceProjects) => {
+      const project = await findMatchingProject(
+        projectName,
+        workspaceProjects,
+        getNxWorkspacePath(),
+      );
+      if (!project) {
+        window.showErrorMessage(`Cannot find project "${projectName}"`);
+        return;
+      }
+      if (!project.data.targets?.[taskName]) {
+        window.showErrorMessage(
+          `Cannot find task "${taskName}" in project "${projectName}"`,
+        );
+        return;
+      }
+      commands.executeCommand('nx.graph.task', {
+        projectName: project.name,
+        taskName: taskName,
+      });
+    });
+  },
+  showFullProjectGraph: () => {
+    commands.executeCommand('nx.graph.showAll');
+  },
+  openGenerateUi: async (
+    generatorName: string,
+    options: Record<string, unknown>,
+    cwd?: string,
+  ): Promise<string> => {
+    const generatorInfo = {
+      collection: generatorName.split(':')[0],
+      name: generatorName.split(':')[1],
+    };
+    const foundGenerator = ((await getGenerators()) ?? []).find(
+      (gen) =>
+        generatorInfo.collection === gen.data?.collection &&
+        (generatorInfo.name === gen.data?.name ||
+          gen.data?.aliases?.includes(generatorInfo.name)),
+    );
+    if (!foundGenerator) {
+      window.showErrorMessage(`Could not find generator "${generatorName}"`);
+      throw new Error(`Could not find generator "${generatorName}"`);
+    }
+    await openGenerateUIPrefilled(
+      {
+        $0: 'nx',
+        _: ['generate', foundGenerator.name],
+        ...options,
+        cwd: cwd,
+      },
+      true,
+    );
+    const finalFileName = await createGeneratorLogFileName(
+      getNxWorkspacePath(),
+      foundGenerator.name,
+    );
+
+    if (isInVSCode()) {
+      window.withProgress(
+        {
+          location: ProgressLocation.Notification,
+          title:
+            'The Agent will continue running after the generator has finished...',
+          cancellable: true,
+        },
+        async (_, cancellationToken) => {
+          await new Promise<void>((resolve) => {
+            let finished = false;
+
+            const finish = () => {
+              if (!finished) {
+                finished = true;
+                taskSubscription.dispose();
+                onGenerateUiDisposable.dispose();
+                resolve();
+              }
+            };
+
+            const taskSubscription = tasks.onDidEndTaskProcess((event) => {
+              if (event.execution.task.name.includes('wrap-generator.js')) {
+                sendMessageToAgent(
+                  `The generator has finished running. Please review the output in "${finalFileName}" and continue.`,
+                  false,
+                );
+                finish();
+              }
+            });
+
+            const onGenerateUiDisposable = onGeneratorUiDispose(() => {
+              finish();
+            });
+
+            cancellationToken.onCancellationRequested(() => {
+              finish();
+            });
+          });
+        },
+      );
+    }
+
+    return finalFileName;
+  },
 };

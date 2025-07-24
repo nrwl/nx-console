@@ -40,7 +40,6 @@ export interface NxWorkspaceInfoProvider {
 }
 
 export class NxMcpServerWrapper {
-  private server: McpServer;
   private logger: Logger;
   private _nxWorkspacePath?: string;
   private ideProvider?: IdeProvider;
@@ -54,6 +53,7 @@ export class NxMcpServerWrapper {
   constructor(
     initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
+    private server: McpServer,
     ideProvider?: IdeProvider,
     private telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
@@ -61,20 +61,6 @@ export class NxMcpServerWrapper {
     this._nxWorkspacePath = initialWorkspacePath;
     this.ideProvider = ideProvider;
     this.messageSender = new McpIdeMessageSender(undefined, false);
-
-    this.server = new McpServer(
-      {
-        name: 'Nx MCP',
-        version: '0.0.1',
-      },
-      {
-        capabilities: {
-          tools: {
-            listChanged: true,
-          },
-        },
-      },
-    );
 
     this.server.server.registerCapabilities({
       logging: {},
@@ -106,6 +92,7 @@ export class NxMcpServerWrapper {
   static async create(
     initialWorkspacePath: string | undefined,
     nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
+    mcpServer: McpServer,
     ideProvider?: IdeProvider,
     telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
@@ -113,6 +100,7 @@ export class NxMcpServerWrapper {
     const server = new NxMcpServerWrapper(
       initialWorkspacePath,
       nxWorkspaceInfoProvider,
+      mcpServer,
       ideProvider,
       telemetry,
       logger,

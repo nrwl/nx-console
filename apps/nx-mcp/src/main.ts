@@ -23,10 +23,45 @@ import { createYargsConfig, ArgvType } from './yargs-config';
 import { createIdeClient } from './ide-client/create-ide-client';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
 import { consoleLogger } from '@nx-console/shared-utils';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
-  const logger = consoleLogger;
+
+  const mcpServer = new McpServer(
+    {
+      name: 'Nx MCP',
+      version: '0.0.1',
+    },
+    {
+      capabilities: {
+        tools: {
+          listChanged: true,
+        },
+      },
+    },
+  );
+  // Create a safe logger that falls back to console until MCP server is connected
+  let mcpConnected = false;
+  const logger = {
+    log: (message: string) => {
+      if (argv.transport === 'stdio' && mcpConnected) {
+        try {
+          mcpServer.server.sendLoggingMessage({
+            level: 'info',
+            message,
+          });
+        } catch (error) {
+          // Fallback to console if MCP logging fails
+          consoleLogger.log(message);
+        }
+      } else {
+        consoleLogger.log(message);
+      }
+    },
+  };
+
+  logger.log('Starting Nx MCP server');
 
   const providedPath: string = resolve(
     argv.workspacePath || (argv._[0] as string) || process.cwd(),
@@ -120,7 +155,9 @@ async function main() {
               callback(false);
             });
           }
-          return () => {}; // No-op cleanup since we can't remove the disconnection handler
+          return () => {
+            // No-op cleanup since we can't remove the disconnection handler
+          };
         },
         dispose: () => {
           if (ideClient) {
@@ -128,16 +165,17 @@ async function main() {
               ideClient.disconnect();
               logger.log('IDE client disconnected');
             } catch (error) {
-              logger.log('Error disconnecting IDE client:', error);
+              logger.log(`Error disconnecting IDE client: ${error}`);
             }
           }
         },
       }
     : undefined;
 
-  const server = await NxMcpServerWrapper.create(
+  const serverWrapper = await NxMcpServerWrapper.create(
     nxWorkspacePath,
     nxWorkspaceInfoProvider,
+    mcpServer,
     ideProvider,
     telemetryLogger,
     logger,
@@ -165,6 +203,7 @@ async function main() {
         const connectionServer = await NxMcpServerWrapper.create(
           nxWorkspacePath,
           nxWorkspaceInfoProvider,
+          mcpServer,
           ideProvider, // Reuse the shared IDE provider
           telemetryLogger,
           logger,
@@ -181,6 +220,7 @@ async function main() {
         });
 
         await connectionServer.getMcpServer().connect(transport);
+        // Note: For HTTP mode, each connection is separate, so we don't set mcpConnected globally
         await transport.handleRequest(req, res, req.body);
       });
 
@@ -191,7 +231,8 @@ async function main() {
       app.get('/sse', async (req, res) => {
         logger.log('Configuring SSE transport');
         transport = new SSEServerTransport('/messages', res);
-        await server.getMcpServer().connect(transport);
+        await serverWrapper.getMcpServer().connect(transport);
+        mcpConnected = true;
 
         // Set up keep-alive interval if enabled
         if (argv.keepAliveInterval > 0) {
@@ -232,7 +273,8 @@ async function main() {
     });
   } else {
     const transport = new StdioServerTransport();
-    server.getMcpServer().connect(transport);
+    serverWrapper.getMcpServer().connect(transport);
+    mcpConnected = true;
   }
 
   function getPackageVersion() {
@@ -247,13 +289,13 @@ async function main() {
   // Prevent the Node.js process from exiting early
   process.on('SIGINT', () => {
     logger.log('Received SIGINT signal. Server shutting down...');
-    server.cleanup();
+    serverWrapper.cleanup();
     process.exit(0);
   });
 
   // Cleanup on exit
   process.on('exit', () => {
-    server.cleanup();
+    serverWrapper.cleanup();
   });
 
   // Keep the process alive
