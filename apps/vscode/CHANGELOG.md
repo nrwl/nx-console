@@ -1,3 +1,10 @@
+## [18.59.2](https://github.com/nrwl/nx-console/compare/vscode-v18.59.1...vscode-v18.59.2) (2025-07-24)
+
+
+### Bug Fixes
+
+* **vscode:** restart nxls whenever the branch changes ([#2633](https://github.com/nrwl/nx-console/issues/2633)) ([53e5329](https://github.com/nrwl/nx-console/commit/53e53299261e7c98444fd1c0d8f08c1fd8764814))
+
 ## [18.59.1](https://github.com/nrwl/nx-console/compare/vscode-v18.59.0...vscode-v18.59.1) (2025-07-21)
 
 
