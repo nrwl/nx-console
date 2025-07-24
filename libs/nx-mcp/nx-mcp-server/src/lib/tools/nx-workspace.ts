@@ -12,13 +12,23 @@ import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxWorkspace } from '@nx-console/shared-types';
 
+// Simple state tracking
+let isRegistered = false;
+
+/**
+ * Register Nx workspace tool for workspace information
+ */
 export function registerNxWorkspaceTool(
   workspacePath: string,
   server: McpServer,
   logger: Logger,
   nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
   telemetry?: NxConsoleTelemetryLogger,
-) {
+): void {
+  if (isRegistered) {
+    logger.log('Nx workspace tool already registered, skipping');
+    return;
+  }
   server.tool(
     NX_WORKSPACE,
     'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
@@ -78,6 +88,9 @@ export function registerNxWorkspaceTool(
       }
     },
   );
+
+  isRegistered = true;
+  logger.log('Registered Nx workspace tool');
 }
 
 export function getTokenLimitedToolResult(
@@ -128,4 +141,18 @@ export function getTokenLimitedToolResult(
   }
 
   return [nxJsonResult, projectGraphResult, errorsResult];
+}
+
+/**
+ * Check if Nx workspace tool is currently registered
+ */
+export function isNxWorkspaceToolRegistered(): boolean {
+  return isRegistered;
+}
+
+/**
+ * Reset registration state (for testing or server restart)
+ */
+export function resetNxWorkspaceToolState(): void {
+  isRegistered = false;
 }
