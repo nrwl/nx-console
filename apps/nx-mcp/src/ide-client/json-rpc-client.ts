@@ -5,15 +5,25 @@ import {
   OpenGenerateUiResponse,
   IIdeJsonRpcClient,
 } from '@nx-console/shared-types';
-import { getNxConsoleSocketPath, consoleLogger } from '@nx-console/shared-utils';
+import {
+  getNxConsoleSocketPath,
+  consoleLogger,
+} from '@nx-console/shared-utils';
 import { Socket } from 'net';
 import { platform } from 'os';
 import * as rpc from 'vscode-jsonrpc/node';
 
 // Define typed request and notification types
-const focusProjectRequest = new rpc.RequestType<{ projectName: string }, void, void>(IDE_RPC_METHODS.FOCUS_PROJECT);
-const focusTaskRequest = new rpc.RequestType<{ projectName: string; taskName: string }, void, void>(IDE_RPC_METHODS.FOCUS_TASK);
-const showFullProjectGraphRequest = new rpc.RequestType0<void, void>(IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH);
+const focusProjectRequest = new rpc.NotificationType<{ projectName: string }>(
+  IDE_RPC_METHODS.FOCUS_PROJECT,
+);
+const focusTaskRequest = new rpc.NotificationType<{
+  projectName: string;
+  taskName: string;
+}>(IDE_RPC_METHODS.FOCUS_TASK);
+const showFullProjectGraphRequest = new rpc.NotificationType<void>(
+  IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH,
+);
 const openGenerateUiRequest = new rpc.RequestType<
   { generatorName: string; options: Record<string, unknown>; cwd?: string },
   OpenGenerateUiResponse,
@@ -98,7 +108,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
 
       // Start listening for messages
       this.connection.listen();
-
     } catch (error) {
       consoleLogger.log('Failed to connect to IDE:', error);
       this.handleDisconnection();
@@ -128,14 +137,12 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     this.status = 'disconnected';
   }
 
-
   /**
    * Get current connection status
    */
   getStatus(): ConnectionStatus {
     return this.status;
   }
-
 
   /**
    * Handle disconnection and attempt reconnection
@@ -179,7 +186,7 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     } else {
       this.status = 'disconnected';
       consoleLogger.log('Max reconnection attempts reached. Connection lost.');
-      
+
       // Notify handler of permanent disconnection
       if (this.disconnectionHandler) {
         this.disconnectionHandler(this);
@@ -194,8 +201,10 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
     }
-    
-    await this.connection.sendRequest(focusProjectRequest, { projectName });
+
+    await this.connection.sendNotification(focusProjectRequest, {
+      projectName,
+    });
   }
 
   /**
@@ -205,8 +214,11 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
     }
-    
-    await this.connection.sendRequest(focusTaskRequest, { projectName, taskName });
+
+    await this.connection.sendNotification(focusTaskRequest, {
+      projectName,
+      taskName,
+    });
   }
 
   /**
@@ -216,8 +228,8 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
     }
-    
-    await this.connection.sendRequest(showFullProjectGraphRequest);
+
+    await this.connection.sendNotification(showFullProjectGraphRequest);
   }
 
   /**
@@ -231,11 +243,11 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
     }
-    
-    const response = await this.connection.sendRequest(openGenerateUiRequest, { 
-      generatorName, 
-      options, 
-      cwd 
+
+    const response = await this.connection.sendRequest(openGenerateUiRequest, {
+      generatorName,
+      options,
+      cwd,
     });
     return response.logFileName;
   }

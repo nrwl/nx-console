@@ -1,46 +1,44 @@
-import net from 'net';
-import { ExtensionContext } from 'vscode';
 import {
   getNxConsoleSocketPath,
   killSocketOnPath,
 } from '@nx-console/shared-utils';
+import net from 'net';
+import { ExtensionContext } from 'vscode';
 import { NxTerminalMessage } from './features/terminal-message';
 
+import { vscodeLogger } from '@nx-console/vscode-utils';
+import crypto from 'crypto';
 import { createMessageConnection } from 'vscode-jsonrpc/node';
+import {
+  IdeFocusProject,
+  IdeFocusTask,
+  IdeOpenGenerateUi,
+  IdeShowFullProjectGraph,
+  initializeIdeRequestHandlers,
+} from './features/ide-requests';
 import {
   NxEndedRunningTasks,
   NxStartedRunningTasks,
   NxUpdatedRunningTasks,
 } from './features/running-tasks';
 import {
-  IdeFocusProject,
-  IdeFocusTask,
-  IdeShowFullProjectGraph,
-  IdeOpenGenerateUi,
-  initializeIdeRequestHandlers,
-} from './features/ide-requests';
-import {
   MessagingNotification,
   MessagingNotification2,
   MessagingRequest,
   MessagingRequest0,
 } from './messaging-notification';
-import crypto from 'crypto';
-import { vscodeLogger } from '@nx-console/vscode-utils';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { gte } from '@nx-console/nx-version';
 
 const messages: Array<MessagingNotification | MessagingNotification2> = [
   NxTerminalMessage,
   NxStartedRunningTasks,
   NxEndedRunningTasks,
   NxUpdatedRunningTasks,
-];
-
-const requests: Array<MessagingRequest<any, any> | MessagingRequest0<any>> = [
   IdeFocusProject,
   IdeFocusTask,
   IdeShowFullProjectGraph,
+];
+
+const requests: Array<MessagingRequest<any, any> | MessagingRequest0<any>> = [
   IdeOpenGenerateUi,
 ];
 
@@ -52,10 +50,10 @@ export class NxMessagingServer {
   constructor(socketPath: string, context: ExtensionContext) {
     this.#fullSocketPath = socketPath;
     this.#context = context;
-    
+
     // Initialize IDE request handlers
     initializeIdeRequestHandlers(context);
-    
+
     this.#server = net.createServer((socket) => {
       const socketId = crypto.randomUUID().toString();
       (socket as any).__socketId = socketId;
@@ -76,10 +74,7 @@ export class NxMessagingServer {
       // Register request handlers
       requests.forEach((request) => {
         if ('type' in request) {
-          connection.onRequest(
-            request.type,
-            request.handler(socketId),
-          );
+          connection.onRequest(request.type.method, request.handler(socketId));
         }
       });
 
@@ -88,7 +83,7 @@ export class NxMessagingServer {
       socket.on('close', () => {
         connection.dispose();
         vscodeLogger.log(`Client disconnected: ${socketId}`);
-        
+
         // Call onClose for both messages and requests
         messages.forEach((messageHandler) => {
           messageHandler.onClose?.(socketId);
@@ -130,11 +125,6 @@ export async function initMessagingServer(
 ) {
   if (existingServer) {
     existingServer.dispose();
-  }
-
-  const version = await getNxVersion();
-  if (!version || !gte(version, '21.1.0-beta.1')) {
-    return;
   }
 
   const socketPath = getNxConsoleSocketPath(workspacePath);

@@ -12,45 +12,45 @@ import {
 } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-utils';
 import { commands, ExtensionContext, window } from 'vscode';
-import { RequestType, RequestType0 } from 'vscode-jsonrpc';
-import { MessagingRequest, MessagingRequest0 } from '../messaging-notification';
+import { NotificationType, RequestType } from 'vscode-jsonrpc';
+import {
+  MessagingNotification,
+  MessagingRequest,
+} from '../messaging-notification';
 
 export function initializeIdeRequestHandlers(context: ExtensionContext) {
   // No initialization needed - we use the singleton getter
 }
 
-export const IdeFocusProject: MessagingRequest<{ projectName: string }, void> =
-  {
-    type: new RequestType(IDE_RPC_METHODS.FOCUS_PROJECT),
-    handler: (connectionId) => async (params) => {
-      vscodeLogger.log(
-        'Received Focus Project Request from MCP:',
-        connectionId,
+export const IdeFocusProject: MessagingNotification<{ projectName: string }> = {
+  type: new NotificationType(IDE_RPC_METHODS.FOCUS_PROJECT),
+  handler: (connectionId) => async (params) => {
+    vscodeLogger.log(
+      'Received Focus Project Request from MCP:',
+      connectionId,
+      params.projectName,
+    );
+
+    getNxWorkspaceProjects().then(async (workspaceProjects) => {
+      const project = await findMatchingProject(
         params.projectName,
+        workspaceProjects,
+        getNxWorkspacePath(),
       );
+      if (!project) {
+        window.showErrorMessage(`Cannot find project "${params.projectName}"`);
+        return;
+      }
+      commands.executeCommand('nx.graph.focus', project.name);
+    });
+  },
+};
 
-      getNxWorkspaceProjects().then(async (workspaceProjects) => {
-        const project = await findMatchingProject(
-          params.projectName,
-          workspaceProjects,
-          getNxWorkspacePath(),
-        );
-        if (!project) {
-          window.showErrorMessage(
-            `Cannot find project "${params.projectName}"`,
-          );
-          return;
-        }
-        commands.executeCommand('nx.graph.focus', project.name);
-      });
-    },
-  };
-
-export const IdeFocusTask: MessagingRequest<
-  { projectName: string; taskName: string },
-  void
-> = {
-  type: new RequestType(IDE_RPC_METHODS.FOCUS_TASK),
+export const IdeFocusTask: MessagingNotification<{
+  projectName: string;
+  taskName: string;
+}> = {
+  type: new NotificationType(IDE_RPC_METHODS.FOCUS_TASK),
   handler: (connectionId) => async (params) => {
     vscodeLogger.log(
       'Received Focus Task Request from MCP:',
@@ -82,8 +82,8 @@ export const IdeFocusTask: MessagingRequest<
   },
 };
 
-export const IdeShowFullProjectGraph: MessagingRequest0<void> = {
-  type: new RequestType0(IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH),
+export const IdeShowFullProjectGraph: MessagingNotification<void> = {
+  type: new NotificationType(IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH),
   handler: (connectionId) => async () => {
     vscodeLogger.log(
       'Received Show Full Project Graph Request from MCP:',
