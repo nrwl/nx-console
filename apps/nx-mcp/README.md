@@ -26,17 +26,25 @@ Here's an example of a `mcp.json` configuration:
     "nx-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["nx-mcp@latest", "/path/to/your/workspace"]
+      "args": ["nx-mcp@latest"]
     }
   }
 }
 ```
 
-For VSCode you can also run:
+<details>
+<summary>Claude Code</summary>
+```
+claude mcp add nx-mcp npx nx-mcp@latest
+```
+</details>
 
+<details>
+<summary>VSCode</summary>
 ```
-code --add-mcp '{"name":"nx-mcp","command":"npx","args":["nx-mcp", "/path/to/your/workspace"]}'
+code --add-mcp '{"name":"nx-mcp","command":"npx","args":["nx-mcp"]}'
 ```
+</details>
 
 Refer to your AI tool's documentation for how to register an MCP server. For example, [Cursor](https://docs.cursor.com/context/model-context-protocol) or [Claude Desktop](https://modelcontextprotocol.io/quickstart/user) support MCP.
 
