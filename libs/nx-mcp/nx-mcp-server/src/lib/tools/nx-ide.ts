@@ -9,8 +9,8 @@ import {
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
-import { IIdeJsonRpcClient } from '@nx-console/shared-types';
 import { McpIdeMessageSender } from '../mcp-message-sender';
+import { IdeProvider } from '../ide-provider';
 
 // Simple state tracking
 let isRegistered = false;
@@ -21,8 +21,8 @@ let isRegistered = false;
 export function registerNxIdeTools(
   server: McpServer,
   logger: Logger,
+  ideProvider: IdeProvider,
   telemetry?: NxConsoleTelemetryLogger,
-  ideClient?: IIdeJsonRpcClient,
   messageSender?: McpIdeMessageSender,
   nxWorkspacePath?: string,
 ): void {
@@ -31,8 +31,8 @@ export function registerNxIdeTools(
     return;
   }
 
-  if (!ideClient) {
-    logger.log('No IDE client available, skipping IDE tool registration');
+  if (!ideProvider.isAvailable()) {
+    logger.log('No IDE provider available, skipping IDE tool registration');
     return;
   }
 
@@ -76,14 +76,14 @@ export function registerNxIdeTools(
         taskName,
       });
 
-      if (!ideClient) {
+      if (!ideProvider || !ideProvider.isAvailable()) {
         await messageSender?.notifyToolError(
           NX_VISUALIZE_GRAPH,
-          'No IDE client available',
+          'No IDE provider available',
         );
         return {
           isError: true,
-          content: [{ type: 'text', text: 'No IDE client available' }],
+          content: [{ type: 'text', text: 'No IDE provider available' }],
         };
       }
 
@@ -96,7 +96,7 @@ export function registerNxIdeTools(
                 content: [{ type: 'text', text: 'Project name is required' }],
               };
             }
-            await ideClient.focusProject(projectName);
+            await ideProvider.focusProject(projectName);
             await messageSender?.notifyToolCompletion(NX_VISUALIZE_GRAPH, {
               visualizationType: 'project',
               projectName,
@@ -127,7 +127,7 @@ export function registerNxIdeTools(
                 content: [{ type: 'text', text: 'Project name is required' }],
               };
             }
-            await ideClient.focusTask(projectName, taskName);
+            await ideProvider.focusTask(projectName, taskName);
             await messageSender?.notifyToolCompletion(NX_VISUALIZE_GRAPH, {
               visualizationType: 'project-task',
               projectName,
@@ -142,7 +142,7 @@ export function registerNxIdeTools(
               ],
             };
           case 'full-project-graph':
-            await ideClient.showFullProjectGraph();
+            await ideProvider.showFullProjectGraph();
             await messageSender?.notifyToolCompletion(NX_VISUALIZE_GRAPH, {
               visualizationType: 'full-project-graph',
             });
@@ -214,19 +214,19 @@ export function registerNxIdeTools(
         };
       }
 
-      if (!ideClient) {
+      if (!ideProvider || !ideProvider.isAvailable()) {
         await messageSender?.notifyToolError(
           NX_RUN_GENERATOR,
-          'No IDE client available',
+          'No IDE provider available',
         );
         return {
           isError: true,
-          content: [{ type: 'text', text: 'No IDE client available' }],
+          content: [{ type: 'text', text: 'No IDE provider available' }],
         };
       }
 
       try {
-        const logFileName = await ideClient.openGenerateUi(
+        const logFileName = await ideProvider.openGenerateUi(
           generatorName,
           options ?? {},
           cwd,

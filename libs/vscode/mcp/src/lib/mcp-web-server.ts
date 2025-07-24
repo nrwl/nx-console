@@ -3,19 +3,16 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
+  IdeProvider,
 } from '@nx-console/nx-mcp-server';
+import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
+import { openGenerateUi } from '@nx-console/vscode-generate-ui-webview';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import {
-  getGenerators,
-  getNxWorkspace,
-} from '@nx-console/vscode-nx-workspace';
+import { getGenerators, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import {
-  getGitDiffs,
-  vscodeLogger,
-} from '@nx-console/vscode-utils';
+import { getGitDiffs, vscodeLogger } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
 
 export class McpWebServer {
@@ -41,6 +38,37 @@ export class McpWebServer {
   private fullSseSetupReady = false;
 
   private streamableServers = new Set<NxMcpServerWrapper>();
+  ideProvider: IdeProvider = {
+    isAvailable: () => true,
+    focusProject: async (projectName: string) => {
+      const graphManager = getGraphWebviewManager();
+      await graphManager.focusProject(projectName);
+    },
+    focusTask: async (projectName: string, taskName: string) => {
+      const graphManager = getGraphWebviewManager();
+      await graphManager.focusTarget(projectName, taskName);
+    },
+    showFullProjectGraph: async () => {
+      const graphManager = getGraphWebviewManager();
+      await graphManager.showAllProjects();
+    },
+    openGenerateUi: async (
+      generatorName: string,
+      options: Record<string, unknown>,
+      cwd?: string,
+    ) => {
+      // VSCode generate UI doesn't return a log file name like the standalone version
+      // So we'll return a placeholder that indicates success
+      await openGenerateUi();
+      return 'generator-ui-opened';
+    },
+    onConnectionChange: () => () => {
+      // No-op for VSCode since it's always connected
+    },
+    dispose: () => {
+      // No-op cleanup
+    },
+  };
 
   public startSkeletonMcpServer(port: number) {
     this.app.get('/sse', async (req, res) => {
@@ -85,6 +113,7 @@ export class McpWebServer {
         const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
           nxWorkspaceInfoProvider,
+          ideProvider,
           getTelemetry(),
           vscodeLogger,
         );
@@ -185,6 +214,7 @@ export class McpWebServer {
     const server = await NxMcpServerWrapper.create(
       getNxWorkspacePath(),
       nxWorkspaceInfoProvider,
+      this.ideProvider,
       getTelemetry(),
       vscodeLogger,
     );
@@ -226,4 +256,3 @@ const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   isNxCloudEnabled: async () =>
     await isNxCloudUsed(getNxWorkspacePath(), vscodeLogger),
 };
-

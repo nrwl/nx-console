@@ -5,7 +5,7 @@ import { getMcpLogger } from './mcp-logger';
 
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import { IIdeJsonRpcClient, NxWorkspace } from '@nx-console/shared-types';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { McpIdeMessageSender } from './mcp-message-sender';
 import {
   isNxCloudToolsRegistered,
@@ -18,6 +18,7 @@ import {
   isNxWorkspaceToolRegistered,
   registerNxWorkspaceTool,
 } from './tools/nx-workspace';
+import { IdeProvider } from './ide-provider';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -42,26 +43,24 @@ export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
   private _nxWorkspacePath?: string;
-  private ideClient?: IIdeJsonRpcClient;
-  private ideAvailable = false;
+  private ideProvider?: IdeProvider;
   private messageSender: McpIdeMessageSender;
   private periodicMonitoringTimer?: NodeJS.Timeout;
   private periodicMonitoringCount = 0;
   private readonly PERIODIC_MONITORING_INTERVAL = 10000; // 10 seconds
   private readonly PERIODIC_MONITORING_MAX_COUNT = 5;
+  private ideConnectionCleanup?: () => void;
 
   constructor(
     initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
+    ideProvider?: IdeProvider,
     private telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
-    ideClient?: IIdeJsonRpcClient,
-    ideAvailable?: boolean,
   ) {
     this._nxWorkspacePath = initialWorkspacePath;
-    this.ideClient = ideClient;
-    this.ideAvailable = ideAvailable ?? false;
-    this.messageSender = new McpIdeMessageSender(ideClient, this.ideAvailable);
+    this.ideProvider = ideProvider;
+    this.messageSender = new McpIdeMessageSender(undefined, false);
 
     this.server = new McpServer(
       {
@@ -86,40 +85,37 @@ export class NxMcpServerWrapper {
 
     this.logger = logger ?? getMcpLogger(this.server);
 
-    // Log IDE connection status
-    if (this.ideAvailable && this.ideClient) {
-      this.logger.log('IDE client available and connected');
-
-      // Set up disconnection handler if the client supports it
-      if (
-        'onDisconnection' in this.ideClient &&
-        typeof this.ideClient.onDisconnection === 'function'
-      ) {
-        (this.ideClient as any).onDisconnection(() => {
-          this.logger.log('IDE client disconnected');
-          this.ideAvailable = false;
-        });
-      }
+    // Log IDE connection status and set up change listener
+    if (this.ideProvider?.isAvailable()) {
+      this.logger.log('IDE provider available and connected');
     } else {
       this.logger.log('Running in standalone mode (no IDE connection)');
+    }
+
+    // Set up IDE connection change listener if provider exists
+    if (this.ideProvider) {
+      this.ideConnectionCleanup = this.ideProvider.onConnectionChange(
+        async (available) => {
+          this.logger.log(`IDE connection status changed to: ${available}`);
+          await this.evaluateAndAddNewTools();
+        },
+      );
     }
   }
 
   static async create(
     initialWorkspacePath: string | undefined,
     nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
+    ideProvider?: IdeProvider,
     telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
-    ideClient?: IIdeJsonRpcClient,
-    ideAvailable?: boolean,
   ): Promise<NxMcpServerWrapper> {
     const server = new NxMcpServerWrapper(
       initialWorkspacePath,
       nxWorkspaceInfoProvider,
+      ideProvider,
       telemetry,
       logger,
-      ideClient,
-      ideAvailable,
     );
     logger?.log('Registering all Nx MCP tools');
 
@@ -157,14 +153,7 @@ export class NxMcpServerWrapper {
    * Check if IDE is available and connected
    */
   isIdeAvailable(): boolean {
-    return this.ideAvailable && this.ideClient !== undefined;
-  }
-
-  /**
-   * Get the IDE client instance (if available)
-   */
-  getIdeClient(): IIdeJsonRpcClient | undefined {
-    return this.ideClient;
+    return this.ideProvider?.isAvailable() ?? false;
   }
 
   /**
@@ -181,14 +170,13 @@ export class NxMcpServerWrapper {
     // Stop periodic monitoring
     this.stopPeriodicMonitoring();
 
-    if (this.ideClient) {
-      try {
-        this.ideClient.disconnect();
-        this.logger.log('IDE client disconnected');
-      } catch (error) {
-        this.logger.log('Error disconnecting IDE client:', error);
-      }
+    // Clean up IDE connection listener
+    if (this.ideConnectionCleanup) {
+      this.ideConnectionCleanup();
     }
+
+    // Dispose IDE provider if it exists
+    this.ideProvider?.dispose();
   }
 
   /**
@@ -226,7 +214,7 @@ export class NxMcpServerWrapper {
    * Check if IDE connection is available
    */
   private isIdeConnectionAvailable(): boolean {
-    return this.isIdeAvailable();
+    return this.ideProvider?.isAvailable() ?? false;
   }
 
   /**
@@ -292,14 +280,15 @@ export class NxMcpServerWrapper {
       const ideAvailable = this.isIdeConnectionAvailable();
       const ideToolsRegistered = isNxIdeToolsRegistered();
 
-      if (ideAvailable && !ideToolsRegistered) {
+      if (ideAvailable && this.ideProvider && !ideToolsRegistered) {
         this.logger.log('IDE tools condition met, registering IDE tools');
         registerNxIdeTools(
           this.server,
           this.logger,
+          this.ideProvider,
           this.telemetry,
-          this.ideClient,
           this.messageSender,
+          this._nxWorkspacePath,
         );
       }
     } catch (error) {
@@ -345,27 +334,6 @@ export class NxMcpServerWrapper {
       clearInterval(this.periodicMonitoringTimer);
       this.periodicMonitoringTimer = undefined;
       this.logger.log('Stopped periodic tool condition monitoring');
-    }
-  }
-
-  /**
-   * Update IDE client connection
-   */
-  async updateIdeConnection(
-    ideClient?: IIdeJsonRpcClient,
-    ideAvailable = false,
-  ): Promise<void> {
-    const wasAvailable = this.ideAvailable;
-    this.ideClient = ideClient;
-    this.ideAvailable = ideAvailable;
-    this.messageSender.updateIdeConnection(ideClient, ideAvailable);
-
-    // If IDE connection status changed, trigger dynamic evaluation
-    if (wasAvailable !== ideAvailable) {
-      this.logger.log(
-        `IDE connection status changed from ${wasAvailable} to ${ideAvailable}`,
-      );
-      await this.evaluateAndAddNewTools();
     }
   }
 }

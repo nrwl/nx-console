@@ -9,6 +9,12 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../generate-ui-webview/tsconfig.lib.json"
+    },
+    {
+      "path": "../project-graph/tsconfig.lib.json"
+    },
+    {
       "path": "../../nx-mcp/nx-mcp-server/tsconfig.lib.json"
     },
     {

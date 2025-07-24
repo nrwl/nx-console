@@ -84,13 +84,63 @@ async function main() {
     }
   }
 
+  // Create IDE provider based on connection status
+  const ideProvider = ideClient
+    ? {
+        isAvailable: () => ideAvailable,
+        focusProject: async (projectName: string) => {
+          if (!ideClient) throw new Error('No IDE client available');
+          await ideClient.focusProject(projectName);
+        },
+        focusTask: async (projectName: string, taskName: string) => {
+          if (!ideClient) throw new Error('No IDE client available');
+          await ideClient.focusTask(projectName, taskName);
+        },
+        showFullProjectGraph: async () => {
+          if (!ideClient) throw new Error('No IDE client available');
+          await ideClient.showFullProjectGraph();
+        },
+        openGenerateUi: async (
+          generatorName: string,
+          options: Record<string, unknown>,
+          cwd?: string,
+        ) => {
+          if (!ideClient) throw new Error('No IDE client available');
+          return await ideClient.openGenerateUi(generatorName, options, cwd);
+        },
+        onConnectionChange: (callback: (available: boolean) => void) => {
+          // Set up disconnection handler if the client supports it
+          if (
+            ideClient &&
+            'onDisconnection' in ideClient &&
+            typeof (ideClient as any).onDisconnection === 'function'
+          ) {
+            (ideClient as any).onDisconnection(() => {
+              logger.log('IDE client disconnected');
+              callback(false);
+            });
+          }
+          return () => {}; // No-op cleanup since we can't remove the disconnection handler
+        },
+        dispose: () => {
+          if (ideClient) {
+            try {
+              ideClient.disconnect();
+              logger.log('IDE client disconnected');
+            } catch (error) {
+              logger.log('Error disconnecting IDE client:', error);
+            }
+          }
+        },
+      }
+    : undefined;
+
   const server = await NxMcpServerWrapper.create(
     nxWorkspacePath,
     nxWorkspaceInfoProvider,
+    ideProvider,
     telemetryLogger,
-    undefined, // logger
-    ideClient,
-    ideAvailable,
+    logger,
   );
 
   if (argv.transport === 'sse' || argv.transport === 'http') {
@@ -112,23 +162,12 @@ async function main() {
           sessionIdGenerator: undefined,
         });
 
-        // Create a new server instance with its own IDE client for this connection
-        let connectionIdeClient: IIdeJsonRpcClient | undefined;
-        let connectionIdeAvailable = false;
-        
-        if (nxWorkspacePath) {
-          const ideConnection = await createIdeClient(nxWorkspacePath);
-          connectionIdeClient = ideConnection.client;
-          connectionIdeAvailable = ideConnection.available;
-        }
-        
         const connectionServer = await NxMcpServerWrapper.create(
           nxWorkspacePath,
           nxWorkspaceInfoProvider,
+          ideProvider, // Reuse the shared IDE provider
           telemetryLogger,
-          undefined, // logger
-          connectionIdeClient,
-          connectionIdeAvailable,
+          logger,
         );
         const connection = { transport, server: connectionServer };
         connections.add(connection);
@@ -137,7 +176,6 @@ async function main() {
         res.on('close', () => {
           connections.delete(connection);
           connectionServer.cleanup();
-          connectionIdeClient?.disconnect();
           connectionServer.getMcpServer().close();
           logger.log('Streamable HTTP connection closed');
         });
@@ -163,9 +201,7 @@ async function main() {
               res.write(':beat\n\n');
             } else {
               clearInterval(keepAliveInterval);
-              logger.log(
-                'SSE connection closed, clearing keep-alive interval',
-              );
+              logger.log('SSE connection closed, clearing keep-alive interval');
             }
           }, argv.keepAliveInterval);
 
