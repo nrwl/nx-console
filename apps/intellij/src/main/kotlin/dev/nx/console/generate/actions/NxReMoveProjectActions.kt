@@ -129,7 +129,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
         dryRun: Boolean = false,
     ) {
         val result = dialog.getResult()
-        val args = mutableListOf<String>("--projectName=${result.project}")
+        val args = mutableListOf("--projectName=${result.project}")
         if (mode == "move") {
             args.add("--destination=${result.directory}")
         }

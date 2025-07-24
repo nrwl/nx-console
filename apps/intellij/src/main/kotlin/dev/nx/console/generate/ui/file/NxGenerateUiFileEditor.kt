@@ -6,10 +6,8 @@ import com.intellij.openapi.ui.getPreferredFocusedComponent
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.JComponent
 
-class NxGenerateUiFileEditor(
-    private val project: Project,
-    private val nxGenerateUiFile: NxGenerateUiFile
-) : FileEditorBase() {
+class NxGenerateUiFileEditor(project: Project, private val nxGenerateUiFile: NxGenerateUiFile) :
+    FileEditorBase() {
 
     private val mainComponent: JComponent = nxGenerateUiFile.createMainComponent(project)
 

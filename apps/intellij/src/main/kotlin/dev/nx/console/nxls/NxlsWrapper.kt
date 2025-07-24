@@ -89,7 +89,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                         }
                                         it.result?.let { result ->
                                             log.trace(
-                                                "Result from nxls: ${result?.let {
+                                                "Result from nxls: ${result.let {
                                                     if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
                                                 }}"
                                             )

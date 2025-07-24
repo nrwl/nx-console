@@ -326,7 +326,7 @@ class ProjectLevelConfigFileCodeVisionManager(
             }
 
             PsiTreeUtil.findChildrenOfType(psiFile, JSStatement::class.java)
-                ?.firstOrNull { it !is JSImportStatement }
+                .firstOrNull { it !is JSImportStatement }
                 ?.also {
                     return it.textRange
                 }

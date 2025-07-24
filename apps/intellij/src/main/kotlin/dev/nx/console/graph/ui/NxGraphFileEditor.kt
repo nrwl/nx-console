@@ -5,8 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.JComponent
 
-class NxGraphFileEditor(private val project: Project, private val nxGraphFile: NxGraphFile) :
-    FileEditorBase() {
+class NxGraphFileEditor(project: Project, private val nxGraphFile: NxGraphFile) : FileEditorBase() {
 
     private val mainComponent: JComponent = nxGraphFile.createMainComponent(project)
 
