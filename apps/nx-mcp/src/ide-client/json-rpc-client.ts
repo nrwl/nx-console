@@ -366,4 +366,26 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     );
     return response.logFileName;
   }
+
+  /**
+   * Send a notification to the IDE (fire-and-forget)
+   */
+  async sendNotification(method: string, params?: unknown): Promise<void> {
+    if (!this.socket || this.status !== 'connected') {
+      throw new Error('Not connected to IDE');
+    }
+
+    const message: JsonRpcMessage = {
+      jsonrpc: '2.0',
+      method,
+      params,
+      // Notifications don't have an id
+    };
+
+    try {
+      this.sendMessage(message);
+    } catch (error) {
+      throw new Error(`Failed to send notification: ${error}`);
+    }
+  }
 }

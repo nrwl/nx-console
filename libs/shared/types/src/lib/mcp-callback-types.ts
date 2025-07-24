@@ -135,6 +135,7 @@ export interface IIdeJsonRpcClient {
   openGenerateUi(
     generatorName: string,
     options: Record<string, unknown>,
-    cwd?: string
+    cwd?: string,
   ): Promise<string>;
+  sendNotification(method: string, params?: unknown): Promise<void>;
 }

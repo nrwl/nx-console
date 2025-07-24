@@ -11,9 +11,7 @@ import {
   getTaskGraphVisualizationMessage,
   NX_WORKSPACE_PATH,
 } from '@nx-console/shared-llm-context';
-import {
-  findMatchingProject,
-} from '@nx-console/shared-npm';
+import { findMatchingProject } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -37,6 +35,7 @@ import {
 } from '@nx-console/shared-llm-context';
 import { registerNxTaskTools } from './tools/nx-tasks';
 import { registerNxWorkspaceTool } from './tools/nx-workspace';
+import { McpIdeMessageSender } from './mcp-message-sender';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -57,13 +56,13 @@ export interface NxWorkspaceInfoProvider {
   isNxCloudEnabled: () => Promise<boolean>;
 }
 
-
 export class NxMcpServerWrapper {
   private server: McpServer;
   private logger: Logger;
   private _nxWorkspacePath?: string;
   private ideClient?: IIdeJsonRpcClient;
   private ideAvailable = false;
+  private messageSender: McpIdeMessageSender;
 
   constructor(
     initialWorkspacePath: string | undefined,
@@ -76,6 +75,7 @@ export class NxMcpServerWrapper {
     this._nxWorkspacePath = initialWorkspacePath;
     this.ideClient = ideClient;
     this.ideAvailable = ideAvailable ?? false;
+    this.messageSender = new McpIdeMessageSender(ideClient, this.ideAvailable);
 
     this.server = new McpServer({
       name: 'Nx MCP',
@@ -91,9 +91,12 @@ export class NxMcpServerWrapper {
     // Log IDE connection status
     if (this.ideAvailable && this.ideClient) {
       this.logger.log('IDE client available and connected');
-      
+
       // Set up disconnection handler if the client supports it
-      if ('onDisconnection' in this.ideClient && typeof this.ideClient.onDisconnection === 'function') {
+      if (
+        'onDisconnection' in this.ideClient &&
+        typeof this.ideClient.onDisconnection === 'function'
+      ) {
         (this.ideClient as any).onDisconnection(() => {
           this.logger.log('IDE client disconnected');
           this.ideAvailable = false;
@@ -151,6 +154,13 @@ export class NxMcpServerWrapper {
   }
 
   /**
+   * Get the message sender instance
+   */
+  getMessageSender(): McpIdeMessageSender {
+    return this.messageSender;
+  }
+
+  /**
    * Cleanup resources when server shuts down
    */
   cleanup(): void {
@@ -162,6 +172,18 @@ export class NxMcpServerWrapper {
         this.logger.log('Error disconnecting IDE client:', error);
       }
     }
+  }
+
+  /**
+   * Update IDE client connection
+   */
+  updateIdeConnection(
+    ideClient?: IIdeJsonRpcClient,
+    ideAvailable = false,
+  ): void {
+    this.ideClient = ideClient;
+    this.ideAvailable = ideAvailable;
+    this.messageSender.updateIdeConnection(ideClient, ideAvailable);
   }
 
   private async registerTools(): Promise<void> {
@@ -523,7 +545,18 @@ and follows the Nx workspace convention for project organization.`
           kind: visualizationType,
         });
 
+        // Notify IDE about tool invocation
+        await this.messageSender.notifyToolInvocation(NX_VISUALIZE_GRAPH, {
+          visualizationType,
+          projectName,
+          taskName,
+        });
+
         if (!this.ideClient) {
+          await this.messageSender.notifyToolError(
+            NX_VISUALIZE_GRAPH,
+            'No IDE client available',
+          );
           return {
             isError: true,
             content: [{ type: 'text', text: 'No IDE client available' }],
@@ -540,6 +573,13 @@ and follows the Nx workspace convention for project organization.`
                 };
               }
               await this.ideClient.focusProject(projectName);
+              await this.messageSender.notifyToolCompletion(
+                NX_VISUALIZE_GRAPH,
+                {
+                  visualizationType: 'project',
+                  projectName,
+                },
+              );
               return {
                 content: [
                   {
@@ -567,6 +607,14 @@ and follows the Nx workspace convention for project organization.`
                 };
               }
               await this.ideClient.focusTask(projectName, taskName);
+              await this.messageSender.notifyToolCompletion(
+                NX_VISUALIZE_GRAPH,
+                {
+                  visualizationType: 'project-task',
+                  projectName,
+                  taskName,
+                },
+              );
               return {
                 content: [
                   {
@@ -580,6 +628,12 @@ and follows the Nx workspace convention for project organization.`
               };
             case 'full-project-graph':
               await this.ideClient.showFullProjectGraph();
+              await this.messageSender.notifyToolCompletion(
+                NX_VISUALIZE_GRAPH,
+                {
+                  visualizationType: 'full-project-graph',
+                },
+              );
               return {
                 content: [
                   {
@@ -590,9 +644,15 @@ and follows the Nx workspace convention for project organization.`
               };
           }
         } catch (error) {
+          await this.messageSender.notifyToolError(
+            NX_VISUALIZE_GRAPH,
+            `IDE communication error: ${error}`,
+          );
           return {
             isError: true,
-            content: [{ type: 'text', text: `IDE communication error: ${error}` }],
+            content: [
+              { type: 'text', text: `IDE communication error: ${error}` },
+            ],
           };
         }
       },
@@ -622,7 +682,19 @@ and follows the Nx workspace convention for project organization.`
         this.telemetry?.logUsage('ai.tool-call', {
           tool: NX_RUN_GENERATOR,
         });
+
+        // Notify IDE about tool invocation
+        await this.messageSender.notifyToolInvocation(NX_RUN_GENERATOR, {
+          generatorName,
+          options,
+          cwd,
+        });
+
         if (!this._nxWorkspacePath) {
+          await this.messageSender.notifyToolError(
+            NX_RUN_GENERATOR,
+            'Error: Workspace path not set',
+          );
           return {
             isError: true,
             content: [{ type: 'text', text: 'Error: Workspace path not set' }],
@@ -630,6 +702,10 @@ and follows the Nx workspace convention for project organization.`
         }
 
         if (!this.ideClient) {
+          await this.messageSender.notifyToolError(
+            NX_RUN_GENERATOR,
+            'No IDE client available',
+          );
           return {
             isError: true,
             content: [{ type: 'text', text: 'No IDE client available' }],
@@ -643,6 +719,11 @@ and follows the Nx workspace convention for project organization.`
             cwd,
           );
 
+          await this.messageSender.notifyToolCompletion(NX_RUN_GENERATOR, {
+            generatorName,
+            logFileName,
+          });
+
           return {
             content: [
               {
@@ -655,9 +736,15 @@ and follows the Nx workspace convention for project organization.`
             ],
           };
         } catch (error) {
+          await this.messageSender.notifyToolError(
+            NX_RUN_GENERATOR,
+            `IDE communication error: ${error}`,
+          );
           return {
             isError: true,
-            content: [{ type: 'text', text: `IDE communication error: ${error}` }],
+            content: [
+              { type: 'text', text: `IDE communication error: ${error}` },
+            ],
           };
         }
       },
