@@ -9,6 +9,7 @@ import {
   getOutputChannel,
   logAndShowError,
 } from '@nx-console/vscode-output-channels';
+import { getGitApi, getGitRepository } from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
@@ -29,6 +30,11 @@ let _nxlsClient: NxlsClient | undefined;
 
 export function createNxlsClient(extensionContext: ExtensionContext) {
   _nxlsClient = new NxlsClient(extensionContext);
+
+  const disposable = refreshWorkspaceOnBranchChange(_nxlsClient);
+  if (disposable) {
+    extensionContext.subscriptions.push(disposable);
+  }
 }
 
 export function getNxlsClient(): NxlsClient {
@@ -359,4 +365,23 @@ async function createLanguageClient(
     serverOptions,
     clientOptions,
   );
+}
+
+function refreshWorkspaceOnBranchChange(
+  client: NxlsClient,
+): Disposable | undefined {
+  const repo = getGitRepository();
+  if (!repo) {
+    return;
+  }
+
+  let branch = repo.state.HEAD.name;
+  return repo.state.onDidChange(async () => {
+    const newBranch = repo.state.HEAD.name;
+    if (newBranch !== branch) {
+      console.log('Branch changed, refreshing workspace', branch, newBranch);
+      branch = newBranch;
+      await client.refreshWorkspace();
+    }
+  });
 }
