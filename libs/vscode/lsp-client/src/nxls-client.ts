@@ -9,10 +9,20 @@ import {
   getOutputChannel,
   logAndShowError,
 } from '@nx-console/vscode-output-channels';
-import { getGitApi, getGitRepository } from '@nx-console/vscode-utils';
+import {
+  getGitApi,
+  getGitRepository,
+  vscodeLogger,
+} from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
-import { Disposable, ExtensionContext, ProgressLocation, window } from 'vscode';
+import {
+  commands,
+  Disposable,
+  ExtensionContext,
+  ProgressLocation,
+  window,
+} from 'vscode';
 import {
   CloseAction,
   ErrorAction,
@@ -379,9 +389,11 @@ function refreshWorkspaceOnBranchChange(
   return repo.state.onDidChange(async () => {
     const newBranch = repo.state.HEAD.name;
     if (newBranch !== branch) {
-      console.log('Branch changed, refreshing workspace', branch, newBranch);
+      vscodeLogger.log(
+        `Branch changed from ${branch} to ${newBranch}, refreshing workspace`,
+      );
       branch = newBranch;
-      await client.refreshWorkspace();
+      commands.executeCommand('nxConsole.refreshWorkspace');
     }
   });
 }
