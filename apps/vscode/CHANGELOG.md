@@ -1,3 +1,10 @@
+## [18.59.3](https://github.com/nrwl/nx-console/compare/vscode-v18.59.2...vscode-v18.59.3) (2025-07-24)
+
+
+### Bug Fixes
+
+* **vscode:** use refresh command instead of direct invocation ([#2635](https://github.com/nrwl/nx-console/issues/2635)) ([f685fc9](https://github.com/nrwl/nx-console/commit/f685fc93a60fc7ce216b4ba1803008bfaf0965d7))
+
 ## [18.59.2](https://github.com/nrwl/nx-console/compare/vscode-v18.59.1...vscode-v18.59.2) (2025-07-24)
 
 
