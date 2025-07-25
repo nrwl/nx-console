@@ -1,4 +1,5 @@
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
 import { join } from 'path';
@@ -9,11 +10,12 @@ export interface NxTaskDefinition {
   command: string;
   flags: Array<string>;
   cwd?: string;
+  useLatestVersion?: boolean;
 }
 
 export class NxTask extends Task {
   static async create(
-    definition: NxTaskDefinition
+    definition: NxTaskDefinition,
   ): Promise<NxTask | undefined> {
     const { command, flags, positional, cwd } = definition;
 
@@ -26,13 +28,13 @@ export class NxTask extends Task {
     const workspace = await getNxWorkspace();
     if (!workspace) {
       getOutputChannel().appendLine(
-        'Error while creating task: no workspace found'
+        'Error while creating task: no workspace found',
       );
       return;
     }
 
     const { workspacePath, isEncapsulatedNx } = workspace;
-    const displayCommand = `nx ${args.join(' ')}`;
+    const displayCommand = `${definition.useLatestVersion ? '-y nx@latest' : 'nx'} ${args.join(' ')}`;
     const task = new NxTask(
       { ...definition, type: 'nx' }, // definition
       TaskScope.Workspace, // scope
@@ -44,7 +46,7 @@ export class NxTask extends Task {
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         encapsulatedNx: isEncapsulatedNx,
         workspacePath,
-      })
+      }),
     );
     return task;
   }
