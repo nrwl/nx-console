@@ -52,6 +52,7 @@ export class McpWebServer {
   private sseTransport?: SSEServerTransport;
   private sseServer?: NxMcpServerWrapper;
   private fullSseSetupReady = false;
+  private activeKeepAliveIntervals = new Set<NodeJS.Timeout>();
 
   private streamableServers = new Set<NxMcpServerWrapper>();
 
@@ -70,15 +71,25 @@ export class McpWebServer {
         if (!res.writableEnded && !res.writableFinished) {
           res.write(':beat\n\n');
         } else {
-          clearInterval(this.sseKeepAliveInterval);
+          if (this.sseKeepAliveInterval) {
+            clearInterval(this.sseKeepAliveInterval);
+            this.activeKeepAliveIntervals.delete(this.sseKeepAliveInterval);
+          }
           vscodeLogger.log(
             'SSE connection closed, clearing keep-alive interval',
           );
         }
       }, 20000);
+      
+      if (this.sseKeepAliveInterval) {
+        this.activeKeepAliveIntervals.add(this.sseKeepAliveInterval);
+      }
 
       req.on('close', () => {
-        clearInterval(this.sseKeepAliveInterval);
+        if (this.sseKeepAliveInterval) {
+          clearInterval(this.sseKeepAliveInterval);
+          this.activeKeepAliveIntervals.delete(this.sseKeepAliveInterval);
+        }
         vscodeLogger.log('SSE connection closed by client');
       });
     });
@@ -218,8 +229,16 @@ export class McpWebServer {
     if (this.appInstance) {
       this.appInstance.close();
     }
+    
+    // Clear all active intervals
+    this.activeKeepAliveIntervals.forEach((interval) => {
+      clearInterval(interval);
+    });
+    this.activeKeepAliveIntervals.clear();
+    
     if (this.sseKeepAliveInterval) {
       clearInterval(this.sseKeepAliveInterval);
+      this.sseKeepAliveInterval = undefined;
     }
     this.serverStartupFailed = false;
   }
