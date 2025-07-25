@@ -17,7 +17,8 @@ export function createYargsConfig(args: string[]): Argv<any> {
   return yargs(args)
     .command('$0 [workspacePath]', 'Start the nx-mcp server', (yargs) => {
       yargs.positional('workspacePath', {
-        describe: 'Path to the Nx workspace root',
+        describe:
+          'Path to the Nx workspace root. Will default to the current cwd if not provided.',
         type: 'string',
       });
     })
