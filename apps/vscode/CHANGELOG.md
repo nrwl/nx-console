@@ -1,3 +1,10 @@
+# [18.60.0](https://github.com/nrwl/nx-console/compare/vscode-v18.59.3...vscode-v18.60.0) (2025-07-25)
+
+
+### Features
+
+* support using latest Nx version in tasks and IntelliJ commands, and use it to connect to cloud ([#2638](https://github.com/nrwl/nx-console/issues/2638)) ([d003e8c](https://github.com/nrwl/nx-console/commit/d003e8cda23b83174f9c098f5b19f0a5539da710))
+
 ## [18.59.3](https://github.com/nrwl/nx-console/compare/vscode-v18.59.2...vscode-v18.59.3) (2025-07-24)
 
 
