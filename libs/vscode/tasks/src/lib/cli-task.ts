@@ -27,7 +27,7 @@ export class CliTask extends Task {
     }
     const { isEncapsulatedNx, workspacePath } = nxWorkspace;
 
-    const displayCommand = `nx ${args.join(' ')}`;
+    const displayCommand = `${definition.useLatestNxVersion ? '-y nx@latest' : 'nx'} ${args.join(' ')}`;
 
     const task = new CliTask(
       { ...definition, type: 'nx' }, // definition
