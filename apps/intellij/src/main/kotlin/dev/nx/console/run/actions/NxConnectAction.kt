@@ -20,7 +20,7 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
-import dev.nx.console.utils.NxGeneralCommandLine
+import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.sync_services.NxCloudStatusSyncAccessService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,7 +66,7 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                 }
                 TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_CONNECT)
 
-                val commandLine = NxGeneralCommandLine(project, listOf("connect"))
+                val commandLine = NxLatestVersionGeneralCommandLine(project, listOf("connect"))
 
                 val processHandler = KillableColoredProcessHandler(commandLine)
                 val console = TextConsoleBuilderFactory.getInstance().createBuilder(project).console

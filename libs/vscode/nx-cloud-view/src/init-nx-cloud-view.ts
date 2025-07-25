@@ -171,8 +171,10 @@ export function runNxConnect(source: TelemetryEventSource = 'command') {
   getTelemetry().logUsage('cloud.connect', {
     source,
   });
+  // we want to make sure to always use `npx nx@latest connect` here
   CliTaskProvider.instance.executeTask({
     command: 'connect',
+    useLatestNxVersion: true,
     flags: [],
   });
 }
