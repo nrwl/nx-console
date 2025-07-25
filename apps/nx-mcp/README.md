@@ -65,12 +65,28 @@ More info:
 
 Currently, the Nx MCP server provides a set of tools. Resources, Roots and Prompts aren't supported yet.
 
-- **nx_workspace**: Returns an annotated representation of the local nx configuration and the project graph
-- **nx_project_details**: Returns the full project configuration for a specific nx project
-- **nx_docs**: Retrieves documentation sections relevant to user queries
-- **nx_generators**: Returns a list of available generators in the workspace
-- **nx_generator_schema**: Provides detailed schema information for a specific generator
-- **nx_available_plugins**: Returns a list of available Nx plugins from the npm registry with their descriptions
+- **nx_docs**: Returns documentation sections relevant to user queries about Nx
+- **nx_available_plugins**: Lists available Nx plugins from the core team and local workspace plugins
+- **nx_workspace_path**: Returns the path to the Nx workspace root
+- **nx_workspace**: Returns readable representation of project graph and nx.json configuration
+- **nx_project_details**: Returns complete project configuration in JSON format for a given project
+- **nx_generators**: Returns list of generators relevant to user queries
+- **nx_generator_schema**: Returns detailed JSON schema for a specific Nx generator
+- **nx_current_running_tasks_details**: Lists currently running Nx TUI processes and task statuses
+- **nx_current_running_task_output**: Returns terminal output for specific running tasks
+- **nx_run_generator**: Opens generate UI with prefilled options (requires running IDE instance)
+- **nx_visualize_graph**: Visualizes the Nx graph (requires running IDE instance)
+
+### Nx Cloud Tools (only available w/ Nx Cloud enabled)
+
+- **nx_cloud_cipe_details**: Returns CI pipeline execution details from Nx Cloud
+- **nx_cloud_fix_cipe_failure**: Returns failure details including terminal output and git diffs
+- **nx_cloud_pipeline_executions_search**: Searches for pipeline executions in Nx Cloud
+- **nx_cloud_pipeline_executions_details**: Gets detailed information about specific pipeline executions
+- **nx_cloud_runs_search**: Searches for runs within pipeline executions
+- **nx_cloud_runs_details**: Gets detailed information about specific runs
+- **nx_cloud_tasks_search**: Searches for task statistics and performance data
+- **nx_cloud_tasks_details**: Returns detailed task execution information
 
 When no workspace path is specified, only the `nx_docs` and `nx_available_plugins` tools will be available.
 
