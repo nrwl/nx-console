@@ -5,10 +5,7 @@
     "types": ["node"]
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
-  "include": [
-    "src/**/*.ts",
-    "../../nx-mcp/nx-mcp-server/src/lib/mcp-message-sender.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "references": [
     {
       "path": "../nx-version/tsconfig.lib.json"
