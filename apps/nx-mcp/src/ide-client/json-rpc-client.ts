@@ -39,10 +39,9 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
 
   constructor(
     private workspacePath: string,
-    private reconnectInterval?: number,
-    private maxReconnectAttempts?: number,
-    private requestTimeout?: number,
     private logger?: Logger,
+    private reconnectInterval = 2000,
+    private maxReconnectAttempts = 5,
   ) {}
 
   /**
@@ -65,10 +64,8 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     try {
       const socketPath = getNxConsoleSocketPath(this.workspacePath);
 
-      // Create socket connection
       this.socket = new Socket();
 
-      // Wait for socket to connect
       await new Promise<void>((resolve, reject) => {
         this.socket!.on('connect', () => {
           this.status = 'connected';
@@ -82,7 +79,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
           reject(error);
         });
 
-        // Connect to socket
         if (platform() === 'win32') {
           // On Windows, connect to named pipe
           this.socket!.connect(socketPath);
@@ -92,12 +88,10 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
         }
       });
 
-      // Create vscode-jsonrpc message connection
       const reader = new rpc.SocketMessageReader(this.socket);
       const writer = new rpc.SocketMessageWriter(this.socket);
       this.connection = rpc.createMessageConnection(reader, writer);
 
-      // Set up connection event handlers
       this.connection.onClose(() => {
         this.logger?.log('JSON-RPC connection closed');
         this.handleDisconnection();
@@ -108,7 +102,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
         this.handleDisconnection();
       });
 
-      // Start listening for messages
       this.connection.listen();
     } catch (error) {
       this.logger?.log('Failed to connect to IDE:', error);
@@ -139,9 +132,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     this.status = 'disconnected';
   }
 
-  /**
-   * Get current connection status
-   */
   getStatus(): ConnectionStatus {
     return this.status;
   }
@@ -196,9 +186,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     }
   }
 
-  /**
-   * Focus on a specific project in the IDE
-   */
   async focusProject(projectName: string): Promise<void> {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
@@ -209,9 +196,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     });
   }
 
-  /**
-   * Focus on a specific task in the IDE
-   */
   async focusTask(projectName: string, taskName: string): Promise<void> {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
@@ -223,9 +207,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     });
   }
 
-  /**
-   * Show the full project graph in the IDE
-   */
   async showFullProjectGraph(): Promise<void> {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');
@@ -234,9 +215,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     await this.connection.sendNotification(showFullProjectGraphRequest);
   }
 
-  /**
-   * Open the generator UI in the IDE
-   */
   async openGenerateUi(
     generatorName: string,
     options: Record<string, unknown>,
@@ -254,9 +232,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     return response.logFileName;
   }
 
-  /**
-   * Send a notification to the IDE (fire-and-forget)
-   */
   async sendNotification(method: string, params?: unknown): Promise<void> {
     if (!this.connection || this.status !== 'connected') {
       throw new Error('Not connected to IDE');

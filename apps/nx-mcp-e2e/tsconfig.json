@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/utils"
+    },
+    {
       "path": "../../libs/shared/e2e-utils"
     }
   ]
