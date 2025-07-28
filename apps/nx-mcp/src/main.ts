@@ -17,7 +17,7 @@ import {
   NxConsoleTelemetryLogger,
 } from '@nx-console/shared-telemetry';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
-import { consoleLogger } from '@nx-console/shared-utils';
+import { consoleLogger, killGroup } from '@nx-console/shared-utils';
 import { randomUUID } from 'crypto';
 import express from 'express';
 import { resolve } from 'path';
@@ -221,7 +221,6 @@ async function main() {
         });
 
         await connectionServer.getMcpServer().connect(transport);
-        // Note: For HTTP mode, each connection is separate, so we don't set mcpConnected globally
         await transport.handleRequest(req, res, req.body);
       });
 
@@ -286,17 +285,22 @@ async function main() {
     }
   }
 
+  const exitHandler = () => {
+    if (process.connected) {
+      process.disconnect();
+    }
+    serverWrapper.cleanup();
+    killGroup(process.pid);
+  };
+
   // Prevent the Node.js process from exiting early
   process.on('SIGINT', () => {
     logger.log('Received SIGINT signal. Server shutting down...');
-    serverWrapper.cleanup();
-    process.exit(0);
+    exitHandler();
   });
 
   // Cleanup on exit
-  process.on('exit', () => {
-    serverWrapper.cleanup();
-  });
+  process.on('exit', exitHandler);
 
   // Keep the process alive
   process.stdin.resume();

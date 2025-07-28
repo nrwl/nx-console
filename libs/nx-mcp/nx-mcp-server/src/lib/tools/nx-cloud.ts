@@ -30,12 +30,8 @@ import {
   NX_CLOUD_TASKS_SEARCH,
 } from '@nx-console/shared-llm-context/src/lib/tool-names';
 
-// Simple state tracking
 let isRegistered = false;
 
-/**
- * Register Nx Cloud tools that require Nx Cloud to be enabled
- */
 export function registerNxCloudTools(
   workspacePath: string,
   server: McpServer,
@@ -671,16 +667,10 @@ const nxCloudTaskDetails =
     return { content };
   };
 
-/**
- * Check if Nx Cloud tools are currently registered
- */
 export function isNxCloudToolsRegistered(): boolean {
   return isRegistered;
 }
 
-/**
- * Reset registration state (for testing or server restart)
- */
 export function resetNxCloudToolsState(): void {
   isRegistered = false;
 }

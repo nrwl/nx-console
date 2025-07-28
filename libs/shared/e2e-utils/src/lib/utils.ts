@@ -116,7 +116,10 @@ export async function createInvokeMCPInspectorCLI(
   workspaceName: string,
   mcpProjectName = 'nx-mcp',
 ) {
-  const graph = await createProjectGraphAsync();
+  const graph = await createProjectGraphAsync({
+    resetDaemonClient: true,
+    exitOnError: true,
+  });
   const nxMcp = graph.nodes[mcpProjectName];
   if (
     !nxMcp ||
@@ -132,7 +135,7 @@ export async function createInvokeMCPInspectorCLI(
   );
 
   /**
-   * We have a HUGE range of major versionss of commander that are dependend upon by our dev dependencies. The mcp-inspector package
+   * We have a HUGE range of major versions of commander that are dependend upon by our dev dependencies. The mcp-inspector package
    * cannot run currently based on our dep tree.
    *
    * I tried multiple combinations of yarn resolution configurations to try and get this to work but the only way was to ensure that the

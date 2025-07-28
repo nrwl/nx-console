@@ -14,7 +14,6 @@ import {
   IdeFocusTask,
   IdeOpenGenerateUi,
   IdeShowFullProjectGraph,
-  initializeIdeRequestHandlers,
 } from './features/ide-requests';
 import {
   NxEndedRunningTasks,
@@ -50,9 +49,6 @@ export class NxMessagingServer {
   constructor(socketPath: string, context: ExtensionContext) {
     this.#fullSocketPath = socketPath;
     this.#context = context;
-
-    // Initialize IDE request handlers
-    initializeIdeRequestHandlers(context);
 
     this.#server = net.createServer((socket) => {
       const socketId = crypto.randomUUID().toString();

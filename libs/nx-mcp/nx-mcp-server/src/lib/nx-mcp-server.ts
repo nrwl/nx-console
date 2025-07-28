@@ -6,7 +6,6 @@ import { getMcpLogger } from './mcp-logger';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
-import { McpIdeMessageSender } from './mcp-message-sender';
 import {
   isNxCloudToolsRegistered,
   registerNxCloudTools,
@@ -43,7 +42,6 @@ export class NxMcpServerWrapper {
   private logger: Logger;
   private _nxWorkspacePath?: string;
   private ideProvider?: IdeProvider;
-  private messageSender: McpIdeMessageSender;
   private periodicMonitoringTimer?: NodeJS.Timeout;
   private periodicMonitoringCount = 0;
   private readonly PERIODIC_MONITORING_INTERVAL = 10000; // 10 seconds
@@ -60,7 +58,6 @@ export class NxMcpServerWrapper {
   ) {
     this._nxWorkspacePath = initialWorkspacePath;
     this.ideProvider = ideProvider;
-    this.messageSender = new McpIdeMessageSender(undefined, false);
 
     this.server.server.registerCapabilities({
       logging: {},
@@ -142,13 +139,6 @@ export class NxMcpServerWrapper {
    */
   isIdeAvailable(): boolean {
     return this.ideProvider?.isAvailable() ?? false;
-  }
-
-  /**
-   * Get the message sender instance
-   */
-  getMessageSender(): McpIdeMessageSender {
-    return this.messageSender;
   }
 
   /**
@@ -275,7 +265,6 @@ export class NxMcpServerWrapper {
           this.logger,
           this.ideProvider,
           this.telemetry,
-          this.messageSender,
           this._nxWorkspacePath,
         );
       }

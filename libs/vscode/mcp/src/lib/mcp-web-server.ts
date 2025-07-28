@@ -1,18 +1,19 @@
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
+  IdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
-  IdeProvider,
 } from '@nx-console/nx-mcp-server';
-import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
-import {
-  onGeneratorUiDispose,
-  openGenerateUi,
-  openGenerateUIPrefilled,
-} from '@nx-console/vscode-generate-ui-webview';
+import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
+import { findMatchingProject } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import {
+  onGeneratorUiDispose,
+  openGenerateUIPrefilled,
+} from '@nx-console/vscode-generate-ui-webview';
 import {
   getGenerators,
   getNxWorkspace,
@@ -22,17 +23,12 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
-  isInCursor,
   isInVSCode,
-  isInWindsurf,
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
-import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
-import { findMatchingProject } from '@nx-console/shared-npm';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 export class McpWebServer {
   private static instance: McpWebServer;

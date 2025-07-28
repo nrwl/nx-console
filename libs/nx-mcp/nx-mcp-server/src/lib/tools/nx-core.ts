@@ -1,4 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { NxVersion } from '@nx-console/nx-version';
 import {
   getDocsContext,
   getDocsPrompt,
@@ -15,18 +16,13 @@ import {
 } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
+import { NxWorkspace } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
-import { z } from 'zod';
-import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 import { readFile } from 'fs/promises';
 import path from 'path';
-import { NxVersion } from '@nx-console/nx-version';
-import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import { NxWorkspace } from '@nx-console/shared-types';
+import { z } from 'zod';
+import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 
-/**
- * Register core Nx tools that are always available regardless of workspace/IDE state
- */
 export function registerNxCoreTools(
   server: McpServer,
   logger: Logger,

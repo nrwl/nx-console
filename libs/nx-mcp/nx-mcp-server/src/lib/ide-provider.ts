@@ -8,24 +8,12 @@ export interface IdeProvider {
    */
   isAvailable(): boolean;
 
-  /**
-   * Focus on a specific project in the IDE
-   */
   focusProject(projectName: string): void;
 
-  /**
-   * Focus on a specific task for a project in the IDE
-   */
   focusTask(projectName: string, taskName: string): void;
 
-  /**
-   * Show the full project graph in the IDE
-   */
   showFullProjectGraph(): void;
 
-  /**
-   * Open the generator UI in the IDE
-   */
   openGenerateUi(
     generatorName: string,
     options: Record<string, unknown>,

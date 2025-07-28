@@ -9,21 +9,15 @@ import {
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
-import { McpIdeMessageSender } from '../mcp-message-sender';
 import { IdeProvider } from '../ide-provider';
 
-// Simple state tracking
 let isRegistered = false;
 
-/**
- * Register IDE-specific tools that require an active IDE connection
- */
 export function registerNxIdeTools(
   server: McpServer,
   logger: Logger,
   ideProvider: IdeProvider,
   telemetry?: NxConsoleTelemetryLogger,
-  messageSender?: McpIdeMessageSender,
   nxWorkspacePath?: string,
 ): void {
   if (isRegistered) {
@@ -69,18 +63,7 @@ export function registerNxIdeTools(
         kind: visualizationType,
       });
 
-      // Notify IDE about tool invocation
-      await messageSender?.notifyToolInvocation(NX_VISUALIZE_GRAPH, {
-        visualizationType,
-        projectName,
-        taskName,
-      });
-
       if (!ideProvider || !ideProvider.isAvailable()) {
-        await messageSender?.notifyToolError(
-          NX_VISUALIZE_GRAPH,
-          'No IDE provider available',
-        );
         return {
           isError: true,
           content: [{ type: 'text', text: 'No IDE provider available' }],
@@ -97,10 +80,7 @@ export function registerNxIdeTools(
               };
             }
             await ideProvider.focusProject(projectName);
-            await messageSender?.notifyToolCompletion(NX_VISUALIZE_GRAPH, {
-              visualizationType: 'project',
-              projectName,
-            });
+
             return {
               content: [
                 {
@@ -128,11 +108,7 @@ export function registerNxIdeTools(
               };
             }
             await ideProvider.focusTask(projectName, taskName);
-            await messageSender?.notifyToolCompletion(NX_VISUALIZE_GRAPH, {
-              visualizationType: 'project-task',
-              projectName,
-              taskName,
-            });
+
             return {
               content: [
                 {
@@ -143,9 +119,7 @@ export function registerNxIdeTools(
             };
           case 'full-project-graph':
             await ideProvider.showFullProjectGraph();
-            await messageSender?.notifyToolCompletion(NX_VISUALIZE_GRAPH, {
-              visualizationType: 'full-project-graph',
-            });
+
             return {
               content: [
                 {
@@ -156,10 +130,6 @@ export function registerNxIdeTools(
             };
         }
       } catch (error) {
-        await messageSender?.notifyToolError(
-          NX_VISUALIZE_GRAPH,
-          `IDE communication error: ${error}`,
-        );
         return {
           isError: true,
           content: [
@@ -196,18 +166,7 @@ export function registerNxIdeTools(
         tool: NX_RUN_GENERATOR,
       });
 
-      // Notify IDE about tool invocation
-      await messageSender?.notifyToolInvocation(NX_RUN_GENERATOR, {
-        generatorName,
-        options,
-        cwd,
-      });
-
       if (!nxWorkspacePath) {
-        await messageSender?.notifyToolError(
-          NX_RUN_GENERATOR,
-          'Error: Workspace path not set',
-        );
         return {
           isError: true,
           content: [{ type: 'text', text: 'Error: Workspace path not set' }],
@@ -215,10 +174,6 @@ export function registerNxIdeTools(
       }
 
       if (!ideProvider || !ideProvider.isAvailable()) {
-        await messageSender?.notifyToolError(
-          NX_RUN_GENERATOR,
-          'No IDE provider available',
-        );
         return {
           isError: true,
           content: [{ type: 'text', text: 'No IDE provider available' }],
@@ -232,11 +187,6 @@ export function registerNxIdeTools(
           cwd,
         );
 
-        await messageSender?.notifyToolCompletion(NX_RUN_GENERATOR, {
-          generatorName,
-          logFileName,
-        });
-
         return {
           content: [
             {
@@ -249,10 +199,6 @@ export function registerNxIdeTools(
           ],
         };
       } catch (error) {
-        await messageSender?.notifyToolError(
-          NX_RUN_GENERATOR,
-          `IDE communication error: ${error}`,
-        );
         return {
           isError: true,
           content: [
@@ -267,16 +213,10 @@ export function registerNxIdeTools(
   logger.log('Registered Nx IDE tools');
 }
 
-/**
- * Check if IDE tools are currently registered
- */
 export function isNxIdeToolsRegistered(): boolean {
   return isRegistered;
 }
 
-/**
- * Reset registration state (for testing or server restart)
- */
 export function resetNxIdeToolsState(): void {
   isRegistered = false;
 }

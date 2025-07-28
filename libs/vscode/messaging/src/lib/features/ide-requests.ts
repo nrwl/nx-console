@@ -11,16 +11,12 @@ import {
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-utils';
-import { commands, ExtensionContext, window } from 'vscode';
+import { commands, window } from 'vscode';
 import { NotificationType, RequestType } from 'vscode-jsonrpc';
 import {
   MessagingNotification,
   MessagingRequest,
 } from '../messaging-notification';
-
-export function initializeIdeRequestHandlers(context: ExtensionContext) {
-  // No initialization needed - we use the singleton getter
-}
 
 export const IdeFocusProject: MessagingNotification<{ projectName: string }> = {
   type: new NotificationType(IDE_RPC_METHODS.FOCUS_PROJECT),

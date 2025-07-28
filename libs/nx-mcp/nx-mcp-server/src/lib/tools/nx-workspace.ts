@@ -12,12 +12,8 @@ import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxWorkspace } from '@nx-console/shared-types';
 
-// Simple state tracking
 let isRegistered = false;
 
-/**
- * Register Nx workspace tool for workspace information
- */
 export function registerNxWorkspaceTool(
   workspacePath: string,
   server: McpServer,
@@ -143,16 +139,10 @@ export function getTokenLimitedToolResult(
   return [nxJsonResult, projectGraphResult, errorsResult];
 }
 
-/**
- * Check if Nx workspace tool is currently registered
- */
 export function isNxWorkspaceToolRegistered(): boolean {
   return isRegistered;
 }
 
-/**
- * Reset registration state (for testing or server restart)
- */
 export function resetNxWorkspaceToolState(): void {
   isRegistered = false;
 }

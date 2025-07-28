@@ -75,35 +75,6 @@ export const IDE_RPC_METHODS = {
 } as const;
 
 /**
- * Generic JSON-RPC request structure
- */
-export interface JsonRpcRequest<T = unknown> {
-  jsonrpc: '2.0';
-  id: string | number;
-  method: string;
-  params?: T;
-}
-
-/**
- * Generic JSON-RPC response structure
- */
-export interface JsonRpcResponse<T = unknown> {
-  jsonrpc: '2.0';
-  id: string | number;
-  result?: T;
-  error?: JsonRpcError;
-}
-
-/**
- * JSON-RPC error structure
- */
-export interface JsonRpcError {
-  code: number;
-  message: string;
-  data?: unknown;
-}
-
-/**
  * Connection status for the IDE client
  */
 export type ConnectionStatus =

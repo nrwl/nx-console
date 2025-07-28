@@ -56,30 +56,6 @@ export async function killSocketOnPath(socketPath: string): Promise<void> {
   }
 }
 
-/**
- * Test if a socket connection can be established
- */
-export async function testSocketConnection(
-  socketPath: string,
-): Promise<boolean> {
-  try {
-    // On Windows, we can't easily test named pipe existence
-    if (platform() === 'win32') {
-      // For Windows named pipes, we'll assume available if the path format is correct
-      return socketPath.startsWith('\\\\.\\pipe\\');
-    }
-
-    // On Unix, check if socket file exists and is accessible
-    await access(socketPath, constants.F_OK);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Test if an IDE is actually listening on the socket
- */
 export async function testIdeConnection(
   workspacePath: string,
 ): Promise<boolean> {
@@ -108,18 +84,4 @@ export async function testIdeConnection(
     // Attempt to connect
     socket.connect(socketPath);
   });
-}
-
-/**
- * Detect if Nx Console socket exists and is accessible
- */
-export async function detectNxConsoleSocket(
-  workspacePath: string,
-): Promise<boolean> {
-  try {
-    const socketPath = getNxConsoleSocketPath(workspacePath);
-    return await testSocketConnection(socketPath);
-  } catch {
-    return false;
-  }
 }
