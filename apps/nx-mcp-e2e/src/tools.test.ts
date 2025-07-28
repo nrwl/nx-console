@@ -39,8 +39,8 @@ describe('tools', () => {
     expect(toolNames).toEqual([
       'nx_docs',
       'nx_available_plugins',
-      'nx_workspace_path',
       'nx_workspace',
+      'nx_workspace_path',
       'nx_project_details',
       'nx_generators',
       'nx_generator_schema',
