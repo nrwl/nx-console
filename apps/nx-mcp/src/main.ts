@@ -1,3 +1,4 @@
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -5,6 +6,8 @@ import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import {
   getGenerators,
   nxWorkspace,
@@ -13,18 +16,15 @@ import {
   GoogleAnalytics,
   NxConsoleTelemetryLogger,
 } from '@nx-console/shared-telemetry';
-import { randomUUID } from 'crypto';
-import { hideBin } from 'yargs/helpers';
-import express from 'express';
-import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import { resolve } from 'path';
-import { createYargsConfig, ArgvType } from './yargs-config';
-import { createIdeClient } from './ide-client/create-ide-client';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
 import { consoleLogger } from '@nx-console/shared-utils';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { randomUUID } from 'crypto';
+import express from 'express';
+import { resolve } from 'path';
+import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
+import { createIdeClient } from './ide-client/create-ide-client';
+import { ArgvType, createYargsConfig } from './yargs-config';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
