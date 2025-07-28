@@ -7,9 +7,6 @@
       "path": "../generate-ui-webview"
     },
     {
-      "path": "../project-graph"
-    },
-    {
       "path": "../../nx-mcp/nx-mcp-server"
     },
     {
