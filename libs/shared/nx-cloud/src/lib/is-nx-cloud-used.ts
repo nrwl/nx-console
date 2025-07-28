@@ -23,17 +23,23 @@ export async function isNxCloudUsed(
   } catch (e) {
     // fallback implementation, copied from nx
     getIsNxCloudUsed = (nxJson: NxJsonConfiguration) => {
-      if (process.env.NX_NO_CLOUD === 'true' || nxJson.neverConnectToCloud) {
+      if (process.env.NX_NO_CLOUD === 'true' || nxJson?.neverConnectToCloud) {
         return false;
       }
 
+      // Ensure nxJson exists and tasksRunnerOptions is a valid object
+      const tasksRunnerOptions = nxJson?.tasksRunnerOptions;
+      const hasCloudRunner = tasksRunnerOptions && typeof tasksRunnerOptions === 'object' && !Array.isArray(tasksRunnerOptions)
+        ? !!Object.values(tasksRunnerOptions).find(
+            (r) => r?.runner === '@nrwl/nx-cloud' || r?.runner === 'nx-cloud',
+          )
+        : false;
+
       return (
         !!process.env.NX_CLOUD_ACCESS_TOKEN ||
-        !!nxJson.nxCloudAccessToken ||
-        !!nxJson.nxCloudId ||
-        !!Object.values(nxJson.tasksRunnerOptions ?? {}).find(
-          (r) => r.runner == '@nrwl/nx-cloud' || r.runner == 'nx-cloud',
-        )
+        !!nxJson?.nxCloudAccessToken ||
+        !!nxJson?.nxCloudId ||
+        hasCloudRunner
       );
     };
   }
