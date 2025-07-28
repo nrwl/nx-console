@@ -18,7 +18,6 @@ export function registerNxIdeTools(
   logger: Logger,
   ideProvider: IdeProvider,
   telemetry?: NxConsoleTelemetryLogger,
-  nxWorkspacePath?: string,
 ): void {
   if (isRegistered) {
     logger.log('Nx IDE tools already registered, skipping');
@@ -165,13 +164,6 @@ export function registerNxIdeTools(
       telemetry?.logUsage('ai.tool-call', {
         tool: NX_RUN_GENERATOR,
       });
-
-      if (!nxWorkspacePath) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
-        };
-      }
 
       if (!ideProvider || !ideProvider.isAvailable()) {
         return {

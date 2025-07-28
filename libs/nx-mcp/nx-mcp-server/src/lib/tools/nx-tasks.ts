@@ -15,7 +15,6 @@ import {
 let isRegistered = false;
 
 export function registerNxTaskTools(
-  workspacePath: string,
   server: McpServer,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,

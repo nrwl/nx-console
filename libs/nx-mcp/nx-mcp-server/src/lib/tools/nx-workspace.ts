@@ -1,26 +1,45 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
+  getGeneratorNamesAndDescriptions,
+  getGeneratorSchema,
+  getGeneratorsPrompt,
   getNxJsonPrompt,
   getProjectGraphErrorsPrompt,
   getProjectGraphPrompt,
+  NX_GENERATOR_SCHEMA,
+  NX_GENERATORS,
+  NX_PROJECT_DETAILS,
   NX_WORKSPACE,
 } from '@nx-console/shared-llm-context';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import {
+  checkIsNxWorkspace,
+  findMatchingProject,
+} from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxWorkspace } from '@nx-console/shared-types';
+import z from 'zod';
+import path from 'path';
+import { readFile } from 'fs/promises';
 
 let isRegistered = false;
 
-export function registerNxWorkspaceTool(
+let nxWorkspacePath: string | undefined = undefined;
+
+export function setNxWorkspacePath(path: string) {
+  nxWorkspacePath = path;
+}
+
+export function registerNxWorkspaceTools(
   workspacePath: string,
   server: McpServer,
   logger: Logger,
   nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
   telemetry?: NxConsoleTelemetryLogger,
 ): void {
+  nxWorkspacePath = workspacePath;
   if (isRegistered) {
     logger.log('Nx workspace tool already registered, skipping');
     return;
@@ -82,6 +101,180 @@ export function registerNxWorkspaceTool(
           content: [{ type: 'text', text: String(e) }],
         };
       }
+    },
+  );
+
+  server.tool(
+    NX_PROJECT_DETAILS,
+    'Returns the complete project configuration in JSON format for a given nx project.',
+    {
+      projectName: z
+        .string()
+        .describe('The name of the project to get details for'),
+    },
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
+    async ({ projectName }) => {
+      telemetry?.logUsage('ai.tool-call', {
+        tool: NX_PROJECT_DETAILS,
+      });
+      if (!nxWorkspacePath) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+        };
+      }
+      const workspace = await nxWorkspaceInfoProvider.nxWorkspace(
+        nxWorkspacePath,
+        logger,
+      );
+      if (!workspace) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'Error: Workspace not found' }],
+        };
+      }
+      const project = await findMatchingProject(
+        projectName,
+        workspace.projectGraph.nodes,
+        nxWorkspacePath,
+      );
+
+      if (!project) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: 'text',
+              text: `Project ${projectName} not found`,
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          { type: 'text', text: JSON.stringify(project.data, null, 2) },
+        ],
+      };
+    },
+  );
+
+  server.tool(
+    NX_GENERATORS,
+    'Returns a list of generators that could be relevant to the user query.',
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
+    async () => {
+      telemetry?.logUsage('ai.tool-call', {
+        tool: NX_GENERATORS,
+      });
+      if (!nxWorkspacePath) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+        };
+      }
+      const generators = await nxWorkspaceInfoProvider.getGenerators(
+        nxWorkspacePath,
+        undefined,
+        logger,
+      );
+      if (!generators) {
+        return {
+          content: [{ type: 'text', text: 'No generators found' }],
+        };
+      }
+      if (generators.length === 0) {
+        return {
+          content: [{ type: 'text', text: 'No generators found' }],
+        };
+      }
+
+      const generatorNamesAndDescriptions =
+        await getGeneratorNamesAndDescriptions(generators);
+      const prompt = getGeneratorsPrompt(generatorNamesAndDescriptions);
+      return {
+        content: [{ type: 'text', text: prompt }],
+      };
+    },
+  );
+
+  server.tool(
+    NX_GENERATOR_SCHEMA,
+    'Returns the detailed JSON schema for an nx generator',
+    {
+      generatorName: z
+        .string()
+        .describe(
+          'The name of the generator to get schema for. Use the generator name from the nx_generators tool.',
+        ),
+    },
+    {
+      destructiveHint: false,
+      readOnlyHint: true,
+      openWorldHint: false,
+    },
+    async ({ generatorName }) => {
+      telemetry?.logUsage('ai.tool-call', {
+        tool: NX_GENERATOR_SCHEMA,
+      });
+      if (!nxWorkspacePath) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+        };
+      }
+      const generators = await nxWorkspaceInfoProvider.getGenerators(
+        nxWorkspacePath,
+        undefined,
+        logger,
+      );
+      if (!generators) {
+        return {
+          content: [{ type: 'text', text: 'No generators found' }],
+        };
+      }
+      const generatorDetails = await getGeneratorSchema(
+        generatorName,
+        generators,
+      );
+
+      let examples = '';
+      try {
+        const examplesPath = path.join(
+          generators.find((g) => g.name === generatorName)?.schemaPath ?? '',
+          '..',
+          'examples.md',
+        );
+        examples = await readFile(examplesPath, 'utf-8');
+      } catch (e) {
+        examples = 'No examples available';
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `
+  Found generator schema for ${generatorName}: ${JSON.stringify(
+    generatorDetails,
+  )}.
+              Follow up by using the nx_run_generator tool if IDE is available, otherwise use CLI commands. When generating libraries, apps or components, use the cwd option to specify the parent directory where you want to create the item.
+            `,
+          },
+          {
+            type: 'text',
+            text: 'Examples: \n' + examples,
+          },
+        ],
+      };
     },
   );
 

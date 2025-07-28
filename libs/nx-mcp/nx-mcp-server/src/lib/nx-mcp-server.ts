@@ -10,12 +10,16 @@ import {
   isNxCloudToolsRegistered,
   registerNxCloudTools,
 } from './tools/nx-cloud';
-import { registerNxCoreTools } from './tools/nx-core';
+import {
+  registerNxCoreTools,
+  setNxWorkspacePath as setNxWorkspacePathForCoreTools,
+} from './tools/nx-core';
 import { isNxIdeToolsRegistered, registerNxIdeTools } from './tools/nx-ide';
 import { isNxTaskToolsRegistered, registerNxTaskTools } from './tools/nx-tasks';
 import {
   isNxWorkspaceToolRegistered,
-  registerNxWorkspaceTool,
+  registerNxWorkspaceTools,
+  setNxWorkspacePath as setNxWorkspacePathForWorkspaceTools,
 } from './tools/nx-workspace';
 import { IdeProvider } from './ide-provider';
 
@@ -62,13 +66,12 @@ export class NxMcpServerWrapper {
     this.server.server.registerCapabilities({
       logging: {},
       tools: {
-        listChanged: true, // Declare that we will send tool list change notifications
+        listChanged: true,
       },
     });
 
     this.logger = logger ?? getMcpLogger(this.server);
 
-    // Log IDE connection status and set up change listener
     if (this.ideProvider?.isAvailable()) {
       this.logger.log('IDE provider available and connected');
     } else {
@@ -126,6 +129,8 @@ export class NxMcpServerWrapper {
 
     // If workspace path changed, trigger dynamic evaluation
     if (oldPath !== path) {
+      setNxWorkspacePathForCoreTools(path);
+      setNxWorkspacePathForWorkspaceTools(path);
       await this.evaluateAndAddNewTools();
     }
   }
@@ -229,7 +234,7 @@ export class NxMcpServerWrapper {
         this.logger.log(
           'Nx workspace tools condition met, registering workspace tool',
         );
-        registerNxWorkspaceTool(
+        registerNxWorkspaceTools(
           this._nxWorkspacePath,
           this.server,
           this.logger,
@@ -246,12 +251,7 @@ export class NxMcpServerWrapper {
         this.logger.log(
           'Nx workspace tools condition met, registering task tools',
         );
-        registerNxTaskTools(
-          this._nxWorkspacePath,
-          this.server,
-          this.logger,
-          this.telemetry,
-        );
+        registerNxTaskTools(this.server, this.logger, this.telemetry);
       }
 
       // Check IDE tools condition
@@ -265,7 +265,6 @@ export class NxMcpServerWrapper {
           this.logger,
           this.ideProvider,
           this.telemetry,
-          this._nxWorkspacePath,
         );
       }
     } catch (error) {
