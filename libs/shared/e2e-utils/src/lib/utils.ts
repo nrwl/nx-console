@@ -114,25 +114,8 @@ export function isWindows() {
 export async function createInvokeMCPInspectorCLI(
   e2eCwd: string,
   workspaceName: string,
-  mcpProjectName = 'nx-mcp',
 ) {
-  const graph = await createProjectGraphAsync({
-    resetDaemonClient: true,
-    exitOnError: true,
-  });
-  const nxMcp = graph.nodes[mcpProjectName];
-  if (
-    !nxMcp ||
-    !nxMcp.data.targets?.build?.options?.outputPath ||
-    !nxMcp.data.targets.build.options.outputFileName
-  ) {
-    throw new Error('NX MCP project not found');
-  }
-  const serverPath = join(
-    workspaceRoot,
-    nxMcp.data.targets.build.options.outputPath,
-    nxMcp.data.targets.build.options.outputFileName,
-  );
+  const serverPath = join(workspaceRoot, 'dist', 'apps', 'nx-mcp', 'main.js');
 
   /**
    * We have a HUGE range of major versions of commander that are dependend upon by our dev dependencies. The mcp-inspector package

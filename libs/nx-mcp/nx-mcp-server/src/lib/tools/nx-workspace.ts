@@ -10,6 +10,7 @@ import {
   NX_GENERATORS,
   NX_PROJECT_DETAILS,
   NX_WORKSPACE,
+  NX_WORKSPACE_PATH,
 } from '@nx-console/shared-llm-context';
 import {
   checkIsNxWorkspace,
@@ -101,6 +102,29 @@ export function registerNxWorkspaceTools(
           content: [{ type: 'text', text: String(e) }],
         };
       }
+    },
+  );
+
+  // NX_WORKSPACE_PATH - always available (returns path or message if not set)
+  server.tool(
+    NX_WORKSPACE_PATH,
+    'Returns the path to the Nx workspace root',
+    {
+      readOnlyHint: true,
+    },
+    async () => {
+      telemetry?.logUsage('ai.tool-call', {
+        tool: NX_WORKSPACE_PATH,
+      });
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: nxWorkspacePath ?? 'No workspace path set',
+          },
+        ],
+      };
     },
   );
 

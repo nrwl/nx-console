@@ -100,28 +100,5 @@ export function registerNxCoreTools(
     },
   );
 
-  // NX_WORKSPACE_PATH - always available (returns path or message if not set)
-  server.tool(
-    NX_WORKSPACE_PATH,
-    'Returns the path to the Nx workspace root',
-    {
-      readOnlyHint: true,
-    },
-    async () => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_WORKSPACE_PATH,
-      });
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: nxWorkspacePath ?? 'No workspace path set',
-          },
-        ],
-      };
-    },
-  );
-
   logger.log('Registered Nx core tools');
 }
