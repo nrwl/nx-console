@@ -86,25 +86,25 @@ export async function testIdeConnection(
   return new Promise((resolve) => {
     const socketPath = getNxConsoleSocketPath(workspacePath);
     const socket = new Socket();
-    
+
     // Set a timeout for the connection attempt
     const timeout = setTimeout(() => {
       socket.destroy();
       resolve(false);
     }, 1000);
-    
+
     socket.once('connect', () => {
       clearTimeout(timeout);
       socket.destroy();
       resolve(true);
     });
-    
+
     socket.once('error', () => {
       clearTimeout(timeout);
       socket.destroy();
       resolve(false);
     });
-    
+
     // Attempt to connect
     socket.connect(socketPath);
   });

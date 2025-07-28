@@ -1,14 +1,10 @@
 import {
   ConnectionStatus,
   IDE_RPC_METHODS,
-  IdeClientConfig,
   OpenGenerateUiResponse,
   IIdeJsonRpcClient,
 } from '@nx-console/shared-types';
-import {
-  getNxConsoleSocketPath,
-  consoleLogger,
-} from '@nx-console/shared-utils';
+import { getNxConsoleSocketPath, Logger } from '@nx-console/shared-utils';
 import { Socket } from 'net';
 import { platform } from 'os';
 import * as rpc from 'vscode-jsonrpc/node';
@@ -41,7 +37,13 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
   private reconnectTimer: NodeJS.Timeout | null = null;
   private disconnectionHandler?: (client: IdeJsonRpcClient) => void;
 
-  constructor(private config: IdeClientConfig) {}
+  constructor(
+    private workspacePath: string,
+    private reconnectInterval?: number,
+    private maxReconnectAttempts?: number,
+    private requestTimeout?: number,
+    private logger?: Logger,
+  ) {}
 
   /**
    * Set a handler to be called when the client disconnects
@@ -61,7 +63,7 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     this.status = 'connecting';
 
     try {
-      const socketPath = getNxConsoleSocketPath(this.config.workspacePath);
+      const socketPath = getNxConsoleSocketPath(this.workspacePath);
 
       // Create socket connection
       this.socket = new Socket();
@@ -71,12 +73,12 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
         this.socket!.on('connect', () => {
           this.status = 'connected';
           this.reconnectAttempts = 0;
-          consoleLogger.log(`Connected to IDE at ${socketPath}`);
+          this.logger?.log(`Connected to IDE at ${socketPath}`);
           resolve();
         });
 
         this.socket!.on('error', (error) => {
-          consoleLogger.log('Socket connection error:', error);
+          this.logger?.log('Socket connection error:', error);
           reject(error);
         });
 
@@ -97,19 +99,19 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
 
       // Set up connection event handlers
       this.connection.onClose(() => {
-        consoleLogger.log('JSON-RPC connection closed');
+        this.logger?.log('JSON-RPC connection closed');
         this.handleDisconnection();
       });
 
       this.connection.onError((error) => {
-        consoleLogger.log('JSON-RPC connection error:', error);
+        this.logger?.log('JSON-RPC connection error:', error);
         this.handleDisconnection();
       });
 
       // Start listening for messages
       this.connection.listen();
     } catch (error) {
-      consoleLogger.log('Failed to connect to IDE:', error);
+      this.logger?.log('Failed to connect to IDE:', error);
       this.handleDisconnection();
       throw error;
     }
@@ -165,27 +167,27 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     }
 
     // Attempt reconnection if configured
-    const maxAttempts = this.config.maxReconnectAttempts || 5;
-    const interval = this.config.reconnectInterval || 2000;
+    const maxAttempts = this.maxReconnectAttempts || 5;
+    const interval = this.reconnectInterval || 2000;
 
     if (this.reconnectAttempts < maxAttempts) {
       this.reconnectAttempts++;
-      consoleLogger.log(
+      this.logger?.log(
         `Attempting to reconnect (${this.reconnectAttempts}/${maxAttempts})...`,
       );
 
       this.reconnectTimer = setTimeout(() => {
         this.connect().catch((error) => {
-          consoleLogger.log('Reconnection failed:', error);
+          this.logger?.log('Reconnection failed:', error);
           if (this.reconnectAttempts >= maxAttempts) {
             this.status = 'disconnected';
-            consoleLogger.log('Max reconnection attempts reached. Giving up.');
+            this.logger?.log('Max reconnection attempts reached. Giving up.');
           }
         });
       }, interval);
     } else {
       this.status = 'disconnected';
-      consoleLogger.log('Max reconnection attempts reached. Connection lost.');
+      this.logger?.log('Max reconnection attempts reached. Connection lost.');
 
       // Notify handler of permanent disconnection
       if (this.disconnectionHandler) {

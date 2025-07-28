@@ -13,9 +13,6 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../../shared/nx-version/tsconfig.lib.json"
-    },
-    {
       "path": "../../shared/utils/tsconfig.lib.json"
     },
     {

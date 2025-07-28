@@ -24,6 +24,7 @@ import { createIdeClient } from './ide-client/create-ide-client';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
 import { consoleLogger } from '@nx-console/shared-utils';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
@@ -41,25 +42,25 @@ async function main() {
       },
     },
   );
-  // Create a safe logger that falls back to console until MCP server is connected
-  let mcpConnected = false;
-  const logger = {
-    log: (message: string) => {
-      if (argv.transport === 'stdio' && mcpConnected) {
-        try {
+
+  let mcpStdioConnected = false;
+  let logger: { log: (message: string) => void } = consoleLogger;
+
+  if (argv.transport === 'stdio') {
+    logger = {
+      log: (message: string) => {
+        if (mcpStdioConnected) {
           mcpServer.server.sendLoggingMessage({
             level: 'info',
             message,
           });
-        } catch (error) {
-          // Fallback to console if MCP logging fails
-          consoleLogger.log(message);
+        } else {
+          // do nothing
         }
-      } else {
-        consoleLogger.log(message);
-      }
-    },
-  };
+      },
+    };
+    ensureOnlyJsonRpcStdout();
+  }
 
   logger.log('Starting Nx MCP server');
 
@@ -204,7 +205,7 @@ async function main() {
           nxWorkspacePath,
           nxWorkspaceInfoProvider,
           mcpServer,
-          ideProvider, // Reuse the shared IDE provider
+          ideProvider,
           telemetryLogger,
           logger,
         );
@@ -232,7 +233,6 @@ async function main() {
         logger.log('Configuring SSE transport');
         transport = new SSEServerTransport('/messages', res);
         await serverWrapper.getMcpServer().connect(transport);
-        mcpConnected = true;
 
         // Set up keep-alive interval if enabled
         if (argv.keepAliveInterval > 0) {
@@ -273,8 +273,8 @@ async function main() {
     });
   } else {
     const transport = new StdioServerTransport();
-    serverWrapper.getMcpServer().connect(transport);
-    mcpConnected = true;
+    await serverWrapper.getMcpServer().connect(transport);
+    mcpStdioConnected = true;
   }
 
   function getPackageVersion() {

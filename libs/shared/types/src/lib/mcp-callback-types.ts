@@ -113,16 +113,6 @@ export type ConnectionStatus =
   | 'error';
 
 /**
- * IDE client configuration
- */
-export interface IdeClientConfig {
-  workspacePath: string;
-  reconnectInterval?: number;
-  maxReconnectAttempts?: number;
-  requestTimeout?: number;
-}
-
-/**
  * Interface for IDE JSON-RPC client
  */
 export interface IIdeJsonRpcClient {
