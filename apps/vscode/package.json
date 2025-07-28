@@ -447,6 +447,12 @@
         }
       ]
     },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "nx-mcp",
+        "label": "Nx MCP Server"
+      }
+    ],
     "chatParticipants": [
       {
         "id": "nx-console.nx",
