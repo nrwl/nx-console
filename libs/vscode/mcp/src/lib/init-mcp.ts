@@ -18,15 +18,18 @@ import {
 } from '@nx-console/vscode-utils';
 import {
   commands,
+  env,
   ExtensionContext,
   FileSystemWatcher,
   Uri,
+  version,
   window,
   workspace,
 } from 'vscode';
 import { AgentRulesManager } from './agent-rules-manager';
 import { McpWebServer } from './mcp-web-server';
 import { findAvailablePort } from './ports';
+import { gte } from '@nx-console/nx-version';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
@@ -218,5 +221,12 @@ async function updateMcpJson() {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   commands.executeCommand('vscode.open', Uri.file(getMcpJsonPath()!));
 
+  return true;
+}
+
+async function shouldUseLegacyMcpRegistration(): Promise<boolean> {
+  if (isInVSCode() && gte(version, '1.101.0')) {
+    return false;
+  }
   return true;
 }
