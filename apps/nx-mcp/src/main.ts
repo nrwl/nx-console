@@ -286,6 +286,8 @@ async function main() {
   }
 
   const exitHandler = () => {
+    process.stdin.destroy();
+
     if (process.connected) {
       process.disconnect();
     }

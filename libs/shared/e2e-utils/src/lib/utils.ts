@@ -3,7 +3,6 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  createProjectGraphAsync,
   readJsonFile,
   workspaceRoot,
 } from 'nx/src/devkit-exports';
@@ -155,4 +154,63 @@ export async function createInvokeMCPInspectorCLI(
       }),
     );
   };
+}
+
+export function logWindowsFileLocks(dirPath: string) {
+  if (!isWindows() || !existsSync(dirPath)) {
+    console.log(`[DEBUG] Not Windows or directory doesn't exist: ${dirPath}`);
+    return;
+  }
+
+  console.log(`[DEBUG] Checking for file locks on directory: ${dirPath}`);
+  
+  // Use handle.exe from Sysinternals if available to detect file handles
+  try {
+    const handleOutput = execSync(`handle.exe "${dirPath}"`, {
+      encoding: 'utf8',
+      timeout: 5000,
+    });
+    console.log(`[DEBUG] Handle.exe output:\n${handleOutput}`);
+  } catch (error) {
+    // handle.exe might not be available, try alternative methods
+    console.log(`[DEBUG] handle.exe not available: ${(error as Error).message}`);
+  }
+
+  // Try using PowerShell to get processes with open handles to the directory
+  try {
+    const psCommand = `Get-Process | Where-Object { $_.Modules -and ($_.Modules | Where-Object { $_.FileName -like "*${dirPath.replace(/\\/g, '\\\\').replace(/"/g, '""')}*" }) }`;
+    const psOutput = execSync(`powershell.exe -Command "${psCommand}"`, {
+      encoding: 'utf8',
+      timeout: 10000,
+    });
+    if (psOutput.trim()) {
+      console.log(`[DEBUG] Processes with potential file handles:\n${psOutput}`);
+    } else {
+      console.log(`[DEBUG] No processes found with file handles to the directory`);
+    }
+  } catch (error) {
+    console.log(`[DEBUG] PowerShell process check failed: ${(error as Error).message}`);
+  }
+
+  // List all running Node.js processes that might be holding file handles
+  try {
+    const nodeProcesses = execSync('tasklist /FI "IMAGENAME eq node.exe" /FO CSV', {
+      encoding: 'utf8',
+      timeout: 5000,
+    });
+    console.log(`[DEBUG] Node.js processes:\n${nodeProcesses}`);
+  } catch (error) {
+    console.log(`[DEBUG] Failed to list Node.js processes: ${(error as Error).message}`);
+  }
+
+  // Also try to list files in the directory to see what's there
+  try {
+    const dirContents = execSync(`dir /s "${dirPath}"`, {
+      encoding: 'utf8',
+      timeout: 5000,
+    });
+    console.log(`[DEBUG] Directory contents:\n${dirContents}`);
+  } catch (error) {
+    console.log(`[DEBUG] Failed to list directory contents: ${(error as Error).message}`);
+  }
 }
