@@ -161,68 +161,120 @@ export function logWindowsFileLocks(dirPath: string) {
 
   console.log(`[DEBUG] Checking for file locks on directory: ${dirPath}`);
 
-  // Use handle.exe from Sysinternals if available to detect file handles
+  // List all Node.js processes with command lines to identify what they're doing
   try {
-    const handleOutput = execSync(`handle.exe "${dirPath}"`, {
-      encoding: 'utf8',
-      timeout: 5000,
-    });
-    console.log(`[DEBUG] Handle.exe output:\n${handleOutput}`);
-  } catch (error) {
-    // handle.exe might not be available, try alternative methods
+    const nodeProcesses = execSync(
+      'wmic process where "name=\'node.exe\'" get ProcessId,CommandLine,ParentProcessId /format:csv',
+      {
+        encoding: 'utf8',
+        timeout: 10000,
+      },
+    );
     console.log(
-      `[DEBUG] handle.exe not available: ${(error as Error).message}`,
+      `[DEBUG] Node.js processes with command lines:\n${nodeProcesses}`,
+    );
+  } catch (error) {
+    console.log(
+      `[DEBUG] Failed to get Node.js process details: ${(error as Error).message}`,
     );
   }
 
-  // Try using PowerShell to get processes with open handles to the directory
+  // Use PowerShell to find processes with open file handles using Get-Process and file system access
   try {
-    const psCommand = `Get-Process | Where-Object { $_.Modules -and ($_.Modules | Where-Object { $_.FileName -like "*${dirPath.replace(/\\/g, '\\\\').replace(/"/g, '""')}*" }) }`;
-    const psOutput = execSync(`powershell.exe -Command "${psCommand}"`, {
+    const psScript = `
+    $targetPath = "${dirPath.replace(/\\/g, '\\\\')}"
+    Write-Host "Searching for processes with handles to: $targetPath"
+    
+    # Get all processes and check their modules
+    Get-Process | ForEach-Object {
+      $proc = $_
+      try {
+        if ($proc.Modules) {
+          $matchingModules = $proc.Modules | Where-Object { $_.FileName -like "*$targetPath*" }
+          if ($matchingModules) {
+            Write-Host "Process $($proc.ProcessName) (PID: $($proc.Id)) has modules in target directory:"
+            $matchingModules | ForEach-Object { Write-Host "  $($_.FileName)" }
+          }
+        }
+      } catch {
+        # Ignore access denied errors for system processes
+      }
+    }
+    
+    # Also check current working directories
+    Get-WmiObject Win32_Process | Where-Object { $_.Name -eq "node.exe" } | ForEach-Object {
+      if ($_.CommandLine -and $_.CommandLine.Contains($targetPath)) {
+        Write-Host "Node process PID $($_.ProcessId) has target path in command line: $($_.CommandLine)"
+      }
+    }
+    `;
+
+    const psOutput = execSync(`powershell.exe -Command "${psScript}"`, {
       encoding: 'utf8',
-      timeout: 10000,
+      timeout: 15000,
     });
-    if (psOutput.trim()) {
-      console.log(
-        `[DEBUG] Processes with potential file handles:\n${psOutput}`,
-      );
+    console.log(`[DEBUG] PowerShell handle search:\n${psOutput}`);
+  } catch (error) {
+    console.log(
+      `[DEBUG] PowerShell handle search failed: ${(error as Error).message}`,
+    );
+  }
+
+  // Try using openfiles command to show open files (requires admin privileges)
+  try {
+    const openFiles = execSync(
+      `openfiles /query /fo csv | findstr /i "${dirPath}"`,
+      {
+        encoding: 'utf8',
+        timeout: 10000,
+      },
+    );
+    if (openFiles.trim()) {
+      console.log(`[DEBUG] Open files in target directory:\n${openFiles}`);
     } else {
       console.log(
-        `[DEBUG] No processes found with file handles to the directory`,
+        `[DEBUG] No open files found in target directory (or no admin privileges)`,
       );
     }
   } catch (error) {
     console.log(
-      `[DEBUG] PowerShell process check failed: ${(error as Error).message}`,
+      `[DEBUG] Failed to query open files: ${(error as Error).message}`,
     );
   }
 
-  // List all running Node.js processes that might be holding file handles
+  // List directory contents with detailed info
   try {
-    const nodeProcesses = execSync(
-      'tasklist /FI "IMAGENAME eq node.exe" /FO CSV',
-      {
-        encoding: 'utf8',
-        timeout: 5000,
-      },
-    );
-    console.log(`[DEBUG] Node.js processes:\n${nodeProcesses}`);
-  } catch (error) {
-    console.log(
-      `[DEBUG] Failed to list Node.js processes: ${(error as Error).message}`,
-    );
-  }
-
-  // Also try to list files in the directory to see what's there
-  try {
-    const dirContents = execSync(`dir /s "${dirPath}"`, {
+    const dirContents = execSync(`dir "${dirPath}" /a /s`, {
       encoding: 'utf8',
-      timeout: 5000,
+      timeout: 10000,
     });
-    console.log(`[DEBUG] Directory contents:\n${dirContents}`);
+    console.log(
+      `[DEBUG] Directory contents (first 2000 chars):\n${dirContents.substring(0, 2000)}`,
+    );
   } catch (error) {
     console.log(
       `[DEBUG] Failed to list directory contents: ${(error as Error).message}`,
+    );
+  }
+
+  // Check for .git directory which might have locks
+  try {
+    const gitDir = join(dirPath, '.git');
+    if (existsSync(gitDir)) {
+      console.log(`[DEBUG] .git directory exists, checking for lock files:`);
+      const gitFiles = execSync(`dir "${gitDir}" /s /b | findstr /i lock`, {
+        encoding: 'utf8',
+        timeout: 5000,
+      });
+      if (gitFiles.trim()) {
+        console.log(`[DEBUG] Git lock files found:\n${gitFiles}`);
+      } else {
+        console.log(`[DEBUG] No git lock files found`);
+      }
+    }
+  } catch (error) {
+    console.log(
+      `[DEBUG] Failed to check git locks: ${(error as Error).message}`,
     );
   }
 }
