@@ -57,7 +57,11 @@ export type AITaskFixStatus =
   | 'FAILED'
   | 'NOT_EXECUTABLE';
 
-export type AITaskFixUserAction = 'NONE' | 'APPLIED' | 'REJECTED';
+export type AITaskFixUserAction =
+  | 'NONE'
+  | 'APPLIED'
+  | 'REJECTED'
+  | 'APPLIED_LOCALLY';
 
 export type AITaskFixUserActionOrigin =
   | 'NX_CLOUD_APP'

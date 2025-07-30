@@ -164,6 +164,21 @@ export const Applied: Story = {
   },
 };
 
+export const AppliedLocally: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          userAction: 'APPLIED_LOCALLY',
+        },
+      },
+    },
+  },
+};
+
 export const Ignored: Story = {
   args: {
     details: {
@@ -176,6 +191,22 @@ export const Ignored: Story = {
         },
       },
     },
+  },
+};
+export const UncommittedChanges: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          userAction: 'NONE',
+        },
+      },
+      hasUncommittedChanges: true,
+    },
+    onApplyLocally: (...args) => console.log('onApplyLocally', args),
   },
 };
 

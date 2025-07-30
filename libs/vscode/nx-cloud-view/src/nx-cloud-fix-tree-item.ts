@@ -77,6 +77,14 @@ export class NxCloudFixTreeItem
           'check',
           new ThemeColor('notebookStatusSuccessIcon.foreground'),
         );
+      } else if (userAction === 'APPLIED_LOCALLY') {
+        this.contextValue += '-appliedLocally';
+        this.label =
+          'The suggested changes have been applied to your local branch';
+        this.iconPath = new ThemeIcon(
+          'git-branch',
+          new ThemeColor('notebookStatusSuccessIcon.foreground'),
+        );
       } else if (userAction === 'REJECTED') {
         this.contextValue += '-rejected';
         this.label = 'Fix rejected by user';
