@@ -4,6 +4,6 @@ distribute-on:
   large-changeset: 6 windows-medium-js
 
 assignment-rules:
-    target: build
+  - target: build
     runs-on:
       - windows-medium-js
