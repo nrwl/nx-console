@@ -153,9 +153,12 @@ export async function createInvokeMCPInspectorCLI(
   };
 }
 
-export async function cleanupNxWorkspace(workspacePath: string, version?: string) {
+export async function cleanupNxWorkspace(
+  workspacePath: string,
+  version?: string,
+) {
   console.log(`[DEBUG] Cleaning up Nx workspace: ${workspacePath}`);
-  
+
   try {
     // Stop the Nx daemon to ensure all plugin workers are terminated
     execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
@@ -163,41 +166,56 @@ export async function cleanupNxWorkspace(workspacePath: string, version?: string
       timeout: 10000,
       stdio: 'pipe',
     });
-    console.log(`[DEBUG] Successfully stopped Nx daemon for workspace: ${workspacePath}`);
+    console.log(
+      `[DEBUG] Successfully stopped Nx daemon for workspace: ${workspacePath}`,
+    );
   } catch (error) {
-    console.log(`[DEBUG] Failed to stop Nx daemon: ${(error as Error).message}`);
+    console.log(
+      `[DEBUG] Failed to stop Nx daemon: ${(error as Error).message}`,
+    );
   }
 
   if (isWindows()) {
     // Kill any remaining Node.js processes that might have handles to the workspace
     try {
-      const processes = execSync('wmic process where "name=\'node.exe\'" get ProcessId,CommandLine /format:csv', {
-        encoding: 'utf8',
-        timeout: 10000,
-      });
-      
-      const lines = processes.split('\n').filter(line => line.trim() && !line.startsWith('Node,'));
+      const processes = execSync(
+        'wmic process where "name=\'node.exe\'" get ProcessId,CommandLine /format:csv',
+        {
+          encoding: 'utf8',
+          timeout: 10000,
+        },
+      );
+
+      const lines = processes
+        .split('\n')
+        .filter((line) => line.trim() && !line.startsWith('Node,'));
       for (const line of lines) {
         const parts = line.split(',');
         if (parts.length >= 3) {
           const pid = parts[2]?.trim();
           const commandLine = parts[1]?.trim();
-          
+
           if (pid && commandLine && commandLine.includes(workspacePath)) {
             try {
-              console.log(`[DEBUG] Killing Node.js process ${pid} with command: ${commandLine}`);
+              console.log(
+                `[DEBUG] Killing Node.js process ${pid} with command: ${commandLine}`,
+              );
               execSync(`taskkill /pid ${pid} /T /F`, {
                 timeout: 5000,
                 stdio: 'pipe',
               });
             } catch (killError) {
-              console.log(`[DEBUG] Failed to kill process ${pid}: ${(killError as Error).message}`);
+              console.log(
+                `[DEBUG] Failed to kill process ${pid}: ${(killError as Error).message}`,
+              );
             }
           }
         }
       }
     } catch (error) {
-      console.log(`[DEBUG] Failed to cleanup processes: ${(error as Error).message}`);
+      console.log(
+        `[DEBUG] Failed to cleanup processes: ${(error as Error).message}`,
+      );
     }
 
     // Wait a bit for processes to fully terminate

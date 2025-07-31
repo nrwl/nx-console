@@ -33,7 +33,7 @@ describe('workspace path', () => {
   afterAll(async () => {
     // Clean up Nx workspace processes before attempting to remove directory
     await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
-    
+
     if (platform() === 'win32') {
       logWindowsFileLocks(testWorkspacePath);
     }
