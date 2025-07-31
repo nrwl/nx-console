@@ -279,9 +279,8 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 return true
             }
             "run-task" -> {
-                event.payload?.taskId?.also {
-                    NxTaskExecutionManager.getInstance(project).execute(it)
-                }
+                val task = event.payload?.taskName ?: event.payload?.taskId
+                task?.also { NxTaskExecutionManager.getInstance(project).execute(it) }
                 return true
             }
             "run-help" -> {
@@ -475,6 +474,7 @@ data class NxGraphInteractionPayload(
     val targetName: String? = null,
     val url: String? = null,
     val taskId: String? = null,
+    val taskName: String? = null,
     val targetConfigString: String? = null,
     val helpCommand: String? = null,
     val helpCwd: String? = null,
