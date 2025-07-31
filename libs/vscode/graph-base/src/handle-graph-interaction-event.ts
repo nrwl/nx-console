@@ -17,7 +17,7 @@ export async function handleGraphInteractionEventBase(event: {
 
     commands.executeCommand(
       'vscode.open',
-      Uri.file(join(workspacePath, event.payload.url))
+      Uri.file(join(workspacePath, event.payload.url)),
     );
     return true;
   }
@@ -39,7 +39,7 @@ export async function handleGraphInteractionEventBase(event: {
     });
     CliTaskProvider.instance.executeTask({
       command: 'run',
-      positional: event.payload.taskId,
+      positional: event.payload.taskName ?? event.payload.taskId,
       flags: [],
     });
     return true;
@@ -57,7 +57,7 @@ export async function handleGraphInteractionEventBase(event: {
       if (!project) return;
       importNxPackagePath<typeof import('nx/src/devkit-exports')>(
         workspacePath,
-        'src/devkit-exports'
+        'src/devkit-exports',
       ).then(({ detectPackageManager }) => {
         const pkgManager = detectPackageManager(workspacePath);
         tasks.executeTask(
@@ -77,8 +77,8 @@ export async function handleGraphInteractionEventBase(event: {
               env: {
                 NX_CONSOLE: 'true',
               },
-            })
-          )
+            }),
+          ),
         );
       });
     });

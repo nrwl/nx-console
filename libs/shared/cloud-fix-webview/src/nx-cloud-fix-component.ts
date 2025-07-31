@@ -202,7 +202,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   }
 
   private handleApplyLocally() {
-    if (this.details && this.onApplyLocally) {
+    if (
+      this.details &&
+      this.onApplyLocally &&
+      !this.details?.hasUncommittedChanges
+    ) {
       this.onApplyLocally(this.details);
     }
   }
@@ -351,6 +355,29 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           </h2>
           <p class="text-foreground m-0 text-sm opacity-80">
             The suggested fix has been committed to your branch.
+          </p>
+        </div>
+      `;
+    }
+
+    if (aiFix.userAction === 'APPLIED_LOCALLY') {
+      return html`
+        <div
+          class="border-border bg-background relative m-0 border p-6 text-center"
+        >
+          <div
+            class="mx-auto mb-4 flex h-16 w-16 flex-col items-center justify-center"
+          >
+            <icon-element
+              icon="git-branch"
+              class="text-success leading-none"
+            ></icon-element>
+          </div>
+          <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
+            Fix Applied Locally
+          </h2>
+          <p class="text-foreground m-0 text-sm opacity-80">
+            The suggested changes have been applied locally.
           </p>
         </div>
       `;

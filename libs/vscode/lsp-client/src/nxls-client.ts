@@ -20,6 +20,7 @@ import {
   commands,
   Disposable,
   ExtensionContext,
+  Progress,
   ProgressLocation,
   window,
 } from 'vscode';
@@ -115,51 +116,67 @@ export class NxlsClient {
     this.actor.send({ type: 'STOP' });
   }
 
-  public async refreshWorkspace() {
-    await window.withProgress(
-      {
-        location: ProgressLocation.Notification,
-        title: 'Refreshing Workspace',
-        cancellable: false,
-      },
-      async (progress) => {
-        try {
-          if (this.actor.getSnapshot().matches('running')) {
+  public async refreshWorkspace(silent = false) {
+    const refreshLogic = async (
+      progress?: Progress<{ message?: string; increment?: number }>,
+    ) => {
+      try {
+        if (this.actor.getSnapshot().matches('running')) {
+          if (progress) {
             progress.report({ message: 'Stopping nx daemon', increment: 10 });
-            try {
-              await this.sendRequest(NxStopDaemonRequest, undefined);
-            } catch (e) {
-              // errors while stopping the daemon aren't critical
-            }
-
-            this.stop();
           }
-          progress.report({ increment: 30 });
+          try {
+            await this.sendRequest(NxStopDaemonRequest, undefined);
+          } catch (e) {
+            // errors while stopping the daemon aren't critical
+          }
 
-          progress.report({ message: 'Restarting language server' });
-          await waitFor(this.actor, (snapshot) => snapshot.matches('idle'));
-          this.start();
-          progress.report({ message: 'Refreshing workspace', increment: 30 });
-
-          await this.sendNotification(NxWorkspaceRefreshNotification);
-
-          await new Promise<void>((resolve) => {
-            const disposable = this.onNotification(
-              NxWorkspaceRefreshNotification,
-              () => {
-                disposable.dispose();
-                resolve();
-              },
-            );
-          });
-        } catch (error) {
-          logAndShowError(
-            "Couldn't refresh workspace. Please view the logs for more information.",
-            error,
-          );
+          this.stop();
         }
-      },
-    );
+        if (progress) {
+          progress.report({ increment: 30 });
+        }
+
+        if (progress) {
+          progress.report({ message: 'Restarting language server' });
+        }
+        await waitFor(this.actor, (snapshot) => snapshot.matches('idle'));
+        this.start();
+        if (progress) {
+          progress.report({ message: 'Refreshing workspace', increment: 30 });
+        }
+
+        await this.sendNotification(NxWorkspaceRefreshNotification);
+
+        await new Promise<void>((resolve) => {
+          const disposable = this.onNotification(
+            NxWorkspaceRefreshNotification,
+            () => {
+              disposable.dispose();
+              resolve();
+            },
+          );
+        });
+      } catch (error) {
+        logAndShowError(
+          "Couldn't refresh workspace. Please view the logs for more information.",
+          error,
+        );
+      }
+    };
+
+    if (silent) {
+      await refreshLogic();
+    } else {
+      await window.withProgress(
+        {
+          location: ProgressLocation.Notification,
+          title: 'Refreshing Workspace',
+          cancellable: false,
+        },
+        refreshLogic,
+      );
+    }
   }
 
   public async sendRequest<P, R, E>(
@@ -393,7 +410,7 @@ function refreshWorkspaceOnBranchChange(
         `Branch changed from ${branch} to ${newBranch}, refreshing workspace`,
       );
       branch = newBranch;
-      commands.executeCommand('nxConsole.refreshWorkspace');
+      commands.executeCommand('nxConsole.refreshWorkspace', true);
     }
   });
 }
