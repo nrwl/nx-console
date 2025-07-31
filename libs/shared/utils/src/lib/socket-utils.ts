@@ -23,7 +23,7 @@ function getSocketDir(workspaceRoot: string): string {
       process.env.NX_SOCKET_DIR ??
       process.env.NX_DAEMON_SOCKET_DIR ??
       socketDirName(workspaceRoot);
-    
+
     // On Windows, we don't need to create the directory for named pipes,
     // but we should ensure the fallback workspace directory exists
     if (platform() === 'win32') {
