@@ -1,3 +1,12 @@
+## [18.60.1](https://github.com/nrwl/nx-console/compare/vscode-v18.60.0...vscode-v18.60.1) (2025-07-31)
+
+
+### Bug Fixes
+
+* handle APPLIED_LOCALLY state better in cloud fix ui ([#2642](https://github.com/nrwl/nx-console/issues/2642)) ([f34cfd1](https://github.com/nrwl/nx-console/commit/f34cfd198328f4af507de9e28877903bf92b15f0))
+* make sure run-task callback from new graph still works ([#2646](https://github.com/nrwl/nx-console/issues/2646)) ([a367f21](https://github.com/nrwl/nx-console/commit/a367f218ed336793d33b95019de5c11637933c5b))
+* **vscode:** make refresh silent on branch change ([#2645](https://github.com/nrwl/nx-console/issues/2645)) ([ec98511](https://github.com/nrwl/nx-console/commit/ec98511a7a0b23609548ba7bdf8c392438a643b3))
+
 # [18.60.0](https://github.com/nrwl/nx-console/compare/vscode-v18.59.3...vscode-v18.60.0) (2025-07-25)
 
 
