@@ -75,7 +75,7 @@
     "@nx/web": "21.3.10",
     "@nx/webpack": "21.3.10",
     "@nx/workspace": "21.3.10",
-    "@storybook/core-server": "^8.6.14",
+    "@storybook/addon-docs": "9.0.18",
     "@storybook/web-components-vite": "9.0.9",
     "@swc-node/register": "1.9.2",
     "@swc/core": "1.5.7",

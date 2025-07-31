@@ -2973,6 +2973,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mdx-js/react@npm:^3.0.0":
+  version: 3.1.0
+  resolution: "@mdx-js/react@npm:3.1.0"
+  dependencies:
+    "@types/mdx": ^2.0.0
+  peerDependencies:
+    "@types/react": ">=16"
+    react: ">=16"
+  checksum: c5a9c495f43f498ece24a768762a1743abe2be33d050d7eab731beb754e631700547f039198c6262c998d9a443906bd78811c3fa38bc2fb37659848161dac331
+  languageName: node
+  linkType: hard
+
 "@microsoft/fast-colors@npm:^5.3.0":
   version: 5.3.1
   resolution: "@microsoft/fast-colors@npm:5.3.1"
@@ -5849,6 +5861,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/addon-docs@npm:9.0.18":
+  version: 9.0.18
+  resolution: "@storybook/addon-docs@npm:9.0.18"
+  dependencies:
+    "@mdx-js/react": ^3.0.0
+    "@storybook/csf-plugin": 9.0.18
+    "@storybook/icons": ^1.2.12
+    "@storybook/react-dom-shim": 9.0.18
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    ts-dedent: ^2.0.0
+  peerDependencies:
+    storybook: ^9.0.18
+  checksum: 05be59bd5e20029bb922938613ccab0df9a6e6ffa1f4dd3bd8f4f011cd1512b516ba1486b66199f3ab04630ae8d2daadf3f1becb0a988eff4379ce3a5fe03096
+  languageName: node
+  linkType: hard
+
 "@storybook/builder-vite@npm:9.0.9":
   version: 9.0.9
   resolution: "@storybook/builder-vite@npm:9.0.9"
@@ -5862,12 +5891,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/core-server@npm:^8.6.14":
-  version: 8.6.14
-  resolution: "@storybook/core-server@npm:8.6.14"
+"@storybook/csf-plugin@npm:9.0.18":
+  version: 9.0.18
+  resolution: "@storybook/csf-plugin@npm:9.0.18"
+  dependencies:
+    unplugin: ^1.3.1
   peerDependencies:
-    storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
-  checksum: 0f236580a5871afbb43a3f9d4edc778a41738f9e1bfcd2136581977e97f99d2d299ab9188b8031456a704702dd3b9e7620ef99dcb362c5949be973e86259f664
+    storybook: ^9.0.18
+  checksum: 253a904cd8063e2065e5420d9f621d2187ee9ad24f3d1e0ae26d284d6939ef6ba81b5c892a97e456d102875e3526defb87da728073dde7f68b19010496e3f553
   languageName: node
   linkType: hard
 
@@ -5886,6 +5917,27 @@ __metadata:
   version: 5.0.0
   resolution: "@storybook/global@npm:5.0.0"
   checksum: ede0ad35ec411fe31c61150dbd118fef344d1d0e72bf5d3502368e35cf68126f6b7ae4a0ab5e2ffe2f0baa3b4286f03ad069ba3e098e1725449ef08b7e154ba8
+  languageName: node
+  linkType: hard
+
+"@storybook/icons@npm:^1.2.12":
+  version: 1.4.0
+  resolution: "@storybook/icons@npm:1.4.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+  checksum: a1e41fa9539629cb22a985dac695ac396afc5eb6ded7ce81497499a737ebf7556521acc569dbc0454e0b231ae50e8a5afbeee246dfbf8dc06a16a9cc1caa5bc8
+  languageName: node
+  linkType: hard
+
+"@storybook/react-dom-shim@npm:9.0.18":
+  version: 9.0.18
+  resolution: "@storybook/react-dom-shim@npm:9.0.18"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    storybook: ^9.0.18
+  checksum: 84daee8ad3b905e4d5cabd0e3ff45b13706e0375ad0f2c1a36bce6736e5f8dcc7bd3e3e1bf3a69ab268edbb61e3476922428a0a12476c758906f09a7f132aa80
   languageName: node
   linkType: hard
 
@@ -6485,6 +6537,13 @@ __metadata:
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 97ed0cb44d4070aecea772b7b2e2ed971e10c81ec87dd4ecc160322ffa55ff330dace1793489540e3e318d90942064bb697cc0f8989391797792d919737b3b98
+  languageName: node
+  linkType: hard
+
+"@types/mdx@npm:^2.0.0":
+  version: 2.0.13
+  resolution: "@types/mdx@npm:2.0.13"
+  checksum: 195137b548e75a85f0558bb1ca5088aff1c01ae0fc64454da06085b7513a043356d0bb51ed559d3cbc7ad724ccd8cef2a7d07d014b89a47a74dff8875ceb3b15
   languageName: node
   linkType: hard
 
@@ -16489,7 +16548,7 @@ __metadata:
     "@nx/webpack": 21.3.10
     "@nx/workspace": 21.3.10
     "@open-wc/lit-helpers": ^0.6.0
-    "@storybook/core-server": ^8.6.14
+    "@storybook/addon-docs": 9.0.18
     "@storybook/web-components-vite": 9.0.9
     "@swc-node/register": 1.9.2
     "@swc/core": 1.5.7
@@ -18343,6 +18402,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dom@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0":
+  version: 19.1.1
+  resolution: "react-dom@npm:19.1.1"
+  dependencies:
+    scheduler: ^0.26.0
+  peerDependencies:
+    react: ^19.1.1
+  checksum: 71d63df955e99bb58470c6ae12ebb82fa80e2a73147c387b73a31c17bcff803ce8aded52ae0c4391c9b413be0aa449249d8be7d063136826d1f0caba9720a907
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^18.3.1":
   version: 18.3.1
   resolution: "react-dom@npm:18.3.1"
@@ -18420,6 +18490,13 @@ __metadata:
     "@types/react":
       optional: true
   checksum: a7b0bf493c9231065ebafa84c4237aed997c746c561196121b7de82fe155a5355b372db5070a3ac9fe980cf7f60dc0f1e8cf6402a2aa5b2957392932ccf76e76
+  languageName: node
+  linkType: hard
+
+"react@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0":
+  version: 19.1.1
+  resolution: "react@npm:19.1.1"
+  checksum: f2f18fea5deac87b1167365bd5160bcba64d383c26a37afa905b714ca424f423ef97d8daf53f041ab9ac25a06357fafcf0b5d3b6b84c9d1eace0e621bfeae629
   languageName: node
   linkType: hard
 
@@ -19307,6 +19384,13 @@ __metadata:
   dependencies:
     loose-envify: ^1.1.0
   checksum: 3e82d1f419e240ef6219d794ff29c7ee415fbdc19e038f680a10c067108e06284f1847450a210b29bbaf97b9d8a97ced5f624c31c681248ac84c80d56ad5a2c4
+  languageName: node
+  linkType: hard
+
+"scheduler@npm:^0.26.0":
+  version: 0.26.0
+  resolution: "scheduler@npm:0.26.0"
+  checksum: c63a9f1c0e5089b537231cff6c11f75455b5c8625ae09535c1d7cd0a1b0c77ceecdd9f1074e5e063da5d8dc11e73e8033dcac3361791088be08a6e60c0283ed9
   languageName: node
   linkType: hard
 
