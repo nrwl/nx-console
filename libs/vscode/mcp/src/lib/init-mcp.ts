@@ -1,232 +1,144 @@
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { gte } from '@nx-console/nx-version';
 import {
-  getNxWorkspacePath,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode-configuration';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import {
-  ensureEditorDirExists,
   getMcpJsonPath,
-  getNxMcpPort,
   hasNxMcpEntry,
   isInCursor,
   isInVSCode,
   isInWindsurf,
   readMcpJson,
+  vscodeLogger,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
+import { commands, ExtensionContext, lm, version, window } from 'vscode';
 import {
-  commands,
-  env,
-  ExtensionContext,
-  FileSystemWatcher,
-  Uri,
-  version,
-  window,
-  workspace,
-} from 'vscode';
-import { AgentRulesManager } from './agent-rules-manager';
-import { McpWebServer } from './mcp-web-server';
+  initMcpLegacy,
+  startMcpServerSkeletonLegacy,
+  stopMcpServerLegacy,
+  updateMcpServerWorkspacePathLegacy,
+} from './init-mcp-legacy';
+
+import type { McpStreamableWebServer } from './mcp-streamable-web-server';
+
 import { findAvailablePort } from './ports';
-import { gte } from '@nx-console/nx-version';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { execSync } from 'child_process';
 
-let mcpJsonWatcher: FileSystemWatcher | null = null;
-let hasInitializedMcp = false;
+let mcpStreamableWebServer: McpStreamableWebServer | undefined;
+let initialized = false;
 
-export function startMcpServer() {
-  const port = getNxMcpPort();
-  if (!port) {
+export function startMcpServerSkeleton() {
+  if (shouldUseLegacyMcpRegistration()) {
+    startMcpServerSkeletonLegacy();
     return;
   }
-  McpWebServer.Instance.startSkeletonMcpServer(port);
 }
 
 export function stopMcpServer() {
-  McpWebServer.Instance.stopMcpServer();
+  if (shouldUseLegacyMcpRegistration()) {
+    stopMcpServerLegacy();
+    return;
+  }
+  mcpStreamableWebServer?.stopMcpServer();
 }
 
 export async function updateMcpServerWorkspacePath(workspacePath: string) {
-  await McpWebServer.Instance.updateMcpServerWorkspacePath(workspacePath);
+  if (shouldUseLegacyMcpRegistration()) {
+    await updateMcpServerWorkspacePathLegacy(workspacePath);
+    return;
+  }
+  await mcpStreamableWebServer?.updateMcpServerWorkspacePath(workspacePath);
 }
 
 export async function initMcp(context: ExtensionContext) {
-  if (hasInitializedMcp) {
-    return;
-  }
-
   commands.executeCommand('setContext', 'isInCursor', isInCursor());
   commands.executeCommand('setContext', 'isInWindsurf', isInWindsurf());
   commands.executeCommand('setContext', 'isInVSCode', isInVSCode());
-
-  if (!(await checkIsNxWorkspace(getNxWorkspacePath(), false))) {
-    return;
-  }
-  hasInitializedMcp = true;
-
-  commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
-
-  McpWebServer.Instance.completeMcpServerSetup();
-
-  const rulesManager = new AgentRulesManager(context);
-
-  context.subscriptions.push(
-    commands.registerCommand('nx.configureMcpServer', async () => {
-      await updateMcpJson();
-      await rulesManager.addAgentRulesToWorkspace();
-    }),
-    commands.registerCommand('nx.addAgentRules', async () => {
-      await rulesManager.addAgentRulesToWorkspace();
-    }),
+  commands.executeCommand(
+    'setContext',
+    'isLegacyMcp',
+    shouldUseLegacyMcpRegistration(),
   );
 
-  await rulesManager.initialize();
+  if (shouldUseLegacyMcpRegistration()) {
+    initMcpLegacy(context);
+    return;
+  }
 
-  setupMcpJsonWatcher(context);
+  if (initialized) {
+    return;
+  }
+  initialized = true;
 
-  // Wait a bit before showing notification
-  await new Promise((resolve) => setTimeout(resolve, 20000));
-  await showMCPNotification(rulesManager);
-}
-
-function setupMcpJsonWatcher(context: ExtensionContext) {
+  // if the mcp config file is gitignored, we can safely remove the old manual definition
   const mcpJsonPath = getMcpJsonPath();
-  if (!mcpJsonPath) {
-    return;
-  }
-
-  let lastPort = getNxMcpPort();
-
-  mcpJsonWatcher = workspace.createFileSystemWatcher(mcpJsonPath);
-
-  const handleMcpJsonChange = async (eventMessage: string) => {
-    getOutputChannel().appendLine(eventMessage);
-    const port = getNxMcpPort();
-    if (port !== lastPort) {
-      lastPort = port;
-      McpWebServer.Instance.stopMcpServer();
-      if (port) {
-        McpWebServer.Instance.startSkeletonMcpServer(port);
-      }
+  if (mcpJsonPath && hasNxMcpEntry()) {
+    const removeOldEntry = () => {
+      vscodeLogger.log(
+        `Removing old nx-mcp entry from mcp.json at ${mcpJsonPath}`,
+      );
+      const mcpJson = readMcpJson();
+      delete mcpJson.servers['nx-mcp'];
+      writeMcpJson(mcpJson);
+    };
+    if (mcpJsonIsGitIgnored(mcpJsonPath)) {
+      removeOldEntry();
+    } else {
+      // show notification to delete old entry
+      window
+        .showWarningMessage(
+          "Nx Console can now automatically configure the Nx MCP server dynamically. You can remove the old 'nx-mcp' entry from your mcp.json file.",
+          'Remove Entry',
+        )
+        .then((selection) => {
+          if (selection === 'Remove Entry') {
+            removeOldEntry();
+          }
+        });
     }
-
-    commands.executeCommand(
-      'setContext',
-      'hasNxMcpConfigured',
-      hasNxMcpEntry(),
-    );
-  };
-
-  mcpJsonWatcher.onDidChange(async () => {
-    await handleMcpJsonChange('mcp.json file changed, updating server port');
-  });
-
-  mcpJsonWatcher.onDidCreate(async () => {
-    await handleMcpJsonChange('mcp.json file created, updating server port');
-  });
-
-  mcpJsonWatcher.onDidDelete(async () => {
-    await handleMcpJsonChange('mcp.json file deleted, updating server port');
-  });
-
-  context.subscriptions.push(mcpJsonWatcher);
-}
-
-async function showMCPNotification(rulesManager: AgentRulesManager) {
-  const dontAskAgain = WorkspaceConfigurationStore.instance.get(
-    'mcpDontAskAgain',
-    false,
-  );
-
-  if (dontAskAgain) {
-    return;
   }
 
-  if (isInWindsurf()) {
-    // TODO: do once windsurf supports project-level mcp servers
-    return;
-  }
+  // cursor doesn't have these classes so it will error if we don't import them dynamically
+  const { McpStreamableWebServer, NxMcpServerDefinitionProvider } =
+    await import('./mcp-streamable-web-server.js');
 
-  if (hasNxMcpEntry()) {
-    // if mcp is already configured but the rules file isn't, prompt for rules setup
-    await rulesManager.showAgentRulesNotification();
-    return;
-  }
+  const mcpPort = (await findAvailablePort()) ?? undefined;
 
-  const msg = isInCursor()
-    ? 'Improve Cursor Agents with Nx-specific context? (MCP server & rules file)'
-    : isInWindsurf()
-      ? 'Improve Cascade with Nx-specific context? (MCP server & rules file)'
-      : 'Improve Copilot Agents with Nx-specific context? (MCP server & conventions file)';
-
-  window
-    .showInformationMessage(msg, 'Yes', "Don't ask again")
-    .then(async (answer) => {
-      if (answer === "Don't ask again") {
-        WorkspaceConfigurationStore.instance.set('mcpDontAskAgain', true);
-      }
-
-      if (answer === 'Yes') {
-        await updateMcpJson();
-        await rulesManager.addAgentRulesToWorkspace();
-      }
+  if (mcpPort) {
+    mcpStreamableWebServer = new McpStreamableWebServer(mcpPort);
+    context.subscriptions.push({
+      dispose: () => {
+        mcpStreamableWebServer?.stopMcpServer();
+      },
     });
-}
-
-async function updateMcpJson() {
-  if (!ensureEditorDirExists()) {
-    return false;
-  }
-
-  if (hasNxMcpEntry()) {
-    return true;
-  }
-
-  getTelemetry().logUsage('ai.add-mcp');
-
-  const port = await findAvailablePort();
-  if (!port) {
-    window.showErrorMessage(
-      'Failed to find an available port for MCP SSE server',
+    vscodeLogger.log(
+      `Automatically configured Nx MCP server dynamically on port ${mcpPort}`,
     );
-    return false;
   }
 
-  const mcpJson =
-    readMcpJson() || (isInCursor() ? { mcpServers: {} } : { servers: {} });
-
-  if (isInCursor()) {
-    if (!mcpJson.mcpServers) {
-      mcpJson.mcpServers = {};
-    }
-
-    mcpJson.mcpServers['nx-mcp'] = {
-      url: `http://localhost:${port}/mcp`,
-    };
-  } else {
-    if (!mcpJson.servers) {
-      mcpJson.servers = {};
-    }
-
-    mcpJson.servers['nx-mcp'] = {
-      type: 'http',
-      url: `http://localhost:${port}/mcp`,
-    };
-  }
-  if (!writeMcpJson(mcpJson)) {
-    window.showErrorMessage('Failed to write to mcp.json');
-    return false;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  commands.executeCommand('vscode.open', Uri.file(getMcpJsonPath()!));
-
-  return true;
+  lm.registerMcpServerDefinitionProvider(
+    'nx-mcp',
+    new NxMcpServerDefinitionProvider(mcpStreamableWebServer),
+  );
 }
 
-async function shouldUseLegacyMcpRegistration(): Promise<boolean> {
+function shouldUseLegacyMcpRegistration(): boolean {
+  console.log(version);
   if (isInVSCode() && gte(version, '1.101.0')) {
     return false;
   }
   return true;
+}
+
+function mcpJsonIsGitIgnored(mcpJsonPath: string): boolean {
+  try {
+    execSync(`git check-ignore "${mcpJsonPath}"`, {
+      stdio: 'ignore',
+      cwd: getNxWorkspacePath(),
+    });
+    // If execSync doesn't throw, the file is ignored
+    return true;
+  } catch {
+    // If execSync throws, the file is not ignored
+    return false;
+  }
 }
