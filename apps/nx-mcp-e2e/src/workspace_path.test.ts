@@ -3,7 +3,6 @@ import {
   createInvokeMCPInspectorCLI,
   defaultVersion,
   e2eCwd,
-  logWindowsFileLocks,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
@@ -34,9 +33,6 @@ describe('workspace path', () => {
     // Clean up Nx workspace processes before attempting to remove directory
     await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
 
-    if (platform() === 'win32') {
-      logWindowsFileLocks(testWorkspacePath);
-    }
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
 

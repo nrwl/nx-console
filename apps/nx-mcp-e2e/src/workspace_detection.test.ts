@@ -3,13 +3,11 @@ import {
   createInvokeMCPInspectorCLI,
   defaultVersion,
   e2eCwd,
-  logWindowsFileLocks,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { platform } from 'node:os';
 import { join } from 'node:path';
 
 describe('workspace detection', () => {
@@ -33,9 +31,6 @@ describe('workspace detection', () => {
     });
 
     afterAll(async () => {
-      if (platform() === 'win32') {
-        logWindowsFileLocks(testWorkspacePath);
-      }
       await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
       rmSync(testWorkspacePath, { recursive: true, force: true });
     });

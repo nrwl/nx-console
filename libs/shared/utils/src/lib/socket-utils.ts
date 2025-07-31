@@ -22,26 +22,11 @@ function getSocketDir(workspaceRoot: string): string {
       process.env.NX_SOCKET_DIR ??
       process.env.NX_DAEMON_SOCKET_DIR ??
       socketDirName(workspaceRoot);
+    mkdirSync(dir, { recursive: true });
 
-    // On Windows, we don't need to create the directory for named pipes,
-    // but we should ensure the fallback workspace directory exists
-    if (platform() === 'win32') {
-      // For Windows named pipes, just return the path without trying to create it
-      return dir;
-    } else {
-      // For Unix sockets, create the directory
-      mkdirSync(dir, { recursive: true });
-      return dir;
-    }
+    return dir;
   } catch (e) {
-    // Fallback to workspace directory and ensure it exists
-    const fallbackDir = join(workspaceRoot, DAEMON_DIR_FOR_CURRENT_WORKSPACE);
-    try {
-      mkdirSync(fallbackDir, { recursive: true });
-    } catch {
-      // If we can't create the fallback directory, we'll have bigger problems
-    }
-    return fallbackDir;
+    return join(workspaceRoot, DAEMON_DIR_FOR_CURRENT_WORKSPACE);
   }
 }
 
