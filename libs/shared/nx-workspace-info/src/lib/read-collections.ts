@@ -1,4 +1,4 @@
-import { readJsonFile } from '@nx-console/shared-file-system';
+import { readJsonFile, directoryExists } from '@nx-console/shared-file-system';
 import {
   packageDetails,
   workspaceDependencies,
@@ -12,7 +12,7 @@ import {
   GeneratorType,
 } from '@nx-console/shared-schema';
 import { platform } from 'os';
-import { dirname, resolve } from 'path';
+import { dirname, resolve, join } from 'path';
 import { nxWorkspace } from './workspace';
 import { Logger } from '@nx-console/shared-utils';
 
@@ -40,9 +40,17 @@ export async function readCollections(
     }),
   );
 
+  // Expand collections to include export-based secondary entry points
+  const expandedCollections = await Promise.all(
+    collections.map(async (c) => {
+      const secondaryEntryPoints = await getExportBasedSecondaryEntryPoints(c);
+      return [c, ...secondaryEntryPoints];
+    }),
+  );
+
   const allCollections = (
     await Promise.all(
-      collections.map((c) => readCollection(workspacePath, c, options)),
+      expandedCollections.flat().map((c) => readCollection(workspacePath, c, options)),
     )
   ).flat();
 
@@ -96,6 +104,7 @@ async function readCollection(
       executorCollections,
       generatorCollections,
       options,
+      json, // Pass the package.json for secondary entry point filtering
     );
   } catch (e) {
     return null;
@@ -109,6 +118,7 @@ export async function getCollectionInfo(
   executorCollection: { path: string; json: any },
   generatorCollection: { path: string; json: any },
   options: ReadCollectionsOptions,
+  packageJson?: any, // Package.json for secondary entry point filtering
 ): Promise<CollectionInfo[]> {
   const collectionMap: Map<string, CollectionInfo> = new Map();
 
@@ -162,6 +172,35 @@ export async function getCollectionInfo(
   for (const [key, schema] of Object.entries<any>(generators)) {
     if (!canUse(key, schema, options.includeHidden, options.includeNgAdd)) {
       continue;
+    }
+
+    // Filter generators for secondary entry points
+    if (packageJson?.__secondaryEntryPoint) {
+      const secondaryEntryPoint = packageJson.__secondaryEntryPoint;
+      const schemaPath = schema.schema;
+      
+      // Only include generators that are under the secondary entry point's path
+      if (!schemaPath.includes(`/src/${secondaryEntryPoint}/`)) {
+        continue;
+      }
+    } else if (packageJson?.exports) {
+      // For main collections, exclude generators that are under any secondary entry point
+      const schemaPath = schema.schema;
+      let shouldExclude = false;
+      
+      for (const [exportPath, exportTarget] of Object.entries(packageJson.exports)) {
+        if (typeof exportTarget === 'string' && exportPath.startsWith('./')) {
+          const subpackageName = exportPath.slice(2);
+          if (schemaPath.includes(`/src/${subpackageName}/`)) {
+            shouldExclude = true;
+            break;
+          }
+        }
+      }
+      
+      if (shouldExclude) {
+        continue;
+      }
     }
 
     try {
@@ -347,4 +386,57 @@ function formatPath(path: string): string {
   }
 
   return path;
+}
+
+/**
+ * Discovers export-based secondary entry points and creates virtual collections for them.
+ * For example, if @myorg/nx-plugin has exports: {"./adapters": "./src/adapters/index.js"}
+ * and there are generators in src/adapters/generators/, this creates a virtual collection
+ * with the name "@myorg/nx-plugin/adapters".
+ */
+async function getExportBasedSecondaryEntryPoints(
+  collection: { packagePath: string; packageName: string; packageJson: any },
+): Promise<{ packagePath: string; packageName: string; packageJson: any }[]> {
+  const secondaryEntryPoints: { packagePath: string; packageName: string; packageJson: any }[] = [];
+  
+  try {
+    const { packageJson, packageName, packagePath } = collection;
+    
+    // Check if package has generators/executors and exports
+    if (!(packageJson.generators || packageJson.schematics || packageJson.executors || packageJson.builders)) {
+      return secondaryEntryPoints;
+    }
+    
+    if (!packageJson.exports || typeof packageJson.exports !== 'object') {
+      return secondaryEntryPoints;
+    }
+
+    // For each export path, check if it corresponds to generators/executors
+    for (const [exportPath, exportTarget] of Object.entries(packageJson.exports)) {
+      if (typeof exportTarget === 'string' && exportPath.startsWith('./')) {
+        const subpackageName = exportPath.slice(2); // Remove './'
+        
+        // Check if the export path corresponds to generator files
+        const targetPath = join(packagePath, exportTarget.replace('./src/', 'src/'));
+        const generatorsPath = join(dirname(targetPath), 'generators');
+        
+        if (await directoryExists(generatorsPath)) {
+          // Create a virtual secondary entry point collection
+          secondaryEntryPoints.push({
+            packagePath: packagePath, // Same physical path
+            packageName: `${packageName}/${subpackageName}`, // Virtual collection name
+            packageJson: {
+              ...packageJson,
+              // Mark this as a secondary entry point for filtering generators
+              __secondaryEntryPoint: subpackageName,
+            },
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore errors when scanning for export-based entry points
+  }
+  
+  return secondaryEntryPoints;
 }
