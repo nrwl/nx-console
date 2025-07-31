@@ -417,7 +417,7 @@ async function getExportBasedSecondaryEntryPoints(
         const subpackageName = exportPath.slice(2); // Remove './'
         
         // Check if the export path corresponds to generator files
-        const targetPath = join(packagePath, exportTarget.replace('./src/', 'src/'));
+        const targetPath = resolve(packagePath, exportTarget);
         const generatorsPath = join(dirname(targetPath), 'generators');
         
         if (await directoryExists(generatorsPath)) {
