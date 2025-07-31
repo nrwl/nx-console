@@ -1,6 +1,8 @@
 import {
   createInvokeMCPInspectorCLI,
+  defaultVersion,
   e2eCwd,
+  cleanupNxWorkspace,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
@@ -47,6 +49,7 @@ describe('IDE Communication', () => {
       testServer.stop();
     }
 
+    await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
     // Clean up workspace
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
