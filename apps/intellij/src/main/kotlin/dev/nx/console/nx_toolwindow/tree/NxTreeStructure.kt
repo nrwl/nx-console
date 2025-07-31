@@ -36,6 +36,7 @@ import java.net.URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.concurrency.thenRun
 
 class NxTreeStructure(val tree: NxProjectsTree, val project: Project) : SimpleTreeStructure() {
 
@@ -60,11 +61,18 @@ class NxTreeStructure(val tree: NxProjectsTree, val project: Project) : SimpleTr
             nxTreeBuilder = getTreeBuilder(nxWorkspace)
             root = nxTreeBuilder.buildRootNode()
             withContext(Dispatchers.EDT) {
+                // Save scroll position before invalidating
+                treePersistenceManager.saveScrollPosition()
+
                 treeModel.invalidateAsync().thenRun {
                     TreeUtil.promiseExpand(
-                        tree,
-                        treePersistenceManager.NxProjectsTreePersistenceVisitor(),
-                    )
+                            tree,
+                            treePersistenceManager.NxProjectsTreePersistenceVisitor(),
+                        )
+                        .thenRun {
+                            // Restore scroll position after tree expansion is complete
+                            treePersistenceManager.restoreScrollPosition()
+                        }
                 }
             }
         }
