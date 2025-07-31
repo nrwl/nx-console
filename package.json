@@ -92,7 +92,7 @@
     "@types/tar-stream": "^3.1.3",
     "@types/universal-analytics": "0.4.5",
     "@types/uuid": "^8.3.4",
-    "@types/vscode": "^1.96.0",
+    "@types/vscode": "^1.101.0",
     "@types/vscode-webview": "^1.57.0",
     "@typescript-eslint/eslint-plugin": "7.16.1",
     "@typescript-eslint/parser": "7.16.1",

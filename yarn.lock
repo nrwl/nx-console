@@ -6745,10 +6745,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/vscode@npm:^1.96.0":
-  version: 1.99.1
-  resolution: "@types/vscode@npm:1.99.1"
-  checksum: 4c961d00391d006712a36c1ec12c5d3a671f563b00367b474afccd929cdb8ad32b9bfa2bde3fe7ee85663afd528853f1cf6ed880712a05344521c2d9f0ba81a0
+"@types/vscode@npm:^1.101.0":
+  version: 1.102.0
+  resolution: "@types/vscode@npm:1.102.0"
+  checksum: d3e214acbaca20af418130d3f850ef02cb6309f83ac3f813821a32959e845e9802fcb549b3b3d7d818ab9131823aa2c72026b4cfdab579bca2d4595018f34a19
   languageName: node
   linkType: hard
 
@@ -16562,7 +16562,7 @@ __metadata:
     "@types/tar-stream": ^3.1.3
     "@types/universal-analytics": 0.4.5
     "@types/uuid": ^8.3.4
-    "@types/vscode": ^1.96.0
+    "@types/vscode": ^1.101.0
     "@types/vscode-webview": ^1.57.0
     "@typescript-eslint/eslint-plugin": 7.16.1
     "@typescript-eslint/parser": 7.16.1
