@@ -1,5 +1,7 @@
 import {
+  cleanupNxWorkspace,
   createInvokeMCPInspectorCLI,
+  defaultVersion,
   e2eCwd,
   logWindowsFileLocks,
   newWorkspace,
@@ -30,10 +32,11 @@ describe('workspace detection', () => {
       );
     });
 
-    afterAll(() => {
+    afterAll(async () => {
       if (platform() === 'win32') {
         logWindowsFileLocks(testWorkspacePath);
       }
+      await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
       rmSync(testWorkspacePath, { recursive: true, force: true });
     });
 

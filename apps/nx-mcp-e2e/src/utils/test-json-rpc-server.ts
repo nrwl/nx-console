@@ -82,10 +82,12 @@ export class TestJsonRpcServer {
     // Clean up existing socket using shared utility
     await killSocketOnPath(this.socketPath);
 
-    // Ensure socket directory exists
-    const socketDir = dirname(this.socketPath);
-    if (!existsSync(socketDir)) {
-      mkdirSync(socketDir, { recursive: true });
+    // Ensure socket directory exists (only for Unix sockets, not Windows named pipes)
+    if (process.platform !== 'win32') {
+      const socketDir = dirname(this.socketPath);
+      if (!existsSync(socketDir)) {
+        mkdirSync(socketDir, { recursive: true });
+      }
     }
 
     return new Promise((resolve) => {
