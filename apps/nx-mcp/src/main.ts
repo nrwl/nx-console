@@ -109,9 +109,13 @@ async function main() {
 
   if (nxWorkspacePath) {
     logger.log('Checking for IDE connection...');
-    const ideConnection = await createIdeClient(nxWorkspacePath);
-    ideClient = ideConnection.client;
-    ideAvailable = ideConnection.available;
+    try {
+      const ideConnection = await createIdeClient(nxWorkspacePath);
+      ideClient = ideConnection.client;
+      ideAvailable = ideConnection.available;
+    } catch (error) {
+      logger.log('Error checking for IDE connection: ' + error);
+    }
 
     if (ideAvailable) {
       logger.log('Successfully connected to IDE');

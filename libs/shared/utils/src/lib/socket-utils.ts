@@ -1,9 +1,8 @@
+import { createHash } from 'crypto';
 import { mkdirSync, unlinkSync } from 'fs';
-import { access, constants } from 'fs/promises';
+import { Socket } from 'net';
 import { platform, tmpdir } from 'os';
 import { join, resolve } from 'path';
-import { createHash } from 'crypto';
-import { Socket } from 'net';
 import { consoleLogger } from './logger';
 
 const DAEMON_DIR_FOR_CURRENT_WORKSPACE = join('.nx', 'workspace-data', 'd');
