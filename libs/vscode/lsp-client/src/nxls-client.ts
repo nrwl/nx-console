@@ -402,7 +402,7 @@ function refreshWorkspaceOnBranchChange(
     return;
   }
 
-  let branch = repo.state.HEAD.name;
+  let branch = repo.state.HEAD?.name;
   return repo.state.onDidChange(async () => {
     const newBranch = repo.state.HEAD.name;
     if (newBranch !== branch) {
