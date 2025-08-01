@@ -1,7 +1,8 @@
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
-  NxIdeProvider,
+  IdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
@@ -22,14 +23,12 @@ import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitDiffs,
-  isInCursor,
   isInVSCode,
-  isInWindsurf,
   sendMessageToAgent,
   vscodeLogger,
 } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
-import { commands, env, ProgressLocation, tasks, window } from 'vscode';
+import { commands, ProgressLocation, tasks, window } from 'vscode';
 
 export class McpWebServer {
   private static instance: McpWebServer;
@@ -47,6 +46,19 @@ export class McpWebServer {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
   private serverStartupFailed = false;
+  private mcpServer = new McpServer(
+    {
+      name: 'Nx MCP',
+      version: '0.0.1',
+    },
+    {
+      capabilities: {
+        tools: {
+          listChanged: true,
+        },
+      },
+    },
+  );
 
   private sseKeepAliveInterval?: NodeJS.Timeout;
   private sseTransport?: SSEServerTransport;
@@ -98,6 +110,7 @@ export class McpWebServer {
         const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
           nxWorkspaceInfoProvider,
+          this.mcpServer,
           ideProvider,
           getTelemetry(),
           vscodeLogger,
@@ -199,6 +212,7 @@ export class McpWebServer {
     const server = await NxMcpServerWrapper.create(
       getNxWorkspacePath(),
       nxWorkspaceInfoProvider,
+      this.mcpServer,
       ideProvider,
       getTelemetry(),
       vscodeLogger,
@@ -242,8 +256,14 @@ const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
     await isNxCloudUsed(getNxWorkspacePath(), vscodeLogger),
 };
 
-const ideProvider: NxIdeProvider = {
-  ideName: isInCursor() ? 'cursor' : isInWindsurf() ? 'windsurf' : 'vscode',
+const ideProvider: IdeProvider = {
+  isAvailable: () => true,
+  onConnectionChange: () => () => {
+    // noop in vscode
+  },
+  dispose: () => {
+    // noop in vscode
+  },
   focusProject: (projectName: string) => {
     getNxWorkspaceProjects().then(async (workspaceProjects) => {
       const project = await findMatchingProject(

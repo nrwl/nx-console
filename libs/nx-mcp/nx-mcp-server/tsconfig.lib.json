@@ -6,7 +6,7 @@
     "noImplicitReturns": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "../../shared/llm-context/src/lib/tool-names.ts"],
+  "include": ["src/**/*.ts"],
   "references": [
     {
       "path": "../../shared/running-tasks/tsconfig.lib.json"

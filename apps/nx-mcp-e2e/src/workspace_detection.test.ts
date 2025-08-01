@@ -1,5 +1,7 @@
 import {
+  cleanupNxWorkspace,
   createInvokeMCPInspectorCLI,
+  defaultVersion,
   e2eCwd,
   newWorkspace,
   simpleReactWorkspaceOptions,
@@ -28,7 +30,8 @@ describe('workspace detection', () => {
       );
     });
 
-    afterAll(() => {
+    afterAll(async () => {
+      await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
       rmSync(testWorkspacePath, { recursive: true, force: true });
     });
 
