@@ -3618,6 +3618,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-watcher@workspace:libs/shared/watcher":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-watcher@workspace:libs/shared/watcher"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/vscode-add-dependency@workspace:libs/vscode/add-dependency":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-add-dependency@workspace:libs/vscode/add-dependency"

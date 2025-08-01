@@ -3,6 +3,7 @@
     "nrwl.angular-console",
     "runem.lit-plugin",
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "firsttris.vscode-jest-runner"
   ]
 }

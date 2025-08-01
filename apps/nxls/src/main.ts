@@ -54,10 +54,7 @@ import {
   lspLogger,
   setLspLogger,
 } from '@nx-console/language-server-utils';
-import {
-  NativeWatcher,
-  languageServerWatcher,
-} from '@nx-console/language-server-watcher';
+import { languageServerWatcher } from '@nx-console/language-server-watcher';
 import {
   createProjectGraph,
   getCloudOnboardingInfo,
@@ -104,6 +101,7 @@ import {
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { loadRootEnvFiles } from './loadRootEnvFiles';
+import { NativeWatcher } from '@nx-console/shared-watcher';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));

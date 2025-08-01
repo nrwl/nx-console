@@ -25,7 +25,8 @@
     },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
-      "cache": true
+      "cache": true,
+      "dependsOn": ["^build"]
     },
     "lint": {
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
@@ -102,7 +103,8 @@
       },
       "exclude": [
         "libs/vscode/migrate/*",
-        "libs/vscode/migrate-sidebar-webview/*"
+        "libs/vscode/migrate-sidebar-webview/*",
+        "libs/shared/watcher/*"
       ]
     },
     {
@@ -170,6 +172,15 @@
         "buildStorybookTargetName": "build-storybook",
         "testStorybookTargetName": "test-storybook",
         "staticStorybookTargetName": "static-storybook"
+      }
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": ["libs/shared/watcher/*"],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
       }
     }
   ],
