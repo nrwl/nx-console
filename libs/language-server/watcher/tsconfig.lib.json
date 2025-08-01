@@ -8,19 +8,22 @@
   "include": ["**/*.ts"],
   "references": [
     {
-      "path": "../../shared/npm/tsconfig.lib.json"
+      "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/watcher/tsconfig.lib.json"
     },
     {
       "path": "../../shared/utils/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/nx-version/tsconfig.lib.json"
+      "path": "../../shared/nx-workspace-info/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/npm/tsconfig.lib.json"
     },
     {
       "path": "../utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/nx-workspace-info/tsconfig.lib.json"
     }
   ]
 }

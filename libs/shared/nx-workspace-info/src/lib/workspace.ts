@@ -25,7 +25,7 @@ const enum Status {
 let cachedReplay = new ReplaySubject<NxWorkspace>();
 let status: Status = Status.not_started;
 
-function resetStatus(workspacePath: string) {
+export function resetStatus(workspacePath: string) {
   status = Status.not_started;
   cachedReplay = new ReplaySubject<NxWorkspace>();
 }

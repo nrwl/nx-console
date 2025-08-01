@@ -14,16 +14,19 @@
   ],
   "references": [
     {
-      "path": "../../libs/shared/npm/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/shared/nx-cloud/tsconfig.lib.json"
+      "path": "../../libs/shared/watcher/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/telemetry/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared/nx-workspace-info/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/nx-cloud/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/npm/tsconfig.lib.json"
     },
     {
       "path": "../../libs/nx-mcp/nx-mcp-server/tsconfig.lib.json"
