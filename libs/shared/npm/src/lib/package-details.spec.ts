@@ -26,7 +26,7 @@ describe('packageDetails', () => {
         types: 'dist/index.d.ts',
       },
     });
-    expect(readJsonFileMock).toBeCalledWith(
+    expect(readJsonFileMock).toHaveBeenCalledWith(
       normalize('libs/utils/package.json'),
     );
   });
@@ -42,6 +42,6 @@ describe('packageDetails', () => {
       packageName: undefined,
       packageJson: {},
     });
-    expect(readJsonFileMock).toBeCalledWith('package.json');
+    expect(readJsonFileMock).toHaveBeenCalledWith('package.json');
   });
 });

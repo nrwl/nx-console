@@ -13,17 +13,31 @@ export class Icon extends EditorContext(LitElement) {
   @property({ type: Boolean })
   applyFillColor = false;
 
+  @property()
+  size = '';
+
   override render() {
     if (this.editor === 'intellij') {
       return html`<img
         src="./icons/${this.icon}.svg"
-        class="h-[1.25rem]"
+        class="h-[${this.size ?? '1.25rem'}]"
         @load="${this.applyColorToSVG}"
       ></img>`;
     } else {
+      let spanStyle = 'text-align: center;';
+
+      // Use size prop if provided, otherwise default
+      if (this.size) {
+        spanStyle += ` font-size: ${this.size};`;
+      } else {
+        spanStyle += ' font-size: 0.9rem;';
+      }
+
+      spanStyle += ` color: ${this.color};`;
+
       return html`<span
         class="codicon codicon-${this.icon}"
-        style="text-align: center; font-size: 0.9rem; color: ${this.color}"
+        style="${spanStyle}"
       ></span>`;
     }
   }

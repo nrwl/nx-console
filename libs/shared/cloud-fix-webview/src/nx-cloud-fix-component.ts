@@ -99,7 +99,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
               >&nbsp;and choose to apply or reject them.
             </p>
           </div>
-          ${aiFix.suggestedFix ? this.getFixSection(aiFix) : ''}
+          ${this.getFixSection(aiFix)}
           ${aiFix.suggestedFix
             ? html`<div class="pointer-events-none relative m-0 h-9">
                 <div
@@ -298,6 +298,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
           <icon-element
             icon="loading"
+            size="3rem"
             class="animate-spin-slow leading-none"
           ></icon-element>
         </div>
@@ -323,6 +324,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
             <icon-element
               icon="circle-slash"
+              size="3rem"
               class="text-foreground leading-none opacity-70"
             ></icon-element>
           </div>
@@ -347,6 +349,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           >
             <icon-element
               icon="git-branch"
+              size="3rem"
               class="text-success leading-none"
             ></icon-element>
           </div>
@@ -370,6 +373,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           >
             <icon-element
               icon="git-branch"
+              size="3rem"
               class="text-success leading-none"
             ></icon-element>
           </div>
@@ -383,8 +387,6 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       `;
     }
 
-    const showActions = true;
-
     return html`
       <div class="border-border bg-background relative m-0 border">
         <div
@@ -393,7 +395,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div class="flex-1">
             <h2 class="m-0 flex items-center gap-3 text-base font-semibold">
               <icon-element icon="sparkle"></icon-element>
-              Apply Suggested Fix
+              ${aiFix.suggestedFix ? 'Apply Suggested Fix' : 'No Fix Created'}
             </h2>
           </div>
         </div>
@@ -403,17 +405,19 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                 ${this.renderFormattedText(aiFix.suggestedFixReasoning)}
               </p>`
             : ''}
-          <form-group-element variant="vertical">
-            <label-element for="commit-message">Commit message</label-element>
-            <textarea-element
-              value="${aiFix.suggestedFixDescription ||
-              'fix: nx cloud AI suggested fix'}"
-              disabled
-              rows="3"
-            ></textarea-element>
-          </form-group-element>
-          ${showActions
+          ${aiFix.suggestedFix
             ? html`
+                <form-group-element variant="vertical">
+                  <label-element for="commit-message"
+                    >Commit message</label-element
+                  >
+                  <textarea-element
+                    value="${aiFix.suggestedFixDescription ||
+                    'fix: nx cloud AI suggested fix'}"
+                    disabled
+                    rows="3"
+                  ></textarea-element>
+                </form-group-element>
                 <div class="mt-4 flex justify-end gap-2">
                   <button-element
                     text="Apply Fix"
@@ -492,6 +496,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
             <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="loading"
+                size="3rem"
                 class="animate-spin-slow leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -514,6 +519,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
             <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="verified"
+                size="3rem"
                 class="text-success leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -533,9 +539,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div
             class="border-border bg-background relative m-0 border p-6 text-center"
           >
-            <div class="mb-2 flex items-center justify-center gap-3">
+            <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="error"
+                size="3rem"
                 class="text-error leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -561,7 +568,8 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="circle-slash"
-            class="text-foreground leading-none opacity-70"
+            size="3rem"
+            class="text-error leading-none"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
             Fix Creation Cancelled
@@ -582,6 +590,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="info"
+            size="3rem"
             class="text-primary leading-none"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -604,6 +613,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="error"
+            size="3rem"
             class="text-error leading-none"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
