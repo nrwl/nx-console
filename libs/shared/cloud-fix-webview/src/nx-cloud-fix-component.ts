@@ -298,6 +298,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
           <icon-element
             icon="loading"
+            size="3rem"
             class="animate-spin-slow leading-none"
           ></icon-element>
         </div>
@@ -323,6 +324,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
             <icon-element
               icon="circle-slash"
+              size="3rem"
               class="text-foreground leading-none opacity-70"
             ></icon-element>
           </div>
@@ -347,6 +349,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           >
             <icon-element
               icon="git-branch"
+              size="3rem"
               class="text-success leading-none"
             ></icon-element>
           </div>
@@ -370,6 +373,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           >
             <icon-element
               icon="git-branch"
+              size="3rem"
               class="text-success leading-none"
             ></icon-element>
           </div>
@@ -492,6 +496,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
             <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="loading"
+                size="3rem"
                 class="animate-spin-slow leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -514,6 +519,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
             <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="verified"
+                size="3rem"
                 class="text-success leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -536,6 +542,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
             <div class="mb-2 flex items-center justify-center gap-3">
               <icon-element
                 icon="error"
+                size="3rem"
                 class="text-error leading-none"
               ></icon-element>
               <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -561,7 +568,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="circle-slash"
-            class="text-foreground leading-none opacity-70"
+            class="text-foreground h-8 w-8 text-4xl leading-none opacity-70"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
             Fix Creation Cancelled
@@ -582,6 +589,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="info"
+            size="3rem"
             class="text-primary leading-none"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
@@ -604,6 +612,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="error"
+            size="3rem"
             class="text-error leading-none"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
