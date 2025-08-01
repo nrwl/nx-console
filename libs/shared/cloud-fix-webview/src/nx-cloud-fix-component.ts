@@ -99,7 +99,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
               >&nbsp;and choose to apply or reject them.
             </p>
           </div>
-          ${aiFix.suggestedFix ? this.getFixSection(aiFix) : ''}
+          ${this.getFixSection(aiFix)}
           ${aiFix.suggestedFix
             ? html`<div class="pointer-events-none relative m-0 h-9">
                 <div
@@ -387,8 +387,6 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       `;
     }
 
-    const showActions = true;
-
     return html`
       <div class="border-border bg-background relative m-0 border">
         <div
@@ -407,17 +405,19 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                 ${this.renderFormattedText(aiFix.suggestedFixReasoning)}
               </p>`
             : ''}
-          <form-group-element variant="vertical">
-            <label-element for="commit-message">Commit message</label-element>
-            <textarea-element
-              value="${aiFix.suggestedFixDescription ||
-              'fix: nx cloud AI suggested fix'}"
-              disabled
-              rows="3"
-            ></textarea-element>
-          </form-group-element>
-          ${showActions
+          ${aiFix.suggestedFix
             ? html`
+                <form-group-element variant="vertical">
+                  <label-element for="commit-message"
+                    >Commit message</label-element
+                  >
+                  <textarea-element
+                    value="${aiFix.suggestedFixDescription ||
+                    'fix: nx cloud AI suggested fix'}"
+                    disabled
+                    rows="3"
+                  ></textarea-element>
+                </form-group-element>
                 <div class="mt-4 flex justify-end gap-2">
                   <button-element
                     text="Apply Fix"
