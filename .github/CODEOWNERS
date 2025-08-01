@@ -98,6 +98,8 @@
 
 /apps/generate-ui-v2/ @MaxKless
 
+/libs/shared/watcher/ @MaxKless
+
 /libs/vscode/copilot/ @MaxKless
 
 /libs/vscode/migrate/ @MaxKless

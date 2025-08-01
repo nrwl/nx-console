@@ -1,8 +1,7 @@
 import { lspLogger } from '@nx-console/language-server-utils';
 import { getNxVersion } from '@nx-console/shared-nx-workspace-info';
 import { debounce } from '@nx-console/shared-utils';
-import { DaemonWatcher } from './daemon-watcher';
-import { NativeWatcher } from './native-watcher';
+import { DaemonWatcher, NativeWatcher } from '@nx-console/shared-watcher';
 import { ParcelWatcher } from './parcel-watcher';
 import { gte } from '@nx-console/nx-version';
 
@@ -22,7 +21,11 @@ export async function languageServerWatcher(
         _nativeWatcher.stop();
         _nativeWatcher = undefined;
       }
-      const nativeWatcher = new NativeWatcher(workspacePath, debouncedCallback);
+      const nativeWatcher = new NativeWatcher(
+        workspacePath,
+        debouncedCallback,
+        lspLogger,
+      );
       _nativeWatcher = nativeWatcher;
       return () => {
         lspLogger.log('Unregistering file watcher');
@@ -37,6 +40,7 @@ export async function languageServerWatcher(
         workspacePath,
         version,
         debouncedCallback,
+        lspLogger,
       );
       _daemonWatcher = daemonWatcher;
 
