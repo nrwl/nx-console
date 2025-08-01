@@ -539,7 +539,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div
             class="border-border bg-background relative m-0 border p-6 text-center"
           >
-            <div class="mb-2 flex items-center justify-center gap-3">
+            <div class="mb-2 flex flex-col items-center justify-center gap-3">
               <icon-element
                 icon="error"
                 size="3rem"
@@ -568,7 +568,8 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
         <div class="mb-2 flex flex-col items-center justify-center gap-3">
           <icon-element
             icon="circle-slash"
-            class="text-foreground h-8 w-8 text-4xl leading-none opacity-70"
+            size="3rem"
+            class="text-error leading-none"
           ></icon-element>
           <h2 class="text-foreground m-0 text-lg font-semibold">
             Fix Creation Cancelled
