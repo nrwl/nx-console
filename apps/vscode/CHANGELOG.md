@@ -1,3 +1,11 @@
+## [18.60.2](https://github.com/nrwl/nx-console/compare/vscode-v18.60.1...vscode-v18.60.2) (2025-08-01)
+
+
+### Bug Fixes
+
+* self-healing UI improvements ([#2651](https://github.com/nrwl/nx-console/issues/2651)) ([22951bb](https://github.com/nrwl/nx-console/commit/22951bbb315a0cb239bfd7ab1bd56d25b580e096))
+* **vscode:** handle undefined repo.state.HEAD timing issue ([#2652](https://github.com/nrwl/nx-console/issues/2652)) ([1cf110a](https://github.com/nrwl/nx-console/commit/1cf110a864cc36ca4f053c3194e5c77cb91652ca))
+
 ## [18.60.1](https://github.com/nrwl/nx-console/compare/vscode-v18.60.0...vscode-v18.60.1) (2025-07-31)
 
 
