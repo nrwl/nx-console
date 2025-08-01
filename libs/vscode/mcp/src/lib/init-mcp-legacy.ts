@@ -11,6 +11,7 @@ import {
   getNxMcpPort,
   hasNxMcpEntry,
   isInCursor,
+  isInVSCode,
   isInWindsurf,
   readMcpJson,
   writeMcpJson,
@@ -23,9 +24,12 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { AgentRulesManager } from './agent-rules-manager';
-import { findAvailablePort } from './ports';
+import {
+  AgentRulesManager,
+  shouldSkipRulesNotification,
+} from './agent-rules-manager';
 import { McpWebServer } from './mcp-web-server';
+import { mcpJsonIsGitIgnored } from './init-mcp';
 
 let mcpJsonWatcher: FileSystemWatcher | null = null;
 let hasInitializedMcp = false;
@@ -58,6 +62,10 @@ export async function initMcpLegacy(context: ExtensionContext) {
   }
   hasInitializedMcp = true;
 
+  if (hasNxMcpEntry() && canMigrateToStdio()) {
+    addStdioNxMcpToMcpJson(true);
+  }
+
   commands.executeCommand('setContext', 'hasNxMcpConfigured', hasNxMcpEntry());
 
   McpWebServer.Instance.completeMcpServerSetup();
@@ -66,7 +74,7 @@ export async function initMcpLegacy(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand('nx.configureMcpServer', async () => {
-      await updateMcpJson();
+      await addStdioNxMcpToMcpJson();
       await rulesManager.addAgentRulesToWorkspace();
     }),
     commands.registerCommand('nx.addAgentRules', async () => {
@@ -81,6 +89,16 @@ export async function initMcpLegacy(context: ExtensionContext) {
   // Wait a bit before showing notification
   await new Promise((resolve) => setTimeout(resolve, 20000));
   await showMCPNotification(rulesManager);
+}
+
+function canMigrateToStdio(): boolean {
+  const mcpJsonPath = getMcpJsonPath();
+
+  if (!mcpJsonPath) {
+    return false;
+  }
+
+  return mcpJsonIsGitIgnored(mcpJsonPath);
 }
 
 function setupMcpJsonWatcher(context: ExtensionContext) {
@@ -126,6 +144,7 @@ function setupMcpJsonWatcher(context: ExtensionContext) {
   context.subscriptions.push(mcpJsonWatcher);
 }
 
+// handles different scenarios for showing the mcp & rules notifications
 async function showMCPNotification(rulesManager: AgentRulesManager) {
   const dontAskAgain = WorkspaceConfigurationStore.instance.get(
     'mcpDontAskAgain',
@@ -142,8 +161,38 @@ async function showMCPNotification(rulesManager: AgentRulesManager) {
   }
 
   if (hasNxMcpEntry()) {
-    // if mcp is already configured but the rules file isn't, prompt for rules setup
-    await rulesManager.showAgentRulesNotification();
+    const mcpJson = readMcpJson();
+
+    // if we have do not have an stdio mcp server, prompt to migrate
+    if (
+      !mcpJson?.servers?.['nx-mcp']?.command &&
+      !mcpJson?.mcpServers?.['nx-mcp']?.command
+    ) {
+      let notificationMessage;
+      const shouldSkipRules = shouldSkipRulesNotification();
+      if (shouldSkipRules) {
+        notificationMessage =
+          'Nx Console can avoid port conflicts with the stdio MCP server. Would you like to migrate?';
+      } else {
+        notificationMessage = `Would you like to migrate to the recommended Nx MCP setup (stdio server & ${isInVSCode() ? 'conventions file' : 'rules file'})?`;
+      }
+
+      window
+        .showInformationMessage(notificationMessage, 'Yes', "Don't ask again")
+        .then(async (answer) => {
+          if (answer === "Don't ask again") {
+            WorkspaceConfigurationStore.instance.set('mcpDontAskAgain', true);
+          }
+
+          if (answer === 'Yes') {
+            await addStdioNxMcpToMcpJson(true);
+            await rulesManager.addAgentRulesToWorkspace();
+          }
+        });
+    } else {
+      // if mcp is already configured but the rules file isn't, prompt for rules setup
+      await rulesManager.showAgentRulesNotification();
+    }
     return;
   }
 
@@ -161,31 +210,24 @@ async function showMCPNotification(rulesManager: AgentRulesManager) {
       }
 
       if (answer === 'Yes') {
-        await updateMcpJson();
+        await addStdioNxMcpToMcpJson();
         await rulesManager.addAgentRulesToWorkspace();
       }
     });
 }
 
-async function updateMcpJson() {
+async function addStdioNxMcpToMcpJson(overwrite = false) {
   if (!ensureEditorDirExists()) {
     return false;
   }
 
-  if (hasNxMcpEntry()) {
+  if (hasNxMcpEntry() && !overwrite) {
     return true;
   }
 
-  getTelemetry().logUsage('ai.add-mcp');
-
-  const port = await findAvailablePort();
-  if (!port) {
-    window.showErrorMessage(
-      'Failed to find an available port for MCP SSE server',
-    );
-    return false;
+  if (!overwrite) {
+    getTelemetry().logUsage('ai.add-mcp');
   }
-
   const mcpJson =
     readMcpJson() || (isInCursor() ? { mcpServers: {} } : { servers: {} });
 
@@ -195,7 +237,8 @@ async function updateMcpJson() {
     }
 
     mcpJson.mcpServers['nx-mcp'] = {
-      url: `http://localhost:${port}/mcp`,
+      command: 'npx',
+      args: ['-y', 'nx-mcp@latest', '.'],
     };
   } else {
     if (!mcpJson.servers) {
@@ -203,8 +246,9 @@ async function updateMcpJson() {
     }
 
     mcpJson.servers['nx-mcp'] = {
-      type: 'http',
-      url: `http://localhost:${port}/mcp`,
+      type: 'stdio',
+      command: 'npx',
+      args: ['-y', 'nx-mcp@latest', '.'],
     };
   }
   if (!writeMcpJson(mcpJson)) {

@@ -22,6 +22,7 @@ import type { McpStreamableWebServer } from './mcp-streamable-web-server';
 import { findAvailablePort } from './ports';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { execSync } from 'child_process';
+import { AgentRulesManager } from './agent-rules-manager';
 
 let mcpStreamableWebServer: McpStreamableWebServer | undefined;
 let initialized = false;
@@ -69,6 +70,8 @@ export async function initMcp(context: ExtensionContext) {
   }
   initialized = true;
 
+  const rulesManager = new AgentRulesManager(context);
+
   // if the mcp config file is gitignored, we can safely remove the old manual definition
   const mcpJsonPath = getMcpJsonPath();
   if (mcpJsonPath && hasNxMcpEntry()) {
@@ -97,7 +100,7 @@ export async function initMcp(context: ExtensionContext) {
     }
   }
 
-  // cursor doesn't have these classes so it will error if we don't import them dynamically
+  // cursor doesn't have the base classes for these so it will error if we don't import them dynamically
   const { McpStreamableWebServer, NxMcpServerDefinitionProvider } =
     await import('./mcp-streamable-web-server.js');
 
@@ -115,21 +118,30 @@ export async function initMcp(context: ExtensionContext) {
     );
   }
 
-  lm.registerMcpServerDefinitionProvider(
-    'nx-mcp',
-    new NxMcpServerDefinitionProvider(mcpStreamableWebServer),
+  context.subscriptions.push(
+    lm.registerMcpServerDefinitionProvider(
+      'nx-mcp',
+      new NxMcpServerDefinitionProvider(mcpStreamableWebServer),
+    ),
+    commands.registerCommand('nx.addAgentRules', async () => {
+      await rulesManager.addAgentRulesToWorkspace();
+    }),
   );
+
+  await rulesManager.initialize();
+
+  await new Promise((resolve) => setTimeout(resolve, 20000));
+  await rulesManager.showAgentRulesNotification();
 }
 
 function shouldUseLegacyMcpRegistration(): boolean {
-  console.log(version);
   if (isInVSCode() && gte(version, '1.101.0')) {
     return false;
   }
   return true;
 }
 
-function mcpJsonIsGitIgnored(mcpJsonPath: string): boolean {
+export function mcpJsonIsGitIgnored(mcpJsonPath: string): boolean {
   try {
     execSync(`git check-ignore "${mcpJsonPath}"`, {
       stdio: 'ignore',

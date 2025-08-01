@@ -183,20 +183,7 @@ export class AgentRulesManager {
   }
 
   public async showAgentRulesNotification(): Promise<void> {
-    const dontAskAgain = WorkspaceConfigurationStore.instance.get(
-      'mcpDontAskAgain',
-      false,
-    );
-
-    if (dontAskAgain) {
-      return;
-    }
-
-    const rulesEnabled = GlobalConfigurationStore.instance.get(
-      GENERATE_RULES_KEY,
-      false,
-    );
-    if (rulesEnabled) {
+    if (shouldSkipRulesNotification()) {
       return;
     }
 
@@ -221,4 +208,25 @@ export class AgentRulesManager {
         }
       });
   }
+}
+
+export function shouldSkipRulesNotification(): boolean {
+  const dontAskAgain = WorkspaceConfigurationStore.instance.get(
+    'mcpDontAskAgain',
+    false,
+  );
+
+  if (dontAskAgain) {
+    return true;
+  }
+
+  const rulesEnabled = GlobalConfigurationStore.instance.get(
+    GENERATE_RULES_KEY,
+    false,
+  );
+  if (rulesEnabled) {
+    return true;
+  }
+
+  return false;
 }
