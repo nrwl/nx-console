@@ -5,4 +5,5 @@ export default {
   displayName: 'shared-watcher',
   testEnvironment: 'node',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };
