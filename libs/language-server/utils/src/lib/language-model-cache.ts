@@ -34,19 +34,28 @@ const cleanupIntervalTimeInSec = 60;
 let nModels = 0;
 
 let cleanupInterval: NodeJS.Timer | undefined = undefined;
-if (cleanupIntervalTimeInSec > 0) {
-  cleanupInterval = setInterval(() => {
-    const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
-    const uris = Object.keys(languageModels);
-    for (const uri of uris) {
-      const languageModelInfo = languageModels[uri];
-      if (languageModelInfo.cTime < cutoffTime) {
-        delete languageModels[uri];
-        nModels--;
+
+function initializeCleanupInterval() {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+  }
+  
+  if (cleanupIntervalTimeInSec > 0) {
+    cleanupInterval = setInterval(() => {
+      const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
+      const uris = Object.keys(languageModels);
+      for (const uri of uris) {
+        const languageModelInfo = languageModels[uri];
+        if (languageModelInfo.cTime < cutoffTime) {
+          delete languageModels[uri];
+          nModels--;
+        }
       }
-    }
-  }, cleanupIntervalTimeInSec * 1000);
+    }, cleanupIntervalTimeInSec * 1000);
+  }
 }
+
+initializeCleanupInterval();
 
 export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
   return {

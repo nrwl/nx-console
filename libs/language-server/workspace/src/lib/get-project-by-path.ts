@@ -4,10 +4,22 @@ import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { platform } from 'os';
 import { lspLogger } from '@nx-console/language-server-utils';
+
 let _rootProjectMap: Record<string, ProjectConfiguration> | undefined;
+let _lastCacheTime: number = Date.now();
+const CACHE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 export function resetProjectPathCache() {
   _rootProjectMap = undefined;
+  _lastCacheTime = Date.now();
+}
+
+function checkCacheTimeout() {
+  const now = Date.now();
+  if (now - _lastCacheTime > CACHE_TIMEOUT_MS) {
+    _rootProjectMap = undefined;
+    _lastCacheTime = now;
+  }
 }
 
 export async function getProjectByPath(
@@ -26,6 +38,8 @@ export async function getProjectByRoot(
   rootPath: string,
   workspacePath: string,
 ): Promise<ProjectConfiguration | undefined> {
+  checkCacheTimeout();
+  
   if (_rootProjectMap && _rootProjectMap[rootPath]) {
     return _rootProjectMap[rootPath];
   }
@@ -37,6 +51,7 @@ export async function getProjectByRoot(
     rootProjectMap[projectConfig.data.root] = projectConfig.data;
   }
   _rootProjectMap = rootProjectMap;
+  _lastCacheTime = Date.now();
 
   return _rootProjectMap?.[rootPath];
 }

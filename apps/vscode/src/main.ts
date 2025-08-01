@@ -357,12 +357,21 @@ async function registerWorkspaceFileWatcher(
 
   // when initializing Nx, there can be timing issues as the nxls starts up
   // we make sure to refresh the workspace periodically as we start up so that we have the latest info
+  let refreshTimeout: NodeJS.Timeout | undefined;
+  
   async function refreshWorkspaceWithBackoff(iteration = 1) {
     if (iteration > 3) {
       return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1000 * iteration));
+    // Clear any existing timeout to prevent accumulation
+    if (refreshTimeout) {
+      clearTimeout(refreshTimeout);
+    }
+
+    await new Promise((resolve) => {
+      refreshTimeout = setTimeout(resolve, 1000 * iteration);
+    });
 
     const nxlsClient = getNxlsClient();
 
@@ -372,19 +381,29 @@ async function registerWorkspaceFileWatcher(
 
     const projects = workspace?.projectGraph.nodes;
     if (projects && Object.keys(projects).length > 0) {
+      refreshTimeout = undefined;
       return;
     } else {
       await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 
-      await new Promise<void>((resolve) => {
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          disposable.dispose();
+          reject(new Error('Refresh notification timeout'));
+        }, 10000); // 10 second timeout
+
         const disposable = nxlsClient.onNotification(
           NxWorkspaceRefreshNotification,
           () => {
+            clearTimeout(timeout);
             disposable.dispose();
             resolve();
           },
         );
+      }).catch(() => {
+        // Continue even if timeout occurs
       });
+      
       refreshWorkspaceWithBackoff(iteration + 1);
     }
   }
