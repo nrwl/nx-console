@@ -210,6 +210,26 @@ export const UncommittedChanges: Story = {
   },
 };
 
+export const NoFixCreated: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          suggestedFix: undefined,
+          suggestedFixDescription: undefined,
+          suggestedFixStatus: 'COMPLETED',
+          suggestedFixReasoning:
+            'No fix was created because the it was just an environment failure',
+          verificationStatus: 'NOT_STARTED',
+        },
+      },
+    },
+  },
+};
+
 export const VerificationFailed: Story = {
   args: {
     details: {

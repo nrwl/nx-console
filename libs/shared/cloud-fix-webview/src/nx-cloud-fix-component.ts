@@ -395,7 +395,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <div class="flex-1">
             <h2 class="m-0 flex items-center gap-3 text-base font-semibold">
               <icon-element icon="sparkle"></icon-element>
-              Apply Suggested Fix
+              ${aiFix.suggestedFix ? 'Apply Suggested Fix' : 'No Fix Created'}
             </h2>
           </div>
         </div>
