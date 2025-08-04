@@ -10,25 +10,22 @@
       "path": "../lsp-client"
     },
     {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../utils"
     },
     {
       "path": "../output-channels"
     },
     {
-      "path": "../../shared/nx-version"
+      "path": "../tasks"
     },
     {
       "path": "../nx-workspace"
     },
     {
       "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../tasks"
-    },
-    {
-      "path": "../../shared/npm"
     },
     {
       "path": "../telemetry"

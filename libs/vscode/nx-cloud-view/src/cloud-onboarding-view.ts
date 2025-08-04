@@ -1,7 +1,3 @@
-import {
-  findNxPackagePath,
-  importWorkspaceDependency,
-} from '@nx-console/shared-npm';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 
@@ -18,20 +14,18 @@ import {
   window,
 } from 'vscode';
 
-import { withTimeout } from '@nx-console/shared-utils';
-import { CliTaskProvider } from '@nx-console/vscode-tasks';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { join } from 'path';
-import { isDeepStrictEqual } from 'util';
-import { ActorRef, EventObject } from 'xstate';
-import { createNxCloudOnboardingURL } from './get-cloud-onboarding-url';
 import {
   getNxAccessToken,
   getNxCloudId,
   getNxCloudUrl,
 } from '@nx-console/shared-nx-cloud';
+import { withTimeout } from '@nx-console/shared-utils';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { gte } from '@nx-console/nx-version';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { isDeepStrictEqual } from 'util';
+import { ActorRef, EventObject } from 'xstate';
+import { getCloudOnboardingUrl } from './get-cloud-onboarding-url';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -220,12 +214,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
 async function finishCloudSetup() {
   getTelemetry().logUsage('cloud.finish-setup');
   const workspacePath = getNxWorkspacePath();
-
-  const accessToken = await getNxAccessToken(workspacePath);
-  const nxCloudId = await getNxCloudId(workspacePath);
-
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const nxVersion = await getNxVersion();
 
   if (nxCloudUrl) {
     process.env['NX_CLOUD_API'] = nxCloudUrl;
@@ -234,31 +223,7 @@ async function finishCloudSetup() {
   let url: string | undefined;
 
   await withTimeout(async () => {
-    const importPath = await findNxPackagePath(
-      workspacePath,
-      join('src', 'nx-cloud', 'utilities', 'url-shorten.js'),
-    );
-
-    const nxPackage = importPath
-      ? await importWorkspaceDependency<any>(importPath)
-      : undefined;
-
-    // for newer versions of nx, we can simply load the logic from the local installations
-    if (
-      nxPackage &&
-      nxPackage.createNxCloudOnboardingURL &&
-      gte(nxVersion, '21.4.0')
-    ) {
-      url = await nxPackage.createNxCloudOnboardingURL(
-        'nx-console',
-        accessToken || nxCloudId,
-      );
-    } else {
-      url = await createNxCloudOnboardingURL(
-        'nx-console',
-        accessToken || nxCloudId,
-      );
-    }
+    url = await getCloudOnboardingUrl();
   }, 5000);
 
   if (nxCloudUrl) {
@@ -268,7 +233,9 @@ async function finishCloudSetup() {
   if (url) {
     commands.executeCommand('vscode.open', Uri.parse(url));
   } else {
-    window.showErrorMessage('Failed to shorten Nx Cloud URL');
+    window.showErrorMessage(
+      'Failed to retrieve Nx Cloud URL. Run `nx@latest connect` in the terminal.',
+    );
   }
 }
 
