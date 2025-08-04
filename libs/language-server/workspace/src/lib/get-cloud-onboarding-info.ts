@@ -125,6 +125,7 @@ async function getNxCloudWorkspaceClaimed(
   if (
     !force &&
     lastRequestHash === requestHash &&
+    lastRequestResult !== undefined &&
     Date.now() - lastRequestTime < 5 * 60 * 1000
   ) {
     lspLogger.log(`Returning cached result for claimed request`);
