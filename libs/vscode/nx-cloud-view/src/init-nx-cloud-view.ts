@@ -71,8 +71,8 @@ export function initNxCloudView(context: ExtensionContext) {
   CloudRecentCIPEProvider.create(context, actor);
   NxCloudFixWebview.create(context, actor);
 
-  async function updateOnboarding() {
-    const onboardingInfo = await getCloudOnboardingInfo();
+  async function updateOnboarding(force = false) {
+    const onboardingInfo = await getCloudOnboardingInfo(force);
     actor.send({
       type: 'UPDATE_ONBOARDING',
       value: onboardingInfo,
@@ -81,7 +81,7 @@ export function initNxCloudView(context: ExtensionContext) {
 
   const throttledRefresh = throttle(() => {
     actor.system.get('polling').send({ type: 'FORCE_POLL' });
-    const loadingPromise = updateOnboarding().catch(() => {
+    const loadingPromise = updateOnboarding(true).catch(() => {
       // ignore errors to make sure the loading state is cleaned up
       // errors will be shown in nxls logs already
     });

@@ -522,12 +522,18 @@ connection.onRequest(NxCloudStatusRequest, async () => {
   return await getNxCloudStatus(WORKING_PATH);
 });
 
-connection.onRequest(NxCloudOnboardingInfoRequest, async () => {
-  if (!WORKING_PATH) {
-    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
-  }
-  return await getCloudOnboardingInfo(WORKING_PATH);
-});
+connection.onRequest(
+  NxCloudOnboardingInfoRequest,
+  async (args: { force?: boolean }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path',
+      );
+    }
+    return await getCloudOnboardingInfo(WORKING_PATH, args.force);
+  },
+);
 
 connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
   if (!WORKING_PATH) {

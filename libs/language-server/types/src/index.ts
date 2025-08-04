@@ -190,7 +190,7 @@ export const NxCloudStatusRequest: RequestType<
 > = new RequestType('nx/cloudStatus');
 
 export const NxCloudOnboardingInfoRequest: RequestType<
-  undefined,
+  { force?: boolean },
   CloudOnboardingInfo,
   unknown
 > = new RequestType('nx/cloudOnboardingInfo');
