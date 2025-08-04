@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { execSync } from 'node:child_process';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
   defaultVersion,
@@ -18,7 +19,7 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-const pluginName = '@test-org/test-plugin';
+const pluginName = uniq('test-plugin');
 
 describe('generator secondary entry points', () => {
   beforeAll(async () => {
@@ -36,8 +37,20 @@ describe('generator secondary entry points', () => {
 
     const workspacePath = join(e2eCwd, workspaceName);
 
-    // Create a test plugin with secondary entry points
-    await createTestPluginWithSecondaryEntryPoints(workspacePath, pluginName);
+    // Install @nx/plugin and create a plugin with secondary entry points
+    execSync('npm install -D @nx/plugin --legacy-peer-deps', {
+      cwd: workspacePath,
+      stdio: 'pipe',
+    });
+
+    // Create a plugin using nx generator (it comes with a default generator)
+    execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
+      cwd: workspacePath,
+      stdio: 'pipe',
+    });
+
+    // Create the secondary entry points structure manually since nx doesn't have a generator for this yet
+    await createSecondaryEntryPoints(workspacePath, pluginName);
 
     // Start the language server
     nxlsWrapper = new NxlsWrapper();
@@ -112,14 +125,14 @@ describe('generator secondary entry points', () => {
       const generatorList = generators.result as GeneratorCollectionInfo[];
 
       // Should find both regular and secondary entry point generators
-      const mainGenerator = generatorList.find(
-        (g) => g.name === `${pluginName}:main`,
+      const defaultGenerator = generatorList.find(
+        (g) => g.name === `${pluginName}:${pluginName}`,
       );
       const adaptersGenerator = generatorList.find(
         (g) => g.name === `${pluginName}/adapters:adapter`,
       );
 
-      expect(mainGenerator).toBeDefined();
+      expect(defaultGenerator).toBeDefined();
       expect(adaptersGenerator).toBeDefined();
     });
 
@@ -127,7 +140,6 @@ describe('generator secondary entry points', () => {
       const secondaryPath = join(
         e2eCwd,
         workspaceName,
-        'node_modules',
         pluginName,
         'src',
         'adapters',
@@ -161,86 +173,38 @@ describe('generator secondary entry points', () => {
 });
 
 /**
- * Creates a test plugin with secondary entry points to simulate the real-world scenario
+ * Creates secondary entry points structure for the plugin created by nx generators
  */
-async function createTestPluginWithSecondaryEntryPoints(
+async function createSecondaryEntryPoints(
   workspacePath: string,
   pluginName: string,
 ) {
-  const pluginPath = join(workspacePath, 'node_modules', pluginName);
+  const pluginPath = join(workspacePath, pluginName);
   const adaptersPath = join(pluginPath, 'src', 'adapters');
 
-  // Create plugin directory structure
-  mkdirSync(pluginPath, { recursive: true });
+  // Create secondary entry point directory structure
   mkdirSync(adaptersPath, { recursive: true });
-  mkdirSync(join(pluginPath, 'generators', 'main'), { recursive: true });
   mkdirSync(join(adaptersPath, 'generators', 'adapter'), { recursive: true });
 
-  // Main package.json with exports for secondary entry point
-  writeFileSync(
-    join(pluginPath, 'package.json'),
-    JSON.stringify(
-      {
-        name: pluginName,
-        version: '1.0.0',
-        generators: './generators.json',
-        exports: {
-          './adapters': './src/adapters/index.js',
-        },
-      },
-      null,
-      2,
-    ),
-  );
+  // Update package.json to add exports for secondary entry point
+  modifyJsonFile(join(pluginPath, 'package.json'), (packageJson) => {
+    packageJson.exports = packageJson.exports || {};
+    packageJson.exports['./adapters'] = './src/adapters/index.js';
+    return packageJson;
+  });
 
-  // Main generators.json with both main and adapter generators
-  writeFileSync(
-    join(pluginPath, 'generators.json'),
-    JSON.stringify(
-      {
-        generators: {
-          main: {
-            factory: './generators/main/index.js',
-            schema: './generators/main/schema.json',
-            description: 'Main generator',
-          },
-          adapter: {
-            factory: './src/adapters/generators/adapter/index.js',
-            schema: './src/adapters/generators/adapter/schema.json',
-            description: 'Adapter generator in secondary entry point',
-          },
-        },
-      },
-      null,
-      2,
-    ),
-  );
+  // Update generators.json to include adapter generator from secondary entry point
+  modifyJsonFile(join(pluginPath, 'generators.json'), (generatorsJson) => {
+    generatorsJson.generators = generatorsJson.generators || {};
+    generatorsJson.generators.adapter = {
+      factory: './src/adapters/generators/adapter/index.js',
+      schema: './src/adapters/generators/adapter/schema.json',
+      description: 'Adapter generator in secondary entry point',
+    };
+    return generatorsJson;
+  });
 
-  // Main generator schema
-  writeFileSync(
-    join(pluginPath, 'generators', 'main', 'schema.json'),
-    JSON.stringify(
-      {
-        $schema: 'http://json-schema.org/schema',
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-            description: 'Library name',
-          },
-        },
-        required: ['name'],
-      },
-      null,
-      2,
-    ),
-  );
-
-  // Main generator implementation
-  writeFileSync(
-    join(pluginPath, 'generators', 'main', 'index.js'),
-    `module.exports = function(tree, options) { return tree; };`,
-  );
+  // The main generator files are already created by nx, we just need to create the secondary entry point files
 
   // Create adapters entry point file (for exports)
   writeFileSync(
@@ -279,12 +243,4 @@ module.exports = {};`,
     join(adaptersPath, 'generators', 'adapter', 'index.js'),
     `module.exports = function(tree, options) { return tree; };`,
   );
-
-  // Add the plugin to the workspace dependencies
-  modifyJsonFile(join(workspacePath, 'package.json'), (packageJson) => {
-    packageJson.devDependencies = packageJson.devDependencies || {};
-    packageJson.devDependencies[pluginName] =
-      'file:./node_modules/' + pluginName;
-    return packageJson;
-  });
 }
