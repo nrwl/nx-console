@@ -254,7 +254,10 @@ async function finishCloudSetup() {
         accessToken || nxCloudId,
       );
     } else {
-      url = await createNxCloudOnboardingURL(accessToken || nxCloudId);
+      url = await createNxCloudOnboardingURL(
+        'nx-console',
+        accessToken || nxCloudId,
+      );
     }
   }, 5000);
 
