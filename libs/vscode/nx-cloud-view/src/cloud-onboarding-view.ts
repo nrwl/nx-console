@@ -30,6 +30,8 @@ import {
   getNxCloudId,
   getNxCloudUrl,
 } from '@nx-console/shared-nx-cloud';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { gte } from '@nx-console/nx-version';
 
 export class CloudOnboardingViewProvider implements WebviewViewProvider {
   public static viewId = 'nxCloudOnboarding';
@@ -223,6 +225,7 @@ async function finishCloudSetup() {
   const nxCloudId = await getNxCloudId(workspacePath);
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
+  const nxVersion = await getNxVersion();
 
   if (nxCloudUrl) {
     process.env['NX_CLOUD_API'] = nxCloudUrl;
@@ -241,7 +244,11 @@ async function finishCloudSetup() {
       : undefined;
 
     // for newer versions of nx, we can simply load the logic from the local installations
-    if (nxPackage && nxPackage.createNxCloudOnboardingURL) {
+    if (
+      nxPackage &&
+      nxPackage.createNxCloudOnboardingURL &&
+      gte(nxVersion, '21.4.0')
+    ) {
       url = await nxPackage.createNxCloudOnboardingURL(
         'nx-console',
         accessToken || nxCloudId,

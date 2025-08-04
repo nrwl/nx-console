@@ -16,6 +16,9 @@
       "path": "../output-channels"
     },
     {
+      "path": "../../shared/nx-version"
+    },
+    {
       "path": "../nx-workspace"
     },
     {
