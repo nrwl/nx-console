@@ -52,12 +52,11 @@ export function debounce(callback: (...args: any[]) => any, wait: number) {
 }
 
 /**
- * Creates a throttled function that only invokes the provided function at most once per every `wait` milliseconds.
- * The throttled function comes with a `cancel` method to cancel delayed invocations.
+ * Creates a throttled function that doesn't do anything if the function is called again within the `wait` milliseconds.
  *
  * @param func The function to throttle
  * @param wait The number of milliseconds to throttle invocations to
- * @returns A throttled version of the function with a cancel method
+ * @returns A throttled version of the function
  *
  * @example
  * ```typescript
@@ -74,14 +73,11 @@ export function debounce(callback: (...args: any[]) => any, wait: number) {
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
   wait: number,
-): T & { cancel: () => void } {
+): T {
   let lastCallTime = 0;
-  let timeoutId: NodeJS.Timeout | null = null;
-  let lastArgs: Parameters<T> | null = null;
 
   const throttled = ((...args: Parameters<T>) => {
     const now = Date.now();
-    lastArgs = args;
 
     const timeSinceLastCall = now - lastCallTime;
 
@@ -90,29 +86,9 @@ export function throttle<T extends (...args: any[]) => any>(
       lastCallTime = now;
       return func(...args);
     } else {
-      // Schedule execution for later if we haven't waited long enough
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      timeoutId = setTimeout(() => {
-        lastCallTime = Date.now();
-        if (lastArgs) {
-          func(...lastArgs);
-        }
-        timeoutId = null;
-        lastArgs = null;
-      }, wait - timeSinceLastCall);
+      // do nothing
     }
-  }) as T & { cancel: () => void };
-
-  throttled.cancel = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      timeoutId = null;
-      lastArgs = null;
-    }
-  };
+  }) as T;
 
   return throttled;
 }
