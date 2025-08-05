@@ -27,6 +27,7 @@ export class TextareaElement extends EditorContext(LitElement) {
         rows="${this.rows}"
         placeholder="${this.placeholder}"
         @input="${this.handleInput}"
+        class="w-full"
       ></vscode-textarea>
     `;
   }

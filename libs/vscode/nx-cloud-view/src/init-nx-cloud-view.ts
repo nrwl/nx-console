@@ -12,6 +12,7 @@ import {
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
+import { throttle } from '@nx-console/shared-utils';
 import {
   commands,
   ExtensionContext,
@@ -70,13 +71,33 @@ export function initNxCloudView(context: ExtensionContext) {
   CloudRecentCIPEProvider.create(context, actor);
   NxCloudFixWebview.create(context, actor);
 
-  async function updateOnboarding() {
-    const onboardingInfo = await getCloudOnboardingInfo();
+  async function updateOnboarding(force = false) {
+    const onboardingInfo = await getCloudOnboardingInfo(force);
     actor.send({
       type: 'UPDATE_ONBOARDING',
       value: onboardingInfo,
     });
   }
+
+  const throttledRefresh = throttle(() => {
+    actor.system.get('polling').send({ type: 'FORCE_POLL' });
+    const loadingPromise = updateOnboarding(true).catch(() => {
+      // ignore errors to make sure the loading state is cleaned up
+      // errors will be shown in nxls logs already
+    });
+    window.withProgress(
+      { location: { viewId: 'nxCloudLoading' } },
+      async () => await loadingPromise,
+    );
+    window.withProgress(
+      { location: { viewId: 'nxCloudRecentCIPE' } },
+      async () => await loadingPromise,
+    );
+    window.withProgress(
+      { location: { viewId: 'nxCloudOnboarding' } },
+      async () => await loadingPromise,
+    );
+  }, 1000);
 
   updateOnboarding();
   context.subscriptions.push(
@@ -103,25 +124,7 @@ export function initNxCloudView(context: ExtensionContext) {
         runNxConnect('welcome-view');
       },
     ),
-    commands.registerCommand('nxCloud.refresh', () => {
-      actor.system.get('polling').send({ type: 'FORCE_POLL' });
-      const loadingPromise = updateOnboarding().catch(() => {
-        // ignore errors to make sure the loading state is cleaned up
-        // errors will be shown in nxls logs already
-      });
-      window.withProgress(
-        { location: { viewId: 'nxCloudLoading' } },
-        async () => await loadingPromise,
-      );
-      window.withProgress(
-        { location: { viewId: 'nxCloudRecentCIPE' } },
-        async () => await loadingPromise,
-      );
-      window.withProgress(
-        { location: { viewId: 'nxCloudOnboarding' } },
-        async () => await loadingPromise,
-      );
-    }),
+    commands.registerCommand('nxCloud.refresh', throttledRefresh),
     commands.registerCommand('nxCloud.login', async () => {
       const workspacePath = getWorkspacePath();
 

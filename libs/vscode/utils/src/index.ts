@@ -8,7 +8,7 @@ export {
   isInCursor,
   isInVSCode,
   isInWindsurf,
-} from '@nx-console/vscode-utils/src/lib/editor-name-helpers';
+} from './lib/editor-name-helpers';
 export * from './lib/logger';
 export * from './lib/mcp-json';
 export * from './lib/read-projects';

@@ -14,6 +14,7 @@ import {
 
 export async function getCloudOnboardingInfo(
   workspacePath: string,
+  force = false,
 ): Promise<CloudOnboardingInfo> {
   const commonCIFileContents = getCommonCIFileContents(workspacePath);
   const hasNxInCI = commonCIFileContents.some((content) =>
@@ -43,6 +44,7 @@ export async function getCloudOnboardingInfo(
     nxCloudUrl,
     accessToken,
     nxCloudId,
+    force,
   );
 
   return {
@@ -94,15 +96,49 @@ function getCommonCIFileContents(workspacePath: string): string[] {
   return fileContents;
 }
 
+// the claimed status changes rarely so we can cache the result if the args are the same and avoid pinging the api constantly
+// if force is true, we should ignore the cache
+// the cache should be valid for 5 minutes
+let lastRequestTime = 0;
+let lastRequestHash = '';
+let lastRequestResult: boolean | undefined;
+
 async function getNxCloudWorkspaceClaimed(
   pat: string | undefined,
   nxCloudUrl: string,
   accessToken: string | undefined,
   nxCloudId: string | undefined,
+  force,
 ): Promise<boolean | undefined> {
   if (!nxCloudId && !accessToken) {
     return undefined;
   }
+
+  const requestHash = JSON.stringify({
+    pat,
+    nxCloudUrl,
+    accessToken,
+    nxCloudId,
+  });
+
+  // if the claimed status ever changes to true, it will stay like this forever
+  if (requestHash === lastRequestHash && lastRequestResult === true) {
+    lspLogger.log(`Returning cached true result for claimed request`);
+    return true;
+  }
+
+  if (
+    !force &&
+    lastRequestHash === requestHash &&
+    lastRequestResult !== undefined &&
+    Date.now() - lastRequestTime < 5 * 60 * 1000
+  ) {
+    lspLogger.log(
+      `Returning cached result for claimed request: ${lastRequestResult}`,
+    );
+    return lastRequestResult;
+  }
+
   const data = JSON.stringify(
     nxCloudId ? { nxCloudId } : { nxCloudAccessToken: accessToken },
   );
@@ -116,8 +152,10 @@ async function getNxCloudWorkspaceClaimed(
     headers['Nx-Cloud-Personal-Access-Token'] = pat;
   }
 
-  lspLogger.log(`Making claimed request`);
   try {
+    lastRequestTime = Date.now();
+    lastRequestHash = requestHash;
+
     const response = await xhr({
       type: 'POST',
       url,
@@ -125,11 +163,13 @@ async function getNxCloudWorkspaceClaimed(
       data,
       timeout: 5000,
     });
-    return JSON.parse(response.responseText);
+    lastRequestResult = JSON.parse(response.responseText);
+    return lastRequestResult;
   } catch (error) {
     lspLogger.log(
-      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${error.responseText}`,
+      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${JSON.stringify(error)}`,
     );
+    lastRequestResult = undefined;
     return undefined;
   }
 }

@@ -51,6 +51,48 @@ export function debounce(callback: (...args: any[]) => any, wait: number) {
   };
 }
 
+/**
+ * Creates a throttled function that doesn't do anything if the function is called again within the `wait` milliseconds.
+ *
+ * @param func The function to throttle
+ * @param wait The number of milliseconds to throttle invocations to
+ * @returns A throttled version of the function
+ *
+ * @example
+ * ```typescript
+ * const throttledRefresh = throttle(() => {
+ *   console.log('Refreshing...');
+ * }, 1000);
+ *
+ * // This will only execute once, even if called multiple times
+ * throttledRefresh();
+ * throttledRefresh();
+ * throttledRefresh();
+ * ```
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+): T {
+  let lastCallTime = 0;
+
+  const throttled = ((...args: Parameters<T>) => {
+    const now = Date.now();
+
+    const timeSinceLastCall = now - lastCallTime;
+
+    if (timeSinceLastCall >= wait) {
+      // Execute immediately if enough time has passed
+      lastCallTime = now;
+      return func(...args);
+    } else {
+      // do nothing
+    }
+  }) as T;
+
+  return throttled;
+}
+
 export function withTimeout<T>(
   asyncFn: () => Promise<T>,
   timeoutMs: number,
