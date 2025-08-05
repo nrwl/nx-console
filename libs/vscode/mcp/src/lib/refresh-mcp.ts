@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import {
   getMcpJsonPath,
   readMcpJson,
@@ -21,9 +21,10 @@ export function refreshMcp() {
   }
 
   try {
-    const content = readMcpJson();
-    if (content) {
-      writeMcpJson(content);
+    const mcpPath = getMcpJsonPath();
+    if (mcpPath) {
+      const content = readFileSync(mcpPath, { encoding: 'utf-8' });
+      writeFileSync(mcpPath, content);
     }
   } catch (error) {
     console.error('Error refreshing mcp.json:', error);
