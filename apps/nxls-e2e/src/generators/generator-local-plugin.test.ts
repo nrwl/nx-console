@@ -36,16 +36,26 @@ describe('generator local plugin', () => {
     const workspacePath = join(e2eCwd, workspaceName);
 
     // Install @nx/plugin and create a local plugin using nx generators
-    execSync('npm install -D @nx/plugin --legacy-peer-deps', { 
-      cwd: workspacePath, 
-      stdio: 'pipe' 
+    execSync('npm install -D @nx/plugin --legacy-peer-deps', {
+      cwd: workspacePath,
+      stdio: 'pipe',
     });
 
     // Create a local plugin using nx generator (it comes with a default generator)
     execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
       cwd: workspacePath,
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
+
+    // create a new generator
+    // libs/nx-plugin/src/generator
+    execSync(
+      `npx nx g @nx/plugin:generator --path ${pluginName}/src/generator/generator.ts --no-interactive`,
+      {
+        cwd: workspacePath,
+        stdio: 'pipe',
+      },
+    );
 
     // Start the language server
     nxlsWrapper = new NxlsWrapper();
@@ -68,10 +78,10 @@ describe('generator local plugin', () => {
       expect(generators.error).toBeUndefined();
       const generatorList = generators.result as GeneratorCollectionInfo[];
 
-      // Should find the local plugin generator (default generator that comes with the plugin)
       const localGenerator = generatorList.find(
-        (g) => g.name === `${pluginName}:${pluginName}`,
+        (g) => g.name === `@${workspaceName}/${pluginName}:generator`,
       );
+
       expect(localGenerator).toBeDefined();
       expect(localGenerator?.type).toBe('generator');
     });
@@ -82,8 +92,7 @@ describe('generator local plugin', () => {
         workspaceName,
         pluginName,
         'src',
-        'generators',
-        pluginName,
+        'generator',
         'schema.json',
       );
 
@@ -92,7 +101,7 @@ describe('generator local plugin', () => {
         params: {
           options: {
             collection: pluginName,
-            name: pluginName,
+            name: 'generator',
             path: generatorPath,
           } satisfies NxGeneratorOptionsRequestOptions,
         },

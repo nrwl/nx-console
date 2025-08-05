@@ -24,12 +24,15 @@ testNxWorkspace(
     {
       [workspaceName]: [
         'build',
+        'build-deps',
+        'dev',
         'lint',
         'preview',
         'serve',
         'serve-static',
         'test',
         'typecheck',
+        'watch-deps',
       ],
     },
   ],

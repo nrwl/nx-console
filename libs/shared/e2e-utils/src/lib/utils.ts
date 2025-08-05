@@ -9,7 +9,7 @@ import {
 } from 'nx/src/devkit-exports';
 
 export const defaultVersion =
-  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '20.0.3';
+  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '21.3.0';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),

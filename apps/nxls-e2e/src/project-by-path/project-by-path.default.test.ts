@@ -1,14 +1,13 @@
-import { join } from 'path';
-import { NxlsWrapper } from '../nxls-wrapper';
+import { NxProjectByPathRequest } from '@nx-console/language-server-types';
 import {
   defaultVersion,
   e2eCwd,
   newWorkspace,
-  simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
-import { NxProjectByPathRequest } from '@nx-console/language-server-types';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import { join } from 'path';
+import { NxlsWrapper } from '../nxls-wrapper';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -36,7 +35,7 @@ describe('project by path', () => {
       workspaceName,
       'apps',
       workspaceName,
-      'project.json',
+      'package.json',
     );
 
     const projectInfo = await nxlsWrapper.sendRequest({
@@ -47,7 +46,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo.result as ProjectConfiguration).name).toEqual(
-      workspaceName,
+      `@${workspaceName}/${workspaceName}`,
     );
 
     const mainTsx = join(
@@ -67,7 +66,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo2.result as ProjectConfiguration).name).toEqual(
-      workspaceName,
+      `@${workspaceName}/${workspaceName}`,
     );
   });
 
@@ -77,7 +76,7 @@ describe('project by path', () => {
       workspaceName,
       'apps',
       `${workspaceName}-e2e`,
-      'project.json',
+      'package.json',
     );
 
     const projectInfo = await nxlsWrapper.sendRequest({
@@ -88,7 +87,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo.result as ProjectConfiguration).name).toEqual(
-      `${workspaceName}-e2e`,
+      `@${workspaceName}/${workspaceName}-e2e`,
     );
 
     const cypressConfig = join(
@@ -107,7 +106,7 @@ describe('project by path', () => {
     });
 
     expect((projectInfo2.result as ProjectConfiguration).name).toEqual(
-      `${workspaceName}-e2e`,
+      `@${workspaceName}/${workspaceName}-e2e`,
     );
   });
 

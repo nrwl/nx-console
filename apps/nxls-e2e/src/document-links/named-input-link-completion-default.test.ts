@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
@@ -29,6 +29,7 @@ describe('namedInput link completion - default', () => {
         preset: 'next',
       },
     });
+    writeFileSync(projectJsonPath, `{}`);
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
 

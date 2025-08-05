@@ -132,9 +132,10 @@ describe('package.json nx property completion - default', () => {
     ).map((item) => item.label);
 
     expect(completionItemStrings).toEqual([
-      `"!${workspaceName}"`,
-      `"${workspaceName}-e2e"`,
-      `"!${workspaceName}-e2e"`,
+      `"@${workspaceName}/${workspaceName}"`,
+      `"!@${workspaceName}/${workspaceName}"`,
+      `"@${workspaceName}/${workspaceName}-e2e"`,
+      `"!@${workspaceName}/${workspaceName}-e2e"`,
     ]);
   });
 
