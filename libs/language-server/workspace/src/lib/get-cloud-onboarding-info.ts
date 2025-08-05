@@ -96,10 +96,9 @@ function getCommonCIFileContents(workspacePath: string): string[] {
   return fileContents;
 }
 
-// the claimed status changes rarely so we can cache the result if the args are the same
-// if force is true, we should delete the cache
+// the claimed status changes rarely so we can cache the result if the args are the same and avoid pinging the api constantly
+// if force is true, we should ignore the cache
 // the cache should be valid for 5 minutes
-
 let lastRequestTime = 0;
 let lastRequestHash = '';
 let lastRequestResult: boolean | undefined;
@@ -122,13 +121,21 @@ async function getNxCloudWorkspaceClaimed(
     nxCloudId,
   });
 
+  // if the claimed status ever changes to true, it will stay like this forever
+  if (requestHash === lastRequestHash && lastRequestResult === true) {
+    lspLogger.log(`Returning cached true result for claimed request`);
+    return true;
+  }
+
   if (
     !force &&
     lastRequestHash === requestHash &&
     lastRequestResult !== undefined &&
     Date.now() - lastRequestTime < 5 * 60 * 1000
   ) {
-    lspLogger.log(`Returning cached result for claimed request`);
+    lspLogger.log(
+      `Returning cached result for claimed request: ${lastRequestResult}`,
+    );
     return lastRequestResult;
   }
 
@@ -145,7 +152,6 @@ async function getNxCloudWorkspaceClaimed(
     headers['Nx-Cloud-Personal-Access-Token'] = pat;
   }
 
-  lspLogger.log(`Making claimed request`);
   try {
     lastRequestTime = Date.now();
     lastRequestHash = requestHash;
