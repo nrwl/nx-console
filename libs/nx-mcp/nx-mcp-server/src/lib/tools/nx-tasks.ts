@@ -11,12 +11,18 @@ import {
   NX_CURRENT_RUNNING_TASK_OUTPUT,
   NX_CURRENT_RUNNING_TASKS_DETAILS,
 } from '@nx-console/shared-llm-context';
+
+let isRegistered = false;
+
 export function registerNxTaskTools(
-  workspacePath: string,
   server: McpServer,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,
-) {
+): void {
+  if (isRegistered) {
+    logger.log('Nx task tools already registered, skipping');
+    return;
+  }
   server.tool(
     NX_CURRENT_RUNNING_TASKS_DETAILS,
     `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
@@ -44,6 +50,9 @@ export function registerNxTaskTools(
     },
     nxCurrentlyRunningTaskOutput(telemetry),
   );
+
+  isRegistered = true;
+  logger.log('Registered Nx task tools');
 }
 
 const nxCurrentlyRunningTasksDetails =

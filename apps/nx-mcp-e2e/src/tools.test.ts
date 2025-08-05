@@ -1,11 +1,14 @@
 import {
+  cleanupNxWorkspace,
   createInvokeMCPInspectorCLI,
+  defaultVersion,
   e2eCwd,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
 import { rmSync } from 'node:fs';
+import { platform } from 'node:os';
 import { join } from 'node:path';
 
 describe('tools', () => {
@@ -26,7 +29,10 @@ describe('tools', () => {
     );
   });
 
-  afterAll(() => {
+  afterAll(async () => {
+    // Clean up Nx workspace processes before attempting to remove directory
+    await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
+
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
 
@@ -39,8 +45,8 @@ describe('tools', () => {
     expect(toolNames).toEqual([
       'nx_docs',
       'nx_available_plugins',
-      'nx_workspace_path',
       'nx_workspace',
+      'nx_workspace_path',
       'nx_project_details',
       'nx_generators',
       'nx_generator_schema',
