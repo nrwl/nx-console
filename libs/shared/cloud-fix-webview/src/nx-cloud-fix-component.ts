@@ -245,8 +245,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           >${code}</code
         >`;
       }
-      // Otherwise, render as regular text
-      return part;
+      // Otherwise, render as regular text with line breaks
+      const textLines = part.split('\n');
+      return textLines.map((line, i) =>
+        i === textLines.length - 1 ? line : html`${line}<br />`,
+      );
     })}`;
   }
 
