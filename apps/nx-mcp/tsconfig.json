@@ -4,10 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/npm"
-    },
-    {
-      "path": "../../libs/shared/nx-cloud"
+      "path": "../../libs/shared/watcher"
     },
     {
       "path": "../../libs/shared/telemetry"
@@ -16,7 +13,19 @@
       "path": "../../libs/shared/nx-workspace-info"
     },
     {
+      "path": "../../libs/shared/nx-cloud"
+    },
+    {
+      "path": "../../libs/shared/npm"
+    },
+    {
       "path": "../../libs/nx-mcp/nx-mcp-server"
+    },
+    {
+      "path": "../../libs/shared/utils"
+    },
+    {
+      "path": "../../libs/shared/types"
     },
     {
       "path": "./tsconfig.app.json"

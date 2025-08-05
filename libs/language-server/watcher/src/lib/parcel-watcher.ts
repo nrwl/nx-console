@@ -1,6 +1,5 @@
 import { lspLogger } from '@nx-console/language-server-utils';
 import { importNxPackagePath } from '@nx-console/shared-npm';
-import { xfs } from '@yarnpkg/fslib';
 import { platform } from 'os';
 
 export class ParcelWatcher {

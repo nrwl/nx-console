@@ -1,34 +1,34 @@
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { Logger } from '@nx-console/shared-utils';
-import {
-  getNxCloudTerminalOutput,
-  getRecentCIPEData,
-  getPipelineExecutionsSearch,
-  formatPipelineExecutionsSearchContent,
-  getPipelineExecutionDetails,
-  formatPipelineExecutionDetailsContent,
-  getRunsSearch,
-  formatRunsSearchContent,
-  getRunDetails,
-  formatRunDetailsContent,
-  getTasksDetailsSearch,
-  formatTasksDetailsSearchContent,
-  getTasksSearch,
-  formatTasksSearchContent,
-} from '@nx-console/shared-nx-cloud';
-import { z } from 'zod';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
   NX_CLOUD_CIPE_DETAILS,
   NX_CLOUD_CIPE_FAILURE,
-  NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
   NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS,
+  NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
   NX_CLOUD_RUNS_DETAILS,
   NX_CLOUD_RUNS_SEARCH,
   NX_CLOUD_TASKS_DETAILS,
   NX_CLOUD_TASKS_SEARCH,
 } from '@nx-console/shared-llm-context/src/lib/tool-names';
+import {
+  formatPipelineExecutionDetailsContent,
+  formatPipelineExecutionsSearchContent,
+  formatRunDetailsContent,
+  formatRunsSearchContent,
+  formatTasksDetailsSearchContent,
+  formatTasksSearchContent,
+  getNxCloudTerminalOutput,
+  getPipelineExecutionDetails,
+  getPipelineExecutionsSearch,
+  getRecentCIPEData,
+  getRunDetails,
+  getRunsSearch,
+  getTasksDetailsSearch,
+  getTasksSearch,
+} from '@nx-console/shared-nx-cloud';
+import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
+import { Logger } from '@nx-console/shared-utils';
+import { z } from 'zod';
 
 export function registerNxCloudTools(
   workspacePath: string,
@@ -40,7 +40,7 @@ export function registerNxCloudTools(
     baseSha?: string,
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>,
-) {
+): void {
   server.tool(
     NX_CLOUD_CIPE_DETAILS,
     'Returns a list of CIPE (CI pipeline execution) details for the current workspace and branch from Nx Cloud. This includes the status, and execution ID or link ID. If there are failed tasks, it will also include the task ID. If this returns text that contains "canceled", that means that there were no failures, and additional help and details are not needed.',
@@ -145,6 +145,8 @@ export function registerNxCloudTools(
     },
     nxCloudTaskDetails(workspacePath, logger, telemetry),
   );
+
+  logger.log('Registered Nx Cloud tools');
 }
 
 const nxCloudCipeDetails =

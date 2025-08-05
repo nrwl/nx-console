@@ -2,11 +2,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import {
-  createProjectGraphAsync,
-  readJsonFile,
-  workspaceRoot,
-} from 'nx/src/devkit-exports';
+import { readJsonFile, workspaceRoot } from 'nx/src/devkit-exports';
 
 export const defaultVersion =
   process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '21.3.0';
@@ -114,25 +110,11 @@ export function isWindows() {
 export async function createInvokeMCPInspectorCLI(
   e2eCwd: string,
   workspaceName: string,
-  mcpProjectName = 'nx-mcp',
 ) {
-  const graph = await createProjectGraphAsync();
-  const nxMcp = graph.nodes[mcpProjectName];
-  if (
-    !nxMcp ||
-    !nxMcp.data.targets?.build?.options?.outputPath ||
-    !nxMcp.data.targets.build.options.outputFileName
-  ) {
-    throw new Error('NX MCP project not found');
-  }
-  const serverPath = join(
-    workspaceRoot,
-    nxMcp.data.targets.build.options.outputPath,
-    nxMcp.data.targets.build.options.outputFileName,
-  );
+  const serverPath = join(workspaceRoot, 'dist', 'apps', 'nx-mcp', 'main.js');
 
   /**
-   * We have a HUGE range of major versionss of commander that are dependend upon by our dev dependencies. The mcp-inspector package
+   * We have a HUGE range of major versions of commander that are dependend upon by our dev dependencies. The mcp-inspector package
    * cannot run currently based on our dep tree.
    *
    * I tried multiple combinations of yarn resolution configurations to try and get this to work but the only way was to ensure that the
@@ -169,4 +151,78 @@ export async function createInvokeMCPInspectorCLI(
       }),
     );
   };
+}
+
+export async function cleanupNxWorkspace(
+  workspacePath: string,
+  version?: string,
+) {
+  console.log(`[DEBUG] Cleaning up Nx workspace: ${workspacePath}`);
+
+  try {
+    // Stop the Nx daemon to ensure all plugin workers are terminated
+    execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
+      cwd: workspacePath,
+      timeout: 10000,
+      stdio: 'pipe',
+    });
+    console.log(
+      `[DEBUG] Successfully stopped Nx daemon for workspace: ${workspacePath}`,
+    );
+  } catch (error) {
+    console.log(
+      `[DEBUG] Failed to stop Nx daemon: ${(error as Error).message}`,
+    );
+  }
+
+  if (isWindows()) {
+    // Kill any remaining Node.js processes that might have handles to the workspace
+    try {
+      const processes = execSync(
+        'wmic process where "name=\'node.exe\'" get ProcessId,CommandLine /format:csv',
+        {
+          encoding: 'utf8',
+          timeout: 10000,
+        },
+      );
+
+      const lines = processes
+        .split('\n')
+        .filter((line) => line.trim() && !line.startsWith('Node,'));
+      for (const line of lines) {
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const pid = parts[2]?.trim();
+          const commandLine = parts[1]?.trim();
+
+          if (pid && commandLine && commandLine.includes(workspacePath)) {
+            try {
+              console.log(
+                `[DEBUG] Killing Node.js process ${pid} with command: ${commandLine}`,
+              );
+              execSync(`taskkill /pid ${pid} /T /F`, {
+                timeout: 5000,
+                stdio: 'pipe',
+              });
+            } catch (killError) {
+              console.log(
+                `[DEBUG] Failed to kill process ${pid}: ${(killError as Error).message}`,
+              );
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.log(
+        `[DEBUG] Failed to cleanup processes: ${(error as Error).message}`,
+      );
+    }
+
+    // Wait a bit for processes to fully terminate
+    try {
+      execSync('timeout /t 2 /nobreak >nul 2>&1', { stdio: 'ignore' });
+    } catch {
+      // Ignore timeout command errors
+    }
+  }
 }

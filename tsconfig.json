@@ -191,6 +191,9 @@
     },
     {
       "path": "./libs/shared/cloud-fix-webview"
+    },
+    {
+      "path": "./libs/shared/watcher"
     }
   ],
   "ts-node": {

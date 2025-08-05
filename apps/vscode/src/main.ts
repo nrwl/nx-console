@@ -42,7 +42,7 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import {
   initMcp,
-  startMcpServer,
+  startMcpServerSkeleton,
   stopMcpServer,
   updateMcpServerWorkspacePath,
 } from '@nx-console/vscode-mcp';
@@ -91,7 +91,7 @@ export async function activate(c: ExtensionContext) {
     vscodeLogger.log(`Activating Nx Console (pid ${process.pid})`);
     const startTime = Date.now();
 
-    startMcpServer();
+    startMcpServerSkeleton();
 
     context = c;
 

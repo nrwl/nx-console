@@ -10,6 +10,9 @@
   "include": ["**/*.ts"],
   "references": [
     {
+      "path": "../../libs/shared/watcher/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared/utils/tsconfig.lib.json"
     },
     {

@@ -49,13 +49,13 @@ export class NxCloudFixTreeItem
   constructor(
     public runGroup: CIPERunGroup,
     public cipeId: string,
-    public taskId: string,
+    public showRunGroupId = false,
   ) {
     super('Nx Cloud verified a fix');
     this.collapsibleState = TreeItemCollapsibleState.None;
     this.iconPath = new ThemeIcon('wrench');
     this.contextValue = 'nxCloudFix';
-    this.id = `${cipeId}-${runGroup.runGroup}-${taskId}-aifix`;
+    this.id = `${cipeId}-${runGroup.runGroup}-aifix`;
 
     // Make the tree item clickable - it will open the webview
     this.command = {
@@ -206,6 +206,10 @@ export class NxCloudFixTreeItem
           }
         }
       }
+    }
+
+    if (this.showRunGroupId) {
+      this.label += ` (${this.runGroup.ciExecutionEnv ?? this.runGroup.runGroup})`;
     }
   }
 
