@@ -20,7 +20,6 @@ export function registerNxTaskTools(
   telemetry?: NxConsoleTelemetryLogger,
 ): void {
   if (isRegistered) {
-    logger.log('Nx task tools already registered, skipping');
     return;
   }
   server.tool(

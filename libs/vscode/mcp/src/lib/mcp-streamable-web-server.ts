@@ -1,78 +1,58 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import {
-  nxMcpServerCapabilities,
-  NxMcpServerWrapper,
-} from '@nx-console/nx-mcp-server';
+import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { vscodeLogger } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
+import {
+  CancellationToken,
+  McpHttpServerDefinition,
+  McpServerDefinitionProvider,
+  Uri,
+} from 'vscode';
 import { ideProvider, nxWorkspaceInfoProvider } from './data-providers';
 
-export class McpWebServer {
-  private static instance: McpWebServer;
-  public static get Instance() {
-    if (!McpWebServer.instance) {
-      McpWebServer.instance = new McpWebServer();
+export class NxMcpServerDefinitionProvider
+  implements McpServerDefinitionProvider<NxMcpHttpServerDefinition>
+{
+  constructor(private server: McpStreamableWebServer | undefined) {}
+
+  async provideMcpServerDefinitions(
+    token: CancellationToken,
+  ): Promise<NxMcpHttpServerDefinition[] | undefined> {
+    if (this.server === undefined) {
+      return undefined;
     }
-    return McpWebServer.instance;
+    return [
+      new NxMcpHttpServerDefinition('Nx Mcp Server', this.server.getUri()),
+    ];
   }
+}
 
-  private constructor() {
-    // Singleton pattern
+export class NxMcpHttpServerDefinition extends McpHttpServerDefinition {
+  constructor(
+    label: string,
+    uri: Uri,
+    headers?: Record<string, string>,
+    version?: string,
+  ) {
+    super(label, uri, headers, version);
   }
+}
 
+export class McpStreamableWebServer {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
-  private serverStartupFailed = false;
 
-  private sseKeepAliveInterval?: NodeJS.Timeout;
-  private sseTransport?: SSEServerTransport;
-  private sseServer?: NxMcpServerWrapper;
-  private fullSseSetupReady = false;
+  constructor(private mcpPort: number) {
+    this.startStreamableWebServer(mcpPort);
+  }
 
   private streamableServers = new Set<NxMcpServerWrapper>();
 
-  public startSkeletonMcpServer(port: number) {
-    this.app.get('/sse', async (req, res) => {
-      vscodeLogger.log('SSE connection established');
-
-      this.sseTransport = new SSEServerTransport('/messages', res);
-
-      if (this.fullSseSetupReady) {
-        await this.doCompleteSseServerSetup();
-      }
-
-      // Set up a keep-alive interval to prevent timeout
-      this.sseKeepAliveInterval = setInterval(() => {
-        if (!res.writableEnded && !res.writableFinished) {
-          res.write(':beat\n\n');
-        } else {
-          clearInterval(this.sseKeepAliveInterval);
-          vscodeLogger.log(
-            'SSE connection closed, clearing keep-alive interval',
-          );
-        }
-      }, 20000);
-
-      req.on('close', () => {
-        clearInterval(this.sseKeepAliveInterval);
-        vscodeLogger.log('SSE connection closed by client');
-      });
-    });
-
-    this.app.post('/messages', async (req, res) => {
-      vscodeLogger.log(`Message received`);
-      if (!this.sseTransport) {
-        res.status(400).send('No transport found');
-        return;
-      }
-      await this.sseTransport.handlePostMessage(req, res);
-    });
-
+  private startStreamableWebServer(port: number) {
     this.app.post('/mcp', async (req: Request, res: Response) => {
       vscodeLogger.log('Connecting to MCP via streamable http');
       try {
@@ -156,7 +136,6 @@ export class McpWebServer {
     try {
       this.appInstance = this.app.listen(port, () => {
         vscodeLogger.log(`MCP server started on port ${port}`);
-        this.serverStartupFailed = false;
       });
 
       this.appInstance.on('error', (error: NodeJS.ErrnoException) => {
@@ -167,51 +146,15 @@ export class McpWebServer {
         } else {
           vscodeLogger.log(`Failed to start MCP server: ${error.message}`);
         }
-        this.serverStartupFailed = true;
       });
     } catch (error) {
       // This catch might not be necessary with the error event handler, but keeping for safety
       vscodeLogger.log(`Failed to start MCP server: ${error}`);
-      this.serverStartupFailed = true;
     }
   }
 
-  public async completeMcpServerSetup() {
-    if (this.fullSseSetupReady || this.serverStartupFailed) {
-      return;
-    }
-
-    this.fullSseSetupReady = true;
-
-    if (!this.sseTransport) {
-      return;
-    }
-
-    await this.doCompleteSseServerSetup();
-  }
-
-  private async doCompleteSseServerSetup() {
-    const mcpServer = new McpServer(
-      {
-        name: 'Nx MCP',
-        version: '0.0.1',
-      },
-      {
-        capabilities: nxMcpServerCapabilities,
-      },
-    );
-    const server = await NxMcpServerWrapper.create(
-      getNxWorkspacePath(),
-      nxWorkspaceInfoProvider,
-      mcpServer,
-      ideProvider,
-      getTelemetry(),
-      vscodeLogger,
-    );
-
-    await server.getMcpServer().connect(this.sseTransport!);
-
-    this.sseServer = server;
+  public getUri(): Uri {
+    return Uri.parse(`http://localhost:${this.mcpPort}/mcp`);
   }
 
   public stopMcpServer() {
@@ -223,16 +166,11 @@ export class McpWebServer {
     if (this.appInstance) {
       this.appInstance.close();
     }
-    if (this.sseKeepAliveInterval) {
-      clearInterval(this.sseKeepAliveInterval);
-    }
-    this.serverStartupFailed = false;
   }
 
   public async updateMcpServerWorkspacePath(workspacePath: string) {
     for (const server of this.streamableServers.values()) {
       server.setNxWorkspacePath(workspacePath);
     }
-    await this.sseServer?.setNxWorkspacePath(workspacePath);
   }
 }

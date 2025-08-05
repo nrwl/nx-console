@@ -6,11 +6,17 @@ import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import {
+  checkIsNxWorkspace,
+  getPackageManagerCommand,
+} from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import {
   getGenerators,
+  getNxDaemonClient,
+  getNxVersion,
   nxWorkspace,
+  resetStatus,
 } from '@nx-console/shared-nx-workspace-info';
 import {
   GoogleAnalytics,
@@ -25,6 +31,9 @@ import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { createIdeClient } from './ide-client/create-ide-client';
 import { ArgvType, createYargsConfig } from './yargs-config';
+import { getPackageVersion } from './utils';
+import { execSync } from 'child_process';
+import { DaemonWatcher } from '@nx-console/shared-watcher';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
@@ -280,16 +289,30 @@ async function main() {
     mcpStdioConnected = true;
   }
 
-  function getPackageVersion() {
+  // ensure the daemon is running if possible
+  // if the daemon exists, we can use it to register a change listener
+  let stopWatcher: () => void | undefined;
+  if (nxWorkspacePath) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      return require('./package.json').version;
-    } catch {
-      return '0.0.0';
+      const daemonWatcher = new DaemonWatcher(
+        nxWorkspacePath,
+        await getNxVersion(nxWorkspacePath),
+        () => {
+          resetStatus(nxWorkspacePath);
+        },
+        logger,
+      );
+      await daemonWatcher.start();
+      stopWatcher = () => {
+        daemonWatcher.stop();
+      };
+    } catch (e) {
+      logger.log('Error setting up watcher: ' + e);
     }
   }
 
   const exitHandler = () => {
+    stopWatcher?.();
     process.stdin.destroy();
 
     if (process.connected) {

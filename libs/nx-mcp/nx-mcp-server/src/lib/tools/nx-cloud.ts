@@ -30,8 +30,6 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 
-let isRegistered = false;
-
 export function registerNxCloudTools(
   workspacePath: string,
   server: McpServer,
@@ -43,11 +41,6 @@ export function registerNxCloudTools(
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>,
 ): void {
-  if (isRegistered) {
-    logger.log('Nx Cloud tools already registered, skipping');
-    return;
-  }
-
   server.tool(
     NX_CLOUD_CIPE_DETAILS,
     'Returns a list of CIPE (CI pipeline execution) details for the current workspace and branch from Nx Cloud. This includes the status, and execution ID or link ID. If there are failed tasks, it will also include the task ID. If this returns text that contains "canceled", that means that there were no failures, and additional help and details are not needed.',
@@ -153,7 +146,6 @@ export function registerNxCloudTools(
     nxCloudTaskDetails(workspacePath, logger, telemetry),
   );
 
-  isRegistered = true;
   logger.log('Registered Nx Cloud tools');
 }
 

@@ -1,8 +1,8 @@
 import type { WatchEvent, Watcher } from 'nx/src/native';
-import { lspLogger } from '@nx-console/language-server-utils';
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { normalize } from 'path';
 import { match as minimatch } from 'minimatch';
+import { Logger } from '@nx-console/shared-utils';
 
 const NX_PLUGIN_PATTERNS_TO_WATCH = [
   '**/cypress.config.{js,ts,mjs,cjs}',
@@ -29,6 +29,7 @@ export class NativeWatcher {
   constructor(
     private workspacePath: string,
     private callback: () => unknown,
+    private logger: Logger,
   ) {
     this.initWatcher();
   }
@@ -42,13 +43,13 @@ export class NativeWatcher {
     const native = await importNxPackagePath<typeof import('nx/src/native')>(
       this.workspacePath,
       'src/native/index.js',
-      lspLogger,
+      this.logger,
     );
     this.watcher = new native.Watcher(this.workspacePath);
 
     this.watcher.watch((err: string | null, events: WatchEvent[]) => {
       if (err) {
-        lspLogger.log('Error watching files: ' + err);
+        this.logger.log('Error watching files: ' + err);
       } else if (
         events
           .map((e) => normalize(e.path))
@@ -73,7 +74,7 @@ export class NativeWatcher {
           this.watcher?.stop();
           return;
         }
-        lspLogger.log(
+        this.logger.log(
           `native watcher detected project changes in files ${events
             .map((e) => normalize(e.path))
             .join(', ')}`,

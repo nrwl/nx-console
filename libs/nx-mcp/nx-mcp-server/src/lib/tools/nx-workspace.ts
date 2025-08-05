@@ -25,8 +25,6 @@ import path from 'path';
 import z from 'zod';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 
-let isRegistered = false;
-
 let nxWorkspacePath: string | undefined = undefined;
 
 export function setNxWorkspacePath(path: string) {
@@ -41,10 +39,6 @@ export function registerNxWorkspaceTools(
   telemetry?: NxConsoleTelemetryLogger,
 ): void {
   nxWorkspacePath = workspacePath;
-  if (isRegistered) {
-    logger.log('Nx workspace tool already registered, skipping');
-    return;
-  }
 
   server.tool(
     NX_WORKSPACE,
@@ -303,7 +297,6 @@ export function registerNxWorkspaceTools(
     },
   );
 
-  isRegistered = true;
   logger.log('Registered Nx workspace tool');
 }
 
