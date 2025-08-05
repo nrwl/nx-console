@@ -6,22 +6,18 @@ import { getMcpLogger } from './mcp-logger';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
-import {
-  isNxCloudToolsRegistered,
-  registerNxCloudTools,
-} from './tools/nx-cloud';
+import { IdeProvider } from './ide-provider';
+import { registerNxCloudTools } from './tools/nx-cloud';
 import {
   registerNxCoreTools,
   setNxWorkspacePath as setNxWorkspacePathForCoreTools,
 } from './tools/nx-core';
-import { isNxIdeToolsRegistered, registerNxIdeTools } from './tools/nx-ide';
-import { isNxTaskToolsRegistered, registerNxTaskTools } from './tools/nx-tasks';
+import { registerNxIdeTools } from './tools/nx-ide';
+import { registerNxTaskTools } from './tools/nx-tasks';
 import {
-  isNxWorkspaceToolRegistered,
   registerNxWorkspaceTools,
   setNxWorkspacePath as setNxWorkspacePathForWorkspaceTools,
 } from './tools/nx-workspace';
-import { IdeProvider } from './ide-provider';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -210,10 +206,8 @@ export class NxMcpServerWrapper {
 
       // Check cloud tools condition
       const cloudEnabled = await this.isNxCloudEnabled();
-      const cloudToolsRegistered = isNxCloudToolsRegistered();
 
-      if (cloudEnabled && !cloudToolsRegistered && this._nxWorkspacePath) {
-        this.logger.log('Nx Cloud tools condition met, registering tools');
+      if (cloudEnabled && this._nxWorkspacePath) {
         registerNxCloudTools(
           this._nxWorkspacePath,
           this.server,
@@ -226,14 +220,7 @@ export class NxMcpServerWrapper {
       // Check workspace tools condition
       const workspaceValid = await this.isValidNxWorkspace();
 
-      if (
-        workspaceValid &&
-        !isNxWorkspaceToolRegistered() &&
-        this._nxWorkspacePath
-      ) {
-        this.logger.log(
-          'Nx workspace tools condition met, registering workspace tool',
-        );
+      if (workspaceValid && this._nxWorkspacePath) {
         registerNxWorkspaceTools(
           this._nxWorkspacePath,
           this.server,
@@ -243,22 +230,14 @@ export class NxMcpServerWrapper {
         );
       }
 
-      if (
-        workspaceValid &&
-        !isNxTaskToolsRegistered() &&
-        this._nxWorkspacePath
-      ) {
-        this.logger.log(
-          'Nx workspace tools condition met, registering task tools',
-        );
+      if (workspaceValid && this._nxWorkspacePath) {
         registerNxTaskTools(this.server, this.logger, this.telemetry);
       }
 
       // Check IDE tools condition
       const ideAvailable = this.isIdeConnectionAvailable();
-      const ideToolsRegistered = isNxIdeToolsRegistered();
 
-      if (ideAvailable && this.ideProvider && !ideToolsRegistered) {
+      if (ideAvailable && this.ideProvider) {
         this.logger.log('IDE tools condition met, registering IDE tools');
         registerNxIdeTools(
           this.server,

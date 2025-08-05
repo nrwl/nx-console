@@ -204,11 +204,3 @@ export function registerNxIdeTools(
   isRegistered = true;
   logger.log('Registered Nx IDE tools');
 }
-
-export function isNxIdeToolsRegistered(): boolean {
-  return isRegistered;
-}
-
-export function resetNxIdeToolsState(): void {
-  isRegistered = false;
-}

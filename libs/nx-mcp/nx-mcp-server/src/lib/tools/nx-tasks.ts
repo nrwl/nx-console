@@ -115,11 +115,3 @@ ${task.output}`,
       ],
     };
   };
-
-export function isNxTaskToolsRegistered(): boolean {
-  return isRegistered;
-}
-
-export function resetNxTaskToolsState(): void {
-  isRegistered = false;
-}

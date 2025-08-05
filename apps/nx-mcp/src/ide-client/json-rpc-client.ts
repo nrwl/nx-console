@@ -3,6 +3,10 @@ import {
   IDE_RPC_METHODS,
   OpenGenerateUiResponse,
   IIdeJsonRpcClient,
+  FocusProjectRequest,
+  FocusTaskRequest,
+  ShowFullProjectGraphRequest,
+  OpenGenerateUiRequest,
 } from '@nx-console/shared-types';
 import { getNxConsoleSocketPath, Logger } from '@nx-console/shared-utils';
 import { Socket } from 'net';
@@ -10,18 +14,18 @@ import { platform } from 'os';
 import * as rpc from 'vscode-jsonrpc/node';
 
 // Define typed request and notification types
-const focusProjectRequest = new rpc.NotificationType<{ projectName: string }>(
+const focusProjectRequest = new rpc.NotificationType<FocusProjectRequest>(
   IDE_RPC_METHODS.FOCUS_PROJECT,
 );
-const focusTaskRequest = new rpc.NotificationType<{
-  projectName: string;
-  taskName: string;
-}>(IDE_RPC_METHODS.FOCUS_TASK);
-const showFullProjectGraphRequest = new rpc.NotificationType<void>(
-  IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH,
+const focusTaskRequest = new rpc.NotificationType<FocusTaskRequest>(
+  IDE_RPC_METHODS.FOCUS_TASK,
 );
+const showFullProjectGraphRequest =
+  new rpc.NotificationType<ShowFullProjectGraphRequest>(
+    IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH,
+  );
 const openGenerateUiRequest = new rpc.RequestType<
-  { generatorName: string; options: Record<string, unknown>; cwd?: string },
+  OpenGenerateUiRequest,
   OpenGenerateUiResponse,
   void
 >(IDE_RPC_METHODS.OPEN_GENERATE_UI);
