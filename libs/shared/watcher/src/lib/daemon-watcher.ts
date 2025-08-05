@@ -3,8 +3,12 @@ import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { canReadNxJson } from '@nx-console/shared-npm';
+import {
+  canReadNxJson,
+  getPackageManagerCommand,
+} from '@nx-console/shared-npm';
 import { Logger } from '@nx-console/shared-utils';
+import { execSync } from 'child_process';
 
 export class DaemonWatcher {
   private stopped = false;
@@ -43,6 +47,21 @@ export class DaemonWatcher {
         this.workspacePath,
         this.logger,
       );
+
+      if (
+        daemonClientModule &&
+        daemonClientModule.daemonClient?.enabled() &&
+        !(await daemonClientModule.daemonClient?.isServerAvailable())
+      ) {
+        const pm = await getPackageManagerCommand(
+          this.workspacePath,
+          this.logger,
+        );
+        execSync(`${pm.exec} nx daemon --start`, {
+          cwd: this.workspacePath,
+          windowsHide: true,
+        });
+      }
 
       if (!daemonClientModule?.daemonClient.enabled()) {
         this.logger.log('Daemon is disabled, using native watcher');

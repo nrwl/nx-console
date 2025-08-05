@@ -3,6 +3,10 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { getMcpLogger } from './mcp-logger';
 
+import {
+  ServerCapabilities,
+  SetLevelRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
@@ -47,6 +51,13 @@ export class NxMcpServerWrapper {
   private readonly PERIODIC_MONITORING_INTERVAL = 10000; // 10 seconds
   private readonly PERIODIC_MONITORING_MAX_COUNT = 5;
   private ideConnectionCleanup?: () => void;
+  private toolRegistrationState = {
+    nxWorkspace: false,
+    nxCore: false,
+    nxCloud: false,
+    nxIde: false,
+    nxTasks: false,
+  };
 
   constructor(
     initialWorkspacePath: string | undefined,
@@ -103,6 +114,15 @@ export class NxMcpServerWrapper {
     );
     logger?.log('Registering all Nx MCP tools');
 
+    server.server.server.setRequestHandler(
+      SetLevelRequestSchema,
+      (req, res) => {
+        return {};
+      },
+    );
+
+    logger?.log(`has workspaceinfoprovier ${!!nxWorkspaceInfoProvider}`);
+
     registerNxCoreTools(
       server.server,
       server.logger,
@@ -110,6 +130,7 @@ export class NxMcpServerWrapper {
       server.telemetry,
       server._nxWorkspacePath,
     );
+    server.toolRegistrationState.nxCore = true;
 
     await server.evaluateAndAddNewTools();
 
@@ -202,12 +223,14 @@ export class NxMcpServerWrapper {
    */
   async evaluateAndAddNewTools(): Promise<void> {
     try {
-      this.logger.log('Evaluating tool conditions for dynamic registration');
-
       // Check cloud tools condition
       const cloudEnabled = await this.isNxCloudEnabled();
 
-      if (cloudEnabled && this._nxWorkspacePath) {
+      if (
+        cloudEnabled &&
+        this._nxWorkspacePath &&
+        !this.toolRegistrationState.nxCloud
+      ) {
         registerNxCloudTools(
           this._nxWorkspacePath,
           this.server,
@@ -215,12 +238,17 @@ export class NxMcpServerWrapper {
           this.telemetry,
           this.nxWorkspaceInfoProvider.getGitDiffs,
         );
+        this.toolRegistrationState.nxCloud = true;
       }
 
       // Check workspace tools condition
       const workspaceValid = await this.isValidNxWorkspace();
 
-      if (workspaceValid && this._nxWorkspacePath) {
+      if (
+        workspaceValid &&
+        this._nxWorkspacePath &&
+        !this.toolRegistrationState.nxWorkspace
+      ) {
         registerNxWorkspaceTools(
           this._nxWorkspacePath,
           this.server,
@@ -228,23 +256,34 @@ export class NxMcpServerWrapper {
           this.nxWorkspaceInfoProvider,
           this.telemetry,
         );
+        this.toolRegistrationState.nxWorkspace = true;
       }
 
-      if (workspaceValid && this._nxWorkspacePath) {
+      if (
+        workspaceValid &&
+        this._nxWorkspacePath &&
+        !this.toolRegistrationState.nxTasks
+      ) {
         registerNxTaskTools(this.server, this.logger, this.telemetry);
+        this.toolRegistrationState.nxTasks = true;
       }
 
       // Check IDE tools condition
       const ideAvailable = this.isIdeConnectionAvailable();
 
-      if (ideAvailable && this.ideProvider) {
-        this.logger.log('IDE tools condition met, registering IDE tools');
+      if (
+        ideAvailable &&
+        this.ideProvider &&
+        !this.toolRegistrationState.nxIde &&
+        this.ideProvider.isAvailable()
+      ) {
         registerNxIdeTools(
           this.server,
           this.logger,
           this.ideProvider,
           this.telemetry,
         );
+        this.toolRegistrationState.nxIde = true;
       }
     } catch (error) {
       this.logger.log('Error during tool condition evaluation:', error);
@@ -268,9 +307,6 @@ export class NxMcpServerWrapper {
 
     this.periodicMonitoringTimer = setInterval(async () => {
       this.periodicMonitoringCount++;
-      this.logger.log(
-        `Periodic monitoring check ${this.periodicMonitoringCount}/${this.PERIODIC_MONITORING_MAX_COUNT}`,
-      );
 
       await this.evaluateAndAddNewTools();
 
@@ -292,3 +328,10 @@ export class NxMcpServerWrapper {
     }
   }
 }
+
+export const nxMcpServerCapabilities: ServerCapabilities = {
+  tools: {
+    listChanged: true,
+  },
+  logging: {},
+};

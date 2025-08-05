@@ -1,7 +1,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
+import {
+  nxMcpServerCapabilities,
+  NxMcpServerWrapper,
+} from '@nx-console/nx-mcp-server';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -25,19 +28,6 @@ export class McpWebServer {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
   private serverStartupFailed = false;
-  private mcpServer = new McpServer(
-    {
-      name: 'Nx MCP',
-      version: '0.0.1',
-    },
-    {
-      capabilities: {
-        tools: {
-          listChanged: true,
-        },
-      },
-    },
-  );
 
   private sseKeepAliveInterval?: NodeJS.Timeout;
   private sseTransport?: SSEServerTransport;
@@ -86,10 +76,23 @@ export class McpWebServer {
     this.app.post('/mcp', async (req: Request, res: Response) => {
       vscodeLogger.log('Connecting to MCP via streamable http');
       try {
+        const mcpServer = new McpServer(
+          {
+            name: 'Nx MCP',
+            version: '0.0.1',
+          },
+          {
+            capabilities: {
+              tools: {
+                listChanged: true,
+              },
+            },
+          },
+        );
         const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
           nxWorkspaceInfoProvider,
-          this.mcpServer,
+          mcpServer,
           ideProvider,
           getTelemetry(),
           vscodeLogger,
@@ -188,10 +191,19 @@ export class McpWebServer {
   }
 
   private async doCompleteSseServerSetup() {
+    const mcpServer = new McpServer(
+      {
+        name: 'Nx MCP',
+        version: '0.0.1',
+      },
+      {
+        capabilities: nxMcpServerCapabilities,
+      },
+    );
     const server = await NxMcpServerWrapper.create(
       getNxWorkspacePath(),
       nxWorkspaceInfoProvider,
-      this.mcpServer,
+      mcpServer,
       ideProvider,
       getTelemetry(),
       vscodeLogger,

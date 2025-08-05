@@ -11,24 +11,12 @@ import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { IdeProvider } from '../ide-provider';
 
-let isRegistered = false;
-
 export function registerNxIdeTools(
   server: McpServer,
   logger: Logger,
   ideProvider: IdeProvider,
   telemetry?: NxConsoleTelemetryLogger,
 ): void {
-  if (isRegistered) {
-    logger.log('Nx IDE tools already registered, skipping');
-    return;
-  }
-
-  if (!ideProvider.isAvailable()) {
-    logger.log('No IDE provider available, skipping IDE tool registration');
-    return;
-  }
-
   // Register nx_visualize_graph tool
   server.tool(
     NX_VISUALIZE_GRAPH,
@@ -201,6 +189,5 @@ export function registerNxIdeTools(
     },
   );
 
-  isRegistered = true;
   logger.log('Registered Nx IDE tools');
 }

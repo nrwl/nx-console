@@ -45,19 +45,6 @@ export class NxMcpHttpServerDefinition extends McpHttpServerDefinition {
 export class McpStreamableWebServer {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
-  private mcpServer = new McpServer(
-    {
-      name: 'Nx MCP',
-      version: '0.0.1',
-    },
-    {
-      capabilities: {
-        tools: {
-          listChanged: true,
-        },
-      },
-    },
-  );
 
   constructor(private mcpPort: number) {
     this.startStreamableWebServer(mcpPort);
@@ -69,10 +56,23 @@ export class McpStreamableWebServer {
     this.app.post('/mcp', async (req: Request, res: Response) => {
       vscodeLogger.log('Connecting to MCP via streamable http');
       try {
+        const mcpServer = new McpServer(
+          {
+            name: 'Nx MCP',
+            version: '0.0.1',
+          },
+          {
+            capabilities: {
+              tools: {
+                listChanged: true,
+              },
+            },
+          },
+        );
         const server = await NxMcpServerWrapper.create(
           getNxWorkspacePath(),
           nxWorkspaceInfoProvider,
-          this.mcpServer,
+          mcpServer,
           ideProvider,
           getTelemetry(),
           vscodeLogger,

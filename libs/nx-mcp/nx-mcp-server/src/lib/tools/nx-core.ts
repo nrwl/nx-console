@@ -6,7 +6,6 @@ import {
   getPluginsInformation,
   NX_AVAILABLE_PLUGINS,
   NX_DOCS,
-  NX_WORKSPACE_PATH,
 } from '@nx-console/shared-llm-context';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { NxWorkspace } from '@nx-console/shared-types';

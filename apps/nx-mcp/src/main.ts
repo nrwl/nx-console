@@ -294,23 +294,6 @@ async function main() {
   let stopWatcher: () => void | undefined;
   if (nxWorkspacePath) {
     try {
-      const nxDaemonClientModule = await getNxDaemonClient(
-        nxWorkspacePath,
-        logger,
-      );
-
-      if (
-        nxDaemonClientModule &&
-        nxDaemonClientModule.daemonClient?.enabled() &&
-        !(await nxDaemonClientModule.daemonClient?.isServerAvailable())
-      ) {
-        const pm = await getPackageManagerCommand(nxWorkspacePath, logger);
-        execSync(`${pm.exec} nx daemon --start`, {
-          cwd: nxWorkspacePath,
-          windowsHide: true,
-        });
-      }
-
       const daemonWatcher = new DaemonWatcher(
         nxWorkspacePath,
         await getNxVersion(nxWorkspacePath),
