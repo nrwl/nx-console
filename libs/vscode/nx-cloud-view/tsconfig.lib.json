@@ -19,22 +19,22 @@
       "path": "../lsp-client/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/npm/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {
       "path": "../output-channels/tsconfig.lib.json"
     },
     {
+      "path": "../tasks/tsconfig.lib.json"
+    },
+    {
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
       "path": "../../shared/nx-cloud/tsconfig.lib.json"
-    },
-    {
-      "path": "../tasks/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/npm/tsconfig.lib.json"
     },
     {
       "path": "../telemetry/tsconfig.lib.json"
