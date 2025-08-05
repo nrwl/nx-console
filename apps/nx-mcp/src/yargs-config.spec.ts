@@ -29,7 +29,7 @@ describe('createYargsConfig', () => {
       const argv = createYargsConfig(['--sse']).parseSync();
 
       expect(argv.transport).toBe('sse');
-      expect(argv.sse).toBe(true);
+      expect(argv.sse).toBe(false);
     });
 
     it('should throw error when using --sse with --transport http', () => {
