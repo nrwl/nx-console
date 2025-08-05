@@ -1,3 +1,13 @@
+## [18.60.3](https://github.com/nrwl/nx-console/compare/vscode-v18.60.2...vscode-v18.60.3) (2025-08-05)
+
+
+### Bug Fixes
+
+* improve misc cloud onboarding things  ([#2656](https://github.com/nrwl/nx-console/issues/2656)) ([7522707](https://github.com/nrwl/nx-console/commit/75227075e512e78cf00f374f5141443fe5ca058e))
+* **nxls:** enable read-collections to pick up things from secondary entry points ([#2648](https://github.com/nrwl/nx-console/issues/2648)) ([fae9aa5](https://github.com/nrwl/nx-console/commit/fae9aa540f957d6cc5a8a912d6b96506c2b5db53))
+* render line breaks in AI fix reasoning ([#2659](https://github.com/nrwl/nx-console/issues/2659)) ([ba80ded](https://github.com/nrwl/nx-console/commit/ba80ded3e8728acf3642238bb57d78cd7bb1841e))
+* **vscode:** throttle cloud view refresh clicks ([#2654](https://github.com/nrwl/nx-console/issues/2654)) ([9c32b6b](https://github.com/nrwl/nx-console/commit/9c32b6b82207e935de944d9f572c4afb835e33dc))
+
 ## [18.60.2](https://github.com/nrwl/nx-console/compare/vscode-v18.60.1...vscode-v18.60.2) (2025-08-01)
 
 
