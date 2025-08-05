@@ -67,7 +67,6 @@ describe('generator options', () => {
       'js',
       'minimal',
       'setParserOptionsProject',
-      'simpleName',
       'skipTypeCheck',
       'strict',
       'tags',
@@ -79,6 +78,7 @@ describe('generator options', () => {
       'skipTsConfig',
       'buildable',
       'compiler',
+      'simpleName',
     ]);
   });
 

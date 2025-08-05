@@ -1,17 +1,14 @@
-import { join } from 'path';
-import { NxlsWrapper } from '../nxls-wrapper';
 import {
   e2eCwd,
   modifyJsonFile,
   newWorkspace,
-  simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
-import { readFileSync } from 'fs';
-import { URI } from 'vscode-uri';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 import { Position } from 'vscode-languageserver';
-import { fileURLToPath } from 'url';
+import { URI } from 'vscode-uri';
+import { NxlsWrapper } from '../nxls-wrapper';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -32,6 +29,18 @@ describe('document link completion - default', () => {
         preset: 'next',
       },
     });
+    writeFileSync(
+      projectJsonPath,
+      JSON.stringify(
+        {
+          targets: {
+            build: {},
+          },
+        },
+        null,
+        2,
+      ),
+    );
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
 
@@ -60,7 +69,7 @@ describe('document link completion - default', () => {
           serve: {
             executor: '@nx/next:server',
             options: {
-              buildTarget: `${workspaceName}:build`,
+              buildTarget: `@${workspaceName}/${workspaceName}:build`,
             },
           },
         },
