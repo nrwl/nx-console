@@ -1,3 +1,10 @@
+## [18.60.4](https://github.com/nrwl/nx-console/compare/vscode-v18.60.3...vscode-v18.60.4) (2025-08-05)
+
+
+### Bug Fixes
+
+* **vscode:** write file as-is when refreshing mcp ([#2660](https://github.com/nrwl/nx-console/issues/2660)) ([604c9c7](https://github.com/nrwl/nx-console/commit/604c9c7288617ab0f52f7d03e09c7061a08fc831))
+
 ## [18.60.3](https://github.com/nrwl/nx-console/compare/vscode-v18.60.2...vscode-v18.60.3) (2025-08-05)
 
 
