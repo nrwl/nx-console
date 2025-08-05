@@ -1,3 +1,16 @@
+# [18.61.0](https://github.com/nrwl/nx-console/compare/vscode-v18.60.4...vscode-v18.61.0) (2025-08-05)
+
+
+### Bug Fixes
+
+* **vscode:** move nx cloud fix to rungroup level in tree view ([#2657](https://github.com/nrwl/nx-console/issues/2657)) ([1c43dab](https://github.com/nrwl/nx-console/commit/1c43dab7789a961b525eba34df5f5a1380615e30))
+
+
+### Features
+
+* enable mcp to communicate with IDE via JSON-RPC server ([#2640](https://github.com/nrwl/nx-console/issues/2640)) ([0e9729a](https://github.com/nrwl/nx-console/commit/0e9729a3c9946e7eaae969daf3cc4f53e4c03abf))
+* **vscode:** use vscode api to register mcp server & migrate cursor to stdio mcp ([#2650](https://github.com/nrwl/nx-console/issues/2650)) ([feb448a](https://github.com/nrwl/nx-console/commit/feb448afde50c3ed167ac5fa4b21a36a4c64b574))
+
 ## [18.60.4](https://github.com/nrwl/nx-console/compare/vscode-v18.60.3...vscode-v18.60.4) (2025-08-05)
 
 
