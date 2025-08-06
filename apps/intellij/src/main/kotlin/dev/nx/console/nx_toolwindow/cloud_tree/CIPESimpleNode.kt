@@ -125,8 +125,10 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = taskName
     }
 
-    class NxCloudFixNode(val aiFix: NxAiFix, override val parent: FailedTaskNode) :
-        CIPESimpleNode(parent) {
+    class NxCloudFixNode(
+        val aiFix: NxAiFix,
+        override val parent: CIPESimpleNode,
+    ) : CIPESimpleNode(parent) {
         override val nodeId = "fix_${aiFix.aiFixId}"
 
         override fun isAutoExpandNode(): Boolean {
@@ -138,42 +140,53 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             presentation.tooltip = getFixTooltip()
         }
 
+        fun getRunGroup(): CIPERunGroup? {
+            return when (val parent = this.parent) {
+                is RunGroupNode -> parent.runGroup
+                is CIPENode -> {
+                    // Single run group case - get the first (and only) run group
+                    parent.cipeInfo.runGroups.firstOrNull()
+                }
+                else -> null
+            }
+        }
+
         override fun getName(): String {
             val userAction = aiFix.userAction ?: AITaskFixUserAction.NONE
             val fixStatus = aiFix.suggestedFixStatus ?: AITaskFixStatus.NOT_STARTED
             val verificationStatus = aiFix.verificationStatus ?: AITaskFixStatus.NOT_STARTED
             val hasSuggestedFix = aiFix.suggestedFix != null
 
-            // User action takes precedence
-            if (
-                userAction == AITaskFixUserAction.APPLIED ||
-                    userAction == AITaskFixUserAction.APPLIED_LOCALLY
-            ) {
-                return "Nx Cloud has applied the fix"
-            }
-            if (userAction == AITaskFixUserAction.REJECTED) {
-                return "Fix rejected by user"
-            }
-
-            // If a fix exists, check verification status
-            if (hasSuggestedFix) {
-                return when (verificationStatus) {
-                    AITaskFixStatus.NOT_STARTED -> "Nx Cloud AI fix ready to verify"
-                    AITaskFixStatus.IN_PROGRESS -> "Nx Cloud is verifying the AI fix"
-                    AITaskFixStatus.COMPLETED -> "Nx Cloud AI verified a fix"
-                    AITaskFixStatus.FAILED -> "Failed Nx Cloud AI fix verification"
-                    else -> "Nx Cloud AI fix ready to verify"
+            return run {
+                // User action takes precedence
+                if (
+                    userAction == AITaskFixUserAction.APPLIED ||
+                        userAction == AITaskFixUserAction.APPLIED_LOCALLY
+                ) {
+                    "Nx Cloud has applied the fix"
+                } else if (userAction == AITaskFixUserAction.REJECTED) {
+                    "Fix rejected by user"
+                } else if (hasSuggestedFix) {
+                    // If a fix exists, check verification status
+                    when (verificationStatus) {
+                        AITaskFixStatus.NOT_STARTED -> "Nx Cloud AI fix ready to verify"
+                        AITaskFixStatus.IN_PROGRESS -> "Nx Cloud is verifying the AI fix"
+                        AITaskFixStatus.COMPLETED -> "Nx Cloud verified a fix"
+                        AITaskFixStatus.FAILED -> "Failed Nx Cloud AI fix verification"
+                        else -> "Nx Cloud AI fix ready to verify"
+                    }
+                } else {
+                    // No fix exists yet, check generation status
+                    when (fixStatus) {
+                        AITaskFixStatus.NOT_STARTED -> "Nx Cloud AI is preparing to generate a fix"
+                        AITaskFixStatus.IN_PROGRESS -> "Nx Cloud AI is creating a fix"
+                        AITaskFixStatus.NOT_EXECUTABLE ->
+                            "Nx Cloud AI is not able to generate a fix"
+                        AITaskFixStatus.COMPLETED -> "Nx Cloud AI has generated a fix"
+                        AITaskFixStatus.FAILED -> "Failed Nx Cloud AI fix generation"
+                        else -> "Nx Cloud AI is preparing to generate a fix"
+                    }
                 }
-            }
-
-            // No fix exists yet, check generation status
-            return when (fixStatus) {
-                AITaskFixStatus.NOT_STARTED -> "Nx Cloud AI is preparing to generate a fix"
-                AITaskFixStatus.IN_PROGRESS -> "Nx Cloud AI is creating a fix"
-                AITaskFixStatus.NOT_EXECUTABLE -> "Nx Cloud AI is not able to generate a fix"
-                AITaskFixStatus.COMPLETED -> "Nx Cloud AI has generated a fix"
-                AITaskFixStatus.FAILED -> "Failed Nx Cloud AI fix generation"
-                else -> "Nx Cloud AI is preparing to generate a fix"
             }
         }
 
