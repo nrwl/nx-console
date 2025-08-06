@@ -46,10 +46,11 @@ class CIPETree(private val project: Project) : SimpleTree() {
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS, mapOf("source" to "cipe_tree"))
 
-        val runGroupId = fixNode.parent.parent.runGroup.runGroup
+        val runGroupId = fixNode.getRunGroup()?.runGroup
+
         val cipeId = findAncestor<CIPESimpleNode.CIPENode>(fixNode)?.cipeInfo?.ciPipelineExecutionId
 
-        if (cipeId == null) {
+        if (cipeId == null || runGroupId == null) {
             Notifier.notifyAnything(
                 project,
                 "Couldn't find CIPE for AI fix",
