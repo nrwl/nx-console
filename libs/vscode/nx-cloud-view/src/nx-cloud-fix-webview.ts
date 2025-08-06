@@ -8,6 +8,7 @@ import {
   NxCloudFixDetails,
   NxCloudFixMessage,
 } from '@nx-console/shared-types';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { outputLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -17,8 +18,9 @@ import {
   getGitHasUncommittedChanges,
   getGitRepository,
   getWorkspacePath,
-  GitExtension,
+  vscodeLogger,
 } from '@nx-console/vscode-utils';
+import { execSync } from 'child_process';
 import { unlink, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -27,7 +29,6 @@ import {
   commands,
   EventEmitter,
   ExtensionContext,
-  extensions,
   Tab,
   Uri,
   ViewColumn,
@@ -36,9 +37,9 @@ import {
   workspace,
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
+import { hideAiFixStatusBarItem } from './cipe-notifications';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
-import { hideAiFixStatusBarItem } from './cipe-notifications';
 
 export class NxCloudFixWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -411,8 +412,67 @@ export class NxCloudFixWebview {
 
           const success = await updateSuggestedFix(aiFixId, 'APPLIED');
           if (success) {
-            window.showInformationMessage('Nx Cloud fix applied successfully');
-            commands.executeCommand('nxCloud.refresh');
+            const targetBranch = data.cipe.branch;
+            let hasBranchOnRemote: boolean;
+            try {
+              execSync(`git rev-parse --verify origin/${targetBranch}`, {
+                cwd: getNxWorkspacePath(),
+              });
+              hasBranchOnRemote = true;
+            } catch {
+              hasBranchOnRemote = false;
+            }
+            if (!hasBranchOnRemote) {
+              window.showInformationMessage(
+                "Nx Cloud fix applied successfully. Don't forget to integrate the changes into your local branch",
+              );
+            } else {
+              window
+                .showInformationMessage(
+                  'Nx Cloud fix applied successfully.',
+                  'Fetch & Pull Changes',
+                )
+                .then((result) => {
+                  if (result === 'Fetch & Pull Changes') {
+                    try {
+                      const cwd = getNxWorkspacePath();
+
+                      // Always refresh remotes first
+                      execSync('git fetch origin', { cwd });
+
+                      // Get current branch name
+                      const currentBranch = execSync(
+                        'git rev-parse --abbrev-ref HEAD',
+                        {
+                          cwd,
+                          encoding: 'utf8',
+                        },
+                      ).trim();
+
+                      if (currentBranch === targetBranch) {
+                        // On target branch: fast-forward your working tree
+                        execSync(`git pull --ff-only origin ${targetBranch}`, {
+                          cwd,
+                        });
+                      } else {
+                        // On another branch: fast-forward local target branch without checking it out
+                        // This creates the branch if missing, refuses if it wouldn't be a fast-forward
+                        execSync(
+                          `git fetch origin ${targetBranch}:${targetBranch}`,
+                          { cwd },
+                        );
+                      }
+                    } catch (e) {
+                      vscodeLogger.log(
+                        `Failed to fetch and pull changes: ${e.stderr.toString() || e.message}`,
+                      );
+                      window.showErrorMessage(
+                        'Failed to fetch and pull changes. Please check the output and try again yourself.',
+                      );
+                    }
+                  }
+                });
+            }
             hideAiFixStatusBarItem();
           }
         },
