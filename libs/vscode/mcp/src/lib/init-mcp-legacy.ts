@@ -238,7 +238,7 @@ async function addStdioNxMcpToMcpJson(overwrite = false) {
 
     mcpJson.mcpServers['nx-mcp'] = {
       command: 'npx',
-      args: ['-y', 'nx-mcp@latest', '.'],
+      args: ['-y', 'nx-mcp@latest'],
     };
   } else {
     if (!mcpJson.servers) {
