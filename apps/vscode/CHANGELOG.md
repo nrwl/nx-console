@@ -1,3 +1,15 @@
+# [18.62.0](https://github.com/nrwl/nx-console/compare/vscode-v18.61.1...vscode-v18.62.0) (2025-08-06)
+
+
+### Bug Fixes
+
+* **vscode:** dont specify . workspacepath by default in stdio server ([#2670](https://github.com/nrwl/nx-console/issues/2670)) ([4f35349](https://github.com/nrwl/nx-console/commit/4f353491686c36196b68e40bbfd95b11a0784d74))
+
+
+### Features
+
+* **vscode:** add fetch & pull action to apply notification ([#2669](https://github.com/nrwl/nx-console/issues/2669)) ([5b8b74e](https://github.com/nrwl/nx-console/commit/5b8b74ec9b0b4dc9f93a7df0d7dbb4ed578ca986))
+
 ## [18.61.1](https://github.com/nrwl/nx-console/compare/vscode-v18.61.0...vscode-v18.61.1) (2025-08-06)
 
 
