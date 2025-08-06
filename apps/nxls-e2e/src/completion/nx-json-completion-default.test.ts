@@ -174,6 +174,7 @@ describe('nx.json completion - default', () => {
   xit('plugin autocomplete should contain playwright plugin after installing it', async () => {
     execSync('npm install @nx/playwright --save-dev', {
       cwd: join(e2eCwd, workspaceName),
+      stdio: 'inherit',
     });
 
     const position = getPluginAutocompletePosition(nxJsonPath);

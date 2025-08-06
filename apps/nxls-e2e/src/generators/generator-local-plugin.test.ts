@@ -40,15 +40,15 @@ describe('generator local plugin', () => {
     // Install @nx/plugin and create a local plugin using nx generators
     execSync('npm install -D @nx/plugin --force', {
       cwd: workspacePath,
-      stdio: 'inherit', // Use inherit to avoid buffer issues on Windows
-      timeout: 120000, // 2 minute timeout
+      stdio: 'inherit',
+      timeout: 120000,
     });
 
     // Create a local plugin using nx generator (it comes with a default generator)
     execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
       cwd: workspacePath,
-      stdio: 'inherit', // Use inherit to avoid buffer issues on Windows
-      timeout: 60000, // 1 minute timeout
+      stdio: 'inherit',
+      timeout: 60000,
     });
 
     // create a new generator
@@ -57,8 +57,8 @@ describe('generator local plugin', () => {
       `npx nx g @nx/plugin:generator --path ${pluginName}/src/generator/generator.ts --no-interactive`,
       {
         cwd: workspacePath,
-        stdio: 'inherit', // Use inherit to avoid buffer issues on Windows
-        timeout: 60000, // 1 minute timeout
+        stdio: 'inherit',
+        timeout: 60000,
       },
     );
 

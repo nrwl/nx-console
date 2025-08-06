@@ -142,6 +142,7 @@ export class NxlsWrapper {
     try {
       execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
         cwd: this.cwd,
+        stdio: 'inherit',
       });
     } catch (e) {
       console.error(e);

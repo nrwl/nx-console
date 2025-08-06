@@ -108,6 +108,7 @@ describe('nx cloud onboarding - default', () => {
   it('should return true for CI checks after generating workflow', async () => {
     execSync(`npx nx g @nx/workspace:ci-workflow --ci github --name gh-ci`, {
       cwd: join(e2eCwd, workspaceName),
+      stdio: 'inherit',
     });
 
     const onboardingInfoResponse = await nxlsWrapper.sendRequest({

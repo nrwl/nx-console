@@ -72,6 +72,7 @@ describe('watcher', () => {
 
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
+      stdio: 'inherit',
       windowsHide: true,
       env: process.env,
     });
@@ -147,6 +148,7 @@ describe('watcher', () => {
           'npx nx g @nx/react:app --directory react-app1 --no-interactive --verbose',
           {
             cwd: join(e2eCwd, workspaceName),
+            stdio: 'inherit',
             env: process.env,
           },
         );
