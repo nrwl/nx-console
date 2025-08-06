@@ -43,7 +43,18 @@ export async function readCollections(
   // Expand collections to include export-based secondary entry points
   const expandedCollections = await Promise.all(
     collections.map(async (c) => {
-      const secondaryEntryPoints = await getExportBasedSecondaryEntryPoints(c);
+      let secondaryEntryPoints: {
+        packagePath: string;
+        packageName: string;
+        packageJson: any;
+      }[] = [];
+      try {
+        secondaryEntryPoints = await getExportBasedSecondaryEntryPoints(c);
+      } catch (error) {
+        logger?.log(
+          `Failed to get secondary entry points for ${c.packageName}: ${error}`,
+        );
+      }
       return [c, ...secondaryEntryPoints];
     }),
   );
@@ -183,26 +194,6 @@ export async function getCollectionInfo(
 
       // Only include generators that are under the secondary entry point's path
       if (!schemaPath.includes(`/src/${secondaryEntryPoint}/`)) {
-        continue;
-      }
-    } else if (packageJson?.exports) {
-      // For main collections, exclude generators that are under any secondary entry point
-      const schemaPath = schema.schema;
-      let shouldExclude = false;
-
-      for (const [exportPath, exportTarget] of Object.entries(
-        packageJson.exports,
-      )) {
-        if (typeof exportTarget === 'string' && exportPath.startsWith('./')) {
-          const subpackageName = exportPath.slice(2);
-          if (schemaPath.includes(`/src/${subpackageName}/`)) {
-            shouldExclude = true;
-            break;
-          }
-        }
-      }
-
-      if (shouldExclude) {
         continue;
       }
     }
