@@ -35,8 +35,10 @@ describe('generator local plugin', () => {
 
     const workspacePath = join(e2eCwd, workspaceName);
 
+    console.log('creating local plugin');
+
     // Install @nx/plugin and create a local plugin using nx generators
-    execSync('npm install -D @nx/plugin --legacy-peer-deps', {
+    execSync('npm install -D @nx/plugin --force', {
       cwd: workspacePath,
       stdio: 'pipe',
     });
