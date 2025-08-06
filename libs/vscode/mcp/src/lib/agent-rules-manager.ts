@@ -85,6 +85,10 @@ export class AgentRulesManager {
       return;
     }
 
+    if (this.nxVersion === undefined || this.nxVersion === '0.0.0') {
+      return; // Avoid writing rules if Nx version is not available
+    }
+
     const wrappedContent = ruleInfo.wrapContent(
       nxConsoleRules(this.packageManager, this.nxVersion, this.usingCloud),
     );
@@ -113,8 +117,8 @@ export class AgentRulesManager {
     this.context.subscriptions.push(
       onWorkspaceRefreshed(async () => {
         if (
-          (await this.checkEnvironmentChanges()) &&
-          GlobalConfigurationStore.instance.get(GENERATE_RULES_KEY, false)
+          GlobalConfigurationStore.instance.get(GENERATE_RULES_KEY, false) &&
+          (await this.checkEnvironmentChanges())
         ) {
           await this.writeAgentRules();
         }
@@ -123,10 +127,6 @@ export class AgentRulesManager {
   }
 
   public async checkEnvironmentChanges(): Promise<boolean> {
-    if (!GlobalConfigurationStore.instance.get(GENERATE_RULES_KEY, false)) {
-      return false;
-    }
-
     const workspacePath = getNxWorkspacePath();
     const newUsingCloud = await isNxCloudUsed(workspacePath, vscodeLogger);
     const newPackageManager = await detectPackageManager(
