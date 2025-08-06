@@ -420,9 +420,34 @@ export class NxCloudFixWebview {
               .then((result) => {
                 if (result === 'Fetch & Pull Changes') {
                   try {
-                    execSync('git fetch && git pull', {
-                      cwd: getNxWorkspacePath(),
-                    });
+                    const cwd = getNxWorkspacePath();
+                    const targetBranch = data.cipe.branch;
+                    
+                    // Always refresh remotes first
+                    execSync('git fetch origin', { cwd });
+                    
+                    // Check if the target branch exists on remote
+                    try {
+                      execSync(`git rev-parse --verify origin/${targetBranch}`, { cwd });
+                    } catch {
+                      // Branch doesn't exist on remote, exit silently
+                      return;
+                    }
+                    
+                    // Get current branch name
+                    const currentBranch = execSync('git rev-parse --abbrev-ref HEAD', { 
+                      cwd, 
+                      encoding: 'utf8' 
+                    }).trim();
+                    
+                    if (currentBranch === targetBranch) {
+                      // On target branch: fast-forward your working tree
+                      execSync(`git pull --ff-only origin ${targetBranch}`, { cwd });
+                    } else {
+                      // On another branch: fast-forward local target branch without checking it out
+                      // This creates the branch if missing, refuses if it wouldn't be a fast-forward
+                      execSync(`git fetch origin ${targetBranch}:${targetBranch}`, { cwd });
+                    }
                   } catch (e) {
                     vscodeLogger.log(
                       `Failed to fetch and pull changes: ${e.stderr || e.message}`,
