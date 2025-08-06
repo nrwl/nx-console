@@ -8,6 +8,7 @@ import {
   NxCloudFixDetails,
   NxCloudFixMessage,
 } from '@nx-console/shared-types';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { outputLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -17,8 +18,9 @@ import {
   getGitHasUncommittedChanges,
   getGitRepository,
   getWorkspacePath,
-  GitExtension,
+  vscodeLogger,
 } from '@nx-console/vscode-utils';
+import { execSync } from 'child_process';
 import { unlink, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -27,7 +29,6 @@ import {
   commands,
   EventEmitter,
   ExtensionContext,
-  extensions,
   Tab,
   Uri,
   ViewColumn,
@@ -36,9 +37,9 @@ import {
   workspace,
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
+import { hideAiFixStatusBarItem } from './cipe-notifications';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
-import { hideAiFixStatusBarItem } from './cipe-notifications';
 
 export class NxCloudFixWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -411,8 +412,27 @@ export class NxCloudFixWebview {
 
           const success = await updateSuggestedFix(aiFixId, 'APPLIED');
           if (success) {
-            window.showInformationMessage('Nx Cloud fix applied successfully');
-            commands.executeCommand('nxCloud.refresh');
+            window
+              .showInformationMessage(
+                'Nx Cloud fix applied successfully.',
+                'Fetch & Pull Changes',
+              )
+              .then((result) => {
+                if (result === 'Fetch & Pull Changes') {
+                  try {
+                    execSync('git fetch && git pull', {
+                      cwd: getNxWorkspacePath(),
+                    });
+                  } catch (e) {
+                    vscodeLogger.log(
+                      `Failed to fetch and pull changes: ${e.stderr || e.message}`,
+                    );
+                    window.showErrorMessage(
+                      'Failed to fetch and pull changes. Please check the output and try again yourself.',
+                    );
+                  }
+                }
+              });
             hideAiFixStatusBarItem();
           }
         },
