@@ -1,3 +1,11 @@
+## [18.61.1](https://github.com/nrwl/nx-console/compare/vscode-v18.61.0...vscode-v18.61.1) (2025-08-06)
+
+
+### Bug Fixes
+
+* **nxls:** remove faulty secondary entry point filtering logic ([#2667](https://github.com/nrwl/nx-console/issues/2667)) ([2bf4580](https://github.com/nrwl/nx-console/commit/2bf4580737532a058186c6450ec6b3c147ae85ab))
+* **vscode:** handle no install state better for agent rules manager ([#2666](https://github.com/nrwl/nx-console/issues/2666)) ([30b3c61](https://github.com/nrwl/nx-console/commit/30b3c61b6d7b13acd788d1267572e66984000712))
+
 # [18.61.0](https://github.com/nrwl/nx-console/compare/vscode-v18.60.4...vscode-v18.61.0) (2025-08-05)
 
 
