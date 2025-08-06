@@ -5,7 +5,6 @@ import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
-import dev.nx.console.models.AITaskFixStatus
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.utils.NxConsolePluginDisposable
 import javax.swing.tree.TreeModel
@@ -43,9 +42,6 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
                 is CIPESimpleNode.RunNode -> {
                     buildChildrenForRun(element)
                 }
-                is CIPESimpleNode.FailedTaskNode -> {
-                    buildChildrenForFailedTask(element)
-                }
                 else -> emptyArray()
             }
 
@@ -71,11 +67,28 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
         // If there's only one run group, skip creating the RunGroupNode and return runs directly
         if (runGroups.size == 1) {
             val singleRunGroup = runGroups.first()
-            return singleRunGroup.runs
-                .map { run ->
+            val children = mutableListOf<CIPESimpleNode>()
+
+            // Add AI fix first if it exists for single run group (no need to show run group ID
+            // since there's only one)
+            val aiFix = singleRunGroup.aiFix
+            if (aiFix != null) {
+                children.add(
+                    CIPESimpleNode.NxCloudFixNode(
+                        aiFix = aiFix,
+                        parent = cipeNode,
+                    )
+                )
+            }
+
+            // Add runs after AI fix
+            children.addAll(
+                singleRunGroup.runs.map { run ->
                     CIPESimpleNode.RunNode(run = run, runGroup = singleRunGroup, parent = cipeNode)
                 }
-                .toTypedArray()
+            )
+
+            return children.toTypedArray()
         }
 
         // Multiple run groups - show them in the hierarchy
@@ -87,15 +100,31 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
     private fun buildChildrenForRunGroup(
         runGroupNode: CIPESimpleNode.RunGroupNode
     ): Array<CIPESimpleNode> {
-        return runGroupNode.runGroup.runs
-            .map { run ->
+        val children = mutableListOf<CIPESimpleNode>()
+
+        // Add AI fix first if it exists
+        val aiFix = runGroupNode.runGroup.aiFix
+        if (aiFix != null) {
+            children.add(
+                CIPESimpleNode.NxCloudFixNode(
+                    aiFix = aiFix,
+                    parent = runGroupNode,
+                )
+            )
+        }
+
+        // Add runs after AI fix
+        children.addAll(
+            runGroupNode.runGroup.runs.map { run ->
                 CIPESimpleNode.RunNode(
                     run = run,
                     runGroup = runGroupNode.runGroup,
                     parent = runGroupNode
                 )
             }
-            .toTypedArray()
+        )
+
+        return children.toTypedArray()
     }
 
     private fun buildChildrenForRun(runNode: CIPESimpleNode.RunNode): Array<CIPESimpleNode> {
@@ -106,44 +135,6 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
                 CIPESimpleNode.FailedTaskNode(taskName = taskName, parent = runNode)
             }
             .toTypedArray()
-    }
-
-    private fun buildChildrenForFailedTask(
-        taskNode: CIPESimpleNode.FailedTaskNode
-    ): Array<CIPESimpleNode> {
-        val runGroup = taskNode.parent.runGroup
-        val run = taskNode.parent.run
-
-        val aiFix = runGroup.aiFix
-
-        if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
-            val primaryFixTaskId = aiFix.taskIds.first()
-
-            if (taskNode.taskName != primaryFixTaskId) {
-                return emptyArray()
-            }
-
-            val firstRunWithPrimaryTask =
-                runGroup.runs.firstOrNull { run ->
-                    run.failedTasks?.contains(primaryFixTaskId) == true
-                }
-
-            if (firstRunWithPrimaryTask == null) {
-                return emptyArray()
-            }
-
-            val isFirstRunWithTask =
-                (firstRunWithPrimaryTask.linkId == run.linkId) ||
-                    (firstRunWithPrimaryTask.executionId == run.executionId)
-
-            if (!isFirstRunWithTask || aiFix.suggestedFixStatus == AITaskFixStatus.NOT_STARTED) {
-                return emptyArray()
-            }
-
-            return arrayOf(CIPESimpleNode.NxCloudFixNode(aiFix = aiFix, parent = taskNode))
-        }
-
-        return emptyArray()
     }
 
     override fun getParentElement(element: Any): Any? {
