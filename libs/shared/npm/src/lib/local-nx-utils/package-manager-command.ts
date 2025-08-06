@@ -4,6 +4,9 @@ import type {
   PackageManagerCommands,
 } from 'nx/src/utils/package-manager';
 import { importNxPackagePath } from '../workspace-dependencies';
+import { readNxJson } from '../nx-json';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 export async function detectPackageManager(
   workspacePath: string,
@@ -17,7 +20,23 @@ export async function detectPackageManager(
     return detectPackageManager(workspacePath);
   } catch (e) {
     logger?.log(`Error detecting package manager: ${JSON.stringify(e)}`);
+  }
 
+  // fallback logic
+  try {
+    const nxJson = await readNxJson(workspacePath);
+    return (
+      nxJson.cli?.packageManager ??
+      (existsSync(join(workspacePath, 'bun.lockb')) ||
+      existsSync(join(workspacePath, 'bun.lock'))
+        ? 'bun'
+        : existsSync(join(workspacePath, 'yarn.lock'))
+          ? 'yarn'
+          : existsSync(join(workspacePath, 'pnpm-lock.yaml'))
+            ? 'pnpm'
+            : 'npm')
+    );
+  } catch (e) {
     // return npm by default
     return 'npm';
   }
