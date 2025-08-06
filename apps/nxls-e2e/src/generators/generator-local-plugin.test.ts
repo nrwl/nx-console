@@ -38,80 +38,33 @@ describe('generator local plugin', () => {
     console.log('creating local plugin');
 
     // Install @nx/plugin and create a local plugin using nx generators
-    console.log(
-      `[${new Date().toISOString()}] Running: npm install -D @nx/plugin --force`,
-    );
-    try {
-      const installOutput = execSync('npm install -D @nx/plugin --force', {
-        cwd: workspacePath,
-        stdio: 'pipe',
-        encoding: 'utf-8',
-        timeout: 120000, // 2 minute timeout
-      });
-      console.log(
-        `[${new Date().toISOString()}] npm install completed, output length: ${installOutput?.length || 0}`,
-      );
-    } catch (e) {
-      console.error(`[${new Date().toISOString()}] npm install failed:`, e);
-      throw e;
-    }
+    execSync('npm install -D @nx/plugin --force', {
+      cwd: workspacePath,
+      stdio: 'inherit', // Use inherit to avoid buffer issues on Windows
+      timeout: 120000, // 2 minute timeout
+    });
 
     // Create a local plugin using nx generator (it comes with a default generator)
-    console.log(
-      `[${new Date().toISOString()}] Running: npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`,
-    );
-    try {
-      const pluginOutput = execSync(
-        `npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`,
-        {
-          cwd: workspacePath,
-          stdio: 'pipe',
-          encoding: 'utf-8',
-          timeout: 60000, // 1 minute timeout
-        },
-      );
-      console.log(
-        `[${new Date().toISOString()}] Plugin creation completed, output length: ${pluginOutput?.length || 0}`,
-      );
-    } catch (e) {
-      console.error(`[${new Date().toISOString()}] Plugin creation failed:`, e);
-      throw e;
-    }
+    execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
+      cwd: workspacePath,
+      stdio: 'inherit', // Use inherit to avoid buffer issues on Windows
+      timeout: 60000, // 1 minute timeout
+    });
 
     // create a new generator
     // libs/nx-plugin/src/generator
-    console.log(
-      `[${new Date().toISOString()}] Running: npx nx g @nx/plugin:generator --path ${pluginName}/src/generator/generator.ts --no-interactive`,
+    execSync(
+      `npx nx g @nx/plugin:generator --path ${pluginName}/src/generator/generator.ts --no-interactive`,
+      {
+        cwd: workspacePath,
+        stdio: 'inherit', // Use inherit to avoid buffer issues on Windows
+        timeout: 60000, // 1 minute timeout
+      },
     );
-    try {
-      const generatorOutput = execSync(
-        `npx nx g @nx/plugin:generator --path ${pluginName}/src/generator/generator.ts --no-interactive`,
-        {
-          cwd: workspacePath,
-          stdio: 'pipe',
-          encoding: 'utf-8',
-          timeout: 60000, // 1 minute timeout
-        },
-      );
-      console.log(
-        `[${new Date().toISOString()}] Generator creation completed, output length: ${generatorOutput?.length || 0}`,
-      );
-    } catch (e) {
-      console.error(
-        `[${new Date().toISOString()}] Generator creation failed:`,
-        e,
-      );
-      throw e;
-    }
 
     // Start the language server
-    console.log(`[${new Date().toISOString()}] Creating NxlsWrapper instance`);
     nxlsWrapper = new NxlsWrapper();
-    console.log(
-      `[${new Date().toISOString()}] Starting NXLS with workspace: ${workspacePath}`,
-    );
     await nxlsWrapper.startNxls(workspacePath);
-    console.log(`[${new Date().toISOString()}] NXLS started successfully`);
   });
 
   describe('local plugin generator', () => {
