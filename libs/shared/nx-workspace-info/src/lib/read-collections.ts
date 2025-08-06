@@ -48,13 +48,8 @@ export async function readCollections(
         packageName: string;
         packageJson: any;
       }[] = [];
-      try {
-        secondaryEntryPoints = await getExportBasedSecondaryEntryPoints(c);
-      } catch (error) {
-        logger?.log(
-          `Failed to get secondary entry points for ${c.packageName}: ${error}`,
-        );
-      }
+      secondaryEntryPoints = await getExportBasedSecondaryEntryPoints(c);
+
       return [c, ...secondaryEntryPoints];
     }),
   );
