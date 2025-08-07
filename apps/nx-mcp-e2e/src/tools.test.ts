@@ -50,8 +50,6 @@ describe('tools', () => {
       'nx_project_details',
       'nx_generators',
       'nx_generator_schema',
-      'nx_current_running_tasks_details',
-      'nx_current_running_task_output',
     ]);
   });
 });
