@@ -1,5 +1,6 @@
 import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
+import { getRunningTasksMap } from '@nx-console/shared-running-tasks';
 import {
   GetRunningTasksResponse,
   IDE_RPC_METHODS,
@@ -18,10 +19,6 @@ import {
   MessagingNotification,
   MessagingRequest,
 } from '../messaging-notification';
-import {
-  getRunningTasksMap,
-  RunningTasksMap,
-} from '@nx-console/shared-running-tasks';
 
 export const IdeFocusProject: MessagingNotification<{ projectName: string }> = {
   type: new NotificationType(IDE_RPC_METHODS.FOCUS_PROJECT),

@@ -71,13 +71,7 @@ export interface OpenGenerateUiResponse {
 }
 
 export interface GetRunningTasksResponse {
-  runningTasks: Record<
-    string,
-    UpdatedRunningTask & {
-      connectionId: string;
-      overallRunStatus: TaskStatus;
-    }
-  >;
+  runningTasks: RunningTasksMap;
 }
 
 /**
