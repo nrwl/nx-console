@@ -38,7 +38,7 @@ describe('generator local plugin', () => {
     console.log('creating local plugin');
 
     // Install @nx/plugin and create a local plugin using nx generators
-    execSync('npm install -D @nx/plugin --force', {
+    execSync('npx nx add @nx/plugin --force', {
       cwd: workspacePath,
       stdio: 'inherit',
       timeout: 200000,
