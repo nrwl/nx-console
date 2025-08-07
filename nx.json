@@ -104,7 +104,8 @@
       "exclude": [
         "libs/vscode/migrate/*",
         "libs/vscode/migrate-sidebar-webview/*",
-        "libs/shared/watcher/*"
+        "libs/shared/watcher/*",
+        "libs/shared/socket-utils/*"
       ]
     },
     {
@@ -176,7 +177,7 @@
     },
     {
       "plugin": "@nx/js/typescript",
-      "include": ["libs/shared/watcher/*"],
+      "include": ["libs/shared/watcher/*", "libs/shared/socket-utils/*"],
       "options": {
         "typecheck": {
           "targetName": "typecheck"

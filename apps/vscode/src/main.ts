@@ -11,8 +11,13 @@ import {
   workspace,
 } from 'vscode';
 
-import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import {
+  killGroup,
+  loadRootEnvFiles,
+  withTimeout,
+} from '@nx-console/shared-utils';
+import {
+  getNxWorkspacePath,
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
@@ -97,6 +102,8 @@ export async function activate(c: ExtensionContext) {
 
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
+
+    loadRootEnvFiles(getNxWorkspacePath());
 
     createNxlsClient(context);
     initTelemetry(context);
@@ -270,6 +277,7 @@ async function setWorkspace(workspacePath: string) {
   }
 
   getNxlsClient().setWorkspacePath(workspacePath);
+  loadRootEnvFiles(workspacePath);
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 

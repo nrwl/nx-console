@@ -9,6 +9,9 @@
   "references": [
     {
       "path": "../nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../running-tasks/tsconfig.lib.json"
     }
   ]
 }

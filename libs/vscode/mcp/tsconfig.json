@@ -4,16 +4,19 @@
   "include": [],
   "references": [
     {
-      "path": "../generate-ui-webview"
-    },
-    {
-      "path": "../../nx-mcp/nx-mcp-server"
-    },
-    {
       "path": "../telemetry"
     },
     {
       "path": "../output-channels"
+    },
+    {
+      "path": "../generate-ui-webview"
+    },
+    {
+      "path": "../../shared/running-tasks"
+    },
+    {
+      "path": "../../nx-mcp/nx-mcp-server"
     },
     {
       "path": "../utils"

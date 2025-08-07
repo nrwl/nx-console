@@ -85,7 +85,11 @@ import {
   resetNxVersionCache,
 } from '@nx-console/shared-nx-workspace-info';
 import { NxWorkspace } from '@nx-console/shared-types';
-import { formatError, killGroup } from '@nx-console/shared-utils';
+import {
+  formatError,
+  killGroup,
+  loadRootEnvFiles,
+} from '@nx-console/shared-utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,
@@ -100,7 +104,6 @@ import {
 } from 'vscode-languageserver/node';
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
-import { loadRootEnvFiles } from './loadRootEnvFiles';
 import { NativeWatcher } from '@nx-console/shared-watcher';
 
 process.on('unhandledRejection', (e: any) => {

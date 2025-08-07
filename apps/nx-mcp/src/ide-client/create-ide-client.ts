@@ -1,6 +1,7 @@
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
-import { Logger, testIdeConnection } from '@nx-console/shared-utils';
+import { Logger } from '@nx-console/shared-utils';
 import { IdeJsonRpcClient } from './json-rpc-client';
+import { testIdeConnection } from '@nx-console/shared-socket-utils';
 
 export async function createIdeClient(
   workspacePath: string,

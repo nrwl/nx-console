@@ -3588,6 +3588,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@nx-console/shared-socket-utils@workspace:libs/shared/socket-utils":
+  version: 0.0.0-use.local
+  resolution: "@nx-console/shared-socket-utils@workspace:libs/shared/socket-utils"
+  languageName: unknown
+  linkType: soft
+
 "@nx-console/shared-telemetry@workspace:libs/shared/telemetry":
   version: 0.0.0-use.local
   resolution: "@nx-console/shared-telemetry@workspace:libs/shared/telemetry"
