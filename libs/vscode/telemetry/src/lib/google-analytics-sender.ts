@@ -14,12 +14,14 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
     '0.0.0';
 
+  private os = process.platform;
+
   private rollbar = new Rollbar({
     accessToken: 'd7f75cfc52e745b697be89ef23dbe436',
     captureUncaught: false,
     captureUnhandledRejections: false,
     captureIp: false,
-    environment: this._version,
+    environment: `${this._version}-${this.os}`,
   });
 
   private analytics: GoogleAnalytics;
