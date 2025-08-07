@@ -119,15 +119,21 @@ export async function initMessagingServer(
   context: ExtensionContext,
   workspacePath: string,
 ) {
-  if (existingServer) {
-    existingServer.dispose();
+  try {
+    if (existingServer) {
+      existingServer.dispose();
+    }
+
+    const socketPath = getNxConsoleSocketPath(workspacePath);
+    const messagingServer = new NxMessagingServer(socketPath, context);
+    messagingServer.listen();
+
+    context.subscriptions.push(messagingServer);
+
+    existingServer = messagingServer;
+  } catch (e) {
+    vscodeLogger.log(
+      `Error initializing Nx Console JSON-RPC messaging server: ${e}`,
+    );
   }
-
-  const socketPath = getNxConsoleSocketPath(workspacePath);
-  const messagingServer = new NxMessagingServer(socketPath, context);
-  messagingServer.listen();
-
-  context.subscriptions.push(messagingServer);
-
-  existingServer = messagingServer;
 }
