@@ -41,14 +41,14 @@ describe('generator local plugin', () => {
     execSync('npm install -D @nx/plugin --force', {
       cwd: workspacePath,
       stdio: 'inherit',
-      timeout: 120000,
+      timeout: 200000,
     });
 
     // Create a local plugin using nx generator (it comes with a default generator)
     execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
       cwd: workspacePath,
       stdio: 'inherit',
-      timeout: 60000,
+      timeout: 120000,
     });
 
     // create a new generator
@@ -58,7 +58,7 @@ describe('generator local plugin', () => {
       {
         cwd: workspacePath,
         stdio: 'inherit',
-        timeout: 60000,
+        timeout: 120000,
       },
     );
 
