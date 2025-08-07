@@ -97,6 +97,18 @@
   },
   "plugins": [
     {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "build": true
+      },
+      "exclude": [
+        "libs/vscode/migrate/*",
+        "libs/vscode/migrate-sidebar-webview/*",
+        "libs/shared/watcher/*",
+        "libs/shared/socket-utils/*"
+      ]
+    },
+    {
       "plugin": "@nx/eslint/plugin",
       "options": {
         "targetName": "lint"
