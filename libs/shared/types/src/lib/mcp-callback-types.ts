@@ -1,3 +1,9 @@
+import type {
+  RunningTasksMap,
+  TaskStatus,
+  UpdatedRunningTask,
+} from '@nx-console/shared-running-tasks';
+
 export type IdeCallbackMessage =
   | FocusProjectMessage
   | FocusTaskMessage
@@ -64,6 +70,16 @@ export interface OpenGenerateUiResponse {
   logFileName: string;
 }
 
+export interface GetRunningTasksResponse {
+  runningTasks: Record<
+    string,
+    UpdatedRunningTask & {
+      connectionId: string;
+      overallRunStatus: TaskStatus;
+    }
+  >;
+}
+
 /**
  * JSON-RPC method names for IDE communication
  */
@@ -72,6 +88,7 @@ export const IDE_RPC_METHODS = {
   FOCUS_TASK: 'ide/focusTask',
   SHOW_FULL_PROJECT_GRAPH: 'ide/showFullProjectGraph',
   OPEN_GENERATE_UI: 'ide/openGenerateUi',
+  GET_RUNNING_TASKS: 'ide/getRunningTasks',
 } as const;
 
 /**
@@ -98,5 +115,6 @@ export interface IIdeJsonRpcClient {
     options: Record<string, unknown>,
     cwd?: string,
   ): Promise<string>;
+  getRunningTasks(): Promise<RunningTasksMap>;
   sendNotification(method: string, params?: unknown): Promise<void>;
 }

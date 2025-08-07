@@ -194,6 +194,9 @@
     },
     {
       "path": "./libs/shared/watcher"
+    },
+    {
+      "path": "./libs/shared/socket-utils"
     }
   ],
   "ts-node": {

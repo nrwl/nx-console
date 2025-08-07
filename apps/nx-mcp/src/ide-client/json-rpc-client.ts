@@ -1,3 +1,4 @@
+import { RunningTasksMap } from '@nx-console/shared-running-tasks';
 import {
   ConnectionStatus,
   IDE_RPC_METHODS,
@@ -7,8 +8,10 @@ import {
   FocusTaskRequest,
   ShowFullProjectGraphRequest,
   OpenGenerateUiRequest,
+  GetRunningTasksResponse,
 } from '@nx-console/shared-types';
-import { getNxConsoleSocketPath, Logger } from '@nx-console/shared-utils';
+import { Logger } from '@nx-console/shared-utils';
+import { getNxConsoleSocketPath } from '@nx-console/shared-socket-utils';
 import { Socket } from 'net';
 import { platform } from 'os';
 import * as rpc from 'vscode-jsonrpc/node';
@@ -29,6 +32,12 @@ const openGenerateUiRequest = new rpc.RequestType<
   OpenGenerateUiResponse,
   void
 >(IDE_RPC_METHODS.OPEN_GENERATE_UI);
+
+const getRunningTasksRequest = new rpc.RequestType<
+  undefined,
+  GetRunningTasksResponse,
+  void
+>(IDE_RPC_METHODS.GET_RUNNING_TASKS);
 
 /**
  * JSON-RPC client for communicating with the IDE using vscode-jsonrpc
@@ -66,7 +75,7 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     this.status = 'connecting';
 
     try {
-      const socketPath = getNxConsoleSocketPath(this.workspacePath);
+      const socketPath = await getNxConsoleSocketPath(this.workspacePath);
 
       this.socket = new Socket();
 
@@ -234,6 +243,18 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
       cwd,
     });
     return response.logFileName;
+  }
+
+  async getRunningTasks(): Promise<RunningTasksMap> {
+    if (!this.connection || this.status !== 'connected') {
+      throw new Error('Not connected to IDE');
+    }
+
+    const response = await this.connection.sendRequest(
+      getRunningTasksRequest,
+      undefined,
+    );
+    return response.runningTasks;
   }
 
   async sendNotification(method: string, params?: unknown): Promise<void> {

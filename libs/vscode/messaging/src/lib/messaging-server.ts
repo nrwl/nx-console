@@ -1,7 +1,7 @@
 import {
   getNxConsoleSocketPath,
   killSocketOnPath,
-} from '@nx-console/shared-utils';
+} from '@nx-console/shared-socket-utils';
 import net from 'net';
 import { ExtensionContext } from 'vscode';
 import { NxTerminalMessage } from './features/terminal-message';
@@ -12,6 +12,7 @@ import { createMessageConnection } from 'vscode-jsonrpc/node';
 import {
   IdeFocusProject,
   IdeFocusTask,
+  IdeGetRunningTasks,
   IdeOpenGenerateUi,
   IdeShowFullProjectGraph,
 } from './features/ide-requests';
@@ -39,6 +40,7 @@ const messages: Array<MessagingNotification | MessagingNotification2> = [
 
 const requests: Array<MessagingRequest<any, any> | MessagingRequest0<any>> = [
   IdeOpenGenerateUi,
+  IdeGetRunningTasks,
 ];
 
 export class NxMessagingServer {
@@ -124,7 +126,7 @@ export async function initMessagingServer(
       existingServer.dispose();
     }
 
-    const socketPath = getNxConsoleSocketPath(workspacePath);
+    const socketPath = await getNxConsoleSocketPath(workspacePath);
     const messagingServer = new NxMessagingServer(socketPath, context);
     messagingServer.listen();
 

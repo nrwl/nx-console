@@ -2,20 +2,20 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
-import {
-  getRunningTaskById,
-  getRunningTasks,
-} from '@nx-console/shared-running-tasks';
+
 import z from 'zod';
 import {
   NX_CURRENT_RUNNING_TASK_OUTPUT,
   NX_CURRENT_RUNNING_TASKS_DETAILS,
 } from '@nx-console/shared-llm-context';
+import { IdeProvider } from '../ide-provider';
+import { RunningTasksMap } from '@nx-console/shared-running-tasks';
 
 let isRegistered = false;
 
 export function registerNxTaskTools(
   server: McpServer,
+  ideProvider: IdeProvider,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,
 ): void {
@@ -36,7 +36,7 @@ export function registerNxTaskTools(
       readOnlyHint: true,
       openWorldHint: false,
     },
-    nxCurrentlyRunningTasksDetails(telemetry),
+    nxCurrentlyRunningTasksDetails(telemetry, ideProvider),
   );
   server.tool(
     NX_CURRENT_RUNNING_TASK_OUTPUT,
@@ -47,7 +47,7 @@ export function registerNxTaskTools(
       readOnlyHint: true,
       openWorldHint: false,
     },
-    nxCurrentlyRunningTaskOutput(telemetry),
+    nxCurrentlyRunningTaskOutput(telemetry, ideProvider),
   );
 
   isRegistered = true;
@@ -55,20 +55,27 @@ export function registerNxTaskTools(
 }
 
 const nxCurrentlyRunningTasksDetails =
-  (telemetry: NxConsoleTelemetryLogger | undefined) =>
+  (telemetry: NxConsoleTelemetryLogger | undefined, ideProvider: IdeProvider) =>
   async (): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
       tool: NX_CURRENT_RUNNING_TASKS_DETAILS,
     });
 
-    const runningTasks = getRunningTasks();
+    const runningTasks = Object.values(await ideProvider.getRunningTasks());
 
     const content: CallToolResult['content'] = [];
-    for (const task of runningTasks) {
+    if (runningTasks.length === 0) {
       content.push({
         type: 'text',
-        text: `TaskId: ${task.name} (status: ${task.status}) ${task.continuous ? '(continuous)' : ''}`,
+        text: 'No running tasks',
       });
+    } else {
+      for (const task of runningTasks) {
+        content.push({
+          type: 'text',
+          text: `TaskId: ${task.name} (status: ${task.status}) ${task.continuous ? '(continuous)' : ''}`,
+        });
+      }
     }
 
     return {
@@ -84,7 +91,7 @@ type NxCurrentlyRunningTaskOutputType = z.infer<
   typeof NxCurrentlyRunningTaskOutputSchema
 >;
 const nxCurrentlyRunningTaskOutput =
-  (telemetry: NxConsoleTelemetryLogger | undefined) =>
+  (telemetry: NxConsoleTelemetryLogger | undefined, ideProvider: IdeProvider) =>
   async ({
     taskId,
   }: NxCurrentlyRunningTaskOutputType): Promise<CallToolResult> => {
@@ -92,7 +99,13 @@ const nxCurrentlyRunningTaskOutput =
       tool: NX_CURRENT_RUNNING_TASK_OUTPUT,
     });
 
-    const task = getRunningTaskById(taskId);
+    const runningTasks = await ideProvider.getRunningTasks();
+
+    let task: RunningTasksMap[string] | undefined = runningTasks[taskId];
+    if (!task) {
+      task = Object.values(runningTasks).find((t) => t.name.includes(taskId));
+    }
+
     if (!task) {
       return {
         content: [

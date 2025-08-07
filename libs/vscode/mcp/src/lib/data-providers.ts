@@ -5,6 +5,7 @@ import {
 import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
+import { getRunningTasksMap } from '@nx-console/shared-running-tasks';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   onGeneratorUiDispose,
@@ -158,5 +159,8 @@ export const ideProvider: IdeProvider = {
     }
 
     return finalFileName;
+  },
+  getRunningTasks: async () => {
+    return getRunningTasksMap();
   },
 };

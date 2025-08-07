@@ -22,6 +22,12 @@
       "path": "../../libs/nx-mcp/nx-mcp-server"
     },
     {
+      "path": "../../libs/shared/running-tasks"
+    },
+    {
+      "path": "../../libs/shared/socket-utils"
+    },
+    {
       "path": "../../libs/shared/utils"
     },
     {

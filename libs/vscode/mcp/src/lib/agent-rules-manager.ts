@@ -65,11 +65,8 @@ export class AgentRulesManager {
 
   public async initialize(): Promise<void> {
     const workspacePath = getNxWorkspacePath();
-    this.usingCloud = await isNxCloudUsed(workspacePath, vscodeLogger);
-    this.packageManager = await detectPackageManager(
-      workspacePath,
-      vscodeLogger,
-    );
+    this.usingCloud = await isNxCloudUsed(workspacePath);
+    this.packageManager = await detectPackageManager(workspacePath);
     this.nxVersion = (await getNxVersion())?.full;
 
     if (GlobalConfigurationStore.instance.get(GENERATE_RULES_KEY, false)) {

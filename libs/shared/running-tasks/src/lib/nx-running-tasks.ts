@@ -1,10 +1,10 @@
 import { TaskStatus, UpdatedRunningTask } from './running-tasks-types';
 
-const runningTasksByTaskId = new Map<
+export type RunningTasksMap = Record<
   string,
   UpdatedRunningTask & { connectionId: string; overallRunStatus: TaskStatus }
->();
-
+>;
+const runningTasksByTaskId: RunningTasksMap = {};
 export function startRunningTasks(_connectionId: string, _processId: number) {
   // empty for now
 }
@@ -14,7 +14,7 @@ export function setUpdatingRunningTasks(
   updatedTasks: Array<UpdatedRunningTask>,
 ) {
   for (const task of updatedTasks) {
-    const currentlyRunningTask = runningTasksByTaskId.get(task.name);
+    const currentlyRunningTask = runningTasksByTaskId[task.name];
     if (currentlyRunningTask) {
       currentlyRunningTask.status = task.status;
       currentlyRunningTask.output = task.output;
@@ -24,13 +24,13 @@ export function setUpdatingRunningTasks(
         connectionId,
         overallRunStatus: TaskStatus.InProgress,
       };
-      runningTasksByTaskId.set(task.name, newRunningTask);
+      runningTasksByTaskId[task.name] = newRunningTask;
     }
   }
 }
 
 export function endRunningTasks(connectionId: string) {
-  for (const task of runningTasksByTaskId.values()) {
+  for (const task of Object.values(runningTasksByTaskId)) {
     if (task.connectionId === connectionId) {
       task.overallRunStatus = TaskStatus.Stopped;
       // If the task is still in progress, mark it as stopped
@@ -42,17 +42,6 @@ export function endRunningTasks(connectionId: string) {
   }
 }
 
-export function getRunningTasks() {
-  return runningTasksByTaskId.values();
-}
-
-export function getRunningTaskById(taskId: string) {
-  let task = runningTasksByTaskId.get(taskId);
-  if (!task) {
-    task = Array.from(runningTasksByTaskId.values()).find((t) =>
-      t.name.includes(taskId),
-    );
-  }
-
-  return task;
+export function getRunningTasksMap(): RunningTasksMap {
+  return runningTasksByTaskId;
 }

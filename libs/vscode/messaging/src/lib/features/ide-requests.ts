@@ -1,6 +1,7 @@
 import { createGeneratorLogFileName } from '@nx-console/shared-llm-context';
 import { findMatchingProject } from '@nx-console/shared-npm';
 import {
+  GetRunningTasksResponse,
   IDE_RPC_METHODS,
   OpenGenerateUiResponse,
 } from '@nx-console/shared-types';
@@ -17,6 +18,10 @@ import {
   MessagingNotification,
   MessagingRequest,
 } from '../messaging-notification';
+import {
+  getRunningTasksMap,
+  RunningTasksMap,
+} from '@nx-console/shared-running-tasks';
 
 export const IdeFocusProject: MessagingNotification<{ projectName: string }> = {
   type: new NotificationType(IDE_RPC_METHODS.FOCUS_PROJECT),
@@ -99,7 +104,7 @@ export const IdeOpenGenerateUi: MessagingRequest<
       'IDE Open Generate UI:',
       connectionId,
       params.generatorName,
-      params.options,
+      JSON.stringify(params.options),
       params.cwd,
     );
 
@@ -135,6 +140,22 @@ export const IdeOpenGenerateUi: MessagingRequest<
 
     return {
       logFileName: finalFileName,
+    };
+  },
+};
+
+export const IdeGetRunningTasks: MessagingRequest<
+  undefined,
+  GetRunningTasksResponse
+> = {
+  type: new RequestType(IDE_RPC_METHODS.GET_RUNNING_TASKS),
+  handler: (connectionId) => async () => {
+    vscodeLogger.log(
+      'Received Get Running Tasks Request from MCP:',
+      connectionId,
+    );
+    return {
+      runningTasks: getRunningTasksMap(),
     };
   },
 };

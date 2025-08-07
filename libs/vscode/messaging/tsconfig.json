@@ -4,7 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/utils"
+      "path": "../../shared/socket-utils"
     },
     {
       "path": "../../shared/running-tasks"
