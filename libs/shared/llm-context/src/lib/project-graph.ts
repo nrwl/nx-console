@@ -125,12 +125,7 @@ function getRobotReadableProjectGraph(
     serializedGraph += nodeString;
   });
 
-  return (
-    serializedGraph +
-    '\n' +
-    serializedGraph.length +
-    JSON.stringify(optimizations)
-  );
+  return serializedGraph;
 }
 
 export function getProjectGraphErrorsPrompt(
