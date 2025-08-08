@@ -1,5 +1,6 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse, relative, resolve } from 'path';
+import { exec } from 'child_process';
 import {
   Disposable,
   ExtensionContext,
@@ -110,6 +111,18 @@ export async function activate(c: ExtensionContext) {
     initMcp(context);
 
     initNxInit(context);
+
+    // Run `npx nx@latest --version` once on activation
+    try {
+      const workspacePathForNxVersion =
+        workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
+      exec('npx nx@latest --version', {
+        cwd: workspacePathForNxVersion,
+        env: { ...process.env },
+      });
+    } catch {
+      // ignore errors
+    }
 
     context.subscriptions.push(
       showRefreshLoadingAtLocation(ProgressLocation.Window),
