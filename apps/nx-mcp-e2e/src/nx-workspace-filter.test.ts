@@ -148,7 +148,6 @@ describe('nx_workspace filter', () => {
       '--tool-arg filter="non-existent-project"',
     );
 
-    console.log(JSON.stringify(result, null, 2));
     // Should still have nx.json content but no project graph
     expect(result.content[0]?.text).toContain('nx.json');
     expect(result.content.length).toBe(1);
