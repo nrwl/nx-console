@@ -27,7 +27,9 @@ describe('getTokenLimitedToolResult', () => {
   const mockWorkspace: NxWorkspace = {
     nxJson: {},
     projectGraph: {
-      nodes: {},
+      nodes: {
+        app1: {},
+      },
       dependencies: {},
     },
     errors: undefined,

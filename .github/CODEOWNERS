@@ -68,6 +68,8 @@
 
 /libs/vscode/project-graph/ @MaxKless
 
+/libs/shared/socket-utils/ @MaxKless
+
 /libs/vscode/nx-workspace/ @MaxKless
 
 /apps/generate-ui-v2-e2e/ @MaxKless

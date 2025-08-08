@@ -3,17 +3,14 @@ import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
+  IdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
-import {
-  checkIsNxWorkspace,
-  getPackageManagerCommand,
-} from '@nx-console/shared-npm';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import {
   getGenerators,
-  getNxDaemonClient,
   getNxVersion,
   nxWorkspace,
   resetStatus,
@@ -23,17 +20,20 @@ import {
   NxConsoleTelemetryLogger,
 } from '@nx-console/shared-telemetry';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
-import { consoleLogger, killGroup } from '@nx-console/shared-utils';
+import {
+  consoleLogger,
+  killGroup,
+  loadRootEnvFiles,
+} from '@nx-console/shared-utils';
+import { DaemonWatcher } from '@nx-console/shared-watcher';
 import { randomUUID } from 'crypto';
 import express from 'express';
 import { resolve } from 'path';
 import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { createIdeClient } from './ide-client/create-ide-client';
-import { ArgvType, createYargsConfig } from './yargs-config';
 import { getPackageVersion } from './utils';
-import { execSync } from 'child_process';
-import { DaemonWatcher } from '@nx-console/shared-watcher';
+import { ArgvType, createYargsConfig } from './yargs-config';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
@@ -80,6 +80,10 @@ async function main() {
   // Check if the provided path is an Nx workspace
   const isNxWorkspace = await checkIsNxWorkspace(providedPath);
   const nxWorkspacePath = isNxWorkspace ? providedPath : undefined;
+
+  if (nxWorkspacePath) {
+    loadRootEnvFiles(nxWorkspacePath);
+  }
 
   let googleAnalytics: GoogleAnalytics | undefined;
 
@@ -134,7 +138,7 @@ async function main() {
   }
 
   // Create IDE provider based on connection status
-  const ideProvider = ideClient
+  const ideProvider: IdeProvider = ideClient
     ? {
         isAvailable: () => ideAvailable,
         focusProject: async (projectName: string) => {
@@ -156,6 +160,10 @@ async function main() {
         ) => {
           if (!ideClient) throw new Error('No IDE client available');
           return await ideClient.openGenerateUi(generatorName, options, cwd);
+        },
+        getRunningTasks: async () => {
+          if (!ideClient) throw new Error('No IDE client available');
+          return await ideClient.getRunningTasks();
         },
         onConnectionChange: (callback: (available: boolean) => void) => {
           // Set up disconnection handler if the client supports it

@@ -1,7 +1,7 @@
 import {
   getNxConsoleSocketPath,
   killSocketOnPath,
-} from '@nx-console/shared-utils';
+} from '@nx-console/shared-socket-utils';
 import net from 'net';
 import { ExtensionContext } from 'vscode';
 import { NxTerminalMessage } from './features/terminal-message';
@@ -12,6 +12,7 @@ import { createMessageConnection } from 'vscode-jsonrpc/node';
 import {
   IdeFocusProject,
   IdeFocusTask,
+  IdeGetRunningTasks,
   IdeOpenGenerateUi,
   IdeShowFullProjectGraph,
 } from './features/ide-requests';
@@ -39,6 +40,7 @@ const messages: Array<MessagingNotification | MessagingNotification2> = [
 
 const requests: Array<MessagingRequest<any, any> | MessagingRequest0<any>> = [
   IdeOpenGenerateUi,
+  IdeGetRunningTasks,
 ];
 
 export class NxMessagingServer {
@@ -119,15 +121,21 @@ export async function initMessagingServer(
   context: ExtensionContext,
   workspacePath: string,
 ) {
-  if (existingServer) {
-    existingServer.dispose();
+  try {
+    if (existingServer) {
+      existingServer.dispose();
+    }
+
+    const socketPath = await getNxConsoleSocketPath(workspacePath);
+    const messagingServer = new NxMessagingServer(socketPath, context);
+    messagingServer.listen();
+
+    context.subscriptions.push(messagingServer);
+
+    existingServer = messagingServer;
+  } catch (e) {
+    vscodeLogger.log(
+      `Error initializing Nx Console JSON-RPC messaging server: ${e}`,
+    );
   }
-
-  const socketPath = getNxConsoleSocketPath(workspacePath);
-  const messagingServer = new NxMessagingServer(socketPath, context);
-  messagingServer.listen();
-
-  context.subscriptions.push(messagingServer);
-
-  existingServer = messagingServer;
 }

@@ -9,16 +9,19 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../generate-ui-webview/tsconfig.lib.json"
-    },
-    {
-      "path": "../../nx-mcp/nx-mcp-server/tsconfig.lib.json"
-    },
-    {
       "path": "../telemetry/tsconfig.lib.json"
     },
     {
       "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../generate-ui-webview/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/running-tasks/tsconfig.lib.json"
+    },
+    {
+      "path": "../../nx-mcp/nx-mcp-server/tsconfig.lib.json"
     },
     {
       "path": "../utils/tsconfig.lib.json"

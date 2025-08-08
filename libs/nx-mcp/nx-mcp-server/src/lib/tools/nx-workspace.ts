@@ -16,6 +16,7 @@ import {
 import {
   checkIsNxWorkspace,
   findMatchingProject,
+  findMatchingProjects,
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { NxWorkspace } from '@nx-console/shared-types';
@@ -44,11 +45,19 @@ export function registerNxWorkspaceTools(
     NX_WORKSPACE,
     'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
     {
+      filter: z
+        .string()
+        .optional()
+        .describe(
+          'Optional filter to select specific projects. Supports patterns like: project names (app1,app2), glob patterns (*-app), tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). Multiple patterns can be combined with commas.',
+        ),
+    },
+    {
       destructiveHint: false,
       readOnlyHint: true,
       openWorldHint: false,
     },
-    async () => {
+    async ({ filter }) => {
       telemetry?.logUsage('ai.tool-call', {
         tool: NX_WORKSPACE,
       });
@@ -81,7 +90,39 @@ export function registerNxWorkspaceTools(
             content: [{ type: 'text', text: 'Error: Workspace not found' }],
           };
         }
-        const results = getTokenLimitedToolResult(workspace);
+        let filteredWorkspace = workspace;
+
+        // Apply filter if provided
+        if (filter && workspace.projectGraph) {
+          const filterPatterns = filter.split(',').map((p) => p.trim());
+          const matchingProjectNames = await findMatchingProjects(
+            filterPatterns,
+            workspace.projectGraph.nodes,
+            workspacePath,
+          );
+
+          // Create a filtered project graph
+          const filteredNodes: typeof workspace.projectGraph.nodes = {};
+          const filteredDeps: typeof workspace.projectGraph.dependencies = {};
+
+          for (const projectName of matchingProjectNames) {
+            filteredNodes[projectName] =
+              workspace.projectGraph.nodes[projectName];
+            filteredDeps[projectName] =
+              workspace.projectGraph.dependencies[projectName] || [];
+          }
+
+          filteredWorkspace = {
+            ...workspace,
+            projectGraph: {
+              ...workspace.projectGraph,
+              nodes: filteredNodes,
+              dependencies: filteredDeps,
+            },
+          };
+        }
+
+        const results = getTokenLimitedToolResult(filteredWorkspace);
         const content: CallToolResult['content'] = results
           .filter((result) => !!result)
           .map((result) => ({
@@ -305,7 +346,10 @@ export function getTokenLimitedToolResult(
   maxTokens = 25000,
 ): string[] {
   const nxJsonResult = getNxJsonPrompt(workspace.nxJson);
-  let projectGraphResult = getProjectGraphPrompt(workspace.projectGraph);
+  let projectGraphResult =
+    Object.keys(workspace.projectGraph.nodes).length > 0
+      ? getProjectGraphPrompt(workspace.projectGraph)
+      : '';
   const errorsResult = workspace.errors
     ? getProjectGraphErrorsPrompt(workspace.errors, !!workspace.isPartial)
     : '';

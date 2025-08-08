@@ -257,6 +257,12 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     taskId: string,
     terminalOutput: string,
   ): TemplateResult {
+    let displayTaskId = '';
+    if (taskId.startsWith('nx-cloud record')) {
+      displayTaskId = taskId;
+    } else {
+      displayTaskId = `nx run ${taskId}`;
+    }
     return html`
       <div
         class="bg-background border-border ${this.isTerminalExpanded
@@ -275,7 +281,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           ></icon-element>
           <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
             Original failing task output:
-            <span class="font-mono">nx run ${taskId}</span>
+            <span class="font-mono">${displayTaskId}</span>
           </h2>
         </div>
         ${this.isTerminalExpanded

@@ -1,5 +1,6 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse, relative, resolve } from 'path';
+import { exec } from 'child_process';
 import {
   Disposable,
   ExtensionContext,
@@ -11,8 +12,13 @@ import {
   workspace,
 } from 'vscode';
 
-import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import {
+  killGroup,
+  loadRootEnvFiles,
+  withTimeout,
+} from '@nx-console/shared-utils';
+import {
+  getNxWorkspacePath,
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
@@ -98,11 +104,25 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
+    loadRootEnvFiles(getNxWorkspacePath());
+
     createNxlsClient(context);
     initTelemetry(context);
     initMcp(context);
 
     initNxInit(context);
+
+    // Run `npx nx@latest --version` once on activation
+    try {
+      const workspacePathForNxVersion =
+        workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
+      exec('npx nx@latest --version', {
+        cwd: workspacePathForNxVersion,
+        env: { ...process.env },
+      });
+    } catch {
+      // ignore errors
+    }
 
     context.subscriptions.push(
       showRefreshLoadingAtLocation(ProgressLocation.Window),
@@ -270,6 +290,7 @@ async function setWorkspace(workspacePath: string) {
   }
 
   getNxlsClient().setWorkspacePath(workspacePath);
+  loadRootEnvFiles(workspacePath);
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 

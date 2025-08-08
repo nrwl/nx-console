@@ -259,17 +259,24 @@ export class NxMcpServerWrapper {
         this.toolRegistrationState.nxWorkspace = true;
       }
 
+      // Check IDE tools condition
+      const ideAvailable = this.isIdeConnectionAvailable();
+
       if (
         workspaceValid &&
+        ideAvailable &&
+        this.ideProvider?.isAvailable() &&
         this._nxWorkspacePath &&
         !this.toolRegistrationState.nxTasks
       ) {
-        registerNxTaskTools(this.server, this.logger, this.telemetry);
+        registerNxTaskTools(
+          this.server,
+          this.ideProvider,
+          this.logger,
+          this.telemetry,
+        );
         this.toolRegistrationState.nxTasks = true;
       }
-
-      // Check IDE tools condition
-      const ideAvailable = this.isIdeConnectionAvailable();
 
       if (
         ideAvailable &&

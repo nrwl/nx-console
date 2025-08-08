@@ -1,3 +1,5 @@
+import { RunningTasksMap } from '@nx-console/shared-running-tasks';
+
 /**
  * Interface for IDE integration that supports both direct VSCode callbacks
  * and JSON-RPC communication with standalone IDE processes
@@ -19,6 +21,8 @@ export interface IdeProvider {
     options: Record<string, unknown>,
     cwd?: string,
   ): Promise<string>;
+
+  getRunningTasks(): Promise<RunningTasksMap>;
 
   /**
    * Set up connection status change listener

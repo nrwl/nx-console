@@ -1,31 +1,32 @@
-import { createHash } from 'crypto';
+import { importNxPackagePath } from '@nx-console/shared-npm';
+import { consoleLogger } from '@nx-console/shared-utils';
 import { mkdirSync, unlinkSync } from 'fs';
 import { Socket } from 'net';
 import { platform, tmpdir } from 'os';
 import { join, resolve } from 'path';
-import { consoleLogger } from './logger';
 
 const DAEMON_DIR_FOR_CURRENT_WORKSPACE = join('.nx', 'workspace-data', 'd');
 
-function createSimpleHash(input: string): string {
-  return createHash('sha256').update(input).digest('hex').substring(0, 16);
-}
-
-function socketDirName(workspaceRoot: string): string {
-  const unique = createSimpleHash(workspaceRoot.toLowerCase() + 'nx-console');
+async function socketDirName(workspaceRoot: string): Promise<string> {
+  const { hashArray } = await importNxPackagePath<
+    typeof import('nx/src/native')
+  >(workspaceRoot, 'src/native');
+  const unique = hashArray([workspaceRoot.toLowerCase(), 'nx-console']);
   return join(tmpdir(), unique);
 }
 
-function getSocketDir(workspaceRoot: string): string {
+async function getSocketDir(workspaceRoot: string) {
   try {
     const dir =
       process.env.NX_SOCKET_DIR ??
       process.env.NX_DAEMON_SOCKET_DIR ??
-      socketDirName(workspaceRoot);
-    mkdirSync(dir, { recursive: true });
-
+      (await socketDirName(workspaceRoot));
+    if (platform() !== 'win32') {
+      mkdirSync(dir, { recursive: true });
+    }
     return dir;
   } catch (e) {
+    consoleLogger.log('Error getting socket dir:', e);
     return join(workspaceRoot, DAEMON_DIR_FOR_CURRENT_WORKSPACE);
   }
 }
@@ -33,8 +34,10 @@ function getSocketDir(workspaceRoot: string): string {
 /**
  * Get the full OS-specific socket path for Nx Console communication
  */
-export const getNxConsoleSocketPath = (workspaceRoot: string): string => {
-  const path = resolve(join(getSocketDir(workspaceRoot), 'nx-console.sock'));
+export const getNxConsoleSocketPath = async (workspaceRoot: string) => {
+  const path = resolve(
+    join(await getSocketDir(workspaceRoot), 'nx-console.sock'),
+  );
   return platform() === 'win32' ? '\\\\.\\pipe\\nx\\' + path : path;
 };
 
@@ -57,8 +60,8 @@ export async function killSocketOnPath(socketPath: string): Promise<void> {
 export async function testIdeConnection(
   workspacePath: string,
 ): Promise<boolean> {
+  const socketPath = await getNxConsoleSocketPath(workspacePath);
   return new Promise((resolve) => {
-    const socketPath = getNxConsoleSocketPath(workspacePath);
     const socket = new Socket();
 
     // Set a timeout for the connection attempt
