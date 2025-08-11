@@ -1,8 +1,6 @@
 import { handleGraphInteractionEventBase } from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
-import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { workspaceDependencyPath } from '@nx-console/shared-npm';
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { getGraphData } from '@nx-console/vscode-nx-workspace';
 import { join } from 'path';
 import { createActor, fromPromise } from 'xstate';
 import {
@@ -37,43 +35,43 @@ export class NewGraphWebviewManager {
       graphMachine.provide({
         actors: {
           loadGraphData: fromPromise<LoadGraphDataOutput>(async () => {
-            const nxWorkspacePath = getNxWorkspacePath();
-            const nxPath = await workspaceDependencyPath(nxWorkspacePath, 'nx');
-            if (!nxPath) {
+            const result = await getGraphData();
+            if (!result) {
               return {
-                errorsSerialized: JSON.stringify([
-                  { message: 'Could not resolve Nx dependency path' },
-                ]),
-                errorMessage: 'Could not resolve Nx dependency path',
+                errors: {
+                  errorsSerialized: JSON.stringify([
+                    { message: 'Unable to load graph data' } as NxError,
+                  ]),
+                  errorMessage: 'Unable to load graph data',
+                  isPartial: false,
+                },
+                resultType: 'ERROR',
               } as LoadGraphDataOutput;
             }
 
-            const workspace = await getNxWorkspace();
-
-            const hasProjects =
-              Object.keys(workspace.projectGraph.nodes).length > 0;
-            if (!hasProjects || workspace.errors) {
-              let errorMessage = '';
-              if (!hasProjects) {
-                errorMessage = 'No projects found in the workspace.';
-              }
+            if (result.resultType !== 'SUCCESS') {
               return {
+                graphBasePath: result.graphBasePath,
                 errors: {
-                  errors: workspace.errors,
-                  errorMessage,
-                  isPartial: workspace.isPartial,
+                  errorsSerialized: result.errorsSerialized,
+                  errorMessage: result.errorMessage,
+                  isPartial: result.isPartial,
                 },
-              };
+                resultType: result.resultType,
+              } as LoadGraphDataOutput;
             }
 
             return {
-              graphData: workspace?.projectGraph ?? {},
-              graphBasePath: join(nxPath, 'src', 'core', 'graph'),
+              graphData: result.graphDataSerialized
+                ? JSON.parse(result.graphDataSerialized)
+                : undefined,
+              graphBasePath: result.graphBasePath,
               errors: {
-                errors: workspace.errors,
-                errorMessage: undefined,
-                isPartial: workspace.isPartial,
+                errorsSerialized: result.errorsSerialized,
+                errorMessage: result.errorMessage,
+                isPartial: result.isPartial,
               },
+              resultType: result.resultType,
             } as LoadGraphDataOutput;
           }),
         },
@@ -187,7 +185,7 @@ export class NewGraphWebviewManager {
 
   private renderError(
     errors: {
-      errors: NxError[] | undefined;
+      errorsSerialized: string | undefined;
       isPartial: boolean | undefined;
       errorMessage: string | undefined;
     },
@@ -215,7 +213,7 @@ export class NewGraphWebviewManager {
       `<script> 
           const service = window.renderError({
             message: "${errors.errorMessage ?? ''}",
-            errors: ${JSON.stringify(errors.errors ?? [])}
+            errors: ${errors.errorsSerialized ?? '[]'}
             }
           )
         </script>
