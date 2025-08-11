@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../configuration"
+    },
+    {
+      "path": "../../shared/npm"
+    },
+    {
       "path": "../../shared/types"
     },
     {
