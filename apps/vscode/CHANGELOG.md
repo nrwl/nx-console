@@ -1,3 +1,22 @@
+# [18.63.0](https://github.com/nrwl/nx-console/compare/vscode-v18.62.0...vscode-v18.63.0) (2025-08-11)
+
+
+### Bug Fixes
+
+* **nx-mcp:** remove unused logging from workspace tool ([#2677](https://github.com/nrwl/nx-console/issues/2677)) ([c40a305](https://github.com/nrwl/nx-console/commit/c40a3057c6fef1b09bf60ec0450badcfd429ab73))
+* **nx-mcp:** update migration to stdio message ([#2681](https://github.com/nrwl/nx-console/issues/2681)) ([83e66bb](https://github.com/nrwl/nx-console/commit/83e66bb7520579c6fa2e5d321769b08ff492a6ee))
+* update task ID display format in terminal section for self-healing ci ([#2671](https://github.com/nrwl/nx-console/issues/2671)) ([442de7a](https://github.com/nrwl/nx-console/commit/442de7a6430844c29e68b37a10cf4caa7214bf75))
+* **vscode:** add -y flag ([#2683](https://github.com/nrwl/nx-console/issues/2683)) ([3d44504](https://github.com/nrwl/nx-console/commit/3d4450438e2d9ccbf6d4a9496a83d91190cebbe0))
+* **vscode:** catch errors during messaging server initialization ([#2672](https://github.com/nrwl/nx-console/issues/2672)) ([0952c55](https://github.com/nrwl/nx-console/commit/0952c5560d52d815c2845c3a15334fa1b3967e06))
+* **vscode:** clarify notification to remove old mcp server and add dont ask again button ([#2680](https://github.com/nrwl/nx-console/issues/2680)) ([55e2ad0](https://github.com/nrwl/nx-console/commit/55e2ad0e08133ba2d30708ac92ece33b4cfedbb8))
+* **vscode:** repair socket & route task retrieval through ideProvider ([#2674](https://github.com/nrwl/nx-console/issues/2674)) ([d423ce9](https://github.com/nrwl/nx-console/commit/d423ce90e1a205f700b5c3bd28fd2bfa8aa3cc51))
+* **vscode:** run nx version check on extension activation ([#2679](https://github.com/nrwl/nx-console/issues/2679)) ([be2e293](https://github.com/nrwl/nx-console/commit/be2e29310c975d78d8fe361e20fb14221517ee80))
+
+
+### Features
+
+* **nx-mcp:** add filtering syntax to nx_workspace tool ([#2676](https://github.com/nrwl/nx-console/issues/2676)) ([a4cffdb](https://github.com/nrwl/nx-console/commit/a4cffdb861433eb6d43a25763b3f725f27c173b8))
+
 # [18.62.0](https://github.com/nrwl/nx-console/compare/vscode-v18.61.1...vscode-v18.62.0) (2025-08-06)
 
 
