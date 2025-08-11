@@ -1,3 +1,5 @@
+import { NxError } from '@nx-console/shared-types';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { assign, enqueueActions, fromPromise, setup } from 'xstate';
 
 /**
@@ -14,20 +16,22 @@ import { assign, enqueueActions, fromPromise, setup } from 'xstate';
  * - errorsSerialized / errorMessage: optional error payload for error UI
  */
 export type GraphMachineContext = {
-  graphDataSerialized: string | undefined;
-  errorsSerialized: string | undefined;
-  errorMessage: string | undefined;
+  graphData: ProjectGraph | undefined;
+  graphBasePath: string | undefined;
+  errors:
+    | {
+        errors: NxError[] | undefined;
+        errorMessage: string | undefined;
+        isPartial: boolean | undefined;
+      }
+    | undefined;
 };
 
 // Events the machine reacts to
 export type GraphMachineEvents =
   | { type: 'GRAPH_DATA_LOAD_SUCCESS' }
   | { type: 'GRAPH_DATA_LOAD_ERROR' }
-  | { type: 'REFRESH' }
-  | {
-      type: 'updateGraph';
-      params: { graphData: string | undefined };
-    };
+  | { type: 'REFRESH' };
 
 // The actor should resolve with the fields needed by the machine context
 export type LoadGraphDataOutput = Partial<GraphMachineContext>;
@@ -50,7 +54,10 @@ export const graphMachine = setup({
     renderGraph: () => {
       // Provided by the consumer via .provide({ actions: { renderGraph } })
     },
-    updateGraph: (_: unknown, params: { graphData: string | undefined }) => {
+    updateGraph: (
+      _: unknown,
+      params: { graphData: ProjectGraph | undefined },
+    ) => {
       void params;
       // Provided by the consumer via .provide({ actions: { updateGraph } })
     },
@@ -61,14 +68,17 @@ export const graphMachine = setup({
       ...(event as any)['output'],
     })),
     transitionConditionally: enqueueActions(({ context, enqueue }) => {
-      // If we have the data, we can render the graph
-      if (context.graphDataSerialized) {
-        enqueue.raise({ type: 'GRAPH_DATA_LOAD_SUCCESS' });
+      // If there are errors, go to error state
+      const hasProjects =
+        Object.keys(context.graphData?.nodes ?? {})?.length > 0;
+      if (!hasProjects || context.errors.errors) {
+        enqueue.raise({ type: 'GRAPH_DATA_LOAD_ERROR' });
         return;
       }
-      // If there are errors, go to error state
-      if (context.errorsSerialized || context.errorMessage) {
-        enqueue.raise({ type: 'GRAPH_DATA_LOAD_ERROR' });
+
+      // If we have the data, we can render the graph
+      if (context.graphData) {
+        enqueue.raise({ type: 'GRAPH_DATA_LOAD_SUCCESS' });
         return;
       }
       // Default to error if neither condition is met
@@ -79,9 +89,9 @@ export const graphMachine = setup({
   id: 'projectGraph',
   initial: 'initialLoading',
   context: {
-    graphDataSerialized: undefined,
-    errorsSerialized: undefined,
-    errorMessage: undefined,
+    graphData: undefined,
+    graphBasePath: undefined,
+    errors: undefined,
   },
   states: {
     initialLoading: {
@@ -110,13 +120,14 @@ export const graphMachine = setup({
               actions: [
                 'assignLoadGraphData',
                 enqueueActions(({ context, enqueue }) => {
-                  if (context.graphDataSerialized) {
+                  // if a error came along with the refresh, we reevaluate state
+                  if (context.errors.errors) {
+                    enqueue('transitionConditionally');
+                  } else {
                     enqueue({
                       type: 'updateGraph',
-                      params: { graphData: context.graphDataSerialized },
+                      params: { graphData: context.graphData },
                     });
-                  } else {
-                    enqueue('transitionConditionally');
                   }
                 }),
               ],
