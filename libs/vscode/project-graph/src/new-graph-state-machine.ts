@@ -1,30 +1,18 @@
-import { NxError } from '@nx-console/shared-types';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
+import type { GraphDataResult } from '@nx-console/shared-types';
 import { assign, enqueueActions, fromPromise, setup } from 'xstate';
 
-/**
- * Graph state machine scaffolding modeled after the PDV state machine.
- *
- * States:
- * - initialLoading: render spinner immediately and invoke loadGraphData
- * - showingGraph: graph html rendered, supports REFRESH
- * - showingError: error UI rendered, supports REFRESH
- *
- * Context:
- * - graphDataSerialized: stringified project graph to pass into the webview
- * - graphBasePath: base path for graph assets (environment.js, runtime.js, etc.)
- * - errorsSerialized / errorMessage: optional error payload for error UI
- */
 export type GraphMachineContext = {
   graphData: ProjectGraph | undefined;
   graphBasePath: string | undefined;
   errors:
     | {
-        errors: NxError[] | undefined;
+        errorsSerialized: string | undefined; // JSON string of NxError[]
         errorMessage: string | undefined;
         isPartial: boolean | undefined;
       }
     | undefined;
+  resultType: GraphDataResult['resultType'] | undefined;
 };
 
 // Events the machine reacts to
@@ -69,20 +57,11 @@ export const graphMachine = setup({
     })),
     transitionConditionally: enqueueActions(({ context, enqueue }) => {
       // If there are errors, go to error state
-      const hasProjects =
-        Object.keys(context.graphData?.nodes ?? {})?.length > 0;
-      if (!hasProjects || context.errors.errors) {
-        enqueue.raise({ type: 'GRAPH_DATA_LOAD_ERROR' });
-        return;
-      }
-
-      // If we have the data, we can render the graph
-      if (context.graphData) {
+      if (context.resultType === 'SUCCESS') {
         enqueue.raise({ type: 'GRAPH_DATA_LOAD_SUCCESS' });
-        return;
+      } else {
+        enqueue.raise({ type: 'GRAPH_DATA_LOAD_ERROR' });
       }
-      // Default to error if neither condition is met
-      enqueue.raise({ type: 'GRAPH_DATA_LOAD_ERROR' });
     }),
   },
 }).createMachine({
@@ -92,6 +71,7 @@ export const graphMachine = setup({
     graphData: undefined,
     graphBasePath: undefined,
     errors: undefined,
+    resultType: undefined,
   },
   states: {
     initialLoading: {
@@ -120,8 +100,7 @@ export const graphMachine = setup({
               actions: [
                 'assignLoadGraphData',
                 enqueueActions(({ context, enqueue }) => {
-                  // if a error came along with the refresh, we reevaluate state
-                  if (context.errors.errors) {
+                  if (context.resultType !== 'SUCCESS') {
                     enqueue('transitionConditionally');
                   } else {
                     enqueue({

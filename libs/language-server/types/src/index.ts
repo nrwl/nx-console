@@ -15,6 +15,7 @@ import {
   CloudOnboardingInfo,
   NxWorkspace,
   PDVData,
+  GraphDataResult,
   TreeNode,
 } from '@nx-console/shared-types';
 import type {
@@ -200,6 +201,12 @@ export const NxPDVDataRequest: RequestType<
   PDVData,
   unknown
 > = new RequestType('nx/pdvData');
+
+export const NxGraphDataRequest: RequestType<
+  undefined,
+  GraphDataResult,
+  unknown
+> = new RequestType('nx/graphData');
 
 export const NxRecentCIPEDataRequest: RequestType<
   undefined,
