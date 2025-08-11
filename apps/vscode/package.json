@@ -802,6 +802,11 @@
       },
       {
         "category": "Nx",
+        "title": "Open New Graph (Experimental)",
+        "command": "nx.graph.new"
+      },
+      {
+        "category": "Nx",
         "title": "Open Project Details to Side",
         "command": "nx.project-details.openToSide",
         "icon": "$(open-preview)"
