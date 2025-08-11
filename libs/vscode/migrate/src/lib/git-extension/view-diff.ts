@@ -21,7 +21,7 @@ export function viewDiffForMigration(
   migration: MigrationDetailsWithId,
 ) {
   const completedMigration =
-    readMigrationsJsonMetadata().completedMigrations[migration.id];
+    readMigrationsJsonMetadata()?.completedMigrations[migration.id];
   if (completedMigration.type === 'successful') {
     const toRef = completedMigration.ref;
     const fromRef = `${toRef}^1`;
@@ -31,7 +31,7 @@ export function viewDiffForMigration(
 
 export async function viewDiff(path: string, fromRef?: string, toRef?: string) {
   if (!fromRef) {
-    fromRef = readMigrationsJsonMetadata().initialGitRef.ref;
+    fromRef = readMigrationsJsonMetadata()?.initialGitRef.ref;
   }
 
   const api = getGitApi();

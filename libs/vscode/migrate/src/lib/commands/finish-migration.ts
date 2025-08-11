@@ -22,9 +22,9 @@ export async function finishMigration(squashCommits: boolean) {
         const commitMessage = squashCommits
           ? await window.showInputBox({
               prompt: 'Enter a commit message',
-              value: `chore: migrate nx to ${migrationsJsonMetadata.targetVersion}`,
+              value: `chore: migrate nx to ${migrationsJsonMetadata?.targetVersion ?? 'new version'}`,
             })
-          : `chore: migrate nx to ${migrationsJsonMetadata.targetVersion}`;
+          : `chore: migrate nx to ${migrationsJsonMetadata?.targetVersion ?? 'new version'}`;
 
         if (!commitMessage) {
           return;

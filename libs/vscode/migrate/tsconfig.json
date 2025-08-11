@@ -10,13 +10,10 @@
       "path": "../../shared/types"
     },
     {
-      "path": "../../language-server/types"
-    },
-    {
       "path": "../lsp-client"
     },
     {
-      "path": "../utils"
+      "path": "../../language-server/types"
     },
     {
       "path": "../tasks"
@@ -26,6 +23,12 @@
     },
     {
       "path": "../../shared/nx-version"
+    },
+    {
+      "path": "../utils"
+    },
+    {
+      "path": "../telemetry"
     },
     {
       "path": "../../shared/npm"

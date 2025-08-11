@@ -22,6 +22,39 @@ export function initMigrate(context: ExtensionContext): void {
   const actor = createActor(migrateMachine);
   actor.start();
 
+  const setMigrateContext = () => {
+    const snapshot = actor.getSnapshot();
+
+    const notStarted =
+      snapshot.matches('default') || snapshot.matches('update-available');
+    commands.executeCommand(
+      'setContext',
+      'nxMigrate.state.notStarted',
+      notStarted,
+    );
+
+    const inProgress = snapshot.matches({
+      'in-progress': 'default',
+    });
+    commands.executeCommand(
+      'setContext',
+      'nxMigrate.state.inProgress',
+      inProgress,
+    );
+
+    const pendingPackageUpdates = snapshot.matches({
+      'in-progress': 'pending-package-updates',
+    });
+    commands.executeCommand(
+      'setContext',
+      'nxMigrate.state.pendingPackageUpdates',
+      pendingPackageUpdates,
+    );
+  };
+  setMigrateContext();
+  const sub = actor.subscribe(() => setMigrateContext());
+  context.subscriptions.push({ dispose: () => sub.unsubscribe() });
+
   updateWorkspaceData(actor);
   context.subscriptions.push(
     getNxlsClient().onNotification(

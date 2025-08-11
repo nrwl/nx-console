@@ -17,11 +17,19 @@ export function modifyMigrationsJsonMetadata(
   writeFileSync(migrationsJsonPath, JSON.stringify(migrationsJson, null, 2));
 }
 
-export function readMigrationsJsonMetadata(): MigrationsJsonMetadata {
-  const workspacePath = getNxWorkspacePath();
-  const migrationsJsonPath = join(workspacePath, 'migrations.json');
-  const migrationsJson = JSON.parse(readFileSync(migrationsJsonPath, 'utf-8'));
-  return migrationsJson['nx-console'];
+export function readMigrationsJsonMetadata():
+  | MigrationsJsonMetadata
+  | undefined {
+  try {
+    const workspacePath = getNxWorkspacePath();
+    const migrationsJsonPath = join(workspacePath, 'migrations.json');
+    const migrationsJson = JSON.parse(
+      readFileSync(migrationsJsonPath, 'utf-8'),
+    );
+    return migrationsJson['nx-console'];
+  } catch (e) {
+    return undefined;
+  }
 }
 
 // tries importing the migrate ui from the local nx package but falls back to the bundled one
