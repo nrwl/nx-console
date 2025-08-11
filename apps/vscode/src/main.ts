@@ -116,7 +116,7 @@ export async function activate(c: ExtensionContext) {
     try {
       const workspacePathForNxVersion =
         workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-      exec('npx nx@latest --version', {
+      exec('npx -y nx@latest --version', {
         cwd: workspacePathForNxVersion,
         env: { ...process.env },
       });
