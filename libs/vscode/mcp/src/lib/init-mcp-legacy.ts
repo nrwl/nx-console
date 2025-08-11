@@ -172,7 +172,7 @@ async function showMCPNotification(rulesManager: AgentRulesManager) {
       const shouldSkipRules = shouldSkipRulesNotification();
       if (shouldSkipRules) {
         notificationMessage =
-          'Nx Console can avoid port conflicts with the stdio MCP server. Would you like to migrate?';
+          'Nx MCP can now use stdio for the server communication. This eliminates port conflicts and improves stability. Migrate now?';
       } else {
         notificationMessage = `Would you like to migrate to the recommended Nx MCP setup (stdio server & ${isInVSCode() ? 'conventions file' : 'rules file'})?`;
       }
