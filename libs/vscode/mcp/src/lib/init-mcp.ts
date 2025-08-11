@@ -20,7 +20,10 @@ import {
 import type { McpStreamableWebServer } from './mcp-streamable-web-server';
 
 import { findAvailablePort } from './ports';
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import {
+  getNxWorkspacePath,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode-configuration';
 import { execSync } from 'child_process';
 import { AgentRulesManager } from './agent-rules-manager';
 
@@ -77,7 +80,7 @@ export async function initMcp(context: ExtensionContext) {
   if (mcpJsonPath && hasNxMcpEntry()) {
     const removeOldEntry = () => {
       vscodeLogger.log(
-        `Removing old nx-mcp entry from mcp.json at ${mcpJsonPath}`,
+        `Removing old nx-mcp entry from .vscode/mcp.json at ${mcpJsonPath}`,
       );
       const mcpJson = readMcpJson();
       delete mcpJson.servers['nx-mcp'];
@@ -86,17 +89,22 @@ export async function initMcp(context: ExtensionContext) {
     if (mcpJsonIsGitIgnored(mcpJsonPath)) {
       removeOldEntry();
     } else {
-      // show notification to delete old entry
-      window
-        .showWarningMessage(
-          "Nx Console can now automatically configure the Nx MCP server dynamically. You can remove the old 'nx-mcp' entry from your mcp.json file.",
-          'Remove Entry',
-        )
-        .then((selection) => {
-          if (selection === 'Remove Entry') {
-            removeOldEntry();
-          }
-        });
+      if (!WorkspaceConfigurationStore.instance.get('mcpDontAskAgain', false)) {
+        // show notification to delete old entry
+        window
+          .showWarningMessage(
+            "Nx Console can now automatically configure the Nx MCP server dynamically. You can remove the old 'nx-mcp' entry from your .vscode/mcp.json file.",
+            'Remove Entry',
+            "Don't ask again",
+          )
+          .then((selection) => {
+            if (selection === 'Remove Entry') {
+              removeOldEntry();
+            } else if (selection === "Don't ask again") {
+              WorkspaceConfigurationStore.instance.set('mcpDontAskAgain', true);
+            }
+          });
+      }
     }
   }
 
