@@ -246,6 +246,10 @@ async function main() {
         mcpServer.close?.();
       } catch {}
 
+      try {
+        ideClient.disconnect?.();
+      } catch {}
+
       // Close transports/servers
       try {
         server_instance?.close();
