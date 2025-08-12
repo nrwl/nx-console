@@ -85,6 +85,9 @@ jobs:
       - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 60
 
+      - run: npx nx-cloud fix-ci
+        if: always()
+
   main-windows:
     name: Main Windows
     runs-on: windows-latest
