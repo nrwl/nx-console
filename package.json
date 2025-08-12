@@ -65,6 +65,7 @@
     "@nx/eslint": "21.3.10",
     "@nx/eslint-plugin": "21.3.10",
     "@nx/gradle": "21.3.10",
+    "@nx/graph": "0.5.9",
     "@nx/jest": "21.3.10",
     "@nx/js": "21.3.10",
     "@nx/node": "21.3.10",

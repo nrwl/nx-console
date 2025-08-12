@@ -29,27 +29,30 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { gte } from '@nx-console/nx-version';
 import { NewGraphWebviewManager } from './new-graph-webview-manager';
 
-let _graphWebviewManager: GraphWebviewManager | undefined;
+let _legacyGraphWebviewManager: GraphWebviewManager | undefined;
 
 export function getGraphWebviewManager(): GraphWebviewManager {
-  if (!_graphWebviewManager)
+  if (!_legacyGraphWebviewManager)
     throw new Error('GraphWebviewManager not initialized');
-  return _graphWebviewManager;
+  return _legacyGraphWebviewManager;
 }
 
 export async function initVscodeProjectGraph(context: ExtensionContext) {
-  const graphWebviewManager = new GraphWebviewManager(context);
-  _graphWebviewManager = graphWebviewManager;
+  const legacyGraphWebviewManager = new GraphWebviewManager(context);
+  _legacyGraphWebviewManager = legacyGraphWebviewManager;
+
   const legacyGrapyWebView = new GraphWebView();
 
   context.subscriptions.push(
-    graphWebviewManager,
+    legacyGraphWebviewManager,
     legacyGrapyWebView,
     // Temporary simple command to open the new state-machine powered graph webview
     commands.registerCommand('nx.graph.new', async () => {
-      const newManager = new NewGraphWebviewManager(context);
-      context.subscriptions.push(newManager);
-      newManager.reveal();
+      const newGraphWebviewManager = new NewGraphWebviewManager({
+        type: 'showAll',
+        autoExpand: true,
+      });
+      newGraphWebviewManager.reveal();
     }),
     commands.registerCommand('nx.graph.showAll', async () => {
       getTelemetry().logUsage('graph.show-all');
@@ -59,7 +62,12 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         return;
       }
       if (gte(nxVersion, '17.3.0-beta.3')) {
-        graphWebviewManager.showAllProjects();
+        legacyGraphWebviewManager.showAllProjects();
+        // } else if (gte(nxVersion, '21.4.0')) {
+        //   newGraphWebviewManager.sendCommandToGraph({
+        //     type: 'showAll',
+        //     autoExpand: true,
+        //   });
       } else {
         legacyShowAll(legacyGrapyWebView);
       }
@@ -72,7 +80,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         return;
       }
       if (gte(nxVersion, '17.3.0-beta.3')) {
-        graphWebviewManager.showAffectedProjects();
+        legacyGraphWebviewManager.showAffectedProjects();
       } else {
         legacyShowAffected(legacyGrapyWebView);
       }
@@ -93,14 +101,14 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         }
         if (gte(nxVersion, '17.3.0-beta.3')) {
           if (typeof uriOrProjectName === 'string') {
-            graphWebviewManager.focusProject(uriOrProjectName);
+            legacyGraphWebviewManager.focusProject(uriOrProjectName);
             return;
           }
 
           const project = await getProjectForContext(uriOrProjectName);
 
           if (project && project.name) {
-            graphWebviewManager.focusProject(project.name);
+            legacyGraphWebviewManager.focusProject(project.name);
           }
         } else {
           legacyFocus(
@@ -123,7 +131,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         const project = await getProjectForContext(uri);
 
         if (project && project.name) {
-          graphWebviewManager.selectProject(project.name);
+          legacyGraphWebviewManager.selectProject(project.name);
         }
       } else {
         legacySelect(legacyGrapyWebView, uri);
@@ -143,7 +151,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         if (gte(nxVersion, '17.3.0-beta.3')) {
           const project = treeItem.getProject();
           if (project?.project) {
-            graphWebviewManager.focusProject(project.project);
+            legacyGraphWebviewManager.focusProject(project.project);
           }
         } else {
           legacyFocusButton(legacyGrapyWebView, treeItem);
@@ -164,7 +172,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         if (gte(nxVersion, '17.3.0-beta.3')) {
           const project = treeItem.getProject();
           if (project?.project) {
-            graphWebviewManager.selectProject(project.project);
+            legacyGraphWebviewManager.selectProject(project.project);
           }
         } else {
           legacySelectButton(legacyGrapyWebView, treeItem);
@@ -197,7 +205,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
             !(uriOrTaskParams instanceof Uri)
           ) {
             const { projectName, taskName } = uriOrTaskParams;
-            graphWebviewManager.focusTarget(projectName, taskName);
+            legacyGraphWebviewManager.focusTarget(projectName, taskName);
             return;
           }
 
@@ -218,7 +226,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           const selectedTarget = await selectTarget(Object.keys(targets));
 
           if (selectedTarget && project.name) {
-            graphWebviewManager.focusTarget(project.name, selectedTarget);
+            legacyGraphWebviewManager.focusTarget(project.name, selectedTarget);
           }
         } else {
           legacyTask(
@@ -246,16 +254,19 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
             const project = item.getProject();
             const target = item.getTarget();
             if (project && target) {
-              graphWebviewManager.focusTarget(project.project, target.name);
+              legacyGraphWebviewManager.focusTarget(
+                project.project,
+                target.name,
+              );
             }
           } else if (item instanceof NxCommandsTreeItem) {
             if (item.commandConfig.type === 'target') {
-              graphWebviewManager.showAllTargetsByName(
+              legacyGraphWebviewManager.showAllTargetsByName(
                 item.commandConfig.target,
               );
             }
           } else if (Array.isArray(item))
-            graphWebviewManager.focusTarget(item[0], item[1]);
+            legacyGraphWebviewManager.focusTarget(item[0], item[1]);
         } else {
           legacyTaskButton(legacyGrapyWebView, item);
         }

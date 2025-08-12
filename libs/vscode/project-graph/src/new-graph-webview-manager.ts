@@ -1,27 +1,28 @@
+import { NxError } from '@nx-console/shared-types';
 import { handleGraphInteractionEventBase } from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getGraphData } from '@nx-console/vscode-nx-workspace';
+import type { ProjectGraphEvent } from '@nx/graph/projects';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { join } from 'path';
-import { createActor, fromPromise } from 'xstate';
+import { commands, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
 import {
-  commands,
-  ExtensionContext,
-  Uri,
-  ViewColumn,
-  WebviewPanel,
-  window,
-} from 'vscode';
+  ActorRef,
+  createActor,
+  EventObject,
+  fromPromise,
+  waitFor,
+} from 'xstate';
 import {
   graphMachine,
   type LoadGraphDataOutput,
 } from './new-graph-state-machine';
-import type { ProjectGraph } from 'nx/src/devkit-exports';
-import { NxError } from '@nx-console/shared-types';
 
 export class NewGraphWebviewManager {
   private webviewPanel: WebviewPanel;
+  private actor: ActorRef<any, EventObject>;
 
-  constructor(private context: ExtensionContext) {
+  constructor(private initialCommand: ProjectGraphEvent) {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-graph-new',
       `Nx Graph`,
@@ -31,7 +32,7 @@ export class NewGraphWebviewManager {
       },
     );
 
-    const actor = createActor(
+    this.actor = createActor(
       graphMachine.provide({
         actors: {
           loadGraphData: fromPromise<LoadGraphDataOutput>(async () => {
@@ -108,7 +109,7 @@ export class NewGraphWebviewManager {
     );
 
     const workspaceRefreshListener = onWorkspaceRefreshed(() => {
-      actor.send({ type: 'REFRESH' });
+      this.actor.send({ type: 'REFRESH' });
     });
 
     this.webviewPanel.onDidDispose(() => {
@@ -118,7 +119,7 @@ export class NewGraphWebviewManager {
       commands.executeCommand('setContext', 'graphWebviewVisible', false);
     });
 
-    actor.start();
+    this.actor.start();
   }
 
   reveal(column?: ViewColumn) {
@@ -127,6 +128,13 @@ export class NewGraphWebviewManager {
 
   dispose() {
     this.webviewPanel.dispose();
+  }
+
+  async sendCommandToGraph(command: ProjectGraphEvent) {
+    await waitFor(this.actor, (snapshot) => snapshot.matches('showingGraph'));
+    if (!this.webviewPanel) return;
+
+    this.webviewPanel.webview.postMessage(command);
   }
 
   private renderLoading() {
@@ -151,17 +159,12 @@ export class NewGraphWebviewManager {
             vscode.postMessage(message);
           };
 
-         let service = window.renderProjectGraph(data);
+         let service = window.renderProjectGraph(data, ${JSON.stringify(this.initialCommand)});
 
-          // Optional listener for incremental updates
           window.addEventListener('message', (event) => {
             const message = event.data;
-            if (message && message.type === 'update-graph') {
-                service.send({
-                  type: 'updateGraph',
-                 ...message.data
-                });
-            }
+            service.send(message);
+            
           });
         </script>
       </body>`,
@@ -174,12 +177,10 @@ export class NewGraphWebviewManager {
     if (!graphData) return;
 
     this.webviewPanel.webview.postMessage({
-      type: 'update-graph',
-      data: {
-        projects: Object.values(graphData.nodes),
-        dependencies: graphData.dependencies,
-        fileMap: undefined,
-      },
+      type: 'updateGraph',
+      projects: Object.values(graphData.nodes),
+      dependencies: graphData.dependencies,
+      fileMap: undefined,
     });
   }
 
