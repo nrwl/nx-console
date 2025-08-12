@@ -18,6 +18,9 @@ export type TelemetryEvents =
   | 'misc.open-pdv'
   | 'misc.open-project-details-codelens'
   | 'misc.exception'
+  // migrate
+  | 'migrate.open'
+  | 'migrate.start'
   // cloud
   | 'cloud.connect'
   | 'cloud.open-app'
@@ -28,6 +31,7 @@ export type TelemetryEvents =
   | 'cloud.view-cipe'
   | 'cloud.view-cipe-commit'
   | 'cloud.view-run'
+  | 'cloud.refresh-view'
   | 'cloud.explain-cipe-error'
   | 'cloud.fix-cipe-error'
   | 'cloud.show-ai-fix-notification'
@@ -46,7 +50,7 @@ export type TelemetryEvents =
   | 'graph.interaction-run-help'
   // tasks
   | 'tasks.run'
-  | 'tasks.init'
+  | 'task.init'
   | 'tasks.copy-to-clipboard'
   | 'tasks.run-many'
   // generate

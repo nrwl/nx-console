@@ -444,6 +444,18 @@
         {
           "command": "nx.addAgentRules",
           "when": "isNxWorkspace && hasNxMcpConfigured && !config.nxConsole.generateAiAgentRules && (isInCursor || isInVSCode)"
+        },
+        {
+          "command": "nxMigrate.viewDiff",
+          "when": "isNxWorkspace && nxMigrate.state.pendingPackageUpdates"
+        },
+        {
+          "command": "nxMigrate.open",
+          "when": "isNxWorkspace && nxMigrate.state.inProgress"
+        },
+        {
+          "command": "nxMigrate.startMigrationCustom",
+          "when": "isNxWorkspace && nxMigrate.state.notStarted"
         }
       ]
     },
@@ -981,10 +993,32 @@
         "icon": "$(wand)"
       },
       {
-        "title": "Refresh Nx Migrate View",
+        "category": "Nx Migrate",
+        "title": "Refresh View",
         "command": "nxMigrate.refresh",
         "icon": "$(refresh)",
         "when": "isNxWorkspace"
+      },
+      {
+        "category": "Nx Migrate",
+        "title": "View package.json Changes",
+        "command": "nxMigrate.viewDiff",
+        "icon": "$(diff)",
+        "when": "isNxWorkspace && nxMigrate.state.pendingPackageUpdates"
+      },
+      {
+        "category": "Nx Migrate",
+        "title": "Open Migrate UI",
+        "command": "nxMigrate.open",
+        "icon": "$(browser)",
+        "when": "isNxWorkspace && nxMigrate.state.inProgress"
+      },
+      {
+        "category": "Nx Migrate",
+        "title": "Start Migration",
+        "command": "nxMigrate.startMigrationCustom",
+        "icon": "$(play)",
+        "when": "isNxWorkspace && nxMigrate.state.notStarted"
       },
       {
         "title": "Add Nx Agent Rules",

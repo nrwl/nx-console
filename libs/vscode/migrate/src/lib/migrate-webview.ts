@@ -21,6 +21,7 @@ import {
   viewDocumentation,
   viewImplementation,
 } from './commands/migrate-commands';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { watchFile } from '@nx-console/vscode-utils';
 import { finishMigration } from './commands/finish-migration';
 import {
@@ -37,6 +38,7 @@ export class MigrateWebview {
   async openMigrateUi() {
     if (this._webviewPanel !== undefined) {
       this._webviewPanel.reveal();
+      getTelemetry().logUsage('migrate.open');
       return;
     }
     const nxInstallationLocation = await workspaceDependencyPath(
@@ -66,6 +68,8 @@ export class MigrateWebview {
     this._webviewPanel.webview.html = await this.loadMigrateHtml(
       this._webviewPanel,
     );
+
+    getTelemetry().logUsage('migrate.open');
 
     this._webviewPanel.webview.onDidReceiveMessage((message) => {
       switch (message.type) {
