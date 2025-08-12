@@ -15,6 +15,7 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
     mkdirSync(workspacePath, { recursive: true });
     execSync('npx lerna init', {
       cwd: workspacePath,
+      stdio: 'inherit',
     });
     const packagesDir = join(workspacePath, 'packages');
 

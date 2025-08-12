@@ -38,15 +38,17 @@ describe('generator local plugin', () => {
     console.log('creating local plugin');
 
     // Install @nx/plugin and create a local plugin using nx generators
-    execSync('npm install -D @nx/plugin --force', {
+    execSync('npx nx add @nx/plugin --force', {
       cwd: workspacePath,
-      stdio: 'pipe',
+      stdio: 'inherit',
+      timeout: 200000,
     });
 
     // Create a local plugin using nx generator (it comes with a default generator)
     execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
       cwd: workspacePath,
-      stdio: 'pipe',
+      stdio: 'inherit',
+      timeout: 120000,
     });
 
     // create a new generator
@@ -55,7 +57,8 @@ describe('generator local plugin', () => {
       `npx nx g @nx/plugin:generator --path ${pluginName}/src/generator/generator.ts --no-interactive`,
       {
         cwd: workspacePath,
-        stdio: 'pipe',
+        stdio: 'inherit',
+        timeout: 120000,
       },
     );
 
