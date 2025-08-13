@@ -19,7 +19,8 @@ export type GraphMachineContext = {
 export type GraphMachineEvents =
   | { type: 'GRAPH_DATA_LOAD_SUCCESS' }
   | { type: 'GRAPH_DATA_LOAD_ERROR' }
-  | { type: 'REFRESH' };
+  | { type: 'REFRESH' }
+  | { type: 'INITIALIZED' };
 
 // The actor should resolve with the fields needed by the machine context
 export type LoadGraphDataOutput = Partial<GraphMachineContext>;
@@ -85,13 +86,17 @@ export const graphMachine = setup({
     },
     showingGraph: {
       entry: 'renderGraph',
-      initial: 'idle',
+      initial: 'starting',
       on: {
+        INITIALIZED: {
+          target: '.idle',
+        },
         REFRESH: {
           target: '.refreshing',
         },
       },
       states: {
+        starting: {},
         idle: {},
         refreshing: {
           invoke: {
