@@ -51,7 +51,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
   constructor(
     private path: string,
     extensionContext: ExtensionContext,
-    private expandedTarget?: string
+    private expandedTarget?: string,
   ) {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
@@ -59,7 +59,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
       ViewColumn.Beside,
       {
         enableScripts: true,
-      }
+      },
     );
 
     this.refresh();
@@ -75,7 +75,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     const interactionListener = this.webviewPanel.webview.onDidReceiveMessage(
       async (event) => {
         this.handleGraphInteractionEvent(event);
-      }
+      },
     );
 
     const viewStateListener = this.webviewPanel.onDidChangeViewState(
@@ -83,13 +83,13 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
         commands.executeCommand(
           'setContext',
           'projectDetailsViewVisible',
-          webviewPanel.visible
+          webviewPanel.visible,
         );
-      }
+      },
     );
 
     const workspaceRefreshListener = onWorkspaceRefreshed(() =>
-      this.debouncedRefresh()
+      this.debouncedRefresh(),
     );
 
     this.webviewPanel.onDidDispose(() => {
@@ -162,7 +162,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
         });
       </script>
       </head>
-      `
+      `,
     );
 
     html = html.replace(
@@ -171,11 +171,11 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
         <script type="module">
           await window.waitForRouter()
           window.externalApi.openProjectDetails('${project?.name}'${
-        this.expandedTarget ? `, '${this.expandedTarget}'` : ''
-      })
+            this.expandedTarget ? `, '${this.expandedTarget}'` : ''
+          })
         </script>
       </body>
-      `
+      `,
     );
     html = html.replace('<body', '<body style="padding: 0rem;" ');
     this.webviewPanel.title = `${project?.name} Details`;
@@ -195,14 +195,14 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     if (handled) return;
 
     if (event.type === 'open-project-graph') {
-      getGraphWebviewManager().focusProject(event.payload.projectName);
+      (await getGraphWebviewManager()).focusProject(event.payload.projectName);
       return;
     }
 
     if (event.type === 'open-task-graph') {
-      getGraphWebviewManager().focusTarget(
+      (await getGraphWebviewManager()).focusTarget(
         event.payload.projectName,
-        event.payload.targetName
+        event.payload.targetName,
       );
       return;
     }

@@ -1,17 +1,24 @@
+import { gte } from '@nx-console/nx-version';
 import {
   selectProject,
   selectTarget,
 } from '@nx-console/vscode-nx-cli-quickpicks';
+import { NxCommandsTreeItem } from '@nx-console/vscode-nx-commands-view';
 import { NxTreeItem } from '@nx-console/vscode-nx-project-view';
 import {
   getNxVersion,
   getNxWorkspaceProjects,
   getProjectByPath,
 } from '@nx-console/vscode-nx-workspace';
+import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode-utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { ExtensionContext, Uri, commands, window } from 'vscode';
-import { GraphWebviewManager } from './graph-webview-manager';
+import {
+  GraphWebviewManager,
+  Legacy2GraphWebviewManager,
+} from './legacy-2-graph-webview-manager';
 import { GraphWebView } from './legacy-implementation/graph-webview';
 import {
   legacyFocus,
@@ -23,29 +30,35 @@ import {
   legacyTask,
   legacyTaskButton,
 } from './legacy-implementation/project-graph';
-import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
-import { NxCommandsTreeItem } from '@nx-console/vscode-nx-commands-view';
-import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { gte } from '@nx-console/nx-version';
-import { NewGraphWebview } from './new-graph-webview-manager';
-import { setTimeout } from 'node:timers/promises';
+import { NewGraphWebview } from './new-graph-webview';
+import { NewGraphWebviewManager } from './new-graph-webview-manager';
 
-let _legacyGraphWebviewManager: GraphWebviewManager | undefined;
+let _legacy2GraphWebviewManager: Legacy2GraphWebviewManager | undefined;
+const _newGraphWebviewManager = new NewGraphWebviewManager();
 
-export function getGraphWebviewManager(): GraphWebviewManager {
-  if (!_legacyGraphWebviewManager)
-    throw new Error('GraphWebviewManager not initialized');
-  return _legacyGraphWebviewManager;
+export async function getGraphWebviewManager(): Promise<
+  GraphWebviewManager<unknown>
+> {
+  const nxVersion = await getNxVersion();
+  if (!nxVersion) {
+    return _newGraphWebviewManager;
+  }
+  if (gte(nxVersion, '21.4.0')) {
+    return _newGraphWebviewManager;
+  }
+  if (!_legacy2GraphWebviewManager) {
+    throw new Error('LegacyGraphWebviewManager not initialized');
+  }
+  return _legacy2GraphWebviewManager;
 }
 
 export async function initVscodeProjectGraph(context: ExtensionContext) {
-  const legacyGraphWebviewManager = new GraphWebviewManager(context);
-  _legacyGraphWebviewManager = legacyGraphWebviewManager;
+  _legacy2GraphWebviewManager = new Legacy2GraphWebviewManager(context);
 
   const legacyGrapyWebView = new GraphWebView();
 
   context.subscriptions.push(
-    legacyGraphWebviewManager,
+    _legacy2GraphWebviewManager,
     legacyGrapyWebView,
     // Temporary simple command to open the new state-machine powered graph webview
     commands.registerCommand('nx.graph.new', async () => {
@@ -69,13 +82,10 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion, '17.3.0-beta.3')) {
-        legacyGraphWebviewManager.showAllProjects();
-        // } else if (gte(nxVersion, '21.4.0')) {
-        //   newGraphWebviewManager.sendCommandToGraph({
-        //     type: 'showAll',
-        //     autoExpand: true,
-        //   });
+      if (gte(nxVersion, '21.4.0')) {
+        _newGraphWebviewManager.showAllProjects();
+      } else if (gte(nxVersion, '17.3.0-beta.3')) {
+        _legacy2GraphWebviewManager.showAllProjects();
       } else {
         legacyShowAll(legacyGrapyWebView);
       }
@@ -87,10 +97,13 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion, '17.3.0-beta.3')) {
-        legacyGraphWebviewManager.showAffectedProjects();
-      } else {
+
+      if (gte(nxVersion, '21.4.0')) {
+        _newGraphWebviewManager.showAffectedProjects();
+      } else if (!gte(nxVersion, '17.3.0-beta.3')) {
         legacyShowAffected(legacyGrapyWebView);
+      } else {
+        _legacy2GraphWebviewManager.showAffectedProjects();
       }
     }),
     commands.registerCommand(
@@ -107,22 +120,30 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
-          if (typeof uriOrProjectName === 'string') {
-            legacyGraphWebviewManager.focusProject(uriOrProjectName);
-            return;
-          }
 
-          const project = await getProjectForContext(uriOrProjectName);
-
-          if (project && project.name) {
-            legacyGraphWebviewManager.focusProject(project.name);
-          }
-        } else {
+        if (!gte(nxVersion, '17.3.0-beta.3')) {
           legacyFocus(
             legacyGrapyWebView,
             uriOrProjectName instanceof Uri ? uriOrProjectName : undefined,
           );
+        } else {
+          if (typeof uriOrProjectName === 'string') {
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.focusProject(uriOrProjectName);
+            } else {
+              _legacy2GraphWebviewManager.focusProject(uriOrProjectName);
+            }
+            return;
+          }
+          const project = await getProjectForContext(uriOrProjectName);
+
+          if (project && project.name) {
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.focusProject(project.name);
+            } else {
+              _legacy2GraphWebviewManager.focusProject(project.name);
+            }
+          }
         }
       },
     ),
@@ -135,14 +156,18 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         showNoNxVersionMessage();
         return;
       }
-      if (gte(nxVersion, '17.3.0-beta.3')) {
+      if (!gte(nxVersion, '17.3.0-beta.3')) {
+        legacySelect(legacyGrapyWebView, uri);
+      } else {
         const project = await getProjectForContext(uri);
 
         if (project && project.name) {
-          legacyGraphWebviewManager.selectProject(project.name);
+          if (gte(nxVersion, '21.4.0')) {
+            _newGraphWebviewManager.selectProject(project.name);
+          } else {
+            _legacy2GraphWebviewManager.selectProject(project.name);
+          }
         }
-      } else {
-        legacySelect(legacyGrapyWebView, uri);
       }
     }),
     commands.registerCommand(
@@ -156,13 +181,17 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
+        if (!gte(nxVersion, '17.3.0-beta.3')) {
+          legacyFocusButton(legacyGrapyWebView, treeItem);
+        } else {
           const project = treeItem.getProject();
           if (project?.project) {
-            legacyGraphWebviewManager.focusProject(project.project);
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.focusProject(project.project);
+            } else {
+              _legacy2GraphWebviewManager.focusProject(project.project);
+            }
           }
-        } else {
-          legacyFocusButton(legacyGrapyWebView, treeItem);
         }
       },
     ),
@@ -177,13 +206,17 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
+        if (!gte(nxVersion, '17.3.0-beta.3')) {
+          legacySelectButton(legacyGrapyWebView, treeItem);
+        } else {
           const project = treeItem.getProject();
           if (project?.project) {
-            legacyGraphWebviewManager.selectProject(project.project);
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.selectProject(project.project);
+            } else {
+              _legacy2GraphWebviewManager.selectProject(project.project);
+            }
           }
-        } else {
-          legacySelectButton(legacyGrapyWebView, treeItem);
         }
       },
     ),
@@ -206,14 +239,23 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
+        if (!gte(nxVersion, '17.3.0-beta.3')) {
+          legacyTask(
+            legacyGrapyWebView,
+            uriOrTaskParams instanceof Uri ? uriOrTaskParams : undefined,
+          );
+        } else {
           // If direct project and task names were provided
           if (
             typeof uriOrTaskParams === 'object' &&
             !(uriOrTaskParams instanceof Uri)
           ) {
             const { projectName, taskName } = uriOrTaskParams;
-            legacyGraphWebviewManager.focusTarget(projectName, taskName);
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.focusTarget(projectName, taskName);
+            } else {
+              _legacy2GraphWebviewManager.focusTarget(projectName, taskName);
+            }
             return;
           }
 
@@ -234,13 +276,15 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           const selectedTarget = await selectTarget(Object.keys(targets));
 
           if (selectedTarget && project.name) {
-            legacyGraphWebviewManager.focusTarget(project.name, selectedTarget);
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.focusTarget(project.name, selectedTarget);
+            } else {
+              _legacy2GraphWebviewManager.focusTarget(
+                project.name,
+                selectedTarget,
+              );
+            }
           }
-        } else {
-          legacyTask(
-            legacyGrapyWebView,
-            uriOrTaskParams instanceof Uri ? uriOrTaskParams : undefined,
-          );
         }
       },
     ),
@@ -257,26 +301,44 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
+        if (!gte(nxVersion, '17.3.0-beta.3')) {
+          legacyTaskButton(legacyGrapyWebView, item);
+        } else {
           if (item instanceof NxTreeItem) {
             const project = item.getProject();
             const target = item.getTarget();
             if (project && target) {
-              legacyGraphWebviewManager.focusTarget(
-                project.project,
-                target.name,
-              );
+              if (gte(nxVersion, '21.4.0')) {
+                _newGraphWebviewManager.focusTarget(
+                  project.project,
+                  target.name,
+                );
+              } else {
+                _legacy2GraphWebviewManager.focusTarget(
+                  project.project,
+                  target.name,
+                );
+              }
             }
           } else if (item instanceof NxCommandsTreeItem) {
             if (item.commandConfig.type === 'target') {
-              legacyGraphWebviewManager.showAllTargetsByName(
-                item.commandConfig.target,
-              );
+              if (gte(nxVersion, '21.4.0')) {
+                _newGraphWebviewManager.showAllTargetsByName(
+                  item.commandConfig.target,
+                );
+              } else {
+                _legacy2GraphWebviewManager.showAllTargetsByName(
+                  item.commandConfig.target,
+                );
+              }
             }
-          } else if (Array.isArray(item))
-            legacyGraphWebviewManager.focusTarget(item[0], item[1]);
-        } else {
-          legacyTaskButton(legacyGrapyWebView, item);
+          } else if (Array.isArray(item)) {
+            if (gte(nxVersion, '21.4.0')) {
+              _newGraphWebviewManager.focusTarget(item[0], item[1]);
+            } else {
+              _legacy2GraphWebviewManager.focusTarget(item[0], item[1]);
+            }
+          }
         }
       },
     ),

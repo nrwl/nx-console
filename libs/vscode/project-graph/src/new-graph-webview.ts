@@ -40,7 +40,7 @@ export class NewGraphWebview {
   private handleEventResultEventEmitter: EventEmitter<PartialHandleEventResult> =
     new EventEmitter<PartialHandleEventResult>();
 
-  constructor() {
+  constructor(private onDidDispose?: () => void) {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-graph-new',
       `Nx Graph`,
@@ -142,6 +142,7 @@ export class NewGraphWebview {
       viewStateListener.dispose();
       workspaceRefreshListener?.dispose();
       commands.executeCommand('setContext', 'graphWebviewVisible', false);
+      this.onDidDispose();
     });
 
     this.actor.start();
