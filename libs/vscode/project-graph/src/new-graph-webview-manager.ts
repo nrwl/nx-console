@@ -2,10 +2,20 @@ import { NxError } from '@nx-console/shared-types';
 import { handleGraphInteractionEventBase } from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getGraphData } from '@nx-console/vscode-nx-workspace';
-import type { ProjectGraphEvent } from '@nx/graph/projects';
+import type {
+  ProjectGraphEvent,
+  ProjectGraphHandleEventResult,
+} from '@nx/graph/projects';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { join } from 'path';
-import { commands, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
+import {
+  commands,
+  EventEmitter,
+  Uri,
+  ViewColumn,
+  WebviewPanel,
+  window,
+} from 'vscode';
 import {
   ActorRef,
   createActor,
@@ -18,9 +28,18 @@ import {
   type LoadGraphDataOutput,
 } from './new-graph-state-machine';
 
+export type PartialHandleEventResult = Pick<
+  ProjectGraphHandleEventResult,
+  'projects' | 'edges'
+>;
+
 export class NewGraphWebviewManager {
   private webviewPanel: WebviewPanel;
   private actor: ActorRef<any, EventObject>;
+
+  private handleEventResult: PartialHandleEventResult | undefined;
+  private handleEventResultEventEmitter: EventEmitter<PartialHandleEventResult> =
+    new EventEmitter<PartialHandleEventResult>();
 
   constructor(private initialCommand: ProjectGraphEvent) {
     this.webviewPanel = window.createWebviewPanel(
@@ -94,7 +113,10 @@ export class NewGraphWebviewManager {
       async (event) => {
         const handled = await handleGraphInteractionEventBase(event);
         if (handled) return;
-        // Future: handle additional extension <-> webview messages here
+        if (event.type === 'handleEventResult') {
+          this.handleEventResult = event.result;
+          this.handleEventResultEventEmitter.fire(event.result);
+        }
       },
     );
 
@@ -130,11 +152,22 @@ export class NewGraphWebviewManager {
     this.webviewPanel.dispose();
   }
 
-  async sendCommandToGraph(command: ProjectGraphEvent) {
+  async sendCommandToGraph(
+    command: ProjectGraphEvent,
+  ): Promise<PartialHandleEventResult> {
     await waitFor(this.actor, (snapshot) => snapshot.matches('showingGraph'));
     if (!this.webviewPanel) return;
 
     this.webviewPanel.webview.postMessage(command);
+
+    return await new Promise<PartialHandleEventResult>((resolve) => {
+      const eventSubscriber = this.handleEventResultEventEmitter.event(
+        (result) => {
+          eventSubscriber.dispose();
+          resolve(result);
+        },
+      );
+    });
   }
 
   private renderLoading() {
@@ -154,18 +187,27 @@ export class NewGraphWebviewManager {
         <script>
           const data = ${JSON.stringify(graphData)}
           const vscode = acquireVsCodeApi();
-          window.externalApi = window.externalApi || {};
-          window.externalApi.graphInteractionEventListener = (message) => {
-            vscode.postMessage(message);
-          };
+          
 
          let service = window.renderProjectGraph(data, ${JSON.stringify(this.initialCommand)});
 
           window.addEventListener('message', (event) => {
             const message = event.data;
             service.send(message);
-            
           });
+
+          service.subscribe((state) => {
+            if (state.context.handleEventResult && state.event?.type === 'handleEventResult') {
+              vscode.postMessage({
+                type: 'handleEventResult',
+                result: {
+                  projects: state.context.handleEventResult.projects,
+                  edges: state.context.handleEventResult.edges,
+                }
+              })
+            }
+          });
+
         </script>
       </body>`,
     );
