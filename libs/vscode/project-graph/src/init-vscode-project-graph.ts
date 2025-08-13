@@ -28,6 +28,7 @@ import { NxCommandsTreeItem } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { gte } from '@nx-console/nx-version';
 import { NewGraphWebviewManager } from './new-graph-webview-manager';
+import { setTimeout } from 'node:timers/promises';
 
 let _legacyGraphWebviewManager: GraphWebviewManager | undefined;
 
@@ -53,6 +54,12 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         autoExpand: true,
       });
       newGraphWebviewManager.reveal();
+      // await setTimeout(10000);
+      // const result = await newGraphWebviewManager.sendCommandToGraph({
+      //   type: 'excludeNode',
+      //   nodeIds: ['project-latest-angular-generator-issue-e2e'],
+      // });
+      // console.log(`AAAA`, result);
     }),
     commands.registerCommand('nx.graph.showAll', async () => {
       getTelemetry().logUsage('graph.show-all');
