@@ -142,7 +142,7 @@ export class FormValuesService {
   }
 
   runGenerator(dryRun = false) {
-    const args = this.getSerializedFormValues();
+    const args = this.getSerializedFormValues(false); // Don't include quotes for execution
     args.push('--no-interactive');
     if (dryRun) {
       args.push('--dry-run');
@@ -164,7 +164,7 @@ export class FormValuesService {
   );
 
   copyCommandToClipboard() {
-    const args = this.getSerializedFormValues();
+    const args = this.getSerializedFormValues(true); // Include quotes for clipboard
     const positional = getGeneratorIdentifier(this.icc.generatorSchema);
     const command = `nx g ${positional} ${args.join(' ')}`;
     if (this.icc.editor === 'vscode') {
@@ -176,7 +176,7 @@ export class FormValuesService {
     }
   }
 
-  private getSerializedFormValues(): string[] {
+  private getSerializedFormValues(includeQuotesForShell = true): string[] {
     const args: string[] = [];
     const formValues = {
       ...this.formValues,
@@ -191,7 +191,10 @@ export class FormValuesService {
       if (compareWithDefaultValue(value, defaultValue)) return;
 
       const valueString = value?.toString() ?? '';
-      if (valueString.includes(' ')) {
+      
+      // When includeQuotesForShell is true (for clipboard), add quotes around values with spaces
+      // When false (for execution), don't add quotes as the value will be passed as a proper argument
+      if (includeQuotesForShell && valueString.includes(' ')) {
         if (valueString.includes('"')) {
           args.push(`--${key}='${value}'`);
         } else {
