@@ -33,7 +33,7 @@ export type PartialHandleEventResult = Pick<
   'projects' | 'edges'
 >;
 
-export class NewGraphWebviewManager {
+export class NewGraphWebview {
   private webviewPanel: WebviewPanel;
   private actor: ActorRef<any, EventObject>;
 
