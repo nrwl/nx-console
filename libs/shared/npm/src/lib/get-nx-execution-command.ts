@@ -1,5 +1,6 @@
 import { platform } from 'os';
 import { getPackageManagerCommand } from './local-nx-utils/package-manager-command';
+import { detectCorepackPackageManager, extractPackageManagerName } from './local-nx-utils/corepack-detection';
 
 /**
  * see `getShellExecutionForConfig` for a vscode-specific implementation of this

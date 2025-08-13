@@ -7,6 +7,10 @@ import { importNxPackagePath } from '../workspace-dependencies';
 import { readNxJson } from '../nx-json';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import {
+  detectCorepackPackageManager,
+  extractPackageManagerName
+} from './corepack-detection';
 
 export async function detectPackageManager(
   workspacePath: string,
@@ -71,7 +75,36 @@ export async function getPackageManagerCommand(
         logger,
       );
 
-    return getPackageManagerCommand(detectPackageManager(workspacePath));
+    const commands = getPackageManagerCommand(detectPackageManager(workspacePath));
+
+    // Check if Corepack is being used
+    const corepackPm = await detectCorepackPackageManager(workspacePath, logger);
+    if (corepackPm) {
+      const pmName = extractPackageManagerName(corepackPm);
+
+      // Override exec and dlx commands to use corepack
+      if (pmName === 'yarn') {
+        return {
+          ...commands,
+          exec: 'corepack yarn',
+          dlx: 'corepack yarn dlx',
+        };
+      } else if (pmName === 'pnpm') {
+        return {
+          ...commands,
+          exec: 'corepack pnpm',
+          dlx: 'corepack pnpm dlx',
+        };
+      } else if (pmName === 'npm') {
+        return {
+          ...commands,
+          exec: 'corepack npx',
+          dlx: 'corepack npx',
+        };
+      }
+    }
+
+    return commands;
   } catch (e) {
     logger?.log(`Error getting package manager command: ${JSON.stringify(e)}`);
 
