@@ -12,6 +12,7 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { IdeProvider } from './ide-provider';
 import { registerNxCloudTools } from './tools/nx-cloud';
+import { registerNxCloudCipeResources } from './resources/nx-cloud-cipe-resources';
 import {
   registerNxCoreTools,
   setNxWorkspacePath as setNxWorkspacePathForCoreTools,
@@ -40,6 +41,14 @@ export interface NxWorkspaceInfoProvider {
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>;
   isNxCloudEnabled: () => Promise<boolean>;
+  getRecentCIPEData?: (
+    workspacePath: string,
+    logger: Logger,
+  ) => Promise<{
+    info?: any[];
+    error?: any;
+    workspaceUrl?: string;
+  }>;
 }
 
 export class NxMcpServerWrapper {
@@ -74,6 +83,10 @@ export class NxMcpServerWrapper {
       logging: {},
       tools: {
         listChanged: true,
+      },
+      resources: {
+        list: true,
+        subscribe: false,
       },
     });
 
@@ -238,6 +251,18 @@ export class NxMcpServerWrapper {
           this.telemetry,
           this.nxWorkspaceInfoProvider.getGitDiffs,
         );
+        
+        // Register CIPE resources if the provider supports it
+        if (this.nxWorkspaceInfoProvider.getRecentCIPEData) {
+          registerNxCloudCipeResources(
+            this._nxWorkspacePath,
+            this.server,
+            this.logger,
+            this.telemetry,
+            this.nxWorkspaceInfoProvider.getRecentCIPEData,
+          );
+        }
+        
         this.toolRegistrationState.nxCloud = true;
       }
 
@@ -339,6 +364,10 @@ export class NxMcpServerWrapper {
 export const nxMcpServerCapabilities: ServerCapabilities = {
   tools: {
     listChanged: true,
+  },
+  resources: {
+    list: true,
+    subscribe: false,
   },
   logging: {},
 };

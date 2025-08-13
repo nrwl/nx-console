@@ -8,9 +8,9 @@ import {
 import {
   downloadAndExtractArtifact,
   getNxCloudTerminalOutput,
-  getRecentCIPEData,
   nxCloudAuthHeaders,
 } from '@nx-console/shared-nx-cloud';
+import { getRecentCIPEData } from '@nx-console/shared-nx-workspace-info';
 import { getDefinition } from '@nx-console/language-server-capabilities-definition';
 import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
 import { getHover } from '@nx-console/language-server-capabilities-hover';
