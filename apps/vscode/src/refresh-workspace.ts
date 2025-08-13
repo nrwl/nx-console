@@ -18,8 +18,9 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
 
       isRefreshing = true;
 
-      getTelemetry().logUsage('misc.refresh-workspace');
-
+      if (!silent) {
+        getTelemetry().logUsage('misc.refresh-workspace');
+      }
       try {
         await getNxlsClient().refreshWorkspace(silent);
         await getNxGraphServer(context).restart();

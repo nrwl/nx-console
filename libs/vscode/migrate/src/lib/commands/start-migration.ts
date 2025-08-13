@@ -12,8 +12,11 @@ import { major, rcompare } from 'semver';
 import { QuickPickItem, tasks, window } from 'vscode';
 import { viewPackageJsonDiff } from '../git-extension/view-diff';
 import { importMigrateUIApi } from './utils';
+import { existsSync, writeFileSync } from 'fs';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export async function startMigration(custom = false) {
+  getTelemetry().logUsage('migrate.start');
   const nxVersion = await getNxVersion();
 
   let pkgInfo: PackageInformationResponse;
@@ -58,7 +61,6 @@ export async function startMigration(custom = false) {
   }
 
   const workspacePath = getNxWorkspacePath();
-  const migrationsJsonPath = join(workspacePath, 'migrations.json');
 
   const command = `nx migrate ${versionToMigrateTo}`;
 
@@ -86,6 +88,11 @@ export async function startMigration(custom = false) {
       'Migration failed, see integrated terminal for more details.',
     );
     return;
+  }
+
+  const migrationJsonPath = join(workspacePath, 'migrations.json');
+  if (!existsSync(migrationJsonPath)) {
+    writeFileSync(migrationJsonPath, '{}');
   }
 
   const migrateUiApi = await importMigrateUIApi(workspacePath);

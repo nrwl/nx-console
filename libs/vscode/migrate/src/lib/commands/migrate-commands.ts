@@ -29,6 +29,10 @@ export function registerCommands(
     commands.registerCommand('nxMigrate.open', () => {
       migrateWebview.openMigrateUi();
     }),
+    // command to explicitly start a custom migration (shown when none is in progress)
+    commands.registerCommand('nxMigrate.startMigrationCustom', async () => {
+      await startMigration(true);
+    }),
     commands.registerCommand('nxMigrate.close', () => {
       migrateWebview.closeMigrateUi();
     }),

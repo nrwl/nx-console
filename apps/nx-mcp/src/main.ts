@@ -34,6 +34,7 @@ import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { createIdeClient } from './ide-client/create-ide-client';
 import { getPackageVersion } from './utils';
 import { ArgvType, createYargsConfig } from './yargs-config';
+import { IncomingMessage, Server, ServerResponse } from 'http';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
@@ -203,6 +204,70 @@ async function main() {
     logger,
   );
 
+  // disposables for shutting down
+  let sseKeepAliveInterval: NodeJS.Timeout | undefined;
+  let server_instance:
+    | Server<typeof IncomingMessage, typeof ServerResponse>
+    | undefined;
+
+  /* eslint-disable no-empty */
+  let exiting = false;
+  const exitHandler = (signal: NodeJS.Signals) => {
+    if (exiting) return;
+    exiting = true;
+
+    try {
+      logger.log(`Shutting down Nx MCP (${signal})…`);
+
+      // Stop watchers/timers first (prevents new work)
+      try {
+        stopWatcher?.();
+      } catch {}
+      if (sseKeepAliveInterval) {
+        clearInterval(sseKeepAliveInterval);
+        sseKeepAliveInterval = undefined;
+      }
+
+      // make sure exit handlers are removed so nothing else comes in
+      try {
+        process.off('SIGINT', exitHandler);
+      } catch {}
+      try {
+        process.off('SIGTERM', exitHandler);
+      } catch {}
+
+      // Tell internal components to close
+      try {
+        serverWrapper.cleanup();
+      } catch (e) {
+        logger.log('cleanup error: ' + e);
+      }
+      try {
+        mcpServer.close?.();
+      } catch {}
+
+      try {
+        ideClient.disconnect?.();
+      } catch {}
+
+      // Close transports/servers
+      try {
+        server_instance?.close();
+      } catch {}
+
+      // Stop reading stdin last in stdio mode
+      try {
+        process.stdin.pause();
+      } catch {}
+      try {
+        if (process.connected) process.disconnect();
+      } catch {}
+
+      // Reap any descendants we didn't start ourselves (see section 3)
+      killGroup(process.pid);
+    } catch (e) {}
+  };
+
   if (argv.transport === 'sse' || argv.transport === 'http') {
     const port = argv.port ?? 9921;
     const app = express();
@@ -256,19 +321,19 @@ async function main() {
 
         // Set up keep-alive interval if enabled
         if (argv.keepAliveInterval > 0) {
-          const keepAliveInterval = setInterval(() => {
+          sseKeepAliveInterval = setInterval(() => {
             // Check if the connection is still open using the socket's writable state
             if (!res.writableEnded && !res.writableFinished) {
               res.write(':beat\n\n');
             } else {
-              clearInterval(keepAliveInterval);
+              clearInterval(sseKeepAliveInterval);
               logger.log('SSE connection closed, clearing keep-alive interval');
             }
           }, argv.keepAliveInterval);
 
           // Clean up interval if the client disconnects
           req.on('close', () => {
-            clearInterval(keepAliveInterval);
+            clearInterval(sseKeepAliveInterval);
             logger.log('SSE connection closed by client');
           });
         }
@@ -286,15 +351,13 @@ async function main() {
       logger.log(`Nx MCP server (SSE) listening on port ${port}`);
     }
 
-    const server_instance = app.listen(port);
-
-    process.on('exit', () => {
-      server_instance.close();
-    });
+    server_instance = app.listen(port);
   } else {
     const transport = new StdioServerTransport();
     await serverWrapper.getMcpServer().connect(transport);
     mcpStdioConnected = true;
+
+    transport.onclose = () => exitHandler('SIGINT');
   }
 
   // ensure the daemon is running if possible
@@ -319,25 +382,16 @@ async function main() {
     }
   }
 
-  const exitHandler = () => {
-    stopWatcher?.();
-    process.stdin.destroy();
-
-    if (process.connected) {
-      process.disconnect();
-    }
-    serverWrapper.cleanup();
-    killGroup(process.pid);
-  };
-
   // Prevent the Node.js process from exiting early
   process.on('SIGINT', () => {
     logger.log('Received SIGINT signal. Server shutting down...');
-    exitHandler();
+    exitHandler('SIGINT');
   });
 
-  // Cleanup on exit
-  process.on('exit', exitHandler);
+  process.on('SIGTERM', () => {
+    logger.log('Received SIGTERM signal. Server shutting down...');
+    exitHandler('SIGTERM');
+  });
 
   // Keep the process alive
   process.stdin.resume();

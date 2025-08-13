@@ -713,22 +713,31 @@ function getJsonDocument(document: TextDocument) {
 
 ensureOnlyJsonRpcStdout();
 
+let exiting = false;
+/* eslint-disable no-empty */
 const exitHandler = () => {
+  if (exiting) return;
+  exiting = true;
   process.off('SIGTERM', exitHandler);
 
   try {
-    connection.dispose();
-  } catch (e) {
-    // noop
-  }
+    unregisterFileWatcher();
+  } catch {}
 
-  if (process.connected) {
-    process.disconnect();
-  }
+  try {
+    connection.dispose();
+  } catch (e) {}
+
+  try {
+    if (process.connected) {
+      process.disconnect();
+    }
+  } catch {}
 
   killGroup(process.pid);
 };
 process.on('SIGTERM', exitHandler);
+process.on('SIGINT', exitHandler);
 
 connection.onExit(exitHandler);
 

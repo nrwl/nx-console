@@ -18,6 +18,10 @@ enum class TelemetryEvent(val eventName: String) {
     MISC_OPEN_PROJECT_DETAILS_CODELENS("misc.open-project-details-codelens"),
     MISC_EXCEPTION("misc.exception"),
 
+    // Migrate
+    MIGRATE_OPEN("migrate.open"),
+    MIGRATE_START("migrate.start"),
+
     // AI
     AI_ADD_MCP("ai.add-mcp"),
     AI_CHAT_MESSAGE("ai.chat-message"),

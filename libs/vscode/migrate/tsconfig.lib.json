@@ -13,13 +13,10 @@
       "path": "../../shared/types/tsconfig.lib.json"
     },
     {
-      "path": "../../language-server/types/tsconfig.lib.json"
-    },
-    {
       "path": "../lsp-client/tsconfig.lib.json"
     },
     {
-      "path": "../utils/tsconfig.lib.json"
+      "path": "../../language-server/types/tsconfig.lib.json"
     },
     {
       "path": "../tasks/tsconfig.lib.json"
@@ -29,6 +26,12 @@
     },
     {
       "path": "../../shared/nx-version/tsconfig.lib.json"
+    },
+    {
+      "path": "../utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../telemetry/tsconfig.lib.json"
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
