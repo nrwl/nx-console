@@ -49,11 +49,12 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
     legacyGrapyWebView,
     // Temporary simple command to open the new state-machine powered graph webview
     commands.registerCommand('nx.graph.new', async () => {
-      const newGraphWebviewManager = new NewGraphWebviewManager({
+      const newGraphWebviewManager = new NewGraphWebviewManager();
+      newGraphWebviewManager.reveal();
+      await newGraphWebviewManager.sendCommandToGraph({
         type: 'showAll',
         autoExpand: true,
       });
-      newGraphWebviewManager.reveal();
       // await setTimeout(10000);
       // const result = await newGraphWebviewManager.sendCommandToGraph({
       //   type: 'excludeNode',

@@ -37,11 +37,10 @@ export class NewGraphWebviewManager {
   private webviewPanel: WebviewPanel;
   private actor: ActorRef<any, EventObject>;
 
-  private handleEventResult: PartialHandleEventResult | undefined;
   private handleEventResultEventEmitter: EventEmitter<PartialHandleEventResult> =
     new EventEmitter<PartialHandleEventResult>();
 
-  constructor(private initialCommand: ProjectGraphEvent) {
+  constructor() {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-graph-new',
       `Nx Graph`,
@@ -113,9 +112,13 @@ export class NewGraphWebviewManager {
       async (event) => {
         const handled = await handleGraphInteractionEventBase(event);
         if (handled) return;
+        if (event.type === 'initialized') {
+          this.actor.send({ type: 'INITIALIZED' });
+          return;
+        }
         if (event.type === 'handleEventResult') {
-          this.handleEventResult = event.result;
           this.handleEventResultEventEmitter.fire(event.result);
+          return;
         }
       },
     );
@@ -155,7 +158,11 @@ export class NewGraphWebviewManager {
   async sendCommandToGraph(
     command: ProjectGraphEvent,
   ): Promise<PartialHandleEventResult> {
-    await waitFor(this.actor, (snapshot) => snapshot.matches('showingGraph'));
+    await waitFor(this.actor, (snapshot) =>
+      snapshot.matches({
+        showingGraph: 'idle',
+      }),
+    );
     if (!this.webviewPanel) return;
 
     this.webviewPanel.webview.postMessage(command);
@@ -189,7 +196,7 @@ export class NewGraphWebviewManager {
           const vscode = acquireVsCodeApi();
           
 
-         let service = window.renderProjectGraph(data, ${JSON.stringify(this.initialCommand)});
+         let service = window.renderProjectGraph(data);
 
           window.addEventListener('message', (event) => {
             const message = event.data;
@@ -197,6 +204,11 @@ export class NewGraphWebviewManager {
           });
 
           service.subscribe((state) => {
+            if(state.event?.type === 'setGraphClient') {
+             vscode.postMessage({
+              type: 'initialized'
+             })
+            }
             if (state.context.handleEventResult && state.event?.type === 'handleEventResult') {
               vscode.postMessage({
                 type: 'handleEventResult',
