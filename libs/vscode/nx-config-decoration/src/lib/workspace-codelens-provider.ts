@@ -1,4 +1,13 @@
-import { CodeLens, Command, Range, TextDocument, Uri } from 'vscode';
+import {
+  CodeLens,
+  Command,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  Range,
+  TextDocument,
+  Uri,
+} from 'vscode';
 
 import { buildProjectPath } from '@nx-console/shared-file-system';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
@@ -6,7 +15,11 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode-nx-workspace';
-import { NxCodeLensProvider } from '@nx-console/vscode-utils';
+import {
+  NxCodeLensProvider,
+  registerCodeLensProvider,
+} from '@nx-console/vscode-utils';
+import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { ProjectLocations, getProjectLocations } from './get-project-locations';
 
 export class TargetCodeLens extends CodeLens {
@@ -42,6 +55,31 @@ export class TaskGraphCodeLens extends CodeLens {
 
 export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
   CODELENS_PATTERN = { pattern: '**/{workspace,project}.json' };
+  private changeEvent = new EventEmitter<void>();
+  private projectToTargetsMap: Record<string, Set<string>> = {};
+
+  static async register(context: ExtensionContext) {
+    const provider = new WorkspaceCodeLensProvider();
+
+    provider.projectToTargetsMap = await buildProjectToTargetsMap();
+
+    context.subscriptions.push(
+      onWorkspaceRefreshed(async () => {
+        provider.projectToTargetsMap = await buildProjectToTargetsMap();
+        provider.refresh();
+      }),
+    );
+
+    registerCodeLensProvider(provider);
+  }
+
+  public get onDidChangeCodeLenses(): Event<void> {
+    return this.changeEvent.event;
+  }
+
+  public refresh(): void {
+    this.changeEvent.fire();
+  }
   /**
    * Provides a CodeLens set for a matched document
    * @param document a document matched by the pattern passed to registerCodeLensProvider
@@ -68,8 +106,11 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
       }
 
       const projectLocations = getProjectLocations(document, projectName);
-      const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
-      if (!validWorkspaceJson) {
+      // Avoid slow workspace retrieval here; rely on cached targets map instead
+      if (
+        !this.projectToTargetsMap ||
+        Object.keys(this.projectToTargetsMap).length === 0
+      ) {
         return;
       }
 
@@ -119,6 +160,10 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
   ) {
     const projectTargets = project.targets;
     for (const target in projectTargets) {
+      const allowedTargets = this.projectToTargetsMap[projectName];
+      if (!allowedTargets || !allowedTargets.has(target)) {
+        continue;
+      }
       const position = document.positionAt(projectTargets[target].position);
 
       lens.push(
@@ -189,4 +234,20 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
 
     return null;
   }
+}
+
+async function buildProjectToTargetsMap(): Promise<
+  Record<string, Set<string>>
+> {
+  const map: Record<string, Set<string>> = {};
+  const nxWorkspace = await getNxWorkspace();
+  if (!nxWorkspace) {
+    return map;
+  }
+  const { projectGraph } = nxWorkspace;
+  for (const [name, node] of Object.entries(projectGraph.nodes)) {
+    const targets = Object.keys(node.data.targets ?? {});
+    map[name] = new Set(targets);
+  }
+  return map;
 }
