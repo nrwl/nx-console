@@ -214,6 +214,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         }()
     }
 
+    suspend fun graphData(): NxGraphDataResult? {
+        return withMessageIssueCatch("nx/graphData") {
+            server()?.getNxService()?.graphData()?.await()
+        }()
+    }
+
     suspend fun parseTargetString(targetString: String): TargetInfo? {
         return withMessageIssueCatch("nx/parseTargetString") {
             server()?.getNxService()?.parseTargetString(targetString)?.await()

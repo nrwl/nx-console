@@ -131,6 +131,11 @@ interface NxService {
     }
 
     @JsonRequest
+    fun graphData(): CompletableFuture<NxGraphDataResult> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun parseTargetString(targetString: String): CompletableFuture<TargetInfo> {
         throw UnsupportedOperationException()
     }

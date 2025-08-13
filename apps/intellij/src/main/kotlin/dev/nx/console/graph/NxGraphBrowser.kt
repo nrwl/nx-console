@@ -4,12 +4,10 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.ui.jcef.*
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.project_details.browsers.OldProjectDetailsBrowser
 import dev.nx.console.utils.executeJavascriptWithCatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -33,7 +31,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
             logger<NxGraphBrowser>().debug(e.message)
         }
 
-        with(messageBusConnection) {
+                with(messageBusConnection) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                 NxWorkspaceRefreshListener {
@@ -41,7 +39,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                         try {
                             refresh()
                         } catch (e: Throwable) {
-                            logger<OldProjectDetailsBrowser>().debug(e.message)
+                                    logger<NxGraphBrowser>().debug(e.message)
                         }
                     }
                 },
