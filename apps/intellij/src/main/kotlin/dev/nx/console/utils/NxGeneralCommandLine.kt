@@ -15,10 +15,43 @@ fun NxGeneralCommandLine(
     cwd: String? = null,
 ) =
     GeneralCommandLine().apply {
-        exePath = NxExecutable.getExecutablePath(project.nxBasePath, project)
-        addParameters(args)
         val workDirectory =
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
+        
+        // Check if Corepack should be used
+        val corepackPm = CorepackDetection.detectCorepackPackageManager(project.nxBasePath)
+        if (corepackPm != null) {
+            // Use corepack to run the correct package manager
+            val pmName = CorepackDetection.extractPackageManagerName(corepackPm)
+            exePath = "corepack"
+            
+            // Determine the appropriate exec command based on package manager
+            when (pmName) {
+                "yarn" -> {
+                    addParameters("yarn")
+                    addParameters("nx")
+                }
+                "pnpm" -> {
+                    addParameters("pnpm")
+                    addParameters("exec")
+                    addParameters("nx")
+                }
+                "npm" -> {
+                    addParameters("npx")
+                    addParameters("nx")
+                }
+                else -> {
+                    // Fallback to standard approach
+                    exePath = NxExecutable.getExecutablePath(project.nxBasePath, project)
+                }
+            }
+            addParameters(args)
+        } else {
+            // Standard approach when not using Corepack
+            exePath = NxExecutable.getExecutablePath(project.nxBasePath, project)
+            addParameters(args)
+        }
+        
         setWorkDirectory(workDirectory)
         environmentVariables.configureCommandLine(this, true)
 
@@ -46,13 +79,43 @@ fun NxLatestVersionGeneralCommandLine(
     cwd: String? = null,
 ) =
     GeneralCommandLine().apply {
-        // Use npx nx@latest instead of the full binary path
-        exePath = if (SystemInfo.isWindows) "npx.cmd" else "npx"
-        addParameters("-y")
-        addParameters("nx@latest")
-        addParameters(args)
         val workDirectory =
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
+        
+        // Check if Corepack should be used
+        val corepackPm = CorepackDetection.detectCorepackPackageManager(project.nxBasePath)
+        if (corepackPm != null) {
+            // Use corepack with the package manager's exec command
+            val pmName = CorepackDetection.extractPackageManagerName(corepackPm)
+            exePath = "corepack"
+            
+            when (pmName) {
+                "yarn" -> {
+                    addParameters("yarn")
+                    addParameters("dlx")
+                }
+                "pnpm" -> {
+                    addParameters("pnpm")
+                    addParameters("dlx")
+                }
+                "npm" -> {
+                    addParameters("npx")
+                    addParameters("-y")
+                }
+                else -> {
+                    // Fallback to npx
+                    exePath = if (SystemInfo.isWindows) "npx.cmd" else "npx"
+                    addParameters("-y")
+                }
+            }
+        } else {
+            // Standard approach when not using Corepack
+            exePath = if (SystemInfo.isWindows) "npx.cmd" else "npx"
+            addParameters("-y")
+        }
+        
+        addParameters("nx@latest")
+        addParameters(args)
         setWorkDirectory(workDirectory)
         environmentVariables.configureCommandLine(this, true)
 
