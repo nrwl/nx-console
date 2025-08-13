@@ -1,3 +1,16 @@
+# [18.64.0](https://github.com/nrwl/nx-console/compare/vscode-v18.63.0...vscode-v18.64.0) (2025-08-13)
+
+
+### Bug Fixes
+
+* improve nx-mcp & nxls exit handlers ([#2688](https://github.com/nrwl/nx-console/issues/2688)) ([91cc0a3](https://github.com/nrwl/nx-console/commit/91cc0a3b279b21aa1aee6bcefa9b80d4a4fd67a8))
+* **vscode:** don't track nx refresh when it's automatically happening on branch change ([#2686](https://github.com/nrwl/nx-console/issues/2686)) ([1b85ea9](https://github.com/nrwl/nx-console/commit/1b85ea91aa94c13c206bd0b9c3091582b3cc74ea))
+
+
+### Features
+
+* **vscode:** improve migrate ui with commands for individual actions ([#2682](https://github.com/nrwl/nx-console/issues/2682)) ([3eed25e](https://github.com/nrwl/nx-console/commit/3eed25edfaddb0e63686292a8c5b366209260cf3))
+
 # [18.63.0](https://github.com/nrwl/nx-console/compare/vscode-v18.62.0...vscode-v18.63.0) (2025-08-11)
 
 
