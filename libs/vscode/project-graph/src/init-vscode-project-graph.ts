@@ -27,7 +27,7 @@ import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
 import { NxCommandsTreeItem } from '@nx-console/vscode-nx-commands-view';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { gte } from '@nx-console/nx-version';
-import { NewGraphWebviewManager } from './new-graph-webview-manager';
+import { NewGraphWebview } from './new-graph-webview-manager';
 import { setTimeout } from 'node:timers/promises';
 
 let _legacyGraphWebviewManager: GraphWebviewManager | undefined;
@@ -49,7 +49,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
     legacyGrapyWebView,
     // Temporary simple command to open the new state-machine powered graph webview
     commands.registerCommand('nx.graph.new', async () => {
-      const newGraphWebviewManager = new NewGraphWebviewManager();
+      const newGraphWebviewManager = new NewGraphWebview();
       newGraphWebviewManager.reveal();
       await newGraphWebviewManager.sendCommandToGraph({
         type: 'showAll',
