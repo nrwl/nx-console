@@ -4,8 +4,9 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 
-// Store registered CIPE IDs to avoid re-registering
-const registeredCipeIds = new Set<string>();
+// Store registered resources by CIPE ID for management
+// The value is the registered resource object returned by server.resource()
+const registeredResources = new Map<string, any>();
 
 export async function registerNxCloudCipeResources(
   workspacePath: string,
@@ -29,6 +30,37 @@ export async function registerNxCloudCipeResources(
       return;
     }
 
+    const latestCipeIds = new Set<string>();
+    
+    if (cipeData.info && cipeData.info.length > 0) {
+      // Track which CIPEs are in the latest data
+      for (const cipe of cipeData.info) {
+        latestCipeIds.add(cipe.ciPipelineExecutionId);
+      }
+    }
+
+    // Remove resources for CIPEs that no longer exist
+    const resourcesToRemove: string[] = [];
+    for (const [cipeId, resource] of registeredResources.entries()) {
+      if (!latestCipeIds.has(cipeId)) {
+        resourcesToRemove.push(cipeId);
+        try {
+          resource.remove();
+        } catch (error) {
+          logger.log(`Error removing CIPE resource ${cipeId}:`, error);
+        }
+      }
+    }
+    
+    // Clean up our tracking map
+    for (const cipeId of resourcesToRemove) {
+      registeredResources.delete(cipeId);
+    }
+    
+    if (resourcesToRemove.length > 0) {
+      logger.log(`Removed ${resourcesToRemove.length} stale CIPE resources`);
+    }
+
     if (!cipeData.info || cipeData.info.length === 0) {
       logger.log('No recent CIPEs found to register as resources');
       return;
@@ -41,7 +73,7 @@ export async function registerNxCloudCipeResources(
       const cipeId = cipe.ciPipelineExecutionId;
       
       // Skip if already registered
-      if (registeredCipeIds.has(cipeId)) {
+      if (registeredResources.has(cipeId)) {
         continue;
       }
 
@@ -54,7 +86,7 @@ export async function registerNxCloudCipeResources(
       // Use CIPE ID in URL for stability
       const resourceUri = `nx-cloud://cipes/${cipeId}`;
       
-      server.resource(
+      const registeredResource = server.resource(
         resourceName,
         resourceUri,
         {
@@ -121,12 +153,12 @@ export async function registerNxCloudCipeResources(
         },
       );
 
-      registeredCipeIds.add(cipeId);
+      registeredResources.set(cipeId, registeredResource);
       newResourcesCount++;
     }
 
     if (newResourcesCount > 0) {
-      logger.log(`Registered ${newResourcesCount} new Nx Cloud CIPE resources (${registeredCipeIds.size} total)`);
+      logger.log(`Registered ${newResourcesCount} new Nx Cloud CIPE resources (${registeredResources.size} total)`);
     }
   } catch (error) {
     logger.log('Error registering CIPE resources:', error);
@@ -134,8 +166,16 @@ export async function registerNxCloudCipeResources(
 }
 
 /**
- * Clear all registered CIPE IDs (useful for cleanup)
+ * Clear all registered CIPE resources (useful for cleanup)
  */
-export function clearRegisteredCipeIds(): void {
-  registeredCipeIds.clear();
+export function clearRegisteredCipeResources(): void {
+  // Remove all registered resources
+  for (const resource of registeredResources.values()) {
+    try {
+      resource.remove();
+    } catch (error) {
+      // Resource might already be removed, ignore errors
+    }
+  }
+  registeredResources.clear();
 }

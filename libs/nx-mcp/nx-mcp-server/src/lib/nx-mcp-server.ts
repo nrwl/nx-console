@@ -14,7 +14,7 @@ import { IdeProvider } from './ide-provider';
 import { registerNxCloudTools } from './tools/nx-cloud';
 import { 
   registerNxCloudCipeResources,
-  clearRegisteredCipeIds 
+  clearRegisteredCipeResources 
 } from './resources/nx-cloud-cipe-resources';
 import {
   registerNxCoreTools,
@@ -199,8 +199,8 @@ export class NxMcpServerWrapper {
     // Dispose IDE provider if it exists
     this.ideProvider?.dispose();
     
-    // Clear registered CIPE IDs
-    clearRegisteredCipeIds();
+    // Clear all registered CIPE resources
+    clearRegisteredCipeResources();
   }
 
   /**
