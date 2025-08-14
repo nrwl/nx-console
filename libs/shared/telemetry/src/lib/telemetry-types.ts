@@ -20,7 +20,6 @@ export type TelemetryEvents =
   | 'misc.exception'
   // migrate
   | 'migrate.open'
-  | 'migrate.start'
   // cloud
   | 'cloud.connect'
   | 'cloud.open-app'
@@ -69,6 +68,7 @@ export type TelemetryEvents =
   | 'ai.feedback-bad'
   | 'ai.response-interaction'
   | 'ai.tool-call'
+  | 'ai.resource-read'
   | 'ai.add-mcp';
 
 export type TelemetryData = {

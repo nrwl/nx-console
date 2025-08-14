@@ -28,15 +28,18 @@ export async function registerNxCloudCipeResources(
     }
 
     // Fetch recent CIPEs through the provider
-    const cipeData = await nxWorkspaceInfoProvider.getRecentCIPEData(workspacePath, logger);
-    
+    const cipeData = await nxWorkspaceInfoProvider.getRecentCIPEData(
+      workspacePath,
+      logger,
+    );
+
     if (cipeData.error) {
       logger.log(`Error getting recent CIPE data: ${cipeData.error.message}`);
       return;
     }
 
     const latestCipeIds = new Set<string>();
-    
+
     if (cipeData.info && cipeData.info.length > 0) {
       // Track which CIPEs are in the latest data
       for (const cipe of cipeData.info) {
@@ -57,12 +60,12 @@ export async function registerNxCloudCipeResources(
         }
       }
     }
-    
+
     // Clean up our tracking map
     for (const cipeId of resourcesToRemove) {
       registeredResources.delete(cipeId);
     }
-    
+
     if (resourcesToRemove.length > 0) {
       logger.log(`Removed ${resourcesToRemove.length} stale CIPE resources`);
     }
@@ -77,7 +80,7 @@ export async function registerNxCloudCipeResources(
     // Register each CIPE as an individual resource
     for (const cipe of cipeData.info) {
       const cipeId = cipe.ciPipelineExecutionId;
-      
+
       // Skip if already registered
       if (registeredResources.has(cipeId)) {
         continue;
@@ -85,13 +88,18 @@ export async function registerNxCloudCipeResources(
 
       // Create pretty name with branch and commit info
       const resourceName = `${cipe.branch} - ${cipe.commitTitle || 'No commit title'}`;
-      const statusEmoji = cipe.status === 'SUCCEEDED' ? '✅' : 
-                          cipe.status === 'FAILED' ? '❌' : 
-                          cipe.status === 'IN_PROGRESS' ? '🔄' : '⏸️';
-      
+      const statusEmoji =
+        cipe.status === 'SUCCEEDED'
+          ? '✅'
+          : cipe.status === 'FAILED'
+            ? '❌'
+            : cipe.status === 'IN_PROGRESS'
+              ? '🔄'
+              : '⏸️';
+
       // Use CIPE ID in URL for stability
       const resourceUri = `nx-cloud://cipes/${cipeId}`;
-      
+
       // Register the resource and store the returned object (which has .remove(), .enable(), .disable() methods)
       const registeredResource = server.resource(
         resourceName,
@@ -102,42 +110,55 @@ export async function registerNxCloudCipeResources(
           mimeType: 'application/json',
         },
         async (): Promise<ReadResourceResult> => {
-          telemetry?.logUsage('mcp.resource-read', {
+          telemetry?.logUsage('ai.resource-read', {
             resource: 'nx-cloud-cipe',
-            branch: cipe.branch,
-            cipeId: cipe.ciPipelineExecutionId,
           });
 
           // Re-fetch to get the latest data
-          const latestData = await nxWorkspaceInfoProvider.getRecentCIPEData!(workspacePath, logger);
-          
-          if (latestData.error) {
+          const latestData = await nxWorkspaceInfoProvider.getRecentCIPEData(
+            workspacePath,
+            logger,
+          );
+
+          if (!latestData || latestData.error) {
             return {
               contents: [
                 {
                   type: 'text',
-                  text: JSON.stringify({
-                    error: latestData.error,
-                  }, null, 2),
+                  text: JSON.stringify(
+                    {
+                      error: latestData.error,
+                    },
+                    null,
+                    2,
+                  ),
+                  uri: resourceUri,
                 },
               ],
             };
           }
 
           // Find the specific CIPE with latest data
-          const latestCipe = latestData.info?.find(c => c.ciPipelineExecutionId === cipeId);
-          
+          const latestCipe = latestData.info?.find(
+            (c) => c.ciPipelineExecutionId === cipeId,
+          );
+
           if (!latestCipe) {
             return {
               contents: [
                 {
                   type: 'text',
-                  text: JSON.stringify({
-                    error: {
-                      type: 'not_found',
-                      message: `CIPE with ID ${cipeId} not found in recent data`,
+                  text: JSON.stringify(
+                    {
+                      error: {
+                        type: 'not_found',
+                        message: `CIPE with ID ${cipeId} not found in recent data`,
+                      },
                     },
-                  }, null, 2),
+                    null,
+                    2,
+                  ),
+                  uri: resourceUri,
                 },
               ],
             };
@@ -154,6 +175,7 @@ export async function registerNxCloudCipeResources(
               {
                 type: 'text',
                 text: JSON.stringify(result, null, 2),
+                uri: resourceUri,
               },
             ],
           };
@@ -166,7 +188,9 @@ export async function registerNxCloudCipeResources(
     }
 
     if (newResourcesCount > 0) {
-      logger.log(`Registered ${newResourcesCount} new Nx Cloud CIPE resources (${registeredResources.size} total)`);
+      logger.log(
+        `Registered ${newResourcesCount} new Nx Cloud CIPE resources (${registeredResources.size} total)`,
+      );
     }
   } catch (error) {
     logger.log('Error registering CIPE resources:', error);

@@ -12,9 +12,9 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { IdeProvider } from './ide-provider';
 import { registerNxCloudTools } from './tools/nx-cloud';
-import { 
+import {
   registerNxCloudCipeResources,
-  clearRegisteredCipeResources 
+  clearRegisteredCipeResources,
 } from './resources/nx-cloud-cipe-resources';
 import {
   registerNxCoreTools,
@@ -44,7 +44,7 @@ export interface NxWorkspaceInfoProvider {
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>;
   isNxCloudEnabled: () => Promise<boolean>;
-  getRecentCIPEData?: (
+  getRecentCIPEData: (
     workspacePath: string,
     logger: Logger,
   ) => Promise<{
@@ -187,7 +187,7 @@ export class NxMcpServerWrapper {
   cleanup(): void {
     // Stop periodic monitoring
     this.stopPeriodicMonitoring();
-    
+
     // Stop CIPE refresh interval
     this.stopCipeRefreshInterval();
 
@@ -198,7 +198,7 @@ export class NxMcpServerWrapper {
 
     // Dispose IDE provider if it exists
     this.ideProvider?.dispose();
-    
+
     // Clear all registered CIPE resources
     clearRegisteredCipeResources();
   }
@@ -262,7 +262,7 @@ export class NxMcpServerWrapper {
           this.telemetry,
           this.nxWorkspaceInfoProvider.getGitDiffs,
         );
-        
+
         // Register CIPE resources
         await registerNxCloudCipeResources(
           this._nxWorkspacePath,
@@ -271,10 +271,10 @@ export class NxMcpServerWrapper {
           this.telemetry,
           this.nxWorkspaceInfoProvider,
         );
-        
+
         // Start refresh interval for CIPE resources
         this.startCipeRefreshInterval();
-        
+
         this.toolRegistrationState.nxCloud = true;
       }
 
@@ -383,7 +383,10 @@ export class NxMcpServerWrapper {
     }
 
     // Don't start if workspace path or provider is not available
-    if (!this._nxWorkspacePath || !this.nxWorkspaceInfoProvider.getRecentCIPEData) {
+    if (
+      !this._nxWorkspacePath ||
+      !this.nxWorkspaceInfoProvider.getRecentCIPEData
+    ) {
       return;
     }
 
