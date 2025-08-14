@@ -2,21 +2,27 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Logger } from '@nx-console/shared-utils';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
-import { getRecentCIPEData } from '@nx-console/shared-nx-cloud';
-import { CIPEInfo } from '@nx-console/shared-types';
+import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 
-// Store registered CIPE IDs to avoid re-registering
-const registeredCipeIds = new Set<string>();
+// Store registered CIPE resource URIs to avoid re-registering
+const registeredCipeUris = new Set<string>();
 
 export async function registerNxCloudCipeResources(
   workspacePath: string,
   server: McpServer,
   logger: Logger,
   telemetry: NxConsoleTelemetryLogger | undefined,
+  nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
 ): Promise<void> {
   try {
-    // Fetch recent CIPEs
-    const cipeData = await getRecentCIPEData(workspacePath, logger);
+    // Check if provider supports CIPE data
+    if (!nxWorkspaceInfoProvider.getRecentCIPEData) {
+      logger.log('Provider does not support getRecentCIPEData');
+      return;
+    }
+
+    // Fetch recent CIPEs through the provider
+    const cipeData = await nxWorkspaceInfoProvider.getRecentCIPEData(workspacePath, logger);
     
     if (cipeData.error) {
       logger.log(`Error getting recent CIPE data: ${cipeData.error.message}`);
@@ -30,32 +36,37 @@ export async function registerNxCloudCipeResources(
 
     // Register each CIPE as an individual resource
     for (const cipe of cipeData.info) {
-      const cipeId = cipe.ciPipelineExecutionId;
+      // Create a human-readable identifier using branch and commit info
+      const identifier = `${cipe.branch}/${cipe.commitTitle || cipe.ciPipelineExecutionId}`;
+      const resourceUri = `nx-cloud://cipes/${encodeURIComponent(identifier)}`;
       
       // Skip if already registered
-      if (registeredCipeIds.has(cipeId)) {
+      if (registeredCipeUris.has(resourceUri)) {
         continue;
       }
 
-      const resourceName = `CIPE: ${cipe.branch} - ${cipe.status}`;
-      const resourceUri = `nx-cloud://cipes/${cipeId}`;
+      const resourceName = `${cipe.branch} - ${cipe.commitTitle || 'No commit title'}`;
+      const statusEmoji = cipe.status === 'SUCCEEDED' ? '✅' : 
+                          cipe.status === 'FAILED' ? '❌' : 
+                          cipe.status === 'IN_PROGRESS' ? '🔄' : '⏸️';
       
       server.resource(
         resourceName,
         resourceUri,
         {
-          name: resourceName,
-          description: `CI Pipeline Execution on ${cipe.branch} (${cipe.status}) - ${cipe.commitTitle || 'No commit title'}`,
+          name: `${statusEmoji} ${resourceName}`,
+          description: `CI Pipeline Execution on ${cipe.branch} (${cipe.status}) - ${cipe.author || 'Unknown author'}`,
           mimeType: 'application/json',
         },
         async (): Promise<ReadResourceResult> => {
           telemetry?.logUsage('mcp.resource-read', {
             resource: 'nx-cloud-cipe',
-            cipeId,
+            branch: cipe.branch,
+            cipeId: cipe.ciPipelineExecutionId,
           });
 
           // Re-fetch to get the latest data
-          const latestData = await getRecentCIPEData(workspacePath, logger);
+          const latestData = await nxWorkspaceInfoProvider.getRecentCIPEData!(workspacePath, logger);
           
           if (latestData.error) {
             return {
@@ -71,7 +82,8 @@ export async function registerNxCloudCipeResources(
           }
 
           // Find the specific CIPE with latest data
-          const latestCipe = latestData.info?.find(c => c.ciPipelineExecutionId === cipeId);
+          // Match by CIPE ID since that's the stable identifier
+          const latestCipe = latestData.info?.find(c => c.ciPipelineExecutionId === cipe.ciPipelineExecutionId);
           
           if (!latestCipe) {
             return {
@@ -81,7 +93,7 @@ export async function registerNxCloudCipeResources(
                   text: JSON.stringify({
                     error: {
                       type: 'not_found',
-                      message: `CIPE with ID ${cipeId} not found in recent data`,
+                      message: `CIPE for ${identifier} not found in recent data`,
                     },
                   }, null, 2),
                 },
@@ -89,18 +101,24 @@ export async function registerNxCloudCipeResources(
             };
           }
 
+          // Include the workspace URL for convenience
+          const result = {
+            ...latestCipe,
+            workspaceUrl: latestData.workspaceUrl,
+          };
+
           return {
             contents: [
               {
                 type: 'text',
-                text: JSON.stringify(latestCipe, null, 2),
+                text: JSON.stringify(result, null, 2),
               },
             ],
           };
         },
       );
 
-      registeredCipeIds.add(cipeId);
+      registeredCipeUris.add(resourceUri);
     }
 
     logger.log(`Registered ${cipeData.info.length} Nx Cloud CIPE resources`);
@@ -117,6 +135,7 @@ export async function refreshNxCloudCipeResources(
   server: McpServer,
   logger: Logger,
   telemetry: NxConsoleTelemetryLogger | undefined,
+  nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
 ): Promise<void> {
-  await registerNxCloudCipeResources(workspacePath, server, logger, telemetry);
+  await registerNxCloudCipeResources(workspacePath, server, logger, telemetry, nxWorkspaceInfoProvider);
 }

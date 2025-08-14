@@ -12,10 +12,7 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { IdeProvider } from './ide-provider';
 import { registerNxCloudTools } from './tools/nx-cloud';
-import { 
-  registerNxCloudCipeResources,
-  refreshNxCloudCipeResources 
-} from './resources/nx-cloud-cipe-resources';
+import { registerNxCloudCipeResources } from './resources/nx-cloud-cipe-resources';
 import {
   registerNxCoreTools,
   setNxWorkspacePath as setNxWorkspacePathForCoreTools,
@@ -44,6 +41,14 @@ export interface NxWorkspaceInfoProvider {
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>;
   isNxCloudEnabled: () => Promise<boolean>;
+  getRecentCIPEData?: (
+    workspacePath: string,
+    logger: Logger,
+  ) => Promise<{
+    info?: any[];
+    error?: any;
+    workspaceUrl?: string;
+  }>;
 }
 
 export class NxMcpServerWrapper {
@@ -253,6 +258,7 @@ export class NxMcpServerWrapper {
           this.server,
           this.logger,
           this.telemetry,
+          this.nxWorkspaceInfoProvider,
         );
         
         this.toolRegistrationState.nxCloud = true;
