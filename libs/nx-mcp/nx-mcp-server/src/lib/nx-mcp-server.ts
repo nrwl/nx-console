@@ -41,14 +41,6 @@ export interface NxWorkspaceInfoProvider {
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>;
   isNxCloudEnabled: () => Promise<boolean>;
-  getRecentCIPEData?: (
-    workspacePath: string,
-    logger: Logger,
-  ) => Promise<{
-    info?: any[];
-    error?: any;
-    workspaceUrl?: string;
-  }>;
 }
 
 export class NxMcpServerWrapper {
@@ -252,16 +244,13 @@ export class NxMcpServerWrapper {
           this.nxWorkspaceInfoProvider.getGitDiffs,
         );
         
-        // Register CIPE resources if the provider supports it
-        if (this.nxWorkspaceInfoProvider.getRecentCIPEData) {
-          registerNxCloudCipeResources(
-            this._nxWorkspacePath,
-            this.server,
-            this.logger,
-            this.telemetry,
-            this.nxWorkspaceInfoProvider.getRecentCIPEData,
-          );
-        }
+        // Register CIPE resources
+        registerNxCloudCipeResources(
+          this._nxWorkspacePath,
+          this.server,
+          this.logger,
+          this.telemetry,
+        );
         
         this.toolRegistrationState.nxCloud = true;
       }

@@ -16,7 +16,6 @@ import {
   getNxWorkspace,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
-import { getRecentCIPEData } from '@nx-console/shared-nx-workspace-info';
 import {
   getGitDiffs,
   isInVSCode,
@@ -33,8 +32,6 @@ export const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   },
   isNxCloudEnabled: async () =>
     await isNxCloudUsed(getNxWorkspacePath(), vscodeLogger),
-  getRecentCIPEData: async (workspacePath, logger) =>
-    await getRecentCIPEData(workspacePath, logger),
 };
 
 export const ideProvider: IdeProvider = {
