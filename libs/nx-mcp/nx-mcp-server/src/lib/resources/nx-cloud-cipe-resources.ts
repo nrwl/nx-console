@@ -4,9 +4,14 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 
+// Type for registered resource objects (they have a remove() method)
+type RegisteredResource = {
+  remove: () => void;
+};
+
 // Store registered resources by CIPE ID for management
 // The value is the registered resource object returned by server.resource()
-const registeredResources = new Map<string, any>();
+const registeredResources = new Map<string, RegisteredResource>();
 
 export async function registerNxCloudCipeResources(
   workspacePath: string,
@@ -45,6 +50,7 @@ export async function registerNxCloudCipeResources(
       if (!latestCipeIds.has(cipeId)) {
         resourcesToRemove.push(cipeId);
         try {
+          // Call .remove() on the resource object to remove it from the MCP client's list
           resource.remove();
         } catch (error) {
           logger.log(`Error removing CIPE resource ${cipeId}:`, error);
@@ -86,6 +92,7 @@ export async function registerNxCloudCipeResources(
       // Use CIPE ID in URL for stability
       const resourceUri = `nx-cloud://cipes/${cipeId}`;
       
+      // Register the resource and store the returned object (which has .remove(), .enable(), .disable() methods)
       const registeredResource = server.resource(
         resourceName,
         resourceUri,
@@ -153,6 +160,7 @@ export async function registerNxCloudCipeResources(
         },
       );
 
+      // Store the resource object so we can call .remove() on it later
       registeredResources.set(cipeId, registeredResource);
       newResourcesCount++;
     }
@@ -169,13 +177,15 @@ export async function registerNxCloudCipeResources(
  * Clear all registered CIPE resources (useful for cleanup)
  */
 export function clearRegisteredCipeResources(): void {
-  // Remove all registered resources
+  // Remove all registered resources by calling .remove() on each resource object
   for (const resource of registeredResources.values()) {
     try {
+      // This removes the resource from the MCP client's resource list
       resource.remove();
     } catch (error) {
       // Resource might already be removed, ignore errors
     }
   }
+  // Clear our tracking map
   registeredResources.clear();
 }
