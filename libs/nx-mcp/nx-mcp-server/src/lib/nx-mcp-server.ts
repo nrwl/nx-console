@@ -12,7 +12,10 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { IdeProvider } from './ide-provider';
 import { registerNxCloudTools } from './tools/nx-cloud';
-import { registerNxCloudCipeResources } from './resources/nx-cloud-cipe-resources';
+import { 
+  registerNxCloudCipeResources,
+  refreshNxCloudCipeResources 
+} from './resources/nx-cloud-cipe-resources';
 import {
   registerNxCoreTools,
   setNxWorkspacePath as setNxWorkspacePathForCoreTools,
@@ -245,7 +248,7 @@ export class NxMcpServerWrapper {
         );
         
         // Register CIPE resources
-        registerNxCloudCipeResources(
+        await registerNxCloudCipeResources(
           this._nxWorkspacePath,
           this.server,
           this.logger,
