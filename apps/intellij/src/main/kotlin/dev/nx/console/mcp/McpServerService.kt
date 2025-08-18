@@ -24,6 +24,7 @@ class McpServerService(private val project: Project) {
     fun setupMcpServer() {
 
         if (!hasAIAssistantInstalled()) {
+            Notifier.notifyAiAssistantPluginRequired(project)
             return
         }
         if (isMcpServerSetup()) {

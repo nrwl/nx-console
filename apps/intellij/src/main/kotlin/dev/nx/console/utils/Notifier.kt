@@ -238,5 +238,15 @@ class Notifier {
 
             notification.notify(project)
         }
+
+        fun notifyAiAssistantPluginRequired(project: Project) {
+            getGroup()
+                .createNotification(
+                    "This action sets up the MCP server for the AI Assistant plugin. Install the AI Assistant plugin to proceed, or configure the MCP server manually for other tools.",
+                    NotificationType.INFORMATION,
+                )
+                .setTitle("Nx Console")
+                .notify(project)
+        }
     }
 }
