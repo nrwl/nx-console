@@ -1,19 +1,14 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { Logger } from '@nx-console/shared-utils';
-import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
+import {
+  McpServer,
+  RegisteredResource,
+} from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
-import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 import { NX_CLOUD_CIPE_FAILURE } from '@nx-console/shared-llm-context';
-import { CIPEInfo, CIPERun } from '@nx-console/shared-types';
+import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
+import { Logger } from '@nx-console/shared-utils';
+import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
 import { renderCipeDetails } from '../tools/nx-cloud';
 
-// Type for registered resource objects (they have a remove() method)
-type RegisteredResource = {
-  remove: () => void;
-};
-
-// Store registered resources by CIPE ID for management
-// The value is the registered resource object returned by server.resource()
 const registeredResources = new Map<string, RegisteredResource>();
 
 export async function registerNxCloudCipeResources(
@@ -51,10 +46,10 @@ export async function registerNxCloudCipeResources(
     }
 
     // Remove resources for CIPEs that no longer exist
-    const resourcesToRemove: string[] = [];
     for (const [cipeId, resource] of registeredResources.entries()) {
       if (!latestCipeIds.has(cipeId)) {
-        resourcesToRemove.push(cipeId);
+        registeredResources.delete(cipeId);
+
         try {
           // Call .remove() on the resource object to remove it from the MCP client's list
           resource.remove();
@@ -64,17 +59,7 @@ export async function registerNxCloudCipeResources(
       }
     }
 
-    // Clean up our tracking map
-    for (const cipeId of resourcesToRemove) {
-      registeredResources.delete(cipeId);
-    }
-
-    if (resourcesToRemove.length > 0) {
-      logger.log(`Removed ${resourcesToRemove.length} stale CIPE resources`);
-    }
-
     if (!cipeData.info || cipeData.info.length === 0) {
-      logger.log('No recent CIPEs found to register as resources');
       return;
     }
 
@@ -84,12 +69,10 @@ export async function registerNxCloudCipeResources(
     for (const cipe of cipeData.info) {
       const cipeId = cipe.ciPipelineExecutionId;
 
-      // Skip if already registered
       if (registeredResources.has(cipeId)) {
         continue;
       }
 
-      // Create pretty name with branch and commit info
       const resourceName = cipe.branch;
       const statusText =
         cipe.status === 'SUCCEEDED'
@@ -100,10 +83,9 @@ export async function registerNxCloudCipeResources(
               ? 'In Progress'
               : cipe.status;
 
-      // Use CIPE ID in URL for stability
       const resourceUri = `nx-cloud://cipes/${cipeId}`;
 
-      // Register the resource and store the returned object (which has .remove(), .enable(), .disable() methods)
+      // Register the resource and store the returned object
       const registeredResource = server.resource(
         resourceName,
         resourceUri,
@@ -142,7 +124,6 @@ export async function registerNxCloudCipeResources(
             };
           }
 
-          // Find the specific CIPE with latest data
           const latestCipe = latestData.info?.find(
             (c) => c.ciPipelineExecutionId === cipeId,
           );
