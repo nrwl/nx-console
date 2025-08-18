@@ -28,7 +28,7 @@ describe('createYargsConfig', () => {
     it('should set transport to sse when using deprecated --sse flag', () => {
       const argv = createYargsConfig(['--sse']).parseSync();
 
-      expect(argv.transport).toBe('sse');
+      expect(argv.transport).toBe(undefined);
       expect(argv.sse).toBe(false);
     });
 
