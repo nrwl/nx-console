@@ -1,3 +1,11 @@
+## [18.64.1](https://github.com/nrwl/nx-console/compare/vscode-v18.64.0...vscode-v18.64.1) (2025-08-18)
+
+
+### Bug Fixes
+
+* **vscode:** don't show target codelenses for synthetic targets ([#2691](https://github.com/nrwl/nx-console/issues/2691)) ([f2f27c2](https://github.com/nrwl/nx-console/commit/f2f27c20a038f5e7af888e606ffba77d88ea338f))
+* **vscode:** handle eacces error when connecting to jsonrpc server ([#2696](https://github.com/nrwl/nx-console/issues/2696)) ([265910e](https://github.com/nrwl/nx-console/commit/265910e81bf9c3955a5f8796ae15d91308c781d1))
+
 # [18.64.0](https://github.com/nrwl/nx-console/compare/vscode-v18.63.0...vscode-v18.64.0) (2025-08-13)
 
 
