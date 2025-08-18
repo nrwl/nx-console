@@ -15,6 +15,8 @@ export class DaemonWatcher {
   private retryCount = 0;
 
   private disposables: Set<() => void> = new Set();
+  private debounceTimer: NodeJS.Timeout | null = null;
+  private pendingChanges: Set<string> = new Set();
 
   constructor(
     private workspacePath: string,
@@ -29,6 +31,10 @@ export class DaemonWatcher {
 
   stop() {
     this.stopped = true;
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     this.disposeEverything();
   }
 
@@ -149,7 +155,7 @@ export class DaemonWatcher {
                       .map((f) => `${f.path} (${f.type})`)
                       .join(', '),
                 );
-                this.callback();
+                this.handleFileChanges(filteredChangedFiles);
               }
             }
           },
@@ -179,6 +185,63 @@ export class DaemonWatcher {
     this.disposables.add(() => {
       nativeWatcher.stop();
     });
+  }
+
+  private handleFileChanges(
+    changedFiles: Array<{ path: string; type: string }>,
+  ) {
+    const criticalFiles: string[] = [];
+    const nonCriticalFiles: string[] = [];
+
+    for (const file of changedFiles) {
+      const normalized = normalize(file.path);
+      const isCritical =
+        normalized.endsWith('project.json') ||
+        normalized.endsWith('package.json') ||
+        normalized.endsWith('nx.json');
+
+      if (isCritical) {
+        criticalFiles.push(file.path);
+      } else {
+        nonCriticalFiles.push(file.path);
+        this.pendingChanges.add(file.path);
+      }
+    }
+
+    if (criticalFiles.length > 0) {
+      this.logger.log(
+        `Critical files changed (triggering immediately): ${criticalFiles.join(
+          ', ',
+        )}`,
+      );
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = null;
+      }
+      this.pendingChanges.clear();
+      this.callback();
+    } else if (nonCriticalFiles.length > 0) {
+      this.logger.log(
+        `Non-critical files changed (debouncing for 10s): ${nonCriticalFiles.join(
+          ', ',
+        )}`,
+      );
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        if (this.pendingChanges.size > 0) {
+          this.logger.log(
+            `Debounce timer expired, triggering callback for: ${Array.from(
+              this.pendingChanges,
+            ).join(', ')}`,
+          );
+          this.pendingChanges.clear();
+          this.callback();
+        }
+        this.debounceTimer = null;
+      }, 10000);
+    }
   }
 
   private disposeEverything() {

@@ -25,6 +25,8 @@ const NX_PLUGIN_PATTERNS_TO_WATCH = [
 export class NativeWatcher {
   private watcher: Watcher | undefined;
   private stopped = false;
+  private debounceTimer: NodeJS.Timeout | null = null;
+  private pendingChanges: Set<string> = new Set();
 
   constructor(
     private workspacePath: string,
@@ -36,6 +38,10 @@ export class NativeWatcher {
 
   stop() {
     this.stopped = true;
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     this.watcher?.stop();
   }
 
@@ -50,38 +56,90 @@ export class NativeWatcher {
     this.watcher.watch((err: string | null, events: WatchEvent[]) => {
       if (err) {
         this.logger.log('Error watching files: ' + err);
-      } else if (
-        events
-          .map((e) => normalize(e.path))
-          .some(
-            (path) =>
-              (path.endsWith('project.json') ||
-                path.endsWith('package.json') ||
-                path.endsWith('nx.json') ||
-                path.endsWith('workspace.json') ||
-                path.endsWith('tsconfig.base.json') ||
-                NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-                  minimatch([path], pattern, { dot: true }),
-                ) ||
-                NativeWatcher.openDocuments.has(path)) &&
-              !path.startsWith('node_modules') &&
-              !path.startsWith(normalize('.nx/cache')) &&
-              !path.startsWith(normalize('.yarn/cache')) &&
-              !path.startsWith(normalize('.nx/workspace-data')),
-          )
-      ) {
-        if (this.stopped) {
-          this.watcher?.stop();
-          return;
+      } else {
+        const relevantEvents = events.filter((e) => {
+          const path = normalize(e.path);
+          return (
+            (path.endsWith('project.json') ||
+              path.endsWith('package.json') ||
+              path.endsWith('nx.json') ||
+              path.endsWith('workspace.json') ||
+              path.endsWith('tsconfig.base.json') ||
+              NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
+                minimatch([path], pattern, { dot: true }),
+              ) ||
+              NativeWatcher.openDocuments.has(path)) &&
+            !path.startsWith('node_modules') &&
+            !path.startsWith(normalize('.nx/cache')) &&
+            !path.startsWith(normalize('.yarn/cache')) &&
+            !path.startsWith(normalize('.nx/workspace-data'))
+          );
+        });
+
+        if (relevantEvents.length > 0) {
+          if (this.stopped) {
+            this.watcher?.stop();
+            return;
+          }
+          this.handleFileChanges(relevantEvents);
         }
-        this.logger.log(
-          `native watcher detected project changes in files ${events
-            .map((e) => normalize(e.path))
-            .join(', ')}`,
-        );
-        this.callback();
       }
     });
+  }
+
+  private handleFileChanges(events: WatchEvent[]) {
+    const criticalFiles: string[] = [];
+    const nonCriticalFiles: string[] = [];
+
+    for (const event of events) {
+      const path = normalize(event.path);
+      const isCritical =
+        path.endsWith('project.json') ||
+        path.endsWith('package.json') ||
+        path.endsWith('nx.json');
+
+      if (isCritical) {
+        criticalFiles.push(path);
+      } else {
+        nonCriticalFiles.push(path);
+        this.pendingChanges.add(path);
+      }
+    }
+
+    if (criticalFiles.length > 0) {
+      this.logger.log(
+        `Critical files changed (triggering immediately): ${criticalFiles.join(
+          ', ',
+        )}`,
+      );
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = null;
+      }
+      this.pendingChanges.clear();
+      this.callback();
+    } else if (nonCriticalFiles.length > 0) {
+      this.logger.log(
+        `Non-critical files changed (debouncing for 10s): ${nonCriticalFiles.join(
+          ', ',
+        )}`,
+      );
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        if (this.pendingChanges.size > 0) {
+          this.logger.log(
+            `Debounce timer expired, triggering callback for: ${Array.from(
+              this.pendingChanges,
+            ).join(', ')}`,
+          );
+          this.pendingChanges.clear();
+          this.callback();
+        }
+        this.debounceTimer = null;
+      }, 10000);
+    }
   }
 
   private static openDocuments: Set<string> = new Set();
