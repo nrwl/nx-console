@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../lsp-client"
+    },
+    {
+      "path": "../utils"
+    },
+    {
       "path": "../nx-workspace"
     },
     {
@@ -11,9 +17,6 @@
     },
     {
       "path": "../../shared/file-system"
-    },
-    {
-      "path": "../utils"
     },
     {
       "path": "./tsconfig.lib.json"

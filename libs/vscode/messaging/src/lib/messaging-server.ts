@@ -93,21 +93,39 @@ export class NxMessagingServer {
     });
   }
 
-  listen() {
+  async listen() {
     killSocketOnPath(this.#fullSocketPath);
-    this.#server.listen(this.#fullSocketPath, () => {
-      vscodeLogger.log(
-        `Nx Console Messaging JSON-RPC server listening on ${this.#fullSocketPath}`,
-      );
+    await new Promise<void>((resolve, reject) => {
+      const onListening = () => {
+        this.#server.off('error', onError);
+        vscodeLogger.log(
+          `Nx Console Messaging JSON-RPC server listening on ${this.#fullSocketPath}`,
+        );
+        resolve();
+      };
+
+      const onError = (err: NodeJS.ErrnoException) => {
+        this.#server.off('listening', onListening);
+
+        reject(err);
+      };
+
+      this.#server.once('listening', onListening);
+      this.#server.once('error', onError);
+      this.#server.listen(this.#fullSocketPath);
     });
   }
 
-  dispose() {
+  async dispose() {
     try {
-      this.#server.close(() => {
-        vscodeLogger.log(
-          `Nx Console Messaging JSON-RPC server closed on ${this.#fullSocketPath}`,
-        );
+      vscodeLogger.log(`closing server on ${this.#fullSocketPath}`);
+      await new Promise<void>((resolve) => {
+        this.#server.close(() => {
+          vscodeLogger.log(
+            `Nx Console Messaging JSON-RPC server closed on ${this.#fullSocketPath}`,
+          );
+          resolve();
+        });
       });
     } catch (error) {
       vscodeLogger.log('Error closing server:', error);
@@ -123,12 +141,12 @@ export async function initMessagingServer(
 ) {
   try {
     if (existingServer) {
-      existingServer.dispose();
+      await existingServer.dispose();
     }
 
     const socketPath = await getNxConsoleSocketPath(workspacePath);
     const messagingServer = new NxMessagingServer(socketPath, context);
-    messagingServer.listen();
+    await messagingServer.listen();
 
     context.subscriptions.push(messagingServer);
 
@@ -137,5 +155,10 @@ export async function initMessagingServer(
     vscodeLogger.log(
       `Error initializing Nx Console JSON-RPC messaging server: ${e}`,
     );
+    if ((e as any).code === 'EACCES') {
+      vscodeLogger.log(
+        'The socket path is not accessible. You can overwrite it by setting NX_SOCKET_DIR in .env',
+      );
+    }
   }
 }
