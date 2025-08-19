@@ -6,7 +6,7 @@ import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
 import { NX_CLOUD_CIPE_FAILURE } from '@nx-console/shared-llm-context';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
-import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
+import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
 import { renderCipeDetails } from '../tools/nx-cloud';
 
 const registeredResources = new Map<string, RegisteredResource>();
