@@ -1,3 +1,17 @@
+# [18.65.0](https://github.com/nrwl/nx-console/compare/vscode-v18.64.1...vscode-v18.65.0) (2025-08-19)
+
+
+### Bug Fixes
+
+* make AI telemetry more consistent ([#2701](https://github.com/nrwl/nx-console/issues/2701)) ([cad26ab](https://github.com/nrwl/nx-console/commit/cad26ab7da264fe20b5dd6815dc20f7640394cfd))
+* **vscode:** fix integrated nx-mcp behaviour in non-nx workspace ([#2700](https://github.com/nrwl/nx-console/issues/2700)) ([94218cf](https://github.com/nrwl/nx-console/commit/94218cfe8ab67ed58a786ee118460c0145943ba2))
+
+
+### Features
+
+* **nx-mcp:** expose recent CIPEs as MCP resources ([#2694](https://github.com/nrwl/nx-console/issues/2694)) ([614101f](https://github.com/nrwl/nx-console/commit/614101fe94374188ad9d78ec0a269d10254c1674))
+* **vscode:** remove [@nx](https://github.com/nx) chat participant and redirect to MCP ([#2698](https://github.com/nrwl/nx-console/issues/2698)) ([6d40276](https://github.com/nrwl/nx-console/commit/6d40276b8a11264eb454bc2b2b4a32dc5a6b5280))
+
 ## [18.64.1](https://github.com/nrwl/nx-console/compare/vscode-v18.64.0...vscode-v18.64.1) (2025-08-18)
 
 
