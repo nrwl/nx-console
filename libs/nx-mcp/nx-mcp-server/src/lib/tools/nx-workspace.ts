@@ -24,7 +24,7 @@ import { Logger } from '@nx-console/shared-utils';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import z from 'zod';
-import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
+import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
 
 let nxWorkspacePath: string | undefined = undefined;
 

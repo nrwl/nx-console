@@ -26,6 +26,7 @@ import {
 } from '@nx-console/vscode-configuration';
 import { execSync } from 'child_process';
 import { AgentRulesManager } from './agent-rules-manager';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 
 let mcpStreamableWebServer: McpStreamableWebServer | undefined;
 let initialized = false;
@@ -72,8 +73,6 @@ export async function initMcp(context: ExtensionContext) {
     return;
   }
   initialized = true;
-
-  const rulesManager = new AgentRulesManager(context);
 
   // if the mcp config file is gitignored, we can safely remove the old manual definition
   const mcpJsonPath = getMcpJsonPath();
@@ -131,15 +130,22 @@ export async function initMcp(context: ExtensionContext) {
       'nx-mcp',
       new NxMcpServerDefinitionProvider(mcpStreamableWebServer),
     ),
-    commands.registerCommand('nx.addAgentRules', async () => {
-      await rulesManager.addAgentRulesToWorkspace();
-    }),
   );
 
-  await rulesManager.initialize();
+  if (await checkIsNxWorkspace(getNxWorkspacePath())) {
+    const rulesManager = new AgentRulesManager(context);
 
-  await new Promise((resolve) => setTimeout(resolve, 20000));
-  await rulesManager.showAgentRulesNotification();
+    context.subscriptions.push(
+      commands.registerCommand('nx.addAgentRules', async () => {
+        await rulesManager.addAgentRulesToWorkspace();
+      }),
+    );
+
+    await rulesManager.initialize();
+
+    await new Promise((resolve) => setTimeout(resolve, 20000));
+    await rulesManager.showAgentRulesNotification();
+  }
 }
 
 function shouldUseLegacyMcpRegistration(): boolean {

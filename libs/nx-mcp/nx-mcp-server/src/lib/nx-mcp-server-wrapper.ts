@@ -139,8 +139,6 @@ export class NxMcpServerWrapper {
       },
     );
 
-    logger?.log(`has workspaceinfoprovier ${!!nxWorkspaceInfoProvider}`);
-
     registerNxCoreTools(
       server.server,
       server.logger,
@@ -158,12 +156,16 @@ export class NxMcpServerWrapper {
   }
 
   async setNxWorkspacePath(path: string) {
-    this.logger.log(`Setting nx workspace path to ${path}`);
-    const oldPath = this._nxWorkspacePath;
-    this._nxWorkspacePath = path;
+    this.logger.log(
+      `Setting mcp nx workspace path from ${this._nxWorkspacePath} to ${path}`,
+    );
 
     // If workspace path changed, trigger dynamic evaluation
-    if (oldPath !== path) {
+    if (this._nxWorkspacePath !== path) {
+      this._nxWorkspacePath = path;
+      this.logger.log(
+        `Nx workspace path changed, re-evaluating tools for new path: ${path}`,
+      );
       setNxWorkspacePathForCoreTools(path);
       setNxWorkspacePathForWorkspaceTools(path);
       await this.evaluateAndAddNewTools();
@@ -318,6 +320,7 @@ export class NxMcpServerWrapper {
       if (
         ideAvailable &&
         this.ideProvider &&
+        this._nxWorkspacePath &&
         !this.toolRegistrationState.nxIde &&
         this.ideProvider.isAvailable()
       ) {

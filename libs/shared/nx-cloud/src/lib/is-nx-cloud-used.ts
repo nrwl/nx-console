@@ -13,6 +13,10 @@ export async function isNxCloudUsed(
     return false;
   }
 
+  if (!nxJson) {
+    return false;
+  }
+
   let getIsNxCloudUsed: (nxJson: NxJsonConfiguration) => boolean;
   try {
     // try to use nx utils if they exist
@@ -32,7 +36,7 @@ export async function isNxCloudUsed(
         !!nxJson.nxCloudAccessToken ||
         !!nxJson.nxCloudId ||
         !!Object.values(nxJson.tasksRunnerOptions ?? {}).find(
-          (r) => r.runner == '@nrwl/nx-cloud' || r.runner == 'nx-cloud',
+          (r) => r?.runner == '@nrwl/nx-cloud' || r?.runner == 'nx-cloud',
         )
       );
     };

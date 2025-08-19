@@ -13,6 +13,7 @@ import {
   Uri,
 } from 'vscode';
 import { ideProvider, nxWorkspaceInfoProvider } from './data-providers';
+import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 
 export class NxMcpServerDefinitionProvider
   implements McpServerDefinitionProvider<NxMcpHttpServerDefinition>
@@ -69,8 +70,12 @@ export class McpStreamableWebServer {
             },
           },
         );
+        const providedPath = getNxWorkspacePath();
+        const nxWorkspacePath = (await checkIsNxWorkspace(providedPath))
+          ? providedPath
+          : undefined;
         const server = await NxMcpServerWrapper.create(
-          getNxWorkspacePath(),
+          nxWorkspacePath,
           nxWorkspaceInfoProvider,
           mcpServer,
           ideProvider,
