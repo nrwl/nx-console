@@ -41,7 +41,6 @@ import dev.nx.console.cloud.CIPEPollingService
 import dev.nx.console.cloud.NxCloudApiService
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.telemetry.TelemetryEvent
-import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.executeJavascriptWithCatch
@@ -332,9 +331,8 @@ class NxCloudFixFileImpl(
 
     private fun handleApply() {
         logger<NxCloudFixFileImpl>().info("Apply action received")
-        
-        TelemetryService.getInstance(project)
-            .featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX)
+
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX)
 
         val fixDetails = currentFixDetails ?: return
         val aiFixId =
@@ -373,9 +371,8 @@ class NxCloudFixFileImpl(
 
     private fun handleApplyLocally() {
         logger<NxCloudFixFileImpl>().info("Apply locally action received")
-        
-        TelemetryService.getInstance(project)
-            .featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX_LOCALLY)
+
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX_LOCALLY)
 
         val fixDetails = currentFixDetails ?: return
         val suggestedFix = fixDetails.runGroup.aiFix?.suggestedFix ?: return
@@ -489,9 +486,8 @@ class NxCloudFixFileImpl(
 
     private fun handleReject() {
         logger<NxCloudFixFileImpl>().info("Reject action received")
-        
-        TelemetryService.getInstance(project)
-            .featureUsed(TelemetryEvent.CLOUD_REJECT_AI_FIX)
+
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_REJECT_AI_FIX)
 
         val fixDetails = currentFixDetails ?: return
         val aiFixId =
