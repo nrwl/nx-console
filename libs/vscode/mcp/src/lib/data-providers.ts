@@ -15,6 +15,7 @@ import {
   getGenerators,
   getNxWorkspace,
   getNxWorkspaceProjects,
+  getRecentCIPEData,
 } from '@nx-console/vscode-nx-workspace';
 import {
   getGitDiffs,
@@ -32,6 +33,13 @@ export const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   },
   isNxCloudEnabled: async () =>
     await isNxCloudUsed(getNxWorkspacePath(), vscodeLogger),
+  getRecentCIPEData: async () => {
+    // Route through nxls - getRecentCIPEData from vscode-nx-workspace already does this
+    const result = await getRecentCIPEData();
+    return (
+      result || { error: { type: 'other', message: 'Unable to get CIPE data' } }
+    );
+  },
 };
 
 export const ideProvider: IdeProvider = {

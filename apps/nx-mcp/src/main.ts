@@ -8,7 +8,7 @@ import {
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import { isNxCloudUsed } from '@nx-console/shared-nx-cloud';
+import { isNxCloudUsed, getRecentCIPEData } from '@nx-console/shared-nx-cloud';
 import {
   getGenerators,
   getNxVersion,
@@ -115,6 +115,8 @@ async function main() {
     },
     isNxCloudEnabled: async () =>
       nxWorkspacePath ? await isNxCloudUsed(nxWorkspacePath) : false,
+    getRecentCIPEData: async (workspacePath, logger) =>
+      await getRecentCIPEData(workspacePath, logger),
   };
 
   // Detect if IDE is running and create IDE client if available

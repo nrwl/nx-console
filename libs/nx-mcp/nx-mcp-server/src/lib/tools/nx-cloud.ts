@@ -27,6 +27,7 @@ import {
   getTasksSearch,
 } from '@nx-console/shared-nx-cloud';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
+import { CIPEInfo } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 
@@ -183,42 +184,8 @@ const nxCloudCipeDetails =
       for (const info of recentData.info) {
         content.push({
           type: 'text',
-          text: `- ${info.cipeUrl} (CIPE Status: ${info.status})`,
+          text: renderCipeDetails(info),
         });
-        for (const runGroup of info.runGroups) {
-          content.push({
-            type: 'text',
-            text: `  -- Run Group: ${runGroup.runGroup} (Run Group Status: ${runGroup.status})`,
-          });
-          for (const run of runGroup.runs) {
-            let runPrompt = '    --- Run';
-            if (run.executionId) {
-              runPrompt += ` Execution ID: ${run.executionId}`;
-            }
-            if (run.linkId) {
-              runPrompt += ` Link ID: ${run.linkId}`;
-            }
-
-            runPrompt += ` (Run Status: ${run.status})`;
-
-            content.push({
-              type: 'text',
-              text: runPrompt,
-            });
-            for (const task of run.failedTasks ?? []) {
-              content.push({
-                type: 'text',
-                text: `      ---- Failed Task: ${task}`,
-              });
-            }
-            if (run.status === 'CANCELED') {
-              content.push({
-                type: 'text',
-                text: `      ---- Note: This run was canceled, indicating no failures occurred.`,
-              });
-            }
-          }
-        }
       }
     } else {
       content.push({
@@ -231,6 +198,38 @@ const nxCloudCipeDetails =
       content,
     } satisfies CallToolResult;
   };
+
+export const renderCipeDetails = (cipe: CIPEInfo): string => {
+  const lines: string[] = [];
+  lines.push(`- ${cipe.cipeUrl} (CIPE Status: ${cipe.status})`);
+  for (const runGroup of cipe.runGroups) {
+    lines.push(
+      `  -- Run Group: ${runGroup.runGroup} (Run Group Status: ${runGroup.status})`,
+    );
+    for (const run of runGroup.runs) {
+      let runPrompt = `    --- Run ${run.command} \n          `;
+      if (run.executionId) {
+        runPrompt += ` Execution ID: ${run.executionId}`;
+      }
+      if (run.linkId) {
+        runPrompt += ` Link ID: ${run.linkId}`;
+      }
+
+      runPrompt += ` (Run Status: ${run.status})`;
+
+      lines.push(runPrompt);
+      for (const task of run.failedTasks ?? []) {
+        lines.push(`      ---- Failed Task: ${task}`);
+      }
+      if (run.status === 'CANCELED') {
+        lines.push(
+          `      ---- Note: This run was canceled, indicating no failures occurred.`,
+        );
+      }
+    }
+  }
+  return lines.join('\n');
+};
 
 const nxCloudFixCipeSchema = z.object({
   executionId: z
