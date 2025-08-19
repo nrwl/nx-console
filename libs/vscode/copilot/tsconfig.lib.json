@@ -8,43 +8,7 @@
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
-      "path": "../utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/generate-ui-types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/schema/tsconfig.lib.json"
-    },
-    {
       "path": "../telemetry/tsconfig.lib.json"
-    },
-    {
-      "path": "../nx-commands-view/tsconfig.lib.json"
-    },
-    {
-      "path": "../generate-ui-webview/tsconfig.lib.json"
-    },
-    {
-      "path": "../configuration/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/npm/tsconfig.lib.json"
-    },
-    {
-      "path": "../output-channels/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/llm-context/tsconfig.lib.json"
-    },
-    {
-      "path": "../utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../nx-workspace/tsconfig.lib.json"
     }
   ]
 }
