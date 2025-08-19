@@ -37,6 +37,7 @@ export type TelemetryEvents =
   | 'cloud.show-ai-fix-notification'
   | 'cloud.show-ai-fix'
   | 'cloud.apply-ai-fix'
+  | 'cloud.apply-ai-fix-locally'
   | 'cloud.reject-ai-fix'
   | 'cloud.open-fix-details'
   // graph

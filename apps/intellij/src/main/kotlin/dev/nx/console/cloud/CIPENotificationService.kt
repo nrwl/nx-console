@@ -197,7 +197,11 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         private val runGroupId: String
     ) : NotificationAction("View AI Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-            TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS)
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.CLOUD_OPEN_FIX_DETAILS,
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                )
 
             CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
 

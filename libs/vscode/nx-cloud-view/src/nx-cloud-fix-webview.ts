@@ -399,6 +399,7 @@ export class NxCloudFixWebview {
       commands.registerCommand(
         'nxCloud.applyAiFix',
         async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+          getTelemetry().logUsage('cloud.apply-ai-fix');
           if (!data.runGroup.aiFix?.suggestedFix) {
             window.showErrorMessage('No AI fix available to apply');
             return;
@@ -480,6 +481,8 @@ export class NxCloudFixWebview {
       commands.registerCommand(
         'nxCloud.applyAiFixLocally',
         async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+          getTelemetry().logUsage('cloud.apply-ai-fix-locally');
+
           if (!data.runGroup.aiFix?.suggestedFix) {
             window.showErrorMessage('No AI fix available to apply locally');
             return;
@@ -548,6 +551,8 @@ export class NxCloudFixWebview {
       commands.registerCommand(
         'nxCloud.rejectAiFix',
         async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+          getTelemetry().logUsage('cloud.reject-ai-fix');
+
           if (!data.runGroup.aiFix) {
             window.showErrorMessage('No AI fix available to ignore');
             return;

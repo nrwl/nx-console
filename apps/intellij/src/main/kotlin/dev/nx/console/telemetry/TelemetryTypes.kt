@@ -29,6 +29,7 @@ enum class TelemetryEvent(val eventName: String) {
     AI_FEEDBACK_GOOD("ai.feedback-good"),
     AI_RESPONSE_INTERACTION("ai.response-interaction"),
     AI_TOOL_CALL("ai.tool-call"),
+    AI_RESOURCE_READ("ai.resource-read"),
 
     // Cloud
     CLOUD_CONNECT("cloud.connect"),
@@ -41,6 +42,7 @@ enum class TelemetryEvent(val eventName: String) {
     CLOUD_VIEW_CIPE_COMMIT("cloud.view-cipe-commit"),
     CLOUD_FIX_CIPE_ERROR("cloud.fix-cipe-error"),
     CLOUD_APPLY_AI_FIX("cloud.apply-ai-fix"),
+    CLOUD_APPLY_AI_FIX_LOCALLY("cloud.apply-ai-fix-locally"),
     CLOUD_EXPLAIN_CIPE_ERROR("cloud.explain-cipe-error"),
     CLOUD_OPEN_FIX_DETAILS("cloud.open-fix-details"),
     CLOUD_REJECT_AI_FIX("cloud.reject-ai-fix"),
@@ -91,6 +93,7 @@ class TelemetryEventSource(val source: String) {
         val MIGRATE_ANGULAR_PROMPT = "migrate-angular-prompt"
         val EDITOR_TOOLBAR = "editor-toolbar"
         val NOTIFICATION = "notification"
+        val CLOUD_VIEW = "cloud-view"
 
         // Function to get all sources using reflection
         private fun getAllSources(): List<String> {
