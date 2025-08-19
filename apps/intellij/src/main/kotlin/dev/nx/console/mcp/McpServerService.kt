@@ -23,7 +23,7 @@ class McpServerService(private val project: Project) {
 
     fun setupMcpServer() {
 
-        if (!hasAIAssistantInstalled()) {
+        if (!hasAIAssistantAvailable()) {
             Notifier.notifyAiAssistantPluginRequired(project)
             return
         }
@@ -195,6 +195,9 @@ class McpServerService(private val project: Project) {
     }
 }
 
-fun hasAIAssistantInstalled(): Boolean {
-    return PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" } != null
+fun hasAIAssistantAvailable(): Boolean {
+    val plugin =
+        PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" }
+            ?: return false
+    return PluginManagerCore.isPluginInstalled(plugin.pluginId) && plugin.isEnabled
 }
