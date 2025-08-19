@@ -23,7 +23,6 @@ import { join } from 'node:path';
 import {
   commands,
   ExtensionContext,
-  extensions,
   tasks,
   Uri,
   ViewColumn,
@@ -31,7 +30,6 @@ import {
   window,
   EventEmitter,
 } from 'vscode';
-import { fillWithGenerateUi } from './fill-with-generate-ui';
 
 export class GenerateUiWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -209,7 +207,8 @@ export class GenerateUiWebview {
               !!GlobalConfigurationStore.instance.get(
                 'enableTaskExecutionDryRunOnChange',
               ),
-            hasCopilot: !!extensions.getExtension('github.copilot-chat'),
+            // Temporarily disabled copilot feature - to be replaced with new feature
+            hasCopilot: false,
           }),
         );
         this.postMessageToWebview(
@@ -244,13 +243,14 @@ export class GenerateUiWebview {
         );
         break;
       }
-      case 'fill-with-copilot': {
-        await fillWithGenerateUi(
-          message.payload.generatorName,
-          message.payload.formValues,
-        );
-        break;
-      }
+      // Temporarily commented out - to be replaced with new feature
+      // case 'fill-with-copilot': {
+      //   await fillWithGenerateUi(
+      //     message.payload.generatorName,
+      //     message.payload.formValues,
+      //   );
+      //   break;
+      // }
     }
   }
 

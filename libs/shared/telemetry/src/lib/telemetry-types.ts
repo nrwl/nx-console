@@ -37,6 +37,7 @@ export type TelemetryEvents =
   | 'cloud.show-ai-fix-notification'
   | 'cloud.show-ai-fix'
   | 'cloud.apply-ai-fix'
+  | 'cloud.apply-ai-fix-locally'
   | 'cloud.reject-ai-fix'
   | 'cloud.open-fix-details'
   // graph
@@ -69,6 +70,7 @@ export type TelemetryEvents =
   | 'ai.feedback-bad'
   | 'ai.response-interaction'
   | 'ai.tool-call'
+  | 'ai.resource-read'
   | 'ai.add-mcp';
 
 export type TelemetryData = {

@@ -52,13 +52,14 @@ internal class ProjectPostStartup : ProjectActivity {
         }
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            DumbService.getInstance(project).waitForSmartMode()
+
             val aiAssistantPlugin =
                 PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" }
-            if (aiAssistantPlugin != null) {
+            if (aiAssistantPlugin != null && aiAssistantPlugin.isEnabled) {
                 // Wait for indexing to complete
-                DumbService.getInstance(project).waitForSmartMode()
 
-                delay(5000)
+                delay(10000)
 
                 val mcpService = McpServerService.getInstance(project)
                 if (!mcpService.isMcpServerSetup()) {

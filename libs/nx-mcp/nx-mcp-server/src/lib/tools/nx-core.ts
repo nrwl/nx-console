@@ -11,7 +11,7 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
-import { NxWorkspaceInfoProvider } from '../nx-mcp-server';
+import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
 
 let nxWorkspacePath: string | undefined = undefined;
 

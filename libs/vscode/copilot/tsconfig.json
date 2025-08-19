@@ -4,43 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../utils"
-    },
-    {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
       "path": "../telemetry"
-    },
-    {
-      "path": "../nx-commands-view"
-    },
-    {
-      "path": "../generate-ui-webview"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/llm-context"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../nx-workspace"
     },
     {
       "path": "./tsconfig.lib.json"

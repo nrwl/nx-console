@@ -9,9 +9,13 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-import { NxWorkspace } from '@nx-console/shared-types';
+import { NxWorkspace, CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { IdeProvider } from './ide-provider';
 import { registerNxCloudTools } from './tools/nx-cloud';
+import {
+  registerNxCloudCipeResources,
+  clearRegisteredCipeResources,
+} from './resources/nx-cloud-cipe-resources';
 import {
   registerNxCoreTools,
   setNxWorkspacePath as setNxWorkspacePathForCoreTools,
@@ -40,6 +44,14 @@ export interface NxWorkspaceInfoProvider {
     headSha?: string,
   ) => Promise<{ path: string; diffContent: string }[] | null>;
   isNxCloudEnabled: () => Promise<boolean>;
+  getRecentCIPEData?: (
+    workspacePath: string,
+    logger: Logger,
+  ) => Promise<{
+    info?: CIPEInfo[];
+    error?: CIPEInfoError;
+    workspaceUrl?: string;
+  }>;
 }
 
 export class NxMcpServerWrapper {
@@ -51,6 +63,8 @@ export class NxMcpServerWrapper {
   private readonly PERIODIC_MONITORING_INTERVAL = 10000; // 10 seconds
   private readonly PERIODIC_MONITORING_MAX_COUNT = 5;
   private ideConnectionCleanup?: () => void;
+  private cipeRefreshInterval?: NodeJS.Timeout;
+  private readonly CIPE_REFRESH_INTERVAL = 30000; // 30 seconds
   private toolRegistrationState = {
     nxWorkspace: false,
     nxCore: false,
@@ -74,6 +88,10 @@ export class NxMcpServerWrapper {
       logging: {},
       tools: {
         listChanged: true,
+      },
+      resources: {
+        list: true,
+        subscribe: false,
       },
     });
 
@@ -121,8 +139,6 @@ export class NxMcpServerWrapper {
       },
     );
 
-    logger?.log(`has workspaceinfoprovier ${!!nxWorkspaceInfoProvider}`);
-
     registerNxCoreTools(
       server.server,
       server.logger,
@@ -140,12 +156,16 @@ export class NxMcpServerWrapper {
   }
 
   async setNxWorkspacePath(path: string) {
-    this.logger.log(`Setting nx workspace path to ${path}`);
-    const oldPath = this._nxWorkspacePath;
-    this._nxWorkspacePath = path;
+    this.logger.log(
+      `Setting mcp nx workspace path from ${this._nxWorkspacePath} to ${path}`,
+    );
 
     // If workspace path changed, trigger dynamic evaluation
-    if (oldPath !== path) {
+    if (this._nxWorkspacePath !== path) {
+      this._nxWorkspacePath = path;
+      this.logger.log(
+        `Nx workspace path changed, re-evaluating tools for new path: ${path}`,
+      );
       setNxWorkspacePathForCoreTools(path);
       setNxWorkspacePathForWorkspaceTools(path);
       await this.evaluateAndAddNewTools();
@@ -170,6 +190,9 @@ export class NxMcpServerWrapper {
     // Stop periodic monitoring
     this.stopPeriodicMonitoring();
 
+    // Stop CIPE refresh interval
+    this.stopCipeRefreshInterval();
+
     // Clean up IDE connection listener
     if (this.ideConnectionCleanup) {
       this.ideConnectionCleanup();
@@ -177,6 +200,9 @@ export class NxMcpServerWrapper {
 
     // Dispose IDE provider if it exists
     this.ideProvider?.dispose();
+
+    // Clear all registered CIPE resources
+    clearRegisteredCipeResources();
   }
 
   /**
@@ -238,6 +264,19 @@ export class NxMcpServerWrapper {
           this.telemetry,
           this.nxWorkspaceInfoProvider.getGitDiffs,
         );
+
+        // Register CIPE resources
+        await registerNxCloudCipeResources(
+          this._nxWorkspacePath,
+          this.server,
+          this.logger,
+          this.telemetry,
+          this.nxWorkspaceInfoProvider,
+        );
+
+        // Start refresh interval for CIPE resources
+        this.startCipeRefreshInterval();
+
         this.toolRegistrationState.nxCloud = true;
       }
 
@@ -281,6 +320,7 @@ export class NxMcpServerWrapper {
       if (
         ideAvailable &&
         this.ideProvider &&
+        this._nxWorkspacePath &&
         !this.toolRegistrationState.nxIde &&
         this.ideProvider.isAvailable()
       ) {
@@ -334,11 +374,61 @@ export class NxMcpServerWrapper {
       this.logger.log('Stopped periodic tool condition monitoring');
     }
   }
+
+  /**
+   * Start CIPE refresh interval
+   * Refreshes available CIPE resources every 30 seconds
+   */
+  private startCipeRefreshInterval(): void {
+    // Don't start if already running
+    if (this.cipeRefreshInterval) {
+      return;
+    }
+
+    // Don't start if workspace path or provider is not available
+    if (
+      !this._nxWorkspacePath ||
+      !this.nxWorkspaceInfoProvider.getRecentCIPEData
+    ) {
+      return;
+    }
+
+    this.logger.log('Starting CIPE refresh interval (every 30 seconds)');
+
+    this.cipeRefreshInterval = setInterval(async () => {
+      try {
+        await registerNxCloudCipeResources(
+          this._nxWorkspacePath!,
+          this.server,
+          this.logger,
+          this.telemetry,
+          this.nxWorkspaceInfoProvider,
+        );
+      } catch (error) {
+        this.logger.log('Error refreshing CIPE resources:', error);
+      }
+    }, this.CIPE_REFRESH_INTERVAL);
+  }
+
+  /**
+   * Stop CIPE refresh interval
+   */
+  private stopCipeRefreshInterval(): void {
+    if (this.cipeRefreshInterval) {
+      clearInterval(this.cipeRefreshInterval);
+      this.cipeRefreshInterval = undefined;
+      this.logger.log('Stopped CIPE refresh interval');
+    }
+  }
 }
 
 export const nxMcpServerCapabilities: ServerCapabilities = {
   tools: {
     listChanged: true,
+  },
+  resources: {
+    list: true,
+    subscribe: false,
   },
   logging: {},
 };

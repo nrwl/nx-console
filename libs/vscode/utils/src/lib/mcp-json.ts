@@ -1,16 +1,16 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
-import * as path from 'path';
-import { workspace, window } from 'vscode';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { parse } from 'jsonc-parser';
-import { isInCursor, isInWindsurf } from './editor-name-helpers';
+import * as path from 'path';
+import { window, workspace } from 'vscode';
+import { isInCursor } from './editor-name-helpers';
 
 /**
  * Gets the path to the mcp.json file.
  * @returns The path to the mcp.json file or null if the workspace path cannot be determined.
  */
 export function getMcpJsonPath(): string | null {
-  const vscodeWorkspacePath =
-    workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
+  const vscodeWorkspacePath = getNxWorkspacePath();
 
   if (!vscodeWorkspacePath) {
     return null;

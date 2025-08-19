@@ -9,7 +9,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.mcp.McpServerService
-import dev.nx.console.mcp.hasAIAssistantInstalled
+import dev.nx.console.mcp.hasAIAssistantAvailable
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
@@ -197,7 +197,11 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         private val runGroupId: String
     ) : NotificationAction("View AI Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-            TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_OPEN_FIX_DETAILS)
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.CLOUD_OPEN_FIX_DETAILS,
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                )
 
             CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
 
@@ -256,7 +260,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
             // Try to execute the existing AI assistant action if available
             val assistantReady =
-                hasAIAssistantInstalled() && project.service<McpServerService>().isMcpServerSetup()
+                hasAIAssistantAvailable() && project.service<McpServerService>().isMcpServerSetup()
 
             if (assistantReady) {
                 try {

@@ -63,7 +63,7 @@ More info:
 
 ## Available Tools
 
-Currently, the Nx MCP server provides a set of tools. Resources, Roots and Prompts aren't supported yet.
+The Nx MCP server provides a comprehensive set of tools for interacting with your Nx workspace.
 
 - **nx_docs**: Returns documentation sections relevant to user queries about Nx
 - **nx_available_plugins**: Lists available Nx plugins from the core team and local workspace plugins
@@ -89,6 +89,11 @@ Currently, the Nx MCP server provides a set of tools. Resources, Roots and Promp
 - **nx_cloud_tasks_details**: Returns detailed task execution information
 
 When no workspace path is specified, only the `nx_docs` and `nx_available_plugins` tools will be available.
+
+## Available Resources
+
+When connected to an Nx Cloud-enabled workspace, the Nx MCP server automatically exposes recent CI Pipeline Executions (CIPEs) as MCP resources.
+Resources appear in your AI tool's resource picker, allowing the LLM to access detailed information about CI runs including failed tasks, terminal output, and affected files.
 
 ## Contributing & Development
 

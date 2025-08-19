@@ -471,7 +471,7 @@
         "fullName": "Nx",
         "name": "nx",
         "description": "Get insights into your Nx workspace",
-        "isSticky": true,
+        "isSticky": false,
         "commands": [
           {
             "name": "generate",
