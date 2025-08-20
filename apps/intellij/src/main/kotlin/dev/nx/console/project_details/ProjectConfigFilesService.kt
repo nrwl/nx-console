@@ -1,8 +1,11 @@
 package dev.nx.console.project_details
 
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -16,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logger
 
 @Service(Service.Level.PROJECT)
 class ProjectConfigFilesService(private val project: Project, private val cs: CoroutineScope) {
@@ -102,21 +106,42 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
     // REOPEN AND SEE THE PDV THEMSELVES
     private fun ensurePDVPreviewFileEditors() {
         if (project.isDisposed) return
-        // because ProjectDetailsFileEditorProvider triggers only when the file is opened, we
-        // need to reopen all files that should have a PDV preview but don't
-        val fileEditorManager = FileEditorManager.getInstance(project)
 
-        val openFiles = fileEditorManager.openFiles
+        try {
+            // because ProjectDetailsFileEditorProvider triggers only when the file is opened, we
+            // need to reopen all files that should have a PDV preview but don't
+            val fileEditorManager = FileEditorManager.getInstance(project)
 
-        projectConfigFilesPaths.forEach { projectDetailsFile ->
-            val file = openFiles.find { it.path == projectDetailsFile }
-            if (
-                file != null &&
-                    fileEditorManager.getSelectedEditor(file) !is ProjectDetailsEditorWithPreview
-            ) {
-                fileEditorManager.closeFile(file)
-                fileEditorManager.openFile(file, true)
+            val openFiles = fileEditorManager.openFiles
+
+            projectConfigFilesPaths.forEach { projectDetailsFile ->
+                val file = openFiles.find { it.path == projectDetailsFile }
+                if (
+                    file != null &&
+                        file.isValid &&
+                        !project.isDisposed &&
+                        fileEditorManager.getSelectedEditor(file) !is
+                            ProjectDetailsEditorWithPreview
+                ) {
+                    try {
+                        fileEditorManager.closeFile(file)
+                        // Use invokeLater to avoid race conditions in tab updates
+                        ApplicationManager.getApplication()
+                            .invokeLater {
+                                if (!project.isDisposed && file.isValid) {
+                                    fileEditorManager.openFile(file, true)
+                                }
+                            }
+                    } catch (e: Exception) {
+                       logger<ProjectConfigFilesService>()
+                            .warn("Failed to reopen project details file: ${file.path}", e)
+                    }
+                }
             }
+        } catch (e: Exception) {
+            // Handle any unexpected errors gracefully
+            logger<ProjectConfigFilesService>()
+                .warn("Error in ensurePDVPreviewFileEditors", e)
         }
     }
 
