@@ -1,3 +1,10 @@
+## [18.65.1](https://github.com/nrwl/nx-console/compare/vscode-v18.65.0...vscode-v18.65.1) (2025-08-20)
+
+
+### Bug Fixes
+
+* **vscode:** init config store before mcp skeleton ([#2704](https://github.com/nrwl/nx-console/issues/2704)) ([82021d2](https://github.com/nrwl/nx-console/commit/82021d29f8ad6c47987c29d520149b8cb9e85063))
+
 # [18.65.0](https://github.com/nrwl/nx-console/compare/vscode-v18.64.1...vscode-v18.65.0) (2025-08-19)
 
 
