@@ -36,13 +36,13 @@ export class NativeWatcher {
     this.initWatcher();
   }
 
-  stop() {
+  async stop() {
     this.stopped = true;
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = null;
     }
-    this.watcher?.stop();
+    await this.watcher?.stop();
   }
 
   private async initWatcher() {
@@ -107,11 +107,7 @@ export class NativeWatcher {
     }
 
     if (criticalFiles.length > 0) {
-      this.logger.log(
-        `Critical files changed (triggering immediately): ${criticalFiles.join(
-          ', ',
-        )}`,
-      );
+      this.logger.log(`Critical files changed (triggering immediately)`);
       if (this.debounceTimer) {
         clearTimeout(this.debounceTimer);
         this.debounceTimer = null;
@@ -119,21 +115,13 @@ export class NativeWatcher {
       this.pendingChanges.clear();
       this.callback();
     } else if (nonCriticalFiles.length > 0) {
-      this.logger.log(
-        `Non-critical files changed (debouncing for 10s): ${nonCriticalFiles.join(
-          ', ',
-        )}`,
-      );
+      this.logger.log(`Non-critical files changed (debouncing for 10s)`);
       if (this.debounceTimer) {
         clearTimeout(this.debounceTimer);
       }
       this.debounceTimer = setTimeout(() => {
         if (this.pendingChanges.size > 0) {
-          this.logger.log(
-            `Debounce timer expired, triggering callback for: ${Array.from(
-              this.pendingChanges,
-            ).join(', ')}`,
-          );
+          this.logger.log(`Debounce timer expired, triggering callback`);
           this.pendingChanges.clear();
           this.callback();
         }
