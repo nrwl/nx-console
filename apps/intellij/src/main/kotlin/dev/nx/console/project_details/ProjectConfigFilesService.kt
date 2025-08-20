@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -114,10 +113,14 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
 
             val openFiles = fileEditorManager.openFiles
 
-            projectConfigFilesPaths.forEach { projectDetailsFile ->
-                val file = openFiles.find { it.path == projectDetailsFile }
+            val normalizedProjectConfigPaths =
+                projectConfigFilesPaths.map { Paths.get(it).normalize().toString() }.toSet()
+
+            openFiles.forEach { file ->
+                val normalizedFilePath = Paths.get(file.path).normalize().toString()
+
                 if (
-                    file != null &&
+                    normalizedProjectConfigPaths.contains(normalizedFilePath) &&
                         file.isValid &&
                         !project.isDisposed &&
                         fileEditorManager.getSelectedEditor(file) !is
@@ -126,22 +129,20 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
                     try {
                         fileEditorManager.closeFile(file)
                         // Use invokeLater to avoid race conditions in tab updates
-                        ApplicationManager.getApplication()
-                            .invokeLater {
-                                if (!project.isDisposed && file.isValid) {
-                                    fileEditorManager.openFile(file, true)
-                                }
+                        ApplicationManager.getApplication().invokeLater {
+                            if (!project.isDisposed && file.isValid) {
+                                fileEditorManager.openFile(file, true)
                             }
+                        }
                     } catch (e: Exception) {
-                       logger<ProjectConfigFilesService>()
+                        logger<ProjectConfigFilesService>()
                             .warn("Failed to reopen project details file: ${file.path}", e)
                     }
                 }
             }
         } catch (e: Exception) {
             // Handle any unexpected errors gracefully
-            logger<ProjectConfigFilesService>()
-                .warn("Error in ensurePDVPreviewFileEditors", e)
+            logger<ProjectConfigFilesService>().warn("Error in ensurePDVPreviewFileEditors", e)
         }
     }
 
