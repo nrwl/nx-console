@@ -116,7 +116,7 @@ process.on('uncaughtException', (e) => {
 
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
-let unregisterFileWatcher: () => void = () => {
+let unregisterFileWatcher: () => Promise<void> = async () => {
   //noop
 };
 let reconfigureAttempts = 0;
@@ -307,7 +307,7 @@ documents.onDidOpen(async (e) => {
 });
 
 connection.onShutdown(async () => {
-  unregisterFileWatcher();
+  await unregisterFileWatcher();
   jsonDocumentMapper.dispose();
 });
 
@@ -698,7 +698,7 @@ async function reconfigure(
   const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, CLIENT_CAPABILITIES);
 
-  unregisterFileWatcher();
+  await unregisterFileWatcher();
 
   unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
     reconfigureAndSendNotificationWithBackoff(workingPath);
@@ -715,13 +715,13 @@ ensureOnlyJsonRpcStdout();
 
 let exiting = false;
 /* eslint-disable no-empty */
-const exitHandler = () => {
+const exitHandler = async () => {
   if (exiting) return;
   exiting = true;
   process.off('SIGTERM', exitHandler);
 
   try {
-    unregisterFileWatcher();
+    await unregisterFileWatcher();
   } catch {}
 
   try {

@@ -11,14 +11,14 @@ let _nativeWatcher: NativeWatcher | undefined;
 export async function languageServerWatcher(
   workspacePath: string,
   callback: () => unknown,
-): Promise<() => void> {
+): Promise<() => Promise<void>> {
   const version = await getNxVersion(workspacePath);
   const debouncedCallback = debounce(callback, 1000);
 
   if (gte(version, '16.4.0')) {
     if (process.platform === 'win32') {
       if (_nativeWatcher) {
-        _nativeWatcher.stop();
+        await _nativeWatcher.stop();
         _nativeWatcher = undefined;
       }
       const nativeWatcher = new NativeWatcher(
@@ -27,9 +27,9 @@ export async function languageServerWatcher(
         lspLogger,
       );
       _nativeWatcher = nativeWatcher;
-      return () => {
+      return async () => {
         lspLogger.log('Unregistering file watcher');
-        nativeWatcher.stop();
+        await nativeWatcher.stop();
       };
     } else {
       if (_daemonWatcher) {
@@ -45,15 +45,15 @@ export async function languageServerWatcher(
       _daemonWatcher = daemonWatcher;
 
       await daemonWatcher.start();
-      return () => {
+      return async () => {
         lspLogger.log('Unregistering file watcher');
-        daemonWatcher.stop();
+        await daemonWatcher.stop();
       };
     }
   } else {
     lspLogger.log('Nx version <16.4.0, using @parcel/watcher');
     const parcelWatcher = new ParcelWatcher(workspacePath, debouncedCallback);
-    return () => {
+    return async () => {
       lspLogger.log('Unregistering file watcher');
       parcelWatcher.stop();
     };
