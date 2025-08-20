@@ -97,12 +97,12 @@ export async function activate(c: ExtensionContext) {
     vscodeLogger.log(`Activating Nx Console (pid ${process.pid})`);
     const startTime = Date.now();
 
-    startMcpServerSkeleton();
-
     context = c;
 
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
+
+    startMcpServerSkeleton();
 
     loadRootEnvFiles(getNxWorkspacePath());
 
