@@ -330,7 +330,8 @@ class NxCloudFixFileImpl(
     }
 
     private fun handleApply(commitMessage: String? = null) {
-        logger<NxCloudFixFileImpl>().info("Apply action received with commit message: $commitMessage")
+        logger<NxCloudFixFileImpl>()
+            .info("Apply action received with commit message: $commitMessage")
 
         TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX)
 
@@ -349,7 +350,11 @@ class NxCloudFixFileImpl(
                 logger<NxCloudFixFileImpl>()
                     .info("Got cloud API service, calling updateSuggestedFix")
                 val success =
-                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.APPLIED, commitMessage)
+                    cloudApiService.updateSuggestedFix(
+                        aiFixId,
+                        AITaskFixUserAction.APPLIED,
+                        commitMessage
+                    )
 
                 if (success) {
                     showSuccessNotification("Nx Cloud fix applied successfully")

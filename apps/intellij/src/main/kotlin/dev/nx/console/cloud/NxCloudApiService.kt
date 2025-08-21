@@ -32,7 +32,7 @@ class NxCloudApiService(private val project: Project) {
 
     @Serializable
     data class UpdateSuggestedFixRequest(
-        val aiFixId: String, 
+        val aiFixId: String,
         val action: AITaskFixUserAction,
         val userCommitMessage: String? = null
     ) {
@@ -40,8 +40,8 @@ class NxCloudApiService(private val project: Project) {
     }
 
     suspend fun updateSuggestedFix(
-        aiFixId: String, 
-        action: AITaskFixUserAction, 
+        aiFixId: String,
+        action: AITaskFixUserAction,
         commitMessage: String? = null
     ): Boolean =
         withContext(Dispatchers.IO) {
@@ -60,9 +60,8 @@ class NxCloudApiService(private val project: Project) {
                     return@withContext false
                 }
 
-                val requestBody = json.encodeToString(
-                    UpdateSuggestedFixRequest(aiFixId, action, commitMessage)
-                )
+                val requestBody =
+                    json.encodeToString(UpdateSuggestedFixRequest(aiFixId, action, commitMessage))
                 logger.info("suggested fix stringified $requestBody")
 
                 val response =

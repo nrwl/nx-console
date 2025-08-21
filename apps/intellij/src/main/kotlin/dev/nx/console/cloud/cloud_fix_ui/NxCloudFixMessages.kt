@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class NxCloudFixMessage {
-    @Serializable 
-    @SerialName("apply") 
+    @Serializable
+    @SerialName("apply")
     data class Apply(val commitMessage: String? = null) : NxCloudFixMessage()
 
     @Serializable @SerialName("apply-locally") data object ApplyLocally : NxCloudFixMessage()
