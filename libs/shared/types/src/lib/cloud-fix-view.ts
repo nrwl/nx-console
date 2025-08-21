@@ -1,8 +1,11 @@
 import { CIPEInfo, CIPERunGroup } from './cloud-info';
 
-export interface NxCloudFixMessage {
-  type: 'apply' | 'apply-locally' | 'reject' | 'webview-ready' | 'show-diff';
-}
+export type NxCloudFixMessage =
+  | { type: 'apply'; commitMessage?: string }
+  | { type: 'apply-locally' }
+  | { type: 'reject' }
+  | { type: 'webview-ready' }
+  | { type: 'show-diff' };
 
 export interface NxCloudFixDetails {
   cipe: CIPEInfo;

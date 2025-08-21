@@ -40,7 +40,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   details: NxCloudFixDetails | undefined;
 
   @property({ type: Function })
-  onApply: ((details: NxCloudFixDetails) => void) | undefined;
+  onApply:
+    | ((details: NxCloudFixDetails, commitMessage?: string) => void)
+    | undefined;
 
   @property({ type: Function })
   onReject: ((details: NxCloudFixDetails) => void) | undefined;
@@ -56,6 +58,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
 
   @state()
   private isTerminalExpanded = true;
+
+  @state()
+  private userCommitMessage = '';
 
   override render(): TemplateResult {
     if (!this.details) {
@@ -197,8 +202,23 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
 
   private handleApply() {
     if (this.details && this.onApply) {
-      this.onApply(this.details);
+      // Only pass custom message if user has edited it
+      const customMessage =
+        this.userCommitMessage &&
+        this.userCommitMessage !== '' &&
+        this.userCommitMessage !== this.getDefaultCommitMessage()
+          ? this.userCommitMessage
+          : undefined;
+      this.onApply(this.details, customMessage);
     }
+  }
+
+  private getDefaultCommitMessage(): string {
+    return this.details?.runGroup.aiFix?.suggestedFixDescription;
+  }
+
+  private handleCommitMessageChange(e: CustomEvent) {
+    this.userCommitMessage = e.detail.value;
   }
 
   private handleApplyLocally() {
@@ -421,10 +441,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                     >Commit message</label-element
                   >
                   <textarea-element
-                    value="${aiFix.suggestedFixDescription ||
-                    'fix: nx cloud AI suggested fix'}"
-                    disabled
+                    .value="${this.userCommitMessage}"
+                    placeholder="${this.getDefaultCommitMessage()}"
                     rows="3"
+                    @value-changed="${this.handleCommitMessageChange}"
                   ></textarea-element>
                 </form-group-element>
                 <div class="mt-4 flex justify-end gap-2">

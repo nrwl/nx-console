@@ -23,7 +23,8 @@ export class Root extends LitElement {
     return html`
       <nx-cloud-fix-component
         .details=${this.icc.details}
-        .onApply=${() => this.handleApply()}
+        .onApply=${(_details: any, commitMessage?: string) =>
+          this.handleApply(commitMessage)}
         .onApplyLocally=${() => this.handleApplyLocally()}
         .onReject=${() => this.handleReject()}
         .onShowDiff=${() => this.handleShowDiff()}
@@ -32,8 +33,8 @@ export class Root extends LitElement {
     `;
   }
 
-  private handleApply() {
-    this.icc.postMessageToIde({ type: 'apply' });
+  private handleApply(commitMessage?: string) {
+    this.icc.postMessageToIde({ type: 'apply', commitMessage });
   }
 
   private handleApplyLocally() {
