@@ -257,17 +257,17 @@ async function main() {
         server_instance?.close();
       } catch {}
 
-      // Stop reading stdin last in stdio mode
       try {
-        process.stdin.pause();
-      } catch {}
-      try {
-        if (process.connected) process.disconnect();
+        if (process.connected) {
+          process.disconnect();
+        }
       } catch {}
 
-      // Reap any descendants we didn't start ourselves (see section 3)
       killGroup(process.pid);
-    } catch (e) {}
+    } catch (e) {
+    } finally {
+      process.exit(1);
+    }
   };
 
   if (argv.transport === 'sse' || argv.transport === 'http') {
