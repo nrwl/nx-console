@@ -25,11 +25,15 @@ plugins {
     id("org.jetbrains.changelog") version "2.4.0"
 
     id("com.ncorti.ktfmt.gradle") version "0.24.0"
+    id("dev.nx.gradle.project-graph") version "0.1.5"
+
+
 }
 
 group = providers.gradleProperty("pluginGroup").get()
 
 version = providers.gradleProperty("version").get()
+
 
 // Configure project's dependencies
 repositories {
@@ -40,17 +44,10 @@ repositories {
 
 allprojects {
     apply {
-        plugin("project-report")
+        plugin("dev.nx.gradle.project-graph")
+        plugin("org.jetbrains.kotlin.jvm")
         plugin("com.ncorti.ktfmt.gradle")
     }
-}
-
-tasks.register("projectReportAll") {
-    // All project reports of subprojects
-    allprojects.forEach { dependsOn(it.tasks.get("projectReport")) }
-
-    // All projectReportAll of included builds
-    gradle.includedBuilds.forEach { dependsOn(it.task(":projectReportAll")) }
 }
 
 configurations.all {
@@ -89,7 +86,7 @@ dependencies {
         // Add test framework configuration
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
-    implementation(project(":libs:intellij:models"))
+    implementation(project("intellij-models"))
 }
 
 ktfmt { kotlinLangStyle() }
