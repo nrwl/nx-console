@@ -7,7 +7,7 @@ export type NxCloudFixInputMessage =
 
 // Output messages (from webview to IDE)
 export type NxCloudFixOutputMessage =
-  | { type: 'apply' }
+  | { type: 'apply'; commitMessage?: string }
   | { type: 'apply-locally' }
   | { type: 'reject' }
   | { type: 'show-diff' }

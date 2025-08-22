@@ -137,6 +137,7 @@ export class NxCloudFixWebview {
         await commands.executeCommand(
           'nxCloud.applyAiFix',
           this.currentFixDetails,
+          message.commitMessage,
         );
         this.webviewPanel?.dispose();
         break;
@@ -398,7 +399,10 @@ export class NxCloudFixWebview {
     extensionContext.subscriptions.push(
       commands.registerCommand(
         'nxCloud.applyAiFix',
-        async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+        async (
+          data: { cipe: CIPEInfo; runGroup: CIPERunGroup },
+          commitMessage?: string,
+        ) => {
           getTelemetry().logUsage('cloud.apply-ai-fix');
           if (!data.runGroup.aiFix?.suggestedFix) {
             window.showErrorMessage('No AI fix available to apply');
@@ -411,7 +415,11 @@ export class NxCloudFixWebview {
             return;
           }
 
-          const success = await updateSuggestedFix(aiFixId, 'APPLIED');
+          const success = await updateSuggestedFix(
+            aiFixId,
+            'APPLIED',
+            commitMessage,
+          );
           if (success) {
             const targetBranch = data.cipe.branch;
             let hasBranchOnRemote: boolean;
@@ -639,6 +647,7 @@ export class NxCloudFixWebview {
 async function updateSuggestedFix(
   aiFixId: string,
   action: 'APPLIED' | 'REJECTED' | 'APPLIED_LOCALLY',
+  commitMessage?: string,
 ): Promise<boolean> {
   try {
     const nxCloudInfo = await getNxCloudStatus();
@@ -648,6 +657,17 @@ async function updateSuggestedFix(
     }
 
     const workspacePath = getWorkspacePath();
+    const requestData: any = {
+      aiFixId,
+      action,
+      actionOrigin: 'NX_CONSOLE_VSCODE',
+    };
+
+    // Only include userCommitMessage if it was provided
+    if (commitMessage) {
+      requestData.userCommitMessage = commitMessage;
+    }
+
     const response = await xhr({
       url: `${nxCloudInfo.nxCloudUrl}/nx-cloud/update-suggested-fix`,
       type: 'POST',
@@ -655,11 +675,7 @@ async function updateSuggestedFix(
         'Content-Type': 'application/json',
         ...(await nxCloudAuthHeaders(workspacePath)),
       },
-      data: JSON.stringify({
-        aiFixId,
-        action,
-        actionOrigin: 'NX_CONSOLE_VSCODE',
-      }),
+      data: JSON.stringify(requestData),
     });
 
     if (response.status >= 200 && response.status < 300) {
