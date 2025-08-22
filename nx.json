@@ -140,12 +140,11 @@
       }
     },
     {
-      "plugin": "@nx/gradle/plugin-v1",
+      "plugin": "@nx/gradle",
       "options": {
         "testTargetName": "test",
         "classesTargetName": "classes",
-        "buildTargetName": "build",
-        "includeSubprojectsTasks": true
+        "buildTargetName": "build"
       }
     },
     "@nx/enterprise-cloud",
