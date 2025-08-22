@@ -2,7 +2,15 @@ group = "dev.nx.console"
 
 layout.buildDirectory = File("dist")
 
-allprojects { apply { plugin("project-report") } }
+plugins {
+    id("dev.nx.gradle.project-graph") version "0.1.5"
+}
+
+allprojects {
+    apply {
+        plugin("dev.nx.gradle.project-graph")
+    }
+}
 
 tasks {
     register("projectReportAll") {
@@ -29,5 +37,10 @@ tasks {
         doLast {
             println("Compiled test classes for ${gradle.includedBuilds.size} included builds")
         }
+    }
+
+    register("publish") {
+        description = "Placeholder task to workaround the semantic-release plugin"
+        group = "publishing"
     }
 }
