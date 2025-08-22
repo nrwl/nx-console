@@ -86,7 +86,7 @@ dependencies {
         // Add test framework configuration
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
-    implementation(project("intellij-models"))
+    implementation(project(":intellij-models"))
 }
 
 ktfmt { kotlinLangStyle() }
