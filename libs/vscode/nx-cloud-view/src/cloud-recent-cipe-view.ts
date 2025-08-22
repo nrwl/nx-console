@@ -579,29 +579,6 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           }
         }
       }),
-      commands.registerCommand(
-        'nxCloud.explainCipeTaskFailure',
-        async (treeItem: BaseRecentCIPETreeItem) => {
-          if (!treeItem.isFailedTaskTreeItem()) {
-            return;
-          }
-
-          getTelemetry().logUsage('cloud.explain-cipe-error');
-
-          let idPrompt = '';
-          if (treeItem.linkId) {
-            idPrompt += `linkId ${treeItem.linkId}`;
-          }
-          if (treeItem.executionId) {
-            idPrompt += ` executionId ${treeItem.executionId}`;
-          }
-
-          commands.executeCommand(
-            'workbench.action.chat.open',
-            `@nx /explain-cipe help me understand the failed output for ${treeItem.taskId} with the following ids ${idPrompt}`,
-          );
-        },
-      ),
       commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
         getTelemetry().logUsage('cloud.fix-cipe-error');
 
