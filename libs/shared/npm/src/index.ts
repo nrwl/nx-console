@@ -10,6 +10,11 @@ export {
   getPackageManagerCommand,
   getPackageManagerVersion,
 } from './lib/local-nx-utils/package-manager-command';
+export {
+  detectCorepackPackageManager,
+  shouldUseCorepack,
+  extractPackageManagerName,
+} from './lib/local-nx-utils/corepack-detection';
 export * from './lib/local-nx-utils/read-json';
 export * from './lib/local-nx-utils/parse-target-string';
 export * from './lib/local-nx-utils/find-matching-projects';
