@@ -61,14 +61,71 @@ jobs:
       - name: Install NPM dependencies
         run: yarn install --immutable
 
+      - name: Check storage before
+        run: |
+          echo "=== Filesystem summary ==="
+          echo "=== Filesystem space usage (blocks) ==="
+          df -h
+
+          echo
+          echo "=== Filesystem inode usage ==="
+          df -ih
+
+          echo
+          echo "=== Root filesystem breakdown (top dirs) ==="
+          sudo du -h --max-depth=1 / | sort -h | tail -n 20
+
+          echo
+          echo "=== Home dir breakdown ==="
+          du -h --max-depth=1 /home/runner | sort -h
+
       # We intentionally put the gradle tasks first because their artifacts are needed for project graph construction
       # and we do not want to give the false impression that the artifact download time is part of nx commands.
       - name: Gradle artifacts and formatting
         run: |
           yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
 
-      - name: Check project graph creation
-        run: yarn nx show projects --verbose
+      - name: Check storage after
+        run: |
+          echo "=== Filesystem space usage (blocks) ==="
+          df -h
+
+          echo
+          echo "=== Filesystem inode usage ==="
+          df -ih
+
+          echo
+          echo "=== Root filesystem breakdown (top dirs) ==="
+          sudo du -h --max-depth=1 / | sort -h | tail -n 20
+
+          echo
+          echo "=== Home dir breakdown ==="
+          du -h --max-depth=1 /home/runner | sort -h
+
+      - name: Run Nx project graph with disk monitor
+        run: |
+          (
+            echo "== monitor start $(date -Is) ==";
+            while true; do
+              echo "---- $(date -Is) ----"
+              df -h /
+              df -ih /
+              du -h -d1 /home/runner | sort -h | tail -n 20
+              du -h -d2 ~/.gradle 2>/dev/null | sort -h | tail -n 25
+              du -h -d2 "$GITHUB_WORKSPACE" 2>/dev/null | sort -h | tail -n 30
+              du -h -d2 "$GITHUB_WORKSPACE/.nx" 2>/dev/null | sort -h | tail -n 20
+              sleep 5
+            done
+          ) 2>&1 &
+
+          MON_PID=$!
+          # === Your actual Nx task ===
+          yarn nx graph --verbose || true
+          # ===========================
+
+          kill $MON_PID || true
+          echo "== monitor end $(date -Is) ==" >> disk.log
+        shell: bash
 
       - name: Check formatting of other files
         run: yarn nx-cloud record -- yarn nx format:check --verbose
