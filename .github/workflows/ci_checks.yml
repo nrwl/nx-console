@@ -72,30 +72,37 @@ jobs:
         run: |
           yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
 
-      - name: Run Nx project graph with disk monitor
+      - name: Nx graph + identify biggest Gradle downloads
+        shell: bash
         run: |
-          (
-            echo "== monitor start $(date -Is) ==";
-            while true; do
+          set -Eeuo pipefail
+          INTERVAL=20
+          GRADLE_DIR="${GRADLE_USER_HOME:-$HOME/.gradle}"
+
+          monitor() {
+            while :; do
               echo "---- $(date -Is) ----"
               df -h /
               df -ih /
               du -h -d1 /home/runner | sort -h | tail -n 20
-              du -h -d2 ~/.gradle 2>/dev/null | sort -h | tail -n 25
+              du -h -d2 "$GRADLE_DIR" 2>/dev/null | sort -h | tail -n 25
               du -h -d2 "$GITHUB_WORKSPACE" 2>/dev/null | sort -h | tail -n 30
               du -h -d2 "$GITHUB_WORKSPACE/.nx" 2>/dev/null | sort -h | tail -n 20
-              sleep 20
+              sleep "$INTERVAL"
             done
-          ) 2>&1 &
+          }
 
-          MON_PID=$!
-          # === Your actual Nx task ===
-          npx nx show projects
-          # ===========================
+          monitor & MON_PID=$!
 
-          kill $MON_PID || true
-          echo "== monitor end $(date -Is) ==" >> disk.log
-        shell: bash
+          # --- run the Nx project graph task ---
+          yarn nx show projects --verbose
+          NX_RC=$?
+          # -------------------------------------
+
+          kill "$MON_PID" 2>/dev/null || true
+          wait "$MON_PID" 2>/dev/null || true
+
+          exit "$NX_RC"
 
       - name: Check formatting of other files
         run: yarn nx-cloud record -- yarn nx format:check --verbose
