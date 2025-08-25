@@ -66,10 +66,14 @@ jobs:
       - name: Install NPM dependencies
         run: yarn install --immutable
 
+      - name: Setup Gradle Wrapper
+        run: ./gradlew wrapper
+
       # We intentionally put the gradle tasks first because their artifacts are needed for project graph construction
       # and we do not want to give the false impression that the artifact download time is part of nx commands.
       - name: Gradle artifacts and formatting
         run: |
+          yarn nx-cloud record -- ./gradlew nxProjectReport
           yarn nx-cloud record -- ./gradlew :intellij:ktfmtCheck --info
 
       - name: Nx graph + identify biggest Gradle downloads
