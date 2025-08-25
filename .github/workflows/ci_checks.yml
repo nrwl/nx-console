@@ -19,6 +19,11 @@ jobs:
       NX_CI_EXECUTION_ENV: 'linux'
       NX_VERBOSE_LOGGING: true
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
