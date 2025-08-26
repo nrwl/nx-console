@@ -18,3 +18,4 @@ export * from './lib/get-pdv-data';
 export * from './lib/get-recent-cipe-data';
 export * from './lib/get-nx-cloud-terminal-output';
 export * from './lib/get-graph-data';
+export * from './lib/create-task-graph';

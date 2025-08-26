@@ -21,6 +21,7 @@ import {
   NxCloudStatusRequest,
   NxCloudTerminalOutputRequest,
   NxCreateProjectGraphRequest,
+  NxCreateTaskGraphRequest,
   NxDownloadAndExtractArtifactRequest,
   NxGeneratorContextV2Request,
   NxGeneratorOptionsRequest,
@@ -72,6 +73,7 @@ import {
   getSourceMapFilesToProjectsMap,
   getStartupMessage,
   getTargetsForConfigFile,
+  getTaskGraph,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
   nxStopDaemon,
@@ -587,6 +589,29 @@ connection.onRequest(
       );
     }
     return await parseTargetString(targetString, WORKING_PATH);
+  },
+);
+
+connection.onRequest(
+  NxCreateTaskGraphRequest,
+  async (args: {
+    targets: string[];
+    projects?: string[];
+    configuration?: string;
+  }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path',
+      );
+    }
+    return await getTaskGraph(
+      WORKING_PATH,
+      args.targets,
+      args.projects,
+      args.configuration,
+      lspLogger,
+    );
   },
 );
 

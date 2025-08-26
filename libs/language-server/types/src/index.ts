@@ -241,3 +241,12 @@ export const NxDownloadAndExtractArtifactRequest: RequestType<
   { content?: string; error?: string },
   unknown
 > = new RequestType('nx/downloadAndExtractArtifact');
+
+// Placeholder type for TaskGraphResponse - to be refined later
+type TaskGraphResponse = any;
+
+export const NxCreateTaskGraphRequest: RequestType<
+  { targets: string[]; projects?: string[]; configuration?: string },
+  TaskGraphResponse,
+  unknown
+> = new RequestType('nx/createTaskGraph');

@@ -14,3 +14,4 @@ export * from './lib/get-cloud-onboarding-info';
 export * from './lib/get-pdv-data';
 export * from './lib/parse-target-string';
 export * from './lib/get-graph-data';
+export * from './lib/get-task-graph';
