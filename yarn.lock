@@ -4006,15 +4006,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/graph@npm:0.5.9":
-  version: 0.5.9
-  resolution: "@nx/graph@npm:0.5.9"
+"@nx/graph@npm:0.5.12":
+  version: 0.5.12
+  resolution: "@nx/graph@npm:0.5.12"
   peerDependencies:
     "@floating-ui/dom": 1.6.13
     "@floating-ui/react": 0.27.2
     "@headlessui/react": ">= 2.0.0 < 3.0.0"
     "@heroicons/react": ">= 2.0.0 < 3.0.0"
-    "@nx/devkit": 21.4.0-beta.7
+    "@nx/devkit": 21.3.11
     "@tailwindcss/forms": ^0.5.10
     "@tailwindcss/typography": ^0.5.16
     cmdk: ~1.1.1
@@ -4039,13 +4039,13 @@ __metadata:
       optional: true
     tailwind-merge:
       optional: true
-  checksum: ce77a9cf8524c22a3e1d3141261c6ff686431aa622cc41d8f2cfb9357fb20af85b31555a38db15f71e9f91de90b7f38171a72545ff4f2db19552fc66bbbe03b4
+  checksum: 1c4eeb3fd79cfb4e5785b87846c61d03fc4288147b693d27c9712d34c85c441fa10bda8d391b01089ef8951630fd04d011d2e9bee15ddbbea088a013d2ffafc4
   languageName: node
   linkType: hard
 
-"@nx/jest@npm:21.3.10":
-  version: 21.3.10
-  resolution: "@nx/jest@npm:21.3.10"
+"@nx/jest@npm:21.5.0-beta.1":
+  version: 21.5.0-beta.1
+  resolution: "@nx/jest@npm:21.5.0-beta.1"
   dependencies:
     "@jest/reporters": ^30.0.2
     "@jest/test-result": ^30.0.2
@@ -16597,14 +16597,14 @@ __metadata:
     "@nx/cypress": 21.5.0-beta.1
     "@nx/devkit": 21.5.0-beta.1
     "@nx/enterprise-cloud": 21.0.0-beta.0
-    "@nx/esbuild": 21.3.10
-    "@nx/eslint": 21.3.10
-    "@nx/eslint-plugin": 21.3.10
-    "@nx/gradle": 21.3.10
-    "@nx/graph": 0.5.9
-    "@nx/jest": 21.3.10
-    "@nx/js": 21.3.10
-    "@nx/node": 21.3.10
+    "@nx/esbuild": 21.5.0-beta.1
+    "@nx/eslint": 21.5.0-beta.1
+    "@nx/eslint-plugin": 21.5.0-beta.1
+    "@nx/gradle": 21.5.0-beta.1
+    "@nx/graph": 0.5.12
+    "@nx/jest": 21.5.0-beta.1
+    "@nx/js": 21.5.0-beta.1
+    "@nx/node": 21.5.0-beta.1
     "@nx/owners": 21.0.0-beta.0
     "@nx/powerpack-license": 21.0.0-beta.0
     "@nx/storybook": 21.5.0-beta.1
