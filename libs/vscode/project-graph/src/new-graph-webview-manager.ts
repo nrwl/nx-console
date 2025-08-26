@@ -4,11 +4,11 @@ import { NewGraphWebview, PartialHandleEventResult } from './new-graph-webview';
 export class NewGraphWebviewManager
   implements GraphWebviewManager<PartialHandleEventResult>
 {
-  focusProject(
+  async focusProject(
     projectName: string,
     focusWebview?: boolean,
   ): Promise<PartialHandleEventResult> {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented');
   }
   selectProject(
     projectName: string,
@@ -16,12 +16,16 @@ export class NewGraphWebviewManager
   ): Promise<PartialHandleEventResult> {
     throw new Error('Method not implemented.');
   }
-  focusTarget(
+  async focusTarget(
     projectName: string,
     targetName: string,
     focusWebview?: boolean,
   ): Promise<PartialHandleEventResult> {
-    throw new Error('Method not implemented.');
+    this.ensureNewTaskGraphWebview();
+    return await this.newTaskGraphWebview.sendCommandToGraph({
+      type: 'show',
+      taskIds: [`task-${projectName}:${targetName}`],
+    });
   }
   showAllTargetsByName(
     targetName: string,
@@ -34,20 +38,30 @@ export class NewGraphWebviewManager
   ): Promise<PartialHandleEventResult> {
     throw new Error('Method not implemented.');
   }
-  private newGraphWebview: NewGraphWebview | undefined;
+  private newProjectGraphWebview: NewGraphWebview | undefined;
+  private newTaskGraphWebview: NewGraphWebview | undefined;
 
-  private ensureNewGraphWebview() {
-    if (!this.newGraphWebview) {
-      this.newGraphWebview = new NewGraphWebview(() => {
-        this.newGraphWebview = undefined;
+  private ensureNewProjectGraphWebview() {
+    if (!this.newProjectGraphWebview) {
+      this.newProjectGraphWebview = new NewGraphWebview('project', () => {
+        this.newProjectGraphWebview = undefined;
       });
-      this.newGraphWebview.reveal();
+      this.newProjectGraphWebview.reveal();
+    }
+  }
+
+  private ensureNewTaskGraphWebview() {
+    if (!this.newTaskGraphWebview) {
+      this.newTaskGraphWebview = new NewGraphWebview('task', () => {
+        this.newTaskGraphWebview = undefined;
+      });
+      this.newTaskGraphWebview.reveal();
     }
   }
 
   public async showAllProjects(): Promise<PartialHandleEventResult> {
-    this.ensureNewGraphWebview();
-    return await this.newGraphWebview.sendCommandToGraph({
+    this.ensureNewProjectGraphWebview();
+    return await this.newProjectGraphWebview.sendCommandToGraph({
       type: 'showAll',
       autoExpand: true,
     });

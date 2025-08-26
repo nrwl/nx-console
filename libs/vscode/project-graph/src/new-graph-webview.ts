@@ -1,12 +1,15 @@
-import { NxError } from '@nx-console/shared-types';
+import { GraphDataResult, NxError } from '@nx-console/shared-types';
 import { handleGraphInteractionEventBase } from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
-import { getGraphData } from '@nx-console/vscode-nx-workspace';
+import { createTaskGraph, getGraphData } from '@nx-console/vscode-nx-workspace';
 import type {
   ProjectGraphEvent,
   ProjectGraphHandleEventResult,
 } from '@nx/graph/projects';
-import type { ProjectGraph } from 'nx/src/devkit-exports';
+import type {
+  TaskGraphEvent,
+  TaskGraphHandleEventResult,
+} from '@nx/graph/tasks';
 import { join } from 'path';
 import {
   commands,
@@ -24,14 +27,15 @@ import {
   waitFor,
 } from 'xstate';
 import {
-  graphMachine,
+  getGraphMachine,
+  GraphData,
+  TaskGraphMachineContext,
   type LoadGraphDataOutput,
 } from './new-graph-state-machine';
 
-export type PartialHandleEventResult = Pick<
-  ProjectGraphHandleEventResult,
-  'projects' | 'edges'
->;
+export type PartialHandleEventResult =
+  | Pick<ProjectGraphHandleEventResult, 'projects' | 'edges'>
+  | Pick<TaskGraphHandleEventResult, 'tasks' | 'edges'>;
 
 export class NewGraphWebview {
   private webviewPanel: WebviewPanel;
@@ -40,9 +44,12 @@ export class NewGraphWebview {
   private handleEventResultEventEmitter: EventEmitter<PartialHandleEventResult> =
     new EventEmitter<PartialHandleEventResult>();
 
-  constructor(private onDidDispose?: () => void) {
+  constructor(
+    private type: 'project' | 'task',
+    private onDidDispose?: () => void,
+  ) {
     this.webviewPanel = window.createWebviewPanel(
-      'nx-console-project-graph-new',
+      `nx-console-${type}-graph-new`,
       `Nx Graph`,
       ViewColumn.Active,
       {
@@ -51,7 +58,7 @@ export class NewGraphWebview {
     );
 
     this.actor = createActor(
-      graphMachine.provide({
+      getGraphMachine(this.type).provide({
         actors: {
           loadGraphData: fromPromise<LoadGraphDataOutput>(async () => {
             const result = await getGraphData();
@@ -65,7 +72,7 @@ export class NewGraphWebview {
                   isPartial: false,
                 },
                 resultType: 'ERROR',
-              } as LoadGraphDataOutput;
+              };
             }
 
             if (result.resultType !== 'SUCCESS') {
@@ -77,13 +84,19 @@ export class NewGraphWebview {
                   isPartial: result.isPartial,
                 },
                 resultType: result.resultType,
-              } as LoadGraphDataOutput;
+              };
             }
 
-            return {
-              graphData: result.graphDataSerialized
+            let graphData: GraphData;
+            if (this.type === 'project') {
+              graphData = result.graphDataSerialized
                 ? JSON.parse(result.graphDataSerialized)
-                : undefined,
+                : undefined;
+            } else {
+              graphData = await this.loadGraphDataForTaskGraph(result);
+            }
+            return {
+              graphData,
               graphBasePath: result.graphBasePath,
               errors: {
                 errorsSerialized: result.errorsSerialized,
@@ -91,7 +104,7 @@ export class NewGraphWebview {
                 isPartial: result.isPartial,
               },
               resultType: result.resultType,
-            } as LoadGraphDataOutput;
+            };
           }),
         },
         actions: {
@@ -100,7 +113,9 @@ export class NewGraphWebview {
             this.renderGraph(context.graphData, context.graphBasePath),
           updateGraph: (
             _: unknown,
-            params: { graphData: ProjectGraph | undefined },
+            params: {
+              graphData: GraphData;
+            },
           ) => this.updateGraph(params.graphData),
           renderError: ({ context }) =>
             this.renderError(context.errors, context.graphBasePath),
@@ -117,6 +132,7 @@ export class NewGraphWebview {
           return;
         }
         if (event.type === 'handleEventResult') {
+          console.log('handleEventResult', event.result);
           this.handleEventResultEventEmitter.fire(event.result);
           return;
         }
@@ -157,7 +173,7 @@ export class NewGraphWebview {
   }
 
   async sendCommandToGraph(
-    command: ProjectGraphEvent,
+    command: ProjectGraphEvent | TaskGraphEvent,
   ): Promise<PartialHandleEventResult> {
     await waitFor(this.actor, (snapshot) =>
       snapshot.matches({
@@ -183,7 +199,7 @@ export class NewGraphWebview {
   }
 
   private async renderGraph(
-    graphData: ProjectGraph | undefined,
+    graphData: GraphData,
     graphBasePath: string | undefined,
   ) {
     if (!graphData || !graphBasePath) return;
@@ -197,7 +213,7 @@ export class NewGraphWebview {
           const vscode = acquireVsCodeApi();
           
 
-         let service = window.renderProjectGraph(data);
+         let service = window.${this.type === 'project' ? 'renderProjectGraph' : 'renderTaskGraph'}(data);
 
           window.addEventListener('message', (event) => {
             const message = event.data;
@@ -228,13 +244,13 @@ export class NewGraphWebview {
     this.webviewPanel.webview.html = html;
   }
 
-  private updateGraph(graphData: ProjectGraph | undefined) {
+  private updateGraph(graphData: GraphData) {
     if (!graphData) return;
 
     this.webviewPanel.webview.postMessage({
       type: 'updateGraph',
-      projects: Object.values(graphData.nodes),
-      dependencies: graphData.dependencies,
+      projects: Object.values(graphData.projectGraph?.nodes || {}),
+      dependencies: graphData.projectGraph?.dependencies || [],
       fileMap: undefined,
     });
   }
@@ -310,5 +326,21 @@ export class NewGraphWebview {
         <script src="${asWebviewUri('main.js')}"></script>
       </body>
     </html>`;
+  }
+
+  private async loadGraphDataForTaskGraph(
+    baseGraphData: GraphDataResult,
+  ): Promise<TaskGraphMachineContext['graphData']> {
+    const taskGraph = await createTaskGraph(
+      ['build'],
+      ['@new-graph-test/new-graph-test'],
+    );
+
+    return {
+      projectGraph: baseGraphData.graphDataSerialized
+        ? JSON.parse(baseGraphData.graphDataSerialized)
+        : undefined,
+      taskGraph: taskGraph.taskGraph,
+    };
   }
 }
