@@ -329,10 +329,6 @@
           "when": "false"
         },
         {
-          "command": "nxCloud.explainCipeTaskFailure",
-          "when": "false"
-        },
-        {
           "command": "nxCloud.helpMeFixCipeError",
           "when": "false"
         },
