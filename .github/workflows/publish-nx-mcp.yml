@@ -5,7 +5,7 @@ on:
     tags:
       - 'nx-mcp-v*.*.*'
 env:
-  node_version: 22
+  node_version: 24
 
 permissions:
   id-token: write
@@ -38,6 +38,8 @@ jobs:
         uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'master'
+      - name: log npm version
+        run: npm --version
       - name: publish
         run: |
           npx nx run nx-mcp:setup-publish --skip-nx-cache
