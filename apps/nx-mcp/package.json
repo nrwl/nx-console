@@ -28,7 +28,8 @@
   "bin": "main.js",
   "files": [
     "main.js",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "nx": {
     "name": "nx-mcp",
