@@ -140,6 +140,12 @@
   "nx": {
     "includedScripts": [],
     "targets": {
+      "release:vscode": {
+        "command": "npx nx release --group vscode --skip-publish"
+      },
+      "release:nx-mcp": {
+        "command": "npx nx release --group nx-mcp --skip-publish"
+      },
       "telemetry-check": {
         "command": "node tools/scripts/check-telemetry-sync.js"
       }

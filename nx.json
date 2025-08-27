@@ -210,6 +210,9 @@
   "nxCloudUrl": "https://staging.nx.app",
   "nxCloudId": "6660892a00a733543826cfcd",
   "release": {
+    "version": {
+      "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
+    },
     "groups": {
       "vscode": {
         "projects": ["vscode"],
