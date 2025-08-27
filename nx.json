@@ -214,23 +214,20 @@
       "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
     },
     "git": {
-      "push": false
+      "push": false,
+      "commitMessage": "chore(release-{projectName}): {version}"
     },
+    "releaseTagPattern": "{projectName}-v{version}",
     "groups": {
       "vscode": {
         "projects": ["vscode"],
         "projectsRelationship": "independent",
         "version": {
-          "conventionalCommits": true,
-          "git": {
-            "tagMessage": "vscode-v{version}",
-            "commitMessage": "chore(release-vscode): {version}"
-          }
+          "conventionalCommits": true
         },
         "changelog": {
           "projectChangelogs": true
-        },
-        "releaseTagPattern": "vscode-v{version}"
+        }
       },
       "nx-mcp": {
         "projects": ["nx-mcp"],
@@ -239,12 +236,8 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true,
-          "git": {
-            "commitMessage": "chore(release-nx-mcp): {version}"
-          }
-        },
-        "releaseTagPattern": "nx-mcp-v{version}"
+          "projectChangelogs": true
+        }
       }
     }
   }
