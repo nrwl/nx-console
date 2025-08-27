@@ -42,4 +42,4 @@ jobs:
         run: |
           npx nx run nx-mcp:setup-publish --skip-nx-cache
           cd dist/apps/nx-mcp
-          npm publish --dry-run
+          npm publish
