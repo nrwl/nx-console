@@ -209,6 +209,7 @@
   "defaultBase": "master",
   "nxCloudUrl": "https://staging.nx.app",
   "nxCloudId": "6660892a00a733543826cfcd",
+  "bust": 1,
   "release": {
     "version": {
       "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
