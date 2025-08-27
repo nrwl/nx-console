@@ -112,18 +112,6 @@ export async function activate(c: ExtensionContext) {
 
     initNxInit(context);
 
-    // Run `npx nx@latest --version` once on activation
-    try {
-      const workspacePathForNxVersion =
-        workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-      exec('npx -y nx@latest --version', {
-        cwd: workspacePathForNxVersion,
-        env: { ...process.env },
-      });
-    } catch {
-      // ignore errors
-    }
-
     context.subscriptions.push(
       showRefreshLoadingAtLocation(ProgressLocation.Window),
     );
