@@ -14,7 +14,9 @@ export class DaemonWatcher {
   private stopped = false;
   private retryCount = 0;
 
-  private disposables: Set<() => void> = new Set();
+  private disposables: Set<() => void | Promise<void>> = new Set();
+  private debounceTimer: NodeJS.Timeout | null = null;
+  private pendingChanges: Set<string> = new Set();
 
   constructor(
     private workspacePath: string,
@@ -27,9 +29,13 @@ export class DaemonWatcher {
     await this.initWatcher();
   }
 
-  stop() {
+  async stop() {
     this.stopped = true;
-    this.disposeEverything();
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    await this.disposeEverything();
   }
 
   private async initWatcher() {
@@ -64,6 +70,7 @@ export class DaemonWatcher {
       }
 
       if (!daemonClientModule?.daemonClient.enabled()) {
+        daemonClientModule?.daemonClient.reset();
         this.logger.log('Daemon is disabled, using native watcher');
         this.useNativeWatcher();
         return;
@@ -114,7 +121,7 @@ export class DaemonWatcher {
             if (error === 'closed') {
               if (!this.stopped) {
                 this.logger.log('Daemon watcher connection closed, restarting');
-                this.useNativeWatcher();
+                await this.useNativeWatcher();
               }
             } else if (error) {
               this.logger.log('Error watching files: ' + error);
@@ -149,7 +156,7 @@ export class DaemonWatcher {
                       .map((f) => `${f.path} (${f.type})`)
                       .join(', '),
                 );
-                this.callback();
+                this.handleFileChanges(filteredChangedFiles);
               }
             }
           },
@@ -166,8 +173,8 @@ export class DaemonWatcher {
     }
   }
 
-  private useNativeWatcher() {
-    this.disposeEverything();
+  private async useNativeWatcher() {
+    await this.disposeEverything();
 
     const nativeWatcher = new NativeWatcher(
       this.workspacePath,
@@ -176,14 +183,63 @@ export class DaemonWatcher {
       },
       this.logger,
     );
-    this.disposables.add(() => {
-      nativeWatcher.stop();
+    this.disposables.add(async () => {
+      await nativeWatcher.stop();
     });
   }
 
-  private disposeEverything() {
+  private handleFileChanges(
+    changedFiles: Array<{ path: string; type: string }>,
+  ) {
+    const criticalFiles: string[] = [];
+    const nonCriticalFiles: string[] = [];
+
+    for (const file of changedFiles) {
+      const normalized = normalize(file.path);
+      const isCritical =
+        normalized.endsWith('project.json') ||
+        normalized.endsWith('package.json') ||
+        normalized.endsWith('nx.json');
+
+      if (isCritical) {
+        criticalFiles.push(file.path);
+      } else {
+        nonCriticalFiles.push(file.path);
+        this.pendingChanges.add(file.path);
+      }
+    }
+
+    if (criticalFiles.length > 0) {
+      this.logger.log(
+        `Critical files changed (triggering immediately): ${criticalFiles.join(
+          ', ',
+        )}`,
+      );
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = null;
+      }
+      this.pendingChanges.clear();
+      this.callback();
+    } else if (nonCriticalFiles.length > 0) {
+      this.logger.log(`Non-critical files changed (debouncing for 10s)`);
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        if (this.pendingChanges.size > 0) {
+          this.logger.log(`Debounce timer expired, triggering callback`);
+          this.pendingChanges.clear();
+          this.callback();
+        }
+        this.debounceTimer = null;
+      }, 10000);
+    }
+  }
+
+  private async disposeEverything() {
     for (const dispose of this.disposables) {
-      dispose();
+      await dispose();
     }
     this.disposables.clear();
   }

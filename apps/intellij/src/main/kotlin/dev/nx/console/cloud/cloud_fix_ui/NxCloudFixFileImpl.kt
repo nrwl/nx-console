@@ -277,7 +277,7 @@ class NxCloudFixFileImpl(
             logger.info("Received message from webview: $parsed")
 
             when (parsed) {
-                is NxCloudFixMessage.Apply -> handleApply()
+                is NxCloudFixMessage.Apply -> handleApply(parsed.commitMessage)
                 is NxCloudFixMessage.ApplyLocally -> handleApplyLocally()
                 is NxCloudFixMessage.Reject -> handleReject()
                 is NxCloudFixMessage.ShowDiff -> handleShowDiff()
@@ -329,8 +329,9 @@ class NxCloudFixFileImpl(
         }
     }
 
-    private fun handleApply() {
-        logger<NxCloudFixFileImpl>().info("Apply action received")
+    private fun handleApply(commitMessage: String? = null) {
+        logger<NxCloudFixFileImpl>()
+            .info("Apply action received with commit message: $commitMessage")
 
         TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX)
 
@@ -349,7 +350,11 @@ class NxCloudFixFileImpl(
                 logger<NxCloudFixFileImpl>()
                     .info("Got cloud API service, calling updateSuggestedFix")
                 val success =
-                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.APPLIED)
+                    cloudApiService.updateSuggestedFix(
+                        aiFixId,
+                        AITaskFixUserAction.APPLIED,
+                        commitMessage
+                    )
 
                 if (success) {
                     showSuccessNotification("Nx Cloud fix applied successfully")

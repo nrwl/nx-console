@@ -217,11 +217,6 @@
           "group": "inline@1"
         },
         {
-          "command": "nxCloud.explainCipeTaskFailure",
-          "when": "view == nxCloudRecentCIPE && viewItem == failedTask && github.copilot-chat.activated",
-          "group": "inline@1"
-        },
-        {
           "command": "nxCloud.helpMeFixCipeError",
           "when": "view == nxCloudRecentCIPE && viewItem == failedTask && isInCursor",
           "group": "inline@1"
@@ -331,10 +326,6 @@
         },
         {
           "command": "nxCloud.showRunInApp",
-          "when": "false"
-        },
-        {
-          "command": "nxCloud.explainCipeTaskFailure",
           "when": "false"
         },
         {
@@ -949,11 +940,6 @@
         "title": "Open Workspace in Browser",
         "command": "nxCloud.openApp",
         "icon": "$(cloud)"
-      },
-      {
-        "title": "Explain CIPE Task Failure",
-        "command": "nxCloud.explainCipeTaskFailure",
-        "icon": "$(copilot)"
       },
       {
         "title": "Help me fix the latest CIPE error",
