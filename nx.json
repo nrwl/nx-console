@@ -221,16 +221,14 @@
         "projects": ["vscode"],
         "projectsRelationship": "independent",
         "version": {
-          "conventionalCommits": true
-        },
-        "changelog": {
-          "projectChangelogs": true,
+          "conventionalCommits": true,
           "git": {
-            "commit": true,
-            "tag": true,
             "tagMessage": "vscode-v{version}",
             "commitMessage": "chore(release-vscode): {version}"
           }
+        },
+        "changelog": {
+          "projectChangelogs": true
         },
         "releaseTagPattern": "vscode-v{version}"
       },
