@@ -1,6 +1,6 @@
 {
   "name": "nx-mcp",
-  "version": "0.6.1",
+  "version": "0.0.0",
   "main": "main.js",
   "description": "A Model Context Protocol server implementation for Nx",
   "author": {
@@ -57,7 +57,8 @@
           "sourcemap": false,
           "minify": true,
           "assets": [
-            "apps/nx-mcp/README.md"
+            "apps/nx-mcp/README.md",
+            "apps/nx-mcp/CHANGELOG.md"
           ],
           "esbuildOptions": {
             "mainFields": [

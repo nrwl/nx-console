@@ -208,5 +208,37 @@
   },
   "defaultBase": "master",
   "nxCloudUrl": "https://staging.nx.app",
-  "nxCloudId": "6660892a00a733543826cfcd"
+  "nxCloudId": "6660892a00a733543826cfcd",
+  "release": {
+    "version": {
+      "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
+    },
+    "git": {
+      "push": false,
+      "commitMessage": "chore(release-{projectName}): {version}"
+    },
+    "releaseTagPattern": "{projectName}-v{version}",
+    "groups": {
+      "vscode": {
+        "projects": ["vscode"],
+        "projectsRelationship": "independent",
+        "version": {
+          "conventionalCommits": true
+        },
+        "changelog": {
+          "projectChangelogs": true
+        }
+      },
+      "nx-mcp": {
+        "projects": ["nx-mcp"],
+        "projectsRelationship": "independent",
+        "version": {
+          "conventionalCommits": true
+        },
+        "changelog": {
+          "projectChangelogs": true
+        }
+      }
+    }
+  }
 }
