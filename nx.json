@@ -224,10 +224,13 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
-        },
-        "git": {
-          "commitMessage": "chore(release-vscode): {version}"
+          "projectChangelogs": true,
+          "git": {
+            "commit": true,
+            "tag": true,
+            "tagMessage": "vscode-v{version}",
+            "commitMessage": "chore(release-vscode): {version}"
+          }
         },
         "releaseTagPattern": "vscode-v{version}"
       },
@@ -238,10 +241,10 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
-        },
-        "git": {
-          "commitMessage": "chore(release-nx-mcp): {version}"
+          "projectChangelogs": true,
+          "git": {
+            "commitMessage": "chore(release-nx-mcp): {version}"
+          }
         },
         "releaseTagPattern": "nx-mcp-v{version}"
       }
