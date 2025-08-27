@@ -1,3 +1,18 @@
+## 18.66.0 (2025-08-27)
+
+### 🚀 Features
+
+- **vscode:** remove vscode explain-cipe command ([#2713](https://github.com/nrwl/nx-console/pull/2713))
+
+### 🩹 Fixes
+
+- **vscode:** remove version check on startup ([#2718](https://github.com/nrwl/nx-console/pull/2718))
+- **vscode:** remove unused explain cipe menu item ([#2716](https://github.com/nrwl/nx-console/pull/2716))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## [18.65.1](https://github.com/nrwl/nx-console/compare/vscode-v18.65.0...vscode-v18.65.1) (2025-08-20)
 
 
