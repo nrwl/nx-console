@@ -213,6 +213,9 @@
     "version": {
       "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
     },
+    "git": {
+      "push": false
+    },
     "groups": {
       "vscode": {
         "projects": ["vscode"],
