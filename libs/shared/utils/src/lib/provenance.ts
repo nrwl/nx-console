@@ -1,12 +1,15 @@
-import { execSync } from 'child_process';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 
-export function nxLatestHasProvenance(): boolean {
-  const npmView = execSync(
-    `npm view nx@latest dist.attestations.provenance --json`,
-    {
-      encoding: 'utf-8',
-    },
-  ).trim();
+export async function nxLatestHasProvenance(): Promise<boolean> {
+  const npmView = (
+    await promisify(exec)(
+      `npm view nx@latest dist.attestations.provenance --json`,
+      {
+        encoding: 'utf-8',
+      },
+    )
+  ).stdout.trim();
 
   return npmView !== '';
 }

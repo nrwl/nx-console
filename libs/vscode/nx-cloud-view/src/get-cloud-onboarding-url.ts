@@ -10,7 +10,7 @@ import { execSync } from 'child_process';
 export async function getCloudOnboardingUrl() {
   const workspacePath = getNxWorkspacePath();
   const packageManagerCommand = await getPackageManagerCommand(workspacePath);
-  const hasProvenance = nxLatestHasProvenance();
+  const hasProvenance = await nxLatestHasProvenance();
   if (!hasProvenance) {
     getTelemetry().logUsage('misc.nx-latest-no-provenance');
     throw new Error(noProvenanceError);

@@ -33,14 +33,14 @@ export class CliTask extends Task {
     const { isEncapsulatedNx, workspacePath } = nxWorkspace;
 
     if (definition.useLatestNxVersion) {
-      const hasProvenance = nxLatestHasProvenance();
+      const hasProvenance = await nxLatestHasProvenance();
       if (!hasProvenance) {
         getTelemetry().logUsage('misc.nx-latest-no-provenance');
         throw new Error(noProvenanceError);
       }
     }
 
-    const displayCommand = `${definition.useLatestNxVersion ? ' nx@latest' : 'nx'} ${args.join(' ')}`;
+    const displayCommand = `${definition.useLatestNxVersion ? 'nx@latest' : 'nx'} ${args.join(' ')}`;
 
     const task = new CliTask(
       { ...definition, type: 'nx' }, // definition

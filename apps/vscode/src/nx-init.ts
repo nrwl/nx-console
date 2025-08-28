@@ -29,7 +29,7 @@ export function initNxInit(context: ExtensionContext) {
         const workspacePath =
           workspace.workspaceFolders &&
           workspace.workspaceFolders[0].uri.fsPath;
-        const hasProvenance = nxLatestHasProvenance();
+        const hasProvenance = await nxLatestHasProvenance();
         if (!hasProvenance) {
           getTelemetry().logUsage('misc.nx-latest-no-provenance');
           window.showErrorMessage(noProvenanceError);
