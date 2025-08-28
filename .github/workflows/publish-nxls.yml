@@ -1,0 +1,45 @@
+name: Publish NXLS
+
+on:
+  push:
+    tags:
+      - 'nxls-v*.*.*'
+env:
+  node_version: 24
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          check-latest: true
+          cache: yarn
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1.0.5
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+          cache: gradle
+      - run: yarn install --immutable
+        shell: bash
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: 'master'
+      - name: publish
+        run: |
+          npx nx run nxls:package --skip-nx-cache
+          cd dist/packages/nxls
+          npm publish --dry-run
