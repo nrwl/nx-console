@@ -3,7 +3,7 @@ group = "dev.nx.console"
 layout.buildDirectory = File("dist")
 
 plugins {
-    id("dev.nx.gradle.project-graph") version "0.1.5"
+    id("dev.nx.gradle.project-graph") version "0.1.6"
 }
 
 allprojects {
