@@ -21,6 +21,7 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
+import dev.nx.console.utils.NxProvenance
 import dev.nx.console.utils.sync_services.NxCloudStatusSyncAccessService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +66,18 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                     return@withContext
                 }
                 TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_CONNECT)
+
+                val hasProvenance = withContext(Dispatchers.IO) {
+                    NxProvenance.nxLatestHasProvenance()
+                }
+                if (!hasProvenance) {
+                    Notifier.notifyAnything(
+                        project,
+                        NxProvenance.NO_PROVENANCE_ERROR,
+                        NotificationType.ERROR
+                    )
+                    return@withContext
+                 }
 
                 val commandLine = NxLatestVersionGeneralCommandLine(project, listOf("connect"))
 

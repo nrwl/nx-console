@@ -64,6 +64,7 @@ export type TelemetryEvents =
   | 'cli.migrate'
   | 'cli.affected'
   | 'cli.init'
+  | 'cli.init.nx-latest-no-provenance'
   // ai
   | 'ai.chat-message'
   | 'ai.feedback-good'

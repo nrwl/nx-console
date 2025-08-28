@@ -1,4 +1,9 @@
+import {
+  noProvenanceError,
+  nxLatestHasProvenance,
+} from '@nx-console/shared-utils';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { execSync } from 'child_process';
 import {
   commands,
   ExtensionContext,
@@ -6,6 +11,7 @@ import {
   Task,
   tasks,
   TaskScope,
+  window,
   workspace,
 } from 'vscode';
 
@@ -23,6 +29,12 @@ export function initNxInit(context: ExtensionContext) {
         const workspacePath =
           workspace.workspaceFolders &&
           workspace.workspaceFolders[0].uri.fsPath;
+        const hasProvenance = nxLatestHasProvenance();
+        if (!hasProvenance) {
+          getTelemetry().logUsage('cli.init.nx-latest-no-provenance');
+          window.showErrorMessage(noProvenanceError);
+          return;
+        }
         const command = 'nx@latest init';
         const task = new Task(
           { type: 'nx' }, // definition
@@ -35,12 +47,12 @@ export function initNxInit(context: ExtensionContext) {
             env: {
               NX_CONSOLE: 'true',
             },
-          })
+          }),
         );
         task.presentationOptions.focus = true;
 
         tasks.executeTask(task);
-      }
-    )
+      },
+    ),
   );
 }
