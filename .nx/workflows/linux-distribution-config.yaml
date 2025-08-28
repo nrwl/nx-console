@@ -8,3 +8,4 @@ assignment-rules:
       - intellij
     runs-on:
       - linux-large-java
+    parallelism: 1
