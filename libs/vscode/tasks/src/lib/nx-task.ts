@@ -34,7 +34,7 @@ export class NxTask extends Task {
     }
 
     const { workspacePath, isEncapsulatedNx } = workspace;
-    const displayCommand = `${definition.useLatestVersion ? '-y nx@latest' : 'nx'} ${args.join(' ')}`;
+    const displayCommand = `${definition.useLatestVersion ? 'nx@latest' : 'nx'} ${args.join(' ')}`;
     const task = new NxTask(
       { ...definition, type: 'nx' }, // definition
       TaskScope.Workspace, // scope

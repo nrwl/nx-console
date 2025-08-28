@@ -6,6 +6,11 @@ import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
 import { Task, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
+import {
+  noProvenanceError,
+  nxLatestHasProvenance,
+} from '@nx-console/shared-utils';
+import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export class CliTask extends Task {
   /**
@@ -27,7 +32,15 @@ export class CliTask extends Task {
     }
     const { isEncapsulatedNx, workspacePath } = nxWorkspace;
 
-    const displayCommand = `${definition.useLatestNxVersion ? '-y nx@latest' : 'nx'} ${args.join(' ')}`;
+    if (definition.useLatestNxVersion) {
+      const hasProvenance = await nxLatestHasProvenance();
+      if (!hasProvenance) {
+        getTelemetry().logUsage('misc.nx-latest-no-provenance');
+        throw new Error(noProvenanceError);
+      }
+    }
+
+    const displayCommand = `${definition.useLatestNxVersion ? 'nx@latest' : 'nx'} ${args.join(' ')}`;
 
     const task = new CliTask(
       { ...definition, type: 'nx' }, // definition
