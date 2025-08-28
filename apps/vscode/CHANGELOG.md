@@ -1,3 +1,13 @@
+## 18.66.1 (2025-08-28)
+
+### 🩹 Fixes
+
+- always check nx@latest provenance status before executing anything from it ([#2724](https://github.com/nrwl/nx-console/pull/2724))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.66.0 (2025-08-27)
 
 ### 🚀 Features
