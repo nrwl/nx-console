@@ -37,7 +37,9 @@ version = providers.gradleProperty("version").get()
 
 // Configure project's dependencies
 repositories {
+    mavenLocal()
     mavenCentral()
+    gradlePluginPortal()
 
     intellijPlatform { defaultRepositories() }
 }
