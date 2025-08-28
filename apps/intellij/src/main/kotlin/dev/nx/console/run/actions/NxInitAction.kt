@@ -19,8 +19,11 @@ class NxInitService(private val project: Project, private val cs: CoroutineScope
 
     fun runNxInit() {
         cs.launch {
+            val telemetry = TelemetryService.getInstance(project)
+            telemetry.featureUsed(TelemetryEvent.CLI_INIT)
             val hasProvenance = withContext(Dispatchers.IO) { NxProvenance.nxLatestHasProvenance() }
             if (!hasProvenance) {
+                telemetry.featureUsed(TelemetryEvent.MISC_NX_LATEST_NO_PROVENANCE)
                 Notifier.notifyAnything(
                     project,
                     NxProvenance.NO_PROVENANCE_ERROR,

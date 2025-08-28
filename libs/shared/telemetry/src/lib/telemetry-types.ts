@@ -18,6 +18,7 @@ export type TelemetryEvents =
   | 'misc.open-pdv'
   | 'misc.open-project-details-codelens'
   | 'misc.exception'
+  | 'misc.nx-latest-no-provenance'
   // migrate
   | 'migrate.open'
   | 'migrate.start'
@@ -64,7 +65,6 @@ export type TelemetryEvents =
   | 'cli.migrate'
   | 'cli.affected'
   | 'cli.init'
-  | 'cli.init.nx-latest-no-provenance'
   // ai
   | 'ai.chat-message'
   | 'ai.feedback-good'

@@ -12,7 +12,7 @@ export async function getCloudOnboardingUrl() {
   const packageManagerCommand = await getPackageManagerCommand(workspacePath);
   const hasProvenance = nxLatestHasProvenance();
   if (!hasProvenance) {
-    getTelemetry().logUsage('cli.init.nx-latest-no-provenance');
+    getTelemetry().logUsage('misc.nx-latest-no-provenance');
     throw new Error(noProvenanceError);
   }
   const nxConnectOutput = execSync(

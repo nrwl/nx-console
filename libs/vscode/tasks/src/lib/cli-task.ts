@@ -35,7 +35,7 @@ export class CliTask extends Task {
     if (definition.useLatestNxVersion) {
       const hasProvenance = nxLatestHasProvenance();
       if (!hasProvenance) {
-        getTelemetry().logUsage('cli.init.nx-latest-no-provenance');
+        getTelemetry().logUsage('misc.nx-latest-no-provenance');
         throw new Error(noProvenanceError);
       }
     }

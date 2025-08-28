@@ -67,9 +67,8 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                 }
                 TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_CONNECT)
 
-                val hasProvenance = withContext(Dispatchers.IO) {
-                    NxProvenance.nxLatestHasProvenance()
-                }
+                val hasProvenance =
+                    withContext(Dispatchers.IO) { NxProvenance.nxLatestHasProvenance() }
                 if (!hasProvenance) {
                     Notifier.notifyAnything(
                         project,
@@ -77,7 +76,7 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                         NotificationType.ERROR
                     )
                     return@withContext
-                 }
+                }
 
                 val commandLine = NxLatestVersionGeneralCommandLine(project, listOf("connect"))
 
