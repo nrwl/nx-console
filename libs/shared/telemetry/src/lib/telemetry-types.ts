@@ -18,6 +18,7 @@ export type TelemetryEvents =
   | 'misc.open-pdv'
   | 'misc.open-project-details-codelens'
   | 'misc.exception'
+  | 'misc.nx-latest-no-provenance'
   // migrate
   | 'migrate.open'
   | 'migrate.start'

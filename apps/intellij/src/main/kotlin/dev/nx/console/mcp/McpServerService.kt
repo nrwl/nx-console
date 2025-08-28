@@ -6,6 +6,8 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VfsUtil
+import dev.nx.console.telemetry.TelemetryEvent
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nxBasePath
 import java.io.File
@@ -27,6 +29,7 @@ class McpServerService(private val project: Project) {
             Notifier.notifyAiAssistantPluginRequired(project)
             return
         }
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.AI_ADD_MCP)
         if (isMcpServerSetup()) {
             logger.info("[MCP] MCP server is already set up, no action needed")
             Notifier.notifyAnything(
