@@ -1,3 +1,13 @@
+## 18.66.2 (2025-08-29)
+
+### 🩹 Fixes
+
+- fix: repair cipe notification logic for new api timing with aiFixesEnabled (#2729) ([#2729](https://github.com/nrwl/nx-console/pull/2729))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.66.1 (2025-08-28)
 
 ### 🩹 Fixes
