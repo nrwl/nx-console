@@ -537,6 +537,59 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events.isEmpty())
     }
 
+    fun testRegularErrorNotificationAfterAiFixTimeoutFromEmpty() {
+        // When a new CIPE with aiFixesEnabled failed more than 5 minutes ago without AI fix, show
+        // regular error
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
+
+        val failedCipeWithAiEnabledTimedOut =
+            createProgressCIPE()
+                .copy(
+                    aiFixesEnabled = true,
+                    status = CIPEExecutionStatus.FAILED,
+                    createdAt = tenMinutesAgo,
+                    completedAt = sixMinutesAgo
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = emptyList()),
+                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
+    }
+
+    fun testRegularErrorNotificationAfterAiFixTimeoutFromExisting() {
+        // When an existing CIPE with aiFixesEnabled is re-checked after timeout, show regular error
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
+
+        val failedCipeWithAiEnabledTimedOut =
+            createProgressCIPE()
+                .copy(
+                    aiFixesEnabled = true,
+                    status = CIPEExecutionStatus.FAILED,
+                    createdAt = tenMinutesAgo,
+                    completedAt = sixMinutesAgo
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
+                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
+    }
+
     // Helper functions to create test data
     private fun createSuccessfulCIPE() =
         CIPEInfo(
