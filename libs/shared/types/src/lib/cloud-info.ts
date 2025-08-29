@@ -15,6 +15,7 @@ export type CIPEExecutionStatus =
 
 export type CIPEInfo = {
   ciPipelineExecutionId: string;
+  aiFixesEnabled?: boolean;
   branch: string;
   status: CIPEExecutionStatus;
   createdAt: number;
