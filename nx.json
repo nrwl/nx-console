@@ -239,6 +239,16 @@
         "changelog": {
           "projectChangelogs": true
         }
+      },
+      "nxls": {
+        "projects": ["nxls"],
+        "projectsRelationship": "independent",
+        "version": {
+          "conventionalCommits": true
+        },
+        "changelog": {
+          "projectChangelogs": true
+        }
       }
     }
   }

@@ -401,6 +401,195 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events.isEmpty())
     }
 
+    fun testNoNotificationForFailureWithAiFixesEnabled() {
+        // When aiFixesEnabled=true but failure just happened, should not show notification
+        // (waiting to see if AI fix comes)
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val oneMinuteAgo = System.currentTimeMillis() - 1000 * 60 * 1
+
+        val progressCIPE = createProgressCIPE()
+        val failedWithAiFixesEnabled =
+            progressCIPE.copy(
+                aiFixesEnabled = true,
+                status = CIPEExecutionStatus.FAILED,
+                completedAt = oneMinuteAgo
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedWithAiFixesEnabled))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification - waiting for AI fix
+        assertTrue(mockListener.events.isEmpty())
+    }
+
+    fun testNotificationForFailureWithAiFixesEnabledAfterTimeout() {
+        // When aiFixesEnabled=true but failure was more than 5 minutes ago, should show
+        // notification
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
+
+        val progressCIPE = createProgressCIPE()
+        val failedWithAiFixesEnabledTimedOut =
+            progressCIPE.copy(
+                aiFixesEnabled = true,
+                status = CIPEExecutionStatus.FAILED,
+                createdAt = tenMinutesAgo,
+                completedAt = sixMinutesAgo
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedWithAiFixesEnabledTimedOut))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should show notification - timeout passed
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
+    }
+
+    fun testNoNotificationForProgressFailedRunWithAiFixesEnabled() {
+        // When aiFixesEnabled=true and run failed during progress, should not show notification
+        val progressCIPE = createProgressCIPE()
+        val progressWithFailedRunAiEnabled =
+            createProgressWithFailedRun().copy(aiFixesEnabled = true)
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(progressWithFailedRunAiEnabled))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification - waiting for AI fix
+        assertTrue(mockListener.events.isEmpty())
+    }
+
+    fun testSuccessNotificationShowsEvenWithAiFixesEnabled() {
+        // Success notifications should still show even when aiFixesEnabled=true
+        val progressCIPE = createProgressCIPE()
+        val successWithAiEnabled =
+            progressCIPE.copy(
+                aiFixesEnabled = true,
+                status = CIPEExecutionStatus.SUCCEEDED,
+                completedAt = System.currentTimeMillis()
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(successWithAiEnabled))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPESucceeded)
+    }
+
+    fun testTransitionFromAiFixesEnabledToActualAiFix() {
+        // When a CIPE transitions from aiFixesEnabled to actually having an AI fix with suggestion
+        val progressWithAiEnabled = createProgressCIPE().copy(aiFixesEnabled = true)
+        val progressWithAiFix = createProgressWithAiFixAndSuggestion()
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressWithAiEnabled)),
+                newData = CIPEDataResponse(info = listOf(progressWithAiFix))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.AiFixAvailable)
+    }
+
+    fun testNoDoubleNotificationForRegularFailures() {
+        // Regular failures (without aiFixesEnabled) should not show notification twice
+        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+
+        val failedCIPE =
+            createProgressCIPE()
+                .copy(
+                    status = CIPEExecutionStatus.FAILED,
+                    createdAt = tenMinutesAgo,
+                    completedAt = sixMinutesAgo
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(failedCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedCIPE))
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification - already shown
+        assertTrue(mockListener.events.isEmpty())
+    }
+
+    fun testRegularErrorNotificationAfterAiFixTimeoutFromEmpty() {
+        // When a new CIPE with aiFixesEnabled failed more than 5 minutes ago without AI fix, show
+        // regular error
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
+
+        val failedCipeWithAiEnabledTimedOut =
+            createProgressCIPE()
+                .copy(
+                    aiFixesEnabled = true,
+                    status = CIPEExecutionStatus.FAILED,
+                    createdAt = tenMinutesAgo,
+                    completedAt = sixMinutesAgo
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = emptyList()),
+                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
+    }
+
+    fun testRegularErrorNotificationAfterAiFixTimeoutFromExisting() {
+        // When an existing CIPE with aiFixesEnabled is re-checked after timeout, show regular error
+        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
+
+        val failedCipeWithAiEnabledTimedOut =
+            createProgressCIPE()
+                .copy(
+                    aiFixesEnabled = true,
+                    status = CIPEExecutionStatus.FAILED,
+                    createdAt = tenMinutesAgo,
+                    completedAt = sixMinutesAgo
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
+                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut))
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
+    }
+
     // Helper functions to create test data
     private fun createSuccessfulCIPE() =
         CIPEInfo(

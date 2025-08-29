@@ -5,6 +5,7 @@ import kotlinx.serialization.*
 @Serializable
 data class CIPEInfo(
     val ciPipelineExecutionId: String,
+    val aiFixesEnabled: Boolean? = null,
     val branch: String,
     val status: CIPEExecutionStatus,
     val createdAt: Long,

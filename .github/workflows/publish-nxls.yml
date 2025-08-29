@@ -1,11 +1,15 @@
-name: Publish VSCode
+name: Publish NXLS
 
 on:
   push:
     tags:
-      - 'vscode-v*.*.*'
+      - 'nxls-v*.*.*'
 env:
   node_version: 24
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish:
@@ -34,20 +38,8 @@ jobs:
         uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'master'
-      - name: publish to vscode marketplace
+      - name: publish
         run: |
-          node ./tools/scripts/clear-dist.js
-          npx nx run vscode:package --skip-nx-cache
-          yarn vsce publish --packagePath dist/apps/vscode/nx-console.vsix -p ${{ secrets.VSCE_PAT }}
-      - name: release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          files: |
-            dist/apps/vscode/nx-console.vsix
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-      - name: publish to open-vsx marketplace
-        run: |
-          yarn ovsx publish dist/apps/vscode/nx-console.vsix -p ${{ secrets.OVSX_PAT }}
+          npx nx run nxls:package --skip-nx-cache
+          cd dist/packages/nxls
+          npm publish --dry-run
