@@ -34,12 +34,11 @@ jobs:
         uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'master'
-      - name: publish
+      - name: publish to vscode marketplace
         run: |
           node ./tools/scripts/clear-dist.js
           npx nx run vscode:package --skip-nx-cache
           yarn vsce publish --packagePath dist/apps/vscode/nx-console.vsix -p ${{ secrets.VSCE_PAT }}
-          yarn ovsx publish dist/apps/vscode/nx-console.vsix -p ${{ secrets.OVSX_PAT }}
       - name: release
         uses: softprops/action-gh-release@v1
         with:
@@ -49,3 +48,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: publish to open-vsx marketplace
+        run: |
+          yarn ovsx publish dist/apps/vscode/nx-console.vsix -p ${{ secrets.OVSX_PAT }}
