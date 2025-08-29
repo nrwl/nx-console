@@ -39,8 +39,19 @@ export function compareCIPEDataAndSendNotification(
     const newCIPERunGroups = newCIPE.runGroups || [];
     const oldCIPERunGroups = oldCIPE?.runGroups || [];
 
-    // Check if any runGroup has an AI fix (to skip failure notifications)
-    const hasAiFix = newCIPERunGroups.some((runGroup) => !!runGroup.aiFix);
+    // Check if any runGroup has an AI fix or could get one in the future (to skip failure notifications)
+    const hasRunGroupWithAiFix = newCIPERunGroups.some(
+      (runGroup) => !!runGroup.aiFix,
+    );
+    const failedButNoAiFixInFiveMinutes =
+      newCIPE.status === 'FAILED' &&
+      !hasRunGroupWithAiFix &&
+      newCIPE.completedAt &&
+      newCIPE.completedAt + 1000 * 60 * 5 < Date.now();
+
+    const potentiallyHasAiFix =
+      hasRunGroupWithAiFix ||
+      (newCIPE.aiFixesEnabled && !failedButNoAiFixInFiveMinutes);
 
     for (const newRunGroup of newCIPERunGroups) {
       if (
@@ -76,18 +87,24 @@ export function compareCIPEDataAndSendNotification(
 
     // if the cipe has completed somehow or had a failed run before the latest update,
     // we've already shown a notification and can return
-    if (oldCIPE && (oldCIPE.status !== 'IN_PROGRESS' || oldCIPEFailedRun)) {
+    // the one exception is if we supressed the notification because we thought an AI fix might be coming
+    // if ai fixes aren't enabled, we never do this suppression
+    if (
+      oldCIPE &&
+      (oldCIPE.status !== 'IN_PROGRESS' || oldCIPEFailedRun) &&
+      (!failedButNoAiFixInFiveMinutes || !newCIPE.aiFixesEnabled)
+    ) {
       return;
     }
 
-    if (newCIPEIsFailed && !hasAiFix) {
+    if (newCIPEIsFailed && !potentiallyHasAiFix) {
       showMessageWithResultAndCommit(
         `CI failed for #${newCIPE.branch}.`,
         newCIPE.cipeUrl,
         newCIPE.commitUrl,
         'error',
       );
-    } else if (newCIPEFailedRun && !hasAiFix) {
+    } else if (newCIPEFailedRun && !potentiallyHasAiFix) {
       const command =
         newCIPEFailedRun.command.length > 70
           ? newCIPEFailedRun.command.substring(0, 60) + '[...]'
