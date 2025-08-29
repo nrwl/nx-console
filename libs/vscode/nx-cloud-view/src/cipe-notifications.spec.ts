@@ -731,7 +731,7 @@ describe('CIPE Notifications', () => {
       });
     });
 
-    fit('should not show regular notifications twice even if run has been failed for more than 5 minutes and ai fixes are not enabled', () => {
+    it('should not show regular notifications twice even if run has been failed for more than 5 minutes and ai fixes are not enabled', () => {
       const sixMinutesAgo = Date.now() - 1000 * 60 * 6;
       const failedCipe: CIPEInfo[] = [
         {
