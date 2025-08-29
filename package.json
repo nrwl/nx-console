@@ -146,6 +146,9 @@
       "release:nx-mcp": {
         "command": "npx nx release --group nx-mcp --skip-publish"
       },
+      "release:nxls": {
+        "command": "npx nx release --group nxls --skip-publish"
+      },
       "telemetry-check": {
         "command": "node tools/scripts/check-telemetry-sync.js"
       }
