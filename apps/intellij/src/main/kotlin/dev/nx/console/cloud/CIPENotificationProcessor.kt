@@ -53,8 +53,19 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
         newInfo.forEach { newCIPE ->
             val oldCIPE = oldInfo.find { it.ciPipelineExecutionId == newCIPE.ciPipelineExecutionId }
 
-            // Check if any runGroup has an AI fix (to skip failure notifications)
-            val hasAiFix = newCIPE.runGroups.any { it.aiFix != null }
+            // Check if any runGroup has an AI fix or could get one in the future (to skip failure
+            // notifications)
+            val hasRunGroupWithAiFix = newCIPE.runGroups.any { it.aiFix != null }
+            val completedAt = newCIPE.completedAt
+            val failedButNoAiFixInFiveMinutes =
+                newCIPE.status.isFailedStatus() &&
+                    !hasRunGroupWithAiFix &&
+                    completedAt != null &&
+                    completedAt + 1000 * 60 * 5 < System.currentTimeMillis()
+
+            val potentiallyHasAiFix =
+                hasRunGroupWithAiFix ||
+                    (newCIPE.aiFixesEnabled == true && !failedButNoAiFixInFiveMinutes)
 
             // Check for newly available AI fixes and show proactive notifications
             if (oldCIPE != null) {
@@ -62,7 +73,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             } else {
                 // If this is a new CIPE but it has an AI fix that's already complete, show a
                 // notification
-                if (hasAiFix) {
+                if (hasRunGroupWithAiFix) {
                     newCIPE.runGroups.forEach { runGroup ->
                         if (runGroup.aiFix?.suggestedFix != null) {
                             emitNotification(
@@ -75,22 +86,28 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
 
             // Following VSCode logic: if the CIPE has completed or had a failed run before,
             // we've already shown a notification and should return
+            // The one exception is if we suppressed the notification because we thought an AI fix
+            // might be coming
+            // if ai fixes aren't enabled, we never do this suppression
             if (
                 oldCIPE != null &&
-                    (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE))
+                    (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS ||
+                        hasAnyFailedRun(oldCIPE)) &&
+                    (!failedButNoAiFixInFiveMinutes || newCIPE.aiFixesEnabled != true)
             ) {
                 return@forEach
             }
 
             // Check what type of notification to emit
             when {
-                // CIPE just failed - skip if AI fix available
-                newCIPE.status.isFailedStatus() && !hasAiFix -> {
+                // CIPE just failed - skip if AI fix available or potentially available
+                newCIPE.status.isFailedStatus() && !potentiallyHasAiFix -> {
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
 
-                // Run failed while CIPE is in progress - skip if AI fix available
-                hasAnyFailedRun(newCIPE) && !hasAiFix -> {
+                // Run failed while CIPE is in progress - skip if AI fix available or potentially
+                // available
+                hasAnyFailedRun(newCIPE) && !potentiallyHasAiFix -> {
                     // Find the first failed run for the notification
                     val failedRun =
                         newCIPE.runGroups.flatMap { it.runs }.firstOrNull { isRunFailed(it) }
