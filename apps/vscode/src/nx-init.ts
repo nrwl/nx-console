@@ -35,7 +35,7 @@ export function initNxInit(context: ExtensionContext) {
           window.showErrorMessage(noProvenanceError);
           return;
         }
-        const command = 'nx@latest init';
+        const command = 'nx@latest init --ignore-scripts';
         const task = new Task(
           { type: 'nx' }, // definition
           TaskScope.Workspace, // scope

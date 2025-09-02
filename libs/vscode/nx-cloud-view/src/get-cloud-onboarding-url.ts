@@ -16,7 +16,7 @@ export async function getCloudOnboardingUrl() {
     throw new Error(noProvenanceError);
   }
   const nxConnectOutput = execSync(
-    `${packageManagerCommand.dlx} ${packageManagerCommand.dlx === 'npx' ? '-y' : ''} nx@latest connect`,
+    `${packageManagerCommand.dlx} ${packageManagerCommand.dlx === 'npx' ? '-y' : ''} nx@latest connect --ignore-scripts`,
     {
       cwd: workspacePath,
     },
