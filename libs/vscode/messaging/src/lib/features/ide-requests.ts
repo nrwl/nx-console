@@ -12,13 +12,13 @@ import {
   getGenerators,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode-nx-workspace';
-import { vscodeLogger } from '@nx-console/vscode-utils';
 import { commands, window } from 'vscode';
 import { NotificationType, RequestType } from 'vscode-jsonrpc';
 import {
   MessagingNotification,
   MessagingRequest,
 } from '../messaging-notification';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export const IdeFocusProject: MessagingNotification<{ projectName: string }> = {
   type: new NotificationType(IDE_RPC_METHODS.FOCUS_PROJECT),

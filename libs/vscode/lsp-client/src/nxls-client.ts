@@ -8,12 +8,9 @@ import {
   getNxlsOutputChannel,
   getOutputChannel,
   logAndShowError,
-} from '@nx-console/vscode-output-channels';
-import {
-  getGitApi,
-  getGitRepository,
   vscodeLogger,
-} from '@nx-console/vscode-utils';
+} from '@nx-console/vscode-output-channels';
+import { getGitApi, getGitRepository } from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import {

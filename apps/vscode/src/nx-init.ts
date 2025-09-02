@@ -4,8 +4,6 @@ import {
 } from '@nx-console/shared-utils';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { vscodeLogger } from '@nx-console/vscode-utils';
-import { execSync } from 'child_process';
 import {
   commands,
   ExtensionContext,
@@ -13,7 +11,6 @@ import {
   Task,
   tasks,
   TaskScope,
-  window,
   workspace,
 } from 'vscode';
 

@@ -17,11 +17,11 @@ import {
   getNxWorkspaceProjects,
   getRecentCIPEData,
 } from '@nx-console/vscode-nx-workspace';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import {
   getGitDiffs,
   isInVSCode,
   sendMessageToAgent,
-  vscodeLogger,
 } from '@nx-console/vscode-utils';
 import { commands, ProgressLocation, tasks, window } from 'vscode';
 

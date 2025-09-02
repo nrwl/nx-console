@@ -4,8 +4,8 @@ import {
   nxLatestProvenanceCheck,
 } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { vscodeLogger } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 
 export async function getCloudOnboardingUrl() {

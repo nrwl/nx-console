@@ -1,10 +1,7 @@
 import { NxWorkspace } from '@nx-console/shared-types';
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import {
-  getShellExecutionForConfig,
-  vscodeLogger,
-} from '@nx-console/vscode-utils';
+import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
 import { Task, TaskScope } from 'vscode';
@@ -14,6 +11,7 @@ import {
   nxLatestProvenanceCheck,
 } from '@nx-console/shared-utils';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export class CliTask extends Task {
   /**

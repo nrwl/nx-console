@@ -20,7 +20,7 @@ import {
 } from './commands/migrate-commands';
 
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { vscodeLogger } from '@nx-console/vscode-utils';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';

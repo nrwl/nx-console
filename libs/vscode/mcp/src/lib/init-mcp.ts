@@ -6,7 +6,6 @@ import {
   isInVSCode,
   isInWindsurf,
   readMcpJson,
-  vscodeLogger,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
 import { commands, ExtensionContext, lm, version, window } from 'vscode';
@@ -27,6 +26,7 @@ import {
 import { execSync } from 'child_process';
 import { AgentRulesManager } from './agent-rules-manager';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 let mcpStreamableWebServer: McpStreamableWebServer | undefined;
 let initialized = false;
