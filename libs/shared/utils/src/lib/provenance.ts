@@ -4,7 +4,7 @@ import { promisify } from 'node:util';
 export async function nxLatestHasProvenance(): Promise<boolean> {
   try {
     const npmView = (
-      await promisify(exec)(`npm view nx@next --json`, {
+      await promisify(exec)(`npm view nx@latest --json`, {
         encoding: 'utf-8',
       })
     ).stdout.trim();
@@ -16,12 +16,13 @@ export async function nxLatestHasProvenance(): Promise<boolean> {
 
     const attestations = (await (await fetch(attURL)).json()) as any;
 
-    const provenanceBundle = attestations?.attestations?.find(
+    const provenanceAttestation = attestations?.attestations?.find(
       (a) => a.predicateType === 'https://slsa.dev/provenance/v1',
-    ).bundle;
+    );
+    if (!provenanceAttestation) return false;
 
     const dsseEnvelopePayload = JSON.parse(
-      atob(provenanceBundle.dsseEnvelope.payload),
+      atob(provenanceAttestation.bundle.dsseEnvelope.payload),
     );
 
     const workflowParameters =
@@ -35,6 +36,15 @@ export async function nxLatestHasProvenance(): Promise<boolean> {
       return false;
     }
     if (workflowParameters?.ref !== `refs/tags/${npmViewResult.version}`) {
+      return false;
+    }
+
+    const distSha = Buffer.from(
+      npmViewResult.dist.integrity.replace('sha512-', ''),
+      'base64',
+    ).toString('hex');
+    const attestationSha = dsseEnvelopePayload?.subject[0]?.digest.sha512;
+    if (distSha !== attestationSha) {
       return false;
     }
     return true;
