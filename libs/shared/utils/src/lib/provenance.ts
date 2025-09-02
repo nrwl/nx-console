@@ -1,7 +1,12 @@
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
+import { withTimeout } from './utils';
 
-export async function nxLatestHasProvenance(): Promise<boolean> {
+/**
+ * Checks the provenance of the latest version of Nx from the npm registry.
+ * Returns true if the provenance is valid, otherwise returns a string describing the failure reason.
+ */
+export async function nxLatestProvenanceCheck(): Promise<true | string> {
   try {
     const npmView = (
       await promisify(exec)(`npm view nx@latest --json`, {
@@ -12,14 +17,17 @@ export async function nxLatestHasProvenance(): Promise<boolean> {
     const npmViewResult = JSON.parse(npmView);
     const attURL: string | undefined = npmViewResult.dist?.attestations?.url;
 
-    if (!attURL) return false;
+    if (!attURL) return 'No attestation URL found';
 
-    const attestations = (await (await fetch(attURL)).json()) as any;
+    const attestations = await withTimeout(
+      async () => (await (await fetch(attURL)).json()) as any,
+      10000,
+    );
 
     const provenanceAttestation = attestations?.attestations?.find(
       (a) => a.predicateType === 'https://slsa.dev/provenance/v1',
     );
-    if (!provenanceAttestation) return false;
+    if (!provenanceAttestation) return 'No provenance attestation found';
 
     const dsseEnvelopePayload = JSON.parse(
       atob(provenanceAttestation.bundle.dsseEnvelope.payload),
@@ -30,13 +38,13 @@ export async function nxLatestHasProvenance(): Promise<boolean> {
         ?.workflow;
 
     if (workflowParameters?.repository !== 'https://github.com/nrwl/nx') {
-      return false;
+      return 'Repository does not match nrwl/nx';
     }
     if (workflowParameters?.path !== '.github/workflows/publish.yml') {
-      return false;
+      return 'Publishing workflow does not match .github/workflows/publish.yml';
     }
     if (workflowParameters?.ref !== `refs/tags/${npmViewResult.version}`) {
-      return false;
+      return `Version ref does not match refs/tags/${npmViewResult.version}`;
     }
 
     const distSha = Buffer.from(
@@ -45,11 +53,11 @@ export async function nxLatestHasProvenance(): Promise<boolean> {
     ).toString('hex');
     const attestationSha = dsseEnvelopePayload?.subject[0]?.digest.sha512;
     if (distSha !== attestationSha) {
-      return false;
+      return 'Integrity hash does not match attestation hash';
     }
     return true;
   } catch (e) {
-    return false;
+    return `Error checking provenance: ${e instanceof Error ? e.message : e}`;
   }
 }
 

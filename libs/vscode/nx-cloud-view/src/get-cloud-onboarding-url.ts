@@ -1,18 +1,20 @@
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import {
   noProvenanceError,
-  nxLatestHasProvenance,
+  nxLatestProvenanceCheck,
 } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { vscodeLogger } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 
 export async function getCloudOnboardingUrl() {
   const workspacePath = getNxWorkspacePath();
   const packageManagerCommand = await getPackageManagerCommand(workspacePath);
-  const hasProvenance = await nxLatestHasProvenance();
-  if (!hasProvenance) {
+  const provenanceResult = await nxLatestProvenanceCheck();
+  if (provenanceResult !== true) {
     getTelemetry().logUsage('misc.nx-latest-no-provenance');
+    vscodeLogger.log(provenanceResult);
     throw new Error(noProvenanceError);
   }
   const nxConnectOutput = execSync(
