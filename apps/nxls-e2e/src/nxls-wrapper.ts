@@ -28,6 +28,7 @@ export class NxlsWrapper {
     string,
     [(params: object | any[] | undefined) => void, NodeJS.Timeout]
   >();
+  private communicationHealthy = true;
   private earlyExitListener = (code: number) => {
     console.log(`nxls exited with code ${code}`);
     console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
@@ -98,62 +99,40 @@ export class NxlsWrapper {
   }
 
   async stopNxls(version?: string) {
-    await this.sendRequest({
-      method: 'shutdown',
-    });
-    this.sendNotification({ method: 'exit' });
-
-    this.pendingNotificationMap.forEach(([res, timeout]) => {
-      res(new Error('nxls stopped'));
-      clearTimeout(timeout);
-    });
-    this.pendingRequestMap.forEach(([res, timeout], key) => {
-      res({
-        jsonrpc: '2.0',
-        id: key,
-        error: {
-          code: -32000,
-          message: 'nxls stopped',
-        },
-      });
-      clearTimeout(timeout);
-    });
-
-    this.readerDisposable?.dispose();
-    this.readerErrorDisposable?.dispose();
-    this.messageReader?.dispose();
-    this.messageWriter?.dispose();
-
-    // make sure nothing can write to stdin anymore after we destroy the stream
-    // this fixes an issue where a leftover 'Content Length' header would be written to the stdin
-    // during the nxls shutdown sequence
-    if (this.process?.stdin) {
-      this.process.stdin.write = (chunk: any, cb: any) => {
-        return true;
-      };
-    }
-
-    this.process?.stdout?.destroy();
-    this.process?.stderr?.destroy();
-    this.process?.stdin?.destroy();
-
-    this.process?.removeListener('exit', this.earlyExitListener);
-
-    try {
-      execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
-        cwd: this.cwd,
-      });
-    } catch (e) {
-      console.error(e);
-    }
-
-    if (this.process?.pid) {
+    // Try graceful shutdown only if communication is healthy
+    if (this.communicationHealthy) {
       try {
-        killGroup(this.process.pid);
+        await this.sendRequest(
+          {
+            method: 'shutdown',
+          },
+          0.5,
+        ); // Use shorter timeout for shutdown
+        this.sendNotification({ method: 'exit' });
       } catch (e) {
-        console.log(`NXLS WRAPPER: ${e}`);
+        if (this.verbose) {
+          console.log(
+            'Graceful shutdown failed, proceeding with force cleanup',
+          );
+        }
+        this.communicationHealthy = false;
       }
     }
+
+    // Cancel all pending operations
+    this.cancelAllPendingOperations('nxls stopped');
+
+    // Clean up all resources
+    this.cleanupResources();
+
+    // Stop daemon
+    this.stopDaemon(version);
+
+    // Force kill the process
+    this.killProcess();
+
+    // Reset state
+    this.communicationHealthy = true;
   }
 
   async sendRequest(
@@ -216,6 +195,12 @@ export class NxlsWrapper {
       console.log(`waiting for ${method}`, this.pendingNotificationMap);
     }
     return await new Promise<any>((resolve, reject) => {
+      // If communication is already unhealthy, reject immediately
+      if (!this.communicationHealthy) {
+        reject(new Error(`Cannot wait for ${method}: communication failed`));
+        return;
+      }
+
       timeout = setTimeout(
         () => {
           this.pendingNotificationMap.delete(method);
@@ -236,53 +221,195 @@ export class NxlsWrapper {
     clearTimeout(timeout);
   }
 
+  private cancelAllPendingOperations(errorMessage = 'Communication failed') {
+    // Cancel all pending notifications
+    this.pendingNotificationMap.forEach(([resolve, timeout], method) => {
+      resolve(new Error(`${errorMessage} while waiting for ${method}`));
+      clearTimeout(timeout);
+    });
+    this.pendingNotificationMap.clear();
+
+    // Cancel all pending requests
+    this.pendingRequestMap.forEach(([resolve, timeout], id) => {
+      resolve({
+        jsonrpc: '2.0',
+        id,
+        error: {
+          code: -32000,
+          message: errorMessage,
+        },
+      });
+      clearTimeout(timeout);
+    });
+    this.pendingRequestMap.clear();
+  }
+
   setVerbose(verbose: boolean) {
     this.verbose = verbose;
   }
 
+  isCommunicationHealthy(): boolean {
+    return this.communicationHealthy;
+  }
+
+  private cleanupResources() {
+    // Clean up listeners first
+    this.process?.removeListener('exit', this.earlyExitListener);
+
+    // Dispose of message handlers
+    try {
+      this.readerDisposable?.dispose();
+    } catch (e) {
+      // Ignore disposal errors
+    }
+    try {
+      this.readerErrorDisposable?.dispose();
+    } catch (e) {
+      // Ignore disposal errors
+    }
+
+    // Override stdin write before disposing streams
+    if (this.process?.stdin && !this.process.stdin.destroyed) {
+      this.process.stdin.write = (_chunk: any, cb: any) => {
+        if (typeof cb === 'function') cb();
+        return true;
+      };
+    }
+
+    // Dispose message reader/writer
+    try {
+      this.messageReader?.dispose();
+    } catch (e) {
+      // Ignore disposal errors
+    }
+    try {
+      this.messageWriter?.dispose();
+    } catch (e) {
+      // Ignore disposal errors
+    }
+
+    // Destroy streams
+    try {
+      this.process?.stdout?.destroy();
+      this.process?.stderr?.destroy();
+      this.process?.stdin?.destroy();
+    } catch (e) {
+      // Ignore stream destruction errors
+    }
+  }
+
+  private stopDaemon(version?: string, timeout = 5000) {
+    try {
+      execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
+        cwd: this.cwd,
+        timeout,
+      });
+    } catch (e) {
+      if (this.verbose) {
+        console.error('Failed to stop daemon:', e);
+      }
+    }
+  }
+
+  private killProcess() {
+    if (this.process?.pid) {
+      try {
+        killGroup(this.process.pid);
+      } catch (e) {
+        if (this.verbose) {
+          console.log(`NXLS WRAPPER: ${e}`);
+        }
+      }
+    }
+  }
+
+  async forceCleanup(version?: string) {
+    if (this.verbose) {
+      console.log('Forcing cleanup of NXLS process');
+    }
+
+    this.communicationHealthy = false;
+
+    // Cancel all pending operations immediately
+    this.cancelAllPendingOperations();
+
+    // Force kill the process first (different order than graceful shutdown)
+    this.killProcess();
+
+    // Stop daemon with shorter timeout
+    this.stopDaemon(version, 3000);
+
+    // Clean up resources (but ignore errors during force cleanup)
+    try {
+      this.cleanupResources();
+    } catch (e) {
+      // Ignore cleanup errors during force cleanup
+    }
+
+    this.communicationHealthy = true;
+  }
+
   private listenToLSPMessages(messageReader: StreamMessageReader) {
     this.readerDisposable = messageReader.listen((message) => {
-      if (
-        isNotificationMessage(message) &&
-        message.method === 'window/logMessage'
-      ) {
-        if (this.verbose) {
-          console.log((message.params as any)?.message);
+      try {
+        if (
+          isNotificationMessage(message) &&
+          message.method === 'window/logMessage'
+        ) {
+          if (this.verbose) {
+            console.log((message.params as any)?.message);
+          }
+          return;
         }
-        return;
-      }
-      if (this.verbose) {
-        console.log('received message', JSON.stringify(message, null, 2));
-      }
+        if (this.verbose) {
+          console.log('received message', JSON.stringify(message, null, 2));
+        }
 
-      if (isResponseMessage(message) && typeof message.id === 'number') {
-        const requestAndTimeout = this.pendingRequestMap.get(message.id);
-        if (requestAndTimeout) {
-          const [resolve, timeout] = requestAndTimeout;
-          resolve(message);
-          clearTimeout(timeout);
-          this.pendingRequestMap.delete(message.id);
+        if (isResponseMessage(message) && typeof message.id === 'number') {
+          const requestAndTimeout = this.pendingRequestMap.get(message.id);
+          if (requestAndTimeout) {
+            const [resolve, timeout] = requestAndTimeout;
+            resolve(message);
+            clearTimeout(timeout);
+            this.pendingRequestMap.delete(message.id);
+          }
+        } else if (isNotificationMessage(message)) {
+          const method = message.method;
+          if (this.verbose) {
+            console.log('received notification', method);
+            console.log('pending notifications', this.pendingNotificationMap);
+          }
+          const [resolve, timeout] =
+            this.pendingNotificationMap.get(method) ?? [];
+          if (resolve) {
+            resolve(message.params);
+            this.pendingNotificationMap.delete(method);
+          }
+          if (timeout) {
+            clearTimeout(timeout);
+          }
         }
-      } else if (isNotificationMessage(message)) {
-        const method = message.method;
-        if (this.verbose) {
-          console.log('received notification', method);
-          console.log('pending notifications', this.pendingNotificationMap);
-        }
-        const [resolve, timeout] =
-          this.pendingNotificationMap.get(method) ?? [];
-        if (resolve) {
-          resolve(message.params);
-          this.pendingNotificationMap.delete(method);
-        }
-        if (timeout) {
-          clearTimeout(timeout);
-        }
+      } catch (error) {
+        console.error('Error processing message:', error);
+        this.communicationHealthy = false;
+        this.cancelAllPendingOperations();
       }
     });
 
     this.readerErrorDisposable = messageReader.onError((error) => {
       console.error('ERROR: ', error);
+
+      // Check if this is a Content-Length error specifically
+      const isContentLengthError = error.message?.includes('Content-Length');
+      if (isContentLengthError) {
+        console.error(
+          'Content-Length error detected - communication corrupted',
+        );
+      }
+
+      this.communicationHealthy = false;
+      // Cancel all pending operations when communication fails
+      this.cancelAllPendingOperations();
     });
   }
 }
@@ -295,8 +422,4 @@ function isNotificationMessage(
 
 function isResponseMessage(message: Message): message is ResponseMessage {
   return 'result' in message || 'error' in message;
-}
-
-function isRequestMessage(message: Message): message is RequestMessage {
-  return !isNotificationMessage(message) && !isResponseMessage(message);
 }
