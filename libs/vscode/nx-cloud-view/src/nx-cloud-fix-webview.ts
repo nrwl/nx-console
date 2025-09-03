@@ -10,7 +10,10 @@ import {
 } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
-import { outputLogger } from '@nx-console/vscode-output-channels';
+import {
+  logAndShowError,
+  outputLogger,
+} from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   getGitApi,
@@ -472,11 +475,9 @@ export class NxCloudFixWebview {
                         );
                       }
                     } catch (e) {
-                      vscodeLogger.log(
-                        `Failed to fetch and pull changes: ${e.stderr.toString() || e.message}`,
-                      );
-                      window.showErrorMessage(
+                      logAndShowError(
                         'Failed to fetch and pull changes. Please check the output and try again yourself.',
+                        `Failed to fetch and pull changes: ${e.stderr.toString() || e.message}`,
                       );
                     }
                   }
