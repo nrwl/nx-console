@@ -1,4 +1,7 @@
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
+import {
+  detectPackageManager,
+  getPackageManagerCommand,
+} from '@nx-console/shared-npm';
 import {
   noProvenanceError,
   nxLatestProvenanceCheck,
@@ -10,6 +13,10 @@ import { execSync } from 'child_process';
 
 export async function getCloudOnboardingUrl() {
   const workspacePath = getNxWorkspacePath();
+  const packageManager = await detectPackageManager(
+    workspacePath,
+    vscodeLogger,
+  );
   const packageManagerCommand = await getPackageManagerCommand(workspacePath);
   const provenanceResult = await nxLatestProvenanceCheck();
   if (provenanceResult !== true) {
@@ -17,12 +24,16 @@ export async function getCloudOnboardingUrl() {
     vscodeLogger.log(provenanceResult);
     throw new Error(noProvenanceError);
   }
-  const nxConnectOutput = execSync(
-    `${packageManagerCommand.dlx} ${packageManagerCommand.dlx === 'npx' ? '-y' : ''} nx@latest connect --ignore-scripts`,
-    {
-      cwd: workspacePath,
-    },
-  );
+
+  // newer versions of nx will add `--ignore-scripts` by default, but older versions may not
+  // yarn is not compatible with `--ignore-scripts` so we skip it for yarn
+  let command = `${packageManagerCommand.dlx} ${packageManagerCommand.dlx === 'npx' ? '-y' : ''} nx@latest connect --ignore-scripts`;
+  if (!command.includes('--ignore-scripts') && packageManager !== 'yarn') {
+    command += ' --ignore-scripts';
+  }
+  const nxConnectOutput = execSync(command, {
+    cwd: workspacePath,
+  });
   const match = nxConnectOutput.toString().match(/(https:\/\/\S+)/);
   return match ? match[1] : undefined;
 }

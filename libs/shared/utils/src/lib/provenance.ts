@@ -30,7 +30,10 @@ export async function nxLatestProvenanceCheck(): Promise<true | string> {
     if (!provenanceAttestation) return 'No provenance attestation found';
 
     const dsseEnvelopePayload = JSON.parse(
-      atob(provenanceAttestation.bundle.dsseEnvelope.payload),
+      Buffer.from(
+        provenanceAttestation.bundle.dsseEnvelope.payload,
+        'base64',
+      ).toString(),
     );
 
     const workflowParameters =
