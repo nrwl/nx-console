@@ -9,7 +9,7 @@ import { withTimeout } from './utils';
 export async function nxLatestProvenanceCheck(): Promise<true | string> {
   try {
     const npmView = (
-      await promisify(exec)(`npm view nx@latest --json`, {
+      await promisify(exec)(`npm view nx@latest --json --silent`, {
         encoding: 'utf-8',
       })
     ).stdout.trim();
