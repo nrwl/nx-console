@@ -139,7 +139,6 @@ npx nx init
 
 ## Compatibility
 
-
 The latest version of Nx Console supports all Nx versions starting at Nx 15. For older versions, we cannot guarantee compatibility or full functionality. However, we welcome contributions! If you encounter specific issues with older versions, please consider submitting a PR. Of course, if you discover any problems with newer versions of Nx, please report these issues to help us improve Nx Console.
 
 If you're looking to upgrade your version of Nx easily, refer to the [Nx
