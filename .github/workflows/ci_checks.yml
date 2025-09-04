@@ -72,7 +72,7 @@ jobs:
         run: yarn nx show projects --verbose
 
       - name: Check formatting of other files
-        run: yarn nx format:check --verbose
+        run: yarn nx-cloud record -- yarn nx format:check --verbose
 
       - name: Ensure the workspace configuration is in sync
         run: yarn nx-cloud record -- yarn nx sync:check
@@ -86,7 +86,7 @@ jobs:
         timeout-minutes: 60
 
       - run: npx nx-cloud fix-ci
-        if: always()
+        if: failure()
 
   # main-windows:
   #   name: Main Windows
