@@ -19,10 +19,20 @@ export async function nxLatestProvenanceCheck(): Promise<true | string> {
 
     if (!attURL) return 'No attestation URL found';
 
-    const attestations = await withTimeout(
-      async () => (await (await fetch(attURL)).json()) as any,
-      10000,
-    );
+    let attestations;
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 10000);
+
+    try {
+      const response = await fetch(attURL, { signal: abortController.signal });
+      clearTimeout(timeoutId);
+      attestations = await response.json();
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out');
+      }
+      throw error;
+    }
 
     const provenanceAttestation = attestations?.attestations?.find(
       (a) => a.predicateType === 'https://slsa.dev/provenance/v1',
@@ -54,7 +64,7 @@ export async function nxLatestProvenanceCheck(): Promise<true | string> {
       npmViewResult.dist.integrity.replace('sha512-', ''),
       'base64',
     ).toString('hex');
-    const attestationSha = dsseEnvelopePayload?.subject[0]?.digest.sha512;
+    const attestationSha = dsseEnvelopePayload?.subject[0]?.digest?.sha512;
     if (distSha !== attestationSha) {
       return 'Integrity hash does not match attestation hash';
     }
