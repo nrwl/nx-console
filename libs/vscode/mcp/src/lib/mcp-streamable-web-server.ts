@@ -2,9 +2,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import {
+  getOutputChannel,
+  vscodeLogger,
+} from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { vscodeLogger } from '@nx-console/vscode-utils';
 import express, { Request, Response } from 'express';
 import {
   CancellationToken,

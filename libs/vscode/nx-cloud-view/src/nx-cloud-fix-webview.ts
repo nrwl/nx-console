@@ -12,7 +12,7 @@ import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import {
   logAndShowError,
-  outputLogger,
+  vscodeLogger,
 } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
@@ -21,7 +21,6 @@ import {
   getGitHasUncommittedChanges,
   getGitRepository,
   getWorkspacePath,
-  vscodeLogger,
 } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { unlink, writeFile } from 'fs/promises';
@@ -547,7 +546,7 @@ export class NxCloudFixWebview {
             );
             hideAiFixStatusBarItem();
           } catch (error) {
-            outputLogger.log(
+            vscodeLogger.log(
               `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message}`,
             );
             window.showErrorMessage(
@@ -596,17 +595,17 @@ export class NxCloudFixWebview {
           );
 
           if (!cipe) {
-            outputLogger.log(`CIPE ${args.cipeId} not found`);
+            vscodeLogger.log(`CIPE ${args.cipeId} not found`);
             return;
           } else if (!runGroup) {
-            outputLogger.log(
+            vscodeLogger.log(
               `Run group ${args.runGroupId} not found in CIPE ${args.cipeId}`,
             );
             return;
           }
 
           if (!runGroup.aiFix) {
-            outputLogger.log('No AI fix available on tree item');
+            vscodeLogger.log('No AI fix available on tree item');
             return;
           }
 
@@ -622,10 +621,10 @@ export class NxCloudFixWebview {
               runGroup.aiFix.terminalLogsUrls[failedTaskId];
             terminalOutput = await downloadAndExtractArtifact(
               terminalOutputUrl,
-              outputLogger,
+              vscodeLogger,
             );
           } catch (error) {
-            outputLogger.log(
+            vscodeLogger.log(
               `Failed to retrieve terminal output for task ${failedTaskId}: ${error}`,
             );
             terminalOutput =

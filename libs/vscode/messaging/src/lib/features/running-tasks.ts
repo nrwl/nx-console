@@ -9,7 +9,7 @@ import {
   startRunningTasks,
   UpdatedRunningTask,
 } from '@nx-console/shared-running-tasks';
-import { vscodeLogger } from '@nx-console/vscode-utils';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export const NxStartedRunningTasks: MessagingNotification<number> = {
   type: new NotificationType('nx/startedRunningTasks'),

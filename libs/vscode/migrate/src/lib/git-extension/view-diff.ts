@@ -1,16 +1,9 @@
-import {
-  commands,
-  extensions,
-  TextDocumentShowOptions,
-  Uri,
-  window,
-} from 'vscode';
-import { GitExtension } from './git';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { join } from 'path';
-import { readMigrationsJsonMetadata } from '../commands/utils';
+import { getGitApi } from '@nx-console/vscode-utils';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
-import { getGitApi, vscodeLogger } from '@nx-console/vscode-utils';
+import { join } from 'path';
+import { commands, TextDocumentShowOptions, Uri, window } from 'vscode';
+import { readMigrationsJsonMetadata } from '../commands/utils';
 
 export async function viewPackageJsonDiff() {
   await viewDiff('package.json', 'HEAD');

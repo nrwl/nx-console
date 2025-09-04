@@ -1,6 +1,6 @@
 import { commands, env, window } from 'vscode';
 import { isInCursor } from './editor-name-helpers';
-import { vscodeLogger } from './logger';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export async function sendMessageToAgent(message: string, newChat = true) {
   if (isInCursor()) {

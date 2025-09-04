@@ -6602,10 +6602,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:18.16.9":
-  version: 18.16.9
-  resolution: "@types/node@npm:18.16.9"
-  checksum: 7fe0ef372ba8b157bd646efe29b0ece92ccb9f455171a7ceb4c92d6b490789ff0f14411b1dc6ad203351a0efa2b435072dfab5566fb6eaaaa5cd549e1fb22afa
+"@types/node@npm:22.15.0":
+  version: 22.15.0
+  resolution: "@types/node@npm:22.15.0"
+  dependencies:
+    undici-types: ~6.21.0
+  checksum: ee68ef17c161995dfa35edce8b555f3b88edf9ffe99712ee86240fc1e790308ab9bc82531ad212a77aea0f82976f3c7586282a36702aaa06fb3cfeebcf055247
   languageName: node
   linkType: hard
 
@@ -16588,7 +16590,7 @@ __metadata:
     "@types/ini": ^4.1.1
     "@types/jest": 30.0.0
     "@types/mocha": ^9.1.1
-    "@types/node": 18.16.9
+    "@types/node": 22.15.0
     "@types/semver": ^7.3.12
     "@types/tar-stream": ^3.1.3
     "@types/universal-analytics": 0.4.5

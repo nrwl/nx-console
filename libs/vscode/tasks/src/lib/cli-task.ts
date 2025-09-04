@@ -8,9 +8,10 @@ import { Task, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 import {
   noProvenanceError,
-  nxLatestHasProvenance,
+  nxLatestProvenanceCheck,
 } from '@nx-console/shared-utils';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export class CliTask extends Task {
   /**
@@ -33,9 +34,10 @@ export class CliTask extends Task {
     const { isEncapsulatedNx, workspacePath } = nxWorkspace;
 
     if (definition.useLatestNxVersion) {
-      const hasProvenance = await nxLatestHasProvenance();
-      if (!hasProvenance) {
+      const provenanceResult = await nxLatestProvenanceCheck();
+      if (provenanceResult !== true) {
         getTelemetry().logUsage('misc.nx-latest-no-provenance');
+        vscodeLogger.log(provenanceResult);
         throw new Error(noProvenanceError);
       }
     }
