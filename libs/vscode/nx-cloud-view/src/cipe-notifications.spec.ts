@@ -706,20 +706,31 @@ describe('CIPE Notifications', () => {
         );
       });
 
-      it('should show regular error notification if an existing run fails and there is no AI fix after 5 minutes', () => {
+      it('should show regular error notification when transitioning to no AI fix after 5 minutes', () => {
         const sixMinutesAgo = Date.now() - 1000 * 60 * 6;
+
+        // CIPE that was waiting for AI fix (within 5 minutes)
+        const waitingCipe: CIPEInfo[] = [
+          {
+            ...pipelineExamples.failWithAiFixesEnabled[0],
+            createdAt: tenMinutesAgo,
+            completedAt: oneMinuteAgo, // Within 5 minutes
+          },
+        ];
+
+        // Same CIPE but now past 5 minutes
         const failedCipe: CIPEInfo[] = [
           {
             ...pipelineExamples.failWithAiFixesEnabled[0],
             createdAt: tenMinutesAgo,
-            completedAt: sixMinutesAgo,
+            completedAt: sixMinutesAgo, // Past 5 minutes
           },
         ];
 
         jest.clearAllMocks();
 
-        // should also fail if same CIPE is re-checked again but timeout has passed
-        compareCIPEDataAndSendNotification(failedCipe, failedCipe);
+        // Transition from waiting to timeout - should show delayed notification
+        compareCIPEDataAndSendNotification(waitingCipe, failedCipe);
         expect(window.showInformationMessage).not.toHaveBeenCalled();
         expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
         expect(window.showErrorMessage).toHaveBeenCalledWith(
@@ -728,6 +739,55 @@ describe('CIPE Notifications', () => {
           'View Commit',
           'View Results',
         );
+      });
+
+      it('should not show delayed notification repeatedly - only once when transitioning from waiting to no AI fix', () => {
+        const sixMinutesAgo = Date.now() - 1000 * 60 * 6;
+
+        // CIPE that previously could have had AI fix (within 5 minutes)
+        const cipeWaitingForAiFix: CIPEInfo[] = [
+          {
+            ...pipelineExamples.failWithAiFixesEnabled[0],
+            createdAt: tenMinutesAgo,
+            completedAt: oneMinuteAgo, // Within 5 minutes, so still waiting
+          },
+        ];
+
+        // Same CIPE but now past 5 minutes
+        const cipeAfterTimeout: CIPEInfo[] = [
+          {
+            ...pipelineExamples.failWithAiFixesEnabled[0],
+            createdAt: tenMinutesAgo,
+            completedAt: sixMinutesAgo, // Past 5 minutes, no AI fix coming
+          },
+        ];
+
+        // First transition: from waiting to timeout - should show delayed notification
+        compareCIPEDataAndSendNotification(
+          cipeWaitingForAiFix,
+          cipeAfterTimeout,
+        );
+        expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
+        expect(window.showErrorMessage).toHaveBeenCalledWith(
+          'CI failed for #feature.',
+          'Help me fix this error',
+          'View Commit',
+          'View Results',
+        );
+
+        jest.clearAllMocks();
+
+        // Subsequent checks with same state - should NOT show notification again
+        compareCIPEDataAndSendNotification(cipeAfterTimeout, cipeAfterTimeout);
+        expect(window.showErrorMessage).not.toHaveBeenCalled();
+        expect(window.showInformationMessage).not.toHaveBeenCalled();
+
+        jest.clearAllMocks();
+
+        // Another check - should still NOT show notification
+        compareCIPEDataAndSendNotification(cipeAfterTimeout, cipeAfterTimeout);
+        expect(window.showErrorMessage).not.toHaveBeenCalled();
+        expect(window.showInformationMessage).not.toHaveBeenCalled();
       });
     });
 

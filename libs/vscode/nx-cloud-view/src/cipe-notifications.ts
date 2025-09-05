@@ -88,12 +88,25 @@ export function compareCIPEDataAndSendNotification(
     // if the cipe has completed somehow or had a failed run before the latest update,
     // we've already shown a notification and can return
     // the one exception is if we supressed the notification because we thought an AI fix might be coming
-    // if ai fixes aren't enabled, we never do this suppression
-    if (
+    // and now we know no AI fix is coming after 5 minutes AND we haven't shown this delayed notification yet
+    const oldPotentiallyHasAiFix =
+      (oldCIPE?.runGroups || []).some((runGroup) => !!runGroup.aiFix) ||
+      (oldCIPE?.aiFixesEnabled &&
+        oldCIPE.status === 'FAILED' &&
+        oldCIPE.completedAt &&
+        oldCIPE.completedAt + 1000 * 60 * 5 >= Date.now());
+
+    const isDelayedNotificationTransition =
+      oldPotentiallyHasAiFix &&
+      !potentiallyHasAiFix &&
+      failedButNoAiFixInFiveMinutes;
+
+    const shouldSkipDueToCompletedCIPE =
       oldCIPE &&
       (oldCIPE.status !== 'IN_PROGRESS' || oldCIPEFailedRun) &&
-      (!failedButNoAiFixInFiveMinutes || !newCIPE.aiFixesEnabled)
-    ) {
+      !isDelayedNotificationTransition;
+
+    if (shouldSkipDueToCompletedCIPE) {
       return;
     }
 
