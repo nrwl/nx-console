@@ -1,3 +1,14 @@
+## 18.66.3 (2025-09-05)
+
+### 🩹 Fixes
+
+- **vscode:** check provenance contents and verify they come from the nx repo when running anything from nx latest ([#2731](https://github.com/nrwl/nx-console/pull/2731))
+- **vscode:** dont show CIPE notification multiple times even after ai fixes timed out ([#2739](https://github.com/nrwl/nx-console/pull/2739))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.66.2 (2025-08-29)
 
 ### 🩹 Fixes
