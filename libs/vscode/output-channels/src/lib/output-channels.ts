@@ -24,3 +24,11 @@ export function getNxlsOutputChannel(): OutputChannel {
   }
   return _nxlsOutputChannel;
 }
+
+export const vscodeLogger: Logger = {
+  log: (message: string, ...args: any[]) => {
+    getOutputChannel().appendLine(
+      `[${new Date().toISOString()}] ${message} ${args.join(' ')}`,
+    );
+  },
+};

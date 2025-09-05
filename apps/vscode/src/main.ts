@@ -28,11 +28,7 @@ import {
   initNxProjectView,
 } from '@nx-console/vscode-nx-project-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode-tasks';
-import {
-  vscodeLogger,
-  watchCodeLensConfigChange,
-  watchFile,
-} from '@nx-console/vscode-utils';
+import { watchCodeLensConfigChange, watchFile } from '@nx-console/vscode-utils';
 
 import { fileExists } from '@nx-console/shared-file-system';
 import {
@@ -75,6 +71,7 @@ import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
 import {
   getOutputChannel,
   initOutputChannels,
+  vscodeLogger,
 } from '@nx-console/vscode-output-channels';
 import { initVscodeProjectDetails } from '@nx-console/vscode-project-details';
 import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';

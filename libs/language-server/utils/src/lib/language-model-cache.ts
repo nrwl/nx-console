@@ -11,7 +11,7 @@ import { getJsonLanguageService } from './json-language-service';
 export interface LanguageModelCache<T> {
   retrieve(
     document: TextDocument,
-    stripSchema?: boolean
+    stripSchema?: boolean,
   ): { jsonAst: T; document: TextDocument };
   onDocumentRemoved(document: TextDocument): void;
   dispose(): void;
@@ -33,7 +33,7 @@ const maxEntries = 10;
 const cleanupIntervalTimeInSec = 60;
 let nModels = 0;
 
-let cleanupInterval: NodeJS.Timer | undefined = undefined;
+let cleanupInterval: NodeJS.Timeout | undefined = undefined;
 if (cleanupIntervalTimeInSec > 0) {
   cleanupInterval = setInterval(() => {
     const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
@@ -52,7 +52,7 @@ export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
   return {
     retrieve(
       document: TextDocument,
-      stripSchema = true
+      stripSchema = true,
     ): {
       jsonAst: JSONDocument;
       document: TextDocument;
@@ -77,7 +77,7 @@ export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
           document.uri,
           document.languageId,
           document.version,
-          document.getText().replace(/"\$schema":\s".+",/, '')
+          document.getText().replace(/"\$schema":\s".+",/, ''),
         );
       }
 

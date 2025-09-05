@@ -7,10 +7,10 @@
       "path": "../../shared/socket-utils"
     },
     {
-      "path": "../../shared/running-tasks"
+      "path": "../utils"
     },
     {
-      "path": "../utils"
+      "path": "../output-channels"
     },
     {
       "path": "../nx-workspace"
@@ -23,6 +23,9 @@
     },
     {
       "path": "../../shared/types"
+    },
+    {
+      "path": "../../shared/running-tasks"
     },
     {
       "path": "../../shared/npm"

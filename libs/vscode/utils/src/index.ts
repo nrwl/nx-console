@@ -9,7 +9,6 @@ export {
   isInVSCode,
   isInWindsurf,
 } from './lib/editor-name-helpers';
-export * from './lib/logger';
 export * from './lib/mcp-json';
 export * from './lib/read-projects';
 export * from './lib/register-codelens';

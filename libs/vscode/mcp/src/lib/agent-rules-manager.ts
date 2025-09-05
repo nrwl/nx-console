@@ -9,7 +9,8 @@ import {
 } from '@nx-console/vscode-configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { isInCursor, isInVSCode, vscodeLogger } from '@nx-console/vscode-utils';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
+import { isInCursor, isInVSCode } from '@nx-console/vscode-utils';
 import {
   appendFileSync,
   existsSync,

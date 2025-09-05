@@ -6,7 +6,6 @@ import net from 'net';
 import { ExtensionContext } from 'vscode';
 import { NxTerminalMessage } from './features/terminal-message';
 
-import { vscodeLogger } from '@nx-console/vscode-utils';
 import crypto from 'crypto';
 import { createMessageConnection } from 'vscode-jsonrpc/node';
 import {
@@ -27,6 +26,7 @@ import {
   MessagingRequest,
   MessagingRequest0,
 } from './messaging-notification';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 const messages: Array<MessagingNotification | MessagingNotification2> = [
   NxTerminalMessage,
