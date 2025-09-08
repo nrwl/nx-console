@@ -27,10 +27,8 @@ class OpenCIPECommitAction : AnAction("Open Pull Request") {
         if (commitUrl.isNullOrBlank()) return
 
         // Track telemetry
-        TelemetryService.getInstance(project).featureUsed(
-            TelemetryEvent.CLOUD_VIEW_CIPE_COMMIT,
-            mapOf("source" to "cloud-tree")
-        )
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_VIEW_CIPE_COMMIT, mapOf("source" to "cloud-tree"))
 
         // Open commit/PR URL in browser
         BrowserUtil.browse(commitUrl)

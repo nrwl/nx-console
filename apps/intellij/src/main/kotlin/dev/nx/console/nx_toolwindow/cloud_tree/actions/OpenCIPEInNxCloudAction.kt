@@ -23,10 +23,8 @@ class OpenCIPEInNxCloudAction : AnAction("Open in Nx Cloud") {
         val project = e.project ?: return
 
         // Track telemetry
-        TelemetryService.getInstance(project).featureUsed(
-            TelemetryEvent.CLOUD_VIEW_CIPE,
-            mapOf("source" to "cloud-tree")
-        )
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_VIEW_CIPE, mapOf("source" to "cloud-tree"))
 
         // Open CIPE URL in browser
         BrowserUtil.browse(node.cipeInfo.cipeUrl)

@@ -30,11 +30,8 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
     }
 
     private fun installPopupActions() {
-        val actionList = listOf(
-            OpenCIPEInNxCloudAction(),
-            OpenCIPECommitAction(),
-            OpenRunInNxCloudAction()
-        )
+        val actionList =
+            listOf(OpenCIPEInNxCloudAction(), OpenCIPECommitAction(), OpenRunInNxCloudAction())
 
         val actionGroup = DefaultActionGroup(actionList)
         PopupHandler.installPopupMenu(tree, actionGroup, "CIPEToolWindow")

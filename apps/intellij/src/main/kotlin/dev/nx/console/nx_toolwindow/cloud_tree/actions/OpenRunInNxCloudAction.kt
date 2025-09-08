@@ -23,10 +23,8 @@ class OpenRunInNxCloudAction : AnAction("Open in Nx Cloud") {
         val project = e.project ?: return
 
         // Track telemetry (using the same event as runs in VSCode)
-        TelemetryService.getInstance(project).featureUsed(
-            TelemetryEvent.CLOUD_VIEW_RUN,
-            mapOf("source" to "cloud-tree")
-        )
+        TelemetryService.getInstance(project)
+            .featureUsed(TelemetryEvent.CLOUD_VIEW_RUN, mapOf("source" to "cloud-tree"))
 
         // Open run URL in browser
         BrowserUtil.browse(node.run.runUrl)
