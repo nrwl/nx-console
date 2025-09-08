@@ -1,3 +1,8 @@
+## 18.67.0 (2025-09-08)
+
+- **nx-mcp:** update project_details tool description and return dependencies from it ([#2745](https://github.com/nrwl/nx-console/pull/2745))
+- **nxls:** stop native watcher events from being sent after shutdown ([#2746](https://github.com/nrwl/nx-console/pull/2746))
+
 ## 18.66.3 (2025-09-05)
 
 ### 🩹 Fixes
