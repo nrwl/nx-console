@@ -1,11 +1,16 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.Project
+import com.intellij.ui.PopupHandler
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.models.CIPEInfo
+import dev.nx.console.nx_toolwindow.cloud_tree.actions.OpenCIPECommitAction
+import dev.nx.console.nx_toolwindow.cloud_tree.actions.OpenCIPEInNxCloudAction
+import dev.nx.console.nx_toolwindow.cloud_tree.actions.OpenRunInNxCloudAction
 import dev.nx.console.utils.NxConsolePluginDisposable
 import javax.swing.tree.TreeModel
 
@@ -20,7 +25,19 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
         tree.model = AsyncTreeModel(treeModel, NxConsolePluginDisposable.getInstance(project))
         updateCIPEData(emptyList())
 
+        installPopupActions()
         persistenceManager.installPersistenceListeners()
+    }
+
+    private fun installPopupActions() {
+        val actionList = listOf(
+            OpenCIPEInNxCloudAction(),
+            OpenCIPECommitAction(),
+            OpenRunInNxCloudAction()
+        )
+
+        val actionGroup = DefaultActionGroup(actionList)
+        PopupHandler.installPopupMenu(tree, actionGroup, "CIPEToolWindow")
     }
 
     override fun getRootElement(): Any = rootNode
