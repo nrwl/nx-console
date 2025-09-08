@@ -166,7 +166,7 @@ export function registerNxWorkspaceTools(
 
   server.tool(
     NX_PROJECT_DETAILS,
-    'Returns the complete project configuration in JSON format for a given nx project.',
+    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies).',
     {
       projectName: z
         .string()
@@ -215,9 +215,33 @@ export function registerNxWorkspaceTools(
         };
       }
 
+      const dependencies = workspace.projectGraph.dependencies[project.name];
+
+      const projectDependencies = [];
+      const externalDependencies = [];
+
+      for (const dep of dependencies) {
+        if (workspace.projectGraph.externalNodes?.[dep.target]) {
+          externalDependencies.push(dep.target);
+        } else {
+          projectDependencies.push(dep.target);
+        }
+      }
+
       return {
         content: [
-          { type: 'text', text: JSON.stringify(project.data, null, 2) },
+          {
+            type: 'text',
+            text: `Project Details: ${JSON.stringify(project.data, null, 2)}`,
+          },
+          {
+            type: 'text',
+            text: `Project Dependencies: ${projectDependencies.join(', ')}`,
+          },
+          {
+            type: 'text',
+            text: `External Dependencies: ${externalDependencies.join(', ')}`,
+          },
         ],
       };
     },
