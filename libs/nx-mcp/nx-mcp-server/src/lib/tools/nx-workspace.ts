@@ -166,7 +166,7 @@ export function registerNxWorkspaceTools(
 
   server.tool(
     NX_PROJECT_DETAILS,
-    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includeds a list of dependencies (both projects inside the monorepo and external dependencies).',
+    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies).',
     {
       projectName: z
         .string()
