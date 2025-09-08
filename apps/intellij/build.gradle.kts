@@ -29,7 +29,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
 
     id("com.ncorti.ktfmt.gradle") version "0.11.0"
-    id("dev.nx.gradle.project-graph") version "0.1.5"
+    id("dev.nx.gradle.project-graph") version "0.1.7"
 
 
 }
