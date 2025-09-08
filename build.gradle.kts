@@ -38,9 +38,4 @@ tasks {
             println("Compiled test classes for ${gradle.includedBuilds.size} included builds")
         }
     }
-
-    register("publish") {
-        description = "Placeholder task to workaround the semantic-release plugin"
-        group = "publishing"
-    }
 }
