@@ -15,13 +15,13 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
         project?: string,
         target?: string,
         configuration?: string,
-        askForFlags?: boolean
+        askForFlags?: boolean,
       ) => {
         getTelemetry().logUsage('tasks.run', {
           source: target ? 'nx-commands-panel' : 'command',
         });
         selectRunInformationAndRun(project, target, configuration, askForFlags);
-      }
+      },
     ),
     commands.registerCommand(
       `nx.run.fileexplorer`,
@@ -38,13 +38,13 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
         }
 
         selectRunInformationAndRun(await getCliProjectFromUri(uri));
-      }
+      },
     ),
     commands.registerCommand(`nx.run.target`, async () => {
       getTelemetry().logUsage('tasks.run');
 
       selectRunInformationAndRun(undefined, undefined, undefined, true, true);
-    })
+    }),
   );
 }
 
@@ -53,14 +53,14 @@ export async function selectRunInformationAndRun(
   targetName?: string,
   configuration?: string,
   askForFlags = true,
-  selectTargetFirst = false
+  selectTargetFirst = false,
 ) {
   const runInformation = await selectRunInformation(
     projectName,
     targetName,
     configuration,
     askForFlags,
-    selectTargetFirst
+    selectTargetFirst,
   );
   if (
     !runInformation ||
@@ -85,9 +85,8 @@ export async function selectRunInformationAndRun(
   });
 }
 
-
 export async function getCliProjectFromUri(
-  uri: Uri
+  uri: Uri,
 ): Promise<string | undefined> {
   const project = await getProjectByPath(uri.fsPath);
   return project?.name;

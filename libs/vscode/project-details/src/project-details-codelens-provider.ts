@@ -53,7 +53,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
 
   provideCodeLenses(
     document: TextDocument,
-    token: CancellationToken
+    token: CancellationToken,
   ): ProviderResult<(NxTargetsCodelens | ViewProjectDetailsCodelens)[]> {
     try {
       const codelenses = [];
@@ -62,15 +62,15 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
         codelenses.push(
           new ViewProjectDetailsCodelens(
             new Range(codelensLocation, codelensLocation),
-            document.fileName
-          )
+            document.fileName,
+          ),
         );
       }
       codelenses.push(
         new NxTargetsCodelens(
           new Range(codelensLocation, codelensLocation),
-          document.fileName
-        )
+          document.fileName,
+        ),
       );
       return codelenses;
     } catch (e) {
@@ -79,7 +79,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
   }
   async resolveCodeLens?(
     codeLens: NxTargetsCodelens | ViewProjectDetailsCodelens,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<NxTargetsCodelens | ViewProjectDetailsCodelens | undefined> {
     const project = await getProjectByPath(codeLens.filePath);
     const nxWorkspace = await getNxWorkspace();
@@ -154,7 +154,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
 
     if (document.fileName.endsWith('project.json')) {
       const targetsProperty = properties?.find(
-        (prop) => getPropertyName(prop) === 'targets'
+        (prop) => getPropertyName(prop) === 'targets',
       );
       if (targetsProperty) {
         return document.positionAt(targetsProperty.getStart(jsonFile));
@@ -162,13 +162,13 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
       return new Position(1, 1);
     } else {
       const nxProperty = properties?.find(
-        (prop) => getPropertyName(prop) === 'nx'
+        (prop) => getPropertyName(prop) === 'nx',
       );
       if (nxProperty) {
         return document.positionAt(nxProperty.getStart(jsonFile));
       }
       const scriptsProperty = properties?.find(
-        (prop) => getPropertyName(prop) === 'scripts'
+        (prop) => getPropertyName(prop) === 'scripts',
       );
       if (scriptsProperty) {
         return document.positionAt(scriptsProperty.getStart(jsonFile));
@@ -187,7 +187,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
       commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
         showProjectDetailsQuickpick(project);
       }),
-      onWorkspaceRefreshed(() => codeLensProvider.refresh())
+      onWorkspaceRefreshed(() => codeLensProvider.refresh()),
     );
   }
 }
@@ -196,7 +196,7 @@ function showProjectDetailsQuickpick(project: ProjectConfiguration) {
   getTelemetry().logUsage('misc.open-project-details-codelens');
   const quickPick = window.createQuickPick();
   const targetItems: QuickPickItem[] = Object.entries(
-    project.targets ?? {}
+    project.targets ?? {},
   ).map(([name, target]) => ({
     label: name,
     description: target.command ?? target.options?.command ?? target.executor,
@@ -232,20 +232,26 @@ function showProjectDetailsQuickpick(project: ProjectConfiguration) {
 
 class NxTargetsCodelens extends CodeLens {
   type = 'nx-targets-codelens' as const;
-  constructor(range: Range, public filePath: string) {
+  constructor(
+    range: Range,
+    public filePath: string,
+  ) {
     super(range);
   }
 }
 
 class ViewProjectDetailsCodelens extends CodeLens {
   type = 'view-project-details-codelens' as const;
-  constructor(range: Range, public filePath: string) {
+  constructor(
+    range: Range,
+    public filePath: string,
+  ) {
     super(range);
   }
 }
 
 function isNxTargetsCodelens(
-  codelens: NxTargetsCodelens | ViewProjectDetailsCodelens
+  codelens: NxTargetsCodelens | ViewProjectDetailsCodelens,
 ): codelens is NxTargetsCodelens {
   return codelens.type === 'nx-targets-codelens';
 }

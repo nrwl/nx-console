@@ -14,13 +14,13 @@ export function surroundWithQuotesIfNeeded(value: string): string {
  * Quotes the entire string if the project name contains special characters or whitespace
  */
 export function createProjectTargetString(
-  projectName: string, 
-  targetName: string, 
-  configuration?: string
+  projectName: string,
+  targetName: string,
+  configuration?: string,
 ): string {
-  const projectTargetString = configuration 
+  const projectTargetString = configuration
     ? `${projectName}:${targetName}:${configuration}`
     : `${projectName}:${targetName}`;
-    
+
   return surroundWithQuotesIfNeeded(projectTargetString);
 }

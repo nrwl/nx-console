@@ -43,7 +43,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
   };
   constructor(
     public workspaceRoot: string,
-    public sourceMapFilesToProjectsMap: Record<string, string[]>
+    public sourceMapFilesToProjectsMap: Record<string, string[]>,
   ) {}
 
   private changeEvent = new EventEmitter<void>();
@@ -58,7 +58,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
 
   async provideCodeLenses(
     document: TextDocument,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<CodeLens[]> {
     const relativePath = relative(this.workspaceRoot, document.fileName);
     if (
@@ -89,7 +89,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
           document.getText(),
           {
             languageVersion: ScriptTarget.Latest,
-          }
+          },
         );
         let firstNonImportNode: Node | undefined = undefined;
 
@@ -106,7 +106,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
 
         if (firstNonImportNode) {
           const pos = document.positionAt(
-            firstNonImportNode.getStart(configFile)
+            firstNonImportNode.getStart(configFile),
           );
           return new Range(pos, pos);
         }
@@ -119,7 +119,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
 
   async resolveCodeLens(
     codeLens: RunTargetCodeLens | OpenPDVCodeLens,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<CodeLens> {
     if (OpenPDVCodeLens.is(codeLens)) {
       return await this.resolveOpenPDVCodeLens(codeLens);
@@ -129,12 +129,12 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
   }
 
   private async resolveRunTargetCodeLens(
-    codeLens: RunTargetCodeLens
+    codeLens: RunTargetCodeLens,
   ): Promise<CodeLens> {
     const project = await getProjectByRoot(codeLens.projectRoot);
     const targets = await getTargetsForConfigFile(
       project?.name ?? '',
-      codeLens.filePath
+      codeLens.filePath,
     );
     const targetNames = Object.keys(targets ?? {});
     if (targetNames.length === 1) {
@@ -169,13 +169,13 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
   }
 
   private async resolveOpenPDVCodeLens(
-    codeLens: OpenPDVCodeLens
+    codeLens: OpenPDVCodeLens,
   ): Promise<CodeLens> {
     const project = await getProjectByRoot(codeLens.projectRoot);
 
     const targets = await getTargetsForConfigFile(
       project?.name ?? '',
-      codeLens.filePath
+      codeLens.filePath,
     );
     const targetNames = Object.keys(targets ?? {});
     return {
@@ -200,7 +200,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
 
     const codeLensProvider = new ConfigFileCodelensProvider(
       workspaceRoot,
-      initialSourceMapFilesToProjectsMap
+      initialSourceMapFilesToProjectsMap,
     );
 
     onWorkspaceRefreshed(async () => {
@@ -229,8 +229,8 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
             positional: createProjectTargetString(project, target),
             flags: [],
           });
-        }
-      )
+        },
+      ),
     );
 
     commands.registerCommand(
@@ -238,7 +238,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
       (
         targets: { targetName: string; command: string }[],
         projectName: string,
-        fileName: string
+        fileName: string,
       ) => {
         getTelemetry().logUsage('misc.open-project-details-codelens');
 
@@ -246,7 +246,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
           window
             .showErrorMessage(
               `Couldn't find any targets for ${fileName}. Check the Nx Console Client output channel for any errors`,
-              'Open Output'
+              'Open Output',
             )
             .then((value) => {
               if (value === 'Open Output') {
@@ -263,18 +263,21 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
             })),
             {
               placeHolder: `Select nx target to run for ${fileName}`,
-            }
+            },
           )
           .then((selected) => {
             if (selected) {
               CliTaskProvider.instance.executeTask({
                 command: 'run',
-                positional: createProjectTargetString(projectName, selected.label),
+                positional: createProjectTargetString(
+                  projectName,
+                  selected.label,
+                ),
                 flags: [],
               });
             }
           });
-      }
+      },
     );
   }
 }
@@ -283,7 +286,7 @@ class RunTargetCodeLens extends CodeLens {
   constructor(
     public projectRoot: string,
     public filePath: string,
-    range: Range
+    range: Range,
   ) {
     super(range);
   }
@@ -294,7 +297,7 @@ class OpenPDVCodeLens extends CodeLens {
     public document: TextDocument,
     public projectRoot: string,
     public filePath: string,
-    range: Range
+    range: Range,
   ) {
     super(range);
   }

@@ -10,7 +10,6 @@ import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
 
-
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: CliTaskDefinition;
@@ -43,7 +42,7 @@ export class CliTaskProvider implements TaskProvider {
         Object.keys(project.data.targets ?? {}).forEach((targetName) => {
           projectTargetCombinations.push([projectName, targetName]);
         });
-      }
+      },
     );
 
     return CliTask.batchCreate(
@@ -54,7 +53,7 @@ export class CliTaskProvider implements TaskProvider {
           flags: [],
         };
       }),
-      nxWorkspace
+      nxWorkspace,
     );
   }
 
@@ -82,7 +81,7 @@ export class CliTaskProvider implements TaskProvider {
 
     let task;
     const positionals = definition.positional?.match(
-      WORKSPACE_GENERATOR_NAME_REGEX
+      WORKSPACE_GENERATOR_NAME_REGEX,
     );
     try {
       if (

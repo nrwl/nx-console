@@ -10,7 +10,11 @@ import {
   selectRunInformationAndRun,
 } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { AbstractTreeProvider, createProjectTargetString, surroundWithQuotesIfNeeded } from '@nx-console/vscode-utils';
+import {
+  AbstractTreeProvider,
+  createProjectTargetString,
+  surroundWithQuotesIfNeeded,
+} from '@nx-console/vscode-utils';
 import { commands, env, ExtensionContext } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import { TargetViewItem } from './views/nx-project-base-view';
@@ -186,7 +190,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     if (!selection) {
       return;
     }
-    env.clipboard.writeText(`nx run ${surroundWithQuotesIfNeeded(selection.id)}`);
+    env.clipboard.writeText(
+      `nx run ${surroundWithQuotesIfNeeded(selection.id)}`,
+    );
   }
 
   private async revealInExplorer(selection: NxTreeItem | undefined) {
