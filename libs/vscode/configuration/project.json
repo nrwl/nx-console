@@ -1,8 +1,0 @@
-{
-  "name": "vscode-configuration",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/configuration/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

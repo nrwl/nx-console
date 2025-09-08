@@ -1,9 +1,0 @@
-{
-  "extends": "../../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "out-tsc/shared-schema",
-    "types": ["node"]
-  },
-  "exclude": ["**/*.spec.ts", "jest.config.ts"],
-  "include": ["src/**/*.ts"]
-}
