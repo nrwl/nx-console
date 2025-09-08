@@ -54,7 +54,10 @@ import {
   lspLogger,
   setLspLogger,
 } from '@nx-console/language-server-utils';
-import { languageServerWatcher } from '@nx-console/language-server-watcher';
+import {
+  languageServerWatcher,
+  cleanupAllWatchers,
+} from '@nx-console/language-server-watcher';
 import {
   createProjectGraph,
   getCloudOnboardingInfo,
@@ -307,8 +310,25 @@ documents.onDidOpen(async (e) => {
 });
 
 connection.onShutdown(async () => {
-  await unregisterFileWatcher();
-  jsonDocumentMapper.dispose();
+  lspLogger.log('Language server shutdown initiated');
+  try {
+    await unregisterFileWatcher();
+  } catch (e) {
+    lspLogger.log('Error during file watcher cleanup: ' + e);
+  }
+
+  try {
+    await cleanupAllWatchers();
+  } catch (e) {
+    lspLogger.log('Error during global watcher cleanup: ' + e);
+  }
+
+  try {
+    jsonDocumentMapper.dispose();
+  } catch (e) {
+    lspLogger.log('Error disposing json document mapper: ' + e);
+  }
+  lspLogger.log('Language server shutdown completed');
 });
 
 connection.onRequest(NxStopDaemonRequest, async () => {
@@ -720,20 +740,35 @@ const exitHandler = async () => {
   exiting = true;
   process.off('SIGTERM', exitHandler);
 
+  lspLogger.log('Exit handler initiated');
+
   try {
     await unregisterFileWatcher();
-  } catch {}
+  } catch (e) {
+    lspLogger.log('Error in exit handler during file watcher cleanup: ' + e);
+  }
+
+  try {
+    await cleanupAllWatchers();
+  } catch (e) {
+    lspLogger.log('Error in exit handler during global watcher cleanup: ' + e);
+  }
 
   try {
     connection.dispose();
-  } catch (e) {}
+  } catch (e) {
+    lspLogger.log('Error disposing connection in exit handler: ' + e);
+  }
 
   try {
     if (process.connected) {
       process.disconnect();
     }
-  } catch {}
+  } catch (e) {
+    lspLogger.log('Error disconnecting process in exit handler: ' + e);
+  }
 
+  lspLogger.log('Exit handler completed, killing process group');
   killGroup(process.pid);
 };
 process.on('SIGTERM', exitHandler);
