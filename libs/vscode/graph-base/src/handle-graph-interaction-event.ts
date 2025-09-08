@@ -3,6 +3,7 @@ import { revealNxProject } from '@nx-console/vscode-nx-config-decoration';
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { surroundWithQuotesIfNeeded } from '@nx-console/vscode-utils';
 import { join } from 'path';
 import { commands, ShellExecution, Task, tasks, TaskScope, Uri } from 'vscode';
 import { importNxPackagePath } from '@nx-console/shared-npm';
@@ -37,9 +38,10 @@ export async function handleGraphInteractionEventBase(event: {
     getTelemetry().logUsage('tasks.run', {
       source: 'graph-interaction',
     });
+    const taskId = event.payload.taskName ?? event.payload.taskId;
     CliTaskProvider.instance.executeTask({
       command: 'run',
-      positional: event.payload.taskName ?? event.payload.taskId,
+      positional: surroundWithQuotesIfNeeded(taskId),
       flags: [],
     });
     return true;

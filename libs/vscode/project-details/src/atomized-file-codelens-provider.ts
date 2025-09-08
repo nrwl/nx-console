@@ -3,6 +3,7 @@ import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { join } from 'path';
@@ -62,7 +63,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
       const location = this.getCodeLensLocation(document);
       return [
         new CodeLens(location, {
-          title: `$(play) Run ${project}:${target} via nx`,
+          title: `$(play) Run ${createProjectTargetString(project, target)} via nx`,
           command: CODELENS_RUN_TARGET_COMMAND,
           arguments: [project, target],
         }),

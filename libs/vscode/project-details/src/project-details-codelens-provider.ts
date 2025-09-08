@@ -13,6 +13,7 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { parseJsonText } from 'typescript';
@@ -221,7 +222,7 @@ function showProjectDetailsQuickpick(project: ProjectConfiguration) {
     } else {
       CliTaskProvider.instance.executeTask({
         command: 'run',
-        positional: `${project.name}:${selectedItem.label}`,
+        positional: createProjectTargetString(project.name, selectedItem.label),
         flags: [],
       });
     }

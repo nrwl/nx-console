@@ -4,10 +4,12 @@ import {
   getNxWorkspacePathFromNxls,
 } from '@nx-console/vscode-nx-workspace';
 import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
+import { createProjectTargetString } from '@nx-console/vscode-utils';
 import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
+
 
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
@@ -48,7 +50,7 @@ export class CliTaskProvider implements TaskProvider {
       projectTargetCombinations.map(([projectName, targetName]) => {
         return {
           command: 'run',
-          positional: `${projectName}:${targetName}`,
+          positional: createProjectTargetString(projectName, targetName),
           flags: [],
         };
       }),

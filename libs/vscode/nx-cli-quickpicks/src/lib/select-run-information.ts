@@ -6,6 +6,7 @@ import { selectFlags } from './select-flags';
 import {
   showNoProjectsMessage,
   showNoTargetsMessage,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 
 export async function selectRunInformation(
@@ -84,7 +85,7 @@ export async function selectRunInformation(
     }
 
     flags = await selectFlags(
-      `run ${projectName}:${surroundWithQuotesIfHasWhiteSpace(targetName)}`,
+      `run ${createProjectTargetString(projectName, targetName)}`,
       options,
       configuration
         ? {
@@ -261,9 +262,3 @@ export async function selectTarget(
   });
 }
 
-function surroundWithQuotesIfHasWhiteSpace(target: string): string {
-  if (target.match(/\s/g)) {
-    return `"${target}"`;
-  }
-  return target;
-}

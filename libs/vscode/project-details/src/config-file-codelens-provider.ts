@@ -10,6 +10,7 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 import { relative } from 'path';
 import {
@@ -140,7 +141,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
       return {
         ...codeLens,
         command: {
-          title: `$(play) Run ${project?.name}:${targetNames[0]} via nx`,
+          title: `$(play) Run ${createProjectTargetString(project?.name ?? '', targetNames[0])} via nx`,
           command: CODELENS_RUN_TARGET_COMMAND,
           arguments: [project?.name ?? '', targetNames[0]],
         },
@@ -225,7 +226,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
           });
           CliTaskProvider.instance.executeTask({
             command: 'run',
-            positional: `${project}:${target}`,
+            positional: createProjectTargetString(project, target),
             flags: [],
           });
         }
@@ -268,7 +269,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
             if (selected) {
               CliTaskProvider.instance.executeTask({
                 command: 'run',
-                positional: `${projectName}:${selected.label}`,
+                positional: createProjectTargetString(projectName, selected.label),
                 flags: [],
               });
             }
