@@ -42,7 +42,17 @@ export class NativeWatcher {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = null;
     }
-    await this.watcher?.stop();
+    if (this.watcher) {
+      try {
+        await this.watcher.stop();
+      } catch (e) {
+        // Ignore errors when stopping the watcher, as it might already be closed
+        this.logger.log(
+          'Error stopping watcher (this is expected during shutdown): ' + e,
+        );
+      }
+      this.watcher = undefined;
+    }
   }
 
   private async initWatcher() {
@@ -54,6 +64,11 @@ export class NativeWatcher {
     this.watcher = new native.Watcher(this.workspacePath);
 
     this.watcher.watch((err: string | null, events: WatchEvent[]) => {
+      // Check if watcher is stopped before processing any events
+      if (this.stopped) {
+        return;
+      }
+
       if (err) {
         this.logger.log('Error watching files: ' + err);
       } else {
@@ -77,8 +92,8 @@ export class NativeWatcher {
         });
 
         if (relevantEvents.length > 0) {
+          // Double-check stopped state before handling changes
           if (this.stopped) {
-            this.watcher?.stop();
             return;
           }
           this.handleFileChanges(relevantEvents);
@@ -88,6 +103,11 @@ export class NativeWatcher {
   }
 
   private handleFileChanges(events: WatchEvent[]) {
+    // Check if watcher is stopped before processing file changes
+    if (this.stopped) {
+      return;
+    }
+
     const criticalFiles: string[] = [];
     const nonCriticalFiles: string[] = [];
 
@@ -113,14 +133,17 @@ export class NativeWatcher {
         this.debounceTimer = null;
       }
       this.pendingChanges.clear();
-      this.callback();
+      // Check again before invoking callback
+      if (!this.stopped) {
+        this.callback();
+      }
     } else if (nonCriticalFiles.length > 0) {
       this.logger.log(`Non-critical files changed (debouncing for 10s)`);
       if (this.debounceTimer) {
         clearTimeout(this.debounceTimer);
       }
       this.debounceTimer = setTimeout(() => {
-        if (this.pendingChanges.size > 0) {
+        if (this.pendingChanges.size > 0 && !this.stopped) {
           this.logger.log(`Debounce timer expired, triggering callback`);
           this.pendingChanges.clear();
           this.callback();

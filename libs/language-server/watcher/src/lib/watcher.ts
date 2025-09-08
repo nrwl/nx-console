@@ -8,6 +8,34 @@ import { gte } from '@nx-console/nx-version';
 let _daemonWatcher: DaemonWatcher | undefined;
 let _nativeWatcher: NativeWatcher | undefined;
 
+export async function cleanupAllWatchers(): Promise<void> {
+  const cleanupPromises: Promise<void>[] = [];
+
+  if (_nativeWatcher) {
+    cleanupPromises.push(
+      _nativeWatcher.stop().catch((e) => {
+        lspLogger.log(
+          'Error stopping native watcher during global cleanup: ' + e,
+        );
+      }),
+    );
+    _nativeWatcher = undefined;
+  }
+
+  if (_daemonWatcher) {
+    cleanupPromises.push(
+      Promise.resolve(_daemonWatcher.stop()).catch((e) => {
+        lspLogger.log(
+          'Error stopping daemon watcher during global cleanup: ' + e,
+        );
+      }),
+    );
+    _daemonWatcher = undefined;
+  }
+
+  await Promise.all(cleanupPromises);
+}
+
 export async function languageServerWatcher(
   workspacePath: string,
   callback: () => unknown,
@@ -18,7 +46,11 @@ export async function languageServerWatcher(
   if (gte(version, '16.4.0')) {
     if (process.platform === 'win32') {
       if (_nativeWatcher) {
-        await _nativeWatcher.stop();
+        try {
+          await _nativeWatcher.stop();
+        } catch (e) {
+          lspLogger.log('Error stopping previous native watcher: ' + e);
+        }
         _nativeWatcher = undefined;
       }
       const nativeWatcher = new NativeWatcher(
@@ -29,11 +61,22 @@ export async function languageServerWatcher(
       _nativeWatcher = nativeWatcher;
       return async () => {
         lspLogger.log('Unregistering file watcher');
-        await nativeWatcher.stop();
+        try {
+          await nativeWatcher.stop();
+        } catch (e) {
+          lspLogger.log('Error stopping native watcher during cleanup: ' + e);
+        }
+        if (_nativeWatcher === nativeWatcher) {
+          _nativeWatcher = undefined;
+        }
       };
     } else {
       if (_daemonWatcher) {
-        _daemonWatcher.stop();
+        try {
+          _daemonWatcher.stop();
+        } catch (e) {
+          lspLogger.log('Error stopping previous daemon watcher: ' + e);
+        }
         _daemonWatcher = undefined;
       }
       const daemonWatcher = new DaemonWatcher(
@@ -47,7 +90,14 @@ export async function languageServerWatcher(
       await daemonWatcher.start();
       return async () => {
         lspLogger.log('Unregistering file watcher');
-        await daemonWatcher.stop();
+        try {
+          await daemonWatcher.stop();
+        } catch (e) {
+          lspLogger.log('Error stopping daemon watcher during cleanup: ' + e);
+        }
+        if (_daemonWatcher === daemonWatcher) {
+          _daemonWatcher = undefined;
+        }
       };
     }
   } else {
@@ -55,7 +105,11 @@ export async function languageServerWatcher(
     const parcelWatcher = new ParcelWatcher(workspacePath, debouncedCallback);
     return async () => {
       lspLogger.log('Unregistering file watcher');
-      parcelWatcher.stop();
+      try {
+        parcelWatcher.stop();
+      } catch (e) {
+        lspLogger.log('Error stopping parcel watcher during cleanup: ' + e);
+      }
     };
   }
 }
