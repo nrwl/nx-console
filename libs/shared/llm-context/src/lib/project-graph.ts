@@ -99,7 +99,9 @@ function getRobotReadableProjectGraph(
     } else {
       targetsString = targets.join(',');
     }
-    nodeString += `targets:[${targetsString}]`;
+    if (targetsString !== '') {
+      nodeString += `targets:[${targetsString}]`;
+    }
 
     // other metadata
     nodeString += `type:[${node.type}]`;
