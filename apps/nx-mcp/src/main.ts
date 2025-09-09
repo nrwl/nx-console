@@ -374,9 +374,11 @@ async function main() {
           resetStatus(nxWorkspacePath);
         },
         logger,
-        true,
       );
-      await daemonWatcher.start();
+      // Start the daemon watcher asynchronously to avoid blocking MCP startup
+      daemonWatcher.start().catch((e) => {
+        logger.log('Error starting daemon watcher: ' + e);
+      });
       stopWatcher = () => {
         daemonWatcher.stop();
       };
