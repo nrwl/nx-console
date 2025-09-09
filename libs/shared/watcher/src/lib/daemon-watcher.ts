@@ -23,7 +23,6 @@ export class DaemonWatcher {
     private nxVersion: NxVersion,
     private callback: () => unknown,
     private logger: Logger,
-    private skipInitialProjectGraphComputation = false,
   ) {}
 
   async start() {
@@ -84,27 +83,20 @@ export class DaemonWatcher {
       );
 
       let projectGraphErrors = false;
-      if (!this.skipInitialProjectGraphComputation) {
-        try {
-          if (gte(this.nxVersion, '17.2.0')) {
-            await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
-          } else {
-            await (daemonClientModule?.daemonClient as any).getProjectGraph();
-          }
-        } catch (e) {
-          this.logger.log(`caught error,${e}, ${JSON.stringify(e)}`);
-          if (!isProjectGraphError(e)) {
-            projectGraphErrors = true;
-          }
+      try {
+        if (gte(this.nxVersion, '17.2.0')) {
+          await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
+        } else {
+          await (daemonClientModule?.daemonClient as any).getProjectGraph();
         }
-      } else {
-        this.logger.log('Skipping initial project graph computation');
+      } catch (e) {
+        this.logger.log(`caught error,${e}, ${JSON.stringify(e)}`);
+        if (!isProjectGraphError(e)) {
+          projectGraphErrors = true;
+        }
       }
 
-      if (
-        !daemonClientModule ||
-        (!this.skipInitialProjectGraphComputation && projectGraphErrors)
-      ) {
+      if (!daemonClientModule || projectGraphErrors) {
         this.logger.log(
           `project graph computation error during daemon watcher initialization, using native watcher.`,
         );
