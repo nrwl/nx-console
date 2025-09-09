@@ -3,6 +3,7 @@ import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { join } from 'path';
@@ -34,7 +35,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
     public sourceFilesToAtomizedTargetsMap: Record<
       string,
       [project: string, target: string]
-    >
+    >,
   ) {}
   CODELENS_PATTERN = {
     scheme: 'file',
@@ -51,7 +52,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
 
   provideCodeLenses(
     document: TextDocument,
-    token: CancellationToken
+    token: CancellationToken,
   ): ProviderResult<CodeLens[]> {
     const path = document.uri.fsPath;
     if (!this.sourceFilesToAtomizedTargetsMap[path]) {
@@ -62,7 +63,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
       const location = this.getCodeLensLocation(document);
       return [
         new CodeLens(location, {
-          title: `$(play) Run ${project}:${target} via nx`,
+          title: `$(play) Run ${createProjectTargetString(project, target)} via nx`,
           command: CODELENS_RUN_TARGET_COMMAND,
           arguments: [project, target],
         }),
@@ -78,7 +79,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
           document.getText(),
           {
             languageVersion: ScriptTarget.Latest,
-          }
+          },
         );
         let firstNonImportNode: Node | undefined = undefined;
 
@@ -104,7 +105,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
 
         if (firstNonImportNode) {
           const pos = document.positionAt(
-            firstNonImportNode.getStart(configFile)
+            firstNonImportNode.getStart(configFile),
           );
           return new Range(pos, pos);
         }
@@ -122,7 +123,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
 
     const provider = new AtomizedFileCodelensProvider(
       workspacePath,
-      sourceFilesToAtomizedTargetsMap
+      sourceFilesToAtomizedTargetsMap,
     );
 
     context.subscriptions.push(
@@ -136,7 +137,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
           updatedSourceFilesToAtomizedTargetsMap;
 
         provider.refresh();
-      })
+      }),
     );
 
     registerCodeLensProvider(provider);
@@ -144,7 +145,7 @@ export class AtomizedFileCodelensProvider implements NxCodeLensProvider {
 }
 
 export async function getSourceFilesToAtomizedTargetsMap(
-  workspacePath: string
+  workspacePath: string,
 ): Promise<Record<string, [project: string, target: string]>> {
   const sourceFilesToAtomizedTargetsMap: Record<
     string,
@@ -164,7 +165,7 @@ export async function getSourceFilesToAtomizedTargetsMap(
     for (const targetGroup of Object.values(targetGroups)) {
       const atomizerRootTarget = targetGroup.find(
         (target) =>
-          projectNode.data.targets?.[target]?.metadata?.nonAtomizedTarget
+          projectNode.data.targets?.[target]?.metadata?.nonAtomizedTarget,
       );
       if (!atomizerRootTarget) {
         continue;
@@ -176,7 +177,7 @@ export async function getSourceFilesToAtomizedTargetsMap(
         const fileName = join(
           workspacePath,
           projectNode.data.root,
-          target.replace(`${atomizerRootTarget}--`, '')
+          target.replace(`${atomizerRootTarget}--`, ''),
         );
         sourceFilesToAtomizedTargetsMap[fileName] = [projectNode.name, target];
       }

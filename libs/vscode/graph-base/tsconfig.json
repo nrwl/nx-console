@@ -13,6 +13,9 @@
       "path": "../../shared/npm"
     },
     {
+      "path": "../utils"
+    },
+    {
       "path": "../telemetry"
     },
     {
