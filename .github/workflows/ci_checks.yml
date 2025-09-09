@@ -26,7 +26,7 @@ jobs:
           # we just need a little bit more space, we save CI time by not deleting everything
           tool-cache: false
           dotnet: false
-          haskell: false
+          haskell: true
           large-packages: false
           docker-images: false
           swap-storage: false
