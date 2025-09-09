@@ -374,6 +374,7 @@ async function main() {
           resetStatus(nxWorkspacePath);
         },
         logger,
+        true,
       );
       await daemonWatcher.start();
       stopWatcher = () => {
