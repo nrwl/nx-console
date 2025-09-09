@@ -1,6 +1,8 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.DataKey
+import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.project.Project
 import com.intellij.ui.*
 import com.intellij.ui.treeStructure.SimpleTree
@@ -17,7 +19,9 @@ import java.awt.event.MouseEvent
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 
-class CIPETree(private val project: Project) : SimpleTree() {
+val CIPETreeNodeKey = DataKey.create<CIPESimpleNode?>("CIPE_TREE_NODE")
+
+class CIPETree(private val project: Project) : SimpleTree(), DataProvider {
     init {
         isRootVisible = false
         setCellRenderer(CIPETreeCellRenderer())
@@ -60,6 +64,15 @@ class CIPETree(private val project: Project) : SimpleTree() {
         }
 
         CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
+    }
+
+    override fun getData(dataId: String): Any? {
+        if (CIPETreeNodeKey.`is`(dataId)) {
+            val selectedPath = selectionPath ?: return null
+            val lastNode = selectedPath.lastPathComponent as? DefaultMutableTreeNode ?: return null
+            return lastNode.userObject as? CIPESimpleNode
+        }
+        return null
     }
 }
 
