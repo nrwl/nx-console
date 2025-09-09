@@ -80,6 +80,9 @@ export const nxlsClientStateMachine = setup({
         },
       },
       on: {
+        STOP: {
+          target: 'stopping',
+        },
         SET_WORKSPACE_PATH: {
           actions: ['assignWorkspacePath'],
         },
