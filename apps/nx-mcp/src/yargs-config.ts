@@ -3,7 +3,6 @@ import yargs, { Argv } from 'yargs';
 export interface ArgvType {
   workspacePath?: string;
   transport?: 'stdio' | 'sse' | 'http';
-  sse: boolean;
   http: boolean;
   port?: number;
   disableTelemetry: boolean;
@@ -33,14 +32,6 @@ export function createYargsConfig(args: string[]): Argv<any> {
       default: 'stdio',
       type: 'string',
     })
-    .option('sse', {
-      describe:
-        'Configure the server to use SSE (Server-Sent Events) [DEPRECATED: Use --transport sse instead]',
-      type: 'boolean',
-      default: false,
-      deprecated: true,
-      hidden: true,
-    })
     .option('port', {
       alias: 'p',
       describe: 'Port to use for the HTTP/SSE server (default: 9921)',
@@ -60,20 +51,6 @@ export function createYargsConfig(args: string[]): Argv<any> {
       default: 30000,
     })
     .check((argv) => {
-      // Check for conflicting options
-      if (argv.sse && argv.transport === 'http') {
-        throw new Error('Cannot use both sse and http transport together');
-      }
-      // Handle backward compatibility
-      if (argv.sse) {
-        console.warn(
-          'Warning: --sse option is deprecated. Please use --transport sse instead.',
-        );
-        if (!argv.transport || argv.transport === 'stdio') {
-          argv.transport = 'sse';
-        }
-      }
-
       // Validate port usage
       if (argv.port !== undefined && argv.transport === 'stdio') {
         throw new Error(
