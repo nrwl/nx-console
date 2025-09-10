@@ -1204,7 +1204,7 @@
       },
       {
         "view": "nxProjects",
-        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators?utm_source=nxconsole) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration?utm_source=nxconsole).",
+        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs).\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators?utm_source=nxconsole) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration?utm_source=nxconsole).",
         "when": "!nxConsole.hasWorkspaceErrors"
       },
       {
