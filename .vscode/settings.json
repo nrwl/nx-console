@@ -8,7 +8,8 @@
     "nx run vscode:watch-all",
     "add-dependency",
     "add-dev-dependency",
-    "migrate"
+    "migrate",
+    "affected --exclude vscode"
   ],
   "nxConsole.moveGeneratorPatterns": {
     "*": "@nx/workspace"
