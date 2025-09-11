@@ -3,7 +3,7 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode-nx-workspace';
 import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
-import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
+import { ExtensionContext, ViewColumn } from 'vscode';
 import {
   OldProjectDetailsPreview,
   ProjectDetailsPreview,
@@ -17,10 +17,9 @@ export class ProjectDetailsManager {
   constructor(private context: ExtensionContext) {}
 
   async openProjectDetailsToSide(
-    document: TextDocument,
+    path: string,
     expandedTarget?: string
   ) {
-    const path = document.uri.path;
     let preview: ProjectDetailsPreview | undefined =
       await this.findMatchingPreview(path);
 

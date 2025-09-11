@@ -1,6 +1,6 @@
 import { handleGraphInteractionEventBase } from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
-import { getPDVData } from '@nx-console/vscode-nx-workspace';
+import { getPDVData, getProjectByPath } from '@nx-console/vscode-nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
 import { join } from 'path';
 import {
@@ -20,14 +20,17 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
   projectRoot: string | undefined;
 
-  constructor(private path: string, private context: ExtensionContext) {
+  constructor(
+    private path: string,
+    private context: ExtensionContext,
+  ) {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `Project Details`,
       ViewColumn.Beside,
       {
         enableScripts: true,
-      }
+      },
     );
 
     const actor = createActor(
@@ -47,18 +50,18 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
             this.renderError(
               context.errorsSerialized,
               context.errorMessage,
-              context.graphBasePath
+              context.graphBasePath,
             ),
           renderMultiPDV: ({ context }) =>
             this.renderMultiPDV(
               context.pdvDataSerializedMulti,
               context.multiSelectedProject,
-              context.graphBasePath
+              context.graphBasePath,
             ),
           renderNoGraphError: ({ context }) =>
             this.renderNoGraphError(context.errorMessage),
         },
-      })
+      }),
     );
 
     const interactionEventListener =
@@ -81,7 +84,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         if (event.type === 'open-task-graph') {
           getGraphWebviewManager().focusTarget(
             event.payload.projectName,
-            event.payload.targetName
+            event.payload.targetName,
           );
           return;
         }
@@ -97,9 +100,9 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
         commands.executeCommand(
           'setContext',
           'projectDetailsViewVisible',
-          webviewPanel.visible
+          webviewPanel.visible,
         );
-      }
+      },
     );
 
     this.webviewPanel.onDidDispose(() => {
@@ -107,6 +110,13 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       viewStateListener.dispose();
       workspaceRefreshListener?.dispose();
       commands.executeCommand('setContext', 'projectDetailsViewVisible', false);
+    });
+
+    // asynchronously load the project to get the root
+    // this is used to match existing previews
+    // even if they come from a different file in the same project
+    getProjectByPath(path).then((project) => {
+      this.projectRoot = project?.root;
     });
   }
 
@@ -116,7 +126,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
   private renderPDV(
     pdvData: string | undefined,
-    graphBasePath: string | undefined
+    graphBasePath: string | undefined,
   ) {
     if (pdvData === undefined || graphBasePath === undefined) {
       return;
@@ -145,7 +155,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
               }
             });
           </script>
-        </body>`
+        </body>`,
     );
     this.webviewPanel.webview.html = html;
   }
@@ -163,7 +173,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
   private renderError(
     errorsSerialized: string | undefined,
     errorMessage: string | undefined,
-    graphBasePath: string | undefined
+    graphBasePath: string | undefined,
   ) {
     if (errorsSerialized === undefined || graphBasePath === undefined) {
       return;
@@ -179,7 +189,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
             }
           )
         </script>
-    </body>`
+    </body>`,
     );
     this.webviewPanel.webview.html = html;
   }
@@ -187,7 +197,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
   private renderMultiPDV(
     data: Record<string, string> | undefined,
     selectedProject: string | undefined,
-    graphBasePath: string | undefined
+    graphBasePath: string | undefined,
   ) {
     if (
       data === undefined ||
@@ -202,8 +212,8 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     const stringifiedData = JSON.stringify(
       Object.entries(data).reduce(
         (acc, [key, value]) => ({ ...acc, [key]: JSON.parse(value) }),
-        {}
-      )
+        {},
+      ),
     );
 
     let html = this.loadPDVHtmlBase(graphBasePath);
@@ -215,14 +225,14 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
           .asWebviewUri(
             Uri.joinPath(
               this.context.extensionUri,
-              'node_modules/@vscode-elements/elements/dist/bundled.js'
-            )
+              'node_modules/@vscode-elements/elements/dist/bundled.js',
+            ),
           )
           .toString()}"
         type="module"
       ></script>
       </head>
-      `
+      `,
     );
     html = html.replace(
       '<body>',
@@ -241,7 +251,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       </div>
       <vscode-divider></vscode-divider>
       
-      `
+      `,
     );
     html = html.replace(
       '</body>',
@@ -280,7 +290,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
       </script>
       </body>
-      `
+      `,
     );
     this.webviewPanel.webview.html = html;
   }

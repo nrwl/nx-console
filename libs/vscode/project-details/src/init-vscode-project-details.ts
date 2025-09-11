@@ -55,6 +55,7 @@ function registerCommand(context: ExtensionContext) {
       'nx.project-details.openToSide',
       async (
         config:
+          | Uri
           | {
               document?: TextDocument;
               expandTarget?: string;
@@ -66,24 +67,55 @@ function registerCommand(context: ExtensionContext) {
         );
         if (!isEnabled) return;
         const nxVersion = await getNxVersion();
-        getTelemetry().logUsage('misc.open-pdv');
+        
+        // Determine the source based on the argument type
+        const source = config instanceof Uri ? 'explorer-context-menu' : 'command';
+        getTelemetry().logUsage('misc.open-pdv', { source });
 
         if (!nxVersion) {
           showNoNxVersionMessage();
           return;
         }
         if (gte(nxVersion, '17.3.0-beta.3')) {
-          let document = config?.document;
-          if (!document) {
-            document = window.activeTextEditor?.document;
+          let path: string | undefined;
+          
+          // Handle both Uri (from context menu) and config object (from other sources)
+          if (config instanceof Uri) {
+            // Called from context menu with a Uri
+            path = config.fsPath;
+            // Check if the path actually points to a project
+            const project = await getProjectByPath(path);
+            if (!project) {
+              showNoProjectAtPathMessage(path);
+              return;
+            }
+          } else if (config?.document) {
+            path = config.document.uri.path;
+          } else {
+            path = window.activeTextEditor?.document.uri.path;
           }
-          if (!document) return;
+          
+          if (!path) return;
           projectDetailsManager.openProjectDetailsToSide(
-            document,
-            config?.expandTarget
+            path,
+            config instanceof Uri ? undefined : config?.expandTarget
           );
         } else {
-          const uri = window.activeTextEditor?.document.uri;
+          // Handle legacy Nx versions
+          let uri: Uri | undefined;
+          
+          if (config instanceof Uri) {
+            uri = config;
+            // Check if the path actually points to a project
+            const project = await getProjectByPath(uri.fsPath);
+            if (!project) {
+              showNoProjectAtPathMessage(uri.fsPath);
+              return;
+            }
+          } else {
+            uri = window.activeTextEditor?.document.uri;
+          }
+          
           if (!uri) return;
           const project = await getProjectByPath(uri.path);
           if (!project) {

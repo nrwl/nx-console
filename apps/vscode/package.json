@@ -61,6 +61,12 @@
           "group": "2_workspace"
         },
         {
+          "when": "isNxWorkspace && config.nxConsole.showProjectDetailsView",
+          "command": "nx.project-details.openToSide",
+          "title": "Open Project Details",
+          "group": "2_workspace"
+        },
+        {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.move",
           "group": "7_modification@-1"
@@ -798,7 +804,7 @@
       },
       {
         "category": "Nx",
-        "title": "Open Project Details to Side",
+        "title": "Open Project Details",
         "command": "nx.project-details.openToSide",
         "icon": "$(open-preview)"
       },
