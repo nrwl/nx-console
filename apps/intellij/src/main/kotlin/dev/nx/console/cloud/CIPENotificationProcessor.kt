@@ -58,8 +58,9 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             val hasRunGroupWithAiFix = newCIPE.runGroups.any { it.aiFix != null }
             val completedAt = newCIPE.completedAt
             val currentTime = System.currentTimeMillis()
+            // Only treat HARD failures (FAILED) as notifiable failures. CANCELED/TIMED_OUT do not notify.
             val failedButNoAiFixInFiveMinutes =
-                newCIPE.status.isFailedStatus() &&
+                (newCIPE.status == CIPEExecutionStatus.FAILED) &&
                     !hasRunGroupWithAiFix &&
                     completedAt != null &&
                     completedAt + 1000 * 60 * 5 < currentTime
@@ -84,7 +85,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 val oldCompletedAt = oldCIPE.completedAt
                 oldHasRunGroupWithAiFix ||
                     (oldCIPE.aiFixesEnabled == true &&
-                        oldCIPE.status.isFailedStatus() &&
+                        oldCIPE.status == CIPEExecutionStatus.FAILED &&
                         oldCompletedAt != null &&
                         oldCompletedAt + 1000 * 60 * 5 >= currentTime)
             } else {
@@ -110,8 +111,8 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
 
             // Check what type of notification to emit
             when {
-                // CIPE just failed - skip if AI fix available or potentially available
-                newCIPE.status.isFailedStatus() && !potentiallyHasAiFix -> {
+                // CIPE just failed (FAILED only) - skip if AI fix available or potentially available
+                newCIPE.status == CIPEExecutionStatus.FAILED && !potentiallyHasAiFix -> {
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
 
@@ -158,7 +159,8 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     }
 
     private fun isRunFailed(run: CIPERun): Boolean {
-        return (run.status?.isFailedStatus() == true) ||
+        // Only treat FAILED as a failed run for notifications. CANCELED/TIMED_OUT do not notify.
+        return (run.status == CIPEExecutionStatus.FAILED) ||
             (run.numFailedTasks?.let { it > 0 } == true)
     }
 
