@@ -1,6 +1,7 @@
 package dev.nx.console.nx_toolwindow.cloud_tree
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.PopupHandler
 import com.intellij.ui.tree.AsyncTreeModel
@@ -15,6 +16,10 @@ import dev.nx.console.utils.NxConsolePluginDisposable
 import javax.swing.tree.TreeModel
 
 class CIPETreeStructure(val tree: CIPETree, private val project: Project) : SimpleTreeStructure() {
+
+    companion object {
+        private val logger = thisLogger()
+    }
 
     private val rootNode = CIPESimpleNode.CIPERootNode()
     private var cipeData: List<CIPEInfo> = emptyList()
@@ -87,12 +92,19 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
             // since there's only one)
             val aiFix = singleRunGroup.aiFix
             if (aiFix != null) {
+                logger.debug("[CIPE_TREE] Adding AI fix node for single run group. " +
+                    "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
+                    "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
+                    "verificationStatus=${aiFix.verificationStatus}, " +
+                    "hasSuggestedFix=${aiFix.suggestedFix != null}")
                 children.add(
                     CIPESimpleNode.NxCloudFixNode(
                         aiFix = aiFix,
                         parent = cipeNode,
                     )
                 )
+            } else {
+                logger.debug("[CIPE_TREE] No AI fix for single run group ${singleRunGroup.runGroup}")
             }
 
             // Add runs after AI fix
@@ -119,12 +131,19 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
         // Add AI fix first if it exists
         val aiFix = runGroupNode.runGroup.aiFix
         if (aiFix != null) {
+            logger.debug("[CIPE_TREE] Adding AI fix node for run group ${runGroupNode.runGroup.runGroup}. " +
+                "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
+                "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
+                "verificationStatus=${aiFix.verificationStatus}, " +
+                "hasSuggestedFix=${aiFix.suggestedFix != null}")
             children.add(
                 CIPESimpleNode.NxCloudFixNode(
                     aiFix = aiFix,
                     parent = runGroupNode,
                 )
             )
+        } else {
+            logger.debug("[CIPE_TREE] No AI fix for run group ${runGroupNode.runGroup.runGroup}")
         }
 
         // Add runs after AI fix
@@ -160,7 +179,24 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
     override fun hasSomethingToCommit(): Boolean = false
 
     fun updateCIPEData(newData: List<CIPEInfo>) {
+        logger.debug("[CIPE_TREE] Updating CIPE data with ${newData.size} CIPEs")
+        
+        // Log AI fix information for debugging
+        newData.forEach { cipe ->
+            cipe.runGroups.forEach { runGroup ->
+                val aiFix = runGroup.aiFix
+                if (aiFix != null) {
+                    logger.debug("[CIPE_TREE] Found AI fix in data: " +
+                        "cipeId=${cipe.ciPipelineExecutionId}, runGroup=${runGroup.runGroup}, " +
+                        "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
+                        "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
+                        "verificationStatus=${aiFix.verificationStatus}")
+                }
+            }
+        }
+        
         val addedAIFixes = extractAIFixes(newData) - extractAIFixes(cipeData)
+        logger.debug("[CIPE_TREE] Added AI fixes: $addedAIFixes")
 
         cipeData = newData
 
@@ -180,7 +216,7 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
         for (cipe in data) {
             for (runGroup in cipe.runGroups) {
                 val aiFix = runGroup.aiFix
-                if (aiFix != null && aiFix.taskIds.isNotEmpty()) {
+                if (aiFix != null) {
                     fixes.add(aiFix.aiFixId)
                 }
             }
