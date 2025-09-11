@@ -47,7 +47,7 @@ function registerCommand(context: ExtensionContext) {
   const projectDetailsProvider = new ProjectDetailsProvider();
   workspace.registerTextDocumentContentProvider(
     'project-details',
-    projectDetailsProvider
+    projectDetailsProvider,
   );
 
   context.subscriptions.push(
@@ -60,16 +60,17 @@ function registerCommand(context: ExtensionContext) {
               document?: TextDocument;
               expandTarget?: string;
             }
-          | undefined
+          | undefined,
       ) => {
         const isEnabled = GlobalConfigurationStore.instance.get(
-          'showProjectDetailsView'
+          'showProjectDetailsView',
         );
         if (!isEnabled) return;
         const nxVersion = await getNxVersion();
-        
+
         // Determine the source based on the argument type
-        const source = config instanceof Uri ? 'explorer-context-menu' : 'command';
+        const source =
+          config instanceof Uri ? 'explorer-context-menu' : 'command';
         getTelemetry().logUsage('misc.open-pdv', { source });
 
         if (!nxVersion) {
@@ -78,7 +79,7 @@ function registerCommand(context: ExtensionContext) {
         }
         if (gte(nxVersion, '17.3.0-beta.3')) {
           let path: string | undefined;
-          
+
           // Handle both Uri (from context menu) and config object (from other sources)
           if (config instanceof Uri) {
             // Called from context menu with a Uri
@@ -94,16 +95,16 @@ function registerCommand(context: ExtensionContext) {
           } else {
             path = window.activeTextEditor?.document.uri.path;
           }
-          
+
           if (!path) return;
           projectDetailsManager.openProjectDetailsToSide(
             path,
-            config instanceof Uri ? undefined : config?.expandTarget
+            config instanceof Uri ? undefined : config?.expandTarget,
           );
         } else {
           // Handle legacy Nx versions
           let uri: Uri | undefined;
-          
+
           if (config instanceof Uri) {
             uri = config;
             // Check if the path actually points to a project
@@ -115,7 +116,7 @@ function registerCommand(context: ExtensionContext) {
           } else {
             uri = window.activeTextEditor?.document.uri;
           }
-          
+
           if (!uri) return;
           const project = await getProjectByPath(uri.path);
           if (!project) {
@@ -123,15 +124,15 @@ function registerCommand(context: ExtensionContext) {
             return;
           }
           const doc = await workspace.openTextDocument(
-            Uri.parse(`project-details:${project.name}.project.json`)
+            Uri.parse(`project-details:${project.name}.project.json`),
           );
           await window.showTextDocument(doc, {
             preview: false,
             viewColumn: ViewColumn.Beside,
           });
         }
-      }
-    )
+      },
+    ),
   );
 }
 
@@ -144,7 +145,7 @@ async function setProjectDetailsFileContext() {
         Object.keys(sourceMapFilesToProjectMap ?? {}).flatMap((path) => [
           join(nxWorkspacePath, path),
           join(nxWorkspacePath, dirname(path), 'package.json'),
-        ])
+        ]),
       ),
     ];
     commands.executeCommand('setContext', 'nxConsole.pdvPaths', pdvPaths);

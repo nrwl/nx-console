@@ -16,10 +16,7 @@ export class ProjectDetailsManager {
 
   constructor(private context: ExtensionContext) {}
 
-  async openProjectDetailsToSide(
-    path: string,
-    expandedTarget?: string
-  ) {
+  async openProjectDetailsToSide(path: string, expandedTarget?: string) {
     let preview: ProjectDetailsPreview | undefined =
       await this.findMatchingPreview(path);
 
@@ -36,7 +33,7 @@ export class ProjectDetailsManager {
         preview = new OldProjectDetailsPreview(
           path,
           this.context,
-          expandedTarget
+          expandedTarget,
         );
       }
       preview.onDispose(() => {
@@ -49,7 +46,7 @@ export class ProjectDetailsManager {
   }
 
   private async findMatchingPreview(
-    path: string
+    path: string,
   ): Promise<ProjectDetailsPreview | undefined> {
     const directMatch = this.previews.get(path);
     if (directMatch) return directMatch;
