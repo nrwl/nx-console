@@ -92,11 +92,13 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
             // since there's only one)
             val aiFix = singleRunGroup.aiFix
             if (aiFix != null) {
-                logger.debug("[CIPE_TREE] Adding AI fix node for single run group. " +
-                    "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
-                    "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
-                    "verificationStatus=${aiFix.verificationStatus}, " +
-                    "hasSuggestedFix=${aiFix.suggestedFix != null}")
+                logger.debug(
+                    "[CIPE_TREE] Adding AI fix node for single run group. " +
+                        "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
+                        "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
+                        "verificationStatus=${aiFix.verificationStatus}, " +
+                        "hasSuggestedFix=${aiFix.suggestedFix != null}"
+                )
                 children.add(
                     CIPESimpleNode.NxCloudFixNode(
                         aiFix = aiFix,
@@ -104,7 +106,9 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
                     )
                 )
             } else {
-                logger.debug("[CIPE_TREE] No AI fix for single run group ${singleRunGroup.runGroup}")
+                logger.debug(
+                    "[CIPE_TREE] No AI fix for single run group ${singleRunGroup.runGroup}"
+                )
             }
 
             // Add runs after AI fix
@@ -131,11 +135,13 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
         // Add AI fix first if it exists
         val aiFix = runGroupNode.runGroup.aiFix
         if (aiFix != null) {
-            logger.debug("[CIPE_TREE] Adding AI fix node for run group ${runGroupNode.runGroup.runGroup}. " +
-                "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
-                "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
-                "verificationStatus=${aiFix.verificationStatus}, " +
-                "hasSuggestedFix=${aiFix.suggestedFix != null}")
+            logger.debug(
+                "[CIPE_TREE] Adding AI fix node for run group ${runGroupNode.runGroup.runGroup}. " +
+                    "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
+                    "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
+                    "verificationStatus=${aiFix.verificationStatus}, " +
+                    "hasSuggestedFix=${aiFix.suggestedFix != null}"
+            )
             children.add(
                 CIPESimpleNode.NxCloudFixNode(
                     aiFix = aiFix,
@@ -180,21 +186,23 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
 
     fun updateCIPEData(newData: List<CIPEInfo>) {
         logger.debug("[CIPE_TREE] Updating CIPE data with ${newData.size} CIPEs")
-        
+
         // Log AI fix information for debugging
         newData.forEach { cipe ->
             cipe.runGroups.forEach { runGroup ->
                 val aiFix = runGroup.aiFix
                 if (aiFix != null) {
-                    logger.debug("[CIPE_TREE] Found AI fix in data: " +
-                        "cipeId=${cipe.ciPipelineExecutionId}, runGroup=${runGroup.runGroup}, " +
-                        "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
-                        "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
-                        "verificationStatus=${aiFix.verificationStatus}")
+                    logger.debug(
+                        "[CIPE_TREE] Found AI fix in data: " +
+                            "cipeId=${cipe.ciPipelineExecutionId}, runGroup=${runGroup.runGroup}, " +
+                            "aiFixId=${aiFix.aiFixId}, taskIds=${aiFix.taskIds}, " +
+                            "suggestedFixStatus=${aiFix.suggestedFixStatus}, " +
+                            "verificationStatus=${aiFix.verificationStatus}"
+                    )
                 }
             }
         }
-        
+
         val addedAIFixes = extractAIFixes(newData) - extractAIFixes(cipeData)
         logger.debug("[CIPE_TREE] Added AI fixes: $addedAIFixes")
 

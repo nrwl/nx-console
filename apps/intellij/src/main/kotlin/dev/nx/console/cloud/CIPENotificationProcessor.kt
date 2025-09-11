@@ -58,7 +58,8 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             val hasRunGroupWithAiFix = newCIPE.runGroups.any { it.aiFix != null }
             val completedAt = newCIPE.completedAt
             val currentTime = System.currentTimeMillis()
-            // Only treat HARD failures (FAILED) as notifiable failures. CANCELED/TIMED_OUT do not notify.
+            // Only treat HARD failures (FAILED) as notifiable failures. CANCELED/TIMED_OUT do not
+            // notify.
             val failedButNoAiFixInFiveMinutes =
                 (newCIPE.status == CIPEExecutionStatus.FAILED) &&
                     !hasRunGroupWithAiFix &&
@@ -68,7 +69,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             val potentiallyHasAiFix =
                 hasRunGroupWithAiFix ||
                     (newCIPE.aiFixesEnabled == true && !failedButNoAiFixInFiveMinutes)
-            
+
             // Check for newly available AI fixes and show proactive notifications
             if (oldCIPE != null) {
                 checkForNewAiFixNotifications(oldCIPE, newCIPE)
@@ -78,40 +79,42 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             // we've already shown a notification and should return
             // The one exception is if we suppressed the notification because we thought an AI fix
             // might be coming and now we know no AI fix is coming
-            
+
             // Calculate if the OLD CIPE potentially had an AI fix coming
-            val oldPotentiallyHasAiFix = if (oldCIPE != null) {
-                val oldHasRunGroupWithAiFix = oldCIPE.runGroups.any { it.aiFix != null }
-                val oldCompletedAt = oldCIPE.completedAt
-                oldHasRunGroupWithAiFix ||
-                    (oldCIPE.aiFixesEnabled == true &&
-                        oldCIPE.status == CIPEExecutionStatus.FAILED &&
-                        oldCompletedAt != null &&
-                        oldCompletedAt + 1000 * 60 * 5 >= currentTime)
-            } else {
-                false
-            }
-            
+            val oldPotentiallyHasAiFix =
+                if (oldCIPE != null) {
+                    val oldHasRunGroupWithAiFix = oldCIPE.runGroups.any { it.aiFix != null }
+                    val oldCompletedAt = oldCIPE.completedAt
+                    oldHasRunGroupWithAiFix ||
+                        (oldCIPE.aiFixesEnabled == true &&
+                            oldCIPE.status == CIPEExecutionStatus.FAILED &&
+                            oldCompletedAt != null &&
+                            oldCompletedAt + 1000 * 60 * 5 >= currentTime)
+                } else {
+                    false
+                }
+
             // Check if this is a delayed notification transition
             // (we suppressed before because we thought AI fix was coming, but now it's not)
-            val isDelayedNotificationTransition = 
-                oldPotentiallyHasAiFix && 
-                !potentiallyHasAiFix && 
-                failedButNoAiFixInFiveMinutes
-            
-            // Should skip if old CIPE was already completed/failed AND it's not a delayed transition
-            val shouldSkipDueToCompletedCIPE = 
+            val isDelayedNotificationTransition =
+                oldPotentiallyHasAiFix && !potentiallyHasAiFix && failedButNoAiFixInFiveMinutes
+
+            // Should skip if old CIPE was already completed/failed AND it's not a delayed
+            // transition
+            val shouldSkipDueToCompletedCIPE =
                 oldCIPE != null &&
-                (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS || hasAnyFailedRun(oldCIPE)) &&
-                !isDelayedNotificationTransition
-            
+                    (oldCIPE.status != CIPEExecutionStatus.IN_PROGRESS ||
+                        hasAnyFailedRun(oldCIPE)) &&
+                    !isDelayedNotificationTransition
+
             if (shouldSkipDueToCompletedCIPE) {
                 return@forEach
             }
 
             // Check what type of notification to emit
             when {
-                // CIPE just failed (FAILED only) - skip if AI fix available or potentially available
+                // CIPE just failed (FAILED only) - skip if AI fix available or potentially
+                // available
                 newCIPE.status == CIPEExecutionStatus.FAILED && !potentiallyHasAiFix -> {
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
                 }
