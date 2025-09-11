@@ -686,7 +686,7 @@ async function updateSuggestedFix(
   } catch (error) {
     console.error('Failed to update suggested fix:', error);
     window.showErrorMessage(
-      `Failed to ${action.toLowerCase()} AI fix: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      `Failed to ${action.toLowerCase()} AI fix: ${error.responseText ?? error.message ?? 'Unknown error'}`,
     );
     return false;
   }
