@@ -1,4 +1,4 @@
-import { CIPEInfo, CIPERunGroup } from '@nx-console/shared-types';
+import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -10,133 +10,220 @@ export function compareCIPEDataAndSendNotification(
   oldInfo: CIPEInfo[] | null,
   newInfo: CIPEInfo[],
 ) {
-  // Always update status bar
+  // Always update status bar first
   updateAiFixStatusBar(newInfo);
 
   const nxCloudNotificationsSetting = GlobalConfigurationStore.instance.get(
     'nxCloudNotifications',
   );
 
+  // Early return if notifications are disabled
   if (nxCloudNotificationsSetting === 'none') {
     return;
   }
 
-  // oldInfo is only null on the initial load
-  // we don't know whether a cipe was actually just completed or if it's just being loaded for the first time
-  // so we don't show any notifications on the initial load
+  // Skip notifications on initial load since we don't know if CIPEs
+  // just completed or are just being loaded for the first time
   if (oldInfo === null) {
     return;
   }
 
-  // Completed & Task Failed Notifications
+  // Process each CIPE for potential notifications
   for (const newCIPE of newInfo) {
+    // Find the corresponding old CIPE if it exists
     const oldCIPE = oldInfo.find(
-      (oldCIPE) =>
-        newCIPE.ciPipelineExecutionId === oldCIPE.ciPipelineExecutionId,
+      (old) => old.ciPipelineExecutionId === newCIPE.ciPipelineExecutionId,
     );
+    processCIPENotifications(oldCIPE, newCIPE, nxCloudNotificationsSetting);
+  }
+}
 
-    // Check if aiFix is newly available on any runGroup
-    const newCIPERunGroups = newCIPE.runGroups || [];
-    const oldCIPERunGroups = oldCIPE?.runGroups || [];
-
-    // Check if any runGroup has an AI fix or could get one in the future (to skip failure notifications)
-    const hasRunGroupWithAiFix = newCIPERunGroups.some(
-      (runGroup) => !!runGroup.aiFix,
+function processCIPENotifications(
+  oldCIPE: CIPEInfo | undefined,
+  newCIPE: CIPEInfo,
+  notificationSetting: string,
+) {
+  // Check for AI fixes to notify about
+  if (oldCIPE) {
+    // Compare with old CIPE to find new AI fixes
+    const newAiFixes = findNewAiFixes(
+      newCIPE.runGroups || [],
+      oldCIPE.runGroups || [],
     );
-    const failedButNoAiFixInFiveMinutes =
-      newCIPE.status === 'FAILED' &&
-      !hasRunGroupWithAiFix &&
-      newCIPE.completedAt &&
-      newCIPE.completedAt + 1000 * 60 * 5 < Date.now();
-
-    const potentiallyHasAiFix =
-      hasRunGroupWithAiFix ||
-      (newCIPE.aiFixesEnabled && !failedButNoAiFixInFiveMinutes);
-
-    for (const newRunGroup of newCIPERunGroups) {
+    for (const runGroup of newAiFixes) {
+      showAiFixNotification(newCIPE, runGroup);
+    }
+  } else {
+    // No old CIPE - show AI fix notification for any existing AI fixes
+    for (const runGroup of newCIPE.runGroups || []) {
       if (
-        newRunGroup.aiFix?.suggestedFix &&
-        newRunGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
+        runGroup.aiFix?.suggestedFix &&
+        runGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
       ) {
-        const oldRunGroup = oldCIPERunGroups.find(
-          (runGroup) => runGroup.runGroup === newRunGroup.runGroup,
-        );
-        if (!oldRunGroup?.aiFix?.suggestedFix) {
-          showAiFixNotification(newCIPE, newRunGroup);
-        }
+        showAiFixNotification(newCIPE, runGroup);
       }
     }
+  }
 
-    const newCipeIsSucceeded = newCIPE.status === 'SUCCEEDED';
-    const newCIPEIsFailed = isFailedStatus(newCIPE.status);
-    const newCIPEFailedRun = newCIPE.runGroups
-      .flatMap((runGroup) => runGroup.runs)
-      .find(
-        (run) =>
-          (run.status && isFailedStatus(run.status)) ||
-          (run.numFailedTasks && run.numFailedTasks > 0),
-      );
+  // Determine if we should show any completion/failure notifications
+  const shouldShow = shouldShowCIPENotification(oldCIPE, newCIPE);
+  if (!shouldShow) {
+    return;
+  }
 
-    const oldCIPEFailedRun = oldCIPE?.runGroups
-      .flatMap((runGroup) => runGroup.runs)
-      .find(
-        (run) =>
-          (run.status && isFailedStatus(run.status)) ||
-          (run.numFailedTasks && run.numFailedTasks > 0),
-      );
+  // Check if we should suppress failure notifications due to AI fix
+  const shouldSuppressFailure = shouldSuppressCIPEFailureNotification(newCIPE);
 
-    // if the cipe has completed somehow or had a failed run before the latest update,
-    // we've already shown a notification and can return
-    // the one exception is if we supressed the notification because we thought an AI fix might be coming
-    // and now we know no AI fix is coming after 5 minutes AND we haven't shown this delayed notification yet
-    const oldPotentiallyHasAiFix =
-      (oldCIPE?.runGroups || []).some((runGroup) => !!runGroup.aiFix) ||
-      (oldCIPE?.aiFixesEnabled &&
-        oldCIPE.status === 'FAILED' &&
-        oldCIPE.completedAt &&
-        oldCIPE.completedAt + 1000 * 60 * 5 >= Date.now());
-
-    const isDelayedNotificationTransition =
-      oldPotentiallyHasAiFix &&
-      !potentiallyHasAiFix &&
-      failedButNoAiFixInFiveMinutes;
-
-    const shouldSkipDueToCompletedCIPE =
-      oldCIPE &&
-      (oldCIPE.status !== 'IN_PROGRESS' || oldCIPEFailedRun) &&
-      !isDelayedNotificationTransition;
-
-    if (shouldSkipDueToCompletedCIPE) {
-      return;
+  // Show appropriate notification based on CIPE status
+  if (newCIPE.status === 'SUCCEEDED') {
+    if (notificationSetting === 'all') {
+      showSuccessNotification(newCIPE);
     }
-
-    if (newCIPEIsFailed && !potentiallyHasAiFix) {
-      showMessageWithResultAndCommit(
-        `CI failed for #${newCIPE.branch}.`,
-        newCIPE.cipeUrl,
-        newCIPE.commitUrl,
-        'error',
-      );
-    } else if (newCIPEFailedRun && !potentiallyHasAiFix) {
-      const command =
-        newCIPEFailedRun.command.length > 70
-          ? newCIPEFailedRun.command.substring(0, 60) + '[...]'
-          : newCIPEFailedRun.command;
-      showMessageWithResultAndCommit(
-        `"${command}" failed on #${newCIPE.branch}.`,
-        newCIPEFailedRun.runUrl,
-        newCIPE.commitUrl,
-        'error',
-      );
-    } else if (newCipeIsSucceeded && nxCloudNotificationsSetting === 'all') {
-      showMessageWithResultAndCommit(
-        `CI succeeded for #${newCIPE.branch}.`,
-        newCIPE.cipeUrl,
-        newCIPE.commitUrl,
-        'information',
-      );
+  } else if (isFailedStatus(newCIPE.status) && !shouldSuppressFailure) {
+    showFailureNotification(newCIPE);
+  } else if (newCIPE.status === 'IN_PROGRESS') {
+    // Check for failed runs within the IN_PROGRESS CIPE
+    const failedRun = findFailedRun(newCIPE);
+    if (failedRun && !shouldSuppressFailure) {
+      showFailureNotification(newCIPE, failedRun);
     }
   }
+}
+
+// Pure helper functions for AI fix detection
+const AI_FIX_WAIT_TIME_MS = 1000 * 60 * 5;
+
+function hasAnyAiFix(runGroups: CIPERunGroup[]): boolean {
+  return runGroups.some((runGroup) => !!runGroup.aiFix);
+}
+
+function hasPassedAiFixWaitTime(cipe: CIPEInfo): boolean {
+  if (!cipe.completedAt) {
+    return false;
+  }
+
+  return (
+    cipe.status === 'FAILED' &&
+    !hasAnyAiFix(cipe.runGroups || []) &&
+    cipe.completedAt + AI_FIX_WAIT_TIME_MS < Date.now()
+  );
+}
+
+function shouldSuppressCIPEFailureNotification(cipe: CIPEInfo): boolean {
+  return (
+    hasAnyAiFix(cipe.runGroups || []) ||
+    (cipe.aiFixesEnabled && !hasPassedAiFixWaitTime(cipe))
+  );
+}
+
+function findNewAiFixes(
+  newRunGroups: CIPERunGroup[],
+  oldRunGroups: CIPERunGroup[],
+): CIPERunGroup[] {
+  const newFixRunGroups: CIPERunGroup[] = [];
+
+  for (const newRunGroup of newRunGroups) {
+    if (
+      newRunGroup.aiFix?.suggestedFix &&
+      newRunGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
+    ) {
+      const oldRunGroup = oldRunGroups.find(
+        (rg) => rg.runGroup === newRunGroup.runGroup,
+      );
+      if (!oldRunGroup?.aiFix?.suggestedFix) {
+        newFixRunGroups.push(newRunGroup);
+      }
+    }
+  }
+
+  return newFixRunGroups;
+}
+
+// Pure helper functions for CIPE comparison
+function findFailedRun(cipe: CIPEInfo): CIPERun | undefined {
+  return cipe.runGroups
+    .flatMap((runGroup) => runGroup.runs)
+    .find(
+      (run) =>
+        (run.status && isFailedStatus(run.status)) ||
+        (run.numFailedTasks && run.numFailedTasks > 0),
+    );
+}
+
+function isDelayedNotification(
+  oldCIPE: CIPEInfo | undefined,
+  newCIPE: CIPEInfo,
+): boolean {
+  if (!oldCIPE) return false;
+
+  // This is the case where we previously suppressed a notification
+  // because we were waiting for an AI fix, but now the wait time has passed
+  // and no fix has arrived
+  const wasSuppressed = shouldSuppressCIPEFailureNotification(oldCIPE);
+  const isNoLongerSuppressed = !shouldSuppressCIPEFailureNotification(newCIPE);
+  const hasPassedWaitTime = hasPassedAiFixWaitTime(newCIPE);
+
+  return wasSuppressed && isNoLongerSuppressed && hasPassedWaitTime;
+}
+
+// Helper functions for notification display
+function truncateCommand(command: string): string {
+  return command.length > 70 ? command.substring(0, 60) + '[...]' : command;
+}
+
+function showFailureNotification(cipe: CIPEInfo, failedRun?: CIPERun) {
+  if (failedRun) {
+    const command = truncateCommand(failedRun.command);
+    showMessageWithResultAndCommit(
+      `"${command}" failed on #${cipe.branch}.`,
+      failedRun.runUrl,
+      cipe.commitUrl,
+      'error',
+    );
+  } else {
+    showMessageWithResultAndCommit(
+      `CI failed for #${cipe.branch}.`,
+      cipe.cipeUrl,
+      cipe.commitUrl,
+      'error',
+    );
+  }
+}
+
+function showSuccessNotification(cipe: CIPEInfo) {
+  showMessageWithResultAndCommit(
+    `CI succeeded for #${cipe.branch}.`,
+    cipe.cipeUrl,
+    cipe.commitUrl,
+    'information',
+  );
+}
+
+function shouldShowCIPENotification(
+  oldCIPE: CIPEInfo | undefined,
+  newCIPE: CIPEInfo,
+): boolean {
+  // If there's no old CIPE, this is a new CIPE appearing in our list
+  if (!oldCIPE) {
+    // For new CIPEs, show notification if:
+    // 1. It's completed/failed (not IN_PROGRESS)
+    // 2. OR it's IN_PROGRESS but has failed runs
+    return newCIPE.status !== 'IN_PROGRESS' || !!findFailedRun(newCIPE);
+  }
+
+  // Check if this is a delayed notification scenario
+  // (we previously suppressed due to waiting for AI fix, but time has passed)
+  const isDelayed = isDelayedNotification(oldCIPE, newCIPE);
+
+  // If the CIPE was already completed or had failed runs,
+  // we've likely already shown a notification
+  const wasAlreadyNotified =
+    oldCIPE.status !== 'IN_PROGRESS' || !!findFailedRun(oldCIPE);
+
+  // Show notification if:
+  // 1. It's a delayed notification (we suppressed before, now showing)
+  // 2. It's a new completion/failure (wasn't already notified)
+  return isDelayed || !wasAlreadyNotified;
 }
 
 function showMessageWithResultAndCommit(
