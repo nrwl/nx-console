@@ -25,10 +25,6 @@ import {
   window,
 } from 'vscode';
 import { createActor } from 'xstate';
-import {
-  compareCIPEDataAndSendNotification,
-  disposeAiFixStatusBarItem,
-} from './cipe-notifications';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
@@ -37,9 +33,15 @@ import {
   closeCloudFixDiffTab,
   NxCloudFixWebview,
 } from './nx-cloud-fix-webview';
+import {
+  CIPENotificationService,
+  disposeAiFixStatusBarItem,
+} from './cipe-notification-service';
 
 export function initNxCloudView(context: ExtensionContext) {
   closeCloudFixDiffTab();
+
+  const notificationService = new CIPENotificationService();
 
   // set up state machine & listeners
   const actor = createActor(
@@ -52,7 +54,10 @@ export function initNxCloudView(context: ExtensionContext) {
             newData: CIPEInfo[];
           },
         ) => {
-          compareCIPEDataAndSendNotification(params.oldData, params.newData);
+          notificationService.compareCIPEDataAndSendNotifications(
+            params.oldData,
+            params.newData,
+          );
         },
         setViewVisible: (_, params: { viewId: string }) => {
           setCloudViewContext(params.viewId);
