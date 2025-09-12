@@ -5,6 +5,7 @@ import {
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getNxVersion,
+  getNxWorkspaceProjects,
   getProjectByPath,
   getSourceMapFilesToProjectsMap,
 } from '@nx-console/vscode-nx-workspace';
@@ -27,6 +28,7 @@ import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { AtomizedFileCodelensProvider } from './atomized-file-codelens-provider';
 import { gte } from '@nx-console/nx-version';
+import { selectProject } from '@nx-console/vscode-nx-cli-quickpicks';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -77,50 +79,48 @@ function registerCommand(context: ExtensionContext) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
-          let path: string | undefined;
 
-          // Handle both Uri (from context menu) and config object (from other sources)
-          if (config instanceof Uri) {
-            // Called from context menu with a Uri
-            path = config.fsPath;
-            // Check if the path actually points to a project
-            const project = await getProjectByPath(path);
-            if (!project) {
-              showNoProjectAtPathMessage(path);
+        let path: string | undefined;
+
+        // called with uri: triggered from context menu
+        if (config instanceof Uri) {
+          path = config.fsPath;
+          const project = await getProjectByPath(path);
+          if (!project) {
+            showNoProjectAtPathMessage(path);
+            return;
+          }
+          // called with document: triggered from editor toolbar
+        } else if (config?.document) {
+          path = config.document.uri.path;
+          // called with neither: triggered from command palette
+        } else {
+          path = window.activeTextEditor?.document.uri.path;
+
+          if (!path) {
+            const projects = await getNxWorkspaceProjects();
+            const selectedProject = await selectProject(Object.keys(projects), {
+              placeholderText: 'Select a project to view details for',
+            });
+
+            if (!selectedProject) {
               return;
             }
-          } else if (config?.document) {
-            path = config.document.uri.path;
-          } else {
-            path = window.activeTextEditor?.document.uri.path;
-          }
 
-          if (!path) return;
+            path = projects[selectedProject].data.root;
+          }
+        }
+
+        if (!path) return;
+        if (gte(nxVersion, '17.3.0-beta.3')) {
           projectDetailsManager.openProjectDetailsToSide(
             path,
             config instanceof Uri ? undefined : config?.expandTarget,
           );
         } else {
-          // Handle legacy Nx versions
-          let uri: Uri | undefined;
-
-          if (config instanceof Uri) {
-            uri = config;
-            // Check if the path actually points to a project
-            const project = await getProjectByPath(uri.fsPath);
-            if (!project) {
-              showNoProjectAtPathMessage(uri.fsPath);
-              return;
-            }
-          } else {
-            uri = window.activeTextEditor?.document.uri;
-          }
-
-          if (!uri) return;
-          const project = await getProjectByPath(uri.path);
+          const project = await getProjectByPath(path);
           if (!project) {
-            showNoProjectAtPathMessage(uri.path);
+            showNoProjectAtPathMessage(path);
             return;
           }
           const doc = await workspace.openTextDocument(

@@ -19,6 +19,9 @@
       "path": "../graph-base"
     },
     {
+      "path": "../nx-cli-quickpicks"
+    },
+    {
       "path": "../../shared/nx-version"
     },
     {
