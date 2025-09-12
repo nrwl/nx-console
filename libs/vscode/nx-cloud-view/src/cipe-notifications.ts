@@ -107,7 +107,7 @@ export function compareCIPEDataAndSendNotification(
       !isDelayedNotificationTransition;
 
     if (shouldSkipDueToCompletedCIPE) {
-      return;
+      continue;
     }
 
     if (newCIPEIsFailed && !potentiallyHasAiFix) {
