@@ -2,7 +2,15 @@ group = "dev.nx.console"
 
 layout.buildDirectory = File("dist")
 
-allprojects { apply { plugin("project-report") } }
+plugins {
+    id("dev.nx.gradle.project-graph") version "0.1.7"
+}
+
+allprojects {
+    apply {
+        plugin("dev.nx.gradle.project-graph")
+    }
+}
 
 tasks {
     register("projectReportAll") {
