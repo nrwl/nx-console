@@ -620,9 +620,8 @@ describe('CIPE Notifications', () => {
 
     describe('AI Fix Suppression Logic', () => {
       it('should suppress failure notifications but show AI fix notification when AI fix becomes available', () => {
-        const notificationService = new CIPENotificationService();
         // CIPE failure with AI fix - should suppress error notification but show AI fix notification
-        notificationService.compareCIPEDataAndSendNotifications(
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
           pipelineExamples.progress,
           pipelineExamples.failWithAiFix,
         );
@@ -637,7 +636,7 @@ describe('CIPE Notifications', () => {
         jest.clearAllMocks();
 
         // Run failure with AI fix - should suppress error notification but show AI fix notification
-        notificationService.compareCIPEDataAndSendNotifications(
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
           pipelineExamples.progress,
           pipelineExamples.progressFailedRunWithAiFix,
         );

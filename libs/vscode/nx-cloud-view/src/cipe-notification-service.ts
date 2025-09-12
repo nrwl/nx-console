@@ -134,9 +134,8 @@ export class CIPENotificationService {
     oldCIPE: CIPEInfo | undefined,
     newCIPE: CIPEInfo,
   ) {
-    // Check for AI fixes to notify about
+    // AI fix notifications
     if (oldCIPE) {
-      // Compare with old CIPE to find new AI fixes
       const newAiFixes = findNewAiFixes(
         newCIPE.runGroups || [],
         oldCIPE.runGroups || [],
@@ -157,18 +156,11 @@ export class CIPENotificationService {
     }
 
     const couldShow = couldShowCIPENotification(oldCIPE, newCIPE);
-
     if (!couldShow) {
-      const wasSuppressed = shouldSuppressCIPEFailureNotification(oldCIPE);
-      const isNoLongerSuppressed =
-        !shouldSuppressCIPEFailureNotification(newCIPE);
-      const hasPassedWaitTime = hasPassedAiFixWaitTime(newCIPE);
-
-      if (!wasSuppressed || !isNoLongerSuppressed || !hasPassedWaitTime) {
-        return;
-      }
+      return;
     }
 
+    // CIPE success notifications
     if (newCIPE.status === 'SUCCEEDED') {
       if (this.nxCloudNotificationsSetting === 'all') {
         this.showCIPESuccessNotification(newCIPE);
@@ -183,25 +175,54 @@ export class CIPENotificationService {
       return;
     }
 
-    // Show appropriate notification based on CIPE status
+    // CIPE error notifications
     if (isFailedStatus(newCIPE.status)) {
       this.showCIPEFailureNotification(newCIPE);
       return;
     }
+
+    // run failed notifications
     const failedRun = findFailedRun(newCIPE);
     if (newCIPE.status === 'IN_PROGRESS' && failedRun) {
-      // Check for failed runs within the IN_PROGRESS CIPE
       this.showCommandFailureNotification(newCIPE, failedRun);
       return;
     }
   }
 }
 
-const AI_FIX_WAIT_TIME_MS = 1000 * 60 * 5;
+function couldShowCIPENotification(
+  oldCIPE: CIPEInfo | undefined,
+  newCIPE: CIPEInfo,
+): boolean {
+  // If there's no old CIPE, this is a new CIPE appearing in our list
+  if (!oldCIPE) {
+    // For new CIPEs, we could show notifications if:
+    // 1. It's completed/failed (not IN_PROGRESS)
+    // 2. OR it's IN_PROGRESS but has failed runs
+    return newCIPE.status !== 'IN_PROGRESS' || !!findFailedRun(newCIPE);
+  }
 
-function hasAnyAiFix(runGroups: CIPERunGroup[]): boolean {
-  return runGroups.some((runGroup) => !!runGroup.aiFix);
+  // we don't want to send notifications for status changes that
+  // would've triggered a notification in the past
+  const oldCipeHadNotifiableState =
+    oldCIPE.status !== 'IN_PROGRESS' || !!findFailedRun(oldCIPE);
+
+  if (oldCipeHadNotifiableState) {
+    // the one exception to this is if the CIPE was previously suppressed
+    const wasSuppressed = shouldSuppressCIPEFailureNotification(oldCIPE);
+    const isNoLongerSuppressed =
+      !shouldSuppressCIPEFailureNotification(newCIPE);
+    const hasPassedWaitTime = hasPassedAiFixWaitTime(newCIPE);
+
+    return wasSuppressed && isNoLongerSuppressed && hasPassedWaitTime;
+  } else {
+    return true;
+  }
 }
+
+// When a CIPE fails, we will wait up to five minutes for an AI fix to become available
+// during that time, we don't show failure notifications
+const AI_FIX_WAIT_TIME_MS = 1000 * 60 * 5;
 
 function hasPassedAiFixWaitTime(cipe: CIPEInfo): boolean {
   if (!cipe.completedAt) {
@@ -225,6 +246,11 @@ function shouldSuppressCIPEFailureNotification(
     hasAnyAiFix(cipe.runGroups || []) ||
     (cipe.aiFixesEnabled && !hasPassedAiFixWaitTime(cipe))
   );
+}
+
+// helper functions
+function hasAnyAiFix(runGroups: CIPERunGroup[]): boolean {
+  return runGroups.some((runGroup) => !!runGroup.aiFix);
 }
 
 function findNewAiFixes(
@@ -262,23 +288,6 @@ function findFailedRun(cipe: CIPEInfo): CIPERun | undefined {
 
 function truncateCommand(command: string): string {
   return command.length > 70 ? command.substring(0, 60) + '[...]' : command;
-}
-
-function couldShowCIPENotification(
-  oldCIPE: CIPEInfo | undefined,
-  newCIPE: CIPEInfo,
-): boolean {
-  // If there's no old CIPE, this is a new CIPE appearing in our list
-  if (!oldCIPE) {
-    // For new CIPEs, we could show notifications if:
-    // 1. It's completed/failed (not IN_PROGRESS)
-    // 2. OR it's IN_PROGRESS but has failed runs
-    return newCIPE.status !== 'IN_PROGRESS' || !!findFailedRun(newCIPE);
-  }
-  const oldCipeHadNotifiableState =
-    oldCIPE.status !== 'IN_PROGRESS' || !!findFailedRun(oldCIPE);
-
-  return !oldCipeHadNotifiableState;
 }
 
 function showMessageWithResultAndCommit(
@@ -331,6 +340,11 @@ function showMessageWithResultAndCommit(
   show(message, ...messageCommands).then(handleResults);
 }
 
+function getAIFixMessage(branch: string) {
+  return `CI failed. Nx Cloud AI has a fix for #${branch}`;
+}
+
+// status bar updates
 export function disposeAiFixStatusBarItem() {
   if (aiFixStatusBarItem) {
     aiFixStatusBarItem.dispose();
@@ -387,8 +401,4 @@ export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
     // Hide status bar if no fixes available
     hideAiFixStatusBarItem();
   }
-}
-
-function getAIFixMessage(branch: string) {
-  return `CI failed. Nx Cloud AI has a fix for #${branch}`;
 }
