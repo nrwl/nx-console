@@ -5,6 +5,7 @@ import {
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getNxVersion,
+  getNxWorkspaceProjects,
   getProjectByPath,
   getSourceMapFilesToProjectsMap,
 } from '@nx-console/vscode-nx-workspace';
@@ -27,6 +28,7 @@ import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { AtomizedFileCodelensProvider } from './atomized-file-codelens-provider';
 import { gte } from '@nx-console/nx-version';
+import { selectProject } from '@nx-console/vscode-nx-cli-quickpicks';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();
@@ -47,7 +49,7 @@ function registerCommand(context: ExtensionContext) {
   const projectDetailsProvider = new ProjectDetailsProvider();
   workspace.registerTextDocumentContentProvider(
     'project-details',
-    projectDetailsProvider
+    projectDetailsProvider,
   );
 
   context.subscriptions.push(
@@ -55,51 +57,82 @@ function registerCommand(context: ExtensionContext) {
       'nx.project-details.openToSide',
       async (
         config:
+          | Uri
           | {
               document?: TextDocument;
               expandTarget?: string;
             }
-          | undefined
+          | undefined,
       ) => {
         const isEnabled = GlobalConfigurationStore.instance.get(
-          'showProjectDetailsView'
+          'showProjectDetailsView',
         );
         if (!isEnabled) return;
         const nxVersion = await getNxVersion();
-        getTelemetry().logUsage('misc.open-pdv');
+
+        // Determine the source based on the argument type
+        const source =
+          config instanceof Uri ? 'explorer-context-menu' : 'command';
+        getTelemetry().logUsage('misc.open-pdv', { source });
 
         if (!nxVersion) {
           showNoNxVersionMessage();
           return;
         }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
-          let document = config?.document;
-          if (!document) {
-            document = window.activeTextEditor?.document;
+
+        let path: string | undefined;
+
+        // called with uri: triggered from context menu
+        if (config instanceof Uri) {
+          path = config.fsPath;
+          const project = await getProjectByPath(path);
+          if (!project) {
+            showNoProjectAtPathMessage(path);
+            return;
           }
-          if (!document) return;
+          // called with document: triggered from editor toolbar
+        } else if (config?.document) {
+          path = config.document.uri.path;
+          // called with neither: triggered from command palette
+        } else {
+          path = window.activeTextEditor?.document.uri.path;
+
+          if (!path) {
+            const projects = await getNxWorkspaceProjects();
+            const selectedProject = await selectProject(Object.keys(projects), {
+              placeholderText: 'Select a project to view details for',
+            });
+
+            if (!selectedProject) {
+              return;
+            }
+
+            path = projects[selectedProject].data.root;
+          }
+        }
+
+        if (!path) return;
+        if (gte(nxVersion, '17.3.0-beta.3')) {
           projectDetailsManager.openProjectDetailsToSide(
-            document,
-            config?.expandTarget
+            path,
+            config instanceof Uri ? undefined : config?.expandTarget,
           );
         } else {
-          const uri = window.activeTextEditor?.document.uri;
-          if (!uri) return;
-          const project = await getProjectByPath(uri.path);
+          const project = await getProjectByPath(path);
           if (!project) {
-            showNoProjectAtPathMessage(uri.path);
+            showNoProjectAtPathMessage(path);
             return;
           }
           const doc = await workspace.openTextDocument(
-            Uri.parse(`project-details:${project.name}.project.json`)
+            Uri.parse(`project-details:${project.name}.project.json`),
           );
           await window.showTextDocument(doc, {
             preview: false,
             viewColumn: ViewColumn.Beside,
           });
         }
-      }
-    )
+      },
+    ),
   );
 }
 
@@ -112,7 +145,7 @@ async function setProjectDetailsFileContext() {
         Object.keys(sourceMapFilesToProjectMap ?? {}).flatMap((path) => [
           join(nxWorkspacePath, path),
           join(nxWorkspacePath, dirname(path), 'package.json'),
-        ])
+        ]),
       ),
     ];
     commands.executeCommand('setContext', 'nxConsole.pdvPaths', pdvPaths);
