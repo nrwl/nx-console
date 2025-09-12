@@ -4,8 +4,6 @@ import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { commands, window, StatusBarItem, StatusBarAlignment } from 'vscode';
 
-let aiFixStatusBarItem: StatusBarItem | undefined;
-
 export class CIPENotificationService {
   private sentNotifications = new Set<string>();
 
@@ -21,9 +19,6 @@ export class CIPENotificationService {
     oldInfo: CIPEInfo[] | null,
     newInfo: CIPEInfo[],
   ) {
-    // Always update status bar first
-    updateAiFixStatusBar(newInfo);
-
     this.nxCloudNotificationsSetting = GlobalConfigurationStore.instance.get(
       'nxCloudNotifications',
     );
@@ -50,10 +45,65 @@ export class CIPENotificationService {
         (old) => old.ciPipelineExecutionId === cipeId,
       );
       this.processCIPENotifications(oldCIPE, newCIPE);
-      //   const cipeId = newCIPE.ciPipelineExecutionId;
-      //   if (!this.sentNotifications.has(cipeId)) {
-      //     this.processCIPENotifications(newCIPE);
-      //   }
+    }
+  }
+
+  private processCIPENotifications(
+    oldCIPE: CIPEInfo | undefined,
+    newCIPE: CIPEInfo,
+  ) {
+    // AI fix notifications
+    if (oldCIPE) {
+      const newAiFixes = findNewAiFixes(
+        newCIPE.runGroups || [],
+        oldCIPE.runGroups || [],
+      );
+      for (const runGroup of newAiFixes) {
+        this.showAiFixNotification(newCIPE, runGroup);
+      }
+    } else {
+      // No old CIPE - show AI fix notification for any existing AI fixes
+      for (const runGroup of newCIPE.runGroups || []) {
+        if (
+          runGroup.aiFix?.suggestedFix &&
+          runGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
+        ) {
+          this.showAiFixNotification(newCIPE, runGroup);
+        }
+      }
+    }
+
+    const couldShow = couldShowCIPENotification(oldCIPE, newCIPE);
+    if (!couldShow) {
+      return;
+    }
+
+    // CIPE success notifications
+    if (newCIPE.status === 'SUCCEEDED') {
+      if (this.nxCloudNotificationsSetting === 'all') {
+        this.showCIPESuccessNotification(newCIPE);
+      }
+      return;
+    }
+
+    const shouldWaitForAiFix =
+      newCIPE.aiFixesEnabled && !hasPassedAiFixWaitTime(newCIPE);
+
+    if (shouldWaitForAiFix) {
+      return;
+    }
+
+    // CIPE error notifications
+    if (isFailedStatus(newCIPE.status)) {
+      this.showCIPEFailureNotification(newCIPE);
+      return;
+    }
+
+    // run failed notifications
+    const failedRun = findFailedRun(newCIPE);
+    if (newCIPE.status === 'IN_PROGRESS' && failedRun) {
+      this.showCommandFailureNotification(newCIPE, failedRun);
+      return;
     }
   }
 
@@ -128,65 +178,6 @@ export class CIPENotificationService {
     const message = getAIFixMessage(cipe.branch);
 
     window.showErrorMessage(message, ...messageCommands).then(handleResults);
-  }
-
-  private processCIPENotifications(
-    oldCIPE: CIPEInfo | undefined,
-    newCIPE: CIPEInfo,
-  ) {
-    // AI fix notifications
-    if (oldCIPE) {
-      const newAiFixes = findNewAiFixes(
-        newCIPE.runGroups || [],
-        oldCIPE.runGroups || [],
-      );
-      for (const runGroup of newAiFixes) {
-        this.showAiFixNotification(newCIPE, runGroup);
-      }
-    } else {
-      // No old CIPE - show AI fix notification for any existing AI fixes
-      for (const runGroup of newCIPE.runGroups || []) {
-        if (
-          runGroup.aiFix?.suggestedFix &&
-          runGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
-        ) {
-          this.showAiFixNotification(newCIPE, runGroup);
-        }
-      }
-    }
-
-    const couldShow = couldShowCIPENotification(oldCIPE, newCIPE);
-    if (!couldShow) {
-      return;
-    }
-
-    // CIPE success notifications
-    if (newCIPE.status === 'SUCCEEDED') {
-      if (this.nxCloudNotificationsSetting === 'all') {
-        this.showCIPESuccessNotification(newCIPE);
-      }
-      return;
-    }
-
-    const shouldWaitForAiFix =
-      newCIPE.aiFixesEnabled && !hasPassedAiFixWaitTime(newCIPE);
-
-    if (shouldWaitForAiFix) {
-      return;
-    }
-
-    // CIPE error notifications
-    if (isFailedStatus(newCIPE.status)) {
-      this.showCIPEFailureNotification(newCIPE);
-      return;
-    }
-
-    // run failed notifications
-    const failedRun = findFailedRun(newCIPE);
-    if (newCIPE.status === 'IN_PROGRESS' && failedRun) {
-      this.showCommandFailureNotification(newCIPE, failedRun);
-      return;
-    }
   }
 }
 
@@ -340,65 +331,6 @@ function showMessageWithResultAndCommit(
   show(message, ...messageCommands).then(handleResults);
 }
 
-function getAIFixMessage(branch: string) {
+export function getAIFixMessage(branch: string) {
   return `CI failed. Nx Cloud AI has a fix for #${branch}`;
-}
-
-// status bar updates
-export function disposeAiFixStatusBarItem() {
-  if (aiFixStatusBarItem) {
-    aiFixStatusBarItem.dispose();
-    aiFixStatusBarItem = undefined;
-  }
-}
-
-export function hideAiFixStatusBarItem() {
-  if (aiFixStatusBarItem) {
-    aiFixStatusBarItem.hide();
-  }
-}
-
-export function updateAiFixStatusBar(cipeData: CIPEInfo[]) {
-  let foundFix: { cipe: CIPEInfo; runGroup: CIPERunGroup } | null = null;
-
-  for (const cipe of cipeData) {
-    for (const runGroup of cipe.runGroups || []) {
-      if (
-        runGroup.aiFix?.suggestedFix &&
-        runGroup.aiFix.userAction === 'NONE'
-      ) {
-        foundFix = { cipe, runGroup };
-        break;
-      }
-    }
-    if (foundFix) break;
-  }
-
-  if (foundFix) {
-    if (!aiFixStatusBarItem) {
-      aiFixStatusBarItem = window.createStatusBarItem(
-        StatusBarAlignment.Left,
-        100,
-      );
-    }
-
-    const message = getAIFixMessage(foundFix.cipe.branch);
-
-    aiFixStatusBarItem.text = `$(wrench) Nx Cloud AI Fix`;
-    aiFixStatusBarItem.tooltip = message;
-    aiFixStatusBarItem.command = {
-      command: 'nxCloud.openFixDetails',
-      title: 'Show Error Details',
-      arguments: [
-        {
-          cipeId: foundFix.cipe.ciPipelineExecutionId,
-          runGroupId: foundFix.runGroup.runGroup,
-        },
-      ],
-    };
-    aiFixStatusBarItem.show();
-  } else {
-    // Hide status bar if no fixes available
-    hideAiFixStatusBarItem();
-  }
 }

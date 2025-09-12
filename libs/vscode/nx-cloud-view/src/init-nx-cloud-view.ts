@@ -33,15 +33,14 @@ import {
   closeCloudFixDiffTab,
   NxCloudFixWebview,
 } from './nx-cloud-fix-webview';
-import {
-  CIPENotificationService,
-  disposeAiFixStatusBarItem,
-} from './cipe-notification-service';
+import { CIPENotificationService } from './cipe-notification-service';
+import { AiFixStatusBarService } from './ai-fix-status-bar-service';
 
 export function initNxCloudView(context: ExtensionContext) {
   closeCloudFixDiffTab();
 
   const notificationService = new CIPENotificationService();
+  const statusBarService = new AiFixStatusBarService();
 
   // set up state machine & listeners
   const actor = createActor(
@@ -54,6 +53,7 @@ export function initNxCloudView(context: ExtensionContext) {
             newData: CIPEInfo[];
           },
         ) => {
+          statusBarService.updateAiFixStatusBar(params.newData);
           notificationService.compareCIPEDataAndSendNotifications(
             params.oldData,
             params.newData,
@@ -115,7 +115,7 @@ export function initNxCloudView(context: ExtensionContext) {
     showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' }),
-    { dispose: () => disposeAiFixStatusBarItem() },
+    statusBarService,
   );
 
   // register commands
