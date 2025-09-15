@@ -30,7 +30,7 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v3
+        uses: gradle/actions/wrapper-validation@v3
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
