@@ -39,6 +39,7 @@ export type NxAiFix = {
   verificationStatus: AITaskFixStatus;
   userAction: AITaskFixUserAction;
   userActionOrigin?: AITaskFixUserActionOrigin;
+  couldAutoApplyTasks?: boolean;
 };
 
 export type CIPERunGroup = {
@@ -62,7 +63,8 @@ export type AITaskFixUserAction =
   | 'NONE'
   | 'APPLIED'
   | 'REJECTED'
-  | 'APPLIED_LOCALLY';
+  | 'APPLIED_LOCALLY'
+  | 'APPLIED_AUTOMATICALLY';
 
 export type AITaskFixUserActionOrigin =
   | 'NX_CLOUD_APP'

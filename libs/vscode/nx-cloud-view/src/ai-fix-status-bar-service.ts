@@ -3,6 +3,14 @@ import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { Disposable } from 'vscode-languageserver';
 import { getAIFixMessage } from './cipe-notification-service';
 
+let __instance: AiFixStatusBarService | undefined = undefined;
+export function getAiFixStatusBarService(): AiFixStatusBarService {
+  if (!__instance) {
+    __instance = new AiFixStatusBarService();
+  }
+  return __instance;
+}
+
 export class AiFixStatusBarService implements Disposable {
   private aiFixStatusBarItem: StatusBarItem | undefined;
 

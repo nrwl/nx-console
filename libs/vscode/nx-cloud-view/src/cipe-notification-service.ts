@@ -1,8 +1,9 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { commands, window, StatusBarItem, StatusBarAlignment } from 'vscode';
+import { commands, window } from 'vscode';
 
 export class CIPENotificationService {
   private sentNotifications = new Set<string>();
@@ -44,6 +45,7 @@ export class CIPENotificationService {
       const oldCIPE = oldInfo.find(
         (old) => old.ciPipelineExecutionId === cipeId,
       );
+      this.processAIFixNotifications(oldCIPE, newCIPE);
       this.processCIPENotifications(oldCIPE, newCIPE);
     }
   }
@@ -52,27 +54,6 @@ export class CIPENotificationService {
     oldCIPE: CIPEInfo | undefined,
     newCIPE: CIPEInfo,
   ) {
-    // AI fix notifications
-    if (oldCIPE) {
-      const newAiFixes = findNewAiFixes(
-        newCIPE.runGroups || [],
-        oldCIPE.runGroups || [],
-      );
-      for (const runGroup of newAiFixes) {
-        this.showAiFixNotification(newCIPE, runGroup);
-      }
-    } else {
-      // No old CIPE - show AI fix notification for any existing AI fixes
-      for (const runGroup of newCIPE.runGroups || []) {
-        if (
-          runGroup.aiFix?.suggestedFix &&
-          runGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
-        ) {
-          this.showAiFixNotification(newCIPE, runGroup);
-        }
-      }
-    }
-
     const couldShow = couldShowCIPENotification(oldCIPE, newCIPE);
     if (!couldShow) {
       return;
@@ -104,6 +85,42 @@ export class CIPENotificationService {
     if (newCIPE.status === 'IN_PROGRESS' && failedRun) {
       this.showCommandFailureNotification(newCIPE, failedRun);
       return;
+    }
+  }
+
+  private processAIFixNotifications(
+    oldCIPE: CIPEInfo | undefined,
+    newCIPE: CIPEInfo,
+  ) {
+    let runGroupsToProcess: CIPERunGroup[] | undefined = undefined;
+    // only process AI fixes for rungroups with new ai fixes
+    if (oldCIPE) {
+      runGroupsToProcess = findRunGroupsWithNewAiFixes(
+        newCIPE.runGroups || [],
+        oldCIPE.runGroups || [],
+      );
+    } else {
+      // No old CIPE - process AI fix notification for any existing AI fixes
+      runGroupsToProcess = newCIPE.runGroups;
+    }
+
+    if (!runGroupsToProcess) {
+      return;
+    }
+    runGroupsToProcess = runGroupsToProcess.filter(
+      (rg) =>
+        rg.aiFix?.suggestedFix && rg.aiFix.suggestedFixStatus !== 'NOT_STARTED',
+    );
+    for (const runGroup of runGroupsToProcess) {
+      // if auto apply is enabled, we don't show the notification until after verification is complete
+      if (
+        runGroup.aiFix &&
+        runGroup.aiFix.couldAutoApplyTasks &&
+        runGroup.aiFix.verificationStatus !== 'COMPLETED'
+      ) {
+        continue;
+      }
+      this.showAiFixNotification(newCIPE, runGroup);
     }
   }
 
@@ -153,6 +170,35 @@ export class CIPENotificationService {
     }
     this.sentNotifications.add(cipe.ciPipelineExecutionId);
     const telemetry = getTelemetry();
+
+    // Check if the fix was applied automatically
+    if (runGroup.aiFix?.userAction === 'APPLIED_AUTOMATICALLY') {
+      telemetry.logUsage('cloud.show-ai-fix-notification', {
+        source: 'notification',
+      });
+
+      const message = `Nx Cloud automatically applied a fix for #${cipe.branch}`;
+
+      const notificationCommands: 'View PR'[] = [];
+
+      if (cipe.commitUrl) {
+        notificationCommands.push('View PR');
+      }
+
+      window
+        .showInformationMessage(message, ...notificationCommands)
+        .then((selection) => {
+          if (selection === 'View PR') {
+            telemetry.logUsage('cloud.show-ai-fix', {
+              source: 'notification',
+            });
+            commands.executeCommand('vscode.open', cipe.commitUrl);
+          }
+        });
+      return;
+    }
+
+    // Original notification for manual fixes
     telemetry.logUsage('cloud.show-ai-fix-notification');
 
     type MessageCommand = 'Show Fix' | 'Reject';
@@ -244,23 +290,25 @@ function hasAnyAiFix(runGroups: CIPERunGroup[]): boolean {
   return runGroups.some((runGroup) => !!runGroup.aiFix);
 }
 
-function findNewAiFixes(
+function findRunGroupsWithNewAiFixes(
   newRunGroups: CIPERunGroup[],
   oldRunGroups: CIPERunGroup[],
 ): CIPERunGroup[] {
   const newFixRunGroups: CIPERunGroup[] = [];
 
   for (const newRunGroup of newRunGroups) {
-    if (
-      newRunGroup.aiFix?.suggestedFix &&
-      newRunGroup.aiFix.suggestedFixStatus !== 'NOT_STARTED'
-    ) {
-      const oldRunGroup = oldRunGroups.find(
-        (rg) => rg.runGroup === newRunGroup.runGroup,
-      );
-      if (!oldRunGroup?.aiFix?.suggestedFix) {
-        newFixRunGroups.push(newRunGroup);
-      }
+    const oldRunGroup = oldRunGroups.find(
+      (rg) => rg.runGroup === newRunGroup.runGroup,
+    );
+
+    // Trigger if there's no old AI fix, or if userAction has changed
+    const hasNewFix =
+      !oldRunGroup?.aiFix?.suggestedFix && newRunGroup.aiFix?.suggestedFix;
+    const hasUserActionChange =
+      oldRunGroup?.aiFix?.userAction !== newRunGroup.aiFix?.userAction;
+
+    if (hasNewFix || hasUserActionChange) {
+      newFixRunGroups.push(newRunGroup);
     }
   }
 

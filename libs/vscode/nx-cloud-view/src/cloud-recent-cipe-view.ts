@@ -519,7 +519,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       commands.registerCommand(
         'nxCloud.showCIPEInApp',
         async (treeItem: BaseRecentCIPETreeItem) => {
-          if (!treeItem.isCIPETreeItem()) {
+          if (!treeItem || !treeItem.isCIPETreeItem()) {
             return;
           }
           getTelemetry().logUsage('cloud.view-cipe', {
@@ -543,7 +543,7 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       commands.registerCommand(
         'nxCloud.showCommitForCIPE',
         async (treeItem: BaseRecentCIPETreeItem) => {
-          if (!treeItem.isCIPETreeItem()) {
+          if (!treeItem || !treeItem.isCIPETreeItem()) {
             return;
           }
           if (treeItem.cipe.commitUrl) {
