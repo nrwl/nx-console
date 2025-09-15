@@ -30,6 +30,9 @@
       "path": "../graph-base/tsconfig.lib.json"
     },
     {
+      "path": "../nx-cli-quickpicks/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/nx-version/tsconfig.lib.json"
     },
     {

@@ -4,6 +4,7 @@ import {
   getNxWorkspacePathFromNxls,
 } from '@nx-console/vscode-nx-workspace';
 import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
+import { createProjectTargetString } from '@nx-console/vscode-utils';
 import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
@@ -41,18 +42,18 @@ export class CliTaskProvider implements TaskProvider {
         Object.keys(project.data.targets ?? {}).forEach((targetName) => {
           projectTargetCombinations.push([projectName, targetName]);
         });
-      }
+      },
     );
 
     return CliTask.batchCreate(
       projectTargetCombinations.map(([projectName, targetName]) => {
         return {
           command: 'run',
-          positional: `${projectName}:${targetName}`,
+          positional: createProjectTargetString(projectName, targetName),
           flags: [],
         };
       }),
-      nxWorkspace
+      nxWorkspace,
     );
   }
 
@@ -80,7 +81,7 @@ export class CliTaskProvider implements TaskProvider {
 
     let task;
     const positionals = definition.positional?.match(
-      WORKSPACE_GENERATOR_NAME_REGEX
+      WORKSPACE_GENERATOR_NAME_REGEX,
     );
     try {
       if (

@@ -6,6 +6,7 @@ import { selectFlags } from './select-flags';
 import {
   showNoProjectsMessage,
   showNoTargetsMessage,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 
 export async function selectRunInformation(
@@ -13,7 +14,7 @@ export async function selectRunInformation(
   targetName?: string,
   configuration?: string,
   askForFlags = true,
-  selectTargetFirst = false
+  selectTargetFirst = false,
 ): Promise<
   | {
       projectName: string;
@@ -58,7 +59,7 @@ export async function selectRunInformation(
   const builderDefinition = await verifyBuilderDefinition(
     projectName,
     targetName,
-    projectGraph
+    projectGraph,
   );
   const {
     validBuilder,
@@ -84,13 +85,13 @@ export async function selectRunInformation(
     }
 
     flags = await selectFlags(
-      `run ${projectName}:${surroundWithQuotesIfHasWhiteSpace(targetName)}`,
+      `run ${createProjectTargetString(projectName, targetName)}`,
       options,
       configuration
         ? {
             configuration,
           }
-        : undefined
+        : undefined,
     );
 
     return { flags, projectName, targetName, configuration };
@@ -100,7 +101,7 @@ export async function selectRunInformation(
 
 async function selectProjectAndThenTarget(
   projectName?: string,
-  targetName?: string
+  targetName?: string,
 ): Promise<{ projectName: string; targetName: string } | undefined> {
   let p = projectName;
   let t = targetName;
@@ -129,7 +130,7 @@ async function selectProjectAndThenTarget(
 
 async function selectTargetAndThenProject(
   projectName?: string,
-  targetName?: string
+  targetName?: string,
 ): Promise<{ projectName: string; targetName: string } | undefined> {
   let p = projectName;
   let t = targetName;
@@ -177,7 +178,7 @@ async function getTargets(projectName?: string): Promise<string[]> {
 
   if (projectName) {
     return Object.keys(
-      projectGraph.nodes[projectName].data.targets || {}
+      projectGraph.nodes[projectName].data.targets || {},
     ).sort();
   }
 
@@ -187,7 +188,7 @@ async function getTargets(projectName?: string): Promise<string[]> {
         acc.add(target);
       }
       return acc;
-    }, new Set<string>())
+    }, new Set<string>()),
   ).sort();
 }
 
@@ -207,7 +208,7 @@ async function getProjects(targetName?: string): Promise<string[] | undefined> {
           {
             data: { targets },
           },
-        ]) => targets && Object.keys(targets).includes(targetName)
+        ]) => targets && Object.keys(targets).includes(targetName),
       )
       .map(([project]) => project);
   }
@@ -218,7 +219,7 @@ async function getProjects(targetName?: string): Promise<string[] | undefined> {
         {
           data: { targets },
         },
-      ]) => Boolean(targets)
+      ]) => Boolean(targets),
     )
     .map(([project]) => project);
 }
@@ -228,7 +229,7 @@ export async function selectProject(
   options?: {
     highlightedProject?: string;
     placeholderText?: string;
-  }
+  },
 ): Promise<string | undefined> {
   const quickPickItems = !options?.highlightedProject
     ? projects.map((p) => ({ label: p }))
@@ -254,16 +255,9 @@ export async function selectProject(
 }
 
 export async function selectTarget(
-  targets: string[]
+  targets: string[],
 ): Promise<string | undefined> {
   return window.showQuickPick(targets, {
     placeHolder: 'Target to run',
   });
-}
-
-function surroundWithQuotesIfHasWhiteSpace(target: string): string {
-  if (target.match(/\s/g)) {
-    return `"${target}"`;
-  }
-  return target;
 }

@@ -3,7 +3,7 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode-nx-workspace';
 import { showNoNxVersionMessage } from '@nx-console/vscode-output-channels';
-import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
+import { ExtensionContext, ViewColumn } from 'vscode';
 import {
   OldProjectDetailsPreview,
   ProjectDetailsPreview,
@@ -16,11 +16,7 @@ export class ProjectDetailsManager {
 
   constructor(private context: ExtensionContext) {}
 
-  async openProjectDetailsToSide(
-    document: TextDocument,
-    expandedTarget?: string
-  ) {
-    const path = document.uri.path;
+  async openProjectDetailsToSide(path: string, expandedTarget?: string) {
     let preview: ProjectDetailsPreview | undefined =
       await this.findMatchingPreview(path);
 
@@ -37,7 +33,7 @@ export class ProjectDetailsManager {
         preview = new OldProjectDetailsPreview(
           path,
           this.context,
-          expandedTarget
+          expandedTarget,
         );
       }
       preview.onDispose(() => {
@@ -50,7 +46,7 @@ export class ProjectDetailsManager {
   }
 
   private async findMatchingPreview(
-    path: string
+    path: string,
   ): Promise<ProjectDetailsPreview | undefined> {
     const directMatch = this.previews.get(path);
     if (directMatch) return directMatch;

@@ -1,6 +1,7 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
 import { getProjectByPath } from '@nx-console/vscode-nx-workspace';
+import { createProjectTargetString } from '@nx-console/vscode-utils';
 import { CliTaskProvider } from './cli-task-provider';
 
 import { selectRunInformation } from '@nx-console/vscode-nx-cli-quickpicks';
@@ -14,13 +15,13 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
         project?: string,
         target?: string,
         configuration?: string,
-        askForFlags?: boolean
+        askForFlags?: boolean,
       ) => {
         getTelemetry().logUsage('tasks.run', {
           source: target ? 'nx-commands-panel' : 'command',
         });
         selectRunInformationAndRun(project, target, configuration, askForFlags);
-      }
+      },
     ),
     commands.registerCommand(
       `nx.run.fileexplorer`,
@@ -37,13 +38,13 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
         }
 
         selectRunInformationAndRun(await getCliProjectFromUri(uri));
-      }
+      },
     ),
     commands.registerCommand(`nx.run.target`, async () => {
       getTelemetry().logUsage('tasks.run');
 
       selectRunInformationAndRun(undefined, undefined, undefined, true, true);
-    })
+    }),
   );
 }
 
@@ -52,14 +53,14 @@ export async function selectRunInformationAndRun(
   targetName?: string,
   configuration?: string,
   askForFlags = true,
-  selectTargetFirst = false
+  selectTargetFirst = false,
 ) {
   const runInformation = await selectRunInformation(
     projectName,
     targetName,
     configuration,
     askForFlags,
-    selectTargetFirst
+    selectTargetFirst,
   );
   if (
     !runInformation ||
@@ -76,9 +77,7 @@ export async function selectRunInformationAndRun(
     flags: f,
   } = runInformation;
 
-  const positional = c
-    ? `${p}:${surroundWithQuotesIfHasWhiteSpace(t)}:${c}`
-    : `${p}:${surroundWithQuotesIfHasWhiteSpace(t)}`;
+  const positional = createProjectTargetString(p, t, c);
   CliTaskProvider.instance.executeTask({
     positional,
     command: 'run',
@@ -86,15 +85,8 @@ export async function selectRunInformationAndRun(
   });
 }
 
-function surroundWithQuotesIfHasWhiteSpace(target: string): string {
-  if (target.match(/\s/g)) {
-    return `"${target}"`;
-  }
-  return target;
-}
-
 export async function getCliProjectFromUri(
-  uri: Uri
+  uri: Uri,
 ): Promise<string | undefined> {
   const project = await getProjectByPath(uri.fsPath);
   return project?.name;

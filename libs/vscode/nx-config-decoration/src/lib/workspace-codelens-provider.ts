@@ -18,6 +18,7 @@ import {
 import {
   NxCodeLensProvider,
   registerCodeLensProvider,
+  createProjectTargetString,
 } from '@nx-console/vscode-utils';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { ProjectLocations, getProjectLocations } from './get-project-locations';
@@ -204,9 +205,7 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
     if (lens instanceof TargetCodeLens) {
       const command: Command = {
         command: `nx.run`,
-        title: lens.configuration
-          ? `nx run ${lens.target}:${lens.configuration}`
-          : `nx run ${lens.target}`,
+        title: `nx run ${createProjectTargetString(lens.project, lens.target, lens.configuration)}`,
         arguments: [lens.project, lens.target, lens.configuration, false],
       };
       lens.command = command;
