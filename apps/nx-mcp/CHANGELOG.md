@@ -1,3 +1,17 @@
+## 0.6.4 (2025-09-15)
+
+### 🚀 Features
+
+- **nx-mcp:** update project_details tool description and return dependencies from it ([#2745](https://github.com/nrwl/nx-console/pull/2745))
+
+### 🩹 Fixes
+
+- **nx-mcp:** do not block mcp init with project graph computation ([#2752](https://github.com/nrwl/nx-console/pull/2752))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.6.3 (2025-08-27)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
