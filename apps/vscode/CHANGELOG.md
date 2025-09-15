@@ -1,3 +1,21 @@
+## 18.68.0 (2025-09-15)
+
+### 🚀 Features
+
+- **vscode:** add context menu action for opening project details ([#2757](https://github.com/nrwl/nx-console/pull/2757))
+
+### 🩹 Fixes
+
+- **vscode:** show error properly when updating fix ([#2758](https://github.com/nrwl/nx-console/pull/2758))
+- **vscode:** add logs link to no projects error view ([#2754](https://github.com/nrwl/nx-console/pull/2754))
+- **nx-mcp:** do not block mcp init with project graph computation ([#2752](https://github.com/nrwl/nx-console/pull/2752))
+- **vscode:** handle nxls STOP event during startup ([#2751](https://github.com/nrwl/nx-console/pull/2751))
+- **vscode:** handle # is project names when running tasks ([#2749](https://github.com/nrwl/nx-console/pull/2749))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.67.0 (2025-09-08)
 
 - **nx-mcp:** update project_details tool description and return dependencies from it ([#2745](https://github.com/nrwl/nx-console/pull/2745))
