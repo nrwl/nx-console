@@ -3,7 +3,6 @@ package dev.nx.console.utils
 import com.google.gson.JsonParser
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.util.SystemInfo
 import java.net.HttpURLConnection
 import java.net.URL
@@ -11,7 +10,6 @@ import java.util.Base64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import logger
 
 object NxProvenance {
 
