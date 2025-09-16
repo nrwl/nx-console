@@ -1,6 +1,6 @@
 import { CIPEInfo } from '@nx-console/shared-types';
 import { window } from 'vscode';
-import { compareCIPEDataAndSendNotification } from './cipe-notifications';
+import { CIPENotificationService } from './cipe-notification-service';
 
 const globalConfigMock = jest.fn().mockReturnValue('all');
 
@@ -468,27 +468,29 @@ describe('CIPE Notifications', () => {
     it('should not show any notifications when setting is "none"', () => {
       globalConfigMock.mockReturnValue('none');
 
-      compareCIPEDataAndSendNotification(
+      const notificationService = new CIPENotificationService();
+
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.success,
       );
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.fail,
       );
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.progressFailedRun,
       );
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.success,
       );
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.fail,
       );
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.progressFailedRun,
       );
@@ -583,7 +585,11 @@ describe('CIPE Notifications', () => {
       ) => {
         const oldPipeline = oldInfo ? pipelineExamples[oldInfo] : null;
         const newPipeline = pipelineExamples[newInfo];
-        compareCIPEDataAndSendNotification(oldPipeline, newPipeline);
+        const notificationService = new CIPENotificationService();
+        notificationService.compareCIPEDataAndSendNotifications(
+          oldPipeline,
+          newPipeline,
+        );
         if (result === 'info') {
           expect(window.showInformationMessage).toHaveBeenCalled();
           expect(window.showErrorMessage).not.toHaveBeenCalled();
@@ -598,12 +604,13 @@ describe('CIPE Notifications', () => {
     );
 
     it('should not show success notifications when setting is "error"', () => {
+      const notificationService = new CIPENotificationService();
       globalConfigMock.mockReturnValue('error');
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.empty,
         pipelineExamples.success,
       );
-      compareCIPEDataAndSendNotification(
+      notificationService.compareCIPEDataAndSendNotifications(
         pipelineExamples.progress,
         pipelineExamples.success,
       );
@@ -614,7 +621,7 @@ describe('CIPE Notifications', () => {
     describe('AI Fix Suppression Logic', () => {
       it('should suppress failure notifications but show AI fix notification when AI fix becomes available', () => {
         // CIPE failure with AI fix - should suppress error notification but show AI fix notification
-        compareCIPEDataAndSendNotification(
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
           pipelineExamples.progress,
           pipelineExamples.failWithAiFix,
         );
@@ -629,7 +636,7 @@ describe('CIPE Notifications', () => {
         jest.clearAllMocks();
 
         // Run failure with AI fix - should suppress error notification but show AI fix notification
-        compareCIPEDataAndSendNotification(
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
           pipelineExamples.progress,
           pipelineExamples.progressFailedRunWithAiFix,
         );
@@ -643,8 +650,9 @@ describe('CIPE Notifications', () => {
       });
 
       it('should only suppress failure notifications without showing AI fix notification when AI fix already existed', () => {
+        const notificationService = new CIPENotificationService();
         // When AI fix with suggestedFix already existed in old state, should not show any notification
-        compareCIPEDataAndSendNotification(
+        notificationService.compareCIPEDataAndSendNotifications(
           pipelineExamples.failWithAiFix, // Already has AI fix with suggestion
           pipelineExamples.failWithAiFix, // Same state
         );
@@ -654,7 +662,7 @@ describe('CIPE Notifications', () => {
         jest.clearAllMocks();
 
         // Transition between different AI fixes that both have suggestions - no notification
-        compareCIPEDataAndSendNotification(
+        notificationService.compareCIPEDataAndSendNotifications(
           pipelineExamples.progressWithAiFixWithSuggestion,
           pipelineExamples.progressFailedRunWithAiFix,
         );
@@ -663,7 +671,8 @@ describe('CIPE Notifications', () => {
       });
 
       it('should not show failure notifications for cipes with aiFixesEnabled until we know if an AI fix comes', () => {
-        compareCIPEDataAndSendNotification(
+        const notificationService = new CIPENotificationService();
+        notificationService.compareCIPEDataAndSendNotifications(
           pipelineExamples.empty,
           pipelineExamples.failWithAiFixesEnabled,
         );
@@ -672,7 +681,7 @@ describe('CIPE Notifications', () => {
 
         jest.clearAllMocks();
 
-        compareCIPEDataAndSendNotification(
+        notificationService.compareCIPEDataAndSendNotifications(
           pipelineExamples.progressFailedRunWithAiFixesEnabled,
           pipelineExamples.progressFailedRunWithAiFix,
         );
@@ -695,7 +704,11 @@ describe('CIPE Notifications', () => {
           },
         ];
 
-        compareCIPEDataAndSendNotification(pipelineExamples.empty, failedCipe);
+        const notificationService = new CIPENotificationService();
+        notificationService.compareCIPEDataAndSendNotifications(
+          pipelineExamples.empty,
+          failedCipe,
+        );
         expect(window.showInformationMessage).not.toHaveBeenCalled();
         expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
         expect(window.showErrorMessage).toHaveBeenCalledWith(
@@ -730,7 +743,10 @@ describe('CIPE Notifications', () => {
         jest.clearAllMocks();
 
         // Transition from waiting to timeout - should show delayed notification
-        compareCIPEDataAndSendNotification(waitingCipe, failedCipe);
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
+          waitingCipe,
+          failedCipe,
+        );
         expect(window.showInformationMessage).not.toHaveBeenCalled();
         expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
         expect(window.showErrorMessage).toHaveBeenCalledWith(
@@ -763,7 +779,7 @@ describe('CIPE Notifications', () => {
         ];
 
         // First transition: from waiting to timeout - should show delayed notification
-        compareCIPEDataAndSendNotification(
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
           cipeWaitingForAiFix,
           cipeAfterTimeout,
         );
@@ -778,14 +794,20 @@ describe('CIPE Notifications', () => {
         jest.clearAllMocks();
 
         // Subsequent checks with same state - should NOT show notification again
-        compareCIPEDataAndSendNotification(cipeAfterTimeout, cipeAfterTimeout);
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
+          cipeAfterTimeout,
+          cipeAfterTimeout,
+        );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).not.toHaveBeenCalled();
 
         jest.clearAllMocks();
 
         // Another check - should still NOT show notification
-        compareCIPEDataAndSendNotification(cipeAfterTimeout, cipeAfterTimeout);
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
+          cipeAfterTimeout,
+          cipeAfterTimeout,
+        );
         expect(window.showErrorMessage).not.toHaveBeenCalled();
         expect(window.showInformationMessage).not.toHaveBeenCalled();
       });
@@ -801,7 +823,10 @@ describe('CIPE Notifications', () => {
         },
       ];
 
-      compareCIPEDataAndSendNotification(failedCipe, failedCipe);
+      new CIPENotificationService().compareCIPEDataAndSendNotifications(
+        failedCipe,
+        failedCipe,
+      );
       expect(window.showInformationMessage).not.toHaveBeenCalled();
       expect(window.showErrorMessage).not.toHaveBeenCalled();
     });
@@ -866,7 +891,7 @@ describe('CIPE Notifications', () => {
         ];
 
         // Should suppress failure notification but show AI fix notification because suggestedFix is newly available
-        compareCIPEDataAndSendNotification(
+        new CIPENotificationService().compareCIPEDataAndSendNotifications(
           pipelineExamples.progress,
           mixedRunGroups,
         );
@@ -904,7 +929,7 @@ describe('CIPE Notifications', () => {
         transitions.forEach(([from, to, shouldNotify]) => {
           jest.clearAllMocks();
 
-          compareCIPEDataAndSendNotification(
+          new CIPENotificationService().compareCIPEDataAndSendNotifications(
             pipelineExamples[from],
             pipelineExamples[to],
           );
