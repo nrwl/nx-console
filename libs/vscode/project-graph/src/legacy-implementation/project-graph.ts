@@ -35,28 +35,28 @@ export function legacySelect(graphWebView: GraphWebView, uri: Uri) {
 
 export function legacyFocusButton(
   graphWebView: GraphWebView,
-  treeItem: NxTreeItem
+  treeItem: NxTreeItem,
 ) {
   const project = getProjectItem(treeItem);
   if (project) {
     graphWebView.projectInWebview(
       project.nxProject.project,
       undefined,
-      MessageType.focus
+      MessageType.focus,
     );
   }
 }
 
 export function legacySelectButton(
   graphWebView: GraphWebView,
-  treeItem: NxTreeItem
+  treeItem: NxTreeItem,
 ) {
   const project = getProjectItem(treeItem);
   if (project) {
     graphWebView.projectInWebview(
       project.nxProject.project,
       undefined,
-      MessageType.select
+      MessageType.select,
     );
   }
 }
@@ -67,7 +67,7 @@ export function legacyTask(graphWebView: GraphWebView, uri: Uri | undefined) {
 
 export function legacyTaskButton(
   graphWebView: GraphWebView,
-  item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
+  item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string],
 ) {
   if (item instanceof NxTreeItem) {
     const project = getTaskItem(item);
@@ -75,7 +75,7 @@ export function legacyTaskButton(
       graphWebView.projectInWebview(
         project.nxProject.project,
         project.nxTarget.name,
-        MessageType.task
+        MessageType.task,
       );
     }
   } else if (item instanceof NxCommandsTreeItem) {
@@ -105,10 +105,6 @@ export function projectGraph() {
       });
       await openProjectWithFile(graphWebView, uri, MessageType.focus);
     }),
-    commands.registerCommand('nx.graph.select', async (uri: Uri) => {
-      getTelemetry().logUsage('graph.select-project');
-      await openProjectWithFile(graphWebView, uri, MessageType.select);
-    }),
     commands.registerCommand(
       'nx.graph.focus.button',
       async (treeItem: NxTreeItem) => {
@@ -120,26 +116,10 @@ export function projectGraph() {
           graphWebView.projectInWebview(
             project.nxProject.project,
             undefined,
-            MessageType.focus
+            MessageType.focus,
           );
         }
-      }
-    ),
-    commands.registerCommand(
-      'nx.graph.select.button',
-      async (treeItem: NxTreeItem) => {
-        getTelemetry().logUsage('graph.select-project', {
-          source: 'projects-view',
-        });
-        const project = getProjectItem(treeItem);
-        if (project) {
-          graphWebView.projectInWebview(
-            project.nxProject.project,
-            undefined,
-            MessageType.select
-          );
-        }
-      }
+      },
     ),
     commands.registerCommand('nx.graph.task', async (uri: Uri | undefined) => {
       getTelemetry().logUsage('graph.show-task');
@@ -148,7 +128,7 @@ export function projectGraph() {
     commands.registerCommand(
       'nx.graph.task.button',
       async (
-        item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
+        item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string],
       ) => {
         getTelemetry().logUsage('graph.show-task', {
           source: 'projects-view',
@@ -160,7 +140,7 @@ export function projectGraph() {
             graphWebView.projectInWebview(
               project.nxProject.project,
               project.nxTarget.name,
-              MessageType.task
+              MessageType.task,
             );
           }
         } else if (item instanceof NxCommandsTreeItem) {
@@ -169,15 +149,15 @@ export function projectGraph() {
           }
         } else
           graphWebView.projectInWebview(item[0], item[1], MessageType.task);
-      }
-    )
+      },
+    ),
   );
 }
 
 async function openProjectWithFile(
   webview: GraphWebView,
   uri: Uri | undefined,
-  messageType: MessageType
+  messageType: MessageType,
 ) {
   let filePath;
   if (uri) {

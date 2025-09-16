@@ -178,11 +178,6 @@
           "group": "inline@1"
         },
         {
-          "command": "nx.graph.select.button",
-          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
-          "group": "z_commands"
-        },
-        {
           "command": "nx.move.projectView",
           "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "navigation@2"
@@ -295,10 +290,6 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.graph.select",
-          "when": "isNxWorkspace"
-        },
-        {
           "command": "nx.graph.task",
           "when": "isNxWorkspace"
         },
@@ -308,10 +299,6 @@
         },
         {
           "command": "nx.graph.focus.button",
-          "when": "false"
-        },
-        {
-          "command": "nx.graph.select.button",
           "when": "false"
         },
         {
@@ -764,11 +751,6 @@
       },
       {
         "category": "Nx",
-        "title": "Select/Deselect in Nx Graph",
-        "command": "nx.graph.select"
-      },
-      {
-        "category": "Nx",
         "title": "Focus Task in Nx Graph",
         "command": "nx.graph.task"
       },
@@ -783,12 +765,6 @@
         "title": "Focus in Nx Graph",
         "command": "nx.graph.focus.button",
         "icon": "$(target)"
-      },
-      {
-        "category": "Nx",
-        "title": "Select/Deselect in Nx Graph",
-        "command": "nx.graph.select.button",
-        "icon": "$(eye)"
       },
       {
         "category": "Nx",

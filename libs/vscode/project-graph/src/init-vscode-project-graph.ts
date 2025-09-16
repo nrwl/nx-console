@@ -103,25 +103,6 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         }
       },
     ),
-    commands.registerCommand('nx.graph.select', async (uri: Uri) => {
-      getTelemetry().logUsage('graph.select-project', {
-        source: uri ? 'explorer-context-menu' : 'command',
-      });
-      const nxVersion = await getNxVersion();
-      if (!nxVersion) {
-        showNoNxVersionMessage();
-        return;
-      }
-      if (gte(nxVersion, '17.3.0-beta.3')) {
-        const project = await getProjectForContext(uri);
-
-        if (project && project.name) {
-          graphWebviewManager.selectProject(project.name);
-        }
-      } else {
-        legacySelect(legacyGrapyWebView, uri);
-      }
-    }),
     commands.registerCommand(
       'nx.graph.focus.button',
       async (treeItem: NxTreeItem) => {
@@ -140,27 +121,6 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
           }
         } else {
           legacyFocusButton(legacyGrapyWebView, treeItem);
-        }
-      },
-    ),
-    commands.registerCommand(
-      'nx.graph.select.button',
-      async (treeItem: NxTreeItem) => {
-        getTelemetry().logUsage('graph.select-project', {
-          source: 'projects-view',
-        });
-        const nxVersion = await getNxVersion();
-        if (!nxVersion) {
-          showNoNxVersionMessage();
-          return;
-        }
-        if (gte(nxVersion, '17.3.0-beta.3')) {
-          const project = treeItem.getProject();
-          if (project?.project) {
-            graphWebviewManager.selectProject(project.project);
-          }
-        } else {
-          legacySelectButton(legacyGrapyWebView, treeItem);
         }
       },
     ),
