@@ -1,3 +1,44 @@
+## 1.47.0 (2025-09-17)
+
+### Bug Fixes
+
+* always check nx@latest provenance status before executing anything from it ([#2724](https://github.com/nrwl/nx-console/issues/2724)) ([a5d4e6e](https://github.com/nrwl/nx-console/commit/a5d4e6e78f2e81489d7bc8236f948af10d2b830c))
+* handle APPLIED_LOCALLY state better in cloud fix ui ([#2642](https://github.com/nrwl/nx-console/issues/2642)) ([f34cfd1](https://github.com/nrwl/nx-console/commit/f34cfd198328f4af507de9e28877903bf92b15f0))
+* improve misc cloud onboarding things  ([#2656](https://github.com/nrwl/nx-console/issues/2656)) ([7522707](https://github.com/nrwl/nx-console/commit/75227075e512e78cf00f374f5141443fe5ca058e))
+* improve nx-mcp & nxls exit handlers ([#2688](https://github.com/nrwl/nx-console/issues/2688)) ([91cc0a3](https://github.com/nrwl/nx-console/commit/91cc0a3b279b21aa1aee6bcefa9b80d4a4fd67a8))
+* **intellij:** add notification instead of exiting silently when AI Assistant plugin is not installed ([#2699](https://github.com/nrwl/nx-console/issues/2699)) ([0815bc1](https://github.com/nrwl/nx-console/commit/0815bc1fe12cf139809a9035d941cdfb2980e195))
+* **intellij:** improve nx@latest provenance check ([#2765](https://github.com/nrwl/nx-console/issues/2765)) ([f005ffd](https://github.com/nrwl/nx-console/commit/f005ffd177118c63617dde88ca19dcb928c45ea5))
+* **intellij:** make sure projects view doesnt jump to beginning on refresh ([#2647](https://github.com/nrwl/nx-console/issues/2647)) ([6f2c838](https://github.com/nrwl/nx-console/commit/6f2c838da618e3e39b66ce983daf9458f3888fef))
+* **intellij:** prevent NPE while quickly closing/reopening files with PDV browser ([#2707](https://github.com/nrwl/nx-console/issues/2707)) ([1070122](https://github.com/nrwl/nx-console/commit/10701226d77c44aaeb146c5ab61fff18c13d99db))
+* **intellij:** restructure CIPE tree with ai fixes at runGroup level ([#2665](https://github.com/nrwl/nx-console/issues/2665)) ([1344628](https://github.com/nrwl/nx-console/commit/1344628230b4dc93257816266788b273f7b605c2))
+* **intellij:** run plugin inspection and fix misc stuff ([#2630](https://github.com/nrwl/nx-console/issues/2630)) ([e2b78fd](https://github.com/nrwl/nx-console/commit/e2b78fd84b3257254396b9a33480b2b0b3a5934d))
+* make AI telemetry more consistent ([#2701](https://github.com/nrwl/nx-console/issues/2701)) ([cad26ab](https://github.com/nrwl/nx-console/commit/cad26ab7da264fe20b5dd6815dc20f7640394cfd))
+* make sure run-task callback from new graph still works ([#2646](https://github.com/nrwl/nx-console/issues/2646)) ([a367f21](https://github.com/nrwl/nx-console/commit/a367f218ed336793d33b95019de5c11637933c5b))
+* **nxls:** add watcher debounce & await native watcher stop ([#2706](https://github.com/nrwl/nx-console/issues/2706)) ([3d432c0](https://github.com/nrwl/nx-console/commit/3d432c0d85d00d8cef7c459aa462679d225231b8))
+* **nxls:** enable read-collections to pick up things from secondary entry points ([#2648](https://github.com/nrwl/nx-console/issues/2648)) ([fae9aa5](https://github.com/nrwl/nx-console/commit/fae9aa540f957d6cc5a8a912d6b96506c2b5db53))
+* **nxls:** remove faulty secondary entry point filtering logic ([#2667](https://github.com/nrwl/nx-console/issues/2667)) ([2bf4580](https://github.com/nrwl/nx-console/commit/2bf4580737532a058186c6450ec6b3c147ae85ab))
+* **nxls:** stop native watcher events from being sent after shutdown ([#2746](https://github.com/nrwl/nx-console/issues/2746)) ([bcdae76](https://github.com/nrwl/nx-console/commit/bcdae76a5f08e12949ddfb73f5dcead868e64a9c))
+* render line breaks in AI fix reasoning ([#2659](https://github.com/nrwl/nx-console/issues/2659)) ([ba80ded](https://github.com/nrwl/nx-console/commit/ba80ded3e8728acf3642238bb57d78cd7bb1841e))
+* repair cipe notification logic for new api timing with aiFixesEnabled ([#2729](https://github.com/nrwl/nx-console/issues/2729)) ([09130a8](https://github.com/nrwl/nx-console/commit/09130a8e5658b3de6a692b30656589957f633f8f))
+* self-healing UI improvements ([#2651](https://github.com/nrwl/nx-console/issues/2651)) ([22951bb](https://github.com/nrwl/nx-console/commit/22951bbb315a0cb239bfd7ab1bd56d25b580e096))
+* update task ID display format in terminal section for self-healing ci ([#2671](https://github.com/nrwl/nx-console/issues/2671)) ([442de7a](https://github.com/nrwl/nx-console/commit/442de7a6430844c29e68b37a10cf4caa7214bf75))
+* **vscode:** check provenance contents and verify they come from the nx repo when running anything from nx latest ([#2731](https://github.com/nrwl/nx-console/issues/2731)) ([51520b2](https://github.com/nrwl/nx-console/commit/51520b2dc324bd39e905573fb810fa581a16a406))
+* **vscode:** fix integrated nx-mcp behaviour in non-nx workspace ([#2700](https://github.com/nrwl/nx-console/issues/2700)) ([94218cf](https://github.com/nrwl/nx-console/commit/94218cfe8ab67ed58a786ee118460c0145943ba2))
+* **vscode:** handle no install state better for agent rules manager ([#2666](https://github.com/nrwl/nx-console/issues/2666)) ([30b3c61](https://github.com/nrwl/nx-console/commit/30b3c61b6d7b13acd788d1267572e66984000712))
+* **vscode:** repair socket & route task retrieval through ideProvider ([#2674](https://github.com/nrwl/nx-console/issues/2674)) ([d423ce9](https://github.com/nrwl/nx-console/commit/d423ce90e1a205f700b5c3bd28fd2bfa8aa3cc51))
+* **vscode:** throttle cloud view refresh clicks ([#2654](https://github.com/nrwl/nx-console/issues/2654)) ([9c32b6b](https://github.com/nrwl/nx-console/commit/9c32b6b82207e935de944d9f572c4afb835e33dc))
+
+
+### Features
+
+* enable editing commit message for self-healing ai fixes ([#2708](https://github.com/nrwl/nx-console/issues/2708)) ([1289cfd](https://github.com/nrwl/nx-console/commit/1289cfda78acdc17f6a1b7f007e1c45221ef79b6))
+* enable mcp to communicate with IDE via JSON-RPC server ([#2640](https://github.com/nrwl/nx-console/issues/2640)) ([0e9729a](https://github.com/nrwl/nx-console/commit/0e9729a3c9946e7eaae969daf3cc4f53e4c03abf))
+* **intellij:** add Open in Nx Cloud and Open Pull Request context menu actions ([#2748](https://github.com/nrwl/nx-console/issues/2748)) ([908e3fc](https://github.com/nrwl/nx-console/commit/908e3fc1e4d7d52c42ecfd7260dc1a24aa5b4d75))
+* support using latest Nx version in tasks and IntelliJ commands, and use it to connect to cloud ([#2638](https://github.com/nrwl/nx-console/issues/2638)) ([d003e8c](https://github.com/nrwl/nx-console/commit/d003e8cda23b83174f9c098f5b19f0a5539da710))
+* **vscode:** improve migrate ui with commands for individual actions ([#2682](https://github.com/nrwl/nx-console/issues/2682)) ([3eed25e](https://github.com/nrwl/nx-console/commit/3eed25edfaddb0e63686292a8c5b366209260cf3))
+* **vscode:** show notifications for auto-applied fixes ([#2767](https://github.com/nrwl/nx-console/issues/2767)) ([8c8f531](https://github.com/nrwl/nx-console/commit/8c8f5311ca3c5d08eaa72b5b8d18013dba6ed6f9))
+* **vscode:** use vscode api to register mcp server & migrate cursor to stdio mcp ([#2650](https://github.com/nrwl/nx-console/issues/2650)) ([feb448a](https://github.com/nrwl/nx-console/commit/feb448afde50c3ed167ac5fa4b21a36a4c64b574))
+
 ## <small>1.46.3 (2025-07-21)</small>
 
 ### Bug Fixes
