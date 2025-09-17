@@ -1,5 +1,7 @@
-import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
+import { TelemetryEventSource } from '@nx-console/shared-telemetry';
+import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
+import { throttle } from '@nx-console/shared-utils';
 import {
   onWorkspaceRefreshed,
   showRefreshLoadingAtLocation,
@@ -12,7 +14,6 @@ import {
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
-import { throttle } from '@nx-console/shared-utils';
 import {
   commands,
   ExtensionContext,
@@ -25,14 +26,11 @@ import {
   window,
 } from 'vscode';
 import { createActor } from 'xstate';
-import {
-  compareCIPEDataAndSendNotification,
-  disposeAiFixStatusBarItem,
-} from './cipe-notifications';
+import { getAiFixStatusBarService } from './ai-fix-status-bar-service';
+import { CIPENotificationService } from './cipe-notification-service';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
 import { CloudRecentCIPEProvider } from './cloud-recent-cipe-view';
 import { machine } from './cloud-view-state-machine';
-import { TelemetryEventSource } from '@nx-console/shared-telemetry';
 import {
   closeCloudFixDiffTab,
   NxCloudFixWebview,
@@ -40,6 +38,9 @@ import {
 
 export function initNxCloudView(context: ExtensionContext) {
   closeCloudFixDiffTab();
+
+  const notificationService = new CIPENotificationService();
+  const statusBarService = getAiFixStatusBarService();
 
   // set up state machine & listeners
   const actor = createActor(
@@ -52,7 +53,11 @@ export function initNxCloudView(context: ExtensionContext) {
             newData: CIPEInfo[];
           },
         ) => {
-          compareCIPEDataAndSendNotification(params.oldData, params.newData);
+          statusBarService.updateAiFixStatusBar(params.newData);
+          notificationService.compareCIPEDataAndSendNotifications(
+            params.oldData,
+            params.newData,
+          );
         },
         setViewVisible: (_, params: { viewId: string }) => {
           setCloudViewContext(params.viewId);
@@ -110,7 +115,7 @@ export function initNxCloudView(context: ExtensionContext) {
     showRefreshLoadingAtLocation({ viewId: 'nxCloudLoading' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudRecentCIPE' }),
     showRefreshLoadingAtLocation({ viewId: 'nxCloudOnboarding' }),
-    { dispose: () => disposeAiFixStatusBarItem() },
+    statusBarService,
   );
 
   // register commands

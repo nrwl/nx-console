@@ -67,14 +67,10 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                 }
                 TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_CONNECT)
 
-                val hasProvenance =
-                    withContext(Dispatchers.IO) { NxProvenance.nxLatestHasProvenance() }
+                val (hasProvenance, errorMessage) = NxProvenance.nxLatestProvenanceCheck()
                 if (!hasProvenance) {
-                    Notifier.notifyAnything(
-                        project,
-                        NxProvenance.NO_PROVENANCE_ERROR,
-                        NotificationType.ERROR
-                    )
+                    val message = errorMessage ?: NxProvenance.NO_PROVENANCE_ERROR
+                    Notifier.notifyAnything(project, message, NotificationType.ERROR)
                     return@withContext
                 }
 

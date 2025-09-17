@@ -39,7 +39,7 @@ import {
   workspace,
 } from 'vscode';
 import { ActorRef, EventObject } from 'xstate';
-import { hideAiFixStatusBarItem } from './cipe-notifications';
+import { getAiFixStatusBarService } from './ai-fix-status-bar-service';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
 
@@ -482,7 +482,7 @@ export class NxCloudFixWebview {
                   }
                 });
             }
-            hideAiFixStatusBarItem();
+            getAiFixStatusBarService().hideAiFixStatusBarItem();
           }
         },
       ),
@@ -544,7 +544,7 @@ export class NxCloudFixWebview {
               data.runGroup.aiFix.aiFixId,
               'APPLIED_LOCALLY',
             );
-            hideAiFixStatusBarItem();
+            getAiFixStatusBarService().hideAiFixStatusBarItem();
           } catch (error) {
             vscodeLogger.log(
               `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message}`,
@@ -576,7 +576,7 @@ export class NxCloudFixWebview {
           if (success) {
             window.showInformationMessage('Nx Cloud fix ignored');
             commands.executeCommand('nxCloud.refresh');
-            hideAiFixStatusBarItem();
+            getAiFixStatusBarService().hideAiFixStatusBarItem();
           }
         },
       ),
@@ -636,7 +636,7 @@ export class NxCloudFixWebview {
             runGroup: runGroup,
             terminalOutput,
           });
-          hideAiFixStatusBarItem();
+          getAiFixStatusBarService().hideAiFixStatusBarItem();
         },
       ),
     );
