@@ -87,7 +87,12 @@ function cleanupOldMcpJson() {
     const removeOldEntry = () => {
       vscodeLogger.log(`Removing old nx-mcp entry from ${mcpJsonPath}`);
       const mcpJson = readMcpJson();
-      delete mcpJson.servers['nx-mcp'];
+
+      if (isInCursor()) {
+        delete mcpJson.mcpServers['nx-mcp'];
+      } else {
+        delete mcpJson.servers['nx-mcp'];
+      }
       writeMcpJson(mcpJson);
     };
     if (mcpJsonIsGitIgnored(mcpJsonPath)) {
