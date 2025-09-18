@@ -6,6 +6,7 @@ import {
   ExtensionContext,
   ProgressLocation,
   RelativePattern,
+  Uri,
   commands,
   tasks,
   window,
@@ -67,7 +68,10 @@ import {
   hasNxGraphServerAffected,
 } from '@nx-console/vscode-graph-base';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
-import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
+import {
+  handleSelfHealingUri,
+  initNxCloudView,
+} from '@nx-console/vscode-nx-cloud-view';
 import {
   getOutputChannel,
   initOutputChannels,
@@ -108,6 +112,8 @@ export async function activate(c: ExtensionContext) {
     initMcp(context);
 
     initNxInit(context);
+
+    registerUriHandlers(context);
 
     context.subscriptions.push(
       showRefreshLoadingAtLocation(ProgressLocation.Window),
@@ -416,4 +422,14 @@ async function registerSettingsNxWorkspacePathWatcher() {
   );
 
   context.subscriptions.push(settingsNxWorkspacePathWatcher);
+}
+
+function registerUriHandlers(context: ExtensionContext) {
+  const uriHandler = window.registerUriHandler({
+    handleUri(uri: Uri): void {
+      getOutputChannel().appendLine(`Received URI: ${uri.toString()}`);
+      handleSelfHealingUri(uri);
+    },
+  });
+  context.subscriptions.push(uriHandler);
 }
