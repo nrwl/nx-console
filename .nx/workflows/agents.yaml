@@ -33,6 +33,8 @@ common-init-steps: &common-init-steps
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
       - name: Install Browsers (if needed)
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+  - name: Project graph
+    script: ./gradlew nxProjectReport --info
 
 launch-templates:
   linux-medium-plus-js:

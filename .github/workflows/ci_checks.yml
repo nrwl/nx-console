@@ -65,15 +65,6 @@ jobs:
       - name: Setup Gradle Dependencies
         run: ./gradlew dependencies
 
-      # We intentionally put the gradle tasks first because their artifacts are needed for project graph construction
-      # and we do not want to give the false impression that the artifact download time is part of nx commands.
-      - name: Gradle artifacts
-        run: |
-          yarn nx-cloud record -- ./gradlew nxProjectReport --info
-
-      - name: Verify Nx project graph
-        run: yarn nx show projects
-
       - name: Check formatting
         run: |
           yarn nx-cloud record -- yarn nx format:check --verbose
