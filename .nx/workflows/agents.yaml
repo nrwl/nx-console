@@ -40,8 +40,8 @@ launch-templates:
     image: 'ubuntu22.04-node20.11-v10'
     env: *common-env
     init-steps: *common-init-steps
-  linux-large-js:
-    resource-class: 'docker_linux_amd64/large'
+  linux-large-plus-js:
+    resource-class: 'docker_linux_amd64/large+'
     image: 'ubuntu22.04-node20.11-v10'
     env: *common-env
     init-steps: *common-init-steps

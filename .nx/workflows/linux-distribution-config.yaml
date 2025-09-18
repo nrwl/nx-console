@@ -1,7 +1,7 @@
 distribute-on:
-  small-changeset: 3 linux-large-js
-  medium-changeset: 4 linux-large-js
-  large-changeset: 6 linux-large-js
+  small-changeset: 3 linux-large-plus-js
+  medium-changeset: 4 linux-large-plus-js
+  large-changeset: 6 linux-large-plus-js
 
 assignment-rules:
   - projects:
