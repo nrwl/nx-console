@@ -7,5 +7,5 @@ assignment-rules:
   - projects:
       - intellij
     runs-on:
-      - linux-large-js
+      - linux-large-plus-js
     parallelism: 1
