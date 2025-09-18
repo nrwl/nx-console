@@ -11,7 +11,7 @@ import {
   getGitRepository,
   getShellExecutionForConfig,
 } from '@nx-console/vscode-utils';
-import { hideAiFixStatusBarItem } from './cipe-notifications';
+import { getAiFixStatusBarService } from './ai-fix-status-bar-service';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { writeFile, unlink } from 'fs/promises';
@@ -50,7 +50,7 @@ export async function applyFixLocallyWithGit(
       'Nx Cloud fix applied locally. Please review and modify any changes before committing.',
     );
 
-    hideAiFixStatusBarItem();
+    getAiFixStatusBarService().hideAiFixStatusBarItem();
   } catch (error) {
     vscodeLogger.log(
       `Failed to apply Nx Cloud fix locally: ${error.stderr || error.message}`,
@@ -76,7 +76,7 @@ export async function applyFixLocallyWithNxCloud(fixId: string): Promise<void> {
 
     if (success) {
       getOutputChannel().appendLine(`Successfully applied fix: ${fixId}`);
-      hideAiFixStatusBarItem();
+      getAiFixStatusBarService().hideAiFixStatusBarItem();
     } else {
       getOutputChannel().appendLine(`Failed to apply fix ${fixId}`);
     }
