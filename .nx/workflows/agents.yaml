@@ -1,3 +1,5 @@
+common-env: &common-env
+  GRADLE_USER_HOME: ~/workspace/.gradle
 common-init-steps: &common-init-steps
   - name: Checkout
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
@@ -34,10 +36,12 @@ launch-templates:
   linux-medium-plus-js:
     resource-class: 'docker_linux_amd64/medium+'
     image: 'ubuntu22.04-node20.11-v10'
+    env: *common-env
     init-steps: *common-init-steps
   linux-large-js:
     resource-class: 'docker_linux_amd64/large'
     image: 'ubuntu22.04-node20.11-v10'
+    env: *common-env
     init-steps: *common-init-steps
   # windows-medium-js:
   #   resource-class: 'windows/medium'
