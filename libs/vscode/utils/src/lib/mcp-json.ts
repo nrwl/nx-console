@@ -1,8 +1,7 @@
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { parse } from 'jsonc-parser';
 import * as path from 'path';
-import { window, workspace } from 'vscode';
 import { isInCursor } from './editor-name-helpers';
 
 /**
@@ -25,28 +24,6 @@ export function getMcpJsonPath(): string | null {
   else {
     // If not in cursor, use the workspace root
     return path.join(vscodeWorkspacePath, '.vscode', 'mcp.json');
-  }
-}
-
-/**
- * Gets the directory path for the editor folder.
- * @returns The path to the editor directory or null if the workspace path cannot be determined.
- * Return `${workspaceRoot}/.cursor` if in cursor  otherwise `${workspaceRoot}/.vscode`.
- */
-export function getEditorDirPath(): string | null {
-  const vscodeWorkspacePath =
-    workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-
-  if (!vscodeWorkspacePath) {
-    return null;
-  }
-
-  if (isInCursor()) {
-    // If in cursor, use the .cursor directory
-    return path.join(vscodeWorkspacePath, '.cursor');
-  } else {
-    // If not in cursor, use use the .vscode directory
-    return path.join(vscodeWorkspacePath, '.vscode');
   }
 }
 
@@ -110,64 +87,5 @@ export function writeMcpJson(content: any): boolean {
   } catch (error) {
     console.error('Error writing to mcp.json:', error);
     return false;
-  }
-}
-
-/**
- * Ensures the .cursor directory exists.
- * @returns true if the directory exists or was created successfully, false otherwise.
- */
-export function ensureEditorDirExists(): boolean {
-  const editorDirPath = getEditorDirPath();
-
-  if (!editorDirPath) {
-    return false;
-  }
-
-  if (!existsSync(editorDirPath)) {
-    try {
-      mkdirSync(editorDirPath, { recursive: true });
-    } catch (error) {
-      window.showErrorMessage(
-        `Failed to create editor directory: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      return false;
-    }
-  }
-
-  return true;
-}
-
-/**
- * Gets the port number from the nx-mcp entry in mcp.json.
- * @returns The port number or null if it doesn't exist or can't be parsed.
- */
-export function getNxMcpPort(): number | undefined {
-  if (!hasNxMcpEntry()) {
-    return undefined;
-  }
-
-  const mcpJson = readMcpJson();
-  if (!mcpJson?.mcpServers?.['nx-mcp'] && !mcpJson?.servers?.['nx-mcp']) {
-    return undefined;
-  }
-
-  try {
-    const url =
-      mcpJson.mcpServers?.['nx-mcp']?.url ?? mcpJson.servers?.['nx-mcp']?.url;
-    if (!url) {
-      return undefined;
-    }
-
-    // Extract port from URL (format: http://localhost:PORT/sse)
-    const match = url.match(/:(\d+)\//);
-    if (match && match[1]) {
-      return parseInt(match[1], 10);
-    }
-
-    return undefined;
-  } catch (error) {
-    console.error('Error extracting port from mcp.json:', error);
-    return undefined;
   }
 }

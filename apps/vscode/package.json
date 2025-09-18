@@ -25,7 +25,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.96.2"
+    "vscode": "^1.99.3"
   },
   "keywords": [
     "angular",
@@ -117,12 +117,6 @@
           "command": "nxCloud.openApp",
           "when": "view == nxCloudRecentCIPE",
           "group": "navigation"
-        },
-        {
-          "command": "nx.configureMcpServer",
-          "when": "view == nxProjects && (isInCursor || isInVSCode) && isNxWorkspace && !hasNxMcpConfigured && isLegacyMcp",
-          "group": "navigation@0",
-          "title": "Add Nx to Cursor Agent"
         },
         {
           "command": "nx.addAgentRules",
@@ -433,10 +427,6 @@
         {
           "command": "nx.graph.showAffected",
           "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.configureMcpServer",
-          "when": "isNxWorkspace && !hasNxMcpConfigured && (isInCursor || isInVSCode) && isLegacyMcp"
         },
         {
           "command": "nx.addAgentRules",
@@ -977,12 +967,6 @@
         "title": "Show Nx Errors in Problems View",
         "command": "nxConsole.showProblems",
         "icon": "$(eye)"
-      },
-      {
-        "category": "Nx",
-        "title": "Configure Nx MCP Server",
-        "command": "nx.configureMcpServer",
-        "icon": "$(wand)"
       },
       {
         "category": "Nx Migrate",
