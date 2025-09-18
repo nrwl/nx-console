@@ -12,8 +12,6 @@
 
 /libs/vscode/nx-cloud-onboarding-webview/ @MaxKless
 
-/../../nx/packages/gradle/project-graph/ @MaxKless
-
 /libs/vscode/nx-help-and-feedback-view/ @MaxKless
 
 /libs/vscode/typescript-import-plugin/ @MaxKless

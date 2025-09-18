@@ -25,7 +25,9 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     intellijPlatform {
-        intellijIdea(providers.gradleProperty("platformVersion")) {
+        val type = providers.gradleProperty("platformType")
+        val version = providers.gradleProperty("platformVersion")
+        create(type, version) {
           useCache = true
         }
 

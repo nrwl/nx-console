@@ -75,8 +75,13 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
-        intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-        plugin("com.intellij.ml.llm:252.25557.171")
+      val type = providers.gradleProperty("platformType")
+      val version = providers.gradleProperty("platformVersion")
+      create(type, version) {
+        useCache = true
+      }
+
+      plugin("com.intellij.ml.llm:252.25557.171")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
