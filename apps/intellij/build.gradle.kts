@@ -40,7 +40,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     gradlePluginPortal()
-
     intellijPlatform { defaultRepositories() }
 }
 

@@ -25,7 +25,9 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     intellijPlatform {
-        intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
+        intellijIdea(providers.gradleProperty("platformVersion")) {
+          useCache = true
+        }
 
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
