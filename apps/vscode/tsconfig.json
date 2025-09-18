@@ -7,9 +7,6 @@
       "path": "../../libs/vscode/messaging"
     },
     {
-      "path": "../../libs/vscode/graph-base"
-    },
-    {
       "path": "../../libs/vscode/telemetry"
     },
     {
@@ -25,6 +22,9 @@
       "path": "../../libs/vscode/nvm-tip"
     },
     {
+      "path": "../../libs/vscode/graph-base"
+    },
+    {
       "path": "../../libs/vscode/error-diagnostics"
     },
     {
@@ -32,9 +32,6 @@
     },
     {
       "path": "../../libs/language-server/types"
-    },
-    {
-      "path": "../../libs/vscode/migrate"
     },
     {
       "path": "../../libs/vscode/typescript-plugin"
@@ -52,6 +49,12 @@
       "path": "../../libs/vscode/nx-config-decoration"
     },
     {
+      "path": "../../libs/vscode/migrate"
+    },
+    {
+      "path": "../../libs/vscode/mcp"
+    },
+    {
       "path": "../../libs/vscode/lsp-client"
     },
     {
@@ -65,9 +68,6 @@
     },
     {
       "path": "../../libs/shared/file-system"
-    },
-    {
-      "path": "../../libs/vscode/mcp"
     },
     {
       "path": "../../libs/vscode/utils"

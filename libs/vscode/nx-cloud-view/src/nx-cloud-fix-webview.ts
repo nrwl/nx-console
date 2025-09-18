@@ -16,6 +16,10 @@ import {
 } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
+  applyFixLocallyWithGit,
+  applyFixLocallyWithNxCloud,
+} from './apply-fix-locally';
+import {
   getGitApi,
   getGitBranch,
   getGitHasUncommittedChanges,
@@ -496,12 +500,6 @@ export class NxCloudFixWebview {
             return;
           }
 
-          const repo = getGitRepository();
-          if (!repo) {
-            window.showErrorMessage('No Git repository found');
-            return;
-          }
-
           const branch = await getGitBranch();
           if (branch && branch !== data.cipe.branch) {
             const result = await window.showWarningMessage(
@@ -518,32 +516,15 @@ export class NxCloudFixWebview {
           }
 
           try {
-            const tempFilePath = join(
-              tmpdir(),
-              `nx-cloud-fix-${Date.now()}.patch`,
-            );
-
-            try {
-              const suggestedFix = data.runGroup.aiFix.suggestedFix;
-              if (suggestedFix.lastIndexOf('\n') !== suggestedFix.length - 1) {
-                // Ensure the suggested fix ends with a newline
-                data.runGroup.aiFix.suggestedFix += '\n';
-              }
-
-              await writeFile(tempFilePath, data.runGroup.aiFix.suggestedFix);
-              await repo.apply(tempFilePath);
-            } finally {
-              await unlink(tempFilePath);
+            if (data.runGroup.aiFix.shortLinkId) {
+              await applyFixLocallyWithNxCloud(data.runGroup.aiFix.shortLinkId);
+            } else {
+              await applyFixLocallyWithGit(data.runGroup.aiFix.suggestedFix);
+              await updateSuggestedFix(
+                data.runGroup.aiFix.aiFixId,
+                'APPLIED_LOCALLY',
+              );
             }
-
-            window.showInformationMessage(
-              'Nx Cloud fix applied locally. Please review and modify any changes before committing.',
-            );
-
-            await updateSuggestedFix(
-              data.runGroup.aiFix.aiFixId,
-              'APPLIED_LOCALLY',
-            );
             getAiFixStatusBarService().hideAiFixStatusBarItem();
           } catch (error) {
             vscodeLogger.log(

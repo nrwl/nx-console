@@ -13,9 +13,6 @@
       "path": "../../libs/vscode/messaging/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/vscode/telemetry/tsconfig.lib.json"
     },
     {
@@ -31,6 +28,9 @@
       "path": "../../libs/vscode/nvm-tip/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/graph-base/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/error-diagnostics/tsconfig.lib.json"
     },
     {
@@ -38,9 +38,6 @@
     },
     {
       "path": "../../libs/language-server/types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/migrate/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/typescript-plugin/tsconfig.lib.json"
@@ -58,6 +55,12 @@
       "path": "../../libs/vscode/nx-config-decoration/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/vscode/migrate/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/vscode/mcp/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/vscode/lsp-client/tsconfig.lib.json"
     },
     {
@@ -71,9 +74,6 @@
     },
     {
       "path": "../../libs/shared/file-system/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/mcp/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/utils/tsconfig.lib.json"
