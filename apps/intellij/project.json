@@ -6,6 +6,9 @@
     "initializeIntellijPlatformPlugin": {
       "inputs": ["!{workspaceRoot}/.intellijPlatform"]
     },
+    "runInspections": {
+      "inputs": ["!{projectRoot}/.intellijPlatform"]
+    },
     "verifyPlugin": {
       "inputs": ["!{workspaceRoot}/.intellijPlatform"],
       "cache": true
