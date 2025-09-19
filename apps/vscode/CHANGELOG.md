@@ -1,3 +1,13 @@
+# [18.69.0](https://github.com/nrwl/nx-console/compare/vscode-v18.68.0...vscode-v18.69.0) (2025-09-19)
+
+
+### Features
+
+* **vscode:** add uri handler for self healing links ([#2771](https://github.com/nrwl/nx-console/issues/2771)) ([ebf0ce5](https://github.com/nrwl/nx-console/commit/ebf0ce59464c5a18751f607b233fa5d1364dc281))
+* **vscode:** remove unused select project in graph feature ([#2768](https://github.com/nrwl/nx-console/issues/2768)) ([f89d2d2](https://github.com/nrwl/nx-console/commit/f89d2d24ae56c3c688726abea2b5b506d925f5fe))
+* **vscode:** rework MCP integration to be cursor-native ([#2770](https://github.com/nrwl/nx-console/issues/2770)) ([d4bc7cd](https://github.com/nrwl/nx-console/commit/d4bc7cdee3c5602db4400d5e253297911979faed))
+* **vscode:** show notifications for auto-applied fixes ([#2767](https://github.com/nrwl/nx-console/issues/2767)) ([8c8f531](https://github.com/nrwl/nx-console/commit/8c8f5311ca3c5d08eaa72b5b8d18013dba6ed6f9))
+
 ## 18.68.0 (2025-09-15)
 
 ### 🚀 Features
