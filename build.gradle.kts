@@ -3,30 +3,31 @@ group = "dev.nx.console"
 layout.buildDirectory = File("dist")
 
 plugins {
-    id("dev.nx.gradle.project-graph") version "0.1.8"
-    id("com.ncorti.ktfmt.gradle") version "0.11.0"
+  id("dev.nx.gradle.project-graph") version "0.1.8"
+  id("com.ncorti.ktfmt.gradle") version "0.24.0"
 
-    // Java support
-    id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "2.0.21"
-    // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
-    id("org.jetbrains.intellij.platform") version "2.9.0"
+  id("org.jetbrains.kotlin.jvm") version "2.2.0"
+  id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
 }
 
 allprojects {
-    apply {
-        plugin("dev.nx.gradle.project-graph")
-        plugin("com.ncorti.ktfmt.gradle")
-        plugin("org.jetbrains.kotlin.jvm")
-        plugin("org.jetbrains.intellij.platform")
-    }
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+  }
+
+  apply {
+    plugin("dev.nx.gradle.project-graph")
+    plugin("com.ncorti.ktfmt.gradle")
+    plugin("org.jetbrains.kotlin.jvm")
+    plugin("org.jetbrains.kotlin.plugin.serialization")
+  }
 }
 
 tasks {
-    register<DefaultTask>("publish") {
-        group = "publish"
-        description = "Placeholder task to workaround the semantic-release plugin"
-    }
+  register<DefaultTask>("publish") {
+    group = "publish"
+    description = "Placeholder task to workaround the semantic-release plugin"
+  }
 }

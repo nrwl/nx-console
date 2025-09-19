@@ -12,33 +12,17 @@ val nxlsRoot = "${rootDir}/dist/apps/nxls"
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
-    // Java support
     id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "2.2.0"
-    // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
-    // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.9.0"
-
-    // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.4.0"
-
-    id("com.ncorti.ktfmt.gradle") version "0.24.0"
-    id("dev.nx.gradle.project-graph") version "0.1.8"
+    id("org.jetbrains.intellij.platform") version "2.9.0"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
+
 version = providers.gradleProperty("version").get()
 
-
 // Configure project's dependencies
-repositories {
-    mavenLocal()
-    mavenCentral()
-    gradlePluginPortal()
-    intellijPlatform { defaultRepositories() }
-}
+repositories { intellijPlatform { defaultRepositories() } }
 
 configurations.all {
     exclude("org.slf4j", "slf4j-api")
@@ -64,13 +48,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
-      val type = providers.gradleProperty("platformType")
-      val version = providers.gradleProperty("platformVersion")
-      create(type, version) {
-        useCache = true
-      }
+        val type = providers.gradleProperty("platformType")
+        val version = providers.gradleProperty("platformVersion")
+        create(type, version) { useCache = true }
 
-      plugin("com.intellij.ml.llm:252.25557.171")
+        plugin("com.intellij.ml.llm:252.25557.171")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
