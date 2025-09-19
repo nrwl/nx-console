@@ -49,7 +49,7 @@ class DocumentManager(val editor: Editor) {
         val changesParams =
             DidChangeTextDocumentParams(
                 VersionedTextDocumentIdentifier(),
-                listOf(TextDocumentContentChangeEvent())
+                listOf(TextDocumentContentChangeEvent()),
             )
         changesParams.textDocument.uri = identifier.uri
         changesParams.textDocument.version = ++version

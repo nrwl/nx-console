@@ -49,8 +49,7 @@ class DocumentUtils {
                 } catch (error: UnsupportedOperationException) {
                     CodeStyleSettingsManager.getInstance(editor.project)
                         .mainProjectCodeStyle
-                        ?.getTabSize(editor.virtualFile.fileType)
-                        ?: 4
+                        ?.getTabSize(editor.virtualFile.fileType) ?: 4
                 }
             }
         }

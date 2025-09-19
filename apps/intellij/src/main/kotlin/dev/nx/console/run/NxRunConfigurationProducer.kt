@@ -14,7 +14,7 @@ data class NxRunSettings(
     val nxTargets: String = "",
     val nxTargetsConfiguration: String = "",
     val arguments: String = "",
-    var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
+    var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT,
 )
 
 internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfiguration>() {
@@ -24,7 +24,7 @@ internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxComma
     override fun setupConfigurationFromContext(
         configuration: NxCommandConfiguration,
         context: ConfigurationContext,
-        sourceElement: Ref<PsiElement>
+        sourceElement: Ref<PsiElement>,
     ): Boolean {
         val runSettings =
             createRunSettingsFromContext(configuration.nxRunSettings, context, sourceElement)
@@ -35,7 +35,7 @@ internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxComma
 
     private fun setupConfigurationFromSettings(
         configuration: NxCommandConfiguration,
-        runSettings: NxRunSettings
+        runSettings: NxRunSettings,
     ) {
         configuration.nxRunSettings = runSettings
         configuration.setGeneratedName()
@@ -44,7 +44,7 @@ internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxComma
     private fun createRunSettingsFromContext(
         runSettings: NxRunSettings,
         context: ConfigurationContext,
-        sourceElement: Ref<PsiElement>?
+        sourceElement: Ref<PsiElement>?,
     ): NxRunSettings? {
         val element = getElement(context) ?: return null
         val targetNode = getPropertyNodeFromLeafNode(element) ?: return null
@@ -54,13 +54,13 @@ internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxComma
         return runSettings.copy(
             nxProjects = targetDescriptor.nxProject,
             nxTargets = targetDescriptor.nxTarget,
-            nxTargetsConfiguration = targetDescriptor.nxTargetConfiguration
+            nxTargetsConfiguration = targetDescriptor.nxTargetConfiguration,
         )
     }
 
     override fun isConfigurationFromContext(
         configuration: NxCommandConfiguration,
-        context: ConfigurationContext
+        context: ConfigurationContext,
     ): Boolean {
 
         val thisRunSettings =
@@ -71,7 +71,7 @@ internal class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxComma
 
     private fun isConfigurationMatched(
         configuration: NxCommandConfiguration,
-        thisRunSettings: NxRunSettings
+        thisRunSettings: NxRunSettings,
     ): Boolean {
         return configuration.nxRunSettings.nxProjects == thisRunSettings.nxProjects &&
             configuration.nxRunSettings.nxTargets == thisRunSettings.nxTargets &&

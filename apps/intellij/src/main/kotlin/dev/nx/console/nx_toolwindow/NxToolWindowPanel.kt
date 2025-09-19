@@ -63,7 +63,7 @@ class NxToolWindowPanel(private val project: Project) :
         nxToolMainComponents.createConnectedToNxCloudPanel(
             cipeTreeComponent,
             cipeTreeToolbar,
-            cloudHeaderPanel
+            cloudHeaderPanel,
         )
     private val notConnectedToNxCloudPanel: JPanel =
         nxToolMainComponents.createNotConnectedToNxCloudPanel()
@@ -107,7 +107,7 @@ class NxToolWindowPanel(private val project: Project) :
         JBSplitter(
             true,
             "NX_CONSOLE.TOOLWINDOW_SPLITTER",
-            0.7f
+            0.7f,
         ) // Vertical splitter with 70% for main content
 
     private var stateMachine: StateMachine? = null
@@ -147,7 +147,7 @@ class NxToolWindowPanel(private val project: Project) :
                 createStateMachine(
                     scope + Dispatchers.EDT,
                     childMode = ChildMode.PARALLEL,
-                    start = true
+                    start = true,
                 ) {
                     state(States.MainContent) {
                         val noNodeInterpreter = state(MainContentStates.NoNodeInterpreter)
@@ -180,7 +180,7 @@ class NxToolWindowPanel(private val project: Project) :
                                                     errorCount,
                                                     nxToolMainComponents.createErrorComponent(
                                                         errorCount
-                                                    )
+                                                    ),
                                                 )
                                             errorCountAndComponent = newPair
                                             newPair.second
@@ -217,7 +217,7 @@ class NxToolWindowPanel(private val project: Project) :
                                 showError,
                                 showNoProject,
                                 showNoNxWorkspace,
-                                showProjectTree
+                                showProjectTree,
                             )
                             .forEach { state ->
                                 state.apply {
@@ -314,7 +314,7 @@ class NxToolWindowPanel(private val project: Project) :
                         object : StateMachine.Listener {
                             override suspend fun onStateEntry(
                                 state: IState,
-                                transitionParams: TransitionParams<*>
+                                transitionParams: TransitionParams<*>,
                             ) {
                                 updateMainPanelContent()
                             }
@@ -332,6 +332,7 @@ class NxToolWindowPanel(private val project: Project) :
                         // for the PDV, we send a manual started event on startup, let's ignore it
                         // here
                         private var isFirst = true
+
                         override fun onWorkspaceRefreshStarted() {
                             if (!isFirst) {
                                 scope.launch { eventChannel.send(RefreshEvents.Refreshing()) }
@@ -339,14 +340,14 @@ class NxToolWindowPanel(private val project: Project) :
                                 isFirst = false
                             }
                         }
-                    }
+                    },
                 )
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                     NxWorkspaceRefreshListener {
                         scope.launch { eventChannel.send(RefreshEvents.Refreshed()) }
                         loadToolwindowContent()
-                    }
+                    },
                 )
                 subscribe(
                     NX_TOOLWINDOW_STYLE_SETTING_TOPIC,

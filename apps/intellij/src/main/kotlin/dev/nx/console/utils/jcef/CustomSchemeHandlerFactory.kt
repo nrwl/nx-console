@@ -11,7 +11,7 @@ class CustomSchemeHandlerFactory() : CefSchemeHandlerFactory {
         browser: CefBrowser?,
         frame: CefFrame?,
         schemeName: String?,
-        request: CefRequest?
+        request: CefRequest?,
     ): CefResourceHandler {
         return CustomResourceHandler()
     }

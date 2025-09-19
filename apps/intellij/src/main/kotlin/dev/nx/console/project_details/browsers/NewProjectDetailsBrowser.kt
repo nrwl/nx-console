@@ -417,8 +417,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     ?: stateMachine.processEvent(
                         Events.LoadErrorNoGraph()
                     ) // Handles null `graphBasePath`
-            }
-                ?: stateMachine.processEvent(Events.LoadErrorNoGraph()) // Handles null `pdvData`
+            } ?: stateMachine.processEvent(Events.LoadErrorNoGraph()) // Handles null `pdvData`
         } catch (e: Throwable) {
             logger<NewProjectDetailsBrowser>().warn("Error loading PDV: ${e.message}")
             stateMachine.processEvent(Events.LoadErrorNoGraph(e.message))

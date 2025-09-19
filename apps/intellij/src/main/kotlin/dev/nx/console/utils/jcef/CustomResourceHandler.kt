@@ -43,7 +43,7 @@ class CustomResourceHandler() : CefResourceHandler {
     override fun getResponseHeaders(
         cefResponse: CefResponse,
         responseLength: IntRef,
-        redirectUrl: StringRef
+        redirectUrl: StringRef,
     ) {
         state.getResponseHeaders(cefResponse, responseLength, redirectUrl)
     }
@@ -52,7 +52,7 @@ class CustomResourceHandler() : CefResourceHandler {
         dataOut: ByteArray,
         bytesToRead: Int,
         bytesRead: IntRef,
-        callback: CefCallback
+        callback: CefCallback,
     ): Boolean {
         return state.readResponse(dataOut, bytesToRead, bytesRead, callback)
     }
@@ -67,14 +67,14 @@ sealed class ResourceHandlerState {
     abstract fun getResponseHeaders(
         cefResponse: CefResponse,
         responseLength: IntRef,
-        redirectUrl: StringRef
+        redirectUrl: StringRef,
     )
 
     abstract fun readResponse(
         dataOut: ByteArray,
         designedBytesToRead: Int,
         bytesRead: IntRef,
-        callback: CefCallback
+        callback: CefCallback,
     ): Boolean
 
     open fun close() {}
@@ -86,7 +86,7 @@ class OpenedConnection(private val connection: URLConnection) : ResourceHandlerS
     override fun getResponseHeaders(
         cefResponse: CefResponse,
         responseLength: IntRef,
-        redirectUrl: StringRef
+        redirectUrl: StringRef,
     ) {
         try {
             val url = connection.url.toString()
@@ -115,7 +115,7 @@ class OpenedConnection(private val connection: URLConnection) : ResourceHandlerS
         dataOut: ByteArray,
         designedBytesToRead: Int,
         bytesRead: IntRef,
-        callback: CefCallback
+        callback: CefCallback,
     ): Boolean {
         val availableSize = inputStream.available()
         return if (availableSize > 0) {
@@ -138,7 +138,7 @@ data object ClosedConnection : ResourceHandlerState() {
     override fun getResponseHeaders(
         cefResponse: CefResponse,
         responseLength: IntRef,
-        redirectUrl: StringRef
+        redirectUrl: StringRef,
     ) {
         cefResponse.status = 404
     }
@@ -147,7 +147,7 @@ data object ClosedConnection : ResourceHandlerState() {
         dataOut: ByteArray,
         designedBytesToRead: Int,
         bytesRead: IntRef,
-        callback: CefCallback
+        callback: CefCallback,
     ): Boolean {
         return false
     }

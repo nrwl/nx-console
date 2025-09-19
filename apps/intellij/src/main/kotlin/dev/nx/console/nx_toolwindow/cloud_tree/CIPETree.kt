@@ -58,7 +58,7 @@ class CIPETree(private val project: Project) : SimpleTree(), DataProvider {
             Notifier.notifyAnything(
                 project,
                 "Couldn't find CIPE for AI fix",
-                NotificationType.ERROR
+                NotificationType.ERROR,
             )
             return
         }
@@ -85,7 +85,7 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
         expanded: Boolean,
         leaf: Boolean,
         row: Int,
-        hasFocus: Boolean
+        hasFocus: Boolean,
     ) {
         val userObject = (value as? DefaultMutableTreeNode)?.userObject
         if (userObject !is CIPESimpleNode) return
@@ -111,7 +111,7 @@ class CIPETreeCellRenderer : ColoredTreeCellRenderer() {
                 // Time ago
                 append(
                     " - ${userObject.cipeInfo.getTimeAgoString()}",
-                    SimpleTextAttributes.GRAY_ATTRIBUTES
+                    SimpleTextAttributes.GRAY_ATTRIBUTES,
                 )
 
                 // Status color indicator

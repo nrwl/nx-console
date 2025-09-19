@@ -65,8 +65,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                         parent = projectNode,
                     )
                 }
-                ?.toTypedArray()
-                ?: emptyArray()
+                ?.toTypedArray() ?: emptyArray()
         } else {
             val targetGroupMap = mutableMapOf<String, MutableList<String>>()
             val nonGroupedTargets: MutableSet<String> =
@@ -127,8 +126,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                 )
             }
             ?.sortedBy { it.displayName }
-            ?.toTypedArray()
-            ?: emptyArray()
+            ?.toTypedArray() ?: emptyArray()
     }
 
     protected fun getTargetConfigurations(targetNode: NxSimpleNode.Target): Array<NxSimpleNode> {
@@ -151,8 +149,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
                     parent = targetNode,
                 )
             }
-            ?.toTypedArray()
-            ?: emptyArray()
+            ?.toTypedArray() ?: emptyArray()
     }
 
     protected fun getTargetsList(
@@ -168,8 +165,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
             ?.groupBy { it.first }
             ?.toSortedMap()
             ?.map { NxSimpleNode.TargetsList(it.key, targetsSectionNode) }
-            ?.toTypedArray()
-            ?: emptyArray()
+            ?.toTypedArray() ?: emptyArray()
     }
 
     protected fun getTargetsForTargetsList(

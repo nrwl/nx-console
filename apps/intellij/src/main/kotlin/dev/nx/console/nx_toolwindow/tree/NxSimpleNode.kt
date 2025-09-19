@@ -79,7 +79,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         val targetGroupName: String,
         val nxProjectName: String,
         val targets: Array<String>,
-        parent: NxSimpleNode
+        parent: NxSimpleNode,
     ) : NxSimpleNode(parent) {
         override val id: String = "targetGroup_${targetGroupName}"
 
@@ -95,7 +95,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         val nxTargetName: String,
         val nxProjectName: String,
         val nonAtomizedTarget: String? = null,
-        parent: NxSimpleNode
+        parent: NxSimpleNode,
     ) : NxSimpleNode(parent) {
         override val id: String = "target_${nxProjectName}_$nxTargetName"
 
@@ -122,7 +122,7 @@ sealed class NxSimpleNode(parent: NxSimpleNode?) : CachingSimpleNode(parent) {
         val nxTargetConfigurationName: String,
         val nxTargetName: String,
         val nxProjectName: String,
-        parent: NxSimpleNode
+        parent: NxSimpleNode,
     ) : NxSimpleNode(parent) {
         override val id: String =
             "config_${nxProjectName}_${nxTargetName}_$nxTargetConfigurationName"

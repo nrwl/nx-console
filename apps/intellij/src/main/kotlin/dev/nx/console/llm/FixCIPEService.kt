@@ -35,10 +35,9 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
     fun fixInAIAssistant() {
         cs.launch {
             withContext(Dispatchers.EDT) {
-
-                val action = ActionManager.getInstance().getAction("AIAssistant.ToolWindow.ShowOrFocus")
-                ActionManager.getInstance()
-                    .tryToExecute(action, null, null, null, true)
+                val action =
+                    ActionManager.getInstance().getAction("AIAssistant.ToolWindow.ShowOrFocus")
+                ActionManager.getInstance().tryToExecute(action, null, null, null, true)
 
                 val chatSession =
                     ChatSessionHost.getInstance(project)
@@ -65,8 +64,6 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
                 )
 
                 FocusedChatSessionHost.getInstance(project).focusChatSession(chatSession)
-
-
             }
         }
     }

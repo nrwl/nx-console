@@ -24,9 +24,8 @@ val json = Json {
     encodeDefaults = true // This ensures default values are always encoded
 }
 
-abstract class NxCloudFixFile(
-    name: String,
-) : LightVirtualFile(name, NxCloudFixFileType.INSTANCE, "") {
+abstract class NxCloudFixFile(name: String) :
+    LightVirtualFile(name, NxCloudFixFileType.INSTANCE, "") {
 
     protected val browser: JBCefBrowser = JBCefBrowser()
 
@@ -52,12 +51,12 @@ abstract class NxCloudFixFile(
                         connection.disconnect()
                         browser.jbCefClient.removeLifeSpanHandler(
                             lifeSpanHandler,
-                            browser.cefBrowser
+                            browser.cefBrowser,
                         )
                         Disposer.dispose(browser)
                     }
                 }
-            }
+            },
         )
         browser.jbCefClient.addLifeSpanHandler(lifeSpanHandler, browser.cefBrowser)
     }

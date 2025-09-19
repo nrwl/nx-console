@@ -102,8 +102,7 @@ class TelemetryEventSource(val source: String) {
                 .companionObject
                 ?.members
                 ?.filterIsInstance<kotlin.reflect.KProperty1<Companion, String>>()
-                ?.map { it.get(this) }
-                ?: emptyList()
+                ?.map { it.get(this) } ?: emptyList()
         }
 
         // Function to validate if a string is a valid source

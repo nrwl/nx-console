@@ -30,15 +30,13 @@ class NxAngularProject(
         get() =
             ngProject.targets?.build?.options?.styles?.mapNotNull {
                 rootDir.findFileByRelativePath(it)
-            }
-                ?: emptyList()
+            } ?: emptyList()
 
     override val stylePreprocessorIncludeDirs
         get() =
             ngProject.targets?.build?.options?.stylePreprocessorOptions?.includePaths?.mapNotNull {
                 workspaceFolder.findFileByRelativePath(it)
-            }
-                ?: emptyList()
+            } ?: emptyList()
 
     override val tsConfigFile: VirtualFile?
         get() = resolveFile(ngProject.targets?.build?.options?.tsConfig)
@@ -57,8 +55,7 @@ class NxAngularProject(
             //        AngularLintConfiguration(project, this, config, name)
             //      }
             result
-        }
-            ?: emptyList()
+        } ?: emptyList()
 
     override val type: AngularProjectType?
         get() = ngProject.projectType

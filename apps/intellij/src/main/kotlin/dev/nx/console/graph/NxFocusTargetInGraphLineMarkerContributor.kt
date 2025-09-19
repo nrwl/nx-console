@@ -16,7 +16,7 @@ internal class NxFocusTargetInGraphLineMarkerContributor : RunLineMarkerContribu
 
         return Info(
             AllIcons.RunConfigurations.TestState.Run,
-            arrayOf(NxGraphFocusTaskAction(targetDescriptor))
+            arrayOf(NxGraphFocusTaskAction(targetDescriptor)),
         ) {
             "Focus target in graph"
         }

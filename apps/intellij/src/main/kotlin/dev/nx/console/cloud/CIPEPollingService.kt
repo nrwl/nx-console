@@ -143,8 +143,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                         rg.aiFix?.let { aiFix ->
                             aiFix.verificationStatus == AITaskFixStatus.NOT_STARTED ||
                                 aiFix.verificationStatus == AITaskFixStatus.IN_PROGRESS
-                        }
-                            ?: false
+                        } ?: false
                     }
                 } == true -> {
                     logger.debug("AI fixes in progress detected, switching to AI_FIX polling")

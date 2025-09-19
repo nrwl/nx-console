@@ -15,7 +15,7 @@ data class CIPEInfo(
     val author: String? = null,
     val authorAvatarUrl: String? = null,
     val cipeUrl: String,
-    val runGroups: List<CIPERunGroup>
+    val runGroups: List<CIPERunGroup>,
 )
 
 @Serializable
@@ -26,7 +26,7 @@ data class CIPERunGroup(
     val completedAt: Long?,
     val status: CIPEExecutionStatus,
     val runs: List<CIPERun>,
-    val aiFix: NxAiFix? = null
+    val aiFix: NxAiFix? = null,
 )
 
 @Serializable
@@ -38,7 +38,7 @@ data class CIPERun(
     val failedTasks: List<String>? = null,
     val numFailedTasks: Int? = null,
     val numTasks: Int? = null,
-    val runUrl: String
+    val runUrl: String,
 )
 
 data class CIPEInfoError(val message: String, val type: CIPEInfoErrorType)
@@ -46,7 +46,7 @@ data class CIPEInfoError(val message: String, val type: CIPEInfoErrorType)
 enum class CIPEInfoErrorType {
     authentication,
     network,
-    other
+    other,
 }
 
 @Serializable
@@ -56,13 +56,13 @@ enum class CIPEExecutionStatus {
     SUCCEEDED,
     FAILED,
     CANCELED,
-    TIMED_OUT
+    TIMED_OUT,
 }
 
 data class CIPEDataResponse(
     val info: List<CIPEInfo>? = null,
     val error: CIPEInfoError? = null,
-    val workspaceUrl: String? = null
+    val workspaceUrl: String? = null,
 )
 
 @Serializable
@@ -75,7 +75,7 @@ data class NxAiFix(
     val suggestedFixDescription: String? = null,
     val suggestedFixStatus: AITaskFixStatus? = null,
     val verificationStatus: AITaskFixStatus? = null,
-    val userAction: AITaskFixUserAction? = null
+    val userAction: AITaskFixUserAction? = null,
 )
 
 @Serializable
@@ -84,7 +84,7 @@ enum class AITaskFixStatus {
     IN_PROGRESS,
     COMPLETED,
     FAILED,
-    NOT_EXECUTABLE
+    NOT_EXECUTABLE,
 }
 
 @Serializable
@@ -92,5 +92,5 @@ enum class AITaskFixUserAction {
     NONE,
     APPLIED,
     REJECTED,
-    APPLIED_LOCALLY
+    APPLIED_LOCALLY,
 }

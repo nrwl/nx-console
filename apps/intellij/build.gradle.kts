@@ -1,6 +1,5 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
-import org.jetbrains.intellij.platform.gradle.ProductMode
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -100,12 +99,9 @@ kotlin { jvmToolchain(21) }
 intellijPlatform {
     projectName = providers.gradleProperty("pluginName").get()
 
-
     pluginConfiguration {
         version = providers.gradleProperty("version").get()
-        ideaVersion {
-            sinceBuild = providers.gradleProperty("pluginSinceBuild").get()
-        }
+        ideaVersion { sinceBuild = providers.gradleProperty("pluginSinceBuild").get() }
         description =
             providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
                 val start = "<!-- Plugin description -->"
@@ -178,7 +174,6 @@ changelog {
     groups.set(emptyList())
     repositoryUrl.set(providers.gradleProperty("pluginRepositoryUrl").get())
 }
-
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions {

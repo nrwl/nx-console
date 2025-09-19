@@ -22,7 +22,7 @@ internal class NxCompletionContributor : CompletionContributor() {
                 override fun addCompletions(
                     parameters: CompletionParameters,
                     context: ProcessingContext,
-                    result: CompletionResultSet
+                    result: CompletionResultSet,
                 ) {
                     log.info("Getting completions")
                     val offset =
@@ -38,10 +38,10 @@ internal class NxCompletionContributor : CompletionContributor() {
                                 completions(offset).let { result.addAllElements(it) }
                             }
                         },
-                        ProgressIndicatorProvider.getGlobalProgressIndicator()
+                        ProgressIndicatorProvider.getGlobalProgressIndicator(),
                     )
                 }
-            }
+            },
         )
     }
 

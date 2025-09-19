@@ -61,7 +61,7 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                     Notifier.notifyAnything(
                         project,
                         "You are already connected to Nx Cloud",
-                        NotificationType.INFORMATION
+                        NotificationType.INFORMATION,
                     )
                     return@withContext
                 }
@@ -88,13 +88,13 @@ class NxConnectService(private val project: Project, private val cs: CoroutineSc
                         processHandler,
                         console.component,
                         "Nx Generate",
-                        NxIcons.Action
+                        NxIcons.Action,
                     )
 
                 val runContentManager = RunContentManager.getInstance(project)
                 runContentManager.showRunContent(
                     DefaultRunExecutor.getRunExecutorInstance(),
-                    contentDescriptor
+                    contentDescriptor,
                 )
 
                 processHandler.startNotify()

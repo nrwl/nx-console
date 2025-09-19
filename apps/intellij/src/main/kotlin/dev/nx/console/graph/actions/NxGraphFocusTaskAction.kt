@@ -51,7 +51,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
                         if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
                         else if (e.isFromContextMenu()) TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
-                )
+                ),
             )
 
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
@@ -79,7 +79,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
                         NxTargetDescriptor(nxProject, nxTarget)
                     }
-                        ?: return@launch
+                    ?: return@launch
 
             val nxGraphService = getNxGraphService(project) ?: return@launch
 

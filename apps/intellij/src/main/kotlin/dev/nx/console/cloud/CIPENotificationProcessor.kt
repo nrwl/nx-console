@@ -163,7 +163,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
             } catch (e: Exception) {
                 logger.error(
                     "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
-                    e
+                    e,
                 )
             }
         }

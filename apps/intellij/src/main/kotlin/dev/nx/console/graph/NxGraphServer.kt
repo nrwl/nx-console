@@ -45,7 +45,7 @@ open class NxGraphServer(
     private val project: Project,
     private val startPort: Int,
     private val affected: Boolean,
-    private val cs: CoroutineScope
+    private val cs: CoroutineScope,
 ) : Disposable {
 
     var currentPort: Int? = null
@@ -66,7 +66,7 @@ open class NxGraphServer(
                             start()
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -118,7 +118,7 @@ open class NxGraphServer(
                 type = request.type,
                 id = request.id,
                 payload = request.payload,
-                error = error
+                error = error,
             )
         }
     }
@@ -174,7 +174,7 @@ open class NxGraphServer(
                         "--open",
                         "false",
                         "--watch",
-                        if (affected) "--affected" else ""
+                        if (affected) "--affected" else "",
                     ),
                 )
 

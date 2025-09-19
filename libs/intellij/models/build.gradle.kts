@@ -36,7 +36,6 @@ dependencies {
     }
 }
 
-
 ktfmt { kotlinLangStyle() }
 
 kotlin { jvmToolchain(21) }

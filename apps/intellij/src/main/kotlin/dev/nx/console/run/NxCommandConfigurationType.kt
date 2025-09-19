@@ -13,7 +13,7 @@ internal class NxCommandConfigurationType :
         "NxRunConfigurationType",
         "Nx",
         "Nx command execution",
-        NotNullLazyValue.createConstantValue(NxIcons.Action)
+        NotNullLazyValue.createConstantValue(NxIcons.Action),
     ) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
         return NxCommandConfiguration(project, this)
