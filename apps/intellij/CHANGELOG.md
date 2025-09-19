@@ -1,3 +1,9 @@
+## 1.48.0 (2025-09-19)
+
+### Features
+
+* **intellij:** update to and build intellij from 2025.2.1 ([#2772](https://github.com/nrwl/nx-console/issues/2772)) ([d2fa565](https://github.com/nrwl/nx-console/commit/d2fa56509))
+
 ## 1.47.0 (2025-09-17)
 
 ### Bug Fixes
