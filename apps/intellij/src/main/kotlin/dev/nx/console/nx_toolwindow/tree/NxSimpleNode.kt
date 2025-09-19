@@ -1,7 +1,6 @@
 package dev.nx.console.nx_toolwindow.tree
 
 import com.intellij.icons.AllIcons
-import com.intellij.tasks.Task
 import com.intellij.ui.treeStructure.CachingSimpleNode
 import dev.nx.console.NxIcons
 import dev.nx.console.models.NxProject

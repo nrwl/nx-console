@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.platform.gradle.ProductMode
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -78,7 +79,7 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-        plugin("com.intellij.ml.llm:252.23892.530")
+        plugin("com.intellij.ml.llm:252.25557.171")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
@@ -159,7 +160,7 @@ intellijPlatform {
 intellijPlatformTesting {
     runIde {
         create("runIntelliJLatest") {
-            version = "252.18003.27"
+            version = "2025.2.1"
             prepareSandboxTask {
                 from(nxlsRoot) {
                     include("**")

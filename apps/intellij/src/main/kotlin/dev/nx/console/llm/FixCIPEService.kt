@@ -1,8 +1,8 @@
 package dev.nx.console.llm
 
 import com.intellij.ml.llm.core.chat.session.*
-import com.intellij.ml.llm.core.chat.ui.AIAssistantUIUtil
 import com.intellij.ml.llm.privacy.trustedStringBuilders.privacyConst
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
@@ -35,6 +35,11 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
     fun fixInAIAssistant() {
         cs.launch {
             withContext(Dispatchers.EDT) {
+
+                val action = ActionManager.getInstance().getAction("AIAssistant.ToolWindow.ShowOrFocus")
+                ActionManager.getInstance()
+                    .tryToExecute(action, null, null, null, true)
+
                 val chatSession =
                     ChatSessionHost.getInstance(project)
                         .createChatSession(
@@ -44,9 +49,7 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
                                 null,
                             )
                         )
-
-                chatSession.addMode(ChatSessionMode.CODE_GENERATION)
-                AIAssistantUIUtil.openChat(project, chatSession)
+                chatSession.setActiveMode(ChatSessionMode.CODE_GENERATION)
                 chatSession.send(
                     project,
                     "Please help me fix the latest CI errors".privacyConst,
@@ -60,6 +63,10 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
                     listOf(),
                     SmartChat,
                 )
+
+                FocusedChatSessionHost.getInstance(project).focusChatSession(chatSession)
+
+
             }
         }
     }
