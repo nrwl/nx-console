@@ -25,13 +25,12 @@ plugins {
     id("org.jetbrains.changelog") version "2.4.0"
 
     id("com.ncorti.ktfmt.gradle") version "0.24.0"
-    id("dev.nx.gradle.project-graph") version "0.1.5"
+    id("dev.nx.gradle.project-graph") version "0.1.8"
 
 
 }
 
 group = providers.gradleProperty("pluginGroup").get()
-
 version = providers.gradleProperty("version").get()
 
 
@@ -41,14 +40,6 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     intellijPlatform { defaultRepositories() }
-}
-
-allprojects {
-    apply {
-        plugin("dev.nx.gradle.project-graph")
-        plugin("org.jetbrains.kotlin.jvm")
-        plugin("com.ncorti.ktfmt.gradle")
-    }
 }
 
 configurations.all {
