@@ -78,7 +78,7 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
     class RunNode(
         val run: CIPERun,
         val runGroup: CIPERunGroup,
-        override val parent: CIPESimpleNode
+        override val parent: CIPESimpleNode,
     ) : CIPESimpleNode(parent) {
         override val nodeId = "run_${run.linkId ?: run.executionId ?: "unknown"}"
 
@@ -125,10 +125,8 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
         override fun getName(): String = taskName
     }
 
-    class NxCloudFixNode(
-        val aiFix: NxAiFix,
-        override val parent: CIPESimpleNode,
-    ) : CIPESimpleNode(parent) {
+    class NxCloudFixNode(val aiFix: NxAiFix, override val parent: CIPESimpleNode) :
+        CIPESimpleNode(parent) {
         override val nodeId = "fix_${aiFix.aiFixId}"
 
         override fun isAutoExpandNode(): Boolean {
@@ -256,5 +254,5 @@ fun CIPEExecutionStatus.isCompleted(): Boolean =
             CIPEExecutionStatus.SUCCEEDED,
             CIPEExecutionStatus.FAILED,
             CIPEExecutionStatus.CANCELED,
-            CIPEExecutionStatus.TIMED_OUT
+            CIPEExecutionStatus.TIMED_OUT,
         )

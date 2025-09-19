@@ -23,6 +23,7 @@ import {
   TaskProcessEndEvent,
   tasks,
   TaskScope,
+  Uri,
   window,
 } from 'vscode';
 import { createActor } from 'xstate';

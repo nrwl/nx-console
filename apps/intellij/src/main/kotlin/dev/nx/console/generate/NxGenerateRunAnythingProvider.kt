@@ -44,7 +44,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
     private fun getAdDebugText(): String {
         return NxConsoleBundle.message(
             "nx.run.anything.ad.run.with.debug",
-            RunAnythingUtil.SHIFT_SHORTCUT_TEXT
+            RunAnythingUtil.SHIFT_SHORTCUT_TEXT,
         )
     }
 
@@ -80,7 +80,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
 
     override fun suggestCompletionVariants(
         dataContext: DataContext,
-        commandLine: CommandLine
+        commandLine: CommandLine,
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
         if (generators.isEmpty()) {
@@ -107,7 +107,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
 
     private fun completeGeneratorNames(
         commandLine: CommandLine,
-        generators: List<NxGenerator>
+        generators: List<NxGenerator>,
     ): Sequence<String> {
         return if (generators.any { it.name in commandLine || commandLine.containsAlias(it) })
             emptySequence()
@@ -117,7 +117,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
     private fun completeOptions(
         project: Project,
         commandLine: CommandLine,
-        generators: List<NxGenerator>
+        generators: List<NxGenerator>,
     ): Sequence<String> {
         val generator = findGenerator(commandLine, generators) ?: return emptySequence()
         if (generatorOptions.containsKey(generator.name).not()) {
@@ -127,7 +127,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
                         NxGeneratorOptionsRequestOptions(
                             collection = generator.data.collection,
                             name = generator.data.name,
-                            path = generator.schemaPath
+                            path = generator.schemaPath,
                         )
                     )
             }
@@ -147,13 +147,12 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
                 .toSet()
         return generatorOptions[generator.name]?.let { options ->
             options.map { "--${it.name}" }.filterNot { it in specifiedOptions }.asSequence()
-        }
-            ?: emptySequence()
+        } ?: emptySequence()
     }
 
     private fun findGenerator(
         commandLine: CommandLine,
-        generators: List<NxGenerator>
+        generators: List<NxGenerator>,
     ): NxGenerator? {
         return generators.find {
             commandLine.completedParameters.contains(it.name) || commandLine.containsAlias(it)
@@ -178,7 +177,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
     internal class NxGenerateRunAnythingItem(
         command: String,
         icon: Icon,
-        private val description: String
+        private val description: String,
     ) : RunAnythingItemBase(command, icon) {
         override fun getDescription(): String? {
             return this.description

@@ -8,52 +8,21 @@ import {
 } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import express, { Request, Response } from 'express';
-import {
-  CancellationToken,
-  McpHttpServerDefinition,
-  McpServerDefinitionProvider,
-  Uri,
-} from 'vscode';
 import { ideProvider, nxWorkspaceInfoProvider } from './data-providers';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 
-export class NxMcpServerDefinitionProvider
-  implements McpServerDefinitionProvider<NxMcpHttpServerDefinition>
-{
-  constructor(private server: McpStreamableWebServer | undefined) {}
-
-  async provideMcpServerDefinitions(
-    token: CancellationToken,
-  ): Promise<NxMcpHttpServerDefinition[] | undefined> {
-    if (this.server === undefined) {
-      return undefined;
-    }
-    return [
-      new NxMcpHttpServerDefinition('Nx Mcp Server', this.server.getUri()),
-    ];
-  }
-}
-
-export class NxMcpHttpServerDefinition extends McpHttpServerDefinition {
-  constructor(
-    label: string,
-    uri: Uri,
-    headers?: Record<string, string>,
-    version?: string,
-  ) {
-    super(label, uri, headers, version);
-  }
-}
-
-export class McpStreamableWebServer {
+/**
+ * Core HTTP server for MCP - platform agnostic
+ * This can be used by both VSCode and Cursor
+ */
+export class McpHttpServerCore {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
+  private streamableServers = new Set<NxMcpServerWrapper>();
 
   constructor(private mcpPort: number) {
     this.startStreamableWebServer(mcpPort);
   }
-
-  private streamableServers = new Set<NxMcpServerWrapper>();
 
   private startStreamableWebServer(port: number) {
     this.app.post('/mcp', async (req: Request, res: Response) => {
@@ -160,8 +129,18 @@ export class McpStreamableWebServer {
     }
   }
 
-  public getUri(): Uri {
-    return Uri.parse(`http://localhost:${this.mcpPort}/mcp`);
+  /**
+   * Get the URL of the server as a string
+   */
+  public getUrl(): string {
+    return `http://localhost:${this.mcpPort}/mcp`;
+  }
+
+  /**
+   * Get the port number
+   */
+  public getPort(): number {
+    return this.mcpPort;
   }
 
   public stopMcpServer() {

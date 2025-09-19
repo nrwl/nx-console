@@ -65,8 +65,7 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
             }
         val nxJsonFile =
             VirtualFileManager.getInstance()
-                .findFileByNioPath(File(project.nxBasePath, "nx.json").toPath())
-                ?: return null
+                .findFileByNioPath(File(project.nxBasePath, "nx.json").toPath()) ?: return null
 
         val description =
             buildHtmlFromDescription((if (error.name != null) error.message else error.stack) ?: "")

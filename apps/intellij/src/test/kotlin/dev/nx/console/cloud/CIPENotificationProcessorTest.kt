@@ -26,7 +26,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = null,
-                newData = CIPEDataResponse(info = listOf(createSuccessfulCIPE()))
+                newData = CIPEDataResponse(info = listOf(createSuccessfulCIPE())),
             )
 
         processor.onDataChanged(event)
@@ -43,7 +43,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
 
         assertTrue(
             mockListener.events.isEmpty(),
-            "Should not show notifications when nothing changes"
+            "Should not show notifications when nothing changes",
         )
     }
 
@@ -53,13 +53,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val successCIPE =
             progressCIPE.copy(
                 status = CIPEExecutionStatus.SUCCEEDED,
-                completedAt = System.currentTimeMillis()
+                completedAt = System.currentTimeMillis(),
             )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(successCIPE))
+                newData = CIPEDataResponse(info = listOf(successCIPE)),
             )
 
         processor.onDataChanged(event)
@@ -74,13 +74,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val failedCIPE =
             progressCIPE.copy(
                 status = CIPEExecutionStatus.FAILED,
-                completedAt = System.currentTimeMillis()
+                completedAt = System.currentTimeMillis(),
             )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedCIPE))
+                newData = CIPEDataResponse(info = listOf(failedCIPE)),
             )
 
         processor.onDataChanged(event)
@@ -97,7 +97,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedRunCIPE))
+                newData = CIPEDataResponse(info = listOf(failedRunCIPE)),
             )
 
         processor.onDataChanged(event)
@@ -116,7 +116,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedWithAiFix))
+                newData = CIPEDataResponse(info = listOf(failedWithAiFix)),
             )
 
         processor.onDataChanged(event)
@@ -134,7 +134,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(progressWithAiFix))
+                newData = CIPEDataResponse(info = listOf(progressWithAiFix)),
             )
 
         processor.onDataChanged(event)
@@ -148,7 +148,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                 .runGroup
                 .aiFix
                 ?.taskIds
-                ?.first()
+                ?.first(),
         )
     }
 
@@ -159,7 +159,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(withAiFix)),
-                newData = CIPEDataResponse(info = listOf(withAiFix))
+                newData = CIPEDataResponse(info = listOf(withAiFix)),
             )
 
         processor.onDataChanged(event)
@@ -175,7 +175,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(withoutSuggestion)),
-                newData = CIPEDataResponse(info = listOf(withSuggestion))
+                newData = CIPEDataResponse(info = listOf(withSuggestion)),
             )
 
         processor.onDataChanged(event)
@@ -192,7 +192,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(withAiFixNoSuggestion))
+                newData = CIPEDataResponse(info = listOf(withAiFixNoSuggestion)),
             )
 
         processor.onDataChanged(event)
@@ -229,7 +229,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                         linkId = "123123",
                                         command = "nx test",
                                         status = CIPEExecutionStatus.FAILED,
-                                        runUrl = "http://test.url"
+                                        runUrl = "http://test.url",
                                     )
                                 ),
                             aiFix =
@@ -240,8 +240,8 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     suggestedFix = "git diff content...",
                                     suggestedFixDescription = "Fix test",
                                     verificationStatus = AITaskFixStatus.COMPLETED,
-                                    userAction = AITaskFixUserAction.NONE
-                                )
+                                    userAction = AITaskFixUserAction.NONE,
+                                ),
                         ),
                         // Second run group without AI fix
                         CIPERunGroup(
@@ -256,17 +256,17 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                         linkId = "456456",
                                         command = "nx build",
                                         status = CIPEExecutionStatus.FAILED,
-                                        runUrl = "http://test2.url"
+                                        runUrl = "http://test2.url",
                                     )
-                                )
-                        )
-                    )
+                                ),
+                        ),
+                    ),
             )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(mixedCIPE))
+                newData = CIPEDataResponse(info = listOf(mixedCIPE)),
             )
 
         processor.onDataChanged(event)
@@ -286,7 +286,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(completedCIPE)),
-                newData = CIPEDataResponse(info = listOf(stillCompleted))
+                newData = CIPEDataResponse(info = listOf(stillCompleted)),
             )
 
         processor.onDataChanged(event)
@@ -304,7 +304,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(withFailedRun)),
-                newData = CIPEDataResponse(info = listOf(failedCIPE))
+                newData = CIPEDataResponse(info = listOf(failedCIPE)),
             )
 
         processor.onDataChanged(event)
@@ -324,7 +324,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(oldCIPE)),
-                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFix))
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFix)),
             )
 
         processor.onDataChanged(event)
@@ -338,7 +338,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                 .runGroup
                 .aiFix
                 ?.taskIds
-                ?.first()
+                ?.first(),
         )
     }
 
@@ -354,7 +354,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(oldCIPE)),
-                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixInProgress))
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixInProgress)),
             )
 
         processor.onDataChanged(event)
@@ -375,7 +375,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(oldCIPE)),
-                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixNotStarted))
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixNotStarted)),
             )
 
         processor.onDataChanged(event)
@@ -392,7 +392,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(oldCIPE)),
-                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixNotStarted))
+                newData = CIPEDataResponse(info = listOf(newCIPEWithAiFixNotStarted)),
             )
 
         processor.onDataChanged(event)
@@ -412,13 +412,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             progressCIPE.copy(
                 aiFixesEnabled = true,
                 status = CIPEExecutionStatus.FAILED,
-                completedAt = oneMinuteAgo
+                completedAt = oneMinuteAgo,
             )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedWithAiFixesEnabled))
+                newData = CIPEDataResponse(info = listOf(failedWithAiFixesEnabled)),
             )
 
         processor.onDataChanged(event)
@@ -439,13 +439,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                 aiFixesEnabled = true,
                 status = CIPEExecutionStatus.FAILED,
                 createdAt = tenMinutesAgo,
-                completedAt = sixMinutesAgo
+                completedAt = sixMinutesAgo,
             )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedWithAiFixesEnabledTimedOut))
+                newData = CIPEDataResponse(info = listOf(failedWithAiFixesEnabledTimedOut)),
             )
 
         processor.onDataChanged(event)
@@ -464,7 +464,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(progressWithFailedRunAiEnabled))
+                newData = CIPEDataResponse(info = listOf(progressWithFailedRunAiEnabled)),
             )
 
         processor.onDataChanged(event)
@@ -480,13 +480,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             progressCIPE.copy(
                 aiFixesEnabled = true,
                 status = CIPEExecutionStatus.SUCCEEDED,
-                completedAt = System.currentTimeMillis()
+                completedAt = System.currentTimeMillis(),
             )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressCIPE)),
-                newData = CIPEDataResponse(info = listOf(successWithAiEnabled))
+                newData = CIPEDataResponse(info = listOf(successWithAiEnabled)),
             )
 
         processor.onDataChanged(event)
@@ -503,7 +503,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(progressWithAiEnabled)),
-                newData = CIPEDataResponse(info = listOf(progressWithAiFix))
+                newData = CIPEDataResponse(info = listOf(progressWithAiFix)),
             )
 
         processor.onDataChanged(event)
@@ -522,13 +522,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                 .copy(
                     status = CIPEExecutionStatus.FAILED,
                     createdAt = tenMinutesAgo,
-                    completedAt = sixMinutesAgo
+                    completedAt = sixMinutesAgo,
                 )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(failedCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedCIPE))
+                newData = CIPEDataResponse(info = listOf(failedCIPE)),
             )
 
         processor.onDataChanged(event)
@@ -549,13 +549,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                     aiFixesEnabled = true,
                     status = CIPEExecutionStatus.FAILED,
                     createdAt = tenMinutesAgo,
-                    completedAt = sixMinutesAgo
+                    completedAt = sixMinutesAgo,
                 )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = emptyList()),
-                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut))
+                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
             )
 
         processor.onDataChanged(event)
@@ -575,13 +575,13 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                     aiFixesEnabled = true,
                     status = CIPEExecutionStatus.FAILED,
                     createdAt = tenMinutesAgo,
-                    completedAt = sixMinutesAgo
+                    completedAt = sixMinutesAgo,
                 )
 
         val event =
             CIPEDataChangedEvent(
                 oldData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
-                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut))
+                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
             )
 
         processor.onDataChanged(event)
@@ -615,11 +615,11 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     linkId = "123123",
                                     command = "nx test",
                                     status = CIPEExecutionStatus.SUCCEEDED,
-                                    runUrl = "http://test.url"
+                                    runUrl = "http://test.url",
                                 )
-                            )
+                            ),
                     )
-                )
+                ),
         )
 
     private fun createProgressCIPE() =
@@ -632,7 +632,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             commitTitle = "fix: fix fix",
             commitUrl = "https://github.com/commit/123",
             cipeUrl = "https://cloud.nx.app/cipes/123",
-            runGroups = emptyList()
+            runGroups = emptyList(),
         )
 
     private fun createProgressWithFailedRun() =
@@ -659,11 +659,11 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     linkId = "123123",
                                     command = "nx test",
                                     status = CIPEExecutionStatus.FAILED,
-                                    runUrl = "http://test.url"
+                                    runUrl = "http://test.url",
                                 )
-                            )
+                            ),
                     )
-                )
+                ),
         )
 
     private fun createFailedCIPEWithAiFix() =
@@ -690,7 +690,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     linkId = "123123",
                                     command = "nx test",
                                     status = CIPEExecutionStatus.FAILED,
-                                    runUrl = "http://test.url"
+                                    runUrl = "http://test.url",
                                 )
                             ),
                         aiFix =
@@ -701,10 +701,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 suggestedFix = "git diff content here...",
                                 suggestedFixDescription = "Fix the failing test",
                                 verificationStatus = AITaskFixStatus.COMPLETED,
-                                userAction = AITaskFixUserAction.NONE
-                            )
+                                userAction = AITaskFixUserAction.NONE,
+                            ),
                     )
-                )
+                ),
         )
 
     private fun createProgressWithAiFixAndSuggestion() =
@@ -731,7 +731,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     linkId = "123123",
                                     command = "nx test",
                                     status = CIPEExecutionStatus.FAILED,
-                                    runUrl = "http://test.url"
+                                    runUrl = "http://test.url",
                                 )
                             ),
                         aiFix =
@@ -742,10 +742,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 suggestedFix = "git diff content here...",
                                 suggestedFixDescription = "Fix the failing test",
                                 verificationStatus = AITaskFixStatus.COMPLETED,
-                                userAction = AITaskFixUserAction.NONE
-                            )
+                                userAction = AITaskFixUserAction.NONE,
+                            ),
                     )
-                )
+                ),
         )
 
     private fun createProgressWithAiFixNoSuggestion() =
@@ -772,7 +772,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     linkId = "123123",
                                     command = "nx test",
                                     status = CIPEExecutionStatus.FAILED,
-                                    runUrl = "http://test.url"
+                                    runUrl = "http://test.url",
                                 )
                             ),
                         aiFix =
@@ -783,10 +783,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 suggestedFix = null,
                                 suggestedFixDescription = null,
                                 verificationStatus = AITaskFixStatus.IN_PROGRESS,
-                                userAction = AITaskFixUserAction.NONE
-                            )
+                                userAction = AITaskFixUserAction.NONE,
+                            ),
                     )
-                )
+                ),
         )
 
     private fun createProgressWithAiFixNotStarted() =
@@ -813,7 +813,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     linkId = "123123",
                                     command = "nx test",
                                     status = CIPEExecutionStatus.FAILED,
-                                    runUrl = "http://test.url"
+                                    runUrl = "http://test.url",
                                 )
                             ),
                         aiFix =
@@ -824,10 +824,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 suggestedFix = null,
                                 suggestedFixDescription = null,
                                 verificationStatus = AITaskFixStatus.NOT_STARTED,
-                                userAction = AITaskFixUserAction.NONE
-                            )
+                                userAction = AITaskFixUserAction.NONE,
+                            ),
                     )
-                )
+                ),
         )
 
     // Test helper class

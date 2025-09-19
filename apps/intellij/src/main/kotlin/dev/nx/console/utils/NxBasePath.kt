@@ -17,5 +17,4 @@ val Project.nxBasePath: String
             } else {
                 Paths.get(it).resolve(settingsPath).toString()
             }
-        }
-            ?: basePath ?: throw IllegalStateException("Base path is not found for project")
+        } ?: basePath ?: throw IllegalStateException("Base path is not found for project")

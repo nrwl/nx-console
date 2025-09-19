@@ -10,5 +10,5 @@ data class NxCloudAuthHeaders(
     @SerializedName("Nx-Cloud-Personal-Access-Token")
     @SerialName("Nx-Cloud-Personal-Access-Token")
     val nxCloudPersonalAccessToken: String? = null,
-    @SerializedName("Authorization") @SerialName("Authorization") val authorization: String? = null
+    @SerializedName("Authorization") @SerialName("Authorization") val authorization: String? = null,
 )

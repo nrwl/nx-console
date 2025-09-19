@@ -64,7 +64,7 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
 
     private fun buildChildrenForRoot(
         rootNode: CIPESimpleNode.CIPERootNode,
-        cipeData: List<CIPEInfo>
+        cipeData: List<CIPEInfo>,
     ): Array<CIPESimpleNode> {
         if (cipeData.isEmpty()) {
             return arrayOf(CIPESimpleNode.LabelNode("No recent PRs from your branches", rootNode))
@@ -87,12 +87,7 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
             // since there's only one)
             val aiFix = singleRunGroup.aiFix
             if (aiFix != null) {
-                children.add(
-                    CIPESimpleNode.NxCloudFixNode(
-                        aiFix = aiFix,
-                        parent = cipeNode,
-                    )
-                )
+                children.add(CIPESimpleNode.NxCloudFixNode(aiFix = aiFix, parent = cipeNode))
             }
 
             // Add runs after AI fix
@@ -119,12 +114,7 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
         // Add AI fix first if it exists
         val aiFix = runGroupNode.runGroup.aiFix
         if (aiFix != null) {
-            children.add(
-                CIPESimpleNode.NxCloudFixNode(
-                    aiFix = aiFix,
-                    parent = runGroupNode,
-                )
-            )
+            children.add(CIPESimpleNode.NxCloudFixNode(aiFix = aiFix, parent = runGroupNode))
         }
 
         // Add runs after AI fix
@@ -133,7 +123,7 @@ class CIPETreeStructure(val tree: CIPETree, private val project: Project) : Simp
                 CIPESimpleNode.RunNode(
                     run = run,
                     runGroup = runGroupNode.runGroup,
-                    parent = runGroupNode
+                    parent = runGroupNode,
                 )
             }
         )

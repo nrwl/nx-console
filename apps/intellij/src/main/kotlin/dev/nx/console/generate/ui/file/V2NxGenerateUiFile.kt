@@ -26,7 +26,7 @@ import kotlinx.serialization.encodeToString
 class V2NxGenerateUiFile(
     name: String,
     private val project: Project,
-    private val runGeneratorManager: RunGeneratorManager
+    private val runGeneratorManager: RunGeneratorManager,
 ) : NxGenerateUiFile(name) {
     private val cs = V2NxGenerateUiFileCoroutineHolder.getInstance(project).cs
 
@@ -37,7 +37,7 @@ class V2NxGenerateUiFile(
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         browser.jbCefClient.addContextMenuHandler(
             OpenDevToolsContextMenuHandler(),
-            browser.cefBrowser
+            browser.cefBrowser,
         )
 
         return browser.component
@@ -78,7 +78,7 @@ class V2NxGenerateUiFile(
                         collectionName = generator.data.collection,
                         description = generator.data.description ?: "",
                         options = options,
-                        context = generator.contextValues
+                        context = generator.contextValues,
                     )
             }
             browser.component.requestFocus()
@@ -111,7 +111,7 @@ class V2NxGenerateUiFile(
                 runGeneratorManager.queueGeneratorToBeRun(
                     messageParsed.payload.positional,
                     messageParsed.payload.flags,
-                    messageParsed.payload.cwd
+                    messageParsed.payload.cwd,
                 )
             }
         }
@@ -182,7 +182,7 @@ class V2NxGenerateUiFile(
             fieldNavHoverColor = fieldNavHoverColor,
             scrollbarThumbColor = scrollbarThumbColor,
             fontFamily = fontFamily,
-            fontSize = fontSize
+            fontSize = fontSize,
         )
         //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
     }

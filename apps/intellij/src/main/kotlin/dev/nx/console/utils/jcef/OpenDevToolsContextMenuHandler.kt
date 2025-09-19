@@ -11,7 +11,7 @@ class OpenDevToolsContextMenuHandler : CefContextMenuHandlerAdapter() {
         browser: CefBrowser?,
         frame: CefFrame?,
         params: CefContextMenuParams?,
-        model: CefMenuModel?
+        model: CefMenuModel?,
     ) {
         if (model == null) {
             return

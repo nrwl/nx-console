@@ -11,5 +11,5 @@ data class NxGeneratorContext(
     val path: String?,
     val fixedFormValues: Map<String, String>?,
     val prefillValues: Map<String, String>?,
-    val nxVersion: NxVersion?
+    val nxVersion: NxVersion?,
 )

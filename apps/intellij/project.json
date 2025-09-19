@@ -16,6 +16,10 @@
     "verifyPlugin": {
       "cache": true
     },
+    "ktfmtFormat": {
+      "//": "TODO: remove this after gradle refactor, probably fixed with different build setup",
+      "cache": false
+    },
     "test": {
       "command": "yarn nx run intellij:check"
     },

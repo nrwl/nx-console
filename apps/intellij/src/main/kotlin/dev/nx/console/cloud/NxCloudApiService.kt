@@ -34,7 +34,7 @@ class NxCloudApiService(private val project: Project) {
     data class UpdateSuggestedFixRequest(
         val aiFixId: String,
         val action: AITaskFixUserAction,
-        val userCommitMessage: String? = null
+        val userCommitMessage: String? = null,
     ) {
         val actionOrigin: String = "NX_CONSOLE_INTELLIJ"
     }
@@ -42,7 +42,7 @@ class NxCloudApiService(private val project: Project) {
     suspend fun updateSuggestedFix(
         aiFixId: String,
         action: AITaskFixUserAction,
-        commitMessage: String? = null
+        commitMessage: String? = null,
     ): Boolean =
         withContext(Dispatchers.IO) {
             try {
@@ -67,7 +67,7 @@ class NxCloudApiService(private val project: Project) {
                 val response =
                     HttpRequests.post(
                             "$nxCloudUrl/nx-cloud/update-suggested-fix",
-                            "application/json"
+                            "application/json",
                         )
                         .tuner { connection ->
                             authHeaders.nxCloudId?.let {

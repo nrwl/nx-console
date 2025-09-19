@@ -30,7 +30,7 @@ class NxCloudStatusSyncAccessService(private val project: Project, private val c
                         return@NxWorkspaceRefreshListener
                     }
                     cs.launch { cloudStatus = nxlsService.cloudStatus() }
-                }
+                },
             )
     }
 

@@ -40,7 +40,6 @@ class NxListTreeBuilder(private val nxWorkspace: NxWorkspace?) : NxTreeBuilderBa
             ?.nodes
             ?.values
             ?.map { NxSimpleNode.Project(it.name, projectsSectionNode) }
-            ?.toTypedArray()
-            ?: emptyArray()
+            ?.toTypedArray() ?: emptyArray()
     }
 }

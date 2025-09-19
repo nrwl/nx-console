@@ -68,7 +68,7 @@ fun applyInitialTextEdit(
                 runnable,
                 "Removing Intellij Completion",
                 "LSPPlugin",
-                context.document
+                context.document,
             )
     }
     context.commitDocument()
@@ -79,10 +79,7 @@ private fun convertPlaceHolders(insertText: String): String {
     return insertText.replace(snippet, "")
 }
 
-private fun applyEdit(
-    documentManager: DocumentManager,
-    textEdit: TextEdit,
-): Boolean {
+private fun applyEdit(documentManager: DocumentManager, textEdit: TextEdit): Boolean {
     val runnable = getEditsRunnable(documentManager, textEdit)
 
     writeAction {
@@ -93,7 +90,7 @@ private fun applyEdit(
                     runnable,
                     "text edit",
                     "NxConsole",
-                    documentManager.editor.document
+                    documentManager.editor.document,
                 )
         }
     }

@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 open class NxGraphSelectAllAction(
     text: String? = null,
     description: String? = null,
-    icon: Icon? = null
+    icon: Icon? = null,
 ) : DumbAwareAction(text, description, icon) {
 
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
@@ -41,7 +41,7 @@ open class NxGraphSelectAllAction(
                         if (e.place == NxToolWindowPanel.NX_TOOLBAR_PLACE)
                             TelemetryEventSource.PROJECTS_VIEW
                         else TelemetryEventSource.COMMAND
-                )
+                ),
             )
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {

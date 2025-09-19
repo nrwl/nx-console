@@ -27,7 +27,7 @@ class NxReMoveProjectDialog(
     private val preselectedProjectName: String?,
     private val projectOptions: Map<String, String>?,
     private val workspaceLayout: WorkspaceLayout?,
-    val dryRunCallback: (dialog: NxReMoveProjectDialog) -> Unit
+    val dryRunCallback: (dialog: NxReMoveProjectDialog) -> Unit,
 ) : DialogWrapper(project) {
 
     init {
@@ -60,8 +60,7 @@ class NxReMoveProjectDialog(
                 preselectedProjectName ?: "",
                 reMoveGenerators.find {
                     it.contains("@nx/workspace") || it.contains("@nrwl/workspace")
-                }
-                    ?: reMoveGenerators[0]
+                } ?: reMoveGenerators[0],
             )
 
         panel =
@@ -73,14 +72,14 @@ class NxReMoveProjectDialog(
                                         project,
                                         projectOptions?.keys ?: emptyList(),
                                         false,
-                                        preselectedProjectName
+                                        preselectedProjectName,
                                     )
                                     .apply {
                                         cell(this)
                                             .bind(
                                                 { component -> component.text },
                                                 { component, value -> component.text = value },
-                                                model::project.toMutableProperty()
+                                                model::project.toMutableProperty(),
                                             )
                                             .comment(getShortcutHint())
                                             .align(AlignX.FILL)
@@ -201,5 +200,5 @@ class NxReMoveProjectDialog(
 data class ReMoveProjectDialogModel(
     var project: String = "",
     var generator: String = "",
-    var directory: String = ""
+    var directory: String = "",
 )

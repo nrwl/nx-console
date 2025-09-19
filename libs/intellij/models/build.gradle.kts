@@ -1,8 +1,10 @@
 plugins {
     // Java support
     id("java-library")
+    id("org.jetbrains.kotlin.jvm") version "2.2.0"
+
     // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
     // Gradle IntelliJ Platform Plugin
     id("org.jetbrains.intellij.platform.module")
 }
@@ -19,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
 
@@ -33,7 +35,6 @@ dependencies {
         instrumentationTools()
     }
 }
-
 
 ktfmt { kotlinLangStyle() }
 

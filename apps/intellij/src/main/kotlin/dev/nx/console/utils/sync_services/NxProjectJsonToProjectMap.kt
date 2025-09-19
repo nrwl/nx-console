@@ -20,7 +20,7 @@ class NxProjectJsonToProjectMap(val project: Project, private val cs: CoroutineS
         with(project.messageBus.connect(cs)) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener { cs.launch { populateMap() } }
+                NxWorkspaceRefreshListener { cs.launch { populateMap() } },
             )
         }
     }

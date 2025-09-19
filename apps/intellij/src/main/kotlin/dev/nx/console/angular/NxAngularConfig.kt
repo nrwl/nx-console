@@ -6,10 +6,8 @@ import java.util.*
 import org.angular2.cli.config.AngularConfig
 import org.angular2.cli.config.AngularProject
 
-class NxAngularConfig(
-    override val file: VirtualFile,
-    val projectFiles: Map<String, VirtualFile>,
-) : AngularConfig {
+class NxAngularConfig(override val file: VirtualFile, val projectFiles: Map<String, VirtualFile>) :
+    AngularConfig {
 
     override val projects: List<AngularProject> =
         projectFiles.mapNotNull { (name, file) -> getNxAngularProject(name, file) }

@@ -40,7 +40,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         TelemetryService.getInstance(project)
             .featureUsed(
                 TelemetryEvent.GRAPH_SHOW_TASK_GROUP,
-                mapOf("source" to TelemetryEventSource.PROJECTS_VIEW)
+                mapOf("source" to TelemetryEventSource.PROJECTS_VIEW),
             )
 
         val targetsList: NxSimpleNode.TargetsList =

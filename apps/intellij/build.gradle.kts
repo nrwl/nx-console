@@ -15,20 +15,16 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "2.0.21"
+    id("org.jetbrains.kotlin.jvm") version "2.2.0"
     // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
     // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.6.0"
+    id("org.jetbrains.intellij.platform") version "2.9.0"
 
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "2.0.0"
-    // Gradle Qodana Plugin
-    id("org.jetbrains.qodana") version "0.1.13"
-    // Gradle Kover Plugin
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    id("org.jetbrains.changelog") version "2.4.0"
 
-    id("com.ncorti.ktfmt.gradle") version "0.11.0"
+    id("com.ncorti.ktfmt.gradle") version "0.24.0"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -45,7 +41,6 @@ repositories {
 allprojects {
     apply {
         plugin("project-report")
-        plugin("org.jetbrains.kotlin.jvm")
         plugin("com.ncorti.ktfmt.gradle")
     }
 }
@@ -69,7 +64,7 @@ configurations.all {
 
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.23.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     implementation("io.github.z4kn4fein:semver:2.0.0")
 
@@ -78,12 +73,12 @@ dependencies {
 
     // Add Kotlin test dependency
     testImplementation(kotlin("test"))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-        plugin("com.intellij.ml.llm:251.26094.80.13")
+        plugin("com.intellij.ml.llm:252.25557.171")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
@@ -104,12 +99,9 @@ kotlin { jvmToolchain(21) }
 intellijPlatform {
     projectName = providers.gradleProperty("pluginName").get()
 
-
     pluginConfiguration {
         version = providers.gradleProperty("version").get()
-        ideaVersion {
-            sinceBuild = providers.gradleProperty("pluginSinceBuild").get()
-        }
+        ideaVersion { sinceBuild = providers.gradleProperty("pluginSinceBuild").get() }
         description =
             providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
                 val start = "<!-- Plugin description -->"
@@ -164,7 +156,7 @@ intellijPlatform {
 intellijPlatformTesting {
     runIde {
         create("runIntelliJLatest") {
-            version = "252.18003.27"
+            version = "2025.2.1"
             prepareSandboxTask {
                 from(nxlsRoot) {
                     include("**")
@@ -183,26 +175,14 @@ changelog {
     repositoryUrl.set(providers.gradleProperty("pluginRepositoryUrl").get())
 }
 
-// Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
-qodana {
-    cachePath.set(file(".qodana").canonicalPath)
-    reportPath.set(file("dist/reports/inspections").canonicalPath)
-    saveReport.set(true)
-    showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
-}
-
-// Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
-kover.xmlReport { onCheck.set(true) }
-
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+        freeCompilerArgs.add("-Xskip-metadata-version-check")
+    }
 }
 
 tasks {
-    runInspections {
-        mount("${rootDir}/../../gradle.properties", "/data/project/gradle.properties")
-    }
-
     prepareSandbox() {
         from(nxlsRoot) {
             include("**")

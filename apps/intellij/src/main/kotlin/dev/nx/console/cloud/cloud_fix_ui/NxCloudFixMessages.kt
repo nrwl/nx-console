@@ -27,5 +27,5 @@ data class NxCloudFixDetails(
     val cipe: CIPEInfo,
     val runGroup: CIPERunGroup,
     val terminalOutput: String? = null,
-    val hasUncommittedChanges: Boolean? = null
+    val hasUncommittedChanges: Boolean? = null,
 )

@@ -1,11 +1,11 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse, relative, resolve } from 'path';
-import { exec } from 'child_process';
 import {
   Disposable,
   ExtensionContext,
   ProgressLocation,
   RelativePattern,
+  Uri,
   commands,
   tasks,
   window,
@@ -44,7 +44,6 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import {
   initMcp,
-  startMcpServerSkeleton,
   stopMcpServer,
   updateMcpServerWorkspacePath,
 } from '@nx-console/vscode-mcp';
@@ -67,7 +66,10 @@ import {
   hasNxGraphServerAffected,
 } from '@nx-console/vscode-graph-base';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
-import { initNxCloudView } from '@nx-console/vscode-nx-cloud-view';
+import {
+  handleSelfHealingUri,
+  initNxCloudView,
+} from '@nx-console/vscode-nx-cloud-view';
 import {
   getOutputChannel,
   initOutputChannels,
@@ -99,8 +101,6 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
-    startMcpServerSkeleton();
-
     loadRootEnvFiles(getNxWorkspacePath());
 
     createNxlsClient(context);
@@ -108,6 +108,8 @@ export async function activate(c: ExtensionContext) {
     initMcp(context);
 
     initNxInit(context);
+
+    registerUriHandlers(context);
 
     context.subscriptions.push(
       showRefreshLoadingAtLocation(ProgressLocation.Window),
@@ -416,4 +418,14 @@ async function registerSettingsNxWorkspacePathWatcher() {
   );
 
   context.subscriptions.push(settingsNxWorkspacePathWatcher);
+}
+
+function registerUriHandlers(context: ExtensionContext) {
+  const uriHandler = window.registerUriHandler({
+    handleUri(uri: Uri): void {
+      getOutputChannel().appendLine(`Received URI: ${uri.toString()}`);
+      handleSelfHealingUri(uri);
+    },
+  });
+  context.subscriptions.push(uriHandler);
 }

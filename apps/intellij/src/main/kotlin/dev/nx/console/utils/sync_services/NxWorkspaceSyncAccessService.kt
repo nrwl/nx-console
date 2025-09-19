@@ -24,7 +24,7 @@ class NxWorkspaceSyncAccessService(private val project: Project, private val cs:
                     }
                     nxWorkspaceSync = null
                     cs.launch { nxWorkspaceSync = project.nxWorkspace() }
-                }
+                },
             )
         }
     }
