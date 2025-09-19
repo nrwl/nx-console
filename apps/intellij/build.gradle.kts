@@ -7,9 +7,9 @@ fun isWindows(): Boolean {
     return System.getProperty("os.name").lowercase().startsWith("windows")
 }
 
-val nxlsRoot = "${rootDir}/../../dist/apps/nxls"
+val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
-layout.buildDirectory = file("${rootDir}/../../dist/apps/intellij")
+layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
     // Java support
@@ -26,8 +26,6 @@ plugins {
 
     id("com.ncorti.ktfmt.gradle") version "0.24.0"
     id("dev.nx.gradle.project-graph") version "0.1.8"
-
-
 }
 
 group = providers.gradleProperty("pluginGroup").get()

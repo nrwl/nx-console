@@ -16,29 +16,21 @@ repositories {
     mavenLocal()
     mavenCentral()
     gradlePluginPortal()
-
     intellijPlatform { defaultRepositories() }
 }
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    intellijPlatform {
-        val type = providers.gradleProperty("platformType")
-        val version = providers.gradleProperty("platformVersion")
-        create(type, version) {
-          useCache = true
-        }
+    implementation("com.google.code.gson:gson:2.10.1")
 
-        bundledPlugins(
-            providers.gradleProperty("platformPlugins").map { plugins ->
-                plugins.split(',').map(String::trim).filter(String::isNotEmpty)
-            }
-        )
-        pluginVerifier()
-        zipSigner()
+    intellijPlatform {
+      val type = providers.gradleProperty("platformType")
+      val version = providers.gradleProperty("platformVersion")
+      create(type, version) {
+        useCache = true
+      }
     }
 }
 
 ktfmt { kotlinLangStyle() }
-
 kotlin { jvmToolchain(21) }
