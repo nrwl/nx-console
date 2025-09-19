@@ -99,7 +99,7 @@ object NxProvenance {
                 if (path != ".github/workflows/publish.yml") {
                     return@withContext Pair(
                         false,
-                        "Publishing workflow does not match .github/workflows/publish.yml"
+                        "Publishing workflow does not match .github/workflows/publish.yml",
                     )
                 }
 
@@ -124,7 +124,7 @@ object NxProvenance {
                     if (distSha != attestationSha) {
                         return@withContext Pair(
                             false,
-                            "Integrity hash does not match attestation hash"
+                            "Integrity hash does not match attestation hash",
                         )
                     }
                 }

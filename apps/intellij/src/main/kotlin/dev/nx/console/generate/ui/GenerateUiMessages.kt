@@ -20,21 +20,21 @@ data class GenerateUiFormInitOutputMessage(override val payloadType: String) :
 data class GenerateUiRunGeneratorPayload(
     val positional: String,
     val flags: List<String>,
-    val cwd: String? = null
+    val cwd: String? = null,
 ) {}
 
 @Serializable()
 @SerialName("run-generator")
 data class GenerateUiRunGeneratorOutputMessage(
     override val payloadType: String,
-    val payload: GenerateUiRunGeneratorPayload
+    val payload: GenerateUiRunGeneratorPayload,
 ) : GenerateUiOutputMessage {}
 
 @Serializable()
 @SerialName("copy-to-clipboard")
 data class GenerateUiCopyToClipboardOutputMessage(
     override val payloadType: String,
-    val payload: String
+    val payload: String,
 ) : GenerateUiOutputMessage {}
 
 // The payload will have to be changed for plugins to be truly supported in Intellij
@@ -61,7 +61,7 @@ data class GeneratorSchema(
     val generatorName: String,
     val description: String,
     val options: List<NxGeneratorOption>,
-    val context: NxGeneratorContext?
+    val context: NxGeneratorContext?,
 ) {}
 
 @Serializable

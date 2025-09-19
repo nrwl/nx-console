@@ -20,7 +20,7 @@ class NxGeneratorListCellRenderer(
         value: NxGenerator,
         index: Int,
         selected: Boolean,
-        hasFocus: Boolean
+        hasFocus: Boolean,
     ) {
         if (alternatingRowColors) {
             if (!selected && index % 2 == 0) {
@@ -31,7 +31,7 @@ class NxGeneratorListCellRenderer(
         append(
             "${value.data.collection} - ${value.data.name}",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
-            true
+            true,
         )
 
         value.data.description
@@ -41,7 +41,7 @@ class NxGeneratorListCellRenderer(
                     " " +
                         StringUtil.shortenTextWithEllipsis(description, 80 - value.name.length, 0),
                     SimpleTextAttributes.GRAY_ATTRIBUTES,
-                    false
+                    false,
                 )
             }
     }

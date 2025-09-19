@@ -83,7 +83,7 @@ object GitUtils {
             modifiedFiles = modifiedFiles,
             addedFiles = addedFiles,
             deletedFiles = deletedFiles,
-            untrackedFiles = untrackedFiles
+            untrackedFiles = untrackedFiles,
         )
     }
 
@@ -111,7 +111,7 @@ data class UncommittedChanges(
     val modifiedFiles: List<String>,
     val addedFiles: List<String>,
     val deletedFiles: List<String>,
-    val untrackedFiles: List<String>
+    val untrackedFiles: List<String>,
 ) {
     val hasAnyChanges: Boolean
         get() =

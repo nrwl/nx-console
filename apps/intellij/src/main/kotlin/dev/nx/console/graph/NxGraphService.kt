@@ -27,8 +27,7 @@ public suspend fun getNxGraphService(project: Project): INxGraphService? {
         ProjectLevelCoroutineHolderService.getInstance(project)
             .cs
             .async { nxlsService.workspace()?.nxVersion }
-            .await()
-            ?: return null
+            .await() ?: return null
 
     return if (nxVersion.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
         NxGraphService.getInstance(project)
@@ -66,7 +65,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
             with(project.messageBus.connect(cs)) {
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                    NxWorkspaceRefreshListener { cs.launch { loadProjectGraph(reload = true) } }
+                    NxWorkspaceRefreshListener { cs.launch { loadProjectGraph(reload = true) } },
                 )
             }
         }
@@ -160,7 +159,7 @@ class NxGraphService(override val project: Project, private val cs: CoroutineSco
                     // we don't want to dispose the browser in this case, so we wait for a second
                     checkDisposalAfterDelay()
                 }
-            }
+            },
         )
     }
 

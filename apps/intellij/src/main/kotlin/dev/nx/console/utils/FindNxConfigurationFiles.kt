@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 suspend fun findNxConfigurationFiles(
     project: Project,
-    includeNxJson: Boolean = true
+    includeNxJson: Boolean = true,
 ): List<VirtualFile> {
     val paths: MutableList<VirtualFile> = ArrayList()
     readAction {

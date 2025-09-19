@@ -78,7 +78,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             content = " CI failed for #${cipe.branch}.",
             type = NotificationType.ERROR,
             cipe = cipe,
-            commitUrl = cipe.commitUrl
+            commitUrl = cipe.commitUrl,
         )
     }
 
@@ -95,7 +95,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             type = NotificationType.ERROR,
             cipe = cipe,
             commitUrl = cipe.commitUrl,
-            resultsUrl = run.runUrl
+            resultsUrl = run.runUrl,
         )
     }
 
@@ -104,7 +104,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             content = "CI succeeded for #${cipe.branch}.",
             type = NotificationType.INFORMATION,
             cipe = cipe,
-            commitUrl = cipe.commitUrl
+            commitUrl = cipe.commitUrl,
         )
     }
 
@@ -115,7 +115,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         val notification =
             NOTIFICATION_GROUP.createNotification(
                 content = "CI failed. Nx Cloud AI has a fix for #${cipe.branch}",
-                type = NotificationType.ERROR
+                type = NotificationType.ERROR,
             )
 
         notification.addAction(
@@ -132,7 +132,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         type: NotificationType,
         cipe: CIPEInfo,
         commitUrl: String? = null,
-        resultsUrl: String? = null
+        resultsUrl: String? = null,
     ) {
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_SHOW_CIPE_NOTIFICATION)
@@ -194,13 +194,13 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
     private inner class ViewAiFixAction(
         private val cipeId: String,
-        private val runGroupId: String
+        private val runGroupId: String,
     ) : NotificationAction("View AI Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             TelemetryService.getInstance(project)
                 .featureUsed(
                     TelemetryEvent.CLOUD_OPEN_FIX_DETAILS,
-                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION),
                 )
 
             CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
@@ -211,13 +211,13 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
     private inner class ShowSuggestedFixAction(
         private val cipeId: String,
-        private val runGroupId: String
+        private val runGroupId: String,
     ) : NotificationAction("Show Fix") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             TelemetryService.getInstance(project)
                 .featureUsed(
                     TelemetryEvent.CLOUD_SHOW_AI_FIX,
-                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION),
                 )
 
             CloudFixUIService.getInstance(project).openCloudFixWebview(cipeId, runGroupId)
@@ -228,13 +228,13 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 
     private inner class RejectAiFixAction(
         private val cipe: CIPEInfo,
-        private val runGroup: CIPERunGroup
+        private val runGroup: CIPERunGroup,
     ) : NotificationAction("Reject") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             TelemetryService.getInstance(project)
                 .featureUsed(
                     TelemetryEvent.CLOUD_REJECT_AI_FIX,
-                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION),
                 )
             val aiFixId = runGroup.aiFix?.aiFixId ?: return
             val cloudApiService = NxCloudApiService.getInstance(project)
@@ -255,7 +255,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             TelemetryService.getInstance(project)
                 .featureUsed(
                     TelemetryEvent.CLOUD_FIX_CIPE_ERROR,
-                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION),
                 )
 
             // Try to execute the existing AI assistant action if available
@@ -282,8 +282,11 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
 /** Represents notification events that should be displayed to the user */
 sealed class CIPENotificationEvent {
     data class CIPEFailed(val cipe: CIPEInfo) : CIPENotificationEvent()
+
     data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
+
     data class CIPESucceeded(val cipe: CIPEInfo) : CIPENotificationEvent()
+
     data class AiFixAvailable(val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
         CIPENotificationEvent()
 }

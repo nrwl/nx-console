@@ -58,7 +58,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                         return@NxWorkspaceRefreshListener
                     }
                     updateUncommittedChangesFlag()
-                }
+                },
             )
     }
 
@@ -78,7 +78,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                     cipe = cipe,
                     runGroup = runGroup,
                     terminalOutput = fixDetails.terminalOutput,
-                    hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
+                    hasUncommittedChanges = GitUtils.hasUncommittedChanges(project),
                 )
             currentFixDetails = updatedDetails
             fixFile.sendFixDetailsToWebview(updatedDetails)
@@ -123,7 +123,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                     NOTIFICATION_GROUP.createNotification(
                             "AI Fix Not Found",
                             "Could not find the AI fix data",
-                            NotificationType.ERROR
+                            NotificationType.ERROR,
                         )
                         .notify(project)
                 }

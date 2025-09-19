@@ -12,7 +12,7 @@ class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
     override fun openGenerateUi(
         project: Project,
         nxGenerator: NxGenerator,
-        runGeneratorManager: RunGeneratorManager
+        runGeneratorManager: RunGeneratorManager,
     ) {
         if (!JBCefApp.isSupported()) {
             Notifier.notifyJCEFNotEnabled(project)

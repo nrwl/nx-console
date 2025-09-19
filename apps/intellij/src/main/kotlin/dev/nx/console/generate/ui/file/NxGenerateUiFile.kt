@@ -47,9 +47,8 @@ class NxGenerateUiFileType : FileType {
     }
 }
 
-abstract class NxGenerateUiFile(
-    name: String,
-) : LightVirtualFile(name, NxGenerateUiFileType.INSTANCE, "") {
+abstract class NxGenerateUiFile(name: String) :
+    LightVirtualFile(name, NxGenerateUiFileType.INSTANCE, "") {
 
     protected val browser: JBCefBrowser = JBCefBrowser()
 
@@ -76,12 +75,12 @@ abstract class NxGenerateUiFile(
                         connection.disconnect()
                         browser.jbCefClient.removeLifeSpanHandler(
                             lifeSpanHandler,
-                            browser.cefBrowser
+                            browser.cefBrowser,
                         )
                         Disposer.dispose(browser)
                     }
                 }
-            }
+            },
         )
         browser.jbCefClient.addLifeSpanHandler(lifeSpanHandler, browser.cefBrowser)
     }

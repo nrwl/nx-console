@@ -16,8 +16,7 @@ val Project.nodeInterpreter: NodeJsInterpreter
             if (it !is NodeJsLocalInterpreter && it !is WslNodeInterpreter) {
                 throw ExecutionException(NxConsoleBundle.message("interpreter.not.configured"))
             }
-        }
-            ?: throw IllegalStateException(NxConsoleBundle.message("interpreter.not.configured"))
+        } ?: throw IllegalStateException(NxConsoleBundle.message("interpreter.not.configured"))
 
 @OptIn(ExperimentalContracts::class)
 fun isWslInterpreter(interpreter: NodeJsInterpreter): Boolean {

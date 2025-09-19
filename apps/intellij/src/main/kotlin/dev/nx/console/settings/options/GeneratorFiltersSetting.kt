@@ -26,6 +26,7 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
                 setExpandableItemsEnabled(false)
             }
     }
+
     override fun render(panel: Panel) {
         panel.apply {
             row() {
@@ -40,7 +41,7 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
                         .align(Align.FILL)
                         .comment(
                             "Generator names or wildcard patterns to include/exclude throughout the UI.",
-                            MAX_LINE_LENGTH_WORD_WRAP
+                            MAX_LINE_LENGTH_WORD_WRAP,
                         )
                         .component
                 }
@@ -70,6 +71,7 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
                 override fun valueOf(item: GeneratorListItem?): String? {
                     return item?.matcher
                 }
+
                 override fun setValue(item: GeneratorListItem, value: String) {
                     item.matcher = value
                 }
@@ -79,9 +81,11 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
                 override fun getWidth(table: JTable?): Int {
                     return 65
                 }
+
                 override fun getColumnClass(): Class<*> {
                     return Boolean::class.java
                 }
+
                 override fun valueOf(item: GeneratorListItem?): Boolean? {
                     return item?.include
                 }
@@ -96,9 +100,11 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
                 override fun getWidth(table: JTable?): Int {
                     return 65
                 }
+
                 override fun getColumnClass(): Class<*> {
                     return Boolean::class.java
                 }
+
                 override fun valueOf(item: GeneratorListItem?): Boolean? {
                     return item?.exclude
                 }
@@ -112,7 +118,7 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
         return arrayOf(
             generatorAllowColumnInfo,
             generatorDisallowColumnInfo,
-            generatorMatcherColumnInfo
+            generatorMatcherColumnInfo,
         )
     }
 }
@@ -120,7 +126,7 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
 private class GeneratorListItem(
     var matcher: String = "@nx/example:*",
     var include: Boolean = false,
-    var exclude: Boolean = true
+    var exclude: Boolean = true,
 ) {}
 
 data class GeneratorFilter(val matcher: String, val include: Boolean)

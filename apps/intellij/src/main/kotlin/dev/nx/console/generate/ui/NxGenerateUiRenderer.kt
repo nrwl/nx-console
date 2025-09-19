@@ -9,7 +9,7 @@ interface NxGenerateUiRenderer {
     fun openGenerateUi(
         project: Project,
         nxGenerator: NxGenerator,
-        runGeneratorManager: RunGeneratorManager
+        runGeneratorManager: RunGeneratorManager,
     )
 
     companion object {

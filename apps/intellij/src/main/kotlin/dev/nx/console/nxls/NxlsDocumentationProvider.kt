@@ -35,8 +35,7 @@ internal class NxlsDocumentationProvider : DocumentationProvider {
                 } catch (e: Throwable) {
                     null
                 }
-            }
-                ?: return null
+            } ?: return null
 
         // extract LSP Markdown format and convert links to html that intellij can understand
         val matches =

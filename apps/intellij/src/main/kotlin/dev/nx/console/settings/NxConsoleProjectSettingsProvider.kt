@@ -48,5 +48,5 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
 data class NxConsoleProjectSettingsState(
     var workspacePath: String? = null,
     var generatorAllowlist: Map<String, Boolean>? = null,
-    var toolwindowStyle: ToolWindowStyles = ToolWindowStyles.AUTOMATIC
+    var toolwindowStyle: ToolWindowStyles = ToolWindowStyles.AUTOMATIC,
 ) {}

@@ -37,28 +37,35 @@ object RefreshStates {
 
 sealed interface MainContentEvents : Event {
     class ShowNoNodeInterpreter : MainContentEvents
+
     class ShowErrors(override val data: Int) : DataEvent<Int>, MainContentEvents
+
     class ShowNoProject : MainContentEvents
+
     class ShowNoNxWorkspace : MainContentEvents
+
     class ShowProjectTree(override val data: NxWorkspace) :
         DataEvent<NxWorkspace>, MainContentEvents
 }
 
 sealed interface NxCloudEvents : Event {
     class ShowNotConnectedToNxCloud : NxCloudEvents
+
     class ShowConnectedToNxCloud(override val data: String) : DataEvent<String>, NxCloudEvents
+
     class Hide : NxCloudEvents
 }
 
 sealed interface RefreshEvents : Event {
     class Refreshing : RefreshEvents
+
     class Refreshed : RefreshEvents
 }
 
 fun createRefreshStateGroup(
     refreshedState: DefaultState,
     refreshingState: DefaultState,
-    progressBar: JProgressBar
+    progressBar: JProgressBar,
 ) {
     refreshedState {
         onEntry { withContext(Dispatchers.EDT) { progressBar.isIndeterminate = false } }

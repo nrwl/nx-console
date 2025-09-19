@@ -47,7 +47,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
                         if (e.place == "NxToolWindow") TelemetryEventSource.PROJECTS_VIEW
                         else if (e.isFromContextMenu()) TelemetryEventSource.EXPLORER_CONTEXT_MENU
                         else TelemetryEventSource.COMMAND
-                )
+                ),
             )
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 

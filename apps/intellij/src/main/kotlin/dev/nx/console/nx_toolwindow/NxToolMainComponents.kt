@@ -66,9 +66,7 @@ class NxToolMainComponents(private val project: Project) {
                                         TelemetryService.getInstance(project)
                                             .featureUsed(
                                                 TelemetryEvent.MISC_REFRESH_WORKSPACE,
-                                                mapOf(
-                                                    "source" to TelemetryEventSource.WELCOME_VIEW
-                                                ),
+                                                mapOf("source" to TelemetryEventSource.WELCOME_VIEW),
                                             )
                                         NxRefreshWorkspaceService.getInstance(project)
                                             .refreshWorkspace()
@@ -201,7 +199,7 @@ class NxToolMainComponents(private val project: Project) {
                                             ShowSettingsUtil.getInstance()
                                                 .showSettingsDialog(
                                                     project,
-                                                    NxConsoleSettingsConfigurable::class.java
+                                                    NxConsoleSettingsConfigurable::class.java,
                                                 )
                                         } else {
                                             BrowserLauncher.instance.browse(
@@ -245,7 +243,7 @@ class NxToolMainComponents(private val project: Project) {
                                     null,
                                     null,
                                     NxToolWindowPanel.NX_TOOLBAR_PLACE,
-                                    true
+                                    true,
                                 )
                         } else {
                             BrowserLauncher.instance.browse(URI.create(it.description))
@@ -320,7 +318,7 @@ class NxToolMainComponents(private val project: Project) {
     fun createConnectedToNxCloudPanel(
         cipeTreeComponent: JComponent,
         cipeTreeToolbar: ActionToolbar,
-        headerPanel: JPanel
+        headerPanel: JPanel,
     ): JPanel {
         return JPanel().apply {
             layout = BorderLayout()
@@ -360,7 +358,7 @@ class NxToolMainComponents(private val project: Project) {
                         AnAction(
                             "Refresh",
                             "Refresh CI Pipeline Executions",
-                            AllIcons.Actions.Refresh
+                            AllIcons.Actions.Refresh,
                         ) {
                         override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
@@ -375,7 +373,7 @@ class NxToolMainComponents(private val project: Project) {
                         AnAction(
                             "Open Nx Cloud App",
                             "Open Nx Cloud in browser",
-                            AllIcons.ToolbarDecorator.Export
+                            AllIcons.ToolbarDecorator.Export,
                         ) {
                         override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
@@ -577,7 +575,7 @@ class NxToolMainComponents(private val project: Project) {
                     Notifier.notifyAnything(
                         project,
                         "Couldn't retrieve Nx Cloud URL",
-                        NotificationType.ERROR
+                        NotificationType.ERROR,
                     )
                 }
             }

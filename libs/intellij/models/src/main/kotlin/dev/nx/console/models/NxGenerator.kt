@@ -13,7 +13,7 @@ data class NxGenerator(
     constructor(
         generator: NxGenerator,
         options: List<NxGeneratorOption>? = generator.options,
-        contextValues: NxGeneratorContext? = generator.contextValues
+        contextValues: NxGeneratorContext? = generator.contextValues,
     ) : this(generator.name, generator.schemaPath, generator.data, options, contextValues) {}
 }
 
@@ -23,7 +23,7 @@ data class NxGeneratorData(
     val name: String,
     val description: String?,
     val type: String,
-    val aliases: List<String>
+    val aliases: List<String>,
 ) {
     val fullNamesWithAliases: List<String>
         get(): List<String> {

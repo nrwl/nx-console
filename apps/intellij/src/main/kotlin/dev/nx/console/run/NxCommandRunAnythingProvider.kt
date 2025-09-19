@@ -68,8 +68,7 @@ internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                 ?.nodes
                 ?.entries
                 ?.map { entry -> entry.key to (entry.value.data.targets?.keys ?: emptySet()) }
-                ?.associate { it }
-                ?: emptyMap()
+                ?.associate { it } ?: emptyMap()
         }
 
         val completeTasks = targets.flatMap { entry -> entry.value.map { entry.key + ":" + it } }

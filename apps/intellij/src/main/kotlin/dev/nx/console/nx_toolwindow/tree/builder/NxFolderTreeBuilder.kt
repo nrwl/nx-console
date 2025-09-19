@@ -7,7 +7,7 @@ import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 
 class NxFolderTreeBuilder(
     private val nxWorkspace: NxWorkspace?,
-    private val nxFolderTreeData: NxFolderTreeData?
+    private val nxFolderTreeData: NxFolderTreeData?,
 ) : NxTreeBuilderBase(nxWorkspace) {
 
     override fun buildChildren(node: NxSimpleNode): Array<NxSimpleNode> {
@@ -38,8 +38,7 @@ class NxFolderTreeBuilder(
                     ?.let { nxFolderTreeData.treeMap[it]?.children }
                     ?.mapNotNull { nxFolderTreeData.treeMap[it] }
                     ?.map { createFolderOrProjectNode(it, node) }
-                    ?.toTypedArray()
-                    ?: return targetChildren
+                    ?.toTypedArray() ?: return targetChildren
             return targetChildren + folderChildren
         }
         if (node is NxSimpleNode.Target) {

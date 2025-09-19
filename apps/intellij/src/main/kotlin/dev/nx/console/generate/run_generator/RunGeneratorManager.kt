@@ -33,7 +33,7 @@ class RunGeneratorManager(val project: Project) {
                 listOf(
                     "workspace-generator",
                     generator.replace(Regex("^workspace-(schematic|generator):"), ""),
-                    *flags.toTypedArray()
+                    *flags.toTypedArray(),
                 )
         } else {
             generatorDefinition = listOf("g", generator, *flags.toTypedArray())
@@ -84,19 +84,19 @@ class RunGeneratorManager(val project: Project) {
                                 processHandler,
                                 console.component,
                                 "Nx Generate",
-                                NxIcons.Action
+                                NxIcons.Action,
                             )
 
                         val runContentManager = RunContentManager.getInstance(project)
                         runContentManager.showRunContent(
                             DefaultRunExecutor.getRunExecutorInstance(),
-                            contentDescriptor
+                            contentDescriptor,
                         )
 
                         processHandler.startNotify()
                         this.setProcessHandler(processHandler, definition.isDryRun().not())
                     },
-                    ModalityState.defaultModalityState()
+                    ModalityState.defaultModalityState(),
                 )
         } catch (e: Exception) {
             thisLogger().info("Cannot execute command", e)
@@ -105,7 +105,7 @@ class RunGeneratorManager(val project: Project) {
 
     private fun setProcessHandler(
         processHandler: KillableColoredProcessHandler,
-        refreshFileSystem: Boolean
+        refreshFileSystem: Boolean,
     ) {
         processHandler.addProcessListener(
             object : ProcessListener {
@@ -116,7 +116,7 @@ class RunGeneratorManager(val project: Project) {
                             true,
                             true,
                             true,
-                            VfsUtil.findFileByIoFile(File(project.nxBasePath), true)
+                            VfsUtil.findFileByIoFile(File(project.nxBasePath), true),
                         )
                     }
                 }

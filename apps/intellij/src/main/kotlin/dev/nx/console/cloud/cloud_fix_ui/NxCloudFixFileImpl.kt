@@ -90,7 +90,7 @@ data class NxCloudFixStyles(
 class NxCloudFixFileImpl(
     name: String,
     private val project: Project,
-    private val disposedCallback: (file: NxCloudFixFileImpl) -> Unit
+    private val disposedCallback: (file: NxCloudFixFileImpl) -> Unit,
 ) : NxCloudFixFile(name) {
 
     private val cs = NxCloudFixFileCoroutineHolder.getInstance(project).cs
@@ -243,7 +243,7 @@ class NxCloudFixFileImpl(
         messageBusConnection = ApplicationManager.getApplication().messageBus.connect()
         messageBusConnection?.subscribe(
             UISettingsListener.TOPIC,
-            UISettingsListener { updateWebviewStyles() }
+            UISettingsListener { updateWebviewStyles() },
         )
     }
 
@@ -353,7 +353,7 @@ class NxCloudFixFileImpl(
                     cloudApiService.updateSuggestedFix(
                         aiFixId,
                         AITaskFixUserAction.APPLIED,
-                        commitMessage
+                        commitMessage,
                     )
 
                 if (success) {
@@ -392,7 +392,7 @@ class NxCloudFixFileImpl(
                         project,
                         "Your local branch '$currentBranch' does not match the branch '$cipeBranch' of the CI pipeline execution.",
                         "Are you sure you want to apply the fix locally?",
-                        Messages.getWarningIcon()
+                        Messages.getWarningIcon(),
                     )
                 if (result == Messages.YES) {
                     applyPatchLocally(suggestedFix)
@@ -416,25 +416,19 @@ class NxCloudFixFileImpl(
                         additionalInfo:
                             ThrowableComputable<
                                 MutableMap<String, MutableMap<String, CharSequence>>,
-                                PatchSyntaxException
-                            >?
+                                PatchSyntaxException,
+                            >?,
                     ) {
                         try {
-                            logger<NxCloudFixFileImpl>()
-                                .info(
-                                    "applying fix locally",
-                                )
+                            logger<NxCloudFixFileImpl>().info("applying fix locally")
                             super.apply(
                                 remaining,
                                 patchGroupsToApply,
                                 localList,
                                 fileName,
-                                additionalInfo
+                                additionalInfo,
                             )
-                            logger<NxCloudFixFileImpl>()
-                                .info(
-                                    "sending message to api",
-                                )
+                            logger<NxCloudFixFileImpl>().info("sending message to api")
 
                             val fixDetails = currentFixDetails ?: return
                             val aiFixId =
@@ -447,15 +441,13 @@ class NxCloudFixFileImpl(
                             cs.launch {
                                 try {
                                     logger<NxCloudFixFileImpl>()
-                                        .info(
-                                            "actually doing send message to api",
-                                        )
+                                        .info("actually doing send message to api")
 
                                     val cloudApiService = NxCloudApiService.getInstance(project)
                                     val success =
                                         cloudApiService.updateSuggestedFix(
                                             aiFixId,
-                                            AITaskFixUserAction.APPLIED_LOCALLY
+                                            AITaskFixUserAction.APPLIED_LOCALLY,
                                         )
 
                                     if (success) {
@@ -483,7 +475,7 @@ class NxCloudFixFileImpl(
                     executor,
                     listOf(),
                     ApplyPatchMode.APPLY,
-                    patchFile
+                    patchFile,
                 )
                 .show()
         }

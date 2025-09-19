@@ -17,7 +17,7 @@ class TelemetrySetting() : NxConsoleSettingBase<Boolean> {
                     .comment(
                         NxConsoleBundle.message("nx.telemetry.permission") +
                             """ <a href="https://nx.dev/recipes/nx-console/console-telemetry#collected-data">Learn more.</a>""",
-                        MAX_LINE_LENGTH_WORD_WRAP
+                        MAX_LINE_LENGTH_WORD_WRAP,
                     )
             }
         }

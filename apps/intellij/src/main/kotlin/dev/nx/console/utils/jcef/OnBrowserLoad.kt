@@ -51,11 +51,7 @@ fun onBrowserLoadEnd(browser: JBCefBrowser, onLoadEnd: () -> Unit) {
 suspend fun JBCefBrowser.awaitLoad() = suspendCancellableCoroutine { continuation ->
     val loadHandler =
         object : CefLoadHandlerAdapter() {
-            override fun onLoadEnd(
-                browser: CefBrowser?,
-                frame: CefFrame?,
-                httpStatusCode: Int,
-            ) {
+            override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
                 this@awaitLoad.jbCefClient.removeLoadHandler(this, this@awaitLoad.cefBrowser)
                 continuation.resume(Unit)
             }
