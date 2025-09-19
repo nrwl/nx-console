@@ -3,28 +3,24 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
-    "build": {
-      "command": "yarn nx run intellij:buildPlugin",
-      "configurations": {
-        "production-intellij": {}
-      },
-      "dependsOn": ["^build"]
-    },
-    "runIde": {
-      "dependsOn": ["^build"]
+    "initializeIntellijPlatformPlugin": {
+      "inputs": ["!{workspaceRoot}/.intellijPlatform"]
     },
     "verifyPlugin": {
+      "inputs": ["!{workspaceRoot}/.intellijPlatform"],
       "cache": true
     },
-    "ktfmtFormat": {
-      "//": "TODO: remove this after gradle refactor, probably fixed with different build setup",
-      "cache": false
+    "compileJava": {
+      "inputs": ["!{workspaceRoot}/.intellijPlatform"]
     },
-    "test": {
-      "command": "yarn nx run intellij:check"
+    "compileTestJava": {
+      "inputs": ["!{workspaceRoot}/.intellijPlatform"]
     },
-    "lint": {
-      "executor": "nx:noop"
+    "verifyPluginProjectConfiguration": {
+      "inputs": ["!{workspaceRoot}/.intellijPlatform"]
+    },
+    "javadoc": {
+      "inputs": ["!{workspaceRoot}/.intellijPlatform"]
     },
     "x-lint": {
       "//": "Run inspections take a long time on the CI. Disable for now",
