@@ -1,6 +1,5 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse, relative, resolve } from 'path';
-import { exec } from 'child_process';
 import {
   Disposable,
   ExtensionContext,
@@ -45,7 +44,6 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import {
   initMcp,
-  startMcpServerSkeleton,
   stopMcpServer,
   updateMcpServerWorkspacePath,
 } from '@nx-console/vscode-mcp';
@@ -102,8 +100,6 @@ export async function activate(c: ExtensionContext) {
 
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
-
-    startMcpServerSkeleton();
 
     loadRootEnvFiles(getNxWorkspacePath());
 
