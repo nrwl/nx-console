@@ -1,0 +1,15 @@
+diff --git a/lib/prepare.js b/lib/prepare.js
+index d232eb2134ab2f1f8081d3b72305caa20bf41513..58e17ca1f33c9507e99613f9ffeeb85f89a67734 100644
+--- a/lib/prepare.js
++++ b/lib/prepare.js
+@@ -8,8 +8,8 @@ module.exports = async (npmrc, {tarballDir, pkgRoot}, {cwd, env, stdout, stderr,
+   logger.log('Write version %s to package.json in %s', version, basePath);
+ 
+   const versionResult = execa(
+-    'npm',
+-    ['version', version, '--userconfig', npmrc, '--no-git-tag-version', '--allow-same-version'],
++    'yarn',
++    ['version', version],
+     {
+       cwd: basePath,
+       env,
