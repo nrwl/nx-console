@@ -1,10 +1,16 @@
-launch-templates:
-  windows-medium-js:
-    resource-class: 'windows/medium'
-    image: 'windows-2022'
-    init-steps:
-      - name: Checkout
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
+common-env: &common-env
+  NX_VERBOSE_LOGGING: true
+common-init-steps: &common-init-steps
+  - name: Checkout
+    uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
+  - group-name: Restore Caches
+    steps:
+      - name: Setup Java 21
+        script: |
+          sudo apt update
+          sudo apt install -y openjdk-21-jdk
+          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+          java -version
       - name: Restore Node Modules Cache
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
         inputs:
@@ -17,69 +23,51 @@ launch-templates:
           key: 'package-lock.json|yarn.lock|pnpm-lock.yaml|"browsers"'
           paths: |
             '../.cache/Cypress'
-            '../.cache/ms-playwright'
           base-branch: 'main'
+  - group-name: Install Dependencies
+    parallel: true
+    steps:
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
-      - name: Install Browsers (if needed)
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
-      - name: Install cypress with --force
-        script: npx cypress install --force
+      - name: Generate workspace data
+        script: npx nx show projects
+  - name: Install Browsers
+    uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+
+launch-templates:
   linux-medium-plus-js:
     resource-class: 'docker_linux_amd64/medium+'
     image: 'ubuntu22.04-node20.11-v10'
-    init-steps:
-      - name: Checkout
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
-      - name: Setup Java 21
-        script: |
-          sudo apt update
-          sudo apt install -y openjdk-21-jdk
-          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
-          java -version
-      - name: Restore Node Modules Cache
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
-        inputs:
-          key: 'package-lock.json|yarn.lock|pnpm-lock.yaml'
-          paths: 'node_modules'
-          base-branch: 'main'
-      - name: Restore Browser Binary Cache
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
-        inputs:
-          key: 'package-lock.json|yarn.lock|pnpm-lock.yaml|"browsers"'
-          paths: |
-            '../.cache/Cypress'
-          base-branch: 'main'
-      - name: Install Node Modules
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
-      - name: Install Browsers (if needed)
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
-  linux-large-js:
-    resource-class: 'docker_linux_amd64/large'
+    env: *common-env
+    init-steps: *common-init-steps
+  linux-large-plus-js:
+    resource-class: 'docker_linux_amd64/large+'
     image: 'ubuntu22.04-node20.11-v10'
-    init-steps:
-      - name: Checkout
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
-      - name: Setup Java 21
-        script: |
-          sudo apt update
-          sudo apt install -y openjdk-21-jdk
-          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
-          java -version
-      - name: Restore Node Modules Cache
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
-        inputs:
-          key: 'package-lock.json|yarn.lock|pnpm-lock.yaml'
-          paths: 'node_modules'
-          base-branch: 'main'
-      - name: Restore Browser Binary Cache
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
-        inputs:
-          key: 'package-lock.json|yarn.lock|pnpm-lock.yaml|"browsers"'
-          paths: |
-            '../.cache/Cypress'
-          base-branch: 'main'
-      - name: Install Node Modules
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
-      - name: Install Browsers (if needed)
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+    env: *common-env
+    init-steps: *common-init-steps
+  # windows-medium-js:
+  #   resource-class: 'windows/medium'
+  #   image: 'windows-2022'
+  #   init-steps:
+  #     - name: Checkout
+  #       uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
+  #     - name: Restore Node Modules Cache
+  #       uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
+  #       inputs:
+  #         key: 'package-lock.json|yarn.lock|pnpm-lock.yaml'
+  #         paths: 'node_modules'
+  #         base-branch: 'main'
+  #     - name: Restore Browser Binary Cache
+  #       uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
+  #       inputs:
+  #         key: 'package-lock.json|yarn.lock|pnpm-lock.yaml|"browsers"'
+  #         paths: |
+  #           '../.cache/Cypress'
+  #           '../.cache/ms-playwright'
+  #         base-branch: 'main'
+  #     - name: Install Node Modules
+  #       uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
+  #     - name: Install Browsers (if needed)
+  #       uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+  #     - name: Install cypress with --force
+  #       script: npx cypress install --force

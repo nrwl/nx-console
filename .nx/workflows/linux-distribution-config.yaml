@@ -1,10 +1,11 @@
 distribute-on:
-  small-changeset: 2 linux-medium-plus-js, 1 linux-large-js
-  medium-changeset: 3 linux-medium-plus-js, 1 linux-large-js
-  large-changeset: 5 linux-medium-plus-js, 1 linux-large-js
+  small-changeset: 3 linux-large-plus-js
+  medium-changeset: 4 linux-large-plus-js
+  large-changeset: 6 linux-large-plus-js
 
 assignment-rules:
-  - project: intellij
-    target: build
+  - projects:
+      - intellij
     runs-on:
-      - linux-large-js
+      - linux-large-plus-js
+    parallelism: 1
