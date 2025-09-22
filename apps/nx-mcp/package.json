@@ -82,6 +82,7 @@
       },
       "setup-publish": {
         "command": "node setup-publish.js",
+        "cache": false,
         "options": {
           "cwd": "apps/nx-mcp"
         },
