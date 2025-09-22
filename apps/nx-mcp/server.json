@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.nrwl/nx-console",
+  "description": "A Model Context Protocol server implementation for Nx",
+  "status": "active",
+  "repository": {
+    "url": "https://github.com/nrwl/nx-console",
+    "source": "github"
+  },
+  "version": "PLACEHOLDER_VERSION",
+  "packages": [
+    {
+      "registry_type": "npm",
+      "registry_base_url": "https://registry.npmjs.org",
+      "identifier": "nx-mcp",
+      "version": "PLACEHOLDER_VERSION",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
