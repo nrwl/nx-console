@@ -30,6 +30,9 @@ const updatedServerJsonContent = serverJsonContent.replace(
 fs.writeFileSync(distServerJsonPath, updatedServerJsonContent);
 console.log(`Server.json copied with version ${version}`);
 
+console.log(`source server.json`, JSON.stringify(serverJsonContent));
+console.log(`updated server.json`, JSON.stringify(updatedServerJsonContent));
+
 console.log('Adding shebang to main.js...');
 const mainJsContent = fs.readFileSync(distMainJsPath, 'utf8');
 const shebang = '#!/usr/bin/env node\n';
