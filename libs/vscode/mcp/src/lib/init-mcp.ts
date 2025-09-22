@@ -102,7 +102,7 @@ function cleanupOldMcpJson() {
         // show notification to delete old entry
         window
           .showWarningMessage(
-            "Nx Console can now automatically configure the Nx MCP server dynamically. You can remove the old 'nx-mcp' entry from your .vscode/mcp.json file.",
+            `Nx Console can now automatically configure the Nx MCP server dynamically. You can remove the old 'nx-mcp' entry from your ${mcpJsonPath} file.`,
             'Remove Entry',
             "Don't ask again",
           )
