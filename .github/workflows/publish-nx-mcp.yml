@@ -15,7 +15,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Use Node.js ${{ env.node_version }}
@@ -53,5 +53,5 @@ jobs:
         run: ./mcp-publisher login github-oidc
         working-directory: dist/apps/nx-mcp
       - name: Publish to MCP Registry
-        run: ./mcp-publisher publish
+        run: cat server.json && ./mcp-publisher publish
         working-directory: dist/apps/nx-mcp
