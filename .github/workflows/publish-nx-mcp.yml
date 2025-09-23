@@ -46,15 +46,15 @@ jobs:
         run: npm --version
       - name: build nx-mcp artifact
         run: npx nx run nx-mcp:setup-publish --skip-nx-cache
-      - name: npm publish
-        run: npm publish
-        working-directory: dist/apps/nx-mcp
       - name: Install mcp-publisher (pinned)
-        run: node tools/scripts/install-mcp-publisher.js --ref 9d184933c50694dc18067de184b0ea393199dfb6
+        run: node tools/scripts/install-mcp-publisher.mjs --ref 9d184933c50694dc18067de184b0ea393199dfb6
         working-directory: dist/apps/nx-mcp
       - name: Login to MCP Registry
         run: ./mcp-publisher login github-oidc
         working-directory: dist/apps/nx-mcp
       - name: Publish to MCP Registry
         run: cat server.json && ./mcp-publisher publish
+        working-directory: dist/apps/nx-mcp
+      - name: npm publish
+        run: npm publish
         working-directory: dist/apps/nx-mcp
