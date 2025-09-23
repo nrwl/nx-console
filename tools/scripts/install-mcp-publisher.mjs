@@ -1,9 +1,9 @@
 // scripts/install-mcp-publisher.js
 // Usage: node scripts/install-mcp-publisher.js --ref <commit-or-tag>
 //        MCP_PUBLISHER_REF=<ref> node scripts/install-mcp-publisher.js
-import { execSync } from 'child_process'
-import { existsSync, mkdirSync, copyFileSync, chmodSync } from 'fs'
-import { join } from 'path'
+import { execSync, execFileSync } from 'child_process';
+import { existsSync, mkdirSync, copyFileSync, chmodSync } from 'fs';
+import { join } from 'path';
 
 function run(cmd, env = {}) {
   return execSync(cmd, { stdio: 'inherit', env: { ...process.env, ...env } });
@@ -60,5 +60,5 @@ chmodSync(target, 0o755);
 
 console.log(`✅ Installed mcp-publisher from ${REF} -> ${target}`);
 try {
-  execSync(`${target} --help`, { stdio: 'inherit' });
-} catch { }
+  execFileSync(target, ['--help'], { stdio: 'inherit' });
+} catch {}
