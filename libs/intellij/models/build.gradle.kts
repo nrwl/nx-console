@@ -1,5 +1,3 @@
-import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
-
 plugins {
     id("java-library")
     id("org.jetbrains.intellij.platform") version "2.9.0"

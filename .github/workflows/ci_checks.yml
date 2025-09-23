@@ -78,7 +78,7 @@ jobs:
 
       # todo(cammisuli): disable verifyPlugin for now as its constantly failing on CI
       # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
-      - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
+      - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 60
 
       - run: npx nx-cloud fix-ci
