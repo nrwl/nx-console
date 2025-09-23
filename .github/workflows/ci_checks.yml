@@ -68,7 +68,7 @@ jobs:
       - name: Check formatting
         run: |
           yarn nx-cloud record -- yarn nx format:check --verbose
-          yarn nx-cloud record -- yarn nx run-many -t ktfmtFormatTest
+          yarn nx-cloud record -- yarn nx run-many -t ktfmtFormat
 
       - name: Ensure the workspace configuration is in sync
         run: yarn nx-cloud record -- yarn nx sync:check

@@ -52,7 +52,7 @@ dependencies {
         val version = providers.gradleProperty("platformVersion")
         create(type, version) { useCache = true }
 
-        plugin("com.intellij.ml.llm:252.25557.171")
+        plugin("com.intellij.ml.llm:252.26199.169")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)

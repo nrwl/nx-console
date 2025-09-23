@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id("java-library")
     id("org.jetbrains.intellij.platform") version "2.9.0"
@@ -15,8 +17,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     intellijPlatform {
-        val type = providers.gradleProperty("platformType")
         val version = providers.gradleProperty("platformVersion")
+        val type = providers.gradleProperty("platformType")
         create(type, version) { useCache = true }
     }
 }
