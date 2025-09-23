@@ -1,39 +1,16 @@
-plugins {
-    // Java support
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm") version "2.2.0"
-
-    // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
-    // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform.module")
-}
+plugins { id("java-library") }
 
 group = providers.gradleProperty("pluginGroup").get()
 
 version = providers.gradleProperty("version").get()
 
 // Configure project's dependencies
-repositories {
-    mavenCentral()
-
-    intellijPlatform { defaultRepositories() }
-}
+repositories { mavenCentral() }
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    intellijPlatform {
-        intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-
-        bundledPlugins(
-            providers.gradleProperty("platformPlugins").map { plugins ->
-                plugins.split(',').map(String::trim).filter(String::isNotEmpty)
-            }
-        )
-        pluginVerifier()
-        zipSigner()
-        instrumentationTools()
-    }
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.semver4j:semver4j:6.0.0")
 }
 
 ktfmt { kotlinLangStyle() }

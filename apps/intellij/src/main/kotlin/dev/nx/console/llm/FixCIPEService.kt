@@ -44,8 +44,7 @@ class FixCIPEService(private val project: Project, private val cs: CoroutineScop
                         .createChatSession(
                             ChatCreationContext(
                                 origin = ChatOrigin.CustomIntention,
-                                sourceActionForStatistic = ChatSessionStorage.SourceAction.NEW_CHAT,
-                                null,
+                                sourceActionForStatistic = ChatSourceAction.NEW_CHAT,
                             )
                         )
                 chatSession.setActiveMode(ChatSessionMode.CODE_GENERATION)

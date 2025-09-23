@@ -7,24 +7,14 @@ fun isWindows(): Boolean {
     return System.getProperty("os.name").lowercase().startsWith("windows")
 }
 
-val nxlsRoot = "${rootDir}/../../dist/apps/nxls"
+val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
-layout.buildDirectory = file("${rootDir}/../../dist/apps/intellij")
+layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
-    // Java support
     id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "2.2.0"
-    // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
-    // Gradle IntelliJ Platform Plugin
-    id("org.jetbrains.intellij.platform") version "2.9.0"
-
-    // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.4.0"
-
-    id("com.ncorti.ktfmt.gradle") version "0.24.0"
+    id("org.jetbrains.intellij.platform") version "2.9.0"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -32,26 +22,7 @@ group = providers.gradleProperty("pluginGroup").get()
 version = providers.gradleProperty("version").get()
 
 // Configure project's dependencies
-repositories {
-    mavenCentral()
-
-    intellijPlatform { defaultRepositories() }
-}
-
-allprojects {
-    apply {
-        plugin("project-report")
-        plugin("com.ncorti.ktfmt.gradle")
-    }
-}
-
-tasks.register("projectReportAll") {
-    // All project reports of subprojects
-    allprojects.forEach { dependsOn(it.tasks.get("projectReport")) }
-
-    // All projectReportAll of included builds
-    gradle.includedBuilds.forEach { dependsOn(it.task(":projectReportAll")) }
-}
+repositories { intellijPlatform { defaultRepositories() } }
 
 configurations.all {
     exclude("org.slf4j", "slf4j-api")
@@ -77,8 +48,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
-        intellijIdeaUltimate(providers.gradleProperty("platformVersion"))
-        plugin("com.intellij.ml.llm:252.25557.171")
+        val type = providers.gradleProperty("platformType")
+        val version = providers.gradleProperty("platformVersion")
+        create(type, version) { useCache = true }
+
+        plugin("com.intellij.ml.llm:252.26199.169")
         bundledPlugins(
             providers.gradleProperty("platformPlugins").map { plugins ->
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
@@ -89,7 +63,7 @@ dependencies {
         // Add test framework configuration
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
-    implementation(project(":libs:intellij:models"))
+    implementation(project(":intellij-models"))
 }
 
 ktfmt { kotlinLangStyle() }
