@@ -1,24 +1,16 @@
-plugins {
-    id("java-library")
-    id("org.jetbrains.intellij.platform") version "2.9.0"
-}
+plugins { id("java-library") }
 
 group = providers.gradleProperty("pluginGroup").get()
 
 version = providers.gradleProperty("version").get()
 
 // Configure project's dependencies
-repositories { intellijPlatform { defaultRepositories() } }
+repositories { mavenCentral() }
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
-
-    intellijPlatform {
-        val version = providers.gradleProperty("platformVersion")
-        val type = providers.gradleProperty("platformType")
-        create(type, version) { useCache = true }
-    }
+    implementation("org.semver4j:semver4j:6.0.0")
 }
 
 ktfmt { kotlinLangStyle() }
