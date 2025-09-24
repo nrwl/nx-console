@@ -25,7 +25,6 @@ common-init-steps: &common-init-steps
             '../.cache/Cypress'
           base-branch: 'main'
   - group-name: Install Dependencies
-    parallel: true
     steps:
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
