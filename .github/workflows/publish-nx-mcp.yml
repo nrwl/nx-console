@@ -32,10 +32,6 @@ jobs:
           distribution: zulu
           java-version: 17
           cache: gradle
-      - name: Setup Go (required by publisher)
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24.x'
       - run: yarn install --immutable
         shell: bash
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
@@ -49,8 +45,9 @@ jobs:
       - name: npm publish
         run: npm publish
         working-directory: dist/apps/nx-mcp
-      - name: Install mcp-publisher (pinned)
-        run: node ../../../tools/scripts/install-mcp-publisher.mjs --ref 9d184933c50694dc18067de184b0ea393199dfb6
+      - name: Install MCP Publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.1.0/mcp-publisher_1.1.0_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
         working-directory: dist/apps/nx-mcp
       - name: Login to MCP Registry
         run: ./mcp-publisher login github-oidc
