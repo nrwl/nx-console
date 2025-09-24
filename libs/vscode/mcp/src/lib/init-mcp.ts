@@ -1,5 +1,23 @@
 import { gte } from '@nx-console/nx-version';
-import { isInCursor, isInVSCode, isInWindsurf } from '@nx-console/vscode-utils';
+import {
+  getNxWorkspacePath,
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode-configuration';
+import {
+  logAndShowError,
+  vscodeLogger,
+} from '@nx-console/vscode-output-channels';
+import {
+  getMcpJsonPath,
+  hasNxMcpEntry,
+  isInCursor,
+  isInVSCode,
+  isInWindsurf,
+  readMcpJson,
+  writeMcpJson,
+} from '@nx-console/vscode-utils';
+import { execSync } from 'child_process';
 import vscode, {
   commands,
   ExtensionContext,
@@ -7,27 +25,10 @@ import vscode, {
   version,
   window,
 } from 'vscode';
-import type { McpStreamableWebServer } from './mcp-vscode-server';
 import type { McpCursorServer } from './mcp-cursor-server';
+import type { McpStreamableWebServer } from './mcp-vscode-server';
+import { setupPeriodicAiCheck } from './periodic-ai-check';
 import { findAvailablePort, isPortAvailable } from './ports';
-import {
-  getNxWorkspacePath,
-  WorkspaceConfigurationStore,
-  GlobalConfigurationStore,
-} from '@nx-console/vscode-configuration';
-import { AgentRulesManager } from './agent-rules-manager';
-import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import {
-  logAndShowError,
-  vscodeLogger,
-} from '@nx-console/vscode-output-channels';
-import { execSync } from 'child_process';
-import {
-  getMcpJsonPath,
-  hasNxMcpEntry,
-  readMcpJson,
-  writeMcpJson,
-} from '@nx-console/vscode-utils';
 
 let mcpStreamableWebServer: McpStreamableWebServer | undefined;
 let mcpCursorServer: McpCursorServer | undefined;
@@ -103,7 +104,8 @@ export async function initMcp(context: ExtensionContext) {
     initModernVSCodeMcp(context, mcpPort);
   }
 
-  await setupAgentRules(context);
+  // Setup periodic AI agent check
+  setupPeriodicAiCheck(context);
 }
 
 function cleanupOldMcpJson() {
@@ -141,23 +143,6 @@ function cleanupOldMcpJson() {
           });
       }
     }
-  }
-}
-
-async function setupAgentRules(context: ExtensionContext) {
-  if (await checkIsNxWorkspace(getNxWorkspacePath())) {
-    const rulesManager = new AgentRulesManager(context);
-
-    context.subscriptions.push(
-      commands.registerCommand('nx.addAgentRules', async () => {
-        await rulesManager.addAgentRulesToWorkspace();
-      }),
-    );
-
-    await rulesManager.initialize();
-
-    await new Promise((resolve) => setTimeout(resolve, 20000));
-    await rulesManager.showAgentRulesNotification();
   }
 }
 
