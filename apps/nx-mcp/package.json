@@ -31,7 +31,7 @@
     "README.md",
     "CHANGELOG.md"
   ],
-  "mcpName": "io.github.nrwl/nx-console",
+  "mcpName": "io.github.nrwl/nx-mcp",
   "nx": {
     "name": "nx-mcp",
     "projectType": "application",
