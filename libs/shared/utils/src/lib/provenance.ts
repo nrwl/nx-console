@@ -1,12 +1,14 @@
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import { withTimeout } from './utils';
 
 /**
  * Checks the provenance of the latest version of Nx from the npm registry.
  * Returns true if the provenance is valid, otherwise returns a string describing the failure reason.
  */
 export async function nxLatestProvenanceCheck(): Promise<true | string> {
+  if (process.env.NX_SKIP_PROVENANCE_CHECK === 'true') {
+    return true;
+  }
   try {
     const npmView = (
       await promisify(exec)(`npm view nx@latest --json --silent`, {
