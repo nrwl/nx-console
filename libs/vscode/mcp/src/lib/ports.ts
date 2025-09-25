@@ -1,7 +1,7 @@
 import * as net from 'net';
 
 /**
- * Generates a random port number and checks if it's available
+ * Finds an available port
  * @returns A promise that resolves to an available port number or null if none found
  */
 export async function findAvailablePort(): Promise<number | null> {
@@ -23,7 +23,7 @@ export async function findAvailablePort(): Promise<number | null> {
  * @param port The port to check
  * @returns A promise that resolves to true if the port is available, false otherwise
  */
-function isPortAvailable(port: number): Promise<boolean> {
+export function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
     const server = net.createServer();
 

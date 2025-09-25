@@ -16,6 +16,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'nxCloudNotifications',
   'debugMode',
   'generateAiAgentRules',
+  'mcpPort',
 ] as const;
 
 export type GlobalConfig = {
@@ -36,6 +37,7 @@ export type GlobalConfig = {
   nxCloudNotifications: 'all' | 'errors' | 'none';
   debugMode: boolean;
   generateAiAgentRules: boolean;
+  mcpPort: number | undefined;
 };
 
 /**
