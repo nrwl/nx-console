@@ -83,12 +83,7 @@ async function runAiAgentCheck() {
   try {
     const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
 
-    const hasProvenance = await nxLatestProvenanceCheck();
-
-    if (hasProvenance !== true) {
-      return;
-    }
-    const command = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check`;
+    const command = `${pkgManagerCommands.dlx} nx configure-ai-agents --check`;
 
     try {
       await promisify(exec)(command, {
@@ -96,7 +91,6 @@ async function runAiAgentCheck() {
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
-          NX_AI_FILES_USE_LOCAL: 'true',
         },
       });
     } catch (e) {
