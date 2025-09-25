@@ -104,7 +104,6 @@ export async function initMcp(context: ExtensionContext) {
     initModernVSCodeMcp(context, mcpPort);
   }
 
-  // Setup periodic AI agent check
   setupPeriodicAiCheck(context);
 }
 
