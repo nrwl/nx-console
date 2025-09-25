@@ -90,7 +90,7 @@ export async function initMcp(context: ExtensionContext) {
     const availablePort = await findAvailablePort();
     if (!availablePort) {
       vscodeLogger.log(
-        'Could not an find available port for MCP server after 100 attempts',
+        'Could not find an available port for MCP server after 100 attempts',
       );
       return;
     }
