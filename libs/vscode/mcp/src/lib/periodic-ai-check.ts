@@ -36,10 +36,9 @@ export function setupPeriodicAiCheck(context: ExtensionContext) {
         runAiAgentCheck();
       },
       60 * 60 * 1000,
-    ); // 1 hour
-  }, 60 * 1000); // 1 minute
+    );
+  }, 60 * 1000);
 
-  // Clean up timers on deactivate
   context.subscriptions.push(
     new Disposable(() => {
       if (checkTimer) {
@@ -53,13 +52,7 @@ export function setupPeriodicAiCheck(context: ExtensionContext) {
 }
 
 async function runAiAgentCheck() {
-  // Check if user has disabled notifications
   if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
-    return;
-  }
-
-  const nxVersion = await getNxVersion(true);
-  if (!nxVersion || !gte(nxVersion, '21.6.0')) {
     return;
   }
 
@@ -83,7 +76,12 @@ async function runAiAgentCheck() {
   try {
     const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
 
-    const command = `${pkgManagerCommands.dlx} nx configure-ai-agents --check`;
+    const hasProvenance = await nxLatestProvenanceCheck();
+    if (hasProvenance !== true) {
+      return;
+    }
+
+    const command = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check`;
 
     try {
       await promisify(exec)(command, {
@@ -91,6 +89,8 @@ async function runAiAgentCheck() {
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
+          // we're already executing from latest, we don't have to fetch latest again
+          NX_AI_FILES_USE_LOCAL: 'true',
         },
       });
     } catch (e) {
