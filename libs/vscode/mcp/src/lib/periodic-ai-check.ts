@@ -1,18 +1,21 @@
+import { gte } from '@nx-console/nx-version';
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import {
-  ExtensionContext,
-  window,
   Disposable,
+  ExtensionContext,
   ShellExecution,
   Task,
   TaskScope,
   tasks,
+  window,
 } from 'vscode';
 
 let checkTimer: NodeJS.Timeout | undefined;
@@ -55,11 +58,17 @@ async function runAiAgentCheck() {
     return;
   }
 
+  const nxVersion = await getNxVersion(true);
+  if (!nxVersion || !gte(nxVersion, '21.6.0')) {
+    return;
+  }
+
   // Check if we already showed a notification within the last 24 hours
   const lastNotificationTimestamp = WorkspaceConfigurationStore.instance.get(
     'lastAiCheckNotificationTimestamp',
     0,
   );
+
   const now = Date.now();
   const oneDayInMs = 24 * 60 * 60 * 1000;
   if (now - lastNotificationTimestamp < oneDayInMs) {
@@ -90,7 +99,15 @@ async function runAiAgentCheck() {
           NX_AI_FILES_USE_LOCAL: 'true',
         },
       });
-    } catch {
+    } catch (e) {
+      vscodeLogger.log(`AI agent configuration check failed: ${e}`);
+
+      // let's be conservative for now.
+      // There are many different reasons this could fail so we want to not spam users
+      const stringified = JSON.stringify(e);
+      if (!stringified.includes('The following AI agents are out of date')) {
+        return;
+      }
       WorkspaceConfigurationStore.instance.set(
         'lastAiCheckNotificationTimestamp',
         now,
