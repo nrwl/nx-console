@@ -1,10 +1,22 @@
 import * as net from 'net';
 
 /**
- * Generates a random port number and checks if it's available
+ * Finds an available port, optionally checking a preferred port first
+ * @param preferredPort - Optional preferred port to check first
  * @returns A promise that resolves to an available port number or null if none found
  */
-export async function findAvailablePort(): Promise<number | null> {
+export async function findAvailablePort(
+  preferredPort?: number,
+): Promise<number | null> {
+  // If a preferred port is provided, only check that specific port
+  if (preferredPort !== undefined) {
+    if (await isPortAvailable(preferredPort)) {
+      return preferredPort;
+    }
+    // If the preferred port is not available, return null (no fallback)
+    return null;
+  }
+
   // Try up to 100 times to find an available port
   for (let i = 0; i < 100; i++) {
     // Generate a random port between 9000 and 10000
@@ -23,7 +35,7 @@ export async function findAvailablePort(): Promise<number | null> {
  * @param port The port to check
  * @returns A promise that resolves to true if the port is available, false otherwise
  */
-function isPortAvailable(port: number): Promise<boolean> {
+export function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
     const server = net.createServer();
 

@@ -1098,6 +1098,11 @@
           "type": "boolean",
           "default": false,
           "description": "Autogenerate Nx-specific AI agent rules for the workspace if the Nx MCP is configured."
+        },
+        "nxConsole.mcpPort": {
+          "type": "number",
+          "scope": "resource",
+          "description": "Fixed port for the Nx MCP server. If set to 0, a random available port will be used."
         }
       }
     },

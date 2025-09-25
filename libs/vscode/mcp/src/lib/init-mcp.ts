@@ -9,10 +9,11 @@ import vscode, {
 } from 'vscode';
 import type { McpStreamableWebServer } from './mcp-vscode-server';
 import type { McpCursorServer } from './mcp-cursor-server';
-import { findAvailablePort } from './ports';
+import { findAvailablePort, isPortAvailable } from './ports';
 import {
   getNxWorkspacePath,
   WorkspaceConfigurationStore,
+  GlobalConfigurationStore,
 } from '@nx-console/vscode-configuration';
 import { AgentRulesManager } from './agent-rules-manager';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
@@ -71,10 +72,35 @@ export async function initMcp(context: ExtensionContext) {
 
   cleanupOldMcpJson();
 
+  const fixedPort =
+    GlobalConfigurationStore.instance.get('mcpPort') ?? undefined;
+  let mcpPort: number;
+
+  if (fixedPort) {
+    vscodeLogger.log(`Using fixed MCP port: ${fixedPort}`);
+    if (!(await isPortAvailable(fixedPort))) {
+      logAndShowError(
+        `The configured MCP port ${fixedPort} is not available. Please choose a different port in the settings.`,
+        `The configured MCP port ${fixedPort} is not available. Please choose a different port in the settings (nxConsole.mcpPort).`,
+      );
+      return;
+    }
+    mcpPort = fixedPort;
+  } else {
+    const availablePort = await findAvailablePort();
+    if (!availablePort) {
+      vscodeLogger.log(
+        'Could not find available port for MCP server after 100 attempts',
+      );
+      return;
+    }
+    mcpPort = availablePort;
+  }
+
   if (inCursor) {
-    await initCursorMcp(context);
+    await initCursorMcp(context, mcpPort);
   } else if (inVSCode) {
-    initModernVSCodeMcp(context);
+    initModernVSCodeMcp(context, mcpPort);
   }
 
   await setupAgentRules(context);
@@ -135,24 +161,20 @@ async function setupAgentRules(context: ExtensionContext) {
   }
 }
 
-async function initModernVSCodeMcp(context: ExtensionContext) {
+async function initModernVSCodeMcp(context: ExtensionContext, mcpPort: number) {
   // Dynamic import for VSCode-specific classes
   const { McpStreamableWebServer, NxMcpServerDefinitionProvider } =
     await import('./mcp-vscode-server.js');
 
-  const mcpPort = (await findAvailablePort()) ?? undefined;
-
-  if (mcpPort) {
-    mcpStreamableWebServer = new McpStreamableWebServer(mcpPort);
-    context.subscriptions.push({
-      dispose: () => {
-        mcpStreamableWebServer?.stopMcpServer();
-      },
-    });
-    vscodeLogger.log(
-      `Automatically configured Nx MCP server dynamically on port ${mcpPort}`,
-    );
-  }
+  mcpStreamableWebServer = new McpStreamableWebServer(mcpPort);
+  context.subscriptions.push({
+    dispose: () => {
+      mcpStreamableWebServer?.stopMcpServer();
+    },
+  });
+  vscodeLogger.log(
+    `Automatically configured Nx MCP server dynamically on port ${mcpPort}`,
+  );
 
   context.subscriptions.push(
     lm.registerMcpServerDefinitionProvider(
@@ -162,16 +184,9 @@ async function initModernVSCodeMcp(context: ExtensionContext) {
   );
 }
 
-async function initCursorMcp(context: ExtensionContext) {
+async function initCursorMcp(context: ExtensionContext, mcpPort: number) {
   // Dynamic import for Cursor-specific server (no VSCode type dependencies)
   const { McpCursorServer } = await import('./mcp-cursor-server.js');
-
-  const mcpPort = (await findAvailablePort()) ?? undefined;
-
-  if (!mcpPort) {
-    vscodeLogger.log('Could not find available port for MCP server');
-    return;
-  }
 
   // Register with Cursor's MCP API
   if ('cursor' in vscode && 'mcp' in (vscode as any).cursor) {
