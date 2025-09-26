@@ -2,6 +2,7 @@ import type {
   CIPEInfo,
   CIPEInfoError,
   CloudOnboardingInfo,
+  NxAiFix,
 } from '@nx-console/shared-types';
 import { getRecentCIPEData } from '@nx-console/vscode-nx-workspace';
 import {
@@ -17,9 +18,12 @@ import {
   setup,
   spawnChild,
 } from 'xstate';
-// need this import for type inference
+// need this import for type inference - DO NOT REMOVE
 import type { Guard } from 'xstate/guards';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import {
+  getOutputChannel,
+  vscodeLogger,
+} from '@nx-console/vscode-output-channels';
 
 const SLEEP_POLLING_TIME = 3_600_000;
 const COLD_POLLING_TIME = 180_000;
@@ -68,11 +72,11 @@ const pollingMachine = setup({
         reason = 'CIPE in progress';
       } else if (
         recentCIPEData?.info?.some((cipe) =>
-          cipe.runGroups.some((rg) => rg.aiFix),
+          cipe.runGroups.some((rg) => isAIFixActive(rg.aiFix)),
         )
       ) {
         newFrequency = AI_FIX_POLLING_TIME;
-        reason = 'AI fix available';
+        reason = 'AI fix in progress';
       } else {
         newFrequency = COLD_POLLING_TIME;
         reason = 'default';
@@ -303,3 +307,42 @@ export const machine = setup({
     }),
   ],
 });
+
+/**
+ * Checks if an AI fix is in an active state that requires frequent polling.
+ * Returns true only if the fix is still being generated or verified.
+ */
+function isAIFixActive(aiFix: NxAiFix | undefined): boolean {
+  if (!aiFix) {
+    return false;
+  }
+
+  const userHasTakenAction =
+    aiFix.userAction === 'APPLIED' ||
+    aiFix.userAction === 'REJECTED' ||
+    aiFix.userAction === 'APPLIED_AUTOMATICALLY';
+
+  if (userHasTakenAction) {
+    return false;
+  }
+
+  const fixGenerationComplete =
+    aiFix.suggestedFixStatus === 'COMPLETED' ||
+    aiFix.suggestedFixStatus === 'FAILED' ||
+    aiFix.suggestedFixStatus === 'NOT_EXECUTABLE';
+
+  const verificationComplete =
+    aiFix.verificationStatus === 'COMPLETED' ||
+    aiFix.verificationStatus === 'FAILED' ||
+    aiFix.verificationStatus === 'NOT_EXECUTABLE';
+
+  // handle undefined as needing verification for backwards compat - API doesn't always return this yet
+  const needsVerification =
+    aiFix.failureClassification === 'code_change' ||
+    aiFix.failureClassification === undefined;
+
+  // Only consider the fix active if either
+  // generation is still in progress or
+  // verification is still in progress AND the fix needs verification
+  return !fixGenerationComplete || (!verificationComplete && needsVerification);
+}
