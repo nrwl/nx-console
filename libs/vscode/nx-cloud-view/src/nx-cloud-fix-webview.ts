@@ -23,12 +23,9 @@ import {
   getGitApi,
   getGitBranch,
   getGitHasUncommittedChanges,
-  getGitRepository,
   getWorkspacePath,
 } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
-import { unlink, writeFile } from 'fs/promises';
-import { tmpdir } from 'os';
 import { join } from 'path';
 import { xhr } from 'request-light';
 import {
@@ -449,40 +446,7 @@ export class NxCloudFixWebview {
                 )
                 .then((result) => {
                   if (result === 'Fetch & Pull Changes') {
-                    try {
-                      const cwd = getNxWorkspacePath();
-
-                      // Always refresh remotes first
-                      execSync('git fetch origin', { cwd });
-
-                      // Get current branch name
-                      const currentBranch = execSync(
-                        'git rev-parse --abbrev-ref HEAD',
-                        {
-                          cwd,
-                          encoding: 'utf8',
-                        },
-                      ).trim();
-
-                      if (currentBranch === targetBranch) {
-                        // On target branch: fast-forward your working tree
-                        execSync(`git pull --ff-only origin ${targetBranch}`, {
-                          cwd,
-                        });
-                      } else {
-                        // On another branch: fast-forward local target branch without checking it out
-                        // This creates the branch if missing, refuses if it wouldn't be a fast-forward
-                        execSync(
-                          `git fetch origin ${targetBranch}:${targetBranch}`,
-                          { cwd },
-                        );
-                      }
-                    } catch (e) {
-                      logAndShowError(
-                        'Failed to fetch and pull changes. Please check the output and try again yourself.',
-                        `Failed to fetch and pull changes: ${e.stderr.toString() || e.message}`,
-                      );
-                    }
+                    fetchAndPullChanges(targetBranch);
                   }
                 });
             }
@@ -568,11 +532,11 @@ export class NxCloudFixWebview {
 
           // Find the parent CIPE
           const cipe = recentCIPEs?.find(
-            (c) => c.ciPipelineExecutionId === args.cipeId,
+            (c: CIPEInfo) => c.ciPipelineExecutionId === args.cipeId,
           );
 
           const runGroup = cipe?.runGroups.find(
-            (rg) => rg.runGroup === args.runGroupId,
+            (rg: CIPERunGroup) => rg.runGroup === args.runGroupId,
           );
 
           if (!cipe) {
@@ -688,4 +652,39 @@ function isCloudFixTab(tab: Tab): boolean {
     (tab as any)?.input?.textDiffs?.[0]?.original?.scheme ===
     'nx-cloud-fix-before'
   );
+}
+
+/**
+ * Fetch and pull changes from remote after a fix has been applied
+ * @param targetBranch The branch to fetch and pull from
+ */
+export async function fetchAndPullChanges(targetBranch: string): Promise<void> {
+  try {
+    const cwd = getNxWorkspacePath();
+
+    // Always refresh remotes first
+    execSync('git fetch origin', { cwd });
+
+    // Get current branch name
+    const currentBranch = execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd,
+      encoding: 'utf8',
+    }).trim();
+
+    if (currentBranch === targetBranch) {
+      // On target branch: fast-forward your working tree
+      execSync(`git pull --ff-only origin ${targetBranch}`, {
+        cwd,
+      });
+    } else {
+      // On another branch: fast-forward local target branch without checking it out
+      // This creates the branch if missing, refuses if it wouldn't be a fast-forward
+      execSync(`git fetch origin ${targetBranch}:${targetBranch}`, { cwd });
+    }
+  } catch (e) {
+    logAndShowError(
+      'Failed to fetch and pull changes. Please check the output and try again yourself.',
+      `Failed to fetch and pull changes: ${e.stderr?.toString() || e.message}`,
+    );
+  }
 }
