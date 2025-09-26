@@ -27,10 +27,10 @@ jest.mock('vscode', () => ({
     Left: 1,
     Right: 2,
   },
-jest.mock('./nx-cloud-fix-webview', () => ({
-  fetchAndPullChanges: jest.fn(),
 }));
 
+jest.mock('./nx-cloud-fix-webview', () => ({
+  fetchAndPullChanges: jest.fn(),
 }));
 
 jest.mock('@nx-console/vscode-telemetry', () => ({
