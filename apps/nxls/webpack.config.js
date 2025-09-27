@@ -10,7 +10,7 @@ module.exports = composePlugins(withNx(), (config) => {
       ...config.module,
       rules: [
         {
-          test: /libs\/shared\/npm\/src\/lib\/workspace-dependencies/,
+          test: /libs\/shared\/npm\/src\/lib\/[^/]+-dependencies/,
           loader: 'string-replace-loader',
           options: {
             search: 'require[(]([^\'"])',
