@@ -109,6 +109,8 @@ import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { NativeWatcher } from '@nx-console/shared-watcher';
 
+const connection = createConnection(ProposedFeatures.all);
+
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
 });
@@ -124,8 +126,6 @@ let unregisterFileWatcher: () => Promise<void> = async () => {
 };
 let reconfigureAttempts = 0;
 
-const connection = createConnection(ProposedFeatures.all);
-
 // Create a text document manager.
 const documents = new TextDocuments(TextDocument);
 
@@ -138,12 +138,13 @@ connection.onInitialize(async (params) => {
   lspLogger.log('Initializing Nx Language Server');
 
   const { workspacePath } = params.initializationOptions ?? {};
+  const extractFsPath = (p: string | undefined) => p && URI.parse(p).fsPath;
   try {
     WORKING_PATH =
-      workspacePath ||
-      params.workspaceFolders?.[0]?.uri ||
+      extractFsPath(workspacePath) ||
+      extractFsPath(params.workspaceFolders?.[0]?.uri) ||
       params.rootPath ||
-      URI.parse(params.rootUri ?? '').fsPath;
+      extractFsPath(params.rootUri ?? '');
 
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
