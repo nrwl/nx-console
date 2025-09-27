@@ -2,7 +2,6 @@ import { gte, NxVersion } from '@nx-console/nx-version';
 import { directoryExists } from '@nx-console/shared-file-system';
 import type { Logger } from '@nx-console/shared-utils';
 import { stat } from 'fs/promises';
-import Module from 'module';
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
 import { platform } from 'os';
 import { join } from 'path';
@@ -81,16 +80,13 @@ export async function workspaceDependencyPath(
 export function importWorkspaceDependency<T>(
   importPath: string,
   logger?: Logger,
-  workspacePath: string = __dirname,
 ): Promise<T> {
   if (platform() === 'win32') {
     importPath = importPath.replace(/\\/g, '/');
   }
 
-  const workspaceRequire = Module.createRequire(workspacePath);
-
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const imported = workspaceRequire(importPath);
+  const imported = require(importPath);
 
   logger?.log(`Using local Nx package at ${importPath}`);
 
