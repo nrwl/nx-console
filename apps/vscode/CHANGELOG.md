@@ -1,3 +1,21 @@
+## 18.70.0 (2025-09-29)
+
+### 🚀 Features
+
+- **vscode:** add periodic check to see if ai configuration is outdated ([#2786](https://github.com/nrwl/nx-console/pull/2786))
+- **vscode:** show fetch & pull changes on auto-apply notification ([#2795](https://github.com/nrwl/nx-console/pull/2795))
+- **vscode:** allow MCP to run on fixed port via setting ([#2791](https://github.com/nrwl/nx-console/pull/2791))
+
+### 🩹 Fixes
+
+- **vscode:** only poll v frequently for active AI fixes ([#2794](https://github.com/nrwl/nx-console/pull/2794))
+- **vscode:** error message typo ([#2792](https://github.com/nrwl/nx-console/pull/2792))
+- **vscode:** show dynamic mcp.json path in removal notification ([#2774](https://github.com/nrwl/nx-console/pull/2774))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 # [18.69.0](https://github.com/nrwl/nx-console/compare/vscode-v18.68.0...vscode-v18.69.0) (2025-09-19)
 
 
