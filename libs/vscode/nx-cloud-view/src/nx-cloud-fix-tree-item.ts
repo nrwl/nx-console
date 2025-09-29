@@ -77,6 +77,13 @@ export class NxCloudFixTreeItem
           'check',
           new ThemeColor('notebookStatusSuccessIcon.foreground'),
         );
+      } else if (userAction === 'APPLIED_AUTOMATICALLY') {
+        this.contextValue += '-appliedAutomatically';
+        this.label = 'Nx Cloud AI has automatically applied a fix';
+        this.iconPath = new ThemeIcon(
+          'check',
+          new ThemeColor('notebookStatusSuccessIcon.foreground'),
+        );
       } else if (userAction === 'APPLIED_LOCALLY') {
         this.contextValue += '-appliedLocally';
         this.label =
