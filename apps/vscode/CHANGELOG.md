@@ -1,3 +1,14 @@
+## 18.70.0 (2025-09-29)
+
+### 🚀 Features
+
+- **vscode:** add periodic check to see if ai configuration is outdated ([#2786](https://github.com/nrwl/nx-console/pull/2786))
+- **vscode:** allow MCP to run on fixed port via setting ([#2791](https://github.com/nrwl/nx-console/pull/2791))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 # [18.69.0](https://github.com/nrwl/nx-console/compare/vscode-v18.68.0...vscode-v18.69.0) (2025-09-19)
 
 
