@@ -55,7 +55,7 @@ describe('parse target string - default', () => {
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
     nxlsWrapper.setVerbose(true);
 
-    await waitFor(1000);
+    await waitFor(11000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {

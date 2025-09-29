@@ -49,7 +49,7 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
         }
     }`,
     );
-    await waitFor(1000);
+    await waitFor(11000);
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(workspacePath);
