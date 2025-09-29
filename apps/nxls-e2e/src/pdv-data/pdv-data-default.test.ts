@@ -63,7 +63,7 @@ describe('pdv data', () => {
   });
 
   it('should contain disabledTaskSyncGenerators if set in nx.json', async () => {
-    await waitFor(1000);
+    await waitFor(11000);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     modifyJsonFile(nxJsonPath, (json) => {
@@ -91,7 +91,7 @@ describe('pdv data', () => {
   });
 
   it('should contain pdv data & error for partial errors', async () => {
-    await waitFor(1000);
+    await waitFor(11000);
     viteFileContents = readFileSync(viteFilePath, 'utf-8');
 
     appendFileSync(viteFilePath, '{');
@@ -122,7 +122,7 @@ describe('pdv data', () => {
   });
 
   it('should return error if root project.json is broken', async () => {
-    await waitFor(1000);
+    await waitFor(11000);
 
     writeFileSync(viteFilePath, viteFileContents);
 
@@ -152,7 +152,7 @@ describe('pdv data', () => {
   });
 
   it('should return error if nx.json is broken', async () => {
-    await waitFor(1000);
+    await waitFor(11000);
 
     writeFileSync(projectJsonPath, projectJsonContents);
 

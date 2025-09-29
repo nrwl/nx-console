@@ -39,25 +39,25 @@ describe('watcher', () => {
   });
 
   it('should send refresh notification when project files are changed', async () => {
-    await waitFor(500);
+    await waitFor(11000);
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
 
-    await waitFor(500);
+    await waitFor(11000);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
 
-    await waitFor(500);
+    await waitFor(11000);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
 
-    await waitFor(500);
+    await waitFor(11000);
     appendFileSync(cypressConfig, 'console.log("hello")');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
@@ -76,8 +76,8 @@ describe('watcher', () => {
       env: process.env,
     });
 
-    // give nxls a second to restart the daemon
-    await waitFor(6000);
+    // give nxls time to restart the daemon and handle debounced changes
+    await waitFor(12000);
 
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
@@ -86,7 +86,7 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
-    await waitFor(2000);
+    await waitFor(11000);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, 'invalid json', {
       encoding: 'utf-8',
@@ -105,8 +105,8 @@ describe('watcher', () => {
     );
 
     // we need to wait until the daemon watcher ultimately fails
-    // and the native watcher is started
-    await waitFor(8000);
+    // and the native watcher is started, plus debounce time
+    await waitFor(15000);
     writeFileSync(projectJsonPath, oldContents);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
@@ -128,7 +128,7 @@ describe('watcher', () => {
         throw new Error('Should not have received refresh notification');
       });
 
-    await waitFor(11000);
+    await waitFor(12000);
     nxlsWrapper.cancelWaitingForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -155,7 +155,7 @@ describe('watcher', () => {
       }
     });
 
-    await waitFor(1000);
+    await waitFor(11000);
 
     addRandomTargetToFile(
       join(e2eCwd, workspaceName, 'react-app1', 'project.json'),

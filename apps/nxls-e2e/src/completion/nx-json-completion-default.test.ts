@@ -88,7 +88,7 @@ describe('nx.json completion - default', () => {
 
   it('should contain proper root keys', async () => {
     // delete all json properties so we can see all possible completions
-    modifyJsonFile(nxJsonPath, (data) => ({}));
+    modifyJsonFile(nxJsonPath, () => ({}));
 
     nxlsWrapper.sendNotification({
       method: 'textDocument/didChange',
@@ -201,7 +201,7 @@ describe('nx.json completion - default', () => {
   });
 
   it('should not error when nx-schema.json is missing', async () => {
-    await waitFor(1000);
+    await waitFor(11000);
 
     rmSync(
       join(
