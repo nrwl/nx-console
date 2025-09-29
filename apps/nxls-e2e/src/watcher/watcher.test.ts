@@ -135,25 +135,29 @@ describe('watcher', () => {
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
-    await new Promise<void>((resolve) => {
-      nxlsWrapper
-        .waitForNotification(NxWorkspaceRefreshNotification.method)
-        .then(() => {
-          resolve();
-        });
+    const notificationPromise = nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method,
+    );
 
-      try {
-        execSync(
-          'npx nx g @nx/react:app --directory react-app1 --no-interactive --verbose',
-          {
-            cwd: join(e2eCwd, workspaceName),
-            env: process.env,
-          },
-        );
-      } catch (e) {
-        console.log('Error: ', e);
-      }
-    });
+    try {
+      execSync(
+        'npx nx g @nx/react:app --directory react-app1 --no-interactive --verbose',
+        {
+          cwd: join(e2eCwd, workspaceName),
+          env: process.env,
+          timeout: 60000,
+        },
+      );
+    } catch (e) {
+      console.log('Error running generator:', e);
+      // Cancel the notification wait if generator fails
+      nxlsWrapper.cancelWaitingForNotification(
+        NxWorkspaceRefreshNotification.method,
+      );
+      throw e;
+    }
+
+    await notificationPromise;
 
     await waitFor(11000);
 
