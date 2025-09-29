@@ -1,7 +1,7 @@
 package dev.nx.console.models
 
-import com.intellij.util.text.SemVer
 import kotlinx.serialization.Serializable
+import org.semver4j.Semver
 
 @Serializable()
 data class NxVersion(val minor: Int, val major: Int, val full: String) {
@@ -12,8 +12,8 @@ data class NxVersion(val minor: Int, val major: Int, val full: String) {
         if (other.full.startsWith("0.0.0-pr-")) {
             return false
         }
-        val semVerThis = SemVer.parseFromText(this.full)
-        val semVerOther = SemVer.parseFromText(other.full)
+        val semVerThis = Semver.parse(this.full)
+        val semVerOther = Semver.parse(other.full)
         if (semVerThis != null && semVerOther != null) {
             return semVerThis >= semVerOther
         }

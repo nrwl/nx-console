@@ -99,6 +99,10 @@ sealed interface Events {
     class LoadOldBrowser : Event
 }
 
+val json = Json {
+    ignoreUnknownKeys = true
+}
+
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
     private val rootPanel = JPanel(BorderLayout())
@@ -653,7 +657,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
         query.addHandler { msg ->
             try {
-                val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                val messageParsed = json.decodeFromString<NxGraphInteractionEvent>(msg)
 
                 when (messageParsed.type) {
                     "file-click" -> {

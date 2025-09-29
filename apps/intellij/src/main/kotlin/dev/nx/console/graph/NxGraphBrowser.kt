@@ -16,7 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
+
 
 class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
@@ -176,7 +176,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
         query.addHandler { msg ->
             try {
-                val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                val messageParsed = json.decodeFromString<NxGraphInteractionEvent>(msg)
                 val handled = handleGraphInteractionEventBase(messageParsed)
                 if (!handled) {
                     logger<NxGraphBrowser>()

@@ -40,6 +40,10 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+val json = Json {
+    ignoreUnknownKeys = true
+}
+
 abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()
 
@@ -423,7 +427,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 }
                 else -> {
                     try {
-                        val messageParsed = Json.decodeFromString<NxGraphRequest>(msg)
+                        val messageParsed = json.decodeFromString<NxGraphRequest>(msg)
                         coroutineScope.launch {
                             val response =
                                 withContext(Dispatchers.IO) {

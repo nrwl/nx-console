@@ -28,9 +28,12 @@ export class NxlsWrapper {
     string,
     [(params: object | any[] | undefined) => void, NodeJS.Timeout]
   >();
+  private isShuttingDown = false;
   private earlyExitListener = (code: number) => {
-    console.log(`nxls exited with code ${code}`);
-    console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
+    if (!this.isShuttingDown) {
+      console.log(`nxls exited unexpectedly with code ${code}`);
+      console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
+    }
   };
 
   constructor(
@@ -98,16 +101,35 @@ export class NxlsWrapper {
   }
 
   async stopNxls(version?: string) {
-    await this.sendRequest({
-      method: 'shutdown',
-    });
-    this.sendNotification({ method: 'exit' });
+    this.isShuttingDown = true;
 
+    try {
+      await this.sendRequest({
+        method: 'shutdown',
+      });
+    } catch (e) {
+      if (this.verbose) {
+        console.log('Error sending shutdown request:', e);
+      }
+    }
+
+    try {
+      this.sendNotification({ method: 'exit' });
+    } catch (e) {
+      if (this.verbose) {
+        console.log('Error sending exit notification:', e);
+      }
+    }
+
+    // Clear all pending operations
     this.pendingNotificationMap.forEach(([res, timeout]) => {
-      res(new Error('nxls stopped'));
       clearTimeout(timeout);
+      res(undefined);
     });
+    this.pendingNotificationMap.clear();
+
     this.pendingRequestMap.forEach(([res, timeout], key) => {
+      clearTimeout(timeout);
       res({
         jsonrpc: '2.0',
         id: key,
@@ -116,11 +138,14 @@ export class NxlsWrapper {
           message: 'nxls stopped',
         },
       });
-      clearTimeout(timeout);
     });
+    this.pendingRequestMap.clear();
 
+    // Dispose message handlers first
     this.readerDisposable?.dispose();
     this.readerErrorDisposable?.dispose();
+
+    // Then dispose readers/writers
     this.messageReader?.dispose();
     this.messageWriter?.dispose();
 
@@ -128,38 +153,62 @@ export class NxlsWrapper {
     // this fixes an issue where a leftover 'Content Length' header would be written to the stdin
     // during the nxls shutdown sequence
     if (this.process?.stdin) {
-      this.process.stdin.write = (chunk: any, cb: any) => {
+      this.process.stdin.write = () => {
         return true;
       };
+      this.process.stdin.end();
     }
 
+    // Remove exit listener before killing process
+    this.process?.removeListener('exit', this.earlyExitListener);
+
+    // Destroy streams
     this.process?.stdout?.destroy();
     this.process?.stderr?.destroy();
     this.process?.stdin?.destroy();
 
-    this.process?.removeListener('exit', this.earlyExitListener);
+    // Give the process a moment to exit gracefully
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    try {
-      execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
-        cwd: this.cwd,
-      });
-    } catch (e) {
-      console.error(e);
-    }
-
+    // Kill the process if it's still running
     if (this.process?.pid) {
       try {
         killGroup(this.process.pid);
       } catch (e) {
-        console.log(`NXLS WRAPPER: ${e}`);
+        if (this.verbose) {
+          console.log(`NXLS WRAPPER: Error killing process group: ${e}`);
+        }
       }
     }
+
+    // Stop the daemon
+    try {
+      execSync(`npx nx@${version ?? defaultVersion} daemon --stop`, {
+        cwd: this.cwd,
+        timeout: 5000,
+      });
+    } catch (e) {
+      if (this.verbose) {
+        console.error('Error stopping daemon:', e);
+      }
+    }
+
+    this.process = undefined;
+    this.isShuttingDown = false;
   }
 
   async sendRequest(
     request: Omit<RequestMessage, 'jsonrpc' | 'id'>,
     customTimeoutMinutes?: number,
   ): Promise<ResponseMessage> {
+    if (this.isShuttingDown) {
+      throw new Error('Cannot send request: wrapper is shutting down');
+    }
+
+    if (!this.messageWriter) {
+      throw new Error('Cannot send request: message writer not initialized');
+    }
+
     let timeout: NodeJS.Timeout;
     return await new Promise<ResponseMessage>((resolve, reject) => {
       timeout = setTimeout(
@@ -189,23 +238,54 @@ export class NxlsWrapper {
           `at ${new Date().toISOString()}`,
         );
       }
-      this.messageWriter?.write(fullRequest);
+
+      try {
+        this.messageWriter?.write(fullRequest);
+      } catch (e) {
+        this.pendingRequestMap.delete(id);
+        clearTimeout(timeout);
+        reject(new Error(`Failed to send request: ${e}`));
+      }
     }).finally(() => {
       clearTimeout(timeout);
     });
   }
 
   sendNotification(notification: Omit<NotificationMessage, 'jsonrpc'>) {
+    if (this.isShuttingDown) {
+      if (this.verbose) {
+        console.log(
+          'Skipping notification during shutdown:',
+          notification.method,
+        );
+      }
+      return;
+    }
+
+    if (!this.messageWriter) {
+      if (this.verbose) {
+        console.log('Cannot send notification: message writer not initialized');
+      }
+      return;
+    }
+
     if (this.verbose) {
       console.log(
         'sending notification',
         JSON.stringify(notification, null, 2),
       );
     }
-    this.messageWriter?.write({
-      jsonrpc: '2.0',
-      ...notification,
-    } as Message);
+
+    try {
+      this.messageWriter.write({
+        jsonrpc: '2.0',
+        ...notification,
+      } as Message);
+    } catch (e) {
+      if (this.verbose) {
+        console.log(`Failed to send notification: ${e}`);
+      }
+    }
   }
 
   async waitForNotification(
@@ -242,6 +322,11 @@ export class NxlsWrapper {
 
   private listenToLSPMessages(messageReader: StreamMessageReader) {
     this.readerDisposable = messageReader.listen((message) => {
+      // Don't process messages if we're shutting down
+      if (this.isShuttingDown) {
+        return;
+      }
+
       if (
         isNotificationMessage(message) &&
         message.method === 'window/logMessage'
@@ -282,7 +367,19 @@ export class NxlsWrapper {
     });
 
     this.readerErrorDisposable = messageReader.onError((error) => {
-      console.error('ERROR: ', error);
+      // Don't log errors during shutdown as they're expected
+      if (!this.isShuttingDown) {
+        // Content-Length errors often happen when the process is restarting
+        // or during race conditions, they're not always fatal
+        if (error.message?.includes('Content-Length')) {
+          if (this.verbose) {
+            console.log('Stream error (non-fatal):', error.message);
+          }
+          // Don't clear pending operations immediately - the process might recover
+          return;
+        }
+        console.error('ERROR: ', error);
+      }
     });
   }
 }
@@ -295,8 +392,4 @@ function isNotificationMessage(
 
 function isResponseMessage(message: Message): message is ResponseMessage {
   return 'result' in message || 'error' in message;
-}
-
-function isRequestMessage(message: Message): message is RequestMessage {
-  return !isNotificationMessage(message) && !isResponseMessage(message);
 }

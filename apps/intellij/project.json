@@ -3,34 +3,11 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
-    "build": {
-      "command": "yarn nx run intellij:buildPlugin",
-      "configurations": {
-        "production-intellij": {}
-      },
-      "dependsOn": ["^build"]
-    },
-    "runIde": {
-      "dependsOn": ["^build"]
-    },
-    "verifyPlugin": {
-      "cache": true
-    },
-    "ktfmtFormat": {
-      "//": "TODO: remove this after gradle refactor, probably fixed with different build setup",
-      "cache": false
-    },
-    "test": {
-      "command": "yarn nx run intellij:check"
-    },
-    "lint": {
-      "executor": "nx:noop"
-    },
-    "x-lint": {
-      "//": "Run inspections take a long time on the CI. Disable for now",
-      "executor": "nx:run-commands",
+    "composedJar": {
+      "executor": "@nx/gradle:gradle",
       "options": {
-        "command": "node ./apps/intellij/run-gradle.js :apps:intellij:runInspections"
+        "taskName": ":intellij:composedJar",
+        "excludeDependsOn": false
       }
     },
     "semantic-release": {

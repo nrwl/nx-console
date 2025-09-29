@@ -1,9 +1,14 @@
 import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
 import { isFailedStatus } from '@nx-console/shared-utils';
-import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
+import {
+  getNxWorkspacePath,
+  GlobalConfigurationStore,
+} from '@nx-console/vscode-configuration';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { commands, window } from 'vscode';
+import { fetchAndPullChanges } from './nx-cloud-fix-webview';
+import { execSync } from 'child_process';
 
 export class CIPENotificationService {
   private sentNotifications = new Set<string>();
@@ -179,10 +184,25 @@ export class CIPENotificationService {
 
       const message = `Nx Cloud automatically applied a fix for #${cipe.branch}`;
 
-      const notificationCommands: 'View PR'[] = [];
+      const notificationCommands: ('View PR' | 'Fetch & Pull Changes')[] = [];
 
       if (cipe.commitUrl) {
         notificationCommands.push('View PR');
+      }
+
+      const targetBranch = cipe.branch;
+      let hasBranchOnRemote: boolean;
+      try {
+        execSync(`git rev-parse --verify origin/${targetBranch}`, {
+          cwd: getNxWorkspacePath(),
+        });
+        hasBranchOnRemote = true;
+      } catch {
+        hasBranchOnRemote = false;
+      }
+
+      if (hasBranchOnRemote) {
+        notificationCommands.push('Fetch & Pull Changes');
       }
 
       window
@@ -193,6 +213,8 @@ export class CIPENotificationService {
               source: 'notification',
             });
             commands.executeCommand('vscode.open', cipe.commitUrl);
+          } else if (selection === 'Fetch & Pull Changes') {
+            fetchAndPullChanges(targetBranch);
           }
         });
       return;
