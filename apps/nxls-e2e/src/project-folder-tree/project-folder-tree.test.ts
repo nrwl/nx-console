@@ -42,7 +42,7 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder nodes for project in subfolder', async () => {
-    await waitFor(500);
+    await waitFor(11000);
 
     const projectFolder = join(e2eCwd, workspaceName, 'subfolder', 'project');
     mkdirSync(projectFolder, { recursive: true });
@@ -81,7 +81,7 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for nested projects', async () => {
-    await waitFor(500);
+    await waitFor(11000);
 
     const nestedProjectFolder = join(
       e2eCwd,
@@ -134,7 +134,7 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for deeply nested projects', async () => {
-    await waitFor(500);
+    await waitFor(11000);
     const deeplyNestedProjectFolder = join(
       e2eCwd,
       workspaceName,
