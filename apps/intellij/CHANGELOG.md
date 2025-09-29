@@ -1,3 +1,9 @@
+## <small>1.48.1 (2025-09-29)</small>
+
+### Bug Fixes
+
+* **intellij:** ignore unknown keys when parsing graph interaction messages ([#2796](https://github.com/nrwl/nx-console/issues/2796)) ([8934112](https://github.com/nrwl/nx-console/commit/8934112f945b35501931e7a1e0025b0df0be1f0d))
+
 ## 1.48.0 (2025-09-19)
 
 ### Features
