@@ -19,6 +19,9 @@
         "plugins": ["gradle-semantic-release-plugin"],
         "gitAssets": ["gradle.properties"]
       }
+    },
+    "buildPlugin": {
+      "dependsOn": ["^build", "^build-webview-files"]
     }
   },
   "tags": ["type:intellij"],
