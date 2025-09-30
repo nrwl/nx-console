@@ -118,7 +118,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             val notification =
                 NOTIFICATION_GROUP.createNotification(
                     content = message,
-                    type = NotificationType.INFORMATION
+                    type = NotificationType.INFORMATION,
                 )
 
             cipe.commitUrl?.also { notification.addAction(ViewPRAction(it)) }
@@ -299,7 +299,7 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             TelemetryService.getInstance(project)
                 .featureUsed(
                     TelemetryEvent.CLOUD_SHOW_AI_FIX,
-                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION),
                 )
             BrowserUtil.browse(url)
             notification.expire()
@@ -312,8 +312,11 @@ sealed class CIPENotificationEvent {
     abstract val cipe: CIPEInfo
 
     data class CIPEFailed(override val cipe: CIPEInfo) : CIPENotificationEvent()
+
     data class RunFailed(override val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
+
     data class CIPESucceeded(override val cipe: CIPEInfo) : CIPENotificationEvent()
+
     data class AiFixAvailable(override val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
         CIPENotificationEvent()
 }

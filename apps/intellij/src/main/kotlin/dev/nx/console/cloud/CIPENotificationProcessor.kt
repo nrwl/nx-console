@@ -69,6 +69,11 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 return@forEach
             }
 
+            if (newCIPE.status == CIPEExecutionStatus.SUCCEEDED) {
+                emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
+                return@forEach
+            }
+
             // Should we wait for AI fix?
             val shouldWaitForAiFix =
                 newCIPE.aiFixesEnabled == true && !hasPassedAiFixWaitTime(newCIPE)
@@ -79,11 +84,6 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
 
             // Check what type of notification to emit
             when {
-                // CIPE succeeded
-                newCIPE.status == CIPEExecutionStatus.SUCCEEDED -> {
-                    emitNotification(CIPENotificationEvent.CIPESucceeded(newCIPE))
-                }
-
                 // CIPE failed
                 newCIPE.status.isFailedStatus() -> {
                     emitNotification(CIPENotificationEvent.CIPEFailed(newCIPE))
@@ -132,7 +132,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     /** Find run groups with newly available AI fixes or changed user actions */
     private fun findRunGroupsWithNewAiFixes(
         newRunGroups: List<CIPERunGroup>,
-        oldRunGroups: List<CIPERunGroup>
+        oldRunGroups: List<CIPERunGroup>,
     ): List<CIPERunGroup> {
         return newRunGroups.filter { newRunGroup ->
             val oldRunGroup = oldRunGroups.find { it.runGroup == newRunGroup.runGroup }

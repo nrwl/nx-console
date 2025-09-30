@@ -76,7 +76,7 @@ data class NxAiFix(
     val suggestedFixReasoning: String? = null,
     val suggestedFixDescription: String? = null,
     val userAction: AITaskFixUserAction? = null,
-    val couldAutoApplyTasks: Boolean? = null
+    val couldAutoApplyTasks: Boolean? = null,
 )
 
 @Serializable
@@ -94,5 +94,5 @@ enum class AITaskFixUserAction {
     APPLIED,
     REJECTED,
     APPLIED_LOCALLY,
-    APPLIED_AUTOMATICALLY
+    APPLIED_AUTOMATICALLY,
 }
