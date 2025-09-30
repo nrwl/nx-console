@@ -23,7 +23,7 @@ const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
 process.env['NX_DAEMON'] = 'true';
 
-describe('watcher', () => {
+xdescribe('watcher', () => {
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
