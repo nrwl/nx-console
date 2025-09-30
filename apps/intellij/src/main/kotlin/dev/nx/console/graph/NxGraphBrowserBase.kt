@@ -40,9 +40,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-val json = Json {
-    ignoreUnknownKeys = true
-}
+val json = Json { ignoreUnknownKeys = true }
 
 abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()

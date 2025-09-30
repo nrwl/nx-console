@@ -99,9 +99,7 @@ sealed interface Events {
     class LoadOldBrowser : Event
 }
 
-val json = Json {
-    ignoreUnknownKeys = true
-}
+val json = Json { ignoreUnknownKeys = true }
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {
