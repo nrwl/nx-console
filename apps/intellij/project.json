@@ -22,6 +22,9 @@
           "headerPartial": "## {{#if isPatch~}} <small>\n  {{~/if~}} {{version}}\n  {{~#if title}} \"{{title}}\"\n  {{~/if~}}\n  {{~#if date}} ({{date}})\n  {{~/if~}}\n  {{~#if isPatch~}} </small>\n  {{~/if}}\n"
         }
       }
+    },
+    "buildPlugin": {
+      "dependsOn": ["^build", "^build-webview-files"]
     }
   },
   "tags": ["type:intellij"],

@@ -189,13 +189,13 @@ tasks {
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {
-    from("${rootDir}/../../dist/apps/generate-ui-v2")
+    from("${rootDir}/dist/apps/generate-ui-v2")
     include("*.js", "*.css")
     into(layout.buildDirectory.file("resources/main/generate_ui_v2"))
 }
 
 tasks.register<Copy>("copyCloudFixWebviewArtifacts") {
-    from("${rootDir}/../../dist/libs/shared/cloud-fix-webview")
+    from("${rootDir}/dist/libs/shared/cloud-fix-webview")
     include("*.js", "*.css", "*.html", "assets/**")
     into(layout.buildDirectory.file("resources/main/cloud_fix_webview"))
 }
