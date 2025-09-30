@@ -4,6 +4,7 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import dev.nx.console.ai.PeriodicAiCheckService
 import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.mcp.McpServerService
@@ -66,6 +67,9 @@ internal class ProjectPostStartup : ProjectActivity {
                     Notifier.notifyMcpServerInstall(project)
                 }
             }
+
+            // Initialize periodic AI configuration check
+            PeriodicAiCheckService.getInstance(project).initialize()
         }
 
         TelemetryService.getInstance(project)
