@@ -99,7 +99,7 @@ function getRecentlyCommittedGitBranches(
     const oneWeekAgo = new Date(
       Date.now() - 60 * 60 * 24 * 7 * 1000,
     ).toISOString();
-    const defaultBranch = getDefaultBranch(workspacePath);
+    const ignoredBranches = getIgnoredBranches(workspacePath);
 
     const res = execSync(
       'git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname) - %(committerdate:iso-strict) - %(authoremail)"',
@@ -125,7 +125,7 @@ function getRecentlyCommittedGitBranches(
         return (
           item.email.includes(localUserEmail) &&
           item.time >= oneWeekAgo &&
-          item.name !== defaultBranch
+          !ignoredBranches.includes(item.name)
         );
       });
 
@@ -135,9 +135,12 @@ function getRecentlyCommittedGitBranches(
   }
 }
 
-export function getDefaultBranch(workspacePath: string) {
+export function getIgnoredBranches(workspacePath: string): string[] {
+  const ignoredBranches = ['main', 'master'];
+
+  // Check refs/remotes/origin/HEAD
   try {
-    const remoteHeadRef = execSync(
+    const originHead = execSync(
       'git symbolic-ref refs/remotes/origin/HEAD',
       {
         cwd: workspacePath,
@@ -145,9 +148,33 @@ export function getDefaultBranch(workspacePath: string) {
       },
     )
       .toString()
-      .trim();
-    return remoteHeadRef.replace('refs/remotes/origin/', '');
+      .trim()
+      .replace('refs/remotes/origin/', '');
+    if (originHead && !ignoredBranches.includes(originHead)) {
+      ignoredBranches.push(originHead);
+    }
   } catch (e) {
-    return 'main';
+    // ignore
   }
+
+  // Check refs/remotes/upstream/HEAD
+  try {
+    const upstreamHead = execSync(
+      'git symbolic-ref refs/remotes/upstream/HEAD',
+      {
+        cwd: workspacePath,
+        stdio: 'pipe',
+      },
+    )
+      .toString()
+      .trim()
+      .replace('refs/remotes/upstream/', '');
+    if (upstreamHead && !ignoredBranches.includes(upstreamHead)) {
+      ignoredBranches.push(upstreamHead);
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return ignoredBranches;
 }
