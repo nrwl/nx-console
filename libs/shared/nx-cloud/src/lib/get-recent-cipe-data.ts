@@ -140,13 +140,10 @@ export function getIgnoredBranches(workspacePath: string): string[] {
 
   // Check refs/remotes/origin/HEAD
   try {
-    const originHead = execSync(
-      'git symbolic-ref refs/remotes/origin/HEAD',
-      {
-        cwd: workspacePath,
-        stdio: 'pipe',
-      },
-    )
+    const originHead = execSync('git symbolic-ref refs/remotes/origin/HEAD', {
+      cwd: workspacePath,
+      stdio: 'pipe',
+    })
       .toString()
       .trim()
       .replace('refs/remotes/origin/', '');
