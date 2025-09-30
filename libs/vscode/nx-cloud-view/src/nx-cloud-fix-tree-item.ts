@@ -106,7 +106,7 @@ export class NxCloudFixTreeItem
           switch (verificationStatus) {
             case 'NOT_STARTED':
               this.contextValue += '-notVerified';
-              this.label = 'Nx Cloud AI fix ready to verify';
+              this.label = 'Nx Cloud fix ready to verify';
               this.iconPath = new ThemeIcon(
                 'wrench',
                 new ThemeColor('editorInfo.foreground'),
@@ -122,7 +122,7 @@ export class NxCloudFixTreeItem
               break;
             case 'COMPLETED':
               this.contextValue += '-verified';
-              this.label = 'Nx Cloud AI verified a fix';
+              this.label = 'Nx Cloud verified a fix';
               this.iconPath = new ThemeIcon(
                 'verified',
                 new ThemeColor('charts.green'),
@@ -130,7 +130,7 @@ export class NxCloudFixTreeItem
               break;
             case 'FAILED':
               this.contextValue += '-verificationFailed';
-              this.label = 'Failed Nx Cloud AI fix verification';
+              this.label = 'Failed Nx Cloud fix verification';
               this.iconPath = new ThemeIcon(
                 'warning',
                 new ThemeColor('list.warningForeground'),
@@ -138,11 +138,18 @@ export class NxCloudFixTreeItem
               break;
           }
         } else {
-          if (aiFix.suggestedFixStatus) {
+          if (aiFix.failureClassification !== 'code_change') {
+            this.contextValue += `-${aiFix.failureClassification}`;
+            this.label = 'Nx Cloud identified a root cause for your failed CI';
+            this.iconPath = new ThemeIcon(
+              'warning',
+              new ThemeColor('list.warningForeground'),
+            );
+          } else if (aiFix.suggestedFixStatus) {
             switch (aiFix.suggestedFixStatus) {
               case 'NOT_STARTED':
                 this.contextValue += '-noFixYet';
-                this.label = 'Nx Cloud AI is preparing to generate a fix';
+                this.label = 'Nx Cloud is preparing to generate a fix';
                 this.iconPath = new ThemeIcon(
                   'info',
                   new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -150,7 +157,7 @@ export class NxCloudFixTreeItem
                 break;
               case 'IN_PROGRESS':
                 this.contextValue += '-creatingFix';
-                this.label = 'Nx Cloud AI is creating a fix';
+                this.label = 'Nx Cloud is creating a fix';
                 this.iconPath = new ThemeIcon(
                   'loading~spin',
                   new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -158,7 +165,7 @@ export class NxCloudFixTreeItem
                 break;
               case 'NOT_EXECUTABLE':
                 this.contextValue += '-cancelledFix';
-                this.label = 'Nx Cloud AI is not able to generate a fix';
+                this.label = 'Nx Cloud is not able to generate a fix';
                 this.iconPath = new ThemeIcon(
                   'circle-slash',
                   new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -166,7 +173,7 @@ export class NxCloudFixTreeItem
                 break;
               case 'COMPLETED':
                 this.contextValue += '-completedFix';
-                this.label = 'Nx Cloud AI has generated a fix';
+                this.label = 'Nx Cloud has generated a fix';
                 this.iconPath = new ThemeIcon(
                   'check',
                   new ThemeColor('charts.green'),
@@ -174,7 +181,7 @@ export class NxCloudFixTreeItem
                 break;
               case 'FAILED':
                 this.contextValue += '-fixFailed';
-                this.label = 'Failed Nx Cloud AI fix generation';
+                this.label = 'Nx Cloud failed to create a fix';
                 this.iconPath = new ThemeIcon(
                   'error',
                   new ThemeColor('notebookStatusErrorIcon.foreground'),
@@ -187,7 +194,7 @@ export class NxCloudFixTreeItem
               case 'NOT_STARTED':
               case 'IN_PROGRESS':
                 this.contextValue += '-creatingFix';
-                this.label = 'Nx Cloud AI is creating a fix';
+                this.label = 'Nx Cloud is creating a fix';
                 this.iconPath = new ThemeIcon(
                   'loading~spin',
                   new ThemeColor('notebookStatusRunningIcon.foreground'),
@@ -196,7 +203,7 @@ export class NxCloudFixTreeItem
               case 'COMPLETED':
               case 'FAILED':
                 this.contextValue += '-fixFailed';
-                this.label = 'Failed Nx Cloud AI fix creation';
+                this.label = 'Nx Cloud failed to create a fix';
                 this.iconPath = new ThemeIcon(
                   'error',
                   new ThemeColor('notebookStatusErrorIcon.foreground'),
