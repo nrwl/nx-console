@@ -1,3 +1,15 @@
+## 1.49.0 (2025-09-30)
+
+### Bug Fixes
+
+* **intellij:** repair relative paths in build.gradle.kts ([#2800](https://github.com/nrwl/nx-console/issues/2800)) ([05281ad](https://github.com/nrwl/nx-console/commit/05281adce1ecb3f31a4d3d3ed7a029406918a21a))
+* **vscode:** only poll v frequently for active AI fixes ([#2794](https://github.com/nrwl/nx-console/issues/2794)) ([f9a1673](https://github.com/nrwl/nx-console/commit/f9a16735d6fb9bf70d10bf8857e9a3207b7d9815))
+
+
+### Features
+
+* **vscode:** add periodic check to see if ai configuration is outdated ([#2786](https://github.com/nrwl/nx-console/issues/2786)) ([33261c0](https://github.com/nrwl/nx-console/commit/33261c0ba3c782274e76709a5c99a664f584e1dd))
+
 ## <small>1.48.1 (2025-09-29)</small>
 
 ### Bug Fixes
