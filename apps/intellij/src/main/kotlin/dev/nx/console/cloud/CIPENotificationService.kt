@@ -112,6 +112,22 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_SHOW_AI_FIX_NOTIFICATION)
 
+        // Check if the fix was applied automatically
+        if (runGroup.aiFix?.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY) {
+            val message = "Nx Cloud automatically applied a fix for #${cipe.branch}"
+            val notification =
+                NOTIFICATION_GROUP.createNotification(
+                    content = message,
+                    type = NotificationType.INFORMATION
+                )
+
+            cipe.commitUrl?.also { notification.addAction(ViewPRAction(it)) }
+
+            notification.notify(project)
+            return
+        }
+
+        // Original notification for manual fixes
         val notification =
             NOTIFICATION_GROUP.createNotification(
                 content = "CI failed. Nx Cloud AI has a fix for #${cipe.branch}",
@@ -277,17 +293,28 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             notification.expire()
         }
     }
+
+    private inner class ViewPRAction(private val url: String) : NotificationAction("View PR") {
+        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.CLOUD_SHOW_AI_FIX,
+                    mapOf("source" to TelemetryEventSource.NOTIFICATION)
+                )
+            BrowserUtil.browse(url)
+            notification.expire()
+        }
+    }
 }
 
 /** Represents notification events that should be displayed to the user */
 sealed class CIPENotificationEvent {
-    data class CIPEFailed(val cipe: CIPEInfo) : CIPENotificationEvent()
+    abstract val cipe: CIPEInfo
 
-    data class RunFailed(val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
-
-    data class CIPESucceeded(val cipe: CIPEInfo) : CIPENotificationEvent()
-
-    data class AiFixAvailable(val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
+    data class CIPEFailed(override val cipe: CIPEInfo) : CIPENotificationEvent()
+    data class RunFailed(override val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
+    data class CIPESucceeded(override val cipe: CIPEInfo) : CIPENotificationEvent()
+    data class AiFixAvailable(override val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
         CIPENotificationEvent()
 }
 

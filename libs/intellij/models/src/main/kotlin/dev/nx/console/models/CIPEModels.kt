@@ -70,12 +70,13 @@ data class NxAiFix(
     val aiFixId: String,
     val taskIds: List<String>,
     val terminalLogsUrls: Map<String, String>,
+    val suggestedFixStatus: AITaskFixStatus,
+    val verificationStatus: AITaskFixStatus,
     val suggestedFix: String? = null,
     val suggestedFixReasoning: String? = null,
     val suggestedFixDescription: String? = null,
-    val suggestedFixStatus: AITaskFixStatus? = null,
-    val verificationStatus: AITaskFixStatus? = null,
     val userAction: AITaskFixUserAction? = null,
+    val couldAutoApplyTasks: Boolean? = null
 )
 
 @Serializable
@@ -93,4 +94,5 @@ enum class AITaskFixUserAction {
     APPLIED,
     REJECTED,
     APPLIED_LOCALLY,
+    APPLIED_AUTOMATICALLY
 }
