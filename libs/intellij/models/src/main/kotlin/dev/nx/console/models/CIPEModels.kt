@@ -77,6 +77,7 @@ data class NxAiFix(
     val suggestedFixDescription: String? = null,
     val userAction: AITaskFixUserAction? = null,
     val couldAutoApplyTasks: Boolean? = null,
+    val failureClassification: String? = null,
 )
 
 @Serializable
