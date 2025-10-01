@@ -55,6 +55,9 @@ internal class ProjectPostStartup : ProjectActivity {
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             DumbService.getInstance(project).waitForSmartMode()
 
+            // Initialize periodic AI configuration check
+            PeriodicAiCheckService.getInstance(project).initialize()
+
             val aiAssistantPlugin =
                 PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" }
             if (aiAssistantPlugin != null && aiAssistantPlugin.isEnabled) {
@@ -68,8 +71,7 @@ internal class ProjectPostStartup : ProjectActivity {
                 }
             }
 
-            // Initialize periodic AI configuration check
-            PeriodicAiCheckService.getInstance(project).initialize()
+
         }
 
         TelemetryService.getInstance(project)

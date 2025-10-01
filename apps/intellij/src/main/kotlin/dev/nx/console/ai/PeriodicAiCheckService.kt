@@ -4,20 +4,24 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
+import com.intellij.execution.util.ExecUtil
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
+import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.NxProvenance
 import dev.nx.console.utils.nxWorkspace
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
+import logger
 
 @Service(Service.Level.PROJECT)
 class PeriodicAiCheckService(private val project: Project) : Disposable {
@@ -63,7 +67,9 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
     }
 
     private suspend fun runAiAgentCheck() {
+        logger.info("Running periodic AI check")
         if (shouldSkipCheck()) {
+            logger.info("Skipping periodic AI check because user opted out")
             return
         }
 
@@ -73,19 +79,24 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
                 .getLong(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, 0)
 
         val now = System.currentTimeMillis()
+        logger.info("Last notification timestamp: $lastNotificationTimestamp")
+        logger.info("Current timestamp: $now")
         if (now - lastNotificationTimestamp < ONE_DAY_MS) {
-            return
+            logger.info("Skipping periodic AI check because we already showed a notification")
+                logger.info("actuall continuiing tho")
+//         //   return
         }
 
-        val nxWorkspace = project.nxWorkspace() ?: return
 
         try {
             // Check provenance first
             val (hasProvenance, _) =
                 withContext(Dispatchers.IO) { NxProvenance.nxLatestProvenanceCheck() }
             if (!hasProvenance) {
+                logger.info("Skipping periodic AI check because provenance is not available")
                 return
             }
+            logger.info("provenance check successful")
 
             // Run the AI configuration check
             val checkCommand =
@@ -93,23 +104,15 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
             checkCommand.withEnvironment("NX_CONSOLE", "true")
             checkCommand.withEnvironment("NX_AI_FILES_USE_LOCAL", "true")
 
+
             val output =
                 withContext(Dispatchers.IO) {
-                    try {
-                        val process = checkCommand.createProcess()
-                        val exitCode = process.waitFor(30, TimeUnit.SECONDS)
-                        if (!exitCode || process.exitValue() != 0) {
-                            // Read error output
-                            process.errorStream.bufferedReader().use { it.readText() }
-                        } else {
-                            null
-                        }
-                    } catch (e: Exception) {
-                        e.message
-                    }
+                    ExecUtil.execAndGetOutput(checkCommand)
+
                 }
 
-            if (output != null && output.contains("The following AI agents are out of date")) {
+            logger.info("AI configuration check output: $output")
+            if ( output.stdout.contains("The following AI agents are out of date")) {
                 // Update timestamp
                 PropertiesComponent.getInstance(project)
                     .setValue(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, now.toString())
@@ -118,13 +121,13 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
                 TelemetryService.getInstance(project)
                     .featureUsed(
                         "ai.configure-agents-check-notification",
-                        mapOf("source" to "notification"),
                     )
 
                 // Show notification
-                withContext(Dispatchers.Main) { notifyAiConfigurationOutdated() }
+                withContext(Dispatchers.EDT) { notifyAiConfigurationOutdated() }
             }
         } catch (e: Exception) {
+            logger.warn("Failed to run AI configuration check: ${e.message}")
             // Silently fail - this is a non-critical operation
         }
     }
@@ -151,11 +154,9 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
             setOf(
                 NotificationAction.createSimpleExpiring("Update") {
                     notification.expire()
-                    // Log telemetry
-                    dev.nx.console.telemetry.TelemetryService.getInstance(project)
+                    TelemetryService.getInstance(project)
                         .featureUsed(
                             "ai.configure-agents-action",
-                            mapOf("source" to "notification"),
                         )
 
                     // Run configure-ai-agents command
@@ -197,16 +198,13 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
                 },
                 NotificationAction.createSimpleExpiring("Don't ask again") {
                     notification.expire()
-                    // Log telemetry
-                    dev.nx.console.telemetry.TelemetryService.getInstance(project)
+                    TelemetryService.getInstance(project)
                         .featureUsed(
                             "ai.configure-agents-dont-ask-again",
                             mapOf("source" to "notification"),
                         )
 
-                    // Set don't ask again flag
-                    dev.nx.console.ai.PeriodicAiCheckService.getInstance(project)
-                        .setDontAskAgain()
+                    setDontAskAgain()
                 },
             )
         )
