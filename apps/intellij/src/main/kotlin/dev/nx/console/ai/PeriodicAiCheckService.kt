@@ -1,30 +1,23 @@
 package dev.nx.console.ai
 
-import com.intellij.execution.executors.DefaultRunExecutor
-import com.intellij.execution.process.KillableColoredProcessHandler
-import com.intellij.execution.ui.RunContentDescriptor
-import com.intellij.execution.ui.RunContentManager
 import com.intellij.execution.util.ExecUtil
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import dev.nx.console.NxIcons
-import dev.nx.console.telemetry.TelemetryEventSource
+import com.intellij.terminal.ui.TerminalWidget
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.NxProvenance
-import dev.nx.console.utils.nxWorkspace
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
 import logger
+import org.jetbrains.plugins.terminal.TerminalToolWindowManager
 
 @Service(Service.Level.PROJECT)
-class PeriodicAiCheckService(private val project: Project) : Disposable {
+class PeriodicAiCheckService(private val project: Project, private val cs: CoroutineScope) {
 
     companion object {
         fun getInstance(project: Project): PeriodicAiCheckService =
@@ -38,7 +31,6 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
         private const val ONE_DAY_MS = 24 * 60 * 60 * 1000L
     }
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private var checkJob: Job? = null
 
     fun initialize() {
@@ -47,7 +39,7 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
         }
 
         checkJob =
-            coroutineScope.launch {
+            cs.launch {
                 // Wait 1 minute before first check
                 delay(ONE_MINUTE_MS)
 
@@ -67,9 +59,7 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
     }
 
     private suspend fun runAiAgentCheck() {
-        logger.info("Running periodic AI check")
         if (shouldSkipCheck()) {
-            logger.info("Skipping periodic AI check because user opted out")
             return
         }
 
@@ -79,24 +69,17 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
                 .getLong(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, 0)
 
         val now = System.currentTimeMillis()
-        logger.info("Last notification timestamp: $lastNotificationTimestamp")
-        logger.info("Current timestamp: $now")
         if (now - lastNotificationTimestamp < ONE_DAY_MS) {
-            logger.info("Skipping periodic AI check because we already showed a notification")
-                logger.info("actuall continuiing tho")
-//         //   return
+            return
         }
-
 
         try {
             // Check provenance first
             val (hasProvenance, _) =
                 withContext(Dispatchers.IO) { NxProvenance.nxLatestProvenanceCheck() }
             if (!hasProvenance) {
-                logger.info("Skipping periodic AI check because provenance is not available")
                 return
             }
-            logger.info("provenance check successful")
 
             // Run the AI configuration check
             val checkCommand =
@@ -104,30 +87,22 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
             checkCommand.withEnvironment("NX_CONSOLE", "true")
             checkCommand.withEnvironment("NX_AI_FILES_USE_LOCAL", "true")
 
+            val output = withContext(Dispatchers.IO) { ExecUtil.execAndGetOutput(checkCommand) }
 
-            val output =
-                withContext(Dispatchers.IO) {
-                    ExecUtil.execAndGetOutput(checkCommand)
-
-                }
-
-            logger.info("AI configuration check output: $output")
-            if ( output.stdout.contains("The following AI agents are out of date")) {
+            if (output.stdout.contains("The following AI agents are out of date")) {
                 // Update timestamp
                 PropertiesComponent.getInstance(project)
                     .setValue(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, now.toString())
 
                 // Log telemetry
                 TelemetryService.getInstance(project)
-                    .featureUsed(
-                        "ai.configure-agents-check-notification",
-                    )
+                    .featureUsed("ai.configure-agents-check-notification")
 
                 // Show notification
                 withContext(Dispatchers.EDT) { notifyAiConfigurationOutdated() }
             }
         } catch (e: Exception) {
-            logger.warn("Failed to run AI configuration check: ${e.message}")
+            logger.info("Failed to run AI configuration check: ${e.message}")
             // Silently fail - this is a non-critical operation
         }
     }
@@ -137,13 +112,10 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
         checkJob?.cancel()
     }
 
-    override fun dispose() {
-        coroutineScope.cancel()
-    }
-
     private fun notifyAiConfigurationOutdated() {
         val notification =
-            NotificationGroupManager.getInstance().getNotificationGroup("Nx Console")
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Nx Console")
                 .createNotification(
                     "Your AI agent configuration is outdated. Would you like to update to the recommended configuration?",
                     NotificationType.INFORMATION,
@@ -154,45 +126,26 @@ class PeriodicAiCheckService(private val project: Project) : Disposable {
             setOf(
                 NotificationAction.createSimpleExpiring("Update") {
                     notification.expire()
-                    TelemetryService.getInstance(project)
-                        .featureUsed(
-                            "ai.configure-agents-action",
-                        )
+                    TelemetryService.getInstance(project).featureUsed("ai.configure-agents-action")
 
                     // Run configure-ai-agents command
-                    val coroutineScope = CoroutineScope(Dispatchers.Default)
-                    coroutineScope.launch {
-                        val configureCommand =
-                            NxLatestVersionGeneralCommandLine(
-                                project,
-                                listOf("configure-ai-agents"),
-                            )
-                        configureCommand.withEnvironment("NX_CONSOLE", "true")
-                        configureCommand.withEnvironment("NX_AI_FILES_USE_LOCAL", "true")
+                    cs.launch {
+                        withContext(Dispatchers.EDT) {
+                            val terminalManager = TerminalToolWindowManager.getInstance(project)
+                            val workingDirectory = project.basePath ?: "."
 
-                        withContext(Dispatchers.Main) {
-                            val processHandler = KillableColoredProcessHandler(configureCommand)
-                            val console =
-                                com.intellij.execution.impl.ConsoleViewImpl(project, true)
-
-                            console.attachToProcess(processHandler)
-
-                            val contentDescriptor =
-                                RunContentDescriptor(
-                                    console,
-                                    processHandler,
-                                    console.component,
-                                    "Configure AI Agents",
-                                    NxIcons.Action,
+                            val terminalWidget: TerminalWidget =
+                                terminalManager.createShellWidget(
+                                    workingDirectory,
+                                    "configure-ai-agents",
+                                    true,
+                                    false,
                                 )
 
-                            val runContentManager = RunContentManager.getInstance(project)
-                            runContentManager.showRunContent(
-                                DefaultRunExecutor.getRunExecutorInstance(),
-                                contentDescriptor,
-                            )
+                            terminalManager.getToolWindow()?.show(null)
 
-                            processHandler.startNotify()
+                            // Execute command using the new TerminalWidget interface
+                            terminalWidget.sendCommandToExecute("npx nx@latest configure-ai-agents")
                         }
                     }
                 },
