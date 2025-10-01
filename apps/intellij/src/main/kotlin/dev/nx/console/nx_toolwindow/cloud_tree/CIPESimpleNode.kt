@@ -157,13 +157,20 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
 
             return run {
                 // User action takes precedence
-                if (
+                if (userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY) {
+                    "Nx Cloud has automatically applied the fix"
+                } else if (
                     userAction == AITaskFixUserAction.APPLIED ||
                         userAction == AITaskFixUserAction.APPLIED_LOCALLY
                 ) {
                     "Nx Cloud has applied the fix"
                 } else if (userAction == AITaskFixUserAction.REJECTED) {
                     "Fix rejected by user"
+                } else if (
+                    aiFix.failureClassification != null &&
+                        aiFix.failureClassification != "code_change"
+                ) {
+                    "Nx Cloud identified a root cause for this issue"
                 } else if (hasSuggestedFix) {
                     // If a fix exists, check verification status
                     when (verificationStatus) {
@@ -195,6 +202,9 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             val hasSuggestedFix = aiFix.suggestedFix != null
 
             // User action takes precedence
+            if (userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY) {
+                return AllIcons.Actions.Checked // Green check mark for auto-applied
+            }
             if (
                 userAction == AITaskFixUserAction.APPLIED ||
                     userAction == AITaskFixUserAction.APPLIED_LOCALLY
@@ -203,6 +213,11 @@ sealed class CIPESimpleNode(parent: CIPESimpleNode?) : CachingSimpleNode(parent)
             }
             if (userAction == AITaskFixUserAction.REJECTED) {
                 return AllIcons.Actions.Cancel // Red circle slash
+            }
+            if (
+                aiFix.failureClassification != null && aiFix.failureClassification != "code_change"
+            ) {
+                return AllIcons.General.BalloonWarning
             }
 
             // If a fix exists, check verification status

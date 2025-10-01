@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 
-
 class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     private var currentLoadHtmlJob: Job? = null

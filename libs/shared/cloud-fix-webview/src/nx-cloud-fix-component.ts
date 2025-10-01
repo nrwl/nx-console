@@ -86,26 +86,42 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
 
         <div class="flex flex-col px-3">
           <div class="px-3 py-2 pb-9">
-            <p class="text-foreground m-0 leading-relaxed opacity-90">
-              Nx Cloud AI analyzes your failing CI tasks and automatically
-              generates fixes whenever possible. The AI examines the error
-              output, identifies the root cause, and suggests minimal code
-              changes to resolve the issue. Once generated, the fix is verified
-              by running the same task on Nx Cloud to ensure it resolves the
-              error.
-            </p>
-            <p class="text-foreground m-0 mt-2 leading-relaxed opacity-90">
-              You can
-              <span
-                class="text-primary hover:text-primary cursor-pointer underline"
-                @click="${() => this.handleShowDiff()}"
-              >
-                review the resulting git diff of the suggested changes</span
-              >&nbsp;and choose to apply or reject them.
-            </p>
+            ${!aiFix.failureClassification ||
+            aiFix.failureClassification === 'code_change'
+              ? html`
+                  <p class="text-foreground m-0 leading-relaxed opacity-90">
+                    Nx Cloud analyzes your failing CI tasks and automatically
+                    generates fixes whenever possible. The AI examines the error
+                    output, identifies the root cause, and suggests minimal code
+                    changes to resolve the issue. Once generated, the fix is
+                    verified by running the same task on Nx Cloud to ensure it
+                    resolves the error.
+                  </p>
+                  <p
+                    class="text-foreground m-0 mt-2 leading-relaxed opacity-90"
+                  >
+                    You can
+                    <span
+                      class="text-primary hover:text-primary cursor-pointer underline"
+                      @click="${() => this.handleShowDiff()}"
+                    >
+                      review the resulting git diff of the suggested
+                      changes</span
+                    >&nbsp;and choose to apply or reject them.
+                  </p>
+                `
+              : html`
+                  <p class="text-foreground m-0 leading-relaxed opacity-90">
+                    Nx Cloud has analyzed your failing CI task and identified
+                    the probable root cause. The analysis below explains why
+                    this task failed and what type of issue was detected.
+                  </p>
+                `}
           </div>
           ${this.getFixSection(aiFix)}
-          ${aiFix.suggestedFix
+          ${aiFix.suggestedFix &&
+          (!aiFix.failureClassification ||
+            aiFix.failureClassification === 'code_change')
             ? html`<div class="pointer-events-none relative m-0 h-9">
                 <div
                   class="bg-border absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2"
@@ -115,7 +131,10 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                 ></div>
               </div>`
             : ''}
-          ${this.getStatusSection(aiFix)}
+          ${!aiFix.failureClassification ||
+          aiFix.failureClassification === 'code_change'
+            ? this.getStatusSection(aiFix)
+            : ''}
           <div class="pointer-events-none relative m-0 h-9">
             <div
               class="bg-border absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2"
@@ -344,6 +363,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   }
 
   private getFixSection(aiFix: NxAiFix): TemplateResult {
+    // Check if this is an environment issue or other non-code_change classification
+    const isEnvironmentIssue =
+      aiFix.failureClassification &&
+      aiFix.failureClassification !== 'code_change';
+
     // If fix was rejected, show the rejected state
     if (aiFix.userAction === 'REJECTED') {
       return html`
@@ -392,6 +416,30 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       `;
     }
 
+    if (aiFix.userAction === 'APPLIED_AUTOMATICALLY') {
+      return html`
+        <div
+          class="border-border bg-background relative m-0 border p-6 text-center"
+        >
+          <div
+            class="mx-auto mb-4 flex h-16 w-16 flex-col items-center justify-center"
+          >
+            <icon-element
+              icon="git-branch"
+              size="3rem"
+              class="text-success leading-none"
+            ></icon-element>
+          </div>
+          <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
+            Fix Applied Automatically
+          </h2>
+          <p class="text-foreground m-0 text-sm opacity-80">
+            The suggested fix has been automatically committed to your branch.
+          </p>
+        </div>
+      `;
+    }
+
     if (aiFix.userAction === 'APPLIED_LOCALLY') {
       return html`
         <div
@@ -412,6 +460,37 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           <p class="text-foreground m-0 text-sm opacity-80">
             The suggested changes have been applied locally.
           </p>
+        </div>
+      `;
+    }
+
+    // For environment issues, show a simplified version without apply/reject buttons
+    if (isEnvironmentIssue) {
+      return html`
+        <div class="border-border bg-background relative m-0 border">
+          <div
+            class="border-border relative flex items-start justify-between border-b p-4 px-5"
+          >
+            <div class="flex-1">
+              <h2 class="m-0 flex items-center gap-3 text-base font-semibold">
+                <icon-element icon="info"></icon-element>
+                ${aiFix.failureClassification === 'environment_state'
+                  ? 'Environment Issue Detected'
+                  : 'Issue Analysis'}
+              </h2>
+            </div>
+          </div>
+          <div class="px-4 py-1 pb-4">
+            ${aiFix.suggestedFixReasoning
+              ? html`<p class="text-foreground m-0 mb-3 text-sm opacity-90">
+                  ${this.renderFormattedText(aiFix.suggestedFixReasoning)}
+                </p>`
+              : html`<p class="text-foreground m-0 mb-3 text-sm opacity-90">
+                  Nx Cloud AI has analyzed this failure and determined it is not
+                  caused by code changes. This may be due to environment issues,
+                  external dependencies, or infrastructure problems.
+                </p>`}
+          </div>
         </div>
       `;
     }

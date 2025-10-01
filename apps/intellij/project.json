@@ -25,6 +25,18 @@
     },
     "buildPlugin": {
       "dependsOn": ["^build", "^build-webview-files"]
+    },
+    "runIde": {
+      "cache": false
+    },
+    "prepareSandbox": {
+      "dependsOn": [
+        "^build",
+        "^build-webview-files",
+        "composedJar",
+        "^jar",
+        "initializeIntellijPlatformPlugin"
+      ]
     }
   },
   "tags": ["type:intellij"],

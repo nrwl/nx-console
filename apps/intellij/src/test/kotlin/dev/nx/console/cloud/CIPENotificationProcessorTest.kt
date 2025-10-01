@@ -2,6 +2,7 @@ package dev.nx.console.cloud
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.nx.console.models.*
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class CIPENotificationProcessorTest : BasePlatformTestCase() {
@@ -237,9 +238,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                     aiFixId = "ai-fix-1",
                                     taskIds = listOf("test-task-1"),
                                     terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
+                                    suggestedFixStatus = AITaskFixStatus.COMPLETED,
+                                    verificationStatus = AITaskFixStatus.COMPLETED,
                                     suggestedFix = "git diff content...",
                                     suggestedFixDescription = "Fix test",
-                                    verificationStatus = AITaskFixStatus.COMPLETED,
                                     userAction = AITaskFixUserAction.NONE,
                                 ),
                         ),
@@ -512,28 +514,241 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events[0] is CIPENotificationEvent.AiFixAvailable)
     }
 
-    fun testNoDoubleNotificationForRegularFailures() {
-        // Regular failures (without aiFixesEnabled) should not show notification twice
-        val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
-        val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
-
-        val failedCIPE =
-            createProgressCIPE()
+    fun testAutoAppliedFixNotification() {
+        // When userAction changes to APPLIED_AUTOMATICALLY, should show notification
+        val progressCIPE = createProgressCIPE()
+        val withAutoAppliedFix =
+            createFailedCIPEWithAiFix()
                 .copy(
                     status = CIPEExecutionStatus.FAILED,
-                    createdAt = tenMinutesAgo,
-                    completedAt = sixMinutesAgo,
+                    runGroups =
+                        listOf(
+                            CIPERunGroup(
+                                ciExecutionEnv = "123123",
+                                runGroup = "rungroup-123123",
+                                createdAt = 10000,
+                                completedAt = 10001,
+                                status = CIPEExecutionStatus.FAILED,
+                                runs =
+                                    listOf(
+                                        CIPERun(
+                                            linkId = "123123",
+                                            command = "nx test",
+                                            status = CIPEExecutionStatus.FAILED,
+                                            runUrl = "http://test.url",
+                                        )
+                                    ),
+                                aiFix =
+                                    NxAiFix(
+                                        aiFixId = "ai-fix-auto",
+                                        taskIds = listOf("test-task-1"),
+                                        terminalLogsUrls =
+                                            mapOf("test-task-1" to "http://logs.url"),
+                                        suggestedFixStatus = AITaskFixStatus.COMPLETED,
+                                        verificationStatus = AITaskFixStatus.COMPLETED,
+                                        suggestedFix = "git diff content...",
+                                        suggestedFixDescription = "Auto-applied fix",
+                                        userAction = AITaskFixUserAction.APPLIED_AUTOMATICALLY,
+                                        couldAutoApplyTasks = true,
+                                    ),
+                            )
+                        ),
                 )
 
         val event =
             CIPEDataChangedEvent(
-                oldData = CIPEDataResponse(info = listOf(failedCIPE)),
-                newData = CIPEDataResponse(info = listOf(failedCIPE)),
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(withAutoAppliedFix)),
             )
 
         processor.onDataChanged(event)
 
-        // Should not show notification - already shown
+        assertEquals(1, mockListener.events.size)
+        val notificationEvent = mockListener.events[0]
+        assertTrue(notificationEvent is CIPENotificationEvent.AiFixAvailable)
+        assertEquals(
+            AITaskFixUserAction.APPLIED_AUTOMATICALLY,
+            (notificationEvent as CIPENotificationEvent.AiFixAvailable).runGroup.aiFix?.userAction,
+        )
+    }
+
+    fun testNoNotificationDuringAutoApplyVerification() {
+        // When couldAutoApplyTasks=true but verification is not complete, should not notify
+        val progressCIPE = createProgressCIPE()
+        val withAutoApplyInProgress =
+            createFailedCIPEWithAiFix()
+                .copy(
+                    runGroups =
+                        listOf(
+                            CIPERunGroup(
+                                ciExecutionEnv = "123123",
+                                runGroup = "rungroup-123123",
+                                createdAt = 10000,
+                                completedAt = 10001,
+                                status = CIPEExecutionStatus.FAILED,
+                                runs =
+                                    listOf(
+                                        CIPERun(
+                                            linkId = "123123",
+                                            command = "nx test",
+                                            status = CIPEExecutionStatus.FAILED,
+                                            runUrl = "http://test.url",
+                                        )
+                                    ),
+                                aiFix =
+                                    NxAiFix(
+                                        aiFixId = "ai-fix-verifying",
+                                        taskIds = listOf("test-task-1"),
+                                        terminalLogsUrls =
+                                            mapOf("test-task-1" to "http://logs.url"),
+                                        suggestedFix = "git diff content...",
+                                        suggestedFixDescription = "Verifying fix",
+                                        suggestedFixStatus = AITaskFixStatus.COMPLETED,
+                                        verificationStatus = AITaskFixStatus.IN_PROGRESS,
+                                        userAction = AITaskFixUserAction.NONE,
+                                        couldAutoApplyTasks = true,
+                                    ),
+                            )
+                        )
+                )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(withAutoApplyInProgress)),
+            )
+
+        processor.onDataChanged(event)
+
+        // Should not show notification while verification is in progress
+        assertTrue(mockListener.events.isEmpty())
+    }
+
+    fun testNotificationAfterAutoApplyVerificationCompletes() {
+        // When verification completes for auto-apply, should show notification
+        val withVerifying =
+            createFailedCIPEWithAiFix()
+                .copy(
+                    runGroups =
+                        listOf(
+                            CIPERunGroup(
+                                ciExecutionEnv = "123123",
+                                runGroup = "rungroup-123123",
+                                createdAt = 10000,
+                                completedAt = 10001,
+                                status = CIPEExecutionStatus.FAILED,
+                                runs =
+                                    listOf(
+                                        CIPERun(
+                                            linkId = "123123",
+                                            command = "nx test",
+                                            status = CIPEExecutionStatus.FAILED,
+                                            runUrl = "http://test.url",
+                                        )
+                                    ),
+                                aiFix =
+                                    NxAiFix(
+                                        aiFixId = "ai-fix-verifying",
+                                        taskIds = listOf("test-task-1"),
+                                        terminalLogsUrls =
+                                            mapOf("test-task-1" to "http://logs.url"),
+                                        suggestedFix = "git diff content...",
+                                        suggestedFixDescription = "Verifying fix",
+                                        suggestedFixStatus = AITaskFixStatus.COMPLETED,
+                                        verificationStatus = AITaskFixStatus.IN_PROGRESS,
+                                        userAction = AITaskFixUserAction.NONE,
+                                        couldAutoApplyTasks = true,
+                                    ),
+                            )
+                        )
+                )
+
+        val withVerified =
+            withVerifying.copy(
+                runGroups =
+                    listOf(
+                        withVerifying.runGroups[0].copy(
+                            aiFix =
+                                withVerifying.runGroups[0]
+                                    .aiFix
+                                    ?.copy(
+                                        verificationStatus = AITaskFixStatus.COMPLETED,
+                                        userAction = AITaskFixUserAction.APPLIED_AUTOMATICALLY,
+                                    )
+                        )
+                    )
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(withVerifying)),
+                newData = CIPEDataResponse(info = listOf(withVerified)),
+            )
+
+        processor.onDataChanged(event)
+
+        // Should show notification after verification completes
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.AiFixAvailable)
+    }
+
+    fun testUserActionChangeTriggersNotification() {
+        // When userAction changes from NONE to APPLIED, should trigger notification
+        val withNoneAction = createFailedCIPEWithAiFix()
+        val withAppliedAction =
+            withNoneAction.copy(
+                runGroups =
+                    listOf(
+                        withNoneAction.runGroups[0].copy(
+                            aiFix =
+                                withNoneAction.runGroups[0]
+                                    .aiFix
+                                    ?.copy(userAction = AITaskFixUserAction.APPLIED)
+                        )
+                    )
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(withNoneAction)),
+                newData = CIPEDataResponse(info = listOf(withAppliedAction)),
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.AiFixAvailable)
+    }
+
+    fun testNoDuplicateNotificationsForSameCIPE() {
+        // Should not send duplicate notifications for the same CIPE
+        val progressCIPE = createProgressCIPE()
+        val failedCIPE =
+            progressCIPE.copy(
+                status = CIPEExecutionStatus.FAILED,
+                completedAt = System.currentTimeMillis(),
+            )
+
+        // First transition - should notify
+        val event1 =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedCIPE)),
+            )
+        processor.onDataChanged(event1)
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
+
+        // Reset listener but processor keeps tracking sent notifications
+        mockListener.reset()
+
+        // Same CIPE appears again - should NOT notify (already sent)
+        val event2 =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(failedCIPE)),
+                newData = CIPEDataResponse(info = listOf(failedCIPE)),
+            )
+        processor.onDataChanged(event2)
         assertTrue(mockListener.events.isEmpty())
     }
 
@@ -564,24 +779,30 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
     }
 
-    fun testRegularErrorNotificationAfterAiFixTimeoutFromExisting() {
-        // When an existing CIPE with aiFixesEnabled is re-checked after timeout, show regular error
+    fun testDelayedNotificationAfterAiFixTimeout() {
+        // When transitioning from waiting for AI fix to timeout, show delayed notification
         val tenMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 10
+        val fourMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 4
         val sixMinutesAgo = System.currentTimeMillis() - 1000 * 60 * 6
 
-        val failedCipeWithAiEnabledTimedOut =
+        val waitingForAiFix =
             createProgressCIPE()
                 .copy(
                     aiFixesEnabled = true,
                     status = CIPEExecutionStatus.FAILED,
                     createdAt = tenMinutesAgo,
-                    completedAt = sixMinutesAgo,
+                    completedAt = fourMinutesAgo,
                 )
+
+        val timedOut =
+            waitingForAiFix.copy(
+                completedAt = sixMinutesAgo // More than 5 minutes
+            )
 
         val event =
             CIPEDataChangedEvent(
-                oldData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
-                newData = CIPEDataResponse(info = listOf(failedCipeWithAiEnabledTimedOut)),
+                oldData = CIPEDataResponse(info = listOf(waitingForAiFix)),
+                newData = CIPEDataResponse(info = listOf(timedOut)),
             )
 
         processor.onDataChanged(event)
@@ -676,6 +897,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             commitTitle = "fix: fix fix",
             commitUrl = "https://github.com/commit/123",
             cipeUrl = "https://cloud.nx.app/cipes/123",
+            aiFixesEnabled = true,
             runGroups =
                 listOf(
                     CIPERunGroup(
@@ -698,9 +920,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 aiFixId = "ai-fix-123",
                                 taskIds = listOf("test-task-1"),
                                 terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
+                                suggestedFixStatus = AITaskFixStatus.COMPLETED,
+                                verificationStatus = AITaskFixStatus.COMPLETED,
                                 suggestedFix = "git diff content here...",
                                 suggestedFixDescription = "Fix the failing test",
-                                verificationStatus = AITaskFixStatus.COMPLETED,
                                 userAction = AITaskFixUserAction.NONE,
                             ),
                     )
@@ -717,6 +940,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             commitTitle = "fix: fix fix",
             commitUrl = "https://github.com/commit/123",
             cipeUrl = "https://cloud.nx.app/cipes/123",
+            aiFixesEnabled = true,
             runGroups =
                 listOf(
                     CIPERunGroup(
@@ -739,9 +963,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 aiFixId = "ai-fix-456",
                                 taskIds = listOf("test-task-1"),
                                 terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
+                                suggestedFixStatus = AITaskFixStatus.COMPLETED,
+                                verificationStatus = AITaskFixStatus.COMPLETED,
                                 suggestedFix = "git diff content here...",
                                 suggestedFixDescription = "Fix the failing test",
-                                verificationStatus = AITaskFixStatus.COMPLETED,
                                 userAction = AITaskFixUserAction.NONE,
                             ),
                     )
@@ -758,6 +983,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             commitTitle = "fix: fix fix",
             commitUrl = "https://github.com/commit/123",
             cipeUrl = "https://cloud.nx.app/cipes/123",
+            aiFixesEnabled = true,
             runGroups =
                 listOf(
                     CIPERunGroup(
@@ -780,9 +1006,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 aiFixId = "ai-fix-789",
                                 taskIds = listOf("test-task-1"),
                                 terminalLogsUrls = mapOf("test-task-1" to "http://logs.url"),
+                                suggestedFixStatus = AITaskFixStatus.IN_PROGRESS,
+                                verificationStatus = AITaskFixStatus.IN_PROGRESS,
                                 suggestedFix = null,
                                 suggestedFixDescription = null,
-                                verificationStatus = AITaskFixStatus.IN_PROGRESS,
                                 userAction = AITaskFixUserAction.NONE,
                             ),
                     )
@@ -799,6 +1026,7 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
             commitTitle = "fix: fix fix",
             commitUrl = "https://github.com/commit/123",
             cipeUrl = "https://cloud.nx.app/cipes/123",
+            aiFixesEnabled = true,
             runGroups =
                 listOf(
                     CIPERunGroup(
@@ -821,9 +1049,10 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
                                 aiFixId = "ai-fix-789",
                                 taskIds = listOf(),
                                 terminalLogsUrls = mapOf(),
+                                suggestedFixStatus = AITaskFixStatus.NOT_STARTED,
+                                verificationStatus = AITaskFixStatus.NOT_STARTED,
                                 suggestedFix = null,
                                 suggestedFixDescription = null,
-                                verificationStatus = AITaskFixStatus.NOT_STARTED,
                                 userAction = AITaskFixUserAction.NONE,
                             ),
                     )

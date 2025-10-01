@@ -1,5 +1,6 @@
 package dev.nx.console.telemetry
 
+import com.intellij.openapi.diagnostic.thisLogger
 import kotlin.reflect.full.companionObject
 
 // these are compared to libs/shared/telemetry/src/lib/telemetry-types.ts
@@ -107,6 +108,8 @@ class TelemetryEventSource(val source: String) {
 
         // Function to validate if a string is a valid source
         fun isValidSource(source: String): Boolean {
+            thisLogger().debug("Checking if $source is a valid source")
+            thisLogger().debug("Valid sources: ${getAllSources()}")
             val validSources = getAllSources()
             return source in validSources
         }
