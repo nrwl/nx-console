@@ -4,6 +4,7 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import dev.nx.console.ai.PeriodicAiCheckService
 import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.mcp.McpServerService
@@ -53,6 +54,9 @@ internal class ProjectPostStartup : ProjectActivity {
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             DumbService.getInstance(project).waitForSmartMode()
+
+            // Initialize periodic AI configuration check
+            PeriodicAiCheckService.getInstance(project).initialize()
 
             val aiAssistantPlugin =
                 PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" }
