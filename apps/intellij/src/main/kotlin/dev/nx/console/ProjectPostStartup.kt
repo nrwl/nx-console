@@ -70,8 +70,6 @@ internal class ProjectPostStartup : ProjectActivity {
                     Notifier.notifyMcpServerInstall(project)
                 }
             }
-
-
         }
 
         TelemetryService.getInstance(project)

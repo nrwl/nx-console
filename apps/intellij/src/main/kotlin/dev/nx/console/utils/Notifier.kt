@@ -2,11 +2,6 @@ package dev.nx.console.utils
 
 // import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNotificationAction
 import com.intellij.analysis.problemsView.toolWindow.ProblemsView
-import com.intellij.execution.executors.DefaultRunExecutor
-import com.intellij.execution.impl.ConsoleViewImpl
-import com.intellij.execution.process.KillableColoredProcessHandler
-import com.intellij.execution.ui.RunContentDescriptor
-import com.intellij.execution.ui.RunContentManager
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.*
@@ -17,14 +12,11 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.RestartDialogImpl
 import dev.nx.console.NxConsoleBundle
-import dev.nx.console.NxIcons
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.telemetry.actions.TelemetryOptInAction
 import dev.nx.console.telemetry.actions.TelemetryOptOutAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 
 class Notifier {
