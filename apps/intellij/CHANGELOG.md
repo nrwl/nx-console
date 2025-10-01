@@ -1,3 +1,16 @@
+## 1.50.0 (2025-10-01)
+
+### Bug Fixes
+
+* handle APPLIED_AUTOMATICALLY better in fix ui & vscode cipe tree ([#2799](https://github.com/nrwl/nx-console/issues/2799)) ([7671db3](https://github.com/nrwl/nx-console/commit/7671db388c79db6e1db623f15393c38d207363c9))
+* **intellij:** refactor cipe notification logic & handle auto-applied fixes ([#2801](https://github.com/nrwl/nx-console/issues/2801)) ([391a2b2](https://github.com/nrwl/nx-console/commit/391a2b203145ebac80830432e77a694c27b18813))
+
+
+### Features
+
+* **intellij:** prompt for ai agent rules update ([#2804](https://github.com/nrwl/nx-console/issues/2804)) ([26d00cc](https://github.com/nrwl/nx-console/commit/26d00cce995e429acc9727bf0a86b64faeca9d20))
+* **vscode:** handle ai fixes that are not code_change better ([#2802](https://github.com/nrwl/nx-console/issues/2802)) ([7b7dc82](https://github.com/nrwl/nx-console/commit/7b7dc82dd9312657a3cbe8345f77999d4cb066ed))
+
 ## 1.49.0 (2025-09-30)
 
 ### Bug Fixes
