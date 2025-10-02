@@ -377,9 +377,7 @@ class NxCloudFixFileImpl(
                                     "Nx Cloud fix applied successfully.",
                                     NotificationType.INFORMATION,
                                 )
-                        notification.addAction(
-                          FetchAndPullChangesAction(targetBranch)
-                        )
+                        notification.addAction(FetchAndPullChangesAction(targetBranch))
                         notification.notify(project)
                     }
 

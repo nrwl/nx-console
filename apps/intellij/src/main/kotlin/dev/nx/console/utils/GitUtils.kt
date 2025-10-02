@@ -13,7 +13,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.changes.VcsIgnoreManager
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.xml.util.XmlStringUtil
 import git4idea.commands.Git
 import git4idea.commands.GitCommand
 import git4idea.commands.GitLineHandler
@@ -286,10 +285,10 @@ data class UncommittedChanges(
 }
 
 class FetchAndPullChangesAction(private val targetBranch: String) :
-        NotificationAction("Fetch and Pull Changes") {
-        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-            val project = e.project ?: return
-            GitUtils.fetchAndPullChanges(project, targetBranch)
-            notification.expire()
-        }
+    NotificationAction("Fetch and Pull Changes") {
+    override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+        val project = e.project ?: return
+        GitUtils.fetchAndPullChanges(project, targetBranch)
+        notification.expire()
     }
+}
