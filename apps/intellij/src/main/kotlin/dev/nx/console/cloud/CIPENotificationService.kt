@@ -19,6 +19,8 @@ import dev.nx.console.settings.options.NxCloudNotificationsLevel
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.FetchAndPullChangesAction
+import dev.nx.console.utils.GitUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -122,6 +124,12 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
                 )
 
             cipe.commitUrl?.also { notification.addAction(ViewPRAction(it)) }
+
+            // Check if the branch exists on remote and add Fetch & Pull Changes button
+            val targetBranch = cipe.branch
+            if (GitUtils.checkBranchExistsOnRemote(project, targetBranch)) {
+                notification.addAction(FetchAndPullChangesAction(targetBranch))
+            }
 
             notification.notify(project)
             return
