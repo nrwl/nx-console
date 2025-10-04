@@ -34,16 +34,40 @@ Here's an example of a `mcp.json` configuration:
 
 <details>
 <summary>Claude Code</summary>
-```
+  
+```sh
 claude mcp add nx-mcp npx nx-mcp@latest
 ```
+
 </details>
 
 <details>
 <summary>VSCode</summary>
-```
+  
+```sh
 code --add-mcp '{"name":"nx-mcp","command":"npx","args":["nx-mcp"]}'
 ```
+
+</details>
+
+<details>
+<summary>Warp</summary>
+
+Go to `Settings` -> `AI` -> `Manage MCP Servers` -> `+ Add` to [add an MCP Server](https://docs.warp.dev/knowledge-and-collaboration/mcp#adding-an-mcp-server).
+
+Alternatively, use the slash command `/add-mcp` in the Warp Agent prompt.
+
+```json
+{
+  "nx-mcp": {
+    "command": "npx",
+    "args": [
+      "nx-mcp@latest"
+    ]
+  }
+}
+```
+
 </details>
 
 Refer to your AI tool's documentation for how to register an MCP server. For example, [Cursor](https://docs.cursor.com/context/model-context-protocol) or [Claude Desktop](https://modelcontextprotocol.io/quickstart/user) support MCP.
