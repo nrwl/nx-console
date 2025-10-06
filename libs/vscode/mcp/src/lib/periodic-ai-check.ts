@@ -84,6 +84,7 @@ async function runAiAgentCheck() {
     const command = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check`;
 
     try {
+      getTelemetry().logUsage('ai.configure-agents-check');
       await promisify(exec)(command, {
         cwd: workspacePath,
         env: {
