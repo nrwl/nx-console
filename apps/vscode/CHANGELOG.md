@@ -1,3 +1,18 @@
+## 18.71.0 (2025-10-06)
+
+### 🚀 Features
+
+- **vscode:** handle ai fixes that are not code_change better ([#2802](https://github.com/nrwl/nx-console/pull/2802))
+
+### 🩹 Fixes
+
+- **nxls:** ignore more branches in recent CIPEs ([#2803](https://github.com/nrwl/nx-console/pull/2803))
+- handle APPLIED_AUTOMATICALLY better in fix ui & vscode cipe tree ([#2799](https://github.com/nrwl/nx-console/pull/2799))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.70.0 (2025-09-29)
 
 ### 🚀 Features
