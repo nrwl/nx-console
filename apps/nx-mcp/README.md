@@ -61,9 +61,7 @@ Alternatively, use the slash command `/add-mcp` in the Warp Agent prompt.
 {
   "nx-mcp": {
     "command": "npx",
-    "args": [
-      "nx-mcp@latest"
-    ]
+    "args": ["nx-mcp@latest"]
   }
 }
 ```
