@@ -1,10 +1,21 @@
 package dev.nx.console.utils
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.changes.VcsIgnoreManager
 import com.intellij.openapi.vfs.VirtualFileManager
+import git4idea.commands.Git
+import git4idea.commands.GitCommand
+import git4idea.commands.GitLineHandler
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
 import java.io.File
@@ -104,6 +115,155 @@ object GitUtils {
             listener()
         }
     }
+
+    /**
+     * Check if a branch exists on the remote repository
+     *
+     * @param project The IntelliJ project
+     * @param branchName The name of the branch to check (without 'origin/' prefix)
+     * @return true if the branch exists on the remote, false otherwise
+     */
+    fun checkBranchExistsOnRemote(project: Project, branchName: String): Boolean {
+        val repository = getGitRepository(project) ?: return false
+        val remoteBranches = repository.branches.remoteBranches
+        return remoteBranches.any { it.name == "origin/$branchName" }
+    }
+
+    /**
+     * Fetch and pull changes from remote for a specific branch. If on the target branch, performs a
+     * fast-forward pull. If on a different branch, updates the local branch reference without
+     * checking it out.
+     *
+     * @param project The IntelliJ project
+     * @param targetBranch The branch to fetch and pull from
+     */
+    fun fetchAndPullChanges(project: Project, targetBranch: String) {
+        val repository = getGitRepository(project)
+        if (repository == null) {
+            showNotification(
+                project,
+                "Failed to fetch and pull changes",
+                "Could not find git repository",
+                NotificationType.ERROR,
+            )
+            return
+        }
+
+        ProgressManager.getInstance()
+            .run(
+                object : Task.Backgroundable(project, "Fetching and Pulling Changes", false) {
+                    override fun run(indicator: ProgressIndicator) {
+                        try {
+                            indicator.text = "Fetching from origin..."
+
+                            // Always refresh remotes first
+                            val fetchHandler =
+                                GitLineHandler(project, repository.root, GitCommand.FETCH)
+                            fetchHandler.addParameters("origin")
+                            val fetchResult = Git.getInstance().runCommand(fetchHandler)
+
+                            if (!fetchResult.success()) {
+                                val errorMsg =
+                                    fetchResult.errorOutputAsJoinedString.ifEmpty {
+                                        "Unknown error"
+                                    }
+                                showNotification(
+                                    project,
+                                    "Failed to fetch from origin",
+                                    errorMsg,
+                                    NotificationType.ERROR,
+                                )
+                                return
+                            }
+
+                            // Get current branch name
+                            val currentBranch = getCurrentBranch(project)
+
+                            indicator.text = "Updating branch..."
+
+                            if (currentBranch == targetBranch) {
+                                // On target branch: fast-forward working tree
+                                val pullHandler =
+                                    GitLineHandler(project, repository.root, GitCommand.PULL)
+                                pullHandler.addParameters("--ff-only", "origin", targetBranch)
+                                val pullResult = Git.getInstance().runCommand(pullHandler)
+
+                                if (!pullResult.success()) {
+                                    val errorMsg =
+                                        pullResult.errorOutputAsJoinedString.ifEmpty {
+                                            "Unknown error"
+                                        }
+                                    showNotification(
+                                        project,
+                                        "Failed to pull changes",
+                                        errorMsg,
+                                        NotificationType.ERROR,
+                                    )
+                                    return
+                                }
+                            } else {
+                                // On another branch: fast-forward local target branch without
+                                // checking it out
+                                val fetchBranchHandler =
+                                    GitLineHandler(project, repository.root, GitCommand.FETCH)
+                                fetchBranchHandler.addParameters(
+                                    "origin",
+                                    "$targetBranch:$targetBranch",
+                                )
+                                val fetchBranchResult =
+                                    Git.getInstance().runCommand(fetchBranchHandler)
+
+                                if (!fetchBranchResult.success()) {
+                                    val errorMsg =
+                                        fetchBranchResult.errorOutputAsJoinedString.ifEmpty {
+                                            "Unknown error"
+                                        }
+                                    showNotification(
+                                        project,
+                                        "Failed to update branch",
+                                        errorMsg,
+                                        NotificationType.ERROR,
+                                    )
+                                    return
+                                }
+                            }
+
+                            // Update repository state
+                            repository.update()
+
+                            showNotification(
+                                project,
+                                "Successfully updated branch",
+                                "Branch '$targetBranch' has been updated with remote changes",
+                                NotificationType.INFORMATION,
+                            )
+                        } catch (e: Exception) {
+                            thisLogger().error("Failed to fetch and pull changes", e)
+                            showNotification(
+                                project,
+                                "Failed to fetch and pull changes",
+                                e.message ?: "Unknown error",
+                                NotificationType.ERROR,
+                            )
+                        }
+                    }
+                }
+            )
+    }
+
+    /** Show a notification to the user */
+    private fun showNotification(
+        project: Project,
+        title: String,
+        content: String,
+        type: NotificationType,
+    ) {
+        val notificationGroup =
+            NotificationGroupManager.getInstance().getNotificationGroup("Nx Cloud CIPE")
+        val notification = notificationGroup.createNotification(content, type)
+        notification.setTitle(title)
+        notification.notify(project)
+    }
 }
 
 /** Data class representing uncommitted changes */
@@ -122,4 +282,13 @@ data class UncommittedChanges(
 
     val totalChangeCount: Int
         get() = modifiedFiles.size + addedFiles.size + deletedFiles.size + untrackedFiles.size
+}
+
+class FetchAndPullChangesAction(private val targetBranch: String) :
+    NotificationAction("Fetch and Pull Changes") {
+    override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+        val project = e.project ?: return
+        GitUtils.fetchAndPullChanges(project, targetBranch)
+        notification.expire()
+    }
 }

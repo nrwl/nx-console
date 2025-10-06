@@ -8,9 +8,12 @@ import com.intellij.diff.util.DiffUserDataKeysEx
 import com.intellij.icons.AllIcons
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.ide.ui.UISettingsListener
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
@@ -42,6 +45,7 @@ import dev.nx.console.cloud.NxCloudApiService
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.FetchAndPullChangesAction
 import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
@@ -357,7 +361,25 @@ class NxCloudFixFileImpl(
                     )
 
                 if (success) {
-                    showSuccessNotification("Nx Cloud fix applied successfully")
+                    val targetBranch = fixDetails.cipe.branch
+                    val hasBranchOnRemote =
+                        GitUtils.checkBranchExistsOnRemote(project, targetBranch)
+
+                    if (!hasBranchOnRemote) {
+                        showSuccessNotification(
+                            "Nx Cloud fix applied successfully. Don't forget to integrate the changes into your local branch"
+                        )
+                    } else {
+                        val notification =
+                            NotificationGroupManager.getInstance()
+                                .getNotificationGroup("Nx Cloud CIPE")
+                                .createNotification(
+                                    "Nx Cloud fix applied successfully.",
+                                    NotificationType.INFORMATION,
+                                )
+                        notification.addAction(FetchAndPullChangesAction(targetBranch))
+                        notification.notify(project)
+                    }
 
                     CIPEPollingService.getInstance(project).forcePoll()
 
@@ -451,7 +473,46 @@ class NxCloudFixFileImpl(
                                         )
 
                                     if (success) {
-                                        showSuccessNotification("Nx Cloud applied locally")
+                                        val targetBranch = fixDetails.cipe.branch
+                                        val hasBranchOnRemote =
+                                            GitUtils.checkBranchExistsOnRemote(
+                                                project,
+                                                targetBranch,
+                                            )
+
+                                        if (!hasBranchOnRemote) {
+                                            showSuccessNotification(
+                                                "Nx Cloud applied locally. Don't forget to integrate the changes into your local branch"
+                                            )
+                                        } else {
+                                            val notification =
+                                                NotificationGroupManager.getInstance()
+                                                    .getNotificationGroup("Nx Cloud CIPE")
+                                                    .createNotification(
+                                                        "Nx Cloud applied locally.",
+                                                        NotificationType.INFORMATION,
+                                                    )
+                                            notification.addAction(
+                                                object :
+                                                    com.intellij.notification.NotificationAction(
+                                                        "Fetch & Pull Changes"
+                                                    ) {
+                                                    override fun actionPerformed(
+                                                        e:
+                                                            com.intellij.openapi.actionSystem.AnActionEvent,
+                                                        notification:
+                                                            com.intellij.notification.Notification,
+                                                    ) {
+                                                        GitUtils.fetchAndPullChanges(
+                                                            project,
+                                                            targetBranch,
+                                                        )
+                                                        notification.expire()
+                                                    }
+                                                }
+                                            )
+                                            notification.notify(project)
+                                        }
                                         // Refresh CIPE data
                                         CIPEPollingService.getInstance(project).forcePoll()
                                         // Close the AI fix editor
