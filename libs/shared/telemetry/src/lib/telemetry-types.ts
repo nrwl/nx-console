@@ -74,6 +74,7 @@ export type TelemetryEvents =
   | 'ai.tool-call'
   | 'ai.resource-read'
   | 'ai.add-mcp'
+  | 'ai.configure-agents-check'
   | 'ai.configure-agents-check-notification'
   | 'ai.configure-agents-action'
   | 'ai.configure-agents-dont-ask-again';
