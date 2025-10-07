@@ -136,7 +136,16 @@ function getRecentlyCommittedGitBranches(
 }
 
 export function getIgnoredBranches(workspacePath: string): string[] {
-  const ignoredBranches = ['main', 'master'];
+  const ignoredBranches = [
+    'main',
+    'master',
+    'trunk',
+    'next',
+    'dev',
+    'development',
+    'stable',
+    'canary',
+  ];
 
   // Check refs/remotes/origin/HEAD
   try {
