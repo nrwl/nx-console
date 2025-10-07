@@ -1,3 +1,11 @@
+## [18.71.1](https://github.com/nrwl/nx-console/compare/vscode-v18.71.0...vscode-v18.71.1) (2025-10-07)
+
+
+### Bug Fixes
+
+* **nxls:** increase default set of ignored branches to align with nx cloud ([#2811](https://github.com/nrwl/nx-console/issues/2811)) ([e7e6a2b](https://github.com/nrwl/nx-console/commit/e7e6a2b62e9b22cdec397b284d22c1e86fdf5282))
+* **vscode:** reduce ai fix polling frequency ([#2813](https://github.com/nrwl/nx-console/issues/2813)) ([bf04b09](https://github.com/nrwl/nx-console/commit/bf04b093cd66221b4103140d15e96e00a52b78e2))
+
 ## 18.71.0 (2025-10-06)
 
 ### 🚀 Features
