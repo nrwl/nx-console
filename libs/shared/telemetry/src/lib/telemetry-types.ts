@@ -78,7 +78,9 @@ export type TelemetryEvents =
   | 'ai.configure-agents-check-done'
   | 'ai.configure-agents-check-notification'
   | 'ai.configure-agents-action'
-  | 'ai.configure-agents-dont-ask-again';
+  | 'ai.configure-agents-dont-ask-again'
+  | 'ai.configure-agents-setup-notification'
+  | 'ai.configure-agents-setup-action';
 
 export type TelemetryData = {
   source?: TelemetryEventSource;

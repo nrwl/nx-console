@@ -8,13 +8,11 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.intellij.terminal.ui.TerminalWidget
+import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.NxProvenance
 import kotlinx.coroutines.*
-import logger
-import org.jetbrains.plugins.terminal.TerminalToolWindowManager
 
 @Service(Service.Level.PROJECT)
 class PeriodicAiCheckService(private val project: Project, private val cs: CoroutineScope) {
@@ -26,9 +24,12 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
         private const val AI_CHECK_DONT_ASK_AGAIN_KEY = "dev.nx.console.ai_check_dont_ask_again"
         private const val LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY =
             "dev.nx.console.last_ai_check_notification_timestamp"
+        private const val LAST_AI_CONFIGURE_NOTIFICATION_TIMESTAMP_KEY =
+            "dev.nx.console.last_ai_configure_notification_timestamp"
         private const val ONE_MINUTE_MS = 60 * 1000L
         private const val ONE_HOUR_MS = 60 * 60 * 1000L
         private const val ONE_DAY_MS = 24 * 60 * 60 * 1000L
+        private const val ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000L
     }
 
     private var checkJob: Job? = null
@@ -40,12 +41,9 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
         checkJob =
             cs.launch {
-                // Wait 1 minute before first check
                 delay(ONE_MINUTE_MS)
-
                 runAiAgentCheck()
 
-                // Then check every hour
                 while (isActive) {
                     delay(ONE_HOUR_MS)
                     runAiAgentCheck()
@@ -63,25 +61,24 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             return
         }
 
-        // Check if we already showed a notification within the last 24 hours
-        val lastNotificationTimestamp =
+        val now = System.currentTimeMillis()
+
+        val lastUpdateNotificationTimestamp =
             PropertiesComponent.getInstance(project)
                 .getLong(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, 0)
-
-        val now = System.currentTimeMillis()
-        if (now - lastNotificationTimestamp < ONE_DAY_MS) {
+        if (now - lastUpdateNotificationTimestamp < ONE_DAY_MS) {
             return
         }
 
         try {
-            // Check provenance first
+            val workspaceRoot = project.basePath ?: "."
             val (hasProvenance, _) =
-                withContext(Dispatchers.IO) { NxProvenance.nxLatestProvenanceCheck() }
+                withContext(Dispatchers.IO) { NxProvenance.nxLatestProvenanceCheck(workspaceRoot) }
+
             if (!hasProvenance) {
                 return
             }
 
-            // Run the AI configuration check
             val checkCommand =
                 NxLatestVersionGeneralCommandLine(project, listOf("configure-ai-agents", "--check"))
             checkCommand.withEnvironment("NX_CONSOLE", "true")
@@ -90,19 +87,51 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             val output = withContext(Dispatchers.IO) { ExecUtil.execAndGetOutput(checkCommand) }
 
             if (output.stdout.contains("The following AI agents are out of date")) {
-                // Update timestamp
                 PropertiesComponent.getInstance(project)
                     .setValue(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, now.toString())
 
-                // Log telemetry
                 TelemetryService.getInstance(project)
-                    .featureUsed("ai.configure-agents-check-notification")
+                    .featureUsed(TelemetryEvent.AI_CONFIGURE_AGENTS_CHECK_NOTIFICATION)
 
-                // Show notification
                 withContext(Dispatchers.EDT) { notifyAiConfigurationOutdated() }
+                return
+            }
+
+            val lastConfigureNotificationTimestamp =
+                PropertiesComponent.getInstance(project)
+                    .getLong(LAST_AI_CONFIGURE_NOTIFICATION_TIMESTAMP_KEY, 0)
+            if (now - lastConfigureNotificationTimestamp < ONE_WEEK_MS) {
+                return
+            }
+            val checkAllCommand =
+                NxLatestVersionGeneralCommandLine(
+                    project,
+                    listOf("configure-ai-agents", "--check=all"),
+                )
+            checkAllCommand.withEnvironment("NX_CONSOLE", "true")
+            checkAllCommand.withEnvironment("NX_AI_FILES_USE_LOCAL", "true")
+
+            val checkAllOutput =
+                withContext(Dispatchers.IO) {
+                    withTimeout(30000L) { ExecUtil.execAndGetOutput(checkAllCommand) }
+                }
+
+            if (checkAllOutput.exitCode != 0) {
+                if (
+                    !checkAllOutput.stdout.contains("The following agents are not fully configured")
+                ) {
+                    return
+                }
+
+                PropertiesComponent.getInstance(project)
+                    .setValue(LAST_AI_CONFIGURE_NOTIFICATION_TIMESTAMP_KEY, now.toString())
+
+                TelemetryService.getInstance(project)
+                    .featureUsed(TelemetryEvent.AI_CONFIGURE_AGENTS_SETUP_NOTIFICATION)
+
+                withContext(Dispatchers.EDT) { notifyAiConfigurationMissing() }
             }
         } catch (e: Exception) {
-            logger.info("Failed to run AI configuration check: ${e.message}")
             // Silently fail - this is a non-critical operation
         }
     }
@@ -126,37 +155,56 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             setOf(
                 NotificationAction.createSimpleExpiring("Update") {
                     notification.expire()
-                    TelemetryService.getInstance(project).featureUsed("ai.configure-agents-action")
-
-                    // Run configure-ai-agents command
-                    cs.launch {
-                        withContext(Dispatchers.EDT) {
-                            val terminalManager = TerminalToolWindowManager.getInstance(project)
-                            val workingDirectory = project.basePath ?: "."
-
-                            val terminalWidget: TerminalWidget =
-                                terminalManager.createShellWidget(
-                                    workingDirectory,
-                                    "configure-ai-agents",
-                                    true,
-                                    false,
-                                )
-
-                            terminalManager.getToolWindow()?.show(null)
-
-                            // Execute command using the new TerminalWidget interface
-                            terminalWidget.sendCommandToExecute("npx nx@latest configure-ai-agents")
-                        }
-                    }
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.AI_CONFIGURE_AGENTS_ACTION,
+                            mapOf("source" to "notification"),
+                        )
+                    ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
                 },
                 NotificationAction.createSimpleExpiring("Don't ask again") {
                     notification.expire()
                     TelemetryService.getInstance(project)
                         .featureUsed(
-                            "ai.configure-agents-dont-ask-again",
+                            TelemetryEvent.AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN,
                             mapOf("source" to "notification"),
                         )
+                    setDontAskAgain()
+                },
+            )
+        )
 
+        notification.notify(project)
+    }
+
+    private fun notifyAiConfigurationMissing() {
+        val notification =
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Nx Console")
+                .createNotification(
+                    "Would you like to configure AI agents for your workspace?",
+                    NotificationType.INFORMATION,
+                )
+                .setTitle("Nx Console")
+
+        notification.addActions(
+            setOf(
+                NotificationAction.createSimpleExpiring("Configure") {
+                    notification.expire()
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.AI_CONFIGURE_AGENTS_SETUP_ACTION,
+                            mapOf("source" to "notification"),
+                        )
+                    ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
+                },
+                NotificationAction.createSimpleExpiring("Don't ask again") {
+                    notification.expire()
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN,
+                            mapOf("source" to "notification"),
+                        )
                     setDontAskAgain()
                 },
             )

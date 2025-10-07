@@ -32,6 +32,11 @@ enum class TelemetryEvent(val eventName: String) {
     AI_RESPONSE_INTERACTION("ai.response-interaction"),
     AI_TOOL_CALL("ai.tool-call"),
     AI_RESOURCE_READ("ai.resource-read"),
+    AI_CONFIGURE_AGENTS_CHECK_NOTIFICATION("ai.configure-agents-check-notification"),
+    AI_CONFIGURE_AGENTS_ACTION("ai.configure-agents-action"),
+    AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN("ai.configure-agents-dont-ask-again"),
+    AI_CONFIGURE_AGENTS_SETUP_NOTIFICATION("ai.configure-agents-setup-notification"),
+    AI_CONFIGURE_AGENTS_SETUP_ACTION("ai.configure-agents-setup-action"),
 
     // Cloud
     CLOUD_CONNECT("cloud.connect"),
