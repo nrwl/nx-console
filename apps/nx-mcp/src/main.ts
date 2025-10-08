@@ -7,8 +7,9 @@ import {
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
+import { gte } from '@nx-console/nx-version';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
-import { isNxCloudUsed, getRecentCIPEData } from '@nx-console/shared-nx-cloud';
+import { getRecentCIPEData, isNxCloudUsed } from '@nx-console/shared-nx-cloud';
 import {
   getGenerators,
   getNxVersion,
@@ -25,16 +26,16 @@ import {
   killGroup,
   loadRootEnvFiles,
 } from '@nx-console/shared-utils';
-import { DaemonWatcher } from '@nx-console/shared-watcher';
+import { PassiveDaemonWatcher } from '@nx-console/shared-watcher';
 import { randomUUID } from 'crypto';
 import express from 'express';
+import { IncomingMessage, Server, ServerResponse } from 'http';
 import { resolve } from 'path';
 import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { createIdeClient } from './ide-client/create-ide-client';
 import { getPackageVersion } from './utils';
 import { ArgvType, createYargsConfig } from './yargs-config';
-import { IncomingMessage, Server, ServerResponse } from 'http';
 
 async function main() {
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
@@ -366,24 +367,25 @@ async function main() {
   // if the daemon exists, we can use it to register a change listener
   let stopWatcher: () => void | undefined;
   if (nxWorkspacePath) {
-    try {
-      const daemonWatcher = new DaemonWatcher(
-        nxWorkspacePath,
-        await getNxVersion(nxWorkspacePath),
-        () => {
+    const nxVersion = await getNxVersion(nxWorkspacePath);
+    if (gte(nxVersion, '22.0.0')) {
+      try {
+        const daemonWatcher = new PassiveDaemonWatcher(nxWorkspacePath, logger);
+        await daemonWatcher.start();
+        daemonWatcher.listen((error, projectGraph) => {
           resetStatus(nxWorkspacePath);
-        },
-        logger,
+        });
+
+        stopWatcher = () => {
+          daemonWatcher.dispose();
+        };
+      } catch (e) {
+        logger.log('Error setting up watcher: ' + e);
+      }
+    } else {
+      logger.log(
+        'Nx version below 22.0.0, Nx MCP will not automatically subscribe to project graph changes.',
       );
-      // Start the daemon watcher asynchronously to avoid blocking MCP startup
-      daemonWatcher.start().catch((e) => {
-        logger.log('Error starting daemon watcher: ' + e);
-      });
-      stopWatcher = () => {
-        daemonWatcher.stop();
-      };
-    } catch (e) {
-      logger.log('Error setting up watcher: ' + e);
     }
   }
 
