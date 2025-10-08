@@ -1,6 +1,7 @@
 package dev.nx.console.ai
 
 import com.intellij.execution.util.ExecUtil
+import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
@@ -153,7 +154,7 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
         notification.addActions(
             setOf(
-                NotificationAction.createSimpleExpiring("Update") {
+                NotificationAction.createSimpleExpiring("Yes") {
                     notification.expire()
                     TelemetryService.getInstance(project)
                         .featureUsed(
@@ -182,14 +183,14 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Nx Console")
                 .createNotification(
-                    "Would you like to configure AI agents for your workspace?",
+                    "Want Nx to configure your AI agents and MCP setup?",
                     NotificationType.INFORMATION,
                 )
                 .setTitle("Nx Console")
 
         notification.addActions(
             setOf(
-                NotificationAction.createSimpleExpiring("Configure") {
+                NotificationAction.createSimpleExpiring("Yes") {
                     notification.expire()
                     TelemetryService.getInstance(project)
                         .featureUsed(
@@ -197,6 +198,16 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
                             mapOf("source" to "notification"),
                         )
                     ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
+                },
+                NotificationAction.createSimpleExpiring("Learn more") {
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.AI_CONFIGURE_AGENTS_LEARN_MORE,
+                            mapOf("source" to "notification"),
+                        )
+                    BrowserUtil.browse(
+                        "https://nx.dev/docs/getting-started/ai-setup#configure-nx-ai-integration"
+                    )
                 },
                 NotificationAction.createSimpleExpiring("Don't ask again") {
                     notification.expire()

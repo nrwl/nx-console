@@ -9,6 +9,7 @@ import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import {
+  commands,
   Disposable,
   ExtensionContext,
   ShellExecution,
@@ -230,12 +231,13 @@ async function runAiAgentCheck() {
       });
 
       const selection = await window.showInformationMessage(
-        'Would you like to configure AI agents for your workspace?',
-        'Configure',
+        'Want Nx to configure your AI agents and MCP setup?',
+        'Yes',
+        'Learn more',
         "Don't ask again",
       );
 
-      if (selection === 'Configure') {
+      if (selection === 'Yes') {
         getTelemetry().logUsage('ai.configure-agents-setup-action', {
           source: 'notification',
         });
@@ -257,6 +259,15 @@ async function runAiAgentCheck() {
         );
         task.presentationOptions.focus = true;
         tasks.executeTask(task);
+      } else if (selection === 'Learn more') {
+        getTelemetry().logUsage('ai.configure-agents-learn-more', {
+          source: 'notification',
+        });
+
+        commands.executeCommand(
+          'vscode.open',
+          'https://nx.dev/docs/getting-started/ai-setup#configure-nx-ai-integration',
+        );
       } else if (selection === "Don't ask again") {
         getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
           source: 'notification',

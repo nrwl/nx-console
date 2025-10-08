@@ -80,7 +80,8 @@ export type TelemetryEvents =
   | 'ai.configure-agents-action'
   | 'ai.configure-agents-dont-ask-again'
   | 'ai.configure-agents-setup-notification'
-  | 'ai.configure-agents-setup-action';
+  | 'ai.configure-agents-setup-action'
+  | 'ai.configure-agents-learn-more';
 
 export type TelemetryData = {
   source?: TelemetryEventSource;

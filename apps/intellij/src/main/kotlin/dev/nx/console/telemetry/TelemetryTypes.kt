@@ -37,6 +37,7 @@ enum class TelemetryEvent(val eventName: String) {
     AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN("ai.configure-agents-dont-ask-again"),
     AI_CONFIGURE_AGENTS_SETUP_NOTIFICATION("ai.configure-agents-setup-notification"),
     AI_CONFIGURE_AGENTS_SETUP_ACTION("ai.configure-agents-setup-action"),
+    AI_CONFIGURE_AGENTS_LEARN_MORE("ai.configure-agents-learn-more"),
 
     // Cloud
     CLOUD_CONNECT("cloud.connect"),
