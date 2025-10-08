@@ -32,6 +32,30 @@ export function setNxWorkspacePath(path: string) {
   nxWorkspacePath = path;
 }
 
+/**
+ * Get a value from an object using a dot-notation path string.
+ * Supports dot notation (foo.bar) and array indices (foo.bar[0] or foo.bar.0).
+ *
+ * @param obj - The object to traverse
+ * @param path - The path string (e.g., "targets.build.inputs" or "targets.build.options.assets[0]")
+ * @returns The value at the path, or undefined if the path doesn't exist
+ */
+function getValueByPath(obj: any, path: string): any {
+  // Convert bracket notation to dot notation: foo[0] -> foo.0
+  const normalizedPath = path.replace(/\[(\d+)\]/g, '.$1');
+
+  // Split on dots and filter out empty strings
+  const keys = normalizedPath.split('.').filter((key) => key.length > 0);
+
+  // Traverse the object
+  return keys.reduce((current, key) => {
+    if (current === null || current === undefined) {
+      return undefined;
+    }
+    return current[key];
+  }, obj);
+}
+
 export function registerNxWorkspaceTools(
   workspacePath: string,
   server: McpServer,
@@ -166,18 +190,24 @@ export function registerNxWorkspaceTools(
 
   server.tool(
     NX_PROJECT_DETAILS,
-    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies).',
+    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies). Optionally filter to a specific path using dot notation (e.g., "targets.build.inputs" or "targets.build.options.assets[0]").',
     {
       projectName: z
         .string()
         .describe('The name of the project to get details for'),
+      filter: z
+        .string()
+        .optional()
+        .describe(
+          'Optional path to filter the project configuration. Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). When provided, only the value at this path will be returned.',
+        ),
     },
     {
       destructiveHint: false,
       readOnlyHint: true,
       openWorldHint: false,
     },
-    async ({ projectName }) => {
+    async ({ projectName, filter }) => {
       telemetry?.logUsage('ai.tool-call', {
         tool: NX_PROJECT_DETAILS,
       });
@@ -215,6 +245,33 @@ export function registerNxWorkspaceTools(
         };
       }
 
+      // If filter is provided, return only the filtered value
+      if (filter) {
+        const filteredValue = getValueByPath(project.data, filter);
+
+        if (filteredValue === undefined) {
+          return {
+            isError: true,
+            content: [
+              {
+                type: 'text',
+                text: `Path "${filter}" not found in project configuration`,
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(filteredValue, null, 2),
+            },
+          ],
+        };
+      }
+
+      // No filter provided, return full project details
       const dependencies = workspace.projectGraph.dependencies[project.name];
 
       const projectDependencies = [];
