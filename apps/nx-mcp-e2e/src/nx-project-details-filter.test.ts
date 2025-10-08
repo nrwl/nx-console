@@ -174,6 +174,8 @@ describe('nx_project_details filter', () => {
     );
 
     expect(result.isError).toBe(true);
-    expect(result.content[0]?.text).toContain('Project nonexistent-project not found');
+    expect(result.content[0]?.text).toContain(
+      'Project nonexistent-project not found',
+    );
   });
 });
