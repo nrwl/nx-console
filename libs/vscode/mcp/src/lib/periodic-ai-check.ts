@@ -94,6 +94,7 @@ async function runAiAgentCheck() {
           NX_AI_FILES_USE_LOCAL: 'true',
         },
       });
+      getTelemetry().logUsage('ai.configure-agents-check-done');
     } catch (e) {
       vscodeLogger.log(`AI agent configuration check failed: ${e}`);
 
