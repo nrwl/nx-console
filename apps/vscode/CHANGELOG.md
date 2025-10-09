@@ -1,3 +1,15 @@
+# [18.72.0](https://github.com/nrwl/nx-console/compare/vscode-v18.71.1...vscode-v18.72.0) (2025-10-09)
+
+
+### Bug Fixes
+
+* **vscode:** add more telemetry ([#2818](https://github.com/nrwl/nx-console/issues/2818)) ([eacde65](https://github.com/nrwl/nx-console/commit/eacde65a2b0f7f293fbf447de00ca464c0cf4617))
+
+
+### Features
+
+* **nx-mcp:** add filter arg to project_details tool ([#2815](https://github.com/nrwl/nx-console/issues/2815)) ([08a3c22](https://github.com/nrwl/nx-console/commit/08a3c22fca90fdbfb8db6f8c135f6ec0d686f702))
+
 ## [18.71.1](https://github.com/nrwl/nx-console/compare/vscode-v18.71.0...vscode-v18.71.1) (2025-10-07)
 
 
