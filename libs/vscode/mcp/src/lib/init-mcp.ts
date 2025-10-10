@@ -27,7 +27,10 @@ import vscode, {
 } from 'vscode';
 import type { McpCursorServer } from './mcp-cursor-server';
 import type { McpStreamableWebServer } from './mcp-vscode-server';
-import { setupPeriodicAiCheck } from './periodic-ai-check';
+import {
+  runConfigureAiAgentsCommand,
+  setupPeriodicAiCheck,
+} from './periodic-ai-check';
 import { findAvailablePort, isPortAvailable } from './ports';
 
 let mcpStreamableWebServer: McpStreamableWebServer | undefined;
@@ -103,6 +106,13 @@ export async function initMcp(context: ExtensionContext) {
   } else if (inVSCode) {
     initModernVSCodeMcp(context, mcpPort);
   }
+
+  // Register configure AI agents command
+  context.subscriptions.push(
+    commands.registerCommand('nx.configureAiAgents', () => {
+      runConfigureAiAgentsCommand();
+    }),
+  );
 
   setupPeriodicAiCheck(context);
 }

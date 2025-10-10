@@ -52,6 +52,7 @@ export const WORKSPACE_CONFIG_KEYS = [
   'mcpDontAskAgain',
   'aiCheckDontAskAgain',
   'lastAiCheckNotificationTimestamp',
+  'lastAiConfigureNotificationTimestamp',
 ] as const;
 /**
  * configuration Keys used for NxConsole on a vscode workspace level

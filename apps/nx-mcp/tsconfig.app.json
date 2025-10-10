@@ -29,6 +29,9 @@
       "path": "../../libs/shared/npm/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared/nx-version/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/nx-mcp/nx-mcp-server/tsconfig.lib.json"
     },
     {

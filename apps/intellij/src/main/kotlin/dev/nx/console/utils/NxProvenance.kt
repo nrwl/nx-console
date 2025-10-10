@@ -13,9 +13,17 @@ import kotlinx.coroutines.withTimeout
 
 object NxProvenance {
 
-    suspend fun nxLatestProvenanceCheck(): Pair<Boolean, String?> {
+    suspend fun nxLatestProvenanceCheck(workspaceRoot: String): Pair<Boolean, String?> {
         return try {
             withContext(Dispatchers.IO) {
+                // Check for NX_SKIP_PROVENANCE_CHECK in environment or .env file
+                val skipCheck =
+                    System.getenv("NX_SKIP_PROVENANCE_CHECK")
+                        ?: loadEnvFile("$workspaceRoot/.env")["NX_SKIP_PROVENANCE_CHECK"]
+
+                if (skipCheck?.lowercase() in listOf("true", "1", "yes")) {
+                    return@withContext Pair(true, null)
+                }
                 // Get npm view data
                 val command =
                     GeneralCommandLine().apply {
@@ -138,4 +146,44 @@ object NxProvenance {
 
     const val NO_PROVENANCE_ERROR =
         "An error occurred while checking the integrity of the latest version of Nx. This shouldn't happen. Please file an issue at https://github.com/nrwl/nx-console/issues"
+
+    // Simple .env file parser - basic workaround to avoid external dependencies
+    // Handles common cases but skips advanced features like variable expansion
+    private fun parseEnvFile(file: java.io.File): Map<String, String> {
+        val env = mutableMapOf<String, String>()
+
+        file.forEachLine { line ->
+            val trimmed = line.trim()
+
+            if (trimmed.isEmpty() || trimmed.startsWith("#")) return@forEachLine
+
+            val separatorIndex = trimmed.indexOf('=')
+            if (separatorIndex == -1) return@forEachLine
+
+            val key = trimmed.substring(0, separatorIndex).trim()
+            var value = trimmed.substring(separatorIndex + 1).trim()
+
+            if (value.length >= 2) {
+                if (
+                    (value.startsWith("\"") && value.endsWith("\"")) ||
+                        (value.startsWith("'") && value.endsWith("'"))
+                ) {
+                    value = value.substring(1, value.length - 1)
+                }
+            }
+
+            env[key] = value
+        }
+
+        return env
+    }
+
+    fun loadEnvFile(filePath: String): Map<String, String> {
+        val file = java.io.File(filePath)
+        return if (file.exists() && file.isFile) {
+            parseEnvFile(file)
+        } else {
+            emptyMap()
+        }
+    }
 }

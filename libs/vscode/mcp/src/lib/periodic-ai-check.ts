@@ -9,6 +9,7 @@ import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import {
+  commands,
   Disposable,
   ExtensionContext,
   ShellExecution,
@@ -51,20 +52,47 @@ export function setupPeriodicAiCheck(context: ExtensionContext) {
   );
 }
 
+export async function runConfigureAiAgentsCommand() {
+  const workspacePath = getWorkspacePath();
+
+  getTelemetry().logUsage('ai.configure-agents-setup-action', {
+    source: 'command',
+  });
+
+  const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
+  const configureCommand = `nx@latest configure-ai-agents`;
+  const task = new Task(
+    { type: 'nx' },
+    TaskScope.Workspace,
+    configureCommand,
+    'nx',
+    new ShellExecution(`${pkgManagerCommands.dlx} ${configureCommand}`, {
+      cwd: workspacePath,
+      env: {
+        ...process.env,
+        NX_CONSOLE: 'true',
+        NX_AI_FILES_USE_LOCAL: 'true',
+      },
+    }),
+  );
+  task.presentationOptions.focus = true;
+  tasks.executeTask(task);
+}
+
 async function runAiAgentCheck() {
   if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
     return;
   }
 
-  // Check if we already showed a notification within the last 24 hours
-  const lastNotificationTimestamp = WorkspaceConfigurationStore.instance.get(
-    'lastAiCheckNotificationTimestamp',
-    0,
-  );
-
   const now = Date.now();
+
+  const lastUpdateNotificationTimestamp =
+    WorkspaceConfigurationStore.instance.get(
+      'lastAiCheckNotificationTimestamp',
+      0,
+    );
   const oneDayInMs = 24 * 60 * 60 * 1000;
-  if (now - lastNotificationTimestamp < oneDayInMs) {
+  if (now - lastUpdateNotificationTimestamp < oneDayInMs) {
     return;
   }
 
@@ -81,11 +109,11 @@ async function runAiAgentCheck() {
       return;
     }
 
-    const command = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check`;
+    const checkCommand = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check`;
 
     try {
       getTelemetry().logUsage('ai.configure-agents-check');
-      await promisify(exec)(command, {
+      await promisify(exec)(checkCommand, {
         cwd: workspacePath,
         env: {
           ...process.env,
@@ -143,6 +171,103 @@ async function runAiAgentCheck() {
         );
         task.presentationOptions.focus = true;
         tasks.executeTask(task);
+      } else if (selection === "Don't ask again") {
+        getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
+          source: 'notification',
+        });
+
+        WorkspaceConfigurationStore.instance.set('aiCheckDontAskAgain', true);
+      }
+
+      // Return early - we showed the update notification
+      return;
+    }
+
+    // If we get here, the update check passed (no updates needed)
+    // Now check if we should prompt for configuration
+
+    const lastConfigureNotificationTimestamp =
+      WorkspaceConfigurationStore.instance.get(
+        'lastAiConfigureNotificationTimestamp',
+        0,
+      );
+    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+    if (now - lastConfigureNotificationTimestamp < oneWeekInMs) {
+      return;
+    }
+
+    // Run the check=all command to see if configuration is needed
+    const checkAllCommand = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check=all`;
+
+    try {
+      await promisify(exec)(checkAllCommand, {
+        cwd: workspacePath,
+        timeout: 30000, // 30 second timeout
+        env: {
+          ...process.env,
+          NX_CONSOLE: 'true',
+          NX_AI_FILES_USE_LOCAL: 'true',
+        },
+      });
+      // If the command succeeds, configuration exists, no need to prompt
+    } catch (e) {
+      // Command threw - check if it's because agents are not fully configured
+      vscodeLogger.log(`AI agent configuration check=all failed: ${e}`);
+
+      const stringified = JSON.stringify(e);
+      if (
+        !stringified.includes('The following agents are not fully configured')
+      ) {
+        return;
+      }
+
+      WorkspaceConfigurationStore.instance.set(
+        'lastAiConfigureNotificationTimestamp',
+        now,
+      );
+
+      getTelemetry().logUsage('ai.configure-agents-setup-notification', {
+        source: 'notification',
+      });
+
+      const selection = await window.showInformationMessage(
+        'Want Nx to configure your AI agents and MCP setup?',
+        'Yes',
+        'Learn more',
+        "Don't ask again",
+      );
+
+      if (selection === 'Yes') {
+        getTelemetry().logUsage('ai.configure-agents-setup-action', {
+          source: 'notification',
+        });
+
+        const configureCommand = `nx@latest configure-ai-agents`;
+        const task = new Task(
+          { type: 'nx' },
+          TaskScope.Workspace,
+          configureCommand,
+          'nx',
+          new ShellExecution(`${pkgManagerCommands.dlx} ${configureCommand}`, {
+            cwd: workspacePath,
+            env: {
+              ...process.env,
+              NX_CONSOLE: 'true',
+              NX_AI_FILES_USE_LOCAL: 'true',
+            },
+          }),
+        );
+        task.presentationOptions.focus = true;
+        tasks.executeTask(task);
+      } else if (selection === 'Learn more') {
+        getTelemetry().logUsage('ai.configure-agents-learn-more', {
+          source: 'notification',
+        });
+
+        commands.executeCommand(
+          'vscode.open',
+          'https://nx.dev/docs/getting-started/ai-setup#configure-nx-ai-integration',
+        );
       } else if (selection === "Don't ask again") {
         getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
           source: 'notification',

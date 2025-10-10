@@ -21,7 +21,8 @@ class NxInitService(private val project: Project, private val cs: CoroutineScope
         cs.launch {
             val telemetry = TelemetryService.getInstance(project)
             telemetry.featureUsed(TelemetryEvent.CLI_INIT)
-            val (hasProvenance, errorMessage) = NxProvenance.nxLatestProvenanceCheck()
+            val workspaceRoot = project.basePath ?: "."
+            val (hasProvenance, errorMessage) = NxProvenance.nxLatestProvenanceCheck(workspaceRoot)
             if (!hasProvenance) {
                 telemetry.featureUsed(TelemetryEvent.MISC_NX_LATEST_NO_PROVENANCE)
                 val message = errorMessage ?: NxProvenance.NO_PROVENANCE_ERROR
