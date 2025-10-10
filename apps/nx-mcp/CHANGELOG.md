@@ -1,3 +1,13 @@
+## 0.7.0 (2025-10-10)
+
+### 🚀 Features
+
+- **nx-mcp:** use new passive daemon watcher to prevent resource usage from mcp ([#2814](https://github.com/nrwl/nx-console/pull/2814))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.6.12 (2025-09-23)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
