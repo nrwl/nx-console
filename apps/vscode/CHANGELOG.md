@@ -1,3 +1,11 @@
+# [18.73.0](https://github.com/nrwl/nx-console/compare/vscode-v18.72.0...vscode-v18.73.0) (2025-10-10)
+
+
+### Features
+
+* **nx-mcp:** use new passive daemon watcher to prevent resource usage from mcp ([#2814](https://github.com/nrwl/nx-console/issues/2814)) ([f56271b](https://github.com/nrwl/nx-console/commit/f56271b8a60d36387ee957390418bb3ea76c8b46))
+* show ai configuration notifications in vscode & intellij ([#2812](https://github.com/nrwl/nx-console/issues/2812)) ([189fc05](https://github.com/nrwl/nx-console/commit/189fc055c123c2429660b00f62987a54d333edd8))
+
 # [18.72.0](https://github.com/nrwl/nx-console/compare/vscode-v18.71.1...vscode-v18.72.0) (2025-10-09)
 
 
