@@ -198,6 +198,15 @@
             icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
+
+    <!-- AI Agents -->
+    <action id="dev.nx.console.ai.ConfigureAiAgentsAction"
+            class="dev.nx.console.ai.ConfigureAiAgentsAction"
+            text="Nx: Configure AI Agents"
+            description="Configure AI agents for your workspace"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
   </actions>
 
 

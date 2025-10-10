@@ -978,6 +978,12 @@
         "command": "nx.addAgentRules",
         "icon": "$(wand)",
         "when": "isNxWorkspace"
+      },
+      {
+        "title": "Configure AI Agents",
+        "category": "Nx",
+        "command": "nx.configureAiAgents",
+        "when": "isNxWorkspace"
       }
     ],
     "configuration": {
