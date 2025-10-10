@@ -37,7 +37,6 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
     companion object {
         private const val NOTIFICATION_GROUP_ID = "Nx Cloud CIPE"
 
-
         fun getInstance(project: Project): CIPENotificationService =
             project.getService(CIPENotificationService::class.java)
     }
@@ -113,7 +112,8 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_SHOW_AI_FIX_NOTIFICATION)
 
-        val notificationGroup =  NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
+        val notificationGroup =
+            NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
 
         // Check if the fix was applied automatically
         if (runGroup.aiFix?.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY) {
@@ -162,7 +162,10 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
         TelemetryService.getInstance(project)
             .featureUsed(TelemetryEvent.CLOUD_SHOW_CIPE_NOTIFICATION)
 
-        val notification =  NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(content = content, type = type)
+        val notification =
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup(NOTIFICATION_GROUP_ID)
+                .createNotification(content = content, type = type)
 
         if (type == NotificationType.ERROR) {
             val runGroupWithFix = cipe.runGroups.find { it.aiFix != null }
