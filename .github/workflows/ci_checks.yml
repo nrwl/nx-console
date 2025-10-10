@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NX_CI_EXECUTION_ENV: 'linux'
-      NX_VERBOSE_LOGGING: true
+      NX_VERBOSE_LOGGING: false
     steps:
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@v1.3.1
