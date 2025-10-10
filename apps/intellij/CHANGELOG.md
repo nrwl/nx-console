@@ -1,3 +1,17 @@
+## 1.51.0 (2025-10-10)
+
+### Bug Fixes
+
+* **nxls:** ignore more branches in recent CIPEs ([#2803](https://github.com/nrwl/nx-console/issues/2803)) ([a22af51](https://github.com/nrwl/nx-console/commit/a22af510b4870c40b250f69c61329cb05afbe0c1))
+* **nxls:** increase default set of ignored branches to align with nx cloud ([#2811](https://github.com/nrwl/nx-console/issues/2811)) ([e7e6a2b](https://github.com/nrwl/nx-console/commit/e7e6a2b62e9b22cdec397b284d22c1e86fdf5282))
+
+
+### Features
+
+* **intellij:** add button to fetch and pull changes after applying ai fix ([#2807](https://github.com/nrwl/nx-console/issues/2807)) ([a0bbe5d](https://github.com/nrwl/nx-console/commit/a0bbe5d4f1c23874312d0dca3e405a5a69d34e07))
+* **nx-mcp:** use new passive daemon watcher to prevent resource usage from mcp ([#2814](https://github.com/nrwl/nx-console/issues/2814)) ([f56271b](https://github.com/nrwl/nx-console/commit/f56271b8a60d36387ee957390418bb3ea76c8b46))
+* show ai configuration notifications in vscode & intellij ([#2812](https://github.com/nrwl/nx-console/issues/2812)) ([189fc05](https://github.com/nrwl/nx-console/commit/189fc055c123c2429660b00f62987a54d333edd8))
+
 ## 1.50.0 (2025-10-01)
 
 ### Bug Fixes
