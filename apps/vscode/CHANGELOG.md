@@ -1,3 +1,10 @@
+## [18.73.1](https://github.com/nrwl/nx-console/compare/vscode-v18.73.0...vscode-v18.73.1) (2025-10-14)
+
+
+### Bug Fixes
+
+* **vscode:** correctly set the timestamp when the check passes ([#2822](https://github.com/nrwl/nx-console/issues/2822)) ([ba211e5](https://github.com/nrwl/nx-console/commit/ba211e550aa7bbb6e1661937953961e82fa8a63f))
+
 # [18.73.0](https://github.com/nrwl/nx-console/compare/vscode-v18.72.0...vscode-v18.73.0) (2025-10-10)
 
 
