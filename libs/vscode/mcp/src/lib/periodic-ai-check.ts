@@ -123,6 +123,10 @@ async function runAiAgentCheck() {
         },
       });
       getTelemetry().logUsage('ai.configure-agents-check-done');
+      WorkspaceConfigurationStore.instance.set(
+        'lastAiCheckNotificationTimestamp',
+        now,
+      );
     } catch (e) {
       vscodeLogger.log(`AI agent configuration check failed: ${e}`);
 
