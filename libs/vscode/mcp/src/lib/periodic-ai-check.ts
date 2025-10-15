@@ -1,8 +1,6 @@
-import { gte } from '@nx-console/nx-version';
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
@@ -18,15 +16,14 @@ import {
   tasks,
   window,
 } from 'vscode';
+import { rmSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 let checkTimer: NodeJS.Timeout | undefined;
 let intervalTimer: NodeJS.Timeout | undefined;
 
 export function setupPeriodicAiCheck(context: ExtensionContext) {
-  if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
-    return;
-  }
-
   // Run first check after 1 minute
   checkTimer = setTimeout(() => {
     runAiAgentCheck();
@@ -109,10 +106,12 @@ async function runAiAgentCheck() {
       return;
     }
 
-    const checkCommand = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check`;
-
     try {
       getTelemetry().logUsage('ai.configure-agents-check');
+      // non a project install, so use NPX and don't pollute npx cache
+      const tmpDir = join(tmpdir(), "nx-console-tmp");
+      rmSync(tmpDir, { recursive: true, force: true });
+      const checkCommand = `npx --cache=${tmpDir} nx@latest configure-ai-agents --check`;
       await promisify(exec)(checkCommand, {
         cwd: workspacePath,
         env: {
