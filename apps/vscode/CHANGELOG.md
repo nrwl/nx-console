@@ -1,3 +1,10 @@
+## [18.73.2](https://github.com/nrwl/nx-console/compare/vscode-v18.73.1...vscode-v18.73.2) (2025-10-15)
+
+
+### Bug Fixes
+
+* **vscode:** clean up ai config check ([#2823](https://github.com/nrwl/nx-console/issues/2823)) ([6fa3997](https://github.com/nrwl/nx-console/commit/6fa39970883343510df48eb639bcc230d25a1e29))
+
 ## [18.73.1](https://github.com/nrwl/nx-console/compare/vscode-v18.73.0...vscode-v18.73.1) (2025-10-14)
 
 
