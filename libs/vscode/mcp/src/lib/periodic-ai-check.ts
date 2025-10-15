@@ -109,7 +109,7 @@ async function runAiAgentCheck() {
     try {
       getTelemetry().logUsage('ai.configure-agents-check');
       // non a project install, so use NPX and don't pollute npx cache
-      const tmpDir = join(tmpdir(), "nx-console-tmp");
+      const tmpDir = join(tmpdir(), 'nx-console-tmp');
       rmSync(tmpDir, { recursive: true, force: true });
       const checkCommand = `npx --cache=${tmpDir} nx@latest configure-ai-agents --check`;
       await promisify(exec)(checkCommand, {
