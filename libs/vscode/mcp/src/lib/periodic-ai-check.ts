@@ -1,4 +1,3 @@
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
@@ -56,14 +55,13 @@ export async function runConfigureAiAgentsCommand() {
     source: 'command',
   });
 
-  const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
-  const configureCommand = `nx@latest configure-ai-agents`;
+  const command = constructCommand('');
   const task = new Task(
     { type: 'nx' },
     TaskScope.Workspace,
-    configureCommand,
+    command,
     'nx',
-    new ShellExecution(`${pkgManagerCommands.dlx} ${configureCommand}`, {
+    new ShellExecution(command, {
       cwd: workspacePath,
       env: {
         ...process.env,
@@ -74,6 +72,20 @@ export async function runConfigureAiAgentsCommand() {
   );
   task.presentationOptions.focus = true;
   tasks.executeTask(task);
+}
+
+function constructCommand(flags: string) {
+  // const workspacePath = getWorkspacePath();
+  // const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
+
+  // non a project install, so use NPX and don't pollute npx cache
+  const tmpDir = join(tmpdir(), 'nx-console-tmp');
+  try {
+    rmSync(tmpDir, { recursive: true, force: true });
+  } catch (e) {
+    // ignore
+  }
+  return `npx -y --cache=${tmpDir} nx@latest configure-ai-agents ${flags}`;
 }
 
 async function runAiAgentCheck() {
@@ -88,8 +100,8 @@ async function runAiAgentCheck() {
       'lastAiCheckNotificationTimestamp',
       0,
     );
-  const oneDayInMs = 24 * 60 * 60 * 1000;
-  if (now - lastUpdateNotificationTimestamp < oneDayInMs) {
+  const gap = 12 * 60 * 60 * 1000;
+  if (now - lastUpdateNotificationTimestamp < gap) {
     return;
   }
 
@@ -99,20 +111,14 @@ async function runAiAgentCheck() {
   }
 
   try {
-    const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
-
     const hasProvenance = await nxLatestProvenanceCheck();
     if (hasProvenance !== true) {
       return;
     }
 
     try {
-      getTelemetry().logUsage('ai.configure-agents-check');
-      // non a project install, so use NPX and don't pollute npx cache
-      const tmpDir = join(tmpdir(), 'nx-console-tmp');
-      rmSync(tmpDir, { recursive: true, force: true });
-      const checkCommand = `npx --cache=${tmpDir} nx@latest configure-ai-agents --check`;
-      await promisify(exec)(checkCommand, {
+      getTelemetry().logUsage('ai.configure-agents-check-start');
+      await promisify(exec)(constructCommand('--check'), {
         cwd: workspacePath,
         env: {
           ...process.env,
@@ -121,7 +127,7 @@ async function runAiAgentCheck() {
           NX_AI_FILES_USE_LOCAL: 'true',
         },
       });
-      getTelemetry().logUsage('ai.configure-agents-check-done');
+      getTelemetry().logUsage('ai.configure-agents-check-end');
       WorkspaceConfigurationStore.instance.set(
         'lastAiCheckNotificationTimestamp',
         now,
@@ -133,6 +139,7 @@ async function runAiAgentCheck() {
       // There are many different reasons this could fail so we want to not spam users
       const stringified = JSON.stringify(e);
       if (!stringified.includes('The following AI agents are out of date')) {
+        getTelemetry().logUsage('ai.configure-agents-check-error');
         return;
       }
       WorkspaceConfigurationStore.instance.set(
@@ -157,13 +164,13 @@ async function runAiAgentCheck() {
         });
 
         // Run the configure command
-        const configureCommand = `nx@latest configure-ai-agents`;
+        const command = constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
-          configureCommand,
+          command,
           'nx',
-          new ShellExecution(`${pkgManagerCommands.dlx} ${configureCommand}`, {
+          new ShellExecution(command, {
             cwd: workspacePath,
             env: {
               ...process.env,
@@ -200,8 +207,7 @@ async function runAiAgentCheck() {
     }
 
     // Run the check=all command to see if configuration is needed
-    const checkAllCommand = `${pkgManagerCommands.dlx} nx@latest configure-ai-agents --check=all`;
-
+    const checkAllCommand = constructCommand('--check=all');
     try {
       await promisify(exec)(checkAllCommand, {
         cwd: workspacePath,
@@ -245,13 +251,13 @@ async function runAiAgentCheck() {
           source: 'notification',
         });
 
-        const configureCommand = `nx@latest configure-ai-agents`;
+        const command = constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
-          configureCommand,
+          command,
           'nx',
-          new ShellExecution(`${pkgManagerCommands.dlx} ${configureCommand}`, {
+          new ShellExecution(command, {
             cwd: workspacePath,
             env: {
               ...process.env,
