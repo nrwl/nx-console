@@ -164,7 +164,7 @@ async function runAiAgentCheck() {
         });
 
         // Run the configure command
-        const command = constructCommand('')
+        const command = constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
