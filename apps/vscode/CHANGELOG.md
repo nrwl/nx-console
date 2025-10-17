@@ -1,3 +1,10 @@
+## [18.73.3](https://github.com/nrwl/nx-console/compare/vscode-v18.73.2...vscode-v18.73.3) (2025-10-17)
+
+
+### Bug Fixes
+
+* **vscode:** track errors correctly and remove duplication ([#2825](https://github.com/nrwl/nx-console/issues/2825)) ([23abb24](https://github.com/nrwl/nx-console/commit/23abb24bd81ea3512236f87265b5e80c07567939))
+
 ## [18.73.2](https://github.com/nrwl/nx-console/compare/vscode-v18.73.1...vscode-v18.73.2) (2025-10-15)
 
 
