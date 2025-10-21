@@ -10150,15 +10150,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decache@npm:^3.0.5":
-  version: 3.1.0
-  resolution: "decache@npm:3.1.0"
-  dependencies:
-    find: ^0.2.4
-  checksum: 8e5508a0238e9e7da66f17fe9b8429e7c6c92f5d40b23dedb1dce15219d899f9e5385553d2a143f44a5145a28ff8aab6008cc850ddedafcdd672505a14208c36
-  languageName: node
-  linkType: hard
-
 "decamelize-keys@npm:^1.1.0":
   version: 1.1.1
   resolution: "decamelize-keys@npm:1.1.1"
@@ -11981,15 +11972,6 @@ __metadata:
   dependencies:
     semver-regex: ^4.0.5
   checksum: 680bdb0081f631f7bfb6f0f8edcfa0b74ab8cabc82097a4527a37b0d042aabc56685bf459ff27991eab0baddc04eb8e3bba8a2869f5004ecf7cdd2779b6e51de
-  languageName: node
-  linkType: hard
-
-"find@npm:^0.2.4":
-  version: 0.2.9
-  resolution: "find@npm:0.2.9"
-  dependencies:
-    traverse-chain: ~0.1.0
-  checksum: a308a3cf419a9ec06d41b4930fe152e929dc38425dfe93ea940c62fe9d0ba4636ff07a5c39a31e6be5764f4743ac6a9c80f40539f1ff92376b53d21a32d88e3d
   languageName: node
   linkType: hard
 
@@ -16648,7 +16630,7 @@ __metadata:
     prettier-plugin-tailwindcss: ^0.6.11
     request-light: ^0.5.8
     rimraf: ^3.0.2
-    rollbar: ^2.26.4
+    rollbar: ^2.26.5
     rxjs: 7.5.6
     semver: ^7.7.1
     storybook: 9.0.9
@@ -16661,7 +16643,7 @@ __metadata:
     typescript: 5.9.2
     universal-analytics: 0.5.3
     uuid: ^8.3.2
-    vite: 7.1.3
+    vite: 7.1.11
     vscode-json-languageservice: ^5.1.0
     vscode-jsonrpc: ^8.2.1
     vscode-languageclient: ^8.0.2
@@ -18965,22 +18947,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollbar@npm:^2.26.4":
-  version: 2.26.4
-  resolution: "rollbar@npm:2.26.4"
+"rollbar@npm:^2.26.5":
+  version: 2.26.5
+  resolution: "rollbar@npm:2.26.5"
   dependencies:
     async: ~3.2.3
     console-polyfill: 0.3.0
-    decache: ^3.0.5
     error-stack-parser: ^2.0.4
     json-stringify-safe: ~5.0.0
     lru-cache: ~2.2.1
     request-ip: ~3.3.0
     source-map: ^0.5.7
-  dependenciesMeta:
-    decache:
-      optional: true
-  checksum: ea0b24264a101112c720e786b7c8903e9f8d2cdf8ebab77ced64e4bb3899a0a1ed5f52c6ba0aa10a01faa85e354fb5142e6d0c4f3a282ad2e038175f3bba6ff0
+  checksum: bf18aee291b1c1d3d9bab90eaf64c3a71190ee6de861cc937dc18d4d5b41733309d6dbee81f2fee6d795485ccd9feb3bf812b655ae26990a05cb24ea5f77c516
   languageName: node
   linkType: hard
 
@@ -20825,13 +20803,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.14":
-  version: 0.2.14
-  resolution: "tinyglobby@npm:0.2.14"
+"tinyglobby@npm:^0.2.15":
+  version: 0.2.15
+  resolution: "tinyglobby@npm:0.2.15"
   dependencies:
-    fdir: ^6.4.4
-    picomatch: ^4.0.2
-  checksum: 261e986e3f2062dec3a582303bad2ce31b4634b9348648b46828c000d464b012cf474e38f503312367d4117c3f2f18611992738fca684040758bba44c24de522
+    fdir: ^6.5.0
+    picomatch: ^4.0.3
+  checksum: 0e33b8babff966c6ab86e9b825a350a6a98a63700fa0bb7ae6cf36a7770a508892383adc272f7f9d17aaf46a9d622b455e775b9949a3f951eaaf5dfb26331d44
   languageName: node
   linkType: hard
 
@@ -20928,13 +20906,6 @@ __metadata:
   version: 0.0.3
   resolution: "tr46@npm:0.0.3"
   checksum: 726321c5eaf41b5002e17ffbd1fb7245999a073e8979085dacd47c4b4e8068ff5777142fc6726d6ca1fd2ff16921b48788b87225cbc57c72636f6efa8efbffe3
-  languageName: node
-  linkType: hard
-
-"traverse-chain@npm:~0.1.0":
-  version: 0.1.0
-  resolution: "traverse-chain@npm:0.1.0"
-  checksum: dea79231a429a3dd80a829ff83e8914b6d0032d55dd0971f69d5273e95155869fca400dd9e22f0d91c3b0dda9668aaeeb694f525d7e5a55ca7f695cc149088a2
   languageName: node
   linkType: hard
 
@@ -21743,9 +21714,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:7.1.3":
-  version: 7.1.3
-  resolution: "vite@npm:7.1.3"
+"vite@npm:7.1.11":
+  version: 7.1.11
+  resolution: "vite@npm:7.1.11"
   dependencies:
     esbuild: ^0.25.0
     fdir: ^6.5.0
@@ -21753,7 +21724,7 @@ __metadata:
     picomatch: ^4.0.3
     postcss: ^8.5.6
     rollup: ^4.43.0
-    tinyglobby: ^0.2.14
+    tinyglobby: ^0.2.15
   peerDependencies:
     "@types/node": ^20.19.0 || >=22.12.0
     jiti: ">=1.21.0"
@@ -21794,7 +21765,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 625974a3399d0e9f98e6c06d2ce83b982b5d76e030201809a6bbce03a1cbdb8ff4e0e0dc5e71cd4f402f3858afa8940e091551632a3423fddeb6afd213792d45
+  checksum: 67855b760fc55228ef91b22bc6bf90c0e3500ea5f52174533bc475f33885fb2d1548d9f0d0533e11f351b752ab3c467c2d07076550cf65e96ed1462534609764
   languageName: node
   linkType: hard
 
