@@ -372,7 +372,7 @@ async function main() {
       try {
         const daemonWatcher = new PassiveDaemonWatcher(nxWorkspacePath, logger);
         await daemonWatcher.start();
-        daemonWatcher.listen((error, projectGraph) => {
+        daemonWatcher.listen(() => {
           resetStatus(nxWorkspacePath);
         });
 
