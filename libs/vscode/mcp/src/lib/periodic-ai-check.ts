@@ -120,6 +120,7 @@ async function runAiAgentCheck() {
       getTelemetry().logUsage('ai.configure-agents-check-start');
       await promisify(exec)(constructCommand('--check'), {
         cwd: workspacePath,
+        timeout: 30000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
@@ -211,7 +212,7 @@ async function runAiAgentCheck() {
     try {
       await promisify(exec)(checkAllCommand, {
         cwd: workspacePath,
-        timeout: 30000, // 30 second timeout
+        timeout: 30000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
