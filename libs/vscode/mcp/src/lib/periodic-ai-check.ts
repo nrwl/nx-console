@@ -85,7 +85,7 @@ function constructCommand(flags: string) {
   } catch (e) {
     // ignore
   }
-  return `npx -y --cache=${tmpDir} nx@latest configure-ai-agents ${flags}`;
+  return `npx -y --cache=${tmpDir} --ignore-scripts nx@latest configure-ai-agents ${flags}`;
 }
 
 async function runAiAgentCheck() {
