@@ -27,6 +27,7 @@ import {
   MessagingRequest0,
 } from './messaging-notification';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
+import { loadRootEnvFiles } from '@nx-console/shared-utils';
 
 const messages: Array<MessagingNotification | MessagingNotification2> = [
   NxTerminalMessage,
@@ -144,7 +145,15 @@ export async function initMessagingServer(
       await existingServer.dispose();
     }
 
-    const socketPath = await getNxConsoleSocketPath(workspacePath);
+    const envWithLocalFiles = loadRootEnvFiles(workspacePath, {
+      ...process.env,
+    });
+
+    const socketPath = await getNxConsoleSocketPath(
+      workspacePath,
+      envWithLocalFiles,
+    );
+
     const messagingServer = new NxMessagingServer(socketPath, context);
     await messagingServer.listen();
 
