@@ -1,6 +1,6 @@
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { consoleLogger } from '@nx-console/shared-utils';
-import { mkdirSync, unlinkSync } from 'fs';
+import { appendFileSync, mkdirSync, unlinkSync } from 'fs';
 import { Socket } from 'net';
 import { platform, tmpdir } from 'os';
 import { join, resolve } from 'path';
@@ -15,12 +15,15 @@ async function socketDirName(workspaceRoot: string): Promise<string> {
   return join(tmpdir(), unique);
 }
 
-async function getSocketDir(workspaceRoot: string) {
+async function getSocketDir(workspaceRoot: string, env: NodeJS.ProcessEnv) {
   try {
-    const dir =
-      process.env.NX_SOCKET_DIR ??
-      process.env.NX_DAEMON_SOCKET_DIR ??
-      (await socketDirName(workspaceRoot));
+    const dir = resolve(
+      workspaceRoot,
+      env.NX_SOCKET_DIR ??
+        env.NX_DAEMON_SOCKET_DIR ??
+        (await socketDirName(workspaceRoot)),
+    );
+
     if (platform() !== 'win32') {
       mkdirSync(dir, { recursive: true });
     }
@@ -34,9 +37,12 @@ async function getSocketDir(workspaceRoot: string) {
 /**
  * Get the full OS-specific socket path for Nx Console communication
  */
-export const getNxConsoleSocketPath = async (workspaceRoot: string) => {
+export const getNxConsoleSocketPath = async (
+  workspaceRoot: string,
+  env = process.env,
+) => {
   const path = resolve(
-    join(await getSocketDir(workspaceRoot), 'nx-console.sock'),
+    join(await getSocketDir(workspaceRoot, env), 'nx-console.sock'),
   );
   return platform() === 'win32' ? '\\\\.\\pipe\\nx\\' + path : path;
 };

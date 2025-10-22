@@ -14,6 +14,7 @@ import {
   TaskScope,
   tasks,
   window,
+  extensions,
 } from 'vscode';
 import { rmSync } from 'fs';
 import { tmpdir } from 'os';
@@ -85,7 +86,7 @@ function constructCommand(flags: string) {
   } catch (e) {
     // ignore
   }
-  return `npx -y --cache=${tmpDir} nx@latest configure-ai-agents ${flags}`;
+  return `npx -y --cache=${tmpDir} --ignore-scripts nx@latest configure-ai-agents ${flags}`;
 }
 
 async function runAiAgentCheck() {
@@ -120,6 +121,7 @@ async function runAiAgentCheck() {
       getTelemetry().logUsage('ai.configure-agents-check-start');
       await promisify(exec)(constructCommand('--check'), {
         cwd: workspacePath,
+        timeout: 30000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
@@ -140,7 +142,9 @@ async function runAiAgentCheck() {
       const stringified = JSON.stringify(e);
       if (!stringified.includes('The following AI agents are out of date')) {
         getTelemetry().logUsage('ai.configure-agents-check-error');
-        return;
+        // throw this error so that it can be tracked in rollbar
+        throw new Error('AIFAIL' + (e as any).message);
+        // return;
       }
       WorkspaceConfigurationStore.instance.set(
         'lastAiCheckNotificationTimestamp',
@@ -211,7 +215,7 @@ async function runAiAgentCheck() {
     try {
       await promisify(exec)(checkAllCommand, {
         cwd: workspacePath,
-        timeout: 30000, // 30 second timeout
+        timeout: 30000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
@@ -287,5 +291,9 @@ async function runAiAgentCheck() {
     }
   } catch (error) {
     // Silently fail - this is a non-critical background check
+    // the one exception is AIFAIL errors which we want to track in rollbar
+    if ((error as any).message.startsWith('AIFAIL')) {
+      throw error;
+    }
   }
 }

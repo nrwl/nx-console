@@ -101,8 +101,6 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
-    loadRootEnvFiles(getNxWorkspacePath());
-
     createNxlsClient(context);
     initTelemetry(context);
     initMcp(context);
@@ -277,7 +275,6 @@ async function setWorkspace(workspacePath: string) {
   }
 
   getNxlsClient().setWorkspacePath(workspacePath);
-  loadRootEnvFiles(workspacePath);
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 

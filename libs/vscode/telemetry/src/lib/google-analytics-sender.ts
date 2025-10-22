@@ -82,6 +82,10 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     if (shouldLogToRollbar) {
       this.rollbar.error(error);
     }
+    // there is a special case of error that we handle but still want to get more details on in rollbar - don't track those in GA
+    if (error.message.startsWith('AIFAIL')) {
+      return;
+    }
     this.sendEventData('misc.exception', {
       ...data,
       name: error.name,

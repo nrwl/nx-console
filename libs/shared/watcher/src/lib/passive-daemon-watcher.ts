@@ -2,6 +2,7 @@ import { getNxDaemonClient } from '@nx-console/shared-nx-workspace-info';
 import { Logger } from '@nx-console/shared-utils';
 import { randomUUID } from 'crypto';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 
 // uses the daemon client to subscribe to project graph change events
 // doesn't fallback to native watcher and doesn't work on older versions of nx
@@ -49,10 +50,17 @@ export class PassiveDaemonWatcher {
     }
 
     this.unregisterCallback =
-      // @ts-expect-error - before nx console is on the released version that contains this
       await daemonClientModule.daemonClient.registerProjectGraphRecomputationListener(
-        (error: Error | null | 'closed', projectGraph: ProjectGraph | null) => {
-          this.listeners.forEach((listener) => listener(error, projectGraph));
+        (
+          error: Error | null | 'closed',
+          projectGraphAndSourceMaps: {
+            projectGraph: ProjectGraph;
+            sourceMaps: ConfigurationSourceMaps;
+          } | null,
+        ) => {
+          this.listeners.forEach((listener) =>
+            listener(error, projectGraphAndSourceMaps?.projectGraph ?? null),
+          );
         },
       );
   }
