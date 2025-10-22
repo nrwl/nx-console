@@ -1,3 +1,16 @@
+## 18.73.4 (2025-10-22)
+
+### 🩹 Fixes
+
+- **vscode:** dont load .env files into process.env on main extension process ([#2827](https://github.com/nrwl/nx-console/pull/2827))
+- **vscode:** track AI notification failures in rollbar ([#2828](https://github.com/nrwl/nx-console/pull/2828))
+- **vscode:** ignore-scripts when running configure-ai-agents ([#2830](https://github.com/nrwl/nx-console/pull/2830))
+- **vscode:** add 30 second timeout to periodic ai check ([#2832](https://github.com/nrwl/nx-console/pull/2832))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## [18.73.3](https://github.com/nrwl/nx-console/compare/vscode-v18.73.2...vscode-v18.73.3) (2025-10-17)
 
 
