@@ -21,7 +21,6 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
     // application settings
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var telemetrySetting: TelemetrySetting
-    private lateinit var showProjectDetailsViewSetting: ShowProjectDetailsViewSetting
     private lateinit var nxCloudNotificationsSetting: NxCloudNotificationsSetting
 
     override fun createComponent(): JComponent {
@@ -42,9 +41,6 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
         telemetrySetting = TelemetrySetting()
         telemetrySetting.setValue(settingsProvider.enableTelemetry)
 
-        showProjectDetailsViewSetting = ShowProjectDetailsViewSetting()
-        showProjectDetailsViewSetting.setValue(settingsProvider.showProjectDetailsView)
-
         nxCloudNotificationsSetting = NxCloudNotificationsSetting()
         nxCloudNotificationsSetting.setValue(settingsProvider.nxCloudNotifications)
 
@@ -57,7 +53,6 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)
-                showProjectDetailsViewSetting.render(this)
                 nxCloudNotificationsSetting.render(this)
             }
         }
@@ -70,7 +65,6 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
             generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters ||
             toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle ||
-            showProjectDetailsViewSetting.getValue() != settingsProvider.showProjectDetailsView ||
             nxCloudNotificationsSetting.getValue() != settingsProvider.nxCloudNotifications
     }
 
@@ -87,7 +81,6 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
-        settingsProvider.showProjectDetailsView = showProjectDetailsViewSetting.getValue()
         settingsProvider.nxCloudNotifications = nxCloudNotificationsSetting.getValue()
     }
 

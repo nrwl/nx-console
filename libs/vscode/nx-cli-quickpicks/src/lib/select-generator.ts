@@ -100,34 +100,32 @@ async function selectGenerator(): Promise<GeneratorSchema | undefined> {
       };
     });
 
-  if (GlobalConfigurationStore.instance.get('enableGeneratorFilters') ?? true) {
-    const allowlist: string[] =
-      GlobalConfigurationStore.instance.get('generatorAllowlist') ?? [];
-    const blocklist: string[] =
-      GlobalConfigurationStore.instance.get('generatorBlocklist') ?? [];
+  const allowlist: string[] =
+    GlobalConfigurationStore.instance.get('generatorAllowlist') ?? [];
+  const blocklist: string[] =
+    GlobalConfigurationStore.instance.get('generatorBlocklist') ?? [];
 
-    if (allowlist.length > 0) {
-      generatorsQuickPicks = generatorsQuickPicks.filter((item) =>
-        allowlist.find((rule) =>
+  if (allowlist.length > 0) {
+    generatorsQuickPicks = generatorsQuickPicks.filter((item) =>
+      allowlist.find((rule) =>
+        matchWithWildcards(
+          `${item.generator.data?.collection}:${item.generator.data?.name}`,
+          rule,
+        ),
+      ),
+    );
+  }
+
+  if (blocklist.length > 0) {
+    generatorsQuickPicks = generatorsQuickPicks.filter(
+      (item) =>
+        !blocklist.find((rule) =>
           matchWithWildcards(
             `${item.generator.data?.collection}:${item.generator.data?.name}`,
             rule,
           ),
         ),
-      );
-    }
-
-    if (blocklist.length > 0) {
-      generatorsQuickPicks = generatorsQuickPicks.filter(
-        (item) =>
-          !blocklist.find((rule) =>
-            matchWithWildcards(
-              `${item.generator.data?.collection}:${item.generator.data?.name}`,
-              rule,
-            ),
-          ),
-      );
-    }
+    );
   }
 
   if (!generators || !generators.length) {

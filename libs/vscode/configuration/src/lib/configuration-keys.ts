@@ -1,42 +1,34 @@
 export const GLOBAL_CONFIG_KEYS = [
   'commonNxCommands',
-  'enableGenerateFromContextMenu',
   'enableCodeLens',
   'enableLibraryImports',
-  'enableGeneratorFilters',
   'generatorAllowlist',
   'generatorBlocklist',
   'enableTaskExecutionDryRunOnChange',
   'projectViewingStyle',
   'moveGeneratorPatterns',
   'useNewGenerateUiPreview',
-  'showProjectDetailsView',
   'showNodeVersionOnStartup',
   'nxWorkspacePath',
   'nxCloudNotifications',
   'debugMode',
-  'generateAiAgentRules',
   'mcpPort',
 ] as const;
 
 export type GlobalConfig = {
   commonNxCommands: string[];
-  enableGenerateFromContextMenu: boolean;
   enableCodeLens: boolean;
   enableLibraryImports: boolean;
-  enableGeneratorFilters: boolean;
   generatorAllowlist: string[];
   generatorBlocklist: string[];
   enableTaskExecutionDryRunOnChange: boolean;
   projectViewingStyle: 'list' | 'tree' | 'automatic';
   moveGeneratorPatterns: Record<string, string>;
   useNewGenerateUiPreview: boolean;
-  showProjectDetailsView: boolean;
   showNodeVersionOnStartup: boolean;
   nxWorkspacePath: string;
   nxCloudNotifications: 'all' | 'errors' | 'none';
   debugMode: boolean;
-  generateAiAgentRules: boolean;
   mcpPort: number | undefined;
 };
 
