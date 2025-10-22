@@ -146,7 +146,7 @@ export function registerNxWorkspaceTools(
           };
         }
 
-        const results = getTokenLimitedToolResult(filteredWorkspace);
+        const results = getTokenOptimizedToolResult(filteredWorkspace);
         const content: CallToolResult['content'] = results
           .filter((result) => !!result)
           .map((result) => ({
@@ -422,9 +422,9 @@ export function registerNxWorkspaceTools(
   logger.log('Registered Nx workspace tool');
 }
 
-export function getTokenLimitedToolResult(
+export function getTokenOptimizedToolResult(
   workspace: NxWorkspace,
-  maxTokens = 25000,
+  maxTokens = 10000,
 ): string[] {
   const nxJsonResult = getNxJsonPrompt(workspace.nxJson);
   let projectGraphResult =

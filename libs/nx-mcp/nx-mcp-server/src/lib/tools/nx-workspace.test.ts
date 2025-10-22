@@ -1,4 +1,4 @@
-import { getTokenLimitedToolResult } from './nx-workspace';
+import { getTokenOptimizedToolResult } from './nx-workspace';
 import { NxWorkspace, NxError } from '@nx-console/shared-types';
 import {
   getNxJsonPrompt,
@@ -49,7 +49,7 @@ describe('getTokenLimitedToolResult', () => {
     mockGetProjectGraphPrompt.mockReturnValue('small');
     mockGetProjectGraphErrorsPrompt.mockReturnValue('small');
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 1000);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 1000);
 
     expect(result).toEqual(['small', 'small', '']);
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(1);
@@ -68,7 +68,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce('short'); // Second call - stops optimization
 
     // Use a very low token limit to trigger optimization
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(2);
     expect(mockGetProjectGraphPrompt).toHaveBeenNthCalledWith(
@@ -94,7 +94,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce(largeString) // Second call - still large, continues optimization
       .mockReturnValueOnce('short'); // Third call - stops optimization
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(3);
     expect(mockGetProjectGraphPrompt).toHaveBeenNthCalledWith(
@@ -126,7 +126,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce(largeString) // Third call - still large, continues
       .mockReturnValueOnce('short'); // Fourth call - stops optimization
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(4);
     expect(mockGetProjectGraphPrompt).toHaveBeenNthCalledWith(
@@ -151,7 +151,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce(largeString)
       .mockReturnValueOnce(largeString);
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(4);
   });
@@ -168,7 +168,7 @@ describe('getTokenLimitedToolResult', () => {
     mockGetProjectGraphPrompt.mockReturnValue('small');
     mockGetProjectGraphErrorsPrompt.mockReturnValue('error-result');
 
-    const result = getTokenLimitedToolResult(workspaceWithErrors, 1000);
+    const result = getTokenOptimizedToolResult(workspaceWithErrors, 1000);
 
     expect(mockGetProjectGraphErrorsPrompt).toHaveBeenCalledWith(
       [mockError],
@@ -187,7 +187,7 @@ describe('getTokenLimitedToolResult', () => {
     mockGetNxJsonPrompt.mockReturnValue('small');
     mockGetProjectGraphPrompt.mockReturnValue('small');
 
-    const result = getTokenLimitedToolResult(workspaceWithoutErrors, 1000);
+    const result = getTokenOptimizedToolResult(workspaceWithoutErrors, 1000);
 
     expect(mockGetProjectGraphErrorsPrompt).not.toHaveBeenCalled();
     expect(result).toEqual(['small', 'small', '']);
