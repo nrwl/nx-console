@@ -14,6 +14,7 @@ import {
   TaskScope,
   tasks,
   window,
+  extensions,
 } from 'vscode';
 import { rmSync } from 'fs';
 import { tmpdir } from 'os';
@@ -141,7 +142,9 @@ async function runAiAgentCheck() {
       const stringified = JSON.stringify(e);
       if (!stringified.includes('The following AI agents are out of date')) {
         getTelemetry().logUsage('ai.configure-agents-check-error');
-        return;
+        // throw this error so that it can be tracked in rollbar
+        throw new Error('AIFAIL' + (e as any).message);
+        // return;
       }
       WorkspaceConfigurationStore.instance.set(
         'lastAiCheckNotificationTimestamp',
@@ -288,5 +291,9 @@ async function runAiAgentCheck() {
     }
   } catch (error) {
     // Silently fail - this is a non-critical background check
+    // the one exception is AIFAIL errors which we want to track in rollbar
+    if ((error as any).message.startsWith('AIFAIL')) {
+      throw error;
+    }
   }
 }
