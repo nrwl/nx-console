@@ -13,6 +13,9 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
+      "path": "../../shared/utils/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/socket-utils/tsconfig.lib.json"
     },
     {

@@ -8,11 +8,29 @@ import { join } from 'path';
  * - .local.env
  * - .env.local
  */
-export function loadRootEnvFiles(root: string) {
+export function loadRootEnvFiles(
+  root: string,
+  targetEnv: NodeJS.ProcessEnv = process.env,
+): NodeJS.ProcessEnv {
+  let expandedEnv: NodeJS.ProcessEnv = {
+    ...targetEnv,
+  };
   for (const file of ['.local.env', '.env.local', '.env']) {
     const myEnv = loadDotEnvFile({
       path: join(root, file),
+      processEnv: targetEnv,
+      override: true,
     });
-    expand(myEnv);
+    const expanded = expand({
+      ...myEnv,
+      processEnv: expandedEnv,
+    });
+    if (expanded.parsed) {
+      expandedEnv = {
+        ...expandedEnv,
+        ...expanded.parsed,
+      };
+    }
   }
+  return expandedEnv;
 }
