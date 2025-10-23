@@ -1,3 +1,9 @@
+## 18.74.1 (2025-10-23)
+
+### 🩹 Fixes
+
+- **vscode:** increase timeout for periodic ai check ([#2839](https://github.com/nrwl/nx-console/pull/2839))
+
 ## 18.74.0 (2025-10-23)
 
 ### 🚀 Features
