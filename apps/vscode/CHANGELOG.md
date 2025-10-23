@@ -1,3 +1,17 @@
+## 18.74.0 (2025-10-23)
+
+### 🚀 Features
+
+- clean up old vscode & intellij settings ([#2834](https://github.com/nrwl/nx-console/pull/2834))
+
+### 🩹 Fixes
+
+- **vscode:** split cache locations and add more details to logs ([#2837](https://github.com/nrwl/nx-console/pull/2837))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.73.4 (2025-10-22)
 
 ### 🩹 Fixes
