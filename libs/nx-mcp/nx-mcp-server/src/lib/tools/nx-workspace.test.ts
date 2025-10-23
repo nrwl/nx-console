@@ -1,4 +1,4 @@
-import { getTokenOptimizedToolResult } from './nx-workspace';
+import { getTokenOptimizedToolResult, chunkContent } from './nx-workspace';
 import { NxWorkspace, NxError } from '@nx-console/shared-types';
 import {
   getNxJsonPrompt,
@@ -191,5 +191,109 @@ describe('getTokenLimitedToolResult', () => {
 
     expect(mockGetProjectGraphErrorsPrompt).not.toHaveBeenCalled();
     expect(result).toEqual(['small', 'small', '']);
+  });
+});
+
+describe('chunkContent', () => {
+  it('should return first chunk when pageNumber is 0', () => {
+    const content = 'abcdefghij';
+    const result = chunkContent(content, 0, 5);
+
+    expect(result.chunk).toBe('abcde\n...[truncated, continue on page 1]');
+    expect(result.hasMore).toBe(true);
+  });
+
+  it('should return second chunk when pageNumber is 1', () => {
+    const content = 'abcdefghij';
+    const result = chunkContent(content, 1, 5);
+
+    expect(result.chunk).toBe('fghij');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should return empty chunk when pageNumber is beyond content', () => {
+    const content = 'abcde';
+    const result = chunkContent(content, 2, 5);
+
+    expect(result.chunk).toBe('no more content on page 2');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should return entire content when chunkSize is larger', () => {
+    const content = 'abcde';
+    const result = chunkContent(content, 0, 100);
+
+    expect(result.chunk).toBe('abcde');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should handle empty content', () => {
+    const content = '';
+    const result = chunkContent(content, 0, 5);
+
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should indicate hasMore correctly for exact chunk boundary', () => {
+    const content = 'abcdefghij';
+    const result = chunkContent(content, 0, 10);
+
+    expect(result.chunk).toBe('abcdefghij');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should indicate hasMore correctly when one char remains', () => {
+    const content = 'abcdefghijk';
+    const result = chunkContent(content, 0, 10);
+
+    expect(result.chunk).toBe('abcdefghij\n...[truncated, continue on page 1]');
+    expect(result.hasMore).toBe(true);
+  });
+
+  it('should handle multiple pages correctly', () => {
+    const content = 'abcdefghijklmnopqrst';
+
+    const page0 = chunkContent(content, 0, 5);
+    expect(page0.chunk).toBe('abcde\n...[truncated, continue on page 1]');
+    expect(page0.hasMore).toBe(true);
+
+    const page1 = chunkContent(content, 1, 5);
+    expect(page1.chunk).toBe('fghij\n...[truncated, continue on page 2]');
+    expect(page1.hasMore).toBe(true);
+
+    const page2 = chunkContent(content, 2, 5);
+    expect(page2.chunk).toBe('klmno\n...[truncated, continue on page 3]');
+    expect(page2.hasMore).toBe(true);
+
+    const page3 = chunkContent(content, 3, 5);
+    expect(page3.chunk).toBe('pqrst');
+    expect(page3.hasMore).toBe(false);
+  });
+
+  it('should handle null content', () => {
+    const result = chunkContent(null as any, 0, 5);
+
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should handle undefined content', () => {
+    const result = chunkContent(undefined as any, 0, 5);
+
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should show correct page number in no more content message for different pages', () => {
+    const content = 'abcde';
+
+    const page5 = chunkContent(content, 5, 5);
+    expect(page5.chunk).toBe('no more content on page 5');
+    expect(page5.hasMore).toBe(false);
+
+    const page10 = chunkContent(content, 10, 5);
+    expect(page10.chunk).toBe('no more content on page 10');
+    expect(page10.hasMore).toBe(false);
   });
 });
