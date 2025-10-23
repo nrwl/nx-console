@@ -4,6 +4,7 @@ import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec } from 'child_process';
+import { createHash } from 'crypto';
 import { promisify } from 'util';
 import {
   commands,
@@ -76,11 +77,15 @@ export async function runConfigureAiAgentsCommand() {
 }
 
 function constructCommand(flags: string) {
-  // const workspacePath = getWorkspacePath();
-  // const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
+  const workspacePath = getWorkspacePath();
 
-  // non a project install, so use NPX and don't pollute npx cache
-  const tmpDir = join(tmpdir(), 'nx-console-tmp');
+  // Create unique cache per workspace to avoid collisions
+  const hash = createHash('sha256')
+    .update(workspacePath || '')
+    .digest('hex')
+    .slice(0, 10);
+
+  const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
   try {
     rmSync(tmpDir, { recursive: true, force: true });
   } catch (e) {
@@ -143,7 +148,18 @@ async function runAiAgentCheck() {
       if (!stringified.includes('The following AI agents are out of date')) {
         getTelemetry().logUsage('ai.configure-agents-check-error');
         // throw this error so that it can be tracked in rollbar
-        throw new Error('AIFAIL' + (e as any).message);
+        const nodeVersion = (
+          await promisify(exec)('node --version')
+        ).stdout.trim();
+        throw new Error(
+          `AIFAIL` +
+            ((e as any).signal === 'SIGTERM' ? '-TIMEOUT-' : '') +
+            `NODEVERSION:${nodeVersion}` +
+            (e as any).message,
+          {
+            cause: e as Error,
+          },
+        );
         // return;
       }
       WorkspaceConfigurationStore.instance.set(
