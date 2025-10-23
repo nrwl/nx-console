@@ -6,7 +6,6 @@ import com.intellij.openapi.fileEditor.FileEditorProvider
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import dev.nx.console.settings.NxConsoleSettingsProvider
 
 internal class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
@@ -16,7 +15,6 @@ internal class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware 
         if (ProjectConfigFilesService.getInstance(project).isProjectDetailsFile(file)) {
             return true
         }
-        if (!NxConsoleSettingsProvider.getInstance().showProjectDetailsView) return false
 
         return false
     }

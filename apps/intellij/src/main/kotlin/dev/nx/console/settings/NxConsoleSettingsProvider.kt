@@ -37,12 +37,6 @@ internal class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSet
             state.promptedForTelemetry = value
         }
 
-    var showProjectDetailsView: Boolean
-        get() = state.showProjectDetailsView
-        set(value) {
-            state.showProjectDetailsView = value
-        }
-
     var nxCloudNotifications: NxCloudNotificationsLevel
         get() = state.nxCloudNotifications
         set(value) {
@@ -60,6 +54,5 @@ data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
-    var showProjectDetailsView: Boolean = true,
     var nxCloudNotifications: NxCloudNotificationsLevel = NxCloudNotificationsLevel.ALL,
 )
