@@ -1,3 +1,15 @@
+## 1.52.0 (2025-10-23)
+
+### Bug Fixes
+
+* **intellij:** extract to inner classes ([#2836](https://github.com/nrwl/nx-console/issues/2836)) ([f4bbe1a](https://github.com/nrwl/nx-console/commit/f4bbe1a1118a129cde72dc0a1b065a72d2d8033f))
+* **vscode:** dont load .env files into process.env on main extension process ([#2827](https://github.com/nrwl/nx-console/issues/2827)) ([324a657](https://github.com/nrwl/nx-console/commit/324a65763c95703eebb8b098cde11388a50cb345))
+
+
+### Features
+
+* clean up old vscode & intellij settings ([#2834](https://github.com/nrwl/nx-console/issues/2834)) ([f10994c](https://github.com/nrwl/nx-console/commit/f10994ca78e328371253bba08cd06e704ff19dd3))
+
 ## 1.51.0 (2025-10-10)
 
 ### Bug Fixes
