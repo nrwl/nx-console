@@ -3,9 +3,11 @@ package dev.nx.console.ai
 import com.intellij.execution.util.ExecUtil
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -153,26 +155,7 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
                 .setTitle("Nx Console")
 
         notification.addActions(
-            setOf(
-                NotificationAction.createSimpleExpiring("Yes") {
-                    notification.expire()
-                    TelemetryService.getInstance(project)
-                        .featureUsed(
-                            TelemetryEvent.AI_CONFIGURE_AGENTS_ACTION,
-                            mapOf("source" to "notification"),
-                        )
-                    ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
-                },
-                NotificationAction.createSimpleExpiring("Don't ask again") {
-                    notification.expire()
-                    TelemetryService.getInstance(project)
-                        .featureUsed(
-                            TelemetryEvent.AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN,
-                            mapOf("source" to "notification"),
-                        )
-                    setDontAskAgain()
-                },
-            )
+            setOf(UpdateConfigurationAction(notification), DontAskAgainAction(notification))
         )
 
         notification.notify(project)
@@ -190,37 +173,65 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
         notification.addActions(
             setOf(
-                NotificationAction.createSimpleExpiring("Yes") {
-                    notification.expire()
-                    TelemetryService.getInstance(project)
-                        .featureUsed(
-                            TelemetryEvent.AI_CONFIGURE_AGENTS_SETUP_ACTION,
-                            mapOf("source" to "notification"),
-                        )
-                    ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
-                },
-                NotificationAction.createSimpleExpiring("Learn more") {
-                    TelemetryService.getInstance(project)
-                        .featureUsed(
-                            TelemetryEvent.AI_CONFIGURE_AGENTS_LEARN_MORE,
-                            mapOf("source" to "notification"),
-                        )
-                    BrowserUtil.browse(
-                        "https://nx.dev/docs/getting-started/ai-setup#configure-nx-ai-integration"
-                    )
-                },
-                NotificationAction.createSimpleExpiring("Don't ask again") {
-                    notification.expire()
-                    TelemetryService.getInstance(project)
-                        .featureUsed(
-                            TelemetryEvent.AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN,
-                            mapOf("source" to "notification"),
-                        )
-                    setDontAskAgain()
-                },
+                SetupConfigurationAction(notification),
+                LearnMoreAction(notification),
+                DontAskAgainAction(notification),
             )
         )
 
         notification.notify(project)
+    }
+
+    private inner class UpdateConfigurationAction(private val notification: Notification) :
+        NotificationAction("Yes") {
+        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+            notification.expire()
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.AI_CONFIGURE_AGENTS_ACTION,
+                    mapOf("source" to "notification"),
+                )
+            ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
+        }
+    }
+
+    private inner class SetupConfigurationAction(private val notification: Notification) :
+        NotificationAction("Yes") {
+        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+            notification.expire()
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.AI_CONFIGURE_AGENTS_SETUP_ACTION,
+                    mapOf("source" to "notification"),
+                )
+            ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
+        }
+    }
+
+    private inner class LearnMoreAction(private val notification: Notification) :
+        NotificationAction("Learn more") {
+        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.AI_CONFIGURE_AGENTS_LEARN_MORE,
+                    mapOf("source" to "notification"),
+                )
+            BrowserUtil.browse(
+                "https://nx.dev/docs/getting-started/ai-setup#configure-nx-ai-integration"
+            )
+        }
+    }
+
+    private inner class DontAskAgainAction(private val notification: Notification) :
+        NotificationAction("Don't ask again") {
+        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+            notification.expire()
+            TelemetryService.getInstance(project)
+                .featureUsed(
+                    TelemetryEvent.AI_CONFIGURE_AGENTS_DONT_ASK_AGAIN,
+                    mapOf("source" to "notification"),
+                )
+            setDontAskAgain()
+        }
     }
 }

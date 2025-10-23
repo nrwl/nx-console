@@ -1,7 +1,4 @@
-import {
-  getNxWorkspacePath,
-  GlobalConfigurationStore,
-} from '@nx-console/vscode-configuration';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import {
   getNxVersion,
@@ -64,10 +61,6 @@ function registerCommand(context: ExtensionContext) {
             }
           | undefined,
       ) => {
-        const isEnabled = GlobalConfigurationStore.instance.get(
-          'showProjectDetailsView',
-        );
-        if (!isEnabled) return;
         const nxVersion = await getNxVersion();
 
         // Determine the source based on the argument type
