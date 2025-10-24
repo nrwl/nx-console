@@ -15,7 +15,6 @@ import {
   TaskScope,
   tasks,
   window,
-  extensions,
 } from 'vscode';
 import { rmSync } from 'fs';
 import { tmpdir } from 'os';
@@ -99,6 +98,17 @@ async function runAiAgentCheck() {
     return;
   }
 
+  // Check Node version - only run on Node 18+
+  try {
+    const nodeVersion = (await promisify(exec)('node --version')).stdout.trim();
+    const majorVersion = parseInt(nodeVersion.replace('v', '').split('.')[0]);
+    if (majorVersion < 18) {
+      return;
+    }
+  } catch (e) {
+    return;
+  }
+
   const now = Date.now();
 
   const lastUpdateNotificationTimestamp =
@@ -147,20 +157,45 @@ async function runAiAgentCheck() {
       const stringified = JSON.stringify(e);
       if (!stringified.includes('The following AI agents are out of date')) {
         getTelemetry().logUsage('ai.configure-agents-check-error');
-        // throw this error so that it can be tracked in rollbar
+        // throw this error so that it can be tracked in rollbar - workaround while we track what's going wrong
         const nodeVersion = (
           await promisify(exec)('node --version')
         ).stdout.trim();
-        throw new Error(
-          `AIFAIL` +
-            ((e as any).signal === 'SIGTERM' ? '-TIMEOUT-' : '') +
-            `NODEVERSION:${nodeVersion}` +
-            (e as any).message,
-          {
-            cause: e as Error,
-          },
+
+        const exitCode = (e as any).code ?? 'unknown';
+        const signal = (e as any).signal ?? 'null';
+
+        const preserveModulePath = (text: string) =>
+          text.replace(
+            /Cannot find module (.+?)\s+at/g,
+            (_match: string, modulePath: string) => {
+              return `Cannot find module ${modulePath.replace(/\//g, '&')} at`;
+            },
+          );
+
+        const stderr = ((e as any).stderr || '').slice(-500);
+
+        const stdout = preserveModulePath(
+          ((e as any).stdout || '').slice(-500),
         );
-        // return;
+
+        const originalMessage = preserveModulePath(
+          ((e as any).message || '') as string,
+        );
+
+        const errorMessage = [
+          'AIFAIL',
+          `NODEVERSION:${nodeVersion}`,
+          `EXITCODE:${exitCode}`,
+          `SIGNAL:${signal}`,
+          `STDERR:${stderr}`,
+          `STDOUT:${stdout}`,
+          `MESSAGE:${originalMessage}`,
+        ].join('|');
+
+        throw new Error(errorMessage, {
+          cause: e as Error,
+        });
       }
       WorkspaceConfigurationStore.instance.set(
         'lastAiCheckNotificationTimestamp',
