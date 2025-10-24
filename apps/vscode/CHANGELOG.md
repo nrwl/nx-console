@@ -1,3 +1,13 @@
+## 18.74.3 (2025-10-24)
+
+### 🩹 Fixes
+
+- **vscode:** only run configure-ai-agents if latest nx is >22 ([#2842](https://github.com/nrwl/nx-console/pull/2842))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.74.2 (2025-10-24)
 
 ### 🩹 Fixes
