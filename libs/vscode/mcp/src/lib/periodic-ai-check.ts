@@ -1,3 +1,4 @@
+import { gte } from '@nx-console/nx-version';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
@@ -93,6 +94,19 @@ function constructCommand(flags: string) {
   return `npx -y --cache=${tmpDir} --ignore-scripts nx@latest configure-ai-agents ${flags}`;
 }
 
+async function getNxLatestVersion(): Promise<string | undefined> {
+  try {
+    const result = await promisify(exec)('npm view nx@latest version', {
+      encoding: 'utf-8',
+      timeout: 10000,
+    });
+    return result.stdout.trim();
+  } catch (e) {
+    vscodeLogger.log(`Failed to get nx@latest version: ${e}`);
+    return undefined;
+  }
+}
+
 async function runAiAgentCheck() {
   if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
     return;
@@ -106,6 +120,12 @@ async function runAiAgentCheck() {
       return;
     }
   } catch (e) {
+    return;
+  }
+
+  // Check nx@latest version - only run if >= 22 (when configure-ai-agents was added)
+  const nxLatestVersion = await getNxLatestVersion();
+  if (!nxLatestVersion || !gte(nxLatestVersion, '22.0.0')) {
     return;
   }
 
@@ -186,6 +206,7 @@ async function runAiAgentCheck() {
         const errorMessage = [
           'AIFAIL',
           `NODEVERSION:${nodeVersion}`,
+          `NXVERSION:${nxLatestVersion}`,
           `EXITCODE:${exitCode}`,
           `SIGNAL:${signal}`,
           `STDERR:${stderr}`,
