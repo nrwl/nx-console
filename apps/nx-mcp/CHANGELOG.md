@@ -1,3 +1,13 @@
+## 0.8.0 (2025-10-24)
+
+### 🚀 Features
+
+- **nx-mcp:** make token optimization kick in sooner & implement pagination for nx_project_details ([#2835](https://github.com/nrwl/nx-console/pull/2835))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.7.0 (2025-10-10)
 
 ### 🚀 Features
