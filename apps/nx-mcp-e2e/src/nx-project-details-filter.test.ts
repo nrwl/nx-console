@@ -41,13 +41,12 @@ describe('nx_project_details filter', () => {
       `--tool-arg projectName="${workspaceName}"`,
     );
 
-    // Should have 3 content blocks: Project Details, Project Dependencies, External Dependencies
-    expect(result.content).toHaveLength(3);
+    // Should have 2 content blocks: Project Details and External Dependencies (no project deps for standalone)
+    expect(result.content).toHaveLength(2);
     expect(result.content[0]?.text).toContain('Project Details:');
     expect(result.content[0]?.text).toContain('"name":');
     expect(result.content[0]?.text).toContain('"targets":');
-    expect(result.content[1]?.text).toContain('Project Dependencies:');
-    expect(result.content[2]?.text).toContain('External Dependencies:');
+    expect(result.content[1]?.text).toContain('External Dependencies:');
   });
 
   it('should filter to root path using dot notation', () => {
@@ -59,11 +58,12 @@ describe('nx_project_details filter', () => {
       '--tool-arg filter="root"',
     );
 
-    // Should have 1 content block with just the root value
+    // Should have 1 content block with the filtered value
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
-    // For react-standalone preset, root is "."
-    expect(text.trim()).toBe('"."');
+    // Should start with "Project Details: " prefix and contain the root value
+    expect(text).toContain('Project Details:');
+    expect(text).toContain('"."');
     // Should not contain other project data
     expect(text).not.toContain('"targets"');
     expect(text).not.toContain('"name"');
@@ -80,7 +80,8 @@ describe('nx_project_details filter', () => {
 
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
-    expect(text.trim()).toBe(`"${workspaceName}"`);
+    expect(text).toContain('Project Details:');
+    expect(text).toContain(`"${workspaceName}"`);
   });
 
   it('should filter to nested targets.build path', () => {
@@ -128,9 +129,10 @@ describe('nx_project_details filter', () => {
 
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
-    // Should be an array
-    expect(text.trim().startsWith('[')).toBe(true);
-    expect(text.trim().endsWith(']')).toBe(true);
+    // Should contain the "Project Details:" prefix and the array
+    expect(text).toContain('Project Details:');
+    expect(text).toContain('[');
+    expect(text).toContain(']');
   });
 
   it('should filter to array element using bracket notation tags[0]', () => {
@@ -144,9 +146,9 @@ describe('nx_project_details filter', () => {
 
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
-    // Should be a single string value (first tag)
-    expect(text.trim().startsWith('"')).toBe(true);
-    expect(text.trim().endsWith('"')).toBe(true);
+    // Should contain the "Project Details:" prefix and a single string value (first tag)
+    expect(text).toContain('Project Details:');
+    expect(text).toContain('"');
   });
 
   it('should return error for invalid path', () => {

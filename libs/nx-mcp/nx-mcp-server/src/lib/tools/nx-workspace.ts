@@ -28,6 +28,8 @@ import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
 
 let nxWorkspacePath: string | undefined = undefined;
 
+const PROJECT_DETAILS_CHUNK_SIZE = 10000;
+
 export function setNxWorkspacePath(path: string) {
   nxWorkspacePath = path;
 }
@@ -54,6 +56,40 @@ function getValueByPath(obj: any, path: string): any {
     }
     return current[key];
   }, obj);
+}
+
+export function chunkContent(
+  content: string,
+  pageNumber: number,
+  chunkSize: number,
+): {
+  chunk: string;
+  hasMore: boolean;
+} {
+  if (!content) {
+    return {
+      chunk: '',
+      hasMore: false,
+    };
+  }
+  const startIndex = pageNumber * chunkSize;
+  if (startIndex >= content.length) {
+    return {
+      chunk: `no more content on page ${pageNumber}`,
+      hasMore: false,
+    };
+  }
+
+  const endIndex = startIndex + chunkSize;
+
+  return {
+    chunk:
+      content.slice(startIndex, endIndex) +
+      (endIndex < content.length
+        ? `\n...[truncated, continue on page ${pageNumber + 1}]`
+        : ''),
+    hasMore: endIndex < content.length,
+  };
 }
 
 export function registerNxWorkspaceTools(
@@ -146,7 +182,7 @@ export function registerNxWorkspaceTools(
           };
         }
 
-        const results = getTokenLimitedToolResult(filteredWorkspace);
+        const results = getTokenOptimizedToolResult(filteredWorkspace);
         const content: CallToolResult['content'] = results
           .filter((result) => !!result)
           .map((result) => ({
@@ -190,7 +226,7 @@ export function registerNxWorkspaceTools(
 
   server.tool(
     NX_PROJECT_DETAILS,
-    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies). Optionally filter to a specific path using dot notation (e.g., "targets.build.inputs" or "targets.build.options.assets[0]").',
+    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies). Optionally filter to a specific path using dot notation (e.g., "targets.build.inputs" or "targets.build.options.assets[0]"). For large projects, results are paginated. If a pagination token is returned, call this tool again with the same projectName and filter parameters plus the token to retrieve additional results and ensure all data is collected.',
     {
       projectName: z
         .string()
@@ -199,7 +235,13 @@ export function registerNxWorkspaceTools(
         .string()
         .optional()
         .describe(
-          'Optional path to filter the project configuration. Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). When provided, only the value at this path will be returned.',
+          'Optional path to filter the project configuration. Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). When provided, only the value at this path will be returned. If filter is set, dependencies and external dependencies will not be included in the response.',
+        ),
+      pageToken: z
+        .number()
+        .optional()
+        .describe(
+          'Token for pagination. Pass the token from the previous response to get the next page.',
         ),
     },
     {
@@ -207,7 +249,7 @@ export function registerNxWorkspaceTools(
       readOnlyHint: true,
       openWorldHint: false,
     },
-    async ({ projectName, filter }) => {
+    async ({ projectName, filter, pageToken }) => {
       telemetry?.logUsage('ai.tool-call', {
         tool: NX_PROJECT_DETAILS,
       });
@@ -245,33 +287,25 @@ export function registerNxWorkspaceTools(
         };
       }
 
-      // If filter is provided, return only the filtered value
-      if (filter) {
-        const filteredValue = getValueByPath(project.data, filter);
+      const pageNumber = pageToken ?? 0;
 
-        if (filteredValue === undefined) {
-          return {
-            isError: true,
-            content: [
-              {
-                type: 'text',
-                text: `Path "${filter}" not found in project configuration`,
-              },
-            ],
-          };
-        }
+      const detailsJson = filter
+        ? getValueByPath(project.data, filter)
+        : project.data;
 
+      // Handle filtered value not found
+      if (filter && detailsJson === undefined) {
         return {
+          isError: true,
           content: [
             {
               type: 'text',
-              text: JSON.stringify(filteredValue, null, 2),
+              text: `Path "${filter}" not found in project configuration`,
             },
           ],
         };
       }
 
-      // No filter provided, return full project details
       const dependencies = workspace.projectGraph.dependencies[project.name];
 
       const projectDependencies = [];
@@ -285,22 +319,63 @@ export function registerNxWorkspaceTools(
         }
       }
 
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Project Details: ${JSON.stringify(project.data, null, 2)}`,
-          },
-          {
-            type: 'text',
-            text: `Project Dependencies: ${projectDependencies.join(', ')}`,
-          },
-          {
-            type: 'text',
-            text: `External Dependencies: ${externalDependencies.join(', ')}`,
-          },
-        ],
-      };
+      const projDepsStr = projectDependencies.join(', ');
+      const extDepsStr = externalDependencies.join(', ');
+
+      // Chunk each section
+      const detailsChunk = chunkContent(
+        JSON.stringify(detailsJson, null, 2),
+        pageNumber,
+        PROJECT_DETAILS_CHUNK_SIZE,
+      );
+      const projDepsChunk = chunkContent(
+        projDepsStr,
+        pageNumber,
+        PROJECT_DETAILS_CHUNK_SIZE,
+      );
+      const extDepsChunk = chunkContent(
+        extDepsStr,
+        pageNumber,
+        PROJECT_DETAILS_CHUNK_SIZE,
+      );
+
+      // Build content blocks
+      const content: CallToolResult['content'] = [];
+
+      const continuedString = pageNumber > 0 ? ' (continued)' : '';
+      if (detailsChunk.chunk) {
+        content.push({
+          type: 'text',
+          text: `Project Details${continuedString}: \n${detailsChunk.chunk}`,
+        });
+      }
+
+      if (!filter && projDepsChunk.chunk) {
+        content.push({
+          type: 'text',
+          text: `Project Dependencies${continuedString}: \n${projDepsChunk.chunk}`,
+        });
+      }
+
+      if (!filter && extDepsChunk.chunk) {
+        content.push({
+          type: 'text',
+          text: `External Dependencies${continuedString}: \n${extDepsChunk.chunk}`,
+        });
+      }
+
+      // Add pagination token if any section has more
+      if (
+        detailsChunk.hasMore ||
+        (!filter && (projDepsChunk.hasMore || extDepsChunk.hasMore))
+      ) {
+        content.push({
+          type: 'text',
+          text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue retrieving project details.`,
+        });
+      }
+
+      return { content };
     },
   );
 
@@ -422,9 +497,9 @@ export function registerNxWorkspaceTools(
   logger.log('Registered Nx workspace tool');
 }
 
-export function getTokenLimitedToolResult(
+export function getTokenOptimizedToolResult(
   workspace: NxWorkspace,
-  maxTokens = 25000,
+  maxTokens = 10000,
 ): string[] {
   const nxJsonResult = getNxJsonPrompt(workspace.nxJson);
   let projectGraphResult =
