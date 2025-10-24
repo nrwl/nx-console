@@ -1,4 +1,4 @@
-import { getTokenLimitedToolResult } from './nx-workspace';
+import { getTokenOptimizedToolResult, chunkContent } from './nx-workspace';
 import { NxWorkspace, NxError } from '@nx-console/shared-types';
 import {
   getNxJsonPrompt,
@@ -49,7 +49,7 @@ describe('getTokenLimitedToolResult', () => {
     mockGetProjectGraphPrompt.mockReturnValue('small');
     mockGetProjectGraphErrorsPrompt.mockReturnValue('small');
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 1000);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 1000);
 
     expect(result).toEqual(['small', 'small', '']);
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(1);
@@ -68,7 +68,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce('short'); // Second call - stops optimization
 
     // Use a very low token limit to trigger optimization
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(2);
     expect(mockGetProjectGraphPrompt).toHaveBeenNthCalledWith(
@@ -94,7 +94,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce(largeString) // Second call - still large, continues optimization
       .mockReturnValueOnce('short'); // Third call - stops optimization
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(3);
     expect(mockGetProjectGraphPrompt).toHaveBeenNthCalledWith(
@@ -126,7 +126,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce(largeString) // Third call - still large, continues
       .mockReturnValueOnce('short'); // Fourth call - stops optimization
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(4);
     expect(mockGetProjectGraphPrompt).toHaveBeenNthCalledWith(
@@ -151,7 +151,7 @@ describe('getTokenLimitedToolResult', () => {
       .mockReturnValueOnce(largeString)
       .mockReturnValueOnce(largeString);
 
-    const result = getTokenLimitedToolResult(mockWorkspace, 50);
+    const result = getTokenOptimizedToolResult(mockWorkspace, 50);
 
     expect(mockGetProjectGraphPrompt).toHaveBeenCalledTimes(4);
   });
@@ -168,7 +168,7 @@ describe('getTokenLimitedToolResult', () => {
     mockGetProjectGraphPrompt.mockReturnValue('small');
     mockGetProjectGraphErrorsPrompt.mockReturnValue('error-result');
 
-    const result = getTokenLimitedToolResult(workspaceWithErrors, 1000);
+    const result = getTokenOptimizedToolResult(workspaceWithErrors, 1000);
 
     expect(mockGetProjectGraphErrorsPrompt).toHaveBeenCalledWith(
       [mockError],
@@ -187,9 +187,113 @@ describe('getTokenLimitedToolResult', () => {
     mockGetNxJsonPrompt.mockReturnValue('small');
     mockGetProjectGraphPrompt.mockReturnValue('small');
 
-    const result = getTokenLimitedToolResult(workspaceWithoutErrors, 1000);
+    const result = getTokenOptimizedToolResult(workspaceWithoutErrors, 1000);
 
     expect(mockGetProjectGraphErrorsPrompt).not.toHaveBeenCalled();
     expect(result).toEqual(['small', 'small', '']);
+  });
+});
+
+describe('chunkContent', () => {
+  it('should return first chunk when pageNumber is 0', () => {
+    const content = 'abcdefghij';
+    const result = chunkContent(content, 0, 5);
+
+    expect(result.chunk).toBe('abcde\n...[truncated, continue on page 1]');
+    expect(result.hasMore).toBe(true);
+  });
+
+  it('should return second chunk when pageNumber is 1', () => {
+    const content = 'abcdefghij';
+    const result = chunkContent(content, 1, 5);
+
+    expect(result.chunk).toBe('fghij');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should return empty chunk when pageNumber is beyond content', () => {
+    const content = 'abcde';
+    const result = chunkContent(content, 2, 5);
+
+    expect(result.chunk).toBe('no more content on page 2');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should return entire content when chunkSize is larger', () => {
+    const content = 'abcde';
+    const result = chunkContent(content, 0, 100);
+
+    expect(result.chunk).toBe('abcde');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should handle empty content', () => {
+    const content = '';
+    const result = chunkContent(content, 0, 5);
+
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should indicate hasMore correctly for exact chunk boundary', () => {
+    const content = 'abcdefghij';
+    const result = chunkContent(content, 0, 10);
+
+    expect(result.chunk).toBe('abcdefghij');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should indicate hasMore correctly when one char remains', () => {
+    const content = 'abcdefghijk';
+    const result = chunkContent(content, 0, 10);
+
+    expect(result.chunk).toBe('abcdefghij\n...[truncated, continue on page 1]');
+    expect(result.hasMore).toBe(true);
+  });
+
+  it('should handle multiple pages correctly', () => {
+    const content = 'abcdefghijklmnopqrst';
+
+    const page0 = chunkContent(content, 0, 5);
+    expect(page0.chunk).toBe('abcde\n...[truncated, continue on page 1]');
+    expect(page0.hasMore).toBe(true);
+
+    const page1 = chunkContent(content, 1, 5);
+    expect(page1.chunk).toBe('fghij\n...[truncated, continue on page 2]');
+    expect(page1.hasMore).toBe(true);
+
+    const page2 = chunkContent(content, 2, 5);
+    expect(page2.chunk).toBe('klmno\n...[truncated, continue on page 3]');
+    expect(page2.hasMore).toBe(true);
+
+    const page3 = chunkContent(content, 3, 5);
+    expect(page3.chunk).toBe('pqrst');
+    expect(page3.hasMore).toBe(false);
+  });
+
+  it('should handle null content', () => {
+    const result = chunkContent(null as any, 0, 5);
+
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should handle undefined content', () => {
+    const result = chunkContent(undefined as any, 0, 5);
+
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should show correct page number in no more content message for different pages', () => {
+    const content = 'abcde';
+
+    const page5 = chunkContent(content, 5, 5);
+    expect(page5.chunk).toBe('no more content on page 5');
+    expect(page5.hasMore).toBe(false);
+
+    const page10 = chunkContent(content, 10, 5);
+    expect(page10.chunk).toBe('no more content on page 10');
+    expect(page10.hasMore).toBe(false);
   });
 });
