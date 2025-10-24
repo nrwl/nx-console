@@ -1,3 +1,9 @@
+## 18.74.2 (2025-10-24)
+
+### 🩹 Fixes
+
+- **vscode:** skip configure-ai-agents for older node versions ([#2840](https://github.com/nrwl/nx-console/pull/2840))
+
 ## 18.74.1 (2025-10-23)
 
 ### 🩹 Fixes
