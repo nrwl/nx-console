@@ -5,19 +5,24 @@ import { join, parse } from 'path';
 import { TreeItemCollapsibleState } from 'vscode';
 import {
   BaseView,
+  DaemonDisabledViewItem,
+  DaemonWatcherNotRunningViewItem,
   FolderViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
+import { WatcherRunningService } from '@nx-console/vscode-lsp-client';
 
 export type TreeViewItem =
   | FolderViewItem
   | ProjectViewItem
   | TargetViewItem
   | TargetGroupViewItem
-  | ProjectGraphErrorViewItem;
+  | ProjectGraphErrorViewItem
+  | DaemonDisabledViewItem
+  | DaemonWatcherNotRunningViewItem;
 
 export type ProjectInfo = {
   dir: string;
@@ -30,15 +35,23 @@ export class TreeView extends BaseView {
   roots: TreeNode[];
 
   async getChildren(
-    element?: TreeViewItem
+    element?: TreeViewItem,
   ): Promise<TreeViewItem[] | undefined> {
     if (!element) {
       const items: TreeViewItem[] = [];
 
       if (this.workspaceData?.errors) {
         items.push(
-          this.createProjectGraphErrorViewItem(this.workspaceData.errors.length)
+          this.createProjectGraphErrorViewItem(
+            this.workspaceData.errors.length,
+          ),
         );
+      }
+
+      if (this.workspaceData.daemonEnabled === false) {
+        items.push(this.createDaemonDisabledViewItem());
+      } else if (WatcherRunningService.INSTANCE.isOperational === false) {
+        items.push(this.createDaemonWatcherNotRunningViewItem());
       }
 
       // if there's only a single root, start with it expanded
@@ -58,9 +71,9 @@ export class TreeView extends BaseView {
               root,
               isSingleProject
                 ? TreeItemCollapsibleState.Expanded
-                : TreeItemCollapsibleState.Collapsed
-            )
-          )
+                : TreeItemCollapsibleState.Collapsed,
+            ),
+          ),
       );
       return items;
     }
@@ -74,8 +87,8 @@ export class TreeView extends BaseView {
           .get(element.nxProject.root)!
           .children.map((folderOrProjectNodeDir) =>
             this.createFolderOrProjectTreeItemFromNode(
-              this.treeMap.get(folderOrProjectNodeDir)!
-            )
+              this.treeMap.get(folderOrProjectNodeDir)!,
+            ),
           );
       }
       return [...targetChildren, ...folderAndProjectChildren];
@@ -87,8 +100,8 @@ export class TreeView extends BaseView {
           .get(element.path)!
           .children.map((folderOrProjectNodeDir) =>
             this.createFolderOrProjectTreeItemFromNode(
-              this.treeMap.get(folderOrProjectNodeDir)!
-            )
+              this.treeMap.get(folderOrProjectNodeDir)!,
+            ),
           );
       }
     }
@@ -104,7 +117,7 @@ export class TreeView extends BaseView {
 
   private createFolderTreeItem(
     path: string,
-    collapsible = TreeItemCollapsibleState.Collapsed
+    collapsible = TreeItemCollapsibleState.Collapsed,
   ): FolderViewItem {
     const folderName = parse(path).base;
     /**
@@ -125,13 +138,13 @@ export class TreeView extends BaseView {
 
   private createFolderOrProjectTreeItemFromNode(
     node: TreeNode,
-    collapsible = TreeItemCollapsibleState.Collapsed
+    collapsible = TreeItemCollapsibleState.Collapsed,
   ): ProjectViewItem | FolderViewItem {
     const config = node.projectConfiguration;
     return config
       ? this.createProjectViewItem(
           [config.name ?? node.projectName ?? '', config],
-          collapsible
+          collapsible,
         )
       : this.createFolderTreeItem(node.dir, collapsible);
   }
