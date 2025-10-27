@@ -1,5 +1,6 @@
 import {
   BaseView,
+  DaemonDisabledViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
@@ -10,7 +11,8 @@ export type ListViewItem =
   | ProjectViewItem
   | TargetViewItem
   | TargetGroupViewItem
-  | ProjectGraphErrorViewItem;
+  | ProjectGraphErrorViewItem
+  | DaemonDisabledViewItem;
 
 export class ListView extends BaseView {
   async getChildren(element?: ListViewItem) {
@@ -18,8 +20,13 @@ export class ListView extends BaseView {
       const items: ListViewItem[] = [];
       if (this.workspaceData?.errors) {
         items.push(
-          this.createProjectGraphErrorViewItem(this.workspaceData.errors.length)
+          this.createProjectGraphErrorViewItem(
+            this.workspaceData.errors.length,
+          ),
         );
+      }
+      if (this.workspaceData.daemonEnabled === false) {
+        items.push(this.createDaemonDisabledViewItem());
       }
       // should return root elements if no element was passed
       items.push(...(await this.createProjects()));
@@ -34,7 +41,9 @@ export class ListView extends BaseView {
     if (element.contextValue === 'projectGraphError') {
       return [];
     }
-    return this.createConfigurationsFromTarget(element);
+    if (element.contextValue === 'target') {
+      return this.createConfigurationsFromTarget(element);
+    }
   }
 
   private async createProjects() {
@@ -43,7 +52,7 @@ export class ListView extends BaseView {
       return [];
     }
     return Object.entries(projectDefs).map((project) =>
-      this.createProjectViewItem(project)
+      this.createProjectViewItem(project),
     );
   }
 }

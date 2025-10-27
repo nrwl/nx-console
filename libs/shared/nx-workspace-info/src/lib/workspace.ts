@@ -15,6 +15,7 @@ import {
 } from 'rxjs';
 import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
+import { getNxDaemonClient } from './get-nx-workspace-package';
 
 const enum Status {
   not_started,
@@ -62,6 +63,7 @@ async function _workspace(
   logger: Logger,
 ): Promise<NxWorkspace> {
   try {
+    const daemonClientModule = await getNxDaemonClient(workspacePath, logger);
     const nxVersion = await getNxVersion(workspacePath);
     const {
       projectGraph,
@@ -75,6 +77,7 @@ async function _workspace(
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
     return {
+      daemonEnabled: daemonClientModule?.isDaemonEnabled() ?? false,
       projectGraph: projectGraph ?? {
         nodes: {},
         dependencies: {},
@@ -99,6 +102,7 @@ async function _workspace(
 
     // Default to nx workspace
     return {
+      daemonEnabled: false,
       validWorkspaceJson: false,
       projectGraph: {
         nodes: {},

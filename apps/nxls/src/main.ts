@@ -83,6 +83,7 @@ import {
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   getGenerators,
+  getNxDaemonClient,
   getNxVersion,
   nxWorkspace,
   resetNxVersionCache,
@@ -154,6 +155,7 @@ connection.onInitialize(async (params) => {
     CLIENT_CAPABILITIES = params.capabilities;
 
     await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {

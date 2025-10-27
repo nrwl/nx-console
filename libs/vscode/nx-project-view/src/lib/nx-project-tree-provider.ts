@@ -147,7 +147,8 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       viewItem.contextValue === 'project' ||
       viewItem.contextValue === 'folder' ||
       viewItem.contextValue === 'targetGroup' ||
-      viewItem.contextValue === 'projectGraphError'
+      viewItem.contextValue === 'projectGraphError' ||
+      viewItem.contextValue === 'daemonDisabled'
     ) {
       // can not run a task on a project, folder or target group
       return;

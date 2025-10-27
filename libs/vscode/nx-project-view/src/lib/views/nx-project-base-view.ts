@@ -46,6 +46,8 @@ export interface ProjectGraphErrorViewItem
   errorCount: number;
 }
 
+export type DaemonDisabledViewItem = BaseViewItem<'daemonDisabled'>;
+
 export interface NxProject {
   project: string;
   root: string;
@@ -246,6 +248,15 @@ export abstract class BaseView {
       contextValue: 'projectGraphError',
       errorCount: count,
       label: `Project Graph Error`,
+      collapsible: TreeItemCollapsibleState.None,
+    };
+  }
+
+  createDaemonDisabledViewItem(): DaemonDisabledViewItem {
+    return {
+      id: 'daemonDisabled',
+      contextValue: 'daemonDisabled',
+      label: `Nx Daemon is Disabled`,
       collapsible: TreeItemCollapsibleState.None,
     };
   }
