@@ -1,4 +1,8 @@
-import { showRefreshLoadingAtLocation } from '@nx-console/vscode-lsp-client';
+import {
+  getNxlsClient,
+  NxlsClient,
+  showRefreshLoadingAtLocation,
+} from '@nx-console/vscode-lsp-client';
 import { selectProject } from '@nx-console/vscode-nx-cli-quickpicks';
 import { revealNxProject } from '@nx-console/vscode-nx-config-decoration';
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
@@ -8,6 +12,14 @@ import { AtomizerDecorationProvider } from './atomizer-decorations';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import { NxTreeItem } from './nx-tree-item';
 import { ProjectGraphErrorDecorationProvider } from './project-graph-error-decorations';
+import {
+  NxStartDaemonRequest,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server-types';
+import {
+  logAndShowError,
+  showErrorMessageWithOpenLogs,
+} from '@nx-console/vscode-output-channels';
 
 export function initNxProjectView(
   context: ExtensionContext,
@@ -19,10 +31,14 @@ export function initNxProjectView(
   });
 
   context.subscriptions.push(nxProjectTreeView);
-
-  commands.registerCommand(
-    'nxConsole.showProjectConfiguration',
-    showProjectConfiguration,
+  context.subscriptions.push(
+    commands.registerCommand(
+      'nxConsole.showProjectConfiguration',
+      showProjectConfiguration,
+    ),
+    commands.registerCommand('nxConsole.restartDaemonWatcher', async () => {
+      await tryRestartDaemonWatcher();
+    }),
   );
 
   AtomizerDecorationProvider.register(context);
@@ -49,7 +65,9 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   const viewItem = selection.item;
   if (
     viewItem.contextValue === 'folder' ||
-    viewItem.contextValue === 'projectGraphError'
+    viewItem.contextValue === 'projectGraphError' ||
+    viewItem.contextValue === 'daemonDisabled' ||
+    viewItem.contextValue === 'daemonWatcherNotRunning'
   ) {
     return;
   }
@@ -63,4 +81,18 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   }
   const target = viewItem.nxTarget;
   return revealNxProject(project, root, target);
+}
+
+async function tryRestartDaemonWatcher() {
+  getTelemetry().logUsage('misc.restart-daemon-watcher');
+
+  const nxlsClient = getNxlsClient();
+  try {
+    await nxlsClient.sendRequest(NxStartDaemonRequest, undefined);
+  } catch (e) {
+    showErrorMessageWithOpenLogs('Failed to start Nx daemon watcher');
+    return;
+  }
+
+  await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 }

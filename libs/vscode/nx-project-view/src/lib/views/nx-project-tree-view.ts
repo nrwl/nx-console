@@ -5,19 +5,24 @@ import { join, parse } from 'path';
 import { TreeItemCollapsibleState } from 'vscode';
 import {
   BaseView,
+  DaemonDisabledViewItem,
+  DaemonWatcherNotRunningViewItem,
   FolderViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
+import { WatcherRunningService } from '@nx-console/vscode-lsp-client';
 
 export type TreeViewItem =
   | FolderViewItem
   | ProjectViewItem
   | TargetViewItem
   | TargetGroupViewItem
-  | ProjectGraphErrorViewItem;
+  | ProjectGraphErrorViewItem
+  | DaemonDisabledViewItem
+  | DaemonWatcherNotRunningViewItem;
 
 export type ProjectInfo = {
   dir: string;
@@ -41,6 +46,12 @@ export class TreeView extends BaseView {
             this.workspaceData.errors.length,
           ),
         );
+      }
+
+      if (this.workspaceData.daemonEnabled === false) {
+        items.push(this.createDaemonDisabledViewItem());
+      } else if (WatcherRunningService.INSTANCE.isOperational === false) {
+        items.push(this.createDaemonWatcherNotRunningViewItem());
       }
 
       // if there's only a single root, start with it expanded

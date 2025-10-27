@@ -25,6 +25,10 @@ export async function getNxWorkspaceConfig(
   workspacePath: string,
   nxVersion: NxVersion,
   logger: Logger,
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
 ): Promise<{
   projectGraph: ProjectGraph | undefined;
   sourceMaps: ConfigurationSourceMaps | undefined;
@@ -100,67 +104,88 @@ export async function getNxWorkspaceConfig(
       });
     }
 
-    try {
-      _defaultProcessExit = process.exit;
-      process.exit = function (code?: number) {
-        console.warn('process.exit called with code', code);
-      } as (code?: number) => never;
+    if (!projectGraphAndSourceMaps) {
+      try {
+        _defaultProcessExit = process.exit;
+        process.exit = function (code?: number) {
+          console.warn('process.exit called with code', code);
+        } as (code?: number) => never;
 
-      if (nxOutput !== undefined) {
-        nxOutput.output.error = (output) => {
-          // do nothing
-        };
-        nxOutput.output.log = (output) => {
-          // do nothing
-        };
-      }
+        if (nxOutput !== undefined) {
+          nxOutput.output.error = (output) => {
+            // do nothing
+          };
+          nxOutput.output.log = (output) => {
+            // do nothing
+          };
+        }
 
-      if (gte(nxVersion, '17.2.0')) {
-        logger.log('createProjectGraphAndSourceMapsAsync');
-        try {
-          const projectGraphAndSourceMaps = await (
-            nxProjectGraph as any
-          ).createProjectGraphAndSourceMapsAsync({
+        if (gte(nxVersion, '17.2.0')) {
+          logger.log('createProjectGraphAndSourceMapsAsync');
+          try {
+            const projectGraphAndSourceMaps = await (
+              nxProjectGraph as any
+            ).createProjectGraphAndSourceMapsAsync({
+              exitOnError: false,
+            });
+            projectGraph = projectGraphAndSourceMaps.projectGraph;
+
+            sourceMaps = projectGraphAndSourceMaps.sourceMaps;
+          } catch (e) {
+            if (isProjectGraphError(e)) {
+              logger.log('caught ProjectGraphError, using partial graph');
+              projectGraph = e.getPartialProjectGraph() ?? {
+                nodes: {},
+                dependencies: {},
+              };
+              sourceMaps = e.getPartialSourcemaps();
+              errors = e.getErrors().map((error) => ({
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+                file:
+                  (error as any).file ??
+                  ((error as any).cause as any)?.errors?.[0]?.location?.file,
+                pluginName: (error as any).pluginName,
+                cause: (error as any).cause,
+              }));
+              isPartial = true;
+            } else {
+              throw e;
+            }
+          }
+          logger.log('createProjectGraphAndSourceMapsAsync successful');
+        } else {
+          logger.log('createProjectGraphAsync');
+          projectGraph = await nxProjectGraph.createProjectGraphAsync({
             exitOnError: false,
           });
-          projectGraph = projectGraphAndSourceMaps.projectGraph;
-
-          sourceMaps = projectGraphAndSourceMaps.sourceMaps;
-        } catch (e) {
-          if (isProjectGraphError(e)) {
-            logger.log('caught ProjectGraphError, using partial graph');
-            projectGraph = e.getPartialProjectGraph() ?? {
-              nodes: {},
-              dependencies: {},
-            };
-            sourceMaps = e.getPartialSourcemaps();
-            errors = e.getErrors().map((error) => ({
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-              file:
-                (error as any).file ??
-                ((error as any).cause as any)?.errors?.[0]?.location?.file,
-              pluginName: (error as any).pluginName,
-              cause: (error as any).cause,
-            }));
-            isPartial = true;
-          } else {
-            throw e;
-          }
+          logger.log('createProjectGraphAsync successful');
         }
-        logger.log('createProjectGraphAndSourceMapsAsync successful');
-      } else {
-        logger.log('createProjectGraphAsync');
-        projectGraph = await nxProjectGraph.createProjectGraphAsync({
-          exitOnError: false,
-        });
-        logger.log('createProjectGraphAsync successful');
+      } catch (e) {
+        logger.log('Unable to get project graph');
+        logger.log(e.stack);
+        errors = [{ stack: e.stack }];
       }
-    } catch (e) {
-      logger.log('Unable to get project graph');
-      logger.log(e.stack);
-      errors = [{ stack: e.stack }];
+
+      // reset the daemon client after getting all required information from the daemon
+      if (
+        nxDaemonClientModule &&
+        nxDaemonClientModule.daemonClient?.enabled()
+      ) {
+        try {
+          logger.log('Resetting daemon client');
+          nxDaemonClientModule.daemonClient?.reset();
+        } catch (e) {
+          logger.log(`Error while resetting daemon client, moving on...`);
+        }
+      }
+    } else {
+      logger.log(
+        'received project graph and source maps, skipping recomputation',
+      );
+      projectGraph = projectGraphAndSourceMaps.projectGraph;
+      sourceMaps = projectGraphAndSourceMaps.sourceMaps;
     }
 
     if (gte(nxVersion, '16.3.1') && projectGraph) {
@@ -174,16 +199,6 @@ export async function getNxWorkspaceConfig(
         projectFileMap[projectName] =
           (projectGraph?.nodes[projectName].data as any).files ?? [];
       });
-    }
-
-    // reset the daemon client after getting all required information from the daemon
-    if (nxDaemonClientModule && nxDaemonClientModule.daemonClient?.enabled()) {
-      try {
-        logger.log('Resetting daemon client');
-        nxDaemonClientModule.daemonClient?.reset();
-      } catch (e) {
-        logger.log(`Error while resetting daemon client, moving on...`);
-      }
     }
 
     const end = performance.now();

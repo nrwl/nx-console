@@ -10,9 +10,6 @@
   "include": ["**/*.ts"],
   "references": [
     {
-      "path": "../output-channels/tsconfig.lib.json"
-    },
-    {
       "path": "../../shared/nx-console-plugins/tsconfig.lib.json"
     },
     {
@@ -26,6 +23,12 @@
     },
     {
       "path": "../../shared/types/tsconfig.lib.json"
+    },
+    {
+      "path": "../output-channels/tsconfig.lib.json"
+    },
+    {
+      "path": "../../language-server/types/tsconfig.lib.json"
     },
     {
       "path": "../telemetry/tsconfig.lib.json"
