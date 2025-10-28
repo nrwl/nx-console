@@ -59,11 +59,11 @@ async function main() {
 
   if (argv.transport === 'stdio') {
     logger = {
-      log: (message: string) => {
+      log: (data: string) => {
         if (mcpStdioConnected) {
           mcpServer.server.sendLoggingMessage({
             level: 'info',
-            message,
+            data,
           });
         } else {
           // do nothing
