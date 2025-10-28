@@ -1,6 +1,7 @@
 import {
   BaseView,
   DaemonDisabledViewItem,
+  DaemonNotRunningViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
@@ -12,7 +13,8 @@ export type ListViewItem =
   | TargetViewItem
   | TargetGroupViewItem
   | ProjectGraphErrorViewItem
-  | DaemonDisabledViewItem;
+  | DaemonDisabledViewItem
+  | DaemonNotRunningViewItem;
 
 export class ListView extends BaseView {
   async getChildren(element?: ListViewItem) {
@@ -27,6 +29,8 @@ export class ListView extends BaseView {
       }
       if (this.workspaceData.daemonEnabled === false) {
         items.push(this.createDaemonDisabledViewItem());
+      } else if (this.workspaceData.daemonRunning === false) {
+        items.push(this.createDaemonNotRunningViewItem());
       }
       // should return root elements if no element was passed
       items.push(...(await this.createProjects()));

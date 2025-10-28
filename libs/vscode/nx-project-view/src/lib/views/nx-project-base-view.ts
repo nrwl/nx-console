@@ -48,6 +48,8 @@ export interface ProjectGraphErrorViewItem
 
 export type DaemonDisabledViewItem = BaseViewItem<'daemonDisabled'>;
 
+export type DaemonNotRunningViewItem = BaseViewItem<'daemonNotRunning'>;
+
 export interface NxProject {
   project: string;
   root: string;
@@ -257,6 +259,15 @@ export abstract class BaseView {
       id: 'daemonDisabled',
       contextValue: 'daemonDisabled',
       label: `Nx Daemon is Disabled`,
+      collapsible: TreeItemCollapsibleState.None,
+    };
+  }
+
+  createDaemonNotRunningViewItem(): DaemonNotRunningViewItem {
+    return {
+      id: 'daemonNotRunning',
+      contextValue: 'daemonNotRunning',
+      label: `Nx Daemon is Not Running`,
       collapsible: TreeItemCollapsibleState.None,
     };
   }

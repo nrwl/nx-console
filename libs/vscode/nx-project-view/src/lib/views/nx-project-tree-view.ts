@@ -6,6 +6,7 @@ import { TreeItemCollapsibleState } from 'vscode';
 import {
   BaseView,
   DaemonDisabledViewItem,
+  DaemonNotRunningViewItem,
   FolderViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
@@ -19,7 +20,8 @@ export type TreeViewItem =
   | TargetViewItem
   | TargetGroupViewItem
   | ProjectGraphErrorViewItem
-  | DaemonDisabledViewItem;
+  | DaemonDisabledViewItem
+  | DaemonNotRunningViewItem;
 
 export type ProjectInfo = {
   dir: string;
@@ -45,8 +47,12 @@ export class TreeView extends BaseView {
         );
       }
 
+      console.log('Daemon enabled:', this.workspaceData?.daemonEnabled);
+      console.log('Daemon running:', this.workspaceData?.daemonRunning);
       if (this.workspaceData.daemonEnabled === false) {
         items.push(this.createDaemonDisabledViewItem());
+      } else if (this.workspaceData.daemonRunning === false) {
+        items.push(this.createDaemonNotRunningViewItem());
       }
 
       // if there's only a single root, start with it expanded

@@ -267,6 +267,8 @@ async function runAiAgentCheck() {
 
       // Return early - we showed the update notification
       return;
+    } finally {
+      getTelemetry().logUsage('ai.configure-agents-check-finally');
     }
 
     // If we get here, the update check passed (no updates needed)

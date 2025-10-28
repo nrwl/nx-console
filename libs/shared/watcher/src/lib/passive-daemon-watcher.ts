@@ -4,14 +4,19 @@ import { randomUUID } from 'crypto';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 
+export type DaemonWatcherCallback = (
+  error: Error | null | 'closed',
+  projectGraphAndSourceMaps: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
+) => void;
+
 // uses the daemon client to subscribe to project graph change events
 // doesn't fallback to native watcher and doesn't work on older versions of nx
 // that's an acceptable limitation for keeping this as lean as possible
 export class PassiveDaemonWatcher {
-  private listeners: Map<
-    string,
-    (error: Error | null | 'closed', projectGraph: ProjectGraph | null) => void
-  > = new Map();
+  private listeners: Map<string, DaemonWatcherCallback> = new Map();
 
   private unregisterCallback?: () => void;
 
@@ -20,12 +25,7 @@ export class PassiveDaemonWatcher {
     private logger: Logger,
   ) {}
 
-  listen(
-    callback: (
-      error: Error | null | 'closed',
-      projectGraph: ProjectGraph | null,
-    ) => void,
-  ): () => void {
+  listen(callback: DaemonWatcherCallback): () => void {
     const id = randomUUID();
     this.listeners.set(id, callback);
     return () => {
@@ -59,7 +59,7 @@ export class PassiveDaemonWatcher {
           } | null,
         ) => {
           this.listeners.forEach((listener) =>
-            listener(error, projectGraphAndSourceMaps?.projectGraph ?? null),
+            listener(error, projectGraphAndSourceMaps),
           );
         },
       );

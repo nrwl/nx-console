@@ -109,6 +109,8 @@ import {
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { NativeWatcher } from '@nx-console/shared-watcher';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -158,11 +160,18 @@ connection.onInitialize(async (params) => {
 
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
-      async () => {
+      async (error, projectGraphAndSourceMaps) => {
         if (!WORKING_PATH) {
           return;
         }
-        await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+        if (error) {
+          lspLogger.log(error.toString());
+        } else {
+          await reconfigureAndSendNotificationWithBackoff(
+            WORKING_PATH,
+            projectGraphAndSourceMaps,
+          );
+        }
       },
     );
   } catch (e) {
@@ -674,11 +683,17 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
-async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
+async function reconfigureAndSendNotificationWithBackoff(
+  workingPath: string,
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
+) {
   if (reconfigureAttempts === 0) {
     connection.sendNotification(NxWorkspaceRefreshStartedNotification.method);
   }
-  const workspace = await reconfigure(workingPath);
+  const workspace = await reconfigure(workingPath, projectGraphAndSourceMaps);
   await connection.sendNotification(NxWorkspaceRefreshNotification.method);
 
   if (
@@ -711,20 +726,27 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
 
 async function reconfigure(
   workingPath: string,
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
 ): Promise<NxWorkspace | undefined> {
   resetNxVersionCache();
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
   resetInferencePluginsCompletionCache();
 
-  const workspace = await nxWorkspace(workingPath, lspLogger, true);
+  const workspace = await nxWorkspace(
+    workingPath,
+    lspLogger,
+    true,
+    projectGraphAndSourceMaps,
+  );
   await configureSchemas(workingPath, CLIENT_CAPABILITIES);
 
-  await unregisterFileWatcher();
-
-  unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
-    reconfigureAndSendNotificationWithBackoff(workingPath);
-  });
+  // unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
+  //   reconfigureAndSendNotificationWithBackoff(workingPath);
+  // });
 
   return workspace;
 }

@@ -16,6 +16,9 @@ import {
 import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 import { getNxDaemonClient } from './get-nx-workspace-package';
+import type { ProjectGraph } from 'nx/src/devkit-exports';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import { execSync } from 'child_process';
 
 const enum Status {
   not_started,
@@ -35,8 +38,12 @@ export async function nxWorkspace(
   workspacePath: string,
   logger: Logger,
   reset?: boolean,
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
 ): Promise<NxWorkspace> {
-  if (reset) {
+  if (reset || projectGraphAndSourceMaps) {
     resetStatus(workspacePath);
   }
 
@@ -47,7 +54,9 @@ export async function nxWorkspace(
         tap(() => {
           status = Status.in_progress;
         }),
-        switchMap(() => from(_workspace(workspacePath, logger))),
+        switchMap(() =>
+          from(_workspace(workspacePath, logger, projectGraphAndSourceMaps)),
+        ),
         tap((workspace) => {
           cachedReplay.next(workspace);
           status = Status.cached;
@@ -61,10 +70,15 @@ export async function nxWorkspace(
 async function _workspace(
   workspacePath: string,
   logger: Logger,
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
 ): Promise<NxWorkspace> {
   try {
     const daemonClientModule = await getNxDaemonClient(workspacePath, logger);
     const nxVersion = await getNxVersion(workspacePath);
+
     const {
       projectGraph,
       sourceMaps,
@@ -72,12 +86,24 @@ async function _workspace(
       projectFileMap,
       errors,
       isPartial,
-    } = await getNxWorkspaceConfig(workspacePath, nxVersion, logger);
+    } = await getNxWorkspaceConfig(
+      workspacePath,
+      nxVersion,
+      logger,
+      projectGraphAndSourceMaps,
+    );
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
+    const isAvailable =
+      await daemonClientModule?.daemonClient.isServerAvailable();
+    const isRunning = execSync(`npx nx daemon`);
+
+    logger.log(`isAvailable: ${isAvailable}, isRunning: ${isRunning}`);
     return {
       daemonEnabled: daemonClientModule?.isDaemonEnabled() ?? false,
+      daemonRunning:
+        (await daemonClientModule?.daemonClient.isServerAvailable()) ?? false,
       projectGraph: projectGraph ?? {
         nodes: {},
         dependencies: {},
@@ -103,6 +129,7 @@ async function _workspace(
     // Default to nx workspace
     return {
       daemonEnabled: false,
+      daemonRunning: false,
       validWorkspaceJson: false,
       projectGraph: {
         nodes: {},

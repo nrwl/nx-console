@@ -8,7 +8,7 @@ import {
 } from './views/nx-project-base-view';
 import { ATOMIZED_SCHEME } from './atomizer-decorations';
 import {
-  NX_DAEMON_DISABLED_DECORATION_SCHEME,
+  NX_DAEMON_WARNING_DECORATION_SCHEME,
   PROJECT_GRAPH_ERROR_DECORATION_SCHEME,
 } from './project-graph-error-decorations';
 
@@ -37,9 +37,18 @@ export class NxTreeItem extends TreeItem {
       this.tooltip = `${item.errorCount} errors detected. The project graph may be missing some information`;
     } else if (item.contextValue === 'daemonDisabled') {
       this.resourceUri = Uri.from({
-        scheme: NX_DAEMON_DISABLED_DECORATION_SCHEME,
+        scheme: NX_DAEMON_WARNING_DECORATION_SCHEME,
         path: '1',
       });
+      this.tooltip =
+        'Nx Daemon is disabled. Nx Console will not receive file changes. Click to learn more.';
+    } else if (item.contextValue === 'daemonNotRunning') {
+      this.resourceUri = Uri.from({
+        scheme: NX_DAEMON_WARNING_DECORATION_SCHEME,
+        path: '2',
+      });
+      this.tooltip =
+        'Nx Daemon is not running. Nx Console will not receive file changes. Click to learn more.';
     }
 
     this.setIcons(item.iconPath);

@@ -1,6 +1,9 @@
 import { lspLogger } from '@nx-console/language-server-utils';
 import { getNxDaemonClient } from '@nx-console/shared-nx-workspace-info';
-import { PassiveDaemonWatcher } from '@nx-console/shared-watcher';
+import {
+  DaemonWatcherCallback,
+  PassiveDaemonWatcher,
+} from '@nx-console/shared-watcher';
 
 let _daemonWatcher: PassiveDaemonWatcher | undefined;
 
@@ -23,7 +26,7 @@ export async function cleanupAllWatchers(): Promise<void> {
 
 export async function languageServerWatcher(
   workspacePath: string,
-  callback: () => unknown,
+  callback: DaemonWatcherCallback,
 ): Promise<() => Promise<void>> {
   const daemonClient = await getNxDaemonClient(workspacePath, lspLogger);
 
@@ -35,8 +38,8 @@ export async function languageServerWatcher(
   }
   _daemonWatcher = new PassiveDaemonWatcher(workspacePath, lspLogger);
   await _daemonWatcher.start();
-  _daemonWatcher.listen(() => {
-    callback();
+  _daemonWatcher.listen((error, projectGraphAndSourceMaps) => {
+    callback(error, projectGraphAndSourceMaps);
   });
   return async () => {
     if (_daemonWatcher) {
