@@ -112,23 +112,6 @@ async function runAiAgentCheck() {
     return;
   }
 
-  // Check Node version - only run on Node 18+
-  try {
-    const nodeVersion = (await promisify(exec)('node --version')).stdout.trim();
-    const majorVersion = parseInt(nodeVersion.replace('v', '').split('.')[0]);
-    if (majorVersion < 18) {
-      return;
-    }
-  } catch (e) {
-    return;
-  }
-
-  // Check nx@latest version - only run if >= 22 (when configure-ai-agents was added)
-  const nxLatestVersion = await getNxLatestVersion();
-  if (!nxLatestVersion || !gte(nxLatestVersion, '22.0.0')) {
-    return;
-  }
-
   const now = Date.now();
 
   const lastUpdateNotificationTimestamp =
@@ -146,6 +129,23 @@ async function runAiAgentCheck() {
     return;
   }
 
+  // Check Node version - only run on Node 20+
+  try {
+    const nodeVersion = (await promisify(exec)('node --version')).stdout.trim();
+    const majorVersion = parseInt(nodeVersion.replace('v', '').split('.')[0]);
+    if (majorVersion < 20) {
+      return;
+    }
+  } catch (e) {
+    return;
+  }
+
+  // Check nx@latest version - only run if >= 22 (when configure-ai-agents was added)
+  const nxLatestVersion = await getNxLatestVersion();
+  if (!nxLatestVersion || !gte(nxLatestVersion, '22.0.0')) {
+    return;
+  }
+
   try {
     const hasProvenance = await nxLatestProvenanceCheck();
     if (hasProvenance !== true) {
@@ -156,7 +156,7 @@ async function runAiAgentCheck() {
       getTelemetry().logUsage('ai.configure-agents-check-start');
       await promisify(exec)(constructCommand('--check'), {
         cwd: workspacePath,
-        timeout: 90000,
+        timeout: 120000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
@@ -187,9 +187,9 @@ async function runAiAgentCheck() {
 
         const preserveModulePath = (text: string) =>
           text.replace(
-            /Cannot find module (.+?)\s+at/g,
+            /Cannot find module ['"](.+?)['"]/g,
             (_match: string, modulePath: string) => {
-              return `Cannot find module ${modulePath.replace(/\//g, '&')} at`;
+              return `Cannot find module ${modulePath.replace(/\//g, '&')}`;
             },
           );
 
@@ -287,7 +287,7 @@ async function runAiAgentCheck() {
     try {
       await promisify(exec)(checkAllCommand, {
         cwd: workspacePath,
-        timeout: 90000,
+        timeout: 120000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
