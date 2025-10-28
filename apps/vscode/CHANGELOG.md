@@ -1,3 +1,13 @@
+## 18.74.4 (2025-10-28)
+
+### 🩹 Fixes
+
+- **vscode:** only configure ai agents on node 20+ and other improvements ([#2847](https://github.com/nrwl/nx-console/pull/2847))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 18.74.3 (2025-10-24)
 
 ### 🩹 Fixes
