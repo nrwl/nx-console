@@ -2,14 +2,10 @@ package dev.nx.console.cloud
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.*
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import dev.nx.console.mcp.McpServerService
-import dev.nx.console.mcp.hasAIAssistantAvailable
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
