@@ -7,7 +7,13 @@
       "path": "../../shared/watcher"
     },
     {
+      "path": "../../shared/utils"
+    },
+    {
       "path": "../../shared/nx-workspace-info"
+    },
+    {
+      "path": "../../shared/nx-version"
     },
     {
       "path": "../utils"
