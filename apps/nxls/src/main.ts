@@ -89,7 +89,6 @@ const fileWatcherCallback: DaemonWatcherCallback = async (
   );
 };
 const fileWatcherOperationalCallback = (isOperational: boolean) => {
-  lspLogger.log(`File watcher is operational: ${isOperational}`);
   connection.sendNotification(NxWatcherOperationalNotification.method, {
     isOperational,
   });

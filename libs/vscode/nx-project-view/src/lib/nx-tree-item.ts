@@ -41,14 +41,14 @@ export class NxTreeItem extends TreeItem {
         path: '1',
       });
       this.tooltip =
-        'Nx Daemon is disabled. Nx Console will not receive file changes. Click to learn more.';
+        'Nx Daemon is disabled. Nx Console will not receive file changes.';
     } else if (item.contextValue === 'daemonWatcherNotRunning') {
       this.resourceUri = Uri.from({
         scheme: NX_DAEMON_WARNING_DECORATION_SCHEME,
         path: '2',
       });
       this.tooltip =
-        'Nx Daemon watcher is not running. Nx Console will not receive file changes. Click to learn more.';
+        'Nx Daemon watcher is not running. Nx Console will not receive file changes. You can restart the watcher by clicking the refresh icon.';
     }
 
     this.setIcons(item.iconPath);

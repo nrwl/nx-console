@@ -224,7 +224,7 @@
         },
         {
           "command": "nxConsole.restartDaemonWatcher",
-          "when": "view == nxProjects && (viewItem == daemonDisabled || viewItem == daemonWatcherNotRunning)",
+          "when": "view == nxProjects && viewItem == daemonWatcherNotRunning",
           "group": "inline@1"
         }
       ],
