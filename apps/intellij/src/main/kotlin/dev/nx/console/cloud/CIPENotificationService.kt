@@ -2,14 +2,10 @@ package dev.nx.console.cloud
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.*
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import dev.nx.console.mcp.McpServerService
-import dev.nx.console.mcp.hasAIAssistantAvailable
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.models.CIPEInfo
 import dev.nx.console.models.CIPERun
@@ -174,8 +170,6 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
                 notification.addAction(
                     ViewAiFixAction(cipe.ciPipelineExecutionId, runGroupWithFix.runGroup)
                 )
-            } else {
-                notification.addAction(HelpMeFixErrorAction())
             }
         }
 
@@ -275,34 +269,6 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
                 }
                 withContext(Dispatchers.EDT) { notification.expire() }
             }
-        }
-    }
-
-    private inner class HelpMeFixErrorAction : NotificationAction("Help me fix this error") {
-        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-            TelemetryService.getInstance(project)
-                .featureUsed(
-                    TelemetryEvent.CLOUD_FIX_CIPE_ERROR,
-                    mapOf("source" to TelemetryEventSource.NOTIFICATION),
-                )
-
-            // Try to execute the existing AI assistant action if available
-            val assistantReady =
-                hasAIAssistantAvailable() && project.service<McpServerService>().isMcpServerSetup()
-
-            if (assistantReady) {
-                try {
-                    val autofixAction =
-                        ActionManager.getInstance()
-                            .getAction("dev.nx.console.llm.CIPEAutoFixAction")
-                    ActionManager.getInstance()
-                        .tryToExecute(autofixAction, null, null, e.place, true)
-                } catch (e: Throwable) {
-                    // Fallback: could show a message about setting up AI assistant
-                }
-            }
-
-            notification.expire()
         }
     }
 
