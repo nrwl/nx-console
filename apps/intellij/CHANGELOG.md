@@ -1,3 +1,14 @@
+## 1.53.0 (2025-10-29)
+
+### Bug Fixes
+
+* **nx-mcp:** update sdk version & use new logging format ([#2848](https://github.com/nrwl/nx-console/issues/2848)) ([e443044](https://github.com/nrwl/nx-console/commit/e443044936e82e71886f9b008118339b07c764bc))
+
+
+### Features
+
+* **intellij:** remove unused fix this error for me feature ([#2849](https://github.com/nrwl/nx-console/issues/2849)) ([4c17c55](https://github.com/nrwl/nx-console/commit/4c17c558a20e56a7266a8c9deb3ee32d0ecb7121))
+
 ## 1.52.0 (2025-10-23)
 
 ### Bug Fixes
