@@ -128,7 +128,7 @@ export async function createInvokeMCPInspectorCLI(
   execSync(
     `npm install -D @modelcontextprotocol/inspector@${mcpInspectorVersion}`,
     {
-      cwd: e2eCwd,
+      cwd: join(e2eCwd, workspaceName),
     },
   );
   const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
