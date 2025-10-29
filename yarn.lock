@@ -3045,24 +3045,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/inspector-cli@npm:^0.17.2":
-  version: 0.17.2
-  resolution: "@modelcontextprotocol/inspector-cli@npm:0.17.2"
+"@modelcontextprotocol/inspector-cli@npm:^0.16.8":
+  version: 0.16.8
+  resolution: "@modelcontextprotocol/inspector-cli@npm:0.16.8"
   dependencies:
-    "@modelcontextprotocol/sdk": ^1.20.1
+    "@modelcontextprotocol/sdk": ^1.18.0
     commander: ^13.1.0
     spawn-rx: ^5.1.2
   bin:
     mcp-inspector-cli: build/cli.js
-  checksum: 4c48dd8194a0879754e8cccd6594c31fc4d50f3331517174cd42b67b3bca3f16dbf2e4f7e9379a090ade2edfc314f4254f1f7ce2b7d2d22e4a879c2df1c70453
+  checksum: 2ff2837f7087da8669d2e095bdefd38485492d6f2fc2762d078504b13733d80828b373f1957b8950aa9132dac492bf6b0be086922369914da9a12f905382948f
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/inspector-client@npm:^0.17.2":
-  version: 0.17.2
-  resolution: "@modelcontextprotocol/inspector-client@npm:0.17.2"
+"@modelcontextprotocol/inspector-client@npm:^0.16.8":
+  version: 0.16.8
+  resolution: "@modelcontextprotocol/inspector-client@npm:0.16.8"
   dependencies:
-    "@modelcontextprotocol/sdk": ^1.20.1
+    "@modelcontextprotocol/sdk": ^1.18.0
     "@radix-ui/react-checkbox": ^1.1.4
     "@radix-ui/react-dialog": ^1.1.3
     "@radix-ui/react-icons": ^1.3.0
@@ -3089,15 +3089,15 @@ __metadata:
     zod: ^3.25.76
   bin:
     mcp-inspector-client: bin/start.js
-  checksum: 3ea8dd612d4467f5fb71574e59509ffcfa1cb05cd785e36d4de92e78580d0b9435dcb2e897306eaed95c490124a6ca545966cf5d3477f46cc86a75e68ce935b5
+  checksum: b621e6bf87d9f311c6bab37f40561e3ee348ea248f06615fdd227e283e43115bfc480b02093d727ffdf5aae3ae2a6c294cb198ac8888af9b1af3049adbdddfc3
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/inspector-server@npm:^0.17.2":
-  version: 0.17.2
-  resolution: "@modelcontextprotocol/inspector-server@npm:0.17.2"
+"@modelcontextprotocol/inspector-server@npm:^0.16.8":
+  version: 0.16.8
+  resolution: "@modelcontextprotocol/inspector-server@npm:0.16.8"
   dependencies:
-    "@modelcontextprotocol/sdk": ^1.20.1
+    "@modelcontextprotocol/sdk": ^1.18.0
     cors: ^2.8.5
     express: ^5.1.0
     shell-quote: ^1.8.3
@@ -3106,18 +3106,18 @@ __metadata:
     zod: ^3.25.76
   bin:
     mcp-inspector-server: build/index.js
-  checksum: 210e3c883a2f616bb2e8f5428c1bf6c242e594abeac74abb8a6bc340d3a522d6162cc6e4194bcc7249a6aa110185147e449b4c926be9ee1ed6076db49ab2bf5d
+  checksum: 8d613333d6f31b29049e22ccbfaf9d491c907c8071aae35f83f75f2054487c78a39f1483394eeaef353eafd17a51730b4371abe5b2ab30a54c1c88c2fd728ec3
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/inspector@npm:^0.17.2":
-  version: 0.17.2
-  resolution: "@modelcontextprotocol/inspector@npm:0.17.2"
+"@modelcontextprotocol/inspector@npm:^0.16.1":
+  version: 0.16.8
+  resolution: "@modelcontextprotocol/inspector@npm:0.16.8"
   dependencies:
-    "@modelcontextprotocol/inspector-cli": ^0.17.2
-    "@modelcontextprotocol/inspector-client": ^0.17.2
-    "@modelcontextprotocol/inspector-server": ^0.17.2
-    "@modelcontextprotocol/sdk": ^1.20.1
+    "@modelcontextprotocol/inspector-cli": ^0.16.8
+    "@modelcontextprotocol/inspector-client": ^0.16.8
+    "@modelcontextprotocol/inspector-server": ^0.16.8
+    "@modelcontextprotocol/sdk": ^1.18.0
     concurrently: ^9.2.0
     node-fetch: ^3.3.2
     open: ^10.2.0
@@ -3127,11 +3127,11 @@ __metadata:
     zod: ^3.25.76
   bin:
     mcp-inspector: cli/build/cli.js
-  checksum: fe22e30162628698f0a4150893815e16bcd814b1d322df05702a42069d1aac285fd7de0889f77c115f6882ed1de2dd57440802abf4358a8a7388d60bb9ccc7f2
+  checksum: 302c4c6b5c63a9f86635532c0a6daf1034aea915b5fb7207cf146041f358f6343074616dae319a8779371b688b3f5994040d2c3f74f2ff405b0ba5e87c0f3529
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.20.1, @modelcontextprotocol/sdk@npm:^1.20.2":
+"@modelcontextprotocol/sdk@npm:^1.18.0, @modelcontextprotocol/sdk@npm:^1.20.2":
   version: 1.20.2
   resolution: "@modelcontextprotocol/sdk@npm:1.20.2"
   dependencies:
@@ -16620,7 +16620,7 @@ __metadata:
     "@microsoft/fast-components": ^2.30.6
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
-    "@modelcontextprotocol/inspector": ^0.17.2
+    "@modelcontextprotocol/inspector": ^0.16.1
     "@modelcontextprotocol/sdk": ^1.20.2
     "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/conformance": 21.0.0-beta.0
