@@ -42,13 +42,13 @@ export class NxTreeItem extends TreeItem {
       });
       this.tooltip =
         'Nx Daemon is disabled. Nx Console will not receive file changes. Click to learn more.';
-    } else if (item.contextValue === 'daemonNotRunning') {
+    } else if (item.contextValue === 'daemonWatcherNotRunning') {
       this.resourceUri = Uri.from({
         scheme: NX_DAEMON_WARNING_DECORATION_SCHEME,
         path: '2',
       });
       this.tooltip =
-        'Nx Daemon is not running. Nx Console will not receive file changes. Click to learn more.';
+        'Nx Daemon watcher is not running. Nx Console will not receive file changes. Click to learn more.';
     }
 
     this.setIcons(item.iconPath);

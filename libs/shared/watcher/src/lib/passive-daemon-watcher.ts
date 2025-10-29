@@ -8,6 +8,7 @@ import {
   assign,
   createActor,
   fromPromise,
+  not,
   setup,
 } from 'xstate';
 
@@ -73,6 +74,16 @@ export class PassiveDaemonWatcher {
           `PassiveDaemonWatcher: transitioning to ${params.to} (attempt ${context.attemptNumber})`,
         );
       },
+      notifyOperationalState: (_, params: { isOperational: boolean }) => {
+        if (this.onOperationalStateChange) {
+          this.onOperationalStateChange(params.isOperational);
+        }
+      },
+      logPermanentFailure: ({ context }) => {
+        this.logger.log(
+          `PassiveDaemonWatcher: Failed to register daemon listener after ${context.attemptNumber} attempts. Giving up.`,
+        );
+      },
     },
     actors: {
       registerListener: fromPromise(async () => {
@@ -101,7 +112,6 @@ export class PassiveDaemonWatcher {
               } | null,
             ) => {
               if (error) {
-                this.listeners.forEach((listener) => listener(error));
                 this.actor.send({ type: 'LISTENER_ERROR', error });
               } else {
                 this.actor.send({ type: 'RESET_ATTEMPTS' });
@@ -116,7 +126,7 @@ export class PassiveDaemonWatcher {
       }),
     },
     guards: {
-      canRetry: ({ context }) => context.attemptNumber <= 5,
+      canRetry: ({ context }) => context.attemptNumber < 5,
     },
     delays: {
       retryDelay: ({ context }) =>
@@ -131,13 +141,20 @@ export class PassiveDaemonWatcher {
     },
     states: {
       idle: {
-        entry: { type: 'logTransition', params: { to: 'idle' } },
+        entry: [
+          { type: 'logTransition', params: { to: 'idle' } },
+          { type: 'notifyOperationalState', params: { isOperational: true } },
+        ],
         on: {
           START: 'starting',
         },
       },
       starting: {
-        entry: { type: 'logTransition', params: { to: 'starting' } },
+        entry: [
+          'incrementAttempt',
+          { type: 'logTransition', params: { to: 'starting' } },
+          { type: 'notifyOperationalState', params: { isOperational: true } },
+        ],
         invoke: {
           id: 'registerListener',
           src: 'registerListener',
@@ -147,19 +164,22 @@ export class PassiveDaemonWatcher {
           },
           onError: {
             target: 'failed',
-            actions: ['assignError', 'incrementAttempt'],
+            actions: ['assignError'],
           },
         },
       },
       listening: {
-        entry: { type: 'logTransition', params: { to: 'listening' } },
+        entry: [
+          { type: 'logTransition', params: { to: 'listening' } },
+          { type: 'notifyOperationalState', params: { isOperational: true } },
+        ],
         on: {
           RESET_ATTEMPTS: {
             actions: ['resetAttempts'],
           },
           LISTENER_ERROR: {
             target: 'failed',
-            actions: ['assignError', 'incrementAttempt'],
+            actions: ['assignError'],
           },
           STOP: {
             target: 'idle',
@@ -168,7 +188,22 @@ export class PassiveDaemonWatcher {
         },
       },
       failed: {
-        entry: { type: 'logTransition', params: { to: 'failed' } },
+        entry: [
+          { type: 'logTransition', params: { to: 'failed' } },
+          { type: 'notifyOperationalState', params: { isOperational: true } },
+        ],
+        always: [
+          {
+            guard: not('canRetry'),
+            actions: [
+              'logPermanentFailure',
+              {
+                type: 'notifyOperationalState',
+                params: { isOperational: false },
+              },
+            ],
+          },
+        ],
         after: {
           retryDelay: [
             {
@@ -192,6 +227,7 @@ export class PassiveDaemonWatcher {
   constructor(
     private workspacePath: string,
     private logger: Logger,
+    private onOperationalStateChange?: (isOperational: boolean) => void,
   ) {
     this.actor.start();
   }

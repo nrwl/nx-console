@@ -51,7 +51,7 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
     viewItem.contextValue === 'folder' ||
     viewItem.contextValue === 'projectGraphError' ||
     viewItem.contextValue === 'daemonDisabled' ||
-    viewItem.contextValue === 'daemonNotRunning'
+    viewItem.contextValue === 'daemonWatcherNotRunning'
   ) {
     return;
   }

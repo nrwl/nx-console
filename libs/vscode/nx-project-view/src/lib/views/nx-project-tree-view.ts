@@ -6,13 +6,14 @@ import { TreeItemCollapsibleState } from 'vscode';
 import {
   BaseView,
   DaemonDisabledViewItem,
-  DaemonNotRunningViewItem,
+  DaemonWatcherNotRunningViewItem,
   FolderViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
   TargetViewItem,
 } from './nx-project-base-view';
+import { WatcherRunningService } from '@nx-console/vscode-lsp-client';
 
 export type TreeViewItem =
   | FolderViewItem
@@ -21,7 +22,7 @@ export type TreeViewItem =
   | TargetGroupViewItem
   | ProjectGraphErrorViewItem
   | DaemonDisabledViewItem
-  | DaemonNotRunningViewItem;
+  | DaemonWatcherNotRunningViewItem;
 
 export type ProjectInfo = {
   dir: string;
@@ -47,12 +48,10 @@ export class TreeView extends BaseView {
         );
       }
 
-      console.log('Daemon enabled:', this.workspaceData?.daemonEnabled);
-      console.log('Daemon running:', this.workspaceData?.daemonRunning);
       if (this.workspaceData.daemonEnabled === false) {
         items.push(this.createDaemonDisabledViewItem());
-      } else if (this.workspaceData.daemonRunning === false) {
-        items.push(this.createDaemonNotRunningViewItem());
+      } else if (WatcherRunningService.INSTANCE.isOperational === false) {
+        items.push(this.createDaemonWatcherNotRunningViewItem());
       }
 
       // if there's only a single root, start with it expanded

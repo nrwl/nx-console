@@ -1,7 +1,8 @@
+import { WatcherRunningService } from '@nx-console/vscode-lsp-client';
 import {
   BaseView,
   DaemonDisabledViewItem,
-  DaemonNotRunningViewItem,
+  DaemonWatcherNotRunningViewItem,
   ProjectGraphErrorViewItem,
   ProjectViewItem,
   TargetGroupViewItem,
@@ -14,7 +15,7 @@ export type ListViewItem =
   | TargetGroupViewItem
   | ProjectGraphErrorViewItem
   | DaemonDisabledViewItem
-  | DaemonNotRunningViewItem;
+  | DaemonWatcherNotRunningViewItem;
 
 export class ListView extends BaseView {
   async getChildren(element?: ListViewItem) {
@@ -29,8 +30,8 @@ export class ListView extends BaseView {
       }
       if (this.workspaceData.daemonEnabled === false) {
         items.push(this.createDaemonDisabledViewItem());
-      } else if (this.workspaceData.daemonRunning === false) {
-        items.push(this.createDaemonNotRunningViewItem());
+      } else if (WatcherRunningService.INSTANCE.isOperational === false) {
+        items.push(this.createDaemonWatcherNotRunningViewItem());
       }
       // should return root elements if no element was passed
       items.push(...(await this.createProjects()));

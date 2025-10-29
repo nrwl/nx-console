@@ -95,15 +95,8 @@ async function _workspace(
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
-    const isAvailable =
-      await daemonClientModule?.daemonClient.isServerAvailable();
-    const isRunning = execSync(`npx nx daemon`);
-
-    logger.log(`isAvailable: ${isAvailable}, isRunning: ${isRunning}`);
     return {
       daemonEnabled: daemonClientModule?.isDaemonEnabled() ?? false,
-      daemonRunning:
-        (await daemonClientModule?.daemonClient.isServerAvailable()) ?? false,
       projectGraph: projectGraph ?? {
         nodes: {},
         dependencies: {},
@@ -129,7 +122,6 @@ async function _workspace(
     // Default to nx workspace
     return {
       daemonEnabled: false,
-      daemonRunning: false,
       validWorkspaceJson: false,
       projectGraph: {
         nodes: {},

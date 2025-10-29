@@ -13,7 +13,6 @@ export type NxProjectConfiguration = ProjectConfiguration & {
 
 export interface NxWorkspace {
   daemonEnabled: boolean;
-  daemonRunning: boolean;
   validWorkspaceJson: boolean;
   nxJson: NxJsonConfiguration;
   projectGraph: ProjectGraph;

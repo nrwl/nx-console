@@ -10,6 +10,7 @@ import { getDocumentLinks } from '@nx-console/language-server-capabilities-docum
 import { getHover } from '@nx-console/language-server-capabilities-hover';
 import {
   NxChangeWorkspace,
+  NxWatcherOperationalNotification,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRefreshStartedNotification,
@@ -40,7 +41,10 @@ import {
   killGroup,
   loadRootEnvFiles,
 } from '@nx-console/shared-utils';
-import { NativeWatcher } from '@nx-console/shared-watcher';
+import {
+  DaemonWatcherCallback,
+  NativeWatcher,
+} from '@nx-console/shared-watcher';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
@@ -71,6 +75,24 @@ let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => Promise<void> = async () => {
   //noop
+};
+const fileWatcherCallback: DaemonWatcherCallback = async (
+  _,
+  projectGraphAndSourceMaps,
+) => {
+  if (!WORKING_PATH) {
+    return;
+  }
+  await reconfigureAndSendNotificationWithBackoff(
+    WORKING_PATH,
+    projectGraphAndSourceMaps,
+  );
+};
+const fileWatcherOperationalCallback = (isOperational: boolean) => {
+  lspLogger.log(`File watcher is operational: ${isOperational}`);
+  connection.sendNotification(NxWatcherOperationalNotification.method, {
+    isOperational,
+  });
 };
 let reconfigureAttempts = 0;
 
@@ -107,19 +129,8 @@ connection.onInitialize(async (params) => {
 
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
-      async (error, projectGraphAndSourceMaps) => {
-        if (!WORKING_PATH) {
-          return;
-        }
-        if (error) {
-          lspLogger.log(error.toString());
-        } else {
-          await reconfigureAndSendNotificationWithBackoff(
-            WORKING_PATH,
-            projectGraphAndSourceMaps,
-          );
-        }
-      },
+      fileWatcherCallback,
+      fileWatcherOperationalCallback,
     );
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
@@ -417,9 +428,11 @@ async function reconfigure(
 
   unregisterFileWatcher?.();
 
-  unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
-    reconfigureAndSendNotificationWithBackoff(workingPath);
-  });
+  unregisterFileWatcher = await languageServerWatcher(
+    workingPath,
+    fileWatcherCallback,
+    fileWatcherOperationalCallback,
+  );
 
   return workspace;
 }

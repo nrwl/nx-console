@@ -10,7 +10,7 @@ import {
   logAndShowError,
   vscodeLogger,
 } from '@nx-console/vscode-output-channels';
-import { getGitApi, getGitRepository } from '@nx-console/vscode-utils';
+import { getGitRepository } from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import {
@@ -33,11 +33,14 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { WatcherRunningService } from './watcher-running-service';
 
 let _nxlsClient: NxlsClient | undefined;
 
 export function createNxlsClient(extensionContext: ExtensionContext) {
   _nxlsClient = new NxlsClient(extensionContext);
+
+  extensionContext.subscriptions.push(new WatcherRunningService(_nxlsClient));
 
   const disposable = refreshWorkspaceOnBranchChange(_nxlsClient);
   if (disposable) {

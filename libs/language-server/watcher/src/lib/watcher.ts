@@ -58,20 +58,28 @@ export async function cleanupAllWatchers(): Promise<void> {
 export async function languageServerWatcher(
   workspacePath: string,
   callback: DaemonWatcherCallback,
+  watcherOperationalCallback?: (isOperational: boolean) => void,
 ): Promise<() => Promise<void>> {
   const nxVersion = await getNxVersion(workspacePath);
   if (!nxVersion || !gte(nxVersion, '16.4.0')) {
     lspLogger.log(
       'File watching is not supported for Nx versions below 16.4.0.',
     );
+    watcherOperationalCallback?.(false);
     return async () => {
       lspLogger.log('unregistering empty watcher');
     };
   }
 
   if (gte(nxVersion, '22.0.0')) {
-    return registerPassiveDaemonWatcher(workspacePath, callback);
+    return registerPassiveDaemonWatcher(
+      workspacePath,
+      callback,
+      watcherOperationalCallback,
+    );
   } else {
+    // older versions don't have this granular watcher tracking so we just assume true
+    watcherOperationalCallback?.(true);
     return registerOldWatcher(workspacePath, nxVersion, callback);
   }
 }
@@ -79,6 +87,7 @@ export async function languageServerWatcher(
 async function registerPassiveDaemonWatcher(
   workspacePath: string,
   callback: DaemonWatcherCallback,
+  watcherOperationalCallback?: (isOperational: boolean) => void,
 ): Promise<() => Promise<void>> {
   const daemonClient = await getNxDaemonClient(workspacePath, lspLogger);
 
@@ -89,7 +98,11 @@ async function registerPassiveDaemonWatcher(
     };
   }
   try {
-    _passiveDaemonWatcher = new PassiveDaemonWatcher(workspacePath, lspLogger);
+    _passiveDaemonWatcher = new PassiveDaemonWatcher(
+      workspacePath,
+      lspLogger,
+      watcherOperationalCallback,
+    );
     await _passiveDaemonWatcher.start();
     _passiveDaemonWatcher.listen((error, projectGraphAndSourceMaps) => {
       callback(error, projectGraphAndSourceMaps);
