@@ -60,7 +60,10 @@ export class NxTreeItem extends TreeItem {
       return;
     }
 
-    if (this.contextValue === 'daemonDisabled') {
+    if (
+      this.contextValue === 'daemonDisabled' ||
+      this.contextValue === 'daemonWatcherNotRunning'
+    ) {
       this.iconPath = new ThemeIcon('warning');
       return;
     }

@@ -259,7 +259,7 @@ export abstract class BaseView {
     return {
       id: 'daemonDisabled',
       contextValue: 'daemonDisabled',
-      label: `Nx Daemon is Disabled`,
+      label: `Nx Daemon is disabled`,
       collapsible: TreeItemCollapsibleState.None,
     };
   }
@@ -268,7 +268,7 @@ export abstract class BaseView {
     return {
       id: 'daemonWatcherNotRunning',
       contextValue: 'daemonWatcherNotRunning',
-      label: `Nx Daemon is Not Running`,
+      label: `Nx daemon watcher is not running`,
       collapsible: TreeItemCollapsibleState.None,
     };
   }

@@ -19,6 +19,7 @@ import {
   NxProjectGraphOutputRequest,
   NxRecentCIPEDataRequest,
   NxSourceMapFilesToProjectsMapRequest,
+  NxStartDaemonRequest,
   NxStartupMessageRequest,
   NxStopDaemonRequest,
   NxTargetsForConfigFileRequest,
@@ -43,6 +44,7 @@ import {
   getTargetsForConfigFile,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
+  nxStartDaemon,
   nxStopDaemon,
   parseTargetString,
 } from '@nx-console/language-server-workspace';
@@ -74,6 +76,18 @@ export function registerRequests(
     }
 
     return await nxStopDaemon(WORKING_PATH, lspLogger);
+  });
+
+  connection.onRequest(NxStartDaemonRequest, async () => {
+    const WORKING_PATH = getWorkingPath();
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path',
+      );
+    }
+
+    return await nxStartDaemon(WORKING_PATH, lspLogger);
   });
 
   connection.onRequest(NxWorkspaceSerializedRequest, async ({ reset }) => {

@@ -41,6 +41,9 @@ export const NxWatcherOperationalNotification: NotificationType<{
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
   new RequestType('nx/stopDaemon');
 
+export const NxStartDaemonRequest: RequestType<undefined, undefined, unknown> =
+  new RequestType('nx/startDaemon');
+
 export const NxWorkspaceRequest: RequestType<
   { reset: boolean },
   NxWorkspace,
