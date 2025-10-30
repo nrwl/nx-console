@@ -132,7 +132,27 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             return
         }
 
-        // Original notification for manual fixes
+        // Check if the fix was applied manually
+        if (runGroup.aiFix?.userAction == AITaskFixUserAction.APPLIED) {
+            val message = "Nx Cloud applied a fix for #${cipe.branch}"
+            val notification =
+                notificationGroup.createNotification(
+                    content = message,
+                    type = NotificationType.INFORMATION,
+                )
+
+            cipe.commitUrl?.also { notification.addAction(ViewPRAction(it)) }
+
+            val targetBranch = cipe.branch
+            if (GitUtils.checkBranchExistsOnRemote(project, targetBranch)) {
+                notification.addAction(FetchAndPullChangesAction(targetBranch))
+            }
+
+            notification.notify(project)
+            return
+        }
+
+        // Original notification for pending fixes
         val notification =
             notificationGroup.createNotification(
                 content = "CI failed. Nx Cloud AI has a fix for #${cipe.branch}",

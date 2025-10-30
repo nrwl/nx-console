@@ -26,6 +26,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     private val logger = thisLogger()
     private val notificationListeners = mutableListOf<CIPENotificationListener>()
     private val sentNotifications = mutableSetOf<String>()
+    private val sentAppliedNotifications = mutableSetOf<String>()
 
     /** Add a listener for notification events */
     fun addNotificationListener(listener: CIPENotificationListener) {
@@ -204,20 +205,52 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     }
 
     private fun emitNotification(event: CIPENotificationEvent) {
-        if (sentNotifications.contains(event.cipe.ciPipelineExecutionId)) {
-            return
-        }
-        notificationListeners.forEach { listener ->
-            try {
-                listener.onNotificationEvent(event)
-            } catch (e: Exception) {
-                logger.error(
-                    "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
-                    e,
-                )
+        val cipeId = event.cipe.ciPipelineExecutionId
+
+        // Check if this is an "applied" notification (APPLIED or APPLIED_AUTOMATICALLY)
+        val isAppliedNotification =
+            when (event) {
+                is CIPENotificationEvent.AiFixAvailable -> {
+                    val userAction = event.runGroup.aiFix?.userAction
+                    userAction == AITaskFixUserAction.APPLIED ||
+                        userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY
+                }
+                else -> false
             }
+
+        if (isAppliedNotification) {
+            // Use separate tracking for applied notifications
+            if (sentAppliedNotifications.contains(cipeId)) {
+                return
+            }
+            notificationListeners.forEach { listener ->
+                try {
+                    listener.onNotificationEvent(event)
+                } catch (e: Exception) {
+                    logger.error(
+                        "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
+                        e,
+                    )
+                }
+            }
+            sentAppliedNotifications.add(cipeId)
+        } else {
+            // Use regular tracking for all other notifications
+            if (sentNotifications.contains(cipeId)) {
+                return
+            }
+            notificationListeners.forEach { listener ->
+                try {
+                    listener.onNotificationEvent(event)
+                } catch (e: Exception) {
+                    logger.error(
+                        "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
+                        e,
+                    )
+                }
+            }
+            sentNotifications.add(cipeId)
         }
-        sentNotifications.add(event.cipe.ciPipelineExecutionId)
     }
 
     override fun dispose() {
