@@ -1,12 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
-  NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS,
-  NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
-  NX_CLOUD_RUNS_DETAILS,
-  NX_CLOUD_RUNS_SEARCH,
-  NX_CLOUD_TASKS_DETAILS,
-  NX_CLOUD_TASKS_SEARCH,
+  NX_CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
+  NX_CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
+  NX_CLOUD_ANALYTICS_RUN_DETAILS,
+  NX_CLOUD_ANALYTICS_RUNS_SEARCH,
+  NX_CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
+  NX_CLOUD_ANALYTICS_TASKS_SEARCH,
 } from '@nx-console/shared-llm-context/src/lib/tool-names';
 import {
   formatPipelineExecutionDetailsContent,
@@ -36,8 +36,8 @@ export function registerNxCloudTools(
 ): void {
   // Pipeline Executions Search
   server.tool(
-    NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
-    'Search for pipeline executions in Nx Cloud. Pipeline executions are the top-level CI/CD workflow containers that contain zero-to-many runs. Use this to find executions by branch, status, author, or time range. Each execution represents a complete CI/CD pipeline run triggered by commits or other events. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    NX_CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
+    'Analyze historical pipeline execution data from Nx Cloud to identify trends and patterns in CI/CD workflows. Use this analytics tool to track pipeline success rates over time, investigate performance patterns across branches or authors, and gain insights into team productivity. Filter by branch, status, author, or time range to analyze specific segments of your CI/CD history. Pipeline executions are the top-level containers in the hierarchy. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
     pipelineExecutionSearchSchema.shape,
     {
       destructiveHint: false,
@@ -49,8 +49,8 @@ export function registerNxCloudTools(
 
   // Pipeline Execution Details
   server.tool(
-    NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS,
-    'Get detailed information about a specific pipeline execution in Nx Cloud. Pipeline executions are the top-level containers that include run groups and their associated runs. Use this to understand the structure and status of a complete CI/CD pipeline execution, including all its child runs.',
+    NX_CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
+    'Analyze detailed historical data for a specific pipeline execution in Nx Cloud. Use this analytics tool to investigate the complete structure of a past CI/CD run, understand performance bottlenecks, and identify optimization opportunities. Returns the full hierarchy including run groups and their associated runs, helping you gain insights into how the pipeline was executed and where improvements can be made.',
     pipelineExecutionDetailsSchema.shape,
     {
       destructiveHint: false,
@@ -62,8 +62,8 @@ export function registerNxCloudTools(
 
   // Runs Search
   server.tool(
-    NX_CLOUD_RUNS_SEARCH,
-    'Search for runs in Nx Cloud. Runs are mid-level containers within pipeline executions that contain zero-to-many tasks. Each run represents execution of a specific command (like "nx affected:build"). Use this to find runs by pipeline execution, branch, command, or status. Runs belong to pipeline executions and contain individual tasks. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    NX_CLOUD_ANALYTICS_RUNS_SEARCH,
+    'Analyze historical run data from Nx Cloud to track performance trends and team productivity patterns. Runs are mid-level containers within pipeline executions, each representing execution of a specific command (like "nx affected:build"). Use this analytics tool to identify which commands are taking the longest, track success rates across different run groups, and understand how your team\'s build patterns have evolved over time. Filter by pipeline execution, branch, run group, or status to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
     runSearchSchema.shape,
     {
       destructiveHint: false,
@@ -75,8 +75,8 @@ export function registerNxCloudTools(
 
   // Run Details
   server.tool(
-    NX_CLOUD_RUNS_DETAILS,
-    'Get detailed information about a specific run in Nx Cloud. Runs sit between pipeline executions and tasks in the hierarchy. Use this to see the command executed, duration, status, and all tasks that were part of this run. Each run contains zero-to-many individual tasks.',
+    NX_CLOUD_ANALYTICS_RUN_DETAILS,
+    'Analyze detailed historical data for a specific run in Nx Cloud. Use this analytics tool to investigate command execution performance, understand task distribution patterns, and identify optimization opportunities. Returns comprehensive information including the command executed, duration, status, and all tasks that were part of this run, helping you gain insights into where time is being spent and how to improve build efficiency.',
     runDetailsSchema.shape,
     {
       destructiveHint: false,
@@ -88,8 +88,8 @@ export function registerNxCloudTools(
 
   // Tasks Search
   server.tool(
-    NX_CLOUD_TASKS_SEARCH,
-    'Search for task statistics in Nx Cloud. Returns aggregated statistics for tasks including success rates, cache hit rates, and average durations. Use this to analyze performance patterns across multiple executions of the same task (project + target combination). If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    NX_CLOUD_ANALYTICS_TASKS_SEARCH,
+    'Analyze aggregated task performance statistics from Nx Cloud to identify optimization opportunities and track trends over time. Returns performance metrics including success rates, cache hit rates, and average durations for each task (project + target combination). Use this analytics tool to understand which tasks are the slowest, track cache effectiveness trends, identify projects with low success rates, and gain insights into overall team productivity patterns. Filter by project, target, or time range to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
     taskSearchSchema.shape,
     {
       destructiveHint: false,
@@ -99,10 +99,10 @@ export function registerNxCloudTools(
     nxCloudTasksSearch(workspacePath, logger, telemetry),
   );
 
-  // Task Details
+  // Task Executions Search
   server.tool(
-    NX_CLOUD_TASKS_DETAILS,
-    'Search for detailed task execution information in Nx Cloud. Returns individual task execution details including project, target, duration, cache status, and parameters. Use filters to find specific task executions. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+    NX_CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
+    'Analyze individual task execution data from Nx Cloud to investigate performance trends and understand task behavior over time. Returns detailed information for each task execution including project, target, duration, cache status, and parameters. Use this analytics tool to track how specific tasks perform across different runs, identify patterns in cache misses, and gain insights into which task configurations are most efficient. Filter by project, target, or time range to analyze specific execution patterns. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
     taskDetailsSchema.shape,
     {
       destructiveHint: false,
@@ -326,7 +326,7 @@ const nxCloudPipelineExecutionsSearch =
     params: z.infer<typeof pipelineExecutionSearchSchema>,
   ): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: NX_CLOUD_PIPELINE_EXECUTIONS_SEARCH,
+      tool: NX_CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
     });
 
     const result = await getPipelineExecutionsSearch(
@@ -360,7 +360,7 @@ const nxCloudPipelineExecutionDetails =
     params: z.infer<typeof pipelineExecutionDetailsSchema>,
   ): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: NX_CLOUD_PIPELINE_EXECUTIONS_DETAILS,
+      tool: NX_CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
     });
 
     const result = await getPipelineExecutionDetails(
@@ -393,7 +393,7 @@ const nxCloudRunsSearch =
   ) =>
   async (params: z.infer<typeof runSearchSchema>): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: NX_CLOUD_RUNS_SEARCH,
+      tool: NX_CLOUD_ANALYTICS_RUNS_SEARCH,
     });
 
     const result = await getRunsSearch(workspacePath, logger, params);
@@ -419,7 +419,7 @@ const nxCloudRunDetails =
   ) =>
   async (params: z.infer<typeof runDetailsSchema>): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: NX_CLOUD_RUNS_DETAILS,
+      tool: NX_CLOUD_ANALYTICS_RUN_DETAILS,
     });
 
     const result = await getRunDetails(workspacePath, logger, params.runId);
@@ -445,7 +445,7 @@ const nxCloudTasksSearch =
   ) =>
   async (params: z.infer<typeof taskSearchSchema>): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: NX_CLOUD_TASKS_SEARCH,
+      tool: NX_CLOUD_ANALYTICS_TASKS_SEARCH,
     });
 
     const result = await getTasksSearch(workspacePath, logger, params);
@@ -473,7 +473,7 @@ const nxCloudTaskDetails =
     params: z.infer<typeof taskDetailsSchema>,
   ): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
-      tool: NX_CLOUD_TASKS_DETAILS,
+      tool: NX_CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
     });
 
     const result = await getTasksDetailsSearch(workspacePath, logger, params);
