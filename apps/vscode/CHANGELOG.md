@@ -1,3 +1,11 @@
+## [18.74.5](https://github.com/nrwl/nx-console/compare/vscode-v18.74.4...vscode-v18.74.5) (2025-10-30)
+
+
+### Bug Fixes
+
+* **nx-mcp:** update sdk version & use new logging format ([#2848](https://github.com/nrwl/nx-console/issues/2848)) ([e443044](https://github.com/nrwl/nx-console/commit/e443044936e82e71886f9b008118339b07c764bc))
+* **vscode:** skip minification ([#2852](https://github.com/nrwl/nx-console/issues/2852)) ([f7ecef2](https://github.com/nrwl/nx-console/commit/f7ecef29501f1c8506f43cabade5cb8734626ecf))
+
 ## 18.74.4 (2025-10-28)
 
 ### 🩹 Fixes
