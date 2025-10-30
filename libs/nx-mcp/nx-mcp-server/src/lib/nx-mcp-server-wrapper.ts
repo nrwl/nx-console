@@ -262,7 +262,6 @@ export class NxMcpServerWrapper {
           this.server,
           this.logger,
           this.telemetry,
-          this.nxWorkspaceInfoProvider.getGitDiffs,
         );
 
         // Register CIPE resources

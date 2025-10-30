@@ -101,8 +101,6 @@ The Nx MCP server provides a comprehensive set of tools for interacting with you
 
 ### Nx Cloud Tools (only available w/ Nx Cloud enabled)
 
-- **nx_cloud_cipe_details**: Returns CI pipeline execution details from Nx Cloud
-- **nx_cloud_fix_cipe_failure**: Returns failure details including terminal output and git diffs
 - **nx_cloud_pipeline_executions_search**: Searches for pipeline executions in Nx Cloud
 - **nx_cloud_pipeline_executions_details**: Gets detailed information about specific pipeline executions
 - **nx_cloud_runs_search**: Searches for runs within pipeline executions

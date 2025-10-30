@@ -1,7 +1,3 @@
-export const NX_CLOUD_CIPE_DETAILS = 'nx_cloud_cipe_details';
-
-export const NX_CLOUD_CIPE_FAILURE = 'nx_cloud_fix_cipe_failure';
-
 export const NX_DOCS = 'nx_docs';
 
 export const NX_AVAILABLE_PLUGINS = 'nx_available_plugins';
