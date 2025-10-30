@@ -20,6 +20,7 @@ import {
 import { rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 
 let checkTimer: NodeJS.Timeout | undefined;
 let intervalTimer: NodeJS.Timeout | undefined;
@@ -182,6 +183,8 @@ async function runAiAgentCheck() {
           await promisify(exec)('node --version')
         ).stdout.trim();
 
+        const localNxVersion = (await getNxVersion())?.full;
+
         const exitCode = (e as any).code ?? 'unknown';
         const signal = (e as any).signal ?? 'null';
 
@@ -207,12 +210,20 @@ async function runAiAgentCheck() {
           'AIFAIL',
           `NODEVERSION:${nodeVersion}`,
           `NXVERSION:${nxLatestVersion}`,
+          `LOCALNXVERSION:${localNxVersion}`,
           `EXITCODE:${exitCode}`,
           `SIGNAL:${signal}`,
           `STDERR:${stderr}`,
           `STDOUT:${stdout}`,
           `MESSAGE:${originalMessage}`,
         ].join('|');
+
+        // there are certain error messages we can't do anything about
+        // let's track those separately but not throw
+        if (errorMessage.includes('E403')) {
+          getTelemetry().logUsage('ai.configure-agents-action-expected-error');
+          return;
+        }
 
         throw new Error(errorMessage, {
           cause: e as Error,
