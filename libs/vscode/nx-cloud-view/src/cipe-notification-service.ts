@@ -4,7 +4,6 @@ import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
 } from '@nx-console/vscode-configuration';
-import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { commands, window } from 'vscode';
 import { fetchAndPullChanges } from './nx-cloud-fix-webview';
@@ -12,6 +11,7 @@ import { execSync } from 'child_process';
 
 export class CIPENotificationService {
   private sentNotifications = new Set<string>();
+  private sentAppliedNotifications = new Set<string>();
 
   private nxCloudNotificationsSetting: 'all' | 'errors' | 'none';
 
@@ -43,15 +43,17 @@ export class CIPENotificationService {
     // Process each CIPE for potential notifications
     for (const newCIPE of newInfo) {
       const cipeId = newCIPE.ciPipelineExecutionId;
-      // Find the corresponding old CIPE if it exists
-      if (this.sentNotifications.has(cipeId)) {
-        continue;
-      }
       const oldCIPE = oldInfo.find(
         (old) => old.ciPipelineExecutionId === cipeId,
       );
+
+      // Always process AI fix notifications (they have separate tracking)
       this.processAIFixNotifications(oldCIPE, newCIPE);
-      this.processCIPENotifications(oldCIPE, newCIPE);
+
+      // Only process regular CIPE notifications if we haven't sent one already
+      if (!this.sentNotifications.has(cipeId)) {
+        this.processCIPENotifications(oldCIPE, newCIPE);
+      }
     }
   }
 
@@ -170,57 +172,37 @@ export class CIPENotificationService {
   }
 
   private showAiFixNotification(cipe: CIPEInfo, runGroup: CIPERunGroup) {
-    if (this.sentNotifications.has(cipe.ciPipelineExecutionId)) {
-      return;
-    }
-    this.sentNotifications.add(cipe.ciPipelineExecutionId);
     const telemetry = getTelemetry();
 
-    // Check if the fix was applied automatically
-    if (runGroup.aiFix?.userAction === 'APPLIED_AUTOMATICALLY') {
+    // Check if the fix was applied (manually or automatically)
+    if (
+      runGroup.aiFix?.userAction === 'APPLIED' ||
+      runGroup.aiFix?.userAction === 'APPLIED_AUTOMATICALLY'
+    ) {
+      if (this.sentAppliedNotifications.has(cipe.ciPipelineExecutionId)) {
+        return;
+      }
+      this.sentAppliedNotifications.add(cipe.ciPipelineExecutionId);
+
       telemetry.logUsage('cloud.show-ai-fix-notification', {
         source: 'notification',
       });
 
-      const message = `Nx Cloud automatically applied a fix for #${cipe.branch}`;
+      const message =
+        runGroup.aiFix.userAction === 'APPLIED_AUTOMATICALLY'
+          ? `Nx Cloud automatically applied a fix for #${cipe.branch}`
+          : `Nx Cloud applied a fix for #${cipe.branch}`;
 
-      const notificationCommands: ('View PR' | 'Fetch & Pull Changes')[] = [];
-
-      if (cipe.commitUrl) {
-        notificationCommands.push('View PR');
-      }
-
-      const targetBranch = cipe.branch;
-      let hasBranchOnRemote: boolean;
-      try {
-        execSync(`git rev-parse --verify origin/${targetBranch}`, {
-          cwd: getNxWorkspacePath(),
-        });
-        hasBranchOnRemote = true;
-      } catch {
-        hasBranchOnRemote = false;
-      }
-
-      if (hasBranchOnRemote) {
-        notificationCommands.push('Fetch & Pull Changes');
-      }
-
-      window
-        .showInformationMessage(message, ...notificationCommands)
-        .then((selection) => {
-          if (selection === 'View PR') {
-            telemetry.logUsage('cloud.show-ai-fix', {
-              source: 'notification',
-            });
-            commands.executeCommand('vscode.open', cipe.commitUrl);
-          } else if (selection === 'Fetch & Pull Changes') {
-            fetchAndPullChanges(targetBranch);
-          }
-        });
+      this.showAppliedFixNotification(cipe, message);
       return;
     }
 
-    // Original notification for manual fixes
+    // Original notification for pending fixes
+    if (this.sentNotifications.has(cipe.ciPipelineExecutionId)) {
+      return;
+    }
+    this.sentNotifications.add(cipe.ciPipelineExecutionId);
+
     telemetry.logUsage('cloud.show-ai-fix-notification');
 
     type MessageCommand = 'Show Fix' | 'Reject';
@@ -246,6 +228,43 @@ export class CIPENotificationService {
     const message = getAIFixMessage(cipe.branch);
 
     window.showErrorMessage(message, ...messageCommands).then(handleResults);
+  }
+
+  private showAppliedFixNotification(cipe: CIPEInfo, message: string) {
+    const telemetry = getTelemetry();
+    const notificationCommands: ('View PR' | 'Fetch & Pull Changes')[] = [];
+
+    if (cipe.commitUrl) {
+      notificationCommands.push('View PR');
+    }
+
+    const targetBranch = cipe.branch;
+    let hasBranchOnRemote: boolean;
+    try {
+      execSync(`git rev-parse --verify origin/${targetBranch}`, {
+        cwd: getNxWorkspacePath(),
+      });
+      hasBranchOnRemote = true;
+    } catch {
+      hasBranchOnRemote = false;
+    }
+
+    if (hasBranchOnRemote) {
+      notificationCommands.push('Fetch & Pull Changes');
+    }
+
+    window
+      .showInformationMessage(message, ...notificationCommands)
+      .then((selection) => {
+        if (selection === 'View PR') {
+          telemetry.logUsage('cloud.show-ai-fix', {
+            source: 'notification',
+          });
+          commands.executeCommand('vscode.open', cipe.commitUrl);
+        } else if (selection === 'Fetch & Pull Changes') {
+          fetchAndPullChanges(targetBranch);
+        }
+      });
   }
 }
 
