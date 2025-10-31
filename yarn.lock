@@ -16712,6 +16712,7 @@ __metadata:
     rxjs: 7.5.6
     semver: ^7.7.1
     storybook: 9.0.9
+    string-replace-loader: ^3.2.0
     tailwindcss: ^3.3.2
     tar-stream: ^3.1.7
     ts-jest: 29.4.0
@@ -19507,7 +19508,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"schema-utils@npm:^4.0.0, schema-utils@npm:^4.0.1, schema-utils@npm:^4.2.0, schema-utils@npm:^4.3.0, schema-utils@npm:^4.3.2":
+"schema-utils@npm:^4, schema-utils@npm:^4.0.0, schema-utils@npm:^4.0.1, schema-utils@npm:^4.2.0, schema-utils@npm:^4.3.0, schema-utils@npm:^4.3.2":
   version: 4.3.2
   resolution: "schema-utils@npm:4.3.2"
   dependencies:
@@ -20327,6 +20328,17 @@ __metadata:
     char-regex: ^1.0.2
     strip-ansi: ^6.0.0
   checksum: ce85533ef5113fcb7e522bcf9e62cb33871aa99b3729cec5595f4447f660b0cefd542ca6df4150c97a677d58b0cb727a3fe09ac1de94071d05526c73579bf505
+  languageName: node
+  linkType: hard
+
+"string-replace-loader@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "string-replace-loader@npm:3.2.0"
+  dependencies:
+    schema-utils: ^4
+  peerDependencies:
+    webpack: ^5
+  checksum: da0fe6ad577465840986e56c5af1a357532b606d76e2bc93d560be99fe88b06b6d0b91857702e1c9ab31d15fe66c5ce266469fca24cd1cba3f3236348fea5824
   languageName: node
   linkType: hard
 
