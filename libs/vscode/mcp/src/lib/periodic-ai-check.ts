@@ -1,11 +1,16 @@
 import { gte } from '@nx-console/nx-version';
+import { detectPackageManager } from '@nx-console/shared-npm';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec } from 'child_process';
 import { createHash } from 'crypto';
+import { rmSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 import { promisify } from 'util';
 import {
   commands,
@@ -13,14 +18,10 @@ import {
   ExtensionContext,
   ShellExecution,
   Task,
-  TaskScope,
   tasks,
+  TaskScope,
   window,
 } from 'vscode';
-import { rmSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 
 let checkTimer: NodeJS.Timeout | undefined;
 let intervalTimer: NodeJS.Timeout | undefined;
@@ -206,11 +207,19 @@ async function runAiAgentCheck() {
           ((e as any).message || '') as string,
         );
 
+        let packageManager: string;
+        try {
+          packageManager = await detectPackageManager(workspacePath);
+        } catch {
+          packageManager = 'error';
+        }
+
         const errorMessage = [
           'AIFAIL',
           `NODEVERSION:${nodeVersion}`,
           `NXVERSION:${nxLatestVersion}`,
           `LOCALNXVERSION:${localNxVersion}`,
+          `PKGMANAGER:${packageManager}`,
           `EXITCODE:${exitCode}`,
           `SIGNAL:${signal}`,
           `STDERR:${stderr}`,
@@ -220,8 +229,14 @@ async function runAiAgentCheck() {
 
         // there are certain error messages we can't do anything about
         // let's track those separately but not throw
-        if (errorMessage.includes('E403')) {
-          getTelemetry().logUsage('ai.configure-agents-action-expected-error');
+        if (
+          errorMessage.includes('E401') ||
+          errorMessage.includes('E403') ||
+          errorMessage.includes('E404') ||
+          errorMessage.includes('ENOTFOUND') ||
+          errorMessage.includes('ECONNRESET')
+        ) {
+          getTelemetry().logUsage('ai.configure-agents-check-expected-error');
           return;
         }
 
