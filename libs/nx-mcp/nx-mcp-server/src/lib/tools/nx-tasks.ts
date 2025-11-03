@@ -11,17 +11,12 @@ import {
 import { IdeProvider } from '../ide-provider';
 import { RunningTasksMap } from '@nx-console/shared-running-tasks';
 
-let isRegistered = false;
-
 export function registerNxTaskTools(
   server: McpServer,
   ideProvider: IdeProvider,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,
 ): void {
-  if (isRegistered) {
-    return;
-  }
   server.tool(
     NX_CURRENT_RUNNING_TASKS_DETAILS,
     `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
@@ -50,7 +45,6 @@ export function registerNxTaskTools(
     nxCurrentlyRunningTaskOutput(telemetry, ideProvider),
   );
 
-  isRegistered = true;
   logger.log('Registered Nx task tools');
 }
 
