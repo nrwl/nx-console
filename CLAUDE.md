@@ -14,6 +14,10 @@
 - before creating a commit, run `npx nx format --fix` and if kotlin files were touched, `npx nx run-many -t ktfmtFormat` to make sure formatting is applied
 - when working from a plan and creating a set of commits, always pause after you have implemented one section or one commit worth of code. Ask me for feedback and wait for me to confirm your code is right. I will commit the code myself and prompt you to continue
 
+## Running Tests
+
+- when running e2e or unit tests and you want to just run one file, always run via nx but pass in the file as a param. Example: `npx nx run nx-mcp-e2e:e2e-local -- project-details-filter` (this will run any test with project-details-filter in the filename)
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 

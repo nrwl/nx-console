@@ -41,12 +41,24 @@ describe('nx_project_details filter', () => {
       `--tool-arg projectName="${workspaceName}"`,
     );
 
-    // Should have 2 content blocks: Project Details and External Dependencies (no project deps for standalone)
-    expect(result.content).toHaveLength(2);
+    // Should have 3 content blocks: Project Details (without targets), Available Targets (compressed), and External Dependencies
+    expect(result.content).toHaveLength(3);
     expect(result.content[0]?.text).toContain('Project Details:');
     expect(result.content[0]?.text).toContain('"name":');
-    expect(result.content[0]?.text).toContain('"targets":');
-    expect(result.content[1]?.text).toContain('External Dependencies:');
+    // Targets should NOT be in the JSON anymore
+    expect(result.content[0]?.text).not.toContain('"targets":');
+
+    // Second block should be compressed targets
+    expect(result.content[1]?.text).toContain(
+      'Available Targets (compressed view)',
+    );
+    expect(result.content[1]?.text).toContain(
+      'To see full configuration for a specific target',
+    );
+    expect(result.content[1]?.text).toContain('cache:');
+
+    // Third block should be External Dependencies
+    expect(result.content[2]?.text).toContain('External Dependencies:');
   });
 
   it('should filter to root path using dot notation', () => {

@@ -131,14 +131,22 @@ describe('nx_project_details pagination', () => {
       `--tool-arg projectName="${workspaceName}"`,
     );
 
+    // With compressed targets, the response is now much smaller and fits on one page
+    // Should have 4 blocks: Project Details (without targets), Available Targets (compressed), Project Dependencies, External Dependencies
     expect(result.content.length).toBe(4);
 
     const projectDetails = result.content[0]?.text;
     expect(projectDetails).toContain('Project Details:');
     expect(projectDetails).not.toContain('(continued)');
 
+    // Verify compressed targets block exists
+    expect(result.content[1]?.text).toContain(
+      'Available Targets (compressed view)',
+    );
+
+    // No pagination needed anymore since content is compressed
     const nextPageToken = getNextPageToken(result);
-    expect(nextPageToken).toBe(1);
+    expect(nextPageToken).toBeNull();
   });
 
   it('should return second page with continued label when page token provided', () => {
@@ -220,23 +228,17 @@ describe('nx_project_details pagination', () => {
       `--tool-arg projectName="${workspaceName}"`,
     );
 
+    // With compressed targets, everything fits on one page now
+    // Page 0 should have 4 blocks: Project Details, Targets (compressed), Project Dependencies, External Dependencies
     expect(page0.content.length).toBe(4);
     expect(page0.content[0]?.text).toContain('Project Details');
-    expect(page0.content[2]?.text).toContain('External Dependencies');
+    expect(page0.content[1]?.text).toContain('Available Targets');
+    expect(page0.content[2]?.text).toContain('Project Dependencies');
+    expect(page0.content[3]?.text).toContain('External Dependencies');
 
+    // No pagination needed anymore
     const nextToken = getNextPageToken(page0);
-    const page1 = invokeMCPInspectorCLI(
-      testWorkspacePath,
-      '--method tools/call',
-      '--tool-name nx_project_details',
-      `--tool-arg projectName="${workspaceName}"`,
-      `--tool-arg pageToken=${nextToken}`,
-    );
-
-    expect(page1.content.length).toBe(4);
-    expect(hasContinuedLabel(page1.content[0]?.text)).toBe(true);
-    expect(hasContinuedLabel(page1.content[1]?.text)).toBe(true);
-    expect(hasContinuedLabel(page1.content[2]?.text)).toBe(true);
+    expect(nextToken).toBeNull();
   });
 
   it('should show truncation indicators on non-final pages', () => {
@@ -248,7 +250,8 @@ describe('nx_project_details pagination', () => {
     );
 
     const projectDetails = result.content[0]?.text;
-    expect(hasTruncationIndicator(projectDetails)).toBe(true);
+    // With compressed targets, content now fits on one page, so no truncation indicators
+    expect(hasTruncationIndicator(projectDetails)).toBe(false);
   });
 
   it('should handle filter with undefined value correctly', () => {
