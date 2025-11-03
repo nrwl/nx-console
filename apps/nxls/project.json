@@ -24,6 +24,12 @@
         "optimization": true,
         "extractLicenses": true,
         "webpackConfig": "apps/nxls/webpack.config.js"
+      },
+      "configurations": {
+        "debug": {
+          "sourceMap": true,
+          "optimization": false
+        }
       }
     },
     "build": {
