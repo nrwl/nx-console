@@ -1,3 +1,15 @@
+# [18.76.0](https://github.com/nrwl/nx-console/compare/vscode-v18.75.0...vscode-v18.76.0) (2025-11-03)
+
+
+### Bug Fixes
+
+* **vscode:** add cache & disable cipe refreshes on mcp side ([#2864](https://github.com/nrwl/nx-console/issues/2864)) ([c5c63cb](https://github.com/nrwl/nx-console/commit/c5c63cbcc27d19a63b8d401cf6bb103a201554e1))
+
+
+### Features
+
+* **nx-mcp:** compress target details by default in nx_project_details tool ([#2862](https://github.com/nrwl/nx-console/issues/2862)) ([a22ab18](https://github.com/nrwl/nx-console/commit/a22ab18a89ca1b712fb3cc7707824bd7d19b8359))
+
 # [18.75.0](https://github.com/nrwl/nx-console/compare/vscode-v18.74.5...vscode-v18.75.0) (2025-11-03)
 
 
