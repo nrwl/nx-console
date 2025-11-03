@@ -58,6 +58,74 @@ function getValueByPath(obj: any, path: string): any {
   }, obj);
 }
 
+/**
+ * Compress a target configuration into a human-readable plain text description.
+ * Shows executor/command, dependencies, and cache status in token-efficient format.
+ *
+ * @param name - The target name
+ * @param config - The target configuration object
+ * @returns Plain text description of the target
+ */
+function compressTargetForDisplay(name: string, config: any): string {
+  let description = `${name}: `;
+
+  // Determine executor/command display
+  const executor = config.executor;
+  if (!executor) {
+    description += 'no executor';
+  } else if (executor === 'nx:run-commands') {
+    const command = config.command ?? config.options?.command;
+    const commands = config.options?.commands;
+
+    if (command) {
+      description += `nx:run-commands - '${command}'`;
+    } else if (commands && Array.isArray(commands)) {
+      if (commands.length === 1) {
+        const cmd =
+          typeof commands[0] === 'string' ? commands[0] : commands[0].command;
+        description += `nx:run-commands - '${cmd}'`;
+      } else {
+        description += `nx:run-commands - ${commands.length} commands`;
+      }
+    } else {
+      description += 'nx:run-commands';
+    }
+  } else if (executor === 'nx:run-script') {
+    const command = config.metadata?.runCommand;
+    const script = config.metadata?.scriptContent;
+
+    if (command) {
+      description += `nx:run-script - '${command}'`;
+    } else if (script) {
+      description += `nx:run-script - '${script}'`;
+    } else {
+      description += 'nx:run-script';
+    }
+  } else {
+    description += executor;
+  }
+
+  // Add dependsOn if present
+  if (
+    config.dependsOn &&
+    Array.isArray(config.dependsOn) &&
+    config.dependsOn.length > 0
+  ) {
+    const deps = config.dependsOn
+      .map((dep: any) => (typeof dep === 'string' ? dep : dep.target))
+      .filter(Boolean);
+    if (deps.length > 0) {
+      description += ` | depends: [${deps.join(', ')}]`;
+    }
+  }
+
+  // Add cache status
+  const cacheEnabled = config.cache !== false;
+  description += ` | cache: ${cacheEnabled}`;
+
+  return description;
+}
+
 export function chunkContent(
   content: string,
   pageNumber: number,
@@ -226,7 +294,7 @@ export function registerNxWorkspaceTools(
 
   server.tool(
     NX_PROJECT_DETAILS,
-    'Returns the complete, unabridged project configuration in JSON format for a specific Nx project. Use this tool whenever you work with a specific project or need detailed information about how to build, test, or run a specific project, understand its relationships with other projects, or access any project-specific configuration. This provides much more detail than the summarized view from nx_workspace. This includes: all targets with their full configuration (executors, options, dependencies, caching, inputs/outputs), project metadata (type, tags, owners, description, package info) and more. It also includes a list of dependencies (both projects inside the monorepo and external dependencies). Optionally filter to a specific path using dot notation (e.g., "targets.build.inputs" or "targets.build.options.assets[0]"). For large projects, results are paginated. If a pagination token is returned, call this tool again with the same projectName and filter parameters plus the token to retrieve additional results and ensure all data is collected.',
+    'Returns the project configuration for a specific Nx project. When called without a filter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the filter parameter with dot notation to access complete unabridged configuration for specific paths (e.g., filter="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
     {
       projectName: z
         .string()
@@ -289,21 +357,47 @@ export function registerNxWorkspaceTools(
 
       const pageNumber = pageToken ?? 0;
 
-      const detailsJson = filter
-        ? getValueByPath(project.data, filter)
-        : project.data;
+      let detailsJson: any;
+      let compressedTargetsText: string | undefined;
 
-      // Handle filtered value not found
-      if (filter && detailsJson === undefined) {
-        return {
-          isError: true,
-          content: [
-            {
-              type: 'text',
-              text: `Path "${filter}" not found in project configuration`,
-            },
-          ],
-        };
+      if (filter) {
+        // When filter is provided, return unabridged data at that path
+        detailsJson = getValueByPath(project.data, filter);
+
+        // Handle filtered value not found
+        if (detailsJson === undefined) {
+          return {
+            isError: true,
+            content: [
+              {
+                type: 'text',
+                text: `Path "${filter}" not found in project configuration`,
+              },
+            ],
+          };
+        }
+      } else {
+        // No filter: compress targets into plain text, return rest as JSON
+        const { targets, ...projectDataWithoutTargets } = project.data;
+        detailsJson = projectDataWithoutTargets;
+
+        if (targets && typeof targets === 'object') {
+          const targetDescriptions = Object.entries(targets)
+            .map(
+              ([name, config]) =>
+                `  - ${compressTargetForDisplay(name, config)}`,
+            )
+            .join('\n');
+
+          // Pick a sample target name for the example
+          const sampleTargetName = Object.keys(targets)[0] ?? 'build';
+
+          compressedTargetsText = `Available Targets (compressed view):
+To see full configuration for a specific target, call this tool again with filter='targets.TARGET_NAME'
+Example: filter='targets.${sampleTargetName}' for the ${sampleTargetName} target
+
+${targetDescriptions}`;
+        }
       }
 
       const dependencies = workspace.projectGraph.dependencies[project.name];
@@ -347,6 +441,14 @@ export function registerNxWorkspaceTools(
         content.push({
           type: 'text',
           text: `Project Details${continuedString}: \n${detailsChunk.chunk}`,
+        });
+      }
+
+      // Add compressed targets text if no filter and on first page only (not on continuation pages)
+      if (!filter && compressedTargetsText && pageNumber === 0) {
+        content.push({
+          type: 'text',
+          text: compressedTargetsText,
         });
       }
 
