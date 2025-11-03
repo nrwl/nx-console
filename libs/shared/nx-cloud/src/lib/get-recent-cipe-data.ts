@@ -7,6 +7,16 @@ import { Logger } from '@nx-console/shared-utils';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 
+const CACHE_TTL_MS = 5000; // 5 seconds
+
+let lastFetchTimestamp = 0;
+let cachedWorkspacePath: string | null = null;
+let cachedResult: {
+  info?: CIPEInfo[];
+  error?: CIPEInfoError;
+  workspaceUrl?: string;
+} | null = null;
+
 export async function getRecentCIPEData(
   workspacePath: string,
   logger: Logger,
@@ -15,6 +25,8 @@ export async function getRecentCIPEData(
   error?: CIPEInfoError;
   workspaceUrl?: string;
 }> {
+  const now = Date.now();
+
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
       error: {
@@ -22,6 +34,15 @@ export async function getRecentCIPEData(
         message: 'Nx Cloud is not used in this workspace',
       },
     };
+  }
+
+  if (
+    cachedResult &&
+    now - lastFetchTimestamp < CACHE_TTL_MS &&
+    cachedWorkspacePath === workspacePath
+  ) {
+    logger.log('Returning cached CIPE data');
+    return cachedResult;
   }
 
   const branches = getRecentlyCommittedGitBranches(workspacePath);
@@ -50,10 +71,16 @@ export async function getRecentCIPEData(
       ciPipelineExecutions: CIPEInfo[];
       workspaceUrl: string;
     };
-    return {
+    const result = {
       info: responseData.ciPipelineExecutions,
       workspaceUrl: responseData.workspaceUrl,
     };
+
+    cachedResult = result;
+    cachedWorkspacePath = workspacePath;
+    lastFetchTimestamp = Date.now();
+
+    return result;
   } catch (e) {
     if (e.status === 401) {
       logger.log(`Authentication error: ${e.responseText}`);
@@ -64,7 +91,6 @@ export async function getRecentCIPEData(
         },
       };
     }
-    // Check for network errors
     if (
       (e.status === 404 || !e.status) &&
       e.responseText &&
