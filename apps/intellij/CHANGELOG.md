@@ -1,3 +1,16 @@
+## 1.54.0 (2025-11-03)
+
+### Bug Fixes
+
+* **intellij:** remove optional llm xml ([#2850](https://github.com/nrwl/nx-console/issues/2850)) ([4f48d95](https://github.com/nrwl/nx-console/commit/4f48d951330fbb2d19bd3bbad8ea02de292cbe06))
+* **intellij:** remove outdated llm dep ([#2863](https://github.com/nrwl/nx-console/issues/2863)) ([cd76f98](https://github.com/nrwl/nx-console/commit/cd76f98effa476bb2f58a13bfef9ce2962f179b6))
+* **vscode:** add cache & disable cipe refreshes on mcp side ([#2864](https://github.com/nrwl/nx-console/issues/2864)) ([c5c63cb](https://github.com/nrwl/nx-console/commit/c5c63cbcc27d19a63b8d401cf6bb103a201554e1))
+
+
+### Features
+
+* show ai notifications on APPLIED as well as APPLIED_AUTOMATICALLY ([#2854](https://github.com/nrwl/nx-console/issues/2854)) ([553cf6b](https://github.com/nrwl/nx-console/commit/553cf6b6ea488db31a641ee30aa86d917ee3c361))
+
 ## 1.53.0 (2025-10-29)
 
 ### Bug Fixes
