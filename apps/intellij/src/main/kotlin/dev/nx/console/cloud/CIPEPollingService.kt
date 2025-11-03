@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Service responsible for polling CIPE data at dynamic intervals. Implements the same polling logic
  * as VSCode:
- * - AI_FIX (3s): When AI fixes are being created/verified (highest priority)
- * - HOT (10s): When CIPEs are in progress
+ * - AI_FIX (10s): When AI fixes are being created/verified (highest priority)
+ * - HOT (20s): When CIPEs are in progress
  * - COLD (180s): Normal polling
  * - SLEEP (3600s): When authentication errors occur
  */
@@ -29,8 +29,8 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     companion object {
         private const val SLEEP_POLLING_TIME_MS = 3_600_000L // 1 hour
         private const val COLD_POLLING_TIME_MS = 180_000L // 3 minutes
-        private const val HOT_POLLING_TIME_MS = 10_000L // 10 seconds
-        private const val AI_FIX_POLLING_TIME_MS = 3_000L // 3 seconds
+        private const val HOT_POLLING_TIME_MS = 20_000L // 20 seconds
+        private const val AI_FIX_POLLING_TIME_MS = 10_000L // 10 seconds
 
         fun getInstance(project: Project): CIPEPollingService =
             project.getService(CIPEPollingService::class.java)

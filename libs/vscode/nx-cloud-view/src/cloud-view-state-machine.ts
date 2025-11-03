@@ -88,9 +88,9 @@ const pollingMachine = setup({
             case COLD_POLLING_TIME:
               return 'COLD (3 minutes)';
             case HOT_POLLING_TIME:
-              return 'HOT (10 seconds)';
+              return 'HOT (20 seconds)';
             case AI_FIX_POLLING_TIME:
-              return 'AI FIX (3 seconds)';
+              return 'AI FIX (10 seconds)';
             default:
               return `${freq}ms`;
           }
