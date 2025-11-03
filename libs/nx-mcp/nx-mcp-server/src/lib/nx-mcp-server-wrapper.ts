@@ -274,7 +274,8 @@ export class NxMcpServerWrapper {
         );
 
         // Start refresh interval for CIPE resources
-        this.startCipeRefreshInterval();
+        // Disabled while we figure out a better way to handle multiple NxMcpServerWrapper
+        // this.startCipeRefreshInterval();
 
         this.toolRegistrationState.nxCloud = true;
       }
