@@ -1,3 +1,18 @@
+# [18.75.0](https://github.com/nrwl/nx-console/compare/vscode-v18.74.5...vscode-v18.75.0) (2025-11-03)
+
+
+### Bug Fixes
+
+* **vscode:** further investigation and fixes in configure-ai-agents ([#2860](https://github.com/nrwl/nx-console/issues/2860)) ([d3c1b91](https://github.com/nrwl/nx-console/commit/d3c1b918f4053de755c1f6cd7ef410f115c01ee5))
+* **vscode:** repair current running tasks tool in cursor ([#2855](https://github.com/nrwl/nx-console/issues/2855)) ([3ba0397](https://github.com/nrwl/nx-console/commit/3ba0397de3c48806e2d608f1a408bd0c42993c97))
+* **vscode:** repair sidebar if there is a target and target:configuration collision ([#2861](https://github.com/nrwl/nx-console/issues/2861)) ([10610b8](https://github.com/nrwl/nx-console/commit/10610b85905a919c425ed812eb9262915d1ee41f))
+
+
+### Features
+
+* **nx-mcp:** remove MCP tools made redundant by self healing and rename others ([#2856](https://github.com/nrwl/nx-console/issues/2856)) ([6bdb776](https://github.com/nrwl/nx-console/commit/6bdb7768ea381e8e80d1f1670a88a71a044defbd))
+* show ai notifications on APPLIED as well as APPLIED_AUTOMATICALLY ([#2854](https://github.com/nrwl/nx-console/issues/2854)) ([553cf6b](https://github.com/nrwl/nx-console/commit/553cf6b6ea488db31a641ee30aa86d917ee3c361))
+
 ## [18.74.5](https://github.com/nrwl/nx-console/compare/vscode-v18.74.4...vscode-v18.74.5) (2025-10-30)
 
 
