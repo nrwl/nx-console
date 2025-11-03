@@ -3,7 +3,6 @@ import {
   RegisteredResource,
 } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
-import { NX_CLOUD_CIPE_FAILURE } from '@nx-console/shared-llm-context';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
@@ -149,7 +148,7 @@ export async function registerNxCloudCipeResources(
             };
           }
 
-          const description = `This is a CI Pipeline Execution (CIPE) from Nx Cloud. To retrieve terminal output for failed tasks, use the ${NX_CLOUD_CIPE_FAILURE} tool with the executionId or linkId and the taskId from the list of failed tasks.`;
+          const description = `This is a CI Pipeline Execution (CIPE) from Nx Cloud.`;
 
           return {
             contents: [

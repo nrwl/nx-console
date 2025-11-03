@@ -99,16 +99,16 @@ The Nx MCP server provides a comprehensive set of tools for interacting with you
 - **nx_run_generator**: Opens generate UI with prefilled options (requires running IDE instance)
 - **nx_visualize_graph**: Visualizes the Nx graph (requires running IDE instance)
 
-### Nx Cloud Tools (only available w/ Nx Cloud enabled)
+### Nx Cloud Analytics Tools (only available w/ Nx Cloud enabled)
 
-- **nx_cloud_cipe_details**: Returns CI pipeline execution details from Nx Cloud
-- **nx_cloud_fix_cipe_failure**: Returns failure details including terminal output and git diffs
-- **nx_cloud_pipeline_executions_search**: Searches for pipeline executions in Nx Cloud
-- **nx_cloud_pipeline_executions_details**: Gets detailed information about specific pipeline executions
-- **nx_cloud_runs_search**: Searches for runs within pipeline executions
-- **nx_cloud_runs_details**: Gets detailed information about specific runs
-- **nx_cloud_tasks_search**: Searches for task statistics and performance data
-- **nx_cloud_tasks_details**: Returns detailed task execution information
+These tools provide analytics and insights into your Nx Cloud CI/CD data, helping you track performance trends and team productivity:
+
+- **nx_cloud_analytics_pipeline_executions_search**: Analyzes historical pipeline execution data to identify trends and patterns
+- **nx_cloud_analytics_pipeline_execution_details**: Analyzes detailed data for a specific pipeline execution to investigate performance
+- **nx_cloud_analytics_runs_search**: Analyzes historical run data to track performance trends and productivity patterns
+- **nx_cloud_analytics_run_details**: Analyzes detailed data for a specific run to investigate command execution performance
+- **nx_cloud_analytics_tasks_search**: Analyzes aggregated task performance statistics including success rates and cache hit rates
+- **nx_cloud_analytics_task_executions_search**: Analyzes individual task execution data to investigate performance trends
 
 When no workspace path is specified, only the `nx_docs` and `nx_available_plugins` tools will be available.
 

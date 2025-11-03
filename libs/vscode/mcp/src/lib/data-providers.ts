@@ -44,7 +44,7 @@ export const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
 
 export const ideProvider: IdeProvider = {
   isAvailable: () => true,
-  onConnectionChange: () => () => {
+  onConnectionChange: (_: (available: boolean) => void) => () => {
     // noop in vscode
   },
   dispose: () => {
