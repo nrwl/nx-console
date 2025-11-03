@@ -10,6 +10,7 @@ import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 const CACHE_TTL_MS = 5000; // 5 seconds
 
 let lastFetchTimestamp = 0;
+let cachedWorkspacePath: string | null = null;
 let cachedResult: {
   info?: CIPEInfo[];
   error?: CIPEInfoError;
@@ -26,11 +27,6 @@ export async function getRecentCIPEData(
 }> {
   const now = Date.now();
 
-  if (cachedResult && now - lastFetchTimestamp < CACHE_TTL_MS) {
-    logger.log('Returning cached CIPE data');
-    return cachedResult;
-  }
-
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
       error: {
@@ -38,6 +34,15 @@ export async function getRecentCIPEData(
         message: 'Nx Cloud is not used in this workspace',
       },
     };
+  }
+
+  if (
+    cachedResult &&
+    now - lastFetchTimestamp < CACHE_TTL_MS &&
+    cachedWorkspacePath === workspacePath
+  ) {
+    logger.log('Returning cached CIPE data');
+    return cachedResult;
   }
 
   const branches = getRecentlyCommittedGitBranches(workspacePath);
@@ -72,6 +77,7 @@ export async function getRecentCIPEData(
     };
 
     cachedResult = result;
+    cachedWorkspacePath = workspacePath;
     lastFetchTimestamp = Date.now();
 
     return result;
