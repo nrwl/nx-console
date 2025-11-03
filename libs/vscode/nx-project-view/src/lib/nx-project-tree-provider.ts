@@ -185,14 +185,39 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     selectRunInformationAndRun(project, target, configuration, true);
   }
 
+  private parseTreeItemId(
+    id: string,
+  ): { project: string; target: string; configuration?: string } | null {
+    if (id.startsWith('target$$')) {
+      const [, project, target] = id.split('$$');
+      return { project, target };
+    }
+    if (id.startsWith('config$$')) {
+      const [, project, target, configuration] = id.split('$$');
+      return { project, target, configuration };
+    }
+    return null;
+  }
+
   private async copyTaskToClipboard(selection: NxTreeItem | undefined) {
     getTelemetry().logUsage('tasks.copy-to-clipboard');
     if (!selection) {
       return;
     }
-    env.clipboard.writeText(
-      `nx run ${surroundWithQuotesIfNeeded(selection.id)}`,
-    );
+
+    const parsed = this.parseTreeItemId(selection.id);
+    if (!parsed) {
+      env.clipboard.writeText(
+        `nx run ${surroundWithQuotesIfNeeded(selection.id)}`,
+      );
+      return;
+    }
+
+    let command = `${parsed.project}:${parsed.target}`;
+    if (parsed.configuration) {
+      command += `:${parsed.configuration}`;
+    }
+    env.clipboard.writeText(`nx run ${surroundWithQuotesIfNeeded(command)}`);
   }
 
   private async revealInExplorer(selection: NxTreeItem | undefined) {

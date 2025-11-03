@@ -150,7 +150,7 @@ export abstract class BaseView {
       configurations && Object.keys(configurations).length > 0;
 
     return {
-      id: `${nxProject.project}:${targetName}`,
+      id: `target$$${nxProject.project}$$${targetName}`,
       contextValue: 'target',
       nxProject,
       nxTarget: { name: targetName },
@@ -168,7 +168,7 @@ export abstract class BaseView {
     targetNames: string[],
   ): TargetGroupViewItem {
     return {
-      id: `${nxProject.project}:targetGroup:${targetGroupName}`,
+      id: `targetGroup$$${nxProject.project}$$${targetGroupName}`,
       contextValue: 'targetGroup',
       nxProject,
       nxTargets: [...new Set(targetNames)].map((name) => ({ name })),
@@ -205,7 +205,7 @@ export abstract class BaseView {
     }
 
     return Object.keys(configurations).map((configuration) => ({
-      id: `${nxProject.project}:${nxTarget.name}:${configuration}`,
+      id: `config$$${nxProject.project}$$${nxTarget.name}$$${configuration}`,
       contextValue: 'target',
       nxProject,
       nxTarget: { name: nxTarget.name, configuration },
