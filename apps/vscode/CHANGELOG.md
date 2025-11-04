@@ -1,3 +1,10 @@
+## [18.76.1](https://github.com/nrwl/nx-console/compare/vscode-v18.76.0...vscode-v18.76.1) (2025-11-04)
+
+
+### Bug Fixes
+
+* **vscode:** handle EBADENGINE errors in configure-ai-agents ([#2865](https://github.com/nrwl/nx-console/issues/2865)) ([5e42bbb](https://github.com/nrwl/nx-console/commit/5e42bbb7c91d23af6fd626450ab4c63f9d84ae01))
+
 # [18.76.0](https://github.com/nrwl/nx-console/compare/vscode-v18.75.0...vscode-v18.76.0) (2025-11-03)
 
 
