@@ -158,12 +158,13 @@ async function runAiAgentCheck() {
       getTelemetry().logUsage('ai.configure-agents-check-start');
       await promisify(exec)(constructCommand('--check'), {
         cwd: workspacePath,
-        timeout: 120000,
+        timeout: 300000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
           // we're already executing from latest, we don't have to fetch latest again
           NX_AI_FILES_USE_LOCAL: 'true',
+          NX_VERBOSE_LOGGING: 'true',
         },
       });
       getTelemetry().logUsage('ai.configure-agents-check-end');
@@ -178,7 +179,6 @@ async function runAiAgentCheck() {
       // There are many different reasons this could fail so we want to not spam users
       const stringified = JSON.stringify(e);
       if (!stringified.includes('The following AI agents are out of date')) {
-        getTelemetry().logUsage('ai.configure-agents-check-error');
         // throw this error so that it can be tracked in rollbar - workaround while we track what's going wrong
         const nodeVersion = (
           await promisify(exec)('node --version')
@@ -197,7 +197,7 @@ async function runAiAgentCheck() {
             },
           );
 
-        const stderr = ((e as any).stderr || '').slice(-500);
+        const stderr = preserveModulePath((e as any).stderr || '').slice(-500);
 
         const stdout = preserveModulePath(
           ((e as any).stdout || '').slice(-500),
@@ -227,18 +227,43 @@ async function runAiAgentCheck() {
           `MESSAGE:${originalMessage}`,
         ].join('|');
 
+        const reasons = [
+          'E401',
+          'E403',
+          'E404',
+          'ENOTFOUND',
+          'ECONNRESET',
+          'EIDLETIMEOUT',
+          'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+        ];
         // there are certain error messages we can't do anything about
         // let's track those separately but not throw
-        if (
-          errorMessage.includes('E401') ||
-          errorMessage.includes('E403') ||
-          errorMessage.includes('E404') ||
-          errorMessage.includes('ENOTFOUND') ||
-          errorMessage.includes('ECONNRESET')
-        ) {
-          getTelemetry().logUsage('ai.configure-agents-check-expected-error');
+        if (reasons.some((reason) => errorMessage.includes(reason))) {
+          getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
+            cause: 'network-or-auth',
+          });
           return;
         }
+
+        let engineStrict = false;
+        try {
+          const npmSetting = await promisify(exec)(
+            'npm config get engine-strict',
+            {
+              cwd: workspacePath,
+            },
+          );
+          engineStrict = npmSetting.stdout.trim() === 'true';
+        } catch (e) {
+          // ignore
+        }
+        if (engineStrict && errorMessage.includes('EBADENGINE')) {
+          getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
+            cause: 'engine-strict',
+          });
+          return;
+        }
+        getTelemetry().logUsage('ai.configure-agents-check-error');
 
         throw new Error(errorMessage, {
           cause: e as Error,
@@ -313,7 +338,7 @@ async function runAiAgentCheck() {
     try {
       await promisify(exec)(checkAllCommand, {
         cwd: workspacePath,
-        timeout: 120000,
+        timeout: 300000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
