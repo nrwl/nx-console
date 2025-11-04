@@ -1,3 +1,11 @@
+## [18.76.2](https://github.com/nrwl/nx-console/compare/vscode-v18.76.1...vscode-v18.76.2) (2025-11-04)
+
+
+### Bug Fixes
+
+* **vscode:** capture stdout/err when configure-ai-agents times out ([#2866](https://github.com/nrwl/nx-console/issues/2866)) ([3a2082c](https://github.com/nrwl/nx-console/commit/3a2082cb220a8013f3b8c37ad71c82275bcb6a99))
+* **vscode:** remove outdated settings checks ([#2867](https://github.com/nrwl/nx-console/issues/2867)) ([66310fa](https://github.com/nrwl/nx-console/commit/66310fa8b0afc00ee1b4bc52ac8b3b7a4ad3cde2))
+
 ## [18.76.1](https://github.com/nrwl/nx-console/compare/vscode-v18.76.0...vscode-v18.76.1) (2025-11-04)
 
 
