@@ -1,3 +1,17 @@
+## 0.9.0 (2025-11-04)
+
+### 🚀 Features
+
+- **nx-mcp:** remove MCP tools made redundant by self healing and rename others ([#2856](https://github.com/nrwl/nx-console/pull/2856))
+
+### 🩹 Fixes
+
+- **nx-mcp:** update sdk version & use new logging format ([#2848](https://github.com/nrwl/nx-console/pull/2848))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.8.0 (2025-10-24)
 
 ### 🚀 Features
