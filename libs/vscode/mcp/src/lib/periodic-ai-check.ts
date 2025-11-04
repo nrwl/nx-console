@@ -271,6 +271,7 @@ async function runAiAgentCheck() {
           'E404',
           'ENOTFOUND',
           'ECONNRESET',
+          'ECONNREFUSED',
           'EIDLETIMEOUT',
           'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
         ];
