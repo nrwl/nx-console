@@ -120,12 +120,6 @@
           "group": "navigation"
         },
         {
-          "command": "nx.addAgentRules",
-          "when": "view == nxProjects && (isInCursor || isInVSCode) && isNxWorkspace && hasNxMcpConfigured && !config.nxConsole.generateAiAgentRules",
-          "group": "navigation@0",
-          "title": "Add Nx Agent Rules"
-        },
-        {
           "command": "nxMigrate.refresh",
           "when": "view == nxMigrate",
           "group": "navigation"
@@ -232,7 +226,7 @@
         {
           "command": "nx.project-details.openToSide",
           "group": "navigation",
-          "when": "resourcePath in nxConsole.pdvPaths && config.nxConsole.showProjectDetailsView"
+          "when": "resourcePath in nxConsole.pdvPaths"
         }
       ],
       "commandPalette": [
@@ -415,10 +409,6 @@
         {
           "command": "nx.graph.showAffected",
           "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.addAgentRules",
-          "when": "isNxWorkspace && hasNxMcpConfigured && !config.nxConsole.generateAiAgentRules && (isInCursor || isInVSCode)"
         },
         {
           "command": "nxMigrate.viewDiff",
