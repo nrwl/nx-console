@@ -6,7 +6,7 @@ import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import { createHash } from 'crypto';
 import { rmSync } from 'fs';
 import { tmpdir } from 'os';
@@ -154,18 +154,54 @@ async function runAiAgentCheck() {
       return;
     }
 
+    let callbackStdout = '';
+    let callbackStderr = '';
+
     try {
       getTelemetry().logUsage('ai.configure-agents-check-start');
-      await promisify(exec)(constructCommand('--check'), {
-        cwd: workspacePath,
-        timeout: 300000,
-        env: {
-          ...process.env,
-          NX_CONSOLE: 'true',
-          // we're already executing from latest, we don't have to fetch latest again
-          NX_AI_FILES_USE_LOCAL: 'true',
-          NX_VERBOSE_LOGGING: 'true',
-        },
+      await new Promise((resolve, reject) => {
+        const childProcess = spawn(constructCommand('--check'), {
+          cwd: workspacePath,
+          env: {
+            ...process.env,
+            NX_CONSOLE: 'true',
+            // we're already executing from latest, we don't have to fetch latest again
+            NX_AI_FILES_USE_LOCAL: 'true',
+            NX_VERBOSE_LOGGING: 'true',
+          },
+          shell: true,
+        });
+
+        const timeout = setTimeout(() => {
+          childProcess.kill();
+        }, 300000);
+
+        childProcess.stdout?.on('data', (data) => {
+          callbackStdout += data.toString();
+        });
+
+        childProcess.stderr?.on('data', (data) => {
+          callbackStderr += data.toString();
+        });
+
+        childProcess.on('close', (code, signal) => {
+          clearTimeout(timeout);
+          if (code !== 0) {
+            const error: any = new Error(`Process exited with code ${code}`);
+            error.code = code;
+            error.signal = signal;
+            error.stdout = callbackStdout;
+            error.stderr = callbackStderr;
+            reject(error);
+          } else {
+            resolve(true);
+          }
+        });
+
+        childProcess.on('error', (error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
       });
       getTelemetry().logUsage('ai.configure-agents-check-end');
       WorkspaceConfigurationStore.instance.set(
@@ -197,10 +233,12 @@ async function runAiAgentCheck() {
             },
           );
 
-        const stderr = preserveModulePath((e as any).stderr || '').slice(-500);
+        const stderr = preserveModulePath(
+          (e as any).stderr || callbackStderr || '',
+        ).slice(-500);
 
         const stdout = preserveModulePath(
-          ((e as any).stdout || '').slice(-500),
+          ((e as any).stdout || callbackStdout || '').slice(-500),
         );
 
         const originalMessage = preserveModulePath(
