@@ -1,3 +1,11 @@
+## [18.76.3](https://github.com/nrwl/nx-console/compare/vscode-v18.76.2...vscode-v18.76.3) (2025-11-04)
+
+
+### Bug Fixes
+
+* **vscode:** also handle ECONNREFUSED as expected error ([#2869](https://github.com/nrwl/nx-console/issues/2869)) ([dda95b0](https://github.com/nrwl/nx-console/commit/dda95b090cd18673ff2caa250fba97dad27482b3))
+* **vscode:** fall back to file from source maps if project.json doesn't exist for project ([#2868](https://github.com/nrwl/nx-console/issues/2868)) ([e9bb695](https://github.com/nrwl/nx-console/commit/e9bb695d7bea9a1d667ac6f7c66988dcf4d6526a))
+
 ## [18.76.2](https://github.com/nrwl/nx-console/compare/vscode-v18.76.1...vscode-v18.76.2) (2025-11-04)
 
 
