@@ -8,7 +8,7 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec, spawn } from 'child_process';
 import { createHash } from 'crypto';
-import { rmSync } from 'fs';
+import { mkdirSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { promisify } from 'util';
@@ -81,19 +81,23 @@ export async function runConfigureAiAgentsCommand() {
 function constructCommand(flags: string) {
   const workspacePath = getWorkspacePath();
 
-  // Create unique cache per workspace to avoid collisions
   const hash = createHash('sha256')
     .update(workspacePath || '')
     .digest('hex')
     .slice(0, 10);
 
   const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
+
+  let cacheParam = '';
   try {
     rmSync(tmpDir, { recursive: true, force: true });
+    mkdirSync(tmpDir, { recursive: true });
+    cacheParam = `--cache=${tmpDir}`;
   } catch (e) {
-    // ignore
+    // No permissions or can't create tmpDir, skip cache parameter
   }
-  return `npx -y --cache=${tmpDir} --ignore-scripts nx@latest configure-ai-agents ${flags}`;
+
+  return `npx -y ${cacheParam} --ignore-scripts nx@latest configure-ai-agents ${flags}`.trim();
 }
 
 async function getNxLatestVersion(): Promise<string | undefined> {
@@ -220,6 +224,13 @@ async function runAiAgentCheck() {
           await promisify(exec)('node --version')
         ).stdout.trim();
 
+        let npmVersion: string;
+        try {
+          npmVersion = (await promisify(exec)('npm --version')).stdout.trim();
+        } catch {
+          npmVersion = 'unknown';
+        }
+
         const localNxVersion = (await getNxVersion())?.full;
 
         const exitCode = (e as any).code ?? 'unknown';
@@ -235,10 +246,10 @@ async function runAiAgentCheck() {
 
         const stderr = preserveModulePath(
           (e as any).stderr || callbackStderr || '',
-        ).slice(-500);
+        ).slice(-1000);
 
         const stdout = preserveModulePath(
-          ((e as any).stdout || callbackStdout || '').slice(-500),
+          ((e as any).stdout || callbackStdout || '').slice(-1000),
         );
 
         const originalMessage = preserveModulePath(
@@ -255,6 +266,7 @@ async function runAiAgentCheck() {
         const errorMessage = [
           'AIFAIL',
           `NODEVERSION:${nodeVersion}`,
+          `NPMVERSION:${npmVersion}`,
           `NXVERSION:${nxLatestVersion}`,
           `LOCALNXVERSION:${localNxVersion}`,
           `PKGMANAGER:${packageManager}`,
@@ -274,6 +286,11 @@ async function runAiAgentCheck() {
           'ECONNREFUSED',
           'EIDLETIMEOUT',
           'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+          'npm error 403',
+          'npm error network',
+          'npm ERR! 404',
+          'npm error 502',
+          'npm error 500',
         ];
         // there are certain error messages we can't do anything about
         // let's track those separately but not throw
