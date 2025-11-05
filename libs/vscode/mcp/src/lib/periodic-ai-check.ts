@@ -224,6 +224,13 @@ async function runAiAgentCheck() {
           await promisify(exec)('node --version')
         ).stdout.trim();
 
+        let npmVersion: string;
+        try {
+          npmVersion = (await promisify(exec)('npm --version')).stdout.trim();
+        } catch {
+          npmVersion = 'unknown';
+        }
+
         const localNxVersion = (await getNxVersion())?.full;
 
         const exitCode = (e as any).code ?? 'unknown';
@@ -259,6 +266,7 @@ async function runAiAgentCheck() {
         const errorMessage = [
           'AIFAIL',
           `NODEVERSION:${nodeVersion}`,
+          `NPMVERSION:${npmVersion}`,
           `NXVERSION:${nxLatestVersion}`,
           `LOCALNXVERSION:${localNxVersion}`,
           `PKGMANAGER:${packageManager}`,
