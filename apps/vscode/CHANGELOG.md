@@ -1,3 +1,10 @@
+## [18.76.4](https://github.com/nrwl/nx-console/compare/vscode-v18.76.3...vscode-v18.76.4) (2025-11-05)
+
+
+### Bug Fixes
+
+* **vscode:** handle configure-ai-agents if no access to tmp folder ([#2871](https://github.com/nrwl/nx-console/issues/2871)) ([35a63f0](https://github.com/nrwl/nx-console/commit/35a63f03c89a04bfb3e9bdd85de20a3424b775a5))
+
 ## [18.76.3](https://github.com/nrwl/nx-console/compare/vscode-v18.76.2...vscode-v18.76.3) (2025-11-04)
 
 
