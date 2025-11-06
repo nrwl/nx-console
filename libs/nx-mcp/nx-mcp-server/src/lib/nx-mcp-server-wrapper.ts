@@ -130,7 +130,7 @@ export class NxMcpServerWrapper {
       telemetry,
       logger,
     );
-    logger?.log('Registering all Nx MCP tools');
+    logger?.debug?.('Registering all Nx MCP tools');
 
     server.server.server.setRequestHandler(
       SetLevelRequestSchema,
@@ -347,7 +347,7 @@ export class NxMcpServerWrapper {
       return;
     }
 
-    this.logger.log(
+    this.logger.debug?.(
       'Starting periodic tool condition monitoring (5 times, 10-second intervals)',
     );
     this.periodicMonitoringCount = 0;
@@ -371,7 +371,7 @@ export class NxMcpServerWrapper {
     if (this.periodicMonitoringTimer) {
       clearInterval(this.periodicMonitoringTimer);
       this.periodicMonitoringTimer = undefined;
-      this.logger.log('Stopped periodic tool condition monitoring');
+      this.logger.debug?.('Stopped periodic tool condition monitoring');
     }
   }
 

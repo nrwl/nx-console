@@ -4,13 +4,14 @@ import {
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server-types';
 import { killGroup } from '@nx-console/shared-utils';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
   logAndShowError,
   vscodeLogger,
 } from '@nx-console/vscode-output-channels';
-import { getGitApi, getGitRepository } from '@nx-console/vscode-utils';
+import { getGitRepository } from '@nx-console/vscode-utils';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import {
@@ -361,6 +362,10 @@ async function createLanguageClient(
     // Register the server for plain text documents
     initializationOptions: {
       workspacePath,
+      enableDebugLogging: GlobalConfigurationStore.instance.get(
+        'enableDebugLogging',
+        false,
+      ),
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },

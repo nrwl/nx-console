@@ -99,5 +99,5 @@ export function registerNxCoreTools(
     },
   );
 
-  logger.log('Registered Nx core tools');
+  logger.debug?.('Registered Nx core tools');
 }

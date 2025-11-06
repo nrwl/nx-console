@@ -45,7 +45,7 @@ export function registerNxTaskTools(
     nxCurrentlyRunningTaskOutput(telemetry, ideProvider),
   );
 
-  logger.log('Registered Nx task tools');
+  logger.debug?.('Registered Nx task tools');
 }
 
 const nxCurrentlyRunningTasksDetails =
