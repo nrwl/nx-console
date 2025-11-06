@@ -1,3 +1,15 @@
+# [18.77.0](https://github.com/nrwl/nx-console/compare/vscode-v18.76.4...vscode-v18.77.0) (2025-11-06)
+
+
+### Bug Fixes
+
+* **vscode:** load root env when checking provenance & npm debugging configure-ai-agents ([#2874](https://github.com/nrwl/nx-console/issues/2874)) ([5c1ffd6](https://github.com/nrwl/nx-console/commit/5c1ffd685085a886634619cb96c85e455974a42d))
+
+
+### Features
+
+* **vscode:** add debug logging setting to vscode & nxls ([#2873](https://github.com/nrwl/nx-console/issues/2873)) ([2660985](https://github.com/nrwl/nx-console/commit/26609852ea4d43d8c9b931d68d0faf9b5fa580ad))
+
 ## [18.76.4](https://github.com/nrwl/nx-console/compare/vscode-v18.76.3...vscode-v18.76.4) (2025-11-05)
 
 
