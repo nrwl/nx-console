@@ -1,12 +1,13 @@
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
+import { loadRootEnvFiles } from './loadRootEnvFiles';
 
-/**
- * Checks the provenance of the latest version of Nx from the npm registry.
- * Returns true if the provenance is valid, otherwise returns a string describing the failure reason.
- */
-export async function nxLatestProvenanceCheck(): Promise<true | string> {
-  if (process.env.NX_SKIP_PROVENANCE_CHECK === 'true') {
+export async function nxLatestProvenanceCheck(
+  workspacePath?: string,
+): Promise<true | string> {
+  const env = workspacePath ? loadRootEnvFiles(workspacePath) : process.env;
+
+  if (env.NX_SKIP_PROVENANCE_CHECK === 'true') {
     return true;
   }
   try {

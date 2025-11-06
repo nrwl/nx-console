@@ -9,7 +9,7 @@ import { join } from 'path';
  * - .env.local
  */
 export function loadRootEnvFiles(
-  root: string,
+  workspacePath: string,
   targetEnv: NodeJS.ProcessEnv = process.env,
 ): NodeJS.ProcessEnv {
   let expandedEnv: NodeJS.ProcessEnv = {
@@ -17,7 +17,7 @@ export function loadRootEnvFiles(
   };
   for (const file of ['.local.env', '.env.local', '.env']) {
     const myEnv = loadDotEnvFile({
-      path: join(root, file),
+      path: join(workspacePath, file),
       processEnv: targetEnv,
       override: true,
     });

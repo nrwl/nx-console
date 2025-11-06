@@ -28,7 +28,7 @@ export function initNxInit(context: ExtensionContext) {
         const workspacePath =
           workspace.workspaceFolders &&
           workspace.workspaceFolders[0].uri.fsPath;
-        const provenanceResult = await nxLatestProvenanceCheck();
+        const provenanceResult = await nxLatestProvenanceCheck(workspacePath);
         if (provenanceResult !== true) {
           getTelemetry().logUsage('misc.nx-latest-no-provenance');
           logAndShowError(noProvenanceError, provenanceResult);
