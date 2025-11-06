@@ -8,6 +8,7 @@ export interface ArgvType {
   port?: number;
   disableTelemetry: boolean;
   keepAliveInterval: number;
+  debugLogs: boolean;
   _: (string | number)[];
   $0: string;
   [x: string]: unknown;
@@ -58,6 +59,11 @@ export function createYargsConfig(args: string[]): Argv<any> {
       deprecated: true,
       hidden: true,
       default: 30000,
+    })
+    .option('debugLogs', {
+      describe: 'Enable debug logging',
+      type: 'boolean',
+      default: false,
     })
     .check((argv) => {
       // Check for conflicting options

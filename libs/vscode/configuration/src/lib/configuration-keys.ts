@@ -11,7 +11,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'showNodeVersionOnStartup',
   'nxWorkspacePath',
   'nxCloudNotifications',
-  'debugMode',
+  'enableDebugLogging',
   'mcpPort',
 ] as const;
 
@@ -28,7 +28,7 @@ export type GlobalConfig = {
   showNodeVersionOnStartup: boolean;
   nxWorkspacePath: string;
   nxCloudNotifications: 'all' | 'errors' | 'none';
-  debugMode: boolean;
+  enableDebugLogging: boolean;
   mcpPort: number | undefined;
 };
 

@@ -88,7 +88,7 @@ export function importWorkspaceDependency<T>(
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const imported = require(importPath);
 
-  logger?.log(`Using local Nx package at ${importPath}`);
+  logger?.debug?.(`Using local Nx package at ${importPath}`);
 
   return imported;
 }

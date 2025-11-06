@@ -32,11 +32,17 @@ labels: 'type: bug'
 
 **For VS Code users:**
 
-1. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. Go to `View: Toggle Output`
-3. Select `Nx Console` from the dropdown
-4. Also select `Nx Language Server` from the dropdown
-5. Paste both outputs below
+1. Enable debug logging (recommended for detailed logs):
+   - Open Settings (`Ctrl+,` / `Cmd+,`)
+   - Search for `nxConsole.enableDebugLogging`
+   - Enable the setting
+   - Restart VS Code or reload the window (`Ctrl+Shift+P` / `Cmd+Shift+P` → `Developer: Reload Window`)
+2. Reproduce the issue
+3. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+4. Go to `View: Toggle Output`
+5. Select `Nx Console` from the dropdown
+6. Also select `Nx Language Server` from the dropdown
+7. Paste both outputs below
 
 **For JetBrains IDE users (IntelliJ, WebStorm, etc.):**
 

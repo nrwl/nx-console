@@ -189,5 +189,5 @@ export function registerNxIdeTools(
     },
   );
 
-  logger.log('Registered Nx IDE tools');
+  logger.debug?.('Registered Nx IDE tools');
 }

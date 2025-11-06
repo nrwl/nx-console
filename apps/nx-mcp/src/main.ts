@@ -55,7 +55,10 @@ async function main() {
   );
 
   let mcpStdioConnected = false;
-  let logger: { log: (message: string) => void } = consoleLogger;
+  let logger: {
+    log: (message: string) => void;
+    debug?: (message: string) => void;
+  } = consoleLogger;
 
   if (argv.transport === 'stdio') {
     logger = {
@@ -69,8 +72,25 @@ async function main() {
           // do nothing
         }
       },
+      debug: (data: string) => {
+        if (argv.debugLogs && mcpStdioConnected) {
+          mcpServer.server.sendLoggingMessage({
+            level: 'info',
+            data,
+          });
+        }
+      },
     };
     ensureOnlyJsonRpcStdout();
+  } else {
+    logger = {
+      log: consoleLogger.log,
+      debug: (message: string) => {
+        if (argv.debugLogs) {
+          consoleLogger.log?.(message);
+        }
+      },
+    };
   }
 
   logger.log('Starting Nx MCP server');

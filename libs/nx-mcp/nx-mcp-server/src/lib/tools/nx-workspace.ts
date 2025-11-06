@@ -596,7 +596,7 @@ ${targetDescriptions}`;
     },
   );
 
-  logger.log('Registered Nx workspace tool');
+  logger.debug?.('Registered Nx workspace tool');
 }
 
 export function getTokenOptimizedToolResult(

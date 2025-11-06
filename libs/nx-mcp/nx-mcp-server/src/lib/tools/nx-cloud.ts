@@ -112,7 +112,7 @@ export function registerNxCloudTools(
     nxCloudTaskDetails(workspacePath, logger, telemetry),
   );
 
-  logger.log('Registered Nx Cloud tools');
+  logger.debug?.('Registered Nx Cloud tools');
 }
 
 export const renderCipeDetails = (cipe: CIPEInfo): string => {
