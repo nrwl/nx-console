@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../configuration"
+    },
+    {
       "path": "../../shared/utils"
     },
     {

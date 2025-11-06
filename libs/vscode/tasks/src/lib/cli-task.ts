@@ -34,7 +34,7 @@ export class CliTask extends Task {
     const { isEncapsulatedNx, workspacePath } = nxWorkspace;
 
     if (definition.useLatestNxVersion) {
-      const provenanceResult = await nxLatestProvenanceCheck();
+      const provenanceResult = await nxLatestProvenanceCheck(workspacePath);
       if (provenanceResult !== true) {
         getTelemetry().logUsage('misc.nx-latest-no-provenance');
         vscodeLogger.log(provenanceResult);

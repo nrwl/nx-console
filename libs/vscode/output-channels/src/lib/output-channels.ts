@@ -1,5 +1,6 @@
 import { OutputChannel, window } from 'vscode';
 import { Logger } from '@nx-console/shared-utils';
+import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 
 let _channel: OutputChannel;
 
@@ -30,5 +31,16 @@ export const vscodeLogger: Logger = {
     getOutputChannel().appendLine(
       `[${new Date().toISOString()}] ${message} ${args.join(' ')}`,
     );
+  },
+  debug: (message: string, ...args: any[]) => {
+    const enableDebugLogging = GlobalConfigurationStore.instance.get(
+      'enableDebugLogging',
+      false,
+    );
+    if (enableDebugLogging) {
+      getOutputChannel().appendLine(
+        `[${new Date().toISOString()}] ${message} ${args.join(' ')}`,
+      );
+    }
   },
 };

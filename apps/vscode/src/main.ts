@@ -12,13 +12,8 @@ import {
   workspace,
 } from 'vscode';
 
+import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import {
-  killGroup,
-  loadRootEnvFiles,
-  withTimeout,
-} from '@nx-console/shared-utils';
-import {
-  getNxWorkspacePath,
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode-configuration';
@@ -65,6 +60,7 @@ import {
   hasNxGraphServer,
   hasNxGraphServerAffected,
 } from '@nx-console/vscode-graph-base';
+import { initMessagingServer } from '@nx-console/vscode-messaging';
 import { initNvmTip } from '@nx-console/vscode-nvm-tip';
 import {
   handleSelfHealingUri,
@@ -80,7 +76,6 @@ import { getTelemetry, initTelemetry } from '@nx-console/vscode-telemetry';
 import { RequestType } from 'vscode-languageserver';
 import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
-import { initMessagingServer } from '@nx-console/vscode-messaging';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 

@@ -37,6 +37,29 @@ When debugging the JCEF-based generate UI, you can attach an instance of Chrome 
 
 ### Building the extension for local testing
 
+### Debugging
+
+When developing or troubleshooting issues, you can enable debug logging to get detailed output:
+
+#### VSCode
+
+1. Open Settings (`Ctrl+,` / `Cmd+,`)
+2. Search for `nxConsole.enableDebugLogging`
+3. Enable the setting
+4. Restart VS Code or reload the window (`Ctrl+Shift+P` / `Cmd+Shift+P` → `Developer: Reload Window`)
+5. View logs in the Output panel:
+   - Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+   - Go to `View: Toggle Output`
+   - Select `Nx Console` and `Nx Language Server` from the dropdown
+
+#### IntelliJ
+
+1. Go to `Help` → `Diagnostic Tools` → `Debug Log Settings...`
+2. Add: `#dev.nx.console:trace`
+3. Click `OK` and restart the IDE
+4. Access logs via `Help` → `Show Log in Explorer` (Windows) / `Show Log in Finder` (macOS) / `Show Log in Files` (Linux)
+5. Look for the `idea.log` file
+
 ## Submitting a PR
 
 Please follow the following guidelines:

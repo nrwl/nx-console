@@ -8,7 +8,7 @@ import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { exec, spawn } from 'child_process';
 import { createHash } from 'crypto';
-import { mkdirSync, rmSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { promisify } from 'util';
@@ -153,7 +153,7 @@ async function runAiAgentCheck() {
   }
 
   try {
-    const hasProvenance = await nxLatestProvenanceCheck();
+    const hasProvenance = await nxLatestProvenanceCheck(workspacePath);
     if (hasProvenance !== true) {
       return;
     }
@@ -172,6 +172,7 @@ async function runAiAgentCheck() {
             // we're already executing from latest, we don't have to fetch latest again
             NX_AI_FILES_USE_LOCAL: 'true',
             NX_VERBOSE_LOGGING: 'true',
+            npm_config_loglevel: 'verbose',
           },
           shell: true,
         });
@@ -246,10 +247,10 @@ async function runAiAgentCheck() {
 
         const stderr = preserveModulePath(
           (e as any).stderr || callbackStderr || '',
-        ).slice(-1000);
+        ).slice(-1500);
 
         const stdout = preserveModulePath(
-          ((e as any).stdout || callbackStdout || '').slice(-1000),
+          ((e as any).stdout || callbackStdout || '').slice(-1500),
         );
 
         const originalMessage = preserveModulePath(
@@ -263,12 +264,20 @@ async function runAiAgentCheck() {
           packageManager = 'error';
         }
 
+        const hash = createHash('sha256')
+          .update(workspacePath || '')
+          .digest('hex')
+          .slice(0, 10);
+        const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
+        const cachedNxVersion = getCachedNxVersion(tmpDir);
+
         const errorMessage = [
           'AIFAIL',
           `NODEVERSION:${nodeVersion}`,
           `NPMVERSION:${npmVersion}`,
           `NXVERSION:${nxLatestVersion}`,
           `LOCALNXVERSION:${localNxVersion}`,
+          `CACHENXVERSION:${cachedNxVersion}`,
           `PKGMANAGER:${packageManager}`,
           `EXITCODE:${exitCode}`,
           `SIGNAL:${signal}`,
@@ -474,5 +483,36 @@ async function runAiAgentCheck() {
     if ((error as any).message.startsWith('AIFAIL')) {
       throw error;
     }
+  }
+}
+
+function getCachedNxVersion(tmpDir: string): string {
+  try {
+    const npxDir = join(tmpDir, '_npx');
+    if (!existsSync(npxDir)) {
+      return 'not-found';
+    }
+
+    const hashDirs = readdirSync(npxDir);
+    if (hashDirs.length === 0) {
+      return 'not-found';
+    }
+
+    const nxPackageJsonPath = join(
+      npxDir,
+      hashDirs[0],
+      'node_modules',
+      'nx',
+      'package.json',
+    );
+
+    if (!existsSync(nxPackageJsonPath)) {
+      return 'not-found';
+    }
+
+    const nxPackageJson = JSON.parse(readFileSync(nxPackageJsonPath, 'utf-8'));
+    return nxPackageJson.version || 'unknown';
+  } catch (e) {
+    return 'error';
   }
 }

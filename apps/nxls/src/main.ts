@@ -134,10 +134,10 @@ const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
 
 connection.onInitialize(async (params) => {
-  setLspLogger(connection);
+  const { workspacePath, enableDebugLogging } =
+    params.initializationOptions ?? {};
+  setLspLogger(connection, enableDebugLogging ?? false);
   lspLogger.log('Initializing Nx Language Server');
-
-  const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
       workspacePath ||
