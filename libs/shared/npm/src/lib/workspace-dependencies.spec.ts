@@ -83,6 +83,7 @@ describe('workspace-dependencies', () => {
       expect(
         await importWorkspaceDependency('node_modules/nx/src/utils.js', {
           log: logMock,
+          debug: logMock,
         }),
       ).toEqual({ utilString: 'util-string' });
       expect(logMock).toHaveBeenCalledWith(
@@ -102,6 +103,7 @@ describe('workspace-dependencies', () => {
       expect(
         await importWorkspaceDependency('node_modules\\nx\\src\\utils.js', {
           log: logMock,
+          debug: logMock,
         }),
       ).toEqual({ utilString: 'util-string' });
       expect(logMock).toHaveBeenCalledWith(
