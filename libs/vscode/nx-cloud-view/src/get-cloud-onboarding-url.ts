@@ -18,7 +18,7 @@ export async function getCloudOnboardingUrl() {
     vscodeLogger,
   );
   const packageManagerCommand = await getPackageManagerCommand(workspacePath);
-  const provenanceResult = await nxLatestProvenanceCheck();
+  const provenanceResult = await nxLatestProvenanceCheck(workspacePath);
   if (provenanceResult !== true) {
     getTelemetry().logUsage('misc.nx-latest-no-provenance');
     vscodeLogger.log(provenanceResult);
