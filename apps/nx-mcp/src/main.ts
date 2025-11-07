@@ -2,10 +2,12 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
   IdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
+  sessions,
 } from '@nx-console/nx-mcp-server';
 import { gte } from '@nx-console/nx-version';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
@@ -296,41 +298,94 @@ async function main() {
     const app = express();
 
     if (argv.transport === 'http') {
-      // Streamable HTTP mode
-      const connections = new Set<{
-        transport: StreamableHTTPServerTransport;
-        server: NxMcpServerWrapper;
-      }>();
-
       app.use(express.json());
 
-      // Streamable HTTP endpoint
-      app.all('/mcp', async (req, res) => {
-        const transport = new StreamableHTTPServerTransport({
-          sessionIdGenerator: undefined,
-        });
+      // POST: Handle initialization and all client->server messages
+      app.post('/mcp', async (req, res) => {
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
 
-        const connectionServer = await NxMcpServerWrapper.create(
-          nxWorkspacePath,
-          nxWorkspaceInfoProvider,
-          mcpServer,
-          ideProvider,
-          telemetryLogger,
-          logger,
-        );
-        const connection = { transport, server: connectionServer };
-        connections.add(connection);
+        let transport: StreamableHTTPServerTransport | undefined = sessionId
+          ? sessions[sessionId]
+          : undefined;
 
-        // Clean up on connection close
-        res.on('close', () => {
-          connections.delete(connection);
-          connectionServer.cleanup();
-          connectionServer.getMcpServer().close();
-          logger.log('Streamable HTTP connection closed');
-        });
+        if (!transport) {
+          if (!isInitializeRequest(req.body)) {
+            res.status(400).json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32000,
+                message: 'Bad Request: No valid session ID provided',
+              },
+              id: null,
+            });
+            return;
+          }
 
-        await connectionServer.getMcpServer().connect(transport);
+          transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => randomUUID(),
+            onsessioninitialized: async (id) => {
+              sessions[id] = transport!;
+              logger.log(`Session initialized: ${id}`);
+            },
+            onsessionclosed: (id) => {
+              delete sessions[id];
+              logger.log(`Session closed: ${id}`);
+            },
+          });
+
+          const sessionMcpServer = new McpServer(
+            {
+              name: 'Nx MCP',
+              version: '0.0.1',
+            },
+            {
+              capabilities: {
+                tools: {
+                  listChanged: true,
+                },
+              },
+            },
+          );
+
+          const connectionServer = await NxMcpServerWrapper.create(
+            nxWorkspacePath,
+            nxWorkspaceInfoProvider,
+            sessionMcpServer,
+            ideProvider,
+            telemetryLogger,
+            logger,
+          );
+
+          await connectionServer.getMcpServer().connect(transport);
+        }
+
         await transport.handleRequest(req, res, req.body);
+      });
+
+      // GET: Open SSE stream for server->client messages
+      app.get('/mcp', async (req, res) => {
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+        const transport = sessionId && sessions[sessionId];
+
+        if (!transport) {
+          res.status(400).send('Invalid or missing session ID');
+          return;
+        }
+
+        await transport.handleRequest(req, res);
+      });
+
+      // DELETE: Allow clients to explicitly terminate sessions
+      app.delete('/mcp', async (req, res) => {
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+        const transport = sessionId && sessions[sessionId];
+
+        if (!transport) {
+          res.status(400).send('Invalid or missing session ID');
+          return;
+        }
+
+        await transport.handleRequest(req, res);
       });
 
       logger.log(`Nx MCP server (Streamable HTTP) listening on port ${port}`);

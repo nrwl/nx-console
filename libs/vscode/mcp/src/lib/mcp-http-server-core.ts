@@ -1,6 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
+import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
+import { NxMcpServerWrapper, sessions } from '@nx-console/nx-mcp-server';
+import { randomUUID } from 'crypto';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   getOutputChannel,
@@ -25,46 +27,75 @@ export class McpHttpServerCore {
   }
 
   private startStreamableWebServer(port: number) {
+    this.app.use(express.json());
+
+    // POST: Handle initialization and all client->server messages
     this.app.post('/mcp', async (req: Request, res: Response) => {
-      vscodeLogger.log('Connecting to MCP via streamable http');
       try {
-        const mcpServer = new McpServer(
-          {
-            name: 'Nx MCP',
-            version: '0.0.1',
-          },
-          {
-            capabilities: {
-              tools: {
-                listChanged: true,
-              },
-            },
-          },
-        );
-        const providedPath = getNxWorkspacePath();
-        const nxWorkspacePath = (await checkIsNxWorkspace(providedPath))
-          ? providedPath
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+
+        let transport: StreamableHTTPServerTransport | undefined = sessionId
+          ? sessions[sessionId]
           : undefined;
-        const server = await NxMcpServerWrapper.create(
-          nxWorkspacePath,
-          nxWorkspaceInfoProvider,
-          mcpServer,
-          ideProvider,
-          getTelemetry(),
-          vscodeLogger,
-        );
-        const transport: StreamableHTTPServerTransport =
-          new StreamableHTTPServerTransport({
-            sessionIdGenerator: undefined,
+
+        if (!transport) {
+          if (!isInitializeRequest(req.body)) {
+            res.status(400).json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32000,
+                message: 'Bad Request: No valid session ID provided',
+              },
+              id: null,
+            });
+            return;
+          }
+
+          vscodeLogger.log('Initializing new MCP session');
+          transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => randomUUID(),
+            onsessioninitialized: async (id) => {
+              sessions[id] = transport!;
+              vscodeLogger.log(`Session initialized: ${id}`);
+            },
+            onsessionclosed: (id) => {
+              delete sessions[id];
+              vscodeLogger.log(`Session closed: ${id}`);
+            },
           });
 
-        this.streamableServers.add(server);
-        res.on('close', () => {
-          vscodeLogger.log('Request closed');
-          transport.close();
-          server.getMcpServer().close();
-        });
-        await server.getMcpServer().connect(transport);
+          const mcpServer = new McpServer(
+            {
+              name: 'Nx MCP',
+              version: '0.0.1',
+            },
+            {
+              capabilities: {
+                tools: {
+                  listChanged: true,
+                },
+              },
+            },
+          );
+
+          const providedPath = getNxWorkspacePath();
+          const nxWorkspacePath = (await checkIsNxWorkspace(providedPath))
+            ? providedPath
+            : undefined;
+
+          const server = await NxMcpServerWrapper.create(
+            nxWorkspacePath,
+            nxWorkspaceInfoProvider,
+            mcpServer,
+            ideProvider,
+            getTelemetry(),
+            vscodeLogger,
+          );
+
+          this.streamableServers.add(server);
+          await server.getMcpServer().connect(transport);
+        }
+
         await transport.handleRequest(req, res, req.body);
       } catch (error) {
         vscodeLogger.log('Error handling MCP request:', error);
@@ -81,32 +112,30 @@ export class McpHttpServerCore {
       }
     });
 
+    // GET: Open SSE stream for server->client messages
     this.app.get('/mcp', async (req: Request, res: Response) => {
-      vscodeLogger.log('Received GET MCP request');
-      res.writeHead(405).end(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          error: {
-            code: -32000,
-            message: 'Method not allowed.',
-          },
-          id: null,
-        }),
-      );
+      const sessionId = req.headers['mcp-session-id'] as string | undefined;
+      const transport = sessionId && sessions[sessionId];
+
+      if (!transport) {
+        res.status(400).send('Invalid or missing session ID');
+        return;
+      }
+
+      await transport.handleRequest(req, res);
     });
 
+    // DELETE: Allow clients to explicitly terminate sessions
     this.app.delete('/mcp', async (req: Request, res: Response) => {
-      vscodeLogger.log('Received DELETE MCP request');
-      res.writeHead(405).end(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          error: {
-            code: -32000,
-            message: 'Method not allowed.',
-          },
-          id: null,
-        }),
-      );
+      const sessionId = req.headers['mcp-session-id'] as string | undefined;
+      const transport = sessionId && sessions[sessionId];
+
+      if (!transport) {
+        res.status(400).send('Invalid or missing session ID');
+        return;
+      }
+
+      await transport.handleRequest(req, res);
     });
 
     try {
