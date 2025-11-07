@@ -20,13 +20,12 @@ export const NX_CURRENT_RUNNING_TASKS_DETAILS =
   'nx_current_running_tasks_details';
 export const NX_CURRENT_RUNNING_TASK_OUTPUT = 'nx_current_running_task_output';
 
-export const NX_CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH =
-  'nx_cloud_analytics_pipeline_executions_search';
-export const NX_CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS =
-  'nx_cloud_analytics_pipeline_execution_details';
-export const NX_CLOUD_ANALYTICS_RUNS_SEARCH = 'nx_cloud_analytics_runs_search';
-export const NX_CLOUD_ANALYTICS_RUN_DETAILS = 'nx_cloud_analytics_run_details';
-export const NX_CLOUD_ANALYTICS_TASKS_SEARCH =
-  'nx_cloud_analytics_tasks_search';
-export const NX_CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
-  'nx_cloud_analytics_task_executions_search';
+export const CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH =
+  'cloud_analytics_pipeline_executions_search';
+export const CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS =
+  'cloud_analytics_pipeline_execution_details';
+export const CLOUD_ANALYTICS_RUNS_SEARCH = 'cloud_analytics_runs_search';
+export const CLOUD_ANALYTICS_RUN_DETAILS = 'cloud_analytics_run_details';
+export const CLOUD_ANALYTICS_TASKS_SEARCH = 'cloud_analytics_tasks_search';
+export const CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
+  'cloud_analytics_task_executions_search';
