@@ -1,3 +1,10 @@
+## [18.77.1](https://github.com/nrwl/nx-console/compare/vscode-v18.77.0...vscode-v18.77.1) (2025-11-07)
+
+
+### Bug Fixes
+
+* **vscode:** run configure-ai-agents with local pm and fall back to npx ([#2875](https://github.com/nrwl/nx-console/issues/2875)) ([48a6fbe](https://github.com/nrwl/nx-console/commit/48a6fbe7be8deb2156b55f4e814314b09dda68ed))
+
 # [18.77.0](https://github.com/nrwl/nx-console/compare/vscode-v18.76.4...vscode-v18.77.0) (2025-11-06)
 
 
