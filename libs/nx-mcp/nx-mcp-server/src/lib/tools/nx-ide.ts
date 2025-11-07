@@ -130,7 +130,7 @@ export function registerNxIdeTools(
   // Register nx_run_generator tool
   server.tool(
     NX_RUN_GENERATOR,
-    'Opens the generate ui with whatever options you provide prefilled. ALWAYS USE THIS to run nx generators. Use the nx_generators and nx_generator_schema tools to learn about the available options BEFORE using this tool. ALWAYS use this when the user wants to generate something and ALWAYS use this instead of running a generator directly via the CLI. You can also call this tool to overwrite the options for an existing generator invocation.',
+    'Opens the Nx Console Generate UI in the IDE with the provided options pre-filled. This tool does NOT directly execute the generator - instead it opens a visual form pre-filled with your options, allowing the user to review, modify, and confirm before execution. The `cwd` parameter specifies the parent directory path (relative to workspace root) where the generated item should be created - this is particularly important when generating libraries, apps, or components in specific locations. This tool can also be called to update options for an existing generator invocation. Prefer this tool over CLI commands when an IDE is available, as it provides a user-review workflow.',
     {
       generatorName: z.string().describe('The name of the generator to run'),
       options: z
