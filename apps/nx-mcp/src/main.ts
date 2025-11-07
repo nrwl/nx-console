@@ -7,7 +7,6 @@ import {
   IdeProvider,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
-  sessions,
 } from '@nx-console/nx-mcp-server';
 import { gte } from '@nx-console/nx-version';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
@@ -298,6 +297,8 @@ async function main() {
     const app = express();
 
     if (argv.transport === 'http') {
+      const sessions: Record<string, StreamableHTTPServerTransport> = {};
+
       app.use(express.json());
 
       // POST: Handle initialization and all client->server messages

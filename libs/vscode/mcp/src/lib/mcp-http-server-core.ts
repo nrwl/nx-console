@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
-import { NxMcpServerWrapper, sessions } from '@nx-console/nx-mcp-server';
+import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
@@ -28,6 +28,7 @@ export class McpHttpServerCore {
 
   private startStreamableWebServer(port: number) {
     this.app.use(express.json());
+    const sessions: Record<string, StreamableHTTPServerTransport> = {};
 
     // POST: Handle initialization and all client->server messages
     this.app.post('/mcp', async (req: Request, res: Response) => {
