@@ -1,5 +1,8 @@
 import { gte } from '@nx-console/nx-version';
-import { detectPackageManager } from '@nx-console/shared-npm';
+import {
+  detectPackageManager,
+  getPackageManagerCommand,
+} from '@nx-console/shared-npm';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
@@ -59,7 +62,7 @@ export async function runConfigureAiAgentsCommand() {
     source: 'command',
   });
 
-  const command = constructCommand('');
+  const command = await constructCommand('');
   const task = new Task(
     { type: 'nx' },
     TaskScope.Workspace,
@@ -78,7 +81,7 @@ export async function runConfigureAiAgentsCommand() {
   tasks.executeTask(task);
 }
 
-function constructCommand(flags: string) {
+async function constructCommand(flags: string, forceNpx = false) {
   const workspacePath = getWorkspacePath();
 
   const hash = createHash('sha256')
@@ -97,7 +100,12 @@ function constructCommand(flags: string) {
     // No permissions or can't create tmpDir, skip cache parameter
   }
 
-  return `npx -y ${cacheParam} --ignore-scripts nx@latest configure-ai-agents ${flags}`.trim();
+  const packageManagerCommands = await getPackageManagerCommand(
+    workspacePath,
+    vscodeLogger,
+  );
+
+  return `${forceNpx ? `npx -y ${cacheParam} --ignore-scripts` : packageManagerCommands.dlx} nx@latest configure-ai-agents ${flags}`.trim();
 }
 
 async function getNxLatestVersion(): Promise<string | undefined> {
@@ -111,6 +119,210 @@ async function getNxLatestVersion(): Promise<string | undefined> {
     vscodeLogger.log(`Failed to get nx@latest version: ${e}`);
     return undefined;
   }
+}
+
+async function doRunAiAgentCheck(
+  workspacePath: string,
+  forceNpx = false,
+): Promise<Error[]> {
+  let callbackStdout = '';
+  let callbackStderr = '';
+  let weKilledIt = false;
+  let commandStartTime = 0;
+
+  const errors: Error[] = [];
+
+  try {
+    const command = await constructCommand('--check', forceNpx);
+    await new Promise((resolve, reject) => {
+      commandStartTime = Date.now();
+      const childProcess = spawn(command, {
+        cwd: workspacePath,
+        env: {
+          ...process.env,
+          NX_CONSOLE: 'true',
+          // we're already executing from latest, we don't have to fetch latest again
+          NX_AI_FILES_USE_LOCAL: 'true',
+          NX_VERBOSE_LOGGING: 'true',
+          npm_config_loglevel: 'verbose',
+          NX_SKIP_VSCODE_EXTENSION_INSTALL: 'true',
+        },
+        shell: true,
+      });
+
+      const timeout = setTimeout(() => {
+        weKilledIt = true;
+        childProcess.kill();
+      }, 360000);
+
+      childProcess.stdout?.on('data', (data) => {
+        callbackStdout += data.toString();
+      });
+
+      childProcess.stderr?.on('data', (data) => {
+        callbackStderr += data.toString();
+      });
+
+      childProcess.on('close', (code, signal) => {
+        clearTimeout(timeout);
+        if (code !== 0) {
+          const error: any = new Error(`Process exited with code ${code}`);
+          error.code = code;
+          error.signal = signal;
+          error.stdout = callbackStdout;
+          error.stderr = callbackStderr;
+          error.weKilledIt = weKilledIt;
+          error.elapsedTime = Date.now() - commandStartTime;
+          reject(error);
+        } else {
+          resolve(true);
+        }
+      });
+
+      childProcess.on('error', (error) => {
+        clearTimeout(timeout);
+        if (!(error as any).stdout) {
+          (error as any).stdout = callbackStdout;
+        }
+        if (!(error as any).stderr) {
+          (error as any).stderr = callbackStderr;
+        }
+        if (!(error as any).weKilledIt) {
+          (error as any).weKilledIt = weKilledIt;
+        }
+        if (!(error as any).elapsedTime) {
+          (error as any).elapsedTime = Date.now() - commandStartTime;
+        }
+        reject(error);
+      });
+    });
+  } catch (e) {
+    errors.push(e as any);
+    if (!forceNpx) {
+      const rerunErrors = await doRunAiAgentCheck(workspacePath, true);
+      errors.push(...rerunErrors);
+    }
+  }
+
+  return errors;
+}
+
+async function getErrorInformation(
+  e: Error,
+  workspacePath: string,
+  nxLatestVersion: string,
+) {
+  const weKilledIt = (e as any).weKilledIt ?? false;
+  // throw this error so that it can be tracked in rollbar - workaround while we track what's going wrong
+  const nodeVersion = (await promisify(exec)('node --version')).stdout.trim();
+
+  let npmVersion: string;
+  try {
+    npmVersion = (await promisify(exec)('npm --version')).stdout.trim();
+  } catch {
+    npmVersion = 'unknown';
+  }
+
+  const localNxVersion = (await getNxVersion())?.full;
+
+  const exitCode = (e as any).code ?? 'unknown';
+  const signal = (e as any).signal ?? 'null';
+
+  const preserveModulePath = (text: string) =>
+    text.replace(
+      /Cannot find module ['"](.+?)['"]/g,
+      (_match: string, modulePath: string) => {
+        return `Cannot find module ${modulePath.replace(/\//g, '&')}`;
+      },
+    );
+
+  const stderr = preserveModulePath((e as any).stderr || '').slice(-1500);
+
+  const stdout = preserveModulePath(((e as any).stdout || '').slice(-1500));
+
+  const originalMessage = preserveModulePath(
+    ((e as any).message || '') as string,
+  );
+
+  let packageManager: string;
+  try {
+    packageManager = await detectPackageManager(workspacePath);
+  } catch {
+    packageManager = 'error';
+  }
+
+  const hash = createHash('sha256')
+    .update(workspacePath || '')
+    .digest('hex')
+    .slice(0, 10);
+  const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
+  const cachedNxVersion = getCachedNxVersion(tmpDir);
+
+  let errorMessage = [
+    'AIFAIL',
+    `ELAPSED:${((e as any).elapsedTime / 1000).toFixed(2)}s`,
+    `WKI:${weKilledIt}`,
+    `NODEVERSION:${nodeVersion}`,
+    `NPMVERSION:${npmVersion}`,
+    `NXVERSION:${nxLatestVersion}`,
+    `LOCALNXVERSION:${localNxVersion}`,
+    `CACHENXVERSION:${cachedNxVersion}`,
+    `PKGMANAGER:${packageManager}`,
+    `EXITCODE:${exitCode}`,
+    `SIGNAL:${signal}`,
+    `STDERR:${stderr}`,
+    `STDOUT:${stdout}`,
+    `MESSAGE:${originalMessage}`,
+  ].join('|');
+
+  errorMessage = errorMessage.replace(
+    'https://registry.npmjs.org/',
+    'OFFICIAL_NPM_REGISTRY',
+  );
+
+  const reasons = [
+    'E401',
+    'E403',
+    'E404',
+    'ENOTFOUND',
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'EIDLETIMEOUT',
+    'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+    'npm error 403',
+    'npm error network',
+    'npm ERR! 404',
+    'npm error 502',
+    'npm error 500',
+    'FETCH_ERROR',
+  ];
+  // there are certain error messages we can't do anything about
+  // let's track those separately but not throw
+  if (reasons.some((reason) => errorMessage.includes(reason))) {
+    getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
+      cause: 'network-or-auth',
+    });
+    return;
+  }
+
+  let engineStrict = false;
+  try {
+    const npmSetting = await promisify(exec)('npm config get engine-strict', {
+      cwd: workspacePath,
+    });
+    engineStrict = npmSetting.stdout.trim() === 'true';
+  } catch (e) {
+    // ignore
+  }
+  if (engineStrict && errorMessage.includes('EBADENGINE')) {
+    getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
+      cause: 'engine-strict',
+    });
+    return;
+  }
+  getTelemetry().logUsage('ai.configure-agents-check-error');
+
+  return errorMessage;
 }
 
 async function runAiAgentCheck() {
@@ -158,182 +370,32 @@ async function runAiAgentCheck() {
       return;
     }
 
-    let callbackStdout = '';
-    let callbackStderr = '';
+    getTelemetry().logUsage('ai.configure-agents-check-start');
+    const errors = await doRunAiAgentCheck(workspacePath);
 
-    try {
-      getTelemetry().logUsage('ai.configure-agents-check-start');
-      await new Promise((resolve, reject) => {
-        const childProcess = spawn(constructCommand('--check'), {
-          cwd: workspacePath,
-          env: {
-            ...process.env,
-            NX_CONSOLE: 'true',
-            // we're already executing from latest, we don't have to fetch latest again
-            NX_AI_FILES_USE_LOCAL: 'true',
-            NX_VERBOSE_LOGGING: 'true',
-            npm_config_loglevel: 'verbose',
-          },
-          shell: true,
-        });
-
-        const timeout = setTimeout(() => {
-          childProcess.kill();
-        }, 300000);
-
-        childProcess.stdout?.on('data', (data) => {
-          callbackStdout += data.toString();
-        });
-
-        childProcess.stderr?.on('data', (data) => {
-          callbackStderr += data.toString();
-        });
-
-        childProcess.on('close', (code, signal) => {
-          clearTimeout(timeout);
-          if (code !== 0) {
-            const error: any = new Error(`Process exited with code ${code}`);
-            error.code = code;
-            error.signal = signal;
-            error.stdout = callbackStdout;
-            error.stderr = callbackStderr;
-            reject(error);
-          } else {
-            resolve(true);
-          }
-        });
-
-        childProcess.on('error', (error) => {
-          clearTimeout(timeout);
-          reject(error);
-        });
-      });
-      getTelemetry().logUsage('ai.configure-agents-check-end');
-      WorkspaceConfigurationStore.instance.set(
-        'lastAiCheckNotificationTimestamp',
-        now,
-      );
-    } catch (e) {
-      vscodeLogger.log(`AI agent configuration check failed: ${e}`);
-
+    if (errors.length > 1) {
       // let's be conservative for now.
       // There are many different reasons this could fail so we want to not spam users
-      const stringified = JSON.stringify(e);
+      const stringified = JSON.stringify(errors);
       if (!stringified.includes('The following AI agents are out of date')) {
-        // throw this error so that it can be tracked in rollbar - workaround while we track what's going wrong
-        const nodeVersion = (
-          await promisify(exec)('node --version')
-        ).stdout.trim();
-
-        let npmVersion: string;
-        try {
-          npmVersion = (await promisify(exec)('npm --version')).stdout.trim();
-        } catch {
-          npmVersion = 'unknown';
-        }
-
-        const localNxVersion = (await getNxVersion())?.full;
-
-        const exitCode = (e as any).code ?? 'unknown';
-        const signal = (e as any).signal ?? 'null';
-
-        const preserveModulePath = (text: string) =>
-          text.replace(
-            /Cannot find module ['"](.+?)['"]/g,
-            (_match: string, modulePath: string) => {
-              return `Cannot find module ${modulePath.replace(/\//g, '&')}`;
-            },
+        const errorsWithInformation = [];
+        for (const error of errors) {
+          const errorInformation = await getErrorInformation(
+            error,
+            workspacePath,
+            nxLatestVersion,
           );
-
-        const stderr = preserveModulePath(
-          (e as any).stderr || callbackStderr || '',
-        ).slice(-1500);
-
-        const stdout = preserveModulePath(
-          ((e as any).stdout || callbackStdout || '').slice(-1500),
-        );
-
-        const originalMessage = preserveModulePath(
-          ((e as any).message || '') as string,
-        );
-
-        let packageManager: string;
-        try {
-          packageManager = await detectPackageManager(workspacePath);
-        } catch {
-          packageManager = 'error';
+          if (errorInformation) {
+            errorsWithInformation.push(errorInformation);
+          }
         }
-
-        const hash = createHash('sha256')
-          .update(workspacePath || '')
-          .digest('hex')
-          .slice(0, 10);
-        const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
-        const cachedNxVersion = getCachedNxVersion(tmpDir);
-
-        const errorMessage = [
-          'AIFAIL',
-          `NODEVERSION:${nodeVersion}`,
-          `NPMVERSION:${npmVersion}`,
-          `NXVERSION:${nxLatestVersion}`,
-          `LOCALNXVERSION:${localNxVersion}`,
-          `CACHENXVERSION:${cachedNxVersion}`,
-          `PKGMANAGER:${packageManager}`,
-          `EXITCODE:${exitCode}`,
-          `SIGNAL:${signal}`,
-          `STDERR:${stderr}`,
-          `STDOUT:${stdout}`,
-          `MESSAGE:${originalMessage}`,
-        ].join('|');
-
-        const reasons = [
-          'E401',
-          'E403',
-          'E404',
-          'ENOTFOUND',
-          'ECONNRESET',
-          'ECONNREFUSED',
-          'EIDLETIMEOUT',
-          'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
-          'npm error 403',
-          'npm error network',
-          'npm ERR! 404',
-          'npm error 502',
-          'npm error 500',
-        ];
-        // there are certain error messages we can't do anything about
-        // let's track those separately but not throw
-        if (reasons.some((reason) => errorMessage.includes(reason))) {
-          getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
-            cause: 'network-or-auth',
-          });
-          return;
-        }
-
-        let engineStrict = false;
-        try {
-          const npmSetting = await promisify(exec)(
-            'npm config get engine-strict',
-            {
-              cwd: workspacePath,
-            },
+        if (errorsWithInformation.length > 0) {
+          throw new Error(
+            `Error 1: \n ${errorsWithInformation[0]}\n\nError 2: \n ${errorsWithInformation[1]}\n`,
           );
-          engineStrict = npmSetting.stdout.trim() === 'true';
-        } catch (e) {
-          // ignore
         }
-        if (engineStrict && errorMessage.includes('EBADENGINE')) {
-          getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
-            cause: 'engine-strict',
-          });
-          return;
-        }
-        getTelemetry().logUsage('ai.configure-agents-check-error');
-
-        throw new Error(errorMessage, {
-          cause: e as Error,
-        });
       }
+
       WorkspaceConfigurationStore.instance.set(
         'lastAiCheckNotificationTimestamp',
         now,
@@ -356,7 +418,7 @@ async function runAiAgentCheck() {
         });
 
         // Run the configure command
-        const command = constructCommand('');
+        const command = await constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
@@ -384,6 +446,11 @@ async function runAiAgentCheck() {
       // Return early - we showed the update notification
       return;
     }
+    getTelemetry().logUsage('ai.configure-agents-check-end');
+    WorkspaceConfigurationStore.instance.set(
+      'lastAiCheckNotificationTimestamp',
+      now,
+    );
 
     // If we get here, the update check passed (no updates needed)
     // Now check if we should prompt for configuration
@@ -399,11 +466,11 @@ async function runAiAgentCheck() {
     }
 
     // Run the check=all command to see if configuration is needed
-    const checkAllCommand = constructCommand('--check=all');
+    const checkAllCommand = await constructCommand('--check=all');
     try {
       await promisify(exec)(checkAllCommand, {
         cwd: workspacePath,
-        timeout: 300000,
+        timeout: 360000,
         env: {
           ...process.env,
           NX_CONSOLE: 'true',
@@ -443,7 +510,7 @@ async function runAiAgentCheck() {
           source: 'notification',
         });
 
-        const command = constructCommand('');
+        const command = await constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
@@ -480,7 +547,7 @@ async function runAiAgentCheck() {
   } catch (error) {
     // Silently fail - this is a non-critical background check
     // the one exception is AIFAIL errors which we want to track in rollbar
-    if ((error as any).message.startsWith('AIFAIL')) {
+    if ((error as any).message.includes('AIFAIL')) {
       throw error;
     }
   }
