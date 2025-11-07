@@ -258,7 +258,7 @@ async function getErrorInformation(
   const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
   const cachedNxVersion = getCachedNxVersion(tmpDir);
 
-  const errorMessage = [
+  let errorMessage = [
     'AIFAIL',
     `ELAPSED:${((e as any).elapsedTime / 1000).toFixed(2)}s`,
     `WKI:${weKilledIt}`,
@@ -275,7 +275,10 @@ async function getErrorInformation(
     `MESSAGE:${originalMessage}`,
   ].join('|');
 
-  errorMessage.replace('https://registry.npmjs.org/', 'OFFICIAL_NPM_REGISTRY');
+  errorMessage = errorMessage.replace(
+    'https://registry.npmjs.org/',
+    'OFFICIAL_NPM_REGISTRY',
+  );
 
   const reasons = [
     'E401',
