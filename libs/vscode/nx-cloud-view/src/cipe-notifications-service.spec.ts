@@ -717,7 +717,6 @@ describe('CIPE Notifications', () => {
         expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
         expect(window.showErrorMessage).toHaveBeenCalledWith(
           'CI failed for #feature.',
-          'Help me fix this error',
           'View Commit',
           'View Results',
         );
@@ -755,7 +754,6 @@ describe('CIPE Notifications', () => {
         expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
         expect(window.showErrorMessage).toHaveBeenCalledWith(
           'CI failed for #feature.',
-          'Help me fix this error',
           'View Commit',
           'View Results',
         );
@@ -790,7 +788,6 @@ describe('CIPE Notifications', () => {
         expect(window.showErrorMessage).toHaveBeenCalledTimes(1);
         expect(window.showErrorMessage).toHaveBeenCalledWith(
           'CI failed for #feature.',
-          'Help me fix this error',
           'View Commit',
           'View Results',
         );

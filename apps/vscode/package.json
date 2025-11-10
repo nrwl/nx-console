@@ -207,11 +207,6 @@
           "group": "inline@1"
         },
         {
-          "command": "nxCloud.helpMeFixCipeError",
-          "when": "view == nxCloudRecentCIPE && viewItem == failedTask && isInCursor",
-          "group": "inline@1"
-        },
-        {
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
@@ -308,10 +303,6 @@
         },
         {
           "command": "nxCloud.showRunInApp",
-          "when": "false"
-        },
-        {
-          "command": "nxCloud.helpMeFixCipeError",
           "when": "false"
         },
         {
@@ -903,14 +894,6 @@
         "title": "Open Workspace in Browser",
         "command": "nxCloud.openApp",
         "icon": "$(cloud)"
-      },
-      {
-        "title": "Help me fix the latest CIPE error",
-        "command": "nxCloud.helpMeFixCipeError",
-        "icon": {
-          "dark": "assets/cursor-dark.svg",
-          "light": "assets/cursor-light.svg"
-        }
       },
       {
         "title": "Apply AI Fix",

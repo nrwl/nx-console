@@ -3,10 +3,7 @@ import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import {
-  AbstractTreeProvider,
-  sendMessageToAgent,
-} from '@nx-console/vscode-utils';
+import { AbstractTreeProvider } from '@nx-console/vscode-utils';
 import { isDeepStrictEqual } from 'util';
 import {
   commands,
@@ -578,13 +575,6 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
             );
           }
         }
-      }),
-      commands.registerCommand('nxCloud.helpMeFixCipeError', async () => {
-        getTelemetry().logUsage('cloud.fix-cipe-error');
-
-        const fixMePrompt = 'help me fix the latest ci pipeline error';
-
-        sendMessageToAgent(fixMePrompt);
       }),
     );
   }
