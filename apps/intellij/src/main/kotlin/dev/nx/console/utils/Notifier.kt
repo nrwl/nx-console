@@ -203,42 +203,6 @@ class Notifier {
             getGroup().createNotification(message, type).setTitle("Nx Console").notify(project)
         }
 
-        fun notifyMcpServerInstall(project: Project) {
-            val hideNotificationPropertyKey = "nx.console.mcp.server.install.notification.hide"
-
-            if (
-                PropertiesComponent.getInstance(project)
-                    .getBoolean(hideNotificationPropertyKey, false)
-            ) {
-                return
-            }
-
-            val notification =
-                getGroup()
-                    .createNotification(
-                        "Install the Nx MCP Server to enhance AI assistant with Nx-specific knowledge?",
-                        NotificationType.INFORMATION,
-                    )
-                    .setTitle("Nx Console")
-
-            notification.addActions(
-                setOf(
-                    NotificationAction.createSimpleExpiring("Install") {
-                        notification.expire()
-                        val mcpService = dev.nx.console.mcp.McpServerService.getInstance(project)
-                        mcpService.setupMcpServer()
-                    },
-                    NotificationAction.createSimpleExpiring("Don't ask again") {
-                        notification.expire()
-                        PropertiesComponent.getInstance(project)
-                            .setValue(hideNotificationPropertyKey, true)
-                    },
-                )
-            )
-
-            notification.notify(project)
-        }
-
         fun notifyAiAssistantPluginRequired(project: Project) {
             getGroup()
                 .createNotification(
