@@ -70,7 +70,7 @@ export class PassiveDaemonWatcher {
         }
       },
       logTransition: ({ context }, params: { to: string }) => {
-        this.logger.log(
+        this.logger.debug?.(
           `PassiveDaemonWatcher: transitioning to ${params.to} (attempt ${context.attemptNumber})`,
         );
       },
