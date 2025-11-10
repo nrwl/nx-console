@@ -1,3 +1,17 @@
+# [18.78.0](https://github.com/nrwl/nx-console/compare/vscode-v18.77.1...vscode-v18.78.0) (2025-11-10)
+
+
+### Bug Fixes
+
+* **nx-mcp:** improve generator tool descriptions ([#2878](https://github.com/nrwl/nx-console/issues/2878)) ([ae5d0ae](https://github.com/nrwl/nx-console/commit/ae5d0aec592fc2538b0ffa1814665d842eca6583))
+* **vscode:** repair error reporting ([#2881](https://github.com/nrwl/nx-console/issues/2881)) ([c4cd7ce](https://github.com/nrwl/nx-console/commit/c4cd7ce3c3564d000e49b76ffec5c94c76f1a4f3))
+
+
+### Features
+
+* **nx-mcp:** make mcp server via streamable http stateful with sessions ([#2877](https://github.com/nrwl/nx-console/issues/2877)) ([76141a9](https://github.com/nrwl/nx-console/commit/76141a9656baf8258376fea11bf7aeba8a31d987))
+* **nx-mcp:** rename nx_cloud_analytics tools to just cloud_analytics ([#2876](https://github.com/nrwl/nx-console/issues/2876)) ([4e118a5](https://github.com/nrwl/nx-console/commit/4e118a5792a22a14f82ddd53856a569572ee5630))
+
 ## [18.77.1](https://github.com/nrwl/nx-console/compare/vscode-v18.77.0...vscode-v18.77.1) (2025-11-07)
 
 
