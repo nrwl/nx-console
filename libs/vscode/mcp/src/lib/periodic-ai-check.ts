@@ -105,7 +105,15 @@ async function constructCommand(flags: string, forceNpx = false) {
     vscodeLogger,
   );
 
-  return `${forceNpx ? `npx -y ${cacheParam} --ignore-scripts` : packageManagerCommands.dlx} nx@latest configure-ai-agents ${flags}`.trim();
+  let dlx = packageManagerCommands.dlx;
+
+  // there are older versions of nx that have this outdated config
+  // 'yarn' isn't actually a dlx command it's only for local packages
+  if (dlx === 'yarn' || dlx === 'npx') {
+    dlx = 'npx -y --ignore-scripts';
+  }
+
+  return `${forceNpx ? `npx -y ${cacheParam} --ignore-scripts` : dlx} nx@latest configure-ai-agents ${flags}`.trim();
 }
 
 async function getNxLatestVersion(): Promise<string | undefined> {
@@ -124,16 +132,17 @@ async function getNxLatestVersion(): Promise<string | undefined> {
 async function doRunAiAgentCheck(
   workspacePath: string,
   forceNpx = false,
-): Promise<Error[]> {
+): Promise<[string, Error][]> {
   let callbackStdout = '';
   let callbackStderr = '';
   let weKilledIt = false;
   let commandStartTime = 0;
+  let command = '';
 
-  const errors: Error[] = [];
+  const errors: [string, Error][] = [];
 
   try {
-    const command = await constructCommand('--check', forceNpx);
+    command = await constructCommand('--check', forceNpx);
     await new Promise((resolve, reject) => {
       commandStartTime = Date.now();
       const childProcess = spawn(command, {
@@ -197,7 +206,7 @@ async function doRunAiAgentCheck(
       });
     });
   } catch (e) {
-    errors.push(e as any);
+    errors.push([command, e as Error]);
     if (!forceNpx) {
       const rerunErrors = await doRunAiAgentCheck(workspacePath, true);
       errors.push(...rerunErrors);
@@ -208,6 +217,7 @@ async function doRunAiAgentCheck(
 }
 
 async function getErrorInformation(
+  command: string,
   e: Error,
   workspacePath: string,
   nxLatestVersion: string,
@@ -260,6 +270,7 @@ async function getErrorInformation(
 
   let errorMessage = [
     'AIFAIL',
+    `COMMAND:${command}`,
     `ELAPSED:${((e as any).elapsedTime / 1000).toFixed(2)}s`,
     `WKI:${weKilledIt}`,
     `NODEVERSION:${nodeVersion}`,
@@ -275,7 +286,7 @@ async function getErrorInformation(
     `MESSAGE:${originalMessage}`,
   ].join('|');
 
-  errorMessage = errorMessage.replace(
+  errorMessage = errorMessage.replaceAll(
     'https://registry.npmjs.org/',
     'OFFICIAL_NPM_REGISTRY',
   );
@@ -295,32 +306,17 @@ async function getErrorInformation(
     'npm error 502',
     'npm error 500',
     'FETCH_ERROR',
+    'ERR_PNPM_UNSUPPORTED_ENGINE',
+    'ERR_INVALID_AUTH',
+    'ERR_SOCKET_TIMEOUT',
+    'EBADENGINE',
+    'This program is blocked by group policy',
   ];
   // there are certain error messages we can't do anything about
   // let's track those separately but not throw
   if (reasons.some((reason) => errorMessage.includes(reason))) {
-    getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
-      cause: 'network-or-auth',
-    });
     return;
   }
-
-  let engineStrict = false;
-  try {
-    const npmSetting = await promisify(exec)('npm config get engine-strict', {
-      cwd: workspacePath,
-    });
-    engineStrict = npmSetting.stdout.trim() === 'true';
-  } catch (e) {
-    // ignore
-  }
-  if (engineStrict && errorMessage.includes('EBADENGINE')) {
-    getTelemetry().logUsage('ai.configure-agents-check-expected-error', {
-      cause: 'engine-strict',
-    });
-    return;
-  }
-  getTelemetry().logUsage('ai.configure-agents-check-error');
 
   return errorMessage;
 }
@@ -381,7 +377,8 @@ async function runAiAgentCheck() {
         const errorsWithInformation = [];
         for (const error of errors) {
           const errorInformation = await getErrorInformation(
-            error,
+            error[0],
+            error[1],
             workspacePath,
             nxLatestVersion,
           );
@@ -390,9 +387,13 @@ async function runAiAgentCheck() {
           }
         }
         if (errorsWithInformation.length > 0) {
+          getTelemetry().logUsage('ai.configure-agents-check-error');
           throw new Error(
             `Error 1: \n ${errorsWithInformation[0]}\n\nError 2: \n ${errorsWithInformation[1]}\n`,
           );
+        } else {
+          getTelemetry().logUsage('ai.configure-agents-check-expected-error');
+          return;
         }
       }
 

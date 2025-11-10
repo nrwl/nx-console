@@ -103,12 +103,12 @@ The Nx MCP server provides a comprehensive set of tools for interacting with you
 
 These tools provide analytics and insights into your Nx Cloud CI/CD data, helping you track performance trends and team productivity:
 
-- **nx_cloud_analytics_pipeline_executions_search**: Analyzes historical pipeline execution data to identify trends and patterns
-- **nx_cloud_analytics_pipeline_execution_details**: Analyzes detailed data for a specific pipeline execution to investigate performance
-- **nx_cloud_analytics_runs_search**: Analyzes historical run data to track performance trends and productivity patterns
-- **nx_cloud_analytics_run_details**: Analyzes detailed data for a specific run to investigate command execution performance
-- **nx_cloud_analytics_tasks_search**: Analyzes aggregated task performance statistics including success rates and cache hit rates
-- **nx_cloud_analytics_task_executions_search**: Analyzes individual task execution data to investigate performance trends
+- **cloud_analytics_pipeline_executions_search**: Analyzes historical pipeline execution data to identify trends and patterns
+- **cloud_analytics_pipeline_execution_details**: Analyzes detailed data for a specific pipeline execution to investigate performance
+- **cloud_analytics_runs_search**: Analyzes historical run data to track performance trends and productivity patterns
+- **cloud_analytics_run_details**: Analyzes detailed data for a specific run to investigate command execution performance
+- **cloud_analytics_tasks_search**: Analyzes aggregated task performance statistics including success rates and cache hit rates
+- **cloud_analytics_task_executions_search**: Analyzes individual task execution data to investigate performance trends
 
 When no workspace path is specified, only the `nx_docs` and `nx_available_plugins` tools will be available.
 

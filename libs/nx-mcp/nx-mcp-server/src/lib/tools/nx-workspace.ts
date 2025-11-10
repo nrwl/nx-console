@@ -483,7 +483,7 @@ ${targetDescriptions}`;
 
   server.tool(
     NX_GENERATORS,
-    'Returns a list of generators that could be relevant to the user query.',
+    "Returns a complete list of all available Nx generators in the workspace, including both plugin-provided generators (like @nx/react:component) and local workspace generators. The output shows each generator's name with its description, useful for discovering what generators exist or finding one that matches a specific need.",
     {
       destructiveHint: false,
       readOnlyHint: true,
@@ -526,7 +526,7 @@ ${targetDescriptions}`;
 
   server.tool(
     NX_GENERATOR_SCHEMA,
-    'Returns the detailed JSON schema for an nx generator',
+    "Returns the complete JSON schema for a specific Nx generator. The schema contains all available options with their types, descriptions, default values, validation rules, and whether they're required or optional. Many generators also include helpful examples showing common usage patterns. The tool automatically handles generator aliases (e.g., 'app' vs 'application').",
     {
       generatorName: z
         .string()
