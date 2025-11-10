@@ -25,10 +25,7 @@ export class TestMCPClient {
     return result.tools;
   }
 
-  async callTool(
-    name: string,
-    args: Record<string, any> = {},
-  ): Promise<any> {
+  async callTool(name: string, args: Record<string, any> = {}): Promise<any> {
     return await this.client.callTool({
       name,
       arguments: args,
