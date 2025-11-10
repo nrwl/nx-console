@@ -383,15 +383,9 @@ function showMessageWithResultAndCommit(
       ? window.showInformationMessage
       : window.showErrorMessage;
 
-  type MessageCommand =
-    | 'View Results'
-    | 'Help me fix this error'
-    | 'View Commit';
+  type MessageCommand = 'View Results' | 'View Commit';
   const messageCommands: MessageCommand[] = [];
 
-  if (type === 'error') {
-    messageCommands.push('Help me fix this error');
-  }
   if (commitUrl) {
     messageCommands.push('View Commit');
   }
@@ -409,11 +403,6 @@ function showMessageWithResultAndCommit(
         source: 'notification',
       });
       commands.executeCommand('vscode.open', commitUrl);
-    } else if (selection === 'Help me fix this error') {
-      telemetry.logUsage('cloud.fix-cipe-error', {
-        source: 'notification',
-      });
-      commands.executeCommand('nxCloud.helpMeFixCipeError');
     }
   };
 
