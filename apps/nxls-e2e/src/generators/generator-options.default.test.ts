@@ -78,7 +78,6 @@ describe('generator options', () => {
       'skipTsConfig',
       'buildable',
       'compiler',
-      'simpleName',
     ]);
   });
 
