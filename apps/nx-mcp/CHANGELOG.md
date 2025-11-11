@@ -1,3 +1,15 @@
+## 0.10.0 (2025-11-11)
+
+### 🚀 Features
+
+- **nx-mcp:** make mcp server via streamable http stateful with sessions ([#2877](https://github.com/nrwl/nx-console/pull/2877))
+- **nx-mcp:** rename nx_cloud_analytics tools to just cloud_analytics ([#2876](https://github.com/nrwl/nx-console/pull/2876))
+- **vscode:** add debug logging setting to vscode & nxls ([#2873](https://github.com/nrwl/nx-console/pull/2873))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.9.0 (2025-11-04)
 
 ### 🚀 Features
