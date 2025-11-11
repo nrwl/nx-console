@@ -11,10 +11,12 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import dev.nx.console.mcp.McpServerService
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.NxProvenance
+import java.io.File
 import kotlinx.coroutines.*
 
 @Service(Service.Level.PROJECT)
@@ -75,6 +77,12 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
         try {
             val workspaceRoot = project.basePath ?: "."
+
+            // Only run AI checks in Nx workspaces
+            if (!File(workspaceRoot, "nx.json").exists()) {
+                return
+            }
+
             val (hasProvenance, _) =
                 withContext(Dispatchers.IO) { NxProvenance.nxLatestProvenanceCheck(workspaceRoot) }
 
@@ -205,6 +213,7 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
                     mapOf("source" to "notification"),
                 )
             ConfigureAiAgentsService.getInstance(project).runConfigureCommand()
+            McpServerService.getInstance(project).setupMcpServer()
         }
     }
 
