@@ -11,6 +11,8 @@ import {
 import { IdeProvider } from '../ide-provider';
 import { RunningTasksMap } from '@nx-console/shared-running-tasks';
 
+const TASK_OUTPUT_CHUNK_SIZE = 10000;
+
 export function registerNxTaskTools(
   server: McpServer,
   ideProvider: IdeProvider,
@@ -35,7 +37,7 @@ export function registerNxTaskTools(
   );
   server.tool(
     NX_CURRENT_RUNNING_TASK_OUTPUT,
-    `Returns the terminal output for a specific task from currently running Nx CLI processes`,
+    `Returns the terminal output for a specific task from currently running Nx CLI processes. For large outputs, if a pagination token is returned, call this tool again with the token to retrieve additional results. Pagination works from the end of the outputs - page 0 shows the most recent output (end of the log), and subsequent pages show progressively older output.`,
     NxCurrentlyRunningTaskOutputSchema.shape,
     {
       destructiveHint: false,
@@ -79,15 +81,22 @@ const nxCurrentlyRunningTasksDetails =
 
 const NxCurrentlyRunningTaskOutputSchema = z.object({
   taskId: z.string().describe('The task ID of the task to get the output for'),
+  pageToken: z
+    .number()
+    .optional()
+    .describe(
+      'Token for pagination (bottom-up: page 0 = most recent output, higher pages = older output). Pass the token from the previous response to get the next page.',
+    ),
 });
 
 type NxCurrentlyRunningTaskOutputType = z.infer<
   typeof NxCurrentlyRunningTaskOutputSchema
 >;
-const nxCurrentlyRunningTaskOutput =
+export const nxCurrentlyRunningTaskOutput =
   (telemetry: NxConsoleTelemetryLogger | undefined, ideProvider: IdeProvider) =>
   async ({
     taskId,
+    pageToken,
   }: NxCurrentlyRunningTaskOutputType): Promise<CallToolResult> => {
     telemetry?.logUsage('ai.tool-call', {
       tool: NX_CURRENT_RUNNING_TASK_OUTPUT,
@@ -111,13 +120,64 @@ const nxCurrentlyRunningTaskOutput =
       };
     }
 
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `TaskId: ${task.name} (status: ${task.status}) ${task.continuous ? '(continuous)' : ''} Output: 
-${task.output}`,
-        },
-      ],
-    };
+    const pageNumber = pageToken ?? 0;
+
+    // Bottom-up pagination: page 0 shows the most recent (last) chunk
+    const output = task.output;
+    const outputLength = output.length;
+
+    // Handle empty output
+    if (outputLength === 0) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `No task outputs available for ${task.name}`,
+          },
+        ],
+      };
+    }
+
+    // Calculate the chunk boundaries from the end
+    const endIndex = outputLength - pageNumber * TASK_OUTPUT_CHUNK_SIZE;
+    const startIndex = Math.max(0, endIndex - TASK_OUTPUT_CHUNK_SIZE);
+
+    // Check if we're beyond the available content
+    if (startIndex >= outputLength || endIndex <= 0) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `TaskId: ${task.name} - no more content on page ${pageNumber}`,
+          },
+        ],
+      };
+    }
+
+    const chunk = output.slice(startIndex, endIndex);
+    const hasMore = startIndex > 0;
+
+    const content: CallToolResult['content'] = [];
+    const continuedString =
+      pageNumber > 0 ? ` (currently on page ${pageNumber})` : '';
+
+    let chunkText = chunk;
+    if (hasMore) {
+      chunkText = `...[older output on page ${pageNumber + 1}]\n${chunk}`;
+    }
+
+    content.push({
+      type: 'text',
+      text: `TaskId: ${task.name} (status: ${task.status}) ${task.continuous ? '(continuous)' : ''}${continuedString} Output:
+${chunkText}`,
+    });
+
+    if (hasMore) {
+      content.push({
+        type: 'text',
+        text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to retrieve older output.`,
+      });
+    }
+
+    return { content };
   };
