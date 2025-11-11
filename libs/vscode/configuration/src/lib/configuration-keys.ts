@@ -12,6 +12,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'nxWorkspacePath',
   'nxCloudNotifications',
   'enableDebugLogging',
+  'disableFileWatching',
   'mcpPort',
 ] as const;
 
@@ -29,6 +30,7 @@ export type GlobalConfig = {
   nxWorkspacePath: string;
   nxCloudNotifications: 'all' | 'errors' | 'none';
   enableDebugLogging: boolean;
+  disableFileWatching: boolean;
   mcpPort: number | undefined;
 };
 
