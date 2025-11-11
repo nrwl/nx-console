@@ -7,7 +7,10 @@ import {
   TargetViewItem,
 } from './views/nx-project-base-view';
 import { ATOMIZED_SCHEME } from './atomizer-decorations';
-import { PROJECT_GRAPH_ERROR_DECORATION_SCHEME } from './project-graph-error-decorations';
+import {
+  NX_DAEMON_WARNING_DECORATION_SCHEME,
+  PROJECT_GRAPH_ERROR_DECORATION_SCHEME,
+} from './project-graph-error-decorations';
 
 export class NxTreeItem extends TreeItem {
   constructor(public readonly item: ViewItem) {
@@ -32,6 +35,20 @@ export class NxTreeItem extends TreeItem {
         path: item.errorCount.toString(),
       });
       this.tooltip = `${item.errorCount} errors detected. The project graph may be missing some information`;
+    } else if (item.contextValue === 'daemonDisabled') {
+      this.resourceUri = Uri.from({
+        scheme: NX_DAEMON_WARNING_DECORATION_SCHEME,
+        path: '1',
+      });
+      this.tooltip =
+        'Nx Daemon is disabled. Nx Console will not receive file changes.';
+    } else if (item.contextValue === 'daemonWatcherNotRunning') {
+      this.resourceUri = Uri.from({
+        scheme: NX_DAEMON_WARNING_DECORATION_SCHEME,
+        path: '2',
+      });
+      this.tooltip =
+        'Nx Daemon watcher is not running. Nx Console will not receive file changes. You can restart the watcher by clicking the refresh icon.';
     }
 
     this.setIcons(item.iconPath);
@@ -40,6 +57,14 @@ export class NxTreeItem extends TreeItem {
   setIcons(iconPath?: string) {
     if (this.contextValue === 'projectGraphError') {
       this.iconPath = new ThemeIcon('error');
+      return;
+    }
+
+    if (
+      this.contextValue === 'daemonDisabled' ||
+      this.contextValue === 'daemonWatcherNotRunning'
+    ) {
+      this.iconPath = new ThemeIcon('warning');
       return;
     }
 

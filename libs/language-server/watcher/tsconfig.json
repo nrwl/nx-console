@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-version"
-    },
-    {
       "path": "../../shared/watcher"
     },
     {
@@ -16,7 +13,7 @@
       "path": "../../shared/nx-workspace-info"
     },
     {
-      "path": "../../shared/npm"
+      "path": "../../shared/nx-version"
     },
     {
       "path": "../utils"
