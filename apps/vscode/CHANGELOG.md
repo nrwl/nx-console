@@ -1,3 +1,16 @@
+# [18.79.0](https://github.com/nrwl/nx-console/compare/vscode-v18.78.0...vscode-v18.79.0) (2025-11-11)
+
+
+### Bug Fixes
+
+* **vscode:** fallback to npx if pm dlx command doesn't exit ([#2888](https://github.com/nrwl/nx-console/issues/2888)) ([f6a94a0](https://github.com/nrwl/nx-console/commit/f6a94a0e21739515ca98e0ddc2f9bb43efc28b68))
+* **vscode:** remove outdated help me fix this button ([#2884](https://github.com/nrwl/nx-console/issues/2884)) ([1e12c1f](https://github.com/nrwl/nx-console/commit/1e12c1f18933930acbbf6656fc76a01bdfd88533))
+
+
+### Features
+
+* **nx-mcp:** add pagination to current_running_task_output tool ([#2887](https://github.com/nrwl/nx-console/issues/2887)) ([1033b70](https://github.com/nrwl/nx-console/commit/1033b7044502c37868a17e7127b41766f6b3930e))
+
 # [18.78.0](https://github.com/nrwl/nx-console/compare/vscode-v18.77.1...vscode-v18.78.0) (2025-11-10)
 
 
