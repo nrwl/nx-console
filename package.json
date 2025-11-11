@@ -140,13 +140,13 @@
   "nx": {
     "includedScripts": [],
     "targets": {
-      "release:vscode": {
+      "release-vscode": {
         "command": "npx nx release --group vscode --skip-publish"
       },
-      "release:nx-mcp": {
+      "release-nx-mcp": {
         "command": "npx nx release --group nx-mcp --skip-publish"
       },
-      "release:nxls": {
+      "release-nxls": {
         "command": "npx nx release --group nxls --skip-publish"
       },
       "telemetry-check": {
