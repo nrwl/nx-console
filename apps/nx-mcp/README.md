@@ -70,7 +70,7 @@ Alternatively, use the slash command `/add-mcp` in the Warp Agent prompt.
 
 Refer to your AI tool's documentation for how to register an MCP server. For example, [Cursor](https://docs.cursor.com/context/model-context-protocol) or [Claude Desktop](https://modelcontextprotocol.io/quickstart/user) support MCP.
 
-If you want to host the server instead of communicating via `stdio`, you can use the `--sse` and `--port` flags. Keep in mind that the Nx MCP server only supports a single concurrent connection right now, so connecting multiple clients at the same time might break in some cases.
+If you want to host the server instead of communicating via `stdio`, you can use the `--sse` and `--port` flags. The HTTP transport supports multiple concurrent connections, allowing different clients to connect simultaneously with independent sessions.
 
 Run `nx-mcp --help` to see what options are available.
 
