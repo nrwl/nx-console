@@ -109,7 +109,7 @@ async function constructCommand(flags: string, forceNpx = false) {
 
   // there are older versions of nx that have this outdated config
   // 'yarn' isn't actually a dlx command it's only for local packages
-  if (dlx === 'yarn' || dlx === 'npx') {
+  if (dlx === 'yarn' || dlx === 'npx' || dlx === undefined) {
     dlx = 'npx -y --ignore-scripts';
   }
 
@@ -137,6 +137,7 @@ async function doRunAiAgentCheck(
   let callbackStderr = '';
   let weKilledIt = false;
   let commandStartTime = 0;
+  let commandKilledTimed = 0;
   let command = '';
 
   const errors: [string, Error][] = [];
@@ -161,6 +162,7 @@ async function doRunAiAgentCheck(
 
       const timeout = setTimeout(() => {
         weKilledIt = true;
+        commandKilledTimed = Date.now();
         childProcess.kill();
       }, 360000);
 
@@ -182,6 +184,10 @@ async function doRunAiAgentCheck(
           error.stderr = callbackStderr;
           error.weKilledIt = weKilledIt;
           error.elapsedTime = Date.now() - commandStartTime;
+
+          if (commandKilledTimed > 0) {
+            error.elapsedKillTime = commandKilledTimed - commandStartTime;
+          }
           reject(error);
         } else {
           resolve(true);
@@ -220,7 +226,6 @@ async function getErrorInformation(
   command: string,
   e: Error,
   workspacePath: string,
-  nxLatestVersion: string,
 ) {
   const weKilledIt = (e as any).weKilledIt ?? false;
   // throw this error so that it can be tracked in rollbar - workaround while we track what's going wrong
@@ -272,10 +277,9 @@ async function getErrorInformation(
     'AIFAIL',
     `COMMAND:${command}`,
     `ELAPSED:${((e as any).elapsedTime / 1000).toFixed(2)}s`,
-    `WKI:${weKilledIt}`,
+    `WKI:${weKilledIt}${(e as any).elapsedKillTime ? `${((e as any).elapsedKillTime / 1000).toFixed()}s` : ''}`,
     `NODEVERSION:${nodeVersion}`,
     `NPMVERSION:${npmVersion}`,
-    `NXVERSION:${nxLatestVersion}`,
     `LOCALNXVERSION:${localNxVersion}`,
     `CACHENXVERSION:${cachedNxVersion}`,
     `PKGMANAGER:${packageManager}`,
@@ -311,6 +315,7 @@ async function getErrorInformation(
     'ERR_SOCKET_TIMEOUT',
     'EBADENGINE',
     'This program is blocked by group policy',
+    'Invalid authentication',
   ];
   // there are certain error messages we can't do anything about
   // let's track those separately but not throw
@@ -380,7 +385,6 @@ async function runAiAgentCheck() {
             error[0],
             error[1],
             workspacePath,
-            nxLatestVersion,
           );
           if (errorInformation) {
             errorsWithInformation.push(errorInformation);
