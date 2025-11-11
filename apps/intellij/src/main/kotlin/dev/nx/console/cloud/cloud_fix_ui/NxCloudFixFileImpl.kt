@@ -45,7 +45,6 @@ import dev.nx.console.cloud.NxCloudApiService
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.FetchAndPullChangesAction
 import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
@@ -361,26 +360,6 @@ class NxCloudFixFileImpl(
                     )
 
                 if (success) {
-                    val targetBranch = fixDetails.cipe.branch
-                    val hasBranchOnRemote =
-                        GitUtils.checkBranchExistsOnRemote(project, targetBranch)
-
-                    if (!hasBranchOnRemote) {
-                        showSuccessNotification(
-                            "Nx Cloud fix applied successfully. Don't forget to integrate the changes into your local branch"
-                        )
-                    } else {
-                        val notification =
-                            NotificationGroupManager.getInstance()
-                                .getNotificationGroup("Nx Cloud CIPE")
-                                .createNotification(
-                                    "Nx Cloud fix applied successfully.",
-                                    NotificationType.INFORMATION,
-                                )
-                        notification.addAction(FetchAndPullChangesAction(targetBranch))
-                        notification.notify(project)
-                    }
-
                     CIPEPollingService.getInstance(project).forcePoll()
 
                     withContext(Dispatchers.EDT) {
