@@ -424,32 +424,6 @@ export class NxCloudFixWebview {
             commitMessage,
           );
           if (success) {
-            const targetBranch = data.cipe.branch;
-            let hasBranchOnRemote: boolean;
-            try {
-              execSync(`git rev-parse --verify origin/${targetBranch}`, {
-                cwd: getNxWorkspacePath(),
-              });
-              hasBranchOnRemote = true;
-            } catch {
-              hasBranchOnRemote = false;
-            }
-            if (!hasBranchOnRemote) {
-              window.showInformationMessage(
-                "Nx Cloud fix applied successfully. Don't forget to integrate the changes into your local branch",
-              );
-            } else {
-              window
-                .showInformationMessage(
-                  'Nx Cloud fix applied successfully.',
-                  'Fetch & Pull Changes',
-                )
-                .then((result) => {
-                  if (result === 'Fetch & Pull Changes') {
-                    fetchAndPullChanges(targetBranch);
-                  }
-                });
-            }
             getAiFixStatusBarService().hideAiFixStatusBarItem();
           }
         },
