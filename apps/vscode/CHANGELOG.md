@@ -1,3 +1,16 @@
+# [18.80.0](https://github.com/nrwl/nx-console/compare/vscode-v18.79.0...vscode-v18.80.0) (2025-11-12)
+
+
+### Bug Fixes
+
+* **vscode:** misc fixes around json parsing ([#2894](https://github.com/nrwl/nx-console/issues/2894)) ([956831a](https://github.com/nrwl/nx-console/commit/956831a51b0601b95a17c93e63701358334e3443))
+* **vscode:** remove duplicate applied notification when applying from Nx Console ([#2891](https://github.com/nrwl/nx-console/issues/2891)) ([a0f7d8b](https://github.com/nrwl/nx-console/commit/a0f7d8b2c6d7ec7393c6ef2bd895a88336c73109))
+
+
+### Features
+
+* **vscode:** add setting to disable file watching in the language server ([#2892](https://github.com/nrwl/nx-console/issues/2892)) ([83e5098](https://github.com/nrwl/nx-console/commit/83e5098fa75c030544548f3b71d42c4c3fb3db3e))
+
 # [18.79.0](https://github.com/nrwl/nx-console/compare/vscode-v18.78.0...vscode-v18.79.0) (2025-11-11)
 
 
