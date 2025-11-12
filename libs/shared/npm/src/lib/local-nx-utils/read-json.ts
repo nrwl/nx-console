@@ -20,7 +20,7 @@ export async function readJsonFile<T>(
       expectComments: true,
     }) as any;
   } else {
-    const filePath = join(workspacePath, 'nx.json');
+    const filePath = join(workspacePath, jsonPath);
     const content = readFileSync(filePath, 'utf8');
     return JSON.parse(content);
   }

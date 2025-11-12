@@ -4,6 +4,7 @@ import {
   lspLogger,
 } from '@nx-console/language-server-utils';
 import { getProjectByRoot } from '@nx-console/language-server-workspace';
+import { readAndParseJson } from '@nx-console/shared-file-system';
 import {
   CompletionType,
   getNxJsonSchema,
@@ -215,9 +216,7 @@ async function getPackageJsonSchema(
       join('schemas', 'project-schema.json'),
     );
     if (projectJsonSchemaPath) {
-      const nxProjectSchema = JSON.parse(
-        await readFile(projectJsonSchemaPath, 'utf-8'),
-      );
+      const nxProjectSchema = await readAndParseJson(projectJsonSchemaPath);
       return {
         type: 'object',
         properties: {
