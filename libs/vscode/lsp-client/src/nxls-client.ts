@@ -366,6 +366,10 @@ async function createLanguageClient(
         'enableDebugLogging',
         false,
       ),
+      disableFileWatching: GlobalConfigurationStore.instance.get(
+        'disableFileWatching',
+        false,
+      ),
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },

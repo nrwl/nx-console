@@ -119,6 +119,7 @@ process.on('uncaughtException', (e) => {
 
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
+let DISABLE_FILE_WATCHING = false;
 let unregisterFileWatcher: () => Promise<void> = async () => {
   //noop
 };
@@ -134,9 +135,10 @@ const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
 
 connection.onInitialize(async (params) => {
-  const { workspacePath, enableDebugLogging } =
+  const { workspacePath, enableDebugLogging, disableFileWatching } =
     params.initializationOptions ?? {};
   setLspLogger(connection, enableDebugLogging ?? false);
+  DISABLE_FILE_WATCHING = disableFileWatching ?? false;
   lspLogger.log('Initializing Nx Language Server');
   try {
     WORKING_PATH =
@@ -154,15 +156,17 @@ connection.onInitialize(async (params) => {
     CLIENT_CAPABILITIES = params.capabilities;
 
     await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
-    unregisterFileWatcher = await languageServerWatcher(
-      WORKING_PATH,
-      async () => {
-        if (!WORKING_PATH) {
-          return;
-        }
-        await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
-      },
-    );
+    if (!DISABLE_FILE_WATCHING) {
+      unregisterFileWatcher = await languageServerWatcher(
+        WORKING_PATH,
+        async () => {
+          if (!WORKING_PATH) {
+            return;
+          }
+          await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+        },
+      );
+    }
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
@@ -720,9 +724,14 @@ async function reconfigure(
 
   await unregisterFileWatcher();
 
-  unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
-    reconfigureAndSendNotificationWithBackoff(workingPath);
-  });
+  if (!DISABLE_FILE_WATCHING) {
+    unregisterFileWatcher = await languageServerWatcher(
+      workingPath,
+      async () => {
+        reconfigureAndSendNotificationWithBackoff(workingPath);
+      },
+    );
+  }
 
   return workspace;
 }
