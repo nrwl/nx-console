@@ -2,6 +2,7 @@ import { findNxPackagePath } from '@nx-console/shared-npm';
 import { NxVersion } from '@nx-console/nx-version';
 import { coerce, SemVer } from 'semver';
 import { readFileSync } from 'node:fs';
+import { readAndParseJson } from '@nx-console/shared-file-system';
 
 let nxWorkspacePackageJsonVersion: string | undefined;
 let loadedNxPackage = false;
@@ -23,7 +24,8 @@ export async function getNxVersion(
       };
     }
 
-    nxWorkspacePackageJsonVersion = readVersionFromPackageJson(packagePath);
+    nxWorkspacePackageJsonVersion =
+      await readVersionFromPackageJson(packagePath);
     loadedNxPackage = true;
   }
 
@@ -57,9 +59,9 @@ export async function resetNxVersionCache() {
   nxWorkspacePackageJsonVersion = undefined;
 }
 
-function readVersionFromPackageJson(packagePath: string) {
+async function readVersionFromPackageJson(packagePath: string) {
   try {
-    const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+    const packageJson = await readAndParseJson(packagePath);
     return packageJson.version;
   } catch (error) {
     return undefined;
