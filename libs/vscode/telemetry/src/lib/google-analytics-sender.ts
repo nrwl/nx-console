@@ -3,7 +3,7 @@ import { env, ExtensionContext, extensions, TelemetrySender } from 'vscode';
 
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 import Rollbar = require('rollbar/src/browser/rollbar');
 
@@ -30,10 +30,6 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     private production: boolean,
     context: ExtensionContext,
   ) {
-    const logger = {
-      log: (message: string) => getOutputChannel().append(message),
-    };
-
     this.analytics = new GoogleAnalytics(
       this.production ? 'production' : 'debug_view',
       env.machineId,
@@ -41,7 +37,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
       env.sessionId,
       this._version,
       env.appName.toLowerCase().includes('cursor') ? 'cursor' : 'vscode',
-      logger,
+      vscodeLogger,
       this._nxVersion,
     );
 
@@ -74,7 +70,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
       return;
     }
 
-    getOutputChannel().appendLine(`Uncaught Exception: ${error}`);
+    vscodeLogger.log(`Uncaught Exception: ${error}`);
 
     const shouldLogToRollbar = this.production
       ? Math.floor(Math.random() * 5) === 0

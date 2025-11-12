@@ -88,6 +88,9 @@ export class GoogleAnalytics {
       url,
       data: JSON.stringify(body),
       type: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
       .then((response) => {
         if (this.mode !== 'production' && response.responseText.length > 0) {
