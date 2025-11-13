@@ -1,5 +1,6 @@
 import { gte } from '@nx-console/nx-version';
 import {
+  checkIsNxWorkspace,
   detectPackageManager,
   getPackageManagerCommand,
 } from '@nx-console/shared-npm';
@@ -25,6 +26,39 @@ import {
   TaskScope,
   window,
 } from 'vscode';
+
+const NO_AI_AGENTS_CONFIGURED_ERROR = 'No AI agents are configured';
+const AI_AGENTS_OUT_OF_DATE_ERROR = 'The following AI agents are out of date';
+const NOT_FULLY_CONFIGURED_ERROR =
+  'The following agents are not fully configured';
+
+const EXPECTED_ERRORS = [
+  'E401',
+  'E403',
+  'E404',
+  'ENOTFOUND',
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'EIDLETIMEOUT',
+  'ETIMEDOUT',
+  'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+  'npm error 403',
+  'npm error network',
+  'npm ERR! 404',
+  'npm error 502',
+  'npm error 500',
+  'FETCH_ERROR',
+  'ERR_PNPM_UNSUPPORTED_ENGINE',
+  'ERR_INVALID_AUTH',
+  'ERR_SOCKET_TIMEOUT',
+  'EBADENGINE',
+  'This program is blocked by group policy',
+  'Invalid authentication',
+  'ERR_PNPM_FETCH_401',
+  'GET 401',
+  // windows npx handles setting peer dependencies differently
+  "Cannot set properties of null (setting 'peer')",
+];
 
 let checkTimer: NodeJS.Timeout | undefined;
 let intervalTimer: NodeJS.Timeout | undefined;
@@ -138,6 +172,7 @@ async function doRunAiAgentCheck(
   let weKilledIt = false;
   let commandStartTime = 0;
   let commandKilledTimed = 0;
+  let commandSpawnedTime = 0;
   let command = '';
 
   const errors: [string, Error][] = [];
@@ -158,6 +193,11 @@ async function doRunAiAgentCheck(
           NX_SKIP_VSCODE_EXTENSION_INSTALL: 'true',
         },
         shell: true,
+      });
+
+      // TODO: maybe put the timeout in here if we realize that spawning takes too long
+      childProcess.on('spawn', () => {
+        commandSpawnedTime = Date.now();
       });
 
       const timeout = setTimeout(() => {
@@ -184,6 +224,7 @@ async function doRunAiAgentCheck(
           error.stderr = callbackStderr;
           error.weKilledIt = weKilledIt;
           error.elapsedTime = Date.now() - commandStartTime;
+          error.elapsedSpawnTime = commandSpawnedTime - commandStartTime;
 
           if (commandKilledTimed > 0) {
             error.elapsedKillTime = commandKilledTimed - commandStartTime;
@@ -208,11 +249,23 @@ async function doRunAiAgentCheck(
         if (!(error as any).elapsedTime) {
           (error as any).elapsedTime = Date.now() - commandStartTime;
         }
+        if (!(error as any).elapsedSpawnTime) {
+          (error as any).elapsedSpawnTime =
+            commandSpawnedTime - commandStartTime;
+        }
         reject(error);
       });
     });
   } catch (e) {
     errors.push([command, e as Error]);
+
+    const stringified = JSON.stringify(e);
+    if (
+      stringified.includes(AI_AGENTS_OUT_OF_DATE_ERROR) ||
+      stringified.includes(NO_AI_AGENTS_CONFIGURED_ERROR)
+    ) {
+      return errors;
+    }
     if (!forceNpx) {
       const rerunErrors = await doRunAiAgentCheck(workspacePath, true);
       errors.push(...rerunErrors);
@@ -277,6 +330,7 @@ async function getErrorInformation(
     'AIFAIL',
     `COMMAND:${command}`,
     `ELAPSED:${((e as any).elapsedTime / 1000).toFixed(2)}s`,
+    `ELAPSED_SPAWN:${((e as any).elapsedSpawnTime / 1000).toFixed(2)}s`,
     `WKI:${weKilledIt}${(e as any).elapsedKillTime ? `${((e as any).elapsedKillTime / 1000).toFixed()}s` : ''}`,
     `NODEVERSION:${nodeVersion}`,
     `NPMVERSION:${npmVersion}`,
@@ -295,31 +349,13 @@ async function getErrorInformation(
     'OFFICIAL_NPM_REGISTRY',
   );
 
-  const reasons = [
-    'E401',
-    'E403',
-    'E404',
-    'ENOTFOUND',
-    'ECONNRESET',
-    'ECONNREFUSED',
-    'EIDLETIMEOUT',
-    'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
-    'npm error 403',
-    'npm error network',
-    'npm ERR! 404',
-    'npm error 502',
-    'npm error 500',
-    'FETCH_ERROR',
-    'ERR_PNPM_UNSUPPORTED_ENGINE',
-    'ERR_INVALID_AUTH',
-    'ERR_SOCKET_TIMEOUT',
-    'EBADENGINE',
-    'This program is blocked by group policy',
-    'Invalid authentication',
-  ];
   // there are certain error messages we can't do anything about
   // let's track those separately but not throw
-  if (reasons.some((reason) => errorMessage.includes(reason))) {
+  if (
+    EXPECTED_ERRORS.some((expectedError) =>
+      errorMessage.includes(expectedError),
+    )
+  ) {
     return;
   }
 
@@ -348,6 +384,9 @@ async function runAiAgentCheck() {
     return;
   }
 
+  if (!(await checkIsNxWorkspace(workspacePath))) {
+    return;
+  }
   // Check Node version - only run on Node 20+
   try {
     const nodeVersion = (await promisify(exec)('node --version')).stdout.trim();
@@ -378,78 +417,83 @@ async function runAiAgentCheck() {
       // let's be conservative for now.
       // There are many different reasons this could fail so we want to not spam users
       const stringified = JSON.stringify(errors);
-      if (!stringified.includes('The following AI agents are out of date')) {
-        const errorsWithInformation = [];
-        for (const error of errors) {
-          const errorInformation = await getErrorInformation(
-            error[0],
-            error[1],
-            workspacePath,
-          );
-          if (errorInformation) {
-            errorsWithInformation.push(errorInformation);
+
+      // no agents -> no need to check
+      if (!stringified.includes(NO_AI_AGENTS_CONFIGURED_ERROR)) {
+        // unrelated error - throw, probably
+        if (!stringified.includes(AI_AGENTS_OUT_OF_DATE_ERROR)) {
+          const errorsWithInformation = [];
+          for (const error of errors) {
+            const errorInformation = await getErrorInformation(
+              error[0],
+              error[1],
+              workspacePath,
+            );
+            if (errorInformation) {
+              errorsWithInformation.push(errorInformation);
+            }
+          }
+          if (errorsWithInformation.length > 0) {
+            getTelemetry().logUsage('ai.configure-agents-check-error');
+            throw new Error(
+              `Error 1: \n ${errorsWithInformation[0]}\n\nError 2: \n ${errorsWithInformation[1]}\n`,
+            );
+          } else {
+            getTelemetry().logUsage('ai.configure-agents-check-expected-error');
+            return;
           }
         }
-        if (errorsWithInformation.length > 0) {
-          getTelemetry().logUsage('ai.configure-agents-check-error');
-          throw new Error(
-            `Error 1: \n ${errorsWithInformation[0]}\n\nError 2: \n ${errorsWithInformation[1]}\n`,
-          );
-        } else {
-          getTelemetry().logUsage('ai.configure-agents-check-expected-error');
-          return;
-        }
-      }
 
-      WorkspaceConfigurationStore.instance.set(
-        'lastAiCheckNotificationTimestamp',
-        now,
-      );
-
-      getTelemetry().logUsage('ai.configure-agents-check-notification', {
-        source: 'notification',
-      });
-
-      const selection = await window.showInformationMessage(
-        'Your AI agent configuration is outdated. Would you like to update to the recommended configuration?',
-        'Update',
-        "Don't ask again",
-      );
-
-      if (selection === 'Update') {
-        // Log telemetry for action taken
-        getTelemetry().logUsage('ai.configure-agents-action', {
-          source: 'notification',
-        });
-
-        // Run the configure command
-        const command = await constructCommand('');
-        const task = new Task(
-          { type: 'nx' },
-          TaskScope.Workspace,
-          command,
-          'nx',
-          new ShellExecution(command, {
-            cwd: workspacePath,
-            env: {
-              ...process.env,
-              NX_CONSOLE: 'true',
-              NX_AI_FILES_USE_LOCAL: 'true',
-            },
-          }),
+        WorkspaceConfigurationStore.instance.set(
+          'lastAiCheckNotificationTimestamp',
+          now,
         );
-        task.presentationOptions.focus = true;
-        tasks.executeTask(task);
-      } else if (selection === "Don't ask again") {
-        getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
+
+        getTelemetry().logUsage('ai.configure-agents-check-notification', {
           source: 'notification',
         });
 
-        WorkspaceConfigurationStore.instance.set('aiCheckDontAskAgain', true);
-      }
+        const selection = await window.showInformationMessage(
+          'Your AI agent configuration is outdated. Would you like to update to the recommended configuration?',
+          'Update',
+          "Don't ask again",
+        );
 
-      // Return early - we showed the update notification
-      return;
+        if (selection === 'Update') {
+          // Log telemetry for action taken
+          getTelemetry().logUsage('ai.configure-agents-action', {
+            source: 'notification',
+          });
+
+          // Run the configure command
+          const command = await constructCommand('');
+          const task = new Task(
+            { type: 'nx' },
+            TaskScope.Workspace,
+            command,
+            'nx',
+            new ShellExecution(command, {
+              cwd: workspacePath,
+              env: {
+                ...process.env,
+                NX_CONSOLE: 'true',
+                NX_AI_FILES_USE_LOCAL: 'true',
+              },
+            }),
+          );
+          task.presentationOptions.focus = true;
+          tasks.executeTask(task);
+        } else if (selection === "Don't ask again") {
+          getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
+            source: 'notification',
+          });
+
+          WorkspaceConfigurationStore.instance.set('aiCheckDontAskAgain', true);
+        }
+
+        // Return early - we showed the update notification
+        return;
+      }
     }
     getTelemetry().logUsage('ai.configure-agents-check-end');
     WorkspaceConfigurationStore.instance.set(
@@ -488,9 +532,7 @@ async function runAiAgentCheck() {
       vscodeLogger.log(`AI agent configuration check=all failed: ${e}`);
 
       const stringified = JSON.stringify(e);
-      if (
-        !stringified.includes('The following agents are not fully configured')
-      ) {
+      if (!stringified.includes(NOT_FULLY_CONFIGURED_ERROR)) {
         return;
       }
 
