@@ -6,3 +6,4 @@ export * from './lib/get-message-for-error';
 export * from './lib/get-available-nx-plugins';
 export * from './lib/loadRootEnvFiles';
 export * from './lib/provenance';
+export * from './lib/http-client';

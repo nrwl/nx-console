@@ -18,7 +18,6 @@ import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import type { PackageManager } from 'nx/src/devkit-exports';
 import { join } from 'path';
-import { xhr, XHRResponse } from 'request-light';
 import { major } from 'semver';
 import {
   commands,

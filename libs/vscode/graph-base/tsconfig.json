@@ -7,6 +7,9 @@
       "path": "../output-channels"
     },
     {
+      "path": "../../shared/utils"
+    },
+    {
       "path": "../../shared/types"
     },
     {

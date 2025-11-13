@@ -27,7 +27,6 @@ import {
 } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { join } from 'path';
-import { xhr } from 'request-light';
 import {
   commands,
   EventEmitter,
@@ -43,6 +42,7 @@ import { ActorRef, EventObject } from 'xstate';
 import { getAiFixStatusBarService } from './ai-fix-status-bar-service';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
+import { httpRequest } from '@nx-console/shared-utils';
 
 export class NxCloudFixWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -587,7 +587,7 @@ async function updateSuggestedFix(
       requestData.userCommitMessage = commitMessage;
     }
 
-    const response = await xhr({
+    const response = await httpRequest({
       url: `${nxCloudInfo.nxCloudUrl}/nx-cloud/update-suggested-fix`,
       type: 'POST',
       headers: {

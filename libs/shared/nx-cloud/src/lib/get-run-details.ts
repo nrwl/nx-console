@@ -1,5 +1,4 @@
-import { Logger } from '@nx-console/shared-utils';
-import { xhr } from 'request-light';
+import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
@@ -85,7 +84,7 @@ export async function getRunDetails(
 
   logger.log(`Making run details request for ID: ${runId}`);
   try {
-    const response = await xhr({
+    const response = await httpRequest({
       type: 'GET',
       url,
       headers,
@@ -97,7 +96,7 @@ export async function getRunDetails(
       data: responseData,
     };
   } catch (e) {
-    if (e.status === 401) {
+    if (e instanceof HttpError && e.status === 401) {
       logger.log(`Authentication error: ${e.responseText}`);
       return {
         error: {
@@ -106,7 +105,7 @@ export async function getRunDetails(
         },
       };
     }
-    if (e.status === 404) {
+    if (e instanceof HttpError && e.status === 404) {
       logger.log(`Run not found: ${e.responseText}`);
       return {
         error: {
@@ -119,7 +118,7 @@ export async function getRunDetails(
     return {
       error: {
         type: 'other',
-        message: e.responseText ?? e.message,
+        message: e instanceof HttpError ? e.responseText : (e as Error).message,
       },
     };
   }
