@@ -1,3 +1,11 @@
+## [18.80.1](https://github.com/nrwl/nx-console/compare/vscode-v18.80.0...vscode-v18.80.1) (2025-11-13)
+
+
+### Bug Fixes
+
+* **nx-mcp:** update @modelcontextprotocol/sdk ([#2895](https://github.com/nrwl/nx-console/issues/2895)) ([91c1740](https://github.com/nrwl/nx-console/commit/91c17409c2be9b30b67625239cc0089a0314e159))
+* **vscode:** only run caia in nx workspaces & more ([#2897](https://github.com/nrwl/nx-console/issues/2897)) ([cebe897](https://github.com/nrwl/nx-console/commit/cebe8976d76f710d3d50812caaac8fcec04b6e43))
+
 # [18.80.0](https://github.com/nrwl/nx-console/compare/vscode-v18.79.0...vscode-v18.80.0) (2025-11-12)
 
 
