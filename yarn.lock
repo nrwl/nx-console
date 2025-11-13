@@ -3148,7 +3148,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.18.0, @modelcontextprotocol/sdk@npm:^1.20.2":
+"@modelcontextprotocol/sdk@npm:^1.18.0":
   version: 1.20.2
   resolution: "@modelcontextprotocol/sdk@npm:1.20.2"
   dependencies:
@@ -3165,6 +3165,32 @@ __metadata:
     zod: ^3.23.8
     zod-to-json-schema: ^3.24.1
   checksum: 72a1acecc05255b4d89d202a02b5e21b8e41e4fbba4be59049404ee1e52ac5a7431b21af8b5aa53f4441f0da7fd25e03f98f8780db87475f81f3e6fa4250caa7
+  languageName: node
+  linkType: hard
+
+"@modelcontextprotocol/sdk@npm:^1.21.1":
+  version: 1.21.1
+  resolution: "@modelcontextprotocol/sdk@npm:1.21.1"
+  dependencies:
+    ajv: ^8.17.1
+    ajv-formats: ^3.0.1
+    content-type: ^1.0.5
+    cors: ^2.8.5
+    cross-spawn: ^7.0.5
+    eventsource: ^3.0.2
+    eventsource-parser: ^3.0.0
+    express: ^5.0.1
+    express-rate-limit: ^7.5.0
+    pkce-challenge: ^5.0.0
+    raw-body: ^3.0.0
+    zod: ^3.23.8
+    zod-to-json-schema: ^3.24.1
+  peerDependencies:
+    "@cfworker/json-schema": ^4.1.1
+  peerDependenciesMeta:
+    "@cfworker/json-schema":
+      optional: true
+  checksum: bf80d59107ff359b1a192fd7dd459b71d658dab189940724aacd5e1d0f4e6b26a4db5f7018a6e08abac53732e710851ea733af81bd4c6b502851ff2f912f9272
   languageName: node
   linkType: hard
 
@@ -7981,6 +8007,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ajv-formats@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "ajv-formats@npm:3.0.1"
+  dependencies:
+    ajv: ^8.0.0
+  peerDependencies:
+    ajv: ^8.0.0
+  peerDependenciesMeta:
+    ajv:
+      optional: true
+  checksum: f4e1fe232d67fcafc02eafe373a7a9962351e0439dd0736647ca75c93c3da23b430b6502c255ab4315410ae330d4f3013ac9fe226c40b2524ca93a58e786d086
+  languageName: node
+  linkType: hard
+
 "ajv-keywords@npm:^3.5.2":
   version: 3.5.2
   resolution: "ajv-keywords@npm:3.5.2"
@@ -8013,7 +8053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^8.0.0, ajv@npm:^8.12.0, ajv@npm:^8.9.0":
+"ajv@npm:^8.0.0, ajv@npm:^8.12.0, ajv@npm:^8.17.1, ajv@npm:^8.9.0":
   version: 8.17.1
   resolution: "ajv@npm:8.17.1"
   dependencies:
@@ -16725,7 +16765,7 @@ __metadata:
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
     "@modelcontextprotocol/inspector": ^0.16.1
-    "@modelcontextprotocol/sdk": ^1.20.2
+    "@modelcontextprotocol/sdk": ^1.21.1
     "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/conformance": 21.0.0-beta.0
     "@nx/cypress": 22.1.0-beta.7
