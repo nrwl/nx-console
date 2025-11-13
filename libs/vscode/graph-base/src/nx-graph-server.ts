@@ -1,9 +1,9 @@
 import { findNxExecutable } from '@nx-console/shared-npm';
+import { httpRequest } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getOutputChannel } from '@nx-console/vscode-output-channels';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
-import { xhr } from 'request-light';
 import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
 
 let nxGraphServer: NxGraphServer | undefined = undefined;
@@ -89,10 +89,8 @@ export class NxGraphServer implements Disposable {
           return;
       }
 
-      const headers = { 'Accept-Encoding': 'gzip, deflate' };
-      const response = await xhr({
+      const response = await httpRequest({
         url,
-        headers,
       });
       const data = response.responseText;
       return {

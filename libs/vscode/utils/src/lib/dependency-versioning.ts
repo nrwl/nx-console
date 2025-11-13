@@ -1,5 +1,5 @@
 import { gte } from '@nx-console/nx-version';
-import { xhr } from 'request-light';
+import { httpRequest } from '@nx-console/shared-utils';
 import { rcompare } from 'semver';
 import { QuickPickItem, QuickPickItemKind, window } from 'vscode';
 import { join } from 'path';
@@ -265,12 +265,11 @@ export function getPackageInfo(
   dep: string,
 ): Promise<PackageInformationResponse> {
   const headers = {
-    'Accept-Encoding': 'gzip, deflate',
     Accept: 'application/vnd.npm.install-v1+json',
   };
 
   // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md
-  return xhr({
+  return httpRequest({
     url: `https://registry.npmjs.org/${dep}`,
     headers,
   }).then(

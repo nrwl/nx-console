@@ -1,11 +1,10 @@
-import { xhr } from 'request-light';
 import { Readable, Transform, TransformCallback } from 'stream';
 import { pipeline } from 'stream/promises';
 import { extract } from 'tar-stream';
 import * as zlib from 'zlib';
 
 import { getNxCloudUrl, isNxCloudUsed } from '@nx-console/shared-nx-cloud';
-import { Logger } from '@nx-console/shared-utils';
+import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 
 export async function getNxCloudTerminalOutput(
@@ -30,7 +29,7 @@ export async function getNxCloudTerminalOutput(
   };
 
   try {
-    const response = await xhr({
+    const response = await httpRequest({
       type: 'POST',
       url,
       data: JSON.stringify({
@@ -55,7 +54,7 @@ export async function getNxCloudTerminalOutput(
     );
     return { terminalOutput: strippedOutput };
   } catch (e) {
-    if (e.status === 401) {
+    if (e instanceof HttpError && e.status === 401) {
       logger.log(`Authentication error: ${e.responseText}`);
       return {
         error: e.responseText,
@@ -72,13 +71,13 @@ export async function downloadAndExtractArtifact(
   artifactUrl: string,
   logger: Logger,
 ): Promise<string> {
-  const response = await xhr({
+  const response = await httpRequest({
     type: 'GET',
     url: artifactUrl,
   });
   const tarExtractStream = new TarExtractTransform(logger);
   const bodyStream = new Readable();
-  bodyStream.push(Buffer.from(response.body));
+  bodyStream.push(Buffer.from(response.responseText));
   bodyStream.push(null);
   // todo(cammisuli): add support for encrypted artifacts
   await pipeline(bodyStream, zlib.createGunzip(), tarExtractStream);

@@ -4,13 +4,13 @@ import { join } from 'path';
 
 import { isNxCloudUsed, lspLogger } from '@nx-console/language-server-utils';
 import { CloudOnboardingInfo } from '@nx-console/shared-types';
-import { xhr } from 'request-light';
 import {
   getNxAccessToken,
   getNxCloudConfigIni,
   getNxCloudId,
   getNxCloudUrl,
 } from '@nx-console/shared-nx-cloud';
+import { httpRequest } from '@nx-console/shared-utils';
 
 export async function getCloudOnboardingInfo(
   workspacePath: string,
@@ -156,7 +156,7 @@ async function getNxCloudWorkspaceClaimed(
     lastRequestTime = Date.now();
     lastRequestHash = requestHash;
 
-    const response = await xhr({
+    const response = await httpRequest({
       type: 'POST',
       url,
       headers,
