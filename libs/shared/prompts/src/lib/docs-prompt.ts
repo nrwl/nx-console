@@ -1,4 +1,4 @@
-import { xhr } from 'request-light';
+import { httpRequest } from '@nx-console/shared-utils';
 
 export type ChatTurn = {
   role: 'user' | 'assistant';
@@ -28,7 +28,7 @@ export async function getDocsContext(
     content: userQuery,
   });
 
-  const req = await xhr({
+  const req = await httpRequest({
     url: 'https://nx.dev/api/query-ai-embeddings',
     type: 'POST',
     headers: { 'Content-Type': 'application/json' },

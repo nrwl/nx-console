@@ -1,5 +1,5 @@
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { xhr, XHRResponse } from 'request-light';
+import { httpRequest, HttpError } from './http-client';
 
 export type AvailableNxPlugin = {
   name: string;
@@ -10,19 +10,15 @@ export type AvailableNxPlugin = {
 export async function getAvailableNxPlugins(
   nxVersion: NxVersion | undefined,
 ): Promise<{ official: AvailableNxPlugin[]; community: AvailableNxPlugin[] }> {
-  const headers = { 'Accept-Encoding': 'gzip, deflate' };
-
   try {
-    const officialResponse = await xhr({
+    const officialResponse = await httpRequest({
       url: 'https://raw.githubusercontent.com/nrwl/nx/master/docs/packages.json',
       followRedirects: 5,
-      headers,
     });
 
-    const communityResponse = await xhr({
+    const communityResponse = await httpRequest({
       url: 'https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json',
       followRedirects: 5,
-      headers,
     });
 
     const officialPlugins: AvailableNxPlugin[] = (
@@ -65,8 +61,8 @@ export async function getAvailableNxPlugins(
       community: communityPlugins,
     };
   } catch (error) {
-    if (error && typeof error === 'object' && 'responseText' in error) {
-      return Promise.reject((error as XHRResponse).responseText);
+    if (error instanceof HttpError) {
+      return Promise.reject(error.responseText);
     }
     return Promise.reject(error);
   }

@@ -1,4 +1,4 @@
-import { xhr, XHRResponse, getErrorStatusDescription } from 'request-light';
+import { httpRequest, HttpError } from '@nx-console/shared-utils';
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
 import { Thenable } from 'vscode-json-languageservice';
@@ -10,18 +10,15 @@ export interface RequestService {
 function getHTTPRequestService(): RequestService {
   return {
     getContent(uri: string, _encoding?: string) {
-      const headers = { 'Accept-Encoding': 'gzip, deflate' };
-      return xhr({ url: uri, followRedirects: 5, headers }).then(
+      return httpRequest({ url: uri, followRedirects: 5 }).then(
         (response) => {
           return response.responseText;
         },
-        (error: XHRResponse) => {
+        (error: HttpError) => {
           return Promise.reject(
-            error.responseText ||
-              getErrorStatusDescription(error.status) ||
-              error.toString()
+            error.responseText || error.message || error.toString(),
           );
-        }
+        },
       );
     },
   };
@@ -44,7 +41,7 @@ function getFileRequestService(): RequestService {
 }
 
 export function getSchemaRequestService(
-  handledSchemas: string[] = ['https', 'http', 'file']
+  handledSchemas: string[] = ['https', 'http', 'file'],
 ) {
   const builtInHandlers: { [protocol: string]: RequestService | undefined } =
     {};

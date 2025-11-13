@@ -16850,7 +16850,6 @@ __metadata:
     ovsx: ^0.10.1
     prettier: ^3.5.1
     prettier-plugin-tailwindcss: ^0.6.11
-    request-light: ^0.5.8
     rimraf: ^3.0.2
     rollbar: ^2.26.5
     rxjs: 7.5.6
@@ -19026,13 +19025,6 @@ __metadata:
   version: 3.3.0
   resolution: "request-ip@npm:3.3.0"
   checksum: 9ca26f814201da19cb6f1a18da4f036803b770665ec0e7c556ea975ba553321922a5f04909f6dfc2371f695ca8aaa3c66f02c00a5e902c76435029804cdc4964
-  languageName: node
-  linkType: hard
-
-"request-light@npm:^0.5.8":
-  version: 0.5.8
-  resolution: "request-light@npm:0.5.8"
-  checksum: 70cec43b32de465a0cd3dadf0931b8bfeeaa2cc1541739bdd0d6092987ddce0beadca3d2ce49e314fd54f19b43dc58835c66ca9a8efd07e47dafd4f3e0d82386
   languageName: node
   linkType: hard
 

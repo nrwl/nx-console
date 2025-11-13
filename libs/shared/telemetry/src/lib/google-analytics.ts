@@ -1,5 +1,5 @@
 import { platform } from 'os';
-import { xhr, XHRResponse } from 'request-light';
+import { httpRequest, HttpError } from '@nx-console/shared-utils';
 import { Logger } from '@nx-console/shared-utils';
 import { TelemetryEvents } from './telemetry-types';
 
@@ -84,7 +84,7 @@ export class GoogleAnalytics {
 
     const url = `${base}/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`;
 
-    xhr({
+    httpRequest({
       url,
       data: JSON.stringify(body),
       type: 'POST',
@@ -97,7 +97,7 @@ export class GoogleAnalytics {
           this.logger?.log(`Telemetry Response: ${response.responseText}`);
         }
       })
-      .catch((reason: XHRResponse) => {
+      .catch((reason: HttpError) => {
         this.logger?.log(`unable to send telemetry: ${reason.responseText}`);
       });
   }

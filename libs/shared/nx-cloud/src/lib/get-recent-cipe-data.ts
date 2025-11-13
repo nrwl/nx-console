@@ -1,9 +1,8 @@
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { execSync } from 'child_process';
-import { xhr } from 'request-light';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 
-import { Logger } from '@nx-console/shared-utils';
+import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 
@@ -60,7 +59,7 @@ export async function getRecentCIPEData(
 
   logger.log(`Making recent CIPE request`);
   try {
-    const response = await xhr({
+    const response = await httpRequest({
       type: 'POST',
       url,
       headers,
@@ -82,7 +81,7 @@ export async function getRecentCIPEData(
 
     return result;
   } catch (e) {
-    if (e.status === 401) {
+    if (e instanceof HttpError && e.status === 401) {
       logger.log(`Authentication error: ${e.responseText}`);
       return {
         error: {
@@ -111,7 +110,7 @@ export async function getRecentCIPEData(
     return {
       error: {
         type: 'other',
-        message: e.responseText ?? e.message,
+        message: e instanceof HttpError ? e.responseText : (e as Error).message,
       },
     };
   }

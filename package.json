@@ -39,7 +39,6 @@
     "jsonc-parser": "^3.3.1",
     "lit": "^2.4.1",
     "minimatch": "^9.0.3",
-    "request-light": "^0.5.8",
     "rollbar": "^2.26.5",
     "rxjs": "7.5.6",
     "semver": "^7.7.1",
