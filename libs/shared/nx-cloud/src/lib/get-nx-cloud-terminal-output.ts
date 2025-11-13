@@ -71,13 +71,27 @@ export async function downloadAndExtractArtifact(
   artifactUrl: string,
   logger: Logger,
 ): Promise<string> {
-  const response = await httpRequest({
-    type: 'GET',
-    url: artifactUrl,
+  const response = await fetch(artifactUrl, {
+    method: 'GET',
+    headers: {
+      Accept: '*/*',
+    },
   });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    logger.log(
+      `Failed to download artifact: ${response.status} - ${errorText}`,
+    );
+    throw new Error(
+      `Failed to download artifact: ${response.status} - ${errorText}`,
+    );
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
   const tarExtractStream = new TarExtractTransform(logger);
   const bodyStream = new Readable();
-  bodyStream.push(Buffer.from(response.responseText));
+  bodyStream.push(Buffer.from(arrayBuffer));
   bodyStream.push(null);
   // todo(cammisuli): add support for encrypted artifacts
   await pipeline(bodyStream, zlib.createGunzip(), tarExtractStream);
