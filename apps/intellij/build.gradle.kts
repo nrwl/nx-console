@@ -12,6 +12,7 @@ val nxlsRoot = "${rootDir}/dist/apps/nxls"
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
+    id("dev.nx.gradle.project-graph") version("0.1.9")
     id("java")
     id("org.jetbrains.changelog") version "2.4.0"
     id("org.jetbrains.intellij.platform") version "2.9.0"
@@ -211,3 +212,9 @@ fun buildCommands() =
     } else {
         mutableListOf("bash", "-c")
     }
+
+allprojects {
+    apply {
+        plugin("dev.nx.gradle.project-graph")
+    }
+}

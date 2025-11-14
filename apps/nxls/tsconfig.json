@@ -4,48 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/watcher"
-    },
-    {
-      "path": "../../libs/shared/utils"
-    },
-    {
-      "path": "../../libs/shared/types"
-    },
-    {
-      "path": "../../libs/shared/nx-workspace-info"
-    },
-    {
-      "path": "../../libs/shared/generate-ui-types"
-    },
-    {
-      "path": "../../libs/language-server/workspace"
-    },
-    {
-      "path": "../../libs/language-server/watcher"
-    },
-    {
-      "path": "../../libs/language-server/utils"
-    },
-    {
-      "path": "../../libs/language-server/types"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/hover"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/document-links"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/definition"
-    },
-    {
-      "path": "../../libs/shared/nx-cloud"
-    },
-    {
-      "path": "../../libs/language-server/capabilities/code-completion"
-    },
-    {
       "path": "./tsconfig.app.json"
     }
   ]

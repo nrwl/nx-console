@@ -4,21 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../utils"
-    },
-    {
-      "path": "../nx-version"
-    },
-    {
-      "path": "../schema"
-    },
-    {
-      "path": "../types"
-    },
-    {
-      "path": "../generate-ui-types"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

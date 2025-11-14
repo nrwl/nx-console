@@ -4,45 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../telemetry"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../generate-ui-webview"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/running-tasks"
-    },
-    {
-      "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../../shared/llm-context"
-    },
-    {
-      "path": "../../nx-mcp/nx-mcp-server"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

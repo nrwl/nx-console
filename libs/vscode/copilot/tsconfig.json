@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../telemetry"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

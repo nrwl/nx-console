@@ -4,21 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../utils"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../language-server/types"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

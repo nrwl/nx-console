@@ -4,27 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../verify"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
