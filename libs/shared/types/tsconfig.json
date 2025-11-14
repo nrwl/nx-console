@@ -4,12 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../nx-version"
-    },
-    {
-      "path": "../running-tasks"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

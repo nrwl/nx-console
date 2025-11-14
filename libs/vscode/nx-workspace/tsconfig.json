@@ -4,27 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-console-plugins"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../../language-server/types"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

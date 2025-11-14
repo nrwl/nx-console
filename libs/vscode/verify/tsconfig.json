@@ -4,18 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../utils"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
-      "path": "../../shared/file-system"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

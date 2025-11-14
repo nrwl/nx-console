@@ -4,21 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/file-system"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

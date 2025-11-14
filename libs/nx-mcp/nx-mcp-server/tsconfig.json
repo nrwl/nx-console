@@ -4,36 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/running-tasks"
-    },
-    {
-      "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../../language-server/types"
-    },
-    {
-      "path": "../../shared/telemetry"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../../shared/llm-context"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

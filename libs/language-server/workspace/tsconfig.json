@@ -4,39 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-console-plugins"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../../shared/generate-ui-types"
-    },
-    {
-      "path": "../../shared/schema"
-    },
-    {
-      "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../../shared/file-system"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../../shared/nx-workspace-info"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

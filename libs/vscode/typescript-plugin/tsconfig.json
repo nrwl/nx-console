@@ -4,33 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../utils"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../typescript-import-plugin"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../../shared/file-system"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
