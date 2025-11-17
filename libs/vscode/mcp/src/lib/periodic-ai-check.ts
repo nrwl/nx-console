@@ -433,7 +433,7 @@ async function runAiAgentCheck() {
               errorsWithInformation.push(errorInformation);
             }
           }
-          if (errorsWithInformation.length > 0) {
+          if (errorsWithInformation.length > 1) {
             getTelemetry().logUsage('ai.configure-agents-check-error');
             throw new Error(
               `Error 1: \n ${errorsWithInformation[0]}\n\nError 2: \n ${errorsWithInformation[1]}\n`,

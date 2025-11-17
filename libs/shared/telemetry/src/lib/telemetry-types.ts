@@ -33,8 +33,6 @@ export type TelemetryEvents =
   | 'cloud.view-cipe-commit'
   | 'cloud.view-run'
   | 'cloud.refresh-view'
-  | 'cloud.explain-cipe-error'
-  | 'cloud.fix-cipe-error'
   | 'cloud.show-ai-fix-notification'
   | 'cloud.show-ai-fix'
   | 'cloud.apply-ai-fix'
