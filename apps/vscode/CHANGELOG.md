@@ -1,3 +1,11 @@
+## [18.80.2](https://github.com/nrwl/nx-console/compare/vscode-v18.80.1...vscode-v18.80.2) (2025-11-17)
+
+
+### Bug Fixes
+
+* **vscode:** remove [@nx](https://github.com/nx) chat participant configuration (keep deprecation notice for clarity) ([#2898](https://github.com/nrwl/nx-console/issues/2898)) ([d0702e9](https://github.com/nrwl/nx-console/commit/d0702e9b6efb160e510c0f3e73759fe5f066a91a))
+* **vscode:** report errors as expected if any invocation matches the list ([#2899](https://github.com/nrwl/nx-console/issues/2899)) ([408d106](https://github.com/nrwl/nx-console/commit/408d106388f4c734948dff977a616230bdbaf59d))
+
 ## [18.80.1](https://github.com/nrwl/nx-console/compare/vscode-v18.80.0...vscode-v18.80.1) (2025-11-13)
 
 
