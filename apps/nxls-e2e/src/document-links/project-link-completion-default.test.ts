@@ -13,15 +13,10 @@ import { NxlsWrapper } from '../nxls-wrapper';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-const e2eProjectName = `${workspaceName}-e2e`;
+const e2eProjectName = 'e2e';
 
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
-const e2eProjectJsonPath = join(
-  e2eCwd,
-  workspaceName,
-  e2eProjectName,
-  'project.json',
-);
+const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 
 describe('document link completion - project links', () => {
   beforeAll(async () => {
@@ -34,7 +29,7 @@ describe('document link completion - project links', () => {
       e2eProjectJsonPath,
       JSON.stringify(
         {
-          implicitDependencies: [e2eProjectName],
+          implicitDependencies: [workspaceName],
         },
         null,
         2,
@@ -48,10 +43,10 @@ describe('document link completion - project links', () => {
       method: 'textDocument/didOpen',
       params: {
         textDocument: {
-          uri: URI.file(projectJsonPath).toString(),
+          uri: URI.file(e2eProjectJsonPath).toString(),
           languageId: 'JSON',
           version: 1,
-          text: readFileSync(projectJsonPath, 'utf-8'),
+          text: readFileSync(e2eProjectJsonPath, 'utf-8'),
         },
       },
     });
@@ -63,9 +58,9 @@ describe('document link completion - project links', () => {
 
   describe('project links', () => {
     it('should return correct link for valid project in implicitDependencies', async () => {
-      modifyJsonFile(projectJsonPath, (data) => ({
+      modifyJsonFile(e2eProjectJsonPath, (data) => ({
         ...data,
-        implicitDependencies: [e2eProjectName],
+        implicitDependencies: [workspaceName],
       }));
 
       nxlsWrapper.sendNotification({
@@ -101,7 +96,7 @@ describe('document link completion - project links', () => {
     });
 
     it('should return correct link for project with ! prefix in implicitDependencies', async () => {
-      modifyJsonFile(projectJsonPath, (data) => ({
+      modifyJsonFile(e2eProjectJsonPath, (data) => ({
         ...data,
         implicitDependencies: [`!${workspaceName}`],
       }));
