@@ -4,15 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared/generate-ui-types"
-    },
-    {
-      "path": "../../libs/shared/schema"
-    },
-    {
-      "path": "../../libs/shared/ui-components"
-    },
-    {
       "path": "./tsconfig.app.json"
     },
     {

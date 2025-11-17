@@ -4,42 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/telemetry"
-    },
-    {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../tasks"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../telemetry"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

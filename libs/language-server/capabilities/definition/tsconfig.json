@@ -4,18 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../../shared/nx-workspace-info"
-    },
-    {
-      "path": "../../../shared/npm"
-    },
-    {
-      "path": "../../../shared/nx-version"
-    },
-    {
-      "path": "../../utils"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

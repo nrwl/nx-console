@@ -4,15 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/nx-cloud"
-    },
-    {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../../shared/json-schema"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
