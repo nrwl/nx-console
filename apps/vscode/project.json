@@ -30,7 +30,7 @@
           "*/nx.wasi.cjs"
         ],
         "thirdParty": true,
-        "minify": false,
+        "minify": true,
         "sourcemap": false,
         "outputPath": "dist/apps/vscode",
         "outputFileName": "main.js",
@@ -95,7 +95,7 @@
         },
         "production": {
           "skipTypeCheck": true,
-          "minify": false,
+          "minify": true,
           "sourcemap": false
         },
         "debug": {
