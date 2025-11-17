@@ -16,6 +16,12 @@ const workspaceName = uniq('workspace');
 const e2eProjectName = `${workspaceName}-e2e`;
 
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
+const e2eProjectJsonPath = join(
+  e2eCwd,
+  workspaceName,
+  e2eProjectName,
+  'project.json',
+);
 
 describe('document link completion - project links', () => {
   beforeAll(async () => {
@@ -25,7 +31,7 @@ describe('document link completion - project links', () => {
     });
 
     writeFileSync(
-      projectJsonPath,
+      e2eProjectJsonPath,
       JSON.stringify(
         {
           implicitDependencies: [e2eProjectName],
@@ -66,13 +72,13 @@ describe('document link completion - project links', () => {
         method: 'textDocument/didChange',
         params: {
           textDocument: {
-            uri: URI.file(projectJsonPath).toString(),
+            uri: URI.file(e2eProjectJsonPath).toString(),
             languageId: 'JSON',
             version: 2,
           },
           contentChanges: [
             {
-              text: readFileSync(projectJsonPath, 'utf-8'),
+              text: readFileSync(e2eProjectJsonPath, 'utf-8'),
             },
           ],
         },
@@ -82,37 +88,35 @@ describe('document link completion - project links', () => {
         method: 'textDocument/documentLink',
         params: {
           textDocument: {
-            uri: URI.file(projectJsonPath).toString(),
+            uri: URI.file(e2eProjectJsonPath).toString(),
           },
-          position: Position.create(0, 1),
+          position: Position.create(1, 4),
         },
       });
 
       const projectLink = (linkResponse.result as any[])[0]?.target;
       expect(projectLink).toBeDefined();
-      expect(decodeURI(projectLink)).toContain(
-        join(e2eProjectName, 'project.json'),
-      );
+      expect(decodeURI(projectLink)).toContain(projectJsonPath);
       expect(projectLink).toMatch(/#1$/);
     });
 
     it('should return correct link for project with ! prefix in implicitDependencies', async () => {
       modifyJsonFile(projectJsonPath, (data) => ({
         ...data,
-        implicitDependencies: [`!${e2eProjectName}`],
+        implicitDependencies: [`!${workspaceName}`],
       }));
 
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
           textDocument: {
-            uri: URI.file(projectJsonPath).toString(),
+            uri: URI.file(e2eProjectJsonPath).toString(),
             languageId: 'JSON',
             version: 3,
           },
           contentChanges: [
             {
-              text: readFileSync(projectJsonPath, 'utf-8'),
+              text: readFileSync(e2eProjectJsonPath, 'utf-8'),
             },
           ],
         },
@@ -122,22 +126,20 @@ describe('document link completion - project links', () => {
         method: 'textDocument/documentLink',
         params: {
           textDocument: {
-            uri: URI.file(projectJsonPath).toString(),
+            uri: URI.file(e2eProjectJsonPath).toString(),
           },
-          position: Position.create(0, 1),
+          position: Position.create(1, 4),
         },
       });
 
       const projectLink = (linkResponse.result as any[])[0]?.target;
       expect(projectLink).toBeDefined();
-      expect(decodeURI(projectLink)).toContain(
-        join(e2eProjectName, 'project.json'),
-      );
+      expect(decodeURI(projectLink)).toContain(projectJsonPath);
       expect(projectLink).toMatch(/#1$/);
     });
 
     it('should not return link for non-existent project in implicitDependencies', async () => {
-      modifyJsonFile(projectJsonPath, (data) => ({
+      modifyJsonFile(e2eProjectJsonPath, (data) => ({
         ...data,
         implicitDependencies: ['non-existent-project'],
       }));
@@ -146,13 +148,13 @@ describe('document link completion - project links', () => {
         method: 'textDocument/didChange',
         params: {
           textDocument: {
-            uri: URI.file(projectJsonPath).toString(),
+            uri: URI.file(e2eProjectJsonPath).toString(),
             languageId: 'JSON',
             version: 4,
           },
           contentChanges: [
             {
-              text: readFileSync(projectJsonPath, 'utf-8'),
+              text: readFileSync(e2eProjectJsonPath, 'utf-8'),
             },
           ],
         },
@@ -162,9 +164,9 @@ describe('document link completion - project links', () => {
         method: 'textDocument/documentLink',
         params: {
           textDocument: {
-            uri: URI.file(projectJsonPath).toString(),
+            uri: URI.file(e2eProjectJsonPath).toString(),
           },
-          position: Position.create(0, 1),
+          position: Position.create(1, 4),
         },
       });
 
