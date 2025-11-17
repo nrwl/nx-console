@@ -1,3 +1,10 @@
+## [18.80.3](https://github.com/nrwl/nx-console/compare/vscode-v18.80.2...vscode-v18.80.3) (2025-11-17)
+
+
+### Bug Fixes
+
+* **vscode:** revert vscode minification ([#2900](https://github.com/nrwl/nx-console/issues/2900)) ([9d366fb](https://github.com/nrwl/nx-console/commit/9d366fb2629cab1cc5c59188783bc268180a7843))
+
 ## [18.80.2](https://github.com/nrwl/nx-console/compare/vscode-v18.80.1...vscode-v18.80.2) (2025-11-17)
 
 
