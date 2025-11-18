@@ -377,7 +377,7 @@ describe('registerNxWorkspaceTools', () => {
     mockNxWorkspaceInfoProvider = {
       nxWorkspace: jest.fn().mockResolvedValue(mockWorkspace),
     };
-    
+
     // Setup shared-npm mock
     const sharedNpm = require('@nx-console/shared-npm');
     sharedNpm.findMatchingProject.mockImplementation((name: string) => {
@@ -493,9 +493,7 @@ describe('registerNxWorkspaceTools', () => {
 
       expect(result.content[0].text).toContain('Project Details');
       // Should contain the full JSON for the target
-      expect(result.content[0].text).toContain(
-        '"executor": "nx:run-commands"',
-      );
+      expect(result.content[0].text).toContain('"executor": "nx:run-commands"');
       // Should NOT contain the compressed targets view
       expect(result.content.length).toBe(1);
     });

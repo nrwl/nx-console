@@ -77,7 +77,7 @@ describe('nx_workspace select', () => {
     const parsed = JSON.parse(content);
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed.length).toBeGreaterThan(0);
-    
+
     // Check structure
     const appResult = parsed.find((p: any) => p.projectName === workspaceName);
     expect(appResult).toBeDefined();
@@ -95,10 +95,10 @@ describe('nx_workspace select', () => {
 
     const content = result.content[0]?.text || '';
     const parsed = JSON.parse(content);
-    
+
     const appResult = parsed.find((p: any) => p.projectName === workspaceName);
     expect(appResult.value).toBe('.');
-    
+
     const libResult = parsed.find((p: any) => p.projectName === 'shared-ui');
     expect(libResult.value).toBe('libs/shared-ui');
   });
@@ -113,7 +113,7 @@ describe('nx_workspace select', () => {
 
     const content = result.content[0]?.text || '';
     const parsed = JSON.parse(content);
-    
+
     const appResult = parsed.find((p: any) => p.projectName === workspaceName);
     expect(appResult.value).toBeNull();
   });
@@ -129,7 +129,7 @@ describe('nx_workspace select', () => {
 
     const content = result.content[0]?.text || '';
     const parsed = JSON.parse(content);
-    
+
     expect(parsed).toHaveLength(1);
     expect(parsed[0].projectName).toBe('shared-ui');
     expect(parsed[0].value).toBe('libs/shared-ui');
