@@ -73,6 +73,93 @@ it('should get all document links for properties that have a X_COMPLETION_TYPE (
   documentMapper.dispose();
 });
 
+it('should get document links for interpolated paths', async () => {
+  const { document, jsonAst } = documentMapper.retrieve(
+    TextDocument.create(
+      'file:///project.json',
+      'json',
+      0,
+      `
+{
+  "root": "apps/my-app",
+  "interpolatedWorkspace": "{workspaceRoot}/libs/my-lib/src/index.ts",
+  "interpolatedProject": "{projectRoot}/src/main.ts",
+  "interpolatedGlob": "{projectRoot}/**/*.ts"
+}
+      `
+    )
+  );
+
+  const matchingSchemas = await languageService.getMatchingSchemas(
+    document,
+    jsonAst,
+    {
+      type: 'object',
+      properties: {
+        interpolatedWorkspace: { type: 'string' },
+        interpolatedProject: { type: 'string' },
+        interpolatedGlob: { type: 'string' },
+      },
+    }
+  );
+
+  const documentLinks = await getDocumentLinks(
+    '/workspace',
+    jsonAst,
+    document,
+    matchingSchemas
+  );
+
+  expect(documentLinks.map((link) => link.target)).toEqual([
+    'file:///workspace/libs/my-lib/src/index.ts',
+    'file:///workspace/apps/my-app/src/main.ts',
+  ]);
+
+  documentMapper.dispose();
+});
+
+it('should get document links for negated interpolated paths', async () => {
+  const { document, jsonAst } = documentMapper.retrieve(
+    TextDocument.create(
+      'file:///project.json',
+      'json',
+      0,
+      `
+{
+  "interpolatedWorkspace": "!{workspaceRoot}/libs/my-lib/src/index.ts",
+  "interpolatedProject": "!{projectRoot}/src/main.ts"
+}
+      `
+    )
+  );
+
+  const matchingSchemas = await languageService.getMatchingSchemas(
+    document,
+    jsonAst,
+    {
+      type: 'object',
+      properties: {
+        interpolatedWorkspace: { type: 'string' },
+        interpolatedProject: { type: 'string' },
+      },
+    }
+  );
+
+  const documentLinks = await getDocumentLinks(
+    '/workspace',
+    jsonAst,
+    document,
+    matchingSchemas
+  );
+
+  expect(documentLinks.map((link) => link.target)).toEqual([
+    'file:///workspace/libs/my-lib/src/index.ts',
+    'file:///workspace/apps/my-app/src/main.ts',
+  ]);
+
+  documentMapper.dispose();
+});
+
 describe('project links', () => {
   const mockProjectGraph = {
     nodes: {
@@ -285,4 +372,5 @@ describe('project links', () => {
 
     documentMapper.dispose();
   });
-});
+})
+
