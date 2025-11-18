@@ -10,11 +10,11 @@ import {
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 
-describe('nx_project_details filter', () => {
+describe('nx_project_details select', () => {
   let invokeMCPInspectorCLI: Awaited<
     ReturnType<typeof createInvokeMCPInspectorCLI>
   >;
-  const workspaceName = uniq('nx-mcp-project-details-filter');
+  const workspaceName = uniq('nx-mcp-project-details-select');
   const testWorkspacePath = join(e2eCwd, workspaceName);
 
   beforeAll(async () => {
@@ -33,7 +33,7 @@ describe('nx_project_details filter', () => {
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
 
-  it('should return full project details when no filter is provided', () => {
+  it('should return full project details when no select is provided', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
@@ -61,16 +61,16 @@ describe('nx_project_details filter', () => {
     expect(result.content[2]?.text).toContain('External Dependencies:');
   });
 
-  it('should filter to root path using dot notation', () => {
+  it('should select to root path using dot notation', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="root"',
+      '--tool-arg select="root"',
     );
 
-    // Should have 1 content block with the filtered value
+    // Should have 1 content block with the selected value
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
     // Should start with "Project Details: " prefix and contain the root value
@@ -81,13 +81,13 @@ describe('nx_project_details filter', () => {
     expect(text).not.toContain('"name"');
   });
 
-  it('should filter to name field', () => {
+  it('should select to name field', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="name"',
+      '--tool-arg select="name"',
     );
 
     expect(result.content).toHaveLength(1);
@@ -96,13 +96,13 @@ describe('nx_project_details filter', () => {
     expect(text).toContain(`"${workspaceName}"`);
   });
 
-  it('should filter to nested targets.build path', () => {
+  it('should select to nested targets.build path', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="targets.build"',
+      '--tool-arg select="targets.build"',
     );
 
     expect(result.content).toHaveLength(1);
@@ -114,13 +114,13 @@ describe('nx_project_details filter', () => {
     expect(text).not.toContain('"targets"');
   });
 
-  it('should filter to deeply nested targets.build.executor path', () => {
+  it('should select to deeply nested targets.build.executor path', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="targets.build.executor"',
+      '--tool-arg select="targets.build.executor"',
     );
 
     expect(result.content).toHaveLength(1);
@@ -130,13 +130,13 @@ describe('nx_project_details filter', () => {
     expect(text).not.toContain('"options"');
   });
 
-  it('should filter to tags array', () => {
+  it('should select to tags array', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="tags"',
+      '--tool-arg select="tags"',
     );
 
     expect(result.content).toHaveLength(1);
@@ -147,13 +147,13 @@ describe('nx_project_details filter', () => {
     expect(text).toContain(']');
   });
 
-  it('should filter to array element using bracket notation tags[0]', () => {
+  it('should select to array element using bracket notation tags[0]', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="tags[0]"',
+      '--tool-arg select="tags[0]"',
     );
 
     expect(result.content).toHaveLength(1);
@@ -169,7 +169,7 @@ describe('nx_project_details filter', () => {
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="nonexistent.path.to.nowhere"',
+      '--tool-arg select="nonexistent.path.to.nowhere"',
     );
 
     expect(result.isError).toBe(true);
@@ -184,7 +184,7 @@ describe('nx_project_details filter', () => {
       '--method tools/call',
       '--tool-name nx_project_details',
       '--tool-arg projectName="nonexistent-project"',
-      '--tool-arg filter="root"',
+      '--tool-arg select="root"',
     );
 
     expect(result.isError).toBe(true);
