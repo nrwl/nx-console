@@ -4,33 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../../shared/schema"
-    },
-    {
-      "path": "../../../shared/file-system"
-    },
-    {
-      "path": "../../workspace"
-    },
-    {
-      "path": "../../../shared/npm"
-    },
-    {
-      "path": "../../../shared/nx-version"
-    },
-    {
-      "path": "../../../shared/types"
-    },
-    {
-      "path": "../../../shared/json-schema"
-    },
-    {
-      "path": "../../../shared/nx-workspace-info"
-    },
-    {
-      "path": "../../utils"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

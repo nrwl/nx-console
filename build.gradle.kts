@@ -3,7 +3,7 @@ group = "dev.nx.console"
 layout.buildDirectory = File("dist")
 
 plugins {
-  id("dev.nx.gradle.project-graph") version "0.1.8"
+  id("dev.nx.gradle.project-graph") version "0.1.9"
   id("com.ncorti.ktfmt.gradle") version "0.24.0"
 
   id("org.jetbrains.kotlin.jvm") version "2.2.0"
