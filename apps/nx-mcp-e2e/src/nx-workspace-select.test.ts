@@ -56,7 +56,7 @@ describe('nx_workspace select', () => {
       '--tool-name nx_workspace',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain(`<${workspaceName}>`);
     expect(content).toContain('<admin-app>');
     expect(content).toContain('<shared-ui>');

@@ -61,7 +61,7 @@ describe('nx_workspace filter', () => {
       '--tool-name nx_workspace',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain(`<${workspaceName}>`);
     expect(content).toContain('<admin-app>');
     expect(content).toContain('<shared-ui>');
@@ -76,7 +76,7 @@ describe('nx_workspace filter', () => {
       '--tool-arg filter="admin-app,shared-ui"',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain('<admin-app>');
     expect(content).toContain('<shared-ui>');
     expect(content).not.toContain('<e2e-app>');
@@ -91,7 +91,7 @@ describe('nx_workspace filter', () => {
       '--tool-arg filter="*-app"',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain('<admin-app>');
     expect(content).toContain('<e2e-app>');
     expect(content).not.toContain('<shared-ui>');
@@ -105,7 +105,7 @@ describe('nx_workspace filter', () => {
       '--tool-arg filter="tag:type:ui"',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain('<shared-ui>');
     expect(content).not.toContain('<admin-app>');
     expect(content).not.toContain('<e2e-app>');
@@ -119,7 +119,7 @@ describe('nx_workspace filter', () => {
       '--tool-arg filter="libs/*"',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain('<shared-ui>');
     expect(content).not.toContain('<admin-app>');
     expect(content).not.toContain('<e2e-app>');
@@ -133,7 +133,7 @@ describe('nx_workspace filter', () => {
       '--tool-arg filter="*,!tag:e2e"',
     );
 
-    const content = result.content[1]?.text || '';
+    const content = result.content[0]?.text || '';
     expect(content).toContain(`<${workspaceName}>`);
     expect(content).toContain('<admin-app>');
     expect(content).toContain('<shared-ui>');

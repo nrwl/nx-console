@@ -23,7 +23,7 @@ jest.mock('@nx-console/shared-llm-context', () => ({
   NX_WORKSPACE_PATH: 'nx_workspace_path',
 }));
 
-// Mock shared-npm module
+// Mock shared-npm module - don't import to avoid lazy-load conflict
 jest.mock('@nx-console/shared-npm', () => ({
   checkIsNxWorkspace: jest.fn().mockResolvedValue(true),
   findMatchingProject: jest.fn(),
@@ -378,9 +378,9 @@ describe('registerNxWorkspaceTools', () => {
       nxWorkspace: jest.fn().mockResolvedValue(mockWorkspace),
     };
 
-    // Setup shared-npm mock
-    const sharedNpm = require('@nx-console/shared-npm');
-    sharedNpm.findMatchingProject.mockImplementation((name: string) => {
+    // Setup shared-npm mock - access via jest.mocked to avoid import
+    const { findMatchingProject } = jest.requireMock('@nx-console/shared-npm');
+    findMatchingProject.mockImplementation((name: string) => {
       return mockWorkspace.projectGraph.nodes[name];
     });
 
