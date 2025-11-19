@@ -164,13 +164,13 @@ describe('nx_project_details pagination', () => {
     expect(projectDetails).toContain('(continued)');
   });
 
-  it('should not paginate small content from filter', () => {
+  it('should not paginate small content from select', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="name"',
+      '--tool-arg select="name"',
     );
 
     expect(result.content).toHaveLength(1);
@@ -183,13 +183,13 @@ describe('nx_project_details pagination', () => {
     expect(hasContinuedLabel(text)).toBe(false);
   });
 
-  it('should handle pagination with filter parameter', () => {
+  it('should handle pagination with select parameter', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="targets"',
+      '--tool-arg select="targets"',
     );
 
     expect(result.content.length).toBe(2);
@@ -254,13 +254,13 @@ describe('nx_project_details pagination', () => {
     expect(hasTruncationIndicator(projectDetails)).toBe(false);
   });
 
-  it('should handle filter with undefined value correctly', () => {
+  it('should handle select with undefined value correctly', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="nonexistent.field"',
+      '--tool-arg select="nonexistent.field"',
     );
 
     expect(result.isError).toBe(true);
