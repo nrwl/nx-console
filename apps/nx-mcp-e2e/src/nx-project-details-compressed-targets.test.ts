@@ -371,18 +371,18 @@ describe('nx_project_details compressed targets', () => {
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain('Available Targets (compressed view)');
     expect(targetsBlock).toContain(
-      "To see full configuration for a specific target, call this tool again with filter='targets.TARGET_NAME'",
+      "To see full configuration for a specific target, call this tool again with select='targets.TARGET_NAME'",
     );
-    expect(targetsBlock).toMatch(/Example: filter='targets\.\w+'/);
+    expect(targetsBlock).toMatch(/Example: select='targets\.\w+'/);
   });
 
-  it('should return full unabridged target when using filter parameter', () => {
+  it('should return full unabridged target when using select parameter', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg filter="targets.target-nx-executor"',
+      '--tool-arg select="targets.target-nx-executor"',
     );
 
     expect(result.content).toHaveLength(1);

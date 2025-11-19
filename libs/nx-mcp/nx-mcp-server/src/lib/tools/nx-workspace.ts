@@ -442,8 +442,8 @@ export function registerNxWorkspaceTools(
           const sampleTargetName = Object.keys(targets)[0] ?? 'build';
 
           compressedTargetsText = `Available Targets (compressed view):
-To see full configuration for a specific target, call this tool again with filter='targets.TARGET_NAME'
-Example: filter='targets.${sampleTargetName}' for the ${sampleTargetName} target
+To see full configuration for a specific target, call this tool again with select='targets.TARGET_NAME'
+Example: select='targets.${sampleTargetName}' for the ${sampleTargetName} target
 
 ${targetDescriptions}`;
         }
