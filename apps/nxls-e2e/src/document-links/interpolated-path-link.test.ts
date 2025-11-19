@@ -35,10 +35,10 @@ describe('interpolated path links', () => {
         {
           root: `apps/${workspaceName}`,
           targets: {
-            build: {},
+            build: {
+              inputs: ['{workspaceRoot}/nx.json', '{projectRoot}/project.json'],
+            },
           },
-          interpolatedWorkspace: '{workspaceRoot}/nx.json',
-          interpolatedProject: '{projectRoot}/project.json',
         },
         null,
         2,
@@ -125,8 +125,11 @@ describe('interpolated path links', () => {
   it('should return correct links for negated {workspaceRoot} and {projectRoot}', async () => {
     modifyJsonFile(projectJsonPath, (data) => ({
       ...data,
-      interpolatedWorkspace: '!{workspaceRoot}/nx.json',
-      interpolatedProject: '!{projectRoot}/project.json',
+      targets: {
+        build: {
+          inputs: ['!{workspaceRoot}/nx.json', '!{projectRoot}/project.json'],
+        },
+      },
     }));
 
     nxlsWrapper.sendNotification({
