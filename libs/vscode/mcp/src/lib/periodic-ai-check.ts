@@ -398,12 +398,6 @@ async function runAiAgentCheck() {
     return;
   }
 
-  // Check nx@latest version - only run if >= 22 (when configure-ai-agents was added)
-  const nxLatestVersion = await getNxLatestVersion();
-  if (!nxLatestVersion || !gte(nxLatestVersion, '22.0.0')) {
-    return;
-  }
-
   try {
     const hasProvenance = await nxLatestProvenanceCheck(workspacePath);
     if (hasProvenance !== true) {
