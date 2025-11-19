@@ -9,7 +9,7 @@ import { URI } from 'vscode-uri';
 
 export async function interpolatedPathLink(
   workingPath: string,
-  node: ASTNode
+  node: ASTNode,
 ): Promise<string | undefined> {
   if (!isStringNode(node)) {
     return;

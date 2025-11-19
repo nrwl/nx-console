@@ -16,8 +16,7 @@ import {
   JSONDocument,
   MatchingSchema,
   TextDocument,
-}
-from 'vscode-json-languageservice';
+} from 'vscode-json-languageservice';
 import { createRange } from './create-range';
 import { targetLink } from './target-link';
 import { namedInputLink } from './named-input-link';

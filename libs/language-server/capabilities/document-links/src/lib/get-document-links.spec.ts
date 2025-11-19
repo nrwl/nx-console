@@ -86,8 +86,8 @@ it('should get document links for interpolated paths', async () => {
   "interpolatedProject": "{projectRoot}/src/main.ts",
   "interpolatedGlob": "{projectRoot}/**/*.ts"
 }
-      `
-    )
+      `,
+    ),
   );
 
   const matchingSchemas = await languageService.getMatchingSchemas(
@@ -100,14 +100,14 @@ it('should get document links for interpolated paths', async () => {
         interpolatedProject: { type: 'string' },
         interpolatedGlob: { type: 'string' },
       },
-    }
+    },
   );
 
   const documentLinks = await getDocumentLinks(
     '/workspace',
     jsonAst,
     document,
-    matchingSchemas
+    matchingSchemas,
   );
 
   expect(documentLinks.map((link) => link.target)).toEqual([
@@ -129,8 +129,8 @@ it('should get document links for negated interpolated paths', async () => {
   "interpolatedWorkspace": "!{workspaceRoot}/libs/my-lib/src/index.ts",
   "interpolatedProject": "!{projectRoot}/src/main.ts"
 }
-      `
-    )
+      `,
+    ),
   );
 
   const matchingSchemas = await languageService.getMatchingSchemas(
@@ -142,14 +142,14 @@ it('should get document links for negated interpolated paths', async () => {
         interpolatedWorkspace: { type: 'string' },
         interpolatedProject: { type: 'string' },
       },
-    }
+    },
   );
 
   const documentLinks = await getDocumentLinks(
     '/workspace',
     jsonAst,
     document,
-    matchingSchemas
+    matchingSchemas,
   );
 
   expect(documentLinks.map((link) => link.target)).toEqual([
@@ -372,5 +372,4 @@ describe('project links', () => {
 
     documentMapper.dispose();
   });
-})
-
+});
