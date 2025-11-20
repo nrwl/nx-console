@@ -21,6 +21,7 @@ import { createRange } from './create-range';
 import { targetLink } from './target-link';
 import { namedInputLink } from './named-input-link';
 import { projectLink } from './project-link';
+import { interpolatedPathLink } from './interpolated-path-link';
 
 export async function getDocumentLinks(
   workingPath: string | undefined,
@@ -50,6 +51,21 @@ export async function getDocumentLinks(
     }
 
     if (!linkType) {
+      if (isStringNode(node)) {
+        const value = node.value;
+        if (
+          (value.startsWith('{workspaceRoot}') ||
+            value.startsWith('{projectRoot}') ||
+            value.startsWith('!{workspaceRoot}') ||
+            value.startsWith('!{projectRoot}')) &&
+          !value.includes('*')
+        ) {
+          const link = await interpolatedPathLink(workingPath, node);
+          if (link) {
+            links.push(DocumentLink.create(createRange(document, node), link));
+          }
+        }
+      }
       continue;
     }
 
