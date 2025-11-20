@@ -26,19 +26,17 @@ export function detectAtomizedTargets(targetGroups: Record<string, string[]>): {
   const atomizedTargetsMap = new Map<string, string[]>();
   const targetsToExclude: string[] = [];
 
-  for (const group in targetGroups) {
-    const targets = targetGroups[group];
+  for (const groupName in targetGroups) {
+    const targets = targetGroups[groupName];
 
-    for (const target of targets) {
-      if (targets.some((t) => t !== target && t.startsWith(target))) {
-        rootTargets.add(target);
+    // The group name is the root target name (from metadata)
+    const rootTarget = groupName;
+    const atomizedTargets = targets.filter((t) => t !== rootTarget);
 
-        const atomizedTargets = targets.filter(
-          (t) => t.startsWith(target) && t !== target,
-        );
-        atomizedTargetsMap.set(target, atomizedTargets);
-        targetsToExclude.push(...atomizedTargets);
-      }
+    if (atomizedTargets.length > 0) {
+      rootTargets.add(rootTarget);
+      atomizedTargetsMap.set(rootTarget, atomizedTargets);
+      targetsToExclude.push(...atomizedTargets);
     }
   }
 
