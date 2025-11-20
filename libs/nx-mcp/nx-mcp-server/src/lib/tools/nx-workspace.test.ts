@@ -2,6 +2,7 @@ import {
   getTokenOptimizedToolResult,
   chunkContent,
   registerNxWorkspaceTools,
+  __testing__,
 } from './nx-workspace';
 import { NxWorkspace, NxError } from '@nx-console/shared-types';
 import {
@@ -12,16 +13,15 @@ import {
   NX_PROJECT_DETAILS,
 } from '@nx-console/shared-llm-context';
 
-jest.mock('@nx-console/shared-llm-context', () => ({
-  getNxJsonPrompt: jest.fn(),
-  getProjectGraphPrompt: jest.fn(),
-  getProjectGraphErrorsPrompt: jest.fn(),
-  NX_WORKSPACE: 'nx_workspace',
-  NX_PROJECT_DETAILS: 'nx_project_details',
-  NX_GENERATORS: 'nx_generators',
-  NX_GENERATOR_SCHEMA: 'nx_generator_schema',
-  NX_WORKSPACE_PATH: 'nx_workspace_path',
-}));
+jest.mock('@nx-console/shared-llm-context', () => {
+  const actual = jest.requireActual('@nx-console/shared-llm-context');
+  return {
+    ...actual,
+    getNxJsonPrompt: jest.fn(),
+    getProjectGraphPrompt: jest.fn(),
+    getProjectGraphErrorsPrompt: jest.fn(),
+  };
+});
 
 // Mock shared-npm module - don't import to avoid lazy-load conflict
 jest.mock('@nx-console/shared-npm', () => ({
@@ -510,5 +510,152 @@ describe('registerNxWorkspaceTools', () => {
         'not found in project configuration',
       );
     });
+  });
+});
+
+describe('compressTargetForDisplay', () => {
+  const { compressTargetForDisplay } = __testing__;
+
+  it('should omit cache status when true', () => {
+    const config = {
+      executor: 'nx:run-commands',
+      command: 'echo test',
+      cache: true,
+    };
+
+    const result = compressTargetForDisplay('build', config);
+
+    expect(result).toBe("build: nx:run-commands - 'echo test'");
+    expect(result).not.toContain('cache');
+  });
+
+  it('should show cache status when false', () => {
+    const config = {
+      executor: 'nx:run-commands',
+      command: 'echo test',
+      cache: false,
+    };
+
+    const result = compressTargetForDisplay('build', config);
+
+    expect(result).toBe("build: nx:run-commands - 'echo test' | cache: false");
+  });
+
+  it('should truncate long dependency lists', () => {
+    const config = {
+      executor: '@nx/gradle:gradle',
+      dependsOn: [
+        'dep1',
+        'dep2',
+        'dep3',
+        'dep4',
+        'dep5',
+        'dep6',
+        'dep7',
+        'dep8',
+        'dep9',
+        'dep10',
+        'dep11',
+      ],
+      cache: true,
+    };
+
+    const result = compressTargetForDisplay('build', config);
+
+    expect(result).toBe(
+      'build: @nx/gradle:gradle | depends: [dep1, dep2, dep3, +8 more]',
+    );
+  });
+
+  it('should not truncate short dependency lists', () => {
+    const config = {
+      executor: '@nx/gradle:gradle',
+      dependsOn: ['dep1', 'dep2', 'dep3'],
+      cache: true,
+    };
+
+    const result = compressTargetForDisplay('build', config);
+
+    expect(result).toBe(
+      'build: @nx/gradle:gradle | depends: [dep1, dep2, dep3]',
+    );
+  });
+
+  it('should show atomized targets with abbreviated names', () => {
+    const config = {
+      executor: 'nx:noop',
+      dependsOn: ['test-ci--Test1', 'test-ci--Test2', 'test-ci--Test3'],
+      cache: true,
+    };
+    const atomizedTargets = [
+      'test-ci--Test1',
+      'test-ci--Test2',
+      'test-ci--Test3',
+    ];
+
+    const result = compressTargetForDisplay('test-ci', config, atomizedTargets);
+
+    expect(result).toBe(
+      'test-ci: nx:noop | depends: [3 atomized targets] | atomized: [Test1, Test2, Test3]',
+    );
+  });
+
+  it('should truncate long atomized target lists', () => {
+    const config = {
+      executor: 'nx:noop',
+      cache: true,
+    };
+    const atomizedTargets = [
+      'test-ci--Test1',
+      'test-ci--Test2',
+      'test-ci--Test3',
+      'test-ci--Test4',
+      'test-ci--Test5',
+      'test-ci--Test6',
+    ];
+
+    const result = compressTargetForDisplay('test-ci', config, atomizedTargets);
+
+    expect(result).toBe(
+      'test-ci: nx:noop | atomized: [Test1, Test2, Test3, +3 more]',
+    );
+  });
+
+  it('should handle target without executor', () => {
+    const config = {
+      cache: true,
+    };
+
+    const result = compressTargetForDisplay('build', config);
+
+    expect(result).toBe('build: no executor');
+  });
+
+  it('should handle nx:run-commands with multiple commands', () => {
+    const config = {
+      executor: 'nx:run-commands',
+      options: {
+        commands: ['echo test1', 'echo test2', 'echo test3'],
+      },
+      cache: true,
+    };
+
+    const result = compressTargetForDisplay('build', config);
+
+    expect(result).toBe('build: nx:run-commands - 3 commands');
+  });
+
+  it('should handle nx:run-script executor', () => {
+    const config = {
+      executor: 'nx:run-script',
+      metadata: {
+        runCommand: 'npm run test',
+      },
+      cache: true,
+    };
+
+    const result = compressTargetForDisplay('test', config);
+
+    expect(result).toBe("test: nx:run-script - 'npm run test'");
   });
 });
