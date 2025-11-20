@@ -10,6 +10,41 @@ export type ProjectGraphOptimizations = {
   truncateTargets?: boolean;
 };
 
+/**
+ * Detects atomized targets from targetGroups metadata.
+ * Atomized targets follow the pattern: rootTarget--identifier
+ *
+ * @param targetGroups - The targetGroups metadata from project data
+ * @returns Object with rootTargets set, atomizedTargetsMap, and targetsToExclude array
+ */
+export function detectAtomizedTargets(targetGroups: Record<string, string[]>): {
+  rootTargets: Set<string>;
+  atomizedTargetsMap: Map<string, string[]>;
+  targetsToExclude: string[];
+} {
+  const rootTargets = new Set<string>();
+  const atomizedTargetsMap = new Map<string, string[]>();
+  const targetsToExclude: string[] = [];
+
+  for (const group in targetGroups) {
+    const targets = targetGroups[group];
+
+    for (const target of targets) {
+      if (targets.some((t) => t !== target && t.startsWith(target))) {
+        rootTargets.add(target);
+
+        const atomizedTargets = targets.filter(
+          (t) => t.startsWith(target) && t !== target,
+        );
+        atomizedTargetsMap.set(target, atomizedTargets);
+        targetsToExclude.push(...atomizedTargets);
+      }
+    }
+  }
+
+  return { rootTargets, atomizedTargetsMap, targetsToExclude };
+}
+
 export function getProjectGraphPrompt(
   projectGraph: ProjectGraph,
   optimizations?: ProjectGraphOptimizations,
@@ -64,27 +99,8 @@ function getRobotReadableProjectGraph(
 
     // targets
     const targetGroups = node.data.metadata?.targetGroups ?? {};
-    const targetsToExclude: string[] = [];
+    const { targetsToExclude } = detectAtomizedTargets(targetGroups);
 
-    // if there are many targets in a group where one is a root target (because of atomizer), ignore the rest
-    for (const group in targetGroups) {
-      const targets = targetGroups[group];
-      const rootTargets = new Set<string>();
-
-      for (const target of targets) {
-        if (targets.some((t) => t !== target && t.startsWith(target))) {
-          rootTargets.add(target);
-        }
-      }
-
-      for (const rootTarget of rootTargets) {
-        targetsToExclude.push(
-          ...targets.filter(
-            (t) => t.startsWith(rootTarget) && t !== rootTarget,
-          ),
-        );
-      }
-    }
     const targets = Object.keys(node.data.targets ?? {}).filter(
       (target) =>
         !targetsToExclude.includes(target) &&

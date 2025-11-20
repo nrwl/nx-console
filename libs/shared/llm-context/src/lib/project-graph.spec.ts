@@ -1,5 +1,5 @@
 import type { ProjectGraph } from 'nx/src/devkit-exports';
-import { getProjectGraphPrompt } from './project-graph';
+import { detectAtomizedTargets, getProjectGraphPrompt } from './project-graph';
 
 describe('project-graph', () => {
   describe('getProjectGraphPrompt', () => {
@@ -383,6 +383,79 @@ describe('project-graph', () => {
         expect(result).not.toContain('deploy');
         expect(result).toContain('...3 more');
       });
+    });
+  });
+
+  describe('detectAtomizedTargets', () => {
+    it('should detect atomized targets correctly', () => {
+      const targetGroups = {
+        'test-ci': [
+          'test-ci',
+          'test-ci--Test1',
+          'test-ci--Test2',
+          'test-ci--Test3',
+        ],
+      };
+
+      const result = detectAtomizedTargets(targetGroups);
+
+      expect(result.rootTargets).toEqual(new Set(['test-ci']));
+      expect(result.atomizedTargetsMap.get('test-ci')).toEqual([
+        'test-ci--Test1',
+        'test-ci--Test2',
+        'test-ci--Test3',
+      ]);
+      expect(result.targetsToExclude).toEqual([
+        'test-ci--Test1',
+        'test-ci--Test2',
+        'test-ci--Test3',
+      ]);
+    });
+
+    it('should handle multiple root targets', () => {
+      const targetGroups = {
+        'test-ci': ['test-ci', 'test-ci--Test1', 'test-ci--Test2'],
+        'e2e-ci': ['e2e-ci', 'e2e-ci--Test1', 'e2e-ci--Test2'],
+      };
+
+      const result = detectAtomizedTargets(targetGroups);
+
+      expect(result.rootTargets).toEqual(new Set(['test-ci', 'e2e-ci']));
+      expect(result.atomizedTargetsMap.get('test-ci')).toEqual([
+        'test-ci--Test1',
+        'test-ci--Test2',
+      ]);
+      expect(result.atomizedTargetsMap.get('e2e-ci')).toEqual([
+        'e2e-ci--Test1',
+        'e2e-ci--Test2',
+      ]);
+      expect(result.targetsToExclude).toEqual([
+        'test-ci--Test1',
+        'test-ci--Test2',
+        'e2e-ci--Test1',
+        'e2e-ci--Test2',
+      ]);
+    });
+
+    it('should handle empty targetGroups', () => {
+      const result = detectAtomizedTargets({});
+
+      expect(result.rootTargets).toEqual(new Set());
+      expect(result.atomizedTargetsMap.size).toBe(0);
+      expect(result.targetsToExclude).toEqual([]);
+    });
+
+    it('should handle groups without atomized targets', () => {
+      const targetGroups = {
+        build: ['build'],
+        test: ['test'],
+      };
+
+      const result = detectAtomizedTargets(targetGroups);
+
+      expect(result.rootTargets).toEqual(new Set());
+      expect(result.atomizedTargetsMap.size).toBe(0);
+      expect(result.targetsToExclude).toEqual([]);
     });
   });
 });
