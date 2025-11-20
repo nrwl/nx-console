@@ -149,7 +149,6 @@ describe('interpolated path links', () => {
     });
 
     const text = readFileSync(projectJsonPath, 'utf-8');
-    writeFileSync('/tmp/debug-project.json', text);
     const lines = text.split('\n');
 
     // Check workspace link
