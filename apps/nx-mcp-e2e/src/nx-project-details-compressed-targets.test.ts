@@ -174,8 +174,10 @@ describe('nx_project_details compressed targets', () => {
 
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
-    expect(targetsBlock).toContain(
-      'target-nx-executor: @nx/webpack:webpack | cache: true',
+    expect(targetsBlock).toContain('target-nx-executor: @nx/webpack:webpack');
+    // Cache is true by default, so it should NOT be shown (token efficiency)
+    expect(targetsBlock).not.toContain(
+      'target-nx-executor: @nx/webpack:webpack | cache:',
     );
   });
 
@@ -190,7 +192,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      'target-custom-executor: @my-org/custom:build | cache: true',
+      'target-custom-executor: @my-org/custom:build',
     );
   });
 
@@ -205,7 +207,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      "target-run-cmd-options: nx:run-commands - 'echo test' | cache: true",
+      "target-run-cmd-options: nx:run-commands - 'echo test'",
     );
   });
 
@@ -220,7 +222,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      "target-run-cmd-array-single-str: nx:run-commands - 'npm build' | cache: true",
+      "target-run-cmd-array-single-str: nx:run-commands - 'npm build'",
     );
   });
 
@@ -235,7 +237,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      "target-run-cmd-array-single-obj: nx:run-commands - 'npm test' | cache: true",
+      "target-run-cmd-array-single-obj: nx:run-commands - 'npm test'",
     );
   });
 
@@ -250,7 +252,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      'target-run-cmd-array-multi: nx:run-commands - 3 commands | cache: true',
+      'target-run-cmd-array-multi: nx:run-commands - 3 commands',
     );
   });
 
@@ -264,9 +266,7 @@ describe('nx_project_details compressed targets', () => {
 
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
-    expect(targetsBlock).toContain(
-      "deploy: nx:run-script - 'npm run deploy' | cache: true",
-    );
+    expect(targetsBlock).toContain("deploy: nx:run-script - 'npm run deploy'");
   });
 
   it('should display nx:run-script target from package.json script - custom-hello', () => {
@@ -280,7 +280,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      "custom-hello: nx:run-script - 'npm run custom-hello' | cache: true",
+      "custom-hello: nx:run-script - 'npm run custom-hello'",
     );
   });
 
@@ -295,7 +295,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      'target-with-deps-string: @nx/js:tsc | depends: [build, test] | cache: true',
+      'target-with-deps-string: @nx/js:tsc | depends: [build, test]',
     );
   });
 
@@ -310,7 +310,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      'target-with-deps-object: @nx/js:tsc | depends: [build, ^build] | cache: true',
+      'target-with-deps-object: @nx/js:tsc | depends: [build, ^build]',
     );
   });
 
@@ -339,8 +339,10 @@ describe('nx_project_details compressed targets', () => {
 
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
-    expect(targetsBlock).toContain(
-      'target-with-cache: @nx/js:tsc | cache: true',
+    // When cache is true (default), it should NOT be displayed (token efficiency)
+    expect(targetsBlock).toContain('target-with-cache: @nx/js:tsc');
+    expect(targetsBlock).not.toContain(
+      'target-with-cache: @nx/js:tsc | cache:',
     );
   });
 
@@ -405,7 +407,7 @@ describe('nx_project_details compressed targets', () => {
     const targetsBlock = getCompressedTargetsBlock(result);
     expect(targetsBlock).toBeDefined();
     expect(targetsBlock).toContain(
-      'target-empty-cmds: nx:run-commands - 0 commands | cache: true',
+      'target-empty-cmds: nx:run-commands - 0 commands',
     );
   });
 

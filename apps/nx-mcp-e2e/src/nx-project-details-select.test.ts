@@ -55,7 +55,9 @@ describe('nx_project_details select', () => {
     expect(result.content[1]?.text).toContain(
       'To see full configuration for a specific target',
     );
-    expect(result.content[1]?.text).toContain('cache:');
+    // Cache should only appear when it's false (token efficiency)
+    // So we should see "cache: false" somewhere, but not "cache: true"
+    expect(result.content[1]?.text).not.toContain('cache: true');
 
     // Third block should be External Dependencies
     expect(result.content[2]?.text).toContain('External Dependencies:');
