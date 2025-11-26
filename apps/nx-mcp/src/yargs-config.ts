@@ -9,6 +9,7 @@ export interface ArgvType {
   disableTelemetry: boolean;
   keepAliveInterval: number;
   debugLogs: boolean;
+  tools?: string | string[];
   _: (string | number)[];
   $0: string;
   [x: string]: unknown;
@@ -64,6 +65,13 @@ export function createYargsConfig(args: string[]): Argv<any> {
       describe: 'Enable debug logging',
       type: 'boolean',
       default: false,
+    })
+    .option('tools', {
+      alias: 't',
+      describe:
+        'Filter which tools are enabled. Accepts glob patterns including negation (e.g., "*", "!nx_docs", "cloud_*")',
+      type: 'array',
+      string: true,
     })
     .check((argv) => {
       // Check for conflicting options

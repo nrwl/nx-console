@@ -157,4 +157,41 @@ describe('createYargsConfig', () => {
       }).toThrow();
     });
   });
+
+  describe('tools option', () => {
+    it('should parse single --tools flag', () => {
+      const argv = createYargsConfig(['--tools', 'nx_docs']).parseSync();
+      expect(argv.tools).toEqual(['nx_docs']);
+    });
+
+    it('should parse multiple --tools flags', () => {
+      const argv = createYargsConfig([
+        '--tools',
+        'nx_docs',
+        '--tools',
+        'nx_workspace',
+      ]).parseSync();
+      expect(argv.tools).toEqual(['nx_docs', 'nx_workspace']);
+    });
+
+    it('should parse -t alias', () => {
+      const argv = createYargsConfig(['-t', 'nx_docs']).parseSync();
+      expect(argv.tools).toEqual(['nx_docs']);
+    });
+
+    it('should handle negation patterns', () => {
+      const argv = createYargsConfig(['--tools', '!nx_docs']).parseSync();
+      expect(argv.tools).toEqual(['!nx_docs']);
+    });
+
+    it('should handle glob patterns', () => {
+      const argv = createYargsConfig(['--tools', 'nx_*']).parseSync();
+      expect(argv.tools).toEqual(['nx_*']);
+    });
+
+    it('should default to undefined when not provided', () => {
+      const argv = createYargsConfig([]).parseSync();
+      expect(argv.tools).toBeUndefined();
+    });
+  });
 });

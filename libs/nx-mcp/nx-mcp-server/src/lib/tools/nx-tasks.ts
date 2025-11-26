@@ -10,6 +10,7 @@ import {
 } from '@nx-console/shared-llm-context';
 import { IdeProvider } from '../ide-provider';
 import { RunningTasksMap } from '@nx-console/shared-running-tasks';
+import { isToolEnabled } from '../tool-filter';
 
 const TASK_OUTPUT_CHUNK_SIZE = 10000;
 
@@ -18,34 +19,48 @@ export function registerNxTaskTools(
   ideProvider: IdeProvider,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,
+  toolsFilter?: string[],
 ): void {
-  server.tool(
-    NX_CURRENT_RUNNING_TASKS_DETAILS,
-    `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
+  if (!isToolEnabled(NX_CURRENT_RUNNING_TASKS_DETAILS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${NX_CURRENT_RUNNING_TASKS_DETAILS} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      NX_CURRENT_RUNNING_TASKS_DETAILS,
+      `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
     There will be scenarios where the current process is not running anymore (as denoted by Stopped).
     Use this tool if users ask for information about recently run tests, builds or other commands.
     Use this tool for assisting with debugging and getting details about the current running tasks.
 
     Use ${NX_CURRENT_RUNNING_TASK_OUTPUT} to get the terminal output for specific tasks.
     `,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: false,
-    },
-    nxCurrentlyRunningTasksDetails(telemetry, ideProvider),
-  );
-  server.tool(
-    NX_CURRENT_RUNNING_TASK_OUTPUT,
-    `Returns the terminal output for a specific task from currently running Nx CLI processes. For large outputs, if a pagination token is returned, call this tool again with the token to retrieve additional results. Pagination works from the end of the outputs - page 0 shows the most recent output (end of the log), and subsequent pages show progressively older output.`,
-    NxCurrentlyRunningTaskOutputSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: false,
-    },
-    nxCurrentlyRunningTaskOutput(telemetry, ideProvider),
-  );
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      nxCurrentlyRunningTasksDetails(telemetry, ideProvider),
+    );
+  }
+
+  if (!isToolEnabled(NX_CURRENT_RUNNING_TASK_OUTPUT, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${NX_CURRENT_RUNNING_TASK_OUTPUT} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      NX_CURRENT_RUNNING_TASK_OUTPUT,
+      `Returns the terminal output for a specific task from currently running Nx CLI processes. For large outputs, if a pagination token is returned, call this tool again with the token to retrieve additional results. Pagination works from the end of the outputs - page 0 shows the most recent output (end of the log), and subsequent pages show progressively older output.`,
+      NxCurrentlyRunningTaskOutputSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      nxCurrentlyRunningTaskOutput(telemetry, ideProvider),
+    );
+  }
 
   logger.debug?.('Registered Nx task tools');
 }
