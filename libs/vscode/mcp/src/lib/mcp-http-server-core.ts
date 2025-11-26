@@ -88,7 +88,8 @@ export class McpHttpServerCore {
             : undefined;
 
           const toolsFilter =
-            GlobalConfigurationStore.instance.get('mcpToolsFilter');
+            GlobalConfigurationStore.instance.get('mcpToolsFilter') ??
+            undefined;
 
           const server = await NxMcpServerWrapper.create(
             nxWorkspacePath,
