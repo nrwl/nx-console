@@ -65,17 +65,20 @@ let intervalTimer: NodeJS.Timeout | undefined;
 
 export function setupPeriodicAiCheck(context: ExtensionContext) {
   // Run first check after 3 minutes
-  checkTimer = setTimeout(() => {
-    runAiAgentCheck();
+  checkTimer = setTimeout(
+    () => {
+      runAiAgentCheck();
 
-    // Then check every 3 hours
-    intervalTimer = setInterval(
-      () => {
-        runAiAgentCheck();
-      },
-      3 * 60 * 60 * 1000,
-    );
-  }, 3 * 60 * 1000);
+      // Then check every 3 hours
+      intervalTimer = setInterval(
+        () => {
+          runAiAgentCheck();
+        },
+        3 * 60 * 60 * 1000,
+      );
+    },
+    3 * 60 * 1000,
+  );
 
   context.subscriptions.push(
     new Disposable(() => {
