@@ -64,18 +64,18 @@ let checkTimer: NodeJS.Timeout | undefined;
 let intervalTimer: NodeJS.Timeout | undefined;
 
 export function setupPeriodicAiCheck(context: ExtensionContext) {
-  // Run first check after 1 minute
+  // Run first check after 3 minutes
   checkTimer = setTimeout(() => {
     runAiAgentCheck();
 
-    // Then check every hour
+    // Then check every 3 hours
     intervalTimer = setInterval(
       () => {
         runAiAgentCheck();
       },
-      60 * 60 * 1000,
+      3 * 60 * 60 * 1000,
     );
-  }, 60 * 1000);
+  }, 3 * 60 * 1000);
 
   context.subscriptions.push(
     new Disposable(() => {
@@ -144,23 +144,10 @@ async function constructCommand(flags: string, forceNpx = false) {
   // there are older versions of nx that have this outdated config
   // 'yarn' isn't actually a dlx command it's only for local packages
   if (dlx === 'yarn' || dlx === 'npx' || dlx === undefined) {
-    dlx = 'npx -y --ignore-scripts';
+    dlx = `npx -y --ignore-scripts ${cacheParam}`;
   }
 
   return `${forceNpx ? `npx -y ${cacheParam} --ignore-scripts` : dlx} nx@latest configure-ai-agents ${flags}`.trim();
-}
-
-async function getNxLatestVersion(): Promise<string | undefined> {
-  try {
-    const result = await promisify(exec)('npm view nx@latest version', {
-      encoding: 'utf-8',
-      timeout: 10000,
-    });
-    return result.stdout.trim();
-  } catch (e) {
-    vscodeLogger.log(`Failed to get nx@latest version: ${e}`);
-    return undefined;
-  }
 }
 
 async function doRunAiAgentCheck(
@@ -369,16 +356,6 @@ async function runAiAgentCheck() {
 
   const now = Date.now();
 
-  const lastUpdateNotificationTimestamp =
-    WorkspaceConfigurationStore.instance.get(
-      'lastAiCheckNotificationTimestamp',
-      0,
-    );
-  const gap = 12 * 60 * 60 * 1000;
-  if (now - lastUpdateNotificationTimestamp < gap) {
-    return;
-  }
-
   const workspacePath = getWorkspacePath();
   if (!workspacePath) {
     return;
@@ -438,6 +415,16 @@ async function runAiAgentCheck() {
           }
         }
 
+        const lastUpdateNotificationTimestamp =
+          WorkspaceConfigurationStore.instance.get(
+            'lastAiCheckNotificationTimestamp',
+            0,
+          );
+        const gap = 12 * 60 * 60 * 1000;
+        if (now - lastUpdateNotificationTimestamp < gap) {
+          return;
+        }
+
         WorkspaceConfigurationStore.instance.set(
           'lastAiCheckNotificationTimestamp',
           now,
@@ -490,10 +477,6 @@ async function runAiAgentCheck() {
       }
     }
     getTelemetry().logUsage('ai.configure-agents-check-end');
-    WorkspaceConfigurationStore.instance.set(
-      'lastAiCheckNotificationTimestamp',
-      now,
-    );
 
     // If we get here, the update check passed (no updates needed)
     // Now check if we should prompt for configuration
