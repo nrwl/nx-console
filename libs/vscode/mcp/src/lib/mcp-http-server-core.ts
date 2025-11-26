@@ -4,7 +4,7 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
 import {
-  getGlobalConfig,
+  GlobalConfigurationStore,
   getNxWorkspacePath,
 } from '@nx-console/vscode-configuration';
 import {
@@ -87,7 +87,8 @@ export class McpHttpServerCore {
             ? providedPath
             : undefined;
 
-          const toolsFilter = getGlobalConfig('mcpToolsFilter');
+          const toolsFilter =
+            GlobalConfigurationStore.instance.get('mcpToolsFilter');
 
           const server = await NxMcpServerWrapper.create(
             nxWorkspacePath,
