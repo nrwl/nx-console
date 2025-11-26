@@ -17,7 +17,6 @@ import {
   formatTasksSearchContent,
   getPipelineExecutionDetails,
   getPipelineExecutionsSearch,
-  getRecentCIPEData,
   getRunDetails,
   getRunsSearch,
   getTasksDetailsSearch,
@@ -27,90 +26,122 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { CIPEInfo } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
+import { isToolEnabled } from '../tool-filter';
 
 export function registerNxCloudTools(
   workspacePath: string,
   server: McpServer,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,
+  toolsFilter?: string[],
 ): void {
-  // Pipeline Executions Search
-  server.tool(
-    CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
-    'Analyze historical pipeline execution data from Nx Cloud to identify trends and patterns in CI/CD workflows. Use this analytics tool to track pipeline success rates over time, investigate performance patterns across branches or authors, and gain insights into team productivity. Filter by branch, status, author, or time range to analyze specific segments of your CI/CD history. Pipeline executions are the top-level containers in the hierarchy. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-    pipelineExecutionSearchSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    nxCloudPipelineExecutionsSearch(workspacePath, logger, telemetry),
-  );
+  if (!isToolEnabled(CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
+      'Analyze historical pipeline execution data from Nx Cloud to identify trends and patterns in CI/CD workflows. Use this analytics tool to track pipeline success rates over time, investigate performance patterns across branches or authors, and gain insights into team productivity. Filter by branch, status, author, or time range to analyze specific segments of your CI/CD history. Pipeline executions are the top-level containers in the hierarchy. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+      pipelineExecutionSearchSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      nxCloudPipelineExecutionsSearch(workspacePath, logger, telemetry),
+    );
+  }
 
-  // Pipeline Execution Details
-  server.tool(
-    CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
-    'Analyze detailed historical data for a specific pipeline execution in Nx Cloud. Use this analytics tool to investigate the complete structure of a past CI/CD run, understand performance bottlenecks, and identify optimization opportunities. Returns the full hierarchy including run groups and their associated runs, helping you gain insights into how the pipeline was executed and where improvements can be made.',
-    pipelineExecutionDetailsSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    nxCloudPipelineExecutionDetails(workspacePath, logger, telemetry),
-  );
+  if (!isToolEnabled(CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
+      'Analyze detailed historical data for a specific pipeline execution in Nx Cloud. Use this analytics tool to investigate the complete structure of a past CI/CD run, understand performance bottlenecks, and identify optimization opportunities. Returns the full hierarchy including run groups and their associated runs, helping you gain insights into how the pipeline was executed and where improvements can be made.',
+      pipelineExecutionDetailsSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      nxCloudPipelineExecutionDetails(workspacePath, logger, telemetry),
+    );
+  }
 
-  // Runs Search
-  server.tool(
-    CLOUD_ANALYTICS_RUNS_SEARCH,
-    'Analyze historical run data from Nx Cloud to track performance trends and team productivity patterns. Runs are mid-level containers within pipeline executions, each representing execution of a specific command (like "nx affected:build"). Use this analytics tool to identify which commands are taking the longest, track success rates across different run groups, and understand how your team\'s build patterns have evolved over time. Filter by pipeline execution, branch, run group, or status to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-    runSearchSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    nxCloudRunsSearch(workspacePath, logger, telemetry),
-  );
+  if (!isToolEnabled(CLOUD_ANALYTICS_RUNS_SEARCH, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_ANALYTICS_RUNS_SEARCH} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      CLOUD_ANALYTICS_RUNS_SEARCH,
+      'Analyze historical run data from Nx Cloud to track performance trends and team productivity patterns. Runs are mid-level containers within pipeline executions, each representing execution of a specific command (like "nx affected:build"). Use this analytics tool to identify which commands are taking the longest, track success rates across different run groups, and understand how your team\'s build patterns have evolved over time. Filter by pipeline execution, branch, run group, or status to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+      runSearchSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      nxCloudRunsSearch(workspacePath, logger, telemetry),
+    );
+  }
 
-  // Run Details
-  server.tool(
-    CLOUD_ANALYTICS_RUN_DETAILS,
-    'Analyze detailed historical data for a specific run in Nx Cloud. Use this analytics tool to investigate command execution performance, understand task distribution patterns, and identify optimization opportunities. Returns comprehensive information including the command executed, duration, status, and all tasks that were part of this run, helping you gain insights into where time is being spent and how to improve build efficiency.',
-    runDetailsSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    nxCloudRunDetails(workspacePath, logger, telemetry),
-  );
+  if (!isToolEnabled(CLOUD_ANALYTICS_RUN_DETAILS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_ANALYTICS_RUN_DETAILS} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      CLOUD_ANALYTICS_RUN_DETAILS,
+      'Analyze detailed historical data for a specific run in Nx Cloud. Use this analytics tool to investigate command execution performance, understand task distribution patterns, and identify optimization opportunities. Returns comprehensive information including the command executed, duration, status, and all tasks that were part of this run, helping you gain insights into where time is being spent and how to improve build efficiency.',
+      runDetailsSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      nxCloudRunDetails(workspacePath, logger, telemetry),
+    );
+  }
 
-  // Tasks Search
-  server.tool(
-    CLOUD_ANALYTICS_TASKS_SEARCH,
-    'Analyze aggregated task performance statistics from Nx Cloud to identify optimization opportunities and track trends over time. Returns performance metrics including success rates, cache hit rates, and average durations for each task (project + target combination). Use this analytics tool to understand which tasks are the slowest, track cache effectiveness trends, identify projects with low success rates, and gain insights into overall team productivity patterns. Filter by project, target, or time range to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-    taskSearchSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    nxCloudTasksSearch(workspacePath, logger, telemetry),
-  );
+  if (!isToolEnabled(CLOUD_ANALYTICS_TASKS_SEARCH, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_ANALYTICS_TASKS_SEARCH} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      CLOUD_ANALYTICS_TASKS_SEARCH,
+      'Analyze aggregated task performance statistics from Nx Cloud to identify optimization opportunities and track trends over time. Returns performance metrics including success rates, cache hit rates, and average durations for each task (project + target combination). Use this analytics tool to understand which tasks are the slowest, track cache effectiveness trends, identify projects with low success rates, and gain insights into overall team productivity patterns. Filter by project, target, or time range to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+      taskSearchSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      nxCloudTasksSearch(workspacePath, logger, telemetry),
+    );
+  }
 
-  // Task Executions Search
-  server.tool(
-    CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
-    'Analyze individual task execution data from Nx Cloud to investigate performance trends and understand task behavior over time. Returns detailed information for each task execution including project, target, duration, cache status, and parameters. Use this analytics tool to track how specific tasks perform across different runs, identify patterns in cache misses, and gain insights into which task configurations are most efficient. Filter by project, target, or time range to analyze specific execution patterns. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-    taskDetailsSchema.shape,
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    nxCloudTaskDetails(workspacePath, logger, telemetry),
-  );
+  if (!isToolEnabled(CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
+      'Analyze individual task execution data from Nx Cloud to investigate performance trends and understand task behavior over time. Returns detailed information for each task execution including project, target, duration, cache status, and parameters. Use this analytics tool to track how specific tasks perform across different runs, identify patterns in cache misses, and gain insights into which task configurations are most efficient. Filter by project, target, or time range to analyze specific execution patterns. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
+      taskDetailsSchema.shape,
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      nxCloudTaskDetails(workspacePath, logger, telemetry),
+    );
+  }
 
   logger.debug?.('Registered Nx Cloud tools');
 }

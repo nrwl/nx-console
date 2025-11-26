@@ -10,184 +10,195 @@ import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { IdeProvider } from '../ide-provider';
+import { isToolEnabled } from '../tool-filter';
 
 export function registerNxIdeTools(
   server: McpServer,
   logger: Logger,
   ideProvider: IdeProvider,
   telemetry?: NxConsoleTelemetryLogger,
+  toolsFilter?: string[],
 ): void {
-  // Register nx_visualize_graph tool
-  server.tool(
-    NX_VISUALIZE_GRAPH,
-    'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
-    {
-      visualizationType: z
-        .enum(['project', 'project-task', 'full-project-graph'])
-        .describe(
-          'The way in which to visualize the graph. "project" shows the project graph focused on a single project. "project-task" shows the task graph focused on a specific task for a specific project. "full-project-graph" shows the full project graph for the entire repository.',
-        ),
-      projectName: z
-        .string()
-        .optional()
-        .describe(
-          'The name of the project to focus the graph on. Only used if visualizationType is "project" or "project-task".',
-        ),
-      taskName: z
-        .string()
-        .optional()
-        .describe(
-          'The name of the task to focus the graph on. Only used if visualizationType is "project-task".',
-        ),
-    },
-    {
-      readOnlyHint: false,
-      openWorldHint: false,
-    },
-    async ({ visualizationType, projectName, taskName }) => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_VISUALIZE_GRAPH,
-        kind: visualizationType,
-      });
+  if (!isToolEnabled(NX_VISUALIZE_GRAPH, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_VISUALIZE_GRAPH} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_VISUALIZE_GRAPH,
+      'Visualize the Nx graph. This can show either a project graph or a task graph depending on the parameters. Use this to help users understand project dependencies or task dependencies. There can only be one graph visualization open at a time so avoid similar tool calls unless the user specifically requests it.',
+      {
+        visualizationType: z
+          .enum(['project', 'project-task', 'full-project-graph'])
+          .describe(
+            'The way in which to visualize the graph. "project" shows the project graph focused on a single project. "project-task" shows the task graph focused on a specific task for a specific project. "full-project-graph" shows the full project graph for the entire repository.',
+          ),
+        projectName: z
+          .string()
+          .optional()
+          .describe(
+            'The name of the project to focus the graph on. Only used if visualizationType is "project" or "project-task".',
+          ),
+        taskName: z
+          .string()
+          .optional()
+          .describe(
+            'The name of the task to focus the graph on. Only used if visualizationType is "project-task".',
+          ),
+      },
+      {
+        readOnlyHint: false,
+        openWorldHint: false,
+      },
+      async ({ visualizationType, projectName, taskName }) => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_VISUALIZE_GRAPH,
+          kind: visualizationType,
+        });
 
-      if (!ideProvider || !ideProvider.isAvailable()) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'No IDE provider available' }],
-        };
-      }
+        if (!ideProvider || !ideProvider.isAvailable()) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'No IDE provider available' }],
+          };
+        }
 
-      try {
-        switch (visualizationType) {
-          case 'project':
-            if (!projectName) {
+        try {
+          switch (visualizationType) {
+            case 'project':
+              if (!projectName) {
+                return {
+                  isError: true,
+                  content: [{ type: 'text', text: 'Project name is required' }],
+                };
+              }
+              await ideProvider.focusProject(projectName);
+
               return {
-                isError: true,
-                content: [{ type: 'text', text: 'Project name is required' }],
-              };
-            }
-            await ideProvider.focusProject(projectName);
-
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: getProjectGraphVisualizationMessage(projectName),
-                },
-              ],
-            };
-          case 'project-task':
-            if (!taskName) {
-              return {
-                isError: true,
                 content: [
                   {
                     type: 'text',
-                    text: 'Task name is required for task graph visualization',
+                    text: getProjectGraphVisualizationMessage(projectName),
                   },
                 ],
               };
-            }
-            if (!projectName) {
+            case 'project-task':
+              if (!taskName) {
+                return {
+                  isError: true,
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Task name is required for task graph visualization',
+                    },
+                  ],
+                };
+              }
+              if (!projectName) {
+                return {
+                  isError: true,
+                  content: [{ type: 'text', text: 'Project name is required' }],
+                };
+              }
+              await ideProvider.focusTask(projectName, taskName);
+
               return {
-                isError: true,
-                content: [{ type: 'text', text: 'Project name is required' }],
+                content: [
+                  {
+                    type: 'text',
+                    text: getTaskGraphVisualizationMessage(
+                      projectName,
+                      taskName,
+                    ),
+                  },
+                ],
               };
-            }
-            await ideProvider.focusTask(projectName, taskName);
+            case 'full-project-graph':
+              await ideProvider.showFullProjectGraph();
 
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: getTaskGraphVisualizationMessage(projectName, taskName),
-                },
-              ],
-            };
-          case 'full-project-graph':
-            await ideProvider.showFullProjectGraph();
-
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: getProjectGraphVisualizationMessage(),
-                },
-              ],
-            };
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: getProjectGraphVisualizationMessage(),
+                  },
+                ],
+              };
+          }
+        } catch (error) {
+          return {
+            isError: true,
+            content: [
+              { type: 'text', text: `IDE communication error: ${error}` },
+            ],
+          };
         }
-      } catch (error) {
-        return {
-          isError: true,
-          content: [
-            { type: 'text', text: `IDE communication error: ${error}` },
-          ],
-        };
-      }
-    },
-  );
+      },
+    );
+  }
 
-  // Register nx_run_generator tool
-  server.tool(
-    NX_RUN_GENERATOR,
-    'Opens the Nx Console Generate UI in the IDE with the provided options pre-filled. This tool does NOT directly execute the generator - instead it opens a visual form pre-filled with your options, allowing the user to review, modify, and confirm before execution. The `cwd` parameter specifies the parent directory path (relative to workspace root) where the generated item should be created - this is particularly important when generating libraries, apps, or components in specific locations. This tool can also be called to update options for an existing generator invocation. Prefer this tool over CLI commands when an IDE is available, as it provides a user-review workflow.',
-    {
-      generatorName: z.string().describe('The name of the generator to run'),
-      options: z
-        .record(z.string(), z.unknown())
-        .describe('The options to pass to the generator'),
-      cwd: z
-        .string()
-        .optional()
-        .describe(
-          'The current working directory to run the generator from. This is always relative to the workspace root. If not specified, the workspace root will be used.',
-        ),
-    },
-    {
-      readOnlyHint: false,
-      openWorldHint: false,
-      destructiveHint: false,
-    },
-    async ({ generatorName, options, cwd }) => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_RUN_GENERATOR,
-      });
+  if (!isToolEnabled(NX_RUN_GENERATOR, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_RUN_GENERATOR} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_RUN_GENERATOR,
+      'Opens the Nx Console Generate UI in the IDE with the provided options pre-filled. This tool does NOT directly execute the generator - instead it opens a visual form pre-filled with your options, allowing the user to review, modify, and confirm before execution. The `cwd` parameter specifies the parent directory path (relative to workspace root) where the generated item should be created - this is particularly important when generating libraries, apps, or components in specific locations. This tool can also be called to update options for an existing generator invocation. Prefer this tool over CLI commands when an IDE is available, as it provides a user-review workflow.',
+      {
+        generatorName: z.string().describe('The name of the generator to run'),
+        options: z
+          .record(z.string(), z.unknown())
+          .describe('The options to pass to the generator'),
+        cwd: z
+          .string()
+          .optional()
+          .describe(
+            'The current working directory to run the generator from. This is always relative to the workspace root. If not specified, the workspace root will be used.',
+          ),
+      },
+      {
+        readOnlyHint: false,
+        openWorldHint: false,
+        destructiveHint: false,
+      },
+      async ({ generatorName, options, cwd }) => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_RUN_GENERATOR,
+        });
 
-      if (!ideProvider || !ideProvider.isAvailable()) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'No IDE provider available' }],
-        };
-      }
+        if (!ideProvider || !ideProvider.isAvailable()) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'No IDE provider available' }],
+          };
+        }
 
-      try {
-        const logFileName = await ideProvider.openGenerateUi(
-          generatorName,
-          options ?? {},
-          cwd,
-        );
+        try {
+          const logFileName = await ideProvider.openGenerateUi(
+            generatorName,
+            options ?? {},
+            cwd,
+          );
 
-        return {
-          content: [
-            {
-              type: 'text',
-              text: createGeneratorUiResponseMessage(
-                generatorName,
-                logFileName,
-              ),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          isError: true,
-          content: [
-            { type: 'text', text: `IDE communication error: ${error}` },
-          ],
-        };
-      }
-    },
-  );
+          return {
+            content: [
+              {
+                type: 'text',
+                text: createGeneratorUiResponseMessage(
+                  generatorName,
+                  logFileName,
+                ),
+              },
+            ],
+          };
+        } catch (error) {
+          return {
+            isError: true,
+            content: [
+              { type: 'text', text: `IDE communication error: ${error}` },
+            ],
+          };
+        }
+      },
+    );
+  }
 
   logger.debug?.('Registered Nx IDE tools');
 }

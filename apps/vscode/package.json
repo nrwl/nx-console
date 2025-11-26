@@ -833,6 +833,14 @@
           "scope": "resource",
           "description": "Fixed port for the Nx MCP server. If set to 0, a random available port will be used."
         },
+        "nxConsole.mcpToolsFilter": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "description": "Filter which MCP tools are enabled. Accepts glob patterns including negation (e.g., '*', '!nx_docs', 'cloud_*'). If empty, all tools are enabled."
+        },
         "nxConsole.enableDebugLogging": {
           "type": "boolean",
           "default": false,

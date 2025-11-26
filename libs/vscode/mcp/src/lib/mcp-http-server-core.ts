@@ -3,7 +3,10 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
-import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
+import {
+  getGlobalConfig,
+  getNxWorkspacePath,
+} from '@nx-console/vscode-configuration';
 import {
   getOutputChannel,
   vscodeLogger,
@@ -84,6 +87,8 @@ export class McpHttpServerCore {
             ? providedPath
             : undefined;
 
+          const toolsFilter = getGlobalConfig('mcpToolsFilter');
+
           const server = await NxMcpServerWrapper.create(
             nxWorkspacePath,
             nxWorkspaceInfoProvider,
@@ -91,6 +96,7 @@ export class McpHttpServerCore {
             ideProvider,
             getTelemetry(),
             vscodeLogger,
+            toolsFilter,
           );
 
           this.streamableServers.add(server);
