@@ -31,9 +31,9 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             "dev.nx.console.last_ai_check_notification_timestamp"
         private const val LAST_AI_CONFIGURE_NOTIFICATION_TIMESTAMP_KEY =
             "dev.nx.console.last_ai_configure_notification_timestamp"
-        private const val ONE_MINUTE_MS = 60 * 1000L
-        private const val ONE_HOUR_MS = 60 * 60 * 1000L
-        private const val ONE_DAY_MS = 24 * 60 * 60 * 1000L
+        private const val THREE_MINUTES_MS = 3 * 60 * 1000L
+        private const val THREE_HOURS_MS = 3 * 60 * 60 * 1000L
+        private const val TWELVE_HOURS_MS = 12 * 60 * 60 * 1000L
         private const val ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000L
     }
 
@@ -46,11 +46,11 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
         checkJob =
             cs.launch {
-                delay(ONE_MINUTE_MS)
+                delay(THREE_MINUTES_MS)
                 runAiAgentCheck()
 
                 while (isActive) {
-                    delay(ONE_HOUR_MS)
+                    delay(THREE_HOURS_MS)
                     runAiAgentCheck()
                 }
             }
@@ -67,13 +67,6 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
         }
 
         val now = System.currentTimeMillis()
-
-        val lastUpdateNotificationTimestamp =
-            PropertiesComponent.getInstance(project)
-                .getLong(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, 0)
-        if (now - lastUpdateNotificationTimestamp < ONE_DAY_MS) {
-            return
-        }
 
         try {
             val workspaceRoot = project.basePath ?: "."
@@ -98,6 +91,13 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             val output = withContext(Dispatchers.IO) { ExecUtil.execAndGetOutput(checkCommand) }
 
             if (output.stdout.contains("The following AI agents are out of date")) {
+                val lastUpdateNotificationTimestamp =
+                    PropertiesComponent.getInstance(project)
+                        .getLong(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, 0)
+                if (now - lastUpdateNotificationTimestamp < TWELVE_HOURS_MS) {
+                    return
+                }
+
                 PropertiesComponent.getInstance(project)
                     .setValue(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, now.toString())
 
