@@ -1,3 +1,18 @@
+# [18.81.0](https://github.com/nrwl/nx-console/compare/vscode-v18.80.3...vscode-v18.81.0) (2025-11-27)
+
+
+### Bug Fixes
+
+* **vscode:** remove redundant latest nx version check ([#2902](https://github.com/nrwl/nx-console/issues/2902)) ([8433d19](https://github.com/nrwl/nx-console/commit/8433d194b00cc1411807371e3bcfbb4f4cdc434e))
+
+
+### Features
+
+* **nx-mcp:** add --tools flag and vscode option to filter mcp tools ([#2908](https://github.com/nrwl/nx-console/issues/2908)) ([56564d1](https://github.com/nrwl/nx-console/commit/56564d18e729e8b47ded14449b6f60d0d542ace7))
+* **nx-mcp:** rework nx_workspace with more parameters ([#2903](https://github.com/nrwl/nx-console/issues/2903)) ([93ba07e](https://github.com/nrwl/nx-console/commit/93ba07e3923cf977f310b95df8a7918a2f858f4b))
+* **nxls:** add clickable links for {workspaceRoot} and {projectRoot} links ([#2904](https://github.com/nrwl/nx-console/issues/2904)) ([a572eeb](https://github.com/nrwl/nx-console/commit/a572eeba5e2aa98cb92b44baae3cfb205742ec56))
+* **nxls:** add clickable links for projects ([#2901](https://github.com/nrwl/nx-console/issues/2901)) ([b50534b](https://github.com/nrwl/nx-console/commit/b50534b21a179e414ae53abbe39d3bac5ab78096))
+
 ## [18.80.3](https://github.com/nrwl/nx-console/compare/vscode-v18.80.2...vscode-v18.80.3) (2025-11-17)
 
 
