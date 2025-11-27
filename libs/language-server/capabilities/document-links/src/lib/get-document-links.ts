@@ -20,12 +20,14 @@ import {
 import { createRange } from './create-range';
 import { targetLink } from './target-link';
 import { namedInputLink } from './named-input-link';
+import { projectLink } from './project-link';
+import { interpolatedPathLink } from './interpolated-path-link';
 
 export async function getDocumentLinks(
   workingPath: string | undefined,
   jsonAst: JSONDocument,
   document: TextDocument,
-  schemas: MatchingSchema[]
+  schemas: MatchingSchema[],
 ): Promise<DocumentLink[]> {
   if (!workingPath) {
     return [];
@@ -49,6 +51,21 @@ export async function getDocumentLinks(
     }
 
     if (!linkType) {
+      if (isStringNode(node)) {
+        const value = node.value;
+        if (
+          (value.startsWith('{workspaceRoot}') ||
+            value.startsWith('{projectRoot}') ||
+            value.startsWith('!{workspaceRoot}') ||
+            value.startsWith('!{projectRoot}')) &&
+          !value.includes('*')
+        ) {
+          const link = await interpolatedPathLink(workingPath, node);
+          if (link) {
+            links.push(DocumentLink.create(createRange(document, node), link));
+          }
+        }
+      }
       continue;
     }
 
@@ -89,6 +106,13 @@ export async function getDocumentLinks(
       }
       case 'projectTarget': {
         const link = await targetLink(workingPath, node);
+        if (link) {
+          links.push(DocumentLink.create(range, link));
+        }
+        break;
+      }
+      case CompletionType.projects: {
+        const link = await projectLink(workingPath, node);
         if (link) {
           links.push(DocumentLink.create(range, link));
         }

@@ -4,33 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../telemetry"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../nx-cli-quickpicks"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../../shared/npm"
-    },
-    {
-      "path": "../utils"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

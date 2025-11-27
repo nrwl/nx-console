@@ -96,6 +96,17 @@ async function main() {
 
   logger.log('Starting Nx MCP server');
 
+  // Normalize tools filter to always be an array or undefined
+  const toolsFilter: string[] | undefined = argv.tools
+    ? Array.isArray(argv.tools)
+      ? argv.tools
+      : [argv.tools]
+    : undefined;
+
+  if (toolsFilter && toolsFilter.length > 0) {
+    logger.log(`Tools filter: ${toolsFilter.join(', ')}`);
+  }
+
   const providedPath: string = resolve(
     argv.workspacePath || (argv._[0] as string) || process.cwd(),
   ) as string;
@@ -226,6 +237,7 @@ async function main() {
     ideProvider,
     telemetryLogger,
     logger,
+    toolsFilter,
   );
 
   // disposables for shutting down
@@ -355,6 +367,7 @@ async function main() {
             ideProvider,
             telemetryLogger,
             logger,
+            toolsFilter,
           );
 
           await connectionServer.getMcpServer().connect(transport);

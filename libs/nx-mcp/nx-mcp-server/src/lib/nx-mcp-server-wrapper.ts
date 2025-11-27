@@ -57,7 +57,6 @@ export interface NxWorkspaceInfoProvider {
 export class NxMcpServerWrapper {
   private logger: Logger;
   private _nxWorkspacePath?: string;
-  private ideProvider?: IdeProvider;
   private periodicMonitoringTimer?: NodeJS.Timeout;
   private periodicMonitoringCount = 0;
   private readonly PERIODIC_MONITORING_INTERVAL = 10000; // 10 seconds
@@ -77,9 +76,10 @@ export class NxMcpServerWrapper {
     initialWorkspacePath: string | undefined,
     private nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
     private server: McpServer,
-    ideProvider?: IdeProvider,
+    private ideProvider?: IdeProvider,
     private telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
+    private toolsFilter?: string[],
   ) {
     this._nxWorkspacePath = initialWorkspacePath;
     this.ideProvider = ideProvider;
@@ -121,6 +121,7 @@ export class NxMcpServerWrapper {
     ideProvider?: IdeProvider,
     telemetry?: NxConsoleTelemetryLogger,
     logger?: Logger,
+    toolsFilter?: string[],
   ): Promise<NxMcpServerWrapper> {
     const server = new NxMcpServerWrapper(
       initialWorkspacePath,
@@ -129,6 +130,7 @@ export class NxMcpServerWrapper {
       ideProvider,
       telemetry,
       logger,
+      toolsFilter,
     );
     logger?.debug?.('Registering all Nx MCP tools');
 
@@ -145,6 +147,7 @@ export class NxMcpServerWrapper {
       server.nxWorkspaceInfoProvider,
       server.telemetry,
       server._nxWorkspacePath,
+      server.toolsFilter,
     );
     server.toolRegistrationState.nxCore = true;
 
@@ -262,6 +265,7 @@ export class NxMcpServerWrapper {
           this.server,
           this.logger,
           this.telemetry,
+          this.toolsFilter,
         );
 
         // Register CIPE resources
@@ -294,6 +298,7 @@ export class NxMcpServerWrapper {
           this.logger,
           this.nxWorkspaceInfoProvider,
           this.telemetry,
+          this.toolsFilter,
         );
         this.toolRegistrationState.nxWorkspace = true;
       }
@@ -313,6 +318,7 @@ export class NxMcpServerWrapper {
           this.ideProvider,
           this.logger,
           this.telemetry,
+          this.toolsFilter,
         );
         this.toolRegistrationState.nxTasks = true;
       }
@@ -329,6 +335,7 @@ export class NxMcpServerWrapper {
           this.logger,
           this.ideProvider,
           this.telemetry,
+          this.toolsFilter,
         );
         this.toolRegistrationState.nxIde = true;
       }

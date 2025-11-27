@@ -25,6 +25,7 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import z from 'zod';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
+import { isToolEnabled } from '../tool-filter';
 
 let nxWorkspacePath: string | undefined = undefined;
 
@@ -166,50 +167,232 @@ export function registerNxWorkspaceTools(
   logger: Logger,
   nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
   telemetry?: NxConsoleTelemetryLogger,
+  toolsFilter?: string[],
 ): void {
   nxWorkspacePath = workspacePath;
 
-  server.tool(
-    NX_WORKSPACE,
-    'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture',
-    {
-      filter: z
-        .string()
-        .optional()
-        .describe(
-          'Optional filter to select specific projects. Supports patterns like: project names (app1,app2), glob patterns (*-app), tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). Multiple patterns can be combined with commas.',
-        ),
-    },
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: false,
-    },
-    async ({ filter }) => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_WORKSPACE,
-      });
-      try {
-        if (!workspacePath) {
+  if (!isToolEnabled(NX_WORKSPACE, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_WORKSPACE} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_WORKSPACE,
+      'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture.',
+      {
+        filter: z
+          .string()
+          .optional()
+          .describe(
+            'Optional filter to select which projects to include. Supports patterns like: project names (app1,app2), glob patterns (*-app), tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). Multiple patterns can be combined with commas.',
+          ),
+        select: z
+          .string()
+          .optional()
+          .describe(
+            'Optional path to select specific properties from each project\'s data. Supports dot notation (e.g., "targets.build") and array indices (e.g., "tags[0]"). When provided, returns JSON format with selected properties for each matching project. When not provided, returns compressed serialized format.',
+          ),
+        pageToken: z
+          .number()
+          .optional()
+          .describe(
+            'Token for pagination (0-based page number). Results are always paginated. If not provided, returns page 0. Pass the token from the previous response to get the next page.',
+          ),
+      },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      async ({ filter, select, pageToken }) => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_WORKSPACE,
+        });
+        try {
+          if (!workspacePath) {
+            return {
+              isError: true,
+              content: [
+                { type: 'text', text: 'Error: Workspace path not set' },
+              ],
+            };
+          }
+          if (!(await checkIsNxWorkspace(workspacePath))) {
+            return {
+              isError: true,
+              content: [
+                {
+                  type: 'text',
+                  text: 'Error: The provided root is not a valid nx workspace.',
+                },
+              ],
+            };
+          }
+
+          const workspace = await nxWorkspaceInfoProvider.nxWorkspace(
+            workspacePath,
+            logger,
+          );
+          if (!workspace) {
+            return {
+              isError: true,
+              content: [{ type: 'text', text: 'Error: Workspace not found' }],
+            };
+          }
+          let filteredWorkspace = workspace;
+
+          // Apply filter if provided
+          if (filter && workspace.projectGraph) {
+            const filterPatterns = filter.split(',').map((p) => p.trim());
+            const matchingProjectNames = await findMatchingProjects(
+              filterPatterns,
+              workspace.projectGraph.nodes,
+              workspacePath,
+            );
+
+            // Create a filtered project graph
+            const filteredNodes: typeof workspace.projectGraph.nodes = {};
+            const filteredDeps: typeof workspace.projectGraph.dependencies = {};
+
+            for (const projectName of matchingProjectNames) {
+              filteredNodes[projectName] =
+                workspace.projectGraph.nodes[projectName];
+              filteredDeps[projectName] =
+                workspace.projectGraph.dependencies[projectName] || [];
+            }
+
+            filteredWorkspace = {
+              ...workspace,
+              projectGraph: {
+                ...workspace.projectGraph,
+                nodes: filteredNodes,
+                dependencies: filteredDeps,
+              },
+            };
+          }
+
+          const pageNumber = pageToken ?? 0;
+          let outputContent: string;
+
+          // Handle select parameter - return JSON format
+          if (select) {
+            const projectResults: Array<{ projectName: string; value: any }> =
+              [];
+
+            for (const [projectName, projectNode] of Object.entries(
+              filteredWorkspace.projectGraph.nodes,
+            )) {
+              // Apply select path to project.data for consistency with nx_project_details
+              const value = getValueByPath(projectNode.data, select);
+              // Use null instead of undefined so it appears in JSON output
+              projectResults.push({ projectName, value: value ?? null });
+            }
+
+            outputContent = JSON.stringify(projectResults, null, 2);
+          } else {
+            // No select - use compressed serialized format with token optimization
+            const results = getTokenOptimizedToolResult(filteredWorkspace);
+            outputContent = results.filter((result) => !!result).join('\n\n');
+          }
+
+          // Apply pagination
+          const { chunk, hasMore } = chunkContent(
+            outputContent,
+            pageNumber,
+            PROJECT_DETAILS_CHUNK_SIZE,
+          );
+
+          const content: CallToolResult['content'] = [
+            {
+              type: 'text',
+              text: chunk,
+            },
+          ];
+
+          // Add pagination token if there's more content
+          if (hasMore) {
+            content.push({
+              type: 'text',
+              text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue retrieving workspace data.`,
+            });
+          }
+
+          return {
+            content,
+          };
+        } catch (e) {
+          return {
+            content: [{ type: 'text', text: String(e) }],
+          };
+        }
+      },
+    );
+  }
+
+  if (!isToolEnabled(NX_WORKSPACE_PATH, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_WORKSPACE_PATH} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_WORKSPACE_PATH,
+      'Returns the path to the Nx workspace root',
+      {
+        readOnlyHint: true,
+      },
+      async () => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_WORKSPACE_PATH,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: nxWorkspacePath ?? 'No workspace path set',
+            },
+          ],
+        };
+      },
+    );
+  }
+
+  if (!isToolEnabled(NX_PROJECT_DETAILS, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_PROJECT_DETAILS} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_PROJECT_DETAILS,
+      'Returns the project configuration for a specific Nx project. When called without a select parameter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the select parameter with dot notation to access complete unabridged configuration for specific paths (e.g., select="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
+      {
+        projectName: z
+          .string()
+          .describe('The name of the project to get details for'),
+        select: z
+          .string()
+          .optional()
+          .describe(
+            'Optional path to select specific properties from the project configuration. Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). When provided, only the value at this path will be returned. If select is set, dependencies and external dependencies will not be included in the response.',
+          ),
+        pageToken: z
+          .number()
+          .optional()
+          .describe(
+            'Token for pagination. Pass the token from the previous response to get the next page.',
+          ),
+      },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      async ({ projectName, select, pageToken }) => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_PROJECT_DETAILS,
+        });
+        if (!nxWorkspacePath) {
           return {
             isError: true,
             content: [{ type: 'text', text: 'Error: Workspace path not set' }],
           };
         }
-        if (!(await checkIsNxWorkspace(workspacePath))) {
-          return {
-            isError: true,
-            content: [
-              {
-                type: 'text',
-                text: 'Error: The provided root is not a valid nx workspace.',
-              },
-            ],
-          };
-        }
-
         const workspace = await nxWorkspaceInfoProvider.nxWorkspace(
-          workspacePath,
+          nxWorkspacePath,
           logger,
         );
         if (!workspace) {
@@ -218,383 +401,275 @@ export function registerNxWorkspaceTools(
             content: [{ type: 'text', text: 'Error: Workspace not found' }],
           };
         }
-        let filteredWorkspace = workspace;
+        const project = await findMatchingProject(
+          projectName,
+          workspace.projectGraph.nodes,
+          nxWorkspacePath,
+        );
 
-        // Apply filter if provided
-        if (filter && workspace.projectGraph) {
-          const filterPatterns = filter.split(',').map((p) => p.trim());
-          const matchingProjectNames = await findMatchingProjects(
-            filterPatterns,
-            workspace.projectGraph.nodes,
-            workspacePath,
-          );
-
-          // Create a filtered project graph
-          const filteredNodes: typeof workspace.projectGraph.nodes = {};
-          const filteredDeps: typeof workspace.projectGraph.dependencies = {};
-
-          for (const projectName of matchingProjectNames) {
-            filteredNodes[projectName] =
-              workspace.projectGraph.nodes[projectName];
-            filteredDeps[projectName] =
-              workspace.projectGraph.dependencies[projectName] || [];
-          }
-
-          filteredWorkspace = {
-            ...workspace,
-            projectGraph: {
-              ...workspace.projectGraph,
-              nodes: filteredNodes,
-              dependencies: filteredDeps,
-            },
-          };
-        }
-
-        const results = getTokenOptimizedToolResult(filteredWorkspace);
-        const content: CallToolResult['content'] = results
-          .filter((result) => !!result)
-          .map((result) => ({
-            type: 'text',
-            text: result,
-          }));
-
-        return {
-          content,
-        };
-      } catch (e) {
-        return {
-          content: [{ type: 'text', text: String(e) }],
-        };
-      }
-    },
-  );
-
-  // NX_WORKSPACE_PATH - always available (returns path or message if not set)
-  server.tool(
-    NX_WORKSPACE_PATH,
-    'Returns the path to the Nx workspace root',
-    {
-      readOnlyHint: true,
-    },
-    async () => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_WORKSPACE_PATH,
-      });
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: nxWorkspacePath ?? 'No workspace path set',
-          },
-        ],
-      };
-    },
-  );
-
-  server.tool(
-    NX_PROJECT_DETAILS,
-    'Returns the project configuration for a specific Nx project. When called without a filter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the filter parameter with dot notation to access complete unabridged configuration for specific paths (e.g., filter="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
-    {
-      projectName: z
-        .string()
-        .describe('The name of the project to get details for'),
-      filter: z
-        .string()
-        .optional()
-        .describe(
-          'Optional path to filter the project configuration. Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). When provided, only the value at this path will be returned. If filter is set, dependencies and external dependencies will not be included in the response.',
-        ),
-      pageToken: z
-        .number()
-        .optional()
-        .describe(
-          'Token for pagination. Pass the token from the previous response to get the next page.',
-        ),
-    },
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: false,
-    },
-    async ({ projectName, filter, pageToken }) => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_PROJECT_DETAILS,
-      });
-      if (!nxWorkspacePath) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
-        };
-      }
-      const workspace = await nxWorkspaceInfoProvider.nxWorkspace(
-        nxWorkspacePath,
-        logger,
-      );
-      if (!workspace) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'Error: Workspace not found' }],
-        };
-      }
-      const project = await findMatchingProject(
-        projectName,
-        workspace.projectGraph.nodes,
-        nxWorkspacePath,
-      );
-
-      if (!project) {
-        return {
-          isError: true,
-          content: [
-            {
-              type: 'text',
-              text: `Project ${projectName} not found`,
-            },
-          ],
-        };
-      }
-
-      const pageNumber = pageToken ?? 0;
-
-      let detailsJson: any;
-      let compressedTargetsText: string | undefined;
-
-      if (filter) {
-        // When filter is provided, return unabridged data at that path
-        detailsJson = getValueByPath(project.data, filter);
-
-        // Handle filtered value not found
-        if (detailsJson === undefined) {
+        if (!project) {
           return {
             isError: true,
             content: [
               {
                 type: 'text',
-                text: `Path "${filter}" not found in project configuration`,
+                text: `Project ${projectName} not found`,
               },
             ],
           };
         }
-      } else {
-        // No filter: compress targets into plain text, return rest as JSON
-        const { targets, ...projectDataWithoutTargets } = project.data;
-        detailsJson = projectDataWithoutTargets;
 
-        if (targets && typeof targets === 'object') {
-          const targetDescriptions = Object.entries(targets)
-            .map(
-              ([name, config]) =>
-                `  - ${compressTargetForDisplay(name, config)}`,
-            )
-            .join('\n');
+        const pageNumber = pageToken ?? 0;
 
-          // Pick a sample target name for the example
-          const sampleTargetName = Object.keys(targets)[0] ?? 'build';
+        let detailsJson: any;
+        let compressedTargetsText: string | undefined;
 
-          compressedTargetsText = `Available Targets (compressed view):
-To see full configuration for a specific target, call this tool again with filter='targets.TARGET_NAME'
-Example: filter='targets.${sampleTargetName}' for the ${sampleTargetName} target
+        if (select) {
+          // When select is provided, return unabridged data at that path
+          detailsJson = getValueByPath(project.data, select);
+
+          // Handle selected value not found
+          if (detailsJson === undefined) {
+            return {
+              isError: true,
+              content: [
+                {
+                  type: 'text',
+                  text: `Path "${select}" not found in project configuration`,
+                },
+              ],
+            };
+          }
+        } else {
+          // No select: compress targets into plain text, return rest as JSON
+          const { targets, ...projectDataWithoutTargets } = project.data;
+          detailsJson = projectDataWithoutTargets;
+
+          if (targets && typeof targets === 'object') {
+            const targetDescriptions = Object.entries(targets)
+              .map(
+                ([name, config]) =>
+                  `  - ${compressTargetForDisplay(name, config)}`,
+              )
+              .join('\n');
+
+            // Pick a sample target name for the example
+            const sampleTargetName = Object.keys(targets)[0] ?? 'build';
+
+            compressedTargetsText = `Available Targets (compressed view):
+To see full configuration for a specific target, call this tool again with select='targets.TARGET_NAME'
+Example: select='targets.${sampleTargetName}' for the ${sampleTargetName} target
 
 ${targetDescriptions}`;
+          }
         }
-      }
 
-      const dependencies = workspace.projectGraph.dependencies[project.name];
+        const dependencies = workspace.projectGraph.dependencies[project.name];
 
-      const projectDependencies = [];
-      const externalDependencies = [];
+        const projectDependencies = [];
+        const externalDependencies = [];
 
-      for (const dep of dependencies) {
-        if (workspace.projectGraph.externalNodes?.[dep.target]) {
-          externalDependencies.push(dep.target);
-        } else {
-          projectDependencies.push(dep.target);
+        for (const dep of dependencies) {
+          if (workspace.projectGraph.externalNodes?.[dep.target]) {
+            externalDependencies.push(dep.target);
+          } else {
+            projectDependencies.push(dep.target);
+          }
         }
-      }
 
-      const projDepsStr = projectDependencies.join(', ');
-      const extDepsStr = externalDependencies.join(', ');
+        const projDepsStr = projectDependencies.join(', ');
+        const extDepsStr = externalDependencies.join(', ');
 
-      // Chunk each section
-      const detailsChunk = chunkContent(
-        JSON.stringify(detailsJson, null, 2),
-        pageNumber,
-        PROJECT_DETAILS_CHUNK_SIZE,
-      );
-      const projDepsChunk = chunkContent(
-        projDepsStr,
-        pageNumber,
-        PROJECT_DETAILS_CHUNK_SIZE,
-      );
-      const extDepsChunk = chunkContent(
-        extDepsStr,
-        pageNumber,
-        PROJECT_DETAILS_CHUNK_SIZE,
-      );
-
-      // Build content blocks
-      const content: CallToolResult['content'] = [];
-
-      const continuedString = pageNumber > 0 ? ' (continued)' : '';
-      if (detailsChunk.chunk) {
-        content.push({
-          type: 'text',
-          text: `Project Details${continuedString}: \n${detailsChunk.chunk}`,
-        });
-      }
-
-      // Add compressed targets text if no filter and on first page only (not on continuation pages)
-      if (!filter && compressedTargetsText && pageNumber === 0) {
-        content.push({
-          type: 'text',
-          text: compressedTargetsText,
-        });
-      }
-
-      if (!filter && projDepsChunk.chunk) {
-        content.push({
-          type: 'text',
-          text: `Project Dependencies${continuedString}: \n${projDepsChunk.chunk}`,
-        });
-      }
-
-      if (!filter && extDepsChunk.chunk) {
-        content.push({
-          type: 'text',
-          text: `External Dependencies${continuedString}: \n${extDepsChunk.chunk}`,
-        });
-      }
-
-      // Add pagination token if any section has more
-      if (
-        detailsChunk.hasMore ||
-        (!filter && (projDepsChunk.hasMore || extDepsChunk.hasMore))
-      ) {
-        content.push({
-          type: 'text',
-          text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue retrieving project details.`,
-        });
-      }
-
-      return { content };
-    },
-  );
-
-  server.tool(
-    NX_GENERATORS,
-    "Returns a complete list of all available Nx generators in the workspace, including both plugin-provided generators (like @nx/react:component) and local workspace generators. The output shows each generator's name with its description, useful for discovering what generators exist or finding one that matches a specific need.",
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: false,
-    },
-    async () => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_GENERATORS,
-      });
-      if (!nxWorkspacePath) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
-        };
-      }
-      const generators = await nxWorkspaceInfoProvider.getGenerators(
-        nxWorkspacePath,
-        undefined,
-        logger,
-      );
-      if (!generators) {
-        return {
-          content: [{ type: 'text', text: 'No generators found' }],
-        };
-      }
-      if (generators.length === 0) {
-        return {
-          content: [{ type: 'text', text: 'No generators found' }],
-        };
-      }
-
-      const generatorNamesAndDescriptions =
-        await getGeneratorNamesAndDescriptions(generators);
-      const prompt = getGeneratorsPrompt(generatorNamesAndDescriptions);
-      return {
-        content: [{ type: 'text', text: prompt }],
-      };
-    },
-  );
-
-  server.tool(
-    NX_GENERATOR_SCHEMA,
-    "Returns the complete JSON schema for a specific Nx generator. The schema contains all available options with their types, descriptions, default values, validation rules, and whether they're required or optional. Many generators also include helpful examples showing common usage patterns. The tool automatically handles generator aliases (e.g., 'app' vs 'application').",
-    {
-      generatorName: z
-        .string()
-        .describe(
-          'The name of the generator to get schema for. Use the generator name from the nx_generators tool.',
-        ),
-    },
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: false,
-    },
-    async ({ generatorName }) => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_GENERATOR_SCHEMA,
-      });
-      if (!nxWorkspacePath) {
-        return {
-          isError: true,
-          content: [{ type: 'text', text: 'Error: Workspace path not set' }],
-        };
-      }
-      const generators = await nxWorkspaceInfoProvider.getGenerators(
-        nxWorkspacePath,
-        undefined,
-        logger,
-      );
-      if (!generators) {
-        return {
-          content: [{ type: 'text', text: 'No generators found' }],
-        };
-      }
-      const generatorDetails = await getGeneratorSchema(
-        generatorName,
-        generators,
-      );
-
-      let examples = '';
-      try {
-        const examplesPath = path.join(
-          generators.find((g) => g.name === generatorName)?.schemaPath ?? '',
-          '..',
-          'examples.md',
+        // Chunk each section
+        const detailsChunk = chunkContent(
+          JSON.stringify(detailsJson, null, 2),
+          pageNumber,
+          PROJECT_DETAILS_CHUNK_SIZE,
         );
-        examples = await readFile(examplesPath, 'utf-8');
-      } catch (e) {
-        examples = 'No examples available';
-      }
+        const projDepsChunk = chunkContent(
+          projDepsStr,
+          pageNumber,
+          PROJECT_DETAILS_CHUNK_SIZE,
+        );
+        const extDepsChunk = chunkContent(
+          extDepsStr,
+          pageNumber,
+          PROJECT_DETAILS_CHUNK_SIZE,
+        );
 
-      return {
-        content: [
-          {
+        // Build content blocks
+        const content: CallToolResult['content'] = [];
+
+        const continuedString = pageNumber > 0 ? ' (continued)' : '';
+        if (detailsChunk.chunk) {
+          content.push({
             type: 'text',
-            text: `
+            text: `Project Details${continuedString}: \n${detailsChunk.chunk}`,
+          });
+        }
+
+        // Add compressed targets text if no select and on first page only (not on continuation pages)
+        if (!select && compressedTargetsText && pageNumber === 0) {
+          content.push({
+            type: 'text',
+            text: compressedTargetsText,
+          });
+        }
+
+        if (!select && projDepsChunk.chunk) {
+          content.push({
+            type: 'text',
+            text: `Project Dependencies${continuedString}: \n${projDepsChunk.chunk}`,
+          });
+        }
+
+        if (!select && extDepsChunk.chunk) {
+          content.push({
+            type: 'text',
+            text: `External Dependencies${continuedString}: \n${extDepsChunk.chunk}`,
+          });
+        }
+
+        // Add pagination token if any section has more
+        if (
+          detailsChunk.hasMore ||
+          (!select && (projDepsChunk.hasMore || extDepsChunk.hasMore))
+        ) {
+          content.push({
+            type: 'text',
+            text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue retrieving project details.`,
+          });
+        }
+
+        return { content };
+      },
+    );
+  }
+
+  if (!isToolEnabled(NX_GENERATORS, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_GENERATORS} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_GENERATORS,
+      "Returns a complete list of all available Nx generators in the workspace, including both plugin-provided generators (like @nx/react:component) and local workspace generators. The output shows each generator's name with its description, useful for discovering what generators exist or finding one that matches a specific need.",
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      async () => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_GENERATORS,
+        });
+        if (!nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
+        const generators = await nxWorkspaceInfoProvider.getGenerators(
+          nxWorkspacePath,
+          undefined,
+          logger,
+        );
+        if (!generators) {
+          return {
+            content: [{ type: 'text', text: 'No generators found' }],
+          };
+        }
+        if (generators.length === 0) {
+          return {
+            content: [{ type: 'text', text: 'No generators found' }],
+          };
+        }
+
+        const generatorNamesAndDescriptions =
+          await getGeneratorNamesAndDescriptions(generators);
+        const prompt = getGeneratorsPrompt(generatorNamesAndDescriptions);
+        return {
+          content: [{ type: 'text', text: prompt }],
+        };
+      },
+    );
+  }
+
+  if (!isToolEnabled(NX_GENERATOR_SCHEMA, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${NX_GENERATOR_SCHEMA} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      NX_GENERATOR_SCHEMA,
+      "Returns the complete JSON schema for a specific Nx generator. The schema contains all available options with their types, descriptions, default values, validation rules, and whether they're required or optional. Many generators also include helpful examples showing common usage patterns. The tool automatically handles generator aliases (e.g., 'app' vs 'application').",
+      {
+        generatorName: z
+          .string()
+          .describe(
+            'The name of the generator to get schema for. Use the generator name from the nx_generators tool.',
+          ),
+      },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      async ({ generatorName }) => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_GENERATOR_SCHEMA,
+        });
+        if (!nxWorkspacePath) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Error: Workspace path not set' }],
+          };
+        }
+        const generators = await nxWorkspaceInfoProvider.getGenerators(
+          nxWorkspacePath,
+          undefined,
+          logger,
+        );
+        if (!generators) {
+          return {
+            content: [{ type: 'text', text: 'No generators found' }],
+          };
+        }
+        const generatorDetails = await getGeneratorSchema(
+          generatorName,
+          generators,
+        );
+
+        let examples = '';
+        try {
+          const examplesPath = path.join(
+            generators.find((g) => g.name === generatorName)?.schemaPath ?? '',
+            '..',
+            'examples.md',
+          );
+          examples = await readFile(examplesPath, 'utf-8');
+        } catch (e) {
+          examples = 'No examples available';
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `
   Found generator schema for ${generatorName}: ${JSON.stringify(
     generatorDetails,
   )}.
               Follow up by using the nx_run_generator tool if IDE is available, otherwise use CLI commands. When generating libraries, apps or components, use the cwd option to specify the parent directory where you want to create the item.
             `,
-          },
-          {
-            type: 'text',
-            text: 'Examples: \n' + examples,
-          },
-        ],
-      };
-    },
-  );
+            },
+            {
+              type: 'text',
+              text: 'Examples: \n' + examples,
+            },
+          ],
+        };
+      },
+    );
+  }
 
   logger.debug?.('Registered Nx workspace tool');
 }

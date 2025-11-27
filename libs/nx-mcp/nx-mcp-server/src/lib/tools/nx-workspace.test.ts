@@ -1,15 +1,33 @@
-import { getTokenOptimizedToolResult, chunkContent } from './nx-workspace';
+import {
+  getTokenOptimizedToolResult,
+  chunkContent,
+  registerNxWorkspaceTools,
+} from './nx-workspace';
 import { NxWorkspace, NxError } from '@nx-console/shared-types';
 import {
   getNxJsonPrompt,
   getProjectGraphPrompt,
   getProjectGraphErrorsPrompt,
+  NX_WORKSPACE,
+  NX_PROJECT_DETAILS,
 } from '@nx-console/shared-llm-context';
 
 jest.mock('@nx-console/shared-llm-context', () => ({
   getNxJsonPrompt: jest.fn(),
   getProjectGraphPrompt: jest.fn(),
   getProjectGraphErrorsPrompt: jest.fn(),
+  NX_WORKSPACE: 'nx_workspace',
+  NX_PROJECT_DETAILS: 'nx_project_details',
+  NX_GENERATORS: 'nx_generators',
+  NX_GENERATOR_SCHEMA: 'nx_generator_schema',
+  NX_WORKSPACE_PATH: 'nx_workspace_path',
+}));
+
+// Mock shared-npm module - don't import to avoid lazy-load conflict
+jest.mock('@nx-console/shared-npm', () => ({
+  checkIsNxWorkspace: jest.fn().mockResolvedValue(true),
+  findMatchingProject: jest.fn(),
+  findMatchingProjects: jest.fn().mockResolvedValue([]),
 }));
 
 const mockGetNxJsonPrompt = getNxJsonPrompt as jest.MockedFunction<
@@ -295,5 +313,202 @@ describe('chunkContent', () => {
     const page10 = chunkContent(content, 10, 5);
     expect(page10.chunk).toBe('no more content on page 10');
     expect(page10.hasMore).toBe(false);
+  });
+});
+
+describe('registerNxWorkspaceTools', () => {
+  let mockServer: any;
+  let mockLogger: any;
+  let mockNxWorkspaceInfoProvider: any;
+  let registeredTools: Record<string, any> = {};
+
+  const mockWorkspace: NxWorkspace = {
+    nxJson: {},
+    projectGraph: {
+      nodes: {
+        app1: {
+          name: 'app1',
+          type: 'app',
+          data: {
+            root: 'apps/app1',
+            targets: {
+              build: {
+                executor: 'nx:run-commands',
+                options: {
+                  command: 'echo build',
+                },
+              },
+            },
+            tags: ['type:app'],
+          },
+        },
+        lib1: {
+          name: 'lib1',
+          type: 'lib',
+          data: {
+            root: 'libs/lib1',
+            targets: {
+              test: {
+                executor: '@nx/jest:jest',
+              },
+            },
+          },
+        },
+      },
+      dependencies: {
+        app1: [{ source: 'app1', target: 'lib1', type: 'static' }],
+        lib1: [],
+      },
+    },
+    errors: undefined,
+    isPartial: false,
+  } as any;
+
+  beforeEach(() => {
+    registeredTools = {};
+    mockServer = {
+      tool: jest.fn((name, description, schema, options, handler) => {
+        registeredTools[name] = handler;
+      }),
+    };
+    mockLogger = {
+      debug: jest.fn(),
+    };
+    mockNxWorkspaceInfoProvider = {
+      nxWorkspace: jest.fn().mockResolvedValue(mockWorkspace),
+    };
+
+    // Setup shared-npm mock - access via jest.mocked to avoid import
+    const { findMatchingProject } = jest.requireMock('@nx-console/shared-npm');
+    findMatchingProject.mockImplementation((name: string) => {
+      return mockWorkspace.projectGraph.nodes[name];
+    });
+
+    // Set default mock return values
+    mockGetNxJsonPrompt.mockReturnValue('nx-json-result');
+    mockGetProjectGraphPrompt.mockReturnValue('project-graph-result');
+    mockGetProjectGraphErrorsPrompt.mockReturnValue('errors-result');
+  });
+
+  it('should register tools', () => {
+    registerNxWorkspaceTools(
+      '/workspace',
+      mockServer,
+      mockLogger,
+      mockNxWorkspaceInfoProvider,
+    );
+
+    expect(mockServer.tool).toHaveBeenCalledWith(
+      NX_WORKSPACE,
+      expect.any(String),
+      expect.any(Object),
+      expect.any(Object),
+      expect.any(Function),
+    );
+    expect(mockServer.tool).toHaveBeenCalledWith(
+      NX_PROJECT_DETAILS,
+      expect.any(String),
+      expect.any(Object),
+      expect.any(Object),
+      expect.any(Function),
+    );
+  });
+
+  describe('nx_workspace tool', () => {
+    beforeEach(() => {
+      registerNxWorkspaceTools(
+        '/workspace',
+        mockServer,
+        mockLogger,
+        mockNxWorkspaceInfoProvider,
+      );
+    });
+
+    it('should return compressed format by default', async () => {
+      const handler = registeredTools[NX_WORKSPACE];
+      const result = await handler({});
+
+      expect(result.content[0].text).toContain('nx-json-result');
+      expect(result.content[0].text).toContain('project-graph-result');
+    });
+
+    it('should return JSON when select is provided', async () => {
+      const handler = registeredTools[NX_WORKSPACE];
+      const result = await handler({ select: 'targets.build' });
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed).toHaveLength(2);
+      expect(parsed.find((p: any) => p.projectName === 'app1').value).toEqual({
+        executor: 'nx:run-commands',
+        options: {
+          command: 'echo build',
+        },
+      });
+      expect(
+        parsed.find((p: any) => p.projectName === 'lib1').value,
+      ).toBeNull();
+    });
+
+    it('should handle pagination', async () => {
+      const handler = registeredTools[NX_WORKSPACE];
+      // Mock a large result by making the prompt return a large string
+      mockGetNxJsonPrompt.mockReturnValue('a'.repeat(6000));
+      mockGetProjectGraphPrompt.mockReturnValue('b'.repeat(6000));
+
+      const resultPage0 = await handler({});
+      expect(resultPage0.content[0].text).toContain('...[truncated');
+      expect(resultPage0.content[1].text).toContain('Next page token: 1');
+
+      const resultPage1 = await handler({ pageToken: 1 });
+      expect(resultPage1.content[0].text).not.toContain('nx-json-result'); // Should be in the middle of the content
+      expect(resultPage1.content[0].text).toHaveLength(2002); // Remaining content
+    });
+  });
+
+  describe('nx_project_details tool', () => {
+    beforeEach(() => {
+      registerNxWorkspaceTools(
+        '/workspace',
+        mockServer,
+        mockLogger,
+        mockNxWorkspaceInfoProvider,
+      );
+    });
+
+    it('should return compressed targets by default', async () => {
+      const handler = registeredTools[NX_PROJECT_DETAILS];
+      const result = await handler({ projectName: 'app1' });
+
+      expect(result.content[0].text).toContain('Project Details');
+      expect(result.content[1].text).toContain('Available Targets');
+      expect(result.content[1].text).toContain('nx:run-commands');
+    });
+
+    it('should return specific path when select is provided', async () => {
+      const handler = registeredTools[NX_PROJECT_DETAILS];
+      const result = await handler({
+        projectName: 'app1',
+        select: 'targets.build',
+      });
+
+      expect(result.content[0].text).toContain('Project Details');
+      // Should contain the full JSON for the target
+      expect(result.content[0].text).toContain('"executor": "nx:run-commands"');
+      // Should NOT contain the compressed targets view
+      expect(result.content.length).toBe(1);
+    });
+
+    it('should return error if select path not found', async () => {
+      const handler = registeredTools[NX_PROJECT_DETAILS];
+      const result = await handler({
+        projectName: 'app1',
+        select: 'non.existent.path',
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain(
+        'not found in project configuration',
+      );
+    });
   });
 });

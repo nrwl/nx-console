@@ -4,18 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../npm"
-    },
-    {
-      "path": "../schema"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../nx-version"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

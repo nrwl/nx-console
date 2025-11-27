@@ -14,6 +14,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'enableDebugLogging',
   'disableFileWatching',
   'mcpPort',
+  'mcpToolsFilter',
 ] as const;
 
 export type GlobalConfig = {
@@ -32,6 +33,7 @@ export type GlobalConfig = {
   enableDebugLogging: boolean;
   disableFileWatching: boolean;
   mcpPort: number | undefined;
+  mcpToolsFilter: string[] | undefined;
 };
 
 /**

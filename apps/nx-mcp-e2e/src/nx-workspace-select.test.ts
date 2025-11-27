@@ -12,11 +12,11 @@ import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
-describe('nx_workspace filter', () => {
+describe('nx_workspace select', () => {
   let invokeMCPInspectorCLI: Awaited<
     ReturnType<typeof createInvokeMCPInspectorCLI>
   >;
-  const workspaceName = uniq('nx-mcp-workspace-filter-test');
+  const workspaceName = uniq('nx-mcp-workspace-select-test');
   const testWorkspacePath = join(e2eCwd, workspaceName);
 
   beforeAll(async () => {
@@ -26,7 +26,7 @@ describe('nx_workspace filter', () => {
       options: simpleReactWorkspaceOptions,
     });
 
-    // Generate a few additional projects to test different filter types
+    // Generate a few additional projects
     await promisify(exec)(
       `npx nx g @nx/react:app admin-app --tags=type:app,scope:admin --directory=apps/admin-app --no-interactive`,
       { cwd: testWorkspacePath },
@@ -34,11 +34,6 @@ describe('nx_workspace filter', () => {
 
     await promisify(exec)(
       `npx nx g @nx/react:library shared-ui --tags=type:ui,scope:shared --directory=libs/shared-ui --no-interactive`,
-      { cwd: testWorkspacePath },
-    );
-
-    await promisify(exec)(
-      `npx nx g @nx/react:app e2e-app --tags=e2e --directory=apps/e2e-app --no-interactive`,
       { cwd: testWorkspacePath },
     );
 
@@ -54,7 +49,7 @@ describe('nx_workspace filter', () => {
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
 
-  it('should return all projects when no filter is provided', () => {
+  it('should return compressed format when no select is provided', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
@@ -65,91 +60,78 @@ describe('nx_workspace filter', () => {
     expect(content).toContain(`<${workspaceName}>`);
     expect(content).toContain('<admin-app>');
     expect(content).toContain('<shared-ui>');
-    expect(content).toContain('<e2e-app>');
+    // Should not be JSON
+    expect(content.trim().startsWith('[')).toBe(false);
   });
 
-  it('should filter by specific project names', () => {
+  it('should return JSON when select is provided', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_workspace',
-      '--tool-arg filter="admin-app,shared-ui"',
+      '--tool-arg select="targets.build"',
     );
 
     const content = result.content[0]?.text || '';
-    expect(content).toContain('<admin-app>');
-    expect(content).toContain('<shared-ui>');
-    expect(content).not.toContain('<e2e-app>');
-    expect(content).not.toContain(`<${workspaceName}>`);
+    // Should be valid JSON
+    const parsed = JSON.parse(content);
+    expect(Array.isArray(parsed)).toBe(true);
+    expect(parsed.length).toBeGreaterThan(0);
+
+    // Check structure
+    const appResult = parsed.find((p: any) => p.projectName === workspaceName);
+    expect(appResult).toBeDefined();
+    expect(appResult.value).toBeDefined();
+    expect(appResult.value.executor).toBeDefined();
   });
 
-  it('should filter by glob pattern', () => {
+  it('should select specific property', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_workspace',
-      '--tool-arg filter="*-app"',
+      '--tool-arg select="root"',
     );
 
     const content = result.content[0]?.text || '';
-    expect(content).toContain('<admin-app>');
-    expect(content).toContain('<e2e-app>');
-    expect(content).not.toContain('<shared-ui>');
+    const parsed = JSON.parse(content);
+
+    const appResult = parsed.find((p: any) => p.projectName === workspaceName);
+    expect(appResult.value).toBe('.');
+
+    const libResult = parsed.find((p: any) => p.projectName === 'shared-ui');
+    expect(libResult.value).toBe('libs/shared-ui');
   });
 
-  it('should filter by tag', () => {
+  it('should handle missing properties with null', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_workspace',
-      '--tool-arg filter="tag:type:ui"',
+      '--tool-arg select="non.existent.prop"',
     );
 
     const content = result.content[0]?.text || '';
-    expect(content).toContain('<shared-ui>');
-    expect(content).not.toContain('<admin-app>');
-    expect(content).not.toContain('<e2e-app>');
+    const parsed = JSON.parse(content);
+
+    const appResult = parsed.find((p: any) => p.projectName === workspaceName);
+    expect(appResult.value).toBeNull();
   });
 
-  it('should filter by directory pattern', () => {
+  it('should combine filter and select', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_workspace',
-      '--tool-arg filter="libs/*"',
+      '--tool-arg filter="shared-ui"',
+      '--tool-arg select="root"',
     );
 
     const content = result.content[0]?.text || '';
-    expect(content).toContain('<shared-ui>');
-    expect(content).not.toContain('<admin-app>');
-    expect(content).not.toContain('<e2e-app>');
-  });
+    const parsed = JSON.parse(content);
 
-  it('should support exclusion patterns', () => {
-    const result = invokeMCPInspectorCLI(
-      testWorkspacePath,
-      '--method tools/call',
-      '--tool-name nx_workspace',
-      '--tool-arg filter="*,!tag:e2e"',
-    );
-
-    const content = result.content[0]?.text || '';
-    expect(content).toContain(`<${workspaceName}>`);
-    expect(content).toContain('<admin-app>');
-    expect(content).toContain('<shared-ui>');
-    expect(content).not.toContain('<e2e-app>');
-  });
-
-  it('should handle filter with no matches', () => {
-    const result = invokeMCPInspectorCLI(
-      testWorkspacePath,
-      '--method tools/call',
-      '--tool-name nx_workspace',
-      '--tool-arg filter="non-existent-project"',
-    );
-
-    // Should still have nx.json content but no project graph
-    expect(result.content[0]?.text).toContain('nx.json');
-    expect(result.content.length).toBe(1);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].projectName).toBe('shared-ui');
+    expect(parsed[0].value).toBe('libs/shared-ui');
   });
 });

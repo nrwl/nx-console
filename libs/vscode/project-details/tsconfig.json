@@ -4,48 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/utils"
-    },
-    {
-      "path": "../nx-config-decoration"
-    },
-    {
-      "path": "../../shared/types"
-    },
-    {
-      "path": "../project-graph"
-    },
-    {
-      "path": "../graph-base"
-    },
-    {
-      "path": "../nx-cli-quickpicks"
-    },
-    {
-      "path": "../../shared/nx-version"
-    },
-    {
-      "path": "../output-channels"
-    },
-    {
-      "path": "../telemetry"
-    },
-    {
-      "path": "../tasks"
-    },
-    {
-      "path": "../lsp-client"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../nx-workspace"
-    },
-    {
-      "path": "../configuration"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

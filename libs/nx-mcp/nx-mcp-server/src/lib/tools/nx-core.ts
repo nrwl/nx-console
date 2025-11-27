@@ -12,6 +12,7 @@ import { NxWorkspace } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
+import { isToolEnabled } from '../tool-filter';
 
 let nxWorkspacePath: string | undefined = undefined;
 
@@ -25,79 +26,88 @@ export function registerNxCoreTools(
   nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
   telemetry?: NxConsoleTelemetryLogger,
   _nxWorkspacePath?: string,
+  toolsFilter?: string[],
 ): void {
   nxWorkspacePath = _nxWorkspacePath;
 
-  // NX_DOCS - always available for documentation
-  server.tool(
-    NX_DOCS,
-    'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
-    {
-      userQuery: z
-        .string()
-        .describe(
-          'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
-        ),
-    },
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    async ({ userQuery }: { userQuery: string }) => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_DOCS,
-      });
-      const docsPages = await getDocsContext(userQuery);
-      return {
-        content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
-      };
-    },
-  );
+  if (!isToolEnabled(NX_DOCS, toolsFilter)) {
+    logger.debug?.(`Skipping ${NX_DOCS} - disabled by tools filter`);
+  } else {
+    server.tool(
+      NX_DOCS,
+      'Returns a list of documentation sections that could be relevant to the user query. IMPORTANT: ALWAYS USE THIS IF YOU ARE ANSWERING QUESTIONS ABOUT NX. NEVER ASSUME KNOWLEDGE ABOUT NX BECAUSE IT WILL PROBABLY BE OUTDATED. Use it to learn about nx, its configuration and options instead of assuming knowledge about it.',
+      {
+        userQuery: z
+          .string()
+          .describe(
+            'The user query to get docs for. You can pass the original user query verbatim or summarize it.',
+          ),
+      },
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      async ({ userQuery }: { userQuery: string }) => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_DOCS,
+        });
+        const docsPages = await getDocsContext(userQuery);
+        return {
+          content: [{ type: 'text', text: getDocsPrompt(docsPages) }],
+        };
+      },
+    );
+  }
 
-  // NX_AVAILABLE_PLUGINS - always available
-  server.tool(
-    NX_AVAILABLE_PLUGINS,
-    'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
-    {
-      destructiveHint: false,
-      readOnlyHint: true,
-      openWorldHint: true,
-    },
-    async () => {
-      telemetry?.logUsage('ai.tool-call', {
-        tool: NX_AVAILABLE_PLUGINS,
-      });
+  if (!isToolEnabled(NX_AVAILABLE_PLUGINS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${NX_AVAILABLE_PLUGINS} - disabled by tools filter`,
+    );
+  } else {
+    server.tool(
+      NX_AVAILABLE_PLUGINS,
+      'Returns a list of available Nx plugins from the core team as well as local workspace Nx plugins.',
+      {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      async () => {
+        telemetry?.logUsage('ai.tool-call', {
+          tool: NX_AVAILABLE_PLUGINS,
+        });
 
-      let nxVersion: NxVersion | undefined = undefined;
-      let nxWorkspace: NxWorkspace | undefined = undefined;
-      const workspacePath: string | undefined = nxWorkspacePath;
+        let nxVersion: NxVersion | undefined = undefined;
+        let nxWorkspace: NxWorkspace | undefined = undefined;
+        const workspacePath: string | undefined = nxWorkspacePath;
 
-      if (nxWorkspacePath) {
-        nxWorkspace = await nxWorkspaceInfoProvider.nxWorkspace(
-          nxWorkspacePath,
+        if (nxWorkspacePath) {
+          nxWorkspace = await nxWorkspaceInfoProvider.nxWorkspace(
+            nxWorkspacePath,
+            logger,
+          );
+          nxVersion = nxWorkspace?.nxVersion;
+        }
+
+        const pluginsInfo = await getPluginsInformation(
+          nxVersion,
+          workspacePath,
+          nxWorkspace,
           logger,
         );
-        nxVersion = nxWorkspace?.nxVersion;
-      }
 
-      const pluginsInfo = await getPluginsInformation(
-        nxVersion,
-        workspacePath,
-        nxWorkspace,
-        logger,
-      );
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: pluginsInfo.formattedText,
-          },
-        ],
-      };
-    },
-  );
+        return {
+          content: [
+            {
+              type: 'text',
+              text: pluginsInfo.formattedText,
+            },
+          ],
+        };
+      },
+    );
+  }
 
   logger.debug?.('Registered Nx core tools');
 }
