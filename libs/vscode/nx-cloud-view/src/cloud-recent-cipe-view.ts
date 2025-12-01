@@ -172,6 +172,18 @@ export class CIPETreeItem
 
         return items;
       }
+
+      // Pipeline completed but no runs have failed status - check if there are any runs at all
+      if (!this.cipe.runGroups.some((rg) => rg.runs && rg.runs.length > 0)) {
+        const statusMessage =
+          this.cipe.status === 'CANCELED'
+            ? 'CI pipeline was canceled'
+            : this.cipe.status === 'TIMED_OUT'
+              ? 'CI pipeline timed out'
+              : 'CI pipeline failed';
+        return [new LabelTreeItem(statusMessage)];
+      }
+      // If there are runs but none failed, fall through to show them
     }
 
     // In Progress CIPE
