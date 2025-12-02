@@ -49,6 +49,7 @@ fun NxLatestVersionGeneralCommandLine(
         // Use npx nx@latest instead of the full binary path
         exePath = if (SystemInfo.isWindows) "npx.cmd" else "npx"
         addParameters("-y")
+        addParameters("--ignore-scripts")
         addParameters("nx@latest")
         addParameters(args)
         val workDirectory =
