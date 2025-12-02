@@ -95,7 +95,10 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             checkCommand.withEnvironment("NX_CONSOLE", "true")
             checkCommand.withEnvironment("NX_AI_FILES_USE_LOCAL", "true")
 
-            val output = withContext(Dispatchers.IO) { ExecUtil.execAndGetOutput(checkCommand) }
+            val output =
+                withContext(Dispatchers.IO) {
+                    withTimeout(360000L) { ExecUtil.execAndGetOutput(checkCommand) }
+                }
 
             if (output.stdout.contains("The following AI agents are out of date")) {
                 PropertiesComponent.getInstance(project)
@@ -124,7 +127,7 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
             val checkAllOutput =
                 withContext(Dispatchers.IO) {
-                    withTimeout(30000L) { ExecUtil.execAndGetOutput(checkAllCommand) }
+                    withTimeout(360000L) { ExecUtil.execAndGetOutput(checkAllCommand) }
                 }
 
             if (checkAllOutput.exitCode != 0) {
