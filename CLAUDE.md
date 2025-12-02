@@ -31,3 +31,8 @@
 - If the user needs help with an Nx configuration or project graph error, use the `nx_workspace` tool to get any errors
 
 <!-- nx configuration end-->
+
+## Self-Healing CI
+
+Predefined fix:
+If a failed task id contains ":lint", fix it by running linting on the project where it failed with the `--fix` flag. Example: `npx nx run nx-mcp-server:lint --fix` where "nx-mcp-server" is the project the task failed on.
