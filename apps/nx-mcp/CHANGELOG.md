@@ -1,3 +1,13 @@
+## 0.11.0 (2025-12-02)
+
+### 🚀 Features
+
+- **nx-mcp:** add --tools flag and vscode option to filter mcp tools ([#2908](https://github.com/nrwl/nx-console/pull/2908))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.10.0 (2025-11-11)
 
 ### 🚀 Features
