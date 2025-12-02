@@ -57,6 +57,7 @@ describe('pdv data', () => {
 
     const pdvDataParsed = JSON.parse(pdvData.pdvDataSerialized ?? '');
     expect(pdvDataParsed.project.name).toEqual(workspaceName);
+    expect(pdvDataParsed.project.type).toEqual('app');
     expect(Object.keys(pdvDataParsed.sourceMap ?? {}).length).toBeGreaterThan(
       0,
     );
