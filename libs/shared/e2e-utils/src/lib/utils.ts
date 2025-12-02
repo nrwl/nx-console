@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { readJsonFile, workspaceRoot } from 'nx/src/devkit-exports';
 
 export const defaultVersion =
-  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '21.3.0';
+  process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '22.0.2';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
