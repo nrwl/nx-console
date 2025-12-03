@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
+  detectAtomizedTargets,
   getGeneratorNamesAndDescriptions,
   getGeneratorSchema,
   getGeneratorsPrompt,
@@ -65,9 +66,14 @@ function getValueByPath(obj: any, path: string): any {
  *
  * @param name - The target name
  * @param config - The target configuration object
+ * @param atomizedTargets - Optional array of atomized target names for this root target
  * @returns Plain text description of the target
  */
-function compressTargetForDisplay(name: string, config: any): string {
+function compressTargetForDisplay(
+  name: string,
+  config: any,
+  atomizedTargets?: string[],
+): string {
   let description = `${name}: `;
 
   // Determine executor/command display
@@ -115,14 +121,41 @@ function compressTargetForDisplay(name: string, config: any): string {
     const deps = config.dependsOn
       .map((dep: any) => (typeof dep === 'string' ? dep : dep.target))
       .filter(Boolean);
+
     if (deps.length > 0) {
-      description += ` | depends: [${deps.join(', ')}]`;
+      // If this is a root atomizer target, simplify the dependency display
+      if (atomizedTargets && atomizedTargets.length > 0) {
+        description += ` | depends: [${atomizedTargets.length} atomized targets]`;
+      } else if (deps.length > 10) {
+        // Truncate long dependency lists
+        const firstThree = deps.slice(0, 3).join(', ');
+        description += ` | depends: [${firstThree}, +${deps.length - 3} more]`;
+      } else {
+        description += ` | depends: [${deps.join(', ')}]`;
+      }
     }
   }
 
-  // Add cache status
+  // Only show cache status if it's false (assume true by default)
   const cacheEnabled = config.cache !== false;
-  description += ` | cache: ${cacheEnabled}`;
+  if (!cacheEnabled) {
+    description += ` | cache: false`;
+  }
+
+  // Add atomized targets list if this is a root atomizer target
+  if (atomizedTargets && atomizedTargets.length > 0) {
+    // Strip the prefix from atomized target names for more compact display
+    const strippedNames = atomizedTargets.map((target) =>
+      target.replace(`${name}--`, ''),
+    );
+
+    if (strippedNames.length <= 5) {
+      description += ` | atomized: [${strippedNames.join(', ')}]`;
+    } else {
+      const firstThree = strippedNames.slice(0, 3).join(', ');
+      description += ` | atomized: [${firstThree}, +${strippedNames.length - 3} more]`;
+    }
+  }
 
   return description;
 }
@@ -446,11 +479,17 @@ export function registerNxWorkspaceTools(
           detailsJson = projectDataWithoutTargets;
 
           if (targets && typeof targets === 'object') {
+            // Detect atomized targets
+            const { atomizedTargetsMap, targetsToExclude } =
+              detectAtomizedTargets(targets);
+
+            // Create compressed descriptions for visible targets only
             const targetDescriptions = Object.entries(targets)
-              .map(
-                ([name, config]) =>
-                  `  - ${compressTargetForDisplay(name, config)}`,
-              )
+              .filter(([name]) => !targetsToExclude.includes(name))
+              .map(([name, config]) => {
+                const atomizedTargets = atomizedTargetsMap.get(name);
+                return `  - ${compressTargetForDisplay(name, config, atomizedTargets)}`;
+              })
               .join('\n');
 
             // Pick a sample target name for the example
@@ -726,3 +765,8 @@ export function getTokenOptimizedToolResult(
 
   return [nxJsonResult, projectGraphResult, errorsResult];
 }
+
+// Export for testing
+export const __testing__ = {
+  compressTargetForDisplay,
+};
