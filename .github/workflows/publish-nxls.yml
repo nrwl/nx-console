@@ -40,6 +40,6 @@ jobs:
           main-branch-name: 'master'
       - name: publish
         run: |
-          npx nx run nxls:package --skip-nx-cache
-          cd dist/packages/nxls
+          npx nx run nxls:build --skip-nx-cache
+          cd dist/apps/nxls
           npm publish --dry-run
