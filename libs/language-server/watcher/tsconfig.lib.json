@@ -20,9 +20,6 @@
       "path": "../../shared/nx-workspace-info/tsconfig.lib.json"
     },
     {
-      "path": "../../shared/npm/tsconfig.lib.json"
-    },
-    {
       "path": "../utils/tsconfig.lib.json"
     }
   ]
