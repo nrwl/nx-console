@@ -10,14 +10,7 @@
     outfile: './dist/apps/nxls/main.js',
     metafile: true,
     sourcemap: true,
-    external: [
-      'typescript',
-      'ts-node',
-      '@swc/*',
-      '@parcel/watcher',
-      'nx',
-      'webpack',
-    ],
+    external: ['typescript', 'ts-node', '@swc/*', 'nx', 'webpack'],
     loader: { '.node': 'file' },
   });
 
