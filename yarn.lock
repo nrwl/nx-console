@@ -16946,6 +16946,7 @@ __metadata:
     "@nx/powerpack-license": 21.0.0-beta.0
     "@nx/storybook": 22.2.0-beta.4
     "@nx/vite": 22.2.0-beta.4
+    "@nx/vitest": 22.2.0-beta.4
     "@nx/web": 22.2.0-beta.4
     "@nx/webpack": 22.2.0-beta.4
     "@nx/workspace": 22.2.0-beta.4
