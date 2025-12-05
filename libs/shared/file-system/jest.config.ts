@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'shared-file-system',
   preset: '../../../jest.preset.js',
   globals: {},

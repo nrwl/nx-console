@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'vscode-lsp-client',
   preset: '../../../jest.preset.js',
   globals: {},

@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: 'vscode-migrate',
   preset: '../../../jest.preset.js',
   testEnvironment: 'node',
