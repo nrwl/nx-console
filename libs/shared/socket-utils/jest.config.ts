@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: 'shared-socket-utils',
   preset: '../../../jest.preset.js',
   testEnvironment: 'node',
