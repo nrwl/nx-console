@@ -222,7 +222,8 @@ describe('parse target string - default', () => {
 
     expect(target.result as Target).toEqual({
       project: projectName,
-      target: 'lint:ci',
+      target: 'lint',
+      configuration: 'ci',
     });
 
     const target2 = await nxlsWrapper.sendRequest({
