@@ -88,8 +88,7 @@ export async function getPDVData(
       };
     }
 
-    const projectNode: ProjectGraphProjectNode =
-      projectGraphNodeFromProject(project);
+    const projectNode = workspace.projectGraph.nodes[project.name];
     return {
       resultType: 'SUCCESS',
       graphBasePath,
@@ -111,7 +110,7 @@ export async function getPDVData(
         projectRootsForConfigFile.includes(project.data.root) &&
         isCompleteProjectConfiguration(project.data)
       ) {
-        projectNodes.push(projectGraphNodeFromProject(project.data));
+        projectNodes.push(project);
       }
     }
 
@@ -153,21 +152,6 @@ async function getGraphBasePath(
   } else {
     return undefined;
   }
-}
-
-function projectGraphNodeFromProject(
-  project: ProjectConfiguration & { name: string },
-): ProjectGraphProjectNode {
-  return {
-    name: project.name,
-    type:
-      project.projectType === 'application'
-        ? 'app'
-        : project.projectType === 'library'
-          ? 'lib'
-          : 'e2e',
-    data: project,
-  };
 }
 
 function isCompleteProjectConfiguration(

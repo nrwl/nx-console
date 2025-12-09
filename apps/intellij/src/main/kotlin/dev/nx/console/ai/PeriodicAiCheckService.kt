@@ -17,7 +17,13 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.NxProvenance
 import java.io.File
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Service(Service.Level.PROJECT)
 class PeriodicAiCheckService(private val project: Project, private val cs: CoroutineScope) {
@@ -35,6 +41,7 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
         private const val THREE_HOURS_MS = 3 * 60 * 60 * 1000L
         private const val TWELVE_HOURS_MS = 12 * 60 * 60 * 1000L
         private const val ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000L
+        private const val COMMAND_TIMEOUT_MS = 360000
     }
 
     private var checkJob: Job? = null
@@ -88,7 +95,10 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             checkCommand.withEnvironment("NX_CONSOLE", "true")
             checkCommand.withEnvironment("NX_AI_FILES_USE_LOCAL", "true")
 
-            val output = withContext(Dispatchers.IO) { ExecUtil.execAndGetOutput(checkCommand) }
+            val output =
+                withContext(Dispatchers.IO) {
+                    ExecUtil.execAndGetOutput(checkCommand, COMMAND_TIMEOUT_MS)
+                }
 
             if (output.stdout.contains("The following AI agents are out of date")) {
                 val lastUpdateNotificationTimestamp =
@@ -124,7 +134,7 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
 
             val checkAllOutput =
                 withContext(Dispatchers.IO) {
-                    withTimeout(30000L) { ExecUtil.execAndGetOutput(checkAllCommand) }
+                    ExecUtil.execAndGetOutput(checkAllCommand, COMMAND_TIMEOUT_MS)
                 }
 
             if (checkAllOutput.exitCode != 0) {

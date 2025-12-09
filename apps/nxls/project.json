@@ -4,53 +4,36 @@
   "sourceRoot": "apps/nxls/src",
   "projectType": "application",
   "targets": {
-    "package": {
-      "executor": "@nx/webpack:webpack",
-      "options": {
-        "main": "apps/nxls/src/main.ts",
-        "tsConfig": "apps/nxls/tsconfig.app.json",
-        "outputPath": "dist/packages/nxls",
-        "assets": [
-          "apps/nxls/src/bin",
-          {
-            "glob": "README.md",
-            "input": "./",
-            "output": "/"
-          }
-        ],
-        "generatePackageJson": true,
-        "externalDependencies": "all",
-        "target": "node",
-        "optimization": true,
-        "extractLicenses": true,
-        "webpackConfig": "apps/nxls/webpack.config.js"
-      }
-    },
     "build": {
-      "command": "node ./tools/scripts/copy-nxls-package-json.js",
-      "dependsOn": ["_build"],
-      "inputs": [
-        "production",
-        "^production",
-        "{workspaceRoot}/tools/scripts/copy-nxls-package-json.js",
-        "{projectRoot}/package.json"
-      ],
-      "outputs": ["{workspaceRoot}/dist/apps/nxls"]
-    },
-    "_build": {
       "defaultConfiguration": "production",
       "executor": "@nx/esbuild:esbuild",
       "inputs": ["production", "^production"],
-      "outputs": ["{workspaceRoot}/dist/apps/nxls/*.js"],
+      "outputs": ["{workspaceRoot}/dist/apps/nxls"],
       "options": {
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
         "outputPath": "dist/apps/nxls",
         "skipTypeCheck": true,
+        "assets": [
+          {
+            "input": "apps/nxls/src/bin",
+            "glob": "**/*",
+            "output": "/bin"
+          },
+          {
+            "glob": "README.md",
+            "input": "apps/nxls",
+            "output": "/"
+          },
+          {
+            "glob": "package.json",
+            "input": "apps/nxls",
+            "output": "/"
+          }
+        ],
         "external": [
           "@swc/*",
           "@angular-devkit/*",
-          "@parcel/watcher",
           "@nx/nx*",
           "webpack",
           "fsevents",
@@ -87,10 +70,10 @@
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
-        "buildTarget": "nxls:package",
+        "buildTarget": "nxls:build",
         "ci": false,
         "packageJsonDir": "apps/nxls",
-        "outputPath": "dist/packages/nxls"
+        "outputPath": "dist/apps/nxls"
       }
     }
   },

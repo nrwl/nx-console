@@ -2,7 +2,6 @@ import { lspLogger } from '@nx-console/language-server-utils';
 import { getNxVersion } from '@nx-console/shared-nx-workspace-info';
 import { debounce } from '@nx-console/shared-utils';
 import { DaemonWatcher, NativeWatcher } from '@nx-console/shared-watcher';
-import { ParcelWatcher } from './parcel-watcher';
 import { gte } from '@nx-console/nx-version';
 
 let _daemonWatcher: DaemonWatcher | undefined;
@@ -101,15 +100,11 @@ export async function languageServerWatcher(
       };
     }
   } else {
-    lspLogger.log('Nx version <16.4.0, using @parcel/watcher');
-    const parcelWatcher = new ParcelWatcher(workspacePath, debouncedCallback);
+    lspLogger.log(
+      'File watching is not supported for Nx versions below 16.4.0.',
+    );
     return async () => {
-      lspLogger.log('Unregistering file watcher');
-      try {
-        parcelWatcher.stop();
-      } catch (e) {
-        lspLogger.log('Error stopping parcel watcher during cleanup: ' + e);
-      }
+      lspLogger.log('unregistering empty watcher');
     };
   }
 }
