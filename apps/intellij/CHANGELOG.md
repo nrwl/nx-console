@@ -1,3 +1,26 @@
+## 1.55.0 (2025-12-09)
+
+### Bug Fixes
+
+* **intellij:** add timeout and ignore-scripts to intellij configure-ai-agents check ([#2914](https://github.com/nrwl/nx-console/issues/2914)) ([8d364f7](https://github.com/nrwl/nx-console/commit/8d364f782e7a06130687a0f28836ad1554b46b74))
+* **intellij:** consolidate AI popups and only show in nx workspace ([#2883](https://github.com/nrwl/nx-console/issues/2883)) ([468ade1](https://github.com/nrwl/nx-console/commit/468ade1e8614657d4922b14020aec2b1829a21cd))
+* **intellij:** properly kill configure-ai-agents processes after a while ([#2918](https://github.com/nrwl/nx-console/issues/2918)) ([83957c5](https://github.com/nrwl/nx-console/commit/83957c5904fc74ae023c020306984a14ddbad7f8))
+* **nx-mcp:** update @modelcontextprotocol/sdk ([#2895](https://github.com/nrwl/nx-console/issues/2895)) ([91c1740](https://github.com/nrwl/nx-console/commit/91c17409c2be9b30b67625239cc0089a0314e159))
+* **nxls:** repair PDV type detection ([#2915](https://github.com/nrwl/nx-console/issues/2915)) ([801d573](https://github.com/nrwl/nx-console/commit/801d573e5f8a72dbeedec310323324c0216b7627))
+* **vscode:** load root env when checking provenance & npm debugging configure-ai-agents ([#2874](https://github.com/nrwl/nx-console/issues/2874)) ([5c1ffd6](https://github.com/nrwl/nx-console/commit/5c1ffd685085a886634619cb96c85e455974a42d))
+* **vscode:** misc fixes around json parsing ([#2894](https://github.com/nrwl/nx-console/issues/2894)) ([956831a](https://github.com/nrwl/nx-console/commit/956831a51b0601b95a17c93e63701358334e3443))
+* **vscode:** remove [@nx](https://github.com/nx) chat participant configuration (keep deprecation notice for clarity) ([#2898](https://github.com/nrwl/nx-console/issues/2898)) ([d0702e9](https://github.com/nrwl/nx-console/commit/d0702e9b6efb160e510c0f3e73759fe5f066a91a))
+* **vscode:** remove duplicate applied notification when applying from Nx Console ([#2891](https://github.com/nrwl/nx-console/issues/2891)) ([a0f7d8b](https://github.com/nrwl/nx-console/commit/a0f7d8b2c6d7ec7393c6ef2bd895a88336c73109))
+
+
+### Features
+
+* **nxls:** add clickable links for {workspaceRoot} and {projectRoot} links ([#2904](https://github.com/nrwl/nx-console/issues/2904)) ([a572eeb](https://github.com/nrwl/nx-console/commit/a572eeba5e2aa98cb92b44baae3cfb205742ec56))
+* **nxls:** add clickable links for projects ([#2901](https://github.com/nrwl/nx-console/issues/2901)) ([b50534b](https://github.com/nrwl/nx-console/commit/b50534b21a179e414ae53abbe39d3bac5ab78096))
+* **nxls:** align build step & remove parcel watcher support ([#2917](https://github.com/nrwl/nx-console/issues/2917)) ([a0477bb](https://github.com/nrwl/nx-console/commit/a0477bb4f28d49ee280ad9ffa278051ec4f56c37))
+* **vscode:** add debug logging setting to vscode & nxls ([#2873](https://github.com/nrwl/nx-console/issues/2873)) ([2660985](https://github.com/nrwl/nx-console/commit/26609852ea4d43d8c9b931d68d0faf9b5fa580ad))
+* **vscode:** add setting to disable file watching in the language server ([#2892](https://github.com/nrwl/nx-console/issues/2892)) ([83e5098](https://github.com/nrwl/nx-console/commit/83e5098fa75c030544548f3b71d42c4c3fb3db3e))
+
 ## 1.54.0 (2025-11-03)
 
 ### Bug Fixes
