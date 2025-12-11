@@ -4,6 +4,7 @@ import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 
 let _channel: OutputChannel;
 
+// TODO: Remove direct usages of getOutputChannel() and use vscodeLogger instead
 export function getOutputChannel(): OutputChannel {
   if (!_channel) {
     _channel = window.createOutputChannel('Nx Console');
