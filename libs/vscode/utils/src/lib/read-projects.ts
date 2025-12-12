@@ -17,7 +17,7 @@ import {
 } from '@nx-console/shared-npm';
 import { normalizeSchema } from '@nx-console/shared-schema';
 import { getPrimitiveValue } from '@nx-console/shared-utils';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 export function readTargetDef(
   targetName: string,
@@ -99,6 +99,6 @@ export async function readBuilderSchema(
   } catch (e) {
     // todo: make this a utility function to be used in more places.
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
-    getOutputChannel().appendLine(stringifiedError);
+    vscodeLogger.log(stringifiedError);
   }
 }

@@ -20,7 +20,7 @@ import {
 } from 'xstate';
 // need this import for type inference - DO NOT REMOVE
 import type { Guard } from 'xstate/guards';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 
 const SLEEP_POLLING_TIME = 3_600_000;
 const COLD_POLLING_TIME = 180_000;
@@ -96,7 +96,7 @@ const pollingMachine = setup({
           }
         };
 
-        getOutputChannel().appendLine(
+        vscodeLogger.log(
           `Nx Cloud - Polling frequency changed from ${getFrequencyName(previousFrequency)} to ${getFrequencyName(newFrequency)} (reason: ${reason})`,
         );
       }

@@ -5,7 +5,7 @@ import {
   TelemetrySender,
   env,
 } from 'vscode';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { GoogleAnalyticsSender } from './google-analytics-sender';
 import { LoggerSender } from './logger-sender';
 import {
@@ -30,9 +30,7 @@ export function initTelemetry(context: ExtensionContext) {
     ignoreBuiltInCommonProperties: true,
   });
 
-  getOutputChannel().appendLine(
-    `Telemetry: ${production ? 'production' : 'development'}`,
-  );
+  vscodeLogger.log(`Telemetry: ${production ? 'production' : 'development'}`);
 }
 
 export interface NxConsoleTelemetryLogger

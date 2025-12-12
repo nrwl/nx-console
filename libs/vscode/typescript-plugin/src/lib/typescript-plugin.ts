@@ -9,7 +9,7 @@ import {
 } from '@nx-console/vscode-configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxVersion, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { watchFile } from '@nx-console/vscode-utils';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
 import { join } from 'path';
@@ -146,9 +146,7 @@ async function enableTypescriptServerPlugin(
   context: vscode.ExtensionContext,
   workspaceRoot: string,
 ) {
-  getOutputChannel().appendLine(
-    `Enabling TypeScript plugin for workspace ${workspaceRoot}`,
-  );
+  vscodeLogger.log(`Enabling TypeScript plugin for workspace ${workspaceRoot}`);
   const tsExtension = vscode.extensions.getExtension(
     'vscode.typescript-language-features',
   );
@@ -247,7 +245,7 @@ async function enableTypescriptServerPlugin(
 }
 
 async function disableTypescriptServerPlugin() {
-  getOutputChannel().appendLine(`Disabling TypeScript plugin`);
+  vscodeLogger.log(`Disabling TypeScript plugin`);
   disposables.forEach((d) => d.dispose());
   disposables = [];
   vscode.window.withProgress(

@@ -1,9 +1,6 @@
 import { window, Uri, workspace, env } from 'vscode';
 import { getNxCloudId } from '@nx-console/shared-nx-cloud';
-import {
-  getOutputChannel,
-  vscodeLogger,
-} from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { applyFixLocallyWithNxCloud } from './apply-fix-locally';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 
@@ -63,9 +60,7 @@ async function findWorkspaceByCloudId(
       const cloudId = await getNxCloudId(workspacePath);
 
       if (cloudId === targetCloudId) {
-        getOutputChannel().appendLine(
-          `Found matching workspace: ${workspacePath}`,
-        );
+        vscodeLogger.log(`Found matching workspace: ${workspacePath}`);
         return workspacePath;
       }
     }
@@ -80,7 +75,7 @@ async function handleWorkspaceNotFound(
 ): Promise<void> {
   const command = `npx nx-cloud apply-locally ${fixId}`;
 
-  getOutputChannel().appendLine(
+  vscodeLogger.log(
     `[Instance ${env.sessionId}] No matching workspace found for Cloud ID: ${workspaceId}`,
   );
 

@@ -7,10 +7,7 @@ import {
   GlobalConfigurationStore,
   getNxWorkspacePath,
 } from '@nx-console/vscode-configuration';
-import {
-  getOutputChannel,
-  vscodeLogger,
-} from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import express, { Request, Response } from 'express';
 import { ideProvider, nxWorkspaceInfoProvider } from './data-providers';
@@ -182,7 +179,7 @@ export class McpHttpServerCore {
   }
 
   public stopMcpServer() {
-    getOutputChannel().appendLine('Stopping MCP server');
+    vscodeLogger.log('Stopping MCP server');
     this.streamableServers.forEach((server) => {
       server.getMcpServer().close();
     });

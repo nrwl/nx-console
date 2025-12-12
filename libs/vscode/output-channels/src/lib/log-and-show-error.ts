@@ -1,6 +1,6 @@
 import {
   getNxlsOutputChannel,
-  getOutputChannel,
+  showOutputChannel,
   vscodeLogger,
 } from './output-channels';
 import { window } from 'vscode';
@@ -12,7 +12,7 @@ export function logAndShowError(message: string, error?: string) {
 
   window.showErrorMessage(message, 'Open Logs', 'OK').then((selection) => {
     if (selection === 'Open Logs') {
-      getOutputChannel().show();
+      showOutputChannel();
     }
   });
 }
@@ -32,7 +32,7 @@ export function showNoNxVersionMessage() {
 }
 
 export function logAndShowTaskCreationError(error: any, message?: string) {
-  getOutputChannel().appendLine(
+  vscodeLogger.log(
     `Error running task: ${JSON.stringify(error.message ?? error)}`,
   );
   window
@@ -44,7 +44,7 @@ export function logAndShowTaskCreationError(error: any, message?: string) {
     )
     .then((selection) => {
       if (selection === 'Open Logs') {
-        getOutputChannel().show();
+        showOutputChannel();
       }
     });
 }
