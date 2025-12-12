@@ -1,22 +1,29 @@
-import { OutputChannel, window } from 'vscode';
+import { commands, ExtensionContext, OutputChannel, window } from 'vscode';
 import { Logger } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 
 let _channel: OutputChannel;
 
-// TODO: Remove direct usages of getOutputChannel() and use vscodeLogger instead
-export function getOutputChannel(): OutputChannel {
+function getOutputChannel(): OutputChannel {
   if (!_channel) {
     _channel = window.createOutputChannel('Nx Console');
   }
   return _channel;
 }
 
-export const outputLogger: Logger = {
-  log(message) {
-    getOutputChannel().appendLine(message);
-  },
-};
+export function showOutputChannel() {
+  getOutputChannel().show();
+}
+
+export function initOutputChannels(context: ExtensionContext) {
+  context.subscriptions.push(
+    getOutputChannel(),
+    getNxlsOutputChannel(),
+    commands.registerCommand('nxConsole.showNxlsLogs', () => {
+      getNxlsOutputChannel().show();
+    }),
+  );
+}
 
 let _nxlsOutputChannel: OutputChannel;
 

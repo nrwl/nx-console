@@ -2,7 +2,7 @@ import {
   getNxVersion,
   getProjectGraphOutput,
 } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { gte } from '@nx-console/nx-version';
@@ -189,16 +189,14 @@ export async function loadHtml(panel: WebviewPanel) {
     return '';
   }
 
-  getOutputChannel().appendLine(
-    'Loading project graph from ' + projectGraphOutput.fullPath
-  );
+  vscodeLogger.log('Loading project graph from ' + projectGraphOutput.fullPath);
   const rootUri = Uri.file(projectGraphOutput.directory);
   const htmlUri = Uri.file(projectGraphOutput.fullPath);
   let projectGraphHtml = (await workspace.fs.readFile(htmlUri)).toString();
 
   projectGraphHtml = projectGraphHtml.replace(
     /static\//g,
-    `${panel.webview.asWebviewUri(rootUri)}/static/`
+    `${panel.webview.asWebviewUri(rootUri)}/static/`,
   );
   projectGraphHtml = projectGraphHtml.replace(
     '</head>',
@@ -231,7 +229,7 @@ export async function loadHtml(panel: WebviewPanel) {
       <script>${injectedScript()}</script>
       ${await setNxConsoleEnvironment()}
 
-      </head>`
+      </head>`,
   );
   projectGraphHtml = projectGraphHtml.replace(
     '</body>',
@@ -241,7 +239,7 @@ export async function loadHtml(panel: WebviewPanel) {
       ${registerOpenProjectConfigCallback()};
       ${registerRunTaskCallback()};
     </script>
-   </body>`
+   </body>`,
   );
 
   return projectGraphHtml;

@@ -1,6 +1,6 @@
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
 import { join } from 'path';
 import { Task, TaskScope } from 'vscode';
@@ -27,9 +27,7 @@ export class NxTask extends Task {
 
     const workspace = await getNxWorkspace();
     if (!workspace) {
-      getOutputChannel().appendLine(
-        'Error while creating task: no workspace found',
-      );
+      vscodeLogger.log('Error while creating task: no workspace found');
       return;
     }
 
