@@ -13,7 +13,7 @@ import {
 } from 'xstate';
 
 export type DaemonWatcherCallback = (
-  error?: Error | null | 'closed',
+  error?: Error | null | 'closed' | 'reconnecting' | 'reconnected',
   projectGraphAndSourceMaps?: {
     projectGraph: ProjectGraph;
     sourceMaps: ConfigurationSourceMaps;
@@ -105,12 +105,24 @@ export class PassiveDaemonWatcher {
         const unregister =
           await daemonClientModule.daemonClient.registerProjectGraphRecomputationListener(
             (
-              error: Error | null | 'closed',
+              error: Error | null | 'closed' | 'reconnecting' | 'reconnected',
               projectGraphAndSourceMaps: {
                 projectGraph: ProjectGraph;
                 sourceMaps: ConfigurationSourceMaps;
               } | null,
             ) => {
+              if (error === 'reconnecting') {
+                this.logger.debug?.(
+                  'PassiveDaemonWatcher: Daemon connection reconnecting...',
+                );
+                return;
+              }
+              if (error === 'reconnected') {
+                this.logger.debug?.(
+                  'PassiveDaemonWatcher: Daemon connection reconnected',
+                );
+                return;
+              }
               if (error) {
                 this.actor.send({ type: 'LISTENER_ERROR', error });
               } else {

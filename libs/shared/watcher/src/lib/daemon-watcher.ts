@@ -117,12 +117,19 @@ export class DaemonWatcher {
             includeGlobalWorkspaceFiles?: boolean;
             includeDependentProjects?: boolean;
           },
-          async (error, data) => {
+          async (
+            error: Error | null | 'closed' | 'reconnecting' | 'reconnected',
+            data,
+          ) => {
             if (error === 'closed') {
               if (!this.stopped) {
                 this.logger.log('Daemon watcher connection closed, restarting');
                 await this.useNativeWatcher();
               }
+            } else if (error === 'reconnecting') {
+              this.logger.log('Daemon watcher connection reconnecting...');
+            } else if (error === 'reconnected') {
+              this.logger.log('Daemon watcher connection reconnected');
             } else if (error) {
               this.logger.log('Error watching files: ' + error);
             } else {
