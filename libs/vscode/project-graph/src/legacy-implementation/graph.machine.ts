@@ -1,5 +1,5 @@
 import { createProjectGraph } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { assign, createActor, createMachine, fromPromise } from 'xstate';
 import { MessageType } from './graph-message-type';
 
@@ -128,13 +128,13 @@ export const graphMachine =
           const showAffected =
             input.messageType === MessageType.affectedProjects;
           return await createProjectGraph(showAffected);
-        }
+        },
       ),
     },
     actions: {
       log: (context, event) => {
-        getOutputChannel().appendLine(
-          `Graph Machine - ${JSON.stringify(event)}, ${JSON.stringify(context)}`
+        vscodeLogger.log(
+          `Graph Machine - ${JSON.stringify(event)}, ${JSON.stringify(context)}`,
         );
       },
       refreshData: assign((context, event) => {
@@ -182,7 +182,7 @@ export const graphMachine =
     },
     guards: {
       loadGraph: ({ context }) => {
-        getOutputChannel().appendLine(`Graph guard - ${context.state}`);
+        vscodeLogger.log(`Graph guard - ${context.state}`);
         return context.state !== State.loaded;
       },
     },

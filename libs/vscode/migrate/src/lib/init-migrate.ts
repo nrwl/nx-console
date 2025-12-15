@@ -5,7 +5,7 @@ import {
   onWorkspaceRefreshed,
 } from '@nx-console/vscode-lsp-client';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
@@ -168,7 +168,7 @@ async function getLatestNxVersion() {
       full: versionString,
     };
   } catch (error) {
-    getOutputChannel().appendLine(`Failed to get latest nx version: ${error}`);
+    vscodeLogger.log(`Failed to get latest nx version: ${error}`);
     return undefined;
   }
 }

@@ -17,14 +17,11 @@ import { MessageType } from './graph-message-type';
 jest.mock(
   '@nx-console/vscode-output-channels',
   (): PartialDeep<typeof outputChannels> => ({
-    getOutputChannel: () => {
-      return {
-        appendLine: jest.fn(() => {
-          // do nothing
-        }),
-      } as unknown as OutputChannel;
+    vscodeLogger: {
+      log: jest.fn(),
+      debug: jest.fn(),
     },
-  })
+  }),
 );
 
 jest.mock(
@@ -38,7 +35,7 @@ jest.mock(
         } as NxWorkspace;
       },
     };
-  }
+  },
 );
 
 const mockMachine = graphMachine.provide({
@@ -86,7 +83,7 @@ describe('graph state machine', () => {
     const nextState = getNextSnapshot(
       mockMachine,
       mockMachine.resolveState({ value: 'viewReady', context: {} as any }),
-      { type: 'REFRESH' }
+      { type: 'REFRESH' },
     );
     expect(nextState.value).toMatchInlineSnapshot(`"loading"`);
     expect(nextState.context).toMatchInlineSnapshot(`

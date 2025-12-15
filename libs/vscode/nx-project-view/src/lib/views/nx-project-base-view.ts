@@ -1,6 +1,6 @@
 import { NxWorkspace } from '@nx-console/shared-types';
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
 import { join } from 'node:path';
 import type {
@@ -77,7 +77,7 @@ export abstract class BaseView {
     const nxProject = { project: name ?? projectName, root };
 
     if (root === undefined) {
-      getOutputChannel().appendLine(
+      vscodeLogger.log(
         `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`,
       );
     }

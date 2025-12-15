@@ -67,7 +67,6 @@ import {
   initNxCloudView,
 } from '@nx-console/vscode-nx-cloud-view';
 import {
-  getOutputChannel,
   initOutputChannels,
   vscodeLogger,
 } from '@nx-console/vscode-output-channels';
@@ -139,10 +138,8 @@ export async function activate(c: ExtensionContext) {
     window.showErrorMessage(
       'Nx Console encountered an error when activating (see output panel)',
     );
-    getOutputChannel().appendLine(
-      'Nx Console encountered an error when activating',
-    );
-    getOutputChannel().appendLine(e.stack);
+    vscodeLogger.log('Nx Console encountered an error when activating');
+    vscodeLogger.log(e.stack);
   }
 
   process.on('exit', () => {
@@ -344,9 +341,7 @@ async function registerWorkspaceFileWatcher(
       if (!isNxWorkspace) {
         await setWorkspace(workspacePath);
         if (isNxWorkspace) {
-          getOutputChannel().appendLine(
-            'Detected Nx workspace. Refreshing workspace.',
-          );
+          vscodeLogger.log('Detected Nx workspace. Refreshing workspace.');
           refreshWorkspaceWithBackoff();
         }
       }
@@ -415,7 +410,7 @@ async function registerSettingsNxWorkspacePathWatcher() {
 function registerUriHandlers(context: ExtensionContext) {
   const uriHandler = window.registerUriHandler({
     handleUri(uri: Uri): void {
-      getOutputChannel().appendLine(`Received URI: ${uri.toString()}`);
+      vscodeLogger.log(`Received URI: ${uri.toString()}`);
       handleSelfHealingUri(uri);
     },
   });

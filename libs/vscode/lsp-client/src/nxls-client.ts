@@ -7,7 +7,6 @@ import { killGroup } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getNxlsOutputChannel,
-  getOutputChannel,
   logAndShowError,
   vscodeLogger,
 } from '@nx-console/vscode-output-channels';
@@ -100,7 +99,7 @@ export class NxlsClient {
       inspect: (event) => {
         const snapshot = event.actorRef.getSnapshot();
         if (event.type === '@xstate.snapshot' && snapshot.value) {
-          getOutputChannel().appendLine(`Nxls Client - ${snapshot.value}`);
+          vscodeLogger.log(`Nxls Client - ${snapshot.value}`);
         }
       },
     },
@@ -197,9 +196,7 @@ export class NxlsClient {
           return this.sendRequest(requestType, params, retry + 1);
         }
       } else {
-        getOutputChannel().appendLine(
-          `Error sending request to Nx Language Server: ${e}`,
-        );
+        vscodeLogger.log(`Error sending request to Nx Language Server: ${e}`);
         return undefined;
       }
     }
@@ -272,7 +269,7 @@ export class NxlsClient {
     await this.client.start();
 
     const onNxlsExit = () => {
-      getOutputChannel().appendLine('Nxls process exited, stopping client.');
+      vscodeLogger.log('Nxls process exited, stopping client.');
       this.actor.send({ type: 'STOP', isNxlsProcessAlive: false });
     };
     const serverProcess = this.client['_serverProcess'];
@@ -283,7 +280,7 @@ export class NxlsClient {
 
     this.registerNotificationListeners();
 
-    getOutputChannel().appendLine(
+    vscodeLogger.log(
       `Nxls process started with pid: ${this.client.initializeResult?.['pid']}`,
     );
     return this.client.initializeResult?.['pid'];

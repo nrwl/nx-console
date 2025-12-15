@@ -1,7 +1,7 @@
 import { findNxExecutable } from '@nx-console/shared-npm';
 import { httpRequest } from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
 import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
@@ -157,7 +157,7 @@ export class NxGraphServer implements Disposable {
     const nxExecutable = await findNxExecutable(workspacePath);
 
     return await new Promise((resolve, reject) => {
-      getOutputChannel().appendLine(`Starting nx graph server at port ${port}`);
+      vscodeLogger.log(`Starting nx graph server at port ${port}`);
       const nxGraphProcess = spawn(
         nxExecutable,
         [

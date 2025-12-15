@@ -525,6 +525,11 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
     extensionContext.subscriptions.push(
       window.registerFileDecorationProvider(fileDecorationProvider),
       CloudRecentCIPEProvider.treeView,
+      CloudRecentCIPEProvider.treeView.onDidChangeVisibility((e) => {
+        if (e.visible) {
+          commands.executeCommand('nxCloud.refresh');
+        }
+      }),
       commands.registerCommand(
         'nxCloud.showCIPEInApp',
         async (treeItem: BaseRecentCIPETreeItem) => {

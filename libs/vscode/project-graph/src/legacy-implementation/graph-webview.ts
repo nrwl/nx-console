@@ -20,7 +20,7 @@ import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 import { join } from 'node:path';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { revealNxProject } from '@nx-console/vscode-nx-config-decoration';
-import { getOutputChannel } from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { waitFor } from 'xstate';
 
@@ -30,7 +30,7 @@ export class GraphWebView implements Disposable {
   constructor() {
     let previousValue = graphService.getSnapshot().value;
     graphService.subscribe(async (state) => {
-      getOutputChannel().appendLine(`Graph - ${state.value}`);
+      vscodeLogger.log(`Graph - ${state.value}`);
 
       if (state.value === previousValue) {
         return;
@@ -71,7 +71,7 @@ export class GraphWebView implements Disposable {
 
     if (!workspacePath || !projectGraphOutput) {
       window.showErrorMessage(
-        "Couldn't load project graph. Make sure you've installed dependencies and check the logs."
+        "Couldn't load project graph. Make sure you've installed dependencies and check the logs.",
       );
       return;
     }
@@ -83,7 +83,7 @@ export class GraphWebView implements Disposable {
         enableScripts: true,
         retainContextWhenHidden: true,
         localResourceRoots: [Uri.file(projectGraphOutput.directory)],
-      }
+      },
     );
 
     this.panel.onDidDispose(() => {
@@ -104,7 +104,7 @@ export class GraphWebView implements Disposable {
         getTelemetry().logUsage('graph.interaction-open-project-edge-file');
         commands.executeCommand(
           'vscode.open',
-          Uri.file(join(workspacePath, event.data))
+          Uri.file(join(workspacePath, event.data)),
         );
       }
       if (event.command === 'openProject') {
@@ -133,7 +133,7 @@ export class GraphWebView implements Disposable {
       commands.executeCommand(
         'setContext',
         'graphWebviewVisible',
-        webviewPanel.visible
+        webviewPanel.visible,
       );
     });
 
@@ -143,9 +143,9 @@ export class GraphWebView implements Disposable {
   async projectInWebview(
     projectName: string | undefined,
     taskName: string | undefined,
-    type: MessageType
+    type: MessageType,
   ) {
-    getOutputChannel().appendLine(`Graph - Opening graph for ${projectName}`);
+    vscodeLogger.log(`Graph - Opening graph for ${projectName}`);
     if (!this.panel) {
       await this._webview();
     }
@@ -168,7 +168,7 @@ export class GraphWebView implements Disposable {
   }
 
   async showAllProjects() {
-    getOutputChannel().appendLine(`Graph - Opening full graph`);
+    vscodeLogger.log(`Graph - Opening full graph`);
 
     if (!this.panel) {
       await this._webview();
@@ -187,7 +187,7 @@ export class GraphWebView implements Disposable {
   }
 
   async showAllTasks(taskName: string) {
-    getOutputChannel().appendLine(`Graph - Opening full graph`);
+    vscodeLogger.log(`Graph - Opening full graph`);
 
     if (!this.panel) {
       await this._webview();
@@ -206,7 +206,7 @@ export class GraphWebView implements Disposable {
   }
 
   async showAffectedProjects() {
-    getOutputChannel().appendLine(`Graph - Opening affected projects`);
+    vscodeLogger.log(`Graph - Opening affected projects`);
     const nxWorkspace = await getNxWorkspace();
     if (!nxWorkspace) {
       showNoProjectsMessage();
@@ -223,7 +223,7 @@ export class GraphWebView implements Disposable {
 
     if (!hasAffected) {
       window.showWarningMessage(
-        'No projects are affected by the current changes.'
+        'No projects are affected by the current changes.',
       );
       return;
     }

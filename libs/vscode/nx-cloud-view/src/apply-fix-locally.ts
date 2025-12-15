@@ -1,7 +1,4 @@
-import {
-  getOutputChannel,
-  vscodeLogger,
-} from '@nx-console/vscode-output-channels';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { Task, TaskScope, window } from 'vscode';
 
@@ -69,20 +66,20 @@ export async function applyFixLocallyWithGit(
  * @returns Promise<boolean> indicating success or failure
  */
 export async function applyFixLocallyWithNxCloud(fixId: string): Promise<void> {
-  getOutputChannel().appendLine(`Applying Nx Cloud fix: ${fixId}`);
+  vscodeLogger.log(`Applying Nx Cloud fix: ${fixId}`);
 
   try {
     const success = await runApplyLocallyCommand(fixId);
 
     if (success) {
-      getOutputChannel().appendLine(`Successfully applied fix: ${fixId}`);
+      vscodeLogger.log(`Successfully applied fix: ${fixId}`);
       getAiFixStatusBarService().hideAiFixStatusBarItem();
     } else {
-      getOutputChannel().appendLine(`Failed to apply fix ${fixId}`);
+      vscodeLogger.log(`Failed to apply fix ${fixId}`);
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    getOutputChannel().appendLine(`Error applying fix: ${message}`);
+    vscodeLogger.log(`Error applying fix: ${message}`);
     window.showErrorMessage(`Failed to apply fix: ${message}`);
   }
 }

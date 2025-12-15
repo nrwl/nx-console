@@ -9,7 +9,8 @@ import {
 import { getCloudOnboardingInfo } from '@nx-console/vscode-nx-workspace';
 import {
   getNxlsOutputChannel,
-  getOutputChannel,
+  showOutputChannel,
+  vscodeLogger,
 } from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
@@ -166,9 +167,8 @@ export function initNxCloudView(context: ExtensionContext) {
     commands.registerCommand('nxCloud.viewRecentError', () => {
       const error = actor.getSnapshot().context.cipeError?.message;
       if (error) {
-        const outputChannel = getOutputChannel();
-        outputChannel.appendLine(`Nx Cloud Error: ${error}`);
-        outputChannel.show();
+        vscodeLogger.log(`Nx Cloud Error: ${error}`);
+        showOutputChannel();
       } else {
         getNxlsOutputChannel().show();
       }
@@ -199,9 +199,7 @@ const getStateMachineLogger = (context: ExtensionContext) =>
           (event.actorRef as any)['_systemId'] === 'cloud-view' &&
           snapshot.value !== 'recent-cipe'
         ) {
-          getOutputChannel().appendLine(
-            `Nx Cloud - ${JSON.stringify(snapshot.value)}`,
-          );
+          vscodeLogger.log(`Nx Cloud - ${JSON.stringify(snapshot.value)}`);
         }
       };
 
