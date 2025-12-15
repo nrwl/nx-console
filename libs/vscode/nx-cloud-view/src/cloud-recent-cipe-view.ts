@@ -1,4 +1,9 @@
-import { CIPEInfo, CIPERun, CIPERunGroup } from '@nx-console/shared-types';
+import {
+  CIPEInfo,
+  CIPEInfoError,
+  CIPERun,
+  CIPERunGroup,
+} from '@nx-console/shared-types';
 import { isCompleteStatus, isFailedStatus } from '@nx-console/shared-utils';
 import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import { showErrorMessageWithOpenLogs } from '@nx-console/vscode-output-channels';
@@ -403,10 +408,45 @@ class ConnectionErrorTreeItem extends BaseRecentCIPETreeItem {
   }
 }
 
+class CIPEErrorTreeItem extends BaseRecentCIPETreeItem {
+  type = 'cipeError' as const;
+
+  constructor(
+    private errorType: 'network' | 'authentication' | 'other',
+    private errorMessage: string,
+  ) {
+    super(
+      errorType === 'network'
+        ? 'Network error accessing Nx Cloud'
+        : errorType === 'authentication'
+          ? 'Authentication error'
+          : 'Error accessing Nx Cloud',
+    );
+    this.description =
+      errorType === 'network'
+        ? 'Check connection'
+        : errorType === 'authentication'
+          ? 'Login required'
+          : 'Click to view details';
+    this.collapsibleState = TreeItemCollapsibleState.None;
+    this.contextValue = `cipeError-${errorType}`;
+    this.iconPath = new ThemeIcon(
+      errorType === 'network' ? 'cloud-offline' : 'error',
+      new ThemeColor('list.errorForeground'),
+    );
+    this.tooltip = errorMessage;
+  }
+
+  override getChildren(): ProviderResult<BaseRecentCIPETreeItem[]> {
+    return [];
+  }
+}
+
 export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPETreeItem> {
   public recentCIPEInfo: CIPEInfo[] | undefined;
   private workspaceUrl: string | undefined;
   private claimCheckFailed = false;
+  private cipeError: CIPEInfoError | undefined;
 
   private cipeElements?: CIPETreeItem[];
   private static treeView: TreeView<BaseRecentCIPETreeItem> | undefined;
@@ -422,14 +462,17 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
       const updatedCIPEs = state.context.recentCIPEs;
       const updatedClaimCheckFailed =
         state.context.onboardingInfo?.isWorkspaceClaimed === undefined;
+      const updatedCIPEError = state.context.cipeError;
 
       if (
         (updatedCIPEs || this.recentCIPEInfo) &&
         (!isDeepStrictEqual(this.recentCIPEInfo, updatedCIPEs) ||
-          updatedClaimCheckFailed !== this.claimCheckFailed)
+          updatedClaimCheckFailed !== this.claimCheckFailed ||
+          !isDeepStrictEqual(this.cipeError, updatedCIPEError))
       ) {
         this.recentCIPEInfo = updatedCIPEs;
         this.claimCheckFailed = updatedClaimCheckFailed;
+        this.cipeError = updatedCIPEError;
         this.refresh();
         CloudRecentCIPEProvider.updateTreeViewBadge(updatedCIPEs);
       }
@@ -453,15 +496,24 @@ export class CloudRecentCIPEProvider extends AbstractTreeProvider<BaseRecentCIPE
           return b.cipe.createdAt - a.cipe.createdAt;
         });
 
-      // Only show connection error if we have CIPEs to display
-      if (this.claimCheckFailed && this.cipeElements.length > 0) {
-        const items: BaseRecentCIPETreeItem[] = [];
-        items.push(new ConnectionErrorTreeItem());
-        items.push(...this.cipeElements);
-        return items;
+      const items: BaseRecentCIPETreeItem[] = [];
+
+      // Show CIPE error if there is one
+      if (this.cipeError) {
+        items.push(
+          new CIPEErrorTreeItem(this.cipeError.type, this.cipeError.message),
+        );
       }
 
-      return this.cipeElements;
+      // Show connection error if we have CIPEs to display
+      if (this.claimCheckFailed && this.cipeElements.length > 0) {
+        items.push(new ConnectionErrorTreeItem());
+      }
+
+      // Add CIPE items
+      items.push(...this.cipeElements);
+
+      return items.length > 0 ? items : this.cipeElements;
     }
 
     return element.getChildren();

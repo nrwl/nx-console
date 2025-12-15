@@ -811,6 +811,28 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
     }
 
+    fun testNoNotificationAfterErrorRecovery() {
+        // When recovering from an error state (oldData.info = null) to success with CIPEs,
+        // should not show notifications (treat like initial load)
+        val errorResponse =
+            CIPEDataResponse(
+                info = null,
+                error =
+                    CIPEInfoError(type = CIPEInfoErrorType.network, message = "Connection failed"),
+            )
+        val successResponse = CIPEDataResponse(info = listOf(createFailedCIPEWithAiFix()))
+
+        val event = CIPEDataChangedEvent(oldData = errorResponse, newData = successResponse)
+
+        processor.onDataChanged(event)
+
+        // Should not show notifications when recovering from error state
+        assertTrue(
+            mockListener.events.isEmpty(),
+            "Should not show notifications after error recovery",
+        )
+    }
+
     // Helper functions to create test data
     private fun createSuccessfulCIPE() =
         CIPEInfo(
