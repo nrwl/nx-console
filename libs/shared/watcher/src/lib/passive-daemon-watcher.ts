@@ -111,7 +111,19 @@ export class PassiveDaemonWatcher {
                 sourceMaps: ConfigurationSourceMaps;
               } | null,
             ) => {
-              if (error === 'closed') {
+              if (error === 'reconnecting') {
+                this.logger.debug?.(
+                  'PassiveDaemonWatcher: Daemon connection reconnecting...',
+                );
+                return;
+              }
+              if (error === 'reconnected') {
+                this.logger.debug?.(
+                  'PassiveDaemonWatcher: Daemon connection reconnected',
+                );
+                return;
+              }
+              if (error) {
                 this.actor.send({ type: 'LISTENER_ERROR', error });
               } else if (error === 'reconnecting' || error === 'reconnected') {
                 this.listeners.forEach((listener) =>
