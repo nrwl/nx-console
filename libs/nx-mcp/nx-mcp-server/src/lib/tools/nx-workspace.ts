@@ -21,12 +21,18 @@ import {
 } from '@nx-console/shared-npm';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { NxWorkspace } from '@nx-console/shared-types';
-import { Logger } from '@nx-console/shared-utils';
+import { getMessageForError, Logger } from '@nx-console/shared-utils';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import z from 'zod';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
 import { isToolEnabled } from '../tool-filter';
+import {
+  nxProjectDetailsOutputSchema,
+  nxWorkspaceOutputSchema,
+  NxWorkspaceOutput,
+  NxProjectDetailsOutput,
+} from './output-schemas';
 
 let nxWorkspacePath: string | undefined = undefined;
 
@@ -207,33 +213,47 @@ export function registerNxWorkspaceTools(
   if (!isToolEnabled(NX_WORKSPACE, toolsFilter)) {
     logger.debug?.(`Skipping ${NX_WORKSPACE} - disabled by tools filter`);
   } else {
-    server.tool(
+    server.registerTool(
       NX_WORKSPACE,
-      'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture.',
       {
-        filter: z
-          .string()
-          .optional()
-          .describe(
-            'Optional filter to select which projects to include. Supports patterns like: project names (app1,app2), glob patterns (*-app), tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). Multiple patterns can be combined with commas.',
-          ),
-        select: z
-          .string()
-          .optional()
-          .describe(
-            'Optional path to select specific properties from each project\'s data. Supports dot notation (e.g., "targets.build") and array indices (e.g., "tags[0]"). When provided, returns JSON format with selected properties for each matching project. When not provided, returns compressed serialized format.',
-          ),
-        pageToken: z
-          .number()
-          .optional()
-          .describe(
-            'Token for pagination (0-based page number). Results are always paginated. If not provided, returns page 0. Pass the token from the previous response to get the next page.',
-          ),
-      },
-      {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: false,
+        description:
+          'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture.',
+        inputSchema: {
+          filter: z
+            .string()
+            .optional()
+            .describe(
+              'Filter which projects to include in the text content output. ' +
+                'Note: structuredContent always returns all projects. ' +
+                'Supports patterns like: project names (app1,app2), glob patterns (*-app), ' +
+                'tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). ' +
+                'Multiple patterns can be combined with commas.',
+            ),
+          select: z
+            .string()
+            .optional()
+            .describe(
+              'Path to select specific properties in text content output. ' +
+                'Note: structuredContent always returns full project data. ' +
+                'Supports dot notation (e.g., "targets.build") and array indices (e.g., "tags[0]"). ' +
+                'When provided, returns JSON format with selected properties for each matching project. ' +
+                'When not provided, returns compressed serialized format.',
+            ),
+          pageToken: z
+            .number()
+            .optional()
+            .describe(
+              'Token for pagination of text content (0-based page number). ' +
+                'Note: structuredContent is not paginated. ' +
+                'If not provided, returns page 0. Pass the token from the previous response to get the next page.',
+            ),
+        },
+        outputSchema: nxWorkspaceOutputSchema,
+        annotations: {
+          destructiveHint: false,
+          readOnlyHint: true,
+          openWorldHint: false,
+        },
       },
       async ({ filter, select, pageToken }) => {
         telemetry?.logUsage('ai.tool-call', {
@@ -270,9 +290,25 @@ export function registerNxWorkspaceTools(
               content: [{ type: 'text', text: 'Error: Workspace not found' }],
             };
           }
-          let filteredWorkspace = workspace;
 
-          // Apply filter if provided
+          // Build structuredContent from full workspace (ignores filter/select)
+          // Cast to unknown first to satisfy TypeScript's strict index signature checks
+          const structuredContent = {
+            projects: Object.entries(workspace.projectGraph.nodes).map(
+              ([name, node]) => ({
+                name,
+                ...node.data,
+              }),
+            ),
+            dependencies: workspace.projectGraph.dependencies,
+            nxJson: workspace.nxJson as Record<string, unknown> | undefined,
+            errors: workspace.errors?.map((e) => ({
+              message: getMessageForError(e),
+            })),
+          } as NxWorkspaceOutput;
+
+          // For text content, apply filter if provided
+          let filteredWorkspace = workspace;
           if (filter && workspace.projectGraph) {
             const filterPatterns = filter.split(',').map((p) => p.trim());
             const matchingProjectNames = await findMatchingProjects(
@@ -305,7 +341,7 @@ export function registerNxWorkspaceTools(
           const pageNumber = pageToken ?? 0;
           let outputContent: string;
 
-          // Handle select parameter - return JSON format
+          // Handle select parameter - return JSON format for text content
           if (select) {
             const projectResults: Array<{ projectName: string; value: any }> =
               [];
@@ -326,7 +362,7 @@ export function registerNxWorkspaceTools(
             outputContent = results.filter((result) => !!result).join('\n\n');
           }
 
-          // Apply pagination
+          // Apply pagination to text content
           const { chunk, hasMore } = chunkContent(
             outputContent,
             pageNumber,
@@ -350,9 +386,11 @@ export function registerNxWorkspaceTools(
 
           return {
             content,
+            structuredContent,
           };
         } catch (e) {
           return {
+            isError: true,
             content: [{ type: 'text', text: String(e) }],
           };
         }
@@ -389,30 +427,40 @@ export function registerNxWorkspaceTools(
   if (!isToolEnabled(NX_PROJECT_DETAILS, toolsFilter)) {
     logger.debug?.(`Skipping ${NX_PROJECT_DETAILS} - disabled by tools filter`);
   } else {
-    server.tool(
+    server.registerTool(
       NX_PROJECT_DETAILS,
-      'Returns the project configuration for a specific Nx project. When called without a select parameter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the select parameter with dot notation to access complete unabridged configuration for specific paths (e.g., select="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
       {
-        projectName: z
-          .string()
-          .describe('The name of the project to get details for'),
-        select: z
-          .string()
-          .optional()
-          .describe(
-            'Optional path to select specific properties from the project configuration. Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). When provided, only the value at this path will be returned. If select is set, dependencies and external dependencies will not be included in the response.',
-          ),
-        pageToken: z
-          .number()
-          .optional()
-          .describe(
-            'Token for pagination. Pass the token from the previous response to get the next page.',
-          ),
-      },
-      {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: false,
+        description:
+          'Returns the project configuration for a specific Nx project. When called without a select parameter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the select parameter with dot notation to access complete unabridged configuration for specific paths (e.g., select="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
+        inputSchema: {
+          projectName: z
+            .string()
+            .describe('The name of the project to get details for'),
+          select: z
+            .string()
+            .optional()
+            .describe(
+              'Path to select specific properties in text content output. ' +
+                'Note: structuredContent always returns full project data. ' +
+                'Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). ' +
+                'When provided, only the value at this path will be returned in text content. ' +
+                'If select is set, dependencies and external dependencies will not be included in the text content response.',
+            ),
+          pageToken: z
+            .number()
+            .optional()
+            .describe(
+              'Token for pagination of text content. ' +
+                'Note: structuredContent is not paginated. ' +
+                'Pass the token from the previous response to get the next page.',
+            ),
+        },
+        outputSchema: nxProjectDetailsOutputSchema,
+        annotations: {
+          destructiveHint: false,
+          readOnlyHint: true,
+          openWorldHint: false,
+        },
       },
       async ({ projectName, select, pageToken }) => {
         telemetry?.logUsage('ai.tool-call', {
@@ -452,13 +500,35 @@ export function registerNxWorkspaceTools(
           };
         }
 
+        // Build structuredContent from full project data (ignores select)
+        const dependencies =
+          workspace.projectGraph.dependencies[project.name] || [];
+        const projectDependencies: string[] = [];
+        const externalDependencies: string[] = [];
+
+        for (const dep of dependencies) {
+          if (workspace.projectGraph.externalNodes?.[dep.target]) {
+            externalDependencies.push(dep.target);
+          } else {
+            projectDependencies.push(dep.target);
+          }
+        }
+
+        const structuredContent = {
+          name: project.name,
+          ...project.data,
+          projectDependencies,
+          externalDependencies,
+        } as NxProjectDetailsOutput;
+
+        // For text content, handle select and pagination
         const pageNumber = pageToken ?? 0;
 
         let detailsJson: any;
         let compressedTargetsText: string | undefined;
 
         if (select) {
-          // When select is provided, return unabridged data at that path
+          // When select is provided, return unabridged data at that path for text content
           detailsJson = getValueByPath(project.data, select);
 
           // Handle selected value not found
@@ -503,23 +573,10 @@ ${targetDescriptions}`;
           }
         }
 
-        const dependencies = workspace.projectGraph.dependencies[project.name];
-
-        const projectDependencies = [];
-        const externalDependencies = [];
-
-        for (const dep of dependencies) {
-          if (workspace.projectGraph.externalNodes?.[dep.target]) {
-            externalDependencies.push(dep.target);
-          } else {
-            projectDependencies.push(dep.target);
-          }
-        }
-
         const projDepsStr = projectDependencies.join(', ');
         const extDepsStr = externalDependencies.join(', ');
 
-        // Chunk each section
+        // Chunk each section for text content pagination
         const detailsChunk = chunkContent(
           JSON.stringify(detailsJson, null, 2),
           pageNumber,
@@ -580,7 +637,7 @@ ${targetDescriptions}`;
           });
         }
 
-        return { content };
+        return { content, structuredContent };
       },
     );
   }
