@@ -1,3 +1,13 @@
+## 1.10.0 (2025-12-15)
+
+### 🚀 Features
+
+- **nxls:** align build step & remove parcel watcher support ([#2917](https://github.com/nrwl/nx-console/pull/2917))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 1.9.0 (2025-12-02)
 
 ### 🚀 Features
