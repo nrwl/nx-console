@@ -207,6 +207,11 @@
           "group": "inline@1"
         },
         {
+          "command": "nxCloud.viewRecentError",
+          "when": "view == nxCloudRecentCIPE && viewItem =~ /^cipeError-/",
+          "group": "inline@1"
+        },
+        {
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
@@ -665,6 +670,11 @@
         "title": "Open Workspace in Browser",
         "command": "nxCloud.openApp",
         "icon": "$(cloud)"
+      },
+      {
+        "title": "View Error Details",
+        "command": "nxCloud.viewRecentError",
+        "icon": "$(output)"
       },
       {
         "title": "Apply AI Fix",
