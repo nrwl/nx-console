@@ -2397,6 +2397,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hono/node-server@npm:^1.19.7":
+  version: 1.19.7
+  resolution: "@hono/node-server@npm:1.19.7"
+  peerDependencies:
+    hono: ^4
+  checksum: d2ac297af1ef9e300981876971eea0770f78212f40b15a9be33bf31ebb454629f93c076322399d72da08042899023c3d0b62a0c9a6c61e23ab2bd7343f0a336d
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.14":
   version: 0.11.14
   resolution: "@humanwhocodes/config-array@npm:0.11.14"
@@ -3168,10 +3177,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.21.1":
-  version: 1.21.1
-  resolution: "@modelcontextprotocol/sdk@npm:1.21.1"
+"@modelcontextprotocol/sdk@npm:^1.25.0":
+  version: 1.25.0
+  resolution: "@modelcontextprotocol/sdk@npm:1.25.0"
   dependencies:
+    "@hono/node-server": ^1.19.7
     ajv: ^8.17.1
     ajv-formats: ^3.0.1
     content-type: ^1.0.5
@@ -3181,16 +3191,21 @@ __metadata:
     eventsource-parser: ^3.0.0
     express: ^5.0.1
     express-rate-limit: ^7.5.0
+    jose: ^6.1.1
+    json-schema-typed: ^8.0.2
     pkce-challenge: ^5.0.0
     raw-body: ^3.0.0
-    zod: ^3.23.8
-    zod-to-json-schema: ^3.24.1
+    zod: ^3.25 || ^4.0
+    zod-to-json-schema: ^3.25.0
   peerDependencies:
     "@cfworker/json-schema": ^4.1.1
+    zod: ^3.25 || ^4.0
   peerDependenciesMeta:
     "@cfworker/json-schema":
       optional: true
-  checksum: bf80d59107ff359b1a192fd7dd459b71d658dab189940724aacd5e1d0f4e6b26a4db5f7018a6e08abac53732e710851ea733af81bd4c6b502851ff2f912f9272
+    zod:
+      optional: false
+  checksum: 95873b2e3d824e6ed5ea1e7ee1a1fb1382c1663314735d953978aea9f80bca0813e54c03cd805542fd5906135b38cccf0eb951c29d32e64a409df07e8d9cedfd
   languageName: node
   linkType: hard
 
@@ -14326,6 +14341,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jose@npm:^6.1.1":
+  version: 6.1.3
+  resolution: "jose@npm:6.1.3"
+  checksum: 7f51c7e77f82b70ef88ede9fd1760298bc0ffbf143b9d94f78c08462987ae61864535c1856bc6c26d335f857c7d41f4fffcc29134212c19ea929ce34a4c790f0
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -14453,6 +14475,13 @@ __metadata:
   version: 1.0.0
   resolution: "json-schema-traverse@npm:1.0.0"
   checksum: 02f2f466cdb0362558b2f1fd5e15cce82ef55d60cd7f8fa828cf35ba74330f8d767fcae5c5c2adb7851fa811766c694b9405810879bc4e1ddd78a7c0e03658ad
+  languageName: node
+  linkType: hard
+
+"json-schema-typed@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "json-schema-typed@npm:8.0.2"
+  checksum: 8ddb3c2b1bad406507ea077d4d8cfe6dae5b920f642efab145e4bd6e0d3984f01034ee4467bbeabd51e129b17d7446ceb357a6b1648857fdfaf61ba8ef621ff6
   languageName: node
   linkType: hard
 
@@ -16657,7 +16686,7 @@ __metadata:
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
     "@modelcontextprotocol/inspector": ^0.16.1
-    "@modelcontextprotocol/sdk": ^1.21.1
+    "@modelcontextprotocol/sdk": ^1.25.0
     "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/conformance": 21.0.0-beta.0
     "@nx/cypress": 22.1.0-rc.5
@@ -16765,7 +16794,7 @@ __metadata:
     webpack: 5.101.3
     xstate: ^5.18.2
     yargs: ^17.7.2
-    zod: ^3.24.2
+    zod: ^4.2.1
     zone.js: 0.14.3
   languageName: unknown
   linkType: soft
@@ -22609,10 +22638,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.23.8, zod@npm:^3.24.2":
+"zod-to-json-schema@npm:^3.25.0":
+  version: 3.25.0
+  resolution: "zod-to-json-schema@npm:3.25.0"
+  peerDependencies:
+    zod: ^3.25 || ^4
+  checksum: 074954856eabf6f1e6d932ba505686f69cb170306e6fc611348c92fd0ac2c69bcc2c6167e07c5c1157d8df8e05007fea66dec6304f12a14481f4cf2e1590118d
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.8":
   version: 3.24.4
   resolution: "zod@npm:3.24.4"
   checksum: 62829789765a9187bd72bed3972a7c1a39fdfe6c59bc752eedabec5f99af701658471b8577d22e0fee2081e6e35d4efc93c02c90e13350755a36feadbf72bbbc
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.25 || ^4.0, zod@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "zod@npm:4.2.1"
+  checksum: 7ef4a6507713fb62e7659513f18e75819a602269a9f252296054224ef121c7b94cbe9806e0d5a76ef070949e771eee5b8d9710c9954ee0743621c4f0cbc9d673
   languageName: node
   linkType: hard
 

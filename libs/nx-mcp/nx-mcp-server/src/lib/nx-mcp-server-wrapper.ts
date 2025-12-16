@@ -90,7 +90,7 @@ export class NxMcpServerWrapper {
         listChanged: true,
       },
       resources: {
-        list: true,
+        listChanged: true,
         subscribe: false,
       },
     });
@@ -434,7 +434,7 @@ export const nxMcpServerCapabilities: ServerCapabilities = {
     listChanged: true,
   },
   resources: {
-    list: true,
+    listChanged: true,
     subscribe: false,
   },
   logging: {},

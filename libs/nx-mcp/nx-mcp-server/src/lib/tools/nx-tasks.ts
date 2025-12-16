@@ -1,5 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import {
+  CallToolResult,
+  TextContent,
+} from '@modelcontextprotocol/sdk/types.js';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 
@@ -112,7 +115,9 @@ export const nxCurrentlyRunningTaskOutput =
   async ({
     taskId,
     pageToken,
-  }: NxCurrentlyRunningTaskOutputType): Promise<CallToolResult> => {
+  }: NxCurrentlyRunningTaskOutputType): Promise<
+    CallToolResult & { readonly content: TextContent[] }
+  > => {
     telemetry?.logUsage('ai.tool-call', {
       tool: NX_CURRENT_RUNNING_TASK_OUTPUT,
     });
@@ -172,7 +177,7 @@ export const nxCurrentlyRunningTaskOutput =
     const chunk = output.slice(startIndex, endIndex);
     const hasMore = startIndex > 0;
 
-    const content: CallToolResult['content'] = [];
+    const content: TextContent[] = [];
     const continuedString =
       pageNumber > 0 ? ` (currently on page ${pageNumber})` : '';
 

@@ -85,11 +85,10 @@ export async function registerNxCloudCipeResources(
       const resourceUri = `nx-cloud://cipes/${cipeId}`;
 
       // Register the resource and store the returned object
-      const registeredResource = server.resource(
+      const registeredResource = server.registerResource(
         resourceName,
         resourceUri,
         {
-          name: `${resourceName}  [${statusText}]`,
           description: `${cipe.commitTitle || 'Unknown commit'} by ${cipe.author || 'Unknown author'}`,
           mimeType: 'application/json',
         },
@@ -109,7 +108,7 @@ export async function registerNxCloudCipeResources(
             return {
               contents: [
                 {
-                  type: 'text',
+                  mimeType: 'text/plain',
                   text: JSON.stringify(
                     {
                       error: latestData.error,
@@ -131,7 +130,7 @@ export async function registerNxCloudCipeResources(
             return {
               contents: [
                 {
-                  type: 'text',
+                  mimeType: 'text/plain',
                   text: JSON.stringify(
                     {
                       error: {
@@ -153,7 +152,7 @@ export async function registerNxCloudCipeResources(
           return {
             contents: [
               {
-                type: 'text',
+                mimeType: 'text/plain',
                 text: `${description}\n\n${renderCipeDetails(latestCipe)}`,
                 uri: resourceUri,
               },
