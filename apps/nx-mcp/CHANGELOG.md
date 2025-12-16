@@ -1,3 +1,7 @@
+## 0.12.0 (2025-12-16)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
 ## 0.11.0 (2025-12-02)
 
 ### 🚀 Features
