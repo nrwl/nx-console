@@ -16765,7 +16765,7 @@ __metadata:
     webpack: 5.101.3
     xstate: ^5.18.2
     yargs: ^17.7.2
-    zod: ^3.24.2
+    zod: ^4.2.1
     zone.js: 0.14.3
   languageName: unknown
   linkType: soft
@@ -22609,7 +22609,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.23.8, zod@npm:^3.24.2":
+"zod@npm:^3.23.8":
   version: 3.24.4
   resolution: "zod@npm:3.24.4"
   checksum: 62829789765a9187bd72bed3972a7c1a39fdfe6c59bc752eedabec5f99af701658471b8577d22e0fee2081e6e35d4efc93c02c90e13350755a36feadbf72bbbc
@@ -22620,6 +22620,13 @@ __metadata:
   version: 3.25.76
   resolution: "zod@npm:3.25.76"
   checksum: c9a403a62b329188a5f6bd24d5d935d2bba345f7ab8151d1baa1505b5da9f227fb139354b043711490c798e91f3df75991395e40142e6510a4b16409f302b849
+  languageName: node
+  linkType: hard
+
+"zod@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "zod@npm:4.2.1"
+  checksum: 7ef4a6507713fb62e7659513f18e75819a602269a9f252296054224ef121c7b94cbe9806e0d5a76ef070949e771eee5b8d9710c9954ee0743621c4f0cbc9d673
   languageName: node
   linkType: hard
 
