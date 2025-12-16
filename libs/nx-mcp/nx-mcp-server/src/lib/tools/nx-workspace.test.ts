@@ -28,6 +28,15 @@ jest.mock('@nx-console/shared-npm', () => ({
   checkIsNxWorkspace: jest.fn().mockResolvedValue(true),
   findMatchingProject: jest.fn(),
   findMatchingProjects: jest.fn().mockResolvedValue([]),
+  workspaceDependencyPath: jest.fn().mockResolvedValue(null),
+}));
+
+// Mock output-schemas to avoid file system operations
+jest.mock('./output-schemas', () => ({
+  loadNxOutputSchemas: jest.fn().mockResolvedValue({
+    nxWorkspaceOutputSchema: { type: 'object' },
+    nxProjectDetailsOutputSchema: { type: 'object' },
+  }),
 }));
 
 const mockGetNxJsonPrompt = getNxJsonPrompt as jest.MockedFunction<
@@ -367,8 +376,8 @@ describe('registerNxWorkspaceTools', () => {
   beforeEach(() => {
     registeredTools = {};
     mockServer = {
-      tool: jest.fn((name, description, schema, options, handler) => {
-        registeredTools[name] = handler;
+      registerTool: jest.fn((tool) => {
+        registeredTools[tool.name] = tool.handler;
       }),
     };
     mockLogger = {
@@ -390,33 +399,25 @@ describe('registerNxWorkspaceTools', () => {
     mockGetProjectGraphErrorsPrompt.mockReturnValue('errors-result');
   });
 
-  it('should register tools', () => {
-    registerNxWorkspaceTools(
+  it('should register tools', async () => {
+    await registerNxWorkspaceTools(
       '/workspace',
       mockServer,
       mockLogger,
       mockNxWorkspaceInfoProvider,
     );
 
-    expect(mockServer.tool).toHaveBeenCalledWith(
-      NX_WORKSPACE,
-      expect.any(String),
-      expect.any(Object),
-      expect.any(Object),
-      expect.any(Function),
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
+      expect.objectContaining({ name: NX_WORKSPACE }),
     );
-    expect(mockServer.tool).toHaveBeenCalledWith(
-      NX_PROJECT_DETAILS,
-      expect.any(String),
-      expect.any(Object),
-      expect.any(Object),
-      expect.any(Function),
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
+      expect.objectContaining({ name: NX_PROJECT_DETAILS }),
     );
   });
 
   describe('nx_workspace tool', () => {
-    beforeEach(() => {
-      registerNxWorkspaceTools(
+    beforeEach(async () => {
+      await registerNxWorkspaceTools(
         '/workspace',
         mockServer,
         mockLogger,
