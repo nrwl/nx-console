@@ -20,7 +20,7 @@
     "@microsoft/fast-components": "^2.30.6",
     "@microsoft/fast-element": "^1.12.0",
     "@microsoft/fast-foundation": "^2.49.0",
-    "@modelcontextprotocol/sdk": "^1.21.1",
+    "@modelcontextprotocol/sdk": "^1.25.0",
     "@open-wc/lit-helpers": "^0.6.0",
     "@vscode-elements/elements": "1.9.2-pre.1",
     "@vscode/chat-extension-utils": "^0.0.0-alpha.5",
