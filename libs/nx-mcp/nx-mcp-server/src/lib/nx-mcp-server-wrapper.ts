@@ -285,7 +285,9 @@ export class NxMcpServerWrapper {
       }
 
       // Check workspace tools condition
-      const workspaceValid = await this.isValidNxWorkspace();
+      const workspaceValid = this.ideProvider
+        ? await this.isValidNxWorkspace()
+        : true;
 
       if (
         workspaceValid &&
