@@ -26,6 +26,7 @@ import {
   registerNxWorkspaceTools,
   setNxWorkspacePath as setNxWorkspacePathForWorkspaceTools,
 } from './tools/nx-workspace';
+import { ToolRegistry } from './tool-registry';
 
 export interface NxWorkspaceInfoProvider {
   nxWorkspace: (
@@ -71,6 +72,7 @@ export class NxMcpServerWrapper {
     nxIde: false,
     nxTasks: false,
   };
+  private toolRegistry: ToolRegistry;
 
   constructor(
     initialWorkspacePath: string | undefined,
@@ -83,12 +85,10 @@ export class NxMcpServerWrapper {
   ) {
     this._nxWorkspacePath = initialWorkspacePath;
     this.ideProvider = ideProvider;
+    this.toolRegistry = new ToolRegistry(this.server.server);
 
     this.server.server.registerCapabilities({
       logging: {},
-      tools: {
-        listChanged: true,
-      },
       resources: {
         listChanged: true,
         subscribe: false,
@@ -142,7 +142,7 @@ export class NxMcpServerWrapper {
     );
 
     registerNxCoreTools(
-      server.server,
+      server.toolRegistry,
       server.logger,
       server.nxWorkspaceInfoProvider,
       server.telemetry,
@@ -262,7 +262,7 @@ export class NxMcpServerWrapper {
       ) {
         registerNxCloudTools(
           this._nxWorkspacePath,
-          this.server,
+          this.toolRegistry,
           this.logger,
           this.telemetry,
           this.toolsFilter,
@@ -292,9 +292,9 @@ export class NxMcpServerWrapper {
         this._nxWorkspacePath &&
         !this.toolRegistrationState.nxWorkspace
       ) {
-        registerNxWorkspaceTools(
+        await registerNxWorkspaceTools(
           this._nxWorkspacePath,
-          this.server,
+          this.toolRegistry,
           this.logger,
           this.nxWorkspaceInfoProvider,
           this.telemetry,
@@ -314,7 +314,7 @@ export class NxMcpServerWrapper {
         !this.toolRegistrationState.nxTasks
       ) {
         registerNxTaskTools(
-          this.server,
+          this.toolRegistry,
           this.ideProvider,
           this.logger,
           this.telemetry,
@@ -331,7 +331,7 @@ export class NxMcpServerWrapper {
         this.ideProvider.isAvailable()
       ) {
         registerNxIdeTools(
-          this.server,
+          this.toolRegistry,
           this.logger,
           this.ideProvider,
           this.telemetry,

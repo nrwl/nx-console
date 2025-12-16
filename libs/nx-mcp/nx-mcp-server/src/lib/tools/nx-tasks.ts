@@ -1,4 +1,3 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
   CallToolResult,
   TextContent,
@@ -14,11 +13,12 @@ import {
 import { IdeProvider } from '../ide-provider';
 import { RunningTasksMap } from '@nx-console/shared-running-tasks';
 import { isToolEnabled } from '../tool-filter';
+import { ToolRegistry } from '../tool-registry';
 
 const TASK_OUTPUT_CHUNK_SIZE = 10000;
 
 export function registerNxTaskTools(
-  server: McpServer,
+  registry: ToolRegistry,
   ideProvider: IdeProvider,
   logger: Logger,
   telemetry?: NxConsoleTelemetryLogger,
@@ -29,22 +29,23 @@ export function registerNxTaskTools(
       `Skipping ${NX_CURRENT_RUNNING_TASKS_DETAILS} - disabled by tools filter`,
     );
   } else {
-    server.tool(
-      NX_CURRENT_RUNNING_TASKS_DETAILS,
-      `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
+    registry.registerTool({
+      name: NX_CURRENT_RUNNING_TASKS_DETAILS,
+      description: `Returns a list of running commands (also called tasks) from currently running Nx CLI processes. This will include the process ID of the Nx CLI processes with task IDs and their status.
     There will be scenarios where the current process is not running anymore (as denoted by Stopped).
     Use this tool if users ask for information about recently run tests, builds or other commands.
     Use this tool for assisting with debugging and getting details about the current running tasks.
 
     Use ${NX_CURRENT_RUNNING_TASK_OUTPUT} to get the terminal output for specific tasks.
     `,
-      {
+      annotations: {
         destructiveHint: false,
         readOnlyHint: true,
         openWorldHint: false,
       },
-      nxCurrentlyRunningTasksDetails(telemetry, ideProvider),
-    );
+      handler: async () =>
+        nxCurrentlyRunningTasksDetails(telemetry, ideProvider)(),
+    });
   }
 
   if (!isToolEnabled(NX_CURRENT_RUNNING_TASK_OUTPUT, toolsFilter)) {
@@ -52,17 +53,22 @@ export function registerNxTaskTools(
       `Skipping ${NX_CURRENT_RUNNING_TASK_OUTPUT} - disabled by tools filter`,
     );
   } else {
-    server.tool(
-      NX_CURRENT_RUNNING_TASK_OUTPUT,
-      `Returns the terminal output for a specific task from currently running Nx CLI processes. For large outputs, if a pagination token is returned, call this tool again with the token to retrieve additional results. Pagination works from the end of the outputs - page 0 shows the most recent output (end of the log), and subsequent pages show progressively older output.`,
-      NxCurrentlyRunningTaskOutputSchema.shape,
-      {
+    registry.registerTool({
+      name: NX_CURRENT_RUNNING_TASK_OUTPUT,
+      description:
+        'Returns the terminal output for a specific task from currently running Nx CLI processes. For large outputs, if a pagination token is returned, call this tool again with the token to retrieve additional results. Pagination works from the end of the outputs - page 0 shows the most recent output (end of the log), and subsequent pages show progressively older output.',
+      inputSchema: NxCurrentlyRunningTaskOutputSchema.shape,
+      annotations: {
         destructiveHint: false,
         readOnlyHint: true,
         openWorldHint: false,
       },
-      nxCurrentlyRunningTaskOutput(telemetry, ideProvider),
-    );
+      handler: async (args) =>
+        nxCurrentlyRunningTaskOutput(
+          telemetry,
+          ideProvider,
+        )(args as z.infer<typeof NxCurrentlyRunningTaskOutputSchema>),
+    });
   }
 
   logger.debug?.('Registered Nx task tools');

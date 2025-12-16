@@ -1,4 +1,3 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
   detectAtomizedTargets,
@@ -27,9 +26,9 @@ import path from 'path';
 import z from 'zod';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';
 import { isToolEnabled } from '../tool-filter';
+import { ToolRegistry } from '../tool-registry';
 import {
-  nxProjectDetailsOutputSchema,
-  nxWorkspaceOutputSchema,
+  loadNxOutputSchemas,
   NxWorkspaceOutput,
   NxProjectDetailsOutput,
 } from './output-schemas';
@@ -200,62 +199,67 @@ export function chunkContent(
   };
 }
 
-export function registerNxWorkspaceTools(
+export async function registerNxWorkspaceTools(
   workspacePath: string,
-  server: McpServer,
+  registry: ToolRegistry,
   logger: Logger,
   nxWorkspaceInfoProvider: NxWorkspaceInfoProvider,
   telemetry?: NxConsoleTelemetryLogger,
   toolsFilter?: string[],
-): void {
+): Promise<void> {
   nxWorkspacePath = workspacePath;
+
+  const outputSchemas = await loadNxOutputSchemas(workspacePath);
 
   if (!isToolEnabled(NX_WORKSPACE, toolsFilter)) {
     logger.debug?.(`Skipping ${NX_WORKSPACE} - disabled by tools filter`);
   } else {
-    server.registerTool(
-      NX_WORKSPACE,
-      {
-        description:
-          'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture.',
-        inputSchema: {
-          filter: z
-            .string()
-            .optional()
-            .describe(
-              'Filter which projects to include in the text content output. ' +
-                'Note: structuredContent always returns all projects. ' +
-                'Supports patterns like: project names (app1,app2), glob patterns (*-app), ' +
-                'tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). ' +
-                'Multiple patterns can be combined with commas.',
-            ),
-          select: z
-            .string()
-            .optional()
-            .describe(
-              'Path to select specific properties in text content output. ' +
-                'Note: structuredContent always returns full project data. ' +
-                'Supports dot notation (e.g., "targets.build") and array indices (e.g., "tags[0]"). ' +
-                'When provided, returns JSON format with selected properties for each matching project. ' +
-                'When not provided, returns compressed serialized format.',
-            ),
-          pageToken: z
-            .number()
-            .optional()
-            .describe(
-              'Token for pagination of text content (0-based page number). ' +
-                'Note: structuredContent is not paginated. ' +
-                'If not provided, returns page 0. Pass the token from the previous response to get the next page.',
-            ),
-        },
-        outputSchema: nxWorkspaceOutputSchema,
-        annotations: {
-          destructiveHint: false,
-          readOnlyHint: true,
-          openWorldHint: false,
-        },
+    registry.registerTool({
+      name: NX_WORKSPACE,
+      description:
+        'Returns a readable representation of the nx project graph and the nx.json that configures nx. If there are project graph errors, it also returns them. Use it to answer questions about the nx workspace and architecture.',
+      inputSchema: {
+        filter: z
+          .string()
+          .optional()
+          .describe(
+            'Filter which projects to include in the text content output. ' +
+              'Note: structuredContent always returns all projects. ' +
+              'Supports patterns like: project names (app1,app2), glob patterns (*-app), ' +
+              'tags (tag:api, tag:type:*), directory patterns (apps/*), and exclusions (!tag:e2e). ' +
+              'Multiple patterns can be combined with commas.',
+          ),
+        select: z
+          .string()
+          .optional()
+          .describe(
+            'Path to select specific properties in text content output. ' +
+              'Note: structuredContent always returns full project data. ' +
+              'Supports dot notation (e.g., "targets.build") and array indices (e.g., "tags[0]"). ' +
+              'When provided, returns JSON format with selected properties for each matching project. ' +
+              'When not provided, returns compressed serialized format.',
+          ),
+        pageToken: z
+          .number()
+          .optional()
+          .describe(
+            'Token for pagination of text content (0-based page number). ' +
+              'Note: structuredContent is not paginated. ' +
+              'If not provided, returns page 0. Pass the token from the previous response to get the next page.',
+          ),
       },
-      async ({ filter, select, pageToken }) => {
+      outputSchema: outputSchemas.nxWorkspaceOutputSchema,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      handler: async (args) => {
+        const { filter, select, pageToken } = args as {
+          filter?: string;
+          select?: string;
+          pageToken?: number;
+        };
         telemetry?.logUsage('ai.tool-call', {
           tool: NX_WORKSPACE,
         });
@@ -395,19 +399,19 @@ export function registerNxWorkspaceTools(
           };
         }
       },
-    );
+    });
   }
 
   if (!isToolEnabled(NX_WORKSPACE_PATH, toolsFilter)) {
     logger.debug?.(`Skipping ${NX_WORKSPACE_PATH} - disabled by tools filter`);
   } else {
-    server.tool(
-      NX_WORKSPACE_PATH,
-      'Returns the path to the Nx workspace root',
-      {
+    registry.registerTool({
+      name: NX_WORKSPACE_PATH,
+      description: 'Returns the path to the Nx workspace root',
+      annotations: {
         readOnlyHint: true,
       },
-      async () => {
+      handler: async () => {
         telemetry?.logUsage('ai.tool-call', {
           tool: NX_WORKSPACE_PATH,
         });
@@ -421,48 +425,51 @@ export function registerNxWorkspaceTools(
           ],
         };
       },
-    );
+    });
   }
 
   if (!isToolEnabled(NX_PROJECT_DETAILS, toolsFilter)) {
     logger.debug?.(`Skipping ${NX_PROJECT_DETAILS} - disabled by tools filter`);
   } else {
-    server.registerTool(
-      NX_PROJECT_DETAILS,
-      {
-        description:
-          'Returns the project configuration for a specific Nx project. When called without a select parameter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the select parameter with dot notation to access complete unabridged configuration for specific paths (e.g., select="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
-        inputSchema: {
-          projectName: z
-            .string()
-            .describe('The name of the project to get details for'),
-          select: z
-            .string()
-            .optional()
-            .describe(
-              'Path to select specific properties in text content output. ' +
-                'Note: structuredContent always returns full project data. ' +
-                'Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). ' +
-                'When provided, only the value at this path will be returned in text content. ' +
-                'If select is set, dependencies and external dependencies will not be included in the text content response.',
-            ),
-          pageToken: z
-            .number()
-            .optional()
-            .describe(
-              'Token for pagination of text content. ' +
-                'Note: structuredContent is not paginated. ' +
-                'Pass the token from the previous response to get the next page.',
-            ),
-        },
-        outputSchema: nxProjectDetailsOutputSchema,
-        annotations: {
-          destructiveHint: false,
-          readOnlyHint: true,
-          openWorldHint: false,
-        },
+    registry.registerTool({
+      name: NX_PROJECT_DETAILS,
+      description:
+        'Returns the project configuration for a specific Nx project. When called without a select parameter, targets are shown in a compressed plain-text format (executor/command, dependencies, cache status) to optimize token usage, while all other configuration (metadata, project dependencies, external dependencies) is shown in full JSON. Use the select parameter with dot notation to access complete unabridged configuration for specific paths (e.g., select="targets.build" for full build target config including all options, inputs, outputs). This tool is ideal for: understanding what targets are available and how to run them, viewing project metadata and relationships, then drilling into specific target details as needed. For large projects, results are paginated - if a pagination token is returned, call this tool again with the same parameters plus the token to retrieve additional results.',
+      inputSchema: {
+        projectName: z
+          .string()
+          .describe('The name of the project to get details for'),
+        select: z
+          .string()
+          .optional()
+          .describe(
+            'Path to select specific properties in text content output. ' +
+              'Note: structuredContent always returns full project data. ' +
+              'Supports dot notation (e.g., "targets.build.inputs") and array indices (e.g., "targets.build.options.assets[0]"). ' +
+              'When provided, only the value at this path will be returned in text content. ' +
+              'If select is set, dependencies and external dependencies will not be included in the text content response.',
+          ),
+        pageToken: z
+          .number()
+          .optional()
+          .describe(
+            'Token for pagination of text content. ' +
+              'Note: structuredContent is not paginated. ' +
+              'Pass the token from the previous response to get the next page.',
+          ),
       },
-      async ({ projectName, select, pageToken }) => {
+      outputSchema: outputSchemas.nxProjectDetailsOutputSchema,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+      handler: async (args) => {
+        const { projectName, select, pageToken } = args as {
+          projectName: string;
+          select?: string;
+          pageToken?: number;
+        };
         telemetry?.logUsage('ai.tool-call', {
           tool: NX_PROJECT_DETAILS,
         });
@@ -639,21 +646,22 @@ ${targetDescriptions}`;
 
         return { content, structuredContent };
       },
-    );
+    });
   }
 
   if (!isToolEnabled(NX_GENERATORS, toolsFilter)) {
     logger.debug?.(`Skipping ${NX_GENERATORS} - disabled by tools filter`);
   } else {
-    server.tool(
-      NX_GENERATORS,
-      "Returns a complete list of all available Nx generators in the workspace, including both plugin-provided generators (like @nx/react:component) and local workspace generators. The output shows each generator's name with its description, useful for discovering what generators exist or finding one that matches a specific need.",
-      {
+    registry.registerTool({
+      name: NX_GENERATORS,
+      description:
+        "Returns a complete list of all available Nx generators in the workspace, including both plugin-provided generators (like @nx/react:component) and local workspace generators. The output shows each generator's name with its description, useful for discovering what generators exist or finding one that matches a specific need.",
+      annotations: {
         destructiveHint: false,
         readOnlyHint: true,
         openWorldHint: false,
       },
-      async () => {
+      handler: async () => {
         telemetry?.logUsage('ai.tool-call', {
           tool: NX_GENERATORS,
         });
@@ -686,7 +694,7 @@ ${targetDescriptions}`;
           content: [{ type: 'text', text: prompt }],
         };
       },
-    );
+    });
   }
 
   if (!isToolEnabled(NX_GENERATOR_SCHEMA, toolsFilter)) {
@@ -694,22 +702,24 @@ ${targetDescriptions}`;
       `Skipping ${NX_GENERATOR_SCHEMA} - disabled by tools filter`,
     );
   } else {
-    server.tool(
-      NX_GENERATOR_SCHEMA,
-      "Returns the complete JSON schema for a specific Nx generator. The schema contains all available options with their types, descriptions, default values, validation rules, and whether they're required or optional. Many generators also include helpful examples showing common usage patterns. The tool automatically handles generator aliases (e.g., 'app' vs 'application').",
-      {
+    registry.registerTool({
+      name: NX_GENERATOR_SCHEMA,
+      description:
+        "Returns the complete JSON schema for a specific Nx generator. The schema contains all available options with their types, descriptions, default values, validation rules, and whether they're required or optional. Many generators also include helpful examples showing common usage patterns. The tool automatically handles generator aliases (e.g., 'app' vs 'application').",
+      inputSchema: {
         generatorName: z
           .string()
           .describe(
             'The name of the generator to get schema for. Use the generator name from the nx_generators tool.',
           ),
       },
-      {
+      annotations: {
         destructiveHint: false,
         readOnlyHint: true,
         openWorldHint: false,
       },
-      async ({ generatorName }) => {
+      handler: async (args) => {
+        const { generatorName } = args as { generatorName: string };
         telemetry?.logUsage('ai.tool-call', {
           tool: NX_GENERATOR_SCHEMA,
         });
@@ -764,7 +774,7 @@ ${targetDescriptions}`;
           ],
         };
       },
-    );
+    });
   }
 
   logger.debug?.('Registered Nx workspace tool');
