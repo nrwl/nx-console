@@ -367,7 +367,7 @@ describe('registerNxWorkspaceTools', () => {
   beforeEach(() => {
     registeredTools = {};
     mockServer = {
-      tool: jest.fn((name, description, schema, options, handler) => {
+      registerTool: jest.fn((name, config, handler) => {
         registeredTools[name] = handler;
       }),
     };
@@ -398,17 +398,13 @@ describe('registerNxWorkspaceTools', () => {
       mockNxWorkspaceInfoProvider,
     );
 
-    expect(mockServer.tool).toHaveBeenCalledWith(
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
       NX_WORKSPACE,
-      expect.any(String),
-      expect.any(Object),
       expect.any(Object),
       expect.any(Function),
     );
-    expect(mockServer.tool).toHaveBeenCalledWith(
+    expect(mockServer.registerTool).toHaveBeenCalledWith(
       NX_PROJECT_DETAILS,
-      expect.any(String),
-      expect.any(Object),
       expect.any(Object),
       expect.any(Function),
     );
