@@ -93,13 +93,3 @@ function getFallbackSchemas(): NxOutputSchemas {
     },
   };
 }
-
-export const nxWorkspaceOutputSchema: Record<string, unknown> = {
-  type: 'object',
-  additionalProperties: true,
-};
-
-export const nxProjectDetailsOutputSchema: Record<string, unknown> = {
-  type: 'object',
-  additionalProperties: true,
-};
