@@ -90,7 +90,7 @@ export class NxMcpServerWrapper {
         listChanged: true,
       },
       resources: {
-        list: true,
+        listChanged: true,
         subscribe: false,
       },
     });
@@ -285,7 +285,9 @@ export class NxMcpServerWrapper {
       }
 
       // Check workspace tools condition
-      const workspaceValid = await this.isValidNxWorkspace();
+      const workspaceValid = this.ideProvider
+        ? await this.isValidNxWorkspace()
+        : true;
 
       if (
         workspaceValid &&
@@ -434,7 +436,7 @@ export const nxMcpServerCapabilities: ServerCapabilities = {
     listChanged: true,
   },
   resources: {
-    list: true,
+    listChanged: true,
     subscribe: false,
   },
   logging: {},

@@ -178,10 +178,8 @@ export const machine = setup({
       }
       enqueue.assign({
         ...context,
-        // Preserve existing CIPEs if we have a network error and no new data
-        recentCIPEs:
-          newCIPEData?.info ??
-          (newCIPEData?.error.type === 'network' ? context.recentCIPEs : []),
+        // Preserve existing CIPEs when errors occur to avoid false notifications
+        recentCIPEs: newCIPEData?.info ?? context.recentCIPEs,
         cipeError: newCIPEData?.error,
         workspaceUrl: newCIPEData?.workspaceUrl,
       });

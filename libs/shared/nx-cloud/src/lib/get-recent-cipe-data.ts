@@ -79,8 +79,12 @@ export async function getRecentCIPEData(
     cachedWorkspacePath = workspacePath;
     lastFetchTimestamp = Date.now();
 
+    logger.debug?.(
+      `Recent CIPE data fetched successfully: ${JSON.stringify(result)}`,
+    );
     return result;
   } catch (e) {
+    // HttpError with 401 status = authentication error
     if (e instanceof HttpError && e.status === 401) {
       logger.log(`Authentication error: ${e.responseText}`);
       return {
@@ -90,27 +94,25 @@ export async function getRecentCIPEData(
         },
       };
     }
-    if (
-      (e.status === 404 || !e.status) &&
-      e.responseText &&
-      (e.responseText.includes('Unable to connect') ||
-        e.responseText.includes('ENOTFOUND') ||
-        e.responseText.includes('ETIMEDOUT') ||
-        e.responseText.includes('ECONNREFUSED'))
-    ) {
-      logger.log(`Network error: ${e.responseText}`);
+
+    // Non-HttpError from fetch = network error (connection refused, timeout, etc.)
+    if (!(e instanceof HttpError)) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      logger.log(`Network error: ${errorMessage}`);
       return {
         error: {
           type: 'network',
-          message: e.responseText,
+          message: errorMessage,
         },
       };
     }
-    logger.log(`Error: ${JSON.stringify(e)}`);
+
+    // Other HttpError statuses = other errors
+    logger.log(`Error: ${e.status} ${e.responseText}`);
     return {
       error: {
         type: 'other',
-        message: e instanceof HttpError ? e.responseText : (e as Error).message,
+        message: e.responseText,
       },
     };
   }

@@ -944,5 +944,17 @@ describe('CIPE Notifications', () => {
         });
       });
     });
+
+    it('should not show notifications when oldData is null (initial load or after error recovery)', () => {
+      // When oldData is null (either initial load or after error state),
+      // should not show notifications to avoid alerting on old CIPEs
+      new CIPENotificationService().compareCIPEDataAndSendNotifications(
+        null,
+        pipelineExamples.failWithAiFix,
+      );
+
+      expect(window.showErrorMessage).not.toHaveBeenCalled();
+      expect(window.showInformationMessage).not.toHaveBeenCalled();
+    });
   });
 });
