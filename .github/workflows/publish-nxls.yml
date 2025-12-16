@@ -42,4 +42,4 @@ jobs:
         run: |
           npx nx run nxls:build --skip-nx-cache
           cd dist/apps/nxls
-          npm publish --dry-run
+          npm publish
