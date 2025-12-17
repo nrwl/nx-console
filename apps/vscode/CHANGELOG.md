@@ -1,3 +1,13 @@
+## 18.82.0 (2025-12-17)
+
+### 🩹 Fixes
+
+- **vscode:** dont show ai fix notification on subsequent loads if first load is error ([#2925](https://github.com/nrwl/nx-console/pull/2925))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 # [18.81.0](https://github.com/nrwl/nx-console/compare/vscode-v18.80.3...vscode-v18.81.0) (2025-11-27)
 
 
