@@ -72,12 +72,14 @@ export async function languageServerWatcher(
   }
 
   if (gte(nxVersion, '22.0.0')) {
+    lspLogger.debug('Using PassiveDaemonWatcher for file watching');
     return registerPassiveDaemonWatcher(
       workspacePath,
       callback,
       watcherOperationalCallback,
     );
   } else {
+    lspLogger.debug('Using old DaemonWatcher/NativeWatcher for file watching');
     // older versions don't have this granular watcher tracking so we just assume true
     watcherOperationalCallback?.(true);
     return registerOldWatcher(workspacePath, nxVersion, callback);
@@ -89,7 +91,12 @@ async function registerPassiveDaemonWatcher(
   callback: DaemonWatcherCallback,
   watcherOperationalCallback?: (isOperational: boolean) => void,
 ): Promise<() => Promise<void>> {
+  lspLogger.debug?.('registerPassiveDaemonWatcher: Starting registration...');
+  lspLogger.debug?.('registerPassiveDaemonWatcher: Getting daemon client...');
   const daemonClient = await getNxDaemonClient(workspacePath, lspLogger);
+  lspLogger.debug?.(
+    `registerPassiveDaemonWatcher: Daemon client retrieved: ${!!daemonClient}`,
+  );
 
   if (!daemonClient.daemonClient.enabled()) {
     lspLogger.log('Daemon client is not enabled, file watching not available.');
@@ -97,24 +104,50 @@ async function registerPassiveDaemonWatcher(
       lspLogger.log('unregistering empty watcher');
     };
   }
+  lspLogger.debug?.('registerPassiveDaemonWatcher: Daemon client is enabled');
   try {
+    lspLogger.debug?.(
+      `registerPassiveDaemonWatcher: Existing _passiveDaemonWatcher: ${!!_passiveDaemonWatcher}`,
+    );
+    if (_passiveDaemonWatcher) {
+      lspLogger.debug?.(
+        `registerPassiveDaemonWatcher: Existing watcher state: ${_passiveDaemonWatcher.state}`,
+      );
+    }
+    lspLogger.debug?.(
+      'registerPassiveDaemonWatcher: Creating new PassiveDaemonWatcher...',
+    );
     _passiveDaemonWatcher = new PassiveDaemonWatcher(
       workspacePath,
       lspLogger,
       watcherOperationalCallback,
     );
+    lspLogger.debug?.('registerPassiveDaemonWatcher: Calling start()...');
     await _passiveDaemonWatcher.start();
+    lspLogger.debug?.(
+      `registerPassiveDaemonWatcher: start() completed, state: ${_passiveDaemonWatcher.state}`,
+    );
     _passiveDaemonWatcher.listen((error, projectGraphAndSourceMaps) => {
+      lspLogger.debug?.(
+        `registerPassiveDaemonWatcher: Listener callback triggered, error=${error}`,
+      );
       callback(error, projectGraphAndSourceMaps);
     });
+    lspLogger.debug?.('registerPassiveDaemonWatcher: Listener registered');
     return async () => {
       if (_passiveDaemonWatcher) {
+        lspLogger.debug?.(
+          'registerPassiveDaemonWatcher: Disposing passive daemon watcher...',
+        );
         return _passiveDaemonWatcher.dispose();
       }
     };
   } catch (e) {
     lspLogger.log(
       'Error starting passive daemon watcher: ' + (e as Error).message,
+    );
+    lspLogger.debug?.(
+      `registerPassiveDaemonWatcher: Error details: ${(e as Error).stack}`,
     );
     return async () => {
       lspLogger.log('unregistering empty watcher');

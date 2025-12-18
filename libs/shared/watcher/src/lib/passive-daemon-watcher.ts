@@ -3,14 +3,7 @@ import { Logger } from '@nx-console/shared-utils';
 import { randomUUID } from 'crypto';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
-import {
-  AnyEventObject,
-  assign,
-  createActor,
-  fromPromise,
-  not,
-  setup,
-} from 'xstate';
+import { AnyEventObject, createActor, fromPromise, setup } from 'xstate';
 
 export type DaemonWatcherCallback = (
   error?: Error | null | 'closed' | 'reconnecting' | 'reconnected',
@@ -20,16 +13,10 @@ export type DaemonWatcherCallback = (
   } | null,
 ) => void;
 
-type MachineContext = {
-  attemptNumber: number;
-  error: Error | null;
-};
-
 type MachineEvents =
   | { type: 'START' }
   | { type: 'STOP' }
-  | { type: 'LISTENER_ERROR'; error: Error | 'closed' }
-  | { type: 'RESET_ATTEMPTS' };
+  | { type: 'LISTENER_ERROR'; error: Error | 'closed' };
 
 export class PassiveDaemonWatcher {
   private listeners: Map<string, DaemonWatcherCallback> = new Map();
@@ -37,27 +24,9 @@ export class PassiveDaemonWatcher {
 
   private machine = setup({
     types: {
-      context: {} as MachineContext,
       events: {} as MachineEvents,
     },
     actions: {
-      assignError: assign(({ event }) => {
-        if (event.type === 'LISTENER_ERROR') {
-          const error =
-            event.error === 'closed'
-              ? new Error('Daemon connection closed')
-              : event.error;
-          return { error };
-        }
-        return {};
-      }),
-      incrementAttempt: assign(({ context }) => ({
-        attemptNumber: context.attemptNumber + 1,
-      })),
-      resetAttempts: assign(() => ({
-        attemptNumber: 0,
-        error: null,
-      })),
       storeUnregisterCallback: ({ event }) => {
         this.unregisterCallback =
           ((event as AnyEventObject)['output'] as (() => void) | undefined) ??
@@ -65,43 +34,79 @@ export class PassiveDaemonWatcher {
       },
       cleanupListener: () => {
         if (this.unregisterCallback) {
+          this.logger.debug?.(
+            'PassiveDaemonWatcher: Cleaning up daemon listener',
+          );
           this.unregisterCallback();
           this.unregisterCallback = null;
+        } else {
+          this.logger.debug?.(
+            'PassiveDaemonWatcher: No daemon listener to clean up',
+          );
         }
       },
-      logTransition: ({ context }, params: { to: string }) => {
+      logTransition: (_, params: { to: string }) => {
         this.logger.debug?.(
-          `PassiveDaemonWatcher: transitioning to ${params.to} (attempt ${context.attemptNumber})`,
+          `PassiveDaemonWatcher: Transitioning to ${params.to}`,
         );
       },
       notifyOperationalState: (_, params: { isOperational: boolean }) => {
+        this.logger.debug?.(
+          `PassiveDaemonWatcher: Operational state changed to ${params.isOperational}`,
+        );
         if (this.onOperationalStateChange) {
           this.onOperationalStateChange(params.isOperational);
         }
       },
-      logPermanentFailure: ({ context }) => {
-        this.logger.log(
-          `PassiveDaemonWatcher: Failed to register daemon listener after ${context.attemptNumber} attempts. Giving up.`,
-        );
+      logError: ({ event }) => {
+        if (event.type === 'LISTENER_ERROR') {
+          this.logger.log(
+            `PassiveDaemonWatcher: Listener error - ${event.error}`,
+          );
+        }
       },
     },
     actors: {
       registerListener: fromPromise(async () => {
+        this.logger.debug?.(
+          'PassiveDaemonWatcher: registerListener actor started',
+        );
+        this.logger.debug?.(
+          'PassiveDaemonWatcher: Attempting to get daemon client...',
+        );
         const daemonClientModule = await getNxDaemonClient(
           this.workspacePath,
           this.logger,
         );
+        this.logger.debug?.(
+          `PassiveDaemonWatcher: Got daemon client module: ${!!daemonClientModule}`,
+        );
 
         if (!daemonClientModule) {
+          this.logger.debug?.(
+            'PassiveDaemonWatcher: Daemon client module not available',
+          );
           throw new Error(
             'Nx Daemon client is not available. Make sure you are using a compatible version of Nx.',
           );
         }
 
-        if (!daemonClientModule.daemonClient?.enabled()) {
+        const isEnabled = daemonClientModule.daemonClient?.enabled();
+        this.logger.debug?.(
+          `PassiveDaemonWatcher: Daemon client enabled check: ${isEnabled}`,
+        );
+        if (!isEnabled) {
+          this.logger.debug?.(
+            'PassiveDaemonWatcher: Daemon client is disabled',
+          );
           throw new Error('Nx Daemon client is not enabled.');
         }
 
+        this.logger.debug?.('PassiveDaemonWatcher: Daemon client is enabled');
+
+        this.logger.debug?.(
+          'PassiveDaemonWatcher: About to call registerProjectGraphRecomputationListener...',
+        );
         const unregister =
           await daemonClientModule.daemonClient.registerProjectGraphRecomputationListener(
             (
@@ -124,13 +129,18 @@ export class PassiveDaemonWatcher {
                 return;
               }
               if (error) {
+                this.logger.debug?.(
+                  `PassiveDaemonWatcher: Listener error received: ${error}`,
+                );
                 this.actor.send({ type: 'LISTENER_ERROR', error });
               } else if (error === 'reconnecting' || error === 'reconnected') {
                 this.listeners.forEach((listener) =>
                   listener(error, projectGraphAndSourceMaps),
                 );
               } else {
-                this.actor.send({ type: 'RESET_ATTEMPTS' });
+                this.logger.debug?.(
+                  'PassiveDaemonWatcher: Project graph update received, notifying listeners',
+                );
                 this.listeners.forEach((listener) =>
                   listener(error, projectGraphAndSourceMaps),
                 );
@@ -138,36 +148,24 @@ export class PassiveDaemonWatcher {
             },
           );
 
+        this.logger.debug?.(
+          'PassiveDaemonWatcher: Successfully registered listener with daemon',
+        );
         return unregister;
       }),
-    },
-    guards: {
-      canRetry: ({ context }) => context.attemptNumber < 5,
-    },
-    delays: {
-      retryDelay: ({ context }) =>
-        Math.min(2000 * Math.pow(2, context.attemptNumber - 1), 40000),
     },
   }).createMachine({
     id: 'passiveDaemonWatcher',
     initial: 'idle',
-    context: {
-      attemptNumber: 0,
-      error: null,
-    },
     states: {
       idle: {
-        entry: [
-          { type: 'logTransition', params: { to: 'idle' } },
-          { type: 'notifyOperationalState', params: { isOperational: true } },
-        ],
+        entry: [{ type: 'logTransition', params: { to: 'idle' } }],
         on: {
           START: 'starting',
         },
       },
       starting: {
         entry: [
-          'incrementAttempt',
           { type: 'logTransition', params: { to: 'starting' } },
           { type: 'notifyOperationalState', params: { isOperational: true } },
         ],
@@ -179,8 +177,13 @@ export class PassiveDaemonWatcher {
             actions: ['storeUnregisterCallback'],
           },
           onError: {
-            target: 'failed',
-            actions: ['assignError'],
+            target: 'idle',
+            actions: [
+              {
+                type: 'notifyOperationalState',
+                params: { isOperational: false },
+              },
+            ],
           },
         },
       },
@@ -190,48 +193,26 @@ export class PassiveDaemonWatcher {
           { type: 'notifyOperationalState', params: { isOperational: true } },
         ],
         on: {
-          RESET_ATTEMPTS: {
-            actions: ['resetAttempts'],
-          },
           LISTENER_ERROR: {
-            target: 'failed',
-            actions: ['assignError'],
-          },
-          STOP: {
             target: 'idle',
-            actions: ['cleanupListener'],
-          },
-        },
-      },
-      failed: {
-        entry: [
-          { type: 'logTransition', params: { to: 'failed' } },
-          { type: 'notifyOperationalState', params: { isOperational: true } },
-        ],
-        always: [
-          {
-            guard: not('canRetry'),
             actions: [
-              'logPermanentFailure',
+              'logError',
+              'cleanupListener',
               {
                 type: 'notifyOperationalState',
                 params: { isOperational: false },
               },
             ],
           },
-        ],
-        after: {
-          retryDelay: [
-            {
-              guard: 'canRetry',
-              target: 'starting',
-            },
-          ],
-        },
-        on: {
           STOP: {
             target: 'idle',
-            actions: ['cleanupListener'],
+            actions: [
+              'cleanupListener',
+              {
+                type: 'notifyOperationalState',
+                params: { isOperational: false },
+              },
+            ],
           },
         },
       },
@@ -250,17 +231,25 @@ export class PassiveDaemonWatcher {
 
   listen(callback: DaemonWatcherCallback): () => void {
     const id = randomUUID();
+    this.logger.debug?.(
+      `PassiveDaemonWatcher: Adding listener (total: ${this.listeners.size + 1})`,
+    );
     this.listeners.set(id, callback);
     return () => {
       this.listeners.delete(id);
+      this.logger.debug?.(
+        `PassiveDaemonWatcher: Removed listener (total: ${this.listeners.size})`,
+      );
     };
   }
 
   start() {
+    this.logger.debug?.('PassiveDaemonWatcher: Starting watcher');
     this.actor.send({ type: 'START' });
   }
 
   stop() {
+    this.logger.debug?.('PassiveDaemonWatcher: Stopping watcher');
     this.actor.send({ type: 'STOP' });
   }
 
@@ -269,6 +258,7 @@ export class PassiveDaemonWatcher {
   }
 
   dispose() {
+    this.logger.debug?.('PassiveDaemonWatcher: Disposing watcher');
     this.stop();
     this.listeners.clear();
     this.actor.stop();

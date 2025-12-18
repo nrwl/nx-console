@@ -44,6 +44,7 @@ export async function nxWorkspace(
   } | null,
 ): Promise<NxWorkspace> {
   if (reset || projectGraphAndSourceMaps) {
+    logger?.debug?.('nxWorkspace: Resetting workspace status...');
     resetStatus(workspacePath);
   }
 
@@ -76,9 +77,19 @@ async function _workspace(
   } | null,
 ): Promise<NxWorkspace> {
   try {
+    logger?.debug?.('_workspace: Starting workspace fetch...');
+    logger?.debug?.('_workspace: Getting daemon client module...');
     const daemonClientModule = await getNxDaemonClient(workspacePath, logger);
+    logger?.debug?.(
+      `_workspace: Daemon client module retrieved: ${!!daemonClientModule}`,
+    );
+    logger?.debug?.('_workspace: Getting Nx version...');
     const nxVersion = await getNxVersion(workspacePath);
+    logger?.debug?.(`_workspace: Nx version retrieved: ${nxVersion.full}`);
 
+    logger?.debug?.(
+      `_workspace: Calling getNxWorkspaceConfig, projectGraphAndSourceMaps provided: ${!!projectGraphAndSourceMaps}`,
+    );
     const {
       projectGraph,
       sourceMaps,
@@ -90,7 +101,11 @@ async function _workspace(
       workspacePath,
       nxVersion,
       logger,
+      daemonClientModule,
       projectGraphAndSourceMaps,
+    );
+    logger?.debug?.(
+      `_workspace: getNxWorkspaceConfig completed, projectGraph nodes: ${Object.keys(projectGraph?.nodes ?? {}).length}`,
     );
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));

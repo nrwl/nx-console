@@ -109,7 +109,13 @@ connection.onInitialize(async (params) => {
   const { workspacePath, enableDebugLogging, disableFileWatching } =
     params.initializationOptions ?? {};
   setLspLogger(connection, enableDebugLogging ?? false);
+  lspLogger.log(
+    'Debug logging is ' + (enableDebugLogging ? 'enabled' : 'disabled'),
+  );
   DISABLE_FILE_WATCHING = disableFileWatching ?? false;
+  lspLogger.log(
+    'File watching is ' + (DISABLE_FILE_WATCHING ? 'disabled' : 'enabled'),
+  );
   lspLogger.log('Initializing Nx Language Server');
 
   const extractFsPathFromUri = (uri: string | undefined) =>
@@ -427,10 +433,14 @@ async function reconfigure(
     sourceMaps: ConfigurationSourceMaps;
   } | null,
 ): Promise<NxWorkspace | undefined> {
+  lspLogger.debug?.(
+    `reconfigure: Starting, projectGraphAndSourceMaps=${!!projectGraphAndSourceMaps}`,
+  );
   resetNxVersionCache();
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
   resetInferencePluginsCompletionCache();
+  lspLogger.debug?.('reconfigure: Caches reset, calling nxWorkspace...');
 
   const workspace = await nxWorkspace(
     workingPath,
@@ -438,16 +448,23 @@ async function reconfigure(
     true,
     projectGraphAndSourceMaps,
   );
+  lspLogger.debug?.(
+    `reconfigure: nxWorkspace completed, errors=${workspace?.errors?.length ?? 0}`,
+  );
   await configureSchemas(workingPath, CLIENT_CAPABILITIES);
+  lspLogger.debug?.('reconfigure: Schemas configured');
 
+  lspLogger.debug?.('reconfigure: Unregistering previous file watcher...');
   unregisterFileWatcher?.();
 
   if (!DISABLE_FILE_WATCHING) {
+    lspLogger.debug?.('reconfigure: Starting new file watcher...');
     unregisterFileWatcher = await languageServerWatcher(
       workingPath,
       fileWatcherCallback,
       fileWatcherOperationalCallback,
     );
+    lspLogger.debug?.('reconfigure: File watcher started');
   }
 
   return workspace;

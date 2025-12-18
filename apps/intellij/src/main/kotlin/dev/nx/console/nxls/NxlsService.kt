@@ -57,6 +57,9 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
                     .onWorkspaceRefreshStarted()
             }
         }
+        client()?.registerFileWatcherOperationalCallback { isOperational ->
+            WatcherRunningService.getInstance(project).setOperational(isOperational)
+        }
 
         cs.launch {
             project.messageBus
@@ -199,6 +202,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     suspend fun cloudStatus(): NxCloudStatus? {
         return withMessageIssueCatch("nx/cloudStatus") {
             server()?.getNxService()?.cloudStatus()?.await()
+        }()
+    }
+
+    suspend fun startDaemon() {
+        withMessageIssueCatch("nx/startDaemon") {
+            server()?.getNxService()?.startDaemon()?.await()
         }()
     }
 
