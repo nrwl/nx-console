@@ -87,12 +87,6 @@ async function tryRestartDaemonWatcher() {
   getTelemetry().logUsage('misc.restart-daemon-watcher');
 
   const nxlsClient = getNxlsClient();
-  try {
-    await nxlsClient.sendRequest(NxStartDaemonRequest, undefined);
-  } catch (e) {
-    showErrorMessageWithOpenLogs('Failed to start Nx daemon watcher');
-    return;
-  }
 
   await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
 }

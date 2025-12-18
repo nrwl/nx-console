@@ -109,191 +109,44 @@ describe('PassiveDaemonWatcher', () => {
     });
   });
 
-  describe('Retry on Registration Failure', () => {
-    it('should retry registration if getNxDaemonClient fails', async () => {
-      (getNxDaemonClient as jest.Mock)
-        .mockRejectedValueOnce(new Error('Failed'))
-        .mockRejectedValueOnce(new Error('Failed'))
-        .mockResolvedValueOnce({ daemonClient: mockDaemonClient });
-
-      const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
-      const listener = jest.fn();
-
-      watcher.listen(listener);
-      watcher.start();
-
-      await flushPromises();
-
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(1);
-
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(2);
-
-      await new Promise((resolve) => setTimeout(resolve, 5500));
-
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(3);
-
-      const mockData = {
-        projectGraph: { nodes: {}, dependencies: {} },
-        sourceMaps: {},
-      };
-      capturedDaemonCallback(null, mockData);
-
-      expect(listener).toHaveBeenCalledWith(null, mockData);
-
-      watcher.dispose();
-    }, 15000);
-
-    it('should retry registration if daemon.enabled() returns false', async () => {
-      mockDaemonClient.enabled
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true);
-
+  describe('Error Handling', () => {
+    it('should transition to idle when daemon listener callback receives an error', async () => {
       const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
       watcher.start();
 
       await flushPromises();
 
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(0);
-
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(1);
-
-      watcher.dispose();
-    }, 10000);
-
-    it('should retry registration if registerProjectGraphRecomputationListener throws', async () => {
-      mockDaemonClient.registerProjectGraphRecomputationListener
-        .mockImplementationOnce(() => {
-          throw new Error('Registration failed');
-        })
-        .mockImplementationOnce((callback: any) => {
-          capturedDaemonCallback = callback;
-          return mockUnregister;
-        });
-
-      const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
-      watcher.start();
-
-      await flushPromises();
-
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(1);
-
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(2);
-
-      watcher.dispose();
-    }, 10000);
-  });
-
-  describe('Retry on Listener Error', () => {
-    it('should retry when daemon listener callback receives an error', async () => {
-      const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
-      watcher.start();
-
-      await flushPromises();
-
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(1);
+      expect(watcher.state).toBe('listening');
 
       capturedDaemonCallback(new Error('Daemon error'));
 
-      await new Promise((resolve) => setTimeout(resolve, 2500));
+      await flushPromises();
 
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(2);
+      expect(watcher.state).toBe('idle');
 
       watcher.dispose();
-    }, 10000);
+    });
 
-    it('should retry when daemon listener callback receives "closed"', async () => {
+    it('should transition to idle when daemon listener callback receives "closed"', async () => {
       const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
       watcher.start();
 
       await flushPromises();
 
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(1);
+      expect(watcher.state).toBe('listening');
 
       capturedDaemonCallback('closed');
 
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(2);
-
-      watcher.dispose();
-    }, 10000);
-
-    it('should notify listeners of error before retrying', async () => {
-      const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
-      const listener = jest.fn();
-
-      watcher.listen(listener);
-      watcher.start();
-
       await flushPromises();
 
-      const error = new Error('Daemon error');
-      capturedDaemonCallback(error);
-
-      expect(listener).toHaveBeenCalledWith(error);
-
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-
-      expect(
-        mockDaemonClient.registerProjectGraphRecomputationListener,
-      ).toHaveBeenCalledTimes(2);
+      expect(watcher.state).toBe('idle');
 
       watcher.dispose();
-    }, 10000);
-  });
+    });
 
-  describe('Exponential Backoff', () => {
-    it('should use exponential backoff for retries (2s, 5s, 10s, 20s)', async () => {
-      (getNxDaemonClient as jest.Mock).mockRejectedValue(
-        new Error('Always fails'),
-      );
-
-      const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
-      watcher.start();
-
-      await flushPromises();
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(1);
-
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(2);
-
-      await new Promise((resolve) => setTimeout(resolve, 5500));
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(3);
-
-      await new Promise((resolve) => setTimeout(resolve, 10500));
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(4);
-
-      await new Promise((resolve) => setTimeout(resolve, 20500));
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(5);
-
-      watcher.dispose();
-    }, 50000);
-
-    it('should stop retrying after 4 failed attempts', async () => {
-      (getNxDaemonClient as jest.Mock).mockRejectedValue(
-        new Error('Always fails'),
+    it('should transition to idle when registration fails', async () => {
+      (getNxDaemonClient as jest.Mock).mockRejectedValueOnce(
+        new Error('Failed'),
       );
 
       const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
@@ -301,16 +154,23 @@ describe('PassiveDaemonWatcher', () => {
 
       await flushPromises();
 
-      await new Promise((resolve) => setTimeout(resolve, 40000));
-
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(5);
-
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-
-      expect(getNxDaemonClient).toHaveBeenCalledTimes(5);
+      expect(watcher.state).toBe('idle');
 
       watcher.dispose();
-    }, 50000);
+    });
+
+    it('should transition to idle when daemon is not enabled', async () => {
+      mockDaemonClient.enabled.mockReturnValue(false);
+
+      const watcher = new PassiveDaemonWatcher('/workspace', mockLogger);
+      watcher.start();
+
+      await flushPromises();
+
+      expect(watcher.state).toBe('idle');
+
+      watcher.dispose();
+    });
   });
 
   describe('Cleanup', () => {
@@ -399,10 +259,10 @@ describe('PassiveDaemonWatcher', () => {
       watcher.dispose();
     });
 
-    it('should call callback with true when failed but can retry', async () => {
+    it('should call callback with false when registration fails', async () => {
       const onOperationalStateChange = jest.fn();
       (getNxDaemonClient as jest.Mock).mockRejectedValueOnce(
-        new Error('Failed once'),
+        new Error('Failed'),
       );
 
       const watcher = new PassiveDaemonWatcher(
@@ -414,20 +274,13 @@ describe('PassiveDaemonWatcher', () => {
       watcher.start();
       await flushPromises();
 
-      const trueCalls = onOperationalStateChange.mock.calls.filter(
-        (call) => call[0] === true,
-      );
-      expect(trueCalls.length).toBeGreaterThan(0);
+      expect(onOperationalStateChange).toHaveBeenCalledWith(false);
 
       watcher.dispose();
     });
 
-    it('should call callback with false when permanently failed', async () => {
+    it('should call callback with false when listener receives error', async () => {
       const onOperationalStateChange = jest.fn();
-      (getNxDaemonClient as jest.Mock).mockRejectedValue(
-        new Error('Always fails'),
-      );
-
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
@@ -437,18 +290,17 @@ describe('PassiveDaemonWatcher', () => {
       watcher.start();
       await flushPromises();
 
-      await new Promise((resolve) => setTimeout(resolve, 45000));
+      onOperationalStateChange.mockClear();
+
+      capturedDaemonCallback('closed');
       await flushPromises();
 
-      const falseCalls = onOperationalStateChange.mock.calls.filter(
-        (call) => call[0] === false,
-      );
-      expect(falseCalls.length).toBeGreaterThan(0);
+      expect(onOperationalStateChange).toHaveBeenCalledWith(false);
 
       watcher.dispose();
-    }, 50000);
+    });
 
-    it('should call callback with true after stop', async () => {
+    it('should call callback with false after stop', async () => {
       const onOperationalStateChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
@@ -464,7 +316,53 @@ describe('PassiveDaemonWatcher', () => {
       watcher.stop();
       await flushPromises();
 
-      expect(onOperationalStateChange).toHaveBeenCalledWith(true);
+      expect(onOperationalStateChange).toHaveBeenCalledWith(false);
+
+      watcher.dispose();
+    });
+  });
+
+  describe('Reconnection Events', () => {
+    it('should not trigger state change on reconnecting event', async () => {
+      const onOperationalStateChange = jest.fn();
+      const watcher = new PassiveDaemonWatcher(
+        '/workspace',
+        mockLogger,
+        onOperationalStateChange,
+      );
+
+      watcher.start();
+      await flushPromises();
+
+      onOperationalStateChange.mockClear();
+
+      capturedDaemonCallback('reconnecting');
+      await flushPromises();
+
+      expect(onOperationalStateChange).not.toHaveBeenCalled();
+      expect(watcher.state).toBe('listening');
+
+      watcher.dispose();
+    });
+
+    it('should not trigger state change on reconnected event', async () => {
+      const onOperationalStateChange = jest.fn();
+      const watcher = new PassiveDaemonWatcher(
+        '/workspace',
+        mockLogger,
+        onOperationalStateChange,
+      );
+
+      watcher.start();
+      await flushPromises();
+
+      onOperationalStateChange.mockClear();
+
+      capturedDaemonCallback('reconnected');
+      await flushPromises();
+
+      expect(onOperationalStateChange).not.toHaveBeenCalled();
+      expect(watcher.state).toBe('listening');
 
       watcher.dispose();
     });
