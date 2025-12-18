@@ -19,6 +19,7 @@ export type TelemetryEvents =
   | 'misc.open-project-details-codelens'
   | 'misc.exception'
   | 'misc.nx-latest-no-provenance'
+  | 'misc.restart-daemon-watcher'
   // migrate
   | 'migrate.open'
   | 'migrate.start'
@@ -76,6 +77,7 @@ export type TelemetryEvents =
   | 'ai.configure-agents-check-end'
   | 'ai.configure-agents-check-error'
   | 'ai.configure-agents-check-expected-error'
+  | 'ai.configure-agents-check-finally'
   | 'ai.configure-agents-check-notification'
   | 'ai.configure-agents-action'
   | 'ai.configure-agents-dont-ask-again'

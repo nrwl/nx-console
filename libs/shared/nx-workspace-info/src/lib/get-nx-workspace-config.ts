@@ -25,6 +25,13 @@ export async function getNxWorkspaceConfig(
   workspacePath: string,
   nxVersion: NxVersion,
   logger: Logger,
+  nxDaemonClientModule:
+    | typeof import('nx/src/daemon/client/client')
+    | undefined,
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null,
 ): Promise<{
   projectGraph: ProjectGraph | undefined;
   sourceMaps: ConfigurationSourceMaps | undefined;
@@ -64,17 +71,13 @@ export async function getNxWorkspaceConfig(
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
     (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
-    const [
-      nxProjectGraph,
-      nxOutput,
-      nxProjectGraphUtils,
-      nxDaemonClientModule,
-    ] = await Promise.all([
+    logger?.debug?.('getNxWorkspaceConfig: Loading Nx modules...');
+    const [nxProjectGraph, nxOutput, nxProjectGraphUtils] = await Promise.all([
       getNxProjectGraph(workspacePath, logger),
       getNxOutput(workspacePath, logger),
       getNxProjectGraphUtils(workspacePath, logger),
-      getNxDaemonClient(workspacePath, logger),
     ]);
+    logger?.debug?.('getNxWorkspaceConfig: Nx modules loaded successfully');
 
     // things tend to break if nx.json is broken so let's abort in this case
     try {
@@ -88,79 +91,117 @@ export async function getNxWorkspaceConfig(
       }
     }
 
-    if (
-      nxDaemonClientModule &&
-      nxDaemonClientModule.daemonClient?.enabled() &&
-      !(await nxDaemonClientModule.daemonClient?.isServerAvailable())
-    ) {
-      const pm = await getPackageManagerCommand(workspacePath, logger);
-      execSync(`${pm.exec} nx daemon --start`, {
-        cwd: workspacePath,
-        windowsHide: true,
-      });
+    logger?.debug?.(
+      `getNxWorkspaceConfig: Daemon client module exists: ${!!nxDaemonClientModule}`,
+    );
+    if (nxDaemonClientModule) {
+      const isEnabled = nxDaemonClientModule.daemonClient?.enabled();
+      logger?.debug?.(
+        `getNxWorkspaceConfig: Daemon client enabled: ${isEnabled}`,
+      );
+      if (isEnabled) {
+        logger?.debug?.(
+          'getNxWorkspaceConfig: Checking if daemon server is available...',
+        );
+        const isServerAvailable =
+          await nxDaemonClientModule.daemonClient?.isServerAvailable();
+        logger?.debug?.(
+          `getNxWorkspaceConfig: Daemon server available: ${isServerAvailable}`,
+        );
+        if (!isServerAvailable) {
+          logger?.debug?.(
+            'getNxWorkspaceConfig: Starting daemon server via CLI...',
+          );
+          const pm = await getPackageManagerCommand(workspacePath, logger);
+          execSync(`${pm.exec} nx daemon --start`, {
+            cwd: workspacePath,
+            windowsHide: true,
+          });
+          logger?.debug?.(
+            'getNxWorkspaceConfig: Daemon server start command executed',
+          );
+        }
+      }
     }
 
-    try {
-      _defaultProcessExit = process.exit;
-      process.exit = function (code?: number) {
-        console.warn('process.exit called with code', code);
-      } as (code?: number) => never;
+    if (!projectGraphAndSourceMaps) {
+      try {
+        _defaultProcessExit = process.exit;
+        process.exit = function (code?: number) {
+          console.warn('process.exit called with code', code);
+        } as (code?: number) => never;
 
-      if (nxOutput !== undefined) {
-        nxOutput.output.error = (output) => {
-          // do nothing
-        };
-        nxOutput.output.log = (output) => {
-          // do nothing
-        };
-      }
+        if (nxOutput !== undefined) {
+          nxOutput.output.error = (output) => {
+            // do nothing
+          };
+          nxOutput.output.log = (output) => {
+            // do nothing
+          };
+        }
 
-      if (gte(nxVersion, '17.2.0')) {
-        logger.log('createProjectGraphAndSourceMapsAsync');
-        try {
-          const projectGraphAndSourceMaps = await (
-            nxProjectGraph as any
-          ).createProjectGraphAndSourceMapsAsync({
+        if (gte(nxVersion, '17.2.0')) {
+          logger.log('createProjectGraphAndSourceMapsAsync');
+          logger?.debug?.(
+            'getNxWorkspaceConfig: About to call createProjectGraphAndSourceMapsAsync...',
+          );
+          try {
+            logger?.debug?.(
+              'getNxWorkspaceConfig: Calling createProjectGraphAndSourceMapsAsync with exitOnError: false',
+            );
+            const projectGraphAndSourceMaps = await (
+              nxProjectGraph as any
+            ).createProjectGraphAndSourceMapsAsync({
+              exitOnError: false,
+            });
+            logger?.debug?.(
+              'getNxWorkspaceConfig: createProjectGraphAndSourceMapsAsync returned successfully',
+            );
+            projectGraph = projectGraphAndSourceMaps.projectGraph;
+
+            sourceMaps = projectGraphAndSourceMaps.sourceMaps;
+          } catch (e) {
+            if (isProjectGraphError(e)) {
+              logger.log('caught ProjectGraphError, using partial graph');
+              projectGraph = e.getPartialProjectGraph() ?? {
+                nodes: {},
+                dependencies: {},
+              };
+              sourceMaps = e.getPartialSourcemaps();
+              errors = e.getErrors().map((error) => ({
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+                file:
+                  (error as any).file ??
+                  ((error as any).cause as any)?.errors?.[0]?.location?.file,
+                pluginName: (error as any).pluginName,
+                cause: (error as any).cause,
+              }));
+              isPartial = true;
+            } else {
+              throw e;
+            }
+          }
+          logger.log('createProjectGraphAndSourceMapsAsync successful');
+        } else {
+          logger.log('createProjectGraphAsync');
+          projectGraph = await nxProjectGraph.createProjectGraphAsync({
             exitOnError: false,
           });
-          projectGraph = projectGraphAndSourceMaps.projectGraph;
-
-          sourceMaps = projectGraphAndSourceMaps.sourceMaps;
-        } catch (e) {
-          if (isProjectGraphError(e)) {
-            logger.log('caught ProjectGraphError, using partial graph');
-            projectGraph = e.getPartialProjectGraph() ?? {
-              nodes: {},
-              dependencies: {},
-            };
-            sourceMaps = e.getPartialSourcemaps();
-            errors = e.getErrors().map((error) => ({
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-              file:
-                (error as any).file ??
-                ((error as any).cause as any)?.errors?.[0]?.location?.file,
-              pluginName: (error as any).pluginName,
-              cause: (error as any).cause,
-            }));
-            isPartial = true;
-          } else {
-            throw e;
-          }
+          logger.log('createProjectGraphAsync successful');
         }
-        logger.log('createProjectGraphAndSourceMapsAsync successful');
-      } else {
-        logger.log('createProjectGraphAsync');
-        projectGraph = await nxProjectGraph.createProjectGraphAsync({
-          exitOnError: false,
-        });
-        logger.log('createProjectGraphAsync successful');
+      } catch (e) {
+        logger.log('Unable to get project graph');
+        logger.log(e.stack);
+        errors = [{ stack: e.stack }];
       }
-    } catch (e) {
-      logger.log('Unable to get project graph');
-      logger.log(e.stack);
-      errors = [{ stack: e.stack }];
+    } else {
+      logger.log(
+        'received project graph and source maps, skipping recomputation',
+      );
+      projectGraph = projectGraphAndSourceMaps.projectGraph;
+      sourceMaps = projectGraphAndSourceMaps.sourceMaps;
     }
 
     if (gte(nxVersion, '16.3.1') && projectGraph) {
@@ -174,16 +215,6 @@ export async function getNxWorkspaceConfig(
         projectFileMap[projectName] =
           (projectGraph?.nodes[projectName].data as any).files ?? [];
       });
-    }
-
-    // reset the daemon client after getting all required information from the daemon
-    if (nxDaemonClientModule && nxDaemonClientModule.daemonClient?.enabled()) {
-      try {
-        logger.log('Resetting daemon client');
-        nxDaemonClientModule.daemonClient?.reset();
-      } catch (e) {
-        logger.log(`Error while resetting daemon client, moving on...`);
-      }
     }
 
     const end = performance.now();

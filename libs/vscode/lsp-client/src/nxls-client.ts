@@ -33,11 +33,14 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { WatcherRunningService } from './watcher-running-service';
 
 let _nxlsClient: NxlsClient | undefined;
 
 export function createNxlsClient(extensionContext: ExtensionContext) {
   _nxlsClient = new NxlsClient(extensionContext);
+
+  extensionContext.subscriptions.push(new WatcherRunningService(_nxlsClient));
 
   const disposable = refreshWorkspaceOnBranchChange(_nxlsClient);
   if (disposable) {
