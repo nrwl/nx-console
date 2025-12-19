@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'nx-mcp-server',
   preset: '../../../jest.preset.js',
   globals: {},

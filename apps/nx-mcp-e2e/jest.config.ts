@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'nx-mcp-e2e',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',

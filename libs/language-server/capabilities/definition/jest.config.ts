@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'language-server-capabilities-definition',
   preset: '../../../../jest.preset.js',
   transform: {
