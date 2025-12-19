@@ -71,6 +71,7 @@
     "@nx/powerpack-license": "21.0.0-beta.0",
     "@nx/storybook": "22.4.0-beta.0",
     "@nx/vite": "22.4.0-beta.0",
+    "@nx/vitest": "22.4.0-beta.0",
     "@nx/web": "22.4.0-beta.0",
     "@nx/webpack": "22.4.0-beta.0",
     "@nx/workspace": "22.4.0-beta.0",
