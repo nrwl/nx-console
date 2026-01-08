@@ -3,6 +3,7 @@ import {
   getProjectGraphOutput,
 } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
+import { escapeHtml } from '@nx-console/vscode-utils';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { gte } from '@nx-console/nx-version';
@@ -45,7 +46,7 @@ export function loadError(errorMessage: string | null) {
         }
       </style>
       <p>Unable to load the project graph. The following error occured:</p>
-      <pre>${errorMessage}</pre>
+      <pre>${escapeHtml(errorMessage)}</pre>
     `;
   }
   return html`

@@ -1,4 +1,5 @@
 export * from './lib/abstract-tree-provider';
+export * from './lib/html-utils';
 export * from './lib/dependency-versioning';
 export * from './lib/empty-state-messages';
 export { getWorkspacePath } from './lib/get-workspace-path';

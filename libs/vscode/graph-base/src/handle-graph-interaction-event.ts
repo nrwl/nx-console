@@ -4,7 +4,7 @@ import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { surroundWithQuotesIfNeeded } from '@nx-console/vscode-utils';
-import { join } from 'path';
+import { isAbsolute, join, relative, resolve } from 'path';
 import { commands, ShellExecution, Task, tasks, TaskScope, Uri } from 'vscode';
 import { importNxPackagePath } from '@nx-console/shared-npm';
 
@@ -16,10 +16,13 @@ export async function handleGraphInteractionEventBase(event: {
     getTelemetry().logUsage('graph.interaction-open-project-edge-file');
     const workspacePath = getNxWorkspacePath();
 
-    commands.executeCommand(
-      'vscode.open',
-      Uri.file(join(workspacePath, event.payload.url)),
-    );
+    const resolvedPath = resolve(workspacePath, event.payload.url);
+    const relativePath = relative(workspacePath, resolvedPath);
+    if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
+      return false;
+    }
+
+    commands.executeCommand('vscode.open', Uri.file(resolvedPath));
     return true;
   }
   if (event.type === 'open-project-config') {
