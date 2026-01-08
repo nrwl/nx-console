@@ -1,6 +1,7 @@
 import { gte } from '@nx-console/nx-version';
 import { NxError } from '@nx-console/shared-types';
 import { debounce } from '@nx-console/shared-utils';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   NxGraphServer,
   getNxGraphServer,
@@ -14,9 +15,11 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode-nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
+import { escapeJsString } from '@nx-console/vscode-utils';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import {
   ExtensionContext,
+  Uri,
   ViewColumn,
   WebviewPanel,
   commands,
@@ -50,16 +53,21 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
 
   constructor(
     private path: string,
-    extensionContext: ExtensionContext,
-    private expandedTarget?: string
+    private extensionContext: ExtensionContext,
+    private expandedTarget?: string,
   ) {
+    const workspacePath = getNxWorkspacePath();
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `Project Details`,
       ViewColumn.Beside,
       {
         enableScripts: true,
-      }
+        localResourceRoots: [
+          extensionContext.extensionUri,
+          Uri.file(workspacePath),
+        ],
+      },
     );
 
     this.refresh();
@@ -75,7 +83,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     const interactionListener = this.webviewPanel.webview.onDidReceiveMessage(
       async (event) => {
         this.handleGraphInteractionEvent(event);
-      }
+      },
     );
 
     const viewStateListener = this.webviewPanel.onDidChangeViewState(
@@ -83,13 +91,13 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
         commands.executeCommand(
           'setContext',
           'projectDetailsViewVisible',
-          webviewPanel.visible
+          webviewPanel.visible,
         );
-      }
+      },
     );
 
     const workspaceRefreshListener = onWorkspaceRefreshed(() =>
-      this.debouncedRefresh()
+      this.debouncedRefresh(),
     );
 
     this.webviewPanel.onDidDispose(() => {
@@ -147,6 +155,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
   private async loadHtml(project: ProjectConfiguration) {
     let html = await loadGraphBaseHtml(this.webviewPanel.webview);
 
+    const safeProjectName = escapeJsString(project?.name ?? '');
     html = html.replace(
       '</head>',
       /*html*/ `
@@ -156,26 +165,27 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
           if(type === 'reload') {
             console.log('reloading');
             window.waitForRouter().then(() => {
-              window.externalApi.openProjectDetails('${project?.name}')
+              window.externalApi.openProjectDetails('${safeProjectName}')
             })
           }
         });
       </script>
       </head>
-      `
+      `,
     );
 
+    const safeExpandedTarget = this.expandedTarget
+      ? `, '${escapeJsString(this.expandedTarget)}'`
+      : '';
     html = html.replace(
       '</body>',
       /*html*/ `
         <script type="module">
           await window.waitForRouter()
-          window.externalApi.openProjectDetails('${project?.name}'${
-        this.expandedTarget ? `, '${this.expandedTarget}'` : ''
-      })
+          window.externalApi.openProjectDetails('${safeProjectName}'${safeExpandedTarget})
         </script>
       </body>
-      `
+      `,
     );
     html = html.replace('<body', '<body style="padding: 0rem;" ');
     this.webviewPanel.title = `${project?.name} Details`;
@@ -202,7 +212,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     if (event.type === 'open-task-graph') {
       getGraphWebviewManager().focusTarget(
         event.payload.projectName,
-        event.payload.targetName
+        event.payload.targetName,
       );
       return;
     }

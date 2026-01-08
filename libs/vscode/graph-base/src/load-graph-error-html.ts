@@ -1,4 +1,5 @@
 import { NxError } from '@nx-console/shared-types';
+import { escapeHtml } from '@nx-console/vscode-utils';
 
 export function loadGraphErrorHtml(errors: NxError[]) {
   return /*html*/ `
@@ -13,7 +14,8 @@ export function loadGraphErrorHtml(errors: NxError[]) {
       <p>Unable to load the project graph. The following error occurred:</p>
       ${errors
         .map(
-          (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
+          (error) =>
+            `<pre>${escapeHtml(error.message ?? '')} \n ${escapeHtml(error.stack ?? '')}</pre>`,
         )
         .join('')}
     `;
