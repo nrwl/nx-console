@@ -6,6 +6,7 @@ import {
   CLOUD_ANALYTICS_RUNS_SEARCH,
   CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
   CLOUD_ANALYTICS_TASKS_SEARCH,
+  GET_SELF_HEALING_CONTEXT,
 } from '@nx-console/shared-llm-context/src/lib/tool-names';
 import {
   formatPipelineExecutionDetailsContent,
@@ -14,19 +15,30 @@ import {
   formatRunsSearchContent,
   formatTasksDetailsSearchContent,
   formatTasksSearchContent,
+  getRecentCIPEData,
   getPipelineExecutionDetails,
   getPipelineExecutionsSearch,
   getRunDetails,
   getRunsSearch,
   getTasksDetailsSearch,
   getTasksSearch,
+  retrieveFixDiff,
+  RetrieveFixDiffResponse,
 } from '@nx-console/shared-nx-cloud';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
-import { CIPEInfo } from '@nx-console/shared-types';
+import { CIPEInfo, NxAiFix } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
+import { execSync } from 'child_process';
 import { z } from 'zod';
 import { isToolEnabled } from '../tool-filter';
 import { ToolRegistry } from '../tool-registry';
+import { chunkContent } from './nx-workspace';
+import {
+  SelfHealingContextOutput,
+  selfHealingContextOutputSchema,
+} from './output-schemas';
+
+const SELF_HEALING_CHUNK_SIZE = 10000;
 
 export function registerNxCloudTools(
   workspacePath: string,
@@ -176,6 +188,31 @@ export function registerNxCloudTools(
           logger,
           telemetry,
         )(args as z.infer<typeof taskDetailsSchema>),
+    });
+  }
+
+  if (!isToolEnabled(GET_SELF_HEALING_CONTEXT, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${GET_SELF_HEALING_CONTEXT} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: GET_SELF_HEALING_CONTEXT,
+      description:
+        'Retrieve self-healing CI context from Nx Cloud for the current branch. Returns information about failed tasks, error summaries, and AI-generated fix suggestions when available. Use this tool when helping users debug CI failures or apply suggested fixes.',
+      inputSchema: getSelfHealingContextSchema.shape,
+      outputSchema: selfHealingContextOutputSchema,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (args) =>
+        getSelfHealingContext(
+          workspacePath,
+          logger,
+          telemetry,
+        )(args as z.infer<typeof getSelfHealingContextSchema>),
     });
   }
 
@@ -382,6 +419,27 @@ const taskDetailsSchema = z.object({
     ),
 });
 
+const getSelfHealingContextSchema = z.object({
+  branch: z
+    .string()
+    .optional()
+    .describe('Branch name to query. Defaults to current git branch.'),
+  shortLink: z
+    .string()
+    .optional()
+    .describe(
+      'Direct shortlink to retrieve specific fix context (format: fixShortLink-suggestionShortLink). This is entirely optional and should only be used if the user provided a specific shortlink. Otherwise using branches to find fixes is perfectly fine.',
+    ),
+  pageToken: z
+    .number()
+    .optional()
+    .describe(
+      'Token for pagination of text content (0-based page number). ' +
+        'Note: structuredContent is not paginated. ' +
+        'If not provided, returns page 0.',
+    ),
+});
+
 // Implementation functions
 const nxCloudPipelineExecutionsSearch =
   (
@@ -558,4 +616,345 @@ const nxCloudTaskDetails =
     );
 
     return { content };
+  };
+
+function getCurrentGitBranch(workspacePath: string): string | null {
+  try {
+    return execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd: workspacePath,
+      stdio: 'pipe',
+    })
+      .toString()
+      .trim();
+  } catch {
+    return null;
+  }
+}
+
+function parseShortLink(shortLink: string): {
+  fixShortLink: string;
+  suggestionShortLink: string;
+} | null {
+  const parts = shortLink.split('-');
+  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+    return null;
+  }
+  return {
+    fixShortLink: parts[0],
+    suggestionShortLink: parts[1],
+  };
+}
+
+function formatSelfHealingContextMarkdown(
+  data: RetrieveFixDiffResponse,
+): string {
+  const lines: string[] = [];
+
+  lines.push('## Self-Healing CI Fix Context');
+  lines.push('');
+
+  // Status
+  lines.push('### Status');
+  const statusText =
+    data.suggestedFixStatus === 'COMPLETED'
+      ? 'Fix available'
+      : data.suggestedFixStatus === 'IN_PROGRESS'
+        ? 'Fix is being generated'
+        : data.suggestedFixStatus === 'FAILED'
+          ? 'Fix generation failed'
+          : data.suggestedFixStatus;
+  lines.push(statusText);
+  lines.push('');
+
+  // PR Context
+  if (data.prTitle || data.prBody) {
+    lines.push('### PR Context');
+    if (data.prTitle) {
+      lines.push(`**Title:** ${data.prTitle}`);
+    }
+    if (data.prBody) {
+      lines.push(`**Description:** ${data.prBody}`);
+    }
+    lines.push('');
+  }
+
+  // Failed Tasks
+  if (data.taskIds && data.taskIds.length > 0) {
+    lines.push('### Failed Tasks');
+    lines.push(data.taskIds.join(', '));
+    lines.push('');
+  }
+
+  // Error Summary
+  if (data.taskOutputSummary) {
+    lines.push('### Error Summary');
+    lines.push(data.taskOutputSummary);
+    lines.push('');
+  }
+
+  // Suggested Fix
+  if (
+    data.suggestedFix ||
+    data.suggestedFixDescription ||
+    data.suggestedFixReasoning
+  ) {
+    lines.push('### Suggested Fix');
+    lines.push(`**Status:** ${data.suggestedFixStatus}`);
+    if (data.suggestedFixDescription) {
+      lines.push(`**Description:** ${data.suggestedFixDescription}`);
+    }
+    if (data.suggestedFixReasoning) {
+      lines.push(`**Reasoning:** ${data.suggestedFixReasoning}`);
+    }
+    lines.push('');
+
+    if (data.suggestedFix) {
+      lines.push('### Patch');
+      lines.push('```diff');
+      lines.push(data.suggestedFix);
+      lines.push('```');
+      lines.push('');
+    }
+  }
+
+  // How to Apply
+  if (data.shortLink) {
+    lines.push('### How to Apply');
+    lines.push('');
+    lines.push('To apply this fix locally, run:');
+    lines.push('```bash');
+    lines.push(`npx nx-cloud apply-locally ${data.shortLink}`);
+    lines.push('```');
+    lines.push('');
+    lines.push(
+      'Review the changes after applying - the fix may need adjustments for your specific situation.',
+    );
+    lines.push('');
+  }
+
+  // Git Context
+  if (data.branch || data.commitSha) {
+    lines.push('### Git Context');
+    if (data.branch) {
+      lines.push(`- **Branch:** ${data.branch}`);
+    }
+    if (data.commitSha) {
+      lines.push(`- **Base Commit:** ${data.commitSha}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
+async function fetchAndFormatFixContext(
+  workspacePath: string,
+  logger: Logger,
+  shortLink: string,
+  pageToken?: number,
+): Promise<CallToolResult> {
+  const parsed = parseShortLink(shortLink);
+  if (!parsed) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Invalid shortlink format: "${shortLink}". Expected format: "fixShortLink-suggestionShortLink" (e.g., "abc123-def456")`,
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  const result = await retrieveFixDiff(
+    workspacePath,
+    logger,
+    parsed.fixShortLink,
+    parsed.suggestionShortLink,
+  );
+
+  if (result.error) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Failed to retrieve self-healing context: ${result.error.message}. Please check your Nx Cloud connection and authentication.`,
+        },
+      ],
+      isError: result.error.type !== 'not_found',
+    };
+  }
+
+  const markdownContent = formatSelfHealingContextMarkdown({
+    ...result.data!,
+    shortLink,
+  });
+
+  // Apply pagination to text content
+  const pageNumber = pageToken ?? 0;
+  const { chunk, hasMore } = chunkContent(
+    markdownContent,
+    pageNumber,
+    SELF_HEALING_CHUNK_SIZE,
+  );
+
+  const content: CallToolResult['content'] = [{ type: 'text', text: chunk }];
+
+  if (hasMore) {
+    content.push({
+      type: 'text',
+      text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue.`,
+    });
+  }
+
+  const structuredContent: SelfHealingContextOutput = {
+    ...result.data!,
+    shortLink,
+  };
+
+  return { content, structuredContent };
+}
+
+const getSelfHealingContext =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (
+    params: z.infer<typeof getSelfHealingContextSchema>,
+  ): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: GET_SELF_HEALING_CONTEXT,
+    });
+
+    // If shortLink is provided, fetch fix context directly
+    if (params.shortLink) {
+      return fetchAndFormatFixContext(
+        workspacePath,
+        logger,
+        params.shortLink,
+        params.pageToken,
+      );
+    }
+
+    // Determine branch (parameter or current git branch)
+    const branch = params.branch ?? getCurrentGitBranch(workspacePath);
+    if (!branch) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'Could not determine the current git branch. Please provide a branch name explicitly.',
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    // Fetch CIPE data for branch
+    const cipeResult = await getRecentCIPEData(workspacePath, logger);
+
+    if (cipeResult.error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Failed to retrieve self-healing context: ${cipeResult.error.message}. Please check your Nx Cloud connection and authentication.`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    // Find CIPE for the specified branch
+    const cipeForBranch = cipeResult.info?.find(
+      (cipe) => cipe.branch === branch,
+    );
+
+    if (!cipeForBranch) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `No CI pipeline execution found for branch "${branch}". This branch may not have any CI runs yet.`,
+          },
+        ],
+        isError: false,
+      };
+    }
+
+    // Find AI fix from run groups
+    let aiFix: NxAiFix | undefined;
+    for (const runGroup of cipeForBranch.runGroups) {
+      if (runGroup.aiFix) {
+        aiFix = runGroup.aiFix;
+        break;
+      }
+    }
+
+    // Check if self-healing is enabled
+    const selfHealingEnabled = cipeForBranch.aiFixesEnabled ?? false;
+
+    if (!aiFix) {
+      if (!selfHealingEnabled) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Self-healing CI is not enabled for this workspace. To enable self-healing CI and get AI-generated fix suggestions for failing tasks, see https://nx.dev/docs/features/ci-features/self-healing-ci#enable-self-healing-ci. Once enabled, Nx Cloud will automatically analyze failures and suggest fixes.',
+            },
+          ],
+          isError: false,
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `CI pipeline found for branch "${branch}" with self-healing enabled, but no fix context is available. This could mean:
+- No tasks failed in the most recent CI run
+- The failure type is not supported by self-healing`,
+          },
+        ],
+        isError: false,
+      };
+    }
+
+    // Check if fix is still generating
+    if (!aiFix.shortLink) {
+      if (
+        aiFix.suggestedFixStatus === 'IN_PROGRESS' ||
+        aiFix.suggestedFixStatus === 'NOT_STARTED'
+      ) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Self-healing fix is still being generated for branch "${branch}". Please wait a moment and try again.`,
+            },
+          ],
+          isError: false,
+        };
+      }
+
+      // Fix failed or not executable
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Self-healing analysis completed for branch "${branch}" but no fix was generated. Status: ${aiFix.suggestedFixStatus}`,
+          },
+        ],
+        isError: false,
+      };
+    }
+
+    // Fetch fix context using shortLink from CIPE data
+    return fetchAndFormatFixContext(
+      workspacePath,
+      logger,
+      aiFix.shortLink,
+      params.pageToken,
+    );
   };

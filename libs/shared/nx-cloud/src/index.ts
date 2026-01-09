@@ -11,3 +11,4 @@ export * from './lib/get-tasks-details-search';
 export * from './lib/get-run-details';
 export * from './lib/get-runs-search';
 export * from './lib/nx-cloud-auth-headers';
+export * from './lib/get-self-healing-fix';

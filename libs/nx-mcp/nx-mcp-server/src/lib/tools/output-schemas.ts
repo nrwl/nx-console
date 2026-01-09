@@ -22,6 +22,43 @@ export interface NxProjectDetailsOutput {
   [key: string]: unknown;
 }
 
+export interface SelfHealingContextOutput {
+  branch: string | null;
+  commitSha: string | null;
+  aiFixId: string | null;
+  suggestedFix: string | null;
+  suggestedFixDescription: string | null;
+  suggestedFixReasoning: string | null;
+  suggestedFixStatus: string;
+  prTitle: string | null;
+  prBody: string | null;
+  taskIds: string[] | null;
+  taskOutputSummary: string | null;
+  shortLink: string | null;
+  [key: string]: unknown;
+}
+
+export const selfHealingContextOutputSchema = {
+  type: 'object',
+  properties: {
+    branch: { type: ['string', 'null'] },
+    commitSha: { type: ['string', 'null'] },
+    aiFixId: { type: ['string', 'null'] },
+    suggestedFix: { type: ['string', 'null'] },
+    suggestedFixDescription: { type: ['string', 'null'] },
+    suggestedFixReasoning: { type: ['string', 'null'] },
+    suggestedFixStatus: { type: 'string' },
+    prTitle: { type: ['string', 'null'] },
+    prBody: { type: ['string', 'null'] },
+    taskIds: {
+      type: ['array', 'null'],
+      items: { type: 'string' },
+    },
+    taskOutputSummary: { type: ['string', 'null'] },
+    shortLink: { type: ['string', 'null'] },
+  },
+};
+
 export async function loadNxOutputSchemas(
   workspacePath: string,
 ): Promise<NxOutputSchemas> {

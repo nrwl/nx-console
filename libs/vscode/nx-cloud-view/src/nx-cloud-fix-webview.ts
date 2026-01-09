@@ -454,8 +454,8 @@ export class NxCloudFixWebview {
           }
 
           try {
-            if (data.runGroup.aiFix.shortLinkId) {
-              await applyFixLocallyWithNxCloud(data.runGroup.aiFix.shortLinkId);
+            if (data.runGroup.aiFix.shortLink) {
+              await applyFixLocallyWithNxCloud(data.runGroup.aiFix.shortLink);
             } else {
               await applyFixLocallyWithGit(data.runGroup.aiFix.suggestedFix);
               await updateSuggestedFix(
