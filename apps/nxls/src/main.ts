@@ -225,7 +225,7 @@ connection.onCompletion(async (completionParams) => {
     documents,
     completionParams,
     jsonDocumentMapper,
-    CLIENT_CAPABILITIES,
+    CLIENTS_CAPABILITIES,
   );
 });
 
