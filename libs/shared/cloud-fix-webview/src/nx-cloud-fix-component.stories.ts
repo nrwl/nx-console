@@ -303,3 +303,36 @@ export const NoTerminalOutput: Story = {
     },
   },
 };
+
+export const AppliedAutomatically: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          userAction: 'APPLIED_AUTOMATICALLY',
+          couldAutoApplyTasks: true,
+        },
+      },
+    },
+  },
+};
+
+export const AutoApplyingInProgress: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          userAction: 'NONE',
+          couldAutoApplyTasks: true,
+          verificationStatus: 'COMPLETED',
+        },
+      },
+    },
+  },
+};

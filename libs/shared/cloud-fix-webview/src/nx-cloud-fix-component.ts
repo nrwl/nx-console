@@ -362,6 +362,31 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     `;
   }
 
+  private createAutoApplyingFixSection(): TemplateResult {
+    return html`
+      <div
+        class="border-border bg-background relative m-0 border p-6 text-center"
+      >
+        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+          <icon-element
+            icon="loading"
+            size="3rem"
+            class="animate-spin-slow leading-none"
+          ></icon-element>
+        </div>
+        <h2 class="text-foreground m-0 mb-2 text-lg font-semibold">
+          Applying Fix Automatically<span
+            class="loading-dots inline-block w-6 text-left"
+          ></span>
+        </h2>
+        <p class="text-foreground m-0 text-sm opacity-80">
+          The fix has been verified and is being automatically committed to your
+          branch.
+        </p>
+      </div>
+    `;
+  }
+
   private getFixSection(aiFix: NxAiFix): TemplateResult {
     // Check if this is an environment issue or other non-code_change classification
     const isEnvironmentIssue =
@@ -462,6 +487,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           </p>
         </div>
       `;
+    }
+
+    // Check if auto-apply is in progress (verified but userAction not yet updated)
+    if (aiFix.couldAutoApplyTasks && aiFix.verificationStatus === 'COMPLETED') {
+      return this.createAutoApplyingFixSection();
     }
 
     // For environment issues, show a simplified version without apply/reject buttons
@@ -620,6 +650,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
           </div>
         `;
       case 'COMPLETED':
+        // Don't show this section when auto-apply is in progress
+        // (the auto-applying section above already indicates the fix is being committed)
+        if (aiFix.couldAutoApplyTasks) {
+          return html``;
+        }
         return html`
           <div
             class="border-border bg-background relative m-0 border p-6 text-center"
