@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'generate-ui-v2',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',

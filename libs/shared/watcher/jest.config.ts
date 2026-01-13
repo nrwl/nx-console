@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   coverageDirectory: 'test-output/jest/coverage',
   globals: {},
   displayName: 'shared-watcher',
