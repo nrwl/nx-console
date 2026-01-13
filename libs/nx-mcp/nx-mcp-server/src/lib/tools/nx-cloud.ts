@@ -38,7 +38,7 @@ import {
   selfHealingContextOutputSchema,
 } from './output-schemas';
 
-const SELF_HEALING_CHUNK_SIZE = 10000;
+export const SELF_HEALING_CHUNK_SIZE = 10000;
 
 export function registerNxCloudTools(
   workspacePath: string,
@@ -958,3 +958,10 @@ const getSelfHealingContext =
       params.pageToken,
     );
   };
+
+// Exported for testing
+export const __testing__ = {
+  parseShortLink,
+  formatSelfHealingContextMarkdown,
+  fetchAndFormatFixContext,
+};
