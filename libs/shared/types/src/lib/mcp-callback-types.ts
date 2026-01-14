@@ -54,22 +54,6 @@ export interface FocusTaskRequest {
  */
 export type ShowFullProjectGraphRequest = Record<string, never>;
 
-/**
- * Request to open the generator UI in the IDE
- */
-export interface OpenGenerateUiRequest {
-  generatorName: string;
-  options: Record<string, unknown>;
-  cwd?: string;
-}
-
-/**
- * Response from opening the generator UI
- */
-export interface OpenGenerateUiResponse {
-  logFileName: string;
-}
-
 export interface GetRunningTasksResponse {
   runningTasks: RunningTasksMap;
 }
@@ -81,7 +65,6 @@ export const IDE_RPC_METHODS = {
   FOCUS_PROJECT: 'ide/focusProject',
   FOCUS_TASK: 'ide/focusTask',
   SHOW_FULL_PROJECT_GRAPH: 'ide/showFullProjectGraph',
-  OPEN_GENERATE_UI: 'ide/openGenerateUi',
   GET_RUNNING_TASKS: 'ide/getRunningTasks',
 } as const;
 
@@ -104,11 +87,6 @@ export interface IIdeJsonRpcClient {
   focusProject(projectName: string): Promise<void>;
   focusTask(projectName: string, taskName: string): Promise<void>;
   showFullProjectGraph(): Promise<void>;
-  openGenerateUi(
-    generatorName: string,
-    options: Record<string, unknown>,
-    cwd?: string,
-  ): Promise<string>;
   getRunningTasks(): Promise<RunningTasksMap>;
   sendNotification(method: string, params?: unknown): Promise<void>;
 }

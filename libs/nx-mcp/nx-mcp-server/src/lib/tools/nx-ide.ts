@@ -1,9 +1,7 @@
 import {
   getProjectGraphVisualizationMessage,
   getTaskGraphVisualizationMessage,
-  createGeneratorUiResponseMessage,
   NX_VISUALIZE_GRAPH,
-  NX_RUN_GENERATOR,
 } from '@nx-console/shared-llm-context';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
@@ -129,77 +127,6 @@ export function registerNxIdeTools(
                 ],
               };
           }
-        } catch (error) {
-          return {
-            isError: true,
-            content: [
-              { type: 'text', text: `IDE communication error: ${error}` },
-            ],
-          };
-        }
-      },
-    });
-  }
-
-  if (!isToolEnabled(NX_RUN_GENERATOR, toolsFilter)) {
-    logger.debug?.(`Skipping ${NX_RUN_GENERATOR} - disabled by tools filter`);
-  } else {
-    registry.registerTool({
-      name: NX_RUN_GENERATOR,
-      description:
-        'Opens the Nx Console Generate UI in the IDE with the provided options pre-filled. This tool does NOT directly execute the generator - instead it opens a visual form pre-filled with your options, allowing the user to review, modify, and confirm before execution. The `cwd` parameter specifies the parent directory path (relative to workspace root) where the generated item should be created - this is particularly important when generating libraries, apps, or components in specific locations. This tool can also be called to update options for an existing generator invocation. Prefer this tool over CLI commands when an IDE is available, as it provides a user-review workflow.',
-      inputSchema: {
-        generatorName: z.string().describe('The name of the generator to run'),
-        options: z
-          .record(z.string(), z.unknown())
-          .describe('The options to pass to the generator'),
-        cwd: z
-          .string()
-          .optional()
-          .describe(
-            'The current working directory to run the generator from. This is always relative to the workspace root. If not specified, the workspace root will be used.',
-          ),
-      },
-      annotations: {
-        readOnlyHint: false,
-        openWorldHint: false,
-        destructiveHint: false,
-      },
-      handler: async (args) => {
-        const { generatorName, options, cwd } = args as {
-          generatorName: string;
-          options?: Record<string, unknown>;
-          cwd?: string;
-        };
-        telemetry?.logUsage('ai.tool-call', {
-          tool: NX_RUN_GENERATOR,
-        });
-
-        if (!ideProvider || !ideProvider.isAvailable()) {
-          return {
-            isError: true,
-            content: [{ type: 'text', text: 'No IDE provider available' }],
-          };
-        }
-
-        try {
-          const logFileName = await ideProvider.openGenerateUi(
-            generatorName,
-            options ?? {},
-            cwd,
-          );
-
-          return {
-            content: [
-              {
-                type: 'text',
-                text: createGeneratorUiResponseMessage(
-                  generatorName,
-                  logFileName,
-                ),
-              },
-            ],
-          };
         } catch (error) {
           return {
             isError: true,

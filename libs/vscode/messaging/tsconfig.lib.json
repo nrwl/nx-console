@@ -28,9 +28,6 @@
       "path": "../nx-workspace/tsconfig.lib.json"
     },
     {
-      "path": "../generate-ui-webview/tsconfig.lib.json"
-    },
-    {
       "path": "../configuration/tsconfig.lib.json"
     },
     {
@@ -41,9 +38,6 @@
     },
     {
       "path": "../../shared/npm/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/llm-context/tsconfig.lib.json"
     }
   ]
 }
