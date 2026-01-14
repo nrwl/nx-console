@@ -1,3 +1,13 @@
+## [18.82.1](https://github.com/nrwl/nx-console/compare/vscode-v18.82.0...vscode-v18.82.1) (2026-01-14)
+
+
+### Bug Fixes
+
+* hide apply button for auto-applied tasks ([#2935](https://github.com/nrwl/nx-console/issues/2935)) ([452e6b1](https://github.com/nrwl/nx-console/commit/452e6b1e941b91800510fd1716d626578c8beb4d))
+* **nxls:** misc fixes to get nxls to work with helix ([#2793](https://github.com/nrwl/nx-console/issues/2793)) ([2728003](https://github.com/nrwl/nx-console/commit/2728003da7efab187423f6ec9b2df8675f0b5766))
+* **vscode:** escape html to fix PDV help script injection ([#2932](https://github.com/nrwl/nx-console/issues/2932)) ([1b0f5e3](https://github.com/nrwl/nx-console/commit/1b0f5e3e4b65d721090bfefc2a62dc791f61210e))
+* **vscode:** repair self-healing UI after showing plain text ([#2938](https://github.com/nrwl/nx-console/issues/2938)) ([6024f47](https://github.com/nrwl/nx-console/commit/6024f47912889d7527345d3fa79611d2fc39ba1a))
+
 ## 18.82.0 (2025-12-17)
 
 ### 🩹 Fixes
