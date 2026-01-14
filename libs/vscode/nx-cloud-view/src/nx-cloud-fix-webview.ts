@@ -24,6 +24,7 @@ import {
   getGitBranch,
   getGitHasUncommittedChanges,
   getWorkspacePath,
+  safeJsonStringify,
 } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { join } from 'path';
@@ -243,7 +244,7 @@ export class NxCloudFixWebview {
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
         <script>
-          globalThis.fixDetails = ${JSON.stringify(details)};
+          globalThis.fixDetails = ${safeJsonStringify(details)};
         </script>
         <root-nx-cloud-fix-element></root-nx-cloud-fix-element>
       </body>
