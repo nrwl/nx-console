@@ -96,7 +96,6 @@ The Nx MCP server provides a comprehensive set of tools for interacting with you
 - **nx_generator_schema**: Returns detailed JSON schema for a specific Nx generator
 - **nx_current_running_tasks_details**: Lists currently running Nx TUI processes and task statuses
 - **nx_current_running_task_output**: Returns terminal output for specific running tasks
-- **nx_run_generator**: Opens generate UI with prefilled options (requires running IDE instance)
 - **nx_visualize_graph**: Visualizes the Nx graph (requires running IDE instance)
 
 ### Nx Cloud Analytics Tools (only available w/ Nx Cloud enabled)

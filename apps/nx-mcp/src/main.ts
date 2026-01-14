@@ -189,14 +189,6 @@ async function main() {
           if (!ideClient) throw new Error('No IDE client available');
           await ideClient.showFullProjectGraph();
         },
-        openGenerateUi: async (
-          generatorName: string,
-          options: Record<string, unknown>,
-          cwd?: string,
-        ) => {
-          if (!ideClient) throw new Error('No IDE client available');
-          return await ideClient.openGenerateUi(generatorName, options, cwd);
-        },
         getRunningTasks: async () => {
           if (!ideClient) throw new Error('No IDE client available');
           return await ideClient.getRunningTasks();

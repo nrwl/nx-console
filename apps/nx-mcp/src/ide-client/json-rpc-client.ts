@@ -2,12 +2,10 @@ import { RunningTasksMap } from '@nx-console/shared-running-tasks';
 import {
   ConnectionStatus,
   IDE_RPC_METHODS,
-  OpenGenerateUiResponse,
   IIdeJsonRpcClient,
   FocusProjectRequest,
   FocusTaskRequest,
   ShowFullProjectGraphRequest,
-  OpenGenerateUiRequest,
   GetRunningTasksResponse,
 } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
@@ -27,11 +25,6 @@ const showFullProjectGraphRequest =
   new rpc.NotificationType<ShowFullProjectGraphRequest>(
     IDE_RPC_METHODS.SHOW_FULL_PROJECT_GRAPH,
   );
-const openGenerateUiRequest = new rpc.RequestType<
-  OpenGenerateUiRequest,
-  OpenGenerateUiResponse,
-  void
->(IDE_RPC_METHODS.OPEN_GENERATE_UI);
 
 const getRunningTasksRequest = new rpc.RequestType<
   undefined,
@@ -226,23 +219,6 @@ export class IdeJsonRpcClient implements IIdeJsonRpcClient {
     }
 
     await this.connection.sendNotification(showFullProjectGraphRequest);
-  }
-
-  async openGenerateUi(
-    generatorName: string,
-    options: Record<string, unknown>,
-    cwd?: string,
-  ): Promise<string> {
-    if (!this.connection || this.status !== 'connected') {
-      throw new Error('Not connected to IDE');
-    }
-
-    const response = await this.connection.sendRequest(openGenerateUiRequest, {
-      generatorName,
-      options,
-      cwd,
-    });
-    return response.logFileName;
   }
 
   async getRunningTasks(): Promise<RunningTasksMap> {
