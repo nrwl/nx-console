@@ -20,12 +20,12 @@ export async function getProjectGraphOutput(workspacePath: string) {
 async function getCacheDir(workspacePath: string): Promise<string> {
   const importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'utils', 'cache-directory.js')
+    join('src', 'utils', 'cache-directory.js'),
   );
 
   if (!importPath) {
     lspLogger.log(
-      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`,
     );
     throw 'local Nx dependency not found';
   }

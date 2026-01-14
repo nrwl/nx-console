@@ -1,7 +1,14 @@
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { handleGraphInteractionEventBase } from '@nx-console/vscode-graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getPDVData, getProjectByPath } from '@nx-console/vscode-nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode-project-graph';
+import {
+  escapeHtml,
+  escapeJsString,
+  escapeScriptTag,
+  safeJsonStringify,
+} from '@nx-console/vscode-utils';
 import { join } from 'path';
 import {
   commands,
@@ -24,12 +31,14 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     private path: string,
     private context: ExtensionContext,
   ) {
+    const workspacePath = getNxWorkspacePath();
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `Project Details`,
       ViewColumn.Beside,
       {
         enableScripts: true,
+        localResourceRoots: [context.extensionUri, Uri.file(workspacePath)],
       },
     );
 
@@ -132,11 +141,12 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       return;
     }
     let html = this.loadPDVHtmlBase(graphBasePath);
+    const safePdvData = escapeScriptTag(pdvData);
     html = html.replace(
       '</body>',
-      /*html*/ ` 
+      /*html*/ `
           <script>
-            const data = ${pdvData}
+            const data = ${safePdvData}
             const pdvService = window.renderPDV(data)
 
             const vscode = acquireVsCodeApi()
@@ -179,13 +189,15 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       return;
     }
     let html = this.loadPDVHtmlBase(graphBasePath);
+    const safeErrorMessage = escapeJsString(errorMessage ?? '');
+    const safeErrorsSerialized = escapeScriptTag(errorsSerialized);
     html = html.replace(
       '</body>',
       `
        <script>
           const service = window.renderError({
-            message: "${errorMessage ?? ''}",
-            errors: ${errorsSerialized}
+            message: "${safeErrorMessage}",
+            errors: ${safeErrorsSerialized}
             }
           )
         </script>
@@ -209,7 +221,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
     const projects = Object.keys(data);
 
-    const stringifiedData = JSON.stringify(
+    const stringifiedData = safeJsonStringify(
       Object.entries(data).reduce(
         (acc, [key, value]) => ({ ...acc, [key]: JSON.parse(value) }),
         {},
@@ -238,25 +250,28 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
       '<body>',
       `
       <body>
-       <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;"> 
+       <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
        <p>
-      Project: 
+      Project:
        </p>
       <vscode-single-select id="project-select">
         ${[
           selectedProject,
           ...projects.filter((p) => p !== selectedProject),
-        ].map((p) => `<vscode-option value="${p}">${p}</vscode-option>`)}
+        ].map(
+          (p) =>
+            `<vscode-option value="${escapeHtml(p)}">${escapeHtml(p)}</vscode-option>`,
+        )}
       </vscode-single-select>
       </div>
       <vscode-divider></vscode-divider>
-      
+
       `,
     );
     html = html.replace(
       '</body>',
       /*html*/ `
-     
+
       <script>
         const vscode = acquireVsCodeApi();
 
@@ -275,11 +290,11 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
 
         window.__pdvData = ${stringifiedData}
 
-        const pdvService = window.renderPDV(window.__pdvData['${selectedProject}'])
-            
+        const pdvService = window.renderPDV(window.__pdvData['${escapeJsString(selectedProject)}'])
+
         window.addEventListener('message', event => {
-        const message = event.data; 
-        
+        const message = event.data;
+
         if(message.type === 'reload') {
           pdvService.send({
             type: 'loadData',
@@ -308,7 +323,7 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
                   ? `
               <h4>
                   The following error occurred: <br/>
-                  <pre>${error}</pre>
+                  <pre>${escapeHtml(error)}</pre>
                   See idea.log for more details.
               </h4>
               `
