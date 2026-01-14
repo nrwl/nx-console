@@ -46,6 +46,21 @@ export interface CIInformationOutput {
   [key: string]: unknown;
 }
 
+export interface UpdateSelfHealingFixOutput {
+  success: boolean;
+  message: string;
+  [key: string]: unknown;
+}
+
+export const updateSelfHealingFixOutputSchema = {
+  type: 'object',
+  properties: {
+    success: { type: 'boolean' },
+    message: { type: 'string' },
+  },
+  required: ['success', 'message'],
+};
+
 export const ciInformationOutputSchema = {
   type: 'object',
   properties: {

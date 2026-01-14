@@ -7,7 +7,8 @@ import {
   CLOUD_ANALYTICS_RUNS_SEARCH,
   CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
   CLOUD_ANALYTICS_TASKS_SEARCH,
-} from '@nx-console/shared-llm-context/src/lib/tool-names';
+  UPDATE_SELF_HEALING_FIX,
+} from '@nx-console/shared-llm-context';
 import {
   formatPipelineExecutionDetailsContent,
   formatPipelineExecutionsSearchContent,
@@ -23,6 +24,7 @@ import {
   getTasksDetailsSearch,
   getTasksSearch,
   retrieveFixDiff,
+  updateSuggestedFix,
 } from '@nx-console/shared-nx-cloud';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { CIPEInfo, NxAiFix } from '@nx-console/shared-types';
@@ -35,6 +37,8 @@ import { chunkContent } from './nx-workspace';
 import {
   CIInformationOutput,
   ciInformationOutputSchema,
+  UpdateSelfHealingFixOutput,
+  updateSelfHealingFixOutputSchema,
 } from './output-schemas';
 
 export const SELF_HEALING_CHUNK_SIZE = 10000;
@@ -210,6 +214,31 @@ export function registerNxCloudTools(
           logger,
           telemetry,
         )(args as z.infer<typeof ciInformationSchema>),
+    });
+  }
+
+  if (!isToolEnabled(UPDATE_SELF_HEALING_FIX, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${UPDATE_SELF_HEALING_FIX} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: UPDATE_SELF_HEALING_FIX,
+      description:
+        'Apply or reject a self-healing CI fix from Nx Cloud. Use this tool after reviewing a suggested fix to record your decision. The fix can be identified by aiFixId, shortLink, or auto-detected from the current branch.',
+      inputSchema: updateSelfHealingFixSchema.shape,
+      outputSchema: updateSelfHealingFixOutputSchema,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (args) =>
+        handleUpdateSelfHealingFix(
+          workspacePath,
+          logger,
+          telemetry,
+        )(args as z.infer<typeof updateSelfHealingFixSchema>),
     });
   }
 
@@ -427,6 +456,30 @@ const ciInformationSchema = z.object({
     .describe(
       'Token for pagination of long content (0-based page number). ' +
         'If not provided, returns page 0.',
+    ),
+});
+
+const updateSelfHealingFixSchema = z.object({
+  aiFixId: z
+    .string()
+    .optional()
+    .describe('Direct AI fix ID to apply or reject.'),
+  shortLink: z
+    .string()
+    .optional()
+    .describe(
+      'Human-readable short link for the fix (e.g., from ci_information tool output).',
+    ),
+  branch: z
+    .string()
+    .optional()
+    .describe(
+      'Branch name to find the fix for. Defaults to current git branch. Only used when aiFixId and shortLink are not provided.',
+    ),
+  action: z
+    .enum(['APPLY', 'REJECT'])
+    .describe(
+      'Action to perform on the fix: APPLY to accept, REJECT to decline.',
     ),
 });
 
@@ -860,6 +913,160 @@ function formatCIInformationMarkdown(output: CIInformationOutput): string {
 
   return lines.join('\n');
 }
+
+const handleUpdateSelfHealingFix =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (
+    params: z.infer<typeof updateSelfHealingFixSchema>,
+  ): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: UPDATE_SELF_HEALING_FIX,
+    });
+
+    let aiFixId = params.aiFixId;
+
+    // If shortLink provided, extract the aiFixId from the fix diff API
+    if (!aiFixId && params.shortLink) {
+      const parsed = parseShortLink(params.shortLink);
+      if (!parsed) {
+        const output: UpdateSelfHealingFixOutput = {
+          success: false,
+          message: `Invalid shortLink format: ${params.shortLink}. Expected format like "abc123-def456".`,
+        };
+        return {
+          content: [{ type: 'text', text: output.message }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      const fixResult = await retrieveFixDiff(
+        workspacePath,
+        logger,
+        parsed.fixShortLink,
+        parsed.suggestionShortLink,
+      );
+
+      if (fixResult.error || !fixResult.data?.aiFixId) {
+        const output: UpdateSelfHealingFixOutput = {
+          success: false,
+          message: `Failed to retrieve fix from shortLink: ${fixResult.error?.message ?? 'aiFixId not found'}`,
+        };
+        return {
+          content: [{ type: 'text', text: output.message }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      aiFixId = fixResult.data.aiFixId;
+    }
+
+    // If neither aiFixId nor shortLink, auto-detect from branch
+    if (!aiFixId) {
+      const branch = params.branch ?? getCurrentGitBranch(workspacePath);
+      if (!branch) {
+        const output: UpdateSelfHealingFixOutput = {
+          success: false,
+          message:
+            'Could not determine the current git branch. Please provide aiFixId, shortLink, or branch explicitly.',
+        };
+        return {
+          content: [{ type: 'text', text: output.message }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      const cipeResult = await getRecentCIPEData(workspacePath, logger);
+      if (cipeResult.error) {
+        const output: UpdateSelfHealingFixOutput = {
+          success: false,
+          message: `Failed to retrieve CI information: ${cipeResult.error.message}`,
+        };
+        return {
+          content: [{ type: 'text', text: output.message }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      const cipeForBranch = cipeResult.info?.find(
+        (cipe) => cipe.branch === branch,
+      );
+
+      if (!cipeForBranch) {
+        const output: UpdateSelfHealingFixOutput = {
+          success: false,
+          message: `No CI pipeline execution found for branch "${branch}".`,
+        };
+        return {
+          content: [{ type: 'text', text: output.message }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      // Find the most recent AI fix
+      let aiFix: NxAiFix | undefined;
+      for (const runGroup of cipeForBranch.runGroups) {
+        if (runGroup.aiFix?.aiFixId) {
+          aiFix = runGroup.aiFix;
+          break;
+        }
+      }
+
+      if (!aiFix?.aiFixId) {
+        const output: UpdateSelfHealingFixOutput = {
+          success: false,
+          message: `No AI fix found for branch "${branch}".`,
+        };
+        return {
+          content: [{ type: 'text', text: output.message }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      aiFixId = aiFix.aiFixId;
+    }
+
+    // Map APPLY/REJECT to APPLIED/REJECTED
+    const action = params.action === 'APPLY' ? 'APPLIED' : 'REJECTED';
+
+    const result = await updateSuggestedFix({
+      workspacePath,
+      logger,
+      aiFixId,
+      action,
+      actionOrigin: 'NX_CLI',
+    });
+
+    if (!result.success) {
+      const output: UpdateSelfHealingFixOutput = {
+        success: false,
+        message: `Failed to ${params.action.toLowerCase()} fix: ${result.error?.message ?? 'Unknown error'}`,
+      };
+      return {
+        content: [{ type: 'text', text: output.message }],
+        structuredContent: output,
+        isError: true,
+      };
+    }
+
+    const output: UpdateSelfHealingFixOutput = {
+      success: true,
+      message: `Successfully ${params.action === 'APPLY' ? 'applied' : 'rejected'} the fix (aiFixId: ${aiFixId}).`,
+    };
+    return {
+      content: [{ type: 'text', text: output.message }],
+      structuredContent: output,
+    };
+  };
 
 // Exported for testing
 export const __testing__ = {

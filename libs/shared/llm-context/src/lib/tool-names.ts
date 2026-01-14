@@ -31,3 +31,5 @@ export const CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
   'cloud_analytics_task_executions_search';
 
 export const CI_INFORMATION = 'ci_information';
+
+export const UPDATE_SELF_HEALING_FIX = 'update_self_healing_fix';
