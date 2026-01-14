@@ -1,29 +1,7 @@
-import {
-  getRecentCIPEData,
-  retrieveFixDiff,
-  RetrieveFixDiffResponse,
-} from '@nx-console/shared-nx-cloud';
-import { chunkContent } from './nx-workspace';
+import { CIInformationOutput } from './output-schemas';
+import { __testing__ } from './nx-cloud';
 
-// Mock dependencies
-jest.mock('@nx-console/shared-nx-cloud', () => ({
-  getRecentCIPEData: jest.fn(),
-  retrieveFixDiff: jest.fn(),
-}));
-
-const mockRetrieveFixDiff = retrieveFixDiff as jest.MockedFunction<
-  typeof retrieveFixDiff
->;
-
-// Import after mocking
-import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { __testing__, SELF_HEALING_CHUNK_SIZE } from './nx-cloud';
-
-const {
-  parseShortLink,
-  formatSelfHealingContextMarkdown,
-  fetchAndFormatFixContext,
-} = __testing__;
+const { parseShortLink, formatCIInformationMarkdown } = __testing__;
 
 describe('parseShortLink', () => {
   it('should parse valid shortlink with two parts', () => {
@@ -55,33 +33,41 @@ describe('parseShortLink', () => {
   });
 });
 
-describe('formatSelfHealingContextMarkdown', () => {
-  it('should format complete response with all fields', () => {
-    const data: RetrieveFixDiffResponse = {
+describe('formatCIInformationMarkdown', () => {
+  it('should format complete output with all fields', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
       branch: 'feature-branch',
       commitSha: 'abc123',
-      aiFixId: 'fix-id',
-      suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
-      suggestedFixDescription: 'Fix the bug',
-      suggestedFixReasoning: 'The variable was undefined',
-      suggestedFixStatus: 'COMPLETED',
-      prTitle: 'Fix bug in feature',
-      prBody: 'This PR fixes a critical bug',
-      taskIds: ['app:build', 'lib:test'],
+      failedTaskIds: ['app:build', 'lib:test'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: 'COMPLETED',
+      userAction: 'NONE',
+      failureClassification: 'build_error',
       taskOutputSummary: 'TypeError: undefined is not a function',
+      suggestedFixReasoning: 'The variable was undefined',
+      suggestedFixDescription: 'Fix the bug',
+      suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
     };
 
-    const result = formatSelfHealingContextMarkdown(data);
+    const result = formatCIInformationMarkdown(output);
 
-    expect(result).toContain('## Self-Healing CI Fix Context');
-    expect(result).toContain('### Status');
-    expect(result).toContain('Fix available');
-    expect(result).toContain('### PR Context');
-    expect(result).toContain('**Title:** Fix bug in feature');
-    expect(result).toContain('**Description:** This PR fixes a critical bug');
+    expect(result).toContain('## CI Pipeline Information');
+    expect(result).toContain('### Pipeline Status');
+    expect(result).toContain('**Status:** FAILED');
+    expect(result).toContain('**Branch:** feature-branch');
+    expect(result).toContain('**URL:** https://cloud.nx.app/cipes/123');
+    expect(result).toContain('**Commit:** abc123');
     expect(result).toContain('### Failed Tasks');
     expect(result).toContain('app:build, lib:test');
+    expect(result).toContain('### Self-Healing');
+    expect(result).toContain('**Enabled:** Yes');
+    expect(result).toContain('**Status:** COMPLETED');
+    expect(result).toContain('**Verification:** COMPLETED');
+    expect(result).toContain('**Failure Classification:** build_error');
     expect(result).toContain('### Error Summary');
     expect(result).toContain('TypeError: undefined is not a function');
     expect(result).toContain('### Suggested Fix');
@@ -91,227 +77,106 @@ describe('formatSelfHealingContextMarkdown', () => {
     expect(result).toContain('```diff');
     expect(result).toContain('-old');
     expect(result).toContain('+new');
-    expect(result).toContain('### How to Apply');
-    expect(result).toContain('npx nx-cloud apply-locally abc-def');
-    expect(result).toContain('### Git Context');
-    expect(result).toContain('**Branch:** feature-branch');
-    expect(result).toContain('**Base Commit:** abc123');
+    expect(result).toContain('### Apply Fix');
+    expect(result).toContain('`abc-def`');
   });
 
-  it('should show "Fix is being generated" for IN_PROGRESS status', () => {
-    const data: RetrieveFixDiffResponse = {
-      branch: null,
+  it('should show self-healing disabled when not enabled', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'SUCCEEDED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
       commitSha: null,
-      aiFixId: null,
-      suggestedFix: null,
-      suggestedFixDescription: null,
-      suggestedFixReasoning: null,
-      suggestedFixStatus: 'IN_PROGRESS',
-      prTitle: null,
-      prBody: null,
-      taskIds: null,
+      failedTaskIds: [],
+      selfHealingEnabled: false,
+      selfHealingStatus: null,
+      verificationStatus: null,
+      userAction: null,
+      failureClassification: null,
       taskOutputSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
       shortLink: null,
     };
 
-    const result = formatSelfHealingContextMarkdown(data);
-    expect(result).toContain('Fix is being generated');
+    const result = formatCIInformationMarkdown(output);
+    expect(result).toContain('**Enabled:** No');
+    expect(result).not.toContain('**Status:** COMPLETED');
   });
 
-  it('should show "Fix generation failed" for FAILED status', () => {
-    const data: RetrieveFixDiffResponse = {
-      branch: null,
+  it('should omit optional sections when data is null', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'IN_PROGRESS',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
       commitSha: null,
-      aiFixId: null,
-      suggestedFix: null,
-      suggestedFixDescription: null,
-      suggestedFixReasoning: null,
-      suggestedFixStatus: 'FAILED',
-      prTitle: null,
-      prBody: null,
-      taskIds: null,
+      failedTaskIds: [],
+      selfHealingEnabled: true,
+      selfHealingStatus: null,
+      verificationStatus: null,
+      userAction: null,
+      failureClassification: null,
       taskOutputSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
       shortLink: null,
     };
 
-    const result = formatSelfHealingContextMarkdown(data);
-    expect(result).toContain('Fix generation failed');
-  });
+    const result = formatCIInformationMarkdown(output);
 
-  it('should omit sections when data is null', () => {
-    const data: RetrieveFixDiffResponse = {
-      branch: null,
-      commitSha: null,
-      aiFixId: null,
-      suggestedFix: null,
-      suggestedFixDescription: null,
-      suggestedFixReasoning: null,
-      suggestedFixStatus: 'NOT_STARTED',
-      prTitle: null,
-      prBody: null,
-      taskIds: null,
-      taskOutputSummary: null,
-      shortLink: null,
-    };
-
-    const result = formatSelfHealingContextMarkdown(data);
-
-    expect(result).not.toContain('### PR Context');
     expect(result).not.toContain('### Failed Tasks');
     expect(result).not.toContain('### Error Summary');
     expect(result).not.toContain('### Suggested Fix');
-    expect(result).not.toContain('### How to Apply');
-    expect(result).not.toContain('### Git Context');
-  });
-});
-
-describe('fetchAndFormatFixContext', () => {
-  const mockLogger = { log: jest.fn(), debug: jest.fn() };
-  const workspacePath = '/test/workspace';
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+    expect(result).not.toContain('### Patch');
+    expect(result).not.toContain('### Apply Fix');
+    expect(result).not.toContain('**Commit:**');
   });
 
-  it('should return error for invalid shortlink format', async () => {
-    const result = (await fetchAndFormatFixContext(
-      workspacePath,
-      mockLogger,
-      'invalid',
-    )) as CallToolResult & { content: { type: 'text' }[] };
-
-    expect(result.content[0].type).toBe('text');
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Invalid shortlink format');
-    expect(mockRetrieveFixDiff).not.toHaveBeenCalled();
-  });
-
-  it('should return error when retrieveFixDiff fails', async () => {
-    mockRetrieveFixDiff.mockResolvedValue({
-      error: { type: 'network', message: 'Connection failed' },
-    });
-
-    const result = (await fetchAndFormatFixContext(
-      workspacePath,
-      mockLogger,
-      'abc-def',
-    )) as CallToolResult & { content: { type: 'text' }[] };
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Failed to retrieve');
-    expect(result.content[0].text).toContain('Connection failed');
-  });
-
-  it('should not mark not_found errors as isError', async () => {
-    mockRetrieveFixDiff.mockResolvedValue({
-      error: { type: 'not_found', message: 'Fix not found' },
-    });
-
-    const result = (await fetchAndFormatFixContext(
-      workspacePath,
-      mockLogger,
-      'abc-def',
-    )) as CallToolResult & { content: { type: 'text' }[] };
-
-    expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Fix not found');
-  });
-
-  it('should return formatted content and structuredContent on success', async () => {
-    const mockData: RetrieveFixDiffResponse = {
+  it('should not show user action when it is NONE', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
       branch: 'main',
-      commitSha: 'abc123',
-      aiFixId: 'fix-1',
-      suggestedFix: '-old\n+new',
-      suggestedFixDescription: 'Fix description',
-      suggestedFixReasoning: 'Fix reasoning',
-      suggestedFixStatus: 'COMPLETED',
-      prTitle: 'PR Title',
-      prBody: 'PR Body',
-      taskIds: ['task1'],
-      taskOutputSummary: 'Error summary',
-      shortLink: null,
-    };
-
-    mockRetrieveFixDiff.mockResolvedValue({ data: mockData });
-
-    const result = (await fetchAndFormatFixContext(
-      workspacePath,
-      mockLogger,
-      'abc-def',
-    )) as CallToolResult & { content: { type: 'text' }[] };
-
-    expect(result.isError).toBeUndefined();
-    expect(result.content[0].type).toBe('text');
-    expect(result.content[0].text).toContain('## Self-Healing CI Fix Context');
-    expect(result.content[0].text).toContain('**Title:** PR Title');
-    expect(result.content[0].text).toContain('task1');
-    expect(result.content[0].text).toContain('Error summary');
-    expect(result.content[0].text).toContain('Fix description');
-    expect(result.structuredContent).toMatchObject({
-      branch: 'main',
-      commitSha: 'abc123',
-      aiFixId: 'fix-1',
-      shortLink: 'abc-def',
-    });
-  });
-
-  it('should apply pagination with pageToken', async () => {
-    const mockData: RetrieveFixDiffResponse = {
-      branch: 'main',
-      commitSha: 'abc123',
-      aiFixId: 'fix-1',
-      suggestedFix: 'x'.repeat(20000),
-      suggestedFixDescription: 'Fix',
-      suggestedFixReasoning: 'Reason',
-      suggestedFixStatus: 'COMPLETED',
-      prTitle: null,
-      prBody: null,
-      taskIds: null,
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: 'NONE',
+      failureClassification: null,
       taskOutputSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
       shortLink: null,
     };
 
-    mockRetrieveFixDiff.mockResolvedValue({ data: mockData });
-
-    const result = (await fetchAndFormatFixContext(
-      workspacePath,
-      mockLogger,
-      'abc-def',
-      0,
-    )) as CallToolResult & { content: { type: 'text' }[] };
-
-    expect(result.content).toHaveLength(2);
-    expect(result.content[1].type).toBe('text');
-    expect(result.content[1].text).toContain('Next page token: 1');
+    const result = formatCIInformationMarkdown(output);
+    expect(result).not.toContain('**User Action:**');
   });
 
-  it('should not show pagination message when hasMore is false', async () => {
-    const mockData: RetrieveFixDiffResponse = {
+  it('should show user action when it is not NONE', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
       branch: 'main',
-      commitSha: 'abc123',
-      aiFixId: 'fix-1',
-      suggestedFix: 'small diff',
-      suggestedFixDescription: 'Fix',
-      suggestedFixReasoning: 'Reason',
-      suggestedFixStatus: 'COMPLETED',
-      prTitle: null,
-      prBody: null,
-      taskIds: null,
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: 'APPLIED_LOCALLY',
+      failureClassification: null,
       taskOutputSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
       shortLink: null,
     };
 
-    mockRetrieveFixDiff.mockResolvedValue({ data: mockData });
-
-    const result = (await fetchAndFormatFixContext(
-      workspacePath,
-      mockLogger,
-      'abc-def',
-    )) as CallToolResult & { content: { type: 'text' }[] };
-
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe('text');
-    expect(result.content[0].text).not.toContain('Next page token');
+    const result = formatCIInformationMarkdown(output);
+    expect(result).toContain('**User Action:** APPLIED_LOCALLY');
   });
 });

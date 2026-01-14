@@ -30,4 +30,4 @@ export const CLOUD_ANALYTICS_TASKS_SEARCH = 'cloud_analytics_tasks_search';
 export const CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
   'cloud_analytics_task_executions_search';
 
-export const GET_SELF_HEALING_CONTEXT = 'get_self_healing_context';
+export const CI_INFORMATION = 'ci_information';

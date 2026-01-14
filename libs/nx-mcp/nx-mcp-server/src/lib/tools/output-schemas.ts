@@ -1,4 +1,9 @@
 import { workspaceDependencyPath } from '@nx-console/shared-npm';
+import {
+  AITaskFixStatus,
+  AITaskFixUserAction,
+  CIPEExecutionStatus,
+} from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -22,39 +27,85 @@ export interface NxProjectDetailsOutput {
   [key: string]: unknown;
 }
 
-export interface SelfHealingContextOutput {
-  branch: string | null;
+export interface CIInformationOutput {
+  cipeStatus: CIPEExecutionStatus;
+  cipeUrl: string;
+  branch: string;
   commitSha: string | null;
-  aiFixId: string | null;
-  suggestedFix: string | null;
-  suggestedFixDescription: string | null;
-  suggestedFixReasoning: string | null;
-  suggestedFixStatus: string;
-  prTitle: string | null;
-  prBody: string | null;
-  taskIds: string[] | null;
+  failedTaskIds: string[];
+  selfHealingEnabled: boolean;
+  selfHealingStatus: AITaskFixStatus | null;
+  verificationStatus: AITaskFixStatus | null;
+  userAction: AITaskFixUserAction | null;
+  failureClassification: string | null;
   taskOutputSummary: string | null;
+  suggestedFixReasoning: string | null;
+  suggestedFixDescription: string | null;
+  suggestedFix: string | null;
   shortLink: string | null;
   [key: string]: unknown;
 }
 
-export const selfHealingContextOutputSchema = {
+export const ciInformationOutputSchema = {
   type: 'object',
   properties: {
-    branch: { type: ['string', 'null'] },
+    cipeStatus: {
+      type: 'string',
+      enum: [
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'SUCCEEDED',
+        'FAILED',
+        'CANCELED',
+        'TIMED_OUT',
+      ],
+    },
+    cipeUrl: { type: 'string' },
+    branch: { type: 'string' },
     commitSha: { type: ['string', 'null'] },
-    aiFixId: { type: ['string', 'null'] },
-    suggestedFix: { type: ['string', 'null'] },
-    suggestedFixDescription: { type: ['string', 'null'] },
-    suggestedFixReasoning: { type: ['string', 'null'] },
-    suggestedFixStatus: { type: 'string' },
-    prTitle: { type: ['string', 'null'] },
-    prBody: { type: ['string', 'null'] },
-    taskIds: {
-      type: ['array', 'null'],
+    failedTaskIds: {
+      type: 'array',
       items: { type: 'string' },
     },
+    selfHealingEnabled: { type: 'boolean' },
+    selfHealingStatus: {
+      type: ['string', 'null'],
+      enum: [
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'FAILED',
+        'NOT_EXECUTABLE',
+        null,
+      ],
+    },
+    verificationStatus: {
+      type: ['string', 'null'],
+      enum: [
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'FAILED',
+        'NOT_EXECUTABLE',
+        null,
+      ],
+    },
+    userAction: {
+      type: ['string', 'null'],
+      enum: [
+        'NONE',
+        'APPLIED',
+        'REJECTED',
+        'APPLIED_LOCALLY',
+        'APPLIED_AUTOMATICALLY',
+        null,
+      ],
+    },
+    failureClassification: { type: ['string', 'null'] },
     taskOutputSummary: { type: ['string', 'null'] },
+    suggestedFixReasoning: { type: ['string', 'null'] },
+    suggestedFixDescription: { type: ['string', 'null'] },
+    suggestedFix: { type: ['string', 'null'] },
     shortLink: { type: ['string', 'null'] },
   },
 };
