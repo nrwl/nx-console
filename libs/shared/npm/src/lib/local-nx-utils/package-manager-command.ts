@@ -88,6 +88,7 @@ export async function getPackageManagerCommand(
       run: (script: any, args: any) =>
         `npm run ${script}${args ? ' -- ' + args : ''}`,
       list: 'npm ls',
+      why: 'npm explain',
       getRegistryUrl: 'npm config get registry',
       publish: (packageRoot, registry, registryConfigKey, tag) =>
         `npm publish "${packageRoot}" --json --"${registryConfigKey}=${registry}" --tag=${tag}`,
