@@ -1,3 +1,15 @@
+## 0.13.0 (2026-01-15)
+
+### 🚀 Features
+
+- **nx-mcp:** add server instructions to help agents understand it ([#2940](https://github.com/nrwl/nx-console/pull/2940))
+- **nx-mcp:** add mcp tool for retrieving self-healing context from CI ([#2934](https://github.com/nrwl/nx-console/pull/2934))
+- **nx-mcp:** remove nx_run_generator tool ([#2939](https://github.com/nrwl/nx-console/pull/2939))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.12.0 (2025-12-16)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
