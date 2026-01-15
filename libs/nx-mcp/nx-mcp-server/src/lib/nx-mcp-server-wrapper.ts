@@ -221,25 +221,6 @@ export class NxMcpServerWrapper {
   }
 
   /**
-   * Check if we have a valid Nx workspace
-   */
-  private async isValidNxWorkspace(): Promise<boolean> {
-    if (!this._nxWorkspacePath) {
-      return false;
-    }
-    try {
-      const workspace = await this.nxWorkspaceInfoProvider.nxWorkspace(
-        this._nxWorkspacePath,
-        this.logger,
-      );
-      return workspace !== undefined;
-    } catch (error) {
-      this.logger.log('Error checking workspace validity:', error);
-      return false;
-    }
-  }
-
-  /**
    * Check if IDE connection is available
    */
   private isIdeConnectionAvailable(): boolean {
@@ -284,13 +265,7 @@ export class NxMcpServerWrapper {
         this.toolRegistrationState.nxCloud = true;
       }
 
-      // Check workspace tools condition
-      const workspaceValid = this.ideProvider
-        ? await this.isValidNxWorkspace()
-        : true;
-
       if (
-        workspaceValid &&
         this._nxWorkspacePath &&
         !this.toolRegistrationState.nxWorkspace
       ) {
