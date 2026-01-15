@@ -10,7 +10,10 @@ import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project
 export class PassiveDaemonWatcher {
   private listeners: Map<
     string,
-    (error: Error | null | 'closed', projectGraph: ProjectGraph | null) => void
+    (
+      error: Error | null | 'reconnecting' | 'reconnected' | 'closed',
+      projectGraph: ProjectGraph | null,
+    ) => void
   > = new Map();
 
   private unregisterCallback?: () => void;
@@ -22,7 +25,7 @@ export class PassiveDaemonWatcher {
 
   listen(
     callback: (
-      error: Error | null | 'closed',
+      error: Error | null | 'reconnecting' | 'reconnected' | 'closed',
       projectGraph: ProjectGraph | null,
     ) => void,
   ): () => void {
@@ -52,10 +55,11 @@ export class PassiveDaemonWatcher {
     this.unregisterCallback =
       await daemonClientModule.daemonClient.registerProjectGraphRecomputationListener(
         (
-          error: Error | null | 'closed',
+          error: Error | null | 'reconnecting' | 'reconnected' | 'closed',
           projectGraphAndSourceMaps: {
             projectGraph: ProjectGraph;
             sourceMaps: ConfigurationSourceMaps;
+            error: Error | null;
           } | null,
         ) => {
           this.listeners.forEach((listener) =>

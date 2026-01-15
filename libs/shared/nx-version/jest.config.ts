@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: 'nx-version',
   preset: '../../../jest.preset.js',
   testEnvironment: 'node',

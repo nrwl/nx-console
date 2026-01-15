@@ -6,6 +6,7 @@ on:
       - 'nx-mcp-v*.*.*'
 env:
   node_version: 24
+  NX_GRADLE_DISABLE: true
 
 permissions:
   id-token: write

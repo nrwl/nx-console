@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
   displayName: 'nxls-e2e',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
