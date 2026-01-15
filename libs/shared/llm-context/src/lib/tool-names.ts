@@ -27,3 +27,7 @@ export const CLOUD_ANALYTICS_RUN_DETAILS = 'cloud_analytics_run_details';
 export const CLOUD_ANALYTICS_TASKS_SEARCH = 'cloud_analytics_tasks_search';
 export const CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
   'cloud_analytics_task_executions_search';
+
+export const CI_INFORMATION = 'ci_information';
+
+export const UPDATE_SELF_HEALING_FIX = 'update_self_healing_fix';

@@ -1,6 +1,7 @@
 import {
   downloadAndExtractArtifact,
-  nxCloudAuthHeaders,
+  updateSuggestedFix as updateSuggestedFixShared,
+  UpdateSuggestedFixAction,
 } from '@nx-console/shared-nx-cloud';
 import {
   CIPEInfo,
@@ -9,7 +10,6 @@ import {
   NxCloudFixMessage,
 } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { getNxCloudStatus } from '@nx-console/vscode-nx-workspace';
 import {
   logAndShowError,
   vscodeLogger,
@@ -43,7 +43,6 @@ import { ActorRef, EventObject } from 'xstate';
 import { getAiFixStatusBarService } from './ai-fix-status-bar-service';
 import { DiffContentProvider, parseGitDiff } from './diffs/diff-provider';
 import { createUnifiedDiffView } from './nx-cloud-fix-tree-item';
-import { httpRequest } from '@nx-console/shared-utils';
 
 export class NxCloudFixWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -455,8 +454,8 @@ export class NxCloudFixWebview {
           }
 
           try {
-            if (data.runGroup.aiFix.shortLinkId) {
-              await applyFixLocallyWithNxCloud(data.runGroup.aiFix.shortLinkId);
+            if (data.runGroup.aiFix.shortLink) {
+              await applyFixLocallyWithNxCloud(data.runGroup.aiFix.shortLink);
             } else {
               await applyFixLocallyWithGit(data.runGroup.aiFix.suggestedFix);
               await updateSuggestedFix(
@@ -566,50 +565,28 @@ export class NxCloudFixWebview {
 
 async function updateSuggestedFix(
   aiFixId: string,
-  action: 'APPLIED' | 'REJECTED' | 'APPLIED_LOCALLY',
+  action: UpdateSuggestedFixAction,
   commitMessage?: string,
 ): Promise<boolean> {
-  try {
-    const nxCloudInfo = await getNxCloudStatus();
-    if (!nxCloudInfo?.nxCloudUrl) {
-      window.showErrorMessage('Nx Cloud URL not found');
-      return false;
-    }
+  const workspacePath = getWorkspacePath();
+  const result = await updateSuggestedFixShared({
+    workspacePath,
+    logger: vscodeLogger,
+    aiFixId,
+    action,
+    actionOrigin: 'NX_CONSOLE_VSCODE',
+    commitMessage,
+  });
 
-    const workspacePath = getWorkspacePath();
-    const requestData: any = {
-      aiFixId,
-      action,
-      actionOrigin: 'NX_CONSOLE_VSCODE',
-    };
-
-    // Only include userCommitMessage if it was provided
-    if (commitMessage) {
-      requestData.userCommitMessage = commitMessage;
-    }
-
-    const response = await httpRequest({
-      url: `${nxCloudInfo.nxCloudUrl}/nx-cloud/update-suggested-fix`,
-      type: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(await nxCloudAuthHeaders(workspacePath)),
-      },
-      data: JSON.stringify(requestData),
-    });
-
-    if (response.status >= 200 && response.status < 300) {
-      return true;
-    } else {
-      throw new Error(`HTTP ${response.status}: ${response.responseText}`);
-    }
-  } catch (error) {
-    console.error('Failed to update suggested fix:', error);
+  if (!result.success) {
+    console.error('Failed to update suggested fix:', result.error);
     window.showErrorMessage(
-      `Failed to ${action.toLowerCase()} AI fix: ${error.responseText ?? error.message ?? 'Unknown error'}`,
+      `Failed to ${action.toLowerCase()} AI fix: ${result.error?.message ?? 'Unknown error'}`,
     );
     return false;
   }
+
+  return true;
 }
 
 export async function closeCloudFixDiffTab() {

@@ -1,4 +1,9 @@
 import { workspaceDependencyPath } from '@nx-console/shared-npm';
+import {
+  AITaskFixStatus,
+  AITaskFixUserAction,
+  CIPEExecutionStatus,
+} from '@nx-console/shared-types';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
@@ -21,6 +26,104 @@ export interface NxProjectDetailsOutput {
   externalDependencies: string[];
   [key: string]: unknown;
 }
+
+export interface CIInformationOutput {
+  cipeStatus: CIPEExecutionStatus;
+  cipeUrl: string;
+  branch: string;
+  commitSha: string | null;
+  failedTaskIds: string[];
+  selfHealingEnabled: boolean;
+  selfHealingStatus: AITaskFixStatus | null;
+  verificationStatus: AITaskFixStatus | null;
+  userAction: AITaskFixUserAction | null;
+  failureClassification: string | null;
+  taskOutputSummary: string | null;
+  suggestedFixReasoning: string | null;
+  suggestedFixDescription: string | null;
+  suggestedFix: string | null;
+  shortLink: string | null;
+  [key: string]: unknown;
+}
+
+export interface UpdateSelfHealingFixOutput {
+  success: boolean;
+  message: string;
+  [key: string]: unknown;
+}
+
+export const updateSelfHealingFixOutputSchema = {
+  type: 'object',
+  properties: {
+    success: { type: 'boolean' },
+    message: { type: 'string' },
+  },
+  required: ['success', 'message'],
+};
+
+export const ciInformationOutputSchema = {
+  type: 'object',
+  properties: {
+    cipeStatus: {
+      type: 'string',
+      enum: [
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'SUCCEEDED',
+        'FAILED',
+        'CANCELED',
+        'TIMED_OUT',
+      ],
+    },
+    cipeUrl: { type: 'string' },
+    branch: { type: 'string' },
+    commitSha: { type: ['string', 'null'] },
+    failedTaskIds: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+    selfHealingEnabled: { type: 'boolean' },
+    selfHealingStatus: {
+      type: ['string', 'null'],
+      enum: [
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'FAILED',
+        'NOT_EXECUTABLE',
+        null,
+      ],
+    },
+    verificationStatus: {
+      type: ['string', 'null'],
+      enum: [
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'FAILED',
+        'NOT_EXECUTABLE',
+        null,
+      ],
+    },
+    userAction: {
+      type: ['string', 'null'],
+      enum: [
+        'NONE',
+        'APPLIED',
+        'REJECTED',
+        'APPLIED_LOCALLY',
+        'APPLIED_AUTOMATICALLY',
+        null,
+      ],
+    },
+    failureClassification: { type: ['string', 'null'] },
+    taskOutputSummary: { type: ['string', 'null'] },
+    suggestedFixReasoning: { type: ['string', 'null'] },
+    suggestedFixDescription: { type: ['string', 'null'] },
+    suggestedFix: { type: ['string', 'null'] },
+    shortLink: { type: ['string', 'null'] },
+  },
+};
 
 export async function loadNxOutputSchemas(
   workspacePath: string,
