@@ -16,12 +16,6 @@ export interface IdeProvider {
 
   showFullProjectGraph(): void;
 
-  openGenerateUi(
-    generatorName: string,
-    options: Record<string, unknown>,
-    cwd?: string,
-  ): Promise<string>;
-
   getRunningTasks(): Promise<RunningTasksMap>;
 
   /**

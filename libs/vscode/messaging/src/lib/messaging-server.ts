@@ -12,7 +12,6 @@ import {
   IdeFocusProject,
   IdeFocusTask,
   IdeGetRunningTasks,
-  IdeOpenGenerateUi,
   IdeShowFullProjectGraph,
 } from './features/ide-requests';
 import {
@@ -40,7 +39,6 @@ const messages: Array<MessagingNotification | MessagingNotification2> = [
 ];
 
 const requests: Array<MessagingRequest<any, any> | MessagingRequest0<any>> = [
-  IdeOpenGenerateUi,
   IdeGetRunningTasks,
 ];
 

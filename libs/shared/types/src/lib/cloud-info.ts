@@ -39,7 +39,7 @@ export type NxAiFix = {
   verificationStatus: AITaskFixStatus;
   userAction: AITaskFixUserAction;
   failureClassification?: string;
-  shortLinkId?: string;
+  shortLink?: string;
   userActionOrigin?: AITaskFixUserActionOrigin;
   couldAutoApplyTasks?: boolean;
 };

@@ -5,6 +5,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
   IdeProvider,
+  mcpServerInstructions,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
@@ -47,6 +48,7 @@ async function main() {
       version: '0.0.1',
     },
     {
+      instructions: mcpServerInstructions,
       capabilities: {
         tools: {
           listChanged: true,
@@ -188,14 +190,6 @@ async function main() {
         showFullProjectGraph: async () => {
           if (!ideClient) throw new Error('No IDE client available');
           await ideClient.showFullProjectGraph();
-        },
-        openGenerateUi: async (
-          generatorName: string,
-          options: Record<string, unknown>,
-          cwd?: string,
-        ) => {
-          if (!ideClient) throw new Error('No IDE client available');
-          return await ideClient.openGenerateUi(generatorName, options, cwd);
         },
         getRunningTasks: async () => {
           if (!ideClient) throw new Error('No IDE client available');
@@ -352,6 +346,7 @@ async function main() {
               version: '0.0.1',
             },
             {
+              instructions: mcpServerInstructions,
               capabilities: {
                 tools: {
                   listChanged: true,

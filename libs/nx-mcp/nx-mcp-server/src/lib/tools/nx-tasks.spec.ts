@@ -65,7 +65,6 @@ describe('nxCurrentlyRunningTaskOutput - bottom-up pagination', () => {
       focusProject: jest.fn(),
       focusTask: jest.fn(),
       showFullProjectGraph: jest.fn(),
-      openGenerateUi: jest.fn(),
       getRunningTasks: jest.fn().mockResolvedValue(mockRunningTasks),
       onConnectionChange: jest.fn(() => {
         // Return cleanup function
