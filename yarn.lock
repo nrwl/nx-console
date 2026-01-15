@@ -3177,9 +3177,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.25.0":
-  version: 1.25.0
-  resolution: "@modelcontextprotocol/sdk@npm:1.25.0"
+"@modelcontextprotocol/sdk@npm:^1.25.2":
+  version: 1.25.2
+  resolution: "@modelcontextprotocol/sdk@npm:1.25.2"
   dependencies:
     "@hono/node-server": ^1.19.7
     ajv: ^8.17.1
@@ -3205,7 +3205,7 @@ __metadata:
       optional: true
     zod:
       optional: false
-  checksum: 95873b2e3d824e6ed5ea1e7ee1a1fb1382c1663314735d953978aea9f80bca0813e54c03cd805542fd5906135b38cccf0eb951c29d32e64a409df07e8d9cedfd
+  checksum: 24c600de2da3478e5ce8a6ae3a00744a3d8a08e9291e6ebb236ca563d5a8d69bee759223950914ef19329ce26b24946639438cc6a7bf33839180348055be5eb9
   languageName: node
   linkType: hard
 
@@ -16686,7 +16686,7 @@ __metadata:
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
     "@modelcontextprotocol/inspector": ^0.16.1
-    "@modelcontextprotocol/sdk": ^1.25.0
+    "@modelcontextprotocol/sdk": ^1.25.2
     "@monodon/typescript-nx-imports-plugin": 0.3.0
     "@nx/conformance": 21.0.0-beta.0
     "@nx/cypress": 22.1.0-rc.5
