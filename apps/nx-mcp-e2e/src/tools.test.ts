@@ -10,14 +10,12 @@ import {
 import { rmSync } from 'node:fs';
 import { platform } from 'node:os';
 import { join } from 'node:path';
-
 describe('tools', () => {
   let invokeMCPInspectorCLI: Awaited<
     ReturnType<typeof createInvokeMCPInspectorCLI>
   >;
   const workspaceName = uniq('nx-mcp-smoke-test');
   const testWorkspacePath = join(e2eCwd, workspaceName);
-
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
@@ -28,14 +26,11 @@ describe('tools', () => {
       workspaceName,
     );
   });
-
   afterAll(async () => {
     // Clean up Nx workspace processes before attempting to remove directory
     await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
-
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
-
   it('should ensure that the server starts and lists the expected tools for an Nx workspace', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,

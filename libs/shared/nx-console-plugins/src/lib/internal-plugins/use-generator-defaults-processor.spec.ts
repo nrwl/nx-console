@@ -25,7 +25,6 @@ const defaultSchema: GeneratorSchema = {
   ],
   description: '',
 };
-
 describe('useGeneratorDefaultsProcessor', () => {
   it('should update options with default values from nx.json - nested', () => {
     const workspace = {
@@ -40,13 +39,11 @@ describe('useGeneratorDefaultsProcessor', () => {
         },
       },
     };
-
     const processedSchema = useGeneratorDefaultsProcessor(
       defaultSchema,
       workspace as any as NxWorkspace,
-      mockLogger
+      mockLogger,
     );
-
     expect(processedSchema.options).toEqual([
       {
         name: 'option1',
@@ -62,7 +59,6 @@ describe('useGeneratorDefaultsProcessor', () => {
       },
     ]);
   });
-
   it('should update options with default values from nx.json - flat', () => {
     const workspace = {
       nxJson: {
@@ -74,13 +70,11 @@ describe('useGeneratorDefaultsProcessor', () => {
         },
       },
     };
-
     const processedSchema = useGeneratorDefaultsProcessor(
       defaultSchema,
       workspace as any as NxWorkspace,
-      mockLogger
+      mockLogger,
     );
-
     expect(processedSchema.options).toEqual([
       {
         name: 'option1',
@@ -96,20 +90,17 @@ describe('useGeneratorDefaultsProcessor', () => {
       },
     ]);
   });
-
   it('should return the original schema if nx.json entry is not found', () => {
     const workspace = {
       nxJson: {
         generators: {},
       },
     };
-
     const processedSchema = useGeneratorDefaultsProcessor(
       defaultSchema,
       workspace as any as NxWorkspace,
-      mockLogger
+      mockLogger,
     );
-
     expect(processedSchema).toEqual(defaultSchema);
   });
 });

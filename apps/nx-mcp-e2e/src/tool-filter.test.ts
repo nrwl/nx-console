@@ -9,14 +9,12 @@ import {
 } from '@nx-console/shared-e2e-utils';
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
-
 describe('tool-filter', () => {
   let invokeMCPInspectorCLI: Awaited<
     ReturnType<typeof createInvokeMCPInspectorCLI>
   >;
   const workspaceName = uniq('nx-mcp-tool-filter');
   const testWorkspacePath = join(e2eCwd, workspaceName);
-
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
@@ -27,12 +25,10 @@ describe('tool-filter', () => {
       workspaceName,
     );
   });
-
   afterAll(async () => {
     await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
-
   it('should filter to a single tool when --tools specifies one tool', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
@@ -44,7 +40,6 @@ describe('tool-filter', () => {
     const toolNames = result.tools.map((tool: any) => tool.name);
     expect(toolNames).toEqual(['nx_docs']);
   });
-
   it('should allow multiple tools with multiple --tools args', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
@@ -57,7 +52,6 @@ describe('tool-filter', () => {
     const toolNames = result.tools.map((tool: any) => tool.name);
     expect(toolNames).toEqual(['nx_docs', 'nx_workspace']);
   });
-
   it('should support glob patterns for tool filtering', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
@@ -77,7 +71,6 @@ describe('tool-filter', () => {
       'nx_generator_schema',
     ]);
   });
-
   it('should exclude tools matching negation patterns', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
@@ -92,7 +85,6 @@ describe('tool-filter', () => {
     expect(toolNames).toContain('nx_workspace');
     expect(toolNames).toContain('nx_generators');
   });
-
   it('should combine positive and negative patterns correctly', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
@@ -112,7 +104,6 @@ describe('tool-filter', () => {
       'nx_project_details',
     ]);
   });
-
   it('should support negative glob patterns', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,

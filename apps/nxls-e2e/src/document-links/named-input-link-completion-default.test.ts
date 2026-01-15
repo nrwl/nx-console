@@ -9,10 +9,8 @@ import {
   newWorkspace,
   uniq,
 } from '@nx-console/shared-e2e-utils';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const projectJsonPath = join(
   e2eCwd,
   workspaceName,
@@ -20,7 +18,6 @@ const projectJsonPath = join(
   workspaceName,
   'project.json',
 );
-
 describe('namedInput link completion - default', () => {
   beforeAll(async () => {
     newWorkspace({
@@ -32,7 +29,6 @@ describe('namedInput link completion - default', () => {
     writeFileSync(projectJsonPath, `{}`);
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -58,7 +54,6 @@ describe('namedInput link completion - default', () => {
           },
         },
       }));
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -74,7 +69,6 @@ describe('namedInput link completion - default', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -84,17 +78,14 @@ describe('namedInput link completion - default', () => {
           position: Position.create(0, 1),
         },
       });
-
       const defaultLine =
         readFileSync(join(e2eCwd, workspaceName, 'nx.json'), 'utf-8')
           .split('\n')
           .findIndex((line) => line.includes('"default":')) + 1;
-
       const targetLink = (linkResponse.result as any[])[0].target;
       expect(targetLink).toMatch(new RegExp(`#${defaultLine}$`));
       expect(decodeURI(targetLink)).toContain(join(workspaceName, 'nx.json'));
     });
-
     it('should not return target link for input if it is not a namedInput in nx.json', async () => {
       modifyJsonFile(projectJsonPath, (data) => ({
         ...data,
@@ -104,7 +95,6 @@ describe('namedInput link completion - default', () => {
           },
         },
       }));
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -120,7 +110,6 @@ describe('namedInput link completion - default', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -130,11 +119,9 @@ describe('namedInput link completion - default', () => {
           position: Position.create(0, 1),
         },
       });
-
       const targetLinks = linkResponse.result as any[];
       expect(targetLinks.length).toBe(0);
     });
-
     it('should return correct target link for named input within nx.json', async () => {
       const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
       modifyJsonFile(nxJsonPath, (data) => ({
@@ -144,7 +131,6 @@ describe('namedInput link completion - default', () => {
           one: ['src/file.js'],
         },
       }));
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didOpen',
         params: {
@@ -156,7 +142,6 @@ describe('namedInput link completion - default', () => {
           },
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -166,12 +151,10 @@ describe('namedInput link completion - default', () => {
           position: Position.create(0, 1),
         },
       });
-
       const oneLine =
         readFileSync(nxJsonPath, 'utf-8')
           .split('\n')
           .findIndex((line) => line.includes('"one": [')) + 1;
-
       const targetLink = (linkResponse.result as any[])[0].target;
       expect(targetLink).toMatch(new RegExp(`#${oneLine}$`));
       expect(decodeURI(targetLink)).toContain(join(workspaceName, 'nx.json'));

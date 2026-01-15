@@ -9,10 +9,8 @@ import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const projectJsonPath = join(
   e2eCwd,
   workspaceName,
@@ -20,7 +18,6 @@ const projectJsonPath = join(
   workspaceName,
   'project.json',
 );
-
 describe('document link completion - default', () => {
   beforeAll(async () => {
     newWorkspace({
@@ -43,7 +40,6 @@ describe('document link completion - default', () => {
     );
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -74,12 +70,10 @@ describe('document link completion - default', () => {
           },
         },
       }));
-
       const buildLine =
         readFileSync(projectJsonPath, 'utf-8')
           .split('\n')
           .findIndex((line) => line.includes('"build": {}')) + 1;
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -95,7 +89,6 @@ describe('document link completion - default', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -105,7 +98,6 @@ describe('document link completion - default', () => {
           position: Position.create(0, 1),
         },
       });
-
       const targetLink = (linkResponse.result as any[])[0].target;
       expect(targetLink).toMatch(new RegExp(`#${buildLine}$`));
       expect(decodeURI(targetLink)).toContain(
@@ -117,12 +109,10 @@ describe('document link completion - default', () => {
         delete data.targets.build;
         return data;
       });
-
       const targetsLine =
         readFileSync(projectJsonPath, 'utf-8')
           .split('\n')
           .findIndex((line) => line.includes('"targets": {')) + 1;
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -138,7 +128,6 @@ describe('document link completion - default', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {

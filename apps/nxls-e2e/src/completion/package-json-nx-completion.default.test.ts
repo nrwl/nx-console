@@ -3,10 +3,8 @@ import { join } from 'path';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
 import { e2eCwd, newWorkspace, uniq } from '@nx-console/shared-e2e-utils';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const packageJsonPath = join(
   e2eCwd,
   workspaceName,
@@ -14,7 +12,6 @@ const packageJsonPath = join(
   workspaceName,
   'package.json',
 );
-
 describe('package.json nx property completion - default', () => {
   beforeAll(async () => {
     newWorkspace({
@@ -27,11 +24,9 @@ describe('package.json nx property completion - default', () => {
       },
       packageManager: 'npm',
     });
-
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
-
   it('should contain contain properties from project.json schema', async () => {
     writeFileSync(
       packageJsonPath,
@@ -41,7 +36,6 @@ describe('package.json nx property completion - default', () => {
         }
         }`,
     );
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -53,9 +47,7 @@ describe('package.json nx property completion - default', () => {
         },
       },
     });
-
     const position = { line: 3, character: 1 };
-
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -65,11 +57,9 @@ describe('package.json nx property completion - default', () => {
         position,
       },
     });
-
     const completionItemStrings = (
       (autocompleteResponse?.result as any).items as any[]
     ).map((item) => item.label);
-
     expect(completionItemStrings).toEqual([
       'name',
       'root',
@@ -84,7 +74,6 @@ describe('package.json nx property completion - default', () => {
       'release',
     ]);
   });
-
   it('should contain contain dynamic properties', async () => {
     writeFileSync(
       packageJsonPath,
@@ -98,7 +87,6 @@ describe('package.json nx property completion - default', () => {
 }
         `,
     );
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didChange',
       params: {
@@ -114,9 +102,7 @@ describe('package.json nx property completion - default', () => {
         ],
       },
     });
-
     const position = { line: 4, character: 10 };
-
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -126,11 +112,9 @@ describe('package.json nx property completion - default', () => {
         position,
       },
     });
-
     const completionItemStrings = (
       (autocompleteResponse?.result as any).items as any[]
     ).map((item) => item.label);
-
     expect(completionItemStrings).toEqual([
       `"@${workspaceName}/${workspaceName}"`,
       `"!@${workspaceName}/${workspaceName}"`,
@@ -138,7 +122,6 @@ describe('package.json nx property completion - default', () => {
       `"!@${workspaceName}/${workspaceName}-e2e"`,
     ]);
   });
-
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });

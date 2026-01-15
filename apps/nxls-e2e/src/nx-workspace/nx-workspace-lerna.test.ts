@@ -5,10 +5,8 @@ import { mkdirSync, writeFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { NxWorkspaceRequest } from '@nx-console/language-server-types';
 import { NxWorkspace } from '@nx-console/shared-types';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const workspacePath = join(e2eCwd, workspaceName);
 xdescribe('nx/workspace - lerna.json only repo', () => {
   beforeAll(async () => {
@@ -17,7 +15,6 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
       cwd: workspacePath,
     });
     const packagesDir = join(workspacePath, 'packages');
-
     mkdirSync(packagesDir);
     mkdirSync(join(packagesDir, 'project-1'));
     writeFileSync(
@@ -50,15 +47,12 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
     }`,
     );
     await waitFor(11000);
-
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(workspacePath);
   });
-
   afterAll(async () => {
     await nxlsWrapper.stopNxls();
   });
-
   it('should return correct projects for lerna workspace', async () => {
     const workspaceResponse = await nxlsWrapper.sendRequest({
       ...NxWorkspaceRequest,
@@ -66,7 +60,6 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
         reset: false,
       },
     });
-
     expect(
       Object.keys((workspaceResponse.result as NxWorkspace).projectGraph.nodes),
     ).toEqual(['project-1', 'project-2', 'project-3']);
@@ -78,10 +71,8 @@ xdescribe('nx/workspace - lerna.json only repo', () => {
         reset: false,
       },
     });
-
     const projects = (workspaceResponse.result as NxWorkspace).projectGraph
       .nodes;
-
     expect(Object.keys(projects['project-1']?.data.targets ?? {}))
       .toMatchInlineSnapshot(`
       Array [

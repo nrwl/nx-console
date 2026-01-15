@@ -1,9 +1,7 @@
 import { readJsonFile } from '@nx-console/shared-file-system';
 import { packageDetails } from './package-details';
 import { normalize } from 'node:path';
-
 jest.mock('@nx-console/shared-file-system');
-
 describe('packageDetails', () => {
   it('should return package path, package name and JSON contents', async () => {
     const readJsonFileMock = jest.mocked(readJsonFile).mockResolvedValueOnce({
@@ -15,7 +13,6 @@ describe('packageDetails', () => {
         types: 'dist/index.d.ts',
       },
     });
-
     expect(await packageDetails('libs/utils')).toEqual({
       packagePath: 'libs/utils',
       packageName: 'utils',
@@ -30,13 +27,11 @@ describe('packageDetails', () => {
       normalize('libs/utils/package.json'),
     );
   });
-
   it('should return undefined package name if JSON is empty', async () => {
     const readJsonFileMock = jest.mocked(readJsonFile).mockResolvedValueOnce({
       path: '',
       json: {},
     });
-
     expect(await packageDetails('')).toEqual({
       packagePath: '',
       packageName: undefined,

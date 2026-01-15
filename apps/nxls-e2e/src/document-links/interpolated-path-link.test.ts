@@ -9,10 +9,8 @@ import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const projectJsonPath = join(
   e2eCwd,
   workspaceName,
@@ -20,7 +18,6 @@ const projectJsonPath = join(
   workspaceName,
   'project.json',
 );
-
 describe('interpolated path links', () => {
   beforeAll(async () => {
     newWorkspace({
@@ -46,7 +43,6 @@ describe('interpolated path links', () => {
     );
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -62,11 +58,9 @@ describe('interpolated path links', () => {
   afterAll(async () => {
     await nxlsWrapper.stopNxls();
   });
-
   it('should return correct links for {workspaceRoot} and {projectRoot}', async () => {
     const text = readFileSync(projectJsonPath, 'utf-8');
     const lines = text.split('\n');
-
     // Check workspace link
     const workspaceLine = lines.findIndex((line) =>
       line.includes('{workspaceRoot}/nx.json'),
@@ -74,7 +68,6 @@ describe('interpolated path links', () => {
     const workspaceChar = lines[workspaceLine].indexOf(
       '{workspaceRoot}/nx.json',
     );
-
     const workspaceLinkResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/documentLink',
       params: {
@@ -84,7 +77,6 @@ describe('interpolated path links', () => {
         position: Position.create(workspaceLine, workspaceChar + 1),
       },
     });
-
     const workspaceLinks = workspaceLinkResponse.result as any[];
     const workspaceLink = workspaceLinks.find(
       (l) => l.target && l.target.endsWith('nx.json'),
@@ -93,7 +85,6 @@ describe('interpolated path links', () => {
     expect(decodeURI(workspaceLink.target)).toContain(
       join(workspaceName, 'nx.json'),
     );
-
     // Check project link
     const projectLine = lines.findIndex((line) =>
       line.includes('{projectRoot}/project.json'),
@@ -101,7 +92,6 @@ describe('interpolated path links', () => {
     const projectChar = lines[projectLine].indexOf(
       '{projectRoot}/project.json',
     );
-
     const projectLinkResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/documentLink',
       params: {
@@ -111,7 +101,6 @@ describe('interpolated path links', () => {
         position: Position.create(projectLine, projectChar + 1),
       },
     });
-
     const projectLinks = projectLinkResponse.result as any[];
     const projectLink = projectLinks.find(
       (l) => l.target && l.target.endsWith('project.json'),
@@ -121,7 +110,6 @@ describe('interpolated path links', () => {
       join(workspaceName, 'apps', workspaceName, 'project.json'),
     );
   });
-
   it('should return correct links for negated {workspaceRoot} and {projectRoot}', async () => {
     modifyJsonFile(projectJsonPath, (data) => ({
       ...data,
@@ -131,7 +119,6 @@ describe('interpolated path links', () => {
         },
       },
     }));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didChange',
       params: {
@@ -147,10 +134,8 @@ describe('interpolated path links', () => {
         ],
       },
     });
-
     const text = readFileSync(projectJsonPath, 'utf-8');
     const lines = text.split('\n');
-
     // Check workspace link
     const workspaceLine = lines.findIndex((line) =>
       line.includes('!{workspaceRoot}/nx.json'),
@@ -158,7 +143,6 @@ describe('interpolated path links', () => {
     const workspaceChar = lines[workspaceLine].indexOf(
       '!{workspaceRoot}/nx.json',
     );
-
     const workspaceLinkResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/documentLink',
       params: {
@@ -168,7 +152,6 @@ describe('interpolated path links', () => {
         position: Position.create(workspaceLine, workspaceChar + 1),
       },
     });
-
     const workspaceLinks = workspaceLinkResponse.result as any[];
     const workspaceLink = workspaceLinks.find(
       (l) => l.target && l.target.endsWith('nx.json'),
@@ -177,7 +160,6 @@ describe('interpolated path links', () => {
     expect(decodeURI(workspaceLink.target)).toContain(
       join(workspaceName, 'nx.json'),
     );
-
     // Check project link
     const projectLine = lines.findIndex((line) =>
       line.includes('!{projectRoot}/project.json'),
@@ -185,7 +167,6 @@ describe('interpolated path links', () => {
     const projectChar = lines[projectLine].indexOf(
       '!{projectRoot}/project.json',
     );
-
     const projectLinkResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/documentLink',
       params: {
@@ -195,7 +176,6 @@ describe('interpolated path links', () => {
         position: Position.create(projectLine, projectChar + 1),
       },
     });
-
     const projectLinks = projectLinkResponse.result as any[];
     const projectLink = projectLinks.find(
       (l) => l.target && l.target.endsWith('project.json'),

@@ -16,75 +16,61 @@ import {
 } from '@nx-console/shared-e2e-utils';
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
-
 process.env['NX_DAEMON'] = 'true';
-
 xdescribe('watcher', () => {
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
     });
-
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
-
   afterAll(async () => {
     await nxlsWrapper.stopNxls();
   });
-
   it('should send refresh notification when project files are changed', async () => {
     await waitFor(11000);
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     await waitFor(11000);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     await waitFor(11000);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     await waitFor(11000);
     appendFileSync(cypressConfig, 'console.log("hello")');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
   });
-
   it('should still get refresh notifications when daemon is stopped for some reason', async () => {
     // if (isWindows()) {
     //   expect(true).toBe(true);
     //   return;
     // }
-
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
       windowsHide: true,
       env: process.env,
     });
-
     // give nxls time to restart the daemon and handle debounced changes
     await waitFor(12000);
-
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
   });
-
   it('should send 4 refresh notifications after error and still handle changes', async () => {
     await waitFor(11000);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
@@ -103,7 +89,6 @@ xdescribe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     // we need to wait until the daemon watcher ultimately fails
     // and the native watcher is started, plus debounce time
     await waitFor(15000);
@@ -112,7 +97,6 @@ xdescribe('watcher', () => {
       NxWorkspaceRefreshNotification.method,
     );
   });
-
   it('should not send refresh notification when project files are not changed', async () => {
     const workspace = await nxlsWrapper.sendRequest({
       ...NxWorkspaceRequest,
@@ -121,19 +105,16 @@ xdescribe('watcher', () => {
       },
     });
     expect(workspace).toBeTruthy();
-
     nxlsWrapper
       .waitForNotification(NxWorkspaceRefreshNotification.method)
       .then(() => {
         throw new Error('Should not have received refresh notification');
       });
-
     await waitFor(12000);
     nxlsWrapper.cancelWaitingForNotification(
       NxWorkspaceRefreshNotification.method,
     );
   });
-
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
     await new Promise<void>((resolve) => {
       nxlsWrapper
@@ -141,7 +122,6 @@ xdescribe('watcher', () => {
         .then(() => {
           resolve();
         });
-
       try {
         execSync(
           'npx nx g @nx/react:app --directory react-app1 --no-interactive --verbose',
@@ -154,9 +134,7 @@ xdescribe('watcher', () => {
         console.log('Error: ', e);
       }
     });
-
     await waitFor(11000);
-
     addRandomTargetToFile(
       join(e2eCwd, workspaceName, 'react-app1', 'project.json'),
     );
@@ -165,7 +143,6 @@ xdescribe('watcher', () => {
     );
   });
 });
-
 function addRandomTargetToFile(path: string) {
   modifyJsonFile(path, (data) => ({
     ...data,

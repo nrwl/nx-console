@@ -4,7 +4,6 @@ import {
   importWorkspaceDependency,
   workspaceDependencyPath,
 } from './workspace-dependencies';
-
 import * as pnpDependencies from './pnp-dependencies';
 jest.mock(
   './pnp-dependencies',
@@ -16,7 +15,6 @@ jest.mock(
   }),
 );
 const mockedPnpDependencies = mocked(pnpDependencies);
-
 import * as fs from '@nx-console/shared-file-system';
 import { normalize } from 'path';
 jest.mock('@nx-console/shared-file-system', (): Partial<typeof fs> => {
@@ -34,7 +32,6 @@ jest.mock('os', () => {
     platform: jest.fn(() => 'darwin'),
   };
 });
-
 describe('workspace-dependencies', () => {
   describe('workspaceDependencyPath', () => {
     it('should return a path to a workspace dependency when using node_modules', async () => {
@@ -46,7 +43,6 @@ describe('workspace-dependencies', () => {
         normalize('/workspace/node_modules/@nrwl/nx'),
       );
     });
-
     it('should return a path to a workspace dependency when using yarn pnp', async () => {
       mockedPnpDependencies.isWorkspaceInPnp.mockImplementationOnce(() =>
         Promise.resolve(true),
@@ -59,7 +55,6 @@ describe('workspace-dependencies', () => {
         normalize('.yarn/cache/workspace/@nrwl/nx'),
       );
     });
-
     it('should return a path to a workspace dependency when the dependency name starts with a `.`', async () => {
       const dependencyPath = await workspaceDependencyPath(
         '/workspace',
@@ -70,7 +65,6 @@ describe('workspace-dependencies', () => {
       );
     });
   });
-
   describe('importWorkspaceDependency', () => {
     it('should import workspace dependency and log the path', async () => {
       jest.mock(
@@ -79,7 +73,6 @@ describe('workspace-dependencies', () => {
         { virtual: true },
       );
       const logMock = jest.fn();
-
       expect(
         await importWorkspaceDependency('node_modules/nx/src/utils.js', {
           log: logMock,
@@ -90,7 +83,6 @@ describe('workspace-dependencies', () => {
         'Using local Nx package at node_modules/nx/src/utils.js',
       );
     });
-
     it('should convert backslashes to forward slashes on Windows', async () => {
       jest.mock(
         'node_modules/nx/src/utils.js',
@@ -99,7 +91,6 @@ describe('workspace-dependencies', () => {
       );
       jest.mocked(os.platform).mockReturnValueOnce('win32');
       const logMock = jest.fn();
-
       expect(
         await importWorkspaceDependency('node_modules\\nx\\src\\utils.js', {
           log: logMock,

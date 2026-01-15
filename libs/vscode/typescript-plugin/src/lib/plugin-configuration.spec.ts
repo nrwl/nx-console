@@ -5,25 +5,20 @@ import {
   PluginConfigurationCache,
   type RootFileInfo,
 } from './plugin-configuration';
-
 jest.mock('@nx-console/shared-file-system', () => ({
   readJsonFile: jest.fn(),
   listFiles: jest.fn(),
   findConfig: jest.fn(),
 }));
-
 jest.mock('@nx-console/shared-npm', () => ({
   ...jest.requireActual('@nx-console/shared-npm'),
   detectPackageManager: jest.fn().mockResolvedValue('npm'),
 }));
-
 describe('getPluginConfiguration', () => {
   const workspaceRoot = '/path/to/workspace';
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
   describe('additionalRootFiles', () => {
     it('should return an empty array if tsconfig.base.json and tsconfig.json do not exist', async () => {
       (readJsonFile as jest.Mock).mockImplementation(async (file) => {
@@ -34,16 +29,13 @@ describe('getPluginConfiguration', () => {
           return { json: {} };
         }
       });
-
       const result = await getPluginConfiguration(workspaceRoot);
-
       expect(result).toEqual({
         additionalRootFiles: [],
         packageManager: 'npm',
         workspacePackages: [],
       });
     });
-
     it('should return an empty array if compilerOptions is missing in tsconfig.base.json and tsconfig.json', async () => {
       (readJsonFile as jest.Mock).mockImplementation(async (file) => {
         if (file === 'tsconfig.base.json') {
@@ -53,16 +45,13 @@ describe('getPluginConfiguration', () => {
           return { json: { someOtherProperty: 'value' } };
         }
       });
-
       const result = await getPluginConfiguration(workspaceRoot);
-
       expect(result).toEqual({
         additionalRootFiles: [],
         packageManager: 'npm',
         workspacePackages: [],
       });
     });
-
     it('should return additional root files for simple path entries in tsconfig.base.json', async () => {
       (readJsonFile as jest.Mock).mockImplementation(async (file) => {
         if (file === 'tsconfig.base.json') {
@@ -83,9 +72,7 @@ describe('getPluginConfiguration', () => {
       (findConfig as jest.Mock).mockImplementation(async (mainFile) => {
         return join(dirname(mainFile), 'tsconfig.lib.json');
       });
-
       const result = await getPluginConfiguration(workspaceRoot);
-
       expect(pathNormalize(result.additionalRootFiles)).toEqual([
         {
           mainFile: '/path/to/workspace/libs/lib1/index.ts',
@@ -97,7 +84,6 @@ describe('getPluginConfiguration', () => {
         },
       ]);
     });
-
     it('should return additional root files for simple path entries in tsconfig.json', async () => {
       (readJsonFile as jest.Mock).mockImplementation((file) => {
         if (file === 'tsconfig.json') {
@@ -118,9 +104,7 @@ describe('getPluginConfiguration', () => {
       (findConfig as jest.Mock).mockImplementation(async (mainFile) => {
         return join(dirname(mainFile), 'tsconfig.lib.json');
       });
-
       const result = await getPluginConfiguration(workspaceRoot);
-
       expect(pathNormalize(result.additionalRootFiles)).toEqual([
         {
           mainFile: '/path/to/workspace/libs/lib1/index.ts',
@@ -133,23 +117,18 @@ describe('getPluginConfiguration', () => {
       ]);
     });
   });
-
   describe('workspacePackages', () => {
     it('should return an empty array if projectGraph is not provided', async () => {
       const result = await getPluginConfiguration(workspaceRoot);
-
       expect(result.workspacePackages).toEqual([]);
     });
-
     it('should return an empty array if projectGraph does not have any nodes', async () => {
       const result = await getPluginConfiguration(workspaceRoot, {
         nodes: {},
         dependencies: {},
       });
-
       expect(result.workspacePackages).toEqual([]);
     });
-
     it('should return an empty array if projectGraph does not have any nodes with metadata', async () => {
       const result = await getPluginConfiguration(workspaceRoot, {
         nodes: {
@@ -161,10 +140,8 @@ describe('getPluginConfiguration', () => {
         },
         dependencies: {},
       });
-
       expect(result.workspacePackages).toEqual([]);
     });
-
     it('should return an empty array if projectGraph does not have any nodes with js metadata', async () => {
       const result = await getPluginConfiguration(workspaceRoot, {
         nodes: {
@@ -176,10 +153,8 @@ describe('getPluginConfiguration', () => {
         },
         dependencies: {},
       });
-
       expect(result.workspacePackages).toEqual([]);
     });
-
     it('should return packages with js metadata and isInPackageManagerWorkspaces is true', async () => {
       const result = await getPluginConfiguration(workspaceRoot, {
         nodes: {
@@ -212,16 +187,13 @@ describe('getPluginConfiguration', () => {
         },
         dependencies: {},
       });
-
       expect(result.workspacePackages).toEqual(['@foo/pkg1']);
     });
   });
 });
-
 describe('PluginConfigurationCache', () => {
   it('should return false if there is no cached result', async () => {
     const cache = new PluginConfigurationCache();
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [],
@@ -230,7 +202,6 @@ describe('PluginConfigurationCache', () => {
       }),
     ).toBe(false);
   });
-
   it('should return false if incoming result has a different number of additionalRootFiles', async () => {
     const cache = new PluginConfigurationCache();
     cache.store({
@@ -238,7 +209,6 @@ describe('PluginConfigurationCache', () => {
       packageManager: 'npm',
       workspacePackages: [],
     });
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [
@@ -252,7 +222,6 @@ describe('PluginConfigurationCache', () => {
       }),
     ).toBe(false);
   });
-
   it('should return false if the additionalRootFiles have the same length but different values', async () => {
     const cache = new PluginConfigurationCache();
     cache.store({
@@ -265,7 +234,6 @@ describe('PluginConfigurationCache', () => {
       packageManager: 'npm',
       workspacePackages: [],
     });
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [
@@ -279,7 +247,6 @@ describe('PluginConfigurationCache', () => {
       }),
     ).toBe(false);
   });
-
   it('should return false if incoming result has a different number of workspacePackages', async () => {
     const cache = new PluginConfigurationCache();
     cache.store({
@@ -287,7 +254,6 @@ describe('PluginConfigurationCache', () => {
       packageManager: 'npm',
       workspacePackages: [],
     });
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [],
@@ -296,7 +262,6 @@ describe('PluginConfigurationCache', () => {
       }),
     ).toBe(false);
   });
-
   it('should return false if the workspacePackages have the same length but different values', async () => {
     const cache = new PluginConfigurationCache();
     cache.store({
@@ -304,7 +269,6 @@ describe('PluginConfigurationCache', () => {
       packageManager: 'npm',
       workspacePackages: ['@foo/pkg1'],
     });
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [],
@@ -313,7 +277,6 @@ describe('PluginConfigurationCache', () => {
       }),
     ).toBe(false);
   });
-
   it('should return false if the packageManager is different', async () => {
     const cache = new PluginConfigurationCache();
     cache.store({
@@ -321,7 +284,6 @@ describe('PluginConfigurationCache', () => {
       packageManager: 'npm',
       workspacePackages: [],
     });
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [],
@@ -330,7 +292,6 @@ describe('PluginConfigurationCache', () => {
       }),
     ).toBe(false);
   });
-
   it('should return true if all values are the same regardless of order', async () => {
     const cache = new PluginConfigurationCache();
     cache.store({
@@ -347,7 +308,6 @@ describe('PluginConfigurationCache', () => {
       packageManager: 'npm',
       workspacePackages: ['@foo/pkg1', '@foo/pkg2'],
     });
-
     expect(
       cache.matchesCachedResult({
         additionalRootFiles: [
@@ -366,7 +326,6 @@ describe('PluginConfigurationCache', () => {
     ).toBe(true);
   });
 });
-
 function pathNormalize(rootFiles: RootFileInfo[]): RootFileInfo[] {
   return rootFiles.map(({ directory, mainFile }) => ({
     directory: directory.split(sep).join(posix.sep),

@@ -10,21 +10,17 @@ import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 const e2eProjectName = 'e2e';
-
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
-
 describe('document link completion - project links', () => {
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
     });
-
     writeFileSync(
       e2eProjectJsonPath,
       JSON.stringify(
@@ -35,10 +31,8 @@ describe('document link completion - project links', () => {
         2,
       ),
     );
-
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -51,18 +45,15 @@ describe('document link completion - project links', () => {
       },
     });
   });
-
   afterAll(async () => {
     await nxlsWrapper.stopNxls();
   });
-
   describe('project links', () => {
     it('should return correct link for valid project in implicitDependencies', async () => {
       modifyJsonFile(e2eProjectJsonPath, (data) => ({
         ...data,
         implicitDependencies: [workspaceName],
       }));
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -78,7 +69,6 @@ describe('document link completion - project links', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -88,19 +78,16 @@ describe('document link completion - project links', () => {
           position: Position.create(1, 4),
         },
       });
-
       const projectLink = (linkResponse.result as any[])[0]?.target;
       expect(projectLink).toBeDefined();
       expect(decodeURI(projectLink)).toContain(projectJsonPath);
       expect(projectLink).toMatch(/#1$/);
     });
-
     it('should return correct link for project with ! prefix in implicitDependencies', async () => {
       modifyJsonFile(e2eProjectJsonPath, (data) => ({
         ...data,
         implicitDependencies: [`!${workspaceName}`],
       }));
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -116,7 +103,6 @@ describe('document link completion - project links', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -126,19 +112,16 @@ describe('document link completion - project links', () => {
           position: Position.create(1, 4),
         },
       });
-
       const projectLink = (linkResponse.result as any[])[0]?.target;
       expect(projectLink).toBeDefined();
       expect(decodeURI(projectLink)).toContain(projectJsonPath);
       expect(projectLink).toMatch(/#1$/);
     });
-
     it('should not return link for non-existent project in implicitDependencies', async () => {
       modifyJsonFile(e2eProjectJsonPath, (data) => ({
         ...data,
         implicitDependencies: ['non-existent-project'],
       }));
-
       nxlsWrapper.sendNotification({
         method: 'textDocument/didChange',
         params: {
@@ -154,7 +137,6 @@ describe('document link completion - project links', () => {
           ],
         },
       });
-
       const linkResponse = await nxlsWrapper.sendRequest({
         method: 'textDocument/documentLink',
         params: {
@@ -164,7 +146,6 @@ describe('document link completion - project links', () => {
           position: Position.create(1, 4),
         },
       });
-
       const links = linkResponse.result as any[];
       expect(links).toEqual([]);
     });

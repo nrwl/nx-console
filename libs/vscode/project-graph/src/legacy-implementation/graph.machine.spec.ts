@@ -8,12 +8,10 @@ import {
   waitFor,
 } from 'xstate';
 import { graphMachine } from './graph.machine';
-
 import { NxWorkspace } from '@nx-console/shared-types';
 import type * as nxWorkspace from '@nx-console/vscode-nx-workspace';
 import * as outputChannels from '@nx-console/vscode-output-channels';
 import { MessageType } from './graph-message-type';
-
 jest.mock(
   '@nx-console/vscode-output-channels',
   (): PartialDeep<typeof outputChannels> => ({
@@ -23,7 +21,6 @@ jest.mock(
     },
   }),
 );
-
 jest.mock(
   '@nx-console/vscode-nx-workspace',
   (): PartialDeep<typeof nxWorkspace> => {
@@ -37,7 +34,6 @@ jest.mock(
     };
   },
 );
-
 const mockMachine = graphMachine.provide({
   actors: {
     generateContent: fromPromise(async () => {
@@ -45,15 +41,12 @@ const mockMachine = graphMachine.provide({
     }),
   },
 });
-
 describe('graph state machine', () => {
   it('should go to the correct states with the actor', (done) => {
     const actor = createActor(mockMachine);
-
     const states: StateValue[] = [];
     actor.subscribe((state) => {
       states.push(state.value);
-
       if (state.matches('viewReady')) {
         expect(states).toMatchInlineSnapshot(`
           Array [
@@ -67,7 +60,6 @@ describe('graph state machine', () => {
         done();
       }
     });
-
     actor.start();
     actor.send({
       type: 'PROJECT_SELECTED',
@@ -78,7 +70,6 @@ describe('graph state machine', () => {
       actor.send({ type: 'VIEW_READY' });
     });
   });
-
   it('should go to loading when refreshing', () => {
     const nextState = getNextSnapshot(
       mockMachine,

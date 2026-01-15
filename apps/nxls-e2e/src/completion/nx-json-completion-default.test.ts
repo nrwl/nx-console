@@ -23,12 +23,9 @@ import {
 import { Position } from 'vscode-json-languageservice';
 import { CompletionList } from 'vscode-languageserver';
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
-
 describe('nx.json completion - default', () => {
   beforeAll(async () => {
     newWorkspace({
@@ -36,11 +33,9 @@ describe('nx.json completion - default', () => {
       options: simpleReactWorkspaceOptions,
       packageManager: 'npm',
     });
-
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
-
   it('should contain contain preinstalled plugins', async () => {
     modifyJsonFile(nxJsonPath, (data) => ({
       ...data,
@@ -50,7 +45,6 @@ describe('nx.json completion - default', () => {
         },
       ],
     }));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -62,9 +56,7 @@ describe('nx.json completion - default', () => {
         },
       },
     });
-
     const position = getPluginAutocompletePosition(nxJsonPath);
-
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -74,22 +66,18 @@ describe('nx.json completion - default', () => {
         position,
       },
     });
-
     const completionItemStrings = (
       (autocompleteResponse?.result as any).items as any[]
     ).map((item) => item.label);
-
     expect(completionItemStrings).toEqual([
       '@nx/cypress/plugin',
       '@nx/eslint/plugin',
       '@nx/vite/plugin',
     ]);
   });
-
   it('should contain proper root keys', async () => {
     // delete all json properties so we can see all possible completions
     modifyJsonFile(nxJsonPath, () => ({}));
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didChange',
       params: {
@@ -105,7 +93,6 @@ describe('nx.json completion - default', () => {
         ],
       },
     });
-
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -115,7 +102,6 @@ describe('nx.json completion - default', () => {
         position: Position.create(0, 1),
       },
     });
-
     expect(
       (autocompleteResponse.result as CompletionList).items
         .map((item) => item.label)
@@ -149,7 +135,6 @@ describe('nx.json completion - default', () => {
       ]
     `);
   });
-
   it('should not contain outdated root keys', async () => {
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
@@ -160,14 +145,12 @@ describe('nx.json completion - default', () => {
         position: Position.create(0, 1),
       },
     });
-
     const labels = (autocompleteResponse.result as CompletionList).items.map(
       (item) => item.label,
     );
     expect(labels).not.toContain('npmScope');
     expect(labels).not.toContain('targetDependencies');
   });
-
   // This technically works but because the nxls doesn't handle reinstallation well currently,
   // it creates a host of side effect issues that make the test flaky
   // enable when the nxls restart story is better
@@ -175,9 +158,7 @@ describe('nx.json completion - default', () => {
     execSync('npm install @nx/playwright --save-dev', {
       cwd: join(e2eCwd, workspaceName),
     });
-
     const position = getPluginAutocompletePosition(nxJsonPath);
-
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -187,11 +168,9 @@ describe('nx.json completion - default', () => {
         position,
       },
     });
-
     const completionItemStrings = (
       (autocompleteResponse?.result as any).items as any[]
     ).map((item) => item.label);
-
     expect(completionItemStrings).toEqual([
       '@nx/cypress/plugin',
       '@nx/eslint/plugin',
@@ -199,10 +178,8 @@ describe('nx.json completion - default', () => {
       '@nx/vite/plugin',
     ]);
   });
-
   it('should not error when nx-schema.json is missing', async () => {
     await waitFor(11000);
-
     rmSync(
       join(
         e2eCwd,
@@ -213,7 +190,6 @@ describe('nx.json completion - default', () => {
         'nx-schema.json',
       ),
     );
-
     nxlsWrapper.sendNotification({
       ...NxWorkspaceRefreshNotification,
       params: {},
@@ -221,7 +197,6 @@ describe('nx.json completion - default', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',
       params: {
@@ -231,27 +206,21 @@ describe('nx.json completion - default', () => {
         position: Position.create(0, 1),
       },
     });
-
     expect(autocompleteResponse.error).toBeUndefined();
-
     // results should only include non-static completions
     const completionItemStrings = (
       (autocompleteResponse?.result as any).items as any[]
     ).map((item) => item.label);
-
     expect(completionItemStrings).toContain('tasksRunnerOptions');
     expect(completionItemStrings).toContain('targetDefaults');
     expect(completionItemStrings).toContain('targetDependencyConfig');
     expect(completionItemStrings).toContain('plugins');
-
     expect(completionItemStrings).not.toContain('nxCloudAccessToken');
   });
-
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });
 });
-
 function getPluginAutocompletePosition(filePath: string): {
   line: number;
   character: number;
@@ -271,14 +240,12 @@ function getPluginAutocompletePosition(filePath: string): {
       ? ((pluginsProperty.initializer as ArrayLiteralExpression)
           .elements[0] as ObjectLiteralExpression)
       : undefined;
-
   const pluginPropertyValue = (
     pluginDefinition?.properties.find(
       (prop) =>
         prop.name && isStringLiteral(prop.name) && prop.name.text === 'plugin',
     ) as PropertyAssignment
   ).initializer;
-
   return jsonFile.getLineAndCharacterOfPosition(
     pluginPropertyValue.getStart(jsonFile),
   );

@@ -10,14 +10,12 @@ import {
 import { rmSync } from 'node:fs';
 import { platform } from 'node:os';
 import { join } from 'node:path';
-
 describe('workspace path', () => {
   let invokeMCPInspectorCLI: Awaited<
     ReturnType<typeof createInvokeMCPInspectorCLI>
   >;
   const workspaceName = uniq('nx-mcp-smoke-test-workspace');
   const testWorkspacePath = join(e2eCwd, workspaceName);
-
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
@@ -28,14 +26,11 @@ describe('workspace path', () => {
       workspaceName,
     );
   });
-
   afterAll(async () => {
     // Clean up Nx workspace processes before attempting to remove directory
     await cleanupNxWorkspace(testWorkspacePath, defaultVersion);
-
     rmSync(testWorkspacePath, { recursive: true, force: true });
   });
-
   it('should return the cwd of the workspace if workspace path is not provided', () => {
     const result = invokeMCPInspectorCLI(
       '--method tools/call',
@@ -43,7 +38,6 @@ describe('workspace path', () => {
     );
     expect(result.content[0].text).toBe(testWorkspacePath);
   });
-
   it('should return the workspace path when provided as a positional', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
@@ -52,7 +46,6 @@ describe('workspace path', () => {
     );
     expect(result.content[0].text).toBe(testWorkspacePath);
   });
-
   it('should return the workspace path when provided as an option', () => {
     const result = invokeMCPInspectorCLI(
       `--workspace-path ${testWorkspacePath}`,
@@ -61,7 +54,6 @@ describe('workspace path', () => {
     );
     expect(result.content[0].text).toBe(testWorkspacePath);
   });
-
   it('should resolve "." to the current working directory when passed as workspace path', () => {
     const result = invokeMCPInspectorCLI(
       '.',

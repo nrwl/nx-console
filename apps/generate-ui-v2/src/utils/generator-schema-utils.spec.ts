@@ -6,13 +6,11 @@ import {
   getGeneratorNameTitleCase,
 } from './generator-schema-utils';
 import { OptionType } from '@nx-console/shared-schema';
-
 describe('generator schema utils', () => {
   describe('getGeneratorIdentifier', () => {
     it('should return an empty string if the generator schema is undefined', () => {
       expect(getGeneratorIdentifier(undefined)).toEqual('');
     });
-
     it('should return the generator identifier', () => {
       expect(
         getGeneratorIdentifier({
@@ -20,16 +18,14 @@ describe('generator schema utils', () => {
           collectionName: 'react',
           description: 'Generate a React library',
           options: [],
-        })
+        }),
       ).toEqual('react:library');
     });
   });
-
   describe('getGeneratorNameTitleCase', () => {
     it('should return an empty string if the generator schema is undefined', () => {
       expect(getGeneratorNameTitleCase(undefined)).toEqual('');
     });
-
     it('should convert the generator name to title case', () => {
       expect(
         getGeneratorNameTitleCase({
@@ -37,10 +33,9 @@ describe('generator schema utils', () => {
           collectionName: 'my-awesome-collection',
           description: 'My cool description',
           options: [],
-        })
+        }),
       ).toEqual('My Awesome Generator');
     });
-
     it('should convert a single word to title case', () => {
       expect(
         getGeneratorNameTitleCase({
@@ -48,10 +43,9 @@ describe('generator schema utils', () => {
           collectionName: 'collection',
           description: 'A simple generator',
           options: [],
-        })
+        }),
       ).toEqual('Generator');
     });
-
     it('should convert single-letter words to title case', () => {
       expect(
         getGeneratorNameTitleCase({
@@ -59,26 +53,23 @@ describe('generator schema utils', () => {
           collectionName: 'collection',
           description: 'A simple generator',
           options: [],
-        })
+        }),
       ).toEqual('A B C');
     });
   });
-
   describe('extractDefaultValue', () => {
     it('should return undefined if the option is undefined', () => {
       expect(extractDefaultValue(undefined)).toBeUndefined();
     });
-
     it('should return undefined if the default value is undefined', () => {
       expect(
         extractDefaultValue({
           name: 'Undefined',
           isRequired: false,
           aliases: [],
-        })
+        }),
       ).toBeUndefined();
     });
-
     it('should return a boolean value if the type is boolean', () => {
       expect(
         extractDefaultValue({
@@ -87,7 +78,7 @@ describe('generator schema utils', () => {
           aliases: [],
           type: 'boolean',
           default: 1,
-        })
+        }),
       ).toEqual(true);
       expect(
         extractDefaultValue({
@@ -96,10 +87,9 @@ describe('generator schema utils', () => {
           aliases: [],
           type: 'boolean',
           default: 0,
-        })
+        }),
       ).toEqual(false);
     });
-
     it('should return a stringified value if it is not a boolean', () => {
       expect(
         extractDefaultValue({
@@ -107,11 +97,10 @@ describe('generator schema utils', () => {
           isRequired: false,
           aliases: [],
           default: 123,
-        })
+        }),
       ).toEqual('123');
     });
   });
-
   describe('compareWithDefaultValue', () => {
     it('should return true if both values are falsy', () => {
       expect(compareWithDefaultValue('', '')).toBe(true);
@@ -119,22 +108,18 @@ describe('generator schema utils', () => {
       expect(compareWithDefaultValue(0, 0)).toBe(true);
       expect(compareWithDefaultValue(undefined, undefined)).toBe(true);
     });
-
     it('should return true if array values are in the same order', () => {
       expect(compareWithDefaultValue(['1', '2'], ['1', '2'])).toBe(true);
     });
-
     it('should return false if array values are not in the same order', () => {
       expect(compareWithDefaultValue(['1', '2'], ['2', '1'])).toBe(false);
     });
-
     it('should compare by equality', () => {
       expect(compareWithDefaultValue('abc', 'abc')).toBe(true);
       expect(compareWithDefaultValue(123, 123)).toBe(true);
       expect(compareWithDefaultValue(true, true)).toBe(true);
     });
   });
-
   describe('extractItemOptions', () => {
     it('should return an empty array if the option has no items', () => {
       expect(
@@ -142,10 +127,9 @@ describe('generator schema utils', () => {
           name: 'Empty',
           isRequired: false,
           aliases: [],
-        })
+        }),
       ).toEqual([]);
     });
-
     it('should return an array of option items', () => {
       expect(
         extractItemOptions({
@@ -153,10 +137,9 @@ describe('generator schema utils', () => {
           isRequired: false,
           aliases: [],
           items: ['a', 'b', 'c'],
-        })
+        }),
       ).toEqual(['a', 'b', 'c']);
     });
-
     it('should return an array of option items enum', () => {
       expect(
         extractItemOptions({
@@ -167,7 +150,7 @@ describe('generator schema utils', () => {
             type: OptionType.String,
             enum: ['a', 'b', 'c'],
           },
-        })
+        }),
       ).toEqual(['a', 'b', 'c']);
     });
   });

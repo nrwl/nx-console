@@ -10,10 +10,8 @@ import {
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,
 } from '@nx-console/language-server-types';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 describe('generator options', () => {
   beforeAll(async () => {
     // Create a new workspace with basic React setup
@@ -27,12 +25,10 @@ describe('generator options', () => {
       },
       version: defaultVersion,
     });
-
     // Start the language server
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
-
   it('should return correct options for @nx/js:lib generator', async () => {
     const generatorOptions = await nxlsWrapper.sendRequest({
       ...NxGeneratorOptionsRequest,
@@ -49,11 +45,9 @@ describe('generator options', () => {
         } satisfies NxGeneratorOptionsRequestOptions,
       },
     });
-
     // Verify the result contains expected options
     expect(generatorOptions.result).toBeDefined();
     const options = generatorOptions.result;
-
     // Check for required options
     expect((options as any[]).map((o) => o.name)).toEqual([
       'directory',
@@ -81,7 +75,6 @@ describe('generator options', () => {
       'simpleName',
     ]);
   });
-
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });

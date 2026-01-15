@@ -16,7 +16,6 @@ import {
 import { getCompletionItems } from './get-completion-items';
 import { NxWorkspace } from '@nx-console/shared-types';
 import { normalize } from 'path';
-
 jest.mock(
   '@nx-console/shared-nx-workspace-info',
   (): Partial<typeof workspace> => ({
@@ -83,17 +82,14 @@ jest.mock(
     ),
   }),
 );
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('fs', () => require('memfs').fs);
-
 const languageService = configureJsonLanguageService(
   {
     clientCapabilities: ClientCapabilities.LATEST,
   },
   {},
 );
-
 describe('getCompletionItems', () => {
   const getTestCompletionItemsFor = async (
     text: string,
@@ -101,7 +97,6 @@ describe('getCompletionItems', () => {
   ) => {
     const offset = text.indexOf('|');
     text = text.substr(0, offset) + text.substr(offset + 1);
-
     const document = TextDocument.create(
       'file:///project.json',
       'json',
@@ -114,7 +109,6 @@ describe('getCompletionItems', () => {
       jsonAst,
       schema,
     );
-
     const items = await getCompletionItems(
       '/workspace',
       {
@@ -127,13 +121,11 @@ describe('getCompletionItems', () => {
       matchingSchemas,
       Position.create(0, offset),
     );
-
     return {
       labels: items.map((item) => item.label),
       details: items.map((item) => item.detail),
     };
   };
-
   beforeEach(() => {
     vol.fromNestedJSON({
       '/workspace': {
@@ -145,12 +137,10 @@ describe('getCompletionItems', () => {
       },
     });
   });
-
   afterAll(() => {
     vol.reset();
     getLanguageModelCache().dispose();
   });
-
   it('should return all completion items without a glob', async () => {
     const { labels, details } = await getTestCompletionItemsFor(
       `{"fileCompletion": "|"}`,
@@ -164,7 +154,6 @@ describe('getCompletionItems', () => {
         },
       },
     );
-
     expect(labels.map((l) => normalize(l)).sort()).toEqual(
       [`"file.js"`, `"project/src/main.js"`, `"project/src/main.ts"`]
         .map((l) => normalize(l))
@@ -180,7 +169,6 @@ describe('getCompletionItems', () => {
         .sort(),
     );
   });
-
   it('should be able to use a glob', async () => {
     const { labels } = await getTestCompletionItemsFor(
       `{"fileCompletion": "|"}`,
@@ -195,14 +183,12 @@ describe('getCompletionItems', () => {
         },
       },
     );
-
     expect(labels).toMatchInlineSnapshot(`
           Array [
             "\\"project/src/main.ts\\"",
           ]
       `);
   });
-
   describe('tags', () => {
     const tagSchema = {
       type: 'object',
@@ -216,7 +202,6 @@ describe('getCompletionItems', () => {
         },
       },
     };
-
     it('should return tags', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"tags": ["|"]}`,
@@ -230,7 +215,6 @@ describe('getCompletionItems', () => {
               ]
           `);
     });
-
     it('should filter tags that already exist on the property', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"tags": ["tag1", "|"]}`,
@@ -244,7 +228,6 @@ describe('getCompletionItems', () => {
           `);
     });
   });
-
   describe('projects', () => {
     const projectSchema = {
       type: 'object',
@@ -273,7 +256,6 @@ describe('getCompletionItems', () => {
           `);
     });
   });
-
   describe('targets', () => {
     const targetSchema = {
       type: 'object',
@@ -294,7 +276,6 @@ describe('getCompletionItems', () => {
         },
       },
     };
-
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"targets": ["|"]}`,
@@ -308,7 +289,6 @@ describe('getCompletionItems', () => {
               ]
           `);
     });
-
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"targetsWithDeps": ["|"]}`,
@@ -326,7 +306,6 @@ describe('getCompletionItems', () => {
       `);
     });
   });
-
   describe('targets', () => {
     const projectWithTargetsSchema = {
       type: 'object',
@@ -344,7 +323,6 @@ describe('getCompletionItems', () => {
         },
       },
     };
-
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"projectTargets": ["|"]}`,
@@ -361,7 +339,6 @@ describe('getCompletionItems', () => {
         ]
       `);
     });
-
     it('should return completion-type results before trying default implementations', async () => {
       const { labels } = await getTestCompletionItemsFor(
         `{"targets": "|"}`,

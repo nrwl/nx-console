@@ -15,16 +15,12 @@ import {
   uniq,
   waitFor,
 } from '@nx-console/shared-e2e-utils';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
-
 const viteFilePath = join(e2eCwd, workspaceName, 'vite.config.ts');
 let viteFileContents: string;
-
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 let projectJsonContents: string;
-
 describe('pdv data', () => {
   beforeAll(async () => {
     newWorkspace({
@@ -32,15 +28,12 @@ describe('pdv data', () => {
       options: simpleReactWorkspaceOptions,
       version: defaultVersion,
     });
-
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
-
   afterAll(async () => {
     await nxlsWrapper.stopNxls();
   });
-
   it('should contain success pdv data by default', async () => {
     const pdvData = (
       await nxlsWrapper.sendRequest({
@@ -50,11 +43,9 @@ describe('pdv data', () => {
         },
       })
     ).result as PDVData;
-
     expect(pdvData.graphBasePath).toBeDefined();
     expect(pdvData.resultType).toEqual('SUCCESS');
     expect(pdvData.pdvDataSerialized).toBeDefined();
-
     const pdvDataParsed = JSON.parse(pdvData.pdvDataSerialized ?? '');
     expect(pdvDataParsed.project.name).toEqual(workspaceName);
     expect(pdvDataParsed.project.type).toEqual('app');
@@ -62,21 +53,17 @@ describe('pdv data', () => {
       0,
     );
   });
-
   it('should contain disabledTaskSyncGenerators if set in nx.json', async () => {
     await waitFor(11000);
-
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     modifyJsonFile(nxJsonPath, (json) => {
       json.sync ??= {};
       json.sync.disabledTaskSyncGenerators = ['@nx/foo:bar'];
       return json;
     });
-
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     const pdvData = (
       await nxlsWrapper.sendRequest({
         ...NxPDVDataRequest,
@@ -85,22 +72,17 @@ describe('pdv data', () => {
         },
       })
     ).result as PDVData;
-
     expect(pdvData.pdvDataSerialized).toContain(
       '"disabledTaskSyncGenerators":["@nx/foo:bar"]',
     );
   });
-
   it('should contain pdv data & error for partial errors', async () => {
     await waitFor(11000);
     viteFileContents = readFileSync(viteFilePath, 'utf-8');
-
     appendFileSync(viteFilePath, '{');
-
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     const pdvData = (
       await nxlsWrapper.sendRequest({
         ...NxPDVDataRequest,
@@ -109,11 +91,9 @@ describe('pdv data', () => {
         },
       })
     ).result as PDVData;
-
     expect(pdvData.graphBasePath).toBeDefined();
     expect(pdvData.resultType).toEqual('SUCCESS');
     expect(pdvData.pdvDataSerialized).toBeDefined();
-
     const pdvDataParsed = JSON.parse(pdvData.pdvDataSerialized ?? '');
     expect(pdvDataParsed.project.name).toEqual(workspaceName);
     expect(Object.keys(pdvDataParsed.sourceMap ?? {}).length).toBeGreaterThan(
@@ -121,19 +101,14 @@ describe('pdv data', () => {
     );
     expect(pdvDataParsed.errors.length).toBeGreaterThan(0);
   });
-
   it('should return error if root project.json is broken', async () => {
     await waitFor(11000);
-
     writeFileSync(viteFilePath, viteFileContents);
-
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, '{');
-
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({
         ...NxPDVDataRequest,
@@ -142,7 +117,6 @@ describe('pdv data', () => {
         },
       })
     ).result as PDVData;
-
     expect(e2ePdvData.resultType).toEqual('ERROR');
     expect(e2ePdvData.errorMessage).toBeDefined();
     expect(e2ePdvData.pdvDataSerialized).toBeUndefined();
@@ -151,19 +125,14 @@ describe('pdv data', () => {
       JSON.parse(e2ePdvData.errorsSerialized ?? '').length,
     ).toBeGreaterThan(0);
   });
-
   it('should return error if nx.json is broken', async () => {
     await waitFor(11000);
-
     writeFileSync(projectJsonPath, projectJsonContents);
-
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     writeFileSync(nxJsonPath, '{');
-
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
-
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({
         ...NxPDVDataRequest,
@@ -172,23 +141,19 @@ describe('pdv data', () => {
         },
       })
     ).result as PDVData;
-
     expect(e2ePdvData.resultType).toEqual('ERROR');
     expect(e2ePdvData.errorMessage).toBeDefined();
     expect(e2ePdvData.pdvDataSerialized).toBeUndefined();
-
     expect(e2ePdvData.errorsSerialized).toBeDefined();
     expect(
       JSON.parse(e2ePdvData.errorsSerialized ?? '').length,
     ).toBeGreaterThan(0);
   });
-
   it('should return graph error if graph file cant be found', async () => {
     rmSync(join(e2eCwd, workspaceName, 'node_modules'), {
       recursive: true,
       force: true,
     });
-
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({
         ...NxPDVDataRequest,
@@ -197,11 +162,9 @@ describe('pdv data', () => {
         },
       })
     ).result as PDVData;
-
     expect(e2ePdvData.resultType).toEqual('NO_GRAPH_ERROR');
     expect(e2ePdvData.errorMessage).toBeUndefined();
     expect(e2ePdvData.pdvDataSerialized).toBeUndefined();
-
     expect(e2ePdvData.errorsSerialized).toBeUndefined();
   });
 });

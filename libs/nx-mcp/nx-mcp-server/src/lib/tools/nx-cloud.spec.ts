@@ -1,8 +1,6 @@
 import { CIInformationOutput } from './output-schemas';
 import { __testing__ } from './nx-cloud';
-
 const { parseShortLink, formatCIInformationMarkdown } = __testing__;
-
 describe('parseShortLink', () => {
   it('should parse valid shortlink with two parts', () => {
     const result = parseShortLink('abc123-def456');
@@ -11,28 +9,22 @@ describe('parseShortLink', () => {
       suggestionShortLink: 'def456',
     });
   });
-
   it('should return null for shortlink with one part', () => {
     expect(parseShortLink('abc123')).toBeNull();
   });
-
   it('should return null for empty string', () => {
     expect(parseShortLink('')).toBeNull();
   });
-
   it('should return null for shortlink with more than two parts', () => {
     expect(parseShortLink('abc-def-ghi')).toBeNull();
   });
-
   it('should return null for shortlink ending with dash', () => {
     expect(parseShortLink('abc123-')).toBeNull();
   });
-
   it('should return null for shortlink starting with dash', () => {
     expect(parseShortLink('-abc123')).toBeNull();
   });
 });
-
 describe('formatCIInformationMarkdown', () => {
   it('should format complete output with all fields', () => {
     const output: CIInformationOutput = {
@@ -52,9 +44,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
     };
-
     const result = formatCIInformationMarkdown(output);
-
     expect(result).toContain('## CI Pipeline Information');
     expect(result).toContain('### Pipeline Status');
     expect(result).toContain('**Status:** FAILED');
@@ -80,7 +70,6 @@ describe('formatCIInformationMarkdown', () => {
     expect(result).toContain('### Apply Fix');
     expect(result).toContain('`abc-def`');
   });
-
   it('should show self-healing disabled when not enabled', () => {
     const output: CIInformationOutput = {
       cipeStatus: 'SUCCEEDED',
@@ -99,12 +88,10 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFix: null,
       shortLink: null,
     };
-
     const result = formatCIInformationMarkdown(output);
     expect(result).toContain('**Enabled:** No');
     expect(result).not.toContain('**Status:** COMPLETED');
   });
-
   it('should omit optional sections when data is null', () => {
     const output: CIInformationOutput = {
       cipeStatus: 'IN_PROGRESS',
@@ -123,9 +110,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFix: null,
       shortLink: null,
     };
-
     const result = formatCIInformationMarkdown(output);
-
     expect(result).not.toContain('### Failed Tasks');
     expect(result).not.toContain('### Error Summary');
     expect(result).not.toContain('### Suggested Fix');
@@ -133,7 +118,6 @@ describe('formatCIInformationMarkdown', () => {
     expect(result).not.toContain('### Apply Fix');
     expect(result).not.toContain('**Commit:**');
   });
-
   it('should not show user action when it is NONE', () => {
     const output: CIInformationOutput = {
       cipeStatus: 'FAILED',
@@ -152,11 +136,9 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFix: null,
       shortLink: null,
     };
-
     const result = formatCIInformationMarkdown(output);
     expect(result).not.toContain('**User Action:**');
   });
-
   it('should show user action when it is not NONE', () => {
     const output: CIInformationOutput = {
       cipeStatus: 'FAILED',
@@ -175,7 +157,6 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFix: null,
       shortLink: null,
     };
-
     const result = formatCIInformationMarkdown(output);
     expect(result).toContain('**User Action:** APPLIED_LOCALLY');
   });

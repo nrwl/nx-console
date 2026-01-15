@@ -4,7 +4,6 @@ import {
   uniq,
 } from '@nx-console/shared-e2e-utils';
 import { testNxWorkspace } from './nx-workspace-base';
-
 const workspaceName = uniq('workspace');
 testNxWorkspace(
   defaultVersion,

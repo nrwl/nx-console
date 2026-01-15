@@ -14,11 +14,9 @@ import {
   NxGeneratorsRequestOptions,
 } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 const pluginName = uniq('local-plugin');
-
 describe('generator local plugin', () => {
   beforeAll(async () => {
     // Create a new workspace with basic React setup
@@ -32,23 +30,18 @@ describe('generator local plugin', () => {
       },
       version: defaultVersion,
     });
-
     const workspacePath = join(e2eCwd, workspaceName);
-
     console.log('creating local plugin');
-
     // Install @nx/plugin and create a local plugin using nx generators
     execSync('npm install -D @nx/plugin --force', {
       cwd: workspacePath,
       stdio: 'pipe',
     });
-
     // Create a local plugin using nx generator (it comes with a default generator)
     execSync(`npx nx g @nx/plugin:plugin ${pluginName} --no-interactive`, {
       cwd: workspacePath,
       stdio: 'pipe',
     });
-
     // create a new generator
     // libs/nx-plugin/src/generator
     execSync(
@@ -58,12 +51,10 @@ describe('generator local plugin', () => {
         stdio: 'pipe',
       },
     );
-
     // Start the language server
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(workspacePath);
   });
-
   describe('local plugin generator', () => {
     it('should discover local plugin generators in NxGeneratorsRequest', async () => {
       const generators = await nxlsWrapper.sendRequest({
@@ -75,19 +66,15 @@ describe('generator local plugin', () => {
           } satisfies NxGeneratorsRequestOptions,
         },
       });
-
       expect(generators.result).toBeDefined();
       expect(generators.error).toBeUndefined();
       const generatorList = generators.result as GeneratorCollectionInfo[];
-
       const localGenerator = generatorList.find(
         (g) => g.name === `@${workspaceName}/${pluginName}:generator`,
       );
-
       expect(localGenerator).toBeDefined();
       expect(localGenerator?.type).toBe('generator');
     });
-
     it('should successfully resolve local plugin generator options', async () => {
       const generatorPath = join(
         e2eCwd,
@@ -97,7 +84,6 @@ describe('generator local plugin', () => {
         'generator',
         'schema.json',
       );
-
       const generatorOptions = await nxlsWrapper.sendRequest({
         ...NxGeneratorOptionsRequest,
         params: {
@@ -108,7 +94,6 @@ describe('generator local plugin', () => {
           } satisfies NxGeneratorOptionsRequestOptions,
         },
       });
-
       expect(generatorOptions.result).toBeDefined();
       expect(generatorOptions.error).toBeUndefined();
       const options = generatorOptions.result as any[];
@@ -116,7 +101,6 @@ describe('generator local plugin', () => {
       expect(options.find((o) => o.name === 'name')).toBeDefined();
     });
   });
-
   afterAll(async () => {
     return await nxlsWrapper.stopNxls();
   });
