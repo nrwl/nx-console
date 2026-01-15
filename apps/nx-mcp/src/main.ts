@@ -5,6 +5,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
   IdeProvider,
+  mcpServerInstructions,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
@@ -47,6 +48,7 @@ async function main() {
       version: '0.0.1',
     },
     {
+      instructions: mcpServerInstructions,
       capabilities: {
         tools: {
           listChanged: true,
@@ -344,6 +346,7 @@ async function main() {
               version: '0.0.1',
             },
             {
+              instructions: mcpServerInstructions,
               capabilities: {
                 tools: {
                   listChanged: true,

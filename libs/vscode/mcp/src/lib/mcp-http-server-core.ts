@@ -1,7 +1,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
-import { NxMcpServerWrapper } from '@nx-console/nx-mcp-server';
+import {
+  mcpServerInstructions,
+  NxMcpServerWrapper,
+} from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
 import {
   GlobalConfigurationStore,
@@ -71,6 +74,7 @@ export class McpHttpServerCore {
               version: '0.0.1',
             },
             {
+              instructions: mcpServerInstructions,
               capabilities: {
                 tools: {
                   listChanged: true,
