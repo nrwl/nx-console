@@ -477,9 +477,9 @@ const updateSelfHealingFixSchema = z.object({
       'Branch name to find the fix for. Defaults to current git branch. Only used when aiFixId and shortLink are not provided.',
     ),
   action: z
-    .enum(['APPLY', 'REJECT', 'RERUN'])
+    .enum(['APPLY', 'REJECT', 'RERUN_ENVIRONMENT_STATE'])
     .describe(
-      'Action to perform on the fix: APPLY to accept, REJECT to decline, RERUN to request a CI rerun.',
+      'Action to perform on the fix: APPLY to accept, REJECT to decline, RERUN_ENVIRONMENT_STATE to request a CI rerun (only available for pipeline executions that failed due to an environment issue).',
     ),
 });
 
@@ -1035,11 +1035,11 @@ const handleUpdateSelfHealingFix =
       aiFixId = aiFix.aiFixId;
     }
 
-    // Map APPLY/REJECT/RERUN to APPLIED/REJECTED/RERUN_REQUESTED
+    // Map APPLY/REJECT/RERUN_ENVIRONMENT_STATE to APPLIED/REJECTED/RERUN_REQUESTED
     const action =
       params.action === 'APPLY'
         ? 'APPLIED'
-        : params.action === 'RERUN'
+        : params.action === 'RERUN_ENVIRONMENT_STATE'
           ? 'RERUN_REQUESTED'
           : 'REJECTED';
 
@@ -1048,7 +1048,7 @@ const handleUpdateSelfHealingFix =
       logger,
       aiFixId,
       action,
-      actionOrigin: 'NX_MCP',
+      actionOrigin: 'NX_CLI',
     });
 
     if (!result.success) {
@@ -1066,7 +1066,7 @@ const handleUpdateSelfHealingFix =
     const actionVerb =
       params.action === 'APPLY'
         ? 'applied'
-        : params.action === 'RERUN'
+        : params.action === 'RERUN_ENVIRONMENT_STATE'
           ? 'requested rerun for'
           : 'rejected';
     const output: UpdateSelfHealingFixOutput = {
