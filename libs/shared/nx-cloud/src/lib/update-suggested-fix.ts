@@ -6,11 +6,13 @@ import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 export type UpdateSuggestedFixAction =
   | 'APPLIED'
   | 'REJECTED'
-  | 'APPLIED_LOCALLY';
+  | 'APPLIED_LOCALLY'
+  | 'RERUN_REQUESTED';
 export type UpdateSuggestedFixActionOrigin =
   | 'NX_CONSOLE_VSCODE'
   | 'NX_CONSOLE_INTELLIJ'
-  | 'NX_CLI';
+  | 'NX_CLI'
+  | 'NX_MCP';
 
 export interface UpdateSuggestedFixError {
   type: 'authentication' | 'network' | 'not_found' | 'other';

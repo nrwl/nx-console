@@ -477,9 +477,9 @@ const updateSelfHealingFixSchema = z.object({
       'Branch name to find the fix for. Defaults to current git branch. Only used when aiFixId and shortLink are not provided.',
     ),
   action: z
-    .enum(['APPLY', 'REJECT'])
+    .enum(['APPLY', 'REJECT', 'RERUN'])
     .describe(
-      'Action to perform on the fix: APPLY to accept, REJECT to decline.',
+      'Action to perform on the fix: APPLY to accept, REJECT to decline, RERUN to request a CI rerun.',
     ),
 });
 
@@ -1035,15 +1035,20 @@ const handleUpdateSelfHealingFix =
       aiFixId = aiFix.aiFixId;
     }
 
-    // Map APPLY/REJECT to APPLIED/REJECTED
-    const action = params.action === 'APPLY' ? 'APPLIED' : 'REJECTED';
+    // Map APPLY/REJECT/RERUN to APPLIED/REJECTED/RERUN_REQUESTED
+    const action =
+      params.action === 'APPLY'
+        ? 'APPLIED'
+        : params.action === 'RERUN'
+          ? 'RERUN_REQUESTED'
+          : 'REJECTED';
 
     const result = await updateSuggestedFix({
       workspacePath,
       logger,
       aiFixId,
       action,
-      actionOrigin: 'NX_CLI',
+      actionOrigin: 'NX_MCP',
     });
 
     if (!result.success) {
@@ -1058,9 +1063,15 @@ const handleUpdateSelfHealingFix =
       };
     }
 
+    const actionVerb =
+      params.action === 'APPLY'
+        ? 'applied'
+        : params.action === 'RERUN'
+          ? 'requested rerun for'
+          : 'rejected';
     const output: UpdateSelfHealingFixOutput = {
       success: true,
-      message: `Successfully ${params.action === 'APPLY' ? 'applied' : 'rejected'} the fix (aiFixId: ${aiFixId}).`,
+      message: `Successfully ${actionVerb} the fix (aiFixId: ${aiFixId}).`,
     };
     return {
       content: [{ type: 'text', text: output.message }],
