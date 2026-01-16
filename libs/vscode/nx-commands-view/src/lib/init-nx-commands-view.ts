@@ -13,14 +13,14 @@ export function initNxCommandsView(context: ExtensionContext) {
     commands.registerCommand('nxConsole.editCommonCommands', () => {
       commands.executeCommand(
         'workbench.action.openSettings',
-        'nxConsole.commonNxCommands'
+        'nxConsole.commonNxCommands',
       );
     }),
     commands.registerCommand(
       EXECUTE_ARBITRARY_COMMAND,
-      executeArbitraryCommand
+      executeArbitraryCommand,
     ),
-    nxCommandsTreeView
+    nxCommandsTreeView,
   );
 }
 

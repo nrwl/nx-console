@@ -3,10 +3,10 @@ const { normalize } = require('path');
 
 execSync(
   `${normalize(
-    '../../../node_modules/.bin/vsce'
+    '../../../node_modules/.bin/vsce',
   )} package --out nx-console.vsix`,
   {
     stdio: [0, 1, 2],
     cwd: normalize('dist/apps/vscode'),
-  }
+  },
 );

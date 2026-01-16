@@ -5,7 +5,7 @@ export const spyOnConsoleLog = (): any =>
 
 export const expectConsoleLogToHaveBeenCalledWith = (
   consoleLog: Cypress.Agent<sinon.SinonSpy>,
-  expectedText: string
+  expectedText: string,
 ) =>
   cy.get('@consoleLog').then(() => {
     expect(consoleLog).to.be.called;

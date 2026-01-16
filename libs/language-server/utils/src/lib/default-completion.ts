@@ -46,7 +46,7 @@ defaultCompletionMap.set('devservertarget', {
 });
 
 export function getDefaultCompletionType(
-  node: ASTNode
+  node: ASTNode,
 ): DefaultCompletion | undefined {
   const parent = node.parent;
   if (isPropertyNode(parent) && isStringNode(parent.keyNode)) {

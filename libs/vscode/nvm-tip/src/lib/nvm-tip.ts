@@ -5,7 +5,7 @@ import { ConfigurationTarget, ExtensionContext, window } from 'vscode';
 
 export async function initNvmTip(_: ExtensionContext) {
   const showTip = GlobalConfigurationStore.instance.get(
-    'showNodeVersionOnStartup'
+    'showNodeVersionOnStartup',
   );
   if (!showTip) {
     return;
@@ -16,14 +16,14 @@ export async function initNvmTip(_: ExtensionContext) {
     .showInformationMessage(
       `VSCode loaded Node ${nodeVersion}. [If that seems wrong, read more here.](https://nx.dev/recipes/nx-console/console-troubleshooting#vscode-nvm-issues)`,
       'OK',
-      "Don't show again"
+      "Don't show again",
     )
     .then((value) => {
       if (value !== 'OK' && value !== undefined) {
         GlobalConfigurationStore.instance.set(
           'showNodeVersionOnStartup',
           false,
-          ConfigurationTarget.Global
+          ConfigurationTarget.Global,
         );
       }
     });

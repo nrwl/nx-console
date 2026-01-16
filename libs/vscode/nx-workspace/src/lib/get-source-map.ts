@@ -10,13 +10,13 @@ export async function getSourceMapFilesToProjectsMap(): Promise<
 > {
   return getNxlsClient().sendRequest(
     NxSourceMapFilesToProjectsMapRequest,
-    undefined
+    undefined,
   );
 }
 
 export async function getTargetsForConfigFile(
   projectName: string,
-  configFilePath: string
+  configFilePath: string,
 ): Promise<Record<string, TargetConfiguration> | undefined> {
   return getNxlsClient().sendRequest(NxTargetsForConfigFileRequest, {
     projectName,

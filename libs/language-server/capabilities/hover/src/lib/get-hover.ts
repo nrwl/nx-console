@@ -13,12 +13,12 @@ import {
 export async function getHover(
   hoverParams: HoverParams,
   jsonAst: JSONDocument,
-  document: TextDocument
+  document: TextDocument,
 ): Promise<Hover | null | undefined> {
   const hover = await getJsonLanguageService()?.doHover(
     document,
     hoverParams.position,
-    jsonAst
+    jsonAst,
   );
 
   if (!hover) {
@@ -36,7 +36,7 @@ export async function getHover(
     hover.contents = {
       kind: 'markdown',
       value: `[View executor documentation on nx.dev](${constructExecutorUrl(
-        node.value
+        node.value,
       )})`,
     };
   }

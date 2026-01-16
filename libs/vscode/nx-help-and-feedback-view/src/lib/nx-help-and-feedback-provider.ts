@@ -24,10 +24,14 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
           'https://nx.dev/core-features/integrate-with-editors#nx-console-for-vscode?utm_source=nxconsole',
           {
             light: Uri.file(
-              join(this.context.extensionPath, 'assets', 'nx-console-light.svg')
+              join(
+                this.context.extensionPath,
+                'assets',
+                'nx-console-light.svg',
+              ),
             ),
             dark: Uri.file(
-              join(this.context.extensionPath, 'assets', 'nx-console-dark.svg')
+              join(this.context.extensionPath, 'assets', 'nx-console-dark.svg'),
             ),
           },
         ],
@@ -63,7 +67,7 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
         ],
       ] as const
     ).map(
-      ([title, link, icon]) => new NxHelpAndFeedbackTreeItem(title, link, icon)
+      ([title, link, icon]) => new NxHelpAndFeedbackTreeItem(title, link, icon),
     );
   }
 }

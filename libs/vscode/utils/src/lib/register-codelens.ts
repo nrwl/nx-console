@@ -19,7 +19,7 @@ export function registerCodeLensProvider(provider: NxCodeLensProvider): void {
   registeredCodeLensProviders.add(provider);
   if (GlobalConfigurationStore.instance.get('enableCodeLens')) {
     codeLensDisposables.add(
-      languages.registerCodeLensProvider(provider.CODELENS_PATTERN, provider)
+      languages.registerCodeLensProvider(provider.CODELENS_PATTERN, provider),
     );
   }
 }
@@ -32,7 +32,7 @@ function disposeCodeLensProviders() {
 function restartCodelensProviders() {
   registeredCodeLensProviders.forEach((provider) => {
     codeLensDisposables.add(
-      languages.registerCodeLensProvider(provider.CODELENS_PATTERN, provider)
+      languages.registerCodeLensProvider(provider.CODELENS_PATTERN, provider),
     );
   });
 }
@@ -46,7 +46,7 @@ export function watchCodeLensConfigChange(context: ExtensionContext) {
     workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
       // if the `nxConsole` config changes, check enableWorkspaceConfigCodeLens and register or dispose
       const affectsNxConsoleConfig = event.affectsConfiguration(
-        GlobalConfigurationStore.configurationSection
+        GlobalConfigurationStore.configurationSection,
       );
       if (affectsNxConsoleConfig) {
         const enableWorkspaceConfigCodeLens =
@@ -57,6 +57,6 @@ export function watchCodeLensConfigChange(context: ExtensionContext) {
           disposeCodeLensProviders();
         }
       }
-    })
+    }),
   );
 }

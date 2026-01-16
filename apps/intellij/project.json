@@ -3,13 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
-    "composedJar": {
-      "executor": "@nx/gradle:gradle",
-      "options": {
-        "taskName": ":intellij:composedJar",
-        "excludeDependsOn": false
-      }
-    },
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {

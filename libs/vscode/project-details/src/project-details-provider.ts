@@ -11,7 +11,7 @@ export class ProjectDetailsProvider implements TextDocumentContentProvider {
 
   async provideTextDocumentContent(
     uri: Uri,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<string | undefined> {
     const projectName = uri.path.replace('.project.json', '');
     const project = (await getNxWorkspaceProjects())?.[projectName] as any;

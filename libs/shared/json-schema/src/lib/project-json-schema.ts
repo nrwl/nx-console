@@ -17,7 +17,7 @@ type JSONSchemaMap = NonNullable<JSONSchema['properties']>;
 export function getProjectJsonSchema(
   collections: CollectionInfo[],
   targetDefaults: TargetDefaults = {},
-  nxVersion: NxVersion
+  nxVersion: NxVersion,
 ) {
   const [, executors] = createBuildersAndExecutorsSchema(collections);
   const contents = createJsonSchema(executors, targetDefaults, nxVersion);
@@ -27,7 +27,7 @@ export function getProjectJsonSchema(
 function createJsonSchema(
   executors: JSONSchema[],
   targetDefaults: TargetDefaults,
-  nxVersion: NxVersion
+  nxVersion: NxVersion,
 ): EnhancedJsonSchema {
   const targetsSchema =
     (targets(nxVersion, executors).additionalProperties as object) ?? {};
@@ -41,7 +41,7 @@ function createJsonSchema(
         ) &&
         target !== 'nx:run-commands' &&
         target !== 'nx:run-script' &&
-        target !== 'nx:noop'
+        target !== 'nx:noop',
     )
     .reduce<JSONSchemaMap>((targets, target) => {
       const defaults: Partial<TargetConfiguration> = targetDefaults[target];

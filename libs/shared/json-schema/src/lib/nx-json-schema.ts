@@ -15,7 +15,7 @@ export async function getNxJsonSchema(
   collections: CollectionInfo[],
   projects: Record<string, ProjectGraphProjectNode>,
   nxVersion: NxVersion,
-  workspacePath: string
+  workspacePath: string,
 ): Promise<JSONSchema> {
   const [, executors] = createBuildersAndExecutorsSchema(collections);
   const targets = getTargets(projects);
@@ -32,7 +32,7 @@ export async function getNxJsonSchema(
 function createJsonSchema(
   executors: JSONSchema[],
   projectTargets: string[],
-  nxVersion: NxVersion
+  nxVersion: NxVersion,
 ): JSONSchema {
   const targetsSchema =
     (targets(nxVersion, executors).additionalProperties as object) ?? {};
@@ -108,7 +108,7 @@ function createJsonSchema(
 }
 
 function getTargets(
-  projects: Record<string, ProjectGraphProjectNode>
+  projects: Record<string, ProjectGraphProjectNode>,
 ): string[] {
   const tags = new Set<string>();
 

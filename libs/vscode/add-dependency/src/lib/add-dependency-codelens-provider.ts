@@ -35,10 +35,10 @@ export class AddDependencyCodelensProvider implements NxCodeLensProvider {
         .expression as ObjectLiteralExpression;
 
       const depProperty = packageJsonObject.properties.find(
-        (property) => getPropertyName(property) === 'dependencies'
+        (property) => getPropertyName(property) === 'dependencies',
       );
       const devDepProperty = packageJsonObject.properties.find(
-        (property) => getPropertyName(property) === 'devDependencies'
+        (property) => getPropertyName(property) === 'devDependencies',
       );
 
       const lenses: CodeLens[] = [];

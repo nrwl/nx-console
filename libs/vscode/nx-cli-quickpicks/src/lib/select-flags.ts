@@ -7,7 +7,7 @@ class CliTaskFlagQuickPickItem implements QuickPickItem {
     readonly detail = '',
     readonly option: Option,
     readonly label: string,
-    readonly description?: string
+    readonly description?: string,
   ) {}
 }
 
@@ -16,14 +16,20 @@ class ExecuteCommandQuickPickItem implements QuickPickItem {
   picked = true;
   alwaysShow = true;
 
-  constructor(readonly label: string, readonly description?: string) {}
+  constructor(
+    readonly label: string,
+    readonly description?: string,
+  ) {}
 }
 
 class CustomOptionsQuickPickItem implements QuickPickItem {
   type = 'custom';
   alwaysShow = true;
 
-  constructor(readonly label: string, readonly description?: string) {}
+  constructor(
+    readonly label: string,
+    readonly description?: string,
+  ) {}
 }
 
 /**
@@ -35,10 +41,10 @@ export async function selectFlags(
   command: string,
   options: Option[],
   userSetFlags: { [key: string]: string } = {},
-  customOptions?: string
+  customOptions?: string,
 ): Promise<string[] | undefined> {
   const flagArray = Object.entries(userSetFlags).map(
-    ([flagName, value]) => `--${flagName}=${value}`
+    ([flagName, value]) => `--${flagName}=${value}`,
   );
   if (customOptions) {
     flagArray.push(customOptions);
@@ -46,7 +52,7 @@ export async function selectFlags(
 
   const selection = await promptForFlagToSet(
     `nx ${command} ${flagArray.join(' ')}`,
-    options.filter((option) => !userSetFlags[option.name])
+    options.filter((option) => !userSetFlags[option.name]),
   );
 
   if (selection.execute !== undefined) {
@@ -73,7 +79,7 @@ export async function selectFlags(
 
 async function promptForFlagToSet(
   currentCommand: string,
-  options: Option[]
+  options: Option[],
 ): Promise<{
   execute?: boolean;
   flag?: CliTaskFlagQuickPickItem;
@@ -94,12 +100,12 @@ async function promptForFlagToSet(
         detail,
         option,
         `${option.name}`,
-        option.isRequired ? 'required' : undefined
+        option.isRequired ? 'required' : undefined,
       );
     }),
     new CustomOptionsQuickPickItem(
       'Custom Options',
-      'Add any additional command text.'
+      'Add any additional command text.',
     ),
   ];
 

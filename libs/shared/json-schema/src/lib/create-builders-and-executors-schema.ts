@@ -12,7 +12,7 @@ type ExecutorsSchema = JSONSchema;
  * @returns [BuildersSchema[], ExecutorsSchema[]]
  */
 export function createBuildersAndExecutorsSchema(
-  collections: CollectionInfo[]
+  collections: CollectionInfo[],
 ): [BuildersSchema[], ExecutorsSchema[]] {
   return collections.reduce<[BuildersSchema[], ExecutorsSchema[]]>(
     (acc, collection) => {
@@ -61,6 +61,6 @@ export function createBuildersAndExecutorsSchema(
       });
       return acc;
     },
-    [[], []]
+    [[], []],
   );
 }

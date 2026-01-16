@@ -19,7 +19,7 @@ export class WorkspaceConfigurationStore implements Store {
   static get instance() {
     if (!CONFIG_STORE) {
       throw Error(
-        'Please create a configuration store with `fromContext` first'
+        'Please create a configuration store with `fromContext` first',
       );
     }
     return CONFIG_STORE;

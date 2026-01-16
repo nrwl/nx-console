@@ -60,7 +60,7 @@ export async function pnpDependencies(workspacePath: string) {
       continue;
     }
     for (const [name, reference] of Object.entries(
-      pkg?.packageDependencies ?? {}
+      pkg?.packageDependencies ?? {},
     )) {
       // Unmet peer dependencies
       if (reference === null) continue;
@@ -78,7 +78,7 @@ export async function pnpDependencies(workspacePath: string) {
 
 export async function pnpDependencyPath(
   workspacePath: string,
-  dependencyName: string
+  dependencyName: string,
 ) {
   try {
     const pnp = await pnpApi(workspacePath);

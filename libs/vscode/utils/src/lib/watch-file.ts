@@ -11,7 +11,7 @@ import { workspace, GlobPattern, Disposable } from 'vscode';
 export function watchFile(
   filePath: GlobPattern,
   callback: (...args: any[]) => unknown,
-  disposable?: Disposable[]
+  disposable?: Disposable[],
 ): Disposable {
   const filewatcher = workspace.createFileSystemWatcher(filePath);
   filewatcher.onDidChange(callback, disposable);

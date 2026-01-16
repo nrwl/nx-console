@@ -16,7 +16,7 @@ export interface GeneratorDefaults {
 
 export async function normalizeSchema(
   s: Schema,
-  projectDefaults?: GeneratorDefaults
+  projectDefaults?: GeneratorDefaults,
 ): Promise<Option[]> {
   const options = schemaToOptions(s);
   const requiredFields = new Set(s.required || []);
@@ -49,7 +49,7 @@ export async function normalizeSchema(
             ? typeof item.value === 'string'
               ? item.value
               : JSON.stringify(item.value)
-            : item
+            : item,
         );
         if (items.length > 0) {
           nxOption.items = items;
@@ -63,7 +63,7 @@ export async function normalizeSchema(
   // since some folks are using Nx Console with older versions,
   // we need to make sure their options are sorted like before
   const optionComparator = nxOptions.some(
-    (option) => option['x-priority'] !== undefined
+    (option) => option['x-priority'] !== undefined,
   )
     ? compareOptions
     : legacyCompareOptions;
@@ -156,7 +156,7 @@ function legacyCompareOptions(a: Option, b: Option): number {
 
 function isFieldRequired(
   requiredFields: Set<string>,
-  nxOption: CliOption
+  nxOption: CliOption,
 ): boolean {
   // checks schema.json requiredFields and xPrompt for required
   return requiredFields.has(nxOption.name);
@@ -189,7 +189,7 @@ function getEnumTooltips(xPrompt: XPrompt): ItemTooltips {
 }
 
 function isOptionItemLabelValue(
-  item: string | OptionItemLabelValue
+  item: string | OptionItemLabelValue,
 ): item is OptionItemLabelValue {
   return (
     (item as Partial<OptionItemLabelValue>).value !== undefined ||
@@ -219,13 +219,13 @@ function schemaToOptions(schema: Schema): CliOption[] {
       });
       return cliOptions;
     },
-    []
+    [],
   );
 }
 
 function isPropertyVisible(
   option: string,
-  property: OptionPropertyDescription
+  property: OptionPropertyDescription,
 ): boolean {
   const ALWAYS_VISIBLE_OPTIONS = ['path'];
 

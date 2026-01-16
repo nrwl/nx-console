@@ -6,7 +6,7 @@ import {
 import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 
 export async function getProjectByPath(
-  selectedPath: string | undefined
+  selectedPath: string | undefined,
 ): Promise<ProjectConfiguration | undefined | null> {
   return getNxlsClient().sendRequest(NxProjectByPathRequest, {
     projectPath: selectedPath,
@@ -14,7 +14,7 @@ export async function getProjectByPath(
 }
 
 export async function getProjectByRoot(
-  projectRoot: string
+  projectRoot: string,
 ): Promise<ProjectConfiguration | undefined | null> {
   return getNxlsClient().sendRequest(NxProjectByRootRequest, { projectRoot });
 }

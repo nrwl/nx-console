@@ -7,16 +7,16 @@ import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 
 export function getTransformedGeneratorSchema(
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): Promise<GeneratorSchema | undefined> {
   return getNxlsClient().sendRequest(
     NxTransformedGeneratorSchemaRequest,
-    schema
+    schema,
   );
 }
 
 export function getStartupMessage(
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): Promise<StartupMessageDefinition | undefined> {
   return getNxlsClient().sendRequest(NxStartupMessageRequest, schema);
 }

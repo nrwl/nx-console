@@ -19,7 +19,7 @@ describe('PdvStateMachine', () => {
         actions: {
           renderLoading: () => renderLoading(),
         },
-      })
+      }),
     );
     actor.start();
 

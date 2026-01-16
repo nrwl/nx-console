@@ -5,7 +5,7 @@ import { isProjectOption } from '@nx-console/shared-schema';
 
 export const addProjectItemsToOptionProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ) => {
   return {
     ...schema,

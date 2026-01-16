@@ -73,13 +73,13 @@ export class AtomizerDecorationProvider implements FileDecorationProvider {
                   modal: true,
                   detail: `Enable Nx Agents to benefit from task distribution and flaky task re-runs. Use ${nonAtomizedTarget} when running without Nx Agents`,
                 },
-                'Learn More'
+                'Learn More',
               )
               .then((selection) => {
                 if (selection === 'Learn More') {
                   commands.executeCommand(
                     'vscode.open',
-                    'https://nx.dev/ci/features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole'
+                    'https://nx.dev/ci/features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole',
                   );
                 }
               });
@@ -92,7 +92,7 @@ export class AtomizerDecorationProvider implements FileDecorationProvider {
                   detail: `Connect to Nx Cloud to benefit from task distribution, remote caching and flaky task re-runs. Use ${nonAtomizedTarget} when running without Nx Agents`,
                 },
                 'Connect to Nx Cloud',
-                'Learn More'
+                'Learn More',
               )
               .then((selection) => {
                 if (selection === 'Connect to Nx Cloud') {
@@ -101,13 +101,13 @@ export class AtomizerDecorationProvider implements FileDecorationProvider {
                 if (selection === 'Learn More') {
                   commands.executeCommand(
                     'vscode.open',
-                    'https://nx.dev/ci/features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole'
+                    'https://nx.dev/ci/features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole',
                   );
                 }
               });
           }
-        }
-      )
+        },
+      ),
     );
   }
 }

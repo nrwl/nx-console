@@ -27,7 +27,7 @@ export class GraphWebviewManager implements Disposable {
     onWorkspaceRefreshed(async () => {
       if (this.webviewPanel) {
         this.webviewPanel.webview.html = await this.loadGraphHtml(
-          this.webviewPanel.webview
+          this.webviewPanel.webview,
         );
         this.rerunLastGraphCommand();
       }
@@ -61,7 +61,7 @@ export class GraphWebviewManager implements Disposable {
   async focusTarget(
     projectName: string,
     targetName: string,
-    focusWebview?: boolean
+    focusWebview?: boolean,
   ) {
     await this.openGraphWebview({ focusWebview });
     this.webviewPanel?.webview.postMessage({
@@ -126,7 +126,7 @@ export class GraphWebviewManager implements Disposable {
       {
         enableScripts: true,
         retainContextWhenHidden: true,
-      }
+      },
     );
 
     const messageListener = this.webviewPanel.webview.onDidReceiveMessage(
@@ -138,7 +138,7 @@ export class GraphWebviewManager implements Disposable {
           this.webviewPanel?.webview.postMessage(response);
           return;
         }
-      }
+      },
     );
 
     const viewStateListener = this.webviewPanel.onDidChangeViewState(
@@ -146,9 +146,9 @@ export class GraphWebviewManager implements Disposable {
         commands.executeCommand(
           'setContext',
           'graphWebviewVisible',
-          webviewPanel.visible
+          webviewPanel.visible,
         );
-      }
+      },
     );
 
     this.webviewPanel.onDidDispose(() => {
@@ -160,7 +160,7 @@ export class GraphWebviewManager implements Disposable {
     });
 
     this.webviewPanel.webview.html = await this.loadGraphHtml(
-      this.webviewPanel.webview
+      this.webviewPanel.webview,
     );
   }
 
@@ -212,7 +212,7 @@ export class GraphWebviewManager implements Disposable {
              }); 
          </script>
          </head>
-         `
+         `,
       );
     }
     return html;
@@ -235,7 +235,7 @@ export class GraphWebviewManager implements Disposable {
         this.focusTarget(
           this.lastGraphCommand.projectName,
           this.lastGraphCommand.targetName,
-          false
+          false,
         );
         break;
       case 'show-all-targets-by-name':
@@ -290,7 +290,7 @@ interface ShowAffectedProjectsCommand {
 }
 
 function isCommandWithProjectName(
-  command: GraphCommand
+  command: GraphCommand,
 ): command is FocusProjectCommand | SelectProjectCommand {
   return command.type === 'focus-project' || command.type === 'select-project';
 }

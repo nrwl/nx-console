@@ -4,7 +4,7 @@ export function ensureOnlyJsonRpcStdout() {
   process.stdout.write = ((
     chunk: any,
     encodingOrCallback?: any,
-    callback?: any
+    callback?: any,
   ) => {
     const message = chunk.toString();
 
@@ -16,7 +16,7 @@ export function ensureOnlyJsonRpcStdout() {
     }
 
     const originalWrite = process.stdout.constructor.prototype.write.bind(
-      process.stdout
+      process.stdout,
     );
     return originalWrite(chunk, encodingOrCallback, callback);
   }) as typeof process.stdout.write;

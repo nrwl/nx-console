@@ -10,7 +10,7 @@ import { NxTreeItem } from './nx-tree-item';
 import { ProjectGraphErrorDecorationProvider } from './project-graph-error-decorations';
 
 export function initNxProjectView(
-  context: ExtensionContext
+  context: ExtensionContext,
 ): NxProjectTreeProvider {
   const nxProjectsTreeProvider = new NxProjectTreeProvider(context);
   const nxProjectTreeView = window.createTreeView('nxProjects', {
@@ -22,14 +22,14 @@ export function initNxProjectView(
 
   commands.registerCommand(
     'nxConsole.showProjectConfiguration',
-    showProjectConfiguration
+    showProjectConfiguration,
   );
 
   AtomizerDecorationProvider.register(context);
   ProjectGraphErrorDecorationProvider.register(context);
 
   context.subscriptions.push(
-    showRefreshLoadingAtLocation({ viewId: 'nxProjects' })
+    showRefreshLoadingAtLocation({ viewId: 'nxProjects' }),
   );
 
   return nxProjectsTreeProvider;

@@ -11,7 +11,7 @@ export function createCompletionItem(
   node: ASTNode,
   document: TextDocument,
   kind: CompletionItemKind,
-  documentation?: string
+  documentation?: string,
 ): CompletionItem {
   const startPosition = document.positionAt(node.offset);
   const endPosition = document.positionAt(node.offset + node.length);

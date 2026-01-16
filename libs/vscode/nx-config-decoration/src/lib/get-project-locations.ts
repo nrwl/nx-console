@@ -26,7 +26,7 @@ export function getProjectLocations(document: TextDocument, projectName = '') {
   const json = parseJsonText('workspace.json', document.getText());
   const statement = json.statements[0];
   const projects = getProperties(statement.expression)?.find(
-    (property) => getPropertyName(property) === 'projects'
+    (property) => getPropertyName(property) === 'projects',
   ) as typescript.PropertyAssignment | undefined;
 
   if (projects) {
@@ -63,14 +63,14 @@ export function getProjectLocations(document: TextDocument, projectName = '') {
 }
 
 export function getTargetsPropertyLocation(
-  document: TextDocument
+  document: TextDocument,
 ): Position | undefined {
   try {
     const json = parseJsonText('project.json', document.getText());
     const statement = json.statements[0];
 
     const targetsProperty = getProperties(statement.expression)?.filter(
-      (prop) => getPropertyName(prop) === 'targets'
+      (prop) => getPropertyName(prop) === 'targets',
     )?.[0];
     if (!targetsProperty) {
       return;
@@ -82,7 +82,7 @@ export function getTargetsPropertyLocation(
 }
 
 function isProjectPathConfig(
-  property: typescript.ObjectLiteralElementLike
+  property: typescript.ObjectLiteralElementLike,
 ): property is typescript.PropertyAssignment {
   return (
     isPropertyAssignment(property) && isStringLiteral(property.initializer)
@@ -92,7 +92,7 @@ function isProjectPathConfig(
 function getPositions(
   property: typescript.Node,
   properties: string[],
-  document: typescript.JsonSourceFile
+  document: typescript.JsonSourceFile,
 ): ProjectTargetLocation | undefined {
   const objectLike = getProperties(property)?.find((prop) => {
     const propName = getPropertyName(prop);
@@ -124,6 +124,6 @@ function getPositions(
 
       return acc;
     },
-    {}
+    {},
   );
 }

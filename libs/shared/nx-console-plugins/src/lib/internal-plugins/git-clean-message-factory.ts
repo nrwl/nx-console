@@ -6,7 +6,7 @@ import { exec } from 'child_process';
 
 export async function gitCleanMessageFactory(
   _: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ): Promise<StartupMessageDefinition | undefined> {
   const workspacePath = workspace.workspacePath;
   try {
