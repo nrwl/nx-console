@@ -1,3 +1,18 @@
+# [18.83.0](https://github.com/nrwl/nx-console/compare/vscode-v18.82.1...vscode-v18.83.0) (2026-01-16)
+
+
+### Bug Fixes
+
+* **nx-mcp:** remove awaiting project graph from mcp startup even with ide provider ([#2944](https://github.com/nrwl/nx-console/issues/2944)) ([12d2f6d](https://github.com/nrwl/nx-console/commit/12d2f6d37367cedeffc6e60c91fef7cb4194bf59))
+* **nxls:** repair nxls path issue on windows ([#2949](https://github.com/nrwl/nx-console/issues/2949)) ([c168440](https://github.com/nrwl/nx-console/commit/c1684406d408871a494ba72b1e81c5140683e23f))
+
+
+### Features
+
+* **nx-mcp:** add mcp tool for retrieving self-healing context from CI ([#2934](https://github.com/nrwl/nx-console/issues/2934)) ([f6246c1](https://github.com/nrwl/nx-console/commit/f6246c1fd14dfe807d023d9cd45b900b1c69abde))
+* **nx-mcp:** add server instructions to help agents understand it ([#2940](https://github.com/nrwl/nx-console/issues/2940)) ([b0f3051](https://github.com/nrwl/nx-console/commit/b0f30515f79d001036bec45335973a62fe801e6a))
+* **nx-mcp:** remove nx_run_generator tool ([#2939](https://github.com/nrwl/nx-console/issues/2939)) ([d2a4402](https://github.com/nrwl/nx-console/commit/d2a4402ce01d985d0cff977e790862c8596c0ea4))
+
 ## [18.82.1](https://github.com/nrwl/nx-console/compare/vscode-v18.82.0...vscode-v18.82.1) (2026-01-14)
 
 
