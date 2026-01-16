@@ -1,5 +1,5 @@
 import { Option } from '@nx-console/shared-schema';
-import { QuickPickItem, window } from 'vscode';
+import { QuickPickItem, window, env } from 'vscode';
 
 class CliTaskFlagQuickPickItem implements QuickPickItem {
   constructor(
@@ -7,7 +7,7 @@ class CliTaskFlagQuickPickItem implements QuickPickItem {
     readonly detail = '',
     readonly option: Option,
     readonly label: string,
-    readonly description?: string
+    readonly description?: string,
   ) {}
 }
 
@@ -16,14 +16,31 @@ class ExecuteCommandQuickPickItem implements QuickPickItem {
   picked = true;
   alwaysShow = true;
 
-  constructor(readonly label: string, readonly description?: string) {}
+  constructor(
+    readonly label: string,
+    readonly description?: string,
+  ) {}
+}
+
+class CopyCommandQuickPickItem implements QuickPickItem {
+  type = 'copy';
+  picked = true;
+  alwaysShow = true;
+
+  constructor(
+    readonly label: string,
+    readonly description?: string,
+  ) {}
 }
 
 class CustomOptionsQuickPickItem implements QuickPickItem {
   type = 'custom';
   alwaysShow = true;
 
-  constructor(readonly label: string, readonly description?: string) {}
+  constructor(
+    readonly label: string,
+    readonly description?: string,
+  ) {}
 }
 
 /**
@@ -35,10 +52,10 @@ export async function selectFlags(
   command: string,
   options: Option[],
   userSetFlags: { [key: string]: string } = {},
-  customOptions?: string
+  customOptions?: string,
 ): Promise<string[] | undefined> {
   const flagArray = Object.entries(userSetFlags).map(
-    ([flagName, value]) => `--${flagName}=${value}`
+    ([flagName, value]) => `--${flagName}=${value}`,
   );
   if (customOptions) {
     flagArray.push(customOptions);
@@ -46,11 +63,16 @@ export async function selectFlags(
 
   const selection = await promptForFlagToSet(
     `nx ${command} ${flagArray.join(' ')}`,
-    options.filter((option) => !userSetFlags[option.name])
+    options.filter((option) => !userSetFlags[option.name]),
   );
 
   if (selection.execute !== undefined) {
     return selection.execute ? flagArray : undefined;
+  }
+
+  if (selection.copy !== undefined) {
+    await copyCommandToClipboard(`nx ${command} ${flagArray.join(' ')}`);
+    return undefined;
   }
 
   if (selection.flag) {
@@ -73,9 +95,10 @@ export async function selectFlags(
 
 async function promptForFlagToSet(
   currentCommand: string,
-  options: Option[]
+  options: Option[],
 ): Promise<{
   execute?: boolean;
+  copy?: boolean;
   flag?: CliTaskFlagQuickPickItem;
   customOptions?: boolean;
 }> {
@@ -94,12 +117,13 @@ async function promptForFlagToSet(
         detail,
         option,
         `${option.name}`,
-        option.isRequired ? 'required' : undefined
+        option.isRequired ? 'required' : undefined,
       );
     }),
+    new CopyCommandQuickPickItem(`Copy to clipboard: ${currentCommand}`),
     new CustomOptionsQuickPickItem(
       'Custom Options',
-      'Add any additional command text.'
+      'Add any additional command text.',
     ),
   ];
 
@@ -113,16 +137,28 @@ async function promptForFlagToSet(
 
   const flagSelected = Boolean((selection as CliTaskFlagQuickPickItem).option);
   if (!flagSelected) {
-    if ((selection as CustomOptionsQuickPickItem).type === 'custom') {
-      return { customOptions: true };
-    } else {
-      return { execute: true };
+    switch ((selection as CustomOptionsQuickPickItem).type) {
+      case 'custom': {
+        return { customOptions: true };
+      }
+      case 'copy': {
+        return { copy: true };
+      }
+      default: {
+        return { execute: true };
+      }
     }
   } else {
     return {
       flag: selection as CliTaskFlagQuickPickItem,
     };
   }
+}
+
+async function copyCommandToClipboard(command: string) {
+  await env.clipboard.writeText(command);
+
+  window.showInformationMessage(`Copied command to clipboard: ${command}`);
 }
 
 function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
