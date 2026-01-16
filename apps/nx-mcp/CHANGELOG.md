@@ -1,3 +1,13 @@
+## 0.13.2 (2026-01-16)
+
+### 🩹 Fixes
+
+- **nx-mcp:** remove awaiting project graph from mcp startup even with ide provider ([#2944](https://github.com/nrwl/nx-console/pull/2944))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.13.1 (2026-01-15)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
