@@ -265,10 +265,7 @@ export class NxMcpServerWrapper {
         this.toolRegistrationState.nxCloud = true;
       }
 
-      if (
-        this._nxWorkspacePath &&
-        !this.toolRegistrationState.nxWorkspace
-      ) {
+      if (this._nxWorkspacePath && !this.toolRegistrationState.nxWorkspace) {
         await registerNxWorkspaceTools(
           this._nxWorkspacePath,
           this.toolRegistry,
