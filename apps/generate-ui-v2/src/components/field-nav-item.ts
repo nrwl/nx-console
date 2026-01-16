@@ -19,11 +19,10 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
         class="${this.shouldRenderError()
           ? 'text-error'
           : this.shouldRenderChanged()
-          ? 'text-primary'
-          : this.greyedOut
-          ? 'text-mutedForeground'
-          : 'text-foreground'} hover:bg-fieldNavHoverBackground  cursor-pointer overflow-hidden 
-          text-ellipsis"
+            ? 'text-primary'
+            : this.greyedOut
+              ? 'text-mutedForeground'
+              : 'text-foreground'} hover:bg-fieldNavHoverBackground cursor-pointer overflow-hidden text-ellipsis"
       >
         ${this.option.name}
       </li>

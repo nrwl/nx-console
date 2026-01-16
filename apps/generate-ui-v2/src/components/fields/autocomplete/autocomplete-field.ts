@@ -29,7 +29,8 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
       >
         ${map(
           extractItemOptions(this.option),
-          (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
+          (item) =>
+            html`<vscode-option value="${item}">${item}</vscode-option>`,
         )}
       </vscode-single-select>
     `;
@@ -46,7 +47,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
         ${map(
           extractItemOptions(this.option),
           (item) =>
-            html`<intellij-option value="${item}">${item}</intellij-option>`
+            html`<intellij-option value="${item}">${item}</intellij-option>`,
         )}
       </intellij-combobox>
     `;
@@ -71,7 +72,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
       const filter = this.filter.toLowerCase();
 
       this.filteredOptions = this._options.filter((o: any) =>
-        o.text.toLowerCase().includes(this.filter.toLowerCase())
+        o.text.toLowerCase().includes(this.filter.toLowerCase()),
       );
 
       if (this.isAutocompleteList) {

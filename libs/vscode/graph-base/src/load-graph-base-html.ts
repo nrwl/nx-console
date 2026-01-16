@@ -9,7 +9,7 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
   const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
   if (!nxPath || !existsSync(nxPath)) {
     window.showErrorMessage(
-      'Error loading the nx graph. Did you run npm/yarn/pnpm install?'
+      'Error loading the nx graph. Did you run npm/yarn/pnpm install?',
     );
     return '';
   }
@@ -47,7 +47,7 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
     }
   </style>
   </head>
-  `
+  `,
   );
 
   html = html.replace(
@@ -118,7 +118,7 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
   </script>
 
   </head>
-  `
+  `,
   );
 
   return html;

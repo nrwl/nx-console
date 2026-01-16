@@ -4,7 +4,7 @@ import { NxWorkspace } from '@nx-console/shared-types';
 
 export const useGeneratorDefaultsProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ) => {
   const nxJsonGeneratorsEntry =
     workspace.nxJson?.generators?.[schema.collectionName]?.[

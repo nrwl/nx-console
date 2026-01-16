@@ -24,8 +24,8 @@ describe('npmDependencies', () => {
             join('workspace', 'node_modules'),
             join('workspace', 'node_modules', 'package-foo'),
             join('workspace', 'node_modules', 'package-bar'),
-          ].includes(filePath)
-        )
+          ].includes(filePath),
+        ),
       );
     jest
       .mocked(readDirectory)
@@ -49,17 +49,17 @@ describe('npmDependencies', () => {
               '.nx',
               'installation',
               'node_modules',
-              'package-foo'
+              'package-foo',
             ),
             join(
               'workspace',
               '.nx',
               'installation',
               'node_modules',
-              'package-bar'
+              'package-bar',
             ),
-          ].includes(filePath)
-        )
+          ].includes(filePath),
+        ),
       );
     jest
       .mocked(readDirectory)
@@ -81,8 +81,8 @@ describe('npmDependencies', () => {
             join('workspace', 'node_modules', 'package-foo'),
             join('workspace', 'node_modules', 'package-bar'),
             join('workspace', '.nx', 'installation', 'node_modules'),
-          ].includes(filePath)
-        )
+          ].includes(filePath),
+        ),
       );
     jest
       .mocked(readDirectory)
@@ -103,8 +103,8 @@ describe('npmDependencies', () => {
             join('workspace', 'node_modules'),
             join('workspace', 'node_modules', '@scope'),
             join('workspace', '.nx', 'installation', 'node_modules'),
-          ].includes(filePath)
-        )
+          ].includes(filePath),
+        ),
       );
     jest
       .mocked(readDirectory)

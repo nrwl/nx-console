@@ -6,7 +6,7 @@ export function showNoProjectsMessage(workspaceIsDefined = false) {
       .showWarningMessage(
         `No projects found. Click to refresh workspace.`,
         'Refresh',
-        'OK'
+        'OK',
       )
       .then((selection) => {
         if (selection === 'Refresh') {
@@ -15,7 +15,7 @@ export function showNoProjectsMessage(workspaceIsDefined = false) {
       });
   } else {
     window.showWarningMessage(
-      `No projects found. Did you run npm/pnpm/yarn install?`
+      `No projects found. Did you run npm/pnpm/yarn install?`,
     );
   }
 }
@@ -26,7 +26,7 @@ export function showNoTargetsMessage(workspaceIsDefined = false) {
       .showWarningMessage(
         `No targets found. Click to refresh workspace.`,
         'Refresh',
-        'OK'
+        'OK',
       )
       .then((selection) => {
         if (selection === 'Refresh') {
@@ -35,19 +35,19 @@ export function showNoTargetsMessage(workspaceIsDefined = false) {
       });
   } else {
     window.showWarningMessage(
-      `No projects found. Did you run npm/pnpm/yarn install?`
+      `No projects found. Did you run npm/pnpm/yarn install?`,
     );
   }
 }
 
 export function showNoProjectAtPathMessage(path: string) {
   window.showWarningMessage(
-    `No project found at ${path}. Did you run npm/pnpm/yarn install?`
+    `No project found at ${path}. Did you run npm/pnpm/yarn install?`,
   );
 }
 
 export function showNoGeneratorsMessage() {
   window.showWarningMessage(
-    'No generators found. Did you run npm/pnpm/yarn install?'
+    'No generators found. Did you run npm/pnpm/yarn install?',
   );
 }

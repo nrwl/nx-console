@@ -4,7 +4,7 @@ import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 
 export async function getGeneratorContextFromPath(
   generator: TaskExecutionSchema,
-  path: string
+  path: string,
 ): Promise<
   | {
       project?: string;

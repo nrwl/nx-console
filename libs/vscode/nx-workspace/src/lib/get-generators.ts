@@ -6,7 +6,7 @@ import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { getNxlsClient } from '@nx-console/vscode-lsp-client';
 
 export function getGenerators(
-  options?: NxGeneratorsRequestOptions
+  options?: NxGeneratorsRequestOptions,
 ): Promise<GeneratorCollectionInfo[] | undefined> {
   return getNxlsClient().sendRequest(NxGeneratorsRequest, { options });
 }

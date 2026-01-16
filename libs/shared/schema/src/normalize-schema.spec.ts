@@ -15,7 +15,7 @@ describe('utils', () => {
     };
     const getSchema = async (
       options: Schema['properties'],
-      required: string[] = []
+      required: string[] = [],
     ): Promise<Option[]> => {
       const r = await normalizeSchema({
         properties: { ...options },

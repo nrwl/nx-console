@@ -18,7 +18,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       `nx.generate.quickpick`,
       async (
         preselectedGenerator?: string,
-        preselectedFlags?: Record<string, string>
+        preselectedFlags?: Record<string, string>,
       ) => {
         if (typeof preselectedGenerator !== 'string') {
           // the command is called from a context menu, different signature - set to undefined as workaround
@@ -28,7 +28,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
         getTelemetry().logUsage('generate.quickpick');
         const result = await selectGeneratorAndPromptForFlags(
           preselectedGenerator,
-          preselectedFlags
+          preselectedFlags,
         );
         if (!result) {
           return;
@@ -41,7 +41,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
             flags: [...flags, '--no-interactive'],
           });
         }
-      }
+      },
     ),
     commands.registerCommand(`nx.generate.ui`, () => {
       getTelemetry().logUsage('generate.ui');
@@ -63,9 +63,9 @@ export async function registerGenerateCommands(context: ExtensionContext) {
         getTelemetry().logUsage('generate.ui', { source: 'projects-view' });
         openGenerateUi(
           undefined,
-          (treeItem.item as ProjectViewItem).nxProject.project
+          (treeItem.item as ProjectViewItem).nxProject.project,
         );
-      }
+      },
     ),
     commands.registerCommand(`nx.move`, async (uri?: Uri) => {
       getTelemetry().logUsage('generate.move', {
@@ -104,7 +104,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
           .project;
 
         openReMoveGenerator(generator, undefined, projectName);
-      }
+      },
     ),
     commands.registerCommand(
       `nx.remove.projectView`,
@@ -121,14 +121,14 @@ export async function registerGenerateCommands(context: ExtensionContext) {
           .project;
 
         openReMoveGenerator(generator, undefined, projectName);
-      }
-    )
+      },
+    ),
   );
 
   const openReMoveGenerator = async (
     generator: string,
     uri: Uri | undefined,
-    projectName: string | undefined
+    projectName: string | undefined,
   ) => {
     if (!projectName && uri) {
       projectName = (await getGeneratorContextV2(uri.fsPath))?.project;
@@ -136,7 +136,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     commands.executeCommand(
       'nx.generate.quickpick',
       generator,
-      projectName ? { projectName } : undefined
+      projectName ? { projectName } : undefined,
     );
   };
 }

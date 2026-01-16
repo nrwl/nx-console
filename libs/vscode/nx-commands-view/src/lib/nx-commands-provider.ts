@@ -13,7 +13,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     super();
 
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
-      this.refresh()
+      this.refresh(),
     );
 
     onWorkspaceRefreshed(() => this.refresh());
@@ -41,7 +41,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
   async getNxCommands(): Promise<NxCommandConfig[]> {
     const commonCommands = GlobalConfigurationStore.instance.get<string[]>(
       'commonNxCommands',
-      []
+      [],
     );
     const vscodeCommands = new Set(await commands.getCommands(true));
     const availableCommands: NxCommandConfig[] = commonCommands
@@ -49,7 +49,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
         (command) =>
           command !== 'add-dependency' &&
           command !== 'add-dev-dependency' &&
-          command !== 'generate'
+          command !== 'generate',
       )
       .map((command) => {
         const transformedCommand = `nx.${command.replace(':', '.')}`;
@@ -79,7 +79,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
         }
         return acc;
       },
-      new Set<string>()
+      new Set<string>(),
     );
     return Array.from(targets)
       .sort()

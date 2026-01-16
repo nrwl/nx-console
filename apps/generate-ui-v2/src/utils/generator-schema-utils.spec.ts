@@ -20,7 +20,7 @@ describe('generator schema utils', () => {
           collectionName: 'react',
           description: 'Generate a React library',
           options: [],
-        })
+        }),
       ).toEqual('react:library');
     });
   });
@@ -37,7 +37,7 @@ describe('generator schema utils', () => {
           collectionName: 'my-awesome-collection',
           description: 'My cool description',
           options: [],
-        })
+        }),
       ).toEqual('My Awesome Generator');
     });
 
@@ -48,7 +48,7 @@ describe('generator schema utils', () => {
           collectionName: 'collection',
           description: 'A simple generator',
           options: [],
-        })
+        }),
       ).toEqual('Generator');
     });
 
@@ -59,7 +59,7 @@ describe('generator schema utils', () => {
           collectionName: 'collection',
           description: 'A simple generator',
           options: [],
-        })
+        }),
       ).toEqual('A B C');
     });
   });
@@ -75,7 +75,7 @@ describe('generator schema utils', () => {
           name: 'Undefined',
           isRequired: false,
           aliases: [],
-        })
+        }),
       ).toBeUndefined();
     });
 
@@ -87,7 +87,7 @@ describe('generator schema utils', () => {
           aliases: [],
           type: 'boolean',
           default: 1,
-        })
+        }),
       ).toEqual(true);
       expect(
         extractDefaultValue({
@@ -96,7 +96,7 @@ describe('generator schema utils', () => {
           aliases: [],
           type: 'boolean',
           default: 0,
-        })
+        }),
       ).toEqual(false);
     });
 
@@ -107,7 +107,7 @@ describe('generator schema utils', () => {
           isRequired: false,
           aliases: [],
           default: 123,
-        })
+        }),
       ).toEqual('123');
     });
   });
@@ -142,7 +142,7 @@ describe('generator schema utils', () => {
           name: 'Empty',
           isRequired: false,
           aliases: [],
-        })
+        }),
       ).toEqual([]);
     });
 
@@ -153,7 +153,7 @@ describe('generator schema utils', () => {
           isRequired: false,
           aliases: [],
           items: ['a', 'b', 'c'],
-        })
+        }),
       ).toEqual(['a', 'b', 'c']);
     });
 
@@ -167,7 +167,7 @@ describe('generator schema utils', () => {
             type: OptionType.String,
             enum: ['a', 'b', 'c'],
           },
-        })
+        }),
       ).toEqual(['a', 'b', 'c']);
     });
   });

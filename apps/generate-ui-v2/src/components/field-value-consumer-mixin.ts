@@ -28,7 +28,7 @@ export declare class FieldValueConsumerInterface {
 }
 
 export const FieldValueConsumer = <T extends Constructor<LitElement>>(
-  superClass: T
+  superClass: T,
 ) => {
   class FieldValueConsumerElement extends superClass {
     option: Option;
@@ -61,15 +61,15 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
           this.formValuesService = service;
           service.registerValidationListener(
             this.option.name,
-            (value) => (this.validation = value)
+            (value) => (this.validation = value),
           );
           service.registerTouchedListener(
             this.option.name,
-            (value) => (this.touched = value)
+            (value) => (this.touched = value),
           );
           service.registerDefaultValueListener(
             this.option.name,
-            (value) => (this.isDefaultValue = value)
+            (value) => (this.isDefaultValue = value),
           );
         },
         subscribe: false,

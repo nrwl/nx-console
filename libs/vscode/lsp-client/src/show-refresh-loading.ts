@@ -13,7 +13,7 @@ export function showRefreshLoadingAtLocation(
     | ProgressLocation
     | {
         viewId: string;
-      }
+      },
 ): Disposable {
   const client = getNxlsClient();
   const locationString = JSON.stringify(location);
@@ -31,7 +31,7 @@ export function showRefreshLoadingAtLocation(
           () => {
             disposable?.dispose();
             resolve();
-          }
+          },
         );
       });
 
@@ -43,11 +43,11 @@ export function showRefreshLoadingAtLocation(
         },
         async () => {
           await refreshPromise;
-        }
+        },
       );
 
       currentLoadingLocations.delete(locationString);
-    }
+    },
   );
 
   return new Disposable(() => {

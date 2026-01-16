@@ -32,7 +32,7 @@ export type NxCommandConfig =
 export class NxCommandsTreeItem extends TreeItem {
   constructor(
     readonly commandConfig: NxCommandConfig,
-    readonly extensionPath: string
+    readonly extensionPath: string,
   ) {
     super('', TreeItemCollapsibleState.None);
 
@@ -124,19 +124,19 @@ export class NxCommandsTreeItem extends TreeItem {
     } else if (commandConfig.type === 'add-dependency') {
       return {
         light: Uri.file(
-          join(this.extensionPath, 'assets', 'nx-console-light.svg')
+          join(this.extensionPath, 'assets', 'nx-console-light.svg'),
         ),
         dark: Uri.file(
-          join(this.extensionPath, 'assets', 'nx-console-dark.svg')
+          join(this.extensionPath, 'assets', 'nx-console-dark.svg'),
         ),
       };
     } else if (commandConfig.type === 'add-dev-dependency') {
       return {
         light: Uri.file(
-          join(this.extensionPath, 'assets', 'nx-console-light.svg')
+          join(this.extensionPath, 'assets', 'nx-console-light.svg'),
         ),
         dark: Uri.file(
-          join(this.extensionPath, 'assets', 'nx-console-dark.svg')
+          join(this.extensionPath, 'assets', 'nx-console-dark.svg'),
         ),
       };
     } else if (commandConfig.type === 'select-workspace') {

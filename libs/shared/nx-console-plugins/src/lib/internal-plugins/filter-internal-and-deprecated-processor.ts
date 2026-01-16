@@ -1,7 +1,7 @@
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 
 export function filterInternalAndDeprecatedProcessor(
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
 ): GeneratorSchema {
   return {
     ...schema,

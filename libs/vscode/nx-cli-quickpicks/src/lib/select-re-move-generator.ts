@@ -5,24 +5,24 @@ import { window } from 'vscode';
 
 export async function selectReMoveGenerator(
   path: string | undefined,
-  target: 'move' | 'remove'
+  target: 'move' | 'remove',
 ): Promise<string | undefined> {
   const generators = await getGenerators();
 
   if (!generators || !generators.length) {
     window.showWarningMessage(
-      `No generators found in your workspace. Did you run npm/pnpm/yarn install?`
+      `No generators found in your workspace. Did you run npm/pnpm/yarn install?`,
     );
     return;
   }
 
   const reMoveGenerators = generators.filter(
-    (generator) => generator.data?.name === target
+    (generator) => generator.data?.name === target,
   );
 
   if (!reMoveGenerators.length) {
     window.showWarningMessage(
-      `No ${target} generator found. Did you run npm/pnpm/yarn install?`
+      `No ${target} generator found. Did you run npm/pnpm/yarn install?`,
     );
     return;
   }

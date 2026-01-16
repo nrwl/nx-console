@@ -10,7 +10,7 @@ let languageService: LanguageService | undefined;
 
 export function configureJsonLanguageService(
   params: LanguageServiceParams,
-  settings: LanguageSettings
+  settings: LanguageSettings,
 ) {
   languageService = getLanguageService(params);
   languageService.configure(settings);

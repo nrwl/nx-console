@@ -6,7 +6,7 @@ import {
 import type * as typescript from 'typescript';
 
 export function getProperties(
-  objectLiteral: typescript.Node
+  objectLiteral: typescript.Node,
 ): typescript.NodeArray<typescript.ObjectLiteralElementLike> | undefined {
   if (isObjectLiteralExpression(objectLiteral)) {
     return objectLiteral.properties;

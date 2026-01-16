@@ -12,14 +12,14 @@ export class NxHelpAndFeedbackTreeItem extends TreeItem {
   constructor(
     private readonly title: string,
     private readonly link: string,
-    readonly icon: string | Uri | { light: Uri; dark: Uri } | ThemeIcon
+    readonly icon: string | Uri | { light: Uri; dark: Uri } | ThemeIcon,
   ) {
     super(title, TreeItemCollapsibleState.None);
     this.iconPath = icon;
     this.contextValue = link;
     this.commandString = `nxConsole.helpAndFeedback.openUrl.${this.title.replace(
       ' ',
-      '_'
+      '_',
     )}`;
     this.command = {
       title: this.title,
@@ -32,7 +32,7 @@ export class NxHelpAndFeedbackTreeItem extends TreeItem {
   // kinda hacky but just setting 'command' on the TreeItem doesn't work anymore
   async registerCommand(url: string) {
     const openCommand = (await commands.getCommands(true)).find(
-      (command) => command === this.commandString
+      (command) => command === this.commandString,
     );
     if (!openCommand) {
       commands.registerCommand(this.commandString, () => {
