@@ -18,7 +18,9 @@ export class ListView extends BaseView {
       const items: ListViewItem[] = [];
       if (this.workspaceData?.errors) {
         items.push(
-          this.createProjectGraphErrorViewItem(this.workspaceData.errors.length)
+          this.createProjectGraphErrorViewItem(
+            this.workspaceData.errors.length,
+          ),
         );
       }
       // should return root elements if no element was passed
@@ -43,7 +45,7 @@ export class ListView extends BaseView {
       return [];
     }
     return Object.entries(projectDefs).map((project) =>
-      this.createProjectViewItem(project)
+      this.createProjectViewItem(project),
     );
   }
 }

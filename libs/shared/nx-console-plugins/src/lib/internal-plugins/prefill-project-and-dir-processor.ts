@@ -5,7 +5,7 @@ import { gte } from '@nx-console/nx-version';
 
 export const prefillProjectAndDirProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ) => {
   schema.context = schema.context ?? {};
   schema.context.prefillValues = schema.context.prefillValues ?? {};
@@ -33,7 +33,7 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
   if (gte(workspace.nxVersion, '18.0.0')) {
     if (
       schema.options.find(
-        (o) => o.name === 'project' || o.name === 'projectName'
+        (o) => o.name === 'project' || o.name === 'projectName',
       )
     ) {
       prefillProject();
@@ -47,7 +47,7 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
   prefillDirectoryAsCwd();
   if (
     schema.options.find(
-      (o) => o.name === 'project' || o.name === 'projectName'
+      (o) => o.name === 'project' || o.name === 'projectName',
     ) &&
     schema.options.every((o) => o.name !== 'nameAndDirectoryFormat')
   ) {

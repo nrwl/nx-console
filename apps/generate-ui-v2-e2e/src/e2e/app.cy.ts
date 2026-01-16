@@ -42,27 +42,27 @@ describe('generate-ui-v2', () => {
         expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
         expectConsoleLogToHaveBeenCalledWith(
           consoleLog,
-          '--option1=test-option1'
+          '--option1=test-option1',
         );
         expectConsoleLogToHaveBeenCalledWith(
           consoleLog,
-          '--select-field=option1'
+          '--select-field=option1',
         );
         expectConsoleLogToHaveBeenCalledWith(
           consoleLog,
-          '--checkbox-field=true'
+          '--checkbox-field=true',
         );
         expectConsoleLogToHaveBeenCalledWith(
           consoleLog,
-          '--multiselect-field=option1,option2'
+          '--multiselect-field=option1,option2',
         );
         expectConsoleLogToHaveBeenCalledWith(
           consoleLog,
-          '--array-field=test-value,test-value2'
+          '--array-field=test-value,test-value2',
         );
         expectConsoleLogToHaveBeenCalledWith(
           consoleLog,
-          '--option2=test-option2'
+          '--option2=test-option2',
         );
       });
     });
@@ -77,7 +77,7 @@ describe('generate-ui-v2', () => {
         .then((clip) => clip.readText())
         .should(
           'equal',
-          'nx g @nx/test:test --option1=test-option1 --select-field=option1'
+          'nx g @nx/test:test --option1=test-option1 --select-field=option1',
         );
     });
   });

@@ -44,7 +44,7 @@ describe('useGeneratorDefaultsProcessor', () => {
     const processedSchema = useGeneratorDefaultsProcessor(
       defaultSchema,
       workspace as any as NxWorkspace,
-      mockLogger
+      mockLogger,
     );
 
     expect(processedSchema.options).toEqual([
@@ -78,7 +78,7 @@ describe('useGeneratorDefaultsProcessor', () => {
     const processedSchema = useGeneratorDefaultsProcessor(
       defaultSchema,
       workspace as any as NxWorkspace,
-      mockLogger
+      mockLogger,
     );
 
     expect(processedSchema.options).toEqual([
@@ -107,7 +107,7 @@ describe('useGeneratorDefaultsProcessor', () => {
     const processedSchema = useGeneratorDefaultsProcessor(
       defaultSchema,
       workspace as any as NxWorkspace,
-      mockLogger
+      mockLogger,
     );
 
     expect(processedSchema).toEqual(defaultSchema);

@@ -281,7 +281,6 @@ export class NxMcpServerWrapper {
       const ideAvailable = this.isIdeConnectionAvailable();
 
       if (
-        workspaceValid &&
         ideAvailable &&
         this.ideProvider?.isAvailable() &&
         this._nxWorkspacePath &&

@@ -6,7 +6,7 @@ declare global {
       postToWebview: (message: string) => void;
       postToIde: (message: string) => void;
       registerPostToWebviewCallback: (
-        callback: (message: GenerateUiInputMessage) => void
+        callback: (message: GenerateUiInputMessage) => void,
       ) => void;
       registerPostToIdeCallback: (callback: (message: string) => void) => void;
     };

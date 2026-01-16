@@ -55,7 +55,7 @@ const RUN_ONE_OPTIONS = [
 export async function verifyBuilderDefinition(
   project: string,
   command: string,
-  projectGraph: ProjectGraph
+  projectGraph: ProjectGraph,
 ): Promise<{
   validBuilder: boolean;
   builderName: string | undefined;
@@ -76,7 +76,7 @@ export async function verifyBuilderDefinition(
   if (!executorName) {
     window.showErrorMessage(
       `Please update ${project}'s ${command} definition to specify a builder.`,
-      'See definition'
+      'See definition',
     );
     return {
       validBuilder: false,
@@ -90,13 +90,13 @@ export async function verifyBuilderDefinition(
     workspacePath(),
     executorName,
     projects,
-    commandDef.options
+    commandDef.options,
   );
 
   if (!options) {
     window.showErrorMessage(
       `Builder specified for ${project} ${command} was not found in your dependencies. Check that specified builder is correct and has a corresponding entry in package.json`,
-      'Show definition'
+      'Show definition',
     );
 
     return {

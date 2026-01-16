@@ -19,7 +19,7 @@ export async function pathCompletion(
     glob: string;
     searchType: 'file' | 'directory';
     supportsInterpolation?: boolean;
-  }
+  },
 ): Promise<CompletionItem[]> {
   const items: CompletionItem[] = [];
 
@@ -61,7 +61,7 @@ export async function pathCompletion(
         file.path.replace(workingPath + '/' + projectRoot, '');
 
       items.push(
-        createCompletionItem(label, file.path, node, document, completionKind)
+        createCompletionItem(label, file.path, node, document, completionKind),
       );
     }
 
@@ -71,11 +71,23 @@ export async function pathCompletion(
       if (supportsInterpolation) {
         const label = '{workspaceRoot}' + file.path.replace(workingPath, '');
         items.push(
-          createCompletionItem(label, file.path, node, document, completionKind)
+          createCompletionItem(
+            label,
+            file.path,
+            node,
+            document,
+            completionKind,
+          ),
         );
       } else {
         items.push(
-          createCompletionItem(label, file.path, node, document, completionKind)
+          createCompletionItem(
+            label,
+            file.path,
+            node,
+            document,
+            completionKind,
+          ),
         );
       }
     }

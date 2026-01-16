@@ -25,7 +25,7 @@ export class GlobalConfigurationStore implements Store {
   static get instance() {
     if (!CONFIG_STORE) {
       throw Error(
-        'Please create a configuration store with `fromContext` first'
+        'Please create a configuration store with `fromContext` first',
       );
     }
     return CONFIG_STORE;
@@ -52,7 +52,7 @@ export class GlobalConfigurationStore implements Store {
   set<T>(
     key: GlobalConfigKeys,
     value: T,
-    configurationTarget?: ConfigurationTarget
+    configurationTarget?: ConfigurationTarget,
   ): void {
     this.storage(key).update(key, value, configurationTarget);
     this._onConfigurationChange.fire();
@@ -69,7 +69,7 @@ export class GlobalConfigurationStore implements Store {
 
   get config() {
     return workspace.getConfiguration(
-      GlobalConfigurationStore.configurationSection
+      GlobalConfigurationStore.configurationSection,
     );
   }
 }

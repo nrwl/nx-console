@@ -8,7 +8,7 @@ import { gte } from '@nx-console/nx-version';
 
 export const nameAndDirectoryProcessor: SchemaProcessor = (
   schema: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ) => {
   if (
     !schema?.options?.find((option) => option.name === 'nameAndDirectoryFormat')
@@ -17,7 +17,7 @@ export const nameAndDirectoryProcessor: SchemaProcessor = (
   }
 
   const nadfDefault = schema.options.find(
-    (opt) => opt.name === 'nameAndDirectoryFormat'
+    (opt) => opt.name === 'nameAndDirectoryFormat',
   )?.default;
   return {
     ...schema,
@@ -59,7 +59,7 @@ export const nameAndDirectoryProcessor: SchemaProcessor = (
 
 export const nameAndDirectoryStartupMessage: StartupMessageFactory = (
   schema: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
 ) => {
   if (
     !schema?.options?.find((option) => option.name === 'nameAndDirectoryFormat')

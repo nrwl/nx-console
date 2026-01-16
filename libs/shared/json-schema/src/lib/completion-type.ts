@@ -22,13 +22,13 @@ export enum CompletionType {
 }
 
 export function hasCompletionType(
-  schema: JSONSchema
+  schema: JSONSchema,
 ): schema is JSONSchema & { [X_COMPLETION_TYPE]: CompletionType } {
   return hasKey(schema, X_COMPLETION_TYPE);
 }
 
 export function hasCompletionGlob(
-  schema: JSONSchema
+  schema: JSONSchema,
 ): schema is JSONSchema & { [X_COMPLETION_GLOB]: string } {
   return hasKey(schema, X_COMPLETION_GLOB);
 }

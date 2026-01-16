@@ -33,7 +33,7 @@ export async function getCompletionItems(
   jsonAst: JSONDocument,
   document: TextDocument,
   schemas: MatchingSchema[],
-  position: Position
+  position: Position,
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
@@ -71,17 +71,17 @@ export async function getCompletionItems(
   if (defaultCompletion && resolvedItems.length === 0) {
     resolvedItems = await items(
       defaultCompletion.completionType,
-      defaultCompletion.glob
+      defaultCompletion.glob,
     );
   }
 
   // remove duplicate values from the resolved completed items
   if (isArrayNode(node.parent)) {
     const existingItems = node.parent.children.map((i) =>
-      JSON.stringify(i.value)
+      JSON.stringify(i.value),
     );
     resolvedItems = resolvedItems.filter(
-      (resolvedItem) => !existingItems.includes(resolvedItem.label)
+      (resolvedItem) => !existingItems.includes(resolvedItem.label),
     );
   }
 
@@ -92,11 +92,11 @@ function completionItems(
   workingPath: string,
   nxVersion: NxVersion,
   node: ASTNode,
-  document: TextDocument
+  document: TextDocument,
 ) {
   return async (
     completion: CompletionType,
-    glob?: string
+    glob?: string,
   ): Promise<CompletionItem[]> => {
     // const supportsInterpolation = gte(nxVersion, '16.0.0');
     // todo(jcammisuli): change this once executors support {workspaceRoot} and {projectRoot} in their options

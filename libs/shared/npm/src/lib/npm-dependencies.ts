@@ -14,7 +14,7 @@ export async function npmDependencies(workspacePath: string) {
     workspacePath,
     '.nx',
     'installation',
-    'node_modules'
+    'node_modules',
   );
 
   let nodeModulesDir = nodeModules;
@@ -44,7 +44,7 @@ export async function npmDependencies(workspacePath: string) {
       (await readDirectory(join(nodeModulesDir, npmPackageOrScope))).forEach(
         (p) => {
           res.push(join(nodeModulesDir, npmPackageOrScope, p));
-        }
+        },
       );
     } else {
       res.push(join(nodeModulesDir, npmPackageOrScope));

@@ -2,14 +2,14 @@ import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import { Option } from '@nx-console/shared-schema';
 
 export function getGeneratorIdentifier(
-  generatorSchema: GeneratorSchema | undefined
+  generatorSchema: GeneratorSchema | undefined,
 ) {
   if (!generatorSchema) return '';
   return `${generatorSchema.collectionName}:${generatorSchema.generatorName}`;
 }
 
 export function getGeneratorNameTitleCase(
-  generatorSchema: GeneratorSchema | undefined
+  generatorSchema: GeneratorSchema | undefined,
 ) {
   if (!generatorSchema) return '';
   return generatorSchema.generatorName
@@ -19,7 +19,7 @@ export function getGeneratorNameTitleCase(
 }
 
 export function extractDefaultValue(
-  option?: Option
+  option?: Option,
 ): string | boolean | number | string[] | undefined {
   if (!option) return;
   if (option.default === undefined || option.default === null) {
@@ -36,7 +36,7 @@ export function extractDefaultValue(
 
 export function compareWithDefaultValue(
   value: string | boolean | number | string[] | undefined,
-  defaultValue: string | boolean | number | string[] | undefined
+  defaultValue: string | boolean | number | string[] | undefined,
 ): boolean {
   // if the default value is undefined, false & empty string are considered default values
   if (!value && !defaultValue) return true;
@@ -50,7 +50,7 @@ export function compareWithDefaultValue(
 
 export function debounce<T extends (...args: any[]) => void>(
   func: T,
-  delay: number
+  delay: number,
 ): (...args: Parameters<T>) => void {
   type Timer = ReturnType<typeof setTimeout>;
   let timer: Timer;

@@ -102,7 +102,7 @@ const projects = (nxVersion: NxVersion): JSONSchema => {
 
 export const targets = (
   nxVersion: NxVersion,
-  executors?: JSONSchema[]
+  executors?: JSONSchema[],
 ): JSONSchema => {
   const schema: JSONSchema = {
     additionalProperties: {

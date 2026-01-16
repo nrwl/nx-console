@@ -14,7 +14,7 @@ export declare class GeneratorContextContextInterface {
 type Constructor<T> = new (...args: any[]) => T;
 
 export const GeneratorContextContext = <T extends Constructor<LitElement>>(
-  superClass: T
+  superClass: T,
 ) => {
   class GeneratorContextContextElement extends superClass {
     @state() generatorContext: GeneratorContext | undefined;

@@ -3,7 +3,7 @@ import { selectFlags } from './select-flags';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 
 export async function selectRunManyFlags(
-  target: string
+  target: string,
 ): Promise<string[] | undefined> {
   let options = RUN_MANY_OPTIONS;
   const projects = await validProjectsForTarget(target);
@@ -84,7 +84,7 @@ const RUN_MANY_OPTIONS: Option[] = [
 ].map((v) => ({ ...v, aliases: [] }));
 
 async function validProjectsForTarget(
-  target: string
+  target: string,
 ): Promise<string[] | undefined> {
   const nxWorkspace = await getNxWorkspace();
   if (!nxWorkspace) {
@@ -100,9 +100,9 @@ async function validProjectsForTarget(
     new Set(
       Object.entries(projectGraph.nodes)
         .filter(
-          ([, project]) => project.data.targets && project.data.targets[target]
+          ([, project]) => project.data.targets && project.data.targets[target],
         )
-        .map(([project]) => project)
-    )
+        .map(([project]) => project),
+    ),
   ).sort();
 }

@@ -28,11 +28,11 @@ export class ProjectGraphErrorDecorationProvider
   static register(context: ExtensionContext) {
     context.subscriptions.push(
       window.registerFileDecorationProvider(
-        new ProjectGraphErrorDecorationProvider()
+        new ProjectGraphErrorDecorationProvider(),
       ),
       commands.registerCommand('nxConsole.showProblems', () => {
         commands.executeCommand('workbench.actions.view.problems');
-      })
+      }),
     );
   }
 }

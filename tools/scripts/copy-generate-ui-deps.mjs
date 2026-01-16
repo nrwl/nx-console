@@ -11,7 +11,7 @@ const files = [
 
 if (!existsSync('node_modules')) {
   throw new Error(
-    'Please make sure node_modules are installed by running yarn.'
+    'Please make sure node_modules are installed by running yarn.',
   );
 }
 
