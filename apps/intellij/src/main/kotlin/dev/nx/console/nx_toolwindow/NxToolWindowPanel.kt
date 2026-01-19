@@ -401,7 +401,7 @@ class NxToolWindowPanel(private val project: Project) :
                 val daemonDisabled = workspace?.daemonEnabled == false
                 val watcherNotRunning =
                     !daemonDisabled &&
-                        !WatcherRunningService.getInstance(project).isOperational.value
+                        WatcherRunningService.getInstance(project).isOperational.value == false
                 updateDaemonWarningBanner(
                     when {
                         daemonDisabled -> DaemonWarningType.DAEMON_DISABLED
