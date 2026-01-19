@@ -141,13 +141,14 @@ connection.onInitialize(async (params) => {
   DISABLE_FILE_WATCHING = disableFileWatching ?? false;
   lspLogger.log('Initializing Nx Language Server');
 
-  const extractFsPath = (p: string | undefined) => p && URI.parse(p).fsPath;
+  const extractFsPathFromUri = (uri: string | undefined) =>
+    uri && URI.parse(uri).fsPath;
   try {
     WORKING_PATH =
-      extractFsPath(workspacePath) ||
-      extractFsPath(params.workspaceFolders?.[0]?.uri) ||
+      workspacePath ||
+      extractFsPathFromUri(params.workspaceFolders?.[0]?.uri) ||
       params.rootPath ||
-      extractFsPath(params.rootUri ?? '');
+      extractFsPathFromUri(params.rootUri ?? '');
 
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
