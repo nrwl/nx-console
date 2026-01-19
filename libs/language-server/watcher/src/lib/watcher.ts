@@ -71,7 +71,7 @@ export async function languageServerWatcher(
     };
   }
 
-  if (gte(nxVersion, '22.4.0')) {
+  if (gte(nxVersion, '22.4.0-beta.4')) {
     lspLogger.debug('Using PassiveDaemonWatcher for file watching');
     return registerPassiveDaemonWatcher(
       workspacePath,

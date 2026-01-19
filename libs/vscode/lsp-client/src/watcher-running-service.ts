@@ -12,10 +12,10 @@ export class WatcherRunningService implements Disposable {
     return WatcherRunningService.INSTANCE;
   }
 
-  private _isOperational = false;
+  private _isOperational: boolean | undefined = undefined;
   private _listener: Disposable | null = null;
 
-  public get isOperational(): boolean {
+  public get isOperational(): boolean | undefined {
     return this._isOperational;
   }
 
