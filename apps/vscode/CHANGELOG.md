@@ -1,3 +1,10 @@
+## [18.83.1](https://github.com/nrwl/nx-console/compare/vscode-v18.83.0...vscode-v18.83.1) (2026-01-19)
+
+
+### Bug Fixes
+
+* **nxls:** fix running tasks on windows ([#2953](https://github.com/nrwl/nx-console/issues/2953)) ([bc7ab45](https://github.com/nrwl/nx-console/commit/bc7ab456ddbd7913cc1793eda8d06e770c00d20f))
+
 # [18.83.0](https://github.com/nrwl/nx-console/compare/vscode-v18.82.1...vscode-v18.83.0) (2026-01-16)
 
 
