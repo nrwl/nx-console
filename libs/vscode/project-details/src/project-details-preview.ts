@@ -38,8 +38,10 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
   private graphServer: NxGraphServer;
   private graphServerError: (string | any)[] | undefined;
   private isShowingErrorHtml = false;
+  private isDisposed = false;
   private debouncedRefresh = debounce(async () => {
     const nxWorkspace = await getNxWorkspace();
+    if (this.isDisposed) return;
     const errors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
@@ -101,6 +103,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
     );
 
     this.webviewPanel.onDidDispose(() => {
+      this.isDisposed = true;
       interactionListener.dispose();
       viewStateListener.dispose();
       workspaceRefreshListener?.dispose();
@@ -118,12 +121,14 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
 
   private async refresh() {
     const project = await getProjectByPath(this.path);
+    if (this.isDisposed) return;
 
     if (project) {
       this.projectRoot = project.root;
     }
 
     const nxWorkspace = await getNxWorkspace();
+    if (this.isDisposed) return;
     const workspaceErrors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
@@ -154,6 +159,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
 
   private async loadHtml(project: ProjectConfiguration) {
     let html = await loadGraphBaseHtml(this.webviewPanel.webview);
+    if (this.isDisposed) return;
 
     const safeProjectName = escapeJsString(project?.name ?? '');
     html = html.replace(
@@ -202,7 +208,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
 
   private async handleGraphInteractionEvent(event: any) {
     const handled = await handleGraphInteractionEventBase(event);
-    if (handled) return;
+    if (handled || this.isDisposed) return;
 
     if (event.type === 'open-project-graph') {
       getGraphWebviewManager().focusProject(event.payload.projectName);
@@ -219,6 +225,7 @@ export class OldProjectDetailsPreview implements ProjectDetailsPreview {
 
     if (event.type.startsWith('request')) {
       const response = await this.graphServer.handleWebviewRequest(event);
+      if (this.isDisposed) return;
       if (response) {
         if (response.error) {
           this.graphServerError = [response.error];
