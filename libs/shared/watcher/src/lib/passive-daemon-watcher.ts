@@ -16,7 +16,7 @@ export type DaemonWatcherCallback = (
 type MachineEvents =
   | { type: 'START' }
   | { type: 'STOP' }
-  | { type: 'LISTENER_ERROR'; error: Error | 'closed' };
+  | { type: 'LISTENER_ERROR'; error: Error | 'closed' | 'reconnecting' | 'reconnected' };
 
 export class PassiveDaemonWatcher {
   private listeners: Map<string, DaemonWatcherCallback> = new Map();

@@ -18,7 +18,6 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-  waitFor,
 } from '@nx-console/shared-e2e-utils';
 import { Position } from 'vscode-json-languageservice';
 import { CompletionList } from 'vscode-languageserver';
@@ -201,8 +200,6 @@ describe('nx.json completion - default', () => {
   });
 
   it('should not error when nx-schema.json is missing', async () => {
-    await waitFor(11000);
-
     rmSync(
       join(
         e2eCwd,

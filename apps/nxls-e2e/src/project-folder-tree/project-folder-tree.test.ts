@@ -6,7 +6,6 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-  waitFor,
 } from '@nx-console/shared-e2e-utils';
 import {
   NxProjectFolderTreeRequest,
@@ -42,12 +41,13 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder nodes for project in subfolder', async () => {
-    await waitFor(11000);
-
     const projectFolder = join(e2eCwd, workspaceName, 'subfolder', 'project');
     mkdirSync(projectFolder, { recursive: true });
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -81,8 +81,6 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for nested projects', async () => {
-    await waitFor(11000);
-
     const nestedProjectFolder = join(
       e2eCwd,
       workspaceName,
@@ -96,6 +94,9 @@ describe('project folder tree', () => {
       '{ "name": "nested" }',
     );
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -134,7 +135,6 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for deeply nested projects', async () => {
-    await waitFor(11000);
     const deeplyNestedProjectFolder = join(
       e2eCwd,
       workspaceName,
@@ -149,6 +149,9 @@ describe('project folder tree', () => {
       '{ "name": "deeplynested" }',
     );
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );

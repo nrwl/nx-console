@@ -10,7 +10,6 @@ import {
   modifyJsonFile,
   newWorkspace,
   uniq,
-  waitFor,
 } from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
@@ -42,7 +41,6 @@ describe('parse target string - default', () => {
       'project.json',
     );
 
-    await waitFor(11000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {
@@ -98,6 +96,9 @@ describe('parse target string - default', () => {
       },
     }));
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );

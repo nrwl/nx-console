@@ -13,7 +13,6 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-  waitFor,
 } from '@nx-console/shared-e2e-utils';
 
 let nxlsWrapper: NxlsWrapper;
@@ -64,8 +63,6 @@ describe('pdv data', () => {
   });
 
   it('should contain disabledTaskSyncGenerators if set in nx.json', async () => {
-    await waitFor(11000);
-
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     modifyJsonFile(nxJsonPath, (json) => {
       json.sync ??= {};
@@ -73,6 +70,9 @@ describe('pdv data', () => {
       return json;
     });
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -92,11 +92,13 @@ describe('pdv data', () => {
   });
 
   it('should contain pdv data & error for partial errors', async () => {
-    await waitFor(11000);
     viteFileContents = readFileSync(viteFilePath, 'utf-8');
 
     appendFileSync(viteFilePath, '{');
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -123,13 +125,14 @@ describe('pdv data', () => {
   });
 
   it('should return error if root project.json is broken', async () => {
-    await waitFor(11000);
-
     writeFileSync(viteFilePath, viteFileContents);
 
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, '{');
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -153,13 +156,14 @@ describe('pdv data', () => {
   });
 
   it('should return error if nx.json is broken', async () => {
-    await waitFor(11000);
-
     writeFileSync(projectJsonPath, projectJsonContents);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     writeFileSync(nxJsonPath, '{');
 
+    nxlsWrapper.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
