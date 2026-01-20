@@ -51,6 +51,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFixDescription: 'Fix the bug',
       suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
+      couldAutoApplyTasks: true,
     };
 
     const result = formatCIInformationMarkdown(output);
@@ -68,6 +69,7 @@ describe('formatCIInformationMarkdown', () => {
     expect(result).toContain('**Status:** COMPLETED');
     expect(result).toContain('**Verification:** COMPLETED');
     expect(result).toContain('**Failure Classification:** build_error');
+    expect(result).toContain('**Could Auto-Apply:** Yes');
     expect(result).toContain('### Error Summary');
     expect(result).toContain('TypeError: undefined is not a function');
     expect(result).toContain('### Suggested Fix');
@@ -98,6 +100,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
     };
 
     const result = formatCIInformationMarkdown(output);
@@ -122,6 +125,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
     };
 
     const result = formatCIInformationMarkdown(output);
@@ -151,6 +155,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
     };
 
     const result = formatCIInformationMarkdown(output);
@@ -174,6 +179,7 @@ describe('formatCIInformationMarkdown', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
     };
 
     const result = formatCIInformationMarkdown(output);

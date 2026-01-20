@@ -43,6 +43,7 @@ export interface CIInformationOutput {
   suggestedFixDescription: string | null;
   suggestedFix: string | null;
   shortLink: string | null;
+  couldAutoApplyTasks: boolean | null;
   [key: string]: unknown;
 }
 
@@ -122,6 +123,7 @@ export const ciInformationOutputSchema = {
     suggestedFixDescription: { type: ['string', 'null'] },
     suggestedFix: { type: ['string', 'null'] },
     shortLink: { type: ['string', 'null'] },
+    couldAutoApplyTasks: { type: ['boolean', 'null'] },
   },
 };
 
