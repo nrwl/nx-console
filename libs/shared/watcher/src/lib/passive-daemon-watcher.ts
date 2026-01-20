@@ -123,9 +123,6 @@ export class PassiveDaemonWatcher {
                 this.logger.debug?.(
                   'PassiveDaemonWatcher: Daemon connection reconnecting...',
                 );
-                this.listeners.forEach((listener) =>
-                  listener(error, projectGraphAndSourceMaps),
-                );
                 return;
               }
               if (error === 'reconnected') {
