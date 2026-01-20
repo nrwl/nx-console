@@ -98,6 +98,43 @@ describe('getPluginConfiguration', () => {
       ]);
     });
 
+    it('should skip invalid path entries (non-array values or non-string values)', async () => {
+      (readJsonFile as jest.Mock).mockImplementation(async (file) => {
+        if (file === 'tsconfig.base.json') {
+          return {
+            json: {
+              compilerOptions: {
+                paths: {
+                  validLib: ['libs/valid/index.ts'],
+                  invalidNotArray: 'not-an-array',
+                  invalidNumberInArray: [123, 'libs/mixed/index.ts'],
+                  invalidAllNumbers: [456, 789],
+                },
+              },
+            },
+          };
+        } else {
+          return { json: {} };
+        }
+      });
+      (findConfig as jest.Mock).mockImplementation(async (mainFile) => {
+        return join(dirname(mainFile), 'tsconfig.lib.json');
+      });
+
+      const result = await getPluginConfiguration(workspaceRoot);
+
+      expect(pathNormalize(result.additionalRootFiles)).toEqual([
+        {
+          mainFile: '/path/to/workspace/libs/valid/index.ts',
+          directory: '/path/to/workspace/libs/valid',
+        },
+        {
+          mainFile: '/path/to/workspace/libs/mixed/index.ts',
+          directory: '/path/to/workspace/libs/mixed',
+        },
+      ]);
+    });
+
     it('should return additional root files for simple path entries in tsconfig.json', async () => {
       (readJsonFile as jest.Mock).mockImplementation((file) => {
         if (file === 'tsconfig.json') {
