@@ -120,11 +120,17 @@ export class PassiveDaemonWatcher {
                 this.logger.debug?.(
                   'PassiveDaemonWatcher: Daemon connection reconnecting...',
                 );
+                this.listeners.forEach((listener) =>
+                  listener(error, projectGraphAndSourceMaps),
+                );
                 return;
               }
               if (error === 'reconnected') {
                 this.logger.debug?.(
                   'PassiveDaemonWatcher: Daemon connection reconnected',
+                );
+                this.listeners.forEach((listener) =>
+                  listener(error, projectGraphAndSourceMaps),
                 );
                 return;
               }
@@ -133,10 +139,6 @@ export class PassiveDaemonWatcher {
                   `PassiveDaemonWatcher: Listener error received: ${error}`,
                 );
                 this.actor.send({ type: 'LISTENER_ERROR', error });
-              } else if (error === 'reconnecting' || error === 'reconnected') {
-                this.listeners.forEach((listener) =>
-                  listener(error, projectGraphAndSourceMaps),
-                );
               } else {
                 this.logger.debug?.(
                   'PassiveDaemonWatcher: Project graph update received, notifying listeners',

@@ -1,10 +1,7 @@
 import { PassiveDaemonWatcher } from './passive-daemon-watcher';
-import type * as nxWorkspaceInfo from '@nx-console/shared-nx-workspace-info';
+import { getNxDaemonClient } from '@nx-console/shared-nx-workspace-info';
 
 jest.mock('@nx-console/shared-nx-workspace-info');
-
-const { getNxDaemonClient } =
-  require('@nx-console/shared-nx-workspace-info') as typeof nxWorkspaceInfo;
 
 describe('PassiveDaemonWatcher', () => {
   let mockDaemonClient: any;

@@ -111,7 +111,7 @@ async function _workspace(
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
     return {
-      daemonEnabled: daemonClientModule?.isDaemonEnabled() ?? false,
+      daemonEnabled: daemonClientModule?.daemonClient?.enabled() ?? false,
       projectGraph: projectGraph ?? {
         nodes: {},
         dependencies: {},
