@@ -785,6 +785,7 @@ const getCIInformation =
       suggestedFixDescription: aiFix?.suggestedFixDescription ?? null,
       suggestedFix: aiFix?.suggestedFix ?? null,
       shortLink: aiFix?.shortLink ?? null,
+      couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
     };
 
     // If we have a shortLink and fix is completed, fetch detailed fix data
@@ -870,6 +871,11 @@ function formatCIInformationMarkdown(output: CIInformationOutput): string {
     if (output.failureClassification) {
       lines.push(
         `- **Failure Classification:** ${output.failureClassification}`,
+      );
+    }
+    if (output.couldAutoApplyTasks !== null) {
+      lines.push(
+        `- **Could Auto-Apply:** ${output.couldAutoApplyTasks ? 'Yes' : 'No'}`,
       );
     }
   }
