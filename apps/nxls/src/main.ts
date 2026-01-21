@@ -158,7 +158,9 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES, { deferred: true });
+    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES, {
+      deferred: true,
+    });
 
     setTimeout(() => {
       if (WORKING_PATH) {
