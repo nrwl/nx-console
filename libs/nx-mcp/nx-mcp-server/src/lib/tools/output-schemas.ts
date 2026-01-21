@@ -39,12 +39,18 @@ export interface CIInformationOutput {
   verificationStatus: AITaskFixStatus | null;
   userAction: AITaskFixUserAction | null;
   failureClassification: string | null;
+  /** @deprecated Use remoteTaskSummary and localTaskSummary instead */
   taskOutputSummary: string | null;
+  /** Task output from CI/remote execution */
+  remoteTaskSummary: string | null;
+  /** Task output from local execution */
+  localTaskSummary: string | null;
   suggestedFixReasoning: string | null;
   suggestedFixDescription: string | null;
   suggestedFix: string | null;
   shortLink: string | null;
   couldAutoApplyTasks: boolean | null;
+  confidenceScore: number | null;
   [key: string]: unknown;
 }
 
@@ -124,11 +130,14 @@ export const ciInformationOutputSchema = {
     },
     failureClassification: { type: ['string', 'null'] },
     taskOutputSummary: { type: ['string', 'null'] },
+    remoteTaskSummary: { type: ['string', 'null'] },
+    localTaskSummary: { type: ['string', 'null'] },
     suggestedFixReasoning: { type: ['string', 'null'] },
     suggestedFixDescription: { type: ['string', 'null'] },
     suggestedFix: { type: ['string', 'null'] },
     shortLink: { type: ['string', 'null'] },
     couldAutoApplyTasks: { type: ['boolean', 'null'] },
+    confidenceScore: { type: ['number', 'null'] },
   },
 };
 

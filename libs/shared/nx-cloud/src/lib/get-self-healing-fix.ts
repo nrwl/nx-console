@@ -14,8 +14,14 @@ export interface RetrieveFixDiffResponse {
   prTitle: string | null;
   prBody: string | null;
   taskIds: string[] | null;
-  taskOutputSummary: string | null;
+  /** @deprecated Use remoteTaskSummary and localTaskSummary instead */
+  taskOutputSummary?: string | null;
+  /** Task output from CI/remote execution */
+  remoteTaskSummary?: string | null;
+  /** Task output from local execution */
+  localTaskSummary?: string | null;
   shortLink: string | null;
+  confidenceScore: number | null;
 }
 
 export interface RetrieveFixDiffError {

@@ -1,6 +1,7 @@
 import {
   getTokenOptimizedToolResult,
   chunkContent,
+  getValueByPath,
   registerNxWorkspaceTools,
   __testing__,
 } from './nx-workspace';
@@ -658,5 +659,46 @@ describe('compressTargetForDisplay', () => {
     const result = compressTargetForDisplay('test', config);
 
     expect(result).toBe("test: nx:run-script - 'npm run test'");
+  });
+});
+
+describe('getValueByPath', () => {
+  it('should get top-level property', () => {
+    const obj = { foo: 'bar', count: 42 };
+    expect(getValueByPath(obj, 'foo')).toBe('bar');
+    expect(getValueByPath(obj, 'count')).toBe(42);
+  });
+
+  it('should get nested property with dot notation', () => {
+    const obj = { nested: { deep: { value: 'found' } } };
+    expect(getValueByPath(obj, 'nested.deep.value')).toBe('found');
+  });
+
+  it('should get array element with bracket notation', () => {
+    const obj = { items: ['a', 'b', 'c'] };
+    expect(getValueByPath(obj, 'items[0]')).toBe('a');
+    expect(getValueByPath(obj, 'items[2]')).toBe('c');
+  });
+
+  it('should get array element with dot notation', () => {
+    const obj = { items: ['a', 'b', 'c'] };
+    expect(getValueByPath(obj, 'items.1')).toBe('b');
+  });
+
+  it('should return undefined for non-existent path', () => {
+    const obj = { foo: 'bar' };
+    expect(getValueByPath(obj, 'missing')).toBeUndefined();
+    expect(getValueByPath(obj, 'foo.bar.baz')).toBeUndefined();
+  });
+
+  it('should handle null values in path', () => {
+    const obj = { foo: null };
+    expect(getValueByPath(obj, 'foo')).toBeNull();
+    expect(getValueByPath(obj, 'foo.bar')).toBeUndefined();
+  });
+
+  it('should handle empty path', () => {
+    const obj = { foo: 'bar' };
+    expect(getValueByPath(obj, '')).toEqual(obj);
   });
 });
