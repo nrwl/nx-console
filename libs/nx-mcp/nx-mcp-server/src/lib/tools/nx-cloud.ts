@@ -33,7 +33,7 @@ import { execSync } from 'child_process';
 import { z } from 'zod';
 import { isToolEnabled } from '../tool-filter';
 import { ToolRegistry } from '../tool-registry';
-import { chunkContent } from './nx-workspace';
+import { chunkContent, getValueByPath } from './nx-workspace';
 import {
   CIInformationOutput,
   ciInformationOutputSchema,
@@ -42,6 +42,67 @@ import {
 } from './output-schemas';
 
 export const SELF_HEALING_CHUNK_SIZE = 10000;
+
+const TRUNCATION_LENGTH = 1000;
+
+/**
+ * Truncate a string to a maximum length.
+ * @param str The string to truncate
+ * @param maxLength Maximum length before truncation
+ * @param fromEnd If true, keeps the end of the string (most recent content)
+ */
+function truncateString(
+  str: string,
+  maxLength: number,
+  fromEnd = false,
+): string {
+  if (str.length <= maxLength) return str;
+  if (fromEnd) {
+    return '...' + str.slice(-maxLength);
+  }
+  return str.slice(0, maxLength) + '...';
+}
+
+/**
+ * Fields that should use reverse pagination (task outputs - most recent first).
+ */
+const REVERSE_PAGINATION_FIELDS = [
+  'remoteTaskSummary',
+  'localTaskSummary',
+  'taskOutputSummary',
+];
+
+/**
+ * Chunk content from the end (reverse pagination).
+ * Page 0 returns the most recent content (end of string).
+ * Higher page numbers return progressively older content.
+ */
+export function chunkContentReverse(
+  content: string,
+  pageNumber: number,
+  chunkSize: number,
+): { chunk: string; hasMore: boolean } {
+  if (!content || content.length === 0) {
+    return { chunk: '', hasMore: false };
+  }
+
+  const len = content.length;
+  const endIndex = len - pageNumber * chunkSize;
+  const startIndex = Math.max(0, endIndex - chunkSize);
+
+  if (endIndex <= 0) {
+    return { chunk: `no more content on page ${pageNumber}`, hasMore: false };
+  }
+
+  let chunk = content.slice(startIndex, endIndex);
+  const hasMore = startIndex > 0;
+
+  if (hasMore) {
+    chunk = `...[older output on page ${pageNumber + 1}]\n${chunk}`;
+  }
+
+  return { chunk, hasMore };
+}
 
 export function registerNxCloudTools(
   workspacePath: string,
@@ -200,7 +261,10 @@ export function registerNxCloudTools(
     registry.registerTool({
       name: CI_INFORMATION,
       description:
-        'Retrieve CI pipeline execution information from Nx Cloud for the current branch. Returns CIPE status, failed task IDs, and self-healing fix information when available. Use this tool to monitor CI status and react to failures.',
+        'Retrieve CI pipeline execution information from Nx Cloud for the current branch. ' +
+        'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
+        'With select parameter: Returns raw JSON value at specified path. ' +
+        'See output schema for available fields. Long strings are paginated automatically.',
       inputSchema: ciInformationSchema.shape,
       outputSchema: ciInformationOutputSchema,
       annotations: {
@@ -450,12 +514,22 @@ const ciInformationSchema = z.object({
     .string()
     .optional()
     .describe('Branch name to query. Defaults to current git branch.'),
+  select: z
+    .string()
+    .optional()
+    .describe(
+      'Path to select a specific property from CI information. ' +
+        'Without select: Returns formatted overview. ' +
+        'With select: Returns raw JSON value at the specified path. ' +
+        'See output schema for available fields. Long strings are paginated automatically.',
+    ),
   pageToken: z
     .number()
     .optional()
     .describe(
-      'Token for pagination of long content (0-based page number). ' +
-        'If not provided, returns page 0.',
+      'Pagination token (0-based). Only used when select returns a long string value. ' +
+        'Task summaries use reverse pagination (page 0 = most recent output). ' +
+        'Other strings use forward pagination (page 0 = start).',
     ),
 });
 
@@ -782,11 +856,14 @@ const getCIInformation =
       userAction: aiFix?.userAction ?? null,
       failureClassification: aiFix?.failureClassification ?? null,
       taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
       suggestedFixReasoning: aiFix?.suggestedFixReasoning ?? null,
       suggestedFixDescription: aiFix?.suggestedFixDescription ?? null,
       suggestedFix: aiFix?.suggestedFix ?? null,
       shortLink: aiFix?.shortLink ?? null,
       couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
+      confidenceScore: aiFix?.confidenceScore ?? null,
     };
 
     // If we have a shortLink and fix is completed, fetch detailed fix data
@@ -801,46 +878,132 @@ const getCIInformation =
         );
         if (fixResult.data) {
           output.commitSha = fixResult.data.commitSha;
-          output.taskOutputSummary = fixResult.data.taskOutputSummary;
+          // Prefer new API fields (remoteTaskSummary and localTaskSummary) over old taskOutputSummary
+          output.remoteTaskSummary = fixResult.data.remoteTaskSummary ?? null;
+          output.localTaskSummary = fixResult.data.localTaskSummary ?? null;
+          // Backwards compatibility for taskOutputSummary:
+          // - If new fields available, combine them
+          // - Otherwise fall back to old API field
+          output.taskOutputSummary =
+            output.remoteTaskSummary || output.localTaskSummary
+              ? [output.remoteTaskSummary, output.localTaskSummary]
+                  .filter(Boolean)
+                  .join('\n\n---\n\n')
+              : (fixResult.data.taskOutputSummary ?? null);
           output.suggestedFixReasoning = fixResult.data.suggestedFixReasoning;
           output.suggestedFixDescription =
             fixResult.data.suggestedFixDescription;
           output.suggestedFix = fixResult.data.suggestedFix;
+          output.confidenceScore = fixResult.data.confidenceScore;
         }
       }
     }
 
-    // Format text content
-    const textContent = formatCIInformationMarkdown(output);
-
-    // Apply pagination
-    const pageNumber = params.pageToken ?? 0;
-    const { chunk, hasMore } = chunkContent(
-      textContent,
-      pageNumber,
-      SELF_HEALING_CHUNK_SIZE,
-    );
-
-    const content: CallToolResult['content'] = [{ type: 'text', text: chunk }];
-
-    if (hasMore) {
-      content.push({
-        type: 'text',
-        text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue.`,
-      });
+    // Branch based on select parameter
+    if (!params.select) {
+      // Overview mode - no pagination needed, returns compact overview
+      const textContent = formatCIInformationOverview(output);
+      return {
+        content: [{ type: 'text', text: textContent }],
+        structuredContent: output,
+      };
     }
 
-    return { content, structuredContent: output };
+    // Select mode - extract value at path and return with appropriate pagination
+    const selectedValue = getValueByPath(
+      output as unknown as Record<string, unknown>,
+      params.select,
+    );
+
+    if (selectedValue === undefined) {
+      const availableFields = Object.keys(output).join(', ');
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Path "${params.select}" not found in CI information. Available fields: ${availableFields}`,
+          },
+        ],
+        structuredContent: output,
+        isError: true,
+      };
+    }
+
+    // Handle null values
+    if (selectedValue === null) {
+      return {
+        content: [
+          { type: 'text', text: `${params.select}: null (no data available)` },
+        ],
+        structuredContent: output,
+      };
+    }
+
+    // Handle string values with pagination
+    if (typeof selectedValue === 'string') {
+      const pageNumber = params.pageToken ?? 0;
+      const useReversePagination = REVERSE_PAGINATION_FIELDS.includes(
+        params.select,
+      );
+
+      const { chunk, hasMore } = useReversePagination
+        ? chunkContentReverse(
+            selectedValue,
+            pageNumber,
+            SELF_HEALING_CHUNK_SIZE,
+          )
+        : chunkContent(selectedValue, pageNumber, SELF_HEALING_CHUNK_SIZE);
+
+      // Format diff content with code block
+      const isDiff = params.select === 'suggestedFix';
+      const formattedChunk = isDiff ? '```diff\n' + chunk + '\n```' : chunk;
+
+      const content: CallToolResult['content'] = [
+        { type: 'text', text: formattedChunk },
+      ];
+
+      if (hasMore) {
+        const paginationHint = useReversePagination
+          ? 'to view older output'
+          : 'to continue';
+        content.push({
+          type: 'text',
+          text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token ${paginationHint}.`,
+        });
+      }
+
+      return { content, structuredContent: output };
+    }
+
+    // Handle non-string values (arrays, objects, numbers, booleans) - return as JSON
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(selectedValue, null, 2),
+        },
+      ],
+      structuredContent: output,
+    };
   };
 
-function formatCIInformationMarkdown(output: CIInformationOutput): string {
+/**
+ * Format CI information as a compact overview (no long content like task output or diff).
+ * Used when select parameter is not provided.
+ */
+function formatCIInformationOverview(output: CIInformationOutput): string {
   const lines: string[] = [];
 
   lines.push('## CI Pipeline Information');
+  lines.push(
+    '_Use the `select` parameter to retrieve any individual property by name._',
+  );
   lines.push('');
 
   // CIPE Status
-  lines.push('### Pipeline Status');
+  lines.push(
+    '### Pipeline Status (`cipeStatus`, `branch`, `cipeUrl`, `commitSha`)',
+  );
   lines.push(`- **Status:** ${output.cipeStatus}`);
   lines.push(`- **Branch:** ${output.branch}`);
   lines.push(`- **URL:** ${output.cipeUrl}`);
@@ -851,13 +1014,15 @@ function formatCIInformationMarkdown(output: CIInformationOutput): string {
 
   // Failed Tasks
   if (output.failedTaskIds.length > 0) {
-    lines.push('### Failed Tasks');
+    lines.push('### Failed Tasks (`failedTaskIds`)');
     lines.push(output.failedTaskIds.join(', '));
     lines.push('');
   }
 
   // Self-Healing Information
-  lines.push('### Self-Healing');
+  lines.push(
+    '### Self-Healing (`selfHealingEnabled`, `selfHealingStatus`, `verificationStatus`, `userAction`, `failureClassification`, `confidenceScore`)',
+  );
   lines.push(`- **Enabled:** ${output.selfHealingEnabled ? 'Yes' : 'No'}`);
   if (output.selfHealingEnabled) {
     if (output.selfHealingStatus) {
@@ -878,42 +1043,85 @@ function formatCIInformationMarkdown(output: CIInformationOutput): string {
       lines.push(
         `- **Could Auto-Apply:** ${output.couldAutoApplyTasks ? 'Yes' : 'No'}`,
       );
+    if (
+      output.confidenceScore !== null &&
+      output.confidenceScore !== undefined
+    ) {
+      lines.push(`- **Confidence Score:** ${output.confidenceScore}`);
     }
   }
   lines.push('');
 
-  // Error Summary
-  if (output.taskOutputSummary) {
-    lines.push('### Error Summary');
-    lines.push(output.taskOutputSummary);
+  // Task output section with truncated previews (show end of logs)
+  const hasTaskOutput =
+    output.remoteTaskSummary ||
+    output.localTaskSummary ||
+    output.taskOutputSummary;
+  if (hasTaskOutput) {
+    lines.push(
+      '### Task Output (`remoteTaskSummary`, `localTaskSummary`, `taskOutputSummary`)',
+    );
+    if (output.remoteTaskSummary) {
+      lines.push('**Task Summary (tasks ran on other machines):**');
+      lines.push('```');
+      lines.push(
+        truncateString(output.remoteTaskSummary, TRUNCATION_LENGTH, true),
+      );
+      lines.push('```');
+    }
+    if (output.localTaskSummary) {
+      lines.push('**Task Output (tasks ran on self-healing agent machine):**');
+      lines.push('```');
+      lines.push(
+        truncateString(output.localTaskSummary, TRUNCATION_LENGTH, true),
+      );
+      lines.push('```');
+    }
+    if (
+      output.taskOutputSummary &&
+      !output.remoteTaskSummary &&
+      !output.localTaskSummary
+    ) {
+      lines.push('**Output:**');
+      lines.push('```');
+      lines.push(
+        truncateString(output.taskOutputSummary, TRUNCATION_LENGTH, true),
+      );
+      lines.push('```');
+    }
+    lines.push(
+      "_Full output available via `select='remoteTaskSummary'` or `select='localTaskSummary'`_",
+    );
     lines.push('');
   }
 
-  // Suggested Fix
-  if (output.suggestedFix || output.suggestedFixDescription) {
-    lines.push('### Suggested Fix');
+  // Suggested Fix with truncated diff preview
+  if (output.suggestedFixDescription || output.suggestedFix) {
+    lines.push(
+      '### Suggested Fix (`suggestedFixDescription`, `suggestedFixReasoning`, `suggestedFix`)',
+    );
     if (output.suggestedFixDescription) {
       lines.push(`**Description:** ${output.suggestedFixDescription}`);
     }
     if (output.suggestedFixReasoning) {
       lines.push(`**Reasoning:** ${output.suggestedFixReasoning}`);
     }
-    lines.push('');
-
     if (output.suggestedFix) {
-      lines.push('### Patch');
-      lines.push('```diff');
-      lines.push(output.suggestedFix);
-      lines.push('```');
       lines.push('');
+      lines.push('#### Diff Preview');
+      lines.push('```diff');
+      lines.push(truncateString(output.suggestedFix, TRUNCATION_LENGTH));
+      lines.push('```');
+      lines.push("_Full diff available via `select='suggestedFix'`_");
     }
+    lines.push('');
   }
 
   // ShortLink for apply tool
   if (output.shortLink) {
-    lines.push('### Apply Fix');
+    lines.push('### Apply Fix (`shortLink`)');
     lines.push(
-      `Use the shortLink \`${output.shortLink}\` with the apply tool to apply this fix.`,
+      `Use the shortLink \`${output.shortLink}\` with the update_self_healing_fix tool to apply or reject this fix.`,
     );
     lines.push('');
   }
@@ -1089,5 +1297,6 @@ const handleUpdateSelfHealingFix =
 // Exported for testing
 export const __testing__ = {
   parseShortLink,
-  formatCIInformationMarkdown,
+  formatCIInformationOverview,
+  chunkContentReverse,
 };

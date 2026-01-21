@@ -43,6 +43,7 @@ export type NxAiFix = {
   shortLink?: string;
   userActionOrigin?: AITaskFixUserActionOrigin;
   couldAutoApplyTasks?: boolean;
+  confidenceScore?: number;
 };
 
 export type CIPERunGroup = {

@@ -1,7 +1,8 @@
 import { CIInformationOutput } from './output-schemas';
 import { __testing__ } from './nx-cloud';
 
-const { parseShortLink, formatCIInformationMarkdown } = __testing__;
+const { parseShortLink, formatCIInformationOverview, chunkContentReverse } =
+  __testing__;
 
 describe('parseShortLink', () => {
   it('should parse valid shortlink with two parts', () => {
@@ -33,8 +34,8 @@ describe('parseShortLink', () => {
   });
 });
 
-describe('formatCIInformationMarkdown', () => {
-  it('should format complete output with all fields', () => {
+describe('formatCIInformationOverview', () => {
+  it('should format overview with all fields (new API with remote/local)', () => {
     const output: CIInformationOutput = {
       cipeStatus: 'FAILED',
       cipeUrl: 'https://cloud.nx.app/cipes/123',
@@ -47,25 +48,39 @@ describe('formatCIInformationMarkdown', () => {
       verificationStatus: 'COMPLETED',
       userAction: 'NONE',
       failureClassification: 'build_error',
-      taskOutputSummary: 'TypeError: undefined is not a function',
+      taskOutputSummary: null,
+      remoteTaskSummary: 'TypeError: undefined is not a function (remote)',
+      localTaskSummary: 'Local build output here',
       suggestedFixReasoning: 'The variable was undefined',
       suggestedFixDescription: 'Fix the bug',
       suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
       couldAutoApplyTasks: true,
+      confidenceScore: 0.85,
     };
 
-    const result = formatCIInformationMarkdown(output);
+    const result = formatCIInformationOverview(output);
 
+    // Overview includes select hint
     expect(result).toContain('## CI Pipeline Information');
+    expect(result).toContain('`select` parameter');
+
+    // Overview includes pipeline status with property names in heading
     expect(result).toContain('### Pipeline Status');
+    expect(result).toContain('`cipeStatus`');
     expect(result).toContain('**Status:** FAILED');
     expect(result).toContain('**Branch:** feature-branch');
     expect(result).toContain('**URL:** https://cloud.nx.app/cipes/123');
     expect(result).toContain('**Commit:** abc123');
+
+    // Overview includes failed tasks with property name
     expect(result).toContain('### Failed Tasks');
+    expect(result).toContain('`failedTaskIds`');
     expect(result).toContain('app:build, lib:test');
+
+    // Overview includes self-healing info with property names
     expect(result).toContain('### Self-Healing');
+    expect(result).toContain('`selfHealingEnabled`');
     expect(result).toContain('**Enabled:** Yes');
     expect(result).toContain('**Status:** COMPLETED');
     expect(result).toContain('**Verification:** COMPLETED');
@@ -73,15 +88,70 @@ describe('formatCIInformationMarkdown', () => {
     expect(result).toContain('**Could Auto-Apply:** Yes');
     expect(result).toContain('### Error Summary');
     expect(result).toContain('TypeError: undefined is not a function');
+    expect(result).toContain('**Confidence Score:** 0.85');
+
+    // Overview includes truncated task output (shown from the end)
+    expect(result).toContain('### Task Output');
+    expect(result).toContain('**Task Summary (tasks ran on other machines):**');
+    expect(result).toContain('TypeError: undefined is not a function (remote)');
+    expect(result).toContain(
+      '**Task Output (tasks ran on self-healing agent machine):**',
+    );
+    expect(result).toContain('Local build output here');
+    expect(result).toContain("select='remoteTaskSummary'");
+
+    // Overview includes fix description and truncated diff preview
     expect(result).toContain('### Suggested Fix');
+    expect(result).toContain('`suggestedFixDescription`');
     expect(result).toContain('**Description:** Fix the bug');
     expect(result).toContain('**Reasoning:** The variable was undefined');
-    expect(result).toContain('### Patch');
+    expect(result).toContain('#### Diff Preview');
     expect(result).toContain('```diff');
     expect(result).toContain('-old');
     expect(result).toContain('+new');
+    expect(result).toContain("select='suggestedFix'");
+
+    // Overview includes shortlink for apply tool
     expect(result).toContain('### Apply Fix');
+    expect(result).toContain('`shortLink`');
     expect(result).toContain('`abc-def`');
+  });
+
+  it('should show legacy task_output when only taskOutputSummary is populated (old API)', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'feature-branch',
+      commitSha: 'abc123',
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: 'COMPLETED',
+      userAction: 'NONE',
+      failureClassification: 'build_error',
+      taskOutputSummary: 'TypeError: undefined is not a function',
+      remoteTaskSummary: null,
+      localTaskSummary: null,
+      suggestedFixReasoning: 'The variable was undefined',
+      suggestedFixDescription: 'Fix the bug',
+      suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
+      shortLink: 'abc-def',
+      confidenceScore: 0.85,
+    };
+
+    const result = formatCIInformationOverview(output);
+
+    // Shows truncated task output from legacy field
+    expect(result).toContain('### Task Output');
+    expect(result).toContain('**Output:**');
+    expect(result).toContain('TypeError: undefined is not a function');
+    // New labels should NOT appear since remote/local are null
+    expect(result).not.toContain(
+      '**Task Summary (tasks ran on other machines):**',
+    );
+    expect(result).not.toContain(
+      '**Task Output (tasks ran on self-healing agent machine):**',
+    );
   });
 
   it('should show self-healing disabled when not enabled', () => {
@@ -98,16 +168,20 @@ describe('formatCIInformationMarkdown', () => {
       userAction: null,
       failureClassification: null,
       taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
       suggestedFixReasoning: null,
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
+      confidenceScore: null,
     };
 
-    const result = formatCIInformationMarkdown(output);
+    const result = formatCIInformationOverview(output);
     expect(result).toContain('**Enabled:** No');
     expect(result).not.toContain('**Status:** COMPLETED');
+    expect(result).not.toContain('**Confidence Score:**');
   });
 
   it('should omit optional sections when data is null', () => {
@@ -124,19 +198,21 @@ describe('formatCIInformationMarkdown', () => {
       userAction: null,
       failureClassification: null,
       taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
       suggestedFixReasoning: null,
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
+      confidenceScore: null,
     };
 
-    const result = formatCIInformationMarkdown(output);
+    const result = formatCIInformationOverview(output);
 
     expect(result).not.toContain('### Failed Tasks');
-    expect(result).not.toContain('### Error Summary');
     expect(result).not.toContain('### Suggested Fix');
-    expect(result).not.toContain('### Patch');
+    expect(result).not.toContain('### Task Output');
     expect(result).not.toContain('### Apply Fix');
     expect(result).not.toContain('**Commit:**');
   });
@@ -155,14 +231,17 @@ describe('formatCIInformationMarkdown', () => {
       userAction: 'NONE',
       failureClassification: null,
       taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
       suggestedFixReasoning: null,
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
+      confidenceScore: null,
     };
 
-    const result = formatCIInformationMarkdown(output);
+    const result = formatCIInformationOverview(output);
     expect(result).not.toContain('**User Action:**');
   });
 
@@ -180,14 +259,190 @@ describe('formatCIInformationMarkdown', () => {
       userAction: 'APPLIED_LOCALLY',
       failureClassification: null,
       taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
       suggestedFixReasoning: null,
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
+      confidenceScore: null,
     };
 
-    const result = formatCIInformationMarkdown(output);
+    const result = formatCIInformationOverview(output);
     expect(result).toContain('**User Action:** APPLIED_LOCALLY');
+  });
+
+  it('should show only remote task output when only remote is available', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: 'NONE',
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: 'Remote output here',
+      localTaskSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
+      shortLink: null,
+      confidenceScore: null,
+    };
+
+    const result = formatCIInformationOverview(output);
+    expect(result).toContain('### Task Output');
+    expect(result).toContain('**Task Summary (tasks ran on other machines):**');
+    expect(result).toContain('Remote output here');
+    expect(result).not.toContain(
+      '**Task Output (tasks ran on self-healing agent machine):**',
+    );
+    expect(result).not.toContain('**Output:**');
+  });
+
+  it('should show only local task output when only local is available', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: 'NONE',
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: 'Local output here',
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
+      shortLink: null,
+      confidenceScore: null,
+    };
+
+    const result = formatCIInformationOverview(output);
+    expect(result).toContain('### Task Output');
+    expect(result).not.toContain(
+      '**Task Summary (tasks ran on other machines):**',
+    );
+    expect(result).toContain(
+      '**Task Output (tasks ran on self-healing agent machine):**',
+    );
+    expect(result).toContain('Local output here');
+    expect(result).not.toContain('**Output:**');
+  });
+
+  it('should truncate long task output from the end', () => {
+    // Create string longer than TRUNCATION_LENGTH (1000)
+    // A's at start should be truncated, B's at end should be kept
+    // Last 1000 chars must not include any A's, so B section needs to be > 1000
+    const longOutput = 'A'.repeat(500) + 'B'.repeat(1200);
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: 'NONE',
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: longOutput,
+      localTaskSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
+      shortLink: null,
+      confidenceScore: null,
+    };
+
+    const result = formatCIInformationOverview(output);
+    // Should show end of output (B's), not beginning (A's)
+    expect(result).toContain('BBBBB');
+    expect(result).not.toContain('AAAAA');
+    // Should have truncation indicator at the beginning
+    expect(result).toContain('...');
+  });
+
+  it('should truncate long diff from the beginning', () => {
+    const longDiff =
+      '--- a/file.ts\n+++ b/file.ts\n' + '+line\n'.repeat(500) + '-lastline';
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: 'NONE',
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: 'Fix the bug',
+      suggestedFix: longDiff,
+      shortLink: null,
+      confidenceScore: null,
+    };
+
+    const result = formatCIInformationOverview(output);
+    // Diff is truncated from the beginning (shows start of diff)
+    expect(result).toContain('--- a/file.ts');
+    // Should have truncation indicator at the end
+    expect(result).toContain('...');
+  });
+});
+
+describe('chunkContentReverse', () => {
+  it('should return entire content when smaller than chunk size', () => {
+    const content = 'Hello World';
+    const result = chunkContentReverse(content, 0, 1000);
+    expect(result.chunk).toBe('Hello World');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should return empty string for empty content', () => {
+    const result = chunkContentReverse('', 0, 1000);
+    expect(result.chunk).toBe('');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should return end of content on page 0', () => {
+    const content = '1234567890';
+    const result = chunkContentReverse(content, 0, 5);
+    expect(result.chunk).toContain('67890');
+    expect(result.hasMore).toBe(true);
+  });
+
+  it('should return earlier content on page 1', () => {
+    const content = '1234567890';
+    const result = chunkContentReverse(content, 1, 5);
+    expect(result.chunk).toContain('12345');
+    expect(result.hasMore).toBe(false);
+  });
+
+  it('should add hint about older output when more content exists', () => {
+    const content = '1234567890';
+    const result = chunkContentReverse(content, 0, 5);
+    expect(result.chunk).toContain('...[older output on page 1]');
+  });
+
+  it('should handle page beyond content', () => {
+    const content = 'short';
+    const result = chunkContentReverse(content, 10, 5);
+    expect(result.chunk).toContain('no more content');
+    expect(result.hasMore).toBe(false);
   });
 });
