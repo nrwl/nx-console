@@ -93,10 +93,12 @@ describe('formatCIInformationOverview', () => {
 
     // Overview includes truncated task output (shown from the end)
     expect(result).toContain('### Task Output');
-    expect(result).toContain('**Task Summary (tasks ran on other machines):**');
+    expect(result).toContain(
+      '**Task Summary (`remoteTaskSummary`) - tasks ran on other machines:**',
+    );
     expect(result).toContain('TypeError: undefined is not a function (remote)');
     expect(result).toContain(
-      '**Task Output (tasks ran on self-healing agent machine):**',
+      '**Task Output (`localTaskSummary`) - tasks ran on self-healing agent machine:**',
     );
     expect(result).toContain('Local build output here');
     expect(result).toContain("select='remoteTaskSummary'");
@@ -148,10 +150,10 @@ describe('formatCIInformationOverview', () => {
     expect(result).toContain('TypeError: undefined is not a function');
     // New labels should NOT appear since remote/local are null
     expect(result).not.toContain(
-      '**Task Summary (tasks ran on other machines):**',
+      '**Task Summary (`remoteTaskSummary`) - tasks ran on other machines:**',
     );
     expect(result).not.toContain(
-      '**Task Output (tasks ran on self-healing agent machine):**',
+      '**Task Output (`localTaskSummary`) - tasks ran on self-healing agent machine:**',
     );
   });
 
@@ -298,10 +300,12 @@ describe('formatCIInformationOverview', () => {
 
     const result = formatCIInformationOverview(output);
     expect(result).toContain('### Task Output');
-    expect(result).toContain('**Task Summary (tasks ran on other machines):**');
+    expect(result).toContain(
+      '**Task Summary (`remoteTaskSummary`) - tasks ran on other machines:**',
+    );
     expect(result).toContain('Remote output here');
     expect(result).not.toContain(
-      '**Task Output (tasks ran on self-healing agent machine):**',
+      '**Task Output (`localTaskSummary`) - tasks ran on self-healing agent machine:**',
     );
     expect(result).not.toContain('**Output:**');
   });
@@ -331,10 +335,10 @@ describe('formatCIInformationOverview', () => {
     const result = formatCIInformationOverview(output);
     expect(result).toContain('### Task Output');
     expect(result).not.toContain(
-      '**Task Summary (tasks ran on other machines):**',
+      '**Task Summary (`remoteTaskSummary`) - tasks ran on other machines:**',
     );
     expect(result).toContain(
-      '**Task Output (tasks ran on self-healing agent machine):**',
+      '**Task Output (`localTaskSummary`) - tasks ran on self-healing agent machine:**',
     );
     expect(result).toContain('Local output here');
     expect(result).not.toContain('**Output:**');
@@ -512,7 +516,7 @@ describe('multi-field select parsing', () => {
     });
   });
 
-  it('should handle undefined fields in multi-field select', () => {
+  it('should skip non-existent fields in multi-field select', () => {
     const output: CIInformationOutput = {
       cipeStatus: 'FAILED',
       cipeUrl: 'https://cloud.nx.app/cipes/123',
@@ -538,21 +542,22 @@ describe('multi-field select parsing', () => {
     const result: Record<string, unknown> = {};
 
     for (const field of fields) {
+      // Skip fields that don't exist as keys in output
+      if (!(field in output)) {
+        continue;
+      }
       const value = getValueByPath(
         output as unknown as Record<string, unknown>,
         field,
       );
-      if (value === undefined) {
-        result[field] = '[Field not found]';
-      } else {
-        result[field] = value;
-      }
+      result[field] = value;
     }
 
+    // nonExistentField should be skipped, not included with error message
     expect(result).toEqual({
       cipeStatus: 'FAILED',
-      nonExistentField: '[Field not found]',
     });
+    expect(result).not.toHaveProperty('nonExistentField');
   });
 
   it('should truncate long strings in multi-field select', () => {

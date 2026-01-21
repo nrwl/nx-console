@@ -44,6 +44,7 @@ import {
 export const SELF_HEALING_CHUNK_SIZE = 10000;
 
 const TRUNCATION_LENGTH = 1000;
+const DIFF_PREVIEW_LENGTH = 3000;
 
 /**
  * Truncate a string to a maximum length.
@@ -915,12 +916,9 @@ const getCIInformation =
     if (fields.length === 1) {
       // Single field - existing behavior with pagination
       const fieldName = fields[0];
-      const selectedValue = getValueByPath(
-        output as unknown as Record<string, unknown>,
-        fieldName,
-      );
 
-      if (selectedValue === undefined) {
+      // Check if field exists as a key in output
+      if (!(fieldName in output)) {
         const availableFields = Object.keys(output).join(', ');
         return {
           content: [
@@ -933,6 +931,11 @@ const getCIInformation =
           isError: true,
         };
       }
+
+      const selectedValue = getValueByPath(
+        output as unknown as Record<string, unknown>,
+        fieldName,
+      );
 
       // Handle null values
       if (selectedValue === null) {
@@ -984,7 +987,7 @@ const getCIInformation =
         content: [
           {
             type: 'text',
-            text: JSON.stringify(selectedValue, null, 2),
+            text: JSON.stringify(selectedValue),
           },
         ],
         structuredContent: output,
@@ -994,16 +997,15 @@ const getCIInformation =
     // Multiple fields - return object with values (truncated, no pagination)
     const result: Record<string, unknown> = {};
     for (const field of fields) {
+      // Skip fields that don't exist as keys in output
+      if (!(field in output)) {
+        continue;
+      }
       const value = getValueByPath(
         output as unknown as Record<string, unknown>,
         field,
       );
-      if (value === undefined) {
-        result[field] = `[Field not found]`;
-      } else if (
-        typeof value === 'string' &&
-        value.length > SELF_HEALING_CHUNK_SIZE
-      ) {
+      if (typeof value === 'string' && value.length > SELF_HEALING_CHUNK_SIZE) {
         // Truncate long strings, indicate more available
         result[field] =
           truncateString(value, SELF_HEALING_CHUNK_SIZE) +
@@ -1013,7 +1015,7 @@ const getCIInformation =
       }
     }
     return {
-      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify(result) }],
       structuredContent: output,
     };
   };
@@ -1093,7 +1095,9 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
       '### Task Output (`remoteTaskSummary`, `localTaskSummary`, `taskOutputSummary`)',
     );
     if (output.remoteTaskSummary) {
-      lines.push('**Task Summary (tasks ran on other machines):**');
+      lines.push(
+        '**Task Summary (`remoteTaskSummary`) - tasks ran on other machines:**',
+      );
       lines.push('```');
       lines.push(
         truncateString(output.remoteTaskSummary, TRUNCATION_LENGTH, true),
@@ -1101,7 +1105,9 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
       lines.push('```');
     }
     if (output.localTaskSummary) {
-      lines.push('**Task Output (tasks ran on self-healing agent machine):**');
+      lines.push(
+        '**Task Output (`localTaskSummary`) - tasks ran on self-healing agent machine:**',
+      );
       lines.push('```');
       lines.push(
         truncateString(output.localTaskSummary, TRUNCATION_LENGTH, true),
@@ -1141,7 +1147,7 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
       lines.push('');
       lines.push('#### Diff Preview');
       lines.push('```diff');
-      lines.push(truncateString(output.suggestedFix, TRUNCATION_LENGTH));
+      lines.push(truncateString(output.suggestedFix, DIFF_PREVIEW_LENGTH));
       lines.push('```');
       lines.push("_Full diff available via `select='suggestedFix'`_");
     }
