@@ -775,6 +775,7 @@ const getCIInformation =
       branch: cipeForBranch.branch,
       commitSha: null,
       failedTaskIds,
+      verifiedTaskIds: aiFix?.verificationTasksExecuted ?? [],
       selfHealingEnabled,
       selfHealingStatus: aiFix?.suggestedFixStatus ?? null,
       verificationStatus: aiFix?.verificationStatus ?? null,

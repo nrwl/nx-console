@@ -33,6 +33,7 @@ export interface CIInformationOutput {
   branch: string;
   commitSha: string | null;
   failedTaskIds: string[];
+  verifiedTaskIds: string[];
   selfHealingEnabled: boolean;
   selfHealingStatus: AITaskFixStatus | null;
   verificationStatus: AITaskFixStatus | null;
@@ -80,6 +81,10 @@ export const ciInformationOutputSchema = {
     branch: { type: 'string' },
     commitSha: { type: ['string', 'null'] },
     failedTaskIds: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+    verifiedTaskIds: {
       type: 'array',
       items: { type: 'string' },
     },
