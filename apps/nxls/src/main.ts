@@ -158,7 +158,14 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES, { deferred: true });
+
+    setTimeout(() => {
+      if (WORKING_PATH) {
+        reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+      }
+    }, 20);
+
     if (!DISABLE_FILE_WATCHING) {
       unregisterFileWatcher = await languageServerWatcher(
         WORKING_PATH,
