@@ -1007,8 +1007,9 @@ const getCIInformation =
       );
       if (typeof value === 'string' && value.length > SELF_HEALING_CHUNK_SIZE) {
         // Truncate long strings, indicate more available
+        const fromEnd = REVERSE_PAGINATION_FIELDS.includes(field);
         result[field] =
-          truncateString(value, SELF_HEALING_CHUNK_SIZE) +
+          truncateString(value, SELF_HEALING_CHUNK_SIZE, fromEnd) +
           `\n\n[Truncated - use select="${field}" alone for full paginated content]`;
       } else {
         result[field] = value;
