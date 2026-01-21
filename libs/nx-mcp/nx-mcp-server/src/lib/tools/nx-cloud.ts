@@ -518,10 +518,10 @@ const ciInformationSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Path to select a specific property from CI information. ' +
-        'Without select: Returns formatted overview. ' +
-        'With select: Returns raw JSON value at the specified path. ' +
-        'See output schema for available fields. Long strings are paginated automatically.',
+      'Comma-separated field names to select from CI information. ' +
+        'Single field: Returns raw value with pagination for long strings. ' +
+        'Multiple fields: Returns object with field values (truncated, no pagination). ' +
+        'Without select: Returns formatted overview.',
     ),
   pageToken: z
     .number()
@@ -909,80 +909,111 @@ const getCIInformation =
       };
     }
 
-    // Select mode - extract value at path and return with appropriate pagination
-    const selectedValue = getValueByPath(
-      output as unknown as Record<string, unknown>,
-      params.select,
-    );
+    // Parse comma-separated field names
+    const fields = params.select.split(',').map((s) => s.trim());
 
-    if (selectedValue === undefined) {
-      const availableFields = Object.keys(output).join(', ');
+    if (fields.length === 1) {
+      // Single field - existing behavior with pagination
+      const fieldName = fields[0];
+      const selectedValue = getValueByPath(
+        output as unknown as Record<string, unknown>,
+        fieldName,
+      );
+
+      if (selectedValue === undefined) {
+        const availableFields = Object.keys(output).join(', ');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Path "${fieldName}" not found in CI information. Available fields: ${availableFields}`,
+            },
+          ],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+
+      // Handle null values
+      if (selectedValue === null) {
+        return {
+          content: [
+            { type: 'text', text: `${fieldName}: null (no data available)` },
+          ],
+          structuredContent: output,
+        };
+      }
+
+      // Handle string values with pagination
+      if (typeof selectedValue === 'string') {
+        const pageNumber = params.pageToken ?? 0;
+        const useReversePagination =
+          REVERSE_PAGINATION_FIELDS.includes(fieldName);
+
+        const { chunk, hasMore } = useReversePagination
+          ? chunkContentReverse(
+              selectedValue,
+              pageNumber,
+              SELF_HEALING_CHUNK_SIZE,
+            )
+          : chunkContent(selectedValue, pageNumber, SELF_HEALING_CHUNK_SIZE);
+
+        // Format diff content with code block
+        const isDiff = fieldName === 'suggestedFix';
+        const formattedChunk = isDiff ? '```diff\n' + chunk + '\n```' : chunk;
+
+        const content: CallToolResult['content'] = [
+          { type: 'text', text: formattedChunk },
+        ];
+
+        if (hasMore) {
+          const paginationHint = useReversePagination
+            ? 'to view older output'
+            : 'to continue';
+          content.push({
+            type: 'text',
+            text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token ${paginationHint}.`,
+          });
+        }
+
+        return { content, structuredContent: output };
+      }
+
+      // Handle non-string values (arrays, objects, numbers, booleans) - return as JSON
       return {
         content: [
           {
             type: 'text',
-            text: `Path "${params.select}" not found in CI information. Available fields: ${availableFields}`,
+            text: JSON.stringify(selectedValue, null, 2),
           },
         ],
         structuredContent: output,
-        isError: true,
       };
     }
 
-    // Handle null values
-    if (selectedValue === null) {
-      return {
-        content: [
-          { type: 'text', text: `${params.select}: null (no data available)` },
-        ],
-        structuredContent: output,
-      };
-    }
-
-    // Handle string values with pagination
-    if (typeof selectedValue === 'string') {
-      const pageNumber = params.pageToken ?? 0;
-      const useReversePagination = REVERSE_PAGINATION_FIELDS.includes(
-        params.select,
+    // Multiple fields - return object with values (truncated, no pagination)
+    const result: Record<string, unknown> = {};
+    for (const field of fields) {
+      const value = getValueByPath(
+        output as unknown as Record<string, unknown>,
+        field,
       );
-
-      const { chunk, hasMore } = useReversePagination
-        ? chunkContentReverse(
-            selectedValue,
-            pageNumber,
-            SELF_HEALING_CHUNK_SIZE,
-          )
-        : chunkContent(selectedValue, pageNumber, SELF_HEALING_CHUNK_SIZE);
-
-      // Format diff content with code block
-      const isDiff = params.select === 'suggestedFix';
-      const formattedChunk = isDiff ? '```diff\n' + chunk + '\n```' : chunk;
-
-      const content: CallToolResult['content'] = [
-        { type: 'text', text: formattedChunk },
-      ];
-
-      if (hasMore) {
-        const paginationHint = useReversePagination
-          ? 'to view older output'
-          : 'to continue';
-        content.push({
-          type: 'text',
-          text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token ${paginationHint}.`,
-        });
+      if (value === undefined) {
+        result[field] = `[Field not found]`;
+      } else if (
+        typeof value === 'string' &&
+        value.length > SELF_HEALING_CHUNK_SIZE
+      ) {
+        // Truncate long strings, indicate more available
+        result[field] =
+          truncateString(value, SELF_HEALING_CHUNK_SIZE) +
+          `\n\n[Truncated - use select="${field}" alone for full paginated content]`;
+      } else {
+        result[field] = value;
       }
-
-      return { content, structuredContent: output };
     }
-
-    // Handle non-string values (arrays, objects, numbers, booleans) - return as JSON
     return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(selectedValue, null, 2),
-        },
-      ],
+      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       structuredContent: output,
     };
   };

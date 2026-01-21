@@ -1,5 +1,6 @@
 import { CIInformationOutput } from './output-schemas';
-import { __testing__ } from './nx-cloud';
+import { __testing__, SELF_HEALING_CHUNK_SIZE } from './nx-cloud';
+import { getValueByPath } from './nx-workspace';
 
 const { parseShortLink, formatCIInformationOverview, chunkContentReverse } =
   __testing__;
@@ -444,5 +445,171 @@ describe('chunkContentReverse', () => {
     const result = chunkContentReverse(content, 10, 5);
     expect(result.chunk).toContain('no more content');
     expect(result.hasMore).toBe(false);
+  });
+});
+
+describe('multi-field select parsing', () => {
+  it('should parse single field correctly', () => {
+    const select = 'suggestedFix';
+    const fields = select.split(',').map((s) => s.trim());
+    expect(fields).toEqual(['suggestedFix']);
+    expect(fields.length).toBe(1);
+  });
+
+  it('should parse multiple comma-separated fields', () => {
+    const select = 'suggestedFix,localTaskSummary';
+    const fields = select.split(',').map((s) => s.trim());
+    expect(fields).toEqual(['suggestedFix', 'localTaskSummary']);
+    expect(fields.length).toBe(2);
+  });
+
+  it('should trim whitespace from field names', () => {
+    const select = ' suggestedFix , localTaskSummary , remoteTaskSummary ';
+    const fields = select.split(',').map((s) => s.trim());
+    expect(fields).toEqual([
+      'suggestedFix',
+      'localTaskSummary',
+      'remoteTaskSummary',
+    ]);
+  });
+
+  it('should handle multiple fields with getValueByPath', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'feature-branch',
+      commitSha: 'abc123',
+      failedTaskIds: ['app:build', 'lib:test'],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: 'COMPLETED',
+      userAction: 'NONE',
+      failureClassification: 'build_error',
+      taskOutputSummary: null,
+      remoteTaskSummary: 'Remote task output',
+      localTaskSummary: 'Local task output',
+      suggestedFixReasoning: 'Reasoning here',
+      suggestedFixDescription: 'Fix description',
+      suggestedFix: '--- a/file.ts\n+++ b/file.ts',
+      shortLink: 'abc-def',
+      confidenceScore: 0.85,
+    };
+
+    const fields = ['suggestedFix', 'localTaskSummary', 'cipeStatus'];
+    const result: Record<string, unknown> = {};
+
+    for (const field of fields) {
+      result[field] = getValueByPath(
+        output as unknown as Record<string, unknown>,
+        field,
+      );
+    }
+
+    expect(result).toEqual({
+      suggestedFix: '--- a/file.ts\n+++ b/file.ts',
+      localTaskSummary: 'Local task output',
+      cipeStatus: 'FAILED',
+    });
+  });
+
+  it('should handle undefined fields in multi-field select', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'feature-branch',
+      commitSha: null,
+      failedTaskIds: [],
+      selfHealingEnabled: false,
+      selfHealingStatus: null,
+      verificationStatus: null,
+      userAction: null,
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
+      shortLink: null,
+      confidenceScore: null,
+    };
+
+    const fields = ['cipeStatus', 'nonExistentField'];
+    const result: Record<string, unknown> = {};
+
+    for (const field of fields) {
+      const value = getValueByPath(
+        output as unknown as Record<string, unknown>,
+        field,
+      );
+      if (value === undefined) {
+        result[field] = '[Field not found]';
+      } else {
+        result[field] = value;
+      }
+    }
+
+    expect(result).toEqual({
+      cipeStatus: 'FAILED',
+      nonExistentField: '[Field not found]',
+    });
+  });
+
+  it('should truncate long strings in multi-field select', () => {
+    // Create a string longer than SELF_HEALING_CHUNK_SIZE
+    const longString = 'A'.repeat(SELF_HEALING_CHUNK_SIZE + 500);
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'feature-branch',
+      commitSha: null,
+      failedTaskIds: [],
+      selfHealingEnabled: true,
+      selfHealingStatus: 'COMPLETED',
+      verificationStatus: null,
+      userAction: null,
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: longString,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
+      shortLink: null,
+      confidenceScore: null,
+    };
+
+    const fields = ['cipeStatus', 'localTaskSummary'];
+    const result: Record<string, unknown> = {};
+
+    for (const field of fields) {
+      const value = getValueByPath(
+        output as unknown as Record<string, unknown>,
+        field,
+      );
+      if (value === undefined) {
+        result[field] = '[Field not found]';
+      } else if (
+        typeof value === 'string' &&
+        value.length > SELF_HEALING_CHUNK_SIZE
+      ) {
+        // Truncate long strings
+        result[field] =
+          value.slice(0, SELF_HEALING_CHUNK_SIZE) +
+          `...\n\n[Truncated - use select="${field}" alone for full paginated content]`;
+      } else {
+        result[field] = value;
+      }
+    }
+
+    expect(result['cipeStatus']).toBe('FAILED');
+    expect(typeof result['localTaskSummary']).toBe('string');
+    expect((result['localTaskSummary'] as string).length).toBeLessThan(
+      longString.length,
+    );
+    expect(result['localTaskSummary']).toContain('[Truncated');
+    expect(result['localTaskSummary']).toContain(
+      'use select="localTaskSummary" alone for full paginated content',
+    );
   });
 });
