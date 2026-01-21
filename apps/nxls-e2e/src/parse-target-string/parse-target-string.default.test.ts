@@ -11,6 +11,7 @@ import {
   modifyJsonFile,
   newWorkspace,
   uniq,
+  waitFor,
 } from '@nx-console/shared-e2e-utils';
 import { writeFileSync } from 'fs';
 
@@ -54,6 +55,7 @@ describe('parse target string - default', () => {
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
     nxlsWrapper.setVerbose(true);
 
+    await waitFor(5000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {
@@ -109,9 +111,6 @@ describe('parse target string - default', () => {
       },
     }));
 
-    nxlsWrapper.sendNotification({
-      method: NxWorkspaceRefreshNotification.method,
-    });
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
