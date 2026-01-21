@@ -1076,6 +1076,7 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
       lines.push(
         `- **Could Auto-Apply:** ${output.couldAutoApplyTasks ? 'Yes' : 'No'}`,
       );
+    }
     if (
       output.confidenceScore !== null &&
       output.confidenceScore !== undefined
