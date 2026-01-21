@@ -87,8 +87,6 @@ describe('formatCIInformationOverview', () => {
     expect(result).toContain('**Verification:** COMPLETED');
     expect(result).toContain('**Failure Classification:** build_error');
     expect(result).toContain('**Could Auto-Apply:** Yes');
-    expect(result).toContain('### Error Summary');
-    expect(result).toContain('TypeError: undefined is not a function');
     expect(result).toContain('**Confidence Score:** 0.85');
 
     // Overview includes truncated task output (shown from the end)
@@ -127,6 +125,7 @@ describe('formatCIInformationOverview', () => {
       branch: 'feature-branch',
       commitSha: 'abc123',
       failedTaskIds: ['app:build'],
+      verifiedTaskIds: ['app:build'],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: 'COMPLETED',
@@ -139,6 +138,7 @@ describe('formatCIInformationOverview', () => {
       suggestedFixDescription: 'Fix the bug',
       suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
+      couldAutoApplyTasks: true,
       confidenceScore: 0.85,
     };
 
@@ -283,6 +283,7 @@ describe('formatCIInformationOverview', () => {
       branch: 'main',
       commitSha: null,
       failedTaskIds: ['app:build'],
+      verifiedTaskIds: [],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: null,
@@ -295,6 +296,7 @@ describe('formatCIInformationOverview', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
       confidenceScore: null,
     };
 
@@ -317,6 +319,7 @@ describe('formatCIInformationOverview', () => {
       branch: 'main',
       commitSha: null,
       failedTaskIds: ['app:build'],
+      verifiedTaskIds: [],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: null,
@@ -329,6 +332,7 @@ describe('formatCIInformationOverview', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
       confidenceScore: null,
     };
 
@@ -355,6 +359,7 @@ describe('formatCIInformationOverview', () => {
       branch: 'main',
       commitSha: null,
       failedTaskIds: ['app:build'],
+      verifiedTaskIds: [],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: null,
@@ -367,6 +372,7 @@ describe('formatCIInformationOverview', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
       confidenceScore: null,
     };
 
@@ -387,6 +393,7 @@ describe('formatCIInformationOverview', () => {
       branch: 'main',
       commitSha: null,
       failedTaskIds: ['app:build'],
+      verifiedTaskIds: [],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: null,
@@ -399,6 +406,7 @@ describe('formatCIInformationOverview', () => {
       suggestedFixDescription: 'Fix the bug',
       suggestedFix: longDiff,
       shortLink: null,
+      couldAutoApplyTasks: null,
       confidenceScore: null,
     };
 
@@ -484,6 +492,7 @@ describe('multi-field select parsing', () => {
       branch: 'feature-branch',
       commitSha: 'abc123',
       failedTaskIds: ['app:build', 'lib:test'],
+      verifiedTaskIds: ['app:build'],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: 'COMPLETED',
@@ -496,6 +505,7 @@ describe('multi-field select parsing', () => {
       suggestedFixDescription: 'Fix description',
       suggestedFix: '--- a/file.ts\n+++ b/file.ts',
       shortLink: 'abc-def',
+      couldAutoApplyTasks: true,
       confidenceScore: 0.85,
     };
 
@@ -523,6 +533,7 @@ describe('multi-field select parsing', () => {
       branch: 'feature-branch',
       commitSha: null,
       failedTaskIds: [],
+      verifiedTaskIds: [],
       selfHealingEnabled: false,
       selfHealingStatus: null,
       verificationStatus: null,
@@ -535,6 +546,7 @@ describe('multi-field select parsing', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
       confidenceScore: null,
     };
 
@@ -569,6 +581,7 @@ describe('multi-field select parsing', () => {
       branch: 'feature-branch',
       commitSha: null,
       failedTaskIds: [],
+      verifiedTaskIds: [],
       selfHealingEnabled: true,
       selfHealingStatus: 'COMPLETED',
       verificationStatus: null,
@@ -581,6 +594,7 @@ describe('multi-field select parsing', () => {
       suggestedFixDescription: null,
       suggestedFix: null,
       shortLink: null,
+      couldAutoApplyTasks: null,
       confidenceScore: null,
     };
 
