@@ -16,6 +16,7 @@ import {
 import { findNxPackagePath } from '@nx-console/shared-npm';
 import {
   getExecutors,
+  getNxVersion,
   nxWorkspace,
 } from '@nx-console/shared-nx-workspace-info';
 import { CollectionInfo } from '@nx-console/shared-schema';
@@ -34,12 +35,73 @@ let currentBaseSchemas: SchemaConfiguration[] = [];
 let currentExecutors: CollectionInfo[] | undefined;
 let currentNxWorkspace: NxWorkspace | undefined;
 
+function createBaseSchemas(
+  projectJsonSchema: JSONSchema,
+  packageJsonSchema: JSONSchema,
+  nxSchema: JSONSchema,
+): SchemaConfiguration[] {
+  return [
+    {
+      uri: 'nx://schemas/project',
+      fileMatch: ['**/project.json'],
+      schema: projectJsonSchema,
+    },
+    {
+      uri: 'nx://schemas/package',
+      fileMatch: ['**/package.json'],
+      schema: packageJsonSchema,
+    },
+    {
+      uri: 'nx://schemas/nx',
+      fileMatch: ['**/nx.json'],
+      schema: nxSchema,
+    },
+  ];
+}
+
 export async function configureSchemas(
   workingPath: string | undefined,
   capabilities: ClientCapabilities | undefined,
+  options?: { deferred?: boolean },
 ) {
   if (!workingPath) {
     lspLogger.log('No workspace path provided');
+    return;
+  }
+
+  // we want to be able to provide schemas before the project graph is available
+  // use empty executors and project nodes since getExecutors needs the project graph
+  if (options?.deferred) {
+    const nxVersion = await getNxVersion(workingPath);
+    currentExecutors = [];
+
+    const projectJsonSchema = getProjectJsonSchema(
+      currentExecutors,
+      {},
+      nxVersion,
+    );
+    const packageJsonSchema = await getPackageJsonSchema(
+      workingPath,
+      projectJsonSchema,
+    );
+    const nxSchema = await getNxJsonSchema(
+      currentExecutors,
+      {},
+      nxVersion,
+      workingPath,
+    );
+
+    currentBaseSchemas = createBaseSchemas(
+      projectJsonSchema,
+      packageJsonSchema,
+      nxSchema,
+    );
+
+    _configureJsonLanguageService(
+      capabilities,
+      getProjectSchemas(),
+      currentBaseSchemas,
+    );
     return;
   }
 
@@ -65,23 +127,11 @@ export async function configureSchemas(
     workingPath,
   );
 
-  currentBaseSchemas = [
-    {
-      uri: 'nx://schemas/project',
-      fileMatch: ['**/project.json'],
-      schema: projectJsonSchema,
-    },
-    {
-      uri: 'nx://schemas/package',
-      fileMatch: ['**/package.json'],
-      schema: packageJsonSchema,
-    },
-    {
-      uri: 'nx://schemas/nx',
-      fileMatch: ['**/nx.json'],
-      schema: nxSchema,
-    },
-  ];
+  currentBaseSchemas = createBaseSchemas(
+    projectJsonSchema,
+    packageJsonSchema,
+    nxSchema,
+  );
 
   // recalculate project-specific schemas
   for (const key in projectSchemas.keys()) {
