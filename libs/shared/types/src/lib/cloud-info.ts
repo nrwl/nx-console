@@ -37,6 +37,7 @@ export type NxAiFix = {
   suggestedFixStatus: AITaskFixStatus;
   suggestedFixReasoning?: string;
   verificationStatus: AITaskFixStatus;
+  verificationTasksExecuted?: string[];
   userAction: AITaskFixUserAction;
   failureClassification?: string;
   shortLink?: string;

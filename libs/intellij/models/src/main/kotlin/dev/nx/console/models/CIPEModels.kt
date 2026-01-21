@@ -72,6 +72,7 @@ data class NxAiFix(
     val terminalLogsUrls: Map<String, String>,
     val suggestedFixStatus: AITaskFixStatus,
     val verificationStatus: AITaskFixStatus,
+    val verificationTasksExecuted: List<String>? = null,
     val suggestedFix: String? = null,
     val suggestedFixReasoning: String? = null,
     val suggestedFixDescription: String? = null,
