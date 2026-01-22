@@ -42,11 +42,12 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder nodes for project in subfolder', async () => {
-    await waitFor(5000);
     const projectFolder = join(e2eCwd, workspaceName, 'subfolder', 'project');
     mkdirSync(projectFolder, { recursive: true });
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
+    // Wait for file system changes to settle before triggering refresh
+    await waitFor(1000);
     await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
@@ -78,7 +79,6 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for nested projects', async () => {
-    await waitFor(5000);
     const nestedProjectFolder = join(
       e2eCwd,
       workspaceName,
@@ -92,6 +92,8 @@ describe('project folder tree', () => {
       '{ "name": "nested" }',
     );
 
+    // Wait for file system changes to settle before triggering refresh
+    await waitFor(1000);
     await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
@@ -128,7 +130,6 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for deeply nested projects', async () => {
-    await waitFor(5000);
     const deeplyNestedProjectFolder = join(
       e2eCwd,
       workspaceName,
@@ -143,6 +144,8 @@ describe('project folder tree', () => {
       '{ "name": "deeplynested" }',
     );
 
+    // Wait for file system changes to settle before triggering refresh
+    await waitFor(1000);
     await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
