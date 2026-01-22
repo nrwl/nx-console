@@ -323,7 +323,7 @@ export class NxlsWrapper {
       method: 'nx/workspace/refresh',
       params: {},
     });
-    await this.waitForNotification('nx/workspace/refresh');
+    await this.waitForNotification('nx/refreshWorkspace');
   }
 
   setVerbose(verbose: boolean) {
