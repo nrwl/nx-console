@@ -39,6 +39,7 @@ export class NxlsWrapper {
   constructor(
     private verbose?: boolean,
     private env?: NodeJS.ProcessEnv,
+    private disableFileWatching = true,
   ) {
     if (verbose === undefined) {
       this.verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
@@ -83,6 +84,7 @@ export class NxlsWrapper {
             capabilities: {},
             initializationOptions: {
               workspacePath: cwd,
+              disableFileWatching: this.disableFileWatching,
             },
           },
         },
