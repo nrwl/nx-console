@@ -69,7 +69,7 @@ describe('nx_workspace select', () => {
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_workspace',
-      '--tool-arg select="targets.build"',
+      '--tool-arg select="targets.lint"',
     );
 
     const content = result.content[0]?.text || '';
