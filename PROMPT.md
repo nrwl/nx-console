@@ -13,24 +13,7 @@ Track progress in `.claude/ralph-upgrade-state.json`. Create it if it doesn't ex
   "defaultVersionUpdated": false,
   "currentTest": null,
   "completedTests": [],
-  "pendingTests": [
-    "nx-workspace-default",
-    "nx-json-completion-default",
-    "named-input-link-completion-default",
-    "project-link-completion-default",
-    "generator-options.default",
-    "generator-local-plugin",
-    "nx-cloud-default",
-    "nx-cloud-onboarding-info-default",
-    "parse-target-string.default",
-    "pdv-data-default",
-    "project-by-path-standalone.default",
-    "project-by-path.default",
-    "project-folder-tree",
-    "package-json-nx-completion.default",
-    "target-link-completion-default",
-    "interpolated-path-link"
-  ],
+  "pendingTests": ["nx-workspace-default", "nx-json-completion-default", "named-input-link-completion-default", "project-link-completion-default", "generator-options.default", "generator-local-plugin", "nx-cloud-default", "nx-cloud-onboarding-info-default", "parse-target-string.default", "pdv-data-default", "project-by-path-standalone.default", "project-by-path.default", "project-folder-tree", "package-json-nx-completion.default", "target-link-completion-default", "interpolated-path-link"],
   "phase": "local",
   "lastPushedCommit": null,
   "iteration": 0
@@ -40,6 +23,7 @@ Track progress in `.claude/ralph-upgrade-state.json`. Create it if it doesn't ex
 ## Process Overview
 
 **Two-phase approach:**
+
 1. **Local Phase**: Get ALL tests passing locally first, one at a time
 2. **CI Phase**: Push to CI and iterate until CI passes
 
@@ -48,6 +32,7 @@ Track progress in `.claude/ralph-upgrade-state.json`. Create it if it doesn't ex
 ### Step 1: Update Default Version (if not done)
 
 If `defaultVersionUpdated` is false:
+
 1. Edit `libs/shared/e2e-utils/src/lib/utils.ts`
 2. Change `'21.3.0'` to `'22.4.0'` on line 8
 3. Set `defaultVersionUpdated` to true in state file
@@ -62,11 +47,13 @@ If `defaultVersionUpdated` is false:
 1. **Pick a test**: If `currentTest` is null, pop the first item from `pendingTests` and set it as `currentTest`
 
 2. **Run the test locally**:
+
    ```bash
    npx nx run nxls-e2e:e2e-local -- <test-name>
    ```
 
 3. **If test fails**:
+
    - Analyze the error output
    - Common issues are:
      - Expected targets have changed (new targets added, old ones renamed/removed)
@@ -88,6 +75,7 @@ If `defaultVersionUpdated` is false:
 ### Step 3: Transition to CI Phase
 
 When `pendingTests` is empty and `currentTest` is null (all tests pass locally):
+
 1. Set `phase` to `"ci"`
 2. Push all commits to remote:
    ```bash
@@ -101,6 +89,7 @@ When `pendingTests` is empty and `currentTest` is null (all tests pass locally):
 ### Step 1: Spawn CI Monitor Subagent
 
 Use the Task tool to spawn the `nx:nx-ci-monitor` subagent:
+
 ```
 Task(
   subagent_type: "nx:nx-ci-monitor",
@@ -112,10 +101,12 @@ Task(
 ### Step 2: Handle CI Results
 
 **If CI is still running:**
+
 - Wait for the subagent to report back
 - Output status and continue monitoring
 
 **If CI fails:**
+
 - Check if self-healing fixes are available from the subagent output
 - If a self-healing fix makes sense (e.g., lint fixes, formatting):
   - Apply the fix using `mcp__plugin_nx_nx-mcp__update_self_healing_fix` with action "APPLY"
@@ -127,12 +118,14 @@ Task(
   - Continue monitoring
 
 **If CI passes:**
+
 - All tests upgraded and CI green!
 - Output: `<promise>UPGRADE COMPLETE</promise>`
 
 ## Test Files Reference
 
 Tests are in `apps/nxls-e2e/src/`:
+
 - `completion/nx-json-completion-default.test.ts`
 - `completion/package-json-nx-completion.default.test.ts`
 - `document-links/interpolated-path-link.test.ts`
@@ -153,20 +146,24 @@ Tests are in `apps/nxls-e2e/src/`:
 ## Common Fix Patterns
 
 ### Target Changes
+
 If a test expects specific targets and fails, the targets list likely changed between Nx versions. Update the expected targets array to match what Nx 22.4 generates.
 
 Example in `nx-workspace-default.test.ts`:
+
 ```typescript
 // Old targets for e2e project
-['e2e', 'e2e-ci', 'e2e-ci--src/e2e/app.cy.ts', 'lint', 'open-cypress']
+['e2e', 'e2e-ci', 'e2e-ci--src/e2e/app.cy.ts', 'lint', 'open-cypress'];
 
 // May need to update if Nx 22.4 adds/removes/renames targets
 ```
 
 ### Preset Changes
+
 If workspace creation fails, the preset options may have changed. Check Nx 22.4 docs for valid preset values.
 
 ### Schema Changes
+
 If completion/validation tests fail, JSON schemas may have changed. Update expected completions accordingly.
 
 ## Important Notes
