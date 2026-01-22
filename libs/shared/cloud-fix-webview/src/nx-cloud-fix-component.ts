@@ -54,7 +54,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   onShowDiff: (() => void) | undefined;
 
   @property({ type: Function })
-  onRerunCi: ((details: NxCloudFixDetails) => void) | undefined;
+  onRerunCi: (() => void) | undefined;
 
   @property({ type: Function })
   onOpenExternalLink: ((url: string) => void) | undefined;
