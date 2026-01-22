@@ -320,7 +320,9 @@ export class NxlsWrapper {
   }
 
   async triggerAndWaitForRefresh(): Promise<void> {
-    const waitPromise = this.waitForNotification(NxWorkspaceRefreshNotification.method);
+    const waitPromise = this.waitForNotification(
+      NxWorkspaceRefreshNotification.method,
+    );
     this.sendNotification({
       method: NxWorkspaceRefreshNotification.method,
       params: {},
