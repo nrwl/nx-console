@@ -21,7 +21,8 @@ export interface RetrieveFixDiffResponse {
   /** Task output from local execution */
   localTaskSummary?: string | null;
   shortLink: string | null;
-  confidenceScore: number | null;
+  confidence: number | null;
+  confidenceReasoning: string | null;
 }
 
 export interface RetrieveFixDiffError {
