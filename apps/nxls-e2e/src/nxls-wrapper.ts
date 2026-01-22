@@ -77,7 +77,9 @@ export class NxlsWrapper {
       this.listenToLSPMessages(this.messageReader);
 
       // Set up wait for refresh BEFORE sending initialize, so we're ready to catch the notification
-      const refreshPromise = this.waitForNotification(NxWorkspaceRefreshNotification.method);
+      const refreshPromise = this.waitForNotification(
+        NxWorkspaceRefreshNotification.method,
+      );
 
       await this.sendRequest(
         {
