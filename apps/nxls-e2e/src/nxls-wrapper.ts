@@ -1,5 +1,5 @@
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
-import { defaultVersion } from '@nx-console/shared-e2e-utils';
+import { defaultVersion, waitFor } from '@nx-console/shared-e2e-utils';
 import { killGroup } from '@nx-console/shared-utils';
 import { ChildProcess, execSync, spawn } from 'child_process';
 import { join } from 'path';
@@ -330,6 +330,7 @@ export class NxlsWrapper {
   }
 
   async triggerAndWaitForRefresh(): Promise<void> {
+    await waitFor(1000);
     const waitPromise = this.waitForNotification(
       NxWorkspaceRefreshNotification.method,
     );
@@ -338,6 +339,7 @@ export class NxlsWrapper {
       params: {},
     });
     await waitPromise;
+    await waitFor(1000);
   }
 
   setVerbose(verbose: boolean) {
