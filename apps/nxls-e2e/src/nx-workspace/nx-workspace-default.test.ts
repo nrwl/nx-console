@@ -31,6 +31,8 @@ testNxWorkspace(
         'serve',
         'serve-static',
         'test',
+        'test-ci',
+        'test-ci--src/app/app.spec.tsx',
         'typecheck',
         'watch-deps',
       ],
