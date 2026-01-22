@@ -19,7 +19,7 @@ import {
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
-const viteFilePath = join(e2eCwd, workspaceName, 'vite.config.ts');
+const viteFilePath = join(e2eCwd, workspaceName, 'vite.config.mts');
 let viteFileContents: string;
 
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
