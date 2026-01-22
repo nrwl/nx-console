@@ -283,6 +283,7 @@ class NxCloudFixFileImpl(
                 is NxCloudFixMessage.Apply -> handleApply(parsed.commitMessage)
                 is NxCloudFixMessage.ApplyLocally -> handleApplyLocally()
                 is NxCloudFixMessage.Reject -> handleReject()
+                is NxCloudFixMessage.RerunCi -> handleRerunCi()
                 is NxCloudFixMessage.ShowDiff -> handleShowDiff()
                 is NxCloudFixMessage.OpenExternalLink -> handleOpenExternalLink(parsed)
             }
@@ -550,6 +551,41 @@ class NxCloudFixFileImpl(
                 }
             } catch (e: Exception) {
                 logger<NxCloudFixFileImpl>().error("Failed to reject AI fix", e)
+            }
+        }
+    }
+
+    private fun handleRerunCi() {
+        logger<NxCloudFixFileImpl>().info("Rerun CI action received")
+
+        TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_RERUN_CI)
+
+        val fixDetails = currentFixDetails ?: return
+        val aiFixId =
+            fixDetails.runGroup.aiFix?.aiFixId
+                ?: run {
+                    showErrorNotification("No AI fix ID found")
+                    return
+                }
+
+        cs.launch {
+            try {
+                val cloudApiService = NxCloudApiService.getInstance(project)
+                val success =
+                    cloudApiService.updateSuggestedFix(aiFixId, AITaskFixUserAction.RERUN_REQUESTED)
+
+                if (success) {
+                    showSuccessNotification("CI rerun requested")
+                    CIPEPollingService.getInstance(project).forcePoll()
+                    withContext(Dispatchers.EDT) {
+                        FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
+                    }
+                } else {
+                    showErrorNotification("Failed to request CI rerun")
+                }
+            } catch (e: Exception) {
+                logger<NxCloudFixFileImpl>().error("Failed to request CI rerun", e)
+                showErrorNotification("Failed to request CI rerun: ${e.message}")
             }
         }
     }

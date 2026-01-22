@@ -5,7 +5,8 @@ export type NxCloudFixMessage =
   | { type: 'apply-locally' }
   | { type: 'reject' }
   | { type: 'webview-ready' }
-  | { type: 'show-diff' };
+  | { type: 'show-diff' }
+  | { type: 'rerun-ci' };
 
 export interface NxCloudFixDetails {
   cipe: CIPEInfo;
