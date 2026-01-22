@@ -18,10 +18,10 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
+  waitFor,
 } from '@nx-console/shared-e2e-utils';
 import { Position } from 'vscode-json-languageservice';
 import { CompletionList } from 'vscode-languageserver';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -38,6 +38,9 @@ describe('nx.json completion - default', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+
+    await waitFor(5000);
+    await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
   it('should contain contain preinstalled plugins', async () => {
@@ -200,6 +203,8 @@ describe('nx.json completion - default', () => {
   });
 
   it('should not error when nx-schema.json is missing', async () => {
+    await waitFor(5000);
+
     rmSync(
       join(
         e2eCwd,
@@ -211,13 +216,7 @@ describe('nx.json completion - default', () => {
       ),
     );
 
-    nxlsWrapper.sendNotification({
-      ...NxWorkspaceRefreshNotification,
-      params: {},
-    });
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const autocompleteResponse = await nxlsWrapper.sendRequest({
       method: 'textDocument/completion',

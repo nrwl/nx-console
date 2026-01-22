@@ -26,6 +26,9 @@ describe('project folder tree', () => {
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
     nxlsWrapper.setVerbose(true);
+
+    await waitFor(5000);
+    await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
   it('should contain base projects with correct information', async () => {

@@ -32,6 +32,9 @@ describe('pdv data', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+
+    await waitFor(5000);
+    await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
   afterAll(async () => {
