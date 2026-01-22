@@ -76,6 +76,9 @@ export class NxlsWrapper {
 
       this.listenToLSPMessages(this.messageReader);
 
+      // Set up wait for refresh BEFORE sending initialize, so we're ready to catch the notification
+      const refreshPromise = this.waitForNotification(NxWorkspaceRefreshNotification.method);
+
       await this.sendRequest(
         {
           method: 'initialize',
@@ -91,6 +94,11 @@ export class NxlsWrapper {
         },
         10,
       );
+
+      // Wait for the initial workspace refresh to complete
+      // This is necessary because nxls initialization is non-blocking (since 6fbf9ed)
+      // and the workspace isn't ready until the first nx/refreshWorkspace notification
+      await refreshPromise;
 
       if (this.verbose) {
         console.log(`started nxls with pid ${p.pid}`);

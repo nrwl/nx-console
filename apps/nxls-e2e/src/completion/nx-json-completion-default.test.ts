@@ -38,9 +38,6 @@ describe('nx.json completion - default', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
-    await waitFor(5000);
-    await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
   it('should contain contain preinstalled plugins', async () => {

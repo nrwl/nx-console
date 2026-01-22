@@ -39,7 +39,6 @@ describe('parse target string - default', () => {
       'project.json',
     );
 
-    await waitFor(5000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {

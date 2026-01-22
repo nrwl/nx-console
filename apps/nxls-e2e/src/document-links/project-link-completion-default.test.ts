@@ -4,7 +4,6 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
-  waitFor,
 } from '@nx-console/shared-e2e-utils';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -40,8 +39,6 @@ describe('document link completion - project links', () => {
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
 
-    await waitFor(5000);
-
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',
       params: {
@@ -53,8 +50,6 @@ describe('document link completion - project links', () => {
         },
       },
     });
-
-    await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
   afterAll(async () => {
