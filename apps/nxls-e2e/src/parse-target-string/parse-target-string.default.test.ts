@@ -48,10 +48,6 @@ describe('parse target string - default', () => {
       ),
     );
 
-    nxlsWrapper = new NxlsWrapper();
-    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
-
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {
@@ -106,6 +102,12 @@ describe('parse target string - default', () => {
         },
       },
     }));
+
+    nxlsWrapper = new NxlsWrapper();
+    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    nxlsWrapper.setVerbose(true);
+
+    
 
     await nxlsWrapper.triggerAndWaitForRefresh();
   });

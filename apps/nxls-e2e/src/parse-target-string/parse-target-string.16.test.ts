@@ -27,10 +27,6 @@ describe('parse target string - default', () => {
       version: '16',
     });
 
-    nxlsWrapper = new NxlsWrapper();
-    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
-
     const projectJson = join(
       e2eCwd,
       workspaceName,
@@ -94,7 +90,9 @@ describe('parse target string - default', () => {
       },
     }));
 
-    await nxlsWrapper.triggerAndWaitForRefresh();
+    nxlsWrapper = new NxlsWrapper();
+    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    nxlsWrapper.setVerbose(true);
   });
 
   it('should correctly parse simple target string', async () => {
