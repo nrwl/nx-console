@@ -3,7 +3,6 @@ import { join } from 'path';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
 import { e2eCwd, newWorkspace, uniq } from '@nx-console/shared-e2e-utils';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -31,12 +30,6 @@ describe('package.json nx property completion - default', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
-    // Wait for the full workspace configuration to load
-    // This ensures the project graph is available for all tests
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
   });
 
   it('should contain contain properties from project.json schema', async () => {

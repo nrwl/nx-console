@@ -8,10 +8,7 @@ import {
   uniq,
   waitFor,
 } from '@nx-console/shared-e2e-utils';
-import {
-  NxProjectFolderTreeRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
+import { NxProjectFolderTreeRequest } from '@nx-console/language-server-types';
 import { TreeMap, TreeNode } from '@nx-console/shared-types';
 import { mkdirSync, writeFileSync } from 'fs';
 
@@ -42,15 +39,13 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder nodes for project in subfolder', async () => {
-    await waitFor(11000);
-
     const projectFolder = join(e2eCwd, workspaceName, 'subfolder', 'project');
     mkdirSync(projectFolder, { recursive: true });
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    // Wait for file system changes to settle before triggering refresh
+    await waitFor(1000);
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -81,8 +76,6 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for nested projects', async () => {
-    await waitFor(11000);
-
     const nestedProjectFolder = join(
       e2eCwd,
       workspaceName,
@@ -96,9 +89,9 @@ describe('project folder tree', () => {
       '{ "name": "nested" }',
     );
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    // Wait for file system changes to settle before triggering refresh
+    await waitFor(1000);
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -134,7 +127,6 @@ describe('project folder tree', () => {
   });
 
   it('should contain projects & folder info for deeply nested projects', async () => {
-    await waitFor(11000);
     const deeplyNestedProjectFolder = join(
       e2eCwd,
       workspaceName,
@@ -149,9 +141,9 @@ describe('project folder tree', () => {
       '{ "name": "deeplynested" }',
     );
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    // Wait for file system changes to settle before triggering refresh
+    await waitFor(1000);
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
 

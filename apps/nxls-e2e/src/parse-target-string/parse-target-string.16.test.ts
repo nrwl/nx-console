@@ -1,7 +1,4 @@
-import {
-  NxParseTargetStringRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
+import { NxParseTargetStringRequest } from '@nx-console/language-server-types';
 import type { Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
@@ -30,10 +27,6 @@ describe('parse target string - default', () => {
       version: '16',
     });
 
-    nxlsWrapper = new NxlsWrapper();
-    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-    nxlsWrapper.setVerbose(true);
-
     const projectJson = join(
       e2eCwd,
       workspaceName,
@@ -42,7 +35,6 @@ describe('parse target string - default', () => {
       'project.json',
     );
 
-    await waitFor(11000);
     modifyJsonFile(projectJson, (json) => ({
       ...json,
       targets: {
@@ -98,9 +90,9 @@ describe('parse target string - default', () => {
       },
     }));
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    nxlsWrapper = new NxlsWrapper();
+    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    nxlsWrapper.setVerbose(true);
   });
 
   it('should correctly parse simple target string', async () => {

@@ -1,4 +1,5 @@
-import { defaultVersion } from '@nx-console/shared-e2e-utils';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
+import { defaultVersion, waitFor } from '@nx-console/shared-e2e-utils';
 import { killGroup } from '@nx-console/shared-utils';
 import { ChildProcess, execSync, spawn } from 'child_process';
 import { join } from 'path';
@@ -39,6 +40,7 @@ export class NxlsWrapper {
   constructor(
     private verbose?: boolean,
     private env?: NodeJS.ProcessEnv,
+    private disableFileWatching = true,
   ) {
     if (verbose === undefined) {
       this.verbose = !!process.env['CI'] || !!process.env['NX_VERBOSE_LOGGING'];
@@ -74,6 +76,11 @@ export class NxlsWrapper {
 
       this.listenToLSPMessages(this.messageReader);
 
+      // Set up wait for refresh BEFORE sending initialize, so we're ready to catch the notification
+      const refreshPromise = this.waitForNotification(
+        NxWorkspaceRefreshNotification.method,
+      );
+
       await this.sendRequest(
         {
           method: 'initialize',
@@ -83,11 +90,17 @@ export class NxlsWrapper {
             capabilities: {},
             initializationOptions: {
               workspacePath: cwd,
+              disableFileWatching: this.disableFileWatching,
             },
           },
         },
         10,
       );
+
+      // Wait for the initial workspace refresh to complete
+      // This is necessary because nxls initialization is non-blocking (since 6fbf9ed)
+      // and the workspace isn't ready until the first nx/refreshWorkspace notification
+      await refreshPromise;
 
       if (this.verbose) {
         console.log(`started nxls with pid ${p.pid}`);
@@ -314,6 +327,19 @@ export class NxlsWrapper {
     const [, timeout] = this.pendingNotificationMap.get(method) ?? [];
     this.pendingNotificationMap.delete(method);
     clearTimeout(timeout);
+  }
+
+  async triggerAndWaitForRefresh(): Promise<void> {
+    await waitFor(1000);
+    const waitPromise = this.waitForNotification(
+      NxWorkspaceRefreshNotification.method,
+    );
+    this.sendNotification({
+      method: NxWorkspaceRefreshNotification.method,
+      params: {},
+    });
+    await waitPromise;
+    await waitFor(1000);
   }
 
   setVerbose(verbose: boolean) {

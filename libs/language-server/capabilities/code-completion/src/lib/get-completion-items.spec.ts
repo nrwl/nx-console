@@ -25,6 +25,7 @@ jest.mock(
         isLerna: false,
         isEncapsulatedNx: false,
         validWorkspaceJson: true,
+        daemonEnabled: false,
         workspacePath: '/',
         workspaceLayout: {
           appsDir: '',

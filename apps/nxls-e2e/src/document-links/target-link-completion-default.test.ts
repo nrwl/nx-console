@@ -9,7 +9,6 @@ import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -44,12 +43,6 @@ describe('document link completion - default', () => {
     );
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-
-    // Wait for the full workspace configuration to load
-    // This ensures the project graph is available for all tests
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
 
     nxlsWrapper.sendNotification({
       method: 'textDocument/didOpen',

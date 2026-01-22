@@ -38,6 +38,11 @@ import javax.swing.*
 import javax.swing.border.CompoundBorder
 import kotlinx.coroutines.launch
 
+enum class DaemonWarningType {
+    DAEMON_DISABLED,
+    WATCHER_NOT_RUNNING,
+}
+
 class NxToolMainComponents(private val project: Project) {
 
     fun createNoProjectsComponent(): JComponent {
@@ -251,6 +256,47 @@ class NxToolMainComponents(private val project: Project) {
                     }
                 }
             }
+        }
+    }
+
+    fun createDaemonWarningBanner(type: DaemonWarningType): JComponent {
+        return JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            border = JBUI.Borders.empty(8, 10)
+            background = JBColor(Color(255, 248, 220), Color(60, 50, 30))
+            isOpaque = true
+
+            add(JLabel(AllIcons.General.Warning))
+            add(Box.createHorizontalStrut(8))
+
+            when (type) {
+                DaemonWarningType.DAEMON_DISABLED -> {
+                    add(
+                        JLabel("Nx Daemon is disabled. File changes won't be detected.").apply {
+                            font = font.deriveFont(Font.PLAIN)
+                        }
+                    )
+                }
+                DaemonWarningType.WATCHER_NOT_RUNNING -> {
+                    add(
+                        JLabel("Daemon watcher is not running.").apply {
+                            font = font.deriveFont(Font.PLAIN)
+                        }
+                    )
+                    add(Box.createHorizontalStrut(8))
+                    add(JButton("Restart").apply { addActionListener { restartDaemonWatcher() } })
+                }
+            }
+
+            add(Box.createHorizontalGlue())
+        }
+    }
+
+    private fun restartDaemonWatcher() {
+        TelemetryService.getInstance(project).featureUsed("misc.restart-daemon-watcher")
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            NxlsService.getInstance(project).startDaemon()
+            NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
         }
     }
 
