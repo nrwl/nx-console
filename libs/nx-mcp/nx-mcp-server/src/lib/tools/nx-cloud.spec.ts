@@ -57,7 +57,9 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
       couldAutoApplyTasks: true,
-      confidenceScore: 0.85,
+      confidence: 0.85,
+      confidenceReasoning:
+        'High confidence because the fix directly addresses the reported error',
     };
 
     const result = formatCIInformationOverview(output);
@@ -87,7 +89,10 @@ describe('formatCIInformationOverview', () => {
     expect(result).toContain('**Verification:** COMPLETED');
     expect(result).toContain('**Failure Classification:** build_error');
     expect(result).toContain('**Could Auto-Apply:** Yes');
-    expect(result).toContain('**Confidence Score:** 0.85');
+    expect(result).toContain('**Confidence:** 0.85');
+    expect(result).toContain(
+      '**Confidence Reasoning:** High confidence because the fix directly addresses the reported error',
+    );
 
     // Overview includes truncated task output (shown from the end)
     expect(result).toContain('### Task Output');
@@ -139,7 +144,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: '--- a/file.ts\n+++ b/file.ts\n@@ -1 +1 @@\n-old\n+new',
       shortLink: 'abc-def',
       couldAutoApplyTasks: true,
-      confidenceScore: 0.85,
+      confidence: 0.85,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -178,13 +184,14 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
     expect(result).toContain('**Enabled:** No');
     expect(result).not.toContain('**Status:** COMPLETED');
-    expect(result).not.toContain('**Confidence Score:**');
+    expect(result).not.toContain('**Confidence:**');
   });
 
   it('should omit optional sections when data is null', () => {
@@ -208,7 +215,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -241,7 +249,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -269,7 +278,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -297,7 +307,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -333,7 +344,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -373,7 +385,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -407,7 +420,8 @@ describe('formatCIInformationOverview', () => {
       suggestedFix: longDiff,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -506,7 +520,8 @@ describe('multi-field select parsing', () => {
       suggestedFix: '--- a/file.ts\n+++ b/file.ts',
       shortLink: 'abc-def',
       couldAutoApplyTasks: true,
-      confidenceScore: 0.85,
+      confidence: 0.85,
+      confidenceReasoning: null,
     };
 
     const fields = ['suggestedFix', 'localTaskSummary', 'cipeStatus'];
@@ -547,7 +562,8 @@ describe('multi-field select parsing', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const fields = ['cipeStatus', 'nonExistentField'];
@@ -595,7 +611,8 @@ describe('multi-field select parsing', () => {
       suggestedFix: null,
       shortLink: null,
       couldAutoApplyTasks: null,
-      confidenceScore: null,
+      confidence: null,
+      confidenceReasoning: null,
     };
 
     const fields = ['cipeStatus', 'localTaskSummary'];

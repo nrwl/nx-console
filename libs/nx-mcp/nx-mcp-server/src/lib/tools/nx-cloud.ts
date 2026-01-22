@@ -864,7 +864,8 @@ const getCIInformation =
       suggestedFix: aiFix?.suggestedFix ?? null,
       shortLink: aiFix?.shortLink ?? null,
       couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
-      confidenceScore: aiFix?.confidenceScore ?? null,
+      confidence: aiFix?.confidenceScore ?? null,
+      confidenceReasoning: null,
     };
 
     // If we have a shortLink and fix is completed, fetch detailed fix data
@@ -895,7 +896,8 @@ const getCIInformation =
           output.suggestedFixDescription =
             fixResult.data.suggestedFixDescription;
           output.suggestedFix = fixResult.data.suggestedFix;
-          output.confidenceScore = fixResult.data.confidenceScore;
+          output.confidence = fixResult.data.confidence;
+          output.confidenceReasoning = fixResult.data.confidenceReasoning;
         }
       }
     }
@@ -1055,7 +1057,7 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
 
   // Self-Healing Information
   lines.push(
-    '### Self-Healing (`selfHealingEnabled`, `selfHealingStatus`, `verificationStatus`, `userAction`, `failureClassification`, `confidenceScore`)',
+    '### Self-Healing (`selfHealingEnabled`, `selfHealingStatus`, `verificationStatus`, `userAction`, `failureClassification`, `confidence`, `confidenceReasoning`)',
   );
   lines.push(`- **Enabled:** ${output.selfHealingEnabled ? 'Yes' : 'No'}`);
   if (output.selfHealingEnabled) {
@@ -1078,11 +1080,11 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
         `- **Could Auto-Apply:** ${output.couldAutoApplyTasks ? 'Yes' : 'No'}`,
       );
     }
-    if (
-      output.confidenceScore !== null &&
-      output.confidenceScore !== undefined
-    ) {
-      lines.push(`- **Confidence Score:** ${output.confidenceScore}`);
+    if (output.confidence !== null && output.confidence !== undefined) {
+      lines.push(`- **Confidence:** ${output.confidence}`);
+    }
+    if (output.confidenceReasoning) {
+      lines.push(`- **Confidence Reasoning:** ${output.confidenceReasoning}`);
     }
   }
   lines.push('');

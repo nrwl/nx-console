@@ -50,7 +50,8 @@ export interface CIInformationOutput {
   suggestedFix: string | null;
   shortLink: string | null;
   couldAutoApplyTasks: boolean | null;
-  confidenceScore: number | null;
+  confidence: number | null;
+  confidenceReasoning: string | null;
   [key: string]: unknown;
 }
 
@@ -137,7 +138,8 @@ export const ciInformationOutputSchema = {
     suggestedFix: { type: ['string', 'null'] },
     shortLink: { type: ['string', 'null'] },
     couldAutoApplyTasks: { type: ['boolean', 'null'] },
-    confidenceScore: { type: ['number', 'null'] },
+    confidence: { type: ['number', 'null'] },
+    confidenceReasoning: { type: ['string', 'null'] },
   },
 };
 
