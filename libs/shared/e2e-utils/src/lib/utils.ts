@@ -71,6 +71,10 @@ export function newWorkspace({
   const _env = {
     CI: 'true',
     NX_CLOUD_API: 'https://staging.nx.app', // create-nx-workspace invocations are tracked and we don't want to skew the stats through e2es
+    GIT_AUTHOR_NAME: 'Nx Console E2E Test',
+    GIT_AUTHOR_EMAIL: 'e2e@nxconsole.test',
+    GIT_COMMITTER_NAME: 'Nx Console E2E Test',
+    GIT_COMMITTER_EMAIL: 'e2e@nxconsole.test',
     ...(env ?? process.env),
   } as NodeJS.ProcessEnv;
 
@@ -85,6 +89,29 @@ export function newWorkspace({
     env: _env,
     encoding: 'utf-8',
   });
+
+  try {
+    const nxJsonPath = join(e2eCwd, name, 'nx.json');
+    if (existsSync(nxJsonPath)) {
+      const nxJson = readJsonFile(nxJsonPath);
+      if (nxJson.plugins && Array.isArray(nxJson.plugins)) {
+        nxJson.plugins = nxJson.plugins.filter(
+          (plugin: any) =>
+            (typeof plugin === 'string' && !plugin.includes('@nx/vitest')) ||
+            (typeof plugin === 'object' &&
+              plugin.plugin &&
+              !plugin.plugin.includes('@nx/vitest')),
+        );
+        writeFileSync(nxJsonPath, JSON.stringify(nxJson, null, 2));
+      }
+    }
+  } catch (error) {
+    if (verbose) {
+      console.log(
+        `Warning: Could not remove @nx/vitest plugin: ${(error as Error).message}`,
+      );
+    }
+  }
 
   return create;
 }

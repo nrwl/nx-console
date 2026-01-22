@@ -50,6 +50,8 @@ describe('document link completion - project links', () => {
         },
       },
     });
+
+    await nxlsWrapper.waitForNotification('nx/refreshWorkspace');
   });
 
   afterAll(async () => {

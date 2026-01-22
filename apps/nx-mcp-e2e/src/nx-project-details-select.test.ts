@@ -98,37 +98,34 @@ describe('nx_project_details select', () => {
     expect(text).toContain(`"${workspaceName}"`);
   });
 
-  it('should select to nested targets.build path', () => {
+  it('should select to nested targets.lint path', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg select="targets.build"',
+      '--tool-arg select="targets.lint"',
     );
 
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
-    // Should contain build target configuration
     expect(text).toContain('"executor"');
     expect(text).toContain('"options"');
-    // Should not contain the full targets object with other targets
     expect(text).not.toContain('"targets"');
   });
 
-  it('should select to deeply nested targets.build.executor path', () => {
+  it('should select to deeply nested targets.lint.executor path', () => {
     const result = invokeMCPInspectorCLI(
       testWorkspacePath,
       '--method tools/call',
       '--tool-name nx_project_details',
       `--tool-arg projectName="${workspaceName}"`,
-      '--tool-arg select="targets.build.executor"',
+      '--tool-arg select="targets.lint.executor"',
     );
 
     expect(result.content).toHaveLength(1);
     const text = result.content[0]?.text;
-    // Should be just the executor string
-    expect(text).toContain('nx:');
+    expect(text).toContain('@nx/eslint:lint');
     expect(text).not.toContain('"options"');
   });
 
