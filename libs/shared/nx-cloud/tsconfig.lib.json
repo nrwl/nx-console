@@ -6,6 +6,7 @@
     "noImplicitReturns": false
   },
   "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
       "path": "../npm/tsconfig.lib.json"
