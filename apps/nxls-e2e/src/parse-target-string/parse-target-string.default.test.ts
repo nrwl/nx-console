@@ -107,8 +107,6 @@ describe('parse target string - default', () => {
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
     nxlsWrapper.setVerbose(true);
 
-    
-
     await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
