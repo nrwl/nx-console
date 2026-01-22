@@ -1,3 +1,22 @@
+# [18.84.0](https://github.com/nrwl/nx-console/compare/vscode-v18.83.1...vscode-v18.84.0) (2026-01-22)
+
+
+### Bug Fixes
+
+* **nx-mcp:** adjust confidence property to match API ([#2962](https://github.com/nrwl/nx-console/issues/2962)) ([13add80](https://github.com/nrwl/nx-console/commit/13add8031b2a99373e9445414d2ffb54fb3b479e))
+* **nx-mcp:** repair available-plugins tool after file has moved ([#2958](https://github.com/nrwl/nx-console/issues/2958)) ([40ec19f](https://github.com/nrwl/nx-console/commit/40ec19f73128923ef8e074af8777f0f94849f8a7))
+* **vscode:** handle disposed webview in PDV better ([#2956](https://github.com/nrwl/nx-console/issues/2956)) ([3df964e](https://github.com/nrwl/nx-console/commit/3df964e208a7870445cf68eb45e54084a313f22e))
+* **vscode:** skip invalid tsconfig paths entries in plugin ([#2955](https://github.com/nrwl/nx-console/issues/2955)) ([d284d5b](https://github.com/nrwl/nx-console/commit/d284d5b9097eb48d0afb8f44fc14e3cfc5e1fb22))
+
+
+### Features
+
+* implement passive daemon watcher ([#2851](https://github.com/nrwl/nx-console/issues/2851)) ([a9e1eb5](https://github.com/nrwl/nx-console/commit/a9e1eb566f9ec3245c5346c855841cb379e13c3f))
+* **nx-mcp:** add couldAutoApply to ci-information mcp tool ([#2954](https://github.com/nrwl/nx-console/issues/2954)) ([96063ce](https://github.com/nrwl/nx-console/commit/96063ce6b21f00976f15e240da2f9c4f6adebf0a))
+* **nx-mcp:** add verifiedTaskIds to ci_information tool output ([#2957](https://github.com/nrwl/nx-console/issues/2957)) ([fbe470e](https://github.com/nrwl/nx-console/commit/fbe470ebfdd1e3ba6d0fa4a91e2ef114bbf959d6))
+* **nx-mcp:** modify MCP tool to have select arg and separately paginated diff, remote and local tasks ([#2960](https://github.com/nrwl/nx-console/issues/2960)) ([9e4aaba](https://github.com/nrwl/nx-console/commit/9e4aaba27ace3c58dcd7b7e877e784a0bead2ee4))
+* **nxls:** make nxls intialization not block on startup ([#2959](https://github.com/nrwl/nx-console/issues/2959)) ([6fbf9ed](https://github.com/nrwl/nx-console/commit/6fbf9ed91e517dece7d50ae50d6839ae9eba2479))
+
 ## [18.83.1](https://github.com/nrwl/nx-console/compare/vscode-v18.83.0...vscode-v18.83.1) (2026-01-19)
 
 
