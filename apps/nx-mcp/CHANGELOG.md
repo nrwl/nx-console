@@ -1,3 +1,20 @@
+## 0.14.0 (2026-01-22)
+
+### 🚀 Features
+
+- **nx-mcp:** add couldAutoApply to ci-information mcp tool ([#2954](https://github.com/nrwl/nx-console/pull/2954))
+- **nx-mcp:** add verifiedTaskIds to ci_information tool output ([#2957](https://github.com/nrwl/nx-console/pull/2957))
+- **nx-mcp:** modify MCP tool to have select arg and separately paginated diff, remote and local tasks ([#2960](https://github.com/nrwl/nx-console/pull/2960))
+
+### 🩹 Fixes
+
+- **nx-mcp:** adjust confidence property to match API ([#2962](https://github.com/nrwl/nx-console/pull/2962))
+
+### ❤️ Thank You
+
+- Chau Tran @nartc
+- MaxKless @MaxKless
+
 ## 0.13.2 (2026-01-16)
 
 ### 🩹 Fixes
