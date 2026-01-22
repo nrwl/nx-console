@@ -1,6 +1,9 @@
 import { NxWorkspace } from '@nx-console/shared-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
-import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
+import {
+  onWorkspaceRefreshed,
+  WatcherRunningService,
+} from '@nx-console/vscode-lsp-client';
 import {
   getNxWorkspace,
   getProjectFolderTree,
@@ -64,7 +67,12 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       this.refresh(),
     );
 
-    onWorkspaceRefreshed(() => this.refresh());
+    context.subscriptions.push(
+      onWorkspaceRefreshed(() => this.refresh()),
+      WatcherRunningService.INSTANCE.onOperationalStateChange(() =>
+        this.refresh(),
+      ),
+    );
   }
 
   getParent() {
@@ -147,7 +155,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       viewItem.contextValue === 'project' ||
       viewItem.contextValue === 'folder' ||
       viewItem.contextValue === 'targetGroup' ||
-      viewItem.contextValue === 'projectGraphError'
+      viewItem.contextValue === 'projectGraphError' ||
+      viewItem.contextValue === 'daemonDisabled' ||
+      viewItem.contextValue === 'daemonWatcherNotRunning'
     ) {
       // can not run a task on a project, folder or target group
       return;

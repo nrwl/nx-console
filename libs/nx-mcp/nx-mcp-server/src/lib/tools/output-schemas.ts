@@ -33,16 +33,25 @@ export interface CIInformationOutput {
   branch: string;
   commitSha: string | null;
   failedTaskIds: string[];
+  verifiedTaskIds: string[];
   selfHealingEnabled: boolean;
   selfHealingStatus: AITaskFixStatus | null;
   verificationStatus: AITaskFixStatus | null;
   userAction: AITaskFixUserAction | null;
   failureClassification: string | null;
+  /** @deprecated Use remoteTaskSummary and localTaskSummary instead */
   taskOutputSummary: string | null;
+  /** Task output from CI/remote execution */
+  remoteTaskSummary: string | null;
+  /** Task output from local execution */
+  localTaskSummary: string | null;
   suggestedFixReasoning: string | null;
   suggestedFixDescription: string | null;
   suggestedFix: string | null;
   shortLink: string | null;
+  couldAutoApplyTasks: boolean | null;
+  confidence: number | null;
+  confidenceReasoning: string | null;
   [key: string]: unknown;
 }
 
@@ -82,6 +91,10 @@ export const ciInformationOutputSchema = {
       type: 'array',
       items: { type: 'string' },
     },
+    verifiedTaskIds: {
+      type: 'array',
+      items: { type: 'string' },
+    },
     selfHealingEnabled: { type: 'boolean' },
     selfHealingStatus: {
       type: ['string', 'null'],
@@ -118,10 +131,15 @@ export const ciInformationOutputSchema = {
     },
     failureClassification: { type: ['string', 'null'] },
     taskOutputSummary: { type: ['string', 'null'] },
+    remoteTaskSummary: { type: ['string', 'null'] },
+    localTaskSummary: { type: ['string', 'null'] },
     suggestedFixReasoning: { type: ['string', 'null'] },
     suggestedFixDescription: { type: ['string', 'null'] },
     suggestedFix: { type: ['string', 'null'] },
     shortLink: { type: ['string', 'null'] },
+    couldAutoApplyTasks: { type: ['boolean', 'null'] },
+    confidence: { type: ['number', 'null'] },
+    confidenceReasoning: { type: ['string', 'null'] },
   },
 };
 

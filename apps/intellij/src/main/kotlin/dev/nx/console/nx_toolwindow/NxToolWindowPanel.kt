@@ -20,6 +20,7 @@ import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxWorkspaceRefreshStartedListener
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.nxls.WatcherRunningService
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
@@ -54,6 +55,7 @@ class NxToolWindowPanel(private val project: Project) :
     private val toolBar = nxToolMainComponents.createToolbar(projectTree)
     private var mainContent: JComponent? = null
     private var errorCountAndComponent: Pair<Int, JComponent>? = null
+    private var daemonWarningBanner: JComponent? = null
 
     // Cloud UI
     private val cipeTreeComponent = ScrollPaneFactory.createScrollPane(cipeTree, 0)
@@ -139,6 +141,13 @@ class NxToolWindowPanel(private val project: Project) :
         scope.launch {
             CIPEPollingService.getInstance(project).currentData.collect { cipeData ->
                 cipeDataListener(cipeData)
+            }
+        }
+
+        // Subscribe to watcher operational state changes
+        scope.launch {
+            WatcherRunningService.getInstance(project).isOperational.collect {
+                loadToolwindowContent()
             }
         }
 
@@ -388,6 +397,19 @@ class NxToolWindowPanel(private val project: Project) :
                         false
                     }
 
+                // Update daemon warning banner
+                val daemonDisabled = workspace?.daemonEnabled == false
+                val watcherNotRunning =
+                    !daemonDisabled &&
+                        WatcherRunningService.getInstance(project).isOperational.value == false
+                updateDaemonWarningBanner(
+                    when {
+                        daemonDisabled -> DaemonWarningType.DAEMON_DISABLED
+                        watcherNotRunning -> DaemonWarningType.WATCHER_NOT_RUNNING
+                        else -> null
+                    }
+                )
+
                 // SEND EVENTS TO CHANNEL INSTEAD OF DIRECTLY CALLING processEvent
                 if (!hasNodeInterpreter) {
                     eventChannel.send(MainContentEvents.ShowNoNodeInterpreter())
@@ -441,6 +463,21 @@ class NxToolWindowPanel(private val project: Project) :
         mainPanel.repaint() // Redraw
     }
 
+    private fun updateDaemonWarningBanner(type: DaemonWarningType?) {
+        // Remove existing banner if any
+        daemonWarningBanner?.let { topPanel.remove(it) }
+        daemonWarningBanner = null
+
+        // Add new banner if type is provided
+        if (type != null) {
+            daemonWarningBanner = nxToolMainComponents.createDaemonWarningBanner(type)
+            topPanel.add(daemonWarningBanner, BorderLayout.CENTER)
+        }
+
+        topPanel.revalidate()
+        topPanel.repaint()
+    }
+
     companion object {
         const val NX_TOOLBAR_PLACE = "Nx Toolbar"
         private const val CLOUD_PANEL_COLLAPSED_PROPERTY_KEY =
@@ -461,6 +498,7 @@ class NxToolWindowPanel(private val project: Project) :
         stateMachine?.let { scope.launch { it.stop() } }
         mainContent = null
         errorCountAndComponent = null
+        daemonWarningBanner = null
 
         // No need to remove listener since we're using StateFlow collection
 

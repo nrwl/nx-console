@@ -215,6 +215,11 @@
           "command": "nxConsole.showProblems",
           "when": "view == nxProjects && viewItem == projectGraphError",
           "group": "inline@1"
+        },
+        {
+          "command": "nxConsole.restartDaemonWatcher",
+          "when": "view == nxProjects && viewItem == daemonWatcherNotRunning",
+          "group": "inline@1"
         }
       ],
       "editor/title": [
@@ -698,6 +703,12 @@
         "title": "Show Nx Errors in Problems View",
         "command": "nxConsole.showProblems",
         "icon": "$(eye)"
+      },
+      {
+        "category": "Nx",
+        "title": "Restart Daemon Watcher",
+        "command": "nxConsole.restartDaemonWatcher",
+        "icon": "$(refresh)"
       },
       {
         "category": "Nx Migrate",

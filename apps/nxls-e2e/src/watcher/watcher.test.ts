@@ -30,7 +30,7 @@ xdescribe('watcher', () => {
       options: simpleReactWorkspaceOptions,
     });
 
-    nxlsWrapper = new NxlsWrapper();
+    nxlsWrapper = new NxlsWrapper(undefined, undefined, false);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 

@@ -113,6 +113,7 @@ describe('document link completion - default', () => {
       );
     });
     it('should return correct target link for x-completion-type:projectTarget if no build target is specified in project.json', async () => {
+      // This test depends on the workspace configuration loaded in the first test
       modifyJsonFile(projectJsonPath, (data) => {
         delete data.targets.build;
         return data;

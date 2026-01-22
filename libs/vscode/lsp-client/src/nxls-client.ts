@@ -33,11 +33,14 @@ import {
 } from 'vscode-languageclient/node';
 import { createActor, fromPromise, waitFor } from 'xstate';
 import { nxlsClientStateMachine } from './nxls-client-state-machine';
+import { WatcherRunningService } from './watcher-running-service';
 
 let _nxlsClient: NxlsClient | undefined;
 
 export function createNxlsClient(extensionContext: ExtensionContext) {
   _nxlsClient = new NxlsClient(extensionContext);
+
+  extensionContext.subscriptions.push(new WatcherRunningService(_nxlsClient));
 
   const disposable = refreshWorkspaceOnBranchChange(_nxlsClient);
   if (disposable) {
@@ -191,15 +194,33 @@ export class NxlsClient {
       }
       return await this.client.sendRequest(requestType, params);
     } catch (e) {
-      if (e.code === -32097) {
-        if (retry < 3) {
-          return this.sendRequest(requestType, params, retry + 1);
-        }
-      } else {
-        vscodeLogger.log(`Error sending request to Nx Language Server: ${e}`);
-        return undefined;
+      const isRetryableError =
+        e.code === -32097 || this.isConnectionDisposedError(e);
+
+      if (isRetryableError && retry < 3) {
+        vscodeLogger.log(
+          `Retrying request ${requestType.method} after error: ${e.message ?? e}`,
+        );
+        // wait a bit for the client to potentially restart
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return this.sendRequest(requestType, params, retry + 1);
       }
+
+      vscodeLogger.log(`Error sending request to Nx Language Server: ${e}`);
+      return undefined;
     }
+  }
+
+  private isConnectionDisposedError(e: unknown): boolean {
+    if (e instanceof Error) {
+      const message = e.message?.toLowerCase() ?? '';
+      return (
+        message.includes('connection got disposed') ||
+        message.includes('pending response rejected') ||
+        message.includes('client is not running')
+      );
+    }
+    return false;
   }
 
   public async sendNotification<P>(

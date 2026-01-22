@@ -52,8 +52,14 @@ async function getAdditionalRootFiles(
 
   const rootFiles: RootFileInfo[] = [];
 
-  for (const [, values] of Object.entries<string[]>(paths)) {
+  for (const [, values] of Object.entries(paths)) {
+    if (!Array.isArray(values)) {
+      continue;
+    }
     for (const value of values) {
+      if (typeof value !== 'string') {
+        continue;
+      }
       const mainFile = join(workspaceRoot, value);
 
       const configFilePath = await findConfig(mainFile, TSCONFIG_LIB);

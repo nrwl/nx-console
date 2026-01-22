@@ -1,7 +1,4 @@
-import {
-  NxPDVDataRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
+import { NxPDVDataRequest } from '@nx-console/language-server-types';
 import { PDVData } from '@nx-console/shared-types';
 import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -64,8 +61,7 @@ describe('pdv data', () => {
   });
 
   it('should contain disabledTaskSyncGenerators if set in nx.json', async () => {
-    await waitFor(11000);
-
+    await waitFor(5000);
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     modifyJsonFile(nxJsonPath, (json) => {
       json.sync ??= {};
@@ -73,9 +69,7 @@ describe('pdv data', () => {
       return json;
     });
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const pdvData = (
       await nxlsWrapper.sendRequest({
@@ -92,14 +86,12 @@ describe('pdv data', () => {
   });
 
   it('should contain pdv data & error for partial errors', async () => {
-    await waitFor(11000);
+    await waitFor(5000);
     viteFileContents = readFileSync(viteFilePath, 'utf-8');
 
     appendFileSync(viteFilePath, '{');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const pdvData = (
       await nxlsWrapper.sendRequest({
@@ -123,16 +115,13 @@ describe('pdv data', () => {
   });
 
   it('should return error if root project.json is broken', async () => {
-    await waitFor(11000);
-
+    await waitFor(5000);
     writeFileSync(viteFilePath, viteFileContents);
 
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, '{');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({
@@ -153,16 +142,13 @@ describe('pdv data', () => {
   });
 
   it('should return error if nx.json is broken', async () => {
-    await waitFor(11000);
-
+    await waitFor(5000);
     writeFileSync(projectJsonPath, projectJsonContents);
 
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     writeFileSync(nxJsonPath, '{');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({

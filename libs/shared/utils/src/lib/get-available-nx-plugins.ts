@@ -16,11 +16,6 @@ export async function getAvailableNxPlugins(
       followRedirects: 5,
     });
 
-    const communityResponse = await httpRequest({
-      url: 'https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json',
-      followRedirects: 5,
-    });
-
     const officialPlugins: AvailableNxPlugin[] = (
       JSON.parse(officialResponse.responseText) as {
         name: string;
@@ -52,9 +47,16 @@ export async function getAvailableNxPlugins(
         };
       });
 
-    const communityPlugins: AvailableNxPlugin[] = JSON.parse(
-      communityResponse.responseText,
-    );
+    let communityPlugins: AvailableNxPlugin[] = [];
+    try {
+      const communityResponse = await httpRequest({
+        url: 'https://raw.githubusercontent.com/nrwl/nx/master/astro-docs/src/content/approved-community-plugins.json',
+        followRedirects: 5,
+      });
+      communityPlugins = JSON.parse(communityResponse.responseText);
+    } catch {
+      // Community plugins fetch failed - continue without them
+    }
 
     return {
       official: officialPlugins,

@@ -37,11 +37,13 @@ export type NxAiFix = {
   suggestedFixStatus: AITaskFixStatus;
   suggestedFixReasoning?: string;
   verificationStatus: AITaskFixStatus;
+  verificationTasksExecuted?: string[];
   userAction: AITaskFixUserAction;
   failureClassification?: string;
   shortLink?: string;
   userActionOrigin?: AITaskFixUserActionOrigin;
   couldAutoApplyTasks?: boolean;
+  confidenceScore?: number;
 };
 
 export type CIPERunGroup = {

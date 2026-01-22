@@ -49,7 +49,7 @@ export function setNxWorkspacePath(path: string) {
  * @param path - The path string (e.g., "targets.build.inputs" or "targets.build.options.assets[0]")
  * @returns The value at the path, or undefined if the path doesn't exist
  */
-function getValueByPath(obj: any, path: string): any {
+export function getValueByPath(obj: any, path: string): any {
   // Convert bracket notation to dot notation: foo[0] -> foo.0
   const normalizedPath = path.replace(/\[(\d+)\]/g, '.$1');
 
