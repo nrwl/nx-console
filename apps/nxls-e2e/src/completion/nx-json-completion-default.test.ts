@@ -82,6 +82,7 @@ describe('nx.json completion - default', () => {
     expect(completionItemStrings).toEqual([
       '@nx/cypress/plugin',
       '@nx/eslint/plugin',
+      '@nx/rollup/plugin',
       '@nx/vite/plugin',
     ]);
   });
@@ -125,6 +126,7 @@ describe('nx.json completion - default', () => {
         "affected",
         "cacheDirectory",
         "cli",
+        "conformance",
         "defaultBase",
         "defaultProject",
         "extends",
