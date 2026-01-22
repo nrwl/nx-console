@@ -805,8 +805,8 @@ const getCIInformation =
       }
 
       cipeIdFromUrl = parsed.cipeId;
-       // Look up the CIPE to get its branch
-       const pipelineResult = await getPipelineExecutionDetails(
+      // Look up the CIPE to get its branch
+      const pipelineResult = await getPipelineExecutionDetails(
         workspacePath,
         logger,
         cipeIdFromUrl,
