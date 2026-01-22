@@ -455,7 +455,7 @@ async function reconfigure(
   lspLogger.debug?.('reconfigure: Schemas configured');
 
   lspLogger.debug?.('reconfigure: Unregistering previous file watcher...');
-  unregisterFileWatcher?.();
+  await unregisterFileWatcher?.();
 
   if (!DISABLE_FILE_WATCHING) {
     lspLogger.debug?.('reconfigure: Starting new file watcher...');
