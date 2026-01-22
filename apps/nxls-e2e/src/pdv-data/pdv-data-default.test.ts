@@ -1,7 +1,4 @@
-import {
-  NxPDVDataRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
+import { NxPDVDataRequest } from '@nx-console/language-server-types';
 import { PDVData } from '@nx-console/shared-types';
 import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -72,9 +69,7 @@ describe('pdv data', () => {
       return json;
     });
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const pdvData = (
       await nxlsWrapper.sendRequest({
@@ -96,9 +91,7 @@ describe('pdv data', () => {
 
     appendFileSync(viteFilePath, '{');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const pdvData = (
       await nxlsWrapper.sendRequest({
@@ -128,9 +121,7 @@ describe('pdv data', () => {
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, '{');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({
@@ -157,9 +148,7 @@ describe('pdv data', () => {
     const nxJsonPath = join(e2eCwd, workspaceName, 'nx.json');
     writeFileSync(nxJsonPath, '{');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const e2ePdvData = (
       await nxlsWrapper.sendRequest({

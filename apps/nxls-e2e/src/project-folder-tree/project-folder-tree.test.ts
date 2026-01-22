@@ -8,10 +8,7 @@ import {
   uniq,
   waitFor,
 } from '@nx-console/shared-e2e-utils';
-import {
-  NxProjectFolderTreeRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
+import { NxProjectFolderTreeRequest } from '@nx-console/language-server-types';
 import { TreeMap, TreeNode } from '@nx-console/shared-types';
 import { mkdirSync, writeFileSync } from 'fs';
 
@@ -47,9 +44,7 @@ describe('project folder tree', () => {
     mkdirSync(projectFolder, { recursive: true });
     writeFileSync(join(projectFolder, 'project.json'), '{ "name": "project" }');
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -94,9 +89,7 @@ describe('project folder tree', () => {
       '{ "name": "nested" }',
     );
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
 
@@ -147,9 +140,7 @@ describe('project folder tree', () => {
       '{ "name": "deeplynested" }',
     );
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
 
     const projectFolderTree = await getProjectFolderTree();
 

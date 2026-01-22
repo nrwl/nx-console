@@ -318,6 +318,14 @@ export class NxlsWrapper {
     clearTimeout(timeout);
   }
 
+  async triggerAndWaitForRefresh(): Promise<void> {
+    this.sendNotification({
+      method: 'nx/workspace/refresh',
+      params: {},
+    });
+    await this.waitForNotification('nx/workspace/refresh');
+  }
+
   setVerbose(verbose: boolean) {
     this.verbose = verbose;
   }

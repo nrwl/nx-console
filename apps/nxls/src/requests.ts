@@ -114,7 +114,7 @@ export function registerRequests(
         );
       }
 
-      return await getGenerators(WORKING_PATH, args.options);
+      return await getGenerators(WORKING_PATH, args.options, lspLogger);
     },
   );
 

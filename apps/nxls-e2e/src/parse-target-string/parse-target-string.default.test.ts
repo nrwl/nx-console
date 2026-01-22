@@ -1,7 +1,4 @@
-import {
-  NxParseTargetStringRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
+import { NxParseTargetStringRequest } from '@nx-console/language-server-types';
 import type { Target } from 'nx/src/devkit-exports';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
@@ -111,9 +108,7 @@ describe('parse target string - default', () => {
       },
     }));
 
-    await nxlsWrapper.waitForNotification(
-      NxWorkspaceRefreshNotification.method,
-    );
+    await nxlsWrapper.triggerAndWaitForRefresh();
   });
 
   it('should correctly parse simple target string', async () => {
