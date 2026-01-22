@@ -215,6 +215,8 @@ describe('parse target string - default', () => {
   });
 
   it('should correctly parse target string with : in target and multiple combination options', async () => {
+    // When both lint target with ci configuration AND lint:ci target exist,
+    // Nx 22.4 prefers the lint target with ci configuration
     const target = await nxlsWrapper.sendRequest({
       ...NxParseTargetStringRequest,
       params: `${projectName}:lint:ci` as any,
@@ -222,9 +224,11 @@ describe('parse target string - default', () => {
 
     expect(target.result as Target).toEqual({
       project: projectName,
-      target: 'lint:ci',
+      target: 'lint',
+      configuration: 'ci',
     });
 
+    // For lint:ci:fix, Nx uses lint:ci target with fix configuration (since lint:ci has fix config)
     const target2 = await nxlsWrapper.sendRequest({
       ...NxParseTargetStringRequest,
       params: `${projectName}:lint:ci:fix` as any,
@@ -236,6 +240,7 @@ describe('parse target string - default', () => {
       configuration: 'fix',
     });
 
+    // For lint:ci:unknown (nonexisting configuration), Nx uses lint:ci target with unknown configuration
     const target3 = await nxlsWrapper.sendRequest({
       ...NxParseTargetStringRequest,
       params: `${projectName}:lint:ci:unknown` as any,
