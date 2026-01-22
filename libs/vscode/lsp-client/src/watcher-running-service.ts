@@ -25,7 +25,7 @@ export class WatcherRunningService implements Disposable {
 
   constructor(nxlsClient: NxlsClient) {
     WatcherRunningService.INSTANCE = this;
-    nxlsClient.onNotification(
+    this._listener = nxlsClient.onNotification(
       NxWatcherOperationalNotification,
       ({ isOperational }) => {
         if (this._isOperational === isOperational) {
