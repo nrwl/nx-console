@@ -267,7 +267,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
 
   private handleRerunCi() {
     if (this.details && this.onRerunCi) {
-      this.onRerunCi(this.details);
+      this.onRerunCi();
     }
   }
 
