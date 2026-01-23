@@ -79,6 +79,7 @@ export class CIPETreeItem
 
     this.id = cipe.ciPipelineExecutionId;
     this.setIcon();
+    this.tooltip = cipe.branch;
 
     // Set context value based on available features
     let contextValue = 'cipe';
