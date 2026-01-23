@@ -98,6 +98,13 @@ The Nx MCP server provides a comprehensive set of tools for interacting with you
 - **nx_current_running_task_output**: Returns terminal output for specific running tasks
 - **nx_visualize_graph**: Visualizes the Nx graph (requires running IDE instance)
 
+### Nx Cloud Tools (only available w/ Nx Cloud enabled)
+
+These tools provide insights and interactions with your Nx Cloud CI/CD data:
+
+- **ci_information**: Retrieves CI pipeline execution information for the current branch or a specific Nx Cloud CIPE URL. Supports a `select` parameter for field selection with pagination, making it easy to access specific data like task outputs or suggested fixes.
+- **update_self_healing_fix**: Apply, reject, or request a rerun for a self-healing CI fix from Nx Cloud
+
 ### Nx Cloud Analytics Tools (only available w/ Nx Cloud enabled)
 
 These tools provide analytics and insights into your Nx Cloud CI/CD data, helping you track performance trends and team productivity:
