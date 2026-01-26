@@ -445,6 +445,12 @@ async function main() {
     mcpStdioConnected = true;
 
     transport.onclose = () => exitHandler('SIGINT');
+
+    // Handle stdin close (client disconnect) - the MCP SDK doesn't detect EOF
+    process.stdin.on('end', () => {
+      logger.log('stdin closed, shutting down...');
+      exitHandler('SIGINT');
+    });
   }
 
   // ensure the daemon is running if possible
@@ -482,6 +488,11 @@ async function main() {
   process.on('SIGTERM', () => {
     logger.log('Received SIGTERM signal. Server shutting down...');
     exitHandler('SIGTERM');
+  });
+
+  process.on('SIGHUP', () => {
+    logger.log('Received SIGHUP signal. Server shutting down...');
+    exitHandler('SIGHUP');
   });
 
   // Keep the process alive
