@@ -13,3 +13,5 @@ export * from './lib/get-runs-search';
 export * from './lib/nx-cloud-auth-headers';
 export * from './lib/get-self-healing-fix';
 export * from './lib/update-suggested-fix';
+export * from './lib/parse-nx-cloud-url';
+export * from './lib/result';

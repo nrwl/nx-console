@@ -2,6 +2,7 @@ import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { Result } from './result';
 
 export interface AgentMetadataSummary {
   launchTemplate?: string;
@@ -94,10 +95,7 @@ export async function getPipelineExecutionDetails(
   workspacePath: string,
   logger: Logger,
   pipelineExecutionId: string,
-): Promise<{
-  data?: PipelineExecutionDetails;
-  error?: PipelineExecutionDetailsError;
-}> {
+): Promise<Result<PipelineExecutionDetails, PipelineExecutionDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
       error: {

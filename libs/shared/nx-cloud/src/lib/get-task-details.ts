@@ -2,6 +2,7 @@ import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { Result } from './result';
 
 export interface FailedTaskAttemptSummary {
   startTimeMs: number;
@@ -52,10 +53,7 @@ export async function getTaskDetails(
   logger: Logger,
   runId: string,
   encodedTaskId: string,
-): Promise<{
-  data?: TaskDetails;
-  error?: TaskDetailsError;
-}> {
+): Promise<Result<TaskDetails, TaskDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
       error: {

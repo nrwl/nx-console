@@ -23,6 +23,7 @@ import {
   getRunsSearch,
   getTasksDetailsSearch,
   getTasksSearch,
+  parseNxCloudUrl,
   retrieveFixDiff,
   updateSuggestedFix,
 } from '@nx-console/shared-nx-cloud';
@@ -263,6 +264,7 @@ export function registerNxCloudTools(
       name: CI_INFORMATION,
       description:
         'Retrieve CI pipeline execution information from Nx Cloud for the current branch. ' +
+        'Supports Nx Cloud CIPE URLs: pass a CIPE URL (/cipes/{id}) to fetch details directly. ' +
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'See output schema for available fields. Long strings are paginated automatically.',
@@ -511,6 +513,13 @@ const taskDetailsSchema = z.object({
 });
 
 const ciInformationSchema = z.object({
+  url: z
+    .string()
+    .optional()
+    .describe(
+      'An Nx Cloud CIPE URL to fetch information for. Supports CIPE URLs (/cipes/{id}). ' +
+        'If provided, branch parameter is ignored.',
+    ),
   branch: z
     .string()
     .optional()
@@ -776,21 +785,60 @@ const getCIInformation =
       tool: CI_INFORMATION,
     });
 
-    // Determine branch (parameter or current git branch)
-    const branch = params.branch ?? getCurrentGitBranch(workspacePath);
-    if (!branch) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: 'Could not determine the current git branch. Please provide a branch name explicitly.',
-          },
-        ],
-        isError: true,
-      };
+    // Determine the branch to look up - either from URL or from params/git
+    let branch: string | undefined;
+    let cipeIdFromUrl: string | undefined;
+
+    if (params.url) {
+      // Parse URL to extract CIPE ID
+      const parsed = parseNxCloudUrl(params.url);
+      if (!parsed) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Invalid Nx Cloud URL. Supported pattern: /cipes/{id}',
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      cipeIdFromUrl = parsed.cipeId;
+      // Look up the CIPE to get its branch
+      const pipelineResult = await getPipelineExecutionDetails(
+        workspacePath,
+        logger,
+        cipeIdFromUrl,
+      );
+      if (pipelineResult.error) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Error looking up CI Pipeline Execution: ${pipelineResult.error.message}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+      branch = pipelineResult.data.vcsContext?.ref;
+    } else {
+      branch = params.branch ?? getCurrentGitBranch(workspacePath) ?? undefined;
+      if (!branch) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Could not determine the current git branch. Please provide a branch name or URL explicitly.',
+            },
+          ],
+          isError: true,
+        };
+      }
     }
 
-    // Fetch CIPE data for branch
+    // Fetch CIPE data for recent branches
     const cipeResult = await getRecentCIPEData(workspacePath, logger);
 
     if (cipeResult.error) {
@@ -805,7 +853,7 @@ const getCIInformation =
       };
     }
 
-    // Find CIPE for the specified branch (most recent one)
+    // Find CIPE for the branch
     const cipeForBranch = cipeResult.info?.find(
       (cipe) => cipe.branch === branch,
     );
@@ -815,12 +863,16 @@ const getCIInformation =
         content: [
           {
             type: 'text',
-            text: `No CI pipeline execution found for branch "${branch}". This branch may not have any CI runs yet.`,
+            text: `No CI pipeline execution found for branch "${branch}". This branch may not be checked out locally or may not have any recent CI runs.`,
           },
         ],
         isError: false,
       };
     }
+
+    // Check if we retrieved a different CIPE than what was in the URL
+    const retrievedDifferentCipe =
+      cipeIdFromUrl && cipeForBranch.ciPipelineExecutionId !== cipeIdFromUrl;
 
     // Collect all failed task IDs from all runs
     const failedTaskIds: string[] = [];
@@ -902,12 +954,17 @@ const getCIInformation =
       }
     }
 
+    // Build disclaimer if we retrieved a different CIPE than the URL pointed to
+    const disclaimer = retrievedDifferentCipe
+      ? `**Note:** The URL pointed to an older CI Pipeline Execution. Showing the most recent CI information for branch "${branch}" instead.\n\n`
+      : '';
+
     // Branch based on select parameter
     if (!params.select) {
       // Overview mode - no pagination needed, returns compact overview
       const textContent = formatCIInformationOverview(output);
       return {
-        content: [{ type: 'text', text: textContent }],
+        content: [{ type: 'text', text: disclaimer + textContent }],
         structuredContent: output,
       };
     }

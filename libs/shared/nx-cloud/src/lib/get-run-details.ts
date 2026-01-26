@@ -2,6 +2,7 @@ import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { Result } from './result';
 
 export interface TaskSummary {
   taskId: string;
@@ -61,10 +62,7 @@ export async function getRunDetails(
   workspacePath: string,
   logger: Logger,
   runId: string,
-): Promise<{
-  data?: RunDetails;
-  error?: RunDetailsError;
-}> {
+): Promise<Result<RunDetails, RunDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
       error: {

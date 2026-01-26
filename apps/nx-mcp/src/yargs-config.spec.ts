@@ -194,4 +194,26 @@ describe('createYargsConfig', () => {
       expect(argv.tools).toBeUndefined();
     });
   });
+
+  describe('minimal option', () => {
+    it('should default to false', () => {
+      const argv = createYargsConfig([]).parseSync();
+      expect(argv.minimal).toBe(false);
+    });
+
+    it('should parse --minimal flag as true', () => {
+      const argv = createYargsConfig(['--minimal']).parseSync();
+      expect(argv.minimal).toBe(true);
+    });
+
+    it('should be combinable with --tools flag', () => {
+      const argv = createYargsConfig([
+        '--minimal',
+        '--tools',
+        'nx_docs',
+      ]).parseSync();
+      expect(argv.minimal).toBe(true);
+      expect(argv.tools).toEqual(['nx_docs']);
+    });
+  });
 });
