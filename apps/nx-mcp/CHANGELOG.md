@@ -1,3 +1,17 @@
+## 0.15.0 (2026-01-26)
+
+### 🚀 Features
+
+- **nx-mcp:** make workspace tools hideable with --minimal flag ([#2968](https://github.com/nrwl/nx-console/pull/2968))
+
+### 🩹 Fixes
+
+- **nx-mcp:** handle process suspension cases ([#2969](https://github.com/nrwl/nx-console/pull/2969))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.14.0 (2026-01-22)
 
 ### 🚀 Features
