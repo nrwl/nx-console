@@ -99,11 +99,27 @@ async function main() {
   logger.log('Starting Nx MCP server');
 
   // Normalize tools filter to always be an array or undefined
-  const toolsFilter: string[] | undefined = argv.tools
+  let toolsFilter: string[] | undefined = argv.tools
     ? Array.isArray(argv.tools)
       ? argv.tools
       : [argv.tools]
     : undefined;
+
+  // When --minimal is set, exclude workspace analysis tools
+  if (argv.minimal) {
+    const minimalExcludedTools = [
+      '!nx_available_plugins',
+      '!nx_workspace_path',
+      '!nx_workspace',
+      '!nx_project_details',
+      '!nx_generators',
+      '!nx_generator_schema',
+    ];
+    toolsFilter = toolsFilter
+      ? [...toolsFilter, ...minimalExcludedTools]
+      : minimalExcludedTools;
+    logger.log('Minimal mode enabled, hiding workspace analysis tools');
+  }
 
   if (toolsFilter && toolsFilter.length > 0) {
     logger.log(`Tools filter: ${toolsFilter.join(', ')}`);
@@ -456,7 +472,7 @@ async function main() {
   // ensure the daemon is running if possible
   // if the daemon exists, we can use it to register a change listener
   let stopWatcher: () => void | undefined;
-  if (nxWorkspacePath) {
+  if (nxWorkspacePath && !argv.minimal) {
     const nxVersion = await getNxVersion(nxWorkspacePath);
     if (gte(nxVersion, '22.0.0')) {
       try {
