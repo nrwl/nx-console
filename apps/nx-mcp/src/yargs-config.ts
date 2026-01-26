@@ -10,6 +10,7 @@ export interface ArgvType {
   keepAliveInterval: number;
   debugLogs: boolean;
   tools?: string | string[];
+  minimal: boolean;
   _: (string | number)[];
   $0: string;
   [x: string]: unknown;
@@ -72,6 +73,12 @@ export function createYargsConfig(args: string[]): Argv<any> {
         'Filter which tools are enabled. Accepts glob patterns including negation (e.g., "*", "!nx_docs", "cloud_*")',
       type: 'array',
       string: true,
+    })
+    .option('minimal', {
+      describe:
+        'Hide workspace analysis tools (nx_available_plugins, nx_workspace_path, nx_workspace, nx_project_details, nx_generators, nx_generator_schema)',
+      type: 'boolean',
+      default: false,
     })
     .check((argv) => {
       // Check for conflicting options
