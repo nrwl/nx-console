@@ -12,7 +12,11 @@ import {
   workspace,
 } from 'vscode';
 
-import { killGroup, withTimeout } from '@nx-console/shared-utils';
+import {
+  configureCustomCACertificates,
+  killGroup,
+  withTimeout,
+} from '@nx-console/shared-utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -86,6 +90,8 @@ let isNxWorkspace = false;
 let hasInitializedExtensionPoints = false;
 
 export async function activate(c: ExtensionContext) {
+  configureCustomCACertificates();
+
   try {
     vscodeLogger.log(`Activating Nx Console (pid ${process.pid})`);
     const startTime = Date.now();
