@@ -60,6 +60,7 @@ describe('formatCIInformationOverview', () => {
       confidence: 0.85,
       confidenceReasoning:
         'High confidence because the fix directly addresses the reported error',
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -146,6 +147,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: true,
       confidence: 0.85,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -186,6 +188,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -217,6 +220,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -251,6 +255,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -280,6 +285,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -309,6 +315,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -346,6 +353,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -387,6 +395,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -422,6 +431,7 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const result = formatCIInformationOverview(output);
@@ -522,6 +532,7 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: true,
       confidence: 0.85,
       confidenceReasoning: null,
+      error: null,
     };
 
     const fields = ['suggestedFix', 'localTaskSummary', 'cipeStatus'];
@@ -564,6 +575,7 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const fields = ['cipeStatus', 'nonExistentField'];
@@ -613,6 +625,7 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      error: null,
     };
 
     const fields = ['cipeStatus', 'localTaskSummary'];
