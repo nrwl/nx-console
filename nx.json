@@ -1,7 +1,5 @@
 {
-  "cli": {
-    "packageManager": "yarn"
-  },
+  "cli": { "packageManager": "yarn" },
   "generators": {
     "@nx/angular:application": {
       "style": "scss",
@@ -9,20 +7,12 @@
       "unitTestRunner": "jest",
       "e2eTestRunner": "cypress"
     },
-    "@nx/angular:library": {
-      "linter": "eslint",
-      "unitTestRunner": "jest"
-    },
-    "@nx/angular:component": {
-      "style": "scss"
-    }
+    "@nx/angular:library": { "linter": "eslint", "unitTestRunner": "jest" },
+    "@nx/angular:component": { "style": "scss" }
   },
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
-    "build": {
-      "inputs": ["production", "^production"],
-      "cache": true
-    },
+    "build": { "inputs": ["production", "^production"], "cache": true },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
       "cache": true,
@@ -32,10 +22,7 @@
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     },
-    "e2e": {
-      "inputs": ["default", "^production"],
-      "cache": true
-    },
+    "e2e": { "inputs": ["default", "^production"], "cache": true },
     "e2e-ci--**/**": {
       "inputs": ["default", "^production"],
       "cache": true,
@@ -47,23 +34,15 @@
       "parallelism": false,
       "dependsOn": ["^build"]
     },
-    "_build": {
-      "cache": true
-    },
-    "package": {
-      "cache": true
-    },
-    "extract-dependencies": {
-      "cache": true
-    },
+    "_build": { "cache": true },
+    "package": { "cache": true },
+    "extract-dependencies": { "cache": true },
     "@nx/esbuild:esbuild": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "storybook": {
-      "dependsOn": ["^build"]
-    }
+    "storybook": { "dependsOn": ["^build"] }
   },
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
@@ -88,9 +67,7 @@
       "!{projectRoot}/tsconfig.storybook.json"
     ],
     "sharedGlobals": [
-      {
-        "runtime": "node -p '`${process.platform}_${process.arch}`'"
-      },
+      { "runtime": "node -p '`${process.platform}_${process.arch}`'" },
       "{workspaceRoot}/.env"
     ],
     "scripts": ["{workspaceRoot}/tools/scripts/**"]
@@ -98,9 +75,7 @@
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
-      "options": {
-        "build": true
-      },
+      "options": { "build": true },
       "exclude": [
         "libs/vscode/migrate/*",
         "libs/vscode/migrate-sidebar-webview/*",
@@ -108,26 +83,16 @@
         "libs/shared/socket-utils/*"
       ]
     },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
     {
       "plugin": "@nx/jest/plugin",
       "exclude": ["apps/nxls-e2e/**/*", "apps/nx-mcp-e2e/**/*"],
-      "options": {
-        "targetName": "test"
-      }
+      "options": { "targetName": "test" }
     },
     {
       "plugin": "@nx/jest/plugin",
       "include": ["apps/nxls-e2e/**/*", "apps/nx-mcp-e2e/**/*"],
-      "options": {
-        "targetName": "e2e-local",
-        "ciTargetName": "e2e-ci"
-      }
+      "options": { "targetName": "e2e-local", "ciTargetName": "e2e-ci" }
     },
     {
       "plugin": "@nx/cypress/plugin",
@@ -156,13 +121,8 @@
         "libs/vscode/migrate-sidebar-webview/*"
       ],
       "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
-        "build": {
-          "targetName": "build",
-          "configName": "tsconfig.lib.json"
-        }
+        "typecheck": { "targetName": "typecheck" },
+        "build": { "targetName": "build", "configName": "tsconfig.lib.json" }
       }
     },
     {
@@ -177,11 +137,7 @@
     {
       "plugin": "@nx/js/typescript",
       "include": ["libs/shared/watcher/*", "libs/shared/socket-utils/*"],
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        }
-      }
+      "options": { "typecheck": { "targetName": "typecheck" } }
     }
   ],
   "sync": {
@@ -190,24 +146,14 @@
   },
   "owners": {
     "format": "github",
-    "patterns": [
-      {
-        "projects": ["*"],
-        "owners": ["@MaxKless"]
-      }
-    ]
+    "patterns": [{ "projects": ["*"], "owners": ["@MaxKless"] }]
   },
   "conformance": {
-    "rules": [
-      {
-        "rule": "@nx/conformance/ensure-owners",
-        "status": "enforced"
-      }
-    ]
+    "rules": [{ "rule": "@nx/conformance/ensure-owners", "status": "enforced" }]
   },
   "defaultBase": "master",
-  "nxCloudUrl": "https://staging.nx.app",
-  "nxCloudId": "6660892a00a733543826cfcd",
+  "nxCloudUrl": "https://snapshot.nx.app",
+  "nxCloudId": "69788ec4a6479b79deb3f651",
   "bust": 1,
   "release": {
     "version": {
@@ -222,32 +168,20 @@
       "vscode": {
         "projects": ["vscode"],
         "projectsRelationship": "independent",
-        "version": {
-          "conventionalCommits": true
-        },
-        "changelog": {
-          "projectChangelogs": true
-        }
+        "version": { "conventionalCommits": true },
+        "changelog": { "projectChangelogs": true }
       },
       "nx-mcp": {
         "projects": ["nx-mcp"],
         "projectsRelationship": "independent",
-        "version": {
-          "conventionalCommits": true
-        },
-        "changelog": {
-          "projectChangelogs": true
-        }
+        "version": { "conventionalCommits": true },
+        "changelog": { "projectChangelogs": true }
       },
       "nxls": {
         "projects": ["nxls"],
         "projectsRelationship": "independent",
-        "version": {
-          "conventionalCommits": true
-        },
-        "changelog": {
-          "projectChangelogs": true
-        }
+        "version": { "conventionalCommits": true },
+        "changelog": { "projectChangelogs": true }
       }
     }
   }
