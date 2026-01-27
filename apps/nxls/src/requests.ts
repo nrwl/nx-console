@@ -347,7 +347,6 @@ export function registerRequests(
     return await getRecentCIPEData(WORKING_PATH, lspLogger);
   });
 
-
   connection.onRequest(
     NxParseTargetStringRequest,
     async (targetString: string) => {
