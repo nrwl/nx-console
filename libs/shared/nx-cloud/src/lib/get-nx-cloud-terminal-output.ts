@@ -3,69 +3,7 @@ import { pipeline } from 'stream/promises';
 import { extract } from 'tar-stream';
 import * as zlib from 'zlib';
 
-import { getNxCloudUrl, isNxCloudUsed } from '@nx-console/shared-nx-cloud';
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
-import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
-
-export async function getNxCloudTerminalOutput(
-  request: {
-    taskId: string;
-    ciPipelineExecutionId?: string;
-    linkId?: string;
-  },
-  workspacePath: string,
-  logger: Logger,
-): Promise<{ terminalOutput?: string; error?: string }> {
-  if (!(await isNxCloudUsed(workspacePath, logger))) {
-    return { error: 'Nx Cloud is not used in this workspace.' };
-  }
-
-  const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const url = `${nxCloudUrl}/nx-cloud/nx-console/ci-pipeline-executions/terminal-outputs`;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
-  };
-
-  try {
-    const response = await httpRequest({
-      type: 'POST',
-      url,
-      data: JSON.stringify({
-        executionId: request.ciPipelineExecutionId ?? null,
-        taskId: request.taskId,
-        linkId: request.linkId ?? null,
-      }),
-      headers,
-    });
-    const responseData = JSON.parse(response.responseText) as {
-      artifactUrl: string;
-    };
-
-    const terminalOutput = await downloadAndExtractArtifact(
-      responseData.artifactUrl,
-      logger,
-    );
-    // Remove ANSI escape codes (color codes and other terminal control sequences)
-    const strippedOutput = terminalOutput.replace(
-      /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g,
-      '',
-    );
-    return { terminalOutput: strippedOutput };
-  } catch (e) {
-    if (e instanceof HttpError && e.status === 401) {
-      logger.log(`Authentication error: ${e.responseText}`);
-      return {
-        error: e.responseText,
-      };
-    }
-    logger.log(`Error: ${JSON.stringify(e)}`);
-    return {
-      error: e.responseText ?? e.message,
-    };
-  }
-}
+import { Logger } from '@nx-console/shared-utils';
 
 export async function downloadAndExtractArtifact(
   artifactUrl: string,
