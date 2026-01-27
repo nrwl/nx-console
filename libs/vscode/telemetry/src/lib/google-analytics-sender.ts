@@ -82,6 +82,10 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     if (error.message.startsWith('AIFAIL')) {
       return;
     }
+    if (error.message.includes('Unable to retrieve document from URI')) {
+      this.sendEventData('misc.vscode-document-uri-error', data);
+      return;
+    }
     this.sendEventData('misc.exception', {
       ...data,
       name: error.name,
