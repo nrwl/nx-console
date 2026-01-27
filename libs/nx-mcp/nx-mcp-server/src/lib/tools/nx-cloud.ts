@@ -859,13 +859,33 @@ const getCIInformation =
     );
 
     if (!cipeForBranch) {
+      const message = `No CI pipeline execution found for branch "${branch}". This branch may not be checked out locally or may not have any recent CI runs.`;
       return {
-        content: [
-          {
-            type: 'text',
-            text: `No CI pipeline execution found for branch "${branch}". This branch may not be checked out locally or may not have any recent CI runs.`,
-          },
-        ],
+        content: [{ type: 'text', text: message }],
+        structuredContent: {
+          cipeStatus: null,
+          cipeUrl: null,
+          branch: branch ?? null,
+          commitSha: null,
+          failedTaskIds: [],
+          verifiedTaskIds: [],
+          selfHealingEnabled: false,
+          selfHealingStatus: null,
+          verificationStatus: null,
+          userAction: null,
+          failureClassification: null,
+          taskOutputSummary: null,
+          remoteTaskSummary: null,
+          localTaskSummary: null,
+          suggestedFixReasoning: null,
+          suggestedFixDescription: null,
+          suggestedFix: null,
+          shortLink: null,
+          couldAutoApplyTasks: null,
+          confidence: null,
+          confidenceReasoning: null,
+          error: message,
+        },
         isError: false,
       };
     }
@@ -918,6 +938,7 @@ const getCIInformation =
       couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
       confidence: aiFix?.confidenceScore ?? null,
       confidenceReasoning: null,
+      error: null,
     };
 
     // If we have a shortLink and fix is completed, fetch detailed fix data
