@@ -7,6 +7,7 @@ on:
 env:
   node_version: 24
   NX_GRADLE_DISABLE: true
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
 
 permissions:
   id-token: write
