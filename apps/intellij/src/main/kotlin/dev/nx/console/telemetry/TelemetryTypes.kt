@@ -52,6 +52,7 @@ enum class TelemetryEvent(val eventName: String) {
     CLOUD_APPLY_AI_FIX_LOCALLY("cloud.apply-ai-fix-locally"),
     CLOUD_OPEN_FIX_DETAILS("cloud.open-fix-details"),
     CLOUD_REJECT_AI_FIX("cloud.reject-ai-fix"),
+    CLOUD_RERUN_CI("cloud.rerun-ci"),
     CLOUD_SHOW_AI_FIX("cloud.show-ai-fix"),
     CLOUD_SHOW_AI_FIX_NOTIFICATION("cloud.show-ai-fix-notification"),
     CLOUD_VIEW_RUN("cloud.view-run"),

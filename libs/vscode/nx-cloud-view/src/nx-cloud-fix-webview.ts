@@ -165,6 +165,13 @@ export class NxCloudFixWebview {
         );
         this.webviewPanel?.dispose();
         break;
+      case 'rerun-ci':
+        await commands.executeCommand(
+          'nxCloud.rerunCi',
+          this.currentFixDetails,
+        );
+        this.webviewPanel?.dispose();
+        break;
     }
   }
 
@@ -494,6 +501,30 @@ export class NxCloudFixWebview {
           const success = await updateSuggestedFix(aiFixId, 'REJECTED');
           if (success) {
             window.showInformationMessage('Nx Cloud fix ignored');
+            commands.executeCommand('nxCloud.refresh');
+            getAiFixStatusBarService().hideAiFixStatusBarItem();
+          }
+        },
+      ),
+      commands.registerCommand(
+        'nxCloud.rerunCi',
+        async (data: { cipe: CIPEInfo; runGroup: CIPERunGroup }) => {
+          getTelemetry().logUsage('cloud.rerun-ci');
+
+          if (!data.runGroup.aiFix) {
+            window.showErrorMessage('No AI fix information available');
+            return;
+          }
+
+          const aiFixId = data.runGroup.aiFix.aiFixId;
+          if (!aiFixId) {
+            window.showErrorMessage('AI fix ID not found');
+            return;
+          }
+
+          const success = await updateSuggestedFix(aiFixId, 'RERUN_REQUESTED');
+          if (success) {
+            window.showInformationMessage('CI rerun requested');
             commands.executeCommand('nxCloud.refresh');
             getAiFixStatusBarService().hideAiFixStatusBarItem();
           }
