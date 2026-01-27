@@ -24,6 +24,7 @@ import {
 } from '@nx-console/shared-telemetry';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
 import {
+  configureCustomCACertificates,
   consoleLogger,
   killGroup,
   loadRootEnvFiles,
@@ -40,6 +41,8 @@ import { getPackageVersion } from './utils';
 import { ArgvType, createYargsConfig } from './yargs-config';
 
 async function main() {
+  configureCustomCACertificates();
+
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
 
   const mcpServer = new McpServer(

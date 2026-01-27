@@ -1,3 +1,30 @@
+/**
+ * Adds OS-trusted CA certificates to Node's default CA store so that
+ * fetch() trusts self-signed certs that the user has installed system-wide.
+ * Requires Node 22+ (tls.getCACertificates / tls.setDefaultCACertificates).
+ * Silently no-ops on older Node versions.
+ */
+export function configureCustomCACertificates(): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const tls = require('tls');
+    if (
+      typeof tls.getCACertificates === 'function' &&
+      typeof tls.setDefaultCACertificates === 'function'
+    ) {
+      const defaultCerts: string[] = tls.getCACertificates('default');
+      const systemCerts: string[] = tls.getCACertificates('system');
+      const merged = [
+        ...defaultCerts,
+        ...systemCerts.filter((c: string) => !defaultCerts.includes(c)),
+      ];
+      tls.setDefaultCACertificates(merged);
+    }
+  } catch {
+    // Node version too old or API unavailable — ignore
+  }
+}
+
 export interface HttpOptions {
   url: string;
   type?: 'GET' | 'POST';
@@ -31,13 +58,15 @@ export async function httpRequest(options: HttpOptions): Promise<HttpResponse> {
     : undefined;
 
   try {
-    const response = await fetch(options.url, {
+    const fetchOptions: RequestInit = {
       method: options.type || 'GET',
       headers: options.headers,
       body: options.data,
       signal: controller.signal,
       redirect: options.followRedirects ? 'follow' : 'manual',
-    });
+    };
+
+    const response = await fetch(options.url, fetchOptions);
 
     const responseText = await response.text();
     const headers: Record<string, string> = {};

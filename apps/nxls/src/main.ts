@@ -37,6 +37,7 @@ import {
 } from '@nx-console/shared-nx-workspace-info';
 import { NxWorkspace } from '@nx-console/shared-types';
 import {
+  configureCustomCACertificates,
   formatError,
   killGroup,
   loadRootEnvFiles,
@@ -62,6 +63,8 @@ import {
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { registerRequests } from './requests';
+
+configureCustomCACertificates();
 
 const connection = createConnection(ProposedFeatures.all);
 
