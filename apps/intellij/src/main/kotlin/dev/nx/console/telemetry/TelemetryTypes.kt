@@ -18,6 +18,7 @@ enum class TelemetryEvent(val eventName: String) {
     MISC_OPEN_PDV("misc.open-pdv"),
     MISC_OPEN_PROJECT_DETAILS_CODELENS("misc.open-project-details-codelens"),
     MISC_EXCEPTION("misc.exception"),
+    MISC_VSCODE_DOCUMENT_URI_ERROR("misc.vscode-document-uri-error"),
     MISC_NX_LATEST_NO_PROVENANCE("misc.nx-latest-no-provenance"),
 
     // Migrate
