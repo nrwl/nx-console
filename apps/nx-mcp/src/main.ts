@@ -24,6 +24,7 @@ import {
 } from '@nx-console/shared-telemetry';
 import { IIdeJsonRpcClient } from '@nx-console/shared-types';
 import {
+  configureCustomCACertificates,
   consoleLogger,
   killGroup,
   loadRootEnvFiles,
@@ -40,6 +41,8 @@ import { getPackageVersion } from './utils';
 import { ArgvType, createYargsConfig } from './yargs-config';
 
 async function main() {
+  configureCustomCACertificates();
+
   const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
 
   const mcpServer = new McpServer(
@@ -121,6 +124,16 @@ async function main() {
     logger.log('Minimal mode enabled, hiding workspace analysis tools');
   }
 
+  // When --experimental-polygraph is not set (default), exclude polygraph tools
+  if (!argv.experimentalPolygraph) {
+    const polygraphExcludedTools = ['!cloud_polygraph_*'];
+    toolsFilter = toolsFilter
+      ? [...toolsFilter, ...polygraphExcludedTools]
+      : polygraphExcludedTools;
+  } else {
+    logger.log('Experimental Polygraph tools enabled');
+  }
+
   if (toolsFilter && toolsFilter.length > 0) {
     logger.log(`Tools filter: ${toolsFilter.join(', ')}`);
   }
@@ -166,8 +179,8 @@ async function main() {
     },
     isNxCloudEnabled: async () =>
       nxWorkspacePath ? await isNxCloudUsed(nxWorkspacePath) : false,
-    getRecentCIPEData: async (workspacePath, logger) =>
-      await getRecentCIPEData(workspacePath, logger),
+    getRecentCIPEData: async (workspacePath, logger, options) =>
+      await getRecentCIPEData(workspacePath, logger, options),
   };
 
   // Detect if IDE is running and create IDE client if available

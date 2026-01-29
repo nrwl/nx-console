@@ -52,6 +52,7 @@ export interface CIInformationOutput {
   couldAutoApplyTasks: boolean | null;
   confidence: number | null;
   confidenceReasoning: string | null;
+  error: string | null;
   [key: string]: unknown;
 }
 
@@ -140,6 +141,7 @@ export const ciInformationOutputSchema = {
     couldAutoApplyTasks: { type: ['boolean', 'null'] },
     confidence: { type: ['number', 'null'] },
     confidenceReasoning: { type: ['string', 'null'] },
+    error: { type: ['string', 'null'] },
   },
 };
 

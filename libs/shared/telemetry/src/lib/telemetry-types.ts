@@ -18,6 +18,7 @@ export type TelemetryEvents =
   | 'misc.open-pdv'
   | 'misc.open-project-details-codelens'
   | 'misc.exception'
+  | 'misc.vscode-document-uri-error'
   | 'misc.nx-latest-no-provenance'
   | 'misc.restart-daemon-watcher'
   // migrate
@@ -40,6 +41,7 @@ export type TelemetryEvents =
   | 'cloud.apply-ai-fix-locally'
   | 'cloud.self-healing-uri'
   | 'cloud.reject-ai-fix'
+  | 'cloud.rerun-ci'
   | 'cloud.open-fix-details'
   // graph
   | 'graph.show-all'

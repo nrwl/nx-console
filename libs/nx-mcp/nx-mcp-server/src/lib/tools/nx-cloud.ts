@@ -34,6 +34,7 @@ import { execSync } from 'child_process';
 import { z } from 'zod';
 import { isToolEnabled } from '../tool-filter';
 import { ToolRegistry } from '../tool-registry';
+import { registerPolygraphTools } from './nx-cloud-polygraph';
 import { chunkContent, getValueByPath } from './nx-workspace';
 import {
   CIInformationOutput,
@@ -308,6 +309,8 @@ export function registerNxCloudTools(
         )(args as z.infer<typeof updateSelfHealingFixSchema>),
     });
   }
+
+  registerPolygraphTools(workspacePath, registry, logger, toolsFilter);
 
   logger.debug?.('Registered Nx Cloud tools');
 }
@@ -838,8 +841,10 @@ const getCIInformation =
       }
     }
 
-    // Fetch CIPE data for recent branches
-    const cipeResult = await getRecentCIPEData(workspacePath, logger);
+    // Fetch CIPE data for recent branches, always include the target branch
+    const cipeResult = await getRecentCIPEData(workspacePath, logger, {
+      branch,
+    });
 
     if (cipeResult.error) {
       return {
@@ -859,13 +864,33 @@ const getCIInformation =
     );
 
     if (!cipeForBranch) {
+      const message = `No CI pipeline execution found for branch "${branch}". This branch may not have any CI runs yet.`;
       return {
-        content: [
-          {
-            type: 'text',
-            text: `No CI pipeline execution found for branch "${branch}". This branch may not be checked out locally or may not have any recent CI runs.`,
-          },
-        ],
+        content: [{ type: 'text', text: message }],
+        structuredContent: {
+          cipeStatus: null,
+          cipeUrl: null,
+          branch: branch ?? null,
+          commitSha: null,
+          failedTaskIds: [],
+          verifiedTaskIds: [],
+          selfHealingEnabled: false,
+          selfHealingStatus: null,
+          verificationStatus: null,
+          userAction: null,
+          failureClassification: null,
+          taskOutputSummary: null,
+          remoteTaskSummary: null,
+          localTaskSummary: null,
+          suggestedFixReasoning: null,
+          suggestedFixDescription: null,
+          suggestedFix: null,
+          shortLink: null,
+          couldAutoApplyTasks: null,
+          confidence: null,
+          confidenceReasoning: null,
+          error: message,
+        },
         isError: false,
       };
     }
@@ -918,6 +943,7 @@ const getCIInformation =
       couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
       confidence: aiFix?.confidenceScore ?? null,
       confidenceReasoning: null,
+      error: null,
     };
 
     // If we have a shortLink and fix is completed, fetch detailed fix data
@@ -1295,7 +1321,9 @@ const handleUpdateSelfHealingFix =
         };
       }
 
-      const cipeResult = await getRecentCIPEData(workspacePath, logger);
+      const cipeResult = await getRecentCIPEData(workspacePath, logger, {
+        branch,
+      });
       if (cipeResult.error) {
         const output: UpdateSelfHealingFixOutput = {
           success: false,

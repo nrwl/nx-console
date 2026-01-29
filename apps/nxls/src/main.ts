@@ -37,6 +37,7 @@ import {
 } from '@nx-console/shared-nx-workspace-info';
 import { NxWorkspace } from '@nx-console/shared-types';
 import {
+  configureCustomCACertificates,
   formatError,
   killGroup,
   loadRootEnvFiles,
@@ -63,13 +64,26 @@ import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { registerRequests } from './requests';
 
+configureCustomCACertificates();
+
 const connection = createConnection(ProposedFeatures.all);
 
+let connectionAlive = true;
+
+function safeSendNotification(
+  ...args: Parameters<typeof connection.sendNotification>
+) {
+  if (!connectionAlive) return;
+  connection.sendNotification(...args);
+}
+
 process.on('unhandledRejection', (e: any) => {
+  if (!connectionAlive) return;
   connection.console.error(formatError(`Unhandled exception`, e));
 });
 
 process.on('uncaughtException', (e) => {
+  if (!connectionAlive) return;
   connection.console.error(formatError('Unhandled exception', e));
 });
 
@@ -92,7 +106,7 @@ const fileWatcherCallback: DaemonWatcherCallback = async (
   );
 };
 const fileWatcherOperationalCallback = (isOperational: boolean) => {
-  connection.sendNotification(NxWatcherOperationalNotification.method, {
+  safeSendNotification(NxWatcherOperationalNotification.method, {
     isOperational,
   });
 };
@@ -299,6 +313,7 @@ documents.onDidOpen(async (e) => {
 });
 
 connection.onShutdown(async () => {
+  connectionAlive = false;
   lspLogger.log('Language server shutdown initiated');
   try {
     await unregisterFileWatcher();
@@ -393,10 +408,10 @@ async function reconfigureAndSendNotificationWithBackoff(
   } | null,
 ) {
   if (reconfigureAttempts === 0) {
-    connection.sendNotification(NxWorkspaceRefreshStartedNotification.method);
+    safeSendNotification(NxWorkspaceRefreshStartedNotification.method);
   }
   const workspace = await reconfigure(workingPath, projectGraphAndSourceMaps);
-  await connection.sendNotification(NxWorkspaceRefreshNotification.method);
+  await safeSendNotification(NxWorkspaceRefreshNotification.method);
 
   if (
     !workspace?.errors ||
@@ -481,37 +496,27 @@ let exiting = false;
 const exitHandler = async () => {
   if (exiting) return;
   exiting = true;
+  connectionAlive = false;
   process.off('SIGTERM', exitHandler);
-
-  lspLogger.log('Exit handler initiated');
 
   try {
     await unregisterFileWatcher();
-  } catch (e) {
-    lspLogger.log('Error in exit handler during file watcher cleanup: ' + e);
-  }
+  } catch (e) {}
 
   try {
     await cleanupAllWatchers();
-  } catch (e) {
-    lspLogger.log('Error in exit handler during global watcher cleanup: ' + e);
-  }
+  } catch (e) {}
 
   try {
     connection.dispose();
-  } catch (e) {
-    lspLogger.log('Error disposing connection in exit handler: ' + e);
-  }
+  } catch (e) {}
 
   try {
     if (process.connected) {
       process.disconnect();
     }
-  } catch (e) {
-    lspLogger.log('Error disconnecting process in exit handler: ' + e);
-  }
+  } catch (e) {}
 
-  lspLogger.log('Exit handler completed, killing process group');
   killGroup(process.pid);
 };
 process.on('SIGTERM', exitHandler);

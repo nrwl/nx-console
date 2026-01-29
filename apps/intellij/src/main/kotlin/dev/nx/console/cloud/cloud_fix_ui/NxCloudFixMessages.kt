@@ -15,6 +15,8 @@ sealed class NxCloudFixMessage {
 
     @Serializable @SerialName("reject") data object Reject : NxCloudFixMessage()
 
+    @Serializable @SerialName("rerun-ci") data object RerunCi : NxCloudFixMessage()
+
     @Serializable @SerialName("show-diff") data object ShowDiff : NxCloudFixMessage()
 
     @Serializable

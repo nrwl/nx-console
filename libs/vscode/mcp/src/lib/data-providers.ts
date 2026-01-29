@@ -24,9 +24,9 @@ export const nxWorkspaceInfoProvider: NxWorkspaceInfoProvider = {
   },
   isNxCloudEnabled: async () =>
     await isNxCloudUsed(getNxWorkspacePath(), vscodeLogger),
-  getRecentCIPEData: async () => {
+  getRecentCIPEData: async (_workspacePath, _logger, options) => {
     // Route through nxls - getRecentCIPEData from vscode-nx-workspace already does this
-    const result = await getRecentCIPEData();
+    const result = await getRecentCIPEData(options);
     return (
       result || { error: { type: 'other', message: 'Unable to get CIPE data' } }
     );

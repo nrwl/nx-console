@@ -209,7 +209,7 @@ export const NxPDVDataRequest: RequestType<
 > = new RequestType('nx/pdvData');
 
 export const NxRecentCIPEDataRequest: RequestType<
-  undefined,
+  { branch?: string } | undefined,
   { info?: CIPEInfo[]; error?: CIPEInfoError; workspaceUrl?: string },
   unknown
 > = new RequestType('nx/recentCIPEData');
@@ -219,12 +219,6 @@ export const NxParseTargetStringRequest: RequestType<
   Target | undefined,
   unknown
 > = new RequestType('nx/parseTargetString');
-
-export const NxCloudTerminalOutputRequest: RequestType<
-  { ciPipelineExecutionId?: string; linkId?: string; taskId: string },
-  { terminalOutput?: string; error?: string },
-  unknown
-> = new RequestType('nx/cloudTerminalOutput');
 
 export const NxCloudAuthHeadersRequest: RequestType<
   undefined,

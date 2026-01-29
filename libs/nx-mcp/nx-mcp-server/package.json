@@ -9,6 +9,9 @@
     "projectType": "library",
     "tags": [
       "type:mcp"
+    ],
+    "nxCloudImplicitDependencies": [
+      "62e400a396c2ae3137cd4cb7::nx-api"
     ]
   }
 }

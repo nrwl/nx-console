@@ -54,6 +54,9 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   onShowDiff: (() => void) | undefined;
 
   @property({ type: Function })
+  onRerunCi: (() => void) | undefined;
+
+  @property({ type: Function })
   onOpenExternalLink: ((url: string) => void) | undefined;
 
   @state()
@@ -259,6 +262,12 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
   private handleShowDiff() {
     if (this.onShowDiff) {
       this.onShowDiff();
+    }
+  }
+
+  private handleRerunCi() {
+    if (this.details && this.onRerunCi) {
+      this.onRerunCi();
     }
   }
 
@@ -520,6 +529,15 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
                   caused by code changes. This may be due to environment issues,
                   external dependencies, or infrastructure problems.
                 </p>`}
+            ${aiFix.failureClassification === 'environment_state'
+              ? html`<div class="mt-4 flex justify-end">
+                  <button-element
+                    text="Rerun CI"
+                    appearance="primary"
+                    @click="${() => this.handleRerunCi()}"
+                  ></button-element>
+                </div>`
+              : ''}
           </div>
         </div>
       `;

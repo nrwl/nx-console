@@ -97,4 +97,5 @@ enum class AITaskFixUserAction {
     REJECTED,
     APPLIED_LOCALLY,
     APPLIED_AUTOMATICALLY,
+    RERUN_REQUESTED,
 }

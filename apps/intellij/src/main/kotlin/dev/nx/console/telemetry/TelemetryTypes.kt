@@ -18,6 +18,7 @@ enum class TelemetryEvent(val eventName: String) {
     MISC_OPEN_PDV("misc.open-pdv"),
     MISC_OPEN_PROJECT_DETAILS_CODELENS("misc.open-project-details-codelens"),
     MISC_EXCEPTION("misc.exception"),
+    MISC_VSCODE_DOCUMENT_URI_ERROR("misc.vscode-document-uri-error"),
     MISC_NX_LATEST_NO_PROVENANCE("misc.nx-latest-no-provenance"),
 
     // Migrate
@@ -52,6 +53,7 @@ enum class TelemetryEvent(val eventName: String) {
     CLOUD_APPLY_AI_FIX_LOCALLY("cloud.apply-ai-fix-locally"),
     CLOUD_OPEN_FIX_DETAILS("cloud.open-fix-details"),
     CLOUD_REJECT_AI_FIX("cloud.reject-ai-fix"),
+    CLOUD_RERUN_CI("cloud.rerun-ci"),
     CLOUD_SHOW_AI_FIX("cloud.show-ai-fix"),
     CLOUD_SHOW_AI_FIX_NOTIFICATION("cloud.show-ai-fix-notification"),
     CLOUD_VIEW_RUN("cloud.view-run"),

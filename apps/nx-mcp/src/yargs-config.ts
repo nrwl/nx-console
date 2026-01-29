@@ -11,6 +11,7 @@ export interface ArgvType {
   debugLogs: boolean;
   tools?: string | string[];
   minimal: boolean;
+  experimentalPolygraph: boolean;
   _: (string | number)[];
   $0: string;
   [x: string]: unknown;
@@ -77,6 +78,12 @@ export function createYargsConfig(args: string[]): Argv<any> {
     .option('minimal', {
       describe:
         'Hide workspace analysis tools (nx_available_plugins, nx_workspace_path, nx_workspace, nx_project_details, nx_generators, nx_generator_schema)',
+      type: 'boolean',
+      default: false,
+    })
+    .option('experimental-polygraph', {
+      describe:
+        'Enable experimental Polygraph tools for multi-repo orchestration',
       type: 'boolean',
       default: false,
     })

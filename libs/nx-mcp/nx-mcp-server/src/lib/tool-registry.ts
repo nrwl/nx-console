@@ -25,7 +25,11 @@ function toJsonSchema(
 ): Record<string, unknown> | undefined {
   if (!input) return undefined;
   if (isZodShape(input)) {
-    return toJSONSchema(z.object(input)) as Record<string, unknown>;
+    const { $schema, ...schema } = toJSONSchema(z.object(input)) as Record<
+      string,
+      unknown
+    >;
+    return schema;
   }
   return input;
 }
