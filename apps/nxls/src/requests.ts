@@ -16,6 +16,7 @@ import {
   NxProjectByRootRequest,
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
+  NxProjectsByPathsRequest,
   NxRecentCIPEDataRequest,
   NxSourceMapFilesToProjectsMapRequest,
   NxStartDaemonRequest,
@@ -38,6 +39,7 @@ import {
   getProjectByRoot,
   getProjectFolderTree,
   getProjectGraphOutput,
+  getProjectsByPaths,
   getSourceMapFilesToProjectsMap,
   getStartupMessage,
   getTargetsForConfigFile,
@@ -161,6 +163,20 @@ export function registerRequests(
         );
       }
       return await getProjectByRoot(args.projectRoot, WORKING_PATH);
+    },
+  );
+
+  connection.onRequest(
+    NxProjectsByPathsRequest,
+    async (args: { paths: string[] }) => {
+      const WORKING_PATH = getWorkingPath();
+      if (!WORKING_PATH) {
+        return new ResponseError(
+          1000,
+          'Unable to get Nx info: no workspace path',
+        );
+      }
+      return await getProjectsByPaths(args.paths, WORKING_PATH);
     },
   );
 
