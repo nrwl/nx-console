@@ -19,12 +19,14 @@ let cachedResult: {
 export async function getRecentCIPEData(
   workspacePath: string,
   logger: Logger,
+  options?: { branch?: string },
 ): Promise<{
   info?: CIPEInfo[];
   error?: CIPEInfoError;
   workspaceUrl?: string;
 }> {
   const now = Date.now();
+  const explicitBranch = options?.branch;
 
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
@@ -35,7 +37,9 @@ export async function getRecentCIPEData(
     };
   }
 
+  // Skip cache when an explicit branch is requested to ensure we always query for it
   if (
+    !explicitBranch &&
     cachedResult &&
     now - lastFetchTimestamp < CACHE_TTL_MS &&
     cachedWorkspacePath === workspacePath
@@ -45,9 +49,15 @@ export async function getRecentCIPEData(
   }
 
   const branches = getRecentlyCommittedGitBranches(workspacePath);
+  const branchNames = branches.map((branch) => branch.name);
+
+  // Always include the explicit branch if provided, even if not in the git branches list
+  if (explicitBranch && !branchNames.includes(explicitBranch)) {
+    branchNames.push(explicitBranch);
+  }
 
   const data = JSON.stringify({
-    branches: branches.map((branch) => branch.name),
+    branches: branchNames,
   });
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
   const url = `${nxCloudUrl}/nx-cloud/nx-console/ci-pipeline-executions`;
@@ -75,9 +85,12 @@ export async function getRecentCIPEData(
       workspaceUrl: responseData.workspaceUrl,
     };
 
-    cachedResult = result;
-    cachedWorkspacePath = workspacePath;
-    lastFetchTimestamp = Date.now();
+    // Only cache results when no explicit branch is requested
+    if (!explicitBranch) {
+      cachedResult = result;
+      cachedWorkspacePath = workspacePath;
+      lastFetchTimestamp = Date.now();
+    }
 
     logger.debug?.(
       `Recent CIPE data fetched successfully: ${JSON.stringify(result)}`,

@@ -166,8 +166,8 @@ async function main() {
     },
     isNxCloudEnabled: async () =>
       nxWorkspacePath ? await isNxCloudUsed(nxWorkspacePath) : false,
-    getRecentCIPEData: async (workspacePath, logger) =>
-      await getRecentCIPEData(workspacePath, logger),
+    getRecentCIPEData: async (workspacePath, logger, options) =>
+      await getRecentCIPEData(workspacePath, logger, options),
   };
 
   // Detect if IDE is running and create IDE client if available

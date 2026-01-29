@@ -841,8 +841,10 @@ const getCIInformation =
       }
     }
 
-    // Fetch CIPE data for recent branches
-    const cipeResult = await getRecentCIPEData(workspacePath, logger);
+    // Fetch CIPE data for recent branches, always include the target branch
+    const cipeResult = await getRecentCIPEData(workspacePath, logger, {
+      branch,
+    });
 
     if (cipeResult.error) {
       return {
@@ -862,7 +864,7 @@ const getCIInformation =
     );
 
     if (!cipeForBranch) {
-      const message = `No CI pipeline execution found for branch "${branch}". This branch may not be checked out locally or may not have any recent CI runs.`;
+      const message = `No CI pipeline execution found for branch "${branch}". This branch may not have any CI runs yet.`;
       return {
         content: [{ type: 'text', text: message }],
         structuredContent: {
@@ -1319,7 +1321,9 @@ const handleUpdateSelfHealingFix =
         };
       }
 
-      const cipeResult = await getRecentCIPEData(workspacePath, logger);
+      const cipeResult = await getRecentCIPEData(workspacePath, logger, {
+        branch,
+      });
       if (cipeResult.error) {
         const output: UpdateSelfHealingFixOutput = {
           success: false,
