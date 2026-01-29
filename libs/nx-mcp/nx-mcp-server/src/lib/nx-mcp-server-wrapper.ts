@@ -48,6 +48,7 @@ export interface NxWorkspaceInfoProvider {
   getRecentCIPEData?: (
     workspacePath: string,
     logger: Logger,
+    options?: { branch?: string },
   ) => Promise<{
     info?: CIPEInfo[];
     error?: CIPEInfoError;

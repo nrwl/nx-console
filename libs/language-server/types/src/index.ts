@@ -209,7 +209,7 @@ export const NxPDVDataRequest: RequestType<
 > = new RequestType('nx/pdvData');
 
 export const NxRecentCIPEDataRequest: RequestType<
-  undefined,
+  { branch?: string } | undefined,
   { info?: CIPEInfo[]; error?: CIPEInfoError; workspaceUrl?: string },
   unknown
 > = new RequestType('nx/recentCIPEData');

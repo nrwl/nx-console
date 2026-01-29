@@ -335,7 +335,7 @@ export function registerRequests(
     return await getPDVData(WORKING_PATH, args.filePath);
   });
 
-  connection.onRequest(NxRecentCIPEDataRequest, async () => {
+  connection.onRequest(NxRecentCIPEDataRequest, async (params) => {
     const WORKING_PATH = getWorkingPath();
     if (!WORKING_PATH) {
       return new ResponseError(
@@ -344,7 +344,7 @@ export function registerRequests(
       );
     }
 
-    return await getRecentCIPEData(WORKING_PATH, lspLogger);
+    return await getRecentCIPEData(WORKING_PATH, lspLogger, params);
   });
 
   connection.onRequest(
