@@ -1,6 +1,19 @@
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { readFile } from 'fs/promises';
-import { normalize } from 'path';
+import { normalizePath } from 'nx/src/utils/path';
+
+async function readSchemaWithFallback(schemaPath: string): Promise<string> {
+  const normalizedPath = normalizePath(schemaPath);
+  try {
+    return await readFile(normalizedPath, 'utf-8');
+  } catch (e: any) {
+    if (e.code === 'ENOENT' && normalizedPath.includes('/dist/')) {
+      const srcPath = normalizedPath.replace('/dist/', '/src/');
+      return await readFile(srcPath, 'utf-8');
+    }
+    throw e;
+  }
+}
 
 export async function getGeneratorSchema(
   generatorName: string,
@@ -23,10 +36,8 @@ export async function getGeneratorSchema(
     return undefined;
   }
 
-  const schemaPath = normalize(
-    generator.schemaPath.replace(/^file:\/\/\//, ''),
-  );
-  const schema = await readFile(schemaPath, 'utf-8');
+  const schemaPath = generator.schemaPath.replace(/^file:\/\/\//, '');
+  const schema = await readSchemaWithFallback(schemaPath);
   const parsedSchema = JSON.parse(schema);
   delete parsedSchema['$schema'];
   delete parsedSchema['$id'];
