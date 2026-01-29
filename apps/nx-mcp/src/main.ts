@@ -121,6 +121,16 @@ async function main() {
     logger.log('Minimal mode enabled, hiding workspace analysis tools');
   }
 
+  // When --experimental-polygraph is not set (default), exclude polygraph tools
+  if (!argv.experimentalPolygraph) {
+    const polygraphExcludedTools = ['!cloud_polygraph_*'];
+    toolsFilter = toolsFilter
+      ? [...toolsFilter, ...polygraphExcludedTools]
+      : polygraphExcludedTools;
+  } else {
+    logger.log('Experimental Polygraph tools enabled');
+  }
+
   if (toolsFilter && toolsFilter.length > 0) {
     logger.log(`Tools filter: ${toolsFilter.join(', ')}`);
   }

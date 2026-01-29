@@ -207,7 +207,12 @@ export function registerPolygraphTools(
   toolsFilter?: string[],
 ) {
   const nxCloudClient = getCloudLightClient(logger, workspacePath);
-  if (nxCloudClient == null) return;
+  if (nxCloudClient == null) {
+    logger.log(
+      'Polygraph tools not registered: could not load Nx Cloud light client',
+    );
+    return;
+  }
   registerInit(toolsFilter, logger, registry, nxCloudClient, workspacePath);
   registerDelegate(toolsFilter, logger, registry, workspacePath, nxCloudClient);
 }
