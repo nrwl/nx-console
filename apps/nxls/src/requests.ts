@@ -2,7 +2,6 @@ import {
   NxCloudAuthHeadersRequest,
   NxCloudOnboardingInfoRequest,
   NxCloudStatusRequest,
-  NxCloudTerminalOutputRequest,
   NxCreateProjectGraphRequest,
   NxDownloadAndExtractArtifactRequest,
   NxGeneratorContextV2Request,
@@ -51,7 +50,6 @@ import {
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 import {
   downloadAndExtractArtifact,
-  getNxCloudTerminalOutput,
   getRecentCIPEData,
   nxCloudAuthHeaders,
 } from '@nx-console/shared-nx-cloud';
@@ -348,24 +346,6 @@ export function registerRequests(
 
     return await getRecentCIPEData(WORKING_PATH, lspLogger);
   });
-
-  connection.onRequest(
-    NxCloudTerminalOutputRequest,
-    async (args: {
-      ciPipelineExecutionId?: string;
-      taskId: string;
-      linkId?: string;
-    }) => {
-      const WORKING_PATH = getWorkingPath();
-      if (!WORKING_PATH) {
-        return new ResponseError(
-          1000,
-          'Unable to get Nx info: no workspace path',
-        );
-      }
-      return getNxCloudTerminalOutput(args, WORKING_PATH, lspLogger);
-    },
-  );
 
   connection.onRequest(
     NxParseTargetStringRequest,
