@@ -17,6 +17,7 @@ jobs:
     name: Main Linux
     runs-on: ubuntu-latest
     env:
+      NX_BATCH_MODE: true
       NX_CI_EXECUTION_ENV: 'linux'
       NX_VERBOSE_LOGGING: true
       GIT_AUTHOR_EMAIL: test@test.com
