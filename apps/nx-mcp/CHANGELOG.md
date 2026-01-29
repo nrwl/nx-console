@@ -1,3 +1,18 @@
+## 0.16.0 (2026-01-29)
+
+### 🩹 Fixes
+
+- include system CA for fetch requests to enable talking to self-signed nx cloud instances ([#2977](https://github.com/nrwl/nx-console/pull/2977))
+- **mcp:** fallback to src/ when local generator schema not found in dist/ ([#2987](https://github.com/nrwl/nx-console/pull/2987))
+- **nx-mcp:** make polygraph tools opt-in for now ([#2988](https://github.com/nrwl/nx-console/pull/2988))
+- **nx-mcp:** strip $schema and return structuredContent in ci-information error case ([#2974](https://github.com/nrwl/nx-console/pull/2974))
+- **nxls:** enable passing explicit branch to getRecentCIPEs ([#2989](https://github.com/nrwl/nx-console/pull/2989))
+
+### ❤️ Thank You
+
+- Juri Strumpflohner @juristr
+- MaxKless @MaxKless
+
 ## 0.15.0 (2026-01-26)
 
 ### 🚀 Features
