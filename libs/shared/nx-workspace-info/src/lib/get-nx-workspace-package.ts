@@ -4,6 +4,7 @@ import type * as NxProjectGraphFileUtils from 'nx/src/project-graph/file-map-uti
 import type * as NxDaemonClient from 'nx/src/daemon/client/client';
 import type * as NxDaemonCache from 'nx/src/daemon/cache';
 import type * as NxOutput from 'nx/src/utils/output';
+import type * as NxCacheDirectory from 'nx/src/utils/cache-directory';
 import { join } from 'path';
 import {
   findNxPackagePath,
@@ -43,6 +44,22 @@ export async function getNxOutput(
   const importPath = await findNxPackagePath(
     workspacePath,
     join('src', 'utils', 'output.js'),
+  );
+
+  if (!importPath) {
+    return;
+  }
+
+  return getNxPackage(importPath, logger);
+}
+
+export async function getNxCacheDirectory(
+  workspacePath: string,
+  logger: Logger,
+): Promise<typeof NxCacheDirectory | undefined> {
+  const importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'utils', 'cache-directory.js'),
   );
 
   if (!importPath) {
