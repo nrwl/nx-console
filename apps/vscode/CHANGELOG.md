@@ -1,3 +1,25 @@
+# [18.85.0](https://github.com/nrwl/nx-console/compare/vscode-v18.84.0...vscode-v18.85.0) (2026-01-29)
+
+
+### Bug Fixes
+
+* add rerun button to environment state fixes ([#2964](https://github.com/nrwl/nx-console/issues/2964)) ([3cd7962](https://github.com/nrwl/nx-console/commit/3cd79622ca24f2b0279ade91151bed0e452349d5))
+* include system CA for fetch requests to enable talking to self-signed nx cloud instances ([#2977](https://github.com/nrwl/nx-console/issues/2977)) ([b56c3f5](https://github.com/nrwl/nx-console/commit/b56c3f5ebd44c2585a1d7610fdf0b10b88b07b61))
+* **mcp:** fallback to src/ when local generator schema not found in dist/ ([#2987](https://github.com/nrwl/nx-console/issues/2987)) ([65c942e](https://github.com/nrwl/nx-console/commit/65c942eea3ffef074afb05883c146953b576bb14))
+* **nx-mcp:** make polygraph tools opt-in for now ([#2988](https://github.com/nrwl/nx-console/issues/2988)) ([a778eb7](https://github.com/nrwl/nx-console/commit/a778eb7adfa45fc808fbcab60344e0e08f5a2584))
+* **nx-mcp:** strip $schema and return structuredContent in ci-information error case ([#2974](https://github.com/nrwl/nx-console/issues/2974)) ([ac2b483](https://github.com/nrwl/nx-console/commit/ac2b48326f5ee239b541acc9f369df89d446d17b))
+* **nxls:** enable passing explicit branch to getRecentCIPEs ([#2989](https://github.com/nrwl/nx-console/issues/2989)) ([49614ee](https://github.com/nrwl/nx-console/commit/49614ee41d4f089a69ff461dc8229ea5c810b0eb))
+* **nxls:** stop nxls from sending things into closed connection ([#2976](https://github.com/nrwl/nx-console/issues/2976)) ([dad9304](https://github.com/nrwl/nx-console/commit/dad930413160d04b06f794bcf5752c34c3e92ec4))
+* **vscode:** show branch on hover for recent PR tree items ([#2967](https://github.com/nrwl/nx-console/issues/2967)) ([8bf2922](https://github.com/nrwl/nx-console/commit/8bf29221a3b00ff48f4488fdf9efafd4a9907ac0))
+
+
+### Features
+
+* implement basic polygraph setup ([#2981](https://github.com/nrwl/nx-console/issues/2981)) ([b127cd3](https://github.com/nrwl/nx-console/commit/b127cd395c530fdbfc9a3cf3ea46532aa22ceecc))
+* **nx-cloud:** set up nx workspace ([#2972](https://github.com/nrwl/nx-console/issues/2972)) ([12a279d](https://github.com/nrwl/nx-console/commit/12a279d49bb2beeb03a80d950b22df3a721d3116))
+* **nx-mcp:** enable support for cipe URLs from nx cloud in ci-information tool ([#2963](https://github.com/nrwl/nx-console/issues/2963)) ([0d12bb6](https://github.com/nrwl/nx-console/commit/0d12bb605c31fae64bade782626a14ca3fe99f03))
+* **vscode:** add button to give more information on WHY daemon was disabled ([#2990](https://github.com/nrwl/nx-console/issues/2990)) ([0b5e696](https://github.com/nrwl/nx-console/commit/0b5e696d80e70c95a793d3fba393c48193c829e8))
+
 # [18.84.0](https://github.com/nrwl/nx-console/compare/vscode-v18.83.1...vscode-v18.84.0) (2026-01-22)
 
 
