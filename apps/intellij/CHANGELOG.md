@@ -1,3 +1,35 @@
+## 1.56.0 (2026-01-29)
+
+### Bug Fixes
+
+* add rerun button to environment state fixes ([#2964](https://github.com/nrwl/nx-console/issues/2964)) ([3cd7962](https://github.com/nrwl/nx-console/commit/3cd79622ca24f2b0279ade91151bed0e452349d5))
+* hide apply button for auto-applied tasks ([#2935](https://github.com/nrwl/nx-console/issues/2935)) ([452e6b1](https://github.com/nrwl/nx-console/commit/452e6b1e941b91800510fd1716d626578c8beb4d))
+* include system CA for fetch requests to enable talking to self-signed nx cloud instances ([#2977](https://github.com/nrwl/nx-console/issues/2977)) ([b56c3f5](https://github.com/nrwl/nx-console/commit/b56c3f5ebd44c2585a1d7610fdf0b10b88b07b61))
+* **nx-mcp:** adjust confidence property to match API ([#2962](https://github.com/nrwl/nx-console/issues/2962)) ([13add80](https://github.com/nrwl/nx-console/commit/13add8031b2a99373e9445414d2ffb54fb3b479e))
+* **nx-mcp:** remove awaiting project graph from mcp startup even with ide provider ([#2944](https://github.com/nrwl/nx-console/issues/2944)) ([12d2f6d](https://github.com/nrwl/nx-console/commit/12d2f6d37367cedeffc6e60c91fef7cb4194bf59))
+* **nx-mcp:** repair available-plugins tool after file has moved ([#2958](https://github.com/nrwl/nx-console/issues/2958)) ([40ec19f](https://github.com/nrwl/nx-console/commit/40ec19f73128923ef8e074af8777f0f94849f8a7))
+* **nxls:** enable passing explicit branch to getRecentCIPEs ([#2989](https://github.com/nrwl/nx-console/issues/2989)) ([49614ee](https://github.com/nrwl/nx-console/commit/49614ee41d4f089a69ff461dc8229ea5c810b0eb))
+* **nxls:** fix running tasks on windows ([#2953](https://github.com/nrwl/nx-console/issues/2953)) ([bc7ab45](https://github.com/nrwl/nx-console/commit/bc7ab456ddbd7913cc1793eda8d06e770c00d20f))
+* **nxls:** misc fixes to get nxls to work with helix ([#2793](https://github.com/nrwl/nx-console/issues/2793)) ([2728003](https://github.com/nrwl/nx-console/commit/2728003da7efab187423f6ec9b2df8675f0b5766))
+* **nxls:** repair nxls path issue on windows ([#2949](https://github.com/nrwl/nx-console/issues/2949)) ([c168440](https://github.com/nrwl/nx-console/commit/c1684406d408871a494ba72b1e81c5140683e23f))
+* **nxls:** stop nxls from sending things into closed connection ([#2976](https://github.com/nrwl/nx-console/issues/2976)) ([dad9304](https://github.com/nrwl/nx-console/commit/dad930413160d04b06f794bcf5752c34c3e92ec4))
+* **vscode:** dont show ai fix notification on subsequent loads if first load is error ([#2925](https://github.com/nrwl/nx-console/issues/2925)) ([e594648](https://github.com/nrwl/nx-console/commit/e5946489e36d9fd84e4d655d10be0f88f6cc1c9c))
+
+
+### Features
+
+* implement basic polygraph setup ([#2981](https://github.com/nrwl/nx-console/issues/2981)) ([b127cd3](https://github.com/nrwl/nx-console/commit/b127cd395c530fdbfc9a3cf3ea46532aa22ceecc))
+* implement passive daemon watcher ([#2851](https://github.com/nrwl/nx-console/issues/2851)) ([a9e1eb5](https://github.com/nrwl/nx-console/commit/a9e1eb566f9ec3245c5346c855841cb379e13c3f))
+* **nx-cloud:** set up nx workspace ([#2972](https://github.com/nrwl/nx-console/issues/2972)) ([12a279d](https://github.com/nrwl/nx-console/commit/12a279d49bb2beeb03a80d950b22df3a721d3116))
+* **nx-mcp:** add mcp tool for retrieving self-healing context from CI ([#2934](https://github.com/nrwl/nx-console/issues/2934)) ([f6246c1](https://github.com/nrwl/nx-console/commit/f6246c1fd14dfe807d023d9cd45b900b1c69abde))
+* **nx-mcp:** add server instructions to help agents understand it ([#2940](https://github.com/nrwl/nx-console/issues/2940)) ([b0f3051](https://github.com/nrwl/nx-console/commit/b0f30515f79d001036bec45335973a62fe801e6a))
+* **nx-mcp:** add verifiedTaskIds to ci_information tool output ([#2957](https://github.com/nrwl/nx-console/issues/2957)) ([fbe470e](https://github.com/nrwl/nx-console/commit/fbe470ebfdd1e3ba6d0fa4a91e2ef114bbf959d6))
+* **nx-mcp:** enable support for cipe URLs from nx cloud in ci-information tool ([#2963](https://github.com/nrwl/nx-console/issues/2963)) ([0d12bb6](https://github.com/nrwl/nx-console/commit/0d12bb605c31fae64bade782626a14ca3fe99f03))
+* **nx-mcp:** modify MCP tool to have select arg and separately paginated diff, remote and local tasks ([#2960](https://github.com/nrwl/nx-console/issues/2960)) ([9e4aaba](https://github.com/nrwl/nx-console/commit/9e4aaba27ace3c58dcd7b7e877e784a0bead2ee4))
+* **nx-mcp:** remove nx_run_generator tool ([#2939](https://github.com/nrwl/nx-console/issues/2939)) ([d2a4402](https://github.com/nrwl/nx-console/commit/d2a4402ce01d985d0cff977e790862c8596c0ea4))
+* **nxls:** make nxls intialization not block on startup ([#2959](https://github.com/nrwl/nx-console/issues/2959)) ([6fbf9ed](https://github.com/nrwl/nx-console/commit/6fbf9ed91e517dece7d50ae50d6839ae9eba2479))
+* **vscode:** add button to give more information on WHY daemon was disabled ([#2990](https://github.com/nrwl/nx-console/issues/2990)) ([0b5e696](https://github.com/nrwl/nx-console/commit/0b5e696d80e70c95a793d3fba393c48193c829e8))
+
 ## 1.55.0 (2025-12-09)
 
 ### Bug Fixes
