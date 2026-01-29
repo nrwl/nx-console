@@ -220,6 +220,11 @@
           "command": "nxConsole.restartDaemonWatcher",
           "when": "view == nxProjects && viewItem == daemonWatcherNotRunning",
           "group": "inline@1"
+        },
+        {
+          "command": "nxConsole.showDaemonDisabledReason",
+          "when": "view == nxProjects && viewItem == daemonDisabled",
+          "group": "inline@1"
         }
       ],
       "editor/title": [
@@ -329,6 +334,10 @@
         },
         {
           "command": "nxCloud.openFixDetails",
+          "when": "false"
+        },
+        {
+          "command": "nxConsole.showDaemonDisabledReason",
           "when": "false"
         },
         {
@@ -709,6 +718,12 @@
         "title": "Restart Daemon Watcher",
         "command": "nxConsole.restartDaemonWatcher",
         "icon": "$(refresh)"
+      },
+      {
+        "category": "Nx",
+        "title": "Show Daemon Disabled Reason",
+        "command": "nxConsole.showDaemonDisabledReason",
+        "icon": "$(eye)"
       },
       {
         "category": "Nx Migrate",

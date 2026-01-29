@@ -1,25 +1,22 @@
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server-types';
+import { getNxCacheDirectory } from '@nx-console/shared-nx-workspace-info';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import {
   getNxlsClient,
-  NxlsClient,
   showRefreshLoadingAtLocation,
 } from '@nx-console/vscode-lsp-client';
 import { selectProject } from '@nx-console/vscode-nx-cli-quickpicks';
 import { revealNxProject } from '@nx-console/vscode-nx-config-decoration';
 import { getNxWorkspaceProjects } from '@nx-console/vscode-nx-workspace';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { ExtensionContext, commands, window } from 'vscode';
+import { existsSync } from 'fs';
+import { join } from 'path';
+import { commands, ExtensionContext, Uri, window, workspace } from 'vscode';
 import { AtomizerDecorationProvider } from './atomizer-decorations';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import { NxTreeItem } from './nx-tree-item';
 import { ProjectGraphErrorDecorationProvider } from './project-graph-error-decorations';
-import {
-  NxStartDaemonRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server-types';
-import {
-  logAndShowError,
-  showErrorMessageWithOpenLogs,
-} from '@nx-console/vscode-output-channels';
 
 export function initNxProjectView(
   context: ExtensionContext,
@@ -39,6 +36,10 @@ export function initNxProjectView(
     commands.registerCommand('nxConsole.restartDaemonWatcher', async () => {
       await tryRestartDaemonWatcher();
     }),
+    commands.registerCommand(
+      'nxConsole.showDaemonDisabledReason',
+      showDaemonDisabledReason,
+    ),
   );
 
   AtomizerDecorationProvider.register(context);
@@ -89,4 +90,57 @@ async function tryRestartDaemonWatcher() {
   const nxlsClient = getNxlsClient();
 
   await nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+}
+
+async function showDaemonDisabledReason() {
+  const daemonDir = await getDaemonDirectory();
+  if (!daemonDir) {
+    showDaemonLogNotFoundError();
+    return;
+  }
+
+  const disabledFilePath = join(daemonDir, 'disabled');
+  if (existsSync(disabledFilePath)) {
+    const doc = await workspace.openTextDocument(Uri.file(disabledFilePath));
+    await window.showTextDocument(doc);
+    return;
+  }
+
+  const daemonLogPath = join(daemonDir, 'daemon.log');
+  if (existsSync(daemonLogPath)) {
+    const doc = await workspace.openTextDocument(Uri.file(daemonLogPath));
+    await window.showTextDocument(doc);
+    return;
+  }
+
+  showDaemonLogNotFoundError();
+}
+
+function showDaemonLogNotFoundError() {
+  window
+    .showErrorMessage(
+      'Could not find daemon log files. Try restarting the daemon.',
+      'Restart Daemon',
+    )
+    .then((selection) => {
+      if (selection === 'Restart Daemon') {
+        commands.executeCommand('nxConsole.restartDaemonWatcher');
+      }
+    });
+}
+
+async function getDaemonDirectory(): Promise<string | undefined> {
+  const workspacePath = getNxWorkspacePath();
+  const cacheDirectoryModule = await getNxCacheDirectory(
+    workspacePath,
+    vscodeLogger,
+  );
+
+  if (!cacheDirectoryModule) {
+    return;
+  }
+
+  const workspaceDataDirectory =
+    cacheDirectoryModule.workspaceDataDirectoryForWorkspace(workspacePath);
+  return join(workspaceDataDirectory, 'd');
 }
