@@ -8,9 +8,21 @@ export function hasNxWorkspaceSkill(workspacePath: string): boolean {
   let skillPath: string | null = null;
 
   if (isInCursor()) {
-    skillPath = join(workspacePath, '.cursor', 'skills', 'nx-workspace', 'SKILL.md');
+    skillPath = join(
+      workspacePath,
+      '.cursor',
+      'skills',
+      'nx-workspace',
+      'SKILL.md',
+    );
   } else if (isInVSCode()) {
-    skillPath = join(workspacePath, '.github', 'skills', 'nx-workspace', 'SKILL.md');
+    skillPath = join(
+      workspacePath,
+      '.github',
+      'skills',
+      'nx-workspace',
+      'SKILL.md',
+    );
   }
 
   return skillPath ? existsSync(skillPath) : false;
