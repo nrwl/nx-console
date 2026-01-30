@@ -22,6 +22,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var telemetrySetting: TelemetrySetting
     private lateinit var nxCloudNotificationsSetting: NxCloudNotificationsSetting
+    private lateinit var enableDebugLoggingSetting: EnableDebugLoggingSetting
 
     override fun createComponent(): JComponent {
         // project settings
@@ -44,6 +45,9 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
         nxCloudNotificationsSetting = NxCloudNotificationsSetting()
         nxCloudNotificationsSetting.setValue(settingsProvider.nxCloudNotifications)
 
+        enableDebugLoggingSetting = EnableDebugLoggingSetting()
+        enableDebugLoggingSetting.setValue(settingsProvider.enableDebugLogging)
+
         return panel {
             group("Project Settings") {
                 workspacePathSetting.render(this)
@@ -54,6 +58,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)
                 nxCloudNotificationsSetting.render(this)
+                enableDebugLoggingSetting.render(this)
             }
         }
     }
@@ -65,7 +70,8 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
             generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters ||
             toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle ||
-            nxCloudNotificationsSetting.getValue() != settingsProvider.nxCloudNotifications
+            nxCloudNotificationsSetting.getValue() != settingsProvider.nxCloudNotifications ||
+            enableDebugLoggingSetting.getValue() != settingsProvider.enableDebugLogging
     }
 
     override fun apply() {
@@ -82,6 +88,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
         settingsProvider.nxCloudNotifications = nxCloudNotificationsSetting.getValue()
+        settingsProvider.enableDebugLogging = enableDebugLoggingSetting.getValue()
     }
 
     override fun getDisplayName(): String {

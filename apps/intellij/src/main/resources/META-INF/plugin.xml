@@ -115,6 +115,10 @@
       <add-to-group group-id="EditorTabPopupMenu"/>
       <add-to-group group-id="EditorTabsEntryPoint"/>
     </action>
+    <action id="dev.nx.console.logs.RevealNxLogsAction" class="dev.nx.console.logs.RevealNxLogsAction">
+      <add-to-group group-id="EditorTabPopupMenu"/>
+      <add-to-group group-id="EditorTabsEntryPoint"/>
+    </action>
     <action id="dev.nx.console.ide.ShowNxProjectConfigurationAction"
             class="dev.nx.console.ide.ShowNxProjectConfigurationAction"
             text="Nx: Show Project Configuration" icon="dev.nx.console.NxIcons.Action">
