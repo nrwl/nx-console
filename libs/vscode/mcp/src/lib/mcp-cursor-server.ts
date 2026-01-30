@@ -1,4 +1,7 @@
-import { McpHttpServerCore } from './mcp-http-server-core';
+import {
+  McpHttpServerCore,
+  McpHttpServerCoreOptions,
+} from './mcp-http-server-core';
 
 /**
  * Cursor-specific wrapper around the core HTTP server
@@ -7,8 +10,8 @@ import { McpHttpServerCore } from './mcp-http-server-core';
 export class McpCursorServer {
   private core: McpHttpServerCore;
 
-  constructor(mcpPort: number) {
-    this.core = new McpHttpServerCore(mcpPort);
+  constructor(mcpPort: number, options: McpHttpServerCoreOptions = {}) {
+    this.core = new McpHttpServerCore(mcpPort, options);
   }
 
   /**

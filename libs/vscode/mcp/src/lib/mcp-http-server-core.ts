@@ -3,6 +3,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
   mcpServerInstructions,
+  MINIMAL_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
 } from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
@@ -16,6 +17,10 @@ import express, { Request, Response } from 'express';
 import { ideProvider, nxWorkspaceInfoProvider } from './data-providers';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
 
+export interface McpHttpServerCoreOptions {
+  minimal?: boolean;
+}
+
 /**
  * Core HTTP server for MCP - platform agnostic
  * This can be used by both VSCode and Cursor
@@ -24,8 +29,13 @@ export class McpHttpServerCore {
   private app: express.Application = express();
   private appInstance?: ReturnType<express.Application['listen']>;
   private streamableServers = new Set<NxMcpServerWrapper>();
+  private options: McpHttpServerCoreOptions;
 
-  constructor(private mcpPort: number) {
+  constructor(
+    private mcpPort: number,
+    options: McpHttpServerCoreOptions = {},
+  ) {
+    this.options = options;
     this.startStreamableWebServer(mcpPort);
   }
 
@@ -88,9 +98,18 @@ export class McpHttpServerCore {
             ? providedPath
             : undefined;
 
-          const toolsFilter =
+          let toolsFilter: string[] | undefined =
             GlobalConfigurationStore.instance.get('mcpToolsFilter') ??
             undefined;
+
+          if (this.options.minimal) {
+            vscodeLogger.log(
+              'Minimal mode enabled, hiding workspace analysis tools',
+            );
+            toolsFilter = toolsFilter
+              ? [...toolsFilter, ...MINIMAL_EXCLUDED_TOOLS]
+              : [...MINIMAL_EXCLUDED_TOOLS];
+          }
 
           const server = await NxMcpServerWrapper.create(
             nxWorkspacePath,

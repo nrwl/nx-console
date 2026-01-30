@@ -11,6 +11,7 @@ import {
 import {
   getMcpJsonPath,
   hasNxMcpEntry,
+  hasNxWorkspaceSkill,
   isInCursor,
   isInVSCode,
   isInWindsurf,
@@ -160,7 +161,13 @@ async function initModernVSCodeMcp(context: ExtensionContext, mcpPort: number) {
   const { McpStreamableWebServer, NxMcpServerDefinitionProvider } =
     await import('./mcp-vscode-server.js');
 
-  mcpStreamableWebServer = new McpStreamableWebServer(mcpPort);
+  const workspacePath = getNxWorkspacePath();
+  const minimal = workspacePath ? hasNxWorkspaceSkill(workspacePath) : false;
+  if (minimal) {
+    vscodeLogger.log('Nx workspace skill detected, enabling minimal MCP mode');
+  }
+
+  mcpStreamableWebServer = new McpStreamableWebServer(mcpPort, { minimal });
   context.subscriptions.push({
     dispose: () => {
       mcpStreamableWebServer?.stopMcpServer();
@@ -184,7 +191,15 @@ async function initCursorMcp(context: ExtensionContext, mcpPort: number) {
 
   // Register with Cursor's MCP API
   if ('cursor' in vscode && 'mcp' in (vscode as any).cursor) {
-    mcpCursorServer = new McpCursorServer(mcpPort);
+    const workspacePath = getNxWorkspacePath();
+    const minimal = workspacePath ? hasNxWorkspaceSkill(workspacePath) : false;
+    if (minimal) {
+      vscodeLogger.log(
+        'Nx workspace skill detected, enabling minimal MCP mode',
+      );
+    }
+
+    mcpCursorServer = new McpCursorServer(mcpPort, { minimal });
     context.subscriptions.push({
       dispose: () => {
         mcpCursorServer?.stopMcpServer();

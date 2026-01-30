@@ -6,6 +6,7 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
   IdeProvider,
   mcpServerInstructions,
+  MINIMAL_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
 } from '@nx-console/nx-mcp-server';
@@ -110,17 +111,9 @@ async function main() {
 
   // When --minimal is set, exclude workspace analysis tools
   if (argv.minimal) {
-    const minimalExcludedTools = [
-      '!nx_available_plugins',
-      '!nx_workspace_path',
-      '!nx_workspace',
-      '!nx_project_details',
-      '!nx_generators',
-      '!nx_generator_schema',
-    ];
     toolsFilter = toolsFilter
-      ? [...toolsFilter, ...minimalExcludedTools]
-      : minimalExcludedTools;
+      ? [...toolsFilter, ...MINIMAL_EXCLUDED_TOOLS]
+      : [...MINIMAL_EXCLUDED_TOOLS];
     logger.log('Minimal mode enabled, hiding workspace analysis tools');
   }
 
