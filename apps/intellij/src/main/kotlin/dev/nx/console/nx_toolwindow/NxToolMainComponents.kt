@@ -7,12 +7,16 @@ import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ToolbarLabelAction
 import com.intellij.openapi.actionSystem.toolbarLayout.ToolbarLayoutStrategy
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Align
@@ -31,9 +35,12 @@ import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import dev.nx.console.utils.nxBasePath
 import java.awt.*
 import java.awt.event.ActionEvent
+import java.io.File
 import java.net.URI
+import java.nio.file.Paths
 import javax.swing.*
 import javax.swing.border.CompoundBorder
 import kotlinx.coroutines.launch
@@ -276,6 +283,18 @@ class NxToolMainComponents(private val project: Project) {
                             font = font.deriveFont(Font.PLAIN)
                         }
                     )
+                    add(Box.createHorizontalStrut(4))
+                    add(
+                        JButton().apply {
+                            icon = AllIcons.General.InspectionsEye
+                            toolTipText = "Show Reason"
+                            isContentAreaFilled = false
+                            isBorderPainted = false
+                            isFocusPainted = false
+                            cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                            addActionListener { showDaemonDisabledReason() }
+                        }
+                    )
                 }
                 DaemonWarningType.WATCHER_NOT_RUNNING -> {
                     add(
@@ -298,6 +317,47 @@ class NxToolMainComponents(private val project: Project) {
             NxlsService.getInstance(project).startDaemon()
             NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
         }
+    }
+
+    private fun showDaemonDisabledReason() {
+        TelemetryService.getInstance(project).featureUsed("misc.show-daemon-disabled-reason")
+
+        val daemonDir = Paths.get(project.nxBasePath, ".nx", "workspace-data", "d").toFile()
+
+        val disabledFile = File(daemonDir, "disabled")
+        if (disabledFile.exists()) {
+            openFile(disabledFile)
+            return
+        }
+
+        val daemonLogFile = File(daemonDir, "daemon.log")
+        if (daemonLogFile.exists()) {
+            openFile(daemonLogFile)
+            return
+        }
+
+        showDaemonLogNotFoundError()
+    }
+
+    private fun openFile(file: File) {
+        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file)
+        if (virtualFile != null) {
+            FileEditorManager.getInstance(project).openFile(virtualFile, true)
+        }
+    }
+
+    private fun showDaemonLogNotFoundError() {
+        NotificationGroupManager.getInstance()
+            .getNotificationGroup("Nx Console")
+            .createNotification(
+                "Could not find daemon log files. Try restarting the daemon.",
+                NotificationType.ERROR,
+            )
+            .setTitle("Nx Console")
+            .addAction(
+                NotificationAction.createSimpleExpiring("Restart Daemon") { restartDaemonWatcher() }
+            )
+            .notify(project)
     }
 
     fun createNoNodeInterpreterComponent(): JComponent {
