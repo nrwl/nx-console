@@ -4,7 +4,10 @@ import {
   McpServerDefinitionProvider,
   Uri,
 } from 'vscode';
-import { McpHttpServerCore } from './mcp-http-server-core';
+import {
+  McpHttpServerCore,
+  McpHttpServerCoreOptions,
+} from './mcp-http-server-core';
 
 /**
  * VSCode-specific MCP server definition provider
@@ -47,8 +50,8 @@ export class NxMcpHttpServerDefinition extends McpHttpServerDefinition {
 export class McpStreamableWebServer {
   private core: McpHttpServerCore;
 
-  constructor(mcpPort: number) {
-    this.core = new McpHttpServerCore(mcpPort);
+  constructor(mcpPort: number, options: McpHttpServerCoreOptions = {}) {
+    this.core = new McpHttpServerCore(mcpPort, options);
   }
 
   /**

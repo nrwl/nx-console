@@ -15,5 +15,6 @@ export * from './lib/read-projects';
 export * from './lib/register-codelens';
 export { sendMessageToAgent } from './lib/send-message-to-agent';
 export { getShellExecutionForConfig } from './lib/shell-execution';
+export { hasNxWorkspaceSkill } from './lib/skill-detection';
 export * from './lib/string-utils';
 export { watchFile } from './lib/watch-file';
