@@ -10,6 +10,7 @@ import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.managers.getFilePath
 import dev.nx.console.nxls.server.NxlsLanguageServer
+import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.nxlsWorkingPath
@@ -80,26 +81,33 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                         fun(consume: MessageConsumer): MessageConsumer {
                             return MessageConsumer { message ->
                                 try {
+                                    val debugEnabled =
+                                        NxConsoleSettingsProvider.getInstance().enableDebugLogging
                                     val response = message as? ResponseMessage
                                     response?.let {
                                         it.error?.let {
                                             log.error("Error from nxls: ${it.message}")
                                         }
                                         it.result?.let { result ->
-                                            log.log(
-                                                "Result from nxls: ${result.let {
-                                                    if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
-                                                }}"
-                                            )
+                                            val resultStr = result.toString()
+                                            val logMessage =
+                                                if (debugEnabled || resultStr.length <= 100)
+                                                    resultStr
+                                                else resultStr.substring(0, 100)
+                                            log.log("Result from nxls: $logMessage")
                                         }
                                     }
 
                                     val request = message as? RequestMessage
                                     request?.let { request ->
+                                        val paramsStr = request.params?.toString()
+                                        val paramsLog =
+                                            if (paramsStr == null) null
+                                            else if (debugEnabled || paramsStr.length <= 100)
+                                                paramsStr
+                                            else paramsStr.substring(0, 100)
                                         log.log(
-                                            "Sending request to nxls: ${request.method} (${request.params?.let {
-                                                if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
-                                            }})"
+                                            "Sending request to nxls: ${request.method} ($paramsLog)"
                                         )
                                     }
 
@@ -240,6 +248,12 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         val initParams = InitializeParams()
         initParams.workspaceFolders =
             listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath), "nx-workspace"))
+
+        initParams.initializationOptions =
+            mapOf(
+                "workspacePath" to nxlsWorkingPath(project.nxBasePath),
+                "enableDebugLogging" to NxConsoleSettingsProvider.getInstance().enableDebugLogging,
+            )
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true

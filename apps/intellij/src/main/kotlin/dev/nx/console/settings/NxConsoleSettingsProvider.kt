@@ -43,6 +43,12 @@ internal class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSet
             state.nxCloudNotifications = value
         }
 
+    var enableDebugLogging: Boolean
+        get() = state.enableDebugLogging
+        set(value) {
+            state.enableDebugLogging = value
+        }
+
     companion object {
         fun getInstance(): NxConsoleSettingsProvider {
             return service()
@@ -55,4 +61,5 @@ data class NxConsoleSettingsState(
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
     var nxCloudNotifications: NxCloudNotificationsLevel = NxCloudNotificationsLevel.ALL,
+    var enableDebugLogging: Boolean = false,
 )

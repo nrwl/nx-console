@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import dev.nx.console.settings.NxConsoleSettingsProvider
 import java.io.File
 import java.io.RandomAccessFile
 import java.time.LocalDateTime
@@ -43,8 +44,10 @@ class NxConsoleLogger {
 
     fun debug(message: String) {
         ideaLogger.debug(message)
-        writeToFile("D", message)
-        notifyListeners()
+        if (NxConsoleSettingsProvider.getInstance().enableDebugLogging) {
+            writeToFile("D", message)
+            notifyListeners()
+        }
     }
 
     fun error(message: String, exception: Throwable? = null) {
