@@ -2,13 +2,13 @@ package dev.nx.console.cloud
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.AITaskFixStatus
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfoErrorType
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.utils.NxConsoleLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +36,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
             project.getService(CIPEPollingService::class.java)
     }
 
-    private val logger = thisLogger()
+    private val logger = NxConsoleLogger.getInstance()
 
     private var pollingJob: Job? = null
     private var currentPollingInterval = COLD_POLLING_TIME_MS
@@ -53,11 +53,11 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
     /** Start polling for CIPE data */
     fun startPolling() {
         if (pollingJob?.isActive == true) {
-            logger.debug("CIPE polling already active")
+            logger.log("CIPE polling already active")
             return
         }
 
-        logger.info("Starting CIPE polling with initial interval: ${currentPollingInterval}ms")
+        logger.log("Starting CIPE polling with initial interval: ${currentPollingInterval}ms")
         _isPolling.value = true
 
         pollingJob =
@@ -69,7 +69,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
-                        logger.error("Error during CIPE polling", e)
+                        logger.log("Error during CIPE polling: ${e.message}")
                         delay(currentPollingInterval)
                     }
                 }
@@ -78,7 +78,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
 
     /** Stop polling for CIPE data */
     fun stopPolling() {
-        logger.info("Stopping CIPE polling")
+        logger.log("Stopping CIPE polling")
         pollingJob?.cancel()
         pollingJob = null
         _isPolling.value = false
@@ -86,7 +86,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
 
     /** Force an immediate poll, useful for user-triggered refreshes */
     fun forcePoll() {
-        logger.debug("Force polling CIPE data")
+        logger.log("Force polling CIPE data")
         cs.launch { pollCIPEData() }
     }
 
@@ -117,7 +117,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                 }
             }
         } catch (e: Exception) {
-            logger.error("[CIPE_POLL] Failed to poll CIPE data: ${e.message}", e)
+            logger.log("[CIPE_POLL] Failed to poll CIPE data: ${e.message}")
         }
     }
 
@@ -133,7 +133,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
             when {
                 // Authentication error - slow down polling
                 data.error?.type == CIPEInfoErrorType.authentication -> {
-                    logger.debug("Authentication error detected, switching to SLEEP polling")
+                    logger.log("Authentication error detected, switching to SLEEP polling")
                     SLEEP_POLLING_TIME_MS
                 }
 
@@ -146,25 +146,25 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                         } ?: false
                     }
                 } == true -> {
-                    logger.debug("AI fixes in progress detected, switching to AI_FIX polling")
+                    logger.log("AI fixes in progress detected, switching to AI_FIX polling")
                     AI_FIX_POLLING_TIME_MS
                 }
 
                 // Any CIPE in progress - speed up polling
                 data.info?.any { it.status == CIPEExecutionStatus.IN_PROGRESS } == true -> {
-                    logger.debug("Active CIPEs detected, switching to HOT polling")
+                    logger.log("Active CIPEs detected, switching to HOT polling")
                     HOT_POLLING_TIME_MS
                 }
 
                 // Normal state
                 else -> {
-                    logger.debug("No active CIPEs or AI fixes, switching to COLD polling")
+                    logger.log("No active CIPEs or AI fixes, switching to COLD polling")
                     COLD_POLLING_TIME_MS
                 }
             }
 
         if (newInterval != currentPollingInterval) {
-            logger.info(
+            logger.log(
                 "Polling interval changed from ${currentPollingInterval}ms to ${newInterval}ms"
             )
             currentPollingInterval = newInterval
@@ -176,7 +176,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
             try {
                 listener.onDataChanged(event)
             } catch (e: Exception) {
-                logger.error("[CIPE_POLL] Error notifying data change listener: ${e.message}", e)
+                logger.log("[CIPE_POLL] Error notifying data change listener: ${e.message}")
             }
         }
     }

@@ -1,10 +1,12 @@
 package dev.nx.console.nx_toolwindow
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import dev.nx.console.logs.OpenNxLogsAction
 
 private class NxToolWindowFactory : ToolWindowFactory, DumbAware {
 
@@ -14,6 +16,8 @@ private class NxToolWindowFactory : ToolWindowFactory, DumbAware {
         val content = contentManager.factory.createContent(toolwindowPanel, null, false)
         content.isCloseable = false
         contentManager.addContent(content)
-        toolWindow.setAdditionalGearActions(DefaultActionGroup(ToggleNxCloudViewAction()))
+        toolWindow.setAdditionalGearActions(
+            DefaultActionGroup(ToggleNxCloudViewAction(), Separator.create(), OpenNxLogsAction())
+        )
     }
 }

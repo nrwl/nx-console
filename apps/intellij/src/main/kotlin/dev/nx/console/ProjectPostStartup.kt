@@ -11,6 +11,7 @@ import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.sync_services.NxProjectJsonToProjectMap
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 
 internal class ProjectPostStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
+        NxConsoleLogger.getInstance().logSessionStart()
 
         var currentDir = File(project.nxBasePath)
         val filesToScanFor = listOf("nx.json", "workspace.json", "lerna.json")
