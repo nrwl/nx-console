@@ -23,12 +23,6 @@ allprojects {
     plugin("org.jetbrains.kotlin.jvm")
     plugin("org.jetbrains.kotlin.plugin.serialization")
   }
-
-  tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    compilerOptions {
-      incremental = System.getenv("CI") == null
-    }
-  }
 }
 
 tasks {
