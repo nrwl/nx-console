@@ -37,7 +37,25 @@ class NxConsoleLogger {
 
     fun log(message: String) {
         ideaLogger.info(message)
-        writeToFile(message)
+        writeToFile("L", message)
+        notifyListeners()
+    }
+
+    fun debug(message: String) {
+        ideaLogger.debug(message)
+        writeToFile("D", message)
+        notifyListeners()
+    }
+
+    fun error(message: String, exception: Throwable? = null) {
+        ideaLogger.error(message, exception)
+        val fullMessage =
+            if (exception != null) {
+                "$message\n${exception.stackTraceToString()}"
+            } else {
+                message
+            }
+        writeToFile("E", fullMessage)
         notifyListeners()
     }
 
@@ -88,12 +106,13 @@ class NxConsoleLogger {
         listeners.remove(listener)
     }
 
-    private fun writeToFile(message: String) {
+    @Synchronized
+    private fun writeToFile(level: String, message: String) {
         try {
             rotateIfNeeded()
 
             val timestamp = LocalDateTime.now().format(dateFormatter)
-            val logLine = "[$timestamp] $message\n"
+            val logLine = "[$level][$timestamp] $message\n"
 
             logFile.appendText(logLine)
         } catch (e: Exception) {

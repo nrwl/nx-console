@@ -15,27 +15,11 @@ class NxLogsViewerService(private val project: Project) {
             project.getService(NxLogsViewerService::class.java)
     }
 
-    private var currentLogFile: NxLogsVirtualFile? = null
-
     suspend fun openLogViewer() {
         withContext(Dispatchers.EDT) {
             val fileEditorManager = FileEditorManager.getInstance(project)
-
-            // Reuse existing file if already open
-            val existingFile = currentLogFile
-            if (existingFile != null) {
-                fileEditorManager.openFile(existingFile, true)
-                return@withContext
-            }
-
-            // Create new log file and open it
             val logFile = NxLogsVirtualFile()
             fileEditorManager.openFile(logFile, true)
-            currentLogFile = logFile
         }
-    }
-
-    fun onLogFileClosed() {
-        currentLogFile = null
     }
 }

@@ -144,16 +144,14 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                                 .downloadAndExtractArtifact(terminalOutputUrl)
 
                         if (response?.error != null) {
-                            logger.log("Failed to download terminal output: ${response.error}")
+                            logger.error("Failed to download terminal output: ${response.error}")
                             terminalOutput =
                                 "Failed to retrieve terminal output. Please check the Nx Console output for more details."
                         } else {
                             terminalOutput = response?.content
                         }
                     } catch (e: Exception) {
-                        logger.log(
-                            "Failed to download terminal output for task $failedTaskId: ${e.message}"
-                        )
+                        logger.error("Failed to download terminal output for task $failedTaskId", e)
                         terminalOutput =
                             "Failed to retrieve terminal output. Please check the Nx Console output for more details."
                     }

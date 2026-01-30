@@ -25,9 +25,7 @@ allprojects {
   }
 
   tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    compilerOptions {
-      incremental = System.getenv("CI") == null
-    }
+    compilerOptions { incremental = System.getenv("CI") == null }
   }
 }
 

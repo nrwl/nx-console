@@ -73,7 +73,7 @@ class CIPEMonitoringService(private val project: Project, private val cs: Corout
                     )
                 }
             } catch (e: Exception) {
-                logger.log("[CIPE_MONITOR] Failed to initialize CIPE monitoring: ${e.message}")
+                logger.error("[CIPE_MONITOR] Failed to initialize CIPE monitoring", e)
             }
         }
     }

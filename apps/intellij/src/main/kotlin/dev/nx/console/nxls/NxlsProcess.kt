@@ -55,7 +55,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                                 return@run
                             }
 
-                            logger.log("Nxls early exit: $this")
+                            logger.error("Nxls early exit: $this")
                             onExit?.invoke()
                         }
                     }

@@ -10,12 +10,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolderBase
 import dev.nx.console.utils.NxConsoleLogListener
 import dev.nx.console.utils.NxConsoleLogger
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.writeAction
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class NxLogsEditor(private val project: Project, private val file: NxLogsVirtualFile) :
@@ -26,7 +25,7 @@ class NxLogsEditor(private val project: Project, private val file: NxLogsVirtual
         EditorFactory.getInstance().createViewer(document, project, EditorKind.MAIN_EDITOR)
             as EditorEx
 
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val cs = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
     private val logListener = NxConsoleLogListener { refreshContent() }
 
@@ -42,7 +41,7 @@ class NxLogsEditor(private val project: Project, private val file: NxLogsVirtual
     }
 
     private fun refreshContent() {
-        scope.launch(Dispatchers.EDT) {
+        cs.launch(Dispatchers.EDT) {
             if (project.isDisposed) return@launch
 
             val content = file.refreshContent()
@@ -95,7 +94,6 @@ class NxLogsEditor(private val project: Project, private val file: NxLogsVirtual
 
     override fun dispose() {
         NxConsoleLogger.getInstance().removeListener(logListener)
-        scope.cancel()
         EditorFactory.getInstance().releaseEditor(editor)
     }
 }
