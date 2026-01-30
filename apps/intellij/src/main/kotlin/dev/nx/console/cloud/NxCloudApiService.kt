@@ -50,13 +50,13 @@ class NxCloudApiService(private val project: Project) {
                 val nxCloudUrl = cloudStatus?.nxCloudUrl ?: DEFAULT_CLOUD_URL
 
                 if (cloudStatus?.isConnected != true) {
-                    logger.log("Nx Cloud is not connected. Status: $cloudStatus")
+                    logger.error("Nx Cloud is not connected. Status: $cloudStatus")
                     return@withContext false
                 }
 
                 val authHeaders = NxlsService.getInstance(project).cloudAuthHeaders()
                 if (authHeaders == null) {
-                    logger.log("Failed to get Nx Cloud auth headers")
+                    logger.error("Failed to get Nx Cloud auth headers")
                     return@withContext false
                 }
 
@@ -94,10 +94,10 @@ class NxCloudApiService(private val project: Project) {
                                     } catch (e: Exception) {
                                         "Unable to read error response"
                                     }
-                                logger.log(
+                                logger.error(
                                     "Authentication failed (401). Please check your Nx Cloud credentials."
                                 )
-                                logger.log("Response body: $errorResponse")
+                                logger.error("Response body: $errorResponse")
                             }
 
                             statusCode in 200..299
@@ -105,7 +105,7 @@ class NxCloudApiService(private val project: Project) {
 
                 return@withContext response
             } catch (e: Exception) {
-                logger.log("Failed to update suggested fix: ${e.message}")
+                logger.error("Failed to update suggested fix", e)
                 return@withContext false
             }
         }

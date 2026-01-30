@@ -97,7 +97,7 @@ class DocumentManager(val editor: Editor) {
                 createLookupItem(this, item)?.let { lookupItems.add(it) }
             }
         } catch (e: Exception) {
-            log.log("Error getting completions: ${e.message}")
+            log.error("Error getting completions", e)
         }
 
         return lookupItems
@@ -113,7 +113,7 @@ class DocumentManager(val editor: Editor) {
                 }
             return contents?.replace("\\", "")?.ifEmpty { null }
         } catch (e: Exception) {
-            log.log("Error getting hover info: ${e.message}")
+            log.error("Error getting hover info", e)
             null
         }
     }

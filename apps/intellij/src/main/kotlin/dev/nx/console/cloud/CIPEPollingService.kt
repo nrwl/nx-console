@@ -117,7 +117,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
-                        logger.log("Error during CIPE polling: ${e.message}")
+                        logger.error("Error during CIPE polling", e)
                         delay(currentPollingInterval)
                     }
                 }
@@ -165,7 +165,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
                 }
             }
         } catch (e: Exception) {
-            logger.log("[CIPE_POLL] Failed to poll CIPE data: ${e.message}")
+            logger.error("[CIPE_POLL] Failed to poll CIPE data", e)
         }
     }
 
@@ -219,7 +219,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
             try {
                 listener.onDataChanged(event)
             } catch (e: Exception) {
-                logger.log("[CIPE_POLL] Error notifying data change listener: ${e.message}")
+                logger.error("[CIPE_POLL] Error notifying data change listener", e)
             }
         }
     }

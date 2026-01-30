@@ -9,7 +9,7 @@ class NxLogsFileType : FileType {
 
     override fun getDescription(): String = "Nx Console Logs"
 
-    override fun getDefaultExtension(): String = ".nxlog"
+    override fun getDefaultExtension(): String = "nxlog"
 
     override fun getIcon(): Icon = NxIcons.FileType
 

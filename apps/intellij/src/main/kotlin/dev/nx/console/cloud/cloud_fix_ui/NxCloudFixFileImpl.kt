@@ -143,7 +143,7 @@ class NxCloudFixFileImpl(
         try {
             json.encodeToString(details)
         } catch (e: Exception) {
-            NxConsoleLogger.getInstance().log("Failed to serialize fix details: ${e.message}")
+            NxConsoleLogger.getInstance().error("Failed to serialize fix details", e)
 
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Nx Cloud CIPE")
@@ -288,7 +288,7 @@ class NxCloudFixFileImpl(
                 is NxCloudFixMessage.OpenExternalLink -> handleOpenExternalLink(parsed)
             }
         } catch (e: Exception) {
-            logger.log("Failed to parse message from webview: ${e.message}")
+            logger.error("Failed to parse message from webview", e)
         }
     }
 
@@ -370,7 +370,7 @@ class NxCloudFixFileImpl(
                     showErrorNotification("Failed to apply AI fix")
                 }
             } catch (e: Exception) {
-                NxConsoleLogger.getInstance().log("Failed to apply AI fix: ${e.message}")
+                NxConsoleLogger.getInstance().error("Failed to apply AI fix", e)
                 showErrorNotification("Failed to apply AI fix: ${e.message}")
             }
         }
@@ -503,12 +503,11 @@ class NxCloudFixFileImpl(
                                     }
                                 } catch (e: Exception) {
                                     NxConsoleLogger.getInstance()
-                                        .log("Failed to apply AI fix locally: ${e.message}")
+                                        .error("Failed to apply AI fix locally", e)
                                 }
                             }
                         } catch (e: Throwable) {
-                            NxConsoleLogger.getInstance()
-                                .log("Failed to apply AI fix locally: ${e.message}")
+                            NxConsoleLogger.getInstance().error("Failed to apply AI fix locally", e)
                         }
                     }
                 }
@@ -548,10 +547,10 @@ class NxCloudFixFileImpl(
                         FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
                     }
                 } else {
-                    NxConsoleLogger.getInstance().log("Failed to reject AI fix")
+                    NxConsoleLogger.getInstance().error("Failed to reject AI fix")
                 }
             } catch (e: Exception) {
-                NxConsoleLogger.getInstance().log("Failed to reject AI fix: ${e.message}")
+                NxConsoleLogger.getInstance().error("Failed to reject AI fix", e)
             }
         }
     }
@@ -585,7 +584,7 @@ class NxCloudFixFileImpl(
                     showErrorNotification("Failed to request CI rerun")
                 }
             } catch (e: Exception) {
-                NxConsoleLogger.getInstance().log("Failed to request CI rerun: ${e.message}")
+                NxConsoleLogger.getInstance().error("Failed to request CI rerun", e)
                 showErrorNotification("Failed to request CI rerun: ${e.message}")
             }
         }
@@ -655,13 +654,13 @@ class NxCloudFixFileImpl(
                 NxConsoleLogger.getInstance().log("Successfully parsed ${result.size} patches")
                 result
             } catch (e: PatchSyntaxException) {
-                NxConsoleLogger.getInstance().log("PatchSyntaxException: ${e.message}")
+                NxConsoleLogger.getInstance().error("PatchSyntaxException", e)
                 withContext(Dispatchers.EDT) {
                     showDiffError("Failed to parse git diff: ${e.message}")
                 }
                 return
             } catch (e: Exception) {
-                NxConsoleLogger.getInstance().log("Exception parsing diff: ${e.message}")
+                NxConsoleLogger.getInstance().error("Exception parsing diff", e)
                 withContext(Dispatchers.EDT) {
                     showDiffError("Failed to parse git diff: ${e.message}")
                 }
@@ -716,7 +715,7 @@ class NxCloudFixFileImpl(
 
                 NxConsoleLogger.getInstance().log("Diff viewer created successfully")
             } catch (e: Exception) {
-                NxConsoleLogger.getInstance().log("Failed to create diff viewer: ${e.message}")
+                NxConsoleLogger.getInstance().error("Failed to create diff viewer", e)
                 diffContainer.add(
                     createErrorPanel("Could not create diff viewer: ${e.message}"),
                     BorderLayout.CENTER,

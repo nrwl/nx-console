@@ -227,9 +227,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 try {
                     listener.onNotificationEvent(event)
                 } catch (e: Exception) {
-                    logger.log(
-                        "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}"
-                    )
+                    logger.error("[CIPE_PROCESSOR] Error notifying CIPE notification listener", e)
                 }
             }
             sentAppliedNotifications.add(cipeId)
@@ -242,9 +240,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 try {
                     listener.onNotificationEvent(event)
                 } catch (e: Exception) {
-                    logger.log(
-                        "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}"
-                    )
+                    logger.error("[CIPE_PROCESSOR] Error notifying CIPE notification listener", e)
                 }
             }
             sentNotifications.add(cipeId)

@@ -82,7 +82,9 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                 try {
                                     val response = message as? ResponseMessage
                                     response?.let {
-                                        it.error?.let { log.log("Error from nxls: ${it.message}") }
+                                        it.error?.let {
+                                            log.error("Error from nxls: ${it.message}")
+                                        }
                                         it.result?.let { result ->
                                             log.log(
                                                 "Result from nxls: ${result.let {
@@ -112,7 +114,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                         }
                                     }
                                 } catch (e: Throwable) {
-                                    log.log("Error in nxls message consumer: ${e.message}")
+                                    log.error("Error in nxls message consumer", e)
                                 }
                             }
                         },
@@ -141,11 +143,11 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                     // NxWorkspaceRefreshNotification after reconfigure completes, which
                     // triggers the registerRefreshCallback to publish the topic
                 } catch (e: Throwable) {
-                    log.log(e.toString())
+                    log.error("Error during nxls initialization", e)
                 }
             }
         } catch (e: Exception) {
-            log.log("Cannot start nxls: ${e.message}")
+            log.error("Cannot start nxls", e)
             status = NxlsState.FAILED
         } finally {
             status = NxlsState.STARTED
@@ -175,7 +177,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
             if (e is ProcessCanceledException) {
                 throw e
             } else {
-                log.log("error while shutting down $e")
+                log.error("Error while shutting down nxls", e)
             }
         } finally {
             languageServer?.exit()
