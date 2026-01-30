@@ -1,7 +1,11 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
+  CLOUD_POLYGRAPH_CREATE_PRS,
   CLOUD_POLYGRAPH_DELEGATE,
   CLOUD_POLYGRAPH_INIT,
+  CLOUD_POLYGRAPH_MARK_READY,
+  CLOUD_POLYGRAPH_PUSH_BRANCH,
+  CLOUD_POLYGRAPH_QUERY_PRS,
 } from '@nx-console/shared-llm-context';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -200,6 +204,332 @@ function registerDelegate(
   }
 }
 
+const pushBranchSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  repoPath: z
+    .string()
+    .describe('Absolute file system path to the local git repository'),
+  branch: z
+    .string()
+    .describe('Branch name to push to remote (e.g., "feature/my-changes")'),
+});
+
+function registerPushBranch(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_PUSH_BRANCH, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_PUSH_BRANCH} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_PUSH_BRANCH,
+      description:
+        'Push a local git branch to the remote repository. Use this after making commits in a delegated repository, before creating a PR. Requires an active Polygraph session.',
+      inputSchema: pushBranchSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const { sessionId, repoPath, branch } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphPushBranch(logger, {
+            repoPath,
+            branch,
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+            workspacePath,
+          });
+
+          if (result.success) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Successfully pushed branch "${branch}" to remote`,
+                },
+              ],
+            };
+          }
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
+const createPRsSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  prs: z
+    .array(
+      z.object({
+        owner: z.string().describe('GitHub repository owner'),
+        repo: z.string().describe('GitHub repository name'),
+        title: z.string().describe('PR title'),
+        body: z
+          .string()
+          .describe(
+            'PR description body (session metadata appended automatically)',
+          ),
+        branch: z.string().describe('Branch name that was pushed'),
+      }),
+    )
+    .describe('Array of PR specifications to create'),
+});
+
+function registerCreatePRs(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_CREATE_PRS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_CREATE_PRS} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_CREATE_PRS,
+      description:
+        'Create draft pull requests for one or more repositories in a Polygraph session. Each PR includes session metadata linking it to related PRs across repos. Branches must be pushed first using cloud_polygraph_push_branch.',
+      inputSchema: createPRsSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const { sessionId, prs } = params as z.infer<typeof createPRsSchema>;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphCreatePRs(logger, {
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+            workspacePath,
+            prs: prs.map((pr) => ({
+              title: pr.title,
+              body: pr.body,
+              headBranch: pr.branch,
+              owner: pr.owner,
+              repo: pr.repo,
+            })),
+          });
+
+          if (result.success) {
+            const successCount = result.results.filter(
+              (r: any) => r.success,
+            ).length;
+            const totalCount = result.results.length;
+
+            let output = `Created ${successCount}/${totalCount} PRs:\n`;
+            for (const item of result.results) {
+              if (item.success) {
+                output += `- ${item.owner}/${item.repo}: ${item.url} (draft)\n`;
+              } else {
+                output += `- ${item.owner}/${item.repo}: FAILED - ${item.error}\n`;
+              }
+            }
+
+            return {
+              content: [{ type: 'text', text: output }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
+const queryPRsSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+});
+
+function registerQueryPRs(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_QUERY_PRS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_QUERY_PRS} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_QUERY_PRS,
+      description:
+        'Query the status of all pull requests in a Polygraph session. Returns repo, title, status (DRAFT/OPEN/MERGED/CLOSED), and URL for each PR.',
+      inputSchema: queryPRsSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const { sessionId } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphQueryPRs(logger, {
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+          });
+
+          if (result.success) {
+            if (result.prs.length === 0) {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: `No PRs found for session ${sessionId}`,
+                  },
+                ],
+              };
+            }
+
+            let output = `Session PRs (${result.prs.length} total):\n`;
+            output += '| Repo | Title | Status | URL |\n';
+            output += '|------|-------|--------|-----|\n';
+            for (const pr of result.prs) {
+              output += `| ${pr.repo} | ${pr.title} | ${pr.status} | ${pr.url} |\n`;
+            }
+
+            return {
+              content: [{ type: 'text', text: output }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
+const markReadySchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  prUrls: z
+    .array(z.string())
+    .describe('URLs of the pull requests to mark as ready for review'),
+});
+
+function registerMarkReady(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_MARK_READY, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_MARK_READY} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_MARK_READY,
+      description:
+        'Mark specified draft pull requests in a Polygraph session as ready for review. Provide PR URLs to transition from DRAFT to OPEN status. Use after cross-repo changes are verified.',
+      inputSchema: markReadySchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const { sessionId, prUrls } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphMarkReady(logger, {
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+            prUrls,
+          });
+
+          if (result.success) {
+            const successCount = result.results.filter(
+              (r: any) => r.success,
+            ).length;
+            const totalCount = result.results.length;
+
+            let output = `Marked ${successCount}/${totalCount} PRs as ready:\n`;
+            for (const item of result.results) {
+              if (item.success) {
+                output += `- ${item.url}: ready\n`;
+              } else {
+                output += `- ${item.url}: FAILED - ${item.error}\n`;
+              }
+            }
+
+            return {
+              content: [{ type: 'text', text: output }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 export function registerPolygraphTools(
   workspacePath: string,
   registry: ToolRegistry,
@@ -207,6 +537,8 @@ export function registerPolygraphTools(
   toolsFilter?: string[],
 ) {
   const nxCloudClient = getCloudLightClient(logger, workspacePath);
+
+  // TODO(cammisuli): have a way to download the client automatically if not present
   if (nxCloudClient == null) {
     logger.log(
       'Polygraph tools not registered: could not load Nx Cloud light client',
@@ -215,4 +547,26 @@ export function registerPolygraphTools(
   }
   registerInit(toolsFilter, logger, registry, nxCloudClient, workspacePath);
   registerDelegate(toolsFilter, logger, registry, workspacePath, nxCloudClient);
+  registerPushBranch(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
+  registerCreatePRs(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
+  registerQueryPRs(toolsFilter, logger, registry, nxCloudClient, workspacePath);
+  registerMarkReady(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
 }
