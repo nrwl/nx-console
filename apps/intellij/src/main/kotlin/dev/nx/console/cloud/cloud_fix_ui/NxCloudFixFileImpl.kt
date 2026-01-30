@@ -17,7 +17,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diff.impl.patch.FilePatch
 import com.intellij.openapi.diff.impl.patch.PatchReader
 import com.intellij.openapi.diff.impl.patch.PatchSyntaxException
@@ -46,6 +45,7 @@ import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.GitUtils
+import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.awaitLoad
@@ -143,7 +143,7 @@ class NxCloudFixFileImpl(
         try {
             json.encodeToString(details)
         } catch (e: Exception) {
-            logger<NxCloudFixFileImpl>().error("Failed to serialize fix details", e)
+            NxConsoleLogger.getInstance().log("Failed to serialize fix details: ${e.message}")
 
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Nx Cloud CIPE")
@@ -268,7 +268,7 @@ class NxCloudFixFileImpl(
     }
 
     private fun handleMessageFromBrowser(message: String) {
-        val logger = logger<NxCloudFixFileImpl>()
+        val logger = NxConsoleLogger.getInstance()
         try {
             val cleanMessage =
                 if (message.startsWith("\"") && message.endsWith("\"")) {
@@ -277,7 +277,7 @@ class NxCloudFixFileImpl(
                     message
                 }
             val parsed = json.decodeFromString<NxCloudFixMessage>(cleanMessage)
-            logger.info("Received message from webview: $parsed")
+            logger.log("Received message from webview: $parsed")
 
             when (parsed) {
                 is NxCloudFixMessage.Apply -> handleApply(parsed.commitMessage)
@@ -288,7 +288,7 @@ class NxCloudFixFileImpl(
                 is NxCloudFixMessage.OpenExternalLink -> handleOpenExternalLink(parsed)
             }
         } catch (e: Exception) {
-            logger.error("Failed to parse message from webview", e)
+            logger.log("Failed to parse message from webview: ${e.message}")
         }
     }
 
@@ -297,7 +297,7 @@ class NxCloudFixFileImpl(
             return
         }
 
-        logger<NxCloudFixFileImpl>().info("Sending fix details to webview")
+        NxConsoleLogger.getInstance().log("Sending fix details to webview")
 
         val hasUncommittedChanges = GitUtils.hasUncommittedChanges(project)
         val updatedDetails = details.copy(hasUncommittedChanges = hasUncommittedChanges)
@@ -334,8 +334,8 @@ class NxCloudFixFileImpl(
     }
 
     private fun handleApply(commitMessage: String? = null) {
-        logger<NxCloudFixFileImpl>()
-            .info("Apply action received with commit message: $commitMessage")
+        NxConsoleLogger.getInstance()
+            .log("Apply action received with commit message: $commitMessage")
 
         TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX)
 
@@ -348,11 +348,11 @@ class NxCloudFixFileImpl(
                 }
 
         cs.launch {
-            logger<NxCloudFixFileImpl>().info("Starting coroutine to apply fix")
+            NxConsoleLogger.getInstance().log("Starting coroutine to apply fix")
             try {
                 val cloudApiService = NxCloudApiService.getInstance(project)
-                logger<NxCloudFixFileImpl>()
-                    .info("Got cloud API service, calling updateSuggestedFix")
+                NxConsoleLogger.getInstance()
+                    .log("Got cloud API service, calling updateSuggestedFix")
                 val success =
                     cloudApiService.updateSuggestedFix(
                         aiFixId,
@@ -370,14 +370,14 @@ class NxCloudFixFileImpl(
                     showErrorNotification("Failed to apply AI fix")
                 }
             } catch (e: Exception) {
-                logger<NxCloudFixFileImpl>().error("Failed to apply AI fix", e)
+                NxConsoleLogger.getInstance().log("Failed to apply AI fix: ${e.message}")
                 showErrorNotification("Failed to apply AI fix: ${e.message}")
             }
         }
     }
 
     private fun handleApplyLocally() {
-        logger<NxCloudFixFileImpl>().info("Apply locally action received")
+        NxConsoleLogger.getInstance().log("Apply locally action received")
 
         TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_APPLY_AI_FIX_LOCALLY)
 
@@ -422,7 +422,7 @@ class NxCloudFixFileImpl(
                             >?,
                     ) {
                         try {
-                            logger<NxCloudFixFileImpl>().info("applying fix locally")
+                            NxConsoleLogger.getInstance().log("applying fix locally")
                             super.apply(
                                 remaining,
                                 patchGroupsToApply,
@@ -430,7 +430,7 @@ class NxCloudFixFileImpl(
                                 fileName,
                                 additionalInfo,
                             )
-                            logger<NxCloudFixFileImpl>().info("sending message to api")
+                            NxConsoleLogger.getInstance().log("sending message to api")
 
                             val fixDetails = currentFixDetails ?: return
                             val aiFixId =
@@ -442,8 +442,8 @@ class NxCloudFixFileImpl(
 
                             cs.launch {
                                 try {
-                                    logger<NxCloudFixFileImpl>()
-                                        .info("actually doing send message to api")
+                                    NxConsoleLogger.getInstance()
+                                        .log("actually doing send message to api")
 
                                     val cloudApiService = NxCloudApiService.getInstance(project)
                                     val success =
@@ -502,12 +502,13 @@ class NxCloudFixFileImpl(
                                         }
                                     }
                                 } catch (e: Exception) {
-                                    logger<NxCloudFixFileImpl>()
-                                        .error("Failed to apply AI fix locally", e)
+                                    NxConsoleLogger.getInstance()
+                                        .log("Failed to apply AI fix locally: ${e.message}")
                                 }
                             }
                         } catch (e: Throwable) {
-                            logger<NxCloudFixFileImpl>().error("Failed to apply AI fix locally", e)
+                            NxConsoleLogger.getInstance()
+                                .log("Failed to apply AI fix locally: ${e.message}")
                         }
                     }
                 }
@@ -523,7 +524,7 @@ class NxCloudFixFileImpl(
     }
 
     private fun handleReject() {
-        logger<NxCloudFixFileImpl>().info("Reject action received")
+        NxConsoleLogger.getInstance().log("Reject action received")
 
         TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_REJECT_AI_FIX)
 
@@ -547,16 +548,16 @@ class NxCloudFixFileImpl(
                         FileEditorManager.getInstance(project).closeFile(this@NxCloudFixFileImpl)
                     }
                 } else {
-                    logger<NxCloudFixFileImpl>().error("Failed to reject AI fix")
+                    NxConsoleLogger.getInstance().log("Failed to reject AI fix")
                 }
             } catch (e: Exception) {
-                logger<NxCloudFixFileImpl>().error("Failed to reject AI fix", e)
+                NxConsoleLogger.getInstance().log("Failed to reject AI fix: ${e.message}")
             }
         }
     }
 
     private fun handleRerunCi() {
-        logger<NxCloudFixFileImpl>().info("Rerun CI action received")
+        NxConsoleLogger.getInstance().log("Rerun CI action received")
 
         TelemetryService.getInstance(project).featureUsed(TelemetryEvent.CLOUD_RERUN_CI)
 
@@ -584,7 +585,7 @@ class NxCloudFixFileImpl(
                     showErrorNotification("Failed to request CI rerun")
                 }
             } catch (e: Exception) {
-                logger<NxCloudFixFileImpl>().error("Failed to request CI rerun", e)
+                NxConsoleLogger.getInstance().log("Failed to request CI rerun: ${e.message}")
                 showErrorNotification("Failed to request CI rerun: ${e.message}")
             }
         }
@@ -648,19 +649,19 @@ class NxCloudFixFileImpl(
 
         val patches =
             try {
-                logger<NxCloudFixFileImpl>().info("Parsing git diff, length: ${gitDiffText.length}")
+                NxConsoleLogger.getInstance().log("Parsing git diff, length: ${gitDiffText.length}")
                 val patchReader = PatchReader(gitDiffText)
                 val result = patchReader.readTextPatches()
-                logger<NxCloudFixFileImpl>().info("Successfully parsed ${result.size} patches")
+                NxConsoleLogger.getInstance().log("Successfully parsed ${result.size} patches")
                 result
             } catch (e: PatchSyntaxException) {
-                logger<NxCloudFixFileImpl>().error("PatchSyntaxException: ${e.message}", e)
+                NxConsoleLogger.getInstance().log("PatchSyntaxException: ${e.message}")
                 withContext(Dispatchers.EDT) {
                     showDiffError("Failed to parse git diff: ${e.message}")
                 }
                 return
             } catch (e: Exception) {
-                logger<NxCloudFixFileImpl>().error("Exception parsing diff: ${e.message}", e)
+                NxConsoleLogger.getInstance().log("Exception parsing diff: ${e.message}")
                 withContext(Dispatchers.EDT) {
                     showDiffError("Failed to parse git diff: ${e.message}")
                 }
@@ -682,20 +683,20 @@ class NxCloudFixFileImpl(
             diffProcessor = null
 
             try {
-                logger<NxCloudFixFileImpl>()
-                    .info("Creating diff viewer for ${patches.size} patches")
+                NxConsoleLogger.getInstance()
+                    .log("Creating diff viewer for ${patches.size} patches")
 
                 val requests: List<DiffRequest> =
                     patches.map { patch ->
-                        logger<NxCloudFixFileImpl>()
-                            .debug(
+                        NxConsoleLogger.getInstance()
+                            .log(
                                 "Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}"
                             )
                         PatchDiffRequest(patch, patch.beforeFileName, patch.beforeFileName, null)
                     }
 
                 if (requests.isEmpty()) {
-                    logger<NxCloudFixFileImpl>().warn("No diff requests created")
+                    NxConsoleLogger.getInstance().log("No diff requests created")
                     showDiffPlaceholder()
                     return@withContext
                 }
@@ -713,9 +714,9 @@ class NxCloudFixFileImpl(
 
                 processor.updateRequest()
 
-                logger<NxCloudFixFileImpl>().info("Diff viewer created successfully")
+                NxConsoleLogger.getInstance().log("Diff viewer created successfully")
             } catch (e: Exception) {
-                logger<NxCloudFixFileImpl>().error("Failed to create diff viewer", e)
+                NxConsoleLogger.getInstance().log("Failed to create diff viewer: ${e.message}")
                 diffContainer.add(
                     createErrorPanel("Could not create diff viewer: ${e.message}"),
                     BorderLayout.CENTER,

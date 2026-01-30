@@ -51,6 +51,9 @@
     <!-- Cloud Fix UI -->
     <fileEditorProvider implementation="dev.nx.console.cloud.cloud_fix_ui.NxCloudFixFileEditorProvider"/>
 
+    <!-- Logs Viewer -->
+    <fileEditorProvider implementation="dev.nx.console.logs.NxLogsFileEditorProvider"/>
+
     <!-- Graph -->
     <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
     <fileEditorProvider implementation="dev.nx.console.project_details.ProjectDetailsFileEditorProvider"/>
@@ -104,6 +107,11 @@
     <!-- Misc -->
     <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
             text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="EditorTabPopupMenu"/>
+      <add-to-group group-id="EditorTabsEntryPoint"/>
+    </action>
+    <action id="dev.nx.console.logs.ClearNxLogsAction" class="dev.nx.console.logs.ClearNxLogsAction"
+            text="Nx: Clear Logs" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="EditorTabPopupMenu"/>
       <add-to-group group-id="EditorTabsEntryPoint"/>
     </action>
@@ -201,6 +209,15 @@
             class="dev.nx.console.ai.ConfigureAiAgentsAction"
             text="Nx: Configure AI Agents"
             description="Configure AI agents for your workspace"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+
+    <!-- Logs -->
+    <action id="dev.nx.console.logs.OpenNxLogsAction"
+            class="dev.nx.console.logs.OpenNxLogsAction"
+            text="Nx: View Logs"
+            description="Open Nx Console logs viewer"
             icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>

@@ -1,8 +1,6 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
@@ -12,6 +10,7 @@ import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.managers.getFilePath
 import dev.nx.console.nxls.server.NxlsLanguageServer
+import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.nxlsWorkingPath
 import java.util.concurrent.CompletableFuture
@@ -35,7 +34,7 @@ enum class NxlsState {
     FAILED,
 }
 
-private val log = logger<NxlsWrapper>()
+private val log by lazy { NxConsoleLogger.getInstance() }
 
 class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
@@ -52,7 +51,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     private var status = NxlsState.STOPPED
 
     fun getServerCapabilities(): ServerCapabilities? {
-        log.info("Getting language server capabilities")
+        log.log("Getting language server capabilities")
         return initializeResult?.capabilities
     }
 
@@ -83,11 +82,9 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                 try {
                                     val response = message as? ResponseMessage
                                     response?.let {
-                                        it.error?.let {
-                                            log.trace("Error from nxls: ${it.message}")
-                                        }
+                                        it.error?.let { log.log("Error from nxls: ${it.message}") }
                                         it.result?.let { result ->
-                                            log.trace(
+                                            log.log(
                                                 "Result from nxls: ${result.let {
                                                     if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
                                                 }}"
@@ -97,7 +94,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
                                     val request = message as? RequestMessage
                                     request?.let { request ->
-                                        log.trace(
+                                        log.log(
                                             "Sending request to nxls: ${request.method} (${request.params?.let {
                                                 if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
                                             }})"
@@ -108,14 +105,14 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                         if (this) {
                                             consume.consume(message)
                                         } else {
-                                            log.info(
+                                            log.log(
                                                 "Unable to send messages to the nxls, the process has exited"
                                             )
                                             status = NxlsState.STOPPED
                                         }
                                     }
                                 } catch (e: Throwable) {
-                                    thisLogger().error(e)
+                                    log.log("Error in nxls message consumer: ${e.message}")
                                 }
                             }
                         },
@@ -144,11 +141,11 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                     // NxWorkspaceRefreshNotification after reconfigure completes, which
                     // triggers the registerRefreshCallback to publish the topic
                 } catch (e: Throwable) {
-                    log.info(e.toString())
+                    log.log(e.toString())
                 }
             }
         } catch (e: Exception) {
-            thisLogger().info("Cannot start nxls", e)
+            log.log("Cannot start nxls: ${e.message}")
             status = NxlsState.FAILED
         } finally {
             status = NxlsState.STARTED
@@ -164,7 +161,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
             return
         }
         status = NxlsState.STOPPING
-        log.info("Stopping nxls")
+        log.log("Stopping nxls")
 
         try {
             ApplicationManager.getApplication().invokeAndWait {
@@ -178,7 +175,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
             if (e is ProcessCanceledException) {
                 throw e
             } else {
-                log.info("error while shutting down $e")
+                log.log("error while shutting down $e")
             }
         } finally {
             languageServer?.exit()
@@ -209,7 +206,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                 connectTextService(documentManager)
             }
         } else {
-            log.info("Nxls not ready for documents yet.. ")
+            log.log("Nxls not ready for documents yet.. ")
         }
 
         connectedEditors.put(getFilePath(editor.document), documentManager)
@@ -218,11 +215,10 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     fun disconnect(editor: Editor) {
         val filePath = getFilePath(editor.document)
         val documentManager =
-            connectedEditors.get(filePath)
-                ?: return log.info("editor not part of connected editors")
+            connectedEditors.get(filePath) ?: return log.log("editor not part of connected editors")
         documentManager.documentClosed()
         connectedEditors.remove(filePath)
-        log.info("Disconnected ${documentManager.documentPath}")
+        log.log("Disconnected ${documentManager.documentPath}")
     }
 
     fun isEditorConnected(editor: Editor): Boolean {
@@ -231,9 +227,9 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     }
 
     private fun connectTextService(documentManager: DocumentManager) {
-        log.info("Connecting textService to ${documentManager.documentPath}")
+        log.log("Connecting textService to ${documentManager.documentPath}")
         val textService =
-            languageServer?.textDocumentService ?: return log.info("text service not ready")
+            languageServer?.textDocumentService ?: return log.log("text service not ready")
         documentManager.addTextDocumentService(textService)
         documentManager.documentOpened()
     }

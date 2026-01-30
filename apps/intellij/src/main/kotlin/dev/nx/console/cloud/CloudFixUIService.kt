@@ -5,7 +5,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import dev.nx.console.cloud.cloud_fix_ui.NxCloudFixDetails
@@ -14,6 +13,7 @@ import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.GitUtils
+import dev.nx.console.utils.NxConsoleLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
             project.getService(CloudFixUIService::class.java)
     }
 
-    private val logger = thisLogger()
+    private val logger = NxConsoleLogger.getInstance()
 
     private var currentFixId: String? = null
     private var currentFixFile: NxCloudFixFileImpl? = null
@@ -94,7 +94,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
     }
 
     fun openCloudFixWebview(cipeId: String, runGroupId: String) {
-        logger.info("Opening cloud fix webview for CIPE: $cipeId, runGroup: $runGroupId")
+        logger.log("Opening cloud fix webview for CIPE: $cipeId, runGroup: $runGroupId")
 
         val fixId = cipeId + runGroupId
 
@@ -144,14 +144,16 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
                                 .downloadAndExtractArtifact(terminalOutputUrl)
 
                         if (response?.error != null) {
-                            logger.warn("Failed to download terminal output: ${response.error}")
+                            logger.log("Failed to download terminal output: ${response.error}")
                             terminalOutput =
                                 "Failed to retrieve terminal output. Please check the Nx Console output for more details."
                         } else {
                             terminalOutput = response?.content
                         }
                     } catch (e: Exception) {
-                        logger.error("Failed to download terminal output for task $failedTaskId", e)
+                        logger.log(
+                            "Failed to download terminal output for task $failedTaskId: ${e.message}"
+                        )
                         terminalOutput =
                             "Failed to retrieve terminal output. Please check the Nx Console output for more details."
                     }
