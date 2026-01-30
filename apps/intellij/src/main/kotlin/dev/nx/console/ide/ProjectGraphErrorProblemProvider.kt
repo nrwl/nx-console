@@ -47,10 +47,9 @@ class ProjectGraphErrorProblemProvider(val project: Project, val cs: CoroutineSc
                     errors.mapNotNull { error -> nxErrorToFileProblem(error) }
                 }
 
-            problems.forEach { problemsCollector.problemDisappeared(it) }
-            newProblems?.forEach { problemsCollector.problemAppeared(it) }
-
             mutex.withLock {
+                problems.forEach { problemsCollector.problemDisappeared(it) }
+                newProblems?.forEach { problemsCollector.problemAppeared(it) }
                 problems.clear()
                 problems.addAll(newProblems ?: emptyList())
             }
