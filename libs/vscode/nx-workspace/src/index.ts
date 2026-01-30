@@ -3,7 +3,6 @@ export * from './lib/get-nx-workspace-path';
 export * from './lib/get-project-by-path';
 export * from './lib/get-generators';
 export * from './lib/get-generator-options';
-export * from './lib/get-generator-context-from-path';
 export * from './lib/get-generator-context-v2';
 export * from './lib/get-nx-version';
 export * from './lib/get-project-graph-output';
