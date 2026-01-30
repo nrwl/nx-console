@@ -1,11 +1,11 @@
 package dev.nx.console.cloud
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.util.io.HttpRequests
 import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.utils.NxConsoleLogger
 import java.net.HttpURLConnection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,7 +23,7 @@ class NxCloudApiService(private val project: Project) {
         private const val DEFAULT_CLOUD_URL = "https://cloud.nx.app"
     }
 
-    private val logger = thisLogger()
+    private val logger = NxConsoleLogger.getInstance()
     private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
@@ -50,19 +50,19 @@ class NxCloudApiService(private val project: Project) {
                 val nxCloudUrl = cloudStatus?.nxCloudUrl ?: DEFAULT_CLOUD_URL
 
                 if (cloudStatus?.isConnected != true) {
-                    logger.warn("Nx Cloud is not connected. Status: $cloudStatus")
+                    logger.error("Nx Cloud is not connected. Status: $cloudStatus")
                     return@withContext false
                 }
 
                 val authHeaders = NxlsService.getInstance(project).cloudAuthHeaders()
                 if (authHeaders == null) {
-                    logger.warn("Failed to get Nx Cloud auth headers")
+                    logger.error("Failed to get Nx Cloud auth headers")
                     return@withContext false
                 }
 
                 val requestBody =
                     json.encodeToString(UpdateSuggestedFixRequest(aiFixId, action, commitMessage))
-                logger.info("suggested fix stringified $requestBody")
+                logger.log("suggested fix stringified $requestBody")
 
                 val response =
                     HttpRequests.post(

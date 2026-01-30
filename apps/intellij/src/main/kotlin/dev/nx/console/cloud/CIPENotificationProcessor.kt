@@ -2,9 +2,9 @@ package dev.nx.console.cloud
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.*
+import dev.nx.console.utils.NxConsoleLogger
 
 /**
  * Stateless service that processes CIPE data changes and determines which notifications to emit.
@@ -23,7 +23,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
         private const val AI_FIX_WAIT_TIME_MS = 1000L * 60 * 5
     }
 
-    private val logger = thisLogger()
+    private val logger = NxConsoleLogger.getInstance()
     private val notificationListeners = mutableListOf<CIPENotificationListener>()
     private val sentNotifications = mutableSetOf<String>()
     private val sentAppliedNotifications = mutableSetOf<String>()
@@ -227,10 +227,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 try {
                     listener.onNotificationEvent(event)
                 } catch (e: Exception) {
-                    logger.error(
-                        "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
-                        e,
-                    )
+                    logger.error("[CIPE_PROCESSOR] Error notifying CIPE notification listener", e)
                 }
             }
             sentAppliedNotifications.add(cipeId)
@@ -243,10 +240,7 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 try {
                     listener.onNotificationEvent(event)
                 } catch (e: Exception) {
-                    logger.error(
-                        "[CIPE_PROCESSOR] Error notifying CIPE notification listener: ${e.message}",
-                        e,
-                    )
+                    logger.error("[CIPE_PROCESSOR] Error notifying CIPE notification listener", e)
                 }
             }
             sentNotifications.add(cipeId)

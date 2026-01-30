@@ -1,7 +1,6 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
@@ -12,6 +11,7 @@ import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.*
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.nxlsWorkingPath
 import java.lang.Runnable
 import kotlinx.coroutines.*
@@ -77,7 +77,7 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
             server()?.getNxService()?.stopDaemon()?.await()
         } catch (e: Throwable) {
             // it's not critical if the daemon can't be stopped
-            thisLogger().debug("Failed to stop daemon during restart", e)
+            NxConsoleLogger.getInstance().log("Failed to stop daemon during restart: ${e.message}")
         }
         wrapper.stop()
         start()
