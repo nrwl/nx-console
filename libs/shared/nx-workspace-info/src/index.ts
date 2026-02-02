@@ -6,3 +6,4 @@ export {
   getNxDaemonClient,
   getNxCacheDirectory,
 } from './lib/get-nx-workspace-package';
+export { ensureDaemonIsStarted } from './lib/ensure-daemon-is-started';

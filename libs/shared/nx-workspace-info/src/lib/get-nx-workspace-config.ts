@@ -11,13 +11,11 @@ import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 import { performance } from 'perf_hooks';
 import {
-  getNxDaemonClient,
   getNxOutput,
   getNxProjectGraph,
   getNxProjectGraphUtils,
 } from './get-nx-workspace-package';
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
-import { execSync } from 'child_process';
+import { ensureDaemonIsStarted } from './ensure-daemon-is-started';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -94,35 +92,7 @@ export async function getNxWorkspaceConfig(
     logger?.debug?.(
       `getNxWorkspaceConfig: Daemon client module exists: ${!!nxDaemonClientModule}`,
     );
-    if (nxDaemonClientModule) {
-      const isEnabled = nxDaemonClientModule.daemonClient?.enabled();
-      logger?.debug?.(
-        `getNxWorkspaceConfig: Daemon client enabled: ${isEnabled}`,
-      );
-      if (isEnabled) {
-        logger?.debug?.(
-          'getNxWorkspaceConfig: Checking if daemon server is available...',
-        );
-        const isServerAvailable =
-          await nxDaemonClientModule.daemonClient?.isServerAvailable();
-        logger?.debug?.(
-          `getNxWorkspaceConfig: Daemon server available: ${isServerAvailable}`,
-        );
-        if (!isServerAvailable) {
-          logger?.debug?.(
-            'getNxWorkspaceConfig: Starting daemon server via CLI...',
-          );
-          const pm = await getPackageManagerCommand(workspacePath, logger);
-          execSync(`${pm.exec} nx daemon --start`, {
-            cwd: workspacePath,
-            windowsHide: true,
-          });
-          logger?.debug?.(
-            'getNxWorkspaceConfig: Daemon server start command executed',
-          );
-        }
-      }
-    }
+    await ensureDaemonIsStarted(workspacePath, logger, nxDaemonClientModule);
 
     if (!projectGraphAndSourceMaps) {
       try {
@@ -205,10 +175,18 @@ export async function getNxWorkspaceConfig(
     }
 
     if (gte(nxVersion, '16.3.1') && projectGraph) {
+      logger?.debug?.(
+        `getNxWorkspaceConfig: About to call createProjectFileMapUsingProjectGraph with ${Object.keys(projectGraph.nodes ?? {}).length} nodes...`,
+      );
+
       projectFileMap =
         (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
           projectGraph,
         )) ?? {};
+
+      logger?.debug?.(
+        `getNxWorkspaceConfig: createProjectFileMapUsingProjectGraph completed, fileMap keys: ${Object.keys(projectFileMap).length}`,
+      );
     } else {
       Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -219,6 +197,9 @@ export async function getNxWorkspaceConfig(
 
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
+    logger?.debug?.(
+      `getNxWorkspaceConfig: Completed successfully, returning results`,
+    );
 
     process.exit = _defaultProcessExit;
 

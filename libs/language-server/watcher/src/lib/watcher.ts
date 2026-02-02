@@ -71,7 +71,7 @@ export async function languageServerWatcher(
     };
   }
 
-  if (gte(nxVersion, '22.4.0-beta.4')) {
+  if (gte(nxVersion, '22.5.0-beta.3')) {
     lspLogger.debug('Using PassiveDaemonWatcher for file watching');
     return registerPassiveDaemonWatcher(
       workspacePath,
@@ -139,7 +139,8 @@ async function registerPassiveDaemonWatcher(
         lspLogger.debug?.(
           'registerPassiveDaemonWatcher: Disposing passive daemon watcher...',
         );
-        return _passiveDaemonWatcher.dispose();
+        _passiveDaemonWatcher.dispose();
+        _passiveDaemonWatcher = undefined;
       }
     };
   } catch (e) {

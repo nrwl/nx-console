@@ -4,11 +4,7 @@ import {
   GeneratorSchema,
 } from '@nx-console/shared-generate-ui-types';
 import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
-import {
-  GeneratorCollectionInfo,
-  Option,
-  TaskExecutionSchema,
-} from '@nx-console/shared-schema';
+import { GeneratorCollectionInfo, Option } from '@nx-console/shared-schema';
 import {
   CIPEInfo,
   CIPEInfoError,
@@ -101,21 +97,6 @@ export const NxProjectByRootRequest: RequestType<
   ProjectConfiguration | null,
   unknown
 > = new RequestType('nx/projectByRoot');
-
-export const NxGeneratorContextFromPathRequest: RequestType<
-  {
-    generator?: TaskExecutionSchema;
-    path: string;
-  },
-  | {
-      path?: string;
-      directory?: string;
-      project?: string;
-      projectName?: string;
-    }
-  | undefined,
-  unknown
-> = new RequestType('nx/generatorContextFromPath');
 
 export const NxGeneratorContextV2Request: RequestType<
   {

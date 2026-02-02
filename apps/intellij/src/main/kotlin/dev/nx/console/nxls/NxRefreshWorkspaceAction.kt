@@ -21,9 +21,8 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlinx.coroutines.*
 
 class NxRefreshWorkspaceAction :
     DumbAwareAction("Refresh Nx Workspace", "Refreshes the Nx workspace", NxIcons.Action) {
@@ -93,17 +92,39 @@ class NxRefreshWorkspaceService(private val project: Project) {
                     override fun run(indicator: ProgressIndicator) {
                         runBlocking {
                             try {
-                                withContext(Dispatchers.EDT) {
-                                    indicator.isIndeterminate = false
-                                    indicator.fraction = 0.1
-                                    NxlsService.getInstance(project).restart()
-                                    indicator.fraction = 0.5
-                                    StandardNxGraphServer.getInstance(project).restart()
-                                    indicator.fraction = 0.8
-                                    NxlsService.getInstance(project).refreshWorkspace()
-                                    CIPEPollingService.getInstance(project).forcePoll()
-                                    indicator.fraction = 1.0
+                                indicator.isIndeterminate = false
+                                indicator.fraction = 0.1
+                                try {
+                                    NxlsService.getInstance(project).stopDaemon()
+                                } catch (e: Throwable) {
+                                    // ignore, stopping daemon is not critical
+                                }
+                                indicator.fraction = 0.3
+                                NxlsService.getInstance(project).restart()
+                                indicator.fraction = 0.5
+                                StandardNxGraphServer.getInstance(project).restart()
+                                indicator.fraction = 0.7
 
+                                // Wait for the refresh notification from nxls.
+                                // nxls triggers reconfigure automatically during initialization
+                                // (via setTimeout in onInitialize), so we wait for that to
+                                // complete.
+                                suspendCancellableCoroutine { continuation ->
+                                    val connection = project.messageBus.connect()
+                                    connection.subscribe(
+                                        NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                                        NxWorkspaceRefreshListener {
+                                            connection.disconnect()
+                                            continuation.resume(Unit)
+                                        },
+                                    )
+                                }
+
+                                indicator.fraction = 0.9
+                                CIPEPollingService.getInstance(project).forcePoll()
+                                indicator.fraction = 1.0
+
+                                withContext(Dispatchers.EDT) {
                                     if (notification?.isExpired == false) {
                                         notification.expire()
                                         Notifier.notifyAnything(
@@ -114,10 +135,12 @@ class NxRefreshWorkspaceService(private val project: Project) {
                                     }
                                 }
                             } catch (ex: Exception) {
-                                if (notification?.isExpired == false) {
-                                    notification.expire()
+                                withContext(Dispatchers.EDT) {
+                                    if (notification?.isExpired == false) {
+                                        notification.expire()
+                                    }
+                                    Notifier.notifyAnything(project, "Error refreshing workspace")
                                 }
-                                Notifier.notifyAnything(project, "Error refreshing workspace")
                             } finally {
                                 refreshing = false
                             }
