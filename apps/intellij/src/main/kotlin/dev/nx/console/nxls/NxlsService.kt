@@ -1,7 +1,6 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
