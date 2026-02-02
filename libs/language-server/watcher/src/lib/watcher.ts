@@ -139,7 +139,8 @@ async function registerPassiveDaemonWatcher(
         lspLogger.debug?.(
           'registerPassiveDaemonWatcher: Disposing passive daemon watcher...',
         );
-        return _passiveDaemonWatcher.dispose();
+        _passiveDaemonWatcher.dispose();
+        _passiveDaemonWatcher = undefined;
       }
     };
   } catch (e) {

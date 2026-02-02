@@ -44,6 +44,14 @@ export async function nxWorkspace(
   } | null,
 ): Promise<NxWorkspace> {
   if (reset || projectGraphAndSourceMaps) {
+    // If already computing and no specific data provided, wait for ongoing computation
+    // instead of starting a duplicate one
+    if (status === Status.in_progress) {
+      logger?.debug?.(
+        'nxWorkspace: Computation already in progress, waiting for result...',
+      );
+      return firstValueFrom(cachedReplay);
+    }
     logger?.debug?.('nxWorkspace: Resetting workspace status...');
     resetStatus(workspacePath);
   }

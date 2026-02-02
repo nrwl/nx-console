@@ -259,7 +259,14 @@ export class PassiveDaemonWatcher {
     return this.actor.getSnapshot().value;
   }
 
+  private disposed = false;
+
   dispose() {
+    if (this.disposed) {
+      this.logger.debug?.('PassiveDaemonWatcher: Already disposed, skipping');
+      return;
+    }
+    this.disposed = true;
     this.logger.debug?.('PassiveDaemonWatcher: Disposing watcher');
     this.stop();
     this.listeners.clear();

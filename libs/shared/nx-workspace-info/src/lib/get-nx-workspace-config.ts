@@ -16,8 +16,6 @@ import {
   getNxProjectGraph,
   getNxProjectGraphUtils,
 } from './get-nx-workspace-package';
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
-import { execSync } from 'child_process';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -94,35 +92,10 @@ export async function getNxWorkspaceConfig(
     logger?.debug?.(
       `getNxWorkspaceConfig: Daemon client module exists: ${!!nxDaemonClientModule}`,
     );
-    if (nxDaemonClientModule) {
-      const isEnabled = nxDaemonClientModule.daemonClient?.enabled();
-      logger?.debug?.(
-        `getNxWorkspaceConfig: Daemon client enabled: ${isEnabled}`,
-      );
-      if (isEnabled) {
-        logger?.debug?.(
-          'getNxWorkspaceConfig: Checking if daemon server is available...',
-        );
-        const isServerAvailable =
-          await nxDaemonClientModule.daemonClient?.isServerAvailable();
-        logger?.debug?.(
-          `getNxWorkspaceConfig: Daemon server available: ${isServerAvailable}`,
-        );
-        if (!isServerAvailable) {
-          logger?.debug?.(
-            'getNxWorkspaceConfig: Starting daemon server via CLI...',
-          );
-          const pm = await getPackageManagerCommand(workspacePath, logger);
-          execSync(`${pm.exec} nx daemon --start`, {
-            cwd: workspacePath,
-            windowsHide: true,
-          });
-          logger?.debug?.(
-            'getNxWorkspaceConfig: Daemon server start command executed',
-          );
-        }
-      }
-    }
+    // Note: We intentionally don't start the daemon here. The Nx daemon client
+    // will auto-start the daemon when needed via startDaemonIfNecessary().
+    // Explicitly starting the daemon here can race with the daemon client's
+    // synchronized startup, causing multiple daemon instances.
 
     if (!projectGraphAndSourceMaps) {
       try {
@@ -205,10 +178,42 @@ export async function getNxWorkspaceConfig(
     }
 
     if (gte(nxVersion, '16.3.1') && projectGraph) {
-      projectFileMap =
-        (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
-          projectGraph,
-        )) ?? {};
+      logger?.debug?.(
+        `getNxWorkspaceConfig: About to call createProjectFileMapUsingProjectGraph with ${Object.keys(projectGraph.nodes ?? {}).length} nodes...`,
+      );
+      try {
+        global.fromConsole = true;
+        const fileMapPromise =
+          nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
+            projectGraph,
+          );
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  'createProjectFileMapUsingProjectGraph timed out after 5 minutes',
+                ),
+              ),
+            300000, // 5 minutes
+          ),
+        );
+        projectFileMap =
+          (await Promise.race([fileMapPromise, timeoutPromise])) ?? {};
+
+        logger?.debug?.(
+          `getNxWorkspaceConfig: createProjectFileMapUsingProjectGraph completed, fileMap keys: ${Object.keys(projectFileMap).length}`,
+        );
+      } catch (e) {
+        logger.log(
+          `createProjectFileMapUsingProjectGraph failed: ${e.message}, falling back to manual file map`,
+        );
+        Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          projectFileMap[projectName] =
+            (projectGraph?.nodes[projectName].data as any).files ?? [];
+        });
+      }
     } else {
       Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -219,6 +224,9 @@ export async function getNxWorkspaceConfig(
 
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
+    logger?.debug?.(
+      `getNxWorkspaceConfig: Completed successfully, returning results`,
+    );
 
     process.exit = _defaultProcessExit;
 
