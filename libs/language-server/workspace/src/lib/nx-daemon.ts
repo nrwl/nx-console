@@ -13,6 +13,7 @@ export async function nxStopDaemon(workspacePath: string, logger: Logger) {
     cwd: workspacePath,
     windowsHide: true,
   });
+  logger.log('daemon stopped');
 }
 
 export async function nxStartDaemon(workspacePath: string, logger: Logger) {
