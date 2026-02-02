@@ -180,9 +180,9 @@ export async function getNxWorkspaceConfig(
       );
 
       projectFileMap =
-        await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
+        (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
           projectGraph,
-        );
+        )) ?? {};
 
       logger?.debug?.(
         `getNxWorkspaceConfig: createProjectFileMapUsingProjectGraph completed, fileMap keys: ${Object.keys(projectFileMap).length}`,
