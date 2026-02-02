@@ -11,11 +11,11 @@ import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 import { performance } from 'perf_hooks';
 import {
-  getNxDaemonClient,
   getNxOutput,
   getNxProjectGraph,
   getNxProjectGraphUtils,
 } from './get-nx-workspace-package';
+import { ensureDaemonIsStarted } from './ensure-daemon-is-started';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -92,10 +92,7 @@ export async function getNxWorkspaceConfig(
     logger?.debug?.(
       `getNxWorkspaceConfig: Daemon client module exists: ${!!nxDaemonClientModule}`,
     );
-    // Note: We intentionally don't start the daemon here. The Nx daemon client
-    // will auto-start the daemon when needed via startDaemonIfNecessary().
-    // Explicitly starting the daemon here can race with the daemon client's
-    // synchronized startup, causing multiple daemon instances.
+    await ensureDaemonIsStarted(workspacePath, logger, nxDaemonClientModule);
 
     if (!projectGraphAndSourceMaps) {
       try {

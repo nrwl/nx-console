@@ -1,4 +1,7 @@
-import { getNxDaemonClient } from '@nx-console/shared-nx-workspace-info';
+import {
+  ensureDaemonIsStarted,
+  getNxDaemonClient,
+} from '@nx-console/shared-nx-workspace-info';
 import { Logger } from '@nx-console/shared-utils';
 import { randomUUID } from 'crypto';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
@@ -106,6 +109,12 @@ export class PassiveDaemonWatcher {
         }
 
         this.logger.debug?.('PassiveDaemonWatcher: Daemon client is enabled');
+
+        await ensureDaemonIsStarted(
+          this.workspacePath,
+          this.logger,
+          daemonClientModule,
+        );
 
         this.logger.debug?.(
           'PassiveDaemonWatcher: About to call registerProjectGraphRecomputationListener...',

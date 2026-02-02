@@ -96,6 +96,12 @@ class NxRefreshWorkspaceService(private val project: Project) {
                                 withContext(Dispatchers.EDT) {
                                     indicator.isIndeterminate = false
                                     indicator.fraction = 0.1
+                                    try {
+                                        NxlsService.getInstance(project).stopDaemon()
+                                    } catch (e: Throwable) {
+                                        // ignore, stopping daemon is not critical
+                                    }
+                                    indicator.fraction = 0.3
                                     NxlsService.getInstance(project).restart()
                                     indicator.fraction = 0.5
                                     StandardNxGraphServer.getInstance(project).restart()
