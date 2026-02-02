@@ -212,9 +212,7 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     }
 
     suspend fun stopDaemon() {
-        withMessageIssueCatch("nx/stopDaemon") {
-            server()?.getNxService()?.stopDaemon()?.await()
-        }()
+        withMessageIssueCatch("nx/stopDaemon") { server()?.getNxService()?.stopDaemon()?.await() }()
     }
 
     suspend fun pdvData(filePath: String): NxPDVData? {

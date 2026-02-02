@@ -106,7 +106,10 @@ class NxRefreshWorkspaceService(private val project: Project) {
                                     indicator.fraction = 0.5
                                     StandardNxGraphServer.getInstance(project).restart()
                                     indicator.fraction = 0.8
-                                    NxlsService.getInstance(project).refreshWorkspace()
+                                    // Don't call refreshWorkspace() here - nxls already
+                                    // triggers reconfigure automatically during initialization
+                                    // (via setTimeout in onInitialize). Calling it again
+                                    // causes a redundant second reconfigure.
                                     CIPEPollingService.getInstance(project).forcePoll()
                                     indicator.fraction = 1.0
 
