@@ -8,7 +8,6 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.models.NxGeneratorOptionDeserializer
-import dev.nx.console.nxls.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.managers.getFilePath
@@ -141,9 +140,9 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                 try {
                     initializeFuture?.await()
                     log.info("nxls Initialized")
-                    project.messageBus
-                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
-                        .onNxWorkspaceRefresh()
+                    // Don't publish NX_WORKSPACE_REFRESH_TOPIC here - nxls will send
+                    // NxWorkspaceRefreshNotification after reconfigure completes, which
+                    // triggers the registerRefreshCallback to publish the topic
                 } catch (e: Throwable) {
                     log.info(e.toString())
                 }

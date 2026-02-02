@@ -1,7 +1,6 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
@@ -73,12 +72,6 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     }
 
     suspend fun restart() {
-        try {
-            server()?.getNxService()?.stopDaemon()?.await()
-        } catch (e: Throwable) {
-            // it's not critical if the daemon can't be stopped
-            thisLogger().debug("Failed to stop daemon during restart", e)
-        }
         wrapper.stop()
         start()
         awaitStarted()
@@ -209,6 +202,10 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         withMessageIssueCatch("nx/startDaemon") {
             server()?.getNxService()?.startDaemon()?.await()
         }()
+    }
+
+    suspend fun stopDaemon() {
+        withMessageIssueCatch("nx/stopDaemon") { server()?.getNxService()?.stopDaemon()?.await() }()
     }
 
     suspend fun pdvData(filePath: String): NxPDVData? {

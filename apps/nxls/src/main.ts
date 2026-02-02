@@ -155,17 +155,9 @@ connection.onInitialize(async (params) => {
 
     setTimeout(() => {
       if (WORKING_PATH) {
-        reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+        reconfigureAndSendNotificationWithBackoff(WORKING_PATH, null);
       }
     }, 20);
-
-    if (!DISABLE_FILE_WATCHING) {
-      unregisterFileWatcher = await languageServerWatcher(
-        WORKING_PATH,
-        fileWatcherCallback,
-        fileWatcherOperationalCallback,
-      );
-    }
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
