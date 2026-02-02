@@ -2,7 +2,15 @@
   "name": "intellij",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
+  "namedInputs": {
+    "kotlinCompileCaches": [
+      "!{workspaceRoot}/dist/apps/intellij/kotlin/compileKotlin/cacheable/caches-jvm/**/*"
+    ]
+  },
   "targets": {
+    "compileKotlin": {
+      "inputs": ["kotlinCompileCaches"]
+    },
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
