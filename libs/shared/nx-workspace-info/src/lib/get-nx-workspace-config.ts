@@ -178,39 +178,15 @@ export async function getNxWorkspaceConfig(
       logger?.debug?.(
         `getNxWorkspaceConfig: About to call createProjectFileMapUsingProjectGraph with ${Object.keys(projectGraph.nodes ?? {}).length} nodes...`,
       );
-      try {
-        global.fromConsole = true;
-        const fileMapPromise =
-          nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
-            projectGraph,
-          );
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error(
-                  'createProjectFileMapUsingProjectGraph timed out after 5 minutes',
-                ),
-              ),
-            300000, // 5 minutes
-          ),
-        );
-        projectFileMap =
-          (await Promise.race([fileMapPromise, timeoutPromise])) ?? {};
 
-        logger?.debug?.(
-          `getNxWorkspaceConfig: createProjectFileMapUsingProjectGraph completed, fileMap keys: ${Object.keys(projectFileMap).length}`,
+      projectFileMap =
+        await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
+          projectGraph,
         );
-      } catch (e) {
-        logger.log(
-          `createProjectFileMapUsingProjectGraph failed: ${e.message}, falling back to manual file map`,
-        );
-        Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          projectFileMap[projectName] =
-            (projectGraph?.nodes[projectName].data as any).files ?? [];
-        });
-      }
+
+      logger?.debug?.(
+        `getNxWorkspaceConfig: createProjectFileMapUsingProjectGraph completed, fileMap keys: ${Object.keys(projectFileMap).length}`,
+      );
     } else {
       Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
