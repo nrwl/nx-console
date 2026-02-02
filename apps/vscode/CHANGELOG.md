@@ -1,3 +1,11 @@
+## [18.85.1](https://github.com/nrwl/nx-console/compare/vscode-v18.85.0...vscode-v18.85.1) (2026-02-02)
+
+
+### Bug Fixes
+
+* **nxls:** fix projectsByPaths request that was dropped during refactor ([#2991](https://github.com/nrwl/nx-console/issues/2991)) ([61f9689](https://github.com/nrwl/nx-console/commit/61f9689404adaa2077009b33adec0ec22d5a1f2e))
+* **nxls:** improve various parts of nxls refresh behaviour ([#3001](https://github.com/nrwl/nx-console/issues/3001)) ([308f690](https://github.com/nrwl/nx-console/commit/308f690aed1c40b882820db00ed68d043e357f9a))
+
 # [18.85.0](https://github.com/nrwl/nx-console/compare/vscode-v18.84.0...vscode-v18.85.0) (2026-01-29)
 
 
