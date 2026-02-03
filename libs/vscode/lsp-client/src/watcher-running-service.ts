@@ -1,6 +1,9 @@
 import { Disposable } from 'vscode-languageserver';
 import { NxlsClient } from './nxls-client';
-import { NxWatcherOperationalNotification } from '@nx-console/language-server-types';
+import {
+  NxWatcherOperationalNotification,
+  NxWatcherStatus,
+} from '@nx-console/language-server-types';
 import { EventEmitter } from 'vscode';
 
 export class WatcherRunningService implements Disposable {
@@ -12,27 +15,34 @@ export class WatcherRunningService implements Disposable {
     return WatcherRunningService.INSTANCE;
   }
 
-  private _isOperational: boolean | undefined = undefined;
+  private _status: NxWatcherStatus | undefined = undefined;
   private _listener: Disposable | null = null;
 
-  public get isOperational(): boolean | undefined {
-    return this._isOperational;
+  public get status(): NxWatcherStatus | undefined {
+    return this._status;
   }
 
-  private readonly _onOperationalStateChange: EventEmitter<boolean> =
+  public get isOperational(): boolean | undefined {
+    if (this._status === undefined) {
+      return undefined;
+    }
+    return this._status === 'operational';
+  }
+
+  private readonly _onStatusChange: EventEmitter<NxWatcherStatus> =
     new EventEmitter();
-  readonly onOperationalStateChange = this._onOperationalStateChange.event;
+  readonly onStatusChange = this._onStatusChange.event;
 
   constructor(nxlsClient: NxlsClient) {
     WatcherRunningService.INSTANCE = this;
     this._listener = nxlsClient.onNotification(
       NxWatcherOperationalNotification,
-      ({ isOperational }) => {
-        if (this._isOperational === isOperational) {
+      ({ status }) => {
+        if (this._status === status) {
           return;
         }
-        this._isOperational = isOperational;
-        this._onOperationalStateChange.fire(isOperational);
+        this._status = status;
+        this._onStatusChange.fire(status);
       },
     );
   }

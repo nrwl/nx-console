@@ -48,9 +48,10 @@ export class TreeView extends BaseView {
         );
       }
 
-      if (this.workspaceData.daemonEnabled === false) {
+      const watcherStatus = WatcherRunningService.INSTANCE.status;
+      if (watcherStatus === 'daemonDisabled') {
         items.push(this.createDaemonDisabledViewItem());
-      } else if (WatcherRunningService.INSTANCE.isOperational === false) {
+      } else if (watcherStatus === 'notRunning') {
         items.push(this.createDaemonWatcherNotRunningViewItem());
       }
 

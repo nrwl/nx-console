@@ -45,6 +45,7 @@ import {
 import {
   DaemonWatcherCallback,
   NativeWatcher,
+  WatcherStatus,
 } from '@nx-console/shared-watcher';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
@@ -105,9 +106,9 @@ const fileWatcherCallback: DaemonWatcherCallback = async (
     projectGraphAndSourceMaps,
   );
 };
-const fileWatcherOperationalCallback = (isOperational: boolean) => {
+const fileWatcherOperationalCallback = (status: WatcherStatus) => {
   safeSendNotification(NxWatcherOperationalNotification.method, {
-    isOperational,
+    status,
   });
 };
 let reconfigureAttempts = 0;

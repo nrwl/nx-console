@@ -30,8 +30,10 @@ export const NxWorkspaceRefreshNotification: NotificationType<void> =
 export const NxWorkspaceRefreshStartedNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspaceStarted');
 
+export type NxWatcherStatus = 'operational' | 'daemonDisabled' | 'notRunning';
+
 export const NxWatcherOperationalNotification: NotificationType<{
-  isOperational: boolean;
+  status: NxWatcherStatus;
 }> = new NotificationType('nx/fileWatcherOperational');
 
 export const NxStopDaemonRequest: RequestType<undefined, undefined, unknown> =
