@@ -35,3 +35,11 @@ export const UPDATE_SELF_HEALING_FIX = 'update_self_healing_fix';
 export const CLOUD_POLYGRAPH_INIT = 'cloud_polygraph_init';
 
 export const CLOUD_POLYGRAPH_DELEGATE = 'cloud_polygraph_delegate';
+
+export const CLOUD_POLYGRAPH_PUSH_BRANCH = 'cloud_polygraph_push_branch';
+
+export const CLOUD_POLYGRAPH_CREATE_PRS = 'cloud_polygraph_create_prs';
+
+export const CLOUD_POLYGRAPH_QUERY_PRS = 'cloud_polygraph_query_prs';
+
+export const CLOUD_POLYGRAPH_MARK_READY = 'cloud_polygraph_mark_ready';
