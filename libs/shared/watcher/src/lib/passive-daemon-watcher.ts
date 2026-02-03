@@ -8,6 +8,8 @@ import type { ProjectGraph } from 'nx/src/config/project-graph';
 import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 import { AnyEventObject, createActor, fromPromise, setup } from 'xstate';
 
+export type WatcherStatus = 'operational' | 'daemonDisabled' | 'notRunning';
+
 export type DaemonWatcherCallback = (
   error?: Error | null | 'closed' | 'reconnecting' | 'reconnected',
   projectGraphAndSourceMaps?: {
@@ -56,12 +58,12 @@ export class PassiveDaemonWatcher {
           `PassiveDaemonWatcher: Transitioning to ${params.to}`,
         );
       },
-      notifyOperationalState: (_, params: { isOperational: boolean }) => {
+      notifyOperationalState: (_, params: { status: WatcherStatus }) => {
         this.logger.debug?.(
-          `PassiveDaemonWatcher: Operational state changed to ${params.isOperational}`,
+          `PassiveDaemonWatcher: Operational state changed to ${params.status}`,
         );
         if (this.onOperationalStateChange) {
-          this.onOperationalStateChange(params.isOperational);
+          this.onOperationalStateChange(params.status);
         }
       },
       logError: ({ event }) => {
@@ -178,7 +180,7 @@ export class PassiveDaemonWatcher {
       starting: {
         entry: [
           { type: 'logTransition', params: { to: 'starting' } },
-          { type: 'notifyOperationalState', params: { isOperational: true } },
+          { type: 'notifyOperationalState', params: { status: 'operational' } },
         ],
         invoke: {
           id: 'registerListener',
@@ -192,7 +194,7 @@ export class PassiveDaemonWatcher {
             actions: [
               {
                 type: 'notifyOperationalState',
-                params: { isOperational: false },
+                params: { status: 'notRunning' },
               },
             ],
           },
@@ -201,7 +203,7 @@ export class PassiveDaemonWatcher {
       listening: {
         entry: [
           { type: 'logTransition', params: { to: 'listening' } },
-          { type: 'notifyOperationalState', params: { isOperational: true } },
+          { type: 'notifyOperationalState', params: { status: 'operational' } },
         ],
         on: {
           LISTENER_ERROR: {
@@ -211,7 +213,7 @@ export class PassiveDaemonWatcher {
               'cleanupListener',
               {
                 type: 'notifyOperationalState',
-                params: { isOperational: false },
+                params: { status: 'notRunning' },
               },
             ],
           },
@@ -221,7 +223,7 @@ export class PassiveDaemonWatcher {
               'cleanupListener',
               {
                 type: 'notifyOperationalState',
-                params: { isOperational: false },
+                params: { status: 'notRunning' },
               },
             ],
           },
@@ -235,7 +237,7 @@ export class PassiveDaemonWatcher {
   constructor(
     private workspacePath: string,
     private logger: Logger,
-    private onOperationalStateChange?: (isOperational: boolean) => void,
+    private onOperationalStateChange?: (status: WatcherStatus) => void,
   ) {
     this.actor.start();
   }

@@ -28,9 +28,10 @@ export class ListView extends BaseView {
           ),
         );
       }
-      if (this.workspaceData.daemonEnabled === false) {
+      const watcherStatus = WatcherRunningService.INSTANCE.status;
+      if (watcherStatus === 'daemonDisabled') {
         items.push(this.createDaemonDisabledViewItem());
-      } else if (WatcherRunningService.INSTANCE.isOperational === false) {
+      } else if (watcherStatus === 'notRunning') {
         items.push(this.createDaemonWatcherNotRunningViewItem());
       }
       // should return root elements if no element was passed

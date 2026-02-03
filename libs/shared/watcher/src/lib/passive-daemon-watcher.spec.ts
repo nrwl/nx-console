@@ -224,40 +224,40 @@ describe('PassiveDaemonWatcher', () => {
   });
 
   describe('Operational State Callback', () => {
-    it('should call callback with true when starting', async () => {
-      const onOperationalStateChange = jest.fn();
+    it('should call callback with operational when starting', async () => {
+      const onStatusChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      expect(onOperationalStateChange).toHaveBeenCalledWith(true);
+      expect(onStatusChange).toHaveBeenCalledWith('operational');
 
       watcher.dispose();
     });
 
-    it('should call callback with true when listening', async () => {
-      const onOperationalStateChange = jest.fn();
+    it('should call callback with operational when listening', async () => {
+      const onStatusChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      expect(onOperationalStateChange).toHaveBeenCalledWith(true);
+      expect(onStatusChange).toHaveBeenCalledWith('operational');
 
       watcher.dispose();
     });
 
-    it('should call callback with false when registration fails', async () => {
-      const onOperationalStateChange = jest.fn();
+    it('should call callback with notRunning when registration fails', async () => {
+      const onStatusChange = jest.fn();
       (getNxDaemonClient as jest.Mock).mockRejectedValueOnce(
         new Error('Failed'),
       );
@@ -265,55 +265,55 @@ describe('PassiveDaemonWatcher', () => {
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      expect(onOperationalStateChange).toHaveBeenCalledWith(false);
+      expect(onStatusChange).toHaveBeenCalledWith('notRunning');
 
       watcher.dispose();
     });
 
-    it('should call callback with false when listener receives error', async () => {
-      const onOperationalStateChange = jest.fn();
+    it('should call callback with notRunning when listener receives error', async () => {
+      const onStatusChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      onOperationalStateChange.mockClear();
+      onStatusChange.mockClear();
 
       capturedDaemonCallback('closed');
       await flushPromises();
 
-      expect(onOperationalStateChange).toHaveBeenCalledWith(false);
+      expect(onStatusChange).toHaveBeenCalledWith('notRunning');
 
       watcher.dispose();
     });
 
-    it('should call callback with false after stop', async () => {
-      const onOperationalStateChange = jest.fn();
+    it('should call callback with notRunning after stop', async () => {
+      const onStatusChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      onOperationalStateChange.mockClear();
+      onStatusChange.mockClear();
 
       watcher.stop();
       await flushPromises();
 
-      expect(onOperationalStateChange).toHaveBeenCalledWith(false);
+      expect(onStatusChange).toHaveBeenCalledWith('notRunning');
 
       watcher.dispose();
     });
@@ -321,44 +321,44 @@ describe('PassiveDaemonWatcher', () => {
 
   describe('Reconnection Events', () => {
     it('should not trigger state change on reconnecting event', async () => {
-      const onOperationalStateChange = jest.fn();
+      const onStatusChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      onOperationalStateChange.mockClear();
+      onStatusChange.mockClear();
 
       capturedDaemonCallback('reconnecting');
       await flushPromises();
 
-      expect(onOperationalStateChange).not.toHaveBeenCalled();
+      expect(onStatusChange).not.toHaveBeenCalled();
       expect(watcher.state).toBe('listening');
 
       watcher.dispose();
     });
 
     it('should not trigger state change on reconnected event', async () => {
-      const onOperationalStateChange = jest.fn();
+      const onStatusChange = jest.fn();
       const watcher = new PassiveDaemonWatcher(
         '/workspace',
         mockLogger,
-        onOperationalStateChange,
+        onStatusChange,
       );
 
       watcher.start();
       await flushPromises();
 
-      onOperationalStateChange.mockClear();
+      onStatusChange.mockClear();
 
       capturedDaemonCallback('reconnected');
       await flushPromises();
 
-      expect(onOperationalStateChange).not.toHaveBeenCalled();
+      expect(onStatusChange).not.toHaveBeenCalled();
       expect(watcher.state).toBe('listening');
 
       watcher.dispose();
