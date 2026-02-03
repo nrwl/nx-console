@@ -94,10 +94,6 @@ async function tryRestartDaemonWatcher() {
 
 async function showDaemonDisabledReason() {
   const daemonDir = await getDaemonDirectory();
-  if (!daemonDir) {
-    showDaemonLogNotFoundError();
-    return;
-  }
 
   const disabledFilePath = join(daemonDir, 'disabled');
   if (existsSync(disabledFilePath)) {
@@ -129,18 +125,34 @@ function showDaemonLogNotFoundError() {
     });
 }
 
-async function getDaemonDirectory(): Promise<string | undefined> {
+async function getDaemonDirectory(): Promise<string> {
   const workspacePath = getNxWorkspacePath();
-  const cacheDirectoryModule = await getNxCacheDirectory(
-    workspacePath,
-    vscodeLogger,
-  );
 
-  if (!cacheDirectoryModule) {
-    return;
+  try {
+    const cacheDirectoryModule = await getNxCacheDirectory(
+      workspacePath,
+      vscodeLogger,
+    );
+
+    if (cacheDirectoryModule) {
+      let workspaceDataDirectory: string;
+      if (
+        typeof cacheDirectoryModule.workspaceDataDirectoryForWorkspace ===
+        'function'
+      ) {
+        workspaceDataDirectory =
+          cacheDirectoryModule.workspaceDataDirectoryForWorkspace(
+            workspacePath,
+          );
+      } else {
+        workspaceDataDirectory = cacheDirectoryModule.workspaceDataDirectory;
+      }
+
+      return join(workspaceDataDirectory, 'd');
+    }
+  } catch {
+    // Fall through to default
   }
 
-  const workspaceDataDirectory =
-    cacheDirectoryModule.workspaceDataDirectoryForWorkspace(workspacePath);
-  return join(workspaceDataDirectory, 'd');
+  return join(workspacePath, '.nx', 'workspace-data', 'd');
 }

@@ -15,13 +15,7 @@
   ],
   "references": [
     {
-      "path": "../../shared/schema/tsconfig.lib.json"
-    },
-    {
       "path": "../configuration/tsconfig.lib.json"
-    },
-    {
-      "path": "../../shared/generate-ui-types/tsconfig.lib.json"
     },
     {
       "path": "../telemetry/tsconfig.lib.json"
@@ -37,6 +31,9 @@
     },
     {
       "path": "../nx-cli-quickpicks/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/generate-ui-types/tsconfig.lib.json"
     }
   ]
 }
