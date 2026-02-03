@@ -69,9 +69,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
     context.subscriptions.push(
       onWorkspaceRefreshed(() => this.refresh()),
-      WatcherRunningService.INSTANCE.onOperationalStateChange(() =>
-        this.refresh(),
-      ),
+      WatcherRunningService.INSTANCE.onStatusChange(() => this.refresh()),
     );
   }
 

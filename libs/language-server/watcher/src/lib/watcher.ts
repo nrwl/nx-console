@@ -10,6 +10,7 @@ import {
   DaemonWatcherCallback,
   NativeWatcher,
   PassiveDaemonWatcher,
+  WatcherStatus,
 } from '@nx-console/shared-watcher';
 
 let _passiveDaemonWatcher: PassiveDaemonWatcher | undefined;
@@ -58,14 +59,13 @@ export async function cleanupAllWatchers(): Promise<void> {
 export async function languageServerWatcher(
   workspacePath: string,
   callback: DaemonWatcherCallback,
-  watcherOperationalCallback?: (isOperational: boolean) => void,
+  watcherOperationalCallback?: (status: WatcherStatus) => void,
 ): Promise<() => Promise<void>> {
   const nxVersion = await getNxVersion(workspacePath);
   if (!nxVersion || !gte(nxVersion, '16.4.0')) {
     lspLogger.log(
       'File watching is not supported for Nx versions below 16.4.0.',
     );
-    watcherOperationalCallback?.(false);
     return async () => {
       lspLogger.log('unregistering empty watcher');
     };
@@ -80,8 +80,8 @@ export async function languageServerWatcher(
     );
   } else {
     lspLogger.debug('Using old DaemonWatcher/NativeWatcher for file watching');
-    // older versions don't have this granular watcher tracking so we just assume true
-    watcherOperationalCallback?.(true);
+    // older versions don't have this granular watcher tracking so we just assume operational
+    watcherOperationalCallback?.('operational');
     return registerOldWatcher(workspacePath, nxVersion, callback);
   }
 }
@@ -89,7 +89,7 @@ export async function languageServerWatcher(
 async function registerPassiveDaemonWatcher(
   workspacePath: string,
   callback: DaemonWatcherCallback,
-  watcherOperationalCallback?: (isOperational: boolean) => void,
+  watcherOperationalCallback?: (status: WatcherStatus) => void,
 ): Promise<() => Promise<void>> {
   lspLogger.debug?.('registerPassiveDaemonWatcher: Starting registration...');
   lspLogger.debug?.('registerPassiveDaemonWatcher: Getting daemon client...');
@@ -100,6 +100,7 @@ async function registerPassiveDaemonWatcher(
 
   if (!daemonClient.daemonClient.enabled()) {
     lspLogger.log('Daemon client is not enabled, file watching not available.');
+    watcherOperationalCallback?.('daemonDisabled');
     return async () => {
       lspLogger.log('unregistering empty watcher');
     };
