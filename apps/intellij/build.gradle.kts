@@ -15,7 +15,7 @@ plugins {
     id("dev.nx.gradle.project-graph") version ("0.1.12")
     id("java")
     id("org.jetbrains.changelog") version "2.4.0"
-    id("org.jetbrains.intellij.platform") version "2.9.0"
+    id("org.jetbrains.intellij.platform") version "2.11.0"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
