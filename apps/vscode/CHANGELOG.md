@@ -1,3 +1,12 @@
+## [18.85.2](https://github.com/nrwl/nx-console/compare/vscode-v18.85.1...vscode-v18.85.2) (2026-02-03)
+
+
+### Bug Fixes
+
+* **nxls:** fix daemon disabled TreeItem in non-node_modules case ([#3008](https://github.com/nrwl/nx-console/issues/3008)) ([4192515](https://github.com/nrwl/nx-console/commit/4192515d3941159631d95e2f5c539c7ca38c4cdd))
+* **vscode:** avoid direct import from nx in readSchemaWithFallback ([#3007](https://github.com/nrwl/nx-console/issues/3007)) ([9e2ea97](https://github.com/nrwl/nx-console/commit/9e2ea9712922be1bf5f5d859e66d81aa4781faeb))
+* **vscode:** enable minimal mode in vscode/cursor mcp if workspace skills exist ([#2998](https://github.com/nrwl/nx-console/issues/2998)) ([5148aba](https://github.com/nrwl/nx-console/commit/5148aba63d0f585c74cf4bbef31f8ecf97a29956))
+
 ## [18.85.1](https://github.com/nrwl/nx-console/compare/vscode-v18.85.0...vscode-v18.85.1) (2026-02-02)
 
 
