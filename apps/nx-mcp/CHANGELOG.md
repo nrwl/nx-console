@@ -1,3 +1,13 @@
+## 0.17.0 (2026-02-03)
+
+### 🩹 Fixes
+
+- **vscode:** enable minimal mode in vscode/cursor mcp if workspace skills exist ([#2998](https://github.com/nrwl/nx-console/pull/2998))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.16.0 (2026-01-29)
 
 ### 🩹 Fixes
