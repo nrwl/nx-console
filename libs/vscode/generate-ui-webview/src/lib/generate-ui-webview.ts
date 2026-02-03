@@ -17,13 +17,11 @@ import {
   getStartupMessage,
   getTransformedGeneratorSchema,
 } from '@nx-console/vscode-nx-workspace';
-import { CliTaskProvider, NodeTask } from '@nx-console/vscode-tasks';
+import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import {
   commands,
   ExtensionContext,
-  tasks,
   Uri,
   ViewColumn,
   WebviewPanel,
@@ -42,8 +40,6 @@ export class GenerateUiWebview {
     | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
     | undefined;
 
-  private openedFromAI = false;
-
   private readonly _onDispose = new EventEmitter<void>();
 
   constructor(private context: ExtensionContext) {
@@ -57,12 +53,10 @@ export class GenerateUiWebview {
     return this._onDispose.event;
   }
 
-  async openGenerateUi(generator: GeneratorSchema, openedFromAI = false) {
+  async openGenerateUi(generator: GeneratorSchema) {
     if (this.webviewPanel !== undefined) {
       this.webviewPanel.dispose();
     }
-
-    this.openedFromAI = openedFromAI;
 
     this.generatorToDisplay = generator;
     this.webviewPanel = window.createWebviewPanel(
@@ -172,28 +166,10 @@ export class GenerateUiWebview {
   private async handleMessageFromWebview(message: GenerateUiOutputMessage) {
     switch (message.payloadType) {
       case 'run-generator': {
-        if (message.payload.flags.includes('--dry-run') || !this.openedFromAI) {
-          CliTaskProvider.instance.executeTask({
-            command: 'generate',
-            ...message.payload,
-          });
-        } else {
-          const scriptLocation = join(
-            this.context.extensionUri.fsPath,
-            'wrap-generator.js',
-          );
-          const task = await NodeTask.create({
-            script: scriptLocation,
-            args: [
-              'npx',
-              'nx',
-              'generate',
-              message.payload.positional,
-              ...message.payload.flags,
-            ],
-          });
-          await tasks.executeTask(task);
-        }
+        CliTaskProvider.instance.executeTask({
+          command: 'generate',
+          ...message.payload,
+        });
         break;
       }
       case 'output-init': {
