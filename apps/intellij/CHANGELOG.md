@@ -1,3 +1,11 @@
+## <small>1.56.1 (2026-02-03)</small>
+
+### Bug Fixes
+
+* **nxls:** fix daemon disabled TreeItem in non-node_modules case ([#3008](https://github.com/nrwl/nx-console/issues/3008)) ([4192515](https://github.com/nrwl/nx-console/commit/4192515d3941159631d95e2f5c539c7ca38c4cdd))
+* **nxls:** fix projectsByPaths request that was dropped during refactor ([#2991](https://github.com/nrwl/nx-console/issues/2991)) ([61f9689](https://github.com/nrwl/nx-console/commit/61f9689404adaa2077009b33adec0ec22d5a1f2e))
+* **nxls:** improve various parts of nxls refresh behaviour ([#3001](https://github.com/nrwl/nx-console/issues/3001)) ([308f690](https://github.com/nrwl/nx-console/commit/308f690aed1c40b882820db00ed68d043e357f9a))
+
 ## 1.56.0 (2026-01-29)
 
 ### Bug Fixes
