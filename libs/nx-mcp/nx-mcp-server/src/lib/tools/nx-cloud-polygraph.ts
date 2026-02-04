@@ -415,7 +415,7 @@ function registerGetSession(
 
           if (result.success) {
             return {
-              content: [{ type: 'text', text: result }],
+              content: [{ type: 'text', text: JSON.stringify(result) }],
             };
           }
 
