@@ -170,10 +170,6 @@ tasks {
         archiveBaseName.set("nx-console")
     }
 
-    named("instrumentCode") { dependsOn("compileKotlin") }
-
-    named("compileTestKotlin") { dependsOn("compileKotlin") }
-
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts", "copyCloudFixWebviewArtifacts") }
 
     withType<RunIdeTask> { maxHeapSize = "6g" }
