@@ -170,9 +170,9 @@ tasks {
         archiveBaseName.set("nx-console")
     }
 
-    instrumentCode { dependsOn("compileKotlin") }
+    named("instrumentCode") { dependsOn("compileKotlin") }
 
-    compileTestKotlin { dependsOn("compileKotlin") }
+    named("compileTestKotlin") { mustRunAfter("compileKotlin") }
 
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts", "copyCloudFixWebviewArtifacts") }
 
