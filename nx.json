@@ -68,6 +68,7 @@
     ],
     "sharedGlobals": [
       { "runtime": "node -p '`${process.platform}_${process.arch}`'" },
+      { "env": "NX_POWERPACK_DISABLE" },
       "{workspaceRoot}/.env"
     ],
     "scripts": ["{workspaceRoot}/tools/scripts/**"]
