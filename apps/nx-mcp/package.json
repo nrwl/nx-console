@@ -1,6 +1,6 @@
 {
   "name": "nx-mcp",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "main": "main.js",
   "description": "A Model Context Protocol server implementation for Nx",
   "author": {

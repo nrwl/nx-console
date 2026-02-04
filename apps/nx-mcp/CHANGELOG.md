@@ -1,3 +1,7 @@
+## 0.17.1 (2026-02-04)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
 ## 0.17.0 (2026-02-03)
 
 ### 🩹 Fixes
