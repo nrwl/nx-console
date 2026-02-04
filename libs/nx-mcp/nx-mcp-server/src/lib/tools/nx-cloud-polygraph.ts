@@ -5,7 +5,7 @@ import {
   CLOUD_POLYGRAPH_INIT,
   CLOUD_POLYGRAPH_MARK_READY,
   CLOUD_POLYGRAPH_PUSH_BRANCH,
-  CLOUD_POLYGRAPH_QUERY_PRS,
+  CLOUD_POLYGRAPH_GET_SESSION,
 } from '@nx-console/shared-llm-context';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -385,15 +385,15 @@ function registerQueryPRs(
   nxCloudClient: any,
   workspacePath: string,
 ) {
-  if (!isToolEnabled(CLOUD_POLYGRAPH_QUERY_PRS, toolsFilter)) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_GET_SESSION, toolsFilter)) {
     logger.debug?.(
-      `Skipping ${CLOUD_POLYGRAPH_QUERY_PRS} - disabled by tools filter`,
+      `Skipping ${CLOUD_POLYGRAPH_GET_SESSION} - disabled by tools filter`,
     );
   } else {
     registry.registerTool({
-      name: CLOUD_POLYGRAPH_QUERY_PRS,
+      name: CLOUD_POLYGRAPH_GET_SESSION,
       description:
-        'Query the status of all pull requests in a Polygraph session. Returns repo, title, status (DRAFT/OPEN/MERGED/CLOSED), and URL for each PR.',
+        'Get the specified Polygraph session. Returns session url, status, and associated pull requests across repositories.',
       inputSchema: queryPRsSchema.shape,
       annotations: {
         destructiveHint: false,
@@ -407,33 +407,15 @@ function registerQueryPRs(
           const nxCloudUrl = await getNxCloudUrl(workspacePath);
           const authHeaders = await nxCloudAuthHeaders(workspacePath);
 
-          const result = await nxCloudClient.polygraphQueryPRs(logger, {
+          const result = await nxCloudClient.polygraphGetSession(logger, {
             sessionId,
             nxCloudUrl,
             authHeaders,
           });
 
-          if (result.success) {
-            if (result.prs.length === 0) {
-              return {
-                content: [
-                  {
-                    type: 'text',
-                    text: `No PRs found for session ${sessionId}`,
-                  },
-                ],
-              };
-            }
-
-            let output = `Session PRs (${result.prs.length} total):\n`;
-            output += '| Repo | Title | Status | URL |\n';
-            output += '|------|-------|--------|-----|\n';
-            for (const pr of result.prs) {
-              output += `| ${pr.repo} | ${pr.title} | ${pr.status} | ${pr.url} |\n`;
-            }
-
+          if (result.success) { 
             return {
-              content: [{ type: 'text', text: output }],
+              content: [{ type: 'text', text: result }],
             };
           }
 
