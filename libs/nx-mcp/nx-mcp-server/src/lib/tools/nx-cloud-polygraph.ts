@@ -413,7 +413,7 @@ function registerGetSession(
             authHeaders,
           });
 
-          if (result.success) { 
+          if (result.success) {
             return {
               content: [{ type: 'text', text: result }],
             };
@@ -543,7 +543,13 @@ export function registerPolygraphTools(
     nxCloudClient,
     workspacePath,
   );
-  registerGetSession(toolsFilter, logger, registry, nxCloudClient, workspacePath);
+  registerGetSession(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
   registerMarkReady(
     toolsFilter,
     logger,
