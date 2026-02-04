@@ -374,11 +374,11 @@ function registerCreatePRs(
   }
 }
 
-const queryPRsSchema = z.object({
+const getSessionSchema = z.object({
   sessionId: z.string().describe('The Polygraph session ID'),
 });
 
-function registerQueryPRs(
+function registerGetSession(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
@@ -394,7 +394,7 @@ function registerQueryPRs(
       name: CLOUD_POLYGRAPH_GET_SESSION,
       description:
         'Get the specified Polygraph session. Returns session url, status, and associated pull requests across repositories.',
-      inputSchema: queryPRsSchema.shape,
+      inputSchema: getSessionSchema.shape,
       annotations: {
         destructiveHint: false,
         readOnlyHint: true,
@@ -543,7 +543,7 @@ export function registerPolygraphTools(
     nxCloudClient,
     workspacePath,
   );
-  registerQueryPRs(toolsFilter, logger, registry, nxCloudClient, workspacePath);
+  registerGetSession(toolsFilter, logger, registry, nxCloudClient, workspacePath);
   registerMarkReady(
     toolsFilter,
     logger,
