@@ -44,15 +44,19 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
          */
         fun isAIFixActive(aiFix: NxAiFix): Boolean {
             // User has already taken action - fix is no longer active
-            if (aiFix.userAction == AITaskFixUserAction.APPLIED ||
+            if (
+                aiFix.userAction == AITaskFixUserAction.APPLIED ||
                     aiFix.userAction == AITaskFixUserAction.REJECTED ||
-                    aiFix.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY) {
+                    aiFix.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY
+            ) {
                 return false
             }
 
             // Fix generation failed or not executable - no longer active
-            if (aiFix.suggestedFixStatus == AITaskFixStatus.FAILED ||
-                    aiFix.suggestedFixStatus == AITaskFixStatus.NOT_EXECUTABLE) {
+            if (
+                aiFix.suggestedFixStatus == AITaskFixStatus.FAILED ||
+                    aiFix.suggestedFixStatus == AITaskFixStatus.NOT_EXECUTABLE
+            ) {
                 return false
             }
 
