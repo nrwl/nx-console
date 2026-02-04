@@ -5,9 +5,11 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.AITaskFixStatus
+import dev.nx.console.models.AITaskFixUserAction
 import dev.nx.console.models.CIPEDataResponse
 import dev.nx.console.models.CIPEExecutionStatus
 import dev.nx.console.models.CIPEInfoErrorType
+import dev.nx.console.models.NxAiFix
 import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +36,52 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
 
         fun getInstance(project: Project): CIPEPollingService =
             project.getService(CIPEPollingService::class.java)
+
+        /**
+         * Checks if an AI fix is in an active state that requires frequent polling. Returns true
+         * only if the fix is still being generated or verified. Mirrors VSCode's isAIFixActive
+         * function.
+         */
+        fun isAIFixActive(aiFix: NxAiFix): Boolean {
+            // User has already taken action - fix is no longer active
+            if (
+                aiFix.userAction == AITaskFixUserAction.APPLIED ||
+                    aiFix.userAction == AITaskFixUserAction.REJECTED ||
+                    aiFix.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY
+            ) {
+                return false
+            }
+
+            // Fix generation failed or not executable - no longer active
+            if (
+                aiFix.suggestedFixStatus == AITaskFixStatus.FAILED ||
+                    aiFix.suggestedFixStatus == AITaskFixStatus.NOT_EXECUTABLE
+            ) {
+                return false
+            }
+
+            // Fix generation still in progress - active
+            if (aiFix.suggestedFixStatus != AITaskFixStatus.COMPLETED) {
+                return true
+            }
+
+            // Generation complete - check if verification is needed
+            // Only "code_change" classification (or null for backwards compat) needs verification
+            val needsVerification =
+                aiFix.failureClassification == "code_change" || aiFix.failureClassification == null
+
+            if (!needsVerification) {
+                return false
+            }
+
+            // Verification is needed - check if it's complete
+            val verificationComplete =
+                aiFix.verificationStatus == AITaskFixStatus.COMPLETED ||
+                    aiFix.verificationStatus == AITaskFixStatus.FAILED ||
+                    aiFix.verificationStatus == AITaskFixStatus.NOT_EXECUTABLE
+
+            return !verificationComplete
+        }
     }
 
     private val logger = thisLogger()
@@ -139,12 +187,7 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
 
                 // AI fixes in progress - ultra-fast polling
                 data.info?.any { cipe ->
-                    cipe.runGroups.any { rg ->
-                        rg.aiFix?.let { aiFix ->
-                            aiFix.verificationStatus == AITaskFixStatus.NOT_STARTED ||
-                                aiFix.verificationStatus == AITaskFixStatus.IN_PROGRESS
-                        } ?: false
-                    }
+                    cipe.runGroups.any { rg -> rg.aiFix?.let { isAIFixActive(it) } ?: false }
                 } == true -> {
                     logger.debug("AI fixes in progress detected, switching to AI_FIX polling")
                     AI_FIX_POLLING_TIME_MS

@@ -26,10 +26,11 @@ export class GraphWebviewManager implements Disposable {
   constructor(private context: ExtensionContext) {
     onWorkspaceRefreshed(async () => {
       if (this.webviewPanel) {
-        this.webviewPanel.webview.html = await this.loadGraphHtml(
-          this.webviewPanel.webview,
-        );
-        this.rerunLastGraphCommand();
+        const html = await this.loadGraphHtml(this.webviewPanel.webview);
+        if (this.webviewPanel) {
+          this.webviewPanel.webview.html = html;
+          this.rerunLastGraphCommand();
+        }
       }
     });
   }
@@ -159,9 +160,10 @@ export class GraphWebviewManager implements Disposable {
       this.webviewPanel = undefined;
     });
 
-    this.webviewPanel.webview.html = await this.loadGraphHtml(
-      this.webviewPanel.webview,
-    );
+    const html = await this.loadGraphHtml(this.webviewPanel.webview);
+    if (this.webviewPanel) {
+      this.webviewPanel.webview.html = html;
+    }
   }
 
   private async loadGraphHtml(webview: Webview) {
