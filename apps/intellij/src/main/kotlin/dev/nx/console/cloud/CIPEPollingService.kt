@@ -44,35 +44,39 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
          */
         fun isAIFixActive(aiFix: NxAiFix): Boolean {
             // User has already taken action - fix is no longer active
-            val userHasTakenAction =
-                aiFix.userAction == AITaskFixUserAction.APPLIED ||
+            if (aiFix.userAction == AITaskFixUserAction.APPLIED ||
                     aiFix.userAction == AITaskFixUserAction.REJECTED ||
-                    aiFix.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY
-
-            if (userHasTakenAction) {
+                    aiFix.userAction == AITaskFixUserAction.APPLIED_AUTOMATICALLY) {
                 return false
             }
 
-            // Check if fix generation is complete
-            val fixGenerationComplete =
-                aiFix.suggestedFixStatus == AITaskFixStatus.COMPLETED ||
-                    aiFix.suggestedFixStatus == AITaskFixStatus.FAILED ||
-                    aiFix.suggestedFixStatus == AITaskFixStatus.NOT_EXECUTABLE
+            // Fix generation failed or not executable - no longer active
+            if (aiFix.suggestedFixStatus == AITaskFixStatus.FAILED ||
+                    aiFix.suggestedFixStatus == AITaskFixStatus.NOT_EXECUTABLE) {
+                return false
+            }
 
-            // Check if verification is complete
+            // Fix generation still in progress - active
+            if (aiFix.suggestedFixStatus != AITaskFixStatus.COMPLETED) {
+                return true
+            }
+
+            // Generation complete - check if verification is needed
+            // Only "code_change" classification (or null for backwards compat) needs verification
+            val needsVerification =
+                aiFix.failureClassification == "code_change" || aiFix.failureClassification == null
+
+            if (!needsVerification) {
+                return false
+            }
+
+            // Verification is needed - check if it's complete
             val verificationComplete =
                 aiFix.verificationStatus == AITaskFixStatus.COMPLETED ||
                     aiFix.verificationStatus == AITaskFixStatus.FAILED ||
                     aiFix.verificationStatus == AITaskFixStatus.NOT_EXECUTABLE
 
-            // Needs verification when failureClassification is "code_change" or null (for backwards
-            // compat)
-            val needsVerification =
-                aiFix.failureClassification == "code_change" || aiFix.failureClassification == null
-
-            // Active if generation in progress OR (needs verification AND verification not
-            // complete)
-            return !fixGenerationComplete || (!verificationComplete && needsVerification)
+            return !verificationComplete
         }
     }
 

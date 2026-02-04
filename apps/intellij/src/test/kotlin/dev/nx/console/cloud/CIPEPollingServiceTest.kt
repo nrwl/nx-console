@@ -102,6 +102,19 @@ class CIPEPollingServiceTest {
     }
 
     @Test
+    fun testAiFixNotActiveWhenGenerationFailedWithNullClassification() {
+        // Bug regression test: FAILED with null failureClassification and NOT_STARTED verification
+        // should still return false (not active)
+        val aiFix =
+            createAiFix(
+                suggestedFixStatus = AITaskFixStatus.FAILED,
+                verificationStatus = AITaskFixStatus.NOT_STARTED,
+                failureClassification = null,
+            )
+        assertFalse(CIPEPollingService.isAIFixActive(aiFix))
+    }
+
+    @Test
     fun testAiFixNotActiveWhenGenerationNotExecutable() {
         // When generation is not executable, verification is also typically not executable
         val aiFix =
