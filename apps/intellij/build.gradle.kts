@@ -172,6 +172,8 @@ tasks {
 
     instrumentCode { dependsOn("compileKotlin") }
 
+    compileTestKotlin { dependsOn("compileKotlin") }
+
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts", "copyCloudFixWebviewArtifacts") }
 
     withType<RunIdeTask> { maxHeapSize = "6g" }
