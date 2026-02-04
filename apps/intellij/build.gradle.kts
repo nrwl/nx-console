@@ -172,7 +172,7 @@ tasks {
 
     named("instrumentCode") { dependsOn("compileKotlin") }
 
-    named("compileTestKotlin") { mustRunAfter("compileKotlin") }
+    named("compileTestKotlin") { dependsOn("compileKotlin") }
 
     instrumentedJar { dependsOn("copyGenerateUiV2Artifacts", "copyCloudFixWebviewArtifacts") }
 
