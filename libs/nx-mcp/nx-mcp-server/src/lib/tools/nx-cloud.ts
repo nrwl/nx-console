@@ -335,7 +335,13 @@ export const renderCipeDetails = (cipe: CIPEInfo): string => {
 
       lines.push(runPrompt);
       for (const task of run.failedTasks ?? []) {
-        lines.push(`      ---- Failed Task: ${task}`);
+        // Transform record-command tasks to use the actual command for better understanding
+        const displayTask =
+          task === 'upload-run-result:record-command' ||
+          task === 'nx-cloud-tasks-runner:record-command'
+            ? run.command
+            : task;
+        lines.push(`      ---- Failed Task: ${displayTask}`);
       }
       if (run.status === 'CANCELED') {
         lines.push(
@@ -904,7 +910,18 @@ const getCIInformation =
     for (const runGroup of cipeForBranch.runGroups) {
       for (const run of runGroup.runs) {
         if (run.failedTasks) {
-          failedTaskIds.push(...run.failedTasks);
+          for (const taskId of run.failedTasks) {
+            // Transform record-command tasks to use the actual command for better agent understanding
+            // These taskIds are internal placeholders - the real command is in run.command
+            if (
+              taskId === 'upload-run-result:record-command' ||
+              taskId === 'nx-cloud-tasks-runner:record-command'
+            ) {
+              failedTaskIds.push(run.command);
+            } else {
+              failedTaskIds.push(taskId);
+            }
+          }
         }
       }
     }
