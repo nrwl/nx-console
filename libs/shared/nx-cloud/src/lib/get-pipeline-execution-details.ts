@@ -84,6 +84,8 @@ export interface PipelineExecutionDetails {
   projectGraphSha?: string;
   fileMapSha?: string;
   hashScope?: string;
+  source?: string;
+  triggeredByAiFix?: boolean;
 }
 
 export interface PipelineExecutionDetailsError {
@@ -127,6 +129,13 @@ export async function getPipelineExecutionDetails(
     const responseData = JSON.parse(
       response.responseText,
     ) as PipelineExecutionDetails;
+
+    if (responseData.triggeredByAiFix) {
+      logger.log(
+        `Pipeline execution ${responseData.id} was triggered by AI fix (source: ${responseData.source})`,
+      );
+    }
+
     return {
       data: responseData,
     };
@@ -172,6 +181,12 @@ export function formatPipelineExecutionDetailsContent(
   }
   if (execution.durationMs) {
     detailsText += `\nDuration: ${Math.round(execution.durationMs / 1000)}s`;
+  }
+  if (execution.source) {
+    detailsText += `\nSource: ${execution.source}`;
+  }
+  if (execution.triggeredByAiFix) {
+    detailsText += `\nTriggered by AI Fix: Yes`;
   }
 
   content.push(detailsText);
