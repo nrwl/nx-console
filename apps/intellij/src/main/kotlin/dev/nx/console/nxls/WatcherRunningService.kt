@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 
 @Service(Service.Level.PROJECT)
 class WatcherRunningService(private val project: Project) {
-    private val _isOperational = MutableStateFlow<Boolean?>(null)
-    val isOperational: StateFlow<Boolean?> = _isOperational.asStateFlow()
+    private val _status = MutableStateFlow<String?>(null)
+    val status: StateFlow<String?> = _status.asStateFlow()
 
-    fun setOperational(operational: Boolean) {
-        _isOperational.value = operational
+    fun setStatus(status: String) {
+        _status.value = status
     }
 
     companion object {

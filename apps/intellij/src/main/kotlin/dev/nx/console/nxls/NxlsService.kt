@@ -56,8 +56,8 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
                     .onWorkspaceRefreshStarted()
             }
         }
-        client()?.registerFileWatcherOperationalCallback { isOperational ->
-            WatcherRunningService.getInstance(project).setOperational(isOperational)
+        client()?.registerFileWatcherOperationalCallback { status ->
+            WatcherRunningService.getInstance(project).setStatus(status)
         }
 
         cs.launch {

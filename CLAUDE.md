@@ -12,7 +12,6 @@
   - This applies to all classes from the `dev.nx.console.*` packages and other packages
   - Exception: Only use fully qualified names when there are naming conflicts that cannot be resolved with import aliases
 - before creating a commit, run `npx nx format --fix` and if kotlin files were touched, `npx nx run-many -t ktfmtFormat` to make sure formatting is applied
-- when working from a plan and creating a set of commits, always pause after you have implemented one section or one commit worth of code. Ask me for feedback and wait for me to confirm your code is right. I will commit the code myself and prompt you to continue
 
 ## Running Tests
 

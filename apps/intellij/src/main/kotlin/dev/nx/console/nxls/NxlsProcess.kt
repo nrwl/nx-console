@@ -6,12 +6,11 @@ import com.intellij.javascript.nodejs.interpreter.NodeCommandLineConfigurator
 import com.intellij.javascript.nodejs.library.yarn.pnp.YarnPnpManager
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil
 import com.intellij.openapi.application.readAction
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.util.io.awaitExit
 import dev.nx.console.NxConsoleBundle
+import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.isDevelopmentInstance
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
@@ -22,7 +21,7 @@ import java.io.OutputStream
 import java.nio.file.Paths
 import kotlinx.coroutines.*
 
-private val logger = logger<NxlsProcess>()
+private val logger by lazy { NxConsoleLogger.getInstance() }
 
 class NxlsProcess(private val project: Project, private val cs: CoroutineScope) {
 
@@ -35,14 +34,14 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
     private var exitJob: Job? = null
 
     suspend fun start() {
-        logger.info("Staring the nxls process in workingDir $basePath")
+        logger.log("Staring the nxls process in workingDir $basePath")
         createCommandLine().apply {
             process = createProcess()
             process?.let {
                 if (!it.isAlive) {
                     throw IOException("Unable to start nxls")
                 } else {
-                    logger.info("nxls started: $it")
+                    logger.log("nxls started: $it")
                 }
                 exitJob =
                     cs.launch {
@@ -56,7 +55,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                                 return@run
                             }
 
-                            logger.trace("Nxls early exit: $this")
+                            logger.error("Nxls early exit: $this")
                             onExit?.invoke()
                         }
                     }
@@ -66,22 +65,22 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
 
     suspend fun stop() {
         exitJob?.cancel()
-        thisLogger().info("stopping nxls process")
+        logger.log("stopping nxls process")
         val hasExited =
             if (process?.isAlive == false) {
-                thisLogger().info("process is not alive")
+                logger.log("process is not alive")
                 true
             } else {
                 withTimeoutOrNull(1000L) {
-                    thisLogger().info("waiting for process to exit")
+                    logger.log("waiting for process to exit")
                     process?.awaitExit()
                     true
                 } ?: false
             }
-        thisLogger().info("Process exited: $hasExited")
+        logger.log("Process exited: $hasExited")
 
         if (!hasExited) {
-            thisLogger().info("Process did not exit in time, destroying forcibly.")
+            logger.log("Process did not exit in time, destroying forcibly.")
             process?.destroyForcibly()
         }
     }
@@ -109,7 +108,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
             throw ExecutionException(NxConsoleBundle.message("language.server.not.found"))
         }
 
-        logger.info("nxls found via ${lsp.path}")
+        logger.log("nxls found via ${lsp.path}")
         return GeneralCommandLine().apply {
             withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
 

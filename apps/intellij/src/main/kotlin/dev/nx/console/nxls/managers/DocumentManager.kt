@@ -1,8 +1,6 @@
 package dev.nx.console.nxls.managers
 
 import com.intellij.codeInsight.lookup.LookupElement
-import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
@@ -11,13 +9,14 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
 import dev.nx.console.completion.createLookupItem
 import dev.nx.console.utils.DocumentUtils
+import dev.nx.console.utils.NxConsoleLogger
 import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.services.TextDocumentService
 
 private val documentManagers = HashMap<String, DocumentManager>()
 
-private val log = logger<DocumentManager>()
+private val log by lazy { NxConsoleLogger.getInstance() }
 
 class DocumentManager(val editor: Editor) {
 
@@ -98,7 +97,7 @@ class DocumentManager(val editor: Editor) {
                 createLookupItem(this, item)?.let { lookupItems.add(it) }
             }
         } catch (e: Exception) {
-            thisLogger().info(e)
+            log.error("Error getting completions", e)
         }
 
         return lookupItems
@@ -114,7 +113,7 @@ class DocumentManager(val editor: Editor) {
                 }
             return contents?.replace("\\", "")?.ifEmpty { null }
         } catch (e: Exception) {
-            thisLogger().info(e)
+            log.error("Error getting hover info", e)
             null
         }
     }
@@ -139,7 +138,7 @@ class DocumentManager(val editor: Editor) {
             document.addDocumentListener(documentListener)
             documentListenerIsInstalled = true
         } catch (exception: Throwable) {
-            log.info("Document listener already registered for this document")
+            log.log("Document listener already registered for this document")
         }
     }
 
@@ -150,7 +149,7 @@ class DocumentManager(val editor: Editor) {
                 documentListenerIsInstalled = false
             }
         } catch (exception: Throwable) {
-            log.info("Document listener was not registered for this document")
+            log.log("Document listener was not registered for this document")
         }
     }
 
