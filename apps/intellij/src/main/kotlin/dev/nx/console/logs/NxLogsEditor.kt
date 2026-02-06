@@ -15,6 +15,8 @@ import dev.nx.console.utils.writeAction
 import java.beans.PropertyChangeListener
 import javax.swing.JComponent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class NxLogsEditor(private val project: Project, private val file: NxLogsVirtualFile) :
@@ -27,7 +29,9 @@ class NxLogsEditor(private val project: Project, private val file: NxLogsVirtual
 
     private val cs = ProjectLevelCoroutineHolderService.getInstance(project).cs
 
-    private val logListener = NxConsoleLogListener { refreshContent() }
+    private var refreshJob: Job? = null
+
+    private val logListener = NxConsoleLogListener { scheduleRefresh() }
 
     init {
         editor.settings.apply {
@@ -40,23 +44,26 @@ class NxLogsEditor(private val project: Project, private val file: NxLogsVirtual
         NxConsoleLogger.getInstance().addListener(logListener)
     }
 
-    private fun refreshContent() {
-        cs.launch(Dispatchers.EDT) {
-            if (project.isDisposed) return@launch
+    private fun scheduleRefresh() {
+        refreshJob?.cancel()
+        refreshJob =
+            cs.launch(Dispatchers.EDT) {
+                delay(300)
+                if (project.isDisposed) return@launch
 
-            val content = file.refreshContent()
-            val wasAtEnd = isScrolledToEnd()
+                val content = file.refreshContent()
+                val wasAtEnd = isScrolledToEnd()
 
-            writeAction {
-                document.setReadOnly(false)
-                document.setText(content)
-                document.setReadOnly(true)
+                writeAction {
+                    document.setReadOnly(false)
+                    document.setText(content)
+                    document.setReadOnly(true)
+                }
+
+                if (wasAtEnd) {
+                    scrollToEnd()
+                }
             }
-
-            if (wasAtEnd) {
-                scrollToEnd()
-            }
-        }
     }
 
     private fun isScrolledToEnd(): Boolean {

@@ -11,7 +11,6 @@ import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.*
 import dev.nx.console.utils.Notifier
-import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.nxlsWorkingPath
 import java.lang.Runnable
 import kotlinx.coroutines.*

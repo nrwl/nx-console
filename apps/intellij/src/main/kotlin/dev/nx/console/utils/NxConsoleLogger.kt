@@ -64,6 +64,7 @@ class NxConsoleLogger {
 
     fun getLogFilePath(): String = logFile.absolutePath
 
+    @Synchronized
     fun readLogContent(): String {
         return if (logFile.exists()) {
             logFile.readText()
@@ -72,6 +73,7 @@ class NxConsoleLogger {
         }
     }
 
+    @Synchronized
     fun clearLogs() {
         try {
             logFile.writeText("")
