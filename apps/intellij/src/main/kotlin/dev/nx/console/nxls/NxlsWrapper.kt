@@ -146,7 +146,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
                 try {
                     initializeFuture?.await()
-                    log.info("nxls Initialized")
+                    log.log("nxls Initialized")
                     // Don't publish NX_WORKSPACE_REFRESH_TOPIC here - nxls will send
                     // NxWorkspaceRefreshNotification after reconfigure completes, which
                     // triggers the registerRefreshCallback to publish the topic

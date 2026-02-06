@@ -15,7 +15,7 @@ class NxlsLanguageClient : LanguageClient {
 
     val refreshCallbacks: MutableList<() -> Unit> = mutableListOf()
     val refreshStartedCallback: MutableList<() -> Unit> = mutableListOf()
-    val fileWatcherOperationalCallbacks: MutableList<(Boolean) -> Unit> = mutableListOf()
+    val fileWatcherOperationalCallbacks: MutableList<(String) -> Unit> = mutableListOf()
 
     override fun telemetryEvent(`object`: Any?) {
         TODO("Not yet implemented")
@@ -49,7 +49,7 @@ class NxlsLanguageClient : LanguageClient {
         refreshStartedCallback.add(block)
     }
 
-    fun registerFileWatcherOperationalCallback(block: (Boolean) -> Unit) {
+    fun registerFileWatcherOperationalCallback(block: (String) -> Unit) {
         fileWatcherOperationalCallbacks.add(block)
     }
 
@@ -67,9 +67,9 @@ class NxlsLanguageClient : LanguageClient {
 
     @JsonNotification("nx/fileWatcherOperational")
     fun fileWatcherOperational(params: FileWatcherOperationalParams) {
-        log.log("File watcher operational status: ${params.isOperational}")
-        fileWatcherOperationalCallbacks.forEach { it(params.isOperational) }
+        log.log("File watcher operational status: ${params.status}")
+        fileWatcherOperationalCallbacks.forEach { it(params.status) }
     }
 }
 
-data class FileWatcherOperationalParams(val isOperational: Boolean)
+data class FileWatcherOperationalParams(val status: String)
