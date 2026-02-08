@@ -1,11 +1,13 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
+  CLOUD_POLYGRAPH_CHILD_STATUS,
   CLOUD_POLYGRAPH_CREATE_PRS,
   CLOUD_POLYGRAPH_DELEGATE,
   CLOUD_POLYGRAPH_INIT,
   CLOUD_POLYGRAPH_MARK_READY,
   CLOUD_POLYGRAPH_PUSH_BRANCH,
   CLOUD_POLYGRAPH_GET_SESSION,
+  CLOUD_POLYGRAPH_STOP_CHILD,
 } from '@nx-console/shared-llm-context';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -512,6 +514,127 @@ function registerMarkReady(
   }
 }
 
+const stopChildSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  target: z.string().describe('Repository name or workspace ID to stop'),
+});
+
+function registerStopChild(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_STOP_CHILD, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_STOP_CHILD} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_STOP_CHILD,
+      description:
+        'Stop a running child agent in a Polygraph session. Use this to terminate a delegated task that is still running.',
+      inputSchema: stopChildSchema.shape,
+      annotations: {
+        destructiveHint: true,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        try {
+          const result = await nxCloudClient.polygraphStopChild(logger, {
+            ...params,
+            workspacePath,
+          });
+
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: result.output }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
+const childStatusSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  target: z
+    .string()
+    .optional()
+    .describe(
+      'Specific repository name or workspace ID to check. If omitted, returns status for all children.',
+    ),
+  tail: z
+    .number()
+    .optional()
+    .describe('Number of output lines to return (default 50)'),
+});
+
+function registerChildStatus(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_CHILD_STATUS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_CHILD_STATUS} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_CHILD_STATUS,
+      description:
+        'Get the status and recent output of child agents in a Polygraph session. Use this to monitor progress of delegated tasks.',
+      inputSchema: childStatusSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        try {
+          const result = await nxCloudClient.polygraphChildStatus(logger, {
+            ...params,
+            workspacePath,
+          });
+
+          if (result.success) {
+            return {
+              content: [
+                { type: 'text', text: JSON.stringify(result.children) },
+              ],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 export function registerPolygraphTools(
   workspacePath: string,
   registry: ToolRegistry,
@@ -551,6 +674,20 @@ export function registerPolygraphTools(
     workspacePath,
   );
   registerMarkReady(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
+  registerStopChild(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
+  registerChildStatus(
     toolsFilter,
     logger,
     registry,

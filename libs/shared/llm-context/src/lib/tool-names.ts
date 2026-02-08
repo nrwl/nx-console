@@ -43,3 +43,7 @@ export const CLOUD_POLYGRAPH_CREATE_PRS = 'cloud_polygraph_create_prs';
 export const CLOUD_POLYGRAPH_GET_SESSION = 'cloud_polygraph_get_session';
 
 export const CLOUD_POLYGRAPH_MARK_READY = 'cloud_polygraph_mark_ready';
+
+export const CLOUD_POLYGRAPH_STOP_CHILD = 'cloud_polygraph_stop_child';
+
+export const CLOUD_POLYGRAPH_CHILD_STATUS = 'cloud_polygraph_child_status';
