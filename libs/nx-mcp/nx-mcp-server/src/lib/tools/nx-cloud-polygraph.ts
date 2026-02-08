@@ -49,7 +49,7 @@ function delegateResultToCallToolResult(result: any): CallToolResult {
   if (result.success === false) {
     return { content: [{ type: 'text', text: result.error }], isError: true };
   }
-  return { content: [{ type: 'text', text: result.output }] };
+  return { content: [{ type: 'text', text: result.message }] };
 }
 
 function getCloudLightClient(logger: Logger, workspacePath: string): any {
