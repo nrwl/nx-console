@@ -134,7 +134,7 @@ export async function configureSchemas(
   );
 
   // recalculate project-specific schemas
-  for (const key in projectSchemas.keys()) {
+  for (const key of projectSchemas.keys()) {
     const projectSchema = await getProjectSchema(key, workingPath);
     if (!projectSchema) {
       continue;
