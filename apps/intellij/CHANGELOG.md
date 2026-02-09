@@ -1,3 +1,17 @@
+## 1.57.0 (2026-02-09)
+
+### Bug Fixes
+
+* handle some nxls & vscode bugs ([#3023](https://github.com/nrwl/nx-console/issues/3023)) ([f3f51e3](https://github.com/nrwl/nx-console/commit/f3f51e370d7fccd542103030485aca729b40ba9d))
+* **intellij:** adjust polling logic to account for all terminal states ([#3002](https://github.com/nrwl/nx-console/issues/3002)) ([5658b14](https://github.com/nrwl/nx-console/commit/5658b14cfd9f1b8c4969b9f860b7375caa0da410))
+* **intellij:** move problem iteration into mutex to avoid race condition ([#3000](https://github.com/nrwl/nx-console/issues/3000)) ([d8c6800](https://github.com/nrwl/nx-console/commit/d8c68007ad486f4c0fc2c17f3716178583ad6546))
+
+
+### Features
+
+* **intellij:** add nx console logs viewer ([#2997](https://github.com/nrwl/nx-console/issues/2997)) ([0bc511f](https://github.com/nrwl/nx-console/commit/0bc511f6953999694edc714669254385ced3a8f9))
+* **intellij:** add reason button to daemon disabled state ([#2992](https://github.com/nrwl/nx-console/issues/2992)) ([b8a80c4](https://github.com/nrwl/nx-console/commit/b8a80c436e7020ac9cc5ee69b620120476085f3c))
+
 ## <small>1.56.1 (2026-02-03)</small>
 
 ### Bug Fixes
