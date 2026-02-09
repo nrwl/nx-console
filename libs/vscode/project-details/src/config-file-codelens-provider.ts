@@ -150,7 +150,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
       const targetInfo = targetNames.map((targetName) => {
         const target = targets?.[targetName];
         const command =
-          target?.command ?? target?.options.command ?? target?.executor;
+          target?.command ?? target?.options?.command ?? target?.executor;
 
         return {
           targetName,

@@ -84,6 +84,9 @@ process.on('unhandledRejection', (e: any) => {
 });
 
 process.on('uncaughtException', (e) => {
+  if (e instanceof TypeError && e.message?.includes('setNoDelay')) {
+    return;
+  }
   if (!connectionAlive) return;
   connection.console.error(formatError('Unhandled exception', e));
 });
