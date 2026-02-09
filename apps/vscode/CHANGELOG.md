@@ -1,3 +1,20 @@
+# [18.86.0](https://github.com/nrwl/nx-console/compare/vscode-v18.85.2...vscode-v18.86.0) (2026-02-09)
+
+
+### Bug Fixes
+
+* handle some nxls & vscode bugs ([#3023](https://github.com/nrwl/nx-console/issues/3023)) ([f3f51e3](https://github.com/nrwl/nx-console/commit/f3f51e370d7fccd542103030485aca729b40ba9d))
+* **nx-mcp:** replace query_prs with get_session for polygraph ([#3014](https://github.com/nrwl/nx-console/issues/3014)) ([7a83f97](https://github.com/nrwl/nx-console/commit/7a83f97aae36975babfd1f4b911b294ca2f0e736))
+* **nx-mcp:** transform record-command taskIds to actual command ([#3012](https://github.com/nrwl/nx-console/issues/3012)) ([22a9cda](https://github.com/nrwl/nx-console/commit/22a9cda112534ea107dea83f495513522c3595da))
+* **vscode:** implement defensive webview disposal check to prevent async error ([#3009](https://github.com/nrwl/nx-console/issues/3009)) ([3639987](https://github.com/nrwl/nx-console/commit/36399876c846afb1c63cebf9f20dc31b06fc6fc8))
+* **vscode:** repair workspace data dir for older versions & remove dead wrap-generator.js ([#3010](https://github.com/nrwl/nx-console/issues/3010)) ([58cc05a](https://github.com/nrwl/nx-console/commit/58cc05ac19ba9823c6194ff040307aeae774864f))
+
+
+### Features
+
+* **nx-mcp:** add polygraph stop_child and child_status MCP tools ([#3019](https://github.com/nrwl/nx-console/issues/3019)) ([67864b8](https://github.com/nrwl/nx-console/commit/67864b83d04cf4af78a2e2c465ad2ababdfdec2e))
+* **nx-mcp:** register four new polygraph PR MCP tools ([#3006](https://github.com/nrwl/nx-console/issues/3006)) ([ea3465c](https://github.com/nrwl/nx-console/commit/ea3465c4d6bac539cb4664fafac850d9ac9e5195))
+
 ## [18.85.2](https://github.com/nrwl/nx-console/compare/vscode-v18.85.1...vscode-v18.85.2) (2026-02-03)
 
 
