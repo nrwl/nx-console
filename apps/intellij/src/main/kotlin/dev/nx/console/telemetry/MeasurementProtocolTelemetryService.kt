@@ -1,8 +1,8 @@
 package dev.nx.console.telemetry
 
 import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.application.ApplicationInfo
-import com.intellij.openapi.application.PermanentInstallationID
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.io.HttpRequests
@@ -15,6 +15,18 @@ import kotlinx.serialization.json.*
 val SESSION_ID = UUID.randomUUID().toString()
 
 private val logger = logger<MeasurementProtocolService>()
+
+private const val INSTALLATION_ID_KEY = "dev.nx.console.installationId"
+
+private fun getInstallationId(): String {
+    val properties = PropertiesComponent.getInstance()
+    var id = properties.getValue(INSTALLATION_ID_KEY)
+    if (id.isNullOrBlank()) {
+        id = UUID.randomUUID().toString()
+        properties.setValue(INSTALLATION_ID_KEY, id)
+    }
+    return id
+}
 
 class MeasurementProtocolService : Telemetry {
 
@@ -53,8 +65,9 @@ class MeasurementProtocolService : Telemetry {
 
     private fun buildPayload(eventName: String, data: Map<String, Any>?): String {
         val payload = buildJsonObject {
-            put("client_id", PermanentInstallationID.get())
-            put("user_id", PermanentInstallationID.get())
+            val installationId = getInstallationId()
+            put("client_id", installationId)
+            put("user_id", installationId)
             put("timestamp_micros", System.currentTimeMillis() * 1000)
             put("non_personalized_ads", true)
             putJsonObject("user_properties") {

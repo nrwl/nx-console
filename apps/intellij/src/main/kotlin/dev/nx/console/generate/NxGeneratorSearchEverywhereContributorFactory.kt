@@ -6,10 +6,9 @@ import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
@@ -81,12 +80,10 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
                     .forEach { consumer.process(it) }
             }
         }
-        val application: Application = ApplicationManager.getApplication()
-        if (application.isDispatchThread) {
-            application.runReadAction(task)
+        if (ApplicationManager.getApplication().isDispatchThread) {
+            ApplicationManager.getApplication().runReadAction(task)
         } else {
-            ProgressIndicatorUtils.yieldToPendingWriteActions()
-            ProgressIndicatorUtils.runInReadActionWithWriteActionPriority(task, progressIndicator)
+            ReadAction.nonBlocking(task).wrapProgress(progressIndicator).executeSynchronously()
         }
     }
 }

@@ -10,6 +10,10 @@ import dev.nx.console.logs.OpenNxLogsAction
 
 private class NxToolWindowFactory : ToolWindowFactory, DumbAware {
 
+    override suspend fun isApplicableAsync(project: Project): Boolean = true
+
+    override fun shouldBeAvailable(project: Project): Boolean = true
+
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val toolwindowPanel = NxToolWindowPanel(project)
         val contentManager = toolWindow.contentManager

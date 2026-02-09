@@ -89,6 +89,7 @@
     <!--Tool Window-->
     <toolWindow id="Nx Console"
                 anchor="right"
+                doNotActivateOnStart="false"
                 factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
                 icon="dev.nx.console.NxIcons.Action"/>
 

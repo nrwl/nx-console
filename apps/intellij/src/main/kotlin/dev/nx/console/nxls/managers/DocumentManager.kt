@@ -1,11 +1,13 @@
 package dev.nx.console.nxls.managers
 
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import dev.nx.console.completion.createLookupItem
 import dev.nx.console.utils.DocumentUtils
@@ -40,6 +42,7 @@ class DocumentManager(val editor: Editor) {
         }
 
     private var documentListenerIsInstalled = false
+    private var listenerDisposable: Disposable? = null
 
     private var textDocumentService: TextDocumentService? = null
 
@@ -56,7 +59,6 @@ class DocumentManager(val editor: Editor) {
         val changeEvent = changesParams.contentChanges[0]
         val newText = event.newFragment
         val offset = event.offset
-        val newTextLength = event.newLength
         val lspPosition: Position = DocumentUtils.offsetToLSPPos(editor, offset) ?: return
         val startLine = lspPosition.line
         val startColumn = lspPosition.character
@@ -80,7 +82,6 @@ class DocumentManager(val editor: Editor) {
         }
         val range = Range(Position(startLine, startColumn), Position(endLine, endColumn))
         changeEvent.range = range
-        changeEvent.rangeLength = newTextLength
         changeEvent.text = newText.toString()
 
         textDocumentService?.didChange(changesParams)
@@ -135,7 +136,9 @@ class DocumentManager(val editor: Editor) {
 
     private fun addDocumentListener() {
         try {
-            document.addDocumentListener(documentListener)
+            val disposable = Disposer.newDisposable()
+            document.addDocumentListener(documentListener, disposable)
+            listenerDisposable = disposable
             documentListenerIsInstalled = true
         } catch (exception: Throwable) {
             log.log("Document listener already registered for this document")
@@ -145,7 +148,8 @@ class DocumentManager(val editor: Editor) {
     private fun removeDocumentListener() {
         try {
             if (documentListenerIsInstalled) {
-                document.removeDocumentListener(documentListener)
+                listenerDisposable?.let { Disposer.dispose(it) }
+                listenerDisposable = null
                 documentListenerIsInstalled = false
             }
         } catch (exception: Throwable) {

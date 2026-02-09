@@ -5,7 +5,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil
 import com.intellij.openapi.util.SystemInfo
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 import java.util.Base64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,7 +51,7 @@ object NxProvenance {
                 // Fetch attestations with timeout
                 val attestationsJson =
                     withTimeout(10000) {
-                        val url = URL(attURL)
+                        val url = URI(attURL).toURL()
                         val connection = url.openConnection() as HttpURLConnection
                         connection.requestMethod = "GET"
                         connection.connectTimeout = 10000
