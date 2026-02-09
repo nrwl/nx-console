@@ -157,8 +157,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 tasks {
-    instrumentCode { dependsOn(compileKotlin) }
-
     prepareSandbox() {
         from(nxlsRoot) {
             include("**")
