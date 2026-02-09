@@ -170,12 +170,6 @@ tasks {
         archiveBaseName.set("nx-console")
     }
 
-    named("instrumentCode") { dependsOn("compileKotlin") }
-
-    named("compileTestKotlin") { dependsOn("compileKotlin") }
-
-    instrumentedJar { dependsOn("copyGenerateUiV2Artifacts", "copyCloudFixWebviewArtifacts") }
-
     withType<RunIdeTask> { maxHeapSize = "6g" }
 
     test {
@@ -209,12 +203,5 @@ tasks.register<DefaultTask>("publish") {
     group = "publish"
     description = "Placeholder task to workaround the semantic-release plugin"
 }
-
-fun buildCommands() =
-    if (isWindows()) {
-        mutableListOf("powershell", "-command")
-    } else {
-        mutableListOf("bash", "-c")
-    }
 
 allprojects { apply { plugin("dev.nx.gradle.project-graph") } }
