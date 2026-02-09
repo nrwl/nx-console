@@ -62,6 +62,7 @@ export async function getRunDetails(
   workspacePath: string,
   logger: Logger,
   runId: string,
+  options?: { linkId?: string },
 ): Promise<Result<RunDetails, RunDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
@@ -73,7 +74,10 @@ export async function getRunDetails(
   }
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}`;
+  const linkIdParam = options?.linkId
+    ? `?linkId=${encodeURIComponent(options.linkId)}`
+    : '';
+  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}${linkIdParam}`;
 
   const headers: any = {
     'Content-Type': 'application/json',
