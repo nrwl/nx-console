@@ -314,8 +314,7 @@ class NxToolMainComponents(private val project: Project) {
     private fun restartDaemonWatcher() {
         TelemetryService.getInstance(project).featureUsed("misc.restart-daemon-watcher")
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            NxlsService.getInstance(project).startDaemon()
-            NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+            NxlsService.getInstance(project).refreshWorkspace()
         }
     }
 

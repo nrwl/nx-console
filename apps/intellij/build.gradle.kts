@@ -12,7 +12,7 @@ val nxlsRoot = "${rootDir}/dist/apps/nxls"
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
-    id("dev.nx.gradle.project-graph") version ("0.1.11")
+    id("dev.nx.gradle.project-graph") version ("0.1.12")
     id("java")
     id("org.jetbrains.changelog") version "2.4.0"
     id("org.jetbrains.intellij.platform") version "2.9.0"
@@ -170,12 +170,6 @@ tasks {
         archiveBaseName.set("nx-console")
     }
 
-    named("instrumentCode") { dependsOn("compileKotlin") }
-
-    named("compileTestKotlin") { dependsOn("compileKotlin") }
-
-    instrumentedJar { dependsOn("copyGenerateUiV2Artifacts", "copyCloudFixWebviewArtifacts") }
-
     withType<RunIdeTask> { maxHeapSize = "6g" }
 
     test {
@@ -209,12 +203,5 @@ tasks.register<DefaultTask>("publish") {
     group = "publish"
     description = "Placeholder task to workaround the semantic-release plugin"
 }
-
-fun buildCommands() =
-    if (isWindows()) {
-        mutableListOf("powershell", "-command")
-    } else {
-        mutableListOf("bash", "-c")
-    }
 
 allprojects { apply { plugin("dev.nx.gradle.project-graph") } }

@@ -3,6 +3,7 @@ package dev.nx.console.mcp
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VfsUtil
@@ -199,8 +200,6 @@ class McpServerService(private val project: Project) {
 }
 
 fun hasAIAssistantAvailable(): Boolean {
-    val plugin =
-        PluginManagerCore.plugins.find { it.pluginId.idString == "com.intellij.ml.llm" }
-            ?: return false
-    return PluginManagerCore.isPluginInstalled(plugin.pluginId) && plugin.isEnabled
+    val pluginId = PluginId.getId("com.intellij.ml.llm")
+    return PluginManagerCore.isPluginInstalled(pluginId) && !PluginManagerCore.isDisabled(pluginId)
 }

@@ -146,9 +146,7 @@ class NxToolWindowPanel(private val project: Project) :
 
         // Subscribe to watcher operational state changes
         scope.launch {
-            WatcherRunningService.getInstance(project).isOperational.collect {
-                loadToolwindowContent()
-            }
+            WatcherRunningService.getInstance(project).status.collect { loadToolwindowContent() }
         }
 
         scope.launch {
@@ -398,14 +396,11 @@ class NxToolWindowPanel(private val project: Project) :
                     }
 
                 // Update daemon warning banner
-                val daemonDisabled = workspace?.daemonEnabled == false
-                val watcherNotRunning =
-                    !daemonDisabled &&
-                        WatcherRunningService.getInstance(project).isOperational.value == false
+                val watcherStatus = WatcherRunningService.getInstance(project).status.value
                 updateDaemonWarningBanner(
-                    when {
-                        daemonDisabled -> DaemonWarningType.DAEMON_DISABLED
-                        watcherNotRunning -> DaemonWarningType.WATCHER_NOT_RUNNING
+                    when (watcherStatus) {
+                        "daemonDisabled" -> DaemonWarningType.DAEMON_DISABLED
+                        "notRunning" -> DaemonWarningType.WATCHER_NOT_RUNNING
                         else -> null
                     }
                 )

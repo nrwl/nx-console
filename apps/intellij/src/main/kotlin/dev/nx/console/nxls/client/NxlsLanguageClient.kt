@@ -1,6 +1,6 @@
 package dev.nx.console.nxls.client
 
-import com.intellij.openapi.diagnostic.logger
+import dev.nx.console.utils.NxConsoleLogger
 import java.util.concurrent.CompletableFuture
 import org.eclipse.lsp4j.MessageActionItem
 import org.eclipse.lsp4j.MessageParams
@@ -9,13 +9,13 @@ import org.eclipse.lsp4j.ShowMessageRequestParams
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.services.LanguageClient
 
-private val log = logger<NxlsLanguageClient>()
+private val log by lazy { NxConsoleLogger.getInstance() }
 
 class NxlsLanguageClient : LanguageClient {
 
     val refreshCallbacks: MutableList<() -> Unit> = mutableListOf()
     val refreshStartedCallback: MutableList<() -> Unit> = mutableListOf()
-    val fileWatcherOperationalCallbacks: MutableList<(Boolean) -> Unit> = mutableListOf()
+    val fileWatcherOperationalCallbacks: MutableList<(String) -> Unit> = mutableListOf()
 
     override fun telemetryEvent(`object`: Any?) {
         TODO("Not yet implemented")
@@ -37,7 +37,7 @@ class NxlsLanguageClient : LanguageClient {
 
     override fun logMessage(message: MessageParams?) {
         message?.message?.let { msg ->
-            log.info(if (msg.endsWith("\n")) msg.substring(0, msg.length - 1) else msg)
+            log.log(if (msg.endsWith("\n")) msg.substring(0, msg.length - 1) else msg)
         }
     }
 
@@ -49,27 +49,27 @@ class NxlsLanguageClient : LanguageClient {
         refreshStartedCallback.add(block)
     }
 
-    fun registerFileWatcherOperationalCallback(block: (Boolean) -> Unit) {
+    fun registerFileWatcherOperationalCallback(block: (String) -> Unit) {
         fileWatcherOperationalCallbacks.add(block)
     }
 
     @JsonNotification("nx/refreshWorkspace")
     fun refreshWorkspace() {
-        log.info("Refresh workspace called from nxls")
+        log.log("Refresh workspace called from nxls")
         refreshCallbacks.forEach { it() }
     }
 
     @JsonNotification("nx/refreshWorkspaceStarted")
     fun refreshWorkspaceStarted() {
-        log.info("Refresh workspace started called from nxls")
+        log.log("Refresh workspace started called from nxls")
         refreshStartedCallback.forEach { it() }
     }
 
     @JsonNotification("nx/fileWatcherOperational")
     fun fileWatcherOperational(params: FileWatcherOperationalParams) {
-        log.info("File watcher operational status: ${params.isOperational}")
-        fileWatcherOperationalCallbacks.forEach { it(params.isOperational) }
+        log.log("File watcher operational status: ${params.status}")
+        fileWatcherOperationalCallbacks.forEach { it(params.status) }
     }
 }
 
-data class FileWatcherOperationalParams(val isOperational: Boolean)
+data class FileWatcherOperationalParams(val status: String)

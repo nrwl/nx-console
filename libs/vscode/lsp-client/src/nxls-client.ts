@@ -295,6 +295,12 @@ export class NxlsClient {
     };
     const serverProcess = this.client['_serverProcess'];
     serverProcess.on('exit', onNxlsExit);
+    serverProcess.on('error', (err: Error) => {
+      if (err?.message?.includes('setNoDelay')) {
+        return;
+      }
+      vscodeLogger.log('Nxls process error: ' + err.message);
+    });
     this.processExitListener = new Disposable(() => {
       serverProcess.off('exit', onNxlsExit);
     });
@@ -309,11 +315,19 @@ export class NxlsClient {
 
   private async _stop(nxlsProcessAlive = true) {
     if (this.client && nxlsProcessAlive) {
-      try {
-        await this.client.stop(2000);
-      } catch (e) {
-        // timeout, kill the process forcefully instead
-        const pid = this.actor.getSnapshot().context.nxlsPid;
+      if (this.client.isRunning()) {
+        try {
+          await this.client.stop(2000);
+        } catch (e) {
+          const pid = this.actor.getSnapshot().context.nxlsPid;
+          if (pid) {
+            killGroup(pid);
+          }
+        }
+      } else {
+        const pid =
+          this.actor.getSnapshot().context.nxlsPid ??
+          this.client['_serverProcess']?.pid;
         if (pid) {
           killGroup(pid);
         }
