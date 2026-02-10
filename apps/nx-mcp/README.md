@@ -133,6 +133,23 @@ The basic steps are:
 2. Build the `nx-mcp` using `nx run nx-mcp:build` (or `nx run nx-mcp:build:debug` for debugging with source maps)
 3. Use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) to test out your changes
 
+## Configuration File
+
+You can also configure the MCP server via a JSON file at `.nx/nx-mcp-config.json` in your workspace root. This is useful when the MCP server binary is managed by a plugin or extension where you can't pass CLI args directly.
+
+```json
+{
+  "tools": ["nx_docs", "!cloud_*"],
+  "minimal": true,
+  "debugLogs": false,
+  "disableTelemetry": true,
+  "transport": "sse",
+  "port": 9922
+}
+```
+
+All keys are optional and match the CLI option names. CLI arguments take precedence over config file values.
+
 ## License
 
 [MIT](../../LICENSE)
