@@ -1,3 +1,13 @@
+## 0.19.0 (2026-02-10)
+
+### 🚀 Features
+
+- **nx-mcp:** enable passing options to mcp via .nx/nx-mcp-config.json ([#3026](https://github.com/nrwl/nx-console/pull/3026))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.18.0 (2026-02-09)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
