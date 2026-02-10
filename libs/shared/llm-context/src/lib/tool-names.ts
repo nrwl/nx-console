@@ -47,3 +47,5 @@ export const CLOUD_POLYGRAPH_MARK_READY = 'cloud_polygraph_mark_ready';
 export const CLOUD_POLYGRAPH_STOP_CHILD = 'cloud_polygraph_stop_child';
 
 export const CLOUD_POLYGRAPH_CHILD_STATUS = 'cloud_polygraph_child_status';
+
+export const CLOUD_POLYGRAPH_ASSOCIATE_PR = 'cloud_polygraph_associate_pr';
