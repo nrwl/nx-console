@@ -809,11 +809,9 @@ async function resolveUrlToBranch(
     };
   }
 
-  // For run and task URLs, look up the run by its linkId
+  // For run and task URLs, look up the run by its URL slug (linkId)
   const runId = parsed.runId;
-  const runResult = await getRunDetails(workspacePath, logger, runId, {
-    linkId: runId,
-  });
+  const runResult = await getRunDetails(workspacePath, logger, runId);
   if (runResult.error) {
     if (runResult.error.type === 'not_found') {
       return {
