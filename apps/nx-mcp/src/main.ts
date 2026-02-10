@@ -38,13 +38,27 @@ import { resolve } from 'path';
 import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { createIdeClient } from './ide-client/create-ide-client';
+import { configToArgs, loadConfigFile } from './load-config-file';
 import { getPackageVersion } from './utils';
 import { ArgvType, createYargsConfig } from './yargs-config';
 
 async function main() {
   configureCustomCACertificates();
 
-  const argv = createYargsConfig(hideBin(process.argv)).parseSync() as ArgvType;
+  const cliArgs = hideBin(process.argv);
+
+  // First parse: resolve workspace path
+  const preArgv = createYargsConfig(cliArgs).parseSync() as ArgvType;
+  const workspacePath = resolve(
+    preArgv.workspacePath || (preArgv._[0] as string) || process.cwd(),
+  );
+
+  // Second parse: config file values (prepended) are overridden by CLI args
+  const configArgs = configToArgs(loadConfigFile(workspacePath));
+  const argv = createYargsConfig([
+    ...configArgs,
+    ...cliArgs,
+  ]).parseSync() as ArgvType;
 
   const mcpServer = new McpServer(
     {
@@ -102,12 +116,7 @@ async function main() {
 
   logger.log('Starting Nx MCP server');
 
-  // Normalize tools filter to always be an array or undefined
-  let toolsFilter: string[] | undefined = argv.tools
-    ? Array.isArray(argv.tools)
-      ? argv.tools
-      : [argv.tools]
-    : undefined;
+  let toolsFilter: string[] | undefined = argv.tools;
 
   // When --minimal is set, exclude workspace analysis tools
   if (argv.minimal) {
@@ -131,13 +140,9 @@ async function main() {
     logger.log(`Tools filter: ${toolsFilter.join(', ')}`);
   }
 
-  const providedPath: string = resolve(
-    argv.workspacePath || (argv._[0] as string) || process.cwd(),
-  ) as string;
-
   // Check if the provided path is an Nx workspace
-  const isNxWorkspace = await checkIsNxWorkspace(providedPath);
-  const nxWorkspacePath = isNxWorkspace ? providedPath : undefined;
+  const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
+  const nxWorkspacePath = isNxWorkspace ? workspacePath : undefined;
 
   if (nxWorkspacePath) {
     loadRootEnvFiles(nxWorkspacePath);

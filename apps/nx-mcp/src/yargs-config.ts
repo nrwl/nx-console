@@ -1,17 +1,13 @@
 import yargs, { Argv } from 'yargs';
+import { NxMcpConfig } from './load-config-file';
 
-export interface ArgvType {
+export interface ArgvType extends NxMcpConfig {
   workspacePath?: string;
-  transport?: 'stdio' | 'sse' | 'http';
+  // Deprecated/hidden options
   sse: boolean;
   http: boolean;
-  port?: number;
-  disableTelemetry: boolean;
   keepAliveInterval: number;
-  debugLogs: boolean;
-  tools?: string | string[];
-  minimal: boolean;
-  experimentalPolygraph: boolean;
+  // Yargs internals
   _: (string | number)[];
   $0: string;
   [x: string]: unknown;
@@ -74,6 +70,10 @@ export function createYargsConfig(args: string[]): Argv<any> {
         'Filter which tools are enabled. Accepts glob patterns including negation (e.g., "*", "!nx_docs", "cloud_*")',
       type: 'array',
       string: true,
+    })
+    .coerce('tools', (val: string | string[] | undefined) => {
+      if (val === undefined) return undefined;
+      return Array.isArray(val) ? val : [val];
     })
     .option('minimal', {
       describe:
