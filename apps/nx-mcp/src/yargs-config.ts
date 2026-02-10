@@ -81,7 +81,7 @@ export function createYargsConfig(args: string[]): Argv<any> {
       type: 'boolean',
       default: false,
     })
-    .option('experimental-polygraph', {
+    .option('experimentalPolygraph', {
       describe:
         'Enable experimental Polygraph tools for multi-repo orchestration',
       type: 'boolean',
