@@ -83,7 +83,9 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
         if (ApplicationManager.getApplication().isDispatchThread) {
             ApplicationManager.getApplication().runReadAction(task)
         } else {
-            ReadAction.nonBlocking(task).wrapProgress(progressIndicator).executeSynchronously()
+            ReadAction.nonBlocking<Unit> { task.run() }
+                .wrapProgress(progressIndicator)
+                .executeSynchronously()
         }
     }
 }

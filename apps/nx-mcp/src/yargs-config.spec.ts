@@ -193,6 +193,12 @@ describe('createYargsConfig', () => {
       const argv = createYargsConfig([]).parseSync();
       expect(argv.tools).toBeUndefined();
     });
+
+    it('should coerce a single string value into an array', () => {
+      const argv = createYargsConfig(['--tools', 'nx_docs']).parseSync();
+      expect(Array.isArray(argv.tools)).toBe(true);
+      expect(argv.tools).toEqual(['nx_docs']);
+    });
   });
 
   describe('minimal option', () => {

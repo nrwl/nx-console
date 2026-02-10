@@ -22,6 +22,16 @@ import {
   nxCloudAuthHeaders,
 } from '@nx-console/shared-nx-cloud';
 
+const CLOUD_CLIENT_MISSING_RESULT: CallToolResult = {
+  content: [
+    {
+      type: 'text',
+      text: 'The Nx Cloud client bundle is missing. Run `npx nx@latest download-cloud-client` to install it.',
+    },
+  ],
+  isError: true,
+};
+
 const polygraphInitSchema = z.object({
   setSessionId: z
     .string()
@@ -134,6 +144,10 @@ function registerInit(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphInit !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
         const sessionId =
           params.setSessionId ??
           process.env.CLAUDE_CODE_SESSION_ID ??
@@ -182,6 +196,10 @@ function registerDelegate(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphDelegate !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
         try {
           const delegateParams = { ...params, workspacePath };
           logger.log(
@@ -239,6 +257,10 @@ function registerPushBranch(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphPushBranch !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
         const { sessionId, repoPath, branch } = params;
 
         try {
@@ -321,6 +343,10 @@ function registerCreatePRs(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphCreatePRs !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
         const { sessionId, prs } = params as z.infer<typeof createPRsSchema>;
 
         try {
@@ -403,6 +429,10 @@ function registerGetSession(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphGetSession !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
         const { sessionId } = params;
 
         try {
@@ -466,6 +496,10 @@ function registerMarkReady(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphMarkReady !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
         const { sessionId, prUrls } = params;
 
         try {
@@ -643,13 +677,6 @@ export function registerPolygraphTools(
 ) {
   const nxCloudClient = getCloudLightClient(logger, workspacePath);
 
-  // TODO(cammisuli): have a way to download the client automatically if not present
-  if (nxCloudClient == null) {
-    logger.log(
-      'Polygraph tools not registered: could not load Nx Cloud light client',
-    );
-    return;
-  }
   registerInit(toolsFilter, logger, registry, nxCloudClient, workspacePath);
   registerDelegate(toolsFilter, logger, registry, workspacePath, nxCloudClient);
   registerPushBranch(
