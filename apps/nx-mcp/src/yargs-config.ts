@@ -79,7 +79,7 @@ export function createYargsConfig(args: string[]): Argv<any> {
       describe:
         'Hide workspace analysis tools (nx_available_plugins, nx_workspace_path, nx_workspace, nx_project_details, nx_generators, nx_generator_schema)',
       type: 'boolean',
-      default: false,
+      default: true,
     })
     .option('experimental-polygraph', {
       describe:
