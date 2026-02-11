@@ -1,21 +1,27 @@
-export interface ParsedCipeUrl {
-  cipeId: string;
-}
+export type ParsedNxCloudUrl =
+  | { type: 'cipe'; cipeId: string }
+  | { type: 'run'; runId: string }
+  | { type: 'task'; runId: string; taskId: string };
 
 /**
- * Parse an Nx Cloud URL to extract the CIPE ID.
+ * @deprecated Use ParsedNxCloudUrl instead
+ */
+export type ParsedCipeUrl = {
+  cipeId: string;
+};
+
+/**
+ * Parse an Nx Cloud URL to extract resource identifiers.
  *
  * Supported URL patterns (additional path segments and query params are ignored):
- * - /cipes/{id}[/...] → { cipeId }
- *
- * TODO: Add support for run URLs (/runs/{id}) and task URLs (/runs/{id}/task/{taskId})
- * once the API supports querying by linkId. Currently the API only supports querying
- * by executionId, which is not available in run/task URLs.
+ * - /cipes/{id}[/...]                → { type: 'cipe', cipeId }
+ * - /runs/{id}[/...]                 → { type: 'run', runId }
+ * - /runs/{id}/task/{taskId}[/...]   → { type: 'task', runId, taskId }
  *
  * @param url The Nx Cloud URL to parse
- * @returns Parsed URL info or null if URL doesn't match the CIPE pattern
+ * @returns Parsed URL info or null if URL doesn't match any known pattern
  */
-export function parseNxCloudUrl(url: string): ParsedCipeUrl | null {
+export function parseNxCloudUrl(url: string): ParsedNxCloudUrl | null {
   let pathname: string;
 
   try {
@@ -29,7 +35,27 @@ export function parseNxCloudUrl(url: string): ParsedCipeUrl | null {
   const cipeMatch = pathname.match(/\/cipes\/([^/]+)/);
   if (cipeMatch) {
     return {
+      type: 'cipe',
       cipeId: cipeMatch[1],
+    };
+  }
+
+  // Match /runs/{id}/task/{taskId} (must check before plain /runs/{id})
+  const taskMatch = pathname.match(/\/runs\/([^/]+)\/task\/(.+?)(?:\/|$)/);
+  if (taskMatch) {
+    return {
+      type: 'task',
+      runId: taskMatch[1],
+      taskId: decodeURIComponent(taskMatch[2]),
+    };
+  }
+
+  // Match /runs/{id} (with optional additional path segments)
+  const runMatch = pathname.match(/\/runs\/([^/]+)/);
+  if (runMatch) {
+    return {
+      type: 'run',
+      runId: runMatch[1],
     };
   }
 
