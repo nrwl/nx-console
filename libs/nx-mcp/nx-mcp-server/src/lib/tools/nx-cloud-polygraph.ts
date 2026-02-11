@@ -1,5 +1,6 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
+  CLOUD_POLYGRAPH_ASSOCIATE_PR,
   CLOUD_POLYGRAPH_CHILD_STATUS,
   CLOUD_POLYGRAPH_CREATE_PRS,
   CLOUD_POLYGRAPH_DELEGATE,
@@ -669,6 +670,87 @@ function registerChildStatus(
   }
 }
 
+const associatePRSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  prUrl: z
+    .string()
+    .optional()
+    .describe('URL of an existing pull request to associate with the session'),
+  branch: z
+    .string()
+    .optional()
+    .describe(
+      'Branch name to find and associate PRs for. Used when prUrl is not provided.',
+    ),
+});
+
+function registerAssociatePR(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  nxCloudClient: any,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_ASSOCIATE_PR, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_ASSOCIATE_PR} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_ASSOCIATE_PR,
+      description:
+        'Associate an existing pull request with a Polygraph session. Use this to link PRs that were created outside of Polygraph (e.g., manually or by CI) to the current session. Provide either a prUrl or a branch name.',
+      inputSchema: associatePRSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        if (typeof nxCloudClient?.polygraphAssociatePR !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
+        const { sessionId, prUrl, branch } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphAssociatePR(logger, {
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+            prUrl,
+            branch,
+          });
+
+          if (result.success) {
+            const prCount = result.prs?.length ?? 0;
+            let output = `Associated ${prCount} PR(s) with session ${result.sessionId}:\n`;
+            for (const pr of result.prs ?? []) {
+              output += `- ${pr.title} [${pr.status}]: ${pr.url}\n`;
+            }
+            return {
+              content: [{ type: 'text', text: output }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 export function registerPolygraphTools(
   workspacePath: string,
   registry: ToolRegistry,
@@ -715,6 +797,13 @@ export function registerPolygraphTools(
     workspacePath,
   );
   registerChildStatus(
+    toolsFilter,
+    logger,
+    registry,
+    nxCloudClient,
+    workspacePath,
+  );
+  registerAssociatePR(
     toolsFilter,
     logger,
     registry,
