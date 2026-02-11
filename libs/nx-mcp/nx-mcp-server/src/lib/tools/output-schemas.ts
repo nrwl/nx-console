@@ -53,12 +53,17 @@ export interface CIInformationOutput {
   confidence: number | null;
   confidenceReasoning: string | null;
   error: string | null;
+  hints?: string[];
   [key: string]: unknown;
 }
 
 export interface UpdateSelfHealingFixOutput {
   success: boolean;
   message: string;
+  aiFixId?: string | null;
+  action?: string | null;
+  shortLink?: string | null;
+  hints?: string[];
   [key: string]: unknown;
 }
 
@@ -67,6 +72,13 @@ export const updateSelfHealingFixOutputSchema = {
   properties: {
     success: { type: 'boolean' },
     message: { type: 'string' },
+    aiFixId: { type: ['string', 'null'] },
+    action: {
+      type: ['string', 'null'],
+      enum: ['APPLY', 'REJECT', 'RERUN_ENVIRONMENT_STATE', null],
+    },
+    shortLink: { type: ['string', 'null'] },
+    hints: { type: 'array', items: { type: 'string' } },
   },
   required: ['success', 'message'],
 };
@@ -142,6 +154,7 @@ export const ciInformationOutputSchema = {
     confidence: { type: ['number', 'null'] },
     confidenceReasoning: { type: ['string', 'null'] },
     error: { type: ['string', 'null'] },
+    hints: { type: 'array', items: { type: 'string' } },
   },
 };
 
