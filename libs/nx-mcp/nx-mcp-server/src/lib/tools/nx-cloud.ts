@@ -24,6 +24,7 @@ import {
   getTasksDetailsSearch,
   getTasksSearch,
   parseNxCloudUrl,
+  ParsedNxCloudUrl,
   retrieveFixDiff,
   updateSuggestedFix,
 } from '@nx-console/shared-nx-cloud';
@@ -265,7 +266,7 @@ export function registerNxCloudTools(
       name: CI_INFORMATION,
       description:
         'Retrieve CI pipeline execution information from Nx Cloud for the current branch. ' +
-        'Supports Nx Cloud CIPE URLs: pass a CIPE URL (/cipes/{id}) to fetch details directly. ' +
+        'Supports Nx Cloud URLs: CIPE URLs (/cipes/{id}), run URLs (/runs/{id}), and task URLs (/runs/{id}/task/{taskId}). ' +
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'See output schema for available fields. Long strings are paginated automatically.',
@@ -526,7 +527,8 @@ const ciInformationSchema = z.object({
     .string()
     .optional()
     .describe(
-      'An Nx Cloud CIPE URL to fetch information for. Supports CIPE URLs (/cipes/{id}). ' +
+      'An Nx Cloud URL to fetch information for. Supports CIPE URLs (/cipes/{id}), ' +
+        'run URLs (/runs/{id}), and task URLs (/runs/{id}/task/{taskId}). ' +
         'If provided, branch parameter is ignored.',
     ),
   branch: z
@@ -781,6 +783,54 @@ function parseShortLink(shortLink: string): {
   };
 }
 
+async function resolveUrlToBranch(
+  parsed: ParsedNxCloudUrl,
+  workspacePath: string,
+  logger: Logger,
+): Promise<{
+  branch?: string;
+  cipeId?: string;
+  error?: string;
+}> {
+  if (parsed.type === 'cipe') {
+    const pipelineResult = await getPipelineExecutionDetails(
+      workspacePath,
+      logger,
+      parsed.cipeId,
+    );
+    if (pipelineResult.error) {
+      return {
+        error: `Error looking up CI Pipeline Execution: ${pipelineResult.error.message}`,
+      };
+    }
+    return {
+      branch: pipelineResult.data.vcsContext?.ref,
+      cipeId: parsed.cipeId,
+    };
+  }
+
+  // For run and task URLs, look up the run by its URL slug (linkId)
+  const runId = parsed.runId;
+  const runResult = await getRunDetails(workspacePath, logger, runId);
+  if (runResult.error) {
+    if (runResult.error.type === 'not_found') {
+      return {
+        error:
+          `Run "${runId}" not found. The API may not yet support looking up runs by their URL identifier. ` +
+          `Try providing a CIPE URL (/cipes/{id}) or a branch name instead.`,
+      };
+    }
+    return {
+      error: `Error looking up run: ${runResult.error.message}`,
+    };
+  }
+
+  return {
+    branch: runResult.data.branch,
+    cipeId: runResult.data.distributedExecutionId,
+  };
+}
+
 const getCIInformation =
   (
     workspacePath: string,
@@ -799,39 +849,32 @@ const getCIInformation =
     let cipeIdFromUrl: string | undefined;
 
     if (params.url) {
-      // Parse URL to extract CIPE ID
       const parsed = parseNxCloudUrl(params.url);
       if (!parsed) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Invalid Nx Cloud URL. Supported pattern: /cipes/{id}',
+              text: 'Invalid Nx Cloud URL. Supported patterns: /cipes/{id}, /runs/{id}, /runs/{id}/task/{taskId}',
             },
           ],
           isError: true,
         };
       }
 
-      cipeIdFromUrl = parsed.cipeId;
-      // Look up the CIPE to get its branch
-      const pipelineResult = await getPipelineExecutionDetails(
+      const urlResolution = await resolveUrlToBranch(
+        parsed,
         workspacePath,
         logger,
-        cipeIdFromUrl,
       );
-      if (pipelineResult.error) {
+      if (urlResolution.error) {
         return {
-          content: [
-            {
-              type: 'text',
-              text: `Error looking up CI Pipeline Execution: ${pipelineResult.error.message}`,
-            },
-          ],
+          content: [{ type: 'text', text: urlResolution.error }],
           isError: true,
         };
       }
-      branch = pipelineResult.data.vcsContext?.ref;
+      branch = urlResolution.branch;
+      cipeIdFromUrl = urlResolution.cipeId;
     } else {
       branch = params.branch ?? getCurrentGitBranch(workspacePath) ?? undefined;
       if (!branch) {

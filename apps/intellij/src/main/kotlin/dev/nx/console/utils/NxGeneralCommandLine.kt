@@ -5,6 +5,8 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.wsl.WSLCommandLineOptions
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.JavaSdkType
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.SystemInfo
 import java.nio.file.Path
 
@@ -21,6 +23,9 @@ fun NxGeneralCommandLine(
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
         setWorkDirectory(workDirectory)
         environmentVariables.configureCommandLine(this, true)
+        if (!environment.containsKey("JAVA_HOME") && System.getenv("JAVA_HOME") == null) {
+            getProjectJavaHome(project)?.let { withEnvironment("JAVA_HOME", it) }
+        }
 
         NodeCommandLineUtil.configureUsefulEnvironment(this)
         NodeCommandLineUtil.prependNodeDirToPATH(this, project.nodeInterpreter)
@@ -56,6 +61,9 @@ fun NxLatestVersionGeneralCommandLine(
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
         setWorkDirectory(workDirectory)
         environmentVariables.configureCommandLine(this, true)
+        if (!environment.containsKey("JAVA_HOME") && System.getenv("JAVA_HOME") == null) {
+            getProjectJavaHome(project)?.let { withEnvironment("JAVA_HOME", it) }
+        }
 
         NodeCommandLineUtil.configureUsefulEnvironment(this)
         NodeCommandLineUtil.prependNodeDirToPATH(this, project.nodeInterpreter)
@@ -73,3 +81,13 @@ fun NxLatestVersionGeneralCommandLine(
             }
         }
     }
+
+fun getProjectJavaHome(project: Project): String? {
+    return try {
+        val sdk = ProjectRootManager.getInstance(project).projectSdk ?: return null
+        if (sdk.sdkType !is JavaSdkType) return null
+        sdk.homePath?.takeIf { it.isNotBlank() }
+    } catch (_: Exception) {
+        null
+    }
+}

@@ -5,6 +5,7 @@ describe('parseNxCloudUrl', () => {
     it('should parse a basic CIPE URL', () => {
       const result = parseNxCloudUrl('https://cloud.nx.app/cipes/abc123');
       expect(result).toEqual({
+        type: 'cipe',
         cipeId: 'abc123',
       });
     });
@@ -12,6 +13,7 @@ describe('parseNxCloudUrl', () => {
     it('should parse CIPE URL with trailing slash', () => {
       const result = parseNxCloudUrl('https://cloud.nx.app/cipes/abc123/');
       expect(result).toEqual({
+        type: 'cipe',
         cipeId: 'abc123',
       });
     });
@@ -21,6 +23,7 @@ describe('parseNxCloudUrl', () => {
         'https://cloud.nx.app/cipes/abc123?foo=bar&baz=qux',
       );
       expect(result).toEqual({
+        type: 'cipe',
         cipeId: 'abc123',
       });
     });
@@ -28,6 +31,7 @@ describe('parseNxCloudUrl', () => {
     it('should parse CIPE URL from snapshot domain', () => {
       const result = parseNxCloudUrl('https://snapshot.nx.app/cipes/def456');
       expect(result).toEqual({
+        type: 'cipe',
         cipeId: 'def456',
       });
     });
@@ -37,6 +41,7 @@ describe('parseNxCloudUrl', () => {
         'https://my-company.nx.app/cipes/custom-id',
       );
       expect(result).toEqual({
+        type: 'cipe',
         cipeId: 'custom-id',
       });
     });
@@ -46,7 +51,92 @@ describe('parseNxCloudUrl', () => {
         'https://staging.nx.app/cipes/6971fd9a2481515cb75c0d56/self-healing?runGroup=21245198689-1-linux&utm_source=pull-request',
       );
       expect(result).toEqual({
+        type: 'cipe',
         cipeId: '6971fd9a2481515cb75c0d56',
+      });
+    });
+  });
+
+  describe('Run URLs', () => {
+    it('should parse a basic run URL', () => {
+      const result = parseNxCloudUrl('https://cloud.nx.app/runs/xyz789');
+      expect(result).toEqual({
+        type: 'run',
+        runId: 'xyz789',
+      });
+    });
+
+    it('should parse run URL with trailing slash', () => {
+      const result = parseNxCloudUrl('https://cloud.nx.app/runs/xyz789/');
+      expect(result).toEqual({
+        type: 'run',
+        runId: 'xyz789',
+      });
+    });
+
+    it('should parse run URL with query params', () => {
+      const result = parseNxCloudUrl(
+        'https://cloud.nx.app/runs/xyz789?utm_source=pr',
+      );
+      expect(result).toEqual({
+        type: 'run',
+        runId: 'xyz789',
+      });
+    });
+
+    it('should parse run URL from custom domain', () => {
+      const result = parseNxCloudUrl(
+        'https://my-company.nx.app/runs/my-run-id',
+      );
+      expect(result).toEqual({
+        type: 'run',
+        runId: 'my-run-id',
+      });
+    });
+  });
+
+  describe('Task URLs', () => {
+    it('should parse a task URL', () => {
+      const result = parseNxCloudUrl(
+        'https://cloud.nx.app/runs/abc/task/project:build',
+      );
+      expect(result).toEqual({
+        type: 'task',
+        runId: 'abc',
+        taskId: 'project:build',
+      });
+    });
+
+    it('should parse task URL with trailing slash', () => {
+      const result = parseNxCloudUrl(
+        'https://cloud.nx.app/runs/abc/task/project:build/',
+      );
+      expect(result).toEqual({
+        type: 'task',
+        runId: 'abc',
+        taskId: 'project:build',
+      });
+    });
+
+    it('should parse task URL with encoded taskId', () => {
+      const result = parseNxCloudUrl(
+        'https://cloud.nx.app/runs/abc/task/my-project%3Abuild',
+      );
+      expect(result).toEqual({
+        type: 'task',
+        runId: 'abc',
+        taskId: 'my-project:build',
+      });
+    });
+
+    it('should parse task URL with query params', () => {
+      const result = parseNxCloudUrl(
+        'https://cloud.nx.app/runs/abc/task/project:test?foo=bar',
+      );
+      expect(result).toEqual({
+        type: 'task',
+        runId: 'abc',
+        taskId: 'project:test',
       });
     });
   });
@@ -70,16 +160,6 @@ describe('parseNxCloudUrl', () => {
 
     it('should return null for partial CIPE path', () => {
       expect(parseNxCloudUrl('https://cloud.nx.app/cipes')).toBeNull();
-    });
-
-    it('should return null for run URLs', () => {
-      expect(parseNxCloudUrl('https://cloud.nx.app/runs/xyz789')).toBeNull();
-    });
-
-    it('should return null for task URLs', () => {
-      expect(
-        parseNxCloudUrl('https://cloud.nx.app/runs/abc/task/project:build'),
-      ).toBeNull();
     });
   });
 });
