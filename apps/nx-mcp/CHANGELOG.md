@@ -1,3 +1,13 @@
+## 0.20.0 (2026-02-11)
+
+### 🩹 Fixes
+
+- **nx-mcp:** re-case experimental polygraph tool ([#3028](https://github.com/nrwl/nx-console/pull/3028))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.19.0 (2026-02-10)
 
 ### 🚀 Features
