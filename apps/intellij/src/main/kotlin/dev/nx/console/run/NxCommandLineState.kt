@@ -2,6 +2,7 @@ package dev.nx.console.run
 
 import com.intellij.execution.DefaultExecutionResult
 import com.intellij.execution.ExecutionResult
+import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
@@ -25,7 +26,10 @@ import com.intellij.util.execution.ParametersListUtil
 import com.intellij.xdebugger.impl.XDebuggerManagerImpl
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.*
+import dev.nx.console.utils.NxExecutable
+import dev.nx.console.utils.getProjectJavaHome
+import dev.nx.console.utils.nodeInterpreter
+import dev.nx.console.utils.nxBasePath
 
 class NxCommandLineState(
     val environment: ExecutionEnvironment,
@@ -121,6 +125,24 @@ class NxCommandLineState(
                 .featureUsed(TelemetryEvent.TASKS_RUN, mapOf("debug" to false))
         }
 
+        val effectiveEnvData =
+            try {
+                val envs = nxRunSettings.environmentVariables.envs
+                if (!envs.containsKey("JAVA_HOME") && System.getenv("JAVA_HOME") == null) {
+                    getProjectJavaHome(project)?.let { javaHome ->
+                        val augmented = envs.toMutableMap().apply { put("JAVA_HOME", javaHome) }
+                        EnvironmentVariablesData.create(
+                            augmented,
+                            nxRunSettings.environmentVariables.isPassParentEnvs,
+                        )
+                    } ?: nxRunSettings.environmentVariables
+                } else {
+                    nxRunSettings.environmentVariables
+                }
+            } catch (_: Exception) {
+                nxRunSettings.environmentVariables
+            }
+
         val targetRun =
             NodeTargetRun(
                     project.nodeInterpreter,
@@ -129,7 +151,7 @@ class NxCommandLineState(
                     NodeTargetRunOptions.of(true, runConfiguration),
                 )
                 .apply {
-                    envData = nxRunSettings.environmentVariables
+                    envData = effectiveEnvData
                     enableWrappingWithYarnNode = false
                 }
 
