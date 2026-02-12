@@ -1,3 +1,13 @@
+## 0.21.0 (2026-02-12)
+
+### 🚀 Features
+
+- **nx-mcp:** switch default behaviour of nx-mcp to have minimal tools ([#3027](https://github.com/nrwl/nx-console/pull/3027))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.20.0 (2026-02-11)
 
 ### 🩹 Fixes
