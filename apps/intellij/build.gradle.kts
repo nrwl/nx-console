@@ -162,41 +162,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     }
 }
 
-// --- Disk space investigation (temporary) ---
-fun logDiskSpace(label: String) {
-    if (System.getenv("CI") != null) {
-        println("=== DISK SPACE: $label ===")
-        exec { commandLine("df", "-h") }
-        exec { commandLine("sh", "-c", "du -sh ~/.gradle 2>/dev/null || true") }
-        exec { commandLine("sh", "-c", "du -sh ~/.gradle/caches 2>/dev/null || true") }
-        exec { commandLine("sh", "-c", "du -sh ~/.cache/intellij-platform 2>/dev/null || true") }
-        exec {
-            commandLine(
-                "sh",
-                "-c",
-                "du -sh ${layout.buildDirectory.get().asFile.absolutePath}/* 2>/dev/null | sort -rh | head -20 || true",
-            )
-        }
-        exec {
-            commandLine(
-                "sh",
-                "-c",
-                "du -sh ${rootDir}/dist/* 2>/dev/null | sort -rh | head -20 || true",
-            )
-        }
-        exec {
-            commandLine(
-                "sh",
-                "-c",
-                "find ~/.gradle ~/.cache ${rootDir}/dist -size +100M -exec ls -lh {} \\; 2>/dev/null | head -20 || true",
-            )
-        }
-        println("=== END DISK SPACE: $label ===")
-    }
-}
-
-// --- End disk space investigation ---
-
 tasks {
     prepareSandbox() {
         from(nxlsRoot) {
@@ -204,8 +169,6 @@ tasks {
             include("**/**")
             into(intellijPlatform.projectName.map { "$it/nxls" }.get())
         }
-        doFirst { logDiskSpace("prepareSandbox START") }
-        doLast { logDiskSpace("prepareSandbox END") }
     }
 
     jar {
@@ -226,16 +189,6 @@ tasks {
             showCauses = true
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
-    }
-
-    named("buildPlugin") {
-        doFirst { logDiskSpace("buildPlugin START") }
-        doLast { logDiskSpace("buildPlugin END") }
-    }
-
-    named("buildSearchableOptions") {
-        doFirst { logDiskSpace("buildSearchableOptions START") }
-        doLast { logDiskSpace("buildSearchableOptions END") }
     }
 }
 

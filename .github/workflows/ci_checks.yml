@@ -29,9 +29,9 @@ jobs:
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
           tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
+          android: false
+          dotnet: false
+          haskell: false
           large-packages: false
           docker-images: false
           swap-storage: false
@@ -97,88 +97,10 @@ jobs:
       # - name: Run Nx Cloud conformance checks
       #   run: yarn nx-cloud record -- yarn nx-cloud conformance:check
 
-      - name: Disk Space Report (Pre-Build)
-        run: |
-          echo "=== DISK SPACE REPORT (PRE-BUILD) ==="
-          df -h
-          echo ""
-          echo "--- ~/.gradle top-level breakdown ---"
-          du -sh ~/.gradle 2>/dev/null || echo "~/.gradle not found"
-          du -sh ~/.gradle/*/ 2>/dev/null | sort -rh || true
-          echo ""
-          echo "--- ~/.gradle/caches breakdown ---"
-          du -sh ~/.gradle/caches/*/ 2>/dev/null | sort -rh || true
-          echo ""
-          echo "--- IntelliJ IDE copies in transforms (look for duplicates) ---"
-          find ~/.gradle/caches -maxdepth 4 -type d -name "ideaI*" 2>/dev/null || echo "no ideaI* dirs found"
-          find ~/.gradle/caches -maxdepth 4 -type d -name "transformed" 2>/dev/null | while read d; do
-            echo "  $d:"
-            du -sh "$d"/* 2>/dev/null | sort -rh | head -5
-          done
-          echo ""
-          echo "--- IntelliJ IDE ZIPs/archives in modules-2 ---"
-          find ~/.gradle/caches/modules-2 -name "*idea*" -o -name "*intellij*" 2>/dev/null | head -20 || true
-          du -sh ~/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea 2>/dev/null || echo "no idea module dir"
-          echo ""
-          echo "--- All dirs > 1GB in ~/.gradle ---"
-          du -h ~/.gradle 2>/dev/null | awk '$1 ~ /G/ && $1+0 >= 1' | sort -rh | head -20 || true
-          echo ""
-          echo "--- Top-level disk usage ---"
-          du -sh /* 2>/dev/null | sort -rh | head -15
-          echo ""
-          echo "--- /home breakdown ---"
-          du -sh /home/*/ 2>/dev/null | sort -rh || true
-          du -sh /home/runner/*/ 2>/dev/null | sort -rh | head -15 || true
-          echo "=== END DISK SPACE REPORT ==="
-
       # todo(cammisuli): disable verifyPlugin for now as its constantly failing on CI
       # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
       - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 60
-
-      - name: Disk Space Report (Post-Build)
-        if: always()
-        run: |
-          echo "=== DISK SPACE REPORT (POST-BUILD) ==="
-          df -h
-          echo ""
-          echo "--- ~/.gradle top-level breakdown ---"
-          du -sh ~/.gradle 2>/dev/null || echo "~/.gradle not found"
-          du -sh ~/.gradle/*/ 2>/dev/null | sort -rh || true
-          echo ""
-          echo "--- ~/.gradle/caches breakdown ---"
-          du -sh ~/.gradle/caches/*/ 2>/dev/null | sort -rh || true
-          echo ""
-          echo "--- IntelliJ IDE copies in transforms (look for duplicates) ---"
-          find ~/.gradle/caches -maxdepth 4 -type d -name "ideaI*" 2>/dev/null || echo "no ideaI* dirs found"
-          for d in $(find ~/.gradle/caches -maxdepth 4 -type d -name "ideaI*" 2>/dev/null); do
-            du -sh "$d"
-          done
-          echo ""
-          echo "--- All transformed dirs with sizes ---"
-          find ~/.gradle/caches -maxdepth 3 -type d -name "transformed" 2>/dev/null | while read d; do
-            echo "  $d:"
-            du -sh "$d"/* 2>/dev/null | sort -rh | head -10
-          done
-          echo ""
-          echo "--- IntelliJ IDE ZIPs/archives in modules-2 ---"
-          find ~/.gradle/caches/modules-2 -name "*idea*" -o -name "*intellij*" 2>/dev/null | head -30 || true
-          echo ""
-          echo "--- All dirs > 1GB in ~/.gradle ---"
-          du -h ~/.gradle 2>/dev/null | awk '$1 ~ /G/ && $1+0 >= 1' | sort -rh | head -20 || true
-          echo ""
-          echo "--- /home/runner breakdown ---"
-          du -sh /home/runner/*/ 2>/dev/null | sort -rh | head -15 || true
-          echo ""
-          echo "--- node_modules size ---"
-          du -sh node_modules 2>/dev/null || true
-          echo ""
-          echo "--- .nx/cache size ---"
-          du -sh .nx/cache 2>/dev/null || true
-          echo ""
-          echo "--- Top-level disk usage ---"
-          du -sh /* 2>/dev/null | sort -rh | head -15
-          echo "=== END DISK SPACE REPORT ==="
 
       - run: npx nx-cloud fix-ci
         if: failure()

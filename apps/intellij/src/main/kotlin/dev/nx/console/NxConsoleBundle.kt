@@ -4,7 +4,6 @@ import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
-// trigger rebuild for disk space investigation
 @NonNls private const val BUNDLE = "messages.NxConsoleBundle"
 
 object NxConsoleBundle : DynamicBundle(BUNDLE) {
