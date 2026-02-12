@@ -115,7 +115,7 @@ export class MigrateWebview {
     const migrationJsonSubscription = watchFile(
       join(getNxWorkspacePath(), 'migrations.json'),
       async () => {
-        this._webviewPanel.webview.postMessage({
+        this._webviewPanel?.webview.postMessage({
           type: 'reload',
           data: this.getMigrateUIData(),
         });
