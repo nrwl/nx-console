@@ -877,6 +877,11 @@
           "scope": "resource",
           "description": "Filter which MCP tools are enabled. Accepts glob patterns including negation (e.g., '*', '!nx_docs', 'cloud_*'). If empty, all tools are enabled."
         },
+        "nxConsole.refreshOnBranchSwitch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh the workspace when switching git branches."
+        },
         "nxConsole.enableDebugLogging": {
           "type": "boolean",
           "default": false,

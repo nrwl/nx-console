@@ -15,6 +15,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'disableFileWatching',
   'mcpPort',
   'mcpToolsFilter',
+  'refreshOnBranchSwitch',
 ] as const;
 
 export type GlobalConfig = {
@@ -34,6 +35,7 @@ export type GlobalConfig = {
   disableFileWatching: boolean;
   mcpPort: number | undefined;
   mcpToolsFilter: string[] | undefined;
+  refreshOnBranchSwitch: boolean;
 };
 
 /**
