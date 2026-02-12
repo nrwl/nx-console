@@ -19,6 +19,7 @@ export type TelemetryEvents =
   | 'misc.open-project-details-codelens'
   | 'misc.exception'
   | 'misc.vscode-document-uri-error'
+  | 'misc.set-no-delay-error'
   | 'misc.nx-latest-no-provenance'
   | 'misc.restart-daemon-watcher'
   // migrate

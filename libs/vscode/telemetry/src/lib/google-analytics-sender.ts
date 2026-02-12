@@ -82,13 +82,41 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     if (error.message.startsWith('AIFAIL')) {
       return;
     }
-    if (error.message.includes('Unable to retrieve document from URI')) {
-      this.sendEventData('misc.vscode-document-uri-error', data);
+
+    const knownErrorEvent = getKnownErrorEvent(error);
+    if (knownErrorEvent) {
+      this.sendEventData(knownErrorEvent, data);
       return;
     }
+
     this.sendEventData('misc.exception', {
       ...data,
       name: error.name,
     });
   }
+}
+
+/**
+ * Maps known, non-critical errors to specific telemetry events so they
+ * don't pollute the generic misc.exception metric.
+ *
+ * - "Unable to retrieve document from URI" – VS Code sometimes fires
+ *   document requests for URIs that are no longer valid (e.g. after
+ *   rapid editor tab switches or closed files).
+ *
+ * - "Cannot read properties of undefined (reading 'setNoDelay')" –
+ *   Node IPC socket race condition that occurs when the language-server
+ *   process is being torn down while a message is in flight.
+ */
+function getKnownErrorEvent(error: Error): TelemetryEvents | undefined {
+  const msg = error.message ?? '';
+
+  if (msg.includes('Unable to retrieve document from URI')) {
+    return 'misc.vscode-document-uri-error';
+  }
+  if (msg.includes('setNoDelay')) {
+    return 'misc.set-no-delay-error';
+  }
+
+  return undefined;
 }
