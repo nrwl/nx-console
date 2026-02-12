@@ -29,9 +29,9 @@ jobs:
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
           tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
+          android: false
+          dotnet: false
+          haskell: false
           large-packages: false
           docker-images: false
           swap-storage: false
@@ -66,7 +66,12 @@ jobs:
         with:
           distribution: zulu
           java-version: ${{ env.JAVA_VERSION }}
-          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-excludes: |
+            caches/*/transforms
 
       - name: Ensure Nx Cloud Agents are configured correctly
         run: yarn dlx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
