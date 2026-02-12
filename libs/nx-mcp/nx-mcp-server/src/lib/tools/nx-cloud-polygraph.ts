@@ -329,7 +329,7 @@ const createPRsSchema = z.object({
     .string()
     .optional()
     .describe(
-      'The Claude agent session ID. Can be used to resume the session later with `claude --continue {agentSessionId}`.',
+      'The Claude agent session ID. Can be used to resume the session later with `claude --resume {agentSessionId}`.',
     ),
 });
 
@@ -438,7 +438,7 @@ function registerGetSession(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_GET_SESSION,
       description:
-        'Get the specified Polygraph session. Returns session url, status, plan, agentSessionId, and associated pull requests across repositories. The agentSessionId can be used to resume a Claude session with `claude --continue {agentSessionId}`.',
+        'Get the specified Polygraph session. Returns session url, status, plan, agentSessionId, and associated pull requests across repositories. The agentSessionId can be used to resume a Claude session with `claude --resume {agentSessionId}`.',
       inputSchema: getSessionSchema.shape,
       annotations: {
         destructiveHint: false,
@@ -498,7 +498,7 @@ const markReadySchema = z.object({
     .string()
     .optional()
     .describe(
-      'The Claude agent session ID. Can be used to resume the session later with `claude --continue {agentSessionId}`.',
+      'The Claude agent session ID. Can be used to resume the session later with `claude --resume {agentSessionId}`.',
     ),
 });
 
@@ -722,7 +722,7 @@ const associatePRSchema = z.object({
     .string()
     .optional()
     .describe(
-      'The Claude agent session ID. Can be used to resume the session later with `claude --continue {agentSessionId}`.',
+      'The Claude agent session ID. Can be used to resume the session later with `claude --resume {agentSessionId}`.',
     ),
 });
 
