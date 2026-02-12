@@ -83,20 +83,44 @@ More info:
 - [Install Nx Console](https://nx.dev/getting-started/editor-setup)
 - [Configure Cursor to use the nx-mcp](https://nx.dev/features/enhance-AI#cursor)
 
+## Minimal Mode (Default)
+
+By default, the Nx MCP server runs in **minimal mode**, which hides workspace analysis tools that overlap with AI tool skills/instructions. This reduces tool clutter and context window usage for AI agents that already have access to equivalent functionality through skills.
+
+The following tools are hidden in minimal mode:
+
+- `nx_available_plugins`
+- `nx_workspace_path`
+- `nx_workspace`
+- `nx_project_details`
+- `nx_generators`
+- `nx_generator_schema`
+
+To disable minimal mode and expose all tools, use the `--no-minimal` flag:
+
+```sh
+npx nx-mcp@latest --no-minimal
+```
+
 ## Available Tools
 
 The Nx MCP server provides a comprehensive set of tools for interacting with your Nx workspace.
 
+### Always Available
+
 - **nx_docs**: Returns documentation sections relevant to user queries about Nx
+- **nx_current_running_tasks_details**: Lists currently running Nx TUI processes and task statuses
+- **nx_current_running_task_output**: Returns terminal output for specific running tasks
+- **nx_visualize_graph**: Visualizes the Nx graph (requires running IDE instance)
+
+### Hidden in Minimal Mode (use `--no-minimal` to enable)
+
 - **nx_available_plugins**: Lists available Nx plugins from the core team and local workspace plugins
 - **nx_workspace_path**: Returns the path to the Nx workspace root
 - **nx_workspace**: Returns readable representation of project graph and nx.json configuration
 - **nx_project_details**: Returns complete project configuration in JSON format for a given project
 - **nx_generators**: Returns list of generators relevant to user queries
 - **nx_generator_schema**: Returns detailed JSON schema for a specific Nx generator
-- **nx_current_running_tasks_details**: Lists currently running Nx TUI processes and task statuses
-- **nx_current_running_task_output**: Returns terminal output for specific running tasks
-- **nx_visualize_graph**: Visualizes the Nx graph (requires running IDE instance)
 
 ### Nx Cloud Tools (only available w/ Nx Cloud enabled)
 

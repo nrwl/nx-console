@@ -164,7 +164,9 @@ async function initModernVSCodeMcp(context: ExtensionContext, mcpPort: number) {
   const workspacePath = getNxWorkspacePath();
   const minimal = workspacePath ? hasNxWorkspaceSkill(workspacePath) : false;
   if (minimal) {
-    vscodeLogger.log('Nx workspace skill detected, enabling minimal MCP mode');
+    vscodeLogger.log(
+      'Nx workspace skill detected, enabling minimal MCP mode. Workspace analysis tools (nx_workspace, nx_project_details, nx_generators, etc.) have been disabled and replaced by skills.',
+    );
   }
 
   mcpStreamableWebServer = new McpStreamableWebServer(mcpPort, { minimal });
@@ -195,7 +197,7 @@ async function initCursorMcp(context: ExtensionContext, mcpPort: number) {
     const minimal = workspacePath ? hasNxWorkspaceSkill(workspacePath) : false;
     if (minimal) {
       vscodeLogger.log(
-        'Nx workspace skill detected, enabling minimal MCP mode',
+        'Nx workspace skill detected, enabling minimal MCP mode. Workspace analysis tools (nx_workspace, nx_project_details, nx_generators, etc.) have been disabled and replaced by skills.',
       );
     }
 

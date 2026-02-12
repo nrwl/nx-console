@@ -57,7 +57,7 @@ describe('HTTP Multi-Client', () => {
     // The workspace will be determined per-session based on requests
     serverProcess = spawn(
       'node',
-      [serverPath, '--transport=http', `--port=${serverPort}`],
+      [serverPath, '--transport=http', `--port=${serverPort}`, '--no-minimal'],
       {
         stdio: 'pipe',
         env: {
