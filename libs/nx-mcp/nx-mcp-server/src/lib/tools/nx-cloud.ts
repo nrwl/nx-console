@@ -1041,9 +1041,20 @@ const getCIInformation =
     }
 
     // Build disclaimer if we retrieved a different CIPE than the URL pointed to
+    const retrievedDifferentCipeDisclaimer = ` The URL pointed to an older CI Pipeline Execution. Showing the most recent CI information for branch "${branch}" instead.`;
     const disclaimer = retrievedDifferentCipe
-      ? `**Note:** The URL pointed to an older CI Pipeline Execution. Showing the most recent CI information for branch "${branch}" instead.\n\n`
+      ? `**Note:** ${retrievedDifferentCipeDisclaimer} \n\n`
       : '';
+
+    // Build hints for structured content
+    const hints: string[] = [];
+    if (retrievedDifferentCipe) {
+      hints.push(retrievedDifferentCipeDisclaimer);
+    }
+    hints.push(
+      'remoteTaskSummary contains output from tasks that ran on CI machines. localTaskSummary contains output from the self-healing agent machine.',
+    );
+    output.hints = hints;
 
     // Branch based on select parameter
     if (!params.select) {
@@ -1327,6 +1338,7 @@ const handleUpdateSelfHealingFix =
     });
 
     let aiFixId = params.aiFixId;
+    let resolvedShortLink: string | null = params.shortLink ?? null;
 
     // If shortLink provided, extract the aiFixId from the fix diff API
     if (!aiFixId && params.shortLink) {
@@ -1335,6 +1347,9 @@ const handleUpdateSelfHealingFix =
         const output: UpdateSelfHealingFixOutput = {
           success: false,
           message: `Invalid shortLink format: ${params.shortLink}. Expected format like "abc123-def456".`,
+          aiFixId: null,
+          action: params.action,
+          shortLink: resolvedShortLink,
         };
         return {
           content: [{ type: 'text', text: output.message }],
@@ -1354,6 +1369,9 @@ const handleUpdateSelfHealingFix =
         const output: UpdateSelfHealingFixOutput = {
           success: false,
           message: `Failed to retrieve fix from shortLink: ${fixResult.error?.message ?? 'aiFixId not found'}`,
+          aiFixId: null,
+          action: params.action,
+          shortLink: resolvedShortLink,
         };
         return {
           content: [{ type: 'text', text: output.message }],
@@ -1373,6 +1391,9 @@ const handleUpdateSelfHealingFix =
           success: false,
           message:
             'Could not determine the current git branch. Please provide aiFixId, shortLink, or branch explicitly.',
+          aiFixId: null,
+          action: params.action,
+          shortLink: null,
         };
         return {
           content: [{ type: 'text', text: output.message }],
@@ -1388,6 +1409,9 @@ const handleUpdateSelfHealingFix =
         const output: UpdateSelfHealingFixOutput = {
           success: false,
           message: `Failed to retrieve CI information: ${cipeResult.error.message}`,
+          aiFixId: null,
+          action: params.action,
+          shortLink: null,
         };
         return {
           content: [{ type: 'text', text: output.message }],
@@ -1404,6 +1428,9 @@ const handleUpdateSelfHealingFix =
         const output: UpdateSelfHealingFixOutput = {
           success: false,
           message: `No CI pipeline execution found for branch "${branch}".`,
+          aiFixId: null,
+          action: params.action,
+          shortLink: null,
         };
         return {
           content: [{ type: 'text', text: output.message }],
@@ -1425,6 +1452,9 @@ const handleUpdateSelfHealingFix =
         const output: UpdateSelfHealingFixOutput = {
           success: false,
           message: `No AI fix found for branch "${branch}".`,
+          aiFixId: null,
+          action: params.action,
+          shortLink: null,
         };
         return {
           content: [{ type: 'text', text: output.message }],
@@ -1434,6 +1464,7 @@ const handleUpdateSelfHealingFix =
       }
 
       aiFixId = aiFix.aiFixId;
+      resolvedShortLink = aiFix.shortLink ?? null;
     }
 
     // Map APPLY/REJECT/RERUN_ENVIRONMENT_STATE to APPLIED/REJECTED/RERUN_REQUESTED
@@ -1456,6 +1487,9 @@ const handleUpdateSelfHealingFix =
       const output: UpdateSelfHealingFixOutput = {
         success: false,
         message: `Failed to ${params.action.toLowerCase()} fix: ${result.error?.message ?? 'Unknown error'}`,
+        aiFixId,
+        action: params.action,
+        shortLink: resolvedShortLink,
       };
       return {
         content: [{ type: 'text', text: output.message }],
@@ -1470,9 +1504,19 @@ const handleUpdateSelfHealingFix =
         : params.action === 'RERUN_ENVIRONMENT_STATE'
           ? 'requested rerun for'
           : 'rejected';
+    const hints: string[] = [];
+    if (resolvedShortLink && params.action !== 'APPLY') {
+      hints.push(
+        `Use the shortLink '${resolvedShortLink}' to apply this fix via the update_self_healing_fix tool.`,
+      );
+    }
     const output: UpdateSelfHealingFixOutput = {
       success: true,
       message: `Successfully ${actionVerb} the fix (aiFixId: ${aiFixId}).`,
+      aiFixId,
+      action: params.action,
+      shortLink: resolvedShortLink,
+      ...(hints.length > 0 ? { hints } : {}),
     };
     return {
       content: [{ type: 'text', text: output.message }],
