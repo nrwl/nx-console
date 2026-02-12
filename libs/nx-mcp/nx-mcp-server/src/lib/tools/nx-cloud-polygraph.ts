@@ -16,6 +16,7 @@ import { isToolEnabled } from '../tool-filter';
 import { ToolRegistry } from '../tool-registry';
 import { join } from 'path';
 import { readdirSync, statSync } from 'fs';
+import { execSync } from 'child_process';
 import { randomUUID } from 'node:crypto';
 import {
   getNxCloudId,
@@ -123,11 +124,43 @@ function getCloudLightClient(logger: Logger, workspacePath: string): any {
   return nxCloudClient;
 }
 
+let cachedNxCloudClient: any = undefined;
+
+async function ensureCloudLightClient(
+  logger: Logger,
+  workspacePath: string,
+): Promise<any> {
+  if (cachedNxCloudClient !== undefined) {
+    return cachedNxCloudClient;
+  }
+
+  let client = getCloudLightClient(logger, workspacePath);
+
+  if (!client) {
+    logger.log('Cloud client bundle not found. Attempting to download...');
+    try {
+      execSync('npx nx@latest download-cloud-client', {
+        cwd: workspacePath,
+        stdio: 'pipe',
+        timeout: 60000,
+      });
+      client = getCloudLightClient(logger, workspacePath);
+      if (client) {
+        logger.log('Cloud client bundle downloaded successfully');
+      }
+    } catch (e: any) {
+      logger.log(`Failed to download cloud client: ${e.message}`);
+    }
+  }
+
+  cachedNxCloudClient = client ?? null;
+  return cachedNxCloudClient;
+}
+
 function registerInit(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_INIT, toolsFilter)) {
@@ -145,6 +178,10 @@ function registerInit(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphInit !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -179,7 +216,6 @@ function registerDelegate(
   logger: Logger,
   registry: ToolRegistry,
   workspacePath: string,
-  nxCloudClient: any,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_DELEGATE, toolsFilter)) {
     logger.debug?.(
@@ -197,6 +233,10 @@ function registerDelegate(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphDelegate !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -239,7 +279,6 @@ function registerPushBranch(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_PUSH_BRANCH, toolsFilter)) {
@@ -258,6 +297,10 @@ function registerPushBranch(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphPushBranch !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -337,7 +380,6 @@ function registerCreatePRs(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_CREATE_PRS, toolsFilter)) {
@@ -356,6 +398,10 @@ function registerCreatePRs(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphCreatePRs !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -427,7 +473,6 @@ function registerGetSession(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_GET_SESSION, toolsFilter)) {
@@ -446,6 +491,10 @@ function registerGetSession(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphGetSession !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -506,7 +555,6 @@ function registerMarkReady(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_MARK_READY, toolsFilter)) {
@@ -525,6 +573,10 @@ function registerMarkReady(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphMarkReady !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -588,7 +640,6 @@ function registerStopChild(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_STOP_CHILD, toolsFilter)) {
@@ -607,6 +658,13 @@ function registerStopChild(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphStopChild !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
         try {
           const result = await nxCloudClient.polygraphStopChild(logger, {
             ...params,
@@ -652,7 +710,6 @@ function registerChildStatus(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_CHILD_STATUS, toolsFilter)) {
@@ -671,6 +728,13 @@ function registerChildStatus(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphChildStatus !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
         try {
           const result = await nxCloudClient.polygraphChildStatus(logger, {
             ...params,
@@ -730,7 +794,6 @@ function registerAssociatePR(
   toolsFilter: string[] | undefined,
   logger: Logger,
   registry: ToolRegistry,
-  nxCloudClient: any,
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_POLYGRAPH_ASSOCIATE_PR, toolsFilter)) {
@@ -749,6 +812,10 @@ function registerAssociatePR(
         openWorldHint: true,
       },
       handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
         if (typeof nxCloudClient?.polygraphAssociatePR !== 'function') {
           return CLOUD_CLIENT_MISSING_RESULT;
         }
@@ -801,57 +868,21 @@ export function registerPolygraphTools(
   logger: Logger,
   toolsFilter?: string[],
 ) {
-  const nxCloudClient = getCloudLightClient(logger, workspacePath);
-
-  registerInit(toolsFilter, logger, registry, nxCloudClient, workspacePath);
-  registerDelegate(toolsFilter, logger, registry, workspacePath, nxCloudClient);
-  registerPushBranch(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
-  registerCreatePRs(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
-  registerGetSession(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
-  registerMarkReady(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
-  registerStopChild(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
-  registerChildStatus(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
-  registerAssociatePR(
-    toolsFilter,
-    logger,
-    registry,
-    nxCloudClient,
-    workspacePath,
-  );
+  registerInit(toolsFilter, logger, registry, workspacePath);
+  registerDelegate(toolsFilter, logger, registry, workspacePath);
+  registerPushBranch(toolsFilter, logger, registry, workspacePath);
+  registerCreatePRs(toolsFilter, logger, registry, workspacePath);
+  registerGetSession(toolsFilter, logger, registry, workspacePath);
+  registerMarkReady(toolsFilter, logger, registry, workspacePath);
+  registerStopChild(toolsFilter, logger, registry, workspacePath);
+  registerChildStatus(toolsFilter, logger, registry, workspacePath);
+  registerAssociatePR(toolsFilter, logger, registry, workspacePath);
 }
+
+export const __testing__ = {
+  getCloudLightClient,
+  ensureCloudLightClient,
+  resetCachedClient: () => {
+    cachedNxCloudClient = undefined;
+  },
+};
