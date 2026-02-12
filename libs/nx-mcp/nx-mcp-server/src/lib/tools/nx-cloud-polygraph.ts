@@ -14,21 +14,19 @@ import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
 import { isToolEnabled } from '../tool-filter';
 import { ToolRegistry } from '../tool-registry';
-import { join } from 'path';
-import { readdirSync, statSync } from 'fs';
-import { execSync } from 'child_process';
 import { randomUUID } from 'node:crypto';
 import {
   getNxCloudId,
   getNxCloudUrl,
   nxCloudAuthHeaders,
 } from '@nx-console/shared-nx-cloud';
+import { ensureCloudLightClient } from './ensure-cloud-light-client';
 
 const CLOUD_CLIENT_MISSING_RESULT: CallToolResult = {
   content: [
     {
       type: 'text',
-      text: 'The Nx Cloud client bundle is missing. Run `npx nx@latest download-cloud-client` to install it.',
+      text: 'The Nx Cloud client bundle is missing. An automatic download was attempted but failed. Try running `npx nx@latest download-cloud-client` manually and check your network connection.',
     },
   ],
   isError: true,
@@ -62,99 +60,6 @@ function delegateResultToCallToolResult(result: any): CallToolResult {
     return { content: [{ type: 'text', text: result.error }], isError: true };
   }
   return { content: [{ type: 'text', text: result.message }] };
-}
-
-function getCloudLightClient(logger: Logger, workspacePath: string): any {
-  let cacheDir;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    cacheDir = require(
-      require.resolve('nx/src/devkit-exports', {
-        paths: [`${workspacePath}/node_modules`],
-      }),
-    ).cacheDir;
-  } catch (e: any) {
-    if (process.env.NX_VERBOSE_LOGGING === 'true') {
-      logger.log(`Could not read cache directory: ${e.message}`);
-    }
-    return null;
-  }
-
-  const cloudLocation = join(cacheDir, 'cloud');
-  let lightClientBundle;
-  try {
-    const installedBundles = readdirSync(cloudLocation)
-      .filter((potentialDirectory) => {
-        return statSync(join(cloudLocation, potentialDirectory)).isDirectory();
-      })
-      .map((fileOrDirectory) => ({
-        version: fileOrDirectory,
-        fullPath: join(cloudLocation, fileOrDirectory),
-      }));
-
-    if (installedBundles.length === 0) {
-      if (process.env.NX_VERBOSE_LOGGING === 'true') {
-        logger.log(`No installed bundles`);
-      }
-
-      // No installed bundles
-      return null;
-    }
-
-    lightClientBundle = installedBundles[0];
-  } catch (e: any) {
-    if (process.env.NX_VERBOSE_LOGGING === 'true') {
-      logger.log('Could not read runner bundle path:', e.message);
-    }
-    return null;
-  }
-
-  let nxCloudClient;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    nxCloudClient = require(
-      lightClientBundle.fullPath + '/lib/polygraph/polygraph-handlers.js',
-    );
-  } catch (e: any) {
-    if (process.env.NX_VERBOSE_LOGGING === 'true') {
-      logger.log(`Could not load Polygraph client: ${e.message}`);
-    }
-    return null;
-  }
-  return nxCloudClient;
-}
-
-let cachedNxCloudClient: any = undefined;
-
-async function ensureCloudLightClient(
-  logger: Logger,
-  workspacePath: string,
-): Promise<any> {
-  if (cachedNxCloudClient !== undefined) {
-    return cachedNxCloudClient;
-  }
-
-  let client = getCloudLightClient(logger, workspacePath);
-
-  if (!client) {
-    logger.log('Cloud client bundle not found. Attempting to download...');
-    try {
-      execSync('npx nx@latest download-cloud-client', {
-        cwd: workspacePath,
-        stdio: 'pipe',
-        timeout: 60000,
-      });
-      client = getCloudLightClient(logger, workspacePath);
-      if (client) {
-        logger.log('Cloud client bundle downloaded successfully');
-      }
-    } catch (e: any) {
-      logger.log(`Failed to download cloud client: ${e.message}`);
-    }
-  }
-
-  cachedNxCloudClient = client ?? null;
-  return cachedNxCloudClient;
 }
 
 function registerInit(
@@ -878,11 +783,3 @@ export function registerPolygraphTools(
   registerChildStatus(toolsFilter, logger, registry, workspacePath);
   registerAssociatePR(toolsFilter, logger, registry, workspacePath);
 }
-
-export const __testing__ = {
-  getCloudLightClient,
-  ensureCloudLightClient,
-  resetCachedClient: () => {
-    cachedNxCloudClient = undefined;
-  },
-};
