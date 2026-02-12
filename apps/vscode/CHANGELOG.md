@@ -1,3 +1,23 @@
+# [18.87.0](https://github.com/nrwl/nx-console/compare/vscode-v18.86.0...vscode-v18.87.0) (2026-02-12)
+
+
+### Bug Fixes
+
+* **nx-mcp:** handle missing client bundle gracefully in polygraph tools ([#3016](https://github.com/nrwl/nx-console/issues/3016)) ([cc0f5cd](https://github.com/nrwl/nx-console/commit/cc0f5cd95f101d17c13caca24b12a709e8202fce))
+* **vscode:** branch logging bug when switching ([#3039](https://github.com/nrwl/nx-console/issues/3039)) ([202c86b](https://github.com/nrwl/nx-console/commit/202c86b7038eec092623ab25a6738d8736e73838))
+* **vscode:** fix timing issue when closing webview while migrate ui loads ([#3038](https://github.com/nrwl/nx-console/issues/3038)) ([9640e0d](https://github.com/nrwl/nx-console/commit/9640e0d3d2fe0bc3fd9ccfd65bf9477cbdc24c18))
+* **vscode:** unsafe treeItem access ([#3035](https://github.com/nrwl/nx-console/issues/3035)) ([a0bdfc6](https://github.com/nrwl/nx-console/commit/a0bdfc6e5666c6d18a1bba55a4f80a98c25ad105))
+
+
+### Features
+
+* **nx-mcp:** add cloud_polygraph_associate_pr MCP tool ([#3029](https://github.com/nrwl/nx-console/issues/3029)) ([55ed2fd](https://github.com/nrwl/nx-console/commit/55ed2fd8cdfc8890b82bd71500745044672d1c38))
+* **nx-mcp:** add hints and structured fields to MCP tool outputs ([#3032](https://github.com/nrwl/nx-console/issues/3032)) ([abf9164](https://github.com/nrwl/nx-console/commit/abf9164b2dc679c55e47d81d46bae2349150ee93))
+* **nx-mcp:** add plan and agentSessionId params to Polygraph tools ([#3033](https://github.com/nrwl/nx-console/issues/3033)) ([79ad8e1](https://github.com/nrwl/nx-console/commit/79ad8e1a4c2970b62376ac39ee88f1e6f0e04e01))
+* **nx-mcp:** support run and task URLs in CI information tool ([#3024](https://github.com/nrwl/nx-console/issues/3024)) ([f89c629](https://github.com/nrwl/nx-console/commit/f89c629a59c621a03a0c472c218e5003be64edf9))
+* **nx-mcp:** switch default behaviour of nx-mcp to have minimal tools ([#3027](https://github.com/nrwl/nx-console/issues/3027)) ([fed1a37](https://github.com/nrwl/nx-console/commit/fed1a37b1b257f80e1103f8d675501295f83977b))
+* **vscode:** add toggle for disabling refresh on branch switch ([#3034](https://github.com/nrwl/nx-console/issues/3034)) ([fd06e59](https://github.com/nrwl/nx-console/commit/fd06e593f132c8c218db0d36da81a9a57850f7af))
+
 # [18.86.0](https://github.com/nrwl/nx-console/compare/vscode-v18.85.2...vscode-v18.86.0) (2026-02-09)
 
 
