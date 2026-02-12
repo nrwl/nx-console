@@ -444,10 +444,16 @@ function refreshWorkspaceOnBranchChange(
   return repo.state.onDidChange(async () => {
     const newBranch = repo.state.HEAD.name;
     if (newBranch !== branch) {
-      vscodeLogger.log(
-        `Branch changed from ${branch} to ${newBranch}, refreshing workspace`,
-      );
+      const oldBranch = branch;
       branch = newBranch;
+      if (
+        !GlobalConfigurationStore.instance.get('refreshOnBranchSwitch', true)
+      ) {
+        return;
+      }
+      vscodeLogger.log(
+        `Branch changed from ${oldBranch} to ${newBranch}, refreshing workspace`,
+      );
       commands.executeCommand('nxConsole.refreshWorkspace', true);
     }
   });

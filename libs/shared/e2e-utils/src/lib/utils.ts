@@ -131,7 +131,7 @@ export async function createInvokeMCPInspectorCLI(
       cwd: join(e2eCwd, workspaceName),
     },
   );
-  const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath}`;
+  const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath} --no-minimal`;
 
   return (...args: string[]) => {
     const command = `${mcpInspectorCommand} ${args.join(' ')}`;

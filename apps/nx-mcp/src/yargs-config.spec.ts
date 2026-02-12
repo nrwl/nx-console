@@ -202,14 +202,14 @@ describe('createYargsConfig', () => {
   });
 
   describe('minimal option', () => {
-    it('should default to false', () => {
+    it('should default to true', () => {
       const argv = createYargsConfig([]).parseSync();
-      expect(argv.minimal).toBe(false);
+      expect(argv.minimal).toBe(true);
     });
 
-    it('should parse --minimal flag as true', () => {
-      const argv = createYargsConfig(['--minimal']).parseSync();
-      expect(argv.minimal).toBe(true);
+    it('should parse --no-minimal flag as false', () => {
+      const argv = createYargsConfig(['--no-minimal']).parseSync();
+      expect(argv.minimal).toBe(false);
     });
 
     it('should be combinable with --tools flag', () => {

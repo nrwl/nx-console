@@ -100,8 +100,8 @@ export async function registerGenerateCommands(context: ExtensionContext) {
           return;
         }
 
-        const projectName = (treeItem?.item as ProjectViewItem).nxProject
-          .project;
+        const projectName = (treeItem?.item as ProjectViewItem)?.nxProject
+          ?.project;
 
         openReMoveGenerator(generator, undefined, projectName);
       },
@@ -117,8 +117,8 @@ export async function registerGenerateCommands(context: ExtensionContext) {
           return;
         }
 
-        const projectName = (treeItem?.item as ProjectViewItem).nxProject
-          .project;
+        const projectName = (treeItem?.item as ProjectViewItem)?.nxProject
+          ?.project;
 
         openReMoveGenerator(generator, undefined, projectName);
       },

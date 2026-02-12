@@ -104,7 +104,7 @@ export class McpHttpServerCore {
 
           if (this.options.minimal) {
             vscodeLogger.log(
-              'Minimal mode enabled, hiding workspace analysis tools',
+              'Minimal mode enabled: The following MCP tools have been disabled because they have been replaced by skills: nx_available_plugins, nx_workspace_path, nx_workspace, nx_project_details, nx_generators, nx_generator_schema. To re-enable them, set nxConsole.mcpMinimalMode to false.',
             );
             toolsFilter = toolsFilter
               ? [...toolsFilter, ...MINIMAL_EXCLUDED_TOOLS]

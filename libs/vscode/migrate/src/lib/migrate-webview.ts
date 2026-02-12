@@ -65,9 +65,28 @@ export class MigrateWebview {
       },
     );
 
-    this._webviewPanel.webview.html = await this.loadMigrateHtml(
-      this._webviewPanel,
+    const migrationJsonSubscription = watchFile(
+      join(getNxWorkspacePath(), 'migrations.json'),
+      async () => {
+        this._webviewPanel?.webview.postMessage({
+          type: 'reload',
+          data: this.getMigrateUIData(),
+        });
+      },
     );
+
+    this._webviewPanel.onDidDispose(() => {
+      this._webviewPanel = undefined;
+      migrationJsonSubscription.dispose();
+    });
+
+    const html = await this.loadMigrateHtml(this._webviewPanel);
+
+    if (!this._webviewPanel) {
+      return;
+    }
+
+    this._webviewPanel.webview.html = html;
 
     getTelemetry().logUsage('migrate.open');
 
@@ -111,21 +130,6 @@ export class MigrateWebview {
           break;
       }
     });
-
-    const migrationJsonSubscription = watchFile(
-      join(getNxWorkspacePath(), 'migrations.json'),
-      async () => {
-        this._webviewPanel.webview.postMessage({
-          type: 'reload',
-          data: this.getMigrateUIData(),
-        });
-      },
-    );
-
-    this._webviewPanel.onDidDispose(() => {
-      this._webviewPanel = undefined;
-      migrationJsonSubscription.dispose();
-    });
   }
 
   closeMigrateUi() {
@@ -148,6 +152,10 @@ export class MigrateWebview {
 
     if (!graphHtmlLocation) {
       return '<div>Migrate UI failed to load. Please create an issue at <a href="https://github.com/nrwl/nx-console/issues">https://github.com/nrwl/nx-console/issues</a>.</div>';
+    }
+
+    if (!this._webviewPanel) {
+      return '';
     }
 
     const initialData = this.getMigrateUIData();
