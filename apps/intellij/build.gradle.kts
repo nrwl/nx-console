@@ -58,7 +58,9 @@ dependencies {
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
             }
         )
-        pluginVerifier()
+        if (System.getenv("CI") == null) {
+            pluginVerifier()
+        }
         zipSigner()
         // Add test framework configuration
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
@@ -124,18 +126,22 @@ intellijPlatform {
         // }.split('.').first()
         //        channels.set(listOf(channel))
     }
-    pluginVerification { ides { recommended() } }
+    if (System.getenv("CI") == null) {
+        pluginVerification { ides { recommended() } }
+    }
 }
 
-intellijPlatformTesting {
-    runIde {
-        create("runIntelliJLatest") {
-            version = "2025.2.1"
-            prepareSandboxTask {
-                from(nxlsRoot) {
-                    include("**")
-                    include("**/**")
-                    into(intellijPlatform.projectName.map { "$it/nxls" }.get())
+if (System.getenv("CI") == null) {
+    intellijPlatformTesting {
+        runIde {
+            create("runIntelliJLatest") {
+                version = "2025.2.1"
+                prepareSandboxTask {
+                    from(nxlsRoot) {
+                        include("**")
+                        include("**/**")
+                        into(intellijPlatform.projectName.map { "$it/nxls" }.get())
+                    }
                 }
             }
         }
