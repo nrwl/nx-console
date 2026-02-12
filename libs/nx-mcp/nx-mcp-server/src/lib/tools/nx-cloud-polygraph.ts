@@ -319,6 +319,18 @@ const createPRsSchema = z.object({
       }),
     )
     .describe('Array of PR specifications to create'),
+  plan: z
+    .string()
+    .optional()
+    .describe(
+      'The plan/context for the Polygraph session. Saved to the session for future resumption.',
+    ),
+  agentSessionId: z
+    .string()
+    .optional()
+    .describe(
+      'The Claude agent session ID. Can be used to resume the session later with `claude --continue {agentSessionId}`.',
+    ),
 });
 
 function registerCreatePRs(
@@ -348,7 +360,9 @@ function registerCreatePRs(
           return CLOUD_CLIENT_MISSING_RESULT;
         }
 
-        const { sessionId, prs } = params as z.infer<typeof createPRsSchema>;
+        const { sessionId, prs, plan, agentSessionId } = params as z.infer<
+          typeof createPRsSchema
+        >;
 
         try {
           const nxCloudUrl = await getNxCloudUrl(workspacePath);
@@ -359,6 +373,8 @@ function registerCreatePRs(
             nxCloudUrl,
             authHeaders,
             workspacePath,
+            plan,
+            agentSessionId,
             prs: prs.map((pr) => ({
               title: pr.title,
               body: pr.body,
@@ -422,7 +438,7 @@ function registerGetSession(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_GET_SESSION,
       description:
-        'Get the specified Polygraph session. Returns session url, status, and associated pull requests across repositories.',
+        'Get the specified Polygraph session. Returns session url, status, plan, agentSessionId, and associated pull requests across repositories. The agentSessionId can be used to resume a Claude session with `claude --continue {agentSessionId}`.',
       inputSchema: getSessionSchema.shape,
       annotations: {
         destructiveHint: false,
@@ -472,6 +488,18 @@ const markReadySchema = z.object({
   prUrls: z
     .array(z.string())
     .describe('URLs of the pull requests to mark as ready for review'),
+  plan: z
+    .string()
+    .optional()
+    .describe(
+      'The plan/context for the Polygraph session. Saved to the session for future resumption.',
+    ),
+  agentSessionId: z
+    .string()
+    .optional()
+    .describe(
+      'The Claude agent session ID. Can be used to resume the session later with `claude --continue {agentSessionId}`.',
+    ),
 });
 
 function registerMarkReady(
@@ -501,7 +529,7 @@ function registerMarkReady(
           return CLOUD_CLIENT_MISSING_RESULT;
         }
 
-        const { sessionId, prUrls } = params;
+        const { sessionId, prUrls, plan, agentSessionId } = params;
 
         try {
           const nxCloudUrl = await getNxCloudUrl(workspacePath);
@@ -512,6 +540,8 @@ function registerMarkReady(
             nxCloudUrl,
             authHeaders,
             prUrls,
+            plan,
+            agentSessionId,
           });
 
           if (result.success) {
@@ -682,6 +712,18 @@ const associatePRSchema = z.object({
     .describe(
       'Branch name to find and associate PRs for. Used when prUrl is not provided.',
     ),
+  plan: z
+    .string()
+    .optional()
+    .describe(
+      'The plan/context for the Polygraph session. Saved to the session for future resumption.',
+    ),
+  agentSessionId: z
+    .string()
+    .optional()
+    .describe(
+      'The Claude agent session ID. Can be used to resume the session later with `claude --continue {agentSessionId}`.',
+    ),
 });
 
 function registerAssociatePR(
@@ -711,7 +753,7 @@ function registerAssociatePR(
           return CLOUD_CLIENT_MISSING_RESULT;
         }
 
-        const { sessionId, prUrl, branch } = params;
+        const { sessionId, prUrl, branch, plan, agentSessionId } = params;
 
         try {
           const nxCloudUrl = await getNxCloudUrl(workspacePath);
@@ -723,6 +765,8 @@ function registerAssociatePR(
             authHeaders,
             prUrl,
             branch,
+            plan,
+            agentSessionId,
           });
 
           if (result.success) {
