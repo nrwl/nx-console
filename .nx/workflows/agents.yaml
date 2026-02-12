@@ -32,6 +32,25 @@ common-init-steps: &common-init-steps
         script: npx nx show projects
   - name: Install Browsers
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+  - name: Disk Space Report (Pre-Build)
+    script: |
+      echo "=== DISK SPACE REPORT (PRE-BUILD) ==="
+      echo "--- df -h ---"
+      df -h
+      echo ""
+      echo "--- Large directories in HOME ---"
+      du -sh ~/.gradle 2>/dev/null || echo "~/.gradle not found"
+      du -sh ~/.gradle/caches 2>/dev/null || echo "~/.gradle/caches not found"
+      du -sh ~/.gradle/caches/modules-2 2>/dev/null || echo "~/.gradle/caches/modules-2 not found"
+      du -sh ~/.cache/intellij-platform 2>/dev/null || echo "~/.cache/intellij-platform not found"
+      du -sh ~/.local/share/JetBrains 2>/dev/null || echo "~/.local/share/JetBrains not found"
+      echo ""
+      echo "--- Top-level disk usage ---"
+      du -sh /* 2>/dev/null | sort -rh | head -20
+      echo ""
+      echo "--- Workspace dist directory ---"
+      du -sh dist 2>/dev/null || echo "dist/ not found"
+      echo "=== END DISK SPACE REPORT ==="
 
 launch-templates:
   linux-medium-plus-js:

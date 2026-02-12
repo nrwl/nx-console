@@ -92,10 +92,62 @@ jobs:
       # - name: Run Nx Cloud conformance checks
       #   run: yarn nx-cloud record -- yarn nx-cloud conformance:check
 
+      - name: Disk Space Report (Pre-Build)
+        run: |
+          echo "=== DISK SPACE REPORT (PRE-BUILD) ==="
+          echo "--- df -h ---"
+          df -h
+          echo ""
+          echo "--- Gradle cache ---"
+          du -sh ~/.gradle 2>/dev/null || echo "~/.gradle not found"
+          du -sh ~/.gradle/caches 2>/dev/null || echo "~/.gradle/caches not found"
+          du -sh ~/.gradle/caches/modules-2 2>/dev/null || echo "~/.gradle/caches/modules-2 not found"
+          echo ""
+          echo "--- IntelliJ Platform cache ---"
+          find ~/.cache -maxdepth 3 -name "*intellij*" -o -name "*jetbrains*" -o -name "*idea*" 2>/dev/null | head -20 || true
+          du -sh ~/.cache/intellij-platform 2>/dev/null || echo "~/.cache/intellij-platform not found"
+          echo ""
+          echo "--- Top-level disk usage ---"
+          du -sh /* 2>/dev/null | sort -rh | head -20
+          echo ""
+          echo "--- Workspace dist directory ---"
+          du -sh dist 2>/dev/null || echo "dist/ not found"
+          echo "=== END DISK SPACE REPORT ==="
+
       # todo(cammisuli): disable verifyPlugin for now as its constantly failing on CI
       # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
       - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 60
+
+      - name: Disk Space Report (Post-Build)
+        if: always()
+        run: |
+          echo "=== DISK SPACE REPORT (POST-BUILD) ==="
+          echo "--- df -h ---"
+          df -h
+          echo ""
+          echo "--- Gradle cache ---"
+          du -sh ~/.gradle 2>/dev/null || echo "~/.gradle not found"
+          du -sh ~/.gradle/caches 2>/dev/null || echo "~/.gradle/caches not found"
+          du -sh ~/.gradle/caches/modules-2 2>/dev/null || echo "~/.gradle/caches/modules-2 not found"
+          echo ""
+          echo "--- IntelliJ Platform cache ---"
+          find ~/.cache -maxdepth 3 -name "*intellij*" -o -name "*jetbrains*" -o -name "*idea*" 2>/dev/null | head -20 || true
+          du -sh ~/.cache/intellij-platform 2>/dev/null || echo "~/.cache/intellij-platform not found"
+          echo ""
+          echo "--- Gradle build output ---"
+          du -sh dist/apps/intellij 2>/dev/null || echo "dist/apps/intellij not found"
+          du -sh dist/apps/intellij/* 2>/dev/null || true
+          echo ""
+          echo "--- dist directory breakdown ---"
+          du -sh dist/* 2>/dev/null | sort -rh | head -20 || true
+          echo ""
+          echo "--- Top-level disk usage ---"
+          du -sh /* 2>/dev/null | sort -rh | head -20
+          echo ""
+          echo "--- Large files in Gradle/IntelliJ dirs (>50MB) ---"
+          find ~/.gradle ~/.cache dist -size +50M -exec ls -lh {} \; 2>/dev/null | head -30 || true
+          echo "=== END DISK SPACE REPORT ==="
 
       - run: npx nx-cloud fix-ci
         if: failure()
