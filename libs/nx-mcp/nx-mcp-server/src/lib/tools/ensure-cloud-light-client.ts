@@ -15,16 +15,17 @@ export function getCloudLightClient(
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     cacheDir = require(
       require.resolve('nx/src/devkit-exports', {
-        paths: [`${workspacePath}/node_modules`],
+        paths: [workspacePath],
       }),
     ).cacheDir;
   } catch (e: any) {
-    if (process.env.NX_VERBOSE_LOGGING === 'true') {
-      logger.log(`Could not read cache directory: ${e.message}`);
-    }
-    return null;
+    logger.log(
+      `Could not load cacheDir from nx devkit-exports, falling back to default: ${e.message}`,
+    );
+    cacheDir = join(workspacePath, '.nx', 'cache');
   }
 
+  logger.log(`Using cloud client cache directory: ${cacheDir}`);
   const cloudLocation = join(cacheDir, 'cloud');
   let lightClientBundle;
   try {
@@ -82,15 +83,32 @@ async function resolveCloudLightClient(
   if (!client) {
     logger.log('Cloud client bundle not found. Attempting to download...');
     try {
-      await execAsync('npx nx@latest download-cloud-client', {
-        cwd: workspacePath,
-        timeout: 60000,
-      });
+      const { stdout, stderr } = await execAsync(
+        'npx nx@latest download-cloud-client',
+        {
+          cwd: workspacePath,
+          timeout: 60000,
+        },
+      );
+      if (stdout) {
+        logger.log(`download-cloud-client stdout: ${stdout.trim()}`);
+      }
+      if (stderr) {
+        logger.log(`download-cloud-client stderr: ${stderr.trim()}`);
+      }
       client = getCloudLightClient(logger, workspacePath);
       if (client) {
         logger.log('Cloud client bundle downloaded successfully');
       }
     } catch (e: any) {
+      const stdout = e.stdout?.trim();
+      const stderr = e.stderr?.trim();
+      if (stdout) {
+        logger.log(`download-cloud-client stdout: ${stdout}`);
+      }
+      if (stderr) {
+        logger.log(`download-cloud-client stderr: ${stderr}`);
+      }
       logger.log(`Failed to download cloud client: ${e.message}`);
     }
   }
