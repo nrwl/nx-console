@@ -7,7 +7,9 @@
     "build": {
       "command": "npx tailwindcss -i dist/apps/generate-ui-v2/tailwind.css -o dist/apps/generate-ui-v2/output.css -c apps/generate-ui-v2/tailwind.config.js",
       "dependsOn": ["extract-dependencies"],
-      "outputs": ["{workspaceRoot}/dist/apps/generate-ui-v2"]
+      "outputs": ["{workspaceRoot}/dist/apps/generate-ui-v2"],
+      "inputs": ["production", "^production"],
+      "cache": true
     },
     "extract-dependencies": {
       "command": "node ./tools/scripts/copy-generate-ui-deps.mjs dist/apps/generate-ui-v2",

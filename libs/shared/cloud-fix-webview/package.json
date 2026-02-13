@@ -12,7 +12,9 @@
         "dependsOn": [
           "_build",
           "build-css"
-        ]
+        ],
+        "inputs": ["production", "^production"],
+        "cache": true
       },
       "_build": {
         "executor": "@nx/esbuild:esbuild",
