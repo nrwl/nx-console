@@ -59,33 +59,43 @@ export async function getGitDiffs(
     return null;
   }
 
-  const branchName = repo.state.HEAD?.name;
-  if (!branchName) {
+  try {
+    const branchName = repo.state.HEAD?.name;
+    if (!branchName) {
+      return null;
+    }
+
+    const baseBranchName = (await repo.getBranchBase(branchName))?.name;
+    if (!baseSha && !baseBranchName) {
+      return null;
+    }
+    const base = baseSha ?? (await repo.getCommit(baseBranchName!)).hash;
+    const head = headSha ?? (await repo.getCommit(branchName)).hash;
+
+    const changedFiles = (await repo.diffBetween(base, head)).map(
+      (changedFile) => {
+        return {
+          value: changedFile.uri,
+        };
+      },
+    );
+
+    const fileDiffs = await Promise.all(
+      changedFiles.map(async (file) => {
+        const fileDiff = await repo.diffBetween(
+          base,
+          head,
+          file.value.fsPath,
+        );
+        return {
+          path: file.value.fsPath,
+          diffContent: fileDiff,
+        };
+      }),
+    );
+
+    return fileDiffs.filter((fileDiff) => fileDiff !== null);
+  } catch {
     return null;
   }
-
-  const base =
-    baseSha ??
-    (await repo.getCommit((await repo.getBranchBase(branchName))?.name)).hash;
-  const head = headSha ?? (await repo.getCommit(branchName)).hash;
-
-  const changedFiles = (await repo.diffBetween(base, head)).map(
-    (changedFile) => {
-      return {
-        value: changedFile.uri,
-      };
-    },
-  );
-
-  const fileDiffs = await Promise.all(
-    changedFiles.map(async (file) => {
-      const fileDiff = await repo.diffBetween(base, head, file.value.fsPath);
-      return {
-        path: file.value.fsPath,
-        diffContent: fileDiff,
-      };
-    }),
-  );
-
-  return fileDiffs.filter((fileDiff) => fileDiff !== null);
 }
