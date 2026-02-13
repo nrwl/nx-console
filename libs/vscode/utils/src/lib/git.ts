@@ -66,11 +66,7 @@ export async function getGitDiffs(
 
   const base =
     baseSha ??
-    (
-      await repo.getCommit(
-        (await repo.getBranchBase(branchName))?.name,
-      )
-    ).hash;
+    (await repo.getCommit((await repo.getBranchBase(branchName))?.name)).hash;
   const head = headSha ?? (await repo.getCommit(branchName)).hash;
 
   const changedFiles = (await repo.diffBetween(base, head)).map(
