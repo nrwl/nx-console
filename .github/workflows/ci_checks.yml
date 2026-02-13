@@ -59,16 +59,16 @@ jobs:
           yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION"
 
       - name: Gradle Wrapper Validation
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v5
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: zulu
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-home-cache-excludes: |
             caches/*/transforms
@@ -143,10 +143,10 @@ jobs:
   #       run: yarn install --immutable
 
   #     - name: Gradle Wrapper Validation
-  #       uses: gradle/actions/wrapper-validation@v3
+  #       uses: gradle/actions/wrapper-validation@v5
 
   #     - name: Setup Java
-  #       uses: actions/setup-java@v3
+  #       uses: actions/setup-java@v4
   #       with:
   #         distribution: zulu
   #         java-version: ${{ env.JAVA_VERSION }}
