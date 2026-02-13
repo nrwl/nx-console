@@ -1,3 +1,9 @@
+const mockExecAsync = jest.fn();
+
+jest.mock('util', () => ({
+  promisify: jest.fn(() => mockExecAsync),
+}));
+
 jest.mock('child_process', () => ({
   exec: jest.fn(),
 }));
@@ -7,14 +13,11 @@ jest.mock('fs', () => ({
   statSync: jest.fn(),
 }));
 
-import { exec } from 'child_process';
 import {
   ensureCloudLightClient,
   resetCachedClient,
   RETRY_COOLDOWN_MS,
 } from './ensure-cloud-light-client';
-
-const mockExec = jest.mocked(exec);
 
 const mockLogger = {
   log: jest.fn(),
@@ -22,14 +25,7 @@ const mockLogger = {
 };
 
 function setupDownloadFailure() {
-  mockExec.mockImplementation((_cmd, _opts, callback) => {
-    if (typeof _opts === 'function') {
-      _opts(new Error('download failed'), '', '');
-    } else if (typeof callback === 'function') {
-      callback(new Error('download failed'), '', '');
-    }
-    return undefined as any;
-  });
+  mockExecAsync.mockRejectedValue(new Error('download failed'));
 }
 
 describe('ensureCloudLightClient', () => {
@@ -62,13 +58,12 @@ describe('ensureCloudLightClient', () => {
 
     await ensureCloudLightClient(mockLogger as any, '/fake/workspace');
 
-    expect(mockExec).toHaveBeenCalledWith(
+    expect(mockExecAsync).toHaveBeenCalledWith(
       'npx nx@latest download-cloud-client',
       expect.objectContaining({
         cwd: '/fake/workspace',
         timeout: 60000,
       }),
-      expect.any(Function),
     );
   });
 
@@ -82,7 +77,7 @@ describe('ensureCloudLightClient', () => {
 
     expect(result1).toBeNull();
     expect(result2).toBeNull();
-    expect(mockExec).toHaveBeenCalledTimes(1);
+    expect(mockExecAsync).toHaveBeenCalledTimes(1);
   });
 
   it('should not retry during cooldown period after failure', async () => {
@@ -96,7 +91,7 @@ describe('ensureCloudLightClient', () => {
     );
 
     expect(result).toBeNull();
-    expect(mockExec).toHaveBeenCalledTimes(1);
+    expect(mockExecAsync).toHaveBeenCalledTimes(1);
   });
 
   it('should retry after cooldown period expires', async () => {
@@ -113,7 +108,7 @@ describe('ensureCloudLightClient', () => {
     resetCachedClient();
     await ensureCloudLightClient(mockLogger as any, '/fake/workspace');
 
-    expect(mockExec).toHaveBeenCalledTimes(2);
+    expect(mockExecAsync).toHaveBeenCalledTimes(2);
   });
 
   it('should reset cache when resetCachedClient is called', async () => {
@@ -123,6 +118,6 @@ describe('ensureCloudLightClient', () => {
     resetCachedClient();
     await ensureCloudLightClient(mockLogger as any, '/fake/workspace');
 
-    expect(mockExec).toHaveBeenCalledTimes(2);
+    expect(mockExecAsync).toHaveBeenCalledTimes(2);
   });
 });
