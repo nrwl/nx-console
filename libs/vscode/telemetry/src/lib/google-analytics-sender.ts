@@ -72,14 +72,13 @@ export class GoogleAnalyticsSender implements TelemetrySender {
 
     vscodeLogger.log(`Uncaught Exception: ${error}`);
 
-    const shouldLogToRollbar = this.production
-      ? Math.floor(Math.random() * 5) === 0
-      : true;
-    if (shouldLogToRollbar) {
-      this.rollbar.error(error);
-    }
     // there is a special case of error that we handle but still want to get more details on in rollbar - don't track those in GA
+    // disabled for now while we evaluate rollbar signal
     if (error.message.startsWith('AIFAIL')) {
+      // eslint-disable-next-line no-constant-condition
+      if (false) {
+        this.rollbar.error(error);
+      }
       return;
     }
 
@@ -87,6 +86,13 @@ export class GoogleAnalyticsSender implements TelemetrySender {
     if (knownErrorEvent) {
       this.sendEventData(knownErrorEvent, data);
       return;
+    }
+
+    const shouldLogToRollbar = this.production
+      ? Math.floor(Math.random() * 2) === 0
+      : true;
+    if (shouldLogToRollbar) {
+      this.rollbar.error(error);
     }
 
     this.sendEventData('misc.exception', {
