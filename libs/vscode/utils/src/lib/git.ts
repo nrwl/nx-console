@@ -82,11 +82,7 @@ export async function getGitDiffs(
 
     const fileDiffs = await Promise.all(
       changedFiles.map(async (file) => {
-        const fileDiff = await repo.diffBetween(
-          base,
-          head,
-          file.value.fsPath,
-        );
+        const fileDiff = await repo.diffBetween(base, head, file.value.fsPath);
         return {
           path: file.value.fsPath,
           diffContent: fileDiff,
