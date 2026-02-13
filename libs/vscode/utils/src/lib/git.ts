@@ -24,7 +24,7 @@ export async function getGitBranch(): Promise<string | undefined> {
   if (!repo) {
     return undefined;
   }
-  return repo.state.HEAD.name;
+  return repo.state.HEAD?.name;
 }
 
 export async function getGitHasUncommittedChanges(): Promise<boolean> {
@@ -59,32 +59,39 @@ export async function getGitDiffs(
     return null;
   }
 
-  const base =
-    baseSha ??
-    (
-      await repo.getCommit(
-        (await repo.getBranchBase(repo.state.HEAD.name))?.name,
-      )
-    ).hash;
-  const head = headSha ?? (await repo.getCommit(repo.state.HEAD.name)).hash;
+  try {
+    const branchName = repo.state.HEAD?.name;
+    if (!branchName) {
+      return null;
+    }
 
-  const changedFiles = (await repo.diffBetween(base, head)).map(
-    (changedFile) => {
-      return {
-        value: changedFile.uri,
-      };
-    },
-  );
+    const baseBranchName = (await repo.getBranchBase(branchName))?.name;
+    if (!baseSha && !baseBranchName) {
+      return null;
+    }
+    const base = baseSha ?? (await repo.getCommit(baseBranchName!)).hash;
+    const head = headSha ?? (await repo.getCommit(branchName)).hash;
 
-  const fileDiffs = await Promise.all(
-    changedFiles.map(async (file) => {
-      const fileDiff = await repo.diffBetween(base, head, file.value.fsPath);
-      return {
-        path: file.value.fsPath,
-        diffContent: fileDiff,
-      };
-    }),
-  );
+    const changedFiles = (await repo.diffBetween(base, head)).map(
+      (changedFile) => {
+        return {
+          value: changedFile.uri,
+        };
+      },
+    );
 
-  return fileDiffs.filter((fileDiff) => fileDiff !== null);
+    const fileDiffs = await Promise.all(
+      changedFiles.map(async (file) => {
+        const fileDiff = await repo.diffBetween(base, head, file.value.fsPath);
+        return {
+          path: file.value.fsPath,
+          diffContent: fileDiff,
+        };
+      }),
+    );
+
+    return fileDiffs.filter((fileDiff) => fileDiff !== null);
+  } catch {
+    return null;
+  }
 }
