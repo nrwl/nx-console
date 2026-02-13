@@ -1,3 +1,16 @@
+# [18.88.0](https://github.com/nrwl/nx-console/compare/vscode-v18.87.0...vscode-v18.88.0) (2026-02-13)
+
+
+### Bug Fixes
+
+* **mcp:** fix incorrect tool description. use resume instead of continue ([#3040](https://github.com/nrwl/nx-console/issues/3040)) ([1bba712](https://github.com/nrwl/nx-console/commit/1bba71272b56aa71dd973b71628a9f12d1df0b90))
+* **vscode:** handle nullable git HEAD ([#3042](https://github.com/nrwl/nx-console/issues/3042)) ([a811452](https://github.com/nrwl/nx-console/commit/a811452c7b910dfe52702ca4d076db2b5c5b4d90))
+
+
+### Features
+
+* **nx-mcp:** auto-install cloud client bundle for polygraph tools ([#3041](https://github.com/nrwl/nx-console/issues/3041)) ([a65bfb7](https://github.com/nrwl/nx-console/commit/a65bfb7e2ce290aa469d0cdeebc836a1c1e7db23))
+
 # [18.87.0](https://github.com/nrwl/nx-console/compare/vscode-v18.86.0...vscode-v18.87.0) (2026-02-12)
 
 
