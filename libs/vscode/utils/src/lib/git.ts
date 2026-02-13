@@ -24,7 +24,7 @@ export async function getGitBranch(): Promise<string | undefined> {
   if (!repo) {
     return undefined;
   }
-  return repo.state.HEAD.name;
+  return repo.state.HEAD?.name;
 }
 
 export async function getGitHasUncommittedChanges(): Promise<boolean> {
@@ -59,14 +59,19 @@ export async function getGitDiffs(
     return null;
   }
 
+  const branchName = repo.state.HEAD?.name;
+  if (!branchName) {
+    return null;
+  }
+
   const base =
     baseSha ??
     (
       await repo.getCommit(
-        (await repo.getBranchBase(repo.state.HEAD.name))?.name,
+        (await repo.getBranchBase(branchName))?.name,
       )
     ).hash;
-  const head = headSha ?? (await repo.getCommit(repo.state.HEAD.name)).hash;
+  const head = headSha ?? (await repo.getCommit(branchName)).hash;
 
   const changedFiles = (await repo.diffBetween(base, head)).map(
     (changedFile) => {
