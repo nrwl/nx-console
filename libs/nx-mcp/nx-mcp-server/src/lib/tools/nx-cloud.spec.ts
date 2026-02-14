@@ -60,6 +60,8 @@ describe('formatCIInformationOverview', () => {
       confidence: 0.85,
       confidenceReasoning:
         'High confidence because the fix directly addresses the reported error',
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -147,6 +149,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: true,
       confidence: 0.85,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -188,6 +192,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -220,6 +226,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -255,6 +263,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -285,6 +295,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -315,6 +327,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -353,6 +367,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -395,6 +411,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -431,6 +449,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -532,6 +552,8 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: true,
       confidence: 0.85,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -575,6 +597,8 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -625,6 +649,8 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 

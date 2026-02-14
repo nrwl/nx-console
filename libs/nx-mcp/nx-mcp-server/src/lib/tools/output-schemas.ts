@@ -52,6 +52,8 @@ export interface CIInformationOutput {
   couldAutoApplyTasks: boolean | null;
   confidence: number | null;
   confidenceReasoning: string | null;
+  selfHealingSkippedReason: string | null;
+  selfHealingSkipMessage: string | null;
   error: string | null;
   hints?: string[];
   [key: string]: unknown;
@@ -153,6 +155,8 @@ export const ciInformationOutputSchema = {
     couldAutoApplyTasks: { type: ['boolean', 'null'] },
     confidence: { type: ['number', 'null'] },
     confidenceReasoning: { type: ['string', 'null'] },
+    selfHealingSkippedReason: { type: ['string', 'null'] },
+    selfHealingSkipMessage: { type: ['string', 'null'] },
     error: { type: ['string', 'null'] },
     hints: { type: 'array', items: { type: 'string' } },
   },
