@@ -26,6 +26,11 @@ export type CIPEInfo = {
   authorAvatarUrl?: string | null;
   cipeUrl: string;
   runGroups: CIPERunGroup[];
+  selfHealingSkipInfo?: {
+    reason: string;
+    message: string;
+    recordedAt: string;
+  } | null;
 };
 
 export type NxAiFix = {
