@@ -1,7 +1,8 @@
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
+import { Logger, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { nxCloudRequest } from './nx-cloud-request';
 
 export interface PipelineExecutionSearchRequest {
   branches?: string[];
@@ -91,7 +92,7 @@ export async function getPipelineExecutionsSearch(
 
   logger.log(`Making pipeline executions search request`);
   try {
-    const response = await httpRequest({
+    const response = await nxCloudRequest('PIPELINE_EXECUTIONS_SEARCH', {
       type: 'POST',
       url,
       headers,

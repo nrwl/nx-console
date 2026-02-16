@@ -2,9 +2,10 @@ import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { execSync } from 'child_process';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
+import { Logger, HttpError } from '@nx-console/shared-utils';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { nxCloudRequest } from './nx-cloud-request';
 
 const CACHE_TTL_MS = 5000; // 5 seconds
 
@@ -69,7 +70,7 @@ export async function getRecentCIPEData(
 
   logger.log(`Making recent CIPE request`);
   try {
-    const response = await httpRequest({
+    const response = await nxCloudRequest('RECENT_CIPES', {
       type: 'POST',
       url,
       headers,

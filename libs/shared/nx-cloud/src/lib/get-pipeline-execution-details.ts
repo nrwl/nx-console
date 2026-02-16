@@ -1,8 +1,9 @@
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
+import { Logger, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 import { Result } from './result';
+import { nxCloudRequest } from './nx-cloud-request';
 
 export interface AgentMetadataSummary {
   launchTemplate?: string;
@@ -117,7 +118,7 @@ export async function getPipelineExecutionDetails(
     `Making pipeline execution details request for ID: ${pipelineExecutionId}`,
   );
   try {
-    const response = await httpRequest({
+    const response = await nxCloudRequest('PIPELINE_EXECUTION_DETAILS', {
       type: 'GET',
       url,
       headers,

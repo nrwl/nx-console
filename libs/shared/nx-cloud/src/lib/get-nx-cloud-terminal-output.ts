@@ -4,26 +4,35 @@ import { extract } from 'tar-stream';
 import * as zlib from 'zlib';
 
 import { Logger } from '@nx-console/shared-utils';
+import { sanitizeNxCloudError } from './nx-cloud-request';
 
 export async function downloadAndExtractArtifact(
   artifactUrl: string,
   logger: Logger,
 ): Promise<string> {
-  const response = await fetch(artifactUrl, {
-    method: 'GET',
-    headers: {
-      Accept: '*/*',
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(artifactUrl, {
+      method: 'GET',
+      headers: {
+        Accept: '*/*',
+      },
+    });
+  } catch (e) {
+    sanitizeNxCloudError(e, artifactUrl, 'ARTIFACT_DOWNLOAD');
+    throw e;
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
     logger.log(
       `Failed to download artifact: ${response.status} - ${errorText}`,
     );
-    throw new Error(
+    const error = new Error(
       `Failed to download artifact: ${response.status} - ${errorText}`,
     );
+    sanitizeNxCloudError(error, artifactUrl, 'ARTIFACT_DOWNLOAD');
+    throw error;
   }
 
   const arrayBuffer = await response.arrayBuffer();
