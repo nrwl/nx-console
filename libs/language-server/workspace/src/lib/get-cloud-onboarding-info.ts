@@ -9,8 +9,8 @@ import {
   getNxCloudConfigIni,
   getNxCloudId,
   getNxCloudUrl,
+  nxCloudRequest,
 } from '@nx-console/shared-nx-cloud';
-import { httpRequest } from '@nx-console/shared-utils';
 
 export async function getCloudOnboardingInfo(
   workspacePath: string,
@@ -156,7 +156,7 @@ async function getNxCloudWorkspaceClaimed(
     lastRequestTime = Date.now();
     lastRequestHash = requestHash;
 
-    const response = await httpRequest({
+    const response = await nxCloudRequest('IS_WORKSPACE_CLAIMED', {
       type: 'POST',
       url,
       headers,
@@ -166,9 +166,7 @@ async function getNxCloudWorkspaceClaimed(
     lastRequestResult = JSON.parse(response.responseText);
     return lastRequestResult;
   } catch (error) {
-    lspLogger.log(
-      `Error from ${nxCloudUrl}/nx-cloud/is-workspace-claimed: ${JSON.stringify(error)}`,
-    );
+    lspLogger.log(`Error from is-workspace-claimed: ${JSON.stringify(error)}`);
     lastRequestResult = undefined;
     return undefined;
   }

@@ -63,6 +63,24 @@ export async function getAvailableNxPlugins(
       community: communityPlugins,
     };
   } catch (error) {
+    if (error instanceof Error) {
+      const githubOrigin = 'https://raw.githubusercontent.com';
+      if (error.message) {
+        error.message = error.message.replaceAll(
+          githubOrigin,
+          '{GITHUB_RAW_URL}',
+        );
+      }
+      if (error.stack) {
+        error.stack = error.stack.replaceAll(githubOrigin, '{GITHUB_RAW_URL}');
+      }
+      if (error instanceof HttpError && error.responseText) {
+        error.responseText = error.responseText.replaceAll(
+          githubOrigin,
+          '{GITHUB_RAW_URL}',
+        );
+      }
+    }
     if (error instanceof HttpError) {
       return Promise.reject(error.responseText);
     }

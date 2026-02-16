@@ -1,7 +1,8 @@
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
+import { Logger, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { nxCloudRequest } from './nx-cloud-request';
 
 export interface RetrieveFixDiffResponse {
   branch: string | null;
@@ -63,7 +64,7 @@ export async function retrieveFixDiff(
 
   logger.log(`Making retrieve-fix-diff request`);
   try {
-    const response = await httpRequest({
+    const response = await nxCloudRequest('RETRIEVE_FIX_DIFF', {
       type: 'POST',
       url,
       headers,

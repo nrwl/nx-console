@@ -15,3 +15,4 @@ export * from './lib/get-self-healing-fix';
 export * from './lib/update-suggested-fix';
 export * from './lib/parse-nx-cloud-url';
 export * from './lib/result';
+export * from './lib/nx-cloud-request';

@@ -1,7 +1,8 @@
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
+import { Logger, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { nxCloudRequest } from './nx-cloud-request';
 
 export interface DateValue {
   date: string;
@@ -83,7 +84,7 @@ export async function getTasksDetailsSearch(
 
   logger.log(`Making tasks details search request`);
   try {
-    const response = await httpRequest({
+    const response = await nxCloudRequest('TASKS_DETAILS_SEARCH', {
       type: 'POST',
       url,
       headers,
