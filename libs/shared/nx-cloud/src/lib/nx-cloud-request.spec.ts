@@ -31,11 +31,7 @@ describe('sanitizeNxCloudError', () => {
   });
 
   it('should sanitize HttpError.responseText', () => {
-    const error = new HttpError(
-      406,
-      `Not acceptable for ${requestUrl}`,
-      {},
-    );
+    const error = new HttpError(406, `Not acceptable for ${requestUrl}`, {});
     sanitizeNxCloudError(error, requestUrl, 'RUN_DETAILS');
     expect(error.responseText).toBe('Not acceptable for {RUN_DETAILS}');
     expect(error.responseText).not.toContain(origin);
