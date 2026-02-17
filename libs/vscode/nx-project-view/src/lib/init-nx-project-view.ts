@@ -17,10 +17,12 @@ import { AtomizerDecorationProvider } from './atomizer-decorations';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import { NxTreeItem } from './nx-tree-item';
 import { ProjectGraphErrorDecorationProvider } from './project-graph-error-decorations';
+import { ProjectsViewManager } from './projects-view-manager';
 
 export function initNxProjectView(
   context: ExtensionContext,
 ): NxProjectTreeProvider {
+  vscodeLogger.log('[debug-view] initNxProjectView called');
   const nxProjectsTreeProvider = new NxProjectTreeProvider(context);
   const nxProjectTreeView = window.createTreeView('nxProjects', {
     treeDataProvider: nxProjectsTreeProvider,
@@ -28,6 +30,10 @@ export function initNxProjectView(
   });
 
   context.subscriptions.push(nxProjectTreeView);
+
+  vscodeLogger.log('[debug-view] creating ProjectsViewManager');
+  const viewManager = new ProjectsViewManager(context, nxProjectsTreeProvider);
+  context.subscriptions.push(viewManager);
   context.subscriptions.push(
     commands.registerCommand(
       'nxConsole.showProjectConfiguration',

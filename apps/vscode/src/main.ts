@@ -280,7 +280,11 @@ async function setWorkspace(workspacePath: string) {
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
+  vscodeLogger.log('[debug-view] before checkIsNxWorkspace');
   isNxWorkspace = await checkIsNxWorkspace(workspacePath);
+  vscodeLogger.log(
+    `[debug-view] checkIsNxWorkspace returned: ${isNxWorkspace}`,
+  );
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
   if (
@@ -327,7 +331,11 @@ async function setWorkspace(workspacePath: string) {
     'isAngularWorkspace',
     isAngularWorkspace,
   );
+  vscodeLogger.log(
+    `[debug-view] setting isNxWorkspace context to: ${isNxWorkspace}`,
+  );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
+  commands.executeCommand('setContext', 'nxConsole.workspaceDetected', true);
 
   initNxConversion(context, isAngularWorkspace, isNxWorkspace);
   await initMessagingServer(context, workspacePath);

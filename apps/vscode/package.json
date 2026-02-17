@@ -964,13 +964,28 @@
       },
       {
         "view": "nxProjects",
-        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs).\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators?utm_source=nxconsole) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration?utm_source=nxconsole).",
-        "when": "!nxConsole.hasWorkspaceErrors"
+        "contents": "Loading Nx workspace...",
+        "when": "!nxProjectsView.state || nxProjectsView.state == loading"
       },
       {
         "view": "nxProjects",
-        "contents": "Nx caught one or more errors while computing your project graph. \n [View Errors](command:workbench.actions.view.problems)\n If the problems persist, you can try running `nx reset` to clear all caches and then [refresh the workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs) and refer to the [Nx Troubleshooting Guide](https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole) and the [Nx Console Troubleshooting Guide](https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole).",
-        "when": "nxConsole.hasWorkspaceErrors"
+        "contents": "Failed to initialize the Nx Language Server.\n\n[View Logs](command:nxConsole.showNxlsLogs)\n[Refresh Workspace](command:nxConsole.refreshWorkspace)",
+        "when": "nxProjectsView.state == init-failed"
+      },
+      {
+        "view": "nxProjects",
+        "contents": "No Nx workspace found.\n\nMake sure you have a valid nx.json file.\n\n[Refresh Workspace](command:nxConsole.refreshWorkspace)",
+        "when": "nxProjectsView.state == no-workspace"
+      },
+      {
+        "view": "nxProjects",
+        "contents": "Nx caught errors while computing your project graph.\n\n[View Errors](command:workbench.actions.view.problems)\n[Refresh Workspace](command:nxConsole.refreshWorkspace)\n[View Logs](command:nxConsole.showNxlsLogs)",
+        "when": "nxProjectsView.state == errors"
+      },
+      {
+        "view": "nxProjects",
+        "contents": "No projects found in this workspace.\n\n[Refresh Workspace](command:nxConsole.refreshWorkspace)\n\n[Use generators](https://nx.dev/plugin-features/use-code-generators) to scaffold new projects.",
+        "when": "nxProjectsView.state == no-projects"
       },
       {
         "view": "nxCloudRecentCIPE",
@@ -1051,7 +1066,7 @@
         {
           "id": "nxConsole.views.welcome",
           "name": "Welcome to Nx Console",
-          "when": "!isNxWorkspace && !isAngularWorkspace",
+          "when": "nxConsole.workspaceDetected && !isNxWorkspace && !isAngularWorkspace",
           "contextualTitle": "Nx Console - Getting Started",
           "icon": "tree-view-icon.svg",
           "visibility": "visible"
@@ -1067,7 +1082,7 @@
         {
           "id": "nxProjects",
           "name": "Projects",
-          "when": "isNxWorkspace",
+          "when": "isNxWorkspace || !nxConsole.workspaceDetected",
           "visibility": "visible"
         },
         {
