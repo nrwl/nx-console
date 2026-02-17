@@ -1,3 +1,10 @@
+# [18.89.0](https://github.com/nrwl/nx-console/compare/vscode-v18.88.0...vscode-v18.89.0) (2026-02-17)
+
+
+### Features
+
+* **vscode:** enhance detection for nx skills for cursor & re-add old rule file cleanup ([#3054](https://github.com/nrwl/nx-console/issues/3054)) ([1fbe81e](https://github.com/nrwl/nx-console/commit/1fbe81ef34ac1f0e3343ad494175541c35b46427))
+
 # [18.88.0](https://github.com/nrwl/nx-console/compare/vscode-v18.87.0...vscode-v18.88.0) (2026-02-13)
 
 
