@@ -67,6 +67,41 @@ describe('loadNxMcpConfig', () => {
     expect(loadNxMcpConfig('/workspace')).toEqual({ minimal: true });
   });
 
+  it('should parse JSONC with single-line comments', () => {
+    mockedReadFileSync.mockReturnValue(`{
+      // enable minimal mode
+      "minimal": true,
+      "transport": "sse" // use server-sent events
+    }`);
+    expect(loadNxMcpConfig('/workspace')).toEqual({
+      minimal: true,
+      transport: 'sse',
+    });
+  });
+
+  it('should parse JSONC with block comments', () => {
+    mockedReadFileSync.mockReturnValue(`{
+      /* debugging options */
+      "debugLogs": true,
+      "port": 9922
+    }`);
+    expect(loadNxMcpConfig('/workspace')).toEqual({
+      debugLogs: true,
+      port: 9922,
+    });
+  });
+
+  it('should parse JSONC with trailing commas', () => {
+    mockedReadFileSync.mockReturnValue(`{
+      "minimal": true,
+      "tools": ["nx_docs", "!cloud_*",],
+    }`);
+    expect(loadNxMcpConfig('/workspace')).toEqual({
+      minimal: true,
+      tools: ['nx_docs', '!cloud_*'],
+    });
+  });
+
   it('should read from correct path', () => {
     mockedReadFileSync.mockReturnValue('{}');
     loadNxMcpConfig('/my/workspace');

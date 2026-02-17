@@ -204,10 +204,10 @@ function cleanupOldRulesFiles() {
           'Migrate',
           "Don't ask again",
         )
-        .then((selection) => {
+        .then(async (selection) => {
           if (selection === 'Migrate') {
             removeFiles();
-            runConfigureAiAgentsCommand();
+            await runConfigureAiAgentsCommand();
           } else if (selection === "Don't ask again") {
             WorkspaceConfigurationStore.instance.set(
               'oldRulesCleanupDontAskAgain',
