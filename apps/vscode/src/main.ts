@@ -131,6 +131,15 @@ export async function activate(c: ExtensionContext) {
       }
     }
 
+    if (!isNxWorkspace) {
+      commands.executeCommand('setContext', 'isNxWorkspace', false);
+      commands.executeCommand(
+        'setContext',
+        'nxConsole.workspaceDetected',
+        true,
+      );
+    }
+
     context.subscriptions.push(manuallySelectWorkspaceDefinitionCommand);
     await registerSettingsNxWorkspacePathWatcher();
 
