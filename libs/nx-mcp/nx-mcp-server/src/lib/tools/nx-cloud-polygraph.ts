@@ -790,7 +790,7 @@ function registerCandidates(
       name: CLOUD_POLYGRAPH_CANDIDATES,
       description:
         'Discover candidate workspaces for a Polygraph session. Returns the initiator workspace and all connected workspaces with their descriptions and dependency graph relationships (distance, direction, path). Use this before cloud_polygraph_init to understand which repositories are available and optionally select a subset via selectedWorkspaceIds.',
-      inputSchema: {},
+      inputSchema: undefined,
       annotations: {
         destructiveHint: false,
         readOnlyHint: true,
