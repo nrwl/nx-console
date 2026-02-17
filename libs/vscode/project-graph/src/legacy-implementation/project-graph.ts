@@ -179,7 +179,7 @@ async function openProjectWithFile(
     }
     const { projectGraph } = nxWorkspace;
 
-    const projectNames = Object.keys(projectGraph.nodes);
+    const projectNames = Object.keys(projectGraph?.nodes ?? {});
 
     if (projectNames.length === 0) {
       showNoProjectsMessage(true);

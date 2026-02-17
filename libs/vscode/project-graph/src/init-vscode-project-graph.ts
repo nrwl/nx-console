@@ -109,6 +109,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         getTelemetry().logUsage('graph.focus-project', {
           source: 'projects-view',
         });
+        if (!treeItem) {
+          return;
+        }
         const nxVersion = await getNxVersion();
         if (!nxVersion) {
           showNoNxVersionMessage();
@@ -189,6 +192,9 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
         getTelemetry().logUsage('graph.show-task', {
           source: 'projects-view',
         });
+        if (!item) {
+          return;
+        }
         const nxVersion = await getNxVersion();
         if (!nxVersion) {
           showNoNxVersionMessage();
