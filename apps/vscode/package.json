@@ -979,6 +979,11 @@
       },
       {
         "view": "nxProjects",
+        "contents": "Dependencies are not installed.\n\nRun your package manager's install command (e.g. `npm install`) to install dependencies.\n\n[Refresh Workspace](command:nxConsole.refreshWorkspace)",
+        "when": "nxProjectsView.state == no-dependencies"
+      },
+      {
+        "view": "nxProjects",
         "contents": "Nx caught errors while computing your project graph.\n\n[View Errors](command:workbench.actions.view.problems)\n[Refresh Workspace](command:nxConsole.refreshWorkspace)\n[View Logs](command:nxConsole.showNxlsLogs)",
         "when": "nxProjectsView.state == errors"
       },

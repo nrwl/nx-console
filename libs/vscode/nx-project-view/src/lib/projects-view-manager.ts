@@ -1,17 +1,20 @@
-import { NxWorkspace } from '@nx-console/shared-types';
 import {
   getNxlsState,
   onNxlsStateChange,
   onWorkspaceRefreshed,
 } from '@nx-console/vscode-lsp-client';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import { commands, Disposable, ExtensionContext } from 'vscode';
-import { createActor, fromPromise, waitFor } from 'xstate';
+import { createActor, fromPromise } from 'xstate';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import {
   projectsViewMachine,
   ProjectsViewState,
+  WorkspaceLoadResult,
 } from './projects-view-state-machine';
 
 export class ProjectsViewManager implements Disposable {
@@ -29,8 +32,23 @@ export class ProjectsViewManager implements Disposable {
             return this.waitForNxlsRunning();
           }),
           loadWorkspaceData: fromPromise(
-            async (): Promise<NxWorkspace | undefined> => {
-              return await getNxWorkspace();
+            async (): Promise<WorkspaceLoadResult> => {
+              const workspace = await getNxWorkspace();
+              const workspacePath = getNxWorkspacePath();
+              const hasDependencies =
+                existsSync(join(workspacePath, 'node_modules', 'nx')) ||
+                existsSync(
+                  join(
+                    workspacePath,
+                    '.nx',
+                    'installation',
+                    'node_modules',
+                    'nx',
+                  ),
+                ) ||
+                existsSync(join(workspacePath, '.pnp.cjs')) ||
+                existsSync(join(workspacePath, '.pnp.js'));
+              return { workspace, hasDependencies };
             },
           ),
         },
@@ -42,8 +60,13 @@ export class ProjectsViewManager implements Disposable {
               'nxProjectsView.state',
               params.state,
             );
+            if (params.state !== 'ready') {
+              this.treeProvider.setEnabled(false);
+              this.treeProvider.refresh();
+            }
           },
           refreshTreeView: () => {
+            this.treeProvider.setEnabled(true);
             this.treeProvider.refresh();
           },
         },

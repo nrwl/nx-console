@@ -5,9 +5,15 @@ export type ProjectsViewState =
   | 'loading'
   | 'init-failed'
   | 'no-workspace'
+  | 'no-dependencies'
   | 'errors'
   | 'no-projects'
   | 'ready';
+
+export type WorkspaceLoadResult = {
+  workspace: NxWorkspace | undefined;
+  hasDependencies: boolean;
+};
 
 export const projectsViewMachine = setup({
   types: {
@@ -21,11 +27,9 @@ export const projectsViewMachine = setup({
     waitForNxls: fromPromise(async () => {
       return;
     }),
-    loadWorkspaceData: fromPromise(
-      async (): Promise<NxWorkspace | undefined> => {
-        return undefined;
-      },
-    ),
+    loadWorkspaceData: fromPromise(async (): Promise<WorkspaceLoadResult> => {
+      return { workspace: undefined, hasDependencies: true };
+    }),
   },
   actions: {
     setViewContext: (_: unknown, params: { state: ProjectsViewState }) => {
@@ -40,7 +44,8 @@ export const projectsViewMachine = setup({
       hasPartialErrors: false,
     })),
     assignWorkspaceData: assign(({ event }) => {
-      const workspace = (event as { output?: NxWorkspace }).output;
+      const workspace = (event as { output?: WorkspaceLoadResult }).output
+        ?.workspace;
       return {
         workspaceErrors: workspace?.errors,
         hasPartialErrors:
@@ -49,7 +54,8 @@ export const projectsViewMachine = setup({
       };
     }),
     transitionConditionally: enqueueActions(({ context, event, enqueue }) => {
-      const workspace = (event as { output?: NxWorkspace }).output;
+      const result = (event as { output?: WorkspaceLoadResult }).output;
+      const workspace = result?.workspace;
 
       if (!workspace) {
         enqueue.raise({ type: 'NO_WORKSPACE' });
@@ -63,6 +69,11 @@ export const projectsViewMachine = setup({
 
       if (hasErrors && projectCount === 0) {
         enqueue.raise({ type: 'ERRORS_ONLY' });
+        return;
+      }
+
+      if (projectCount === 0 && !result?.hasDependencies) {
+        enqueue.raise({ type: 'NO_DEPENDENCIES' });
         return;
       }
 
@@ -113,6 +124,15 @@ export const projectsViewMachine = setup({
     },
     noWorkspace: {
       entry: { type: 'setViewContext', params: { state: 'no-workspace' } },
+      on: {
+        REFRESH: 'loading',
+      },
+    },
+    noDependencies: {
+      entry: {
+        type: 'setViewContext',
+        params: { state: 'no-dependencies' },
+      },
       on: {
         REFRESH: 'loading',
       },
@@ -168,7 +188,9 @@ export const projectsViewMachine = setup({
               actions: [
                 'assignWorkspaceData',
                 enqueueActions(({ context, event, enqueue }) => {
-                  const workspace = (event as { output?: NxWorkspace }).output;
+                  const result = (event as { output?: WorkspaceLoadResult })
+                    .output;
+                  const workspace = result?.workspace;
                   const projectCount = Object.keys(
                     workspace?.projectGraph?.nodes ?? {},
                   ).length;
@@ -181,6 +203,11 @@ export const projectsViewMachine = setup({
 
                   if (hasErrors && projectCount === 0) {
                     enqueue.raise({ type: 'ERRORS_ONLY' });
+                    return;
+                  }
+
+                  if (projectCount === 0 && !result?.hasDependencies) {
+                    enqueue.raise({ type: 'NO_DEPENDENCIES' });
                     return;
                   }
 
@@ -203,6 +230,7 @@ export const projectsViewMachine = setup({
   },
   on: {
     NO_WORKSPACE: '.noWorkspace',
+    NO_DEPENDENCIES: '.noDependencies',
     ERRORS_ONLY: '.errors',
     NO_PROJECTS: '.noProjects',
     READY: '.ready',

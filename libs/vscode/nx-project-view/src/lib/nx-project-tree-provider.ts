@@ -40,6 +40,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly listView: ListView = new ListView();
   private readonly treeView: TreeView = new TreeView();
 
+  private enabled = false;
   private workspaceData: NxWorkspace | undefined = undefined;
   private plugins: NxConsolePluginsDefinition | undefined = undefined;
 
@@ -74,7 +75,15 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     return null;
   }
 
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
+
   async getChildren(element?: NxTreeItem): Promise<NxTreeItem[] | undefined> {
+    if (!this.enabled) {
+      return [];
+    }
+
     if (!element) {
       this.workspaceData = await getNxWorkspace();
       this.plugins = await loadPlugins(getNxWorkspacePath());
