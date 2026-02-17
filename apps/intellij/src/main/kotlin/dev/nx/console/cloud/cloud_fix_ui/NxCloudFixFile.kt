@@ -9,12 +9,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
 import com.intellij.util.messages.MessageBusConnection
-import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.ClasspathResourceRequestHandler
 import javax.swing.JComponent
 import kotlinx.serialization.json.Json
-import org.cef.CefApp
-import org.cef.browser.CefBrowser
-import org.cef.handler.CefLifeSpanHandlerAdapter
 
 val json = Json {
     classDiscriminator = "type"
@@ -31,14 +28,8 @@ abstract class NxCloudFixFile(name: String) :
 
     private val connection: MessageBusConnection
 
-    val lifeSpanHandler: CefLifeSpanHandlerAdapter =
-        object : CefLifeSpanHandlerAdapter() {
-            override fun onAfterCreated(browser: CefBrowser) {
-                val domainName = "nxcloudfix"
-                CefApp.getInstance()
-                    .registerSchemeHandlerFactory("http", domainName, CustomSchemeHandlerFactory())
-            }
-        }
+    private val requestHandler =
+        ClasspathResourceRequestHandler("http", "nxcloudfix", "cloud_fix_webview", browser)
 
     init {
         isWritable = false
@@ -49,16 +40,13 @@ abstract class NxCloudFixFile(name: String) :
                 override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
                     if (file == this@NxCloudFixFile) {
                         connection.disconnect()
-                        browser.jbCefClient.removeLifeSpanHandler(
-                            lifeSpanHandler,
-                            browser.cefBrowser,
-                        )
+                        browser.jbCefClient.removeRequestHandler(requestHandler, browser.cefBrowser)
                         Disposer.dispose(browser)
                     }
                 }
             },
         )
-        browser.jbCefClient.addLifeSpanHandler(lifeSpanHandler, browser.cefBrowser)
+        browser.jbCefClient.addRequestHandler(requestHandler, browser.cefBrowser)
     }
 
     abstract fun createMainComponent(project: Project): JComponent

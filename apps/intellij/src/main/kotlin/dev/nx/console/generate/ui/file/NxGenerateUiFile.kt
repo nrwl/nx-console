@@ -13,11 +13,10 @@ import com.intellij.util.messages.MessageBusConnection
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.ui.*
 import dev.nx.console.models.NxGenerator
-import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.ClasspathResourceRequestHandler
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlinx.serialization.json.Json
-import org.cef.CefApp
 import org.cef.browser.CefBrowser
 import org.cef.handler.CefLifeSpanHandlerAdapter
 
@@ -54,13 +53,13 @@ abstract class NxGenerateUiFile(name: String) :
 
     private val connection: MessageBusConnection
 
-    val lifeSpanHandler: CefLifeSpanHandlerAdapter =
+    private val requestHandler =
+        ClasspathResourceRequestHandler("http", "nxconsolev2", "generate_ui_v2", browser)
+
+    private val lifeSpanHandler: CefLifeSpanHandlerAdapter =
         object : CefLifeSpanHandlerAdapter() {
             override fun onAfterCreated(browser: CefBrowser) {
-                val domainName = "nxconsolev2"
-                CefApp.getInstance()
-                    .registerSchemeHandlerFactory("http", domainName, CustomSchemeHandlerFactory())
-                browser.loadURL("http://$domainName/index.html")
+                browser.loadURL("http://nxconsolev2/index.html")
             }
         }
 
@@ -73,6 +72,7 @@ abstract class NxGenerateUiFile(name: String) :
                 override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
                     if (file == this@NxGenerateUiFile) {
                         connection.disconnect()
+                        browser.jbCefClient.removeRequestHandler(requestHandler, browser.cefBrowser)
                         browser.jbCefClient.removeLifeSpanHandler(
                             lifeSpanHandler,
                             browser.cefBrowser,
@@ -82,6 +82,7 @@ abstract class NxGenerateUiFile(name: String) :
                 }
             },
         )
+        browser.jbCefClient.addRequestHandler(requestHandler, browser.cefBrowser)
         browser.jbCefClient.addLifeSpanHandler(lifeSpanHandler, browser.cefBrowser)
     }
 
