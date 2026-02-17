@@ -413,6 +413,10 @@
           "when": "isNxWorkspace"
         },
         {
+          "command": "nxConsole.showNodeVersion",
+          "when": "isNxWorkspace && config.nxConsole.enableDebugLogging"
+        },
+        {
           "command": "nx.connectToCloud",
           "when": "isNxWorkspace"
         },
@@ -636,6 +640,11 @@
         "category": "Nx",
         "title": "Show Nx Language Server Logs",
         "command": "nxConsole.showNxlsLogs"
+      },
+      {
+        "category": "Nx",
+        "title": "Show Node Version",
+        "command": "nxConsole.showNodeVersion"
       },
       {
         "title": "Add Dependency to Workspace",
