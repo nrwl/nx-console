@@ -769,10 +769,13 @@ function getCurrentGitBranch(workspacePath: string): string | null {
   }
 }
 
-function parseShortLink(shortLink: string): {
+function parseShortLink(shortLink: string | undefined | null): {
   fixShortLink: string;
   suggestionShortLink: string;
 } | null {
+  if (!shortLink || typeof shortLink !== 'string') {
+    return null;
+  }
   const parts = shortLink.split('-');
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
     return null;

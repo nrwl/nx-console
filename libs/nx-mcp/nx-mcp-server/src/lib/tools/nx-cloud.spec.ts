@@ -33,6 +33,18 @@ describe('parseShortLink', () => {
   it('should return null for shortlink starting with dash', () => {
     expect(parseShortLink('-abc123')).toBeNull();
   });
+
+  it('should return null for undefined input', () => {
+    expect(parseShortLink(undefined as unknown as string)).toBeNull();
+  });
+
+  it('should return null for null input', () => {
+    expect(parseShortLink(null as unknown as string)).toBeNull();
+  });
+
+  it('should return null for non-string input', () => {
+    expect(parseShortLink(123 as unknown as string)).toBeNull();
+  });
 });
 
 describe('formatCIInformationOverview', () => {

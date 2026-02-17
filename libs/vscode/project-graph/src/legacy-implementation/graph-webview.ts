@@ -215,7 +215,7 @@ export class GraphWebView implements Disposable {
 
     const { projectGraph } = nxWorkspace;
 
-    if (!projectGraph.nodes || !Object.keys(projectGraph.nodes).length) {
+    if (!projectGraph?.nodes || !Object.keys(projectGraph.nodes).length) {
       showNoProjectsMessage(true);
       return;
     }
