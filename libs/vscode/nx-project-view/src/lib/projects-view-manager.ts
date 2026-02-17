@@ -5,7 +5,6 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
-import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { commands, Disposable, ExtensionContext } from 'vscode';
@@ -54,7 +53,6 @@ export class ProjectsViewManager implements Disposable {
         },
         actions: {
           setViewContext: (_, params: { state: ProjectsViewState }) => {
-            vscodeLogger.log(`[debug-view] setViewContext: ${params.state}`);
             commands.executeCommand(
               'setContext',
               'nxProjectsView.state',

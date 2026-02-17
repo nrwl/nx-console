@@ -22,7 +22,6 @@ import { ProjectsViewManager } from './projects-view-manager';
 export function initNxProjectView(
   context: ExtensionContext,
 ): NxProjectTreeProvider {
-  vscodeLogger.log('[debug-view] initNxProjectView called');
   const nxProjectsTreeProvider = new NxProjectTreeProvider(context);
   const nxProjectTreeView = window.createTreeView('nxProjects', {
     treeDataProvider: nxProjectsTreeProvider,
@@ -31,7 +30,6 @@ export function initNxProjectView(
 
   context.subscriptions.push(nxProjectTreeView);
 
-  vscodeLogger.log('[debug-view] creating ProjectsViewManager');
   const viewManager = new ProjectsViewManager(context, nxProjectsTreeProvider);
   context.subscriptions.push(viewManager);
   context.subscriptions.push(
