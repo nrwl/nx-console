@@ -38,7 +38,7 @@ import { resolve } from 'path';
 import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
 import { createIdeClient } from './ide-client/create-ide-client';
-import { configToArgs, loadConfigFile } from './load-config-file';
+import { configToArgs, loadNxMcpConfig } from '@nx-console/nx-mcp-server';
 import { getPackageVersion } from './utils';
 import { ArgvType, createYargsConfig } from './yargs-config';
 
@@ -54,7 +54,7 @@ async function main() {
   );
 
   // Second parse: config file values (prepended) are overridden by CLI args
-  const configArgs = configToArgs(loadConfigFile(workspacePath));
+  const configArgs = configToArgs(loadNxMcpConfig(workspacePath));
   const argv = createYargsConfig([
     ...configArgs,
     ...cliArgs,

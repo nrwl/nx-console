@@ -3,3 +3,4 @@ export * from './lib/ide-provider';
 export * from './lib/tool-filter';
 export * from './lib/instructions';
 export * from './lib/minimal-mode';
+export * from './lib/load-config-file';
