@@ -19,6 +19,8 @@ import {
   writeMcpJson,
 } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
+import { existsSync, unlinkSync } from 'fs';
+import { join } from 'path';
 import vscode, {
   commands,
   ExtensionContext,
@@ -76,6 +78,7 @@ export async function initMcp(context: ExtensionContext) {
   }
 
   cleanupOldMcpJson();
+  cleanupOldRulesFiles();
 
   const fixedPort =
     GlobalConfigurationStore.instance.get('mcpPort') ?? undefined;
@@ -152,6 +155,66 @@ function cleanupOldMcpJson() {
             }
           });
       }
+    }
+  }
+}
+
+function cleanupOldRulesFiles() {
+  const workspacePath = getNxWorkspacePath();
+  if (!workspacePath) {
+    return;
+  }
+
+  const oldRulesFiles = [
+    join(workspacePath, '.cursor', 'rules', 'nx-rules.mdc'),
+    join(workspacePath, '.github', 'instructions', 'nx.instructions.md'),
+  ];
+
+  const existingFiles = oldRulesFiles.filter((f) => existsSync(f));
+  if (existingFiles.length === 0) {
+    return;
+  }
+
+  const removeFiles = () => {
+    for (const file of existingFiles) {
+      try {
+        vscodeLogger.log(`Removing old rules file: ${file}`);
+        unlinkSync(file);
+      } catch (e) {
+        vscodeLogger.log(`Failed to remove old rules file ${file}: ${e}`);
+      }
+    }
+  };
+
+  if (existingFiles.every((f) => mcpJsonIsGitIgnored(f))) {
+    removeFiles();
+  } else {
+    if (
+      !WorkspaceConfigurationStore.instance.get(
+        'oldRulesCleanupDontAskAgain',
+        false,
+      )
+    ) {
+      const fileNames = existingFiles
+        .map((f) => f.replace(workspacePath + '/', ''))
+        .join(', ');
+      window
+        .showWarningMessage(
+          `Nx Console found outdated AI rules files (${fileNames}). Would you like to migrate to the latest agent skills?`,
+          'Migrate',
+          "Don't ask again",
+        )
+        .then(async (selection) => {
+          if (selection === 'Migrate') {
+            removeFiles();
+            await runConfigureAiAgentsCommand();
+          } else if (selection === "Don't ask again") {
+            WorkspaceConfigurationStore.instance.set(
+              'oldRulesCleanupDontAskAgain',
+              true,
+            );
+          }
+        });
     }
   }
 }

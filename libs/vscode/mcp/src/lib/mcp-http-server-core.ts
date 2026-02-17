@@ -4,7 +4,9 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import {
   mcpServerInstructions,
   MINIMAL_EXCLUDED_TOOLS,
+  POLYGRAPH_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
+  loadNxMcpConfig,
 } from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
 import {
@@ -109,6 +111,15 @@ export class McpHttpServerCore {
             toolsFilter = toolsFilter
               ? [...toolsFilter, ...MINIMAL_EXCLUDED_TOOLS]
               : [...MINIMAL_EXCLUDED_TOOLS];
+          }
+
+          const config = nxWorkspacePath
+            ? loadNxMcpConfig(nxWorkspacePath)
+            : {};
+          if (!config.experimentalPolygraph) {
+            toolsFilter = toolsFilter
+              ? [...toolsFilter, ...POLYGRAPH_EXCLUDED_TOOLS]
+              : [...POLYGRAPH_EXCLUDED_TOOLS];
           }
 
           const server = await NxMcpServerWrapper.create(
