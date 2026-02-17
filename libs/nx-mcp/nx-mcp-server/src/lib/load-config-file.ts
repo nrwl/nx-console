@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { parse } from 'jsonc-parser';
 import { join } from 'path';
 
 const SUPPORTED_KEYS = new Set([
@@ -21,7 +22,7 @@ export type NxMcpConfig = {
   experimentalPolygraph?: boolean;
 };
 
-export function loadConfigFile(workspacePath: string): NxMcpConfig {
+export function loadNxMcpConfig(workspacePath: string): NxMcpConfig {
   const configPath = join(workspacePath, '.nx', 'nx-mcp-config.json');
 
   let raw: string;
@@ -33,7 +34,7 @@ export function loadConfigFile(workspacePath: string): NxMcpConfig {
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = parse(raw);
   } catch {
     return {};
   }

@@ -6,3 +6,5 @@ export const MINIMAL_EXCLUDED_TOOLS = [
   '!nx_generators',
   '!nx_generator_schema',
 ];
+
+export const POLYGRAPH_EXCLUDED_TOOLS = ['!cloud_polygraph_*'];

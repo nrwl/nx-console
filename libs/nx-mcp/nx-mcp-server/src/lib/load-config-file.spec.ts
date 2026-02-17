@@ -1,4 +1,4 @@
-import { configToArgs, loadConfigFile } from './load-config-file';
+import { configToArgs, loadNxMcpConfig } from './load-config-file';
 import * as fs from 'fs';
 
 jest.mock('fs');
@@ -7,7 +7,7 @@ const mockedReadFileSync = fs.readFileSync as jest.MockedFunction<
   typeof fs.readFileSync
 >;
 
-describe('loadConfigFile', () => {
+describe('loadNxMcpConfig', () => {
   afterEach(() => {
     mockedReadFileSync.mockReset();
   });
@@ -16,20 +16,20 @@ describe('loadConfigFile', () => {
     mockedReadFileSync.mockImplementation(() => {
       throw new Error('ENOENT');
     });
-    expect(loadConfigFile('/workspace')).toEqual({});
+    expect(loadNxMcpConfig('/workspace')).toEqual({});
   });
 
   it('should return empty object for malformed JSON', () => {
     mockedReadFileSync.mockReturnValue('not json {{{');
-    expect(loadConfigFile('/workspace')).toEqual({});
+    expect(loadNxMcpConfig('/workspace')).toEqual({});
   });
 
   it('should return empty object for non-object JSON', () => {
     mockedReadFileSync.mockReturnValue('"just a string"');
-    expect(loadConfigFile('/workspace')).toEqual({});
+    expect(loadNxMcpConfig('/workspace')).toEqual({});
 
     mockedReadFileSync.mockReturnValue('[1, 2, 3]');
-    expect(loadConfigFile('/workspace')).toEqual({});
+    expect(loadNxMcpConfig('/workspace')).toEqual({});
   });
 
   it('should parse supported keys', () => {
@@ -45,7 +45,7 @@ describe('loadConfigFile', () => {
       }),
     );
 
-    expect(loadConfigFile('/workspace')).toEqual({
+    expect(loadNxMcpConfig('/workspace')).toEqual({
       minimal: true,
       debugLogs: false,
       transport: 'sse',
@@ -64,12 +64,47 @@ describe('loadConfigFile', () => {
         workspacePath: '/some/path',
       }),
     );
-    expect(loadConfigFile('/workspace')).toEqual({ minimal: true });
+    expect(loadNxMcpConfig('/workspace')).toEqual({ minimal: true });
+  });
+
+  it('should parse JSONC with single-line comments', () => {
+    mockedReadFileSync.mockReturnValue(`{
+      // enable minimal mode
+      "minimal": true,
+      "transport": "sse" // use server-sent events
+    }`);
+    expect(loadNxMcpConfig('/workspace')).toEqual({
+      minimal: true,
+      transport: 'sse',
+    });
+  });
+
+  it('should parse JSONC with block comments', () => {
+    mockedReadFileSync.mockReturnValue(`{
+      /* debugging options */
+      "debugLogs": true,
+      "port": 9922
+    }`);
+    expect(loadNxMcpConfig('/workspace')).toEqual({
+      debugLogs: true,
+      port: 9922,
+    });
+  });
+
+  it('should parse JSONC with trailing commas', () => {
+    mockedReadFileSync.mockReturnValue(`{
+      "minimal": true,
+      "tools": ["nx_docs", "!cloud_*",],
+    }`);
+    expect(loadNxMcpConfig('/workspace')).toEqual({
+      minimal: true,
+      tools: ['nx_docs', '!cloud_*'],
+    });
   });
 
   it('should read from correct path', () => {
     mockedReadFileSync.mockReturnValue('{}');
-    loadConfigFile('/my/workspace');
+    loadNxMcpConfig('/my/workspace');
     expect(mockedReadFileSync).toHaveBeenCalledWith(
       expect.stringContaining('/my/workspace/.nx/nx-mcp-config.json'),
       'utf-8',

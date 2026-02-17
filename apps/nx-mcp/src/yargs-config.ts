@@ -1,5 +1,5 @@
 import yargs, { Argv } from 'yargs';
-import { NxMcpConfig } from './load-config-file';
+import { NxMcpConfig } from '@nx-console/nx-mcp-server';
 
 export interface ArgvType extends NxMcpConfig {
   workspacePath?: string;

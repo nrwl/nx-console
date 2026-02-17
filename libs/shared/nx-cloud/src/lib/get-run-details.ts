@@ -1,8 +1,9 @@
-import { Logger, httpRequest, HttpError } from '@nx-console/shared-utils';
+import { Logger, HttpError } from '@nx-console/shared-utils';
 import { isNxCloudUsed } from './is-nx-cloud-used';
 import { getNxCloudUrl } from './cloud-ids';
 import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 import { Result } from './result';
+import { nxCloudRequest } from './nx-cloud-request';
 
 export interface TaskSummary {
   taskId: string;
@@ -82,7 +83,7 @@ export async function getRunDetails(
 
   logger.log(`Making run details request for ID: ${runId}`);
   try {
-    const response = await httpRequest({
+    const response = await nxCloudRequest('RUN_DETAILS', {
       type: 'GET',
       url,
       headers,
