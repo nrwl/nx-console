@@ -17,6 +17,7 @@ import { AtomizerDecorationProvider } from './atomizer-decorations';
 import { NxProjectTreeProvider } from './nx-project-tree-provider';
 import { NxTreeItem } from './nx-tree-item';
 import { ProjectGraphErrorDecorationProvider } from './project-graph-error-decorations';
+import { ProjectsViewManager } from './projects-view-manager';
 
 export function initNxProjectView(
   context: ExtensionContext,
@@ -28,6 +29,9 @@ export function initNxProjectView(
   });
 
   context.subscriptions.push(nxProjectTreeView);
+
+  const viewManager = new ProjectsViewManager(context, nxProjectsTreeProvider);
+  context.subscriptions.push(viewManager);
   context.subscriptions.push(
     commands.registerCommand(
       'nxConsole.showProjectConfiguration',

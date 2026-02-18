@@ -1,6 +1,7 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
   CLOUD_POLYGRAPH_ASSOCIATE_PR,
+  CLOUD_POLYGRAPH_CANDIDATES,
   CLOUD_POLYGRAPH_CHILD_STATUS,
   CLOUD_POLYGRAPH_COMPLETE_SESSION,
   CLOUD_POLYGRAPH_CREATE_PRS,
@@ -39,6 +40,12 @@ const polygraphInitSchema = z.object({
     .optional()
     .describe(
       'Optional session ID to use. If provided, takes precedence over CLAUDE_CODE_SESSION_ID env var and random generation.',
+    ),
+  selectedWorkspaceIds: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'Optional list of workspace IDs to include in the session. Use cloud_polygraph_candidates to discover available workspaces first. If omitted, all connected workspaces are included.',
     ),
 });
 
@@ -104,6 +111,7 @@ function registerInit(
             nxCloudUrl: await getNxCloudUrl(workspacePath),
             authHeaders: await nxCloudAuthHeaders(workspacePath),
             workspacePath,
+            selectedWorkspaceIds: params.selectedWorkspaceIds,
           });
           return initResultToCallToolResult(result);
         } catch (e: any) {
@@ -768,6 +776,62 @@ function registerAssociatePR(
   }
 }
 
+function registerCandidates(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_CANDIDATES, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_CANDIDATES} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_CANDIDATES,
+      description:
+        'Discover candidate workspaces for a Polygraph session. Returns the initiator workspace and all connected workspaces with their descriptions and dependency graph relationships (distance, direction, path). Use this before cloud_polygraph_init to understand which repositories are available and optionally select a subset via selectedWorkspaceIds.',
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphGetCandidates !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
+        try {
+          const result = await nxCloudClient.polygraphGetCandidates(logger, {
+            nxCloudUrl: await getNxCloudUrl(workspacePath),
+            authHeaders: await nxCloudAuthHeaders(workspacePath),
+          });
+
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: JSON.stringify(result) }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 const completeSessionSchema = z.object({
   sessionId: z.string().describe('The Polygraph session ID'),
 });
@@ -846,6 +910,7 @@ export function registerPolygraphTools(
   logger: Logger,
   toolsFilter?: string[],
 ) {
+  registerCandidates(toolsFilter, logger, registry, workspacePath);
   registerInit(toolsFilter, logger, registry, workspacePath);
   registerDelegate(toolsFilter, logger, registry, workspacePath);
   registerPushBranch(toolsFilter, logger, registry, workspacePath);

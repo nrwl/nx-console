@@ -131,6 +131,15 @@ export async function activate(c: ExtensionContext) {
       }
     }
 
+    if (!isNxWorkspace) {
+      commands.executeCommand('setContext', 'isNxWorkspace', false);
+      commands.executeCommand(
+        'setContext',
+        'nxConsole.workspaceDetected',
+        true,
+      );
+    }
+
     context.subscriptions.push(manuallySelectWorkspaceDefinitionCommand);
     await registerSettingsNxWorkspacePathWatcher();
 
@@ -328,6 +337,7 @@ async function setWorkspace(workspacePath: string) {
     isAngularWorkspace,
   );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
+  commands.executeCommand('setContext', 'nxConsole.workspaceDetected', true);
 
   initNxConversion(context, isAngularWorkspace, isNxWorkspace);
   await initMessagingServer(context, workspacePath);

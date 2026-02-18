@@ -12,7 +12,6 @@ import {
   Uri,
   Range,
   DiagnosticSeverity,
-  commands,
 } from 'vscode';
 import { getMessageForError } from '@nx-console/shared-utils';
 
@@ -23,21 +22,11 @@ export function initErrorDiagnostics(context: ExtensionContext) {
 
   getNxWorkspace().then((nxWorkspace) => {
     setDiagnostics(nxWorkspace?.errors ?? [], diagnosticCollection);
-    commands.executeCommand(
-      'setContext',
-      'nxConsole.hasWorkspaceErrors',
-      nxWorkspace?.errors?.length,
-    );
   });
 
   const listener = onWorkspaceRefreshed(async () => {
     const nxWorkspace = await getNxWorkspace();
     setDiagnostics(nxWorkspace?.errors ?? [], diagnosticCollection);
-    commands.executeCommand(
-      'setContext',
-      'nxConsole.hasWorkspaceErrors',
-      nxWorkspace?.errors?.length,
-    );
   });
 
   if (listener) {
