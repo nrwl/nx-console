@@ -3,6 +3,7 @@ import {
   CLOUD_POLYGRAPH_ASSOCIATE_PR,
   CLOUD_POLYGRAPH_CANDIDATES,
   CLOUD_POLYGRAPH_CHILD_STATUS,
+  CLOUD_POLYGRAPH_COMPLETE_SESSION,
   CLOUD_POLYGRAPH_CREATE_PRS,
   CLOUD_POLYGRAPH_DELEGATE,
   CLOUD_POLYGRAPH_INIT,
@@ -831,6 +832,78 @@ function registerCandidates(
   }
 }
 
+const completeSessionSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+});
+
+function registerCompleteSession(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_COMPLETE_SESSION, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_COMPLETE_SESSION} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_COMPLETE_SESSION,
+      description:
+        'Mark a Polygraph session as completed. Once completed, no further modifications (new PRs, status changes, etc.) can be made to the session. This is idempotent — completing an already-completed session returns success.',
+      inputSchema: completeSessionSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphCompleteSession !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
+        const { sessionId } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphCompleteSession(logger, {
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+          });
+
+          if (result.success) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Session ${sessionId} completed successfully.`,
+                },
+              ],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 export function registerPolygraphTools(
   workspacePath: string,
   registry: ToolRegistry,
@@ -847,4 +920,5 @@ export function registerPolygraphTools(
   registerStopChild(toolsFilter, logger, registry, workspacePath);
   registerChildStatus(toolsFilter, logger, registry, workspacePath);
   registerAssociatePR(toolsFilter, logger, registry, workspacePath);
+  registerCompleteSession(toolsFilter, logger, registry, workspacePath);
 }
