@@ -1,9 +1,6 @@
 import { NxWorkspace } from '@nx-console/shared-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
-import {
-  onWorkspaceRefreshed,
-  WatcherRunningService,
-} from '@nx-console/vscode-lsp-client';
+import { WatcherRunningService } from '@nx-console/vscode-lsp-client';
 import {
   getNxWorkspace,
   getProjectFolderTree,
@@ -43,6 +40,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly listView: ListView = new ListView();
   private readonly treeView: TreeView = new TreeView();
 
+  private enabled = false;
   private workspaceData: NxWorkspace | undefined = undefined;
   private plugins: NxConsolePluginsDefinition | undefined = undefined;
 
@@ -68,7 +66,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     );
 
     context.subscriptions.push(
-      onWorkspaceRefreshed(() => this.refresh()),
       WatcherRunningService.INSTANCE.onStatusChange(() => this.refresh()),
     );
   }
@@ -78,7 +75,15 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     return null;
   }
 
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
+
   async getChildren(element?: NxTreeItem): Promise<NxTreeItem[] | undefined> {
+    if (!this.enabled) {
+      return [];
+    }
+
     if (!element) {
       this.workspaceData = await getNxWorkspace();
       this.plugins = await loadPlugins(getNxWorkspacePath());
