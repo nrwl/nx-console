@@ -12,7 +12,10 @@
         "dependsOn": [
           "_build",
           "build-css"
-        ]
+        ],
+        "inputs": ["production", "^production"],
+        "outputs": ["{workspaceRoot}/dist/libs/shared/cloud-fix-webview"],
+        "cache": true
       },
       "_build": {
         "executor": "@nx/esbuild:esbuild",

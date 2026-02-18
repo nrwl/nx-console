@@ -61,6 +61,18 @@ export function onWorkspaceRefreshed(callback: () => void): Disposable {
   );
 }
 
+export type NxlsState = 'idle' | 'starting' | 'running' | 'stopping';
+
+export function getNxlsState(): NxlsState {
+  return getNxlsClient().getState();
+}
+
+export function onNxlsStateChange(
+  callback: (state: NxlsState, error?: string) => void,
+): Disposable {
+  return getNxlsClient().onStateChange(callback);
+}
+
 export class NxlsClient {
   private client: LanguageClient | undefined;
 
@@ -244,6 +256,19 @@ export class NxlsClient {
 
   public setWorkspacePath(workspacePath: string) {
     this.actor.send({ type: 'SET_WORKSPACE_PATH', value: workspacePath });
+  }
+
+  public getState(): NxlsState {
+    return this.actor.getSnapshot().value as NxlsState;
+  }
+
+  public onStateChange(
+    callback: (state: NxlsState, error?: string) => void,
+  ): Disposable {
+    const subscription = this.actor.subscribe((snapshot) => {
+      callback(snapshot.value as NxlsState, snapshot.context.error);
+    });
+    return new Disposable(() => subscription.unsubscribe());
   }
 
   public onNotification<P>(
