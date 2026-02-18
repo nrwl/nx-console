@@ -1,3 +1,13 @@
+## 0.22.0 (2026-02-18)
+
+### 🚀 Features
+
+- **vscode:** enhance detection for nx skills for cursor & re-add old rule file cleanup ([#3054](https://github.com/nrwl/nx-console/pull/3054))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
 ## 0.21.0 (2026-02-12)
 
 ### 🚀 Features
