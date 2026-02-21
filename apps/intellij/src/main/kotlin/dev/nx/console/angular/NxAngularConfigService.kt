@@ -8,6 +8,8 @@ import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.EmptyRunnable
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.XMap
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
@@ -28,10 +30,32 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
     PersistentStateComponent<NxAngularConfigService.AngularConfigState> {
 
     init {
-        project.messageBus
-            .connect(cs)
-            .subscribe(NX_WORKSPACE_REFRESH_TOPIC, NxWorkspaceRefreshListener { refresh() })
+        val bus = project.messageBus.connect(cs)
+        bus.subscribe(NX_WORKSPACE_REFRESH_TOPIC, NxWorkspaceRefreshListener { refresh() })
+        bus.subscribe(
+            VirtualFileManager.VFS_CHANGES,
+            object : BulkFileListener {
+                override fun after(events: List<VFileEvent>) {
+                    if (events.any { isRspackConfigFile(it.file) }) {
+                        cs.launch {
+                            withContext(Dispatchers.EDT) {
+                                writeAction {
+                                    ProjectRootManagerEx.getInstanceEx(project)
+                                        .makeRootsChange(
+                                            EmptyRunnable.getInstance(),
+                                            RootsChangeRescanningInfo.RESCAN_DEPENDENCIES_IF_NEEDED,
+                                        )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+        )
     }
+
+    private fun isRspackConfigFile(file: VirtualFile?): Boolean =
+        file?.name == "rspack.config.ts" || file?.name == "rspack.config.js"
 
     var config: NxAngularConfig? = null
 

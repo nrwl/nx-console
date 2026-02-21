@@ -12,7 +12,21 @@ class NxAngularProject(
     override val name: String,
     private val ngProject: AngularJsonProject,
     private val workspaceFolder: VirtualFile,
+    private val projectFolder: VirtualFile? = null,
+    private val rspackConfigFile: VirtualFile? = null,
 ) : AngularProject(workspaceFolder) {
+
+    // Cached as (modificationStamp, paths) to invalidate when the file changes.
+    @Volatile private var rspackPathsCache: Pair<Long, List<String>>? = null
+
+    private fun getRspackIncludePaths(): List<String> {
+        val file = rspackConfigFile ?: return emptyList()
+        val stamp = file.modificationStamp
+        rspackPathsCache?.let { if (it.first == stamp) return it.second }
+        val paths = parseRspackIncludePaths(file)
+        rspackPathsCache = Pair(stamp, paths)
+        return paths
+    }
 
     override val rootDir
         get() = workspaceFolder
@@ -34,9 +48,18 @@ class NxAngularProject(
 
     override val stylePreprocessorIncludeDirs
         get() =
-            ngProject.targets?.build?.options?.stylePreprocessorOptions?.includePaths?.mapNotNull {
-                workspaceFolder.findFileByRelativePath(it)
-            } ?: emptyList()
+            ((ngProject.targets
+                    ?.build
+                    ?.options
+                    ?.stylePreprocessorOptions
+                    ?.includePaths
+                    ?.mapNotNull { workspaceFolder.findFileByRelativePath(it) } ?: emptyList()) +
+                    getRspackIncludePaths().mapNotNull { path ->
+                        val normalized = path.removePrefix("./")
+                        projectFolder?.findFileByRelativePath(normalized)
+                            ?: workspaceFolder.findFileByRelativePath(normalized)
+                    })
+                .distinct()
 
     override val tsConfigFile: VirtualFile?
         get() = resolveFile(ngProject.targets?.build?.options?.tsConfig)
