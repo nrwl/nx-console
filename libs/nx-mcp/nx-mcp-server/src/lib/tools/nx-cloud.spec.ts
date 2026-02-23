@@ -72,6 +72,8 @@ describe('formatCIInformationOverview', () => {
       confidence: 0.85,
       confidenceReasoning:
         'High confidence because the fix directly addresses the reported error',
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -159,6 +161,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: true,
       confidence: 0.85,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -200,6 +204,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -232,6 +238,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -267,11 +275,49 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
     const result = formatCIInformationOverview(output);
     expect(result).not.toContain('**User Action:**');
+  });
+
+  it('should show skipped reason and message when self-healing is throttled', () => {
+    const output: CIInformationOutput = {
+      cipeStatus: 'FAILED',
+      cipeUrl: 'https://cloud.nx.app/cipes/123',
+      branch: 'main',
+      commitSha: null,
+      failedTaskIds: ['app:build'],
+      verifiedTaskIds: [],
+      selfHealingEnabled: true,
+      selfHealingStatus: null,
+      verificationStatus: null,
+      userAction: null,
+      failureClassification: null,
+      taskOutputSummary: null,
+      remoteTaskSummary: null,
+      localTaskSummary: null,
+      suggestedFixReasoning: null,
+      suggestedFixDescription: null,
+      suggestedFix: null,
+      shortLink: null,
+      couldAutoApplyTasks: null,
+      confidence: null,
+      confidenceReasoning: null,
+      selfHealingSkippedReason: 'THROTTLED',
+      selfHealingSkipMessage:
+        'Too many unapplied fixes. See https://cloud.nx.app/cipes/abc/self-healing',
+      error: null,
+    };
+
+    const result = formatCIInformationOverview(output);
+    expect(result).toContain('**Skipped:** THROTTLED');
+    expect(result).toContain(
+      '**Skip Message:** Too many unapplied fixes. See https://cloud.nx.app/cipes/abc/self-healing',
+    );
   });
 
   it('should show user action when it is not NONE', () => {
@@ -297,6 +343,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -327,6 +375,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -365,6 +415,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -407,6 +459,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -443,6 +497,8 @@ describe('formatCIInformationOverview', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -544,6 +600,8 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: true,
       confidence: 0.85,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -587,6 +645,8 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 
@@ -637,6 +697,8 @@ describe('multi-field select parsing', () => {
       couldAutoApplyTasks: null,
       confidence: null,
       confidenceReasoning: null,
+      selfHealingSkippedReason: null,
+      selfHealingSkipMessage: null,
       error: null,
     };
 

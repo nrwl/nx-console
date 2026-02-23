@@ -74,7 +74,7 @@ export class GoogleAnalyticsSender implements TelemetrySender {
 
     // there is a special case of error that we handle but still want to get more details on in rollbar - don't track those in GA
     // disabled for now while we evaluate rollbar signal
-    if (error.message.startsWith('AIFAIL')) {
+    if (error.message.includes('AIFAIL')) {
       // eslint-disable-next-line no-constant-condition
       if (false) {
         this.rollbar.error(error);

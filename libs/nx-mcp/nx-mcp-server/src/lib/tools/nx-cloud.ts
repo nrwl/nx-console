@@ -269,6 +269,7 @@ export function registerNxCloudTools(
         'Supports Nx Cloud URLs: CIPE URLs (/cipes/{id}), run URLs (/runs/{id}), and task URLs (/runs/{id}/task/{taskId}). ' +
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
+        'Includes selfHealingSkippedReason/selfHealingSkipMessage when self-healing was skipped (e.g. THROTTLED). ' +
         'See output schema for available fields. Long strings are paginated automatically.',
       inputSchema: ciInformationSchema.shape,
       outputSchema: ciInformationOutputSchema,
@@ -941,6 +942,8 @@ const getCIInformation =
           couldAutoApplyTasks: null,
           confidence: null,
           confidenceReasoning: null,
+          selfHealingSkippedReason: null,
+          selfHealingSkipMessage: null,
           error: message,
         },
         isError: false,
@@ -1006,6 +1009,10 @@ const getCIInformation =
       couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
       confidence: aiFix?.confidenceScore ?? null,
       confidenceReasoning: null,
+      selfHealingSkippedReason:
+        cipeForBranch.selfHealingSkipInfo?.reason ?? null,
+      selfHealingSkipMessage:
+        cipeForBranch.selfHealingSkipInfo?.message ?? null,
       error: null,
     };
 
@@ -1218,6 +1225,12 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
   );
   lines.push(`- **Enabled:** ${output.selfHealingEnabled ? 'Yes' : 'No'}`);
   if (output.selfHealingEnabled) {
+    if (output.selfHealingSkippedReason) {
+      lines.push(`- **Skipped:** ${output.selfHealingSkippedReason}`);
+      if (output.selfHealingSkipMessage) {
+        lines.push(`- **Skip Message:** ${output.selfHealingSkipMessage}`);
+      }
+    }
     if (output.selfHealingStatus) {
       lines.push(`- **Status:** ${output.selfHealingStatus}`);
     }
