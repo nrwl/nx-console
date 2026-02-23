@@ -1,3 +1,20 @@
+# [18.90.0](https://github.com/nrwl/nx-console/compare/vscode-v18.89.0...vscode-v18.90.0) (2026-02-23)
+
+
+### Bug Fixes
+
+* **nx-mcp:** remove empty inputSchema ([#3060](https://github.com/nrwl/nx-console/issues/3060)) ([b868a50](https://github.com/nrwl/nx-console/commit/b868a50cabceb0f491b923a13674e2b821566557))
+* **nx-mcp:** surface selfHealingSkipInfo in ci_information output ([#3063](https://github.com/nrwl/nx-console/issues/3063)) ([980ae2b](https://github.com/nrwl/nx-console/commit/980ae2b3a3ee927da12509bebbaf494c022e9b0a))
+* **vscode:** fix AIFAIL filter not catching wrapped error messages ([#3064](https://github.com/nrwl/nx-console/issues/3064)) ([c35763c](https://github.com/nrwl/nx-console/commit/c35763c669b673228fce2213f3c518fa71046610))
+* **vscode:** handle some more issues from rollbar ([#3057](https://github.com/nrwl/nx-console/issues/3057)) ([eb6be85](https://github.com/nrwl/nx-console/commit/eb6be85420601bc0587f2925c1a39ef055e46333))
+
+
+### Features
+
+* **nx-mcp:** add cloud_polygraph_candidates tool and selectedWorkspaceIds to init ([#3058](https://github.com/nrwl/nx-console/issues/3058)) ([b4d9327](https://github.com/nrwl/nx-console/commit/b4d93279b09d2c0d3c96f21866b11d443108a63b))
+* **polygraph:** add cloud_polygraph_complete_session MCP tool ([#3059](https://github.com/nrwl/nx-console/issues/3059)) ([abae408](https://github.com/nrwl/nx-console/commit/abae40897f103519527401e08bd6f76c0627408a))
+* **vscode:** rework the projects view sidebar with loading states / state machine ([#3053](https://github.com/nrwl/nx-console/issues/3053)) ([67c7f96](https://github.com/nrwl/nx-console/commit/67c7f96ae576e07002118d9b118642df667a0a90))
+
 # [18.89.0](https://github.com/nrwl/nx-console/compare/vscode-v18.88.0...vscode-v18.89.0) (2026-02-17)
 
 
