@@ -1,9 +1,6 @@
 package dev.nx.console.models
 
-data class AgentStatusInfo(
-    val name: String,
-    val displayName: String,
-)
+data class AgentStatusInfo(val name: String, val displayName: String)
 
 data class ConfigureAiAgentsStatus(
     val fullyConfiguredAgents: List<AgentStatusInfo>,

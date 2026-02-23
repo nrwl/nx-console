@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
 import dev.nx.console.generate.ui.GenerateUiStartupMessageDefinition
 import dev.nx.console.generate.ui.GeneratorSchema
-import dev.nx.console.models.ConfigureAiAgentsStatus
 import dev.nx.console.models.*
+import dev.nx.console.models.ConfigureAiAgentsStatus
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.*

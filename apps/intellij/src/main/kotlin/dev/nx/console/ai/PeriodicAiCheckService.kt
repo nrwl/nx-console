@@ -76,7 +76,10 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
         }
 
         val nxVersion = NxVersionUtil.getInstance(project).getNxVersionSynchronously()
-        if (nxVersion != null && (nxVersion.major > 22 || (nxVersion.major == 22 && nxVersion.minor >= 6))) {
+        if (
+            nxVersion != null &&
+                (nxVersion.major > 22 || (nxVersion.major == 22 && nxVersion.minor >= 6))
+        ) {
             runAiAgentCheckViaDaemon()
         } else {
             runAiAgentCheckLegacy()
