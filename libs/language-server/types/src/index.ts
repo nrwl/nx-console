@@ -6,6 +6,7 @@ import {
 import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 import { GeneratorCollectionInfo, Option } from '@nx-console/shared-schema';
 import {
+  ConfigureAiAgentsStatus,
   CIPEInfo,
   CIPEInfoError,
   CloudOnboardingInfo,
@@ -184,6 +185,12 @@ export const NxCloudOnboardingInfoRequest: RequestType<
   CloudOnboardingInfo,
   unknown
 > = new RequestType('nx/cloudOnboardingInfo');
+
+export const NxConfigureAiAgentsStatusRequest: RequestType<
+  Record<string, never>,
+  ConfigureAiAgentsStatus | null,
+  unknown
+> = new RequestType('nx/configureAiAgentsStatus');
 
 export const NxPDVDataRequest: RequestType<
   { filePath: string },
