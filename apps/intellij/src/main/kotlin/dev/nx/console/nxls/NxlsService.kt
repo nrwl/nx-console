@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
 import dev.nx.console.generate.ui.GenerateUiStartupMessageDefinition
 import dev.nx.console.generate.ui.GeneratorSchema
+import dev.nx.console.models.ConfigureAiAgentsStatus
 import dev.nx.console.models.*
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
@@ -195,6 +196,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     suspend fun cloudStatus(): NxCloudStatus? {
         return withMessageIssueCatch("nx/cloudStatus") {
             server()?.getNxService()?.cloudStatus()?.await()
+        }()
+    }
+
+    suspend fun configureAiAgentsStatus(): ConfigureAiAgentsStatus? {
+        return withMessageIssueCatch("nx/configureAiAgentsStatus") {
+            server()?.getNxService()?.configureAiAgentsStatus()?.await()
         }()
     }
 

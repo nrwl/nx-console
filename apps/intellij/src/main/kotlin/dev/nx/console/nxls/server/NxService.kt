@@ -131,6 +131,11 @@ interface NxService {
     }
 
     @JsonRequest
+    fun configureAiAgentsStatus(): CompletableFuture<ConfigureAiAgentsStatus?> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun pdvData(pdvDataRequest: PDVDataRequest): CompletableFuture<NxPDVData> {
         throw UnsupportedOperationException()
     }
