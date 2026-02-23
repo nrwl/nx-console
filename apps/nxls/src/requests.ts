@@ -1,5 +1,6 @@
 import {
   NxCloudAuthHeadersRequest,
+  NxConfigureAiAgentsStatusRequest,
   NxCloudOnboardingInfoRequest,
   NxCloudStatusRequest,
   NxCreateProjectGraphRequest,
@@ -31,6 +32,7 @@ import { lspLogger } from '@nx-console/language-server-utils';
 import {
   createProjectGraph,
   getCloudOnboardingInfo,
+  getConfigureAiAgentsStatus,
   getGeneratorContextV2,
   getGeneratorOptions,
   getNxCloudStatus,
@@ -339,6 +341,14 @@ export function registerRequests(
       return await getCloudOnboardingInfo(WORKING_PATH, args.force);
     },
   );
+
+  connection.onRequest(NxConfigureAiAgentsStatusRequest, async () => {
+    const WORKING_PATH = getWorkingPath();
+    if (!WORKING_PATH) {
+      return null;
+    }
+    return await getConfigureAiAgentsStatus(WORKING_PATH);
+  });
 
   connection.onRequest(NxPDVDataRequest, async (args: { filePath: string }) => {
     const WORKING_PATH = getWorkingPath();
