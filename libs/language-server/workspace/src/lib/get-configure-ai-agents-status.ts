@@ -6,10 +6,15 @@ export async function getConfigureAiAgentsStatus(
   workspacePath: string,
 ): Promise<ConfigureAiAgentsStatus | null> {
   try {
-    const daemonClientModule = await getNxDaemonClient(workspacePath, lspLogger);
+    const daemonClientModule = await getNxDaemonClient(
+      workspacePath,
+      lspLogger,
+    );
 
     if (!daemonClientModule?.daemonClient) {
-      lspLogger.log('Daemon client not available for configure-ai-agents status');
+      lspLogger.log(
+        'Daemon client not available for configure-ai-agents status',
+      );
       return null;
     }
 
