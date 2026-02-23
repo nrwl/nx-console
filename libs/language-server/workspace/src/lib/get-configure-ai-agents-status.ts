@@ -1,10 +1,10 @@
 import { lspLogger } from '@nx-console/language-server-utils';
 import { getNxDaemonClient } from '@nx-console/shared-nx-workspace-info';
-import { ConfigureAiAgentsStatus } from '@nx-console/shared-types';
+import type { ConfigureAiAgentsStatusResponse } from 'nx/src/daemon/message-types/configure-ai-agents';
 
 export async function getConfigureAiAgentsStatus(
   workspacePath: string,
-): Promise<ConfigureAiAgentsStatus | null> {
+): Promise<ConfigureAiAgentsStatusResponse | null> {
   try {
     const daemonClientModule = await getNxDaemonClient(
       workspacePath,

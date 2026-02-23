@@ -5,4 +5,3 @@ export * from './lib/pdv-data';
 export * from './lib/mcp-callback-types';
 export * from './lib/migrate-view-data';
 export * from './lib/cloud-fix-view';
-export * from './lib/ai-agents';

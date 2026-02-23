@@ -6,7 +6,6 @@ import {
 import { StartupMessageDefinition } from '@nx-console/shared-nx-console-plugins';
 import { GeneratorCollectionInfo, Option } from '@nx-console/shared-schema';
 import {
-  ConfigureAiAgentsStatus,
   CIPEInfo,
   CIPEInfoError,
   CloudOnboardingInfo,
@@ -19,6 +18,7 @@ import type {
   Target,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
+import type { ConfigureAiAgentsStatusResponse } from 'nx/src/daemon/message-types/configure-ai-agents';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
@@ -188,7 +188,7 @@ export const NxCloudOnboardingInfoRequest: RequestType<
 
 export const NxConfigureAiAgentsStatusRequest: RequestType<
   Record<string, never>,
-  ConfigureAiAgentsStatus | null,
+  ConfigureAiAgentsStatusResponse | null,
   unknown
 > = new RequestType('nx/configureAiAgentsStatus');
 
