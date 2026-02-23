@@ -384,6 +384,10 @@ async function runAiAgentCheck() {
 }
 
 async function runAiAgentCheckViaDaemon() {
+  if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
+    return;
+  }
+
   const now = Date.now();
 
   try {

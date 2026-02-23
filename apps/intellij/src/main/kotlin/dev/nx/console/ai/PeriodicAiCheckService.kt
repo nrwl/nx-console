@@ -87,6 +87,10 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
     }
 
     private suspend fun runAiAgentCheckViaDaemon() {
+        if (shouldSkipCheck()) {
+            return
+        }
+
         val now = System.currentTimeMillis()
 
         try {
