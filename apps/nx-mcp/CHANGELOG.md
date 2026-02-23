@@ -1,3 +1,7 @@
+## 0.22.2 (2026-02-23)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
 ## 0.22.1 (2026-02-18)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
