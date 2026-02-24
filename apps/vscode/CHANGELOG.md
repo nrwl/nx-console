@@ -1,3 +1,16 @@
+# [18.91.0](https://github.com/nrwl/nx-console/compare/vscode-v18.90.0...vscode-v18.91.0) (2026-02-24)
+
+
+### Bug Fixes
+
+* **vscode:** guard workspace scan loop and add debug traces ([#3068](https://github.com/nrwl/nx-console/issues/3068)) ([e2fce28](https://github.com/nrwl/nx-console/commit/e2fce28156dc6795388426b838ceab48f09e375e))
+* **vscode:** write valid migrations.json when no migrations exist ([#3067](https://github.com/nrwl/nx-console/issues/3067)) ([06d9964](https://github.com/nrwl/nx-console/commit/06d996413e76fffe2a4312c24d29106b9eb97376)), closes [nrwl/nx#34454](https://github.com/nrwl/nx/issues/34454)
+
+
+### Features
+
+* make configure-ai-agents clickable and improve outdated check ([#3065](https://github.com/nrwl/nx-console/issues/3065)) ([98dda78](https://github.com/nrwl/nx-console/commit/98dda78c1ccd2bc014ae8738f570e992649832fb))
+
 # [18.90.0](https://github.com/nrwl/nx-console/compare/vscode-v18.89.0...vscode-v18.90.0) (2026-02-23)
 
 
