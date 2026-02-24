@@ -13,6 +13,8 @@ fun getOrCreateRunnerConfigurationSettings(
 ): RunnerAndConfigurationSettings {
     val runManager = RunManager.getInstance(project)
 
+    val arguments = args.drop(1).joinToString(" ")
+
     return runManager
         .getConfigurationSettingsList(NxCommandConfigurationType.Util.getInstance())
         .firstOrNull {
@@ -21,6 +23,11 @@ fun getOrCreateRunnerConfigurationSettings(
             nxRunSettings.nxTargets == nxTarget &&
                 nxRunSettings.nxProjects == nxProject &&
                 nxRunSettings.nxTargetsConfiguration == nxTargetConfiguration
+        }
+        ?.also {
+            (it.configuration as NxCommandConfiguration).apply {
+                nxRunSettings = nxRunSettings.copy(arguments = arguments)
+            }
         }
         ?: runManager
             .createConfiguration(
@@ -34,7 +41,7 @@ fun getOrCreateRunnerConfigurationSettings(
                             nxProjects = nxProject,
                             nxTargets = nxTarget,
                             nxTargetsConfiguration = nxTargetConfiguration,
-                            arguments = args.drop(1).joinToString(" "),
+                            arguments = arguments,
                         )
                 }
             }
