@@ -16,6 +16,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import kotlinx.coroutines.*
+import kotlinx.coroutines.future.await
 
 data class WebviewRequest(val type: String, val id: String) {}
 
@@ -92,17 +93,14 @@ open class NxGraphServer(
                     else -> throw Exception("unknown request type ${request.type}")
                 }
 
+            val client = HttpClient.newBuilder().build()
+            val httpRequest =
+                HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Accept-Encoding", "gzip, deflate")
+                    .build()
             val response =
-                withContext(Dispatchers.IO) {
-                    val client = HttpClient.newBuilder().build()
-
-                    val httpRequest =
-                        HttpRequest.newBuilder()
-                            .uri(URI.create(url))
-                            .header("Accept-Encoding", "gzip, deflate")
-                            .build()
-                    client.send(httpRequest, HttpResponse.BodyHandlers.ofString())
-                }
+                client.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString()).await()
             return NxGraphRequest(type = request.type, id = request.id, payload = response.body())
         } catch (e: Throwable) {
             logger.info("error while handling graph request: $e")
