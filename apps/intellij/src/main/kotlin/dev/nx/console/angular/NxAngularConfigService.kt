@@ -8,6 +8,8 @@ import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.EmptyRunnable
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.XMap
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
@@ -28,10 +30,22 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
     PersistentStateComponent<NxAngularConfigService.AngularConfigState> {
 
     init {
-        project.messageBus
-            .connect(cs)
-            .subscribe(NX_WORKSPACE_REFRESH_TOPIC, NxWorkspaceRefreshListener { refresh() })
+        val bus = project.messageBus.connect(cs)
+        bus.subscribe(NX_WORKSPACE_REFRESH_TOPIC, NxWorkspaceRefreshListener { refresh() })
+        bus.subscribe(
+            VirtualFileManager.VFS_CHANGES,
+            object : BulkFileListener {
+                override fun after(events: List<VFileEvent>) {
+                    if (events.any { isRspackConfigFile(it.path) }) {
+                        cs.launch { triggerRootsChange() }
+                    }
+                }
+            },
+        )
     }
+
+    private fun isRspackConfigFile(path: String): Boolean =
+        path.endsWith("/rspack.config.ts") || path.endsWith("/rspack.config.js")
 
     var config: NxAngularConfig? = null
 
@@ -96,14 +110,18 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
     private suspend fun updateConfig(newConfig: NxAngularConfig?) {
         if (config != newConfig) {
             config = newConfig
-            withContext(Dispatchers.EDT) {
-                writeAction {
-                    ProjectRootManagerEx.getInstanceEx(project)
-                        .makeRootsChange(
-                            EmptyRunnable.getInstance(),
-                            RootsChangeRescanningInfo.RESCAN_DEPENDENCIES_IF_NEEDED,
-                        )
-                }
+            triggerRootsChange()
+        }
+    }
+
+    private suspend fun triggerRootsChange() {
+        withContext(Dispatchers.EDT) {
+            writeAction {
+                ProjectRootManagerEx.getInstanceEx(project)
+                    .makeRootsChange(
+                        EmptyRunnable.getInstance(),
+                        RootsChangeRescanningInfo.RESCAN_DEPENDENCIES_IF_NEEDED,
+                    )
             }
         }
     }

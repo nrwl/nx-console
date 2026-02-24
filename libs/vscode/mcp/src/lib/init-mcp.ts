@@ -35,6 +35,7 @@ import {
   setupPeriodicAiCheck,
 } from './periodic-ai-check';
 import { findAvailablePort, isPortAvailable } from './ports';
+import { ConfigureAiAgentsTerminalLinkProvider } from './configure-ai-agents-terminal-link-provider';
 
 let mcpStreamableWebServer: McpStreamableWebServer | undefined;
 let mcpCursorServer: McpCursorServer | undefined;
@@ -119,6 +120,10 @@ export async function initMcp(context: ExtensionContext) {
   );
 
   setupPeriodicAiCheck(context);
+
+  window.registerTerminalLinkProvider(
+    new ConfigureAiAgentsTerminalLinkProvider(),
+  );
 }
 
 function cleanupOldMcpJson() {

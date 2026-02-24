@@ -12,10 +12,12 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import dev.nx.console.mcp.McpServerService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxLatestVersionGeneralCommandLine
 import dev.nx.console.utils.NxProvenance
+import dev.nx.console.utils.sync_services.NxVersionUtil
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,6 +71,74 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
     }
 
     private suspend fun runAiAgentCheck() {
+        if (shouldSkipCheck()) {
+            return
+        }
+
+        val nxVersion = NxVersionUtil.getInstance(project).getNxVersionSynchronously()
+        if (
+            nxVersion != null &&
+                (nxVersion.major > 22 || (nxVersion.major == 22 && nxVersion.minor >= 6))
+        ) {
+            runAiAgentCheckViaDaemon()
+        } else {
+            runAiAgentCheckLegacy()
+        }
+    }
+
+    private suspend fun runAiAgentCheckViaDaemon() {
+        if (shouldSkipCheck()) {
+            return
+        }
+
+        val now = System.currentTimeMillis()
+
+        try {
+            val status = NxlsService.getInstance(project).configureAiAgentsStatus() ?: return
+
+            if (status.outdatedAgents.isNotEmpty()) {
+                val lastUpdateNotificationTimestamp =
+                    PropertiesComponent.getInstance(project)
+                        .getLong(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, 0)
+                if (now - lastUpdateNotificationTimestamp < TWELVE_HOURS_MS) {
+                    return
+                }
+
+                PropertiesComponent.getInstance(project)
+                    .setValue(LAST_AI_CHECK_NOTIFICATION_TIMESTAMP_KEY, now.toString())
+
+                TelemetryService.getInstance(project)
+                    .featureUsed(TelemetryEvent.AI_CONFIGURE_AGENTS_CHECK_NOTIFICATION)
+
+                withContext(Dispatchers.EDT) { notifyAiConfigurationOutdated() }
+                return
+            }
+
+            if (
+                status.partiallyConfiguredAgents.isNotEmpty() ||
+                    status.nonConfiguredAgents.isNotEmpty()
+            ) {
+                val lastConfigureNotificationTimestamp =
+                    PropertiesComponent.getInstance(project)
+                        .getLong(LAST_AI_CONFIGURE_NOTIFICATION_TIMESTAMP_KEY, 0)
+                if (now - lastConfigureNotificationTimestamp < ONE_WEEK_MS) {
+                    return
+                }
+
+                PropertiesComponent.getInstance(project)
+                    .setValue(LAST_AI_CONFIGURE_NOTIFICATION_TIMESTAMP_KEY, now.toString())
+
+                TelemetryService.getInstance(project)
+                    .featureUsed(TelemetryEvent.AI_CONFIGURE_AGENTS_SETUP_NOTIFICATION)
+
+                withContext(Dispatchers.EDT) { notifyAiConfigurationMissing() }
+            }
+        } catch (e: Exception) {
+            // Silently fail - non-critical background check
+        }
+    }
+
+    private suspend fun runAiAgentCheckLegacy() {
         if (shouldSkipCheck()) {
             return
         }

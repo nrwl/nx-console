@@ -255,7 +255,13 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
     }
   }
 
+  vscodeLogger.debug(
+    `Scanning for Nx workspace from "${currentDirectory}" up to "${root}"`,
+  );
+
   while (currentDirectory !== root) {
+    vscodeLogger.debug(`Checking workspace path: ${currentDirectory}`);
+
     if (await fileExists(join(currentDirectory, 'angular.json'))) {
       return setWorkspace(currentDirectory);
     }
@@ -268,8 +274,21 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
     if (await fileExists(join(currentDirectory, 'lerna.json'))) {
       return setWorkspace(currentDirectory);
     }
-    currentDirectory = dirname(currentDirectory);
+
+    const nextDirectory = dirname(currentDirectory);
+    if (nextDirectory === currentDirectory) {
+      vscodeLogger.debug(
+        `Stopping workspace scan because path no longer changes at "${currentDirectory}" (target root "${root}")`,
+      );
+      break;
+    }
+
+    currentDirectory = nextDirectory;
   }
+
+  vscodeLogger.debug(
+    `No Nx workspace found while scanning from "${vscodeWorkspacePath}"`,
+  );
 }
 
 async function setWorkspace(workspacePath: string) {

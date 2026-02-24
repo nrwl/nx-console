@@ -198,6 +198,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
         }()
     }
 
+    suspend fun configureAiAgentsStatus(): ConfigureAiAgentsStatus? {
+        return withMessageIssueCatch("nx/configureAiAgentsStatus") {
+            server()?.getNxService()?.configureAiAgentsStatus()?.await()
+        }()
+    }
+
     suspend fun startDaemon() {
         withMessageIssueCatch("nx/startDaemon") {
             server()?.getNxService()?.startDaemon()?.await()

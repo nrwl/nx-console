@@ -36,11 +36,14 @@ fun getNxAngularProject(name: String, projectJson: VirtualFile): AngularProject?
     val document = FileDocumentManager.getInstance().getCachedDocument(projectJson)
     val documentModStamp = document?.modificationStamp ?: -1
     val fileModStamp = projectJson.modificationStamp
+    val rspackConfigFile = findRspackConfigFile(projectJson)
+    val rspackFileModStamp = rspackConfigFile?.modificationStamp ?: -1
     var cached = NX_ANGULAR_PROJECT_KEY[projectJson]
     if (
         cached == null ||
             cached.docTimestamp != documentModStamp ||
             cached.fileTimestamp != fileModStamp ||
+            cached.rspackFileTimestamp != rspackFileModStamp ||
             (cached.config != null && (cached.config?.name != name))
     ) {
         val config =
@@ -49,6 +52,7 @@ fun getNxAngularProject(name: String, projectJson: VirtualFile): AngularProject?
                     name,
                     document?.charsSequence ?: VfsUtilCore.loadText(projectJson),
                     projectJson,
+                    rspackConfigFile,
                 )
             } catch (e: ProcessCanceledException) {
                 throw e
@@ -59,13 +63,19 @@ fun getNxAngularProject(name: String, projectJson: VirtualFile): AngularProject?
                     .warn("Cannot load " + projectJson.name + ": " + e.message)
                 null
             }
-        cached = CachedAngularProjectConfig(config, documentModStamp, fileModStamp)
+        cached =
+            CachedAngularProjectConfig(config, documentModStamp, fileModStamp, rspackFileModStamp)
         NX_ANGULAR_PROJECT_KEY[projectJson] = cached
     }
     return cached.config
 }
 
-private fun loadProjectJson(name: String, text: CharSequence, file: VirtualFile): AngularProject {
+private fun loadProjectJson(
+    name: String,
+    text: CharSequence,
+    file: VirtualFile,
+    rspackConfigFile: VirtualFile? = null,
+): AngularProject {
     val projectFolder = file.parent
     val workspaceFolder = findFileUpHierarchy(null, file, "nx.json")?.parent ?: projectFolder
     val mapper =
@@ -82,7 +92,13 @@ private fun loadProjectJson(name: String, text: CharSequence, file: VirtualFile)
             .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
     val angularProjectJson =
         mapper.readValue(CharSequenceReader(text), AngularJsonProject::class.java)
-    return NxAngularProject(name, angularProjectJson, workspaceFolder)
+    return NxAngularProject(
+        name,
+        angularProjectJson,
+        workspaceFolder,
+        projectFolder,
+        rspackConfigFile,
+    )
 }
 
 private val NX_ANGULAR_PROJECT_KEY =
@@ -92,4 +108,5 @@ private data class CachedAngularProjectConfig(
     val config: AngularProject?,
     val docTimestamp: Long,
     val fileTimestamp: Long,
+    val rspackFileTimestamp: Long = -1,
 )

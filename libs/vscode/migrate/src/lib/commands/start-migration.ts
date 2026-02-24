@@ -92,7 +92,10 @@ export async function startMigration(custom = false) {
 
   const migrationJsonPath = join(workspacePath, 'migrations.json');
   if (!existsSync(migrationJsonPath)) {
-    writeFileSync(migrationJsonPath, '{}');
+    writeFileSync(
+      migrationJsonPath,
+      JSON.stringify({ migrations: [] }, null, 2),
+    );
   }
 
   const migrateUiApi = await importMigrateUIApi(workspacePath);

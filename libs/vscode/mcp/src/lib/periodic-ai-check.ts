@@ -6,7 +6,10 @@ import {
 } from '@nx-console/shared-npm';
 import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
-import { getNxVersion } from '@nx-console/vscode-nx-workspace';
+import {
+  getConfigureAiAgentsStatus,
+  getNxVersion,
+} from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
@@ -353,6 +356,148 @@ async function getErrorInformation(
 }
 
 async function runAiAgentCheck() {
+  if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
+    return;
+  }
+
+  const workspacePath = getWorkspacePath();
+  if (!workspacePath) {
+    return;
+  }
+
+  if (!(await checkIsNxWorkspace(workspacePath))) {
+    return;
+  }
+
+  try {
+    const nxVersion = await getNxVersion();
+    if (nxVersion && gte(nxVersion, '22.6.0')) {
+      await runAiAgentCheckViaDaemon();
+    } else {
+      await runAiAgentCheckLegacy();
+    }
+  } catch (error) {
+    if ((error as any).message?.includes('AIFAIL')) {
+      throw error;
+    }
+  }
+}
+
+async function runAiAgentCheckViaDaemon() {
+  if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
+    return;
+  }
+
+  const now = Date.now();
+
+  try {
+    getTelemetry().logUsage('ai.configure-agents-check-start');
+
+    const status = await getConfigureAiAgentsStatus();
+
+    if (!status) {
+      getTelemetry().logUsage('ai.configure-agents-check-end');
+      return;
+    }
+
+    if (status.outdatedAgents.length > 0) {
+      const lastUpdateNotificationTimestamp =
+        WorkspaceConfigurationStore.instance.get(
+          'lastAiCheckNotificationTimestamp',
+          0,
+        );
+      const gap = 12 * 60 * 60 * 1000;
+      if (now - lastUpdateNotificationTimestamp < gap) {
+        return;
+      }
+
+      WorkspaceConfigurationStore.instance.set(
+        'lastAiCheckNotificationTimestamp',
+        now,
+      );
+
+      getTelemetry().logUsage('ai.configure-agents-check-notification', {
+        source: 'notification',
+      });
+
+      const selection = await window.showInformationMessage(
+        'Your AI agent configuration is outdated. Would you like to update to the recommended configuration?',
+        'Update',
+        "Don't ask again",
+      );
+
+      if (selection === 'Update') {
+        getTelemetry().logUsage('ai.configure-agents-action', {
+          source: 'notification',
+        });
+        runConfigureAiAgentsCommand();
+      } else if (selection === "Don't ask again") {
+        getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
+          source: 'notification',
+        });
+        WorkspaceConfigurationStore.instance.set('aiCheckDontAskAgain', true);
+      }
+      return;
+    }
+
+    getTelemetry().logUsage('ai.configure-agents-check-end');
+
+    if (
+      status.partiallyConfiguredAgents.length > 0 ||
+      status.nonConfiguredAgents.length > 0
+    ) {
+      const lastConfigureNotificationTimestamp =
+        WorkspaceConfigurationStore.instance.get(
+          'lastAiConfigureNotificationTimestamp',
+          0,
+        );
+      const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+      if (now - lastConfigureNotificationTimestamp < oneWeekInMs) {
+        return;
+      }
+      WorkspaceConfigurationStore.instance.set(
+        'lastAiConfigureNotificationTimestamp',
+        now,
+      );
+      getTelemetry().logUsage('ai.configure-agents-setup-notification', {
+        source: 'notification',
+      });
+
+      const selection = await window.showInformationMessage(
+        'Want Nx to configure your AI agents and MCP setup?',
+        'Yes',
+        'Learn more',
+        "Don't ask again",
+      );
+
+      if (selection === 'Yes') {
+        getTelemetry().logUsage('ai.configure-agents-setup-action', {
+          source: 'notification',
+        });
+        runConfigureAiAgentsCommand();
+      } else if (selection === 'Learn more') {
+        getTelemetry().logUsage('ai.configure-agents-learn-more', {
+          source: 'notification',
+        });
+
+        commands.executeCommand(
+          'vscode.open',
+          'https://nx.dev/docs/getting-started/ai-setup#configure-nx-ai-integration',
+        );
+      } else if (selection === "Don't ask again") {
+        getTelemetry().logUsage('ai.configure-agents-dont-ask-again', {
+          source: 'notification',
+        });
+
+        WorkspaceConfigurationStore.instance.set('aiCheckDontAskAgain', true);
+      }
+    }
+  } catch (error) {
+    // Silently fail - this is a non-critical background check
+  }
+}
+
+async function runAiAgentCheckLegacy() {
   if (WorkspaceConfigurationStore.instance.get('aiCheckDontAskAgain', false)) {
     return;
   }

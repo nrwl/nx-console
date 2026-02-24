@@ -18,6 +18,7 @@ import type {
   Target,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
+import type { ConfigureAiAgentsStatusResponse } from 'nx/src/daemon/message-types/configure-ai-agents';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
@@ -184,6 +185,12 @@ export const NxCloudOnboardingInfoRequest: RequestType<
   CloudOnboardingInfo,
   unknown
 > = new RequestType('nx/cloudOnboardingInfo');
+
+export const NxConfigureAiAgentsStatusRequest: RequestType<
+  Record<string, never>,
+  ConfigureAiAgentsStatusResponse | null,
+  unknown
+> = new RequestType('nx/configureAiAgentsStatus');
 
 export const NxPDVDataRequest: RequestType<
   { filePath: string },
