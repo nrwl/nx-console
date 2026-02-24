@@ -1,3 +1,29 @@
+## 1.11.0 (2026-02-24)
+
+### 🚀 Features
+
+- make configure-ai-agents clickable and improve outdated check ([#3065](https://github.com/nrwl/nx-console/pull/3065))
+- implement passive daemon watcher ([#2851](https://github.com/nrwl/nx-console/pull/2851))
+- **nxls:** make nxls intialization not block on startup ([#2959](https://github.com/nrwl/nx-console/pull/2959))
+
+### 🩹 Fixes
+
+- handle some nxls & vscode bugs ([#3023](https://github.com/nrwl/nx-console/pull/3023))
+- **nxls:** fix daemon disabled TreeItem in non-node_modules case ([#3008](https://github.com/nrwl/nx-console/pull/3008))
+- **nxls:** improve various parts of nxls refresh behaviour ([#3001](https://github.com/nrwl/nx-console/pull/3001))
+- **nxls:** fix projectsByPaths request that was dropped during refactor ([#2991](https://github.com/nrwl/nx-console/pull/2991))
+- include system CA for fetch requests to enable talking to self-signed nx cloud instances ([#2977](https://github.com/nrwl/nx-console/pull/2977))
+- **nxls:** enable passing explicit branch to getRecentCIPEs ([#2989](https://github.com/nrwl/nx-console/pull/2989))
+- **nxls:** stop nxls from sending things into closed connection ([#2976](https://github.com/nrwl/nx-console/pull/2976))
+- **nxls:** fix running tasks on windows ([#2953](https://github.com/nrwl/nx-console/pull/2953))
+- **nx-mcp:** remove awaiting project graph from mcp startup even with ide provider ([#2944](https://github.com/nrwl/nx-console/pull/2944))
+- **nxls:** misc fixes to get nxls to work with helix ([#2793](https://github.com/nrwl/nx-console/pull/2793))
+
+### ❤️ Thank You
+
+- Emily Marigold Klassen @forivall
+- MaxKless @MaxKless
+
 ## 1.10.0 (2025-12-15)
 
 ### 🚀 Features
