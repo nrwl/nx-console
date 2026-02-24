@@ -45,6 +45,8 @@ import java.util.regex.Matcher
 import javax.swing.JPanel
 import javax.swing.JProgressBar
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import ru.nsk.kstatemachine.event.DataEvent
@@ -112,7 +114,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private val projectsComboBoxListener = ItemListener { e ->
         if (e != null && e.stateChange == ItemEvent.SELECTED) {
             if (::stateMachine.isInitialized) {
-                stateMachine.processEventByLaunch(Events.SelectMultiProject())
+                safeProcessEvent(Events.SelectMultiProject())
             }
         }
     }
@@ -126,6 +128,11 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private lateinit var messageBusConnection: SimpleMessageBusConnection
 
     private val scope: CoroutineScope = ProjectLevelCoroutineHolderService.getInstance(project).cs
+    private val stateMachineMutex = Mutex()
+
+    private fun safeProcessEvent(event: Event) {
+        scope.launch { stateMachineMutex.withLock { stateMachine.processEvent(event) } }
+    }
 
     init {
         progressBar.setUI(
@@ -762,18 +769,16 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                     if (project.isDisposed) {
                         return@NxWorkspaceRefreshListener
                     }
-                    stateMachine.processEventByLaunch(Events.TryLoadPDV())
+                    safeProcessEvent(Events.TryLoadPDV())
                 },
             )
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
-                NxWorkspaceRefreshStartedListener {
-                    stateMachine.processEventByLaunch(Events.RefreshStarted())
-                },
+                NxWorkspaceRefreshStartedListener { safeProcessEvent(Events.RefreshStarted()) },
             )
             subscribe(
                 UISettingsListener.TOPIC,
-                UISettingsListener { stateMachine.processEventByLaunch(Events.ChangeUISettings()) },
+                UISettingsListener { safeProcessEvent(Events.ChangeUISettings()) },
             )
         }
     }
