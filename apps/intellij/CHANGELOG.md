@@ -1,3 +1,20 @@
+## 1.58.0 (2026-02-24)
+
+### Bug Fixes
+
+* **intellij:** prevent errors from multiple events being processed by PDV state machine simultaneously ([#3069](https://github.com/nrwl/nx-console/issues/3069)) ([5833ffa](https://github.com/nrwl/nx-console/commit/5833ffa2e7dcb80e02bc079efac036b0439beebd))
+* **intellij:** replace deprecated ReadAction.nonBlocking(Runnable) ([#3025](https://github.com/nrwl/nx-console/issues/3025)) ([cffd436](https://github.com/nrwl/nx-console/commit/cffd4362a68b18118651ca50fa30488829598c5f))
+* **intellij:** respect project sdk by injecting JAVA_HOME into nx commands ([#3031](https://github.com/nrwl/nx-console/issues/3031)) ([b4c891d](https://github.com/nrwl/nx-console/commit/b4c891df4233f16855ab272d902f0d2b0edc4542))
+* **intellij:** rework generate ui loading to work with remote dev ([#3055](https://github.com/nrwl/nx-console/issues/3055)) ([099d7ab](https://github.com/nrwl/nx-console/commit/099d7abbb211ca3a68a47fc8b511ec6b3c46ae42))
+* **nx-mcp:** surface selfHealingSkipInfo in ci_information output ([#3063](https://github.com/nrwl/nx-console/issues/3063)) ([980ae2b](https://github.com/nrwl/nx-console/commit/980ae2b3a3ee927da12509bebbaf494c022e9b0a))
+
+
+### Features
+
+* **intellij:** resolve style preprocessor include paths from rspack config ([#3062](https://github.com/nrwl/nx-console/issues/3062)) ([2c3c249](https://github.com/nrwl/nx-console/commit/2c3c2490ee39f6938be6855df990ce4d90623e6f))
+* make configure-ai-agents clickable and improve outdated check ([#3065](https://github.com/nrwl/nx-console/issues/3065)) ([98dda78](https://github.com/nrwl/nx-console/commit/98dda78c1ccd2bc014ae8738f570e992649832fb))
+* **nx-mcp:** support run and task URLs in CI information tool ([#3024](https://github.com/nrwl/nx-console/issues/3024)) ([f89c629](https://github.com/nrwl/nx-console/commit/f89c629a59c621a03a0c472c218e5003be64edf9))
+
 ## 1.57.0 (2026-02-09)
 
 ### Bug Fixes
