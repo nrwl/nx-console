@@ -131,11 +131,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     private val stateMachineMutex = Mutex()
 
     private fun safeProcessEvent(event: Event) {
-        scope.launch {
-            stateMachineMutex.withLock {
-                stateMachine.processEvent(event)
-            }
-        }
+        scope.launch { stateMachineMutex.withLock { stateMachine.processEvent(event) } }
     }
 
     init {
@@ -778,9 +774,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             )
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC,
-                NxWorkspaceRefreshStartedListener {
-                    safeProcessEvent(Events.RefreshStarted())
-                },
+                NxWorkspaceRefreshStartedListener { safeProcessEvent(Events.RefreshStarted()) },
             )
             subscribe(
                 UISettingsListener.TOPIC,
