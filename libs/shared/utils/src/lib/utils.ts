@@ -14,7 +14,11 @@ export function hasKey<T extends object>(
   obj: T,
   key: PropertyKey,
 ): key is keyof T {
-  return key in obj;
+  return (
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    obj !== null &&
+    key in obj
+  );
 }
 
 export function formatError(message: string, err: any): string {
