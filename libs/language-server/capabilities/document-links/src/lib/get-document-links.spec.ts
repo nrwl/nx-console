@@ -160,6 +160,70 @@ it('should get document links for negated interpolated paths', async () => {
   documentMapper.dispose();
 });
 
+it('should not throw when matching schema is malformed', async () => {
+  const { document, jsonAst } = documentMapper.retrieve(
+    TextDocument.create(
+      'file:///project.json',
+      'json',
+      0,
+      `
+{
+  "targets": {
+    "offending-target": {
+      "executor": "@my-org/my-plugin:my-executor",
+      "options": {
+        "inputPath": "path/to/input",
+        "outputPath": "path/to/output"
+      }
+    }
+  }
+}
+      `,
+    ),
+  );
+
+  const matchingSchemas = await languageService.getMatchingSchemas(
+    document,
+    jsonAst,
+    {
+      type: 'object',
+      properties: {
+        targets: {
+          type: 'object',
+          additionalProperties: {
+            type: 'object',
+            properties: {
+              options: {
+                type: 'object',
+                properties: {
+                  // malformed schema seen in issue #2050 local executor schema
+                  inputPath: 'string' as any,
+                  outputPath: 'string' as any,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  );
+
+  const malformedMatchingSchemas = [
+    ...matchingSchemas,
+    {
+      // malformed schema value shape returned in issue #2050
+      schema: 'string',
+      node: jsonAst.root,
+    },
+  ] as any;
+
+  await expect(
+    getDocumentLinks('/workspace', jsonAst, document, malformedMatchingSchemas),
+  ).resolves.toEqual([]);
+
+  documentMapper.dispose();
+});
+
 describe('project links', () => {
   const mockProjectGraph = {
     nodes: {
