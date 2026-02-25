@@ -1,9 +1,12 @@
-import { Combobox, ComboboxAutocomplete } from '@microsoft/fast-foundation';
+import { ComboboxAutocomplete } from '@microsoft/fast-foundation';
 import { spread } from '@open-wc/lit-helpers';
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
-import { extractItemOptions } from '../../../utils/generator-schema-utils';
+import {
+  extractItemLabel,
+  extractItemOptions,
+} from '../../../utils/generator-schema-utils';
 import { Field } from '../mixins/field-mixin';
 import { FieldWrapper } from '../mixins/field-wrapper-mixin';
 
@@ -30,7 +33,9 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
         ${map(
           extractItemOptions(this.option),
           (item) =>
-            html`<vscode-option value="${item}">${item}</vscode-option>`,
+            html`<vscode-option value="${item}">
+              ${extractItemLabel(this.option, item)}
+            </vscode-option>`,
         )}
       </vscode-single-select>
     `;
@@ -47,7 +52,9 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
         ${map(
           extractItemOptions(this.option),
           (item) =>
-            html`<intellij-option value="${item}">${item}</intellij-option>`,
+            html`<intellij-option value="${item}">
+              ${extractItemLabel(this.option, item)}
+            </intellij-option>`,
         )}
       </intellij-combobox>
     `;
