@@ -1,12 +1,9 @@
 import { Option } from '@nx-console/shared-schema';
-import { html, LitElement, PropertyValueMap } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { Field } from './mixins/field-mixin';
-import {
-  extractDefaultValue,
-  extractItemLabel,
-} from '../../utils/generator-schema-utils';
+import { extractItemLabel } from '../../utils/generator-schema-utils';
 import { when } from 'lit/directives/when.js';
 import { spread } from '@open-wc/lit-helpers';
 import {

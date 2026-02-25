@@ -1,4 +1,4 @@
-import { Combobox, ComboboxAutocomplete } from '@microsoft/fast-foundation';
+import { ComboboxAutocomplete } from '@microsoft/fast-foundation';
 import { spread } from '@open-wc/lit-helpers';
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
