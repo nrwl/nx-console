@@ -31,6 +31,19 @@ describe('document links - malformed local executor schema', () => {
       },
     });
 
+    writeFileSync(
+      projectJsonPath,
+      JSON.stringify(
+        {
+          targets: {
+            build: {},
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
     execSync('npm install -D @nx/plugin --force', {
       cwd: workspacePath,
       stdio: 'pipe',
@@ -128,7 +141,9 @@ describe('document links - malformed local executor schema', () => {
   });
 
   afterAll(async () => {
-    await nxlsWrapper.stopNxls();
+    if (nxlsWrapper) {
+      await nxlsWrapper.stopNxls();
+    }
   });
 
   it('should not fail documentLink request when local schema is malformed', async () => {
