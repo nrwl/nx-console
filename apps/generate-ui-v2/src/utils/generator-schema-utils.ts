@@ -73,3 +73,7 @@ export function extractItemOptions(option: Option): string[] {
   }
   return option.items.enum;
 }
+
+export function extractItemLabel(option: Option, itemValue: string): string {
+  return option.itemTooltips?.[itemValue] ?? itemValue;
+}

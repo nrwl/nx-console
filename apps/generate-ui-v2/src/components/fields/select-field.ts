@@ -5,6 +5,7 @@ import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
 import {
   extractDefaultValue,
+  extractItemLabel,
   extractItemOptions,
 } from '../../utils/generator-schema-utils';
 import {
@@ -41,7 +42,12 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
         ${map(
           extractItemOptions(this.option),
           (item) =>
-            html`<option value="${item}" title="${item}">${item}</option>`,
+            html`<option
+              value="${item}"
+              title="${extractItemLabel(this.option, item)}"
+            >
+              ${extractItemLabel(this.option, item)}
+            </option>`,
         )}
       </select>
     `;
@@ -65,9 +71,12 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
         ${map(
           itemOptions,
           (item) =>
-            html`<vscode-option value="${item}" title="${item}"
-              >${item}</vscode-option
-            >`,
+            html`<vscode-option
+              value="${item}"
+              title="${extractItemLabel(this.option, item)}"
+            >
+              ${extractItemLabel(this.option, item)}
+            </vscode-option>`,
         )}
       </vscode-single-select>
     `;

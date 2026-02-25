@@ -3,7 +3,10 @@ import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { Field } from './mixins/field-mixin';
-import { extractDefaultValue } from '../../utils/generator-schema-utils';
+import {
+  extractDefaultValue,
+  extractItemLabel,
+} from '../../utils/generator-schema-utils';
 import { when } from 'lit/directives/when.js';
 import { spread } from '@open-wc/lit-helpers';
 import {
@@ -32,7 +35,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
             ${this.selectedElements.map(
               (element, index) =>
                 html`<badge-element
-                  text="${element}"
+                  text="${extractItemLabel(this.option, element)}"
                   fieldId="${this.fieldId}"
                   @remove="${() => this.removeValue(index)}"
                 ></badge-element>`,
@@ -59,7 +62,12 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         ${map(
           this.extractItemOptions(this.option),
           (item) =>
-            html`<option value="${item}" title="${item}">${item}</option>`,
+            html`<option
+              value="${item}"
+              title="${extractItemLabel(this.option, item)}"
+            >
+              ${extractItemLabel(this.option, item)}
+            </option>`,
         )}
       </select>`;
     } else {
@@ -78,9 +86,12 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         ${map(
           this.extractItemOptions(this.option),
           (item) =>
-            html`<vscode-option value="${item}" title="${item}"
-              >${item}</vscode-option
-            >`,
+            html`<vscode-option
+              value="${item}"
+              title="${extractItemLabel(this.option, item)}"
+            >
+              ${extractItemLabel(this.option, item)}
+            </vscode-option>`,
         )}
       </vscode-single-select>`;
     }

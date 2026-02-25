@@ -1,6 +1,7 @@
 import {
   compareWithDefaultValue,
   extractDefaultValue,
+  extractItemLabel,
   extractItemOptions,
   getGeneratorIdentifier,
   getGeneratorNameTitleCase,
@@ -169,6 +170,40 @@ describe('generator schema utils', () => {
           },
         }),
       ).toEqual(['a', 'b', 'c']);
+    });
+  });
+
+  describe('extractItemLabel', () => {
+    it('should return matching label from item tooltips', () => {
+      expect(
+        extractItemLabel(
+          {
+            name: 'select',
+            isRequired: false,
+            aliases: [],
+            itemTooltips: {
+              da: 'Data Access',
+            },
+          },
+          'da',
+        ),
+      ).toEqual('Data Access');
+    });
+
+    it('should fallback to raw value if no tooltip exists', () => {
+      expect(
+        extractItemLabel(
+          {
+            name: 'select',
+            isRequired: false,
+            aliases: [],
+            itemTooltips: {
+              da: 'Data Access',
+            },
+          },
+          'f',
+        ),
+      ).toEqual('f');
     });
   });
 });
