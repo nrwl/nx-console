@@ -31,7 +31,18 @@ code --extensionDevelopmentPath=/workspace/dist/apps/vscode /path/to/nx-workspac
 ```
 After VS Code opens, trust the workspace when prompted, then reload (Ctrl+R) to fully activate the extension. The Nx Console panel will appear in the sidebar.
 
+## Testing the nx-mcp server with MCP Inspector CLI
+After building (`nx build nx-mcp`), use the [MCP Inspector CLI](https://github.com/modelcontextprotocol/inspector) to test the server programmatically via stdio — no manual SSE wiring needed:
+```bash
+# List all available tools
+npx @modelcontextprotocol/inspector --cli node dist/apps/nx-mcp/main.js /workspace --method tools/list
+
+# Call a specific tool (target args go before --method)
+npx @modelcontextprotocol/inspector --cli node dist/apps/nx-mcp/main.js /workspace --method tools/call --tool-name nx_workspace
+npx @modelcontextprotocol/inspector --cli node dist/apps/nx-mcp/main.js /workspace --method tools/call --tool-name nx_docs --tool-arg userQuery=caching
+npx @modelcontextprotocol/inspector --cli node dist/apps/nx-mcp/main.js /workspace --method tools/call --tool-name nx_project_details --tool-arg projectName=nxls
+```
+
 ## Gotchas
 - The `yarn watch` / `nx run vscode:watch:debug` command requires the Nx Daemon (`npx nx daemon --start`). In headless/containerized environments the daemon's file watcher may not initialize properly, causing watch to fail. Use one-off builds (`nx run vscode:build:debug`) instead.
-- The nx-mcp server can be tested standalone: `node dist/apps/nx-mcp/main.js --sse --port 9921 /path/to/workspace`. It only supports a single concurrent SSE connection; the SSE connection must remain open to receive tool call responses.
 - The nxls language server is designed for stdio communication with IDE clients. It can be verified to start with `node dist/apps/nxls/main.js --stdio` but will error on connection disposal when stdin closes — this is expected.
