@@ -4,6 +4,7 @@ import {
 } from '../support/console-spy';
 import { getFieldByName } from '../support/get-elements';
 import { visitGenerateUi } from '../support/visit-generate-ui';
+import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 
 const itemTooltips = {
   da: 'Data Access',
@@ -11,7 +12,7 @@ const itemTooltips = {
   s: 'State Management',
 };
 
-const labelsSchema = {
+const labelsSchema: GeneratorSchema = {
   collectionName: '@nx/test',
   generatorName: 'test',
   description: 'description',
