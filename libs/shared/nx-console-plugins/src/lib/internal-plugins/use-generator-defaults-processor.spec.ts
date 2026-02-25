@@ -112,4 +112,126 @@ describe('useGeneratorDefaultsProcessor', () => {
 
     expect(processedSchema).toEqual(defaultSchema);
   });
+
+  it('should allow overriding boolean defaults to false - nested', () => {
+    const schema: GeneratorSchema = {
+      collectionName: '@nx/react',
+      generatorName: 'library',
+      description: '',
+      options: [
+        {
+          name: 'component',
+          type: 'boolean',
+          default: true,
+          aliases: [],
+          isRequired: false,
+        },
+      ],
+    };
+    const workspace = {
+      nxJson: {
+        generators: {
+          '@nx/react': {
+            library: {
+              component: false,
+            },
+          },
+        },
+      },
+    };
+
+    const processedSchema = useGeneratorDefaultsProcessor(
+      schema,
+      workspace as any as NxWorkspace,
+      mockLogger,
+    );
+
+    expect(processedSchema.options).toEqual([
+      {
+        name: 'component',
+        type: 'boolean',
+        default: false,
+        aliases: [],
+        isRequired: false,
+      },
+    ]);
+  });
+
+  it('should allow overriding boolean defaults to false - flat', () => {
+    const schema: GeneratorSchema = {
+      collectionName: '@nx/react',
+      generatorName: 'library',
+      description: '',
+      options: [
+        {
+          name: 'component',
+          type: 'boolean',
+          default: true,
+          aliases: [],
+          isRequired: false,
+        },
+      ],
+    };
+    const workspace = {
+      nxJson: {
+        generators: {
+          '@nx/react:library': {
+            component: false,
+          },
+        },
+      },
+    };
+
+    const processedSchema = useGeneratorDefaultsProcessor(
+      schema,
+      workspace as any as NxWorkspace,
+      mockLogger,
+    );
+
+    expect(processedSchema.options).toEqual([
+      {
+        name: 'component',
+        type: 'boolean',
+        default: false,
+        aliases: [],
+        isRequired: false,
+      },
+    ]);
+  });
+
+  it('should keep falsy defaults like empty string and zero', () => {
+    const workspace = {
+      nxJson: {
+        generators: {
+          'my-collection': {
+            'my-generator': {
+              option1: '',
+              option2: 0,
+            },
+          },
+        },
+      },
+    };
+
+    const processedSchema = useGeneratorDefaultsProcessor(
+      defaultSchema,
+      workspace as any as NxWorkspace,
+      mockLogger,
+    );
+
+    expect(processedSchema.options).toEqual([
+      {
+        name: 'option1',
+        default: '',
+        aliases: [],
+        isRequired: false,
+      },
+      {
+        name: 'option2',
+        default: 0,
+        aliases: [],
+        isRequired: false,
+      },
+    ]);
+  });
 });
