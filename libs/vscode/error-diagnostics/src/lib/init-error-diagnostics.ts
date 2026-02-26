@@ -2,8 +2,6 @@ import { NxError } from '@nx-console/shared-types';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode-lsp-client';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { existsSync } from 'fs';
-import { join } from 'path';
 import {
   Diagnostic,
   DiagnosticCollection,
@@ -14,6 +12,7 @@ import {
   DiagnosticSeverity,
 } from 'vscode';
 import { getMessageForError } from '@nx-console/shared-utils';
+import { getUriForError } from './get-uri-for-error';
 
 export function initErrorDiagnostics(context: ExtensionContext) {
   const diagnosticCollection = languages.createDiagnosticCollection('nx');
@@ -40,9 +39,10 @@ function setDiagnostics(
 ) {
   diagnosticCollection.clear();
 
+  const workspacePath = getNxWorkspacePath();
   const diagnosticsByUri = new Map<string, Diagnostic[]>();
   errors.forEach((error) => {
-    const uri = getUriForError(error);
+    const uri = getUriForError(error, workspacePath);
 
     const diagnostic = new Diagnostic(
       new Range(0, 0, 0, 0),
@@ -57,26 +57,7 @@ function setDiagnostics(
     }
   });
 
-  diagnosticsByUri.forEach((diagnostics, uri) => {
-    diagnosticCollection.set(Uri.parse(uri), diagnostics);
+  diagnosticsByUri.forEach((diagnostics, uriString) => {
+    diagnosticCollection.set(Uri.parse(uriString), diagnostics);
   });
-}
-
-function getUriForError(error: NxError) {
-  const workspacePath = getNxWorkspacePath();
-  if (error.file) {
-    return Uri.parse(join(workspacePath, error.file));
-  }
-
-  const nxJsonPath = join(workspacePath, 'nx.json');
-  if (existsSync(nxJsonPath)) {
-    return Uri.parse(nxJsonPath);
-  }
-
-  const lernaJsonPath = join(workspacePath, 'lerna.json');
-  if (existsSync(lernaJsonPath)) {
-    return Uri.parse(lernaJsonPath);
-  }
-
-  return Uri.parse(workspacePath);
 }
