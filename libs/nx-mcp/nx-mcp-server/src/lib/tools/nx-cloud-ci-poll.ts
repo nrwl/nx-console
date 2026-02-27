@@ -14,7 +14,7 @@ import {
   getCurrentGitBranch,
   parseShortLink,
   formatCIInformationOverview,
-} from './nx-cloud';
+} from './nx-cloud-utils';
 import {
   CIInformationOutput,
   CIPollOutput,
