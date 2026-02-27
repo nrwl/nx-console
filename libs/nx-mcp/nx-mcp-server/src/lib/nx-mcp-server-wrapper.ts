@@ -207,6 +207,9 @@ export class NxMcpServerWrapper {
 
     // Clear all registered CIPE resources
     clearRegisteredCipeResources();
+
+    // Clean up tool registry (task store timers)
+    this.toolRegistry.cleanup();
   }
 
   /**
@@ -410,6 +413,11 @@ export const nxMcpServerCapabilities: ServerCapabilities = {
   resources: {
     listChanged: true,
     subscribe: false,
+  },
+  tasks: {
+    list: {},
+    cancel: {},
+    requests: { tools: { call: {} } },
   },
   logging: {},
 };

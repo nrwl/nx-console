@@ -32,6 +32,8 @@ export const CI_INFORMATION = 'ci_information';
 
 export const UPDATE_SELF_HEALING_FIX = 'update_self_healing_fix';
 
+export const CI_POLL = 'ci_poll';
+
 export const CLOUD_POLYGRAPH_INIT = 'cloud_polygraph_init';
 
 export const CLOUD_POLYGRAPH_DELEGATE = 'cloud_polygraph_delegate';

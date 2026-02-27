@@ -59,6 +59,12 @@ export interface CIInformationOutput {
   [key: string]: unknown;
 }
 
+export interface CIPollOutput extends CIInformationOutput {
+  pollStatus: string;
+  pollCount: number;
+  elapsedSeconds: number;
+}
+
 export interface UpdateSelfHealingFixOutput {
   success: boolean;
   message: string;
@@ -160,6 +166,37 @@ export const ciInformationOutputSchema = {
     error: { type: ['string', 'null'] },
     hints: { type: 'array', items: { type: 'string' } },
   },
+};
+
+export const ciPollOutputSchema = {
+  type: 'object',
+  properties: {
+    ...ciInformationOutputSchema.properties,
+    pollStatus: {
+      type: 'string',
+      description: 'Actionable status code indicating why polling stopped',
+      enum: [
+        'ci_success',
+        'fix_available',
+        'fix_auto_applying',
+        'fix_failed',
+        'environment_issue',
+        'no_fix',
+        'self_healing_throttled',
+        'polling_timeout',
+        'cipe_canceled',
+        'cipe_timed_out',
+        'cipe_no_tasks',
+        'no_cipe',
+      ],
+    },
+    pollCount: { type: 'number', description: 'Number of polling iterations' },
+    elapsedSeconds: {
+      type: 'number',
+      description: 'Total elapsed time in seconds',
+    },
+  },
+  required: ['pollStatus', 'pollCount', 'elapsedSeconds'],
 };
 
 export async function loadNxOutputSchemas(
