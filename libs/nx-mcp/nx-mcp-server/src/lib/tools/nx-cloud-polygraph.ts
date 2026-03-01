@@ -634,7 +634,7 @@ function registerChildStatus(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_CHILD_STATUS,
       description:
-        'Get the status and recent output of child agents in a Polygraph session. Use this to monitor progress of delegated tasks. Each child\'s status field uses ACP lifecycle values: created, in-progress, completed, failed, or cancelled.',
+        "Get the status and recent output of child agents in a Polygraph session. Use this to monitor progress of delegated tasks. Each child's status field uses ACP lifecycle values: created, in-progress, completed, failed, or cancelled.",
       inputSchema: childStatusSchema.shape,
       annotations: {
         destructiveHint: false,
