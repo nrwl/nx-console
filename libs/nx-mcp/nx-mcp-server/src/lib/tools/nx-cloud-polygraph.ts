@@ -39,7 +39,7 @@ const polygraphInitSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Optional session ID to use. If provided, takes precedence over CLAUDE_CODE_SESSION_ID env var and random generation.',
+      'Override the auto-generated session ID. Only use this for resuming an existing session or advanced use cases. By default, a unique ID is generated from a short UUID prefix and the local git branch name.',
     ),
   selectedWorkspaceIds: z
     .array(z.string())
@@ -68,6 +68,42 @@ function delegateResultToCallToolResult(result: any): CallToolResult {
     return { content: [{ type: 'text', text: result.error }], isError: true };
   }
   return { content: [{ type: 'text', text: result.message }] };
+}
+
+async function getLocalBranchName(
+  workspacePath: string,
+): Promise<string | null> {
+  try {
+    const { execSync } = await import('node:child_process');
+    const branch = execSync('git branch --show-current', {
+      cwd: workspacePath,
+      encoding: 'utf-8',
+      timeout: 5000,
+    }).trim();
+    if (!branch || ['main', 'master', 'dev', 'develop'].includes(branch)) {
+      return null;
+    }
+    return branch;
+  } catch {
+    return null;
+  }
+}
+
+function sanitizeBranchName(branch: string): string {
+  return branch
+    .replace(/\//g, '-')
+    .replace(/[^a-zA-Z0-9-_]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+async function generateSessionId(workspacePath: string): Promise<string> {
+  const shortId = randomUUID().slice(0, 5);
+  const branch = await getLocalBranchName(workspacePath);
+  if (branch) {
+    return `${shortId}-${sanitizeBranchName(branch)}`;
+  }
+  return shortId;
 }
 
 function registerInit(
@@ -102,7 +138,7 @@ function registerInit(
         const sessionId =
           params.setSessionId ??
           process.env.CLAUDE_CODE_SESSION_ID ??
-          randomUUID();
+          (await generateSessionId(workspacePath));
 
         try {
           const result = await nxCloudClient.polygraphInit(logger, {
