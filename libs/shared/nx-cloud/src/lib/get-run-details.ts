@@ -63,6 +63,7 @@ export async function getRunDetails(
   workspacePath: string,
   logger: Logger,
   runId: string,
+  polygraphSessionId?: string,
 ): Promise<Result<RunDetails, RunDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
@@ -74,7 +75,11 @@ export async function getRunDetails(
   }
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}`;
+  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}${
+    polygraphSessionId
+      ? `?polygraphSessionId=${encodeURIComponent(polygraphSessionId)}`
+      : ''
+  }`;
 
   const headers: any = {
     'Content-Type': 'application/json',

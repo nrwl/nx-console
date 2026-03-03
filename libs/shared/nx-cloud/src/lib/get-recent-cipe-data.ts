@@ -20,7 +20,7 @@ let cachedResult: {
 export async function getRecentCIPEData(
   workspacePath: string,
   logger: Logger,
-  options?: { branch?: string },
+  options?: { branch?: string; polygraphSessionId?: string },
 ): Promise<{
   info?: CIPEInfo[];
   error?: CIPEInfoError;
@@ -38,9 +38,10 @@ export async function getRecentCIPEData(
     };
   }
 
-  // Skip cache when an explicit branch is requested to ensure we always query for it
+  // Skip cache when an explicit branch or polygraphSessionId is requested
   if (
     !explicitBranch &&
+    !options?.polygraphSessionId &&
     cachedResult &&
     now - lastFetchTimestamp < CACHE_TTL_MS &&
     cachedWorkspacePath === workspacePath
@@ -59,6 +60,9 @@ export async function getRecentCIPEData(
 
   const data = JSON.stringify({
     branches: branchNames,
+    ...(options?.polygraphSessionId && {
+      polygraphSessionId: options.polygraphSessionId,
+    }),
   });
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
   const url = `${nxCloudUrl}/nx-cloud/nx-console/ci-pipeline-executions`;
@@ -86,8 +90,8 @@ export async function getRecentCIPEData(
       workspaceUrl: responseData.workspaceUrl,
     };
 
-    // Only cache results when no explicit branch is requested
-    if (!explicitBranch) {
+    // Only cache results when no explicit branch or polygraphSessionId is requested
+    if (!explicitBranch && !options?.polygraphSessionId) {
       cachedResult = result;
       cachedWorkspacePath = workspacePath;
       lastFetchTimestamp = Date.now();

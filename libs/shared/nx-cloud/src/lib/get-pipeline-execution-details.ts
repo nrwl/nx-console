@@ -96,6 +96,7 @@ export async function getPipelineExecutionDetails(
   workspacePath: string,
   logger: Logger,
   pipelineExecutionId: string,
+  polygraphSessionId?: string,
 ): Promise<Result<PipelineExecutionDetails, PipelineExecutionDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
@@ -107,7 +108,11 @@ export async function getPipelineExecutionDetails(
   }
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const url = `${nxCloudUrl}/nx-cloud/mcp-context/pipeline-executions/${pipelineExecutionId}`;
+  const url = `${nxCloudUrl}/nx-cloud/mcp-context/pipeline-executions/${pipelineExecutionId}${
+    polygraphSessionId
+      ? `?polygraphSessionId=${encodeURIComponent(polygraphSessionId)}`
+      : ''
+  }`;
 
   const headers: any = {
     'Content-Type': 'application/json',

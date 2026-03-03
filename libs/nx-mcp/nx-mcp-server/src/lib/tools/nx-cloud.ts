@@ -270,6 +270,7 @@ export function registerNxCloudTools(
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'Includes selfHealingSkippedReason/selfHealingSkipMessage when self-healing was skipped (e.g. THROTTLED). ' +
+        'Supports cross-workspace access via polygraphSessionId for Polygraph sessions spanning multiple workspaces. ' +
         'See output schema for available fields. Long strings are paginated automatically.',
       inputSchema: ciInformationSchema.shape,
       outputSchema: ciInformationOutputSchema,
@@ -553,6 +554,14 @@ const ciInformationSchema = z.object({
         'Task summaries use reverse pagination (page 0 = most recent output). ' +
         'Other strings use forward pagination (page 0 = start).',
     ),
+  polygraphSessionId: z
+    .string()
+    .optional()
+    .describe(
+      'Optional Polygraph session ID for cross-workspace CI data access. ' +
+        'When provided, CI data from all workspaces in the Polygraph session becomes accessible. ' +
+        'Use this when monitoring CI for branches across multiple workspaces within a Polygraph session.',
+    ),
 });
 
 const updateSelfHealingFixSchema = z.object({
@@ -791,6 +800,7 @@ async function resolveUrlToBranch(
   parsed: ParsedNxCloudUrl,
   workspacePath: string,
   logger: Logger,
+  polygraphSessionId?: string,
 ): Promise<{
   branch?: string;
   cipeId?: string;
@@ -801,6 +811,7 @@ async function resolveUrlToBranch(
       workspacePath,
       logger,
       parsed.cipeId,
+      polygraphSessionId,
     );
     if (pipelineResult.error) {
       return {
@@ -815,7 +826,12 @@ async function resolveUrlToBranch(
 
   // For run and task URLs, look up the run by its URL slug (linkId)
   const runId = parsed.runId;
-  const runResult = await getRunDetails(workspacePath, logger, runId);
+  const runResult = await getRunDetails(
+    workspacePath,
+    logger,
+    runId,
+    polygraphSessionId,
+  );
   if (runResult.error) {
     if (runResult.error.type === 'not_found') {
       return {
@@ -870,6 +886,7 @@ const getCIInformation =
         parsed,
         workspacePath,
         logger,
+        params.polygraphSessionId,
       );
       if (urlResolution.error) {
         return {
@@ -897,6 +914,7 @@ const getCIInformation =
     // Fetch CIPE data for recent branches, always include the target branch
     const cipeResult = await getRecentCIPEData(workspacePath, logger, {
       branch,
+      polygraphSessionId: params.polygraphSessionId,
     });
 
     if (cipeResult.error) {
