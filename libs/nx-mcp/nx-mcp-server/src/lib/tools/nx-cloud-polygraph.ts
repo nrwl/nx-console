@@ -45,7 +45,7 @@ const polygraphInitSchema = z.object({
     .array(z.string())
     .optional()
     .describe(
-      'Optional list of workspace IDs to include in the session. Use cloud_polygraph_candidates to discover available workspaces first. If omitted, all connected workspaces are included.',
+      'Optional list of workspace IDs to include in the session. Use cloud_polygraph_candidates to discover available workspaces first. If omitted, all organization workspaces are included.',
     ),
 });
 
@@ -790,7 +790,7 @@ function registerCandidates(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_CANDIDATES,
       description:
-        'Discover candidate workspaces for a Polygraph session. Returns the initiator workspace and all connected workspaces with their descriptions and dependency graph relationships (distance, direction, path). Use this before cloud_polygraph_init to understand which repositories are available and optionally select a subset via selectedWorkspaceIds.',
+        'Discover candidate workspaces for a Polygraph session. Returns the initiator workspace and all organization workspaces with their descriptions and dependency graph relationships (distance, direction, path). Workspaces not connected via the dependency graph will have graphRelationship set to null. Use this before cloud_polygraph_init to understand which repositories are available and optionally select a subset via selectedWorkspaceIds.',
       annotations: {
         destructiveHint: false,
         readOnlyHint: true,
