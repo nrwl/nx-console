@@ -75,15 +75,14 @@ export async function getRunDetails(
   }
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}${
-    polygraphSessionId
-      ? `?polygraphSessionId=${encodeURIComponent(polygraphSessionId)}`
-      : ''
-  }`;
+  const url = `${nxCloudUrl}/nx-cloud/mcp-context/runs/${runId}`;
 
   const headers: any = {
     'Content-Type': 'application/json',
     ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(polygraphSessionId && {
+      'x-polygraph-session-id': polygraphSessionId,
+    }),
   };
 
   logger.log(`Making run details request for ID: ${runId}`);

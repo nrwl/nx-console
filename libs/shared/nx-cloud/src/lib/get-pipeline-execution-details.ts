@@ -108,15 +108,14 @@ export async function getPipelineExecutionDetails(
   }
 
   const nxCloudUrl = await getNxCloudUrl(workspacePath);
-  const url = `${nxCloudUrl}/nx-cloud/mcp-context/pipeline-executions/${pipelineExecutionId}${
-    polygraphSessionId
-      ? `?polygraphSessionId=${encodeURIComponent(polygraphSessionId)}`
-      : ''
-  }`;
+  const url = `${nxCloudUrl}/nx-cloud/mcp-context/pipeline-executions/${pipelineExecutionId}`;
 
   const headers: any = {
     'Content-Type': 'application/json',
     ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(polygraphSessionId && {
+      'x-polygraph-session-id': polygraphSessionId,
+    }),
   };
 
   logger.log(
