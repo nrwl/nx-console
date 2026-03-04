@@ -192,7 +192,15 @@ function registerDelegate(
         }
 
         try {
-          const delegateParams = { ...params, workspacePath };
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const delegateParams = {
+            ...params,
+            workspacePath,
+            nxCloudUrl,
+            authHeaders,
+          };
           logger.log(
             `polygraphDelegate args: ${JSON.stringify(Object.keys(delegateParams))}`,
           );
