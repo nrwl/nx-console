@@ -270,7 +270,7 @@ export function registerNxCloudTools(
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'Includes selfHealingSkippedReason/selfHealingSkipMessage when self-healing was skipped (e.g. THROTTLED). ' +
-        'Supports cross-workspace access via polygraphSessionId for Polygraph sessions spanning multiple workspaces. ' +
+        'Supports cross-workspace access via polygraphSessionId when querying by branch name (not URL) for Polygraph sessions spanning multiple workspaces. ' +
         'See output schema for available fields. Long strings are paginated automatically.',
       inputSchema: ciInformationSchema.shape,
       outputSchema: ciInformationOutputSchema,
@@ -558,7 +558,7 @@ const ciInformationSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Optional Polygraph session ID for cross-workspace CI data access. ' +
+      'Optional Polygraph session ID for cross-workspace CI data access. Only works with branch-based queries (not URL-based lookups). ' +
         'When provided, CI data from all workspaces in the Polygraph session becomes accessible. ' +
         'Use this when monitoring CI for branches across multiple workspaces within a Polygraph session.',
     ),
