@@ -800,7 +800,6 @@ async function resolveUrlToBranch(
   parsed: ParsedNxCloudUrl,
   workspacePath: string,
   logger: Logger,
-  polygraphSessionId?: string,
 ): Promise<{
   branch?: string;
   cipeId?: string;
@@ -811,7 +810,6 @@ async function resolveUrlToBranch(
       workspacePath,
       logger,
       parsed.cipeId,
-      polygraphSessionId,
     );
     if (pipelineResult.error) {
       return {
@@ -826,12 +824,7 @@ async function resolveUrlToBranch(
 
   // For run and task URLs, look up the run by its URL slug (linkId)
   const runId = parsed.runId;
-  const runResult = await getRunDetails(
-    workspacePath,
-    logger,
-    runId,
-    polygraphSessionId,
-  );
+  const runResult = await getRunDetails(workspacePath, logger, runId);
   if (runResult.error) {
     if (runResult.error.type === 'not_found') {
       return {
@@ -886,7 +879,6 @@ const getCIInformation =
         parsed,
         workspacePath,
         logger,
-        params.polygraphSessionId,
       );
       if (urlResolution.error) {
         return {

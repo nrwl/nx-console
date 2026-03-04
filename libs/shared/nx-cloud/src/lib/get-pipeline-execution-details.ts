@@ -96,7 +96,6 @@ export async function getPipelineExecutionDetails(
   workspacePath: string,
   logger: Logger,
   pipelineExecutionId: string,
-  polygraphSessionId?: string,
 ): Promise<Result<PipelineExecutionDetails, PipelineExecutionDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
@@ -113,9 +112,6 @@ export async function getPipelineExecutionDetails(
   const headers: any = {
     'Content-Type': 'application/json',
     ...(await nxCloudAuthHeaders(workspacePath)),
-    ...(polygraphSessionId && {
-      'x-polygraph-session-id': polygraphSessionId,
-    }),
   };
 
   logger.log(

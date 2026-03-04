@@ -63,7 +63,6 @@ export async function getRunDetails(
   workspacePath: string,
   logger: Logger,
   runId: string,
-  polygraphSessionId?: string,
 ): Promise<Result<RunDetails, RunDetailsError>> {
   if (!(await isNxCloudUsed(workspacePath, logger))) {
     return {
@@ -80,9 +79,6 @@ export async function getRunDetails(
   const headers: any = {
     'Content-Type': 'application/json',
     ...(await nxCloudAuthHeaders(workspacePath)),
-    ...(polygraphSessionId && {
-      'x-polygraph-session-id': polygraphSessionId,
-    }),
   };
 
   logger.log(`Making run details request for ID: ${runId}`);
