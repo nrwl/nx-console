@@ -912,8 +912,19 @@ function registerModifySession(
           logger,
           workspacePath,
         );
-        if (typeof nxCloudClient?.polygraphModifySession !== 'function') {
+        if (!nxCloudClient) {
           return CLOUD_CLIENT_MISSING_RESULT;
+        }
+        if (typeof nxCloudClient.polygraphModifySession !== 'function') {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: 'The cloud_polygraph_modify_session tool requires a newer version of the Nx Cloud client bundle. Run `npx nx@latest download-cloud-client` to update.',
+              },
+            ],
+            isError: true,
+          };
         }
 
         const { sessionId, addWorkspaceIds } = params;
