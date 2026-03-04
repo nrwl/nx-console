@@ -8,6 +8,7 @@ import {
   CLOUD_POLYGRAPH_DELEGATE,
   CLOUD_POLYGRAPH_INIT,
   CLOUD_POLYGRAPH_MARK_READY,
+  CLOUD_POLYGRAPH_MODIFY_SESSION,
   CLOUD_POLYGRAPH_PUSH_BRANCH,
   CLOUD_POLYGRAPH_GET_SESSION,
   CLOUD_POLYGRAPH_STOP_CHILD,
@@ -876,6 +877,80 @@ function registerCandidates(
   }
 }
 
+const modifySessionSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  addWorkspaceIds: z
+    .array(z.string())
+    .describe(
+      'Workspace IDs to add to the session. Use cloud_polygraph_candidates to discover available workspaces.',
+    ),
+});
+
+function registerModifySession(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_POLYGRAPH_MODIFY_SESSION, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_POLYGRAPH_MODIFY_SESSION} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_POLYGRAPH_MODIFY_SESSION,
+      description:
+        'Add workspaces to a running Polygraph session. Use this to expand the set of repositories available for delegation after the session has been initialized. Use cloud_polygraph_candidates to discover available workspace IDs.',
+      inputSchema: modifySessionSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: false,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphModifySession !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
+        const { sessionId, addWorkspaceIds } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphModifySession(logger, {
+            sessionId,
+            nxCloudUrl,
+            authHeaders,
+            workspacePath,
+            addWorkspaceIds,
+          });
+
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: result.addedWorkspacesSummary }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 const completeSessionSchema = z.object({
   sessionId: z.string().describe('The Polygraph session ID'),
 });
@@ -964,5 +1039,6 @@ export function registerPolygraphTools(
   registerStopChild(toolsFilter, logger, registry, workspacePath);
   registerChildStatus(toolsFilter, logger, registry, workspacePath);
   registerAssociatePR(toolsFilter, logger, registry, workspacePath);
+  registerModifySession(toolsFilter, logger, registry, workspacePath);
   registerCompleteSession(toolsFilter, logger, registry, workspacePath);
 }
