@@ -949,8 +949,6 @@ function registerCompleteSession(
   }
 }
 
-const CI_LOG_MAX_SIZE = 512 * 1024; // 512KB
-
 const getCILogsSchema = z.object({
   sessionId: z.string().describe('The Polygraph session ID'),
   workspaceId: z
@@ -975,7 +973,7 @@ function registerGetCILogs(
     registry.registerTool({
       name: CLOUD_CI_GET_LOGS,
       description:
-        'Retrieves the plain-text log for a specific CI job. Use jobId from CI run data. Only call for jobs where the run has completed. Logs are streamed from the CI provider and may be large; output is truncated to ~512KB if it exceeds that size.',
+        'Retrieves the plain-text log for a specific CI job and saves it to a local file. Use jobId from CI run data. Only call for jobs where the run has completed. Returns the file path — use the Read tool to examine the log content.',
       inputSchema: getCILogsSchema.shape,
       annotations: {
         destructiveHint: false,
@@ -1006,21 +1004,14 @@ function registerGetCILogs(
           });
 
           if (result.success) {
-            const log = result.log;
-            const truncated = log.length > CI_LOG_MAX_SIZE;
-            const content: CallToolResult['content'] = [
-              {
-                type: 'text',
-                text: truncated ? log.slice(-CI_LOG_MAX_SIZE) : log,
-              },
-            ];
-            if (truncated) {
-              content.unshift({
-                type: 'text',
-                text: `[Log truncated: showing last ${Math.round(CI_LOG_MAX_SIZE / 1024)}KB of ${Math.round(log.length / 1024)}KB total. The beginning of the log was omitted.]`,
-              });
-            }
-            return { content };
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `CI job log saved to ${result.logFile} (${result.sizeBytes} bytes). Use the Read tool to examine the log file.`,
+                },
+              ],
+            };
           }
 
           return {
