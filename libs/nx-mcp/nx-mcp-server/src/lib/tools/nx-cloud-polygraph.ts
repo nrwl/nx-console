@@ -11,6 +11,7 @@ import {
   CLOUD_POLYGRAPH_PUSH_BRANCH,
   CLOUD_POLYGRAPH_GET_SESSION,
   CLOUD_POLYGRAPH_STOP_CHILD,
+  CLOUD_CI_GET_LOGS,
 } from '@nx-console/shared-llm-context';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -948,6 +949,85 @@ function registerCompleteSession(
   }
 }
 
+const getCILogsSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  workspaceId: z
+    .string()
+    .describe(
+      'The Nx Cloud workspace ID for the repository (MongoDB ObjectId hex string)',
+    ),
+  jobId: z
+    .number()
+    .describe(
+      'The GitHub Actions job ID (from the jobs array in CI run data)',
+    ),
+});
+
+function registerGetCILogs(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_CI_GET_LOGS, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_CI_GET_LOGS} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_CI_GET_LOGS,
+      description:
+        'Retrieves the full plain-text log for a specific CI job. Use jobId from CI run data. Only call for jobs where the run has completed.',
+      inputSchema: getCILogsSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphGetCILogs !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
+        const { sessionId, workspaceId, jobId } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphGetCILogs(logger, {
+            sessionId,
+            workspaceId,
+            jobId,
+            nxCloudUrl,
+            authHeaders,
+          });
+
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: result.log }],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 export function registerPolygraphTools(
   workspacePath: string,
   registry: ToolRegistry,
@@ -965,4 +1045,5 @@ export function registerPolygraphTools(
   registerChildStatus(toolsFilter, logger, registry, workspacePath);
   registerAssociatePR(toolsFilter, logger, registry, workspacePath);
   registerCompleteSession(toolsFilter, logger, registry, workspacePath);
+  registerGetCILogs(toolsFilter, logger, registry, workspacePath);
 }

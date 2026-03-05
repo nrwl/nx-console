@@ -54,3 +54,5 @@ export const CLOUD_POLYGRAPH_CANDIDATES = 'cloud_polygraph_candidates';
 
 export const CLOUD_POLYGRAPH_COMPLETE_SESSION =
   'cloud_polygraph_complete_session';
+
+export const CLOUD_CI_GET_LOGS = 'cloud_ci_get_logs';
