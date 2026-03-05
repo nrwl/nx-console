@@ -958,9 +958,7 @@ const getCILogsSchema = z.object({
     ),
   jobId: z
     .number()
-    .describe(
-      'The GitHub Actions job ID (from the jobs array in CI run data)',
-    ),
+    .describe('The GitHub Actions job ID (from the jobs array in CI run data)'),
 });
 
 function registerGetCILogs(
@@ -970,9 +968,7 @@ function registerGetCILogs(
   workspacePath: string,
 ) {
   if (!isToolEnabled(CLOUD_CI_GET_LOGS, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_CI_GET_LOGS} - disabled by tools filter`,
-    );
+    logger.debug?.(`Skipping ${CLOUD_CI_GET_LOGS} - disabled by tools filter`);
   } else {
     registry.registerTool({
       name: CLOUD_CI_GET_LOGS,
