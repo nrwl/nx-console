@@ -28,6 +28,8 @@ export const CLOUD_ANALYTICS_TASKS_SEARCH = 'cloud_analytics_tasks_search';
 export const CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
   'cloud_analytics_task_executions_search';
 
+export const CLOUD_SANDBOX_REPORTS_SEARCH = 'cloud_sandbox_reports_search';
+
 export const CI_INFORMATION = 'ci_information';
 
 export const UPDATE_SELF_HEALING_FIX = 'update_self_healing_fix';

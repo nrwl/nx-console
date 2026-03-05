@@ -7,6 +7,7 @@ import {
   CLOUD_ANALYTICS_RUNS_SEARCH,
   CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
   CLOUD_ANALYTICS_TASKS_SEARCH,
+  CLOUD_SANDBOX_REPORTS_SEARCH,
   UPDATE_SELF_HEALING_FIX,
 } from '@nx-console/shared-llm-context';
 import {
@@ -14,6 +15,7 @@ import {
   formatPipelineExecutionsSearchContent,
   formatRunDetailsContent,
   formatRunsSearchContent,
+  formatSandboxReportsSearchContent,
   formatTasksDetailsSearchContent,
   formatTasksSearchContent,
   getRecentCIPEData,
@@ -21,6 +23,7 @@ import {
   getPipelineExecutionsSearch,
   getRunDetails,
   getRunsSearch,
+  getSandboxReportsSearch,
   getTasksDetailsSearch,
   getTasksSearch,
   parseNxCloudUrl,
@@ -259,6 +262,30 @@ export function registerNxCloudTools(
     });
   }
 
+  if (!isToolEnabled(CLOUD_SANDBOX_REPORTS_SEARCH, toolsFilter)) {
+    logger.debug?.(
+      `Skipping ${CLOUD_SANDBOX_REPORTS_SEARCH} - disabled by tools filter`,
+    );
+  } else {
+    registry.registerTool({
+      name: CLOUD_SANDBOX_REPORTS_SEARCH,
+      description:
+        'Search sandbox reports from Nx Cloud for a specific run group. Sandbox reports track file I/O during task execution and flag unexpected reads/writes, helping identify tasks that access files outside their declared inputs/outputs. Use the violationsOnly flag to filter for only reports with violations. If a pagination token is returned, call this tool again with the token to retrieve additional results.',
+      inputSchema: sandboxReportSearchSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (args) =>
+        nxCloudSandboxReportsSearch(
+          workspacePath,
+          logger,
+          telemetry,
+        )(args as z.infer<typeof sandboxReportSearchSchema>),
+    });
+  }
+
   if (!isToolEnabled(CI_INFORMATION, toolsFilter)) {
     logger.debug?.(`Skipping ${CI_INFORMATION} - disabled by tools filter`);
   } else {
@@ -430,6 +457,23 @@ const runSearchSchema = z.object({
     .optional()
     .describe(
       'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
+    ),
+  limit: z
+    .number()
+    .optional()
+    .default(50)
+    .describe('Maximum number of results to return'),
+  pageToken: z.string().optional().describe('Token for pagination'),
+});
+
+const sandboxReportSearchSchema = z.object({
+  runGroup: z.string().describe('The run group to search sandbox reports for'),
+  violationsOnly: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      'When true, only return reports with violations (unexpected reads or writes)',
     ),
   limit: z
     .number()
@@ -640,6 +684,36 @@ const nxCloudPipelineExecutionDetails =
     }
 
     const textContent = formatPipelineExecutionDetailsContent(result.data!);
+    const content: CallToolResult['content'] = textContent.map((text) => ({
+      type: 'text',
+      text,
+    }));
+
+    return { content };
+  };
+
+const nxCloudSandboxReportsSearch =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (
+    params: z.infer<typeof sandboxReportSearchSchema>,
+  ): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: CLOUD_SANDBOX_REPORTS_SEARCH,
+    });
+
+    const result = await getSandboxReportsSearch(workspacePath, logger, params);
+
+    if (result.error) {
+      throw new Error(
+        `Error searching sandbox reports: ${result.error.message}`,
+      );
+    }
+
+    const textContent = formatSandboxReportsSearchContent(result.data!);
     const content: CallToolResult['content'] = textContent.map((text) => ({
       type: 'text',
       text,
