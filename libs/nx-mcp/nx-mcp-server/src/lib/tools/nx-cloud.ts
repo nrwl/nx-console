@@ -17,12 +17,15 @@ import {
   formatTasksDetailsSearchContent,
   formatTasksSearchContent,
   getRecentCIPEData,
+  getNxCloudUrl,
   getPipelineExecutionDetails,
   getPipelineExecutionsSearch,
   getRunDetails,
   getRunsSearch,
   getTasksDetailsSearch,
   getTasksSearch,
+  nxCloudAuthHeaders,
+  nxCloudRequest,
   parseNxCloudUrl,
   ParsedNxCloudUrl,
   retrieveFixDiff,
@@ -270,6 +273,8 @@ export function registerNxCloudTools(
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'Includes selfHealingSkippedReason/selfHealingSkipMessage when self-healing was skipped (e.g. THROTTLED). ' +
+        'With sessionId + workspaceId: Queries CI data for any workspace in a Polygraph session, including external CI runs (e.g. GitHub Actions) for repos without Nx Cloud CIPEs. ' +
+        'Use cloud_ci_get_logs to drill into specific job logs from external CI runs. ' +
         'See output schema for available fields. Long strings are paginated automatically.',
       inputSchema: ciInformationSchema.shape,
       outputSchema: ciInformationOutputSchema,
@@ -536,6 +541,18 @@ const ciInformationSchema = z.object({
     .string()
     .optional()
     .describe('Branch name to query. Defaults to current git branch.'),
+  sessionId: z
+    .string()
+    .optional()
+    .describe(
+      'Polygraph session ID. When provided along with workspaceId, enables cross-workspace CI queries for any repository in the session.',
+    ),
+  workspaceId: z
+    .string()
+    .optional()
+    .describe(
+      'Target Nx Cloud workspace ID to query CI for (MongoDB ObjectId hex string). Required when sessionId is provided.',
+    ),
   select: z
     .string()
     .optional()
@@ -835,6 +852,94 @@ async function resolveUrlToBranch(
   };
 }
 
+interface ExternalCIJob {
+  jobId: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+}
+
+interface ExternalCIRun {
+  runId: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  url: string;
+  branch: string;
+  jobs: ExternalCIJob[];
+  createdAt: string;
+}
+
+function formatExternalCIRunsResponse(
+  runs: ExternalCIRun[],
+  branch: string | undefined,
+  params: { select?: string; pageToken?: number },
+): CallToolResult {
+  const output: Record<string, unknown> = {
+    type: 'externalCI',
+    branch: branch ?? null,
+    runs: runs.map((run) => ({
+      runId: run.runId,
+      name: run.name,
+      status: run.status,
+      conclusion: run.conclusion,
+      url: run.url,
+      createdAt: run.createdAt,
+      jobs: run.jobs.map((job) => ({
+        jobId: job.jobId,
+        name: job.name,
+        status: job.status,
+        conclusion: job.conclusion,
+      })),
+    })),
+  };
+
+  if (params.select) {
+    const value = getValueByPath(output, params.select);
+    return {
+      content: [
+        {
+          type: 'text',
+          text:
+            typeof value === 'string' ? value : JSON.stringify(value, null, 2),
+        },
+      ],
+      structuredContent: output,
+    };
+  }
+
+  const lines: string[] = [];
+  lines.push('## External CI Runs (GitHub Actions)');
+  lines.push(
+    '_These are external CI runs — not Nx Cloud CIPEs. Use `cloud_ci_get_logs` with a jobId to retrieve full job logs._',
+  );
+  lines.push('');
+
+  for (const run of runs) {
+    const conclusionStr = run.conclusion ? ` — ${run.conclusion}` : '';
+    lines.push(`### ${run.name} (${run.status}${conclusionStr})`);
+    lines.push(`- **URL:** ${run.url}`);
+    lines.push(`- **Run ID:** ${run.runId}`);
+    lines.push(`- **Created:** ${run.createdAt}`);
+
+    if (run.jobs.length > 0) {
+      lines.push('- **Jobs:**');
+      for (const job of run.jobs) {
+        const jobConclusion = job.conclusion ? ` — ${job.conclusion}` : '';
+        lines.push(
+          `  - ${job.name} (${job.status}${jobConclusion}) [jobId: ${job.jobId}]`,
+        );
+      }
+    }
+    lines.push('');
+  }
+
+  return {
+    content: [{ type: 'text', text: lines.join('\n') }],
+    structuredContent: output,
+  };
+}
+
 const getCIInformation =
   (
     workspacePath: string,
@@ -894,10 +999,57 @@ const getCIInformation =
       }
     }
 
-    // Fetch CIPE data for recent branches, always include the target branch
-    const cipeResult = await getRecentCIPEData(workspacePath, logger, {
-      branch,
-    });
+    // Fetch CIPE data — use Polygraph auth for cross-workspace queries, local auth otherwise
+    const isPolygraphQuery = params.sessionId && params.workspaceId;
+    let cipeResult: {
+      info?: CIPEInfo[];
+      error?: { type: string; message: string };
+      externalCIRuns?: ExternalCIRun[];
+    };
+
+    if (isPolygraphQuery) {
+      const nxCloudUrl = await getNxCloudUrl(workspacePath);
+      const authHeaders = await nxCloudAuthHeaders(workspacePath);
+      const url = `${nxCloudUrl}/nx-cloud/nx-console/ci-pipeline-executions`;
+      const data = JSON.stringify({
+        branches: branch ? [branch] : [],
+        workspaceId: params.workspaceId,
+      });
+
+      try {
+        const response = await nxCloudRequest('POLYGRAPH_CIPES', {
+          type: 'POST',
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+          },
+          data,
+          timeout: 10000,
+        });
+        const responseData = JSON.parse(response.responseText) as {
+          ciPipelineExecutions: CIPEInfo[];
+          workspaceUrl: string;
+          externalCIRuns?: ExternalCIRun[];
+        };
+        cipeResult = {
+          info: responseData.ciPipelineExecutions,
+          externalCIRuns: responseData.externalCIRuns,
+        };
+      } catch (e: any) {
+        cipeResult = {
+          error: {
+            type: 'other',
+            message: e.message ?? String(e),
+          },
+        };
+      }
+    } else {
+      const localResult = await getRecentCIPEData(workspacePath, logger, {
+        branch,
+      });
+      cipeResult = localResult;
+    }
 
     if (cipeResult.error) {
       return {
@@ -917,6 +1069,16 @@ const getCIInformation =
     );
 
     if (!cipeForBranch) {
+      // Check for external CI runs (e.g. GitHub Actions) when no CIPE exists
+      const externalRuns = cipeResult.externalCIRuns ?? [];
+      const branchRuns = branch
+        ? externalRuns.filter((run) => run.branch === branch)
+        : externalRuns;
+
+      if (branchRuns.length > 0) {
+        return formatExternalCIRunsResponse(branchRuns, branch, params);
+      }
+
       const message = `No CI pipeline execution found for branch "${branch}". This branch may not have any CI runs yet.`;
       return {
         content: [{ type: 'text', text: message }],
