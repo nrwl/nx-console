@@ -551,7 +551,7 @@ const ciInformationSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Target Nx Cloud workspace ID to query CI for (MongoDB ObjectId hex string). Required when sessionId is provided.',
+      'Target Nx Cloud workspace ID to query CI for. Required when sessionId is provided.',
     ),
   select: z
     .string()
