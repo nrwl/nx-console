@@ -97,7 +97,9 @@ function sanitizeBranchName(branch: string): string {
     .replace(/^-|-$/g, '');
 }
 
-async function readSessionIdFromPolygraphJson(workspacePath: string): Promise<string | null> {
+async function readSessionIdFromPolygraphJson(
+  workspacePath: string,
+): Promise<string | null> {
   try {
     const { readFileSync, existsSync } = await import('node:fs');
     const { join } = await import('node:path');
