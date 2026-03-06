@@ -39,7 +39,7 @@ const polygraphInitSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Override the auto-generated session ID. Only use this for resuming an existing session or advanced use cases. By default, a unique ID is generated from a short UUID prefix and the local git branch name.',
+      'Override the auto-generated session ID. Only use this for resuming an existing session or advanced use cases. By default, a unique ID is generated from the local git branch name with a short UUID suffix.',
     ),
   selectedWorkspaceIds: z
     .array(z.string())
@@ -80,10 +80,7 @@ async function getLocalBranchName(
       encoding: 'utf-8',
       timeout: 5000,
     }).trim();
-    if (!branch || ['main', 'master', 'dev', 'develop'].includes(branch)) {
-      return null;
-    }
-    return branch;
+    return branch || null;
   } catch {
     return null;
   }
@@ -97,13 +94,15 @@ function sanitizeBranchName(branch: string): string {
     .replace(/^-|-$/g, '');
 }
 
+const DEFAULT_BRANCHES = ['main', 'master', 'dev', 'develop'];
+
 async function generateSessionId(workspacePath: string): Promise<string> {
-  const shortId = randomUUID().slice(0, 5);
   const branch = await getLocalBranchName(workspacePath);
-  if (branch) {
-    return `${shortId}-${sanitizeBranchName(branch)}`;
+  if (branch && !DEFAULT_BRANCHES.includes(branch)) {
+    return `${sanitizeBranchName(branch)}-${randomUUID().slice(0, 5)}`;
   }
-  return shortId;
+  const prefix = branch ? `${sanitizeBranchName(branch)}-` : '';
+  return `${prefix}${randomUUID()}`;
 }
 
 function registerInit(
