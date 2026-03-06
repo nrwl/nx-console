@@ -30,6 +30,9 @@ const autocompleteSchema = {
         'object6',
         'object7',
       ],
+      itemTooltips: {
+        item1: 'Item One',
+      },
       aliases: [],
     },
   ],
@@ -49,5 +52,10 @@ describe('autocomplete field', () => {
   it('should correctly render all options when expanded', () => {
     getFieldByName('option2').click();
     cy.get('intellij-option').should('have.length', 13);
+  });
+
+  it('should show labels for tooltip-mapped options', () => {
+    getFieldByName('option2').click();
+    cy.get('intellij-option[value="item1"]').should('contain.text', 'Item One');
   });
 });

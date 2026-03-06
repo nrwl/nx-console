@@ -21,8 +21,13 @@ export const useGeneratorDefaultsProcessor: SchemaProcessor = (
   return {
     ...schema,
     options: (schema.options ?? []).map((option) => {
-      if (nxJsonGeneratorsEntry[option.name]) {
-        option.default = nxJsonGeneratorsEntry[option.name];
+      if (
+        Object.prototype.hasOwnProperty.call(nxJsonGeneratorsEntry, option.name)
+      ) {
+        return {
+          ...option,
+          default: nxJsonGeneratorsEntry[option.name],
+        };
       }
       return option;
     }),

@@ -11,6 +11,7 @@ import {
   CLOUD_POLYGRAPH_PUSH_BRANCH,
   CLOUD_POLYGRAPH_GET_SESSION,
   CLOUD_POLYGRAPH_STOP_CHILD,
+  CLOUD_CI_GET_LOGS,
 } from '@nx-console/shared-llm-context';
 import { Logger } from '@nx-console/shared-utils';
 import { z } from 'zod';
@@ -39,13 +40,13 @@ const polygraphInitSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Optional session ID to use. If provided, takes precedence over CLAUDE_CODE_SESSION_ID env var and random generation.',
+      'Override the auto-generated session ID. Only use this for resuming an existing session or advanced use cases. By default, a unique ID is generated from the local git branch name with a short UUID suffix.',
     ),
   selectedWorkspaceIds: z
     .array(z.string())
     .optional()
     .describe(
-      'Optional list of workspace IDs to include in the session. Use cloud_polygraph_candidates to discover available workspaces first. If omitted, all connected workspaces are included.',
+      'Optional list of workspace IDs to include in the session. Use cloud_polygraph_candidates to discover available workspaces first. If omitted, all organization workspaces are included.',
     ),
 });
 
@@ -68,6 +69,57 @@ function delegateResultToCallToolResult(result: any): CallToolResult {
     return { content: [{ type: 'text', text: result.error }], isError: true };
   }
   return { content: [{ type: 'text', text: result.message }] };
+}
+
+async function getLocalBranchName(
+  workspacePath: string,
+): Promise<string | null> {
+  try {
+    const { execSync } = await import('node:child_process');
+    const branch = execSync('git branch --show-current', {
+      cwd: workspacePath,
+      encoding: 'utf-8',
+      timeout: 5000,
+    }).trim();
+    return branch || null;
+  } catch {
+    return null;
+  }
+}
+
+function sanitizeBranchName(branch: string): string {
+  return branch
+    .replace(/\//g, '-')
+    .replace(/[^a-zA-Z0-9-_]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+async function readSessionIdFromPolygraphJson(
+  workspacePath: string,
+): Promise<string | null> {
+  try {
+    const { readFileSync, existsSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const filePath = join(workspacePath, 'polygraph.json');
+    if (!existsSync(filePath)) {
+      return null;
+    }
+    const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+    return content.sessionId ?? null;
+  } catch {
+    return null;
+  }
+}
+const DEFAULT_BRANCHES = ['main', 'master', 'dev', 'develop'];
+
+async function generateSessionId(workspacePath: string): Promise<string> {
+  const branch = await getLocalBranchName(workspacePath);
+  if (branch && !DEFAULT_BRANCHES.includes(branch)) {
+    return `${sanitizeBranchName(branch)}-${randomUUID().slice(0, 5)}`;
+  }
+  const prefix = branch ? `${sanitizeBranchName(branch)}-` : '';
+  return `${prefix}${randomUUID()}`;
 }
 
 function registerInit(
@@ -102,7 +154,8 @@ function registerInit(
         const sessionId =
           params.setSessionId ??
           process.env.CLAUDE_CODE_SESSION_ID ??
-          randomUUID();
+          (await readSessionIdFromPolygraphJson(workspacePath)) ??
+          (await generateSessionId(workspacePath));
 
         try {
           const result = await nxCloudClient.polygraphInit(logger, {
@@ -156,7 +209,15 @@ function registerDelegate(
         }
 
         try {
-          const delegateParams = { ...params, workspacePath };
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const delegateParams = {
+            ...params,
+            workspacePath,
+            nxCloudUrl,
+            authHeaders,
+          };
           logger.log(
             `polygraphDelegate args: ${JSON.stringify(Object.keys(delegateParams))}`,
           );
@@ -564,7 +625,7 @@ function registerStopChild(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_STOP_CHILD,
       description:
-        'Stop a running child agent in a Polygraph session. Use this to terminate a delegated task that is still running.',
+        'Stop an in-progress child agent in a Polygraph session. Use this to cancel a delegated task that is still in-progress.',
       inputSchema: stopChildSchema.shape,
       annotations: {
         destructiveHint: true,
@@ -634,7 +695,7 @@ function registerChildStatus(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_CHILD_STATUS,
       description:
-        'Get the status and recent output of child agents in a Polygraph session. Use this to monitor progress of delegated tasks.',
+        "Get the status and recent output of child agents in a Polygraph session. Use this to monitor progress of delegated tasks. Each child's status field uses ACP lifecycle values: created, in-progress, completed, failed, or cancelled.",
       inputSchema: childStatusSchema.shape,
       annotations: {
         destructiveHint: false,
@@ -790,7 +851,7 @@ function registerCandidates(
     registry.registerTool({
       name: CLOUD_POLYGRAPH_CANDIDATES,
       description:
-        'Discover candidate workspaces for a Polygraph session. Returns the initiator workspace and all connected workspaces with their descriptions and dependency graph relationships (distance, direction, path). Use this before cloud_polygraph_init to understand which repositories are available and optionally select a subset via selectedWorkspaceIds.',
+        'Discover candidate workspaces for a Polygraph session. Returns the initiator workspace and all organization workspaces with their descriptions and dependency graph relationships (distance, direction, path). Workspaces not connected via the dependency graph will have graphRelationship set to null. Use this before cloud_polygraph_init to understand which repositories are available and optionally select a subset via selectedWorkspaceIds.',
       annotations: {
         destructiveHint: false,
         readOnlyHint: true,
@@ -904,6 +965,86 @@ function registerCompleteSession(
   }
 }
 
+const getCILogsSchema = z.object({
+  sessionId: z.string().describe('The Polygraph session ID'),
+  workspaceId: z
+    .string()
+    .describe(
+      'The Nx Cloud workspace ID for the repository (MongoDB ObjectId hex string)',
+    ),
+  jobId: z
+    .number()
+    .describe('The GitHub Actions job ID (from the jobs array in CI run data)'),
+});
+
+function registerGetCILogs(
+  toolsFilter: string[] | undefined,
+  logger: Logger,
+  registry: ToolRegistry,
+  workspacePath: string,
+) {
+  if (!isToolEnabled(CLOUD_CI_GET_LOGS, toolsFilter)) {
+    logger.debug?.(`Skipping ${CLOUD_CI_GET_LOGS} - disabled by tools filter`);
+  } else {
+    registry.registerTool({
+      name: CLOUD_CI_GET_LOGS,
+      description:
+        'Retrieves the plain-text log for a specific CI job and saves it to a local file. Use jobId from CI run data. Only call for jobs where the run has completed. Returns the file path — use the Read tool to examine the log content.',
+      inputSchema: getCILogsSchema.shape,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (params): Promise<CallToolResult> => {
+        const nxCloudClient = await ensureCloudLightClient(
+          logger,
+          workspacePath,
+        );
+        if (typeof nxCloudClient?.polygraphGetCILogs !== 'function') {
+          return CLOUD_CLIENT_MISSING_RESULT;
+        }
+
+        const { sessionId, workspaceId, jobId } = params;
+
+        try {
+          const nxCloudUrl = await getNxCloudUrl(workspacePath);
+          const authHeaders = await nxCloudAuthHeaders(workspacePath);
+
+          const result = await nxCloudClient.polygraphGetCILogs(logger, {
+            sessionId,
+            workspaceId,
+            jobId,
+            nxCloudUrl,
+            authHeaders,
+          });
+
+          if (result.success) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `CI job log saved to ${result.logFile} (${result.sizeBytes} bytes). Use the Read tool to examine the log file.`,
+                },
+              ],
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: result.error }],
+            isError: true,
+          };
+        } catch (e: any) {
+          return {
+            content: [{ type: 'text', text: e.message ?? String(e) }],
+            isError: true,
+          };
+        }
+      },
+    });
+  }
+}
+
 export function registerPolygraphTools(
   workspacePath: string,
   registry: ToolRegistry,
@@ -921,4 +1062,5 @@ export function registerPolygraphTools(
   registerChildStatus(toolsFilter, logger, registry, workspacePath);
   registerAssociatePR(toolsFilter, logger, registry, workspacePath);
   registerCompleteSession(toolsFilter, logger, registry, workspacePath);
+  registerGetCILogs(toolsFilter, logger, registry, workspacePath);
 }
