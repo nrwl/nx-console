@@ -94,6 +94,22 @@ function sanitizeBranchName(branch: string): string {
     .replace(/^-|-$/g, '');
 }
 
+async function readSessionIdFromPolygraphJson(
+  workspacePath: string,
+): Promise<string | null> {
+  try {
+    const { readFileSync, existsSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const filePath = join(workspacePath, 'polygraph.json');
+    if (!existsSync(filePath)) {
+      return null;
+    }
+    const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+    return content.sessionId ?? null;
+  } catch {
+    return null;
+  }
+}
 const DEFAULT_BRANCHES = ['main', 'master', 'dev', 'develop'];
 
 async function generateSessionId(workspacePath: string): Promise<string> {
@@ -137,6 +153,7 @@ function registerInit(
         const sessionId =
           params.setSessionId ??
           process.env.CLAUDE_CODE_SESSION_ID ??
+          (await readSessionIdFromPolygraphJson(workspacePath)) ??
           (await generateSessionId(workspacePath));
 
         try {
