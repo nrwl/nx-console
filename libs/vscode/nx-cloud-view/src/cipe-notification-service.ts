@@ -123,6 +123,7 @@ export class CIPENotificationService {
       if (
         runGroup.aiFix &&
         runGroup.aiFix.couldAutoApplyTasks &&
+        !runGroup.aiFix.autoApplySkipped &&
         runGroup.aiFix.verificationStatus !== 'COMPLETED'
       ) {
         continue;
