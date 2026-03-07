@@ -112,6 +112,21 @@ async function readSessionIdFromPolygraphJson(workspacePath: string): Promise<st
   }
 }
 
+async function readOrgIdFromPolygraphJson(workspacePath: string): Promise<string | null> {
+  try {
+    const { readFileSync, existsSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const filePath = join(workspacePath, 'polygraph.json');
+    if (!existsSync(filePath)) {
+      return null;
+    }
+    const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+    return content.orgId ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function generateSessionId(workspacePath: string): Promise<string> {
   const shortId = randomUUID().slice(0, 5);
   const branch = await getLocalBranchName(workspacePath);
@@ -164,6 +179,7 @@ function registerInit(
             authHeaders: await nxCloudAuthHeaders(workspacePath),
             workspacePath,
             selectedWorkspaceIds: params.selectedWorkspaceIds,
+            orgId: await readOrgIdFromPolygraphJson(workspacePath),
           });
           return initResultToCallToolResult(result);
         } catch (e: any) {
@@ -869,6 +885,7 @@ function registerCandidates(
           const result = await nxCloudClient.polygraphGetCandidates(logger, {
             nxCloudUrl: await getNxCloudUrl(workspacePath),
             authHeaders: await nxCloudAuthHeaders(workspacePath),
+            orgId: await readOrgIdFromPolygraphJson(workspacePath),
           });
 
           if (result.success) {
