@@ -52,6 +52,8 @@ export const CLOUD_POLYGRAPH_ASSOCIATE_PR = 'cloud_polygraph_associate_pr';
 
 export const CLOUD_POLYGRAPH_CANDIDATES = 'cloud_polygraph_candidates';
 
+export const CLOUD_POLYGRAPH_MODIFY_SESSION = 'cloud_polygraph_modify_session';
+
 export const CLOUD_POLYGRAPH_COMPLETE_SESSION =
   'cloud_polygraph_complete_session';
 
