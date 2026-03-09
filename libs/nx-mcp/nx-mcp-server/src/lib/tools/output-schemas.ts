@@ -50,6 +50,8 @@ export interface CIInformationOutput {
   suggestedFix: string | null;
   shortLink: string | null;
   couldAutoApplyTasks: boolean | null;
+  autoApplySkipped: boolean | null;
+  autoApplySkipReason: string | null;
   confidence: number | null;
   confidenceReasoning: string | null;
   selfHealingSkippedReason: string | null;
@@ -153,6 +155,8 @@ export const ciInformationOutputSchema = {
     suggestedFix: { type: ['string', 'null'] },
     shortLink: { type: ['string', 'null'] },
     couldAutoApplyTasks: { type: ['boolean', 'null'] },
+    autoApplySkipped: { type: ['boolean', 'null'] },
+    autoApplySkipReason: { type: ['string', 'null'] },
     confidence: { type: ['number', 'null'] },
     confidenceReasoning: { type: ['string', 'null'] },
     selfHealingSkippedReason: { type: ['string', 'null'] },

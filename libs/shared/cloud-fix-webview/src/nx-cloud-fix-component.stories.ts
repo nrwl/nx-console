@@ -336,3 +336,23 @@ export const AutoApplyingInProgress: Story = {
     },
   },
 };
+
+export const AutoApplySkipped: Story = {
+  args: {
+    details: {
+      ...mockDetails,
+      runGroup: {
+        ...mockDetails.runGroup,
+        aiFix: {
+          ...mockDetails.runGroup.aiFix!,
+          userAction: 'NONE',
+          couldAutoApplyTasks: true,
+          autoApplySkipped: true,
+          autoApplySkipReason:
+            'The previous CI pipeline execution was triggered by Nx Cloud',
+          verificationStatus: 'COMPLETED',
+        },
+      },
+    },
+  },
+};

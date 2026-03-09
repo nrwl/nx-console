@@ -270,6 +270,7 @@ export function registerNxCloudTools(
         'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'Includes selfHealingSkippedReason/selfHealingSkipMessage when self-healing was skipped (e.g. THROTTLED). ' +
+        'Includes autoApplySkipped/autoApplySkipReason when a fix could have been auto-applied but was skipped. ' +
         'See output schema for available fields. Long strings are paginated automatically.',
       inputSchema: ciInformationSchema.shape,
       outputSchema: ciInformationOutputSchema,
@@ -940,6 +941,8 @@ const getCIInformation =
           suggestedFix: null,
           shortLink: null,
           couldAutoApplyTasks: null,
+          autoApplySkipped: null,
+          autoApplySkipReason: null,
           confidence: null,
           confidenceReasoning: null,
           selfHealingSkippedReason: null,
@@ -1007,6 +1010,8 @@ const getCIInformation =
       suggestedFix: aiFix?.suggestedFix ?? null,
       shortLink: aiFix?.shortLink ?? null,
       couldAutoApplyTasks: aiFix?.couldAutoApplyTasks ?? null,
+      autoApplySkipped: aiFix?.autoApplySkipped ?? null,
+      autoApplySkipReason: aiFix?.autoApplySkipReason ?? null,
       confidence: aiFix?.confidenceScore ?? null,
       confidenceReasoning: null,
       selfHealingSkippedReason:
@@ -1249,6 +1254,14 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
       lines.push(
         `- **Could Auto-Apply:** ${output.couldAutoApplyTasks ? 'Yes' : 'No'}`,
       );
+    }
+    if (output.autoApplySkipped) {
+      lines.push(`- **Auto-Apply Skipped:** Yes`);
+      if (output.autoApplySkipReason) {
+        lines.push(
+          `- **Auto-Apply Skip Reason:** ${output.autoApplySkipReason}`,
+        );
+      }
     }
     if (output.confidence !== null && output.confidence !== undefined) {
       lines.push(`- **Confidence:** ${output.confidence}`);
