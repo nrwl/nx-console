@@ -41,7 +41,6 @@ describe('loadNxMcpConfig', () => {
         port: 9922,
         tools: ['nx_docs', '!cloud_*'],
         disableTelemetry: true,
-        experimentalPolygraph: true,
       }),
     );
 
@@ -52,7 +51,6 @@ describe('loadNxMcpConfig', () => {
       port: 9922,
       tools: ['nx_docs', '!cloud_*'],
       disableTelemetry: true,
-      experimentalPolygraph: true,
     });
   });
 

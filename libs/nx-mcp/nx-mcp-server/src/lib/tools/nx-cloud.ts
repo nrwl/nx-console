@@ -35,7 +35,6 @@ import { execSync } from 'child_process';
 import { z } from 'zod';
 import { isToolEnabled } from '../tool-filter';
 import { ToolRegistry } from '../tool-registry';
-import { registerPolygraphTools } from './nx-cloud-polygraph';
 import { chunkContent, getValueByPath } from './nx-workspace';
 import {
   CIInformationOutput,
@@ -312,8 +311,6 @@ export function registerNxCloudTools(
         )(args as z.infer<typeof updateSelfHealingFixSchema>),
     });
   }
-
-  registerPolygraphTools(workspacePath, registry, logger, toolsFilter);
 
   logger.debug?.('Registered Nx Cloud tools');
 }
