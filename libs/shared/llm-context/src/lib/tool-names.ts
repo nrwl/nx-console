@@ -31,30 +31,3 @@ export const CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH =
 export const CI_INFORMATION = 'ci_information';
 
 export const UPDATE_SELF_HEALING_FIX = 'update_self_healing_fix';
-
-export const CLOUD_POLYGRAPH_INIT = 'cloud_polygraph_init';
-
-export const CLOUD_POLYGRAPH_DELEGATE = 'cloud_polygraph_delegate';
-
-export const CLOUD_POLYGRAPH_PUSH_BRANCH = 'cloud_polygraph_push_branch';
-
-export const CLOUD_POLYGRAPH_CREATE_PRS = 'cloud_polygraph_create_prs';
-
-export const CLOUD_POLYGRAPH_GET_SESSION = 'cloud_polygraph_get_session';
-
-export const CLOUD_POLYGRAPH_MARK_READY = 'cloud_polygraph_mark_ready';
-
-export const CLOUD_POLYGRAPH_STOP_CHILD = 'cloud_polygraph_stop_child';
-
-export const CLOUD_POLYGRAPH_CHILD_STATUS = 'cloud_polygraph_child_status';
-
-export const CLOUD_POLYGRAPH_ASSOCIATE_PR = 'cloud_polygraph_associate_pr';
-
-export const CLOUD_POLYGRAPH_CANDIDATES = 'cloud_polygraph_candidates';
-
-export const CLOUD_POLYGRAPH_MODIFY_SESSION = 'cloud_polygraph_modify_session';
-
-export const CLOUD_POLYGRAPH_COMPLETE_SESSION =
-  'cloud_polygraph_complete_session';
-
-export const CLOUD_CI_GET_LOGS = 'cloud_ci_get_logs';
