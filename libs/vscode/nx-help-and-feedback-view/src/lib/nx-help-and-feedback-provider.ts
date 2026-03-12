@@ -21,7 +21,7 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
       [
         [
           'Nx Console Documentation',
-          'https://nx.dev/core-features/integrate-with-editors#nx-console-for-vscode?utm_source=nxconsole',
+          'https://nx.dev/docs/getting-started/editor-setup?utm_source=nxconsole',
           {
             light: Uri.file(
               join(
@@ -57,12 +57,12 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
         ],
         [
           'Nx Console Troubleshooting Guide',
-          'https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole',
+          'https://nx.dev/docs/troubleshooting/console-troubleshooting?utm_source=nxconsole',
           new ThemeIcon('tools'),
         ],
         [
           'Nx Troubleshooting Guide',
-          'https://nx.dev/recipes/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole',
+          'https://nx.dev/docs/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole',
           new ThemeIcon('tools'),
         ],
       ] as const
