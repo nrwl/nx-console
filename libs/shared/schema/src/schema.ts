@@ -20,7 +20,7 @@ export type CliOption = {
   deprecated?: boolean | string;
 } & OptionPropertyDescription;
 
-export interface Option extends CliOption {
+export interface Option extends Omit<CliOption, 'items'> {
   tooltip?: string;
   itemTooltips?: ItemTooltips;
   items?: string[] | ItemsWithEnum;

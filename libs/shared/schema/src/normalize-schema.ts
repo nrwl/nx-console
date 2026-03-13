@@ -163,13 +163,16 @@ function isFieldRequired(
 }
 
 function getItems(option: CliOption): { items: string[] } | undefined {
-  return (
-    option.items && {
-      items:
-        (option.items as ItemsWithEnum).enum ||
-        ((option.items as string[]).length && option.items),
-    }
-  );
+  if (!option.items) return undefined;
+  const items = option.items as Record<string, unknown>;
+  if (Array.isArray(items['enum'])) {
+    return { items: items['enum'].map((e: unknown) => String(e)) };
+  }
+  // backwards compat: older Nx versions may pass items as a plain string[]
+  if (Array.isArray(items) && items.length > 0) {
+    return { items: items as unknown as string[] };
+  }
+  return undefined;
 }
 
 function isLongFormXPrompt(xPrompt: XPrompt): xPrompt is LongFormXPrompt {
