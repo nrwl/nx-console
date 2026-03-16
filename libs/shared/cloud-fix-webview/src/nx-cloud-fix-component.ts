@@ -499,7 +499,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
     }
 
     // Check if auto-apply is in progress (verified but userAction not yet updated)
-    if (aiFix.couldAutoApplyTasks && aiFix.verificationStatus === 'COMPLETED') {
+    if (
+      aiFix.couldAutoApplyTasks &&
+      !aiFix.autoApplySkipped &&
+      aiFix.verificationStatus === 'COMPLETED'
+    ) {
       return this.createAutoApplyingFixSection();
     }
 
@@ -670,7 +674,7 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
       case 'COMPLETED':
         // Don't show this section when auto-apply is in progress
         // (the auto-applying section above already indicates the fix is being committed)
-        if (aiFix.couldAutoApplyTasks) {
+        if (aiFix.couldAutoApplyTasks && !aiFix.autoApplySkipped) {
           return html``;
         }
         return html`
@@ -693,6 +697,11 @@ export class NxCloudFixComponent extends EditorContext(LitElement) {
               changes. You can now commit the fix to your branch using the
               controls above.
             </p>
+            ${aiFix.autoApplySkipped && aiFix.autoApplySkipReason
+              ? html`<p class="text-foreground m-0 mt-2 text-xs opacity-60">
+                  Auto-apply was skipped: ${aiFix.autoApplySkipReason}
+                </p>`
+              : html``}
           </div>
         `;
       case 'FAILED':

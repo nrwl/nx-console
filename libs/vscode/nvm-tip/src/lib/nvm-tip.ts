@@ -13,7 +13,7 @@ export async function initNvmTip(context: ExtensionContext) {
     commands.registerCommand('nxConsole.showNodeVersion', async () => {
       const nodeVersion = await getNodeVersion();
       window.showInformationMessage(
-        `VSCode loaded Node ${nodeVersion}. [If that seems wrong, read more here.](https://nx.dev/recipes/nx-console/console-troubleshooting#vscode-nvm-issues)`,
+        `VSCode loaded Node ${nodeVersion}. [If that seems wrong, read more here.](https://nx.dev/docs/troubleshooting/console-troubleshooting#vscode-nvm-issues)`,
       );
     }),
   );
@@ -27,7 +27,7 @@ export async function initNvmTip(context: ExtensionContext) {
   const nodeVersion = await getNodeVersion();
   window
     .showInformationMessage(
-      `VSCode loaded Node ${nodeVersion}. [If that seems wrong, read more here.](https://nx.dev/recipes/nx-console/console-troubleshooting#vscode-nvm-issues)`,
+      `VSCode loaded Node ${nodeVersion}. [If that seems wrong, read more here.](https://nx.dev/docs/troubleshooting/console-troubleshooting#vscode-nvm-issues)`,
       'OK',
       "Don't show again",
     )

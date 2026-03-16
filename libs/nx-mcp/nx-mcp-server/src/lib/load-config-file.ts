@@ -9,7 +9,6 @@ const SUPPORTED_KEYS = new Set([
   'disableTelemetry',
   'transport',
   'port',
-  'experimentalPolygraph',
 ]);
 
 export type NxMcpConfig = {
@@ -19,7 +18,6 @@ export type NxMcpConfig = {
   disableTelemetry?: boolean;
   transport?: 'stdio' | 'sse' | 'http';
   port?: number;
-  experimentalPolygraph?: boolean;
 };
 
 export function loadNxMcpConfig(workspacePath: string): NxMcpConfig {

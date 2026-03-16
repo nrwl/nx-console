@@ -81,12 +81,6 @@ export function createYargsConfig(args: string[]): Argv<any> {
       type: 'boolean',
       default: true,
     })
-    .option('experimentalPolygraph', {
-      describe:
-        'Enable experimental Polygraph tools for multi-repo orchestration',
-      type: 'boolean',
-      default: false,
-    })
     .check((argv) => {
       // Check for conflicting options
       if (argv.sse && argv.transport === 'http') {

@@ -48,6 +48,8 @@ export type NxAiFix = {
   shortLink?: string;
   userActionOrigin?: AITaskFixUserActionOrigin;
   couldAutoApplyTasks?: boolean;
+  autoApplySkipped?: boolean;
+  autoApplySkipReason?: string;
   confidenceScore?: number;
 };
 

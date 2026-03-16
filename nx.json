@@ -207,7 +207,7 @@
   "defaultBase": "master",
   "nxCloudUrl": "https://snapshot.nx.app",
   "nxCloudId": "698fe56d9c60351a0e65a82b",
-  "bust": 9,
+  "bust": 10,
   "release": {
     "version": {
       "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
