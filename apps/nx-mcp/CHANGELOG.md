@@ -1,3 +1,14 @@
+## 0.24.0 (2026-03-16)
+
+### 🚀 Features
+
+- **nx-mcp:** remove Polygraph MCP tools ([#3092](https://github.com/nrwl/nx-console/pull/3092))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- MaxKless @MaxKless
+
 ## 0.23.0 (2026-03-06)
 
 This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
