@@ -79,7 +79,7 @@ export class AtomizerDecorationProvider implements FileDecorationProvider {
                 if (selection === 'Learn More') {
                   commands.executeCommand(
                     'vscode.open',
-                    'https://nx.dev/ci/features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole',
+                    'https://nx.dev/docs/features/ci-features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole',
                   );
                 }
               });
@@ -101,7 +101,7 @@ export class AtomizerDecorationProvider implements FileDecorationProvider {
                 if (selection === 'Learn More') {
                   commands.executeCommand(
                     'vscode.open',
-                    'https://nx.dev/ci/features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole',
+                    'https://nx.dev/docs/features/ci-features/split-e2e-tasks#automatically-split-e2e-tasks-by-file-atomizer?utm_source=nxconsole',
                   );
                 }
               });

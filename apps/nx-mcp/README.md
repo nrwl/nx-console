@@ -8,7 +8,7 @@ A [Model Context Protocol](https://modelcontextprotocol.io/introduction) server 
 
 The Nx MCP server gives LLMs deep access to your monorepo’s structure: project relationships, file mappings, runnable tasks, ownership info, tech stacks, Nx generators, and even Nx documentation. With this context, LLMs can generate code tailored to your stack, understand the impact of a change, and apply modifications across connected files with precision. This is possible because Nx already understands the higher-level architecture of your workspace, and monorepos bring all relevant projects into one place.
 
-Read more in [our blog post](https://nx.dev/blog/nx-made-cursor-smarter) and [in our docs](https://nx.dev/features/enhance-AI).
+Read more in [our blog post](https://nx.dev/blog/nx-made-cursor-smarter) and [in our docs](https://nx.dev/docs/features/enhance-ai).
 
 ## Installation and Usage
 
@@ -80,8 +80,8 @@ If you're using Cursor you can directly install the Nx Console extension which a
 
 More info:
 
-- [Install Nx Console](https://nx.dev/getting-started/editor-setup)
-- [Configure Cursor to use the nx-mcp](https://nx.dev/features/enhance-AI#cursor)
+- [Install Nx Console](https://nx.dev/docs/getting-started/editor-setup)
+- [Configure Cursor to use the nx-mcp](https://nx.dev/docs/features/enhance-ai#cursor)
 
 ## Minimal Mode (Default)
 
