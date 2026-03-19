@@ -256,7 +256,8 @@ class NxTreeStructure(val tree: NxProjectsTree, val project: Project) : SimpleTr
         override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
         override fun actionPerformed(e: AnActionEvent) {
-            val url = "https://nx.dev/docs/features/ci-features/split-e2e-tasks?utm_source=nx-console"
+            val url =
+                "https://nx.dev/docs/features/ci-features/split-e2e-tasks?utm_source=nx-console"
             BrowserLauncher.instance.browse(URI.create(url))
         }
 
