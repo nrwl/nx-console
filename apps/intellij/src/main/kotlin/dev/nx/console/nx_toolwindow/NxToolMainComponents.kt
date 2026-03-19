@@ -94,7 +94,7 @@ class NxToolMainComponents(private val project: Project) {
                         panel {
                             row {
                                 text(
-                                        " If you're just getting started with Nx, you can <a href='https://nx.dev/plugin-features/use-code-generators'>use generators</a> to quickly scaffold new projects or <a href='https://nx.dev/reference/project-configuration'>add them manually</a>.<br/> If your Nx workspace is not at the root of the opened project, make sure to set the <a href='open-setting'>workspace path setting</a>."
+                                        " If you're just getting started with Nx, you can <a href='https://nx.dev/docs/features/generate-code'>use generators</a> to quickly scaffold new projects or <a href='https://nx.dev/docs/reference/project-configuration'>add them manually</a>.<br/> If your Nx workspace is not at the root of the opened project, make sure to set the <a href='open-setting'>workspace path setting</a>."
                                     ) {
                                         if (it.description == "open-setting") {
                                             ShowSettingsUtil.getInstance()
@@ -204,7 +204,7 @@ class NxToolMainComponents(private val project: Project) {
                         panel {
                             row {
                                 text(
-                                        "New to Nx? <a href='https://nx.dev/plugin-features/use-code-generators'>Use generators</a> to scaffold projects or <a href='https://nx.dev/reference/project-configuration'>configure them manually</a>. " +
+                                        "New to Nx? <a href='https://nx.dev/docs/features/generate-code'>Use generators</a> to scaffold projects or <a href='https://nx.dev/docs/reference/project-configuration'>configure them manually</a>. " +
                                             "If your workspace isn't at the project root, set the <a href='open-setting'>workspace path</a>."
                                     ) {
                                         if (it.description == "open-setting") {

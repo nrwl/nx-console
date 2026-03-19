@@ -56,7 +56,7 @@ Nx Console enhances your editors AI features by providing relevant context to th
 
 Nx Console comes with an MCP server for both, [VSCode](https://nx.dev/blog/nx-mcp-vscode-copilot) and [Cursor](https://nx.dev/blog/nx-made-cursor-smarter).
 
-You can also install the MCP server separately from the Nx Console extension via the `nx-mcp` NPM package. More about that [here](./apps/nx-mcp/README.md). Learn more in [the Nx docs](https://nx.dev/features/enhance-AI).
+You can also install the MCP server separately from the Nx Console extension via the `nx-mcp` NPM package. More about that [here](./apps/nx-mcp/README.md). Learn more in [the Nx docs](https://nx.dev/docs/features/enhance-ai).
 
 ### Project Details View
 
@@ -69,7 +69,7 @@ Nx Console provides seamless integration with the Project Details View (PDV). Yo
     </picture>
 </p>
 
-[Learn more about the Project Details view on nx.dev](https://nx.dev/recipes/nx-console/console-project-details#nx-console-project-details-view)
+[Learn more about the Project Details view on nx.dev](https://nx.dev/docs/guides/nx-console/console-project-details#nx-console-project-details-view)
 
 ### Generate UI
 
@@ -82,7 +82,7 @@ Nx Console makes it easier to run generators through our interactive Generate UI
     </picture>
 </p>
 
-You can launch the Generate UI via the `Nx: Generate (UI)` command or through the context menu in the file explorer. Paths will be automatically prefilled! [Learn more about the Generate UI on nx.dev](https://nx.dev/recipes/nx-console/console-generate-command)
+You can launch the Generate UI via the `Nx: Generate (UI)` command or through the context menu in the file explorer. Paths will be automatically prefilled! [Learn more about the Generate UI on nx.dev](https://nx.dev/docs/guides/nx-console/console-generate-command)
 
 ### Nx Cloud Integration
 
@@ -97,7 +97,7 @@ Nx Console improves the experience of using Nx Cloud by giving you an overview o
 
 Additionally, Nx Console helps by guiding you through the Nx Cloud onboarding process, right in your editor.
 
-[Learn more about the Nx Cloud Integration on nx.dev](https://nx.dev/recipes/nx-console/console-nx-cloud)
+[Learn more about the Nx Cloud Integration on nx.dev](https://nx.dev/docs/guides/nx-console/console-nx-cloud)
 
 ### Projects & Tasks Overview
 
@@ -123,15 +123,15 @@ Nx Console visualizes the Nx project & task graphs right in your editor. It know
 
 ## Requirements
 
-To use Nx Console, make sure you're in an Nx or Lerna workspace and have Node.js installed. If you're not using Nx yet, learn more here: [Intro to Nx](https://nx.dev/getting-started/intro)
+To use Nx Console, make sure you're in an Nx or Lerna workspace and have Node.js installed. If you're not using Nx yet, learn more here: [Intro to Nx](https://nx.dev/docs/getting-started/intro)
 
-You can [create an Nx workspace](https://nx.dev/getting-started/installation) by running the following command:
+You can [create an Nx workspace](https://nx.dev/docs/getting-started/installation) by running the following command:
 
 ```bash
 npx create-nx-workspace@latest my-workspace
 ```
 
-To [install Nx into an existing repository](https://nx.dev/getting-started/installation#installing-nx-into-an-existing-repository), simply run
+To [install Nx into an existing repository](https://nx.dev/docs/getting-started/installation#installing-nx-into-an-existing-repository), simply run
 
 ```bash
 npx nx init
@@ -142,7 +142,7 @@ npx nx init
 The latest version of Nx Console supports all Nx versions starting at Nx 15. For older versions, we cannot guarantee compatibility or full functionality. However, we welcome contributions! If you encounter specific issues with older versions, please consider submitting a PR. Of course, if you discover any problems with newer versions of Nx, please report these issues to help us improve Nx Console.
 
 If you're looking to upgrade your version of Nx easily, refer to the [Nx
-migrate documentation](https://nx.dev/features/automate-updating-dependencies).
+migrate documentation](https://nx.dev/docs/features/automate-updating-dependencies).
 
 # Contributing
 
@@ -153,7 +153,7 @@ list to get started.
 
 ## Learn More
 
-- [Documentation](https://nx.dev/getting-started/editor-setup) - Official documentation with video tutorials
+- [Documentation](https://nx.dev/docs/getting-started/editor-setup) - Official documentation with video tutorials
 - [nx.dev](http://nx.dev) - Documentation, Guides and Interactive Tutorials on Nx
 - [Join the community](http://go.nx.dev/community) - Chat about Nx & Nx Console on the official discord server
 - [Learn more about the team at Nx](https://nx.dev/company) - The team at Nx led the development of Nx Console,

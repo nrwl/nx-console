@@ -19,7 +19,7 @@
     "color": "#176BCC",
     "theme": "dark"
   },
-  "homepage": "https://nx.dev/using-nx/console#nx-console-for-vscode",
+  "homepage": "https://nx.dev/docs/getting-started/editor-setup#nx-console-for-vscode",
   "bugs": {
     "url": "https://github.com/nrwl/nx-console/issues"
   },
@@ -965,11 +965,11 @@
     "viewsWelcome": [
       {
         "view": "nxConsole.views.welcome",
-        "contents": "It looks like you're not inside an Nx workspace. Click the button below to add nx to your current workspace by running [nx init](https://nx.dev/recipes/adopting-nx/adding-to-existing-project). \n [Add Nx](command:nx.init)\n If your Nx workspace is in a different folder, you can manually select it below. \n[Select Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
+        "contents": "It looks like you're not inside an Nx workspace. Click the button below to add nx to your current workspace by running [nx init](https://nx.dev/docs/guides/adopting-nx/adding-to-existing-project). \n [Add Nx](command:nx.init)\n If your Nx workspace is in a different folder, you can manually select it below. \n[Select Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/docs/getting-started/editor-setup)."
       },
       {
         "view": "nxConsole.views.angular-welcome",
-        "contents": "Nx Console no longer supports Angular CLI workspaces.\nHowever, Nx now supports a [Standalone App workspace](https://nx.dev/getting-started/angular-standalone-tutorial) setup aimed at non-monorepo scenarios. This setup is identical to a typical Angular CLI workspace and allows for leveraging all Nx features, including:\n- [Modularizing your codebase](https://nx.dev/more-concepts/applications-and-libraries) with local libraries\n- [Powerful generators and plugins](https://nx.dev/plugin-features/use-code-generators) from the team and the Nx community (Jest, Cypress, Tailwind, Storybook, NgRx, etc.)\n- [Visualizing your workspace structure](https://nx.dev/core-features/explore-graph)\n- [Task caching](https://nx.dev/core-features/cache-task-results) to speed up your runs and CI\nFurthermore, if you ever want to migrate to a monorepo, it can be done easily.\nMigrating from the Angular CLI to Nx is fully automated and won't change your workspace structure. Click the button below to run the migration and convert your workspace. Make sure to commit all changes first.\n[Migrate to Nx](command:nxConsole.migrateAngularCliToNx)"
+        "contents": "Nx Console no longer supports Angular CLI workspaces.\nHowever, Nx now supports a [Standalone App workspace](https://nx.dev/docs/getting-started/tutorials/angular-monorepo-tutorial) setup aimed at non-monorepo scenarios. This setup is identical to a typical Angular CLI workspace and allows for leveraging all Nx features, including:\n- [Modularizing your codebase](https://nx.dev/docs/concepts/decisions/project-size) with local libraries\n- [Powerful generators and plugins](https://nx.dev/docs/features/generate-code) from the team and the Nx community (Jest, Cypress, Tailwind, Storybook, NgRx, etc.)\n- [Visualizing your workspace structure](https://nx.dev/docs/features/explore-graph)\n- [Task caching](https://nx.dev/docs/features/cache-task-results) to speed up your runs and CI\nFurthermore, if you ever want to migrate to a monorepo, it can be done easily.\nMigrating from the Angular CLI to Nx is fully automated and won't change your workspace structure. Click the button below to run the migration and convert your workspace. Make sure to commit all changes first.\n[Migrate to Nx](command:nxConsole.migrateAngularCliToNx)"
       },
       {
         "view": "nxProjects",
@@ -998,7 +998,7 @@
       },
       {
         "view": "nxProjects",
-        "contents": "No projects found in this workspace.\n\n[Refresh Workspace](command:nxConsole.refreshWorkspace)\n\n[Use generators](https://nx.dev/plugin-features/use-code-generators) to scaffold new projects.",
+        "contents": "No projects found in this workspace.\n\n[Refresh Workspace](command:nxConsole.refreshWorkspace)\n\n[Use generators](https://nx.dev/docs/features/generate-code) to scaffold new projects.",
         "when": "nxProjectsView.state == no-projects"
       },
       {

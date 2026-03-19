@@ -92,7 +92,7 @@ export class Root extends LitElement {
     if (!this.cloudOnboardingInfo?.isConnectedToCloud) {
       return html`<p>
         Nx Cloud facilitates Remote Caching, Task Distribution and more.
-        <vscode-link href="https://nx.dev/ci/intro/why-nx-cloud"
+        <vscode-link href="https://nx.dev/docs/getting-started/nx-cloud"
           >Learn more about Nx Cloud</vscode-link
         >
       </p>`;
@@ -100,7 +100,7 @@ export class Root extends LitElement {
       return html`<p>
         Finish connecting your repository to Nx Cloud in the web application,
         gain access to the PR integration and more.
-        <vscode-link href="https://nx.dev/ci/intro/why-nx-cloud"
+        <vscode-link href="https://nx.dev/docs/getting-started/nx-cloud"
           >Learn more about Nx Cloud</vscode-link
         >
       </p>`;
@@ -108,7 +108,7 @@ export class Root extends LitElement {
       return html`<p>
         Use our generator to easily create a CI configuration for your CI
         provider of choice.
-        <vscode-link href="https://nx.dev/ci/intro/why-nx-cloud"
+        <vscode-link href="https://nx.dev/docs/getting-started/nx-cloud"
           >Learn more about Nx Cloud</vscode-link
         >
       </p>`;

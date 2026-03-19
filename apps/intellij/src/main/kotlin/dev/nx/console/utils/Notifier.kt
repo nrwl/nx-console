@@ -51,7 +51,7 @@ class Notifier {
                         object : AnAction("Learn more") {
                             override fun actionPerformed(e: AnActionEvent) {
                                 BrowserUtil.browse(
-                                    "https://nx.dev/recipes/nx-console/console-telemetry#collected-data"
+                                    "https://nx.dev/docs/guides/nx-console/console-telemetry#collected-data"
                                 )
                             }
                         },
@@ -213,7 +213,7 @@ class Notifier {
                 .addAction(
                     NotificationAction.createSimpleExpiring("Learn More") {
                         BrowserUtil.browse(
-                            "https://nx.dev/getting-started/ai-integration#manual-setup-for-other-ai-clients"
+                            "https://nx.dev/docs/getting-started/ai-setup#manual-setup-for-other-ai-clients"
                         )
                     }
                 )
