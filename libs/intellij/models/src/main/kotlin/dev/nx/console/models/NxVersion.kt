@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import org.semver4j.Semver
 
 @Serializable()
-data class NxVersion(val minor: Int, val major: Int, val full: String) {
+data class NxVersion(val minor: Int, val major: Int, val full: String, val patch: Int) {
     fun gte(other: NxVersion): Boolean {
         if (this.full.startsWith("0.0.0-pr-")) {
             return true
@@ -20,16 +20,23 @@ data class NxVersion(val minor: Int, val major: Int, val full: String) {
         if (this.major > other.major) {
             return true
         } else if (this.major == other.major) {
-            return this.minor >= other.minor
+            if (this.minor > other.minor) {
+                return true
+            } else if (this.minor == other.minor) {
+                return this.patch >= other.patch
+            }
         }
         return false
     }
 
     fun gte(other: Int): Boolean {
-        return gte(NxVersion(other, 0, "$other.0.0"))
+        return gte(NxVersion(other, 0, "$other.0.0", 0))
     }
 
     fun equals(other: NxVersion): Boolean {
-        return this.major == other.major && this.minor == other.minor && this.full == other.full
+        return this.major == other.major &&
+            this.minor == other.minor &&
+            this.patch == other.patch &&
+            this.full == other.full
     }
 }
