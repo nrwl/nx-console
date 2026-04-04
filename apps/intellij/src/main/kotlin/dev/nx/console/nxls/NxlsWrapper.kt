@@ -50,6 +50,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     private var connectedEditors = ConcurrentHashMap<String, DocumentManager>()
 
     private var status = NxlsState.STOPPED
+    private var loggedProcessExited = false
 
     fun getServerCapabilities(): ServerCapabilities? {
         log.log("Getting language server capabilities")
@@ -58,6 +59,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
     suspend fun start() {
         try {
+            loggedProcessExited = false
             status = NxlsState.STARTING
             val nxlsProcess = NxlsProcess(project, cs)
             this.nxlsProcess = nxlsProcess
@@ -115,9 +117,12 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                         if (this) {
                                             consume.consume(message)
                                         } else {
-                                            log.log(
-                                                "Unable to send messages to the nxls, the process has exited"
-                                            )
+                                            if (!loggedProcessExited) {
+                                                loggedProcessExited = true
+                                                log.log(
+                                                    "Unable to send messages to the nxls, the process has exited"
+                                                )
+                                            }
                                             status = NxlsState.STOPPED
                                         }
                                     }

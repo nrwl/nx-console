@@ -46,16 +46,11 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                 exitJob =
                     cs.launch {
                         it.awaitExit()
-                        it.errorStream.readAllBytes().decodeToString().run {
-                            if (this.isEmpty()) {
-                                return@run
-                            }
-
-                            if (project.isDisposed) {
-                                return@run
-                            }
-
-                            logger.error("Nxls early exit: $this")
+                        val stderr = it.errorStream.readAllBytes().decodeToString()
+                        if (stderr.isNotEmpty() && !project.isDisposed) {
+                            logger.error("Nxls early exit: $stderr")
+                        }
+                        if (!project.isDisposed) {
                             onExit?.invoke()
                         }
                     }
