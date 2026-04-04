@@ -114,6 +114,12 @@ async function registerPassiveDaemonWatcher(
       lspLogger.debug?.(
         `registerPassiveDaemonWatcher: Existing watcher state: ${_passiveDaemonWatcher.state}`,
       );
+      try {
+        _passiveDaemonWatcher.dispose();
+      } catch (e) {
+        lspLogger.log('Error stopping previous passive daemon watcher: ' + e);
+      }
+      _passiveDaemonWatcher = undefined;
     }
     lspLogger.debug?.(
       'registerPassiveDaemonWatcher: Creating new PassiveDaemonWatcher...',
@@ -128,11 +134,12 @@ async function registerPassiveDaemonWatcher(
     lspLogger.debug?.(
       `registerPassiveDaemonWatcher: start() completed, state: ${_passiveDaemonWatcher.state}`,
     );
+    const debouncedCallback = debounce(callback, 1000);
     _passiveDaemonWatcher.listen((error, projectGraphAndSourceMaps) => {
       lspLogger.debug?.(
         `registerPassiveDaemonWatcher: Listener callback triggered, error=${error}`,
       );
-      callback(error, projectGraphAndSourceMaps);
+      debouncedCallback(error, projectGraphAndSourceMaps);
     });
     lspLogger.debug?.('registerPassiveDaemonWatcher: Listener registered');
     return async () => {
