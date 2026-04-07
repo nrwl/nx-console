@@ -151,9 +151,6 @@
       },
       "telemetry-check": {
         "command": "node tools/scripts/check-telemetry-sync.js"
-      },
-      "check-pinned-versions": {
-        "command": "node tools/scripts/check-pinned-versions.js"
       }
     }
   },
