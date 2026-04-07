@@ -1,4 +1,8 @@
 import {
+  buildSafeDlxCommand,
+  getPackageManagerCommand,
+} from '@nx-console/shared-npm';
+import {
   noProvenanceError,
   nxLatestProvenanceCheck,
 } from '@nx-console/shared-utils';
@@ -34,16 +38,23 @@ export function initNxInit(context: ExtensionContext) {
           logAndShowError(noProvenanceError, provenanceResult);
           return;
         }
-        const command = 'nx@latest init --ignore-scripts';
+        const packageManagerCommand = await getPackageManagerCommand(
+          workspacePath ?? '',
+        );
+        const { prefix, env } = buildSafeDlxCommand(
+          packageManagerCommand.dlx,
+        );
+        const command = `${prefix} nx@latest init`;
         const task = new Task(
-          { type: 'nx' }, // definition
-          TaskScope.Workspace, // scope
-          command, // name
+          { type: 'nx' },
+          TaskScope.Workspace,
+          command,
           'nx',
-          // execution
-          new ShellExecution(`npx ${command}`, {
+          new ShellExecution(command, {
             cwd: workspacePath,
             env: {
+              ...process.env,
+              ...env,
               NX_CONSOLE: 'true',
             },
           }),

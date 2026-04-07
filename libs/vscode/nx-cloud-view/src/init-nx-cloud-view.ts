@@ -1,4 +1,7 @@
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
+import {
+  buildSafeDlxCommand,
+  getPackageManagerCommand,
+} from '@nx-console/shared-npm';
 import { TelemetryEventSource } from '@nx-console/shared-telemetry';
 import { CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
 import { throttle } from '@nx-console/shared-utils';
@@ -136,17 +139,21 @@ export function initNxCloudView(context: ExtensionContext) {
       const workspacePath = getWorkspacePath();
 
       const pkgManagerCommands = await getPackageManagerCommand(workspacePath);
+      const { prefix, env: dlxEnv } = buildSafeDlxCommand(
+        pkgManagerCommands.dlx,
+      );
 
-      const command = 'nx-cloud login';
+      const command = `${prefix} nx-cloud login`;
       const task = new Task(
         { type: 'nx' },
         TaskScope.Workspace,
         command,
         'nx',
-        new ShellExecution(`${pkgManagerCommands.dlx} ${command}`, {
+        new ShellExecution(command, {
           cwd: workspacePath,
           env: {
             ...process.env,
+            ...dlxEnv,
             NX_CONSOLE: 'true',
           },
         }),

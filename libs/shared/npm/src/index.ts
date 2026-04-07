@@ -4,6 +4,8 @@ export * from './lib/package-details';
 export * from './lib/pnp-dependencies';
 export { checkIsNxWorkspace } from './lib/check-is-nx-workspace';
 export { getNxExecutionCommand } from './lib/get-nx-execution-command';
+export { buildSafeDlxCommand } from './lib/safe-dlx-command';
+export type { SafeDlxCommand } from './lib/safe-dlx-command';
 
 export {
   detectPackageManager,
