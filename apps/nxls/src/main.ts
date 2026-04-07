@@ -417,6 +417,12 @@ async function reconfigureAndSendNotificationWithBackoff(
     return;
   }
 
+  if (retryTimeoutId) {
+    clearTimeout(retryTimeoutId);
+    retryTimeoutId = undefined;
+    reconfigureAttempts = 0;
+  }
+
   isReconfiguring = true;
   try {
     if (reconfigureAttempts === 0) {
