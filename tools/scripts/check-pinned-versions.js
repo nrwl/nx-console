@@ -9,7 +9,9 @@ const violations = [];
 
 for (const section of ['dependencies', 'devDependencies']) {
   for (const [name, version] of Object.entries(pkg[section] || {})) {
-    if (version.startsWith('^') || version.startsWith('~')) {
+    if (
+      !/^\d+\.\d+\.\d+(-[0-9A-Za-z-.]+)?(\+[0-9A-Za-z-.]+)?$/.test(version)
+    ) {
       violations.push(`  ${section} > ${name}: ${version}`);
     }
   }
@@ -17,7 +19,7 @@ for (const section of ['dependencies', 'devDependencies']) {
 
 if (violations.length > 0) {
   console.error(
-    'Found unpinned dependency versions (^ or ~ ranges):\n' +
+    'Found unpinned dependency versions (must be exact semver):\n' +
       violations.join('\n')
   );
   console.error(
