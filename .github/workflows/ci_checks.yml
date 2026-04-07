@@ -94,6 +94,9 @@ jobs:
       - name: Ensure the workspace configuration is in sync
         run: yarn nx-cloud record -- yarn nx sync:check
 
+      - name: Check pinned dependency versions
+        run: yarn nx-cloud record -- node tools/scripts/check-pinned-versions.js
+
       # - name: Run Nx Cloud conformance checks
       #   run: yarn nx-cloud record -- yarn nx-cloud conformance:check
 
