@@ -41,9 +41,7 @@ export function initNxInit(context: ExtensionContext) {
         const packageManagerCommand = await getPackageManagerCommand(
           workspacePath ?? '',
         );
-        const { prefix, env } = buildSafeDlxCommand(
-          packageManagerCommand.dlx,
-        );
+        const { prefix, env } = buildSafeDlxCommand(packageManagerCommand.dlx);
         const command = `${prefix} nx@latest init`;
         const task = new Task(
           { type: 'nx' },

@@ -141,8 +141,7 @@ async function constructCommand(
     : buildSafeDlxCommand(packageManagerCommands.dlx, { npxCacheDir });
 
   return {
-    command:
-      `${prefix} nx@latest configure-ai-agents ${flags}`.trim(),
+    command: `${prefix} nx@latest configure-ai-agents ${flags}`.trim(),
     env,
   };
 }
@@ -677,8 +676,7 @@ async function runAiAgentCheckLegacy() {
           source: 'notification',
         });
 
-        const { command: setupCmd, env: setupEnv } =
-          await constructCommand('');
+        const { command: setupCmd, env: setupEnv } = await constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
