@@ -115,6 +115,15 @@ const fileWatcherOperationalCallback = (status: WatcherStatus) => {
   });
 };
 let reconfigureAttempts = 0;
+let isReconfiguring = false;
+let pendingReconfigure: {
+  workingPath: string;
+  projectGraphAndSourceMaps?: {
+    projectGraph: ProjectGraph;
+    sourceMaps: ConfigurationSourceMaps;
+  } | null;
+} | null = null;
+let retryTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
 // Create a text document manager.
 const documents = new TextDocuments(TextDocument);
@@ -403,37 +412,71 @@ async function reconfigureAndSendNotificationWithBackoff(
     sourceMaps: ConfigurationSourceMaps;
   } | null,
 ) {
-  if (reconfigureAttempts === 0) {
-    safeSendNotification(NxWorkspaceRefreshStartedNotification.method);
-  }
-  const workspace = await reconfigure(workingPath, projectGraphAndSourceMaps);
-  await safeSendNotification(NxWorkspaceRefreshNotification.method);
-
-  if (
-    !workspace?.errors ||
-    (workspace.errors &&
-      workspace.isPartial &&
-      Object.keys(workspace.projectGraph.nodes ?? {}).length > 0)
-  ) {
-    reconfigureAttempts = 0;
+  if (isReconfiguring) {
+    pendingReconfigure = { workingPath, projectGraphAndSourceMaps };
     return;
   }
 
-  if (reconfigureAttempts < 3) {
-    reconfigureAttempts++;
-    lspLogger.log(
-      `reconfiguration failed, trying again in ${
-        reconfigureAttempts * reconfigureAttempts
-      } seconds`,
-    );
-    new Promise((resolve) =>
-      setTimeout(resolve, 1000 * reconfigureAttempts * reconfigureAttempts),
-    ).then(() => reconfigureAndSendNotificationWithBackoff(workingPath));
-  } else {
-    lspLogger.log(
-      `reconfiguration failed after ${reconfigureAttempts} attempts`,
-    );
+  if (retryTimeoutId) {
+    clearTimeout(retryTimeoutId);
+    retryTimeoutId = undefined;
     reconfigureAttempts = 0;
+  }
+
+  isReconfiguring = true;
+  try {
+    if (reconfigureAttempts === 0) {
+      safeSendNotification(NxWorkspaceRefreshStartedNotification.method);
+    }
+    const workspace = await reconfigure(workingPath, projectGraphAndSourceMaps);
+    safeSendNotification(NxWorkspaceRefreshNotification.method);
+
+    if (
+      !workspace?.errors ||
+      (workspace.errors &&
+        workspace.isPartial &&
+        Object.keys(workspace.projectGraph.nodes ?? {}).length > 0)
+    ) {
+      reconfigureAttempts = 0;
+      return;
+    }
+
+    if (reconfigureAttempts < 3) {
+      reconfigureAttempts++;
+      lspLogger.log(
+        `reconfiguration failed, trying again in ${
+          reconfigureAttempts * reconfigureAttempts
+        } seconds`,
+      );
+      retryTimeoutId = setTimeout(
+        () => {
+          retryTimeoutId = undefined;
+          reconfigureAndSendNotificationWithBackoff(workingPath);
+        },
+        1000 * reconfigureAttempts * reconfigureAttempts,
+      );
+    } else {
+      lspLogger.log(
+        `reconfiguration failed after ${reconfigureAttempts} attempts`,
+      );
+      reconfigureAttempts = 0;
+    }
+  } finally {
+    isReconfiguring = false;
+
+    if (pendingReconfigure) {
+      const pending = pendingReconfigure;
+      pendingReconfigure = null;
+      if (retryTimeoutId) {
+        clearTimeout(retryTimeoutId);
+        retryTimeoutId = undefined;
+      }
+      reconfigureAttempts = 0;
+      reconfigureAndSendNotificationWithBackoff(
+        pending.workingPath,
+        pending.projectGraphAndSourceMaps,
+      );
+    }
   }
 }
 

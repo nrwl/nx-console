@@ -1,5 +1,6 @@
 import { gte } from '@nx-console/nx-version';
 import {
+  buildSafeDlxCommand,
   checkIsNxWorkspace,
   detectPackageManager,
   getPackageManagerCommand,
@@ -64,32 +65,18 @@ const EXPECTED_ERRORS = [
 ];
 
 let checkTimer: NodeJS.Timeout | undefined;
-let intervalTimer: NodeJS.Timeout | undefined;
 
 export function setupPeriodicAiCheck(context: ExtensionContext) {
-  // Run first check after 3 minutes
-  checkTimer = setTimeout(
-    () => {
-      runAiAgentCheck();
-
-      // Then check every 3 hours
-      intervalTimer = setInterval(
-        () => {
-          runAiAgentCheck();
-        },
-        3 * 60 * 60 * 1000,
-      );
-    },
-    3 * 60 * 1000,
-  );
+  // Run once on startup with a randomized delay (1 to 5 minutes)
+  const delayMs = (60 + Math.floor(Math.random() * 240)) * 1000;
+  checkTimer = setTimeout(() => {
+    runAiAgentCheck();
+  }, delayMs);
 
   context.subscriptions.push(
     new Disposable(() => {
       if (checkTimer) {
         clearTimeout(checkTimer);
-      }
-      if (intervalTimer) {
-        clearInterval(intervalTimer);
       }
     }),
   );
@@ -102,7 +89,7 @@ export async function runConfigureAiAgentsCommand() {
     source: 'command',
   });
 
-  const command = await constructCommand('');
+  const { command, env: dlxEnv } = await constructCommand('');
   const task = new Task(
     { type: 'nx' },
     TaskScope.Workspace,
@@ -112,6 +99,7 @@ export async function runConfigureAiAgentsCommand() {
       cwd: workspacePath,
       env: {
         ...process.env,
+        ...dlxEnv,
         NX_CONSOLE: 'true',
         NX_AI_FILES_USE_LOCAL: 'true',
       },
@@ -121,7 +109,10 @@ export async function runConfigureAiAgentsCommand() {
   tasks.executeTask(task);
 }
 
-async function constructCommand(flags: string, forceNpx = false) {
+async function constructCommand(
+  flags: string,
+  forceNpx = false,
+): Promise<{ command: string; env: Record<string, string> }> {
   const workspacePath = getWorkspacePath();
 
   const hash = createHash('sha256')
@@ -131,11 +122,11 @@ async function constructCommand(flags: string, forceNpx = false) {
 
   const tmpDir = join(tmpdir(), 'nx-console-tmp', hash);
 
-  let cacheParam = '';
+  let npxCacheDir: string | undefined;
   try {
     rmSync(tmpDir, { recursive: true, force: true });
     mkdirSync(tmpDir, { recursive: true });
-    cacheParam = `--cache=${tmpDir}`;
+    npxCacheDir = tmpDir;
   } catch (e) {
     // No permissions or can't create tmpDir, skip cache parameter
   }
@@ -145,15 +136,14 @@ async function constructCommand(flags: string, forceNpx = false) {
     vscodeLogger,
   );
 
-  let dlx = packageManagerCommands.dlx;
+  const { prefix, env } = forceNpx
+    ? buildSafeDlxCommand(undefined, { npxCacheDir })
+    : buildSafeDlxCommand(packageManagerCommands.dlx, { npxCacheDir });
 
-  // there are older versions of nx that have this outdated config
-  // 'yarn' isn't actually a dlx command it's only for local packages
-  if (dlx === 'yarn' || dlx === 'npx' || dlx === undefined) {
-    dlx = `npx -y --ignore-scripts ${cacheParam}`;
-  }
-
-  return `${forceNpx ? `npx -y ${cacheParam} --ignore-scripts` : dlx} nx@latest configure-ai-agents ${flags}`.trim();
+  return {
+    command: `${prefix} nx@latest configure-ai-agents ${flags}`.trim(),
+    env,
+  };
 }
 
 async function doRunAiAgentCheck(
@@ -171,13 +161,15 @@ async function doRunAiAgentCheck(
   const errors: [string, Error][] = [];
 
   try {
-    command = await constructCommand('--check', forceNpx);
+    const result = await constructCommand('--check', forceNpx);
+    command = result.command;
     await new Promise((resolve, reject) => {
       commandStartTime = Date.now();
       const childProcess = spawn(command, {
         cwd: workspacePath,
         env: {
           ...process.env,
+          ...result.env,
           NX_CONSOLE: 'true',
           // we're already executing from latest, we don't have to fetch latest again
           NX_AI_FILES_USE_LOCAL: 'true',
@@ -595,7 +587,7 @@ async function runAiAgentCheckLegacy() {
           });
 
           // Run the configure command
-          const command = await constructCommand('');
+          const { command, env: dlxEnv } = await constructCommand('');
           const task = new Task(
             { type: 'nx' },
             TaskScope.Workspace,
@@ -605,6 +597,7 @@ async function runAiAgentCheckLegacy() {
               cwd: workspacePath,
               env: {
                 ...process.env,
+                ...dlxEnv,
                 NX_CONSOLE: 'true',
                 NX_AI_FILES_USE_LOCAL: 'true',
               },
@@ -640,13 +633,14 @@ async function runAiAgentCheckLegacy() {
     }
 
     // Run the check=all command to see if configuration is needed
-    const checkAllCommand = await constructCommand('--check=all');
+    const checkAllResult = await constructCommand('--check=all');
     try {
-      await promisify(exec)(checkAllCommand, {
+      await promisify(exec)(checkAllResult.command, {
         cwd: workspacePath,
         timeout: 360000,
         env: {
           ...process.env,
+          ...checkAllResult.env,
           NX_CONSOLE: 'true',
           NX_AI_FILES_USE_LOCAL: 'true',
         },
@@ -682,16 +676,17 @@ async function runAiAgentCheckLegacy() {
           source: 'notification',
         });
 
-        const command = await constructCommand('');
+        const { command: setupCmd, env: setupEnv } = await constructCommand('');
         const task = new Task(
           { type: 'nx' },
           TaskScope.Workspace,
-          command,
+          setupCmd,
           'nx',
-          new ShellExecution(command, {
+          new ShellExecution(setupCmd, {
             cwd: workspacePath,
             env: {
               ...process.env,
+              ...setupEnv,
               NX_CONSOLE: 'true',
               NX_AI_FILES_USE_LOCAL: 'true',
             },

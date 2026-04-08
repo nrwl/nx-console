@@ -54,7 +54,7 @@ export async function initNxConversion(
   if (answer === 'Learn More') {
     commands.executeCommand(
       'vscode.open',
-      'https://nx.dev/technologies/angular/migration/angular#migrating-an-angular-cli-project-to-nx?utm_source=nx-console',
+      'https://nx.dev/docs/technologies/angular/migration/angular#migrating-an-angular-cli-project-to-nx?utm_source=nx-console',
     );
     return;
   }

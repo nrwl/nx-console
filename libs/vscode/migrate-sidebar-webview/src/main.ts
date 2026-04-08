@@ -32,7 +32,9 @@ export class Root extends LitElement {
           A newer version of Nx is available:
           ${this.migrateViewData?.latestNxVersion.full} <br />
           Use the button below to start a guided migration using the Migrate UI.
-          <a href="https://nx.dev/latest/react/cli/migrate">Learn more</a>
+          <a href="https://nx.dev/docs/features/automate-updating-dependencies"
+            >Learn more</a
+          >
         </p>
 
         ${this.migrateViewData?.hasPendingChanges
