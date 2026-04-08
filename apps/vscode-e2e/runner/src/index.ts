@@ -1,8 +1,10 @@
 import * as http from 'node:http';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as vscode from 'vscode';
+import {
+  MARKER_DIR,
+  getMarkerFilePath,
+} from '../../fixtures/vscode-e2e-runtime';
 
 interface InvokeRequest {
   fn: string;
@@ -56,15 +58,11 @@ export function run(): Promise<void> {
       const address = server.address();
       if (address && typeof address !== 'string') {
         const url = `http://localhost:${address.port}`;
+        const markerId = process.env.VSCODE_E2E_MARKER_ID ?? `${process.pid}`;
+        const markerFilePath = getMarkerFilePath(markerId);
 
-        // Write the URL to a well-known file so the test side can find it
-        const markerDir = path.join(os.tmpdir(), 'vscode-e2e-test-server');
-        fs.mkdirSync(markerDir, { recursive: true });
-        fs.writeFileSync(
-          path.join(markerDir, `${process.pid}.url`),
-          url,
-          'utf-8',
-        );
+        fs.mkdirSync(MARKER_DIR, { recursive: true });
+        fs.writeFileSync(markerFilePath, url, 'utf-8');
       }
     });
 

@@ -1,24 +1,16 @@
-import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import type * as vscode from 'vscode';
+import { getMarkerFilePath } from './vscode-e2e-runtime';
 
-const MARKER_DIR = join(tmpdir(), 'vscode-e2e-test-server');
 const POLL_INTERVAL = 500;
 
-/**
- * Clean up any stale marker files from previous runs.
- * Must be called BEFORE launching VS Code.
- */
-export function cleanupMarkerFiles(): void {
-  if (existsSync(MARKER_DIR)) {
-    for (const file of readdirSync(MARKER_DIR)) {
-      rmSync(join(MARKER_DIR, file), { force: true });
-    }
-  }
+export function cleanupMarkerFile(markerId: string): void {
+  rmSync(getMarkerFilePath(markerId), { force: true });
 }
 
 export class VSCodeEvaluator {
+  constructor(private readonly markerId: string) {}
+
   private serverUrl: string | undefined;
 
   /**
@@ -27,24 +19,22 @@ export class VSCodeEvaluator {
    */
   async connect(): Promise<void> {
     this.serverUrl = await new Promise<string>((resolve, reject) => {
+      const markerFilePath = getMarkerFilePath(this.markerId);
       const timeout = setTimeout(() => {
         reject(
           new Error(
-            `Timed out waiting for VSCodeTestServer URL in ${MARKER_DIR}`,
+            `Timed out waiting for VSCodeTestServer URL at ${markerFilePath}`,
           ),
         );
       }, 60_000);
 
       const poll = setInterval(() => {
-        if (!existsSync(MARKER_DIR)) return;
+        if (!existsSync(markerFilePath)) return;
 
-        const files = readdirSync(MARKER_DIR).filter((f) => f.endsWith('.url'));
-        if (files.length > 0) {
-          const url = readFileSync(join(MARKER_DIR, files[0]), 'utf-8').trim();
-          clearInterval(poll);
-          clearTimeout(timeout);
-          resolve(url);
-        }
+        const url = readFileSync(markerFilePath, 'utf-8').trim();
+        clearInterval(poll);
+        clearTimeout(timeout);
+        resolve(url);
       }, POLL_INTERVAL);
     });
   }
@@ -80,7 +70,7 @@ export class VSCodeEvaluator {
   }
 
   close(): void {
-    cleanupMarkerFiles();
+    cleanupMarkerFile(this.markerId);
     this.serverUrl = undefined;
   }
 }

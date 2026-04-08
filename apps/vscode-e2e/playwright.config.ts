@@ -1,6 +1,10 @@
 import { defineConfig } from '@playwright/test';
 
-export default defineConfig({
+type VSCodeE2EWorkerOptions = {
+  vscodeVersion: string;
+};
+
+export default defineConfig<{}, VSCodeE2EWorkerOptions>({
   testDir: './specs',
   outputDir: '../../dist/apps/vscode-e2e/test-results',
   globalSetup: './setup',
@@ -33,9 +37,3 @@ export default defineConfig({
     },
   ],
 });
-
-declare module '@playwright/test' {
-  interface TestOptions {
-    vscodeVersion: string;
-  }
-}

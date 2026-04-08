@@ -6,6 +6,17 @@
   "tags": ["type:e2e"],
   "implicitDependencies": ["vscode"],
   "targets": {
+    "e2e": {
+      "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
+      "dependsOn": [
+        {
+          "projects": "vscode",
+          "target": "build",
+          "params": "forward"
+        },
+        "build-runner"
+      ]
+    },
     "e2e-local": {
       "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
       "dependsOn": [
@@ -17,9 +28,15 @@
         "build-runner"
       ]
     },
+    "test": {
+      "command": "node --test --experimental-strip-types apps/vscode-e2e/fixtures/vscode-e2e-runtime.spec.ts"
+    },
     "build-runner": {
       "command": "esbuild apps/vscode-e2e/runner/src/index.ts --bundle --outfile=dist/apps/vscode-e2e/runner/index.js --platform=node --external:vscode --format=cjs",
-      "inputs": ["{projectRoot}/runner/**/*"],
+      "inputs": [
+        "{projectRoot}/runner/**/*",
+        "{projectRoot}/fixtures/vscode-e2e-runtime.ts"
+      ],
       "outputs": ["{workspaceRoot}/dist/apps/vscode-e2e/runner"]
     }
   }

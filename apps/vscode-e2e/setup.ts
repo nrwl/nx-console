@@ -7,8 +7,11 @@ export default async function globalSetup() {
   const vscodePath = await downloadAndUnzipVSCode('stable');
   process.env.VSCODE_E2E_BINARY_PATH = vscodePath;
 
-  // Build the runner that gets injected into the VS Code extension host
-  execSync('npx nx run vscode-e2e:build-runner', {
+  execSync('yarn nx run vscode:build', {
+    cwd: workspaceRoot,
+    stdio: 'inherit',
+  });
+  execSync('yarn nx run vscode-e2e:build-runner', {
     cwd: workspaceRoot,
     stdio: 'inherit',
   });

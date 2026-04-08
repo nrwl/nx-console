@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { getCommandPaletteShortcut } from '../../fixtures/vscode-e2e-runtime';
 
 export class QuickPick {
   private readonly container: Locator;
@@ -8,7 +9,7 @@ export class QuickPick {
   }
 
   async execute(command: string): Promise<void> {
-    await this.page.keyboard.press('Meta+Shift+P');
+    await this.page.keyboard.press(getCommandPaletteShortcut());
     await this.container.locator('.input').fill(command);
     await this.page
       .locator(`.quick-input-list .monaco-list-row[aria-label*="${command}"]`)

@@ -29,10 +29,9 @@ export class VSCodePage {
   }
 
   async hasCommand(command: string): Promise<boolean> {
-    return this.evaluator.evaluate((vscodeApi, cmd) => {
-      return vscodeApi.commands.getCommands(true).then((commands) => {
-        return commands.includes(cmd as string);
-      });
+    return this.evaluator.evaluate(async (vscodeApi, cmd) => {
+      const commands = await vscodeApi.commands.getCommands(true);
+      return commands.includes(cmd as string);
     }, command);
   }
 

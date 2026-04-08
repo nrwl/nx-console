@@ -14,8 +14,9 @@ import {
 } from '@nx-console/shared-e2e-utils';
 import {
   VSCodeEvaluator,
-  cleanupMarkerFiles,
+  cleanupMarkerFile,
 } from './fixtures/vscode-evaluator';
+import { getMarkerId, getWorkerDisplay } from './fixtures/vscode-e2e-runtime';
 import { NxConsolePage } from './page-objects/nx-console-page';
 
 export interface LaunchOptions {
@@ -39,19 +40,22 @@ const DEFAULT_SETTINGS: Record<string, unknown> = {
   'git.autofetch': false,
 };
 
-let xvfbProcess: ChildProcess | undefined;
-
-function ensureXvfb(): void {
+function ensureXvfb(workerIndex: number): {
+  display?: string;
+  process?: ChildProcess;
+} {
   if (process.platform !== 'linux' || process.env.DISPLAY) {
-    return;
+    return {};
   }
 
-  process.env.DISPLAY = ':99';
-  xvfbProcess = spawn('Xvfb', [':99', '-screen', '0', '1920x1080x24'], {
+  const display = getWorkerDisplay(workerIndex);
+  const xvfbProcess = spawn('Xvfb', [display, '-screen', '0', '1920x1080x24'], {
     stdio: 'ignore',
     detached: true,
   });
   xvfbProcess.unref();
+
+  return { display, process: xvfbProcess };
 }
 
 export const test = base.extend<
@@ -70,7 +74,7 @@ export const test = base.extend<
   // Worker-scoped: one VS Code instance per worker
   vscode: [
     async ({ vscodeVersion }, use, workerInfo) => {
-      ensureXvfb();
+      const xvfb = ensureXvfb(workerInfo.workerIndex);
 
       // Download VS Code
       const vscodePath = await downloadAndUnzipVSCode(vscodeVersion);
@@ -122,13 +126,16 @@ export const test = base.extend<
         'index.js',
       );
 
-      // Clean up marker files from previous runs BEFORE launching
-      cleanupMarkerFiles();
-
       // Launch VS Code via Playwright's Electron support
+      const markerId = getMarkerId(workerInfo.workerIndex);
       const env = { ...process.env };
+      cleanupMarkerFile(markerId);
       // Critical: unset this when running from within VS Code/Claude Code
       delete env.ELECTRON_RUN_AS_NODE;
+      env.VSCODE_E2E_MARKER_ID = markerId;
+      if (xvfb.display) {
+        env.DISPLAY = xvfb.display;
+      }
 
       const electronApp = await _electron.launch({
         executablePath: vscodePath,
@@ -151,7 +158,7 @@ export const test = base.extend<
 
       // Connect to the HTTP test server running inside the extension host.
       // The runner writes its URL to a temp file; we poll for it.
-      const evaluator = new VSCodeEvaluator();
+      const evaluator = new VSCodeEvaluator(markerId);
       await evaluator.connect();
 
       // Get the VS Code window
@@ -176,9 +183,8 @@ export const test = base.extend<
       await cleanupNxWorkspace(workspacePath);
       rmSync(tmpDir, { recursive: true, force: true });
 
-      if (xvfbProcess) {
-        xvfbProcess.kill();
-        xvfbProcess = undefined;
+      if (xvfb.process) {
+        xvfb.process.kill();
       }
     },
     { scope: 'worker', timeout: 180_000 },
