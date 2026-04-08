@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"]
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["runner"],
+  "references": [
+    {
+      "path": "../../libs/shared/e2e-utils"
+    }
+  ]
+}

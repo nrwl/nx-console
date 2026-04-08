@@ -70,6 +70,9 @@ apps/intellij/bin/
 # WDIO
 **/.wdio-vscode-service
 apps/vscode-e2e/.screenshots
+
+# VS Code test downloads
+.vscode-test
 **/dist
 
 .angular

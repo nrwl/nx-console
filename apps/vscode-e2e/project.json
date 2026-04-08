@@ -1,0 +1,26 @@
+{
+  "name": "vscode-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/vscode-e2e",
+  "projectType": "application",
+  "tags": ["type:e2e"],
+  "implicitDependencies": ["vscode"],
+  "targets": {
+    "e2e-local": {
+      "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
+      "dependsOn": [
+        {
+          "projects": "vscode",
+          "target": "build",
+          "params": "forward"
+        },
+        "build-runner"
+      ]
+    },
+    "build-runner": {
+      "command": "esbuild apps/vscode-e2e/runner/src/index.ts --bundle --outfile=dist/apps/vscode-e2e/runner/index.js --platform=node --external:vscode --format=cjs",
+      "inputs": ["{projectRoot}/runner/**/*"],
+      "outputs": ["{workspaceRoot}/dist/apps/vscode-e2e/runner"]
+    }
+  }
+}
