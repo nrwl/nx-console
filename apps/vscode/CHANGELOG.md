@@ -1,3 +1,31 @@
+# [18.92.0](https://github.com/nrwl/nx-console/compare/vscode-v18.91.0...vscode-v18.92.0) (2026-04-08)
+
+
+### Bug Fixes
+
+* **nx-mcp:** expose autoApplySkipped in getCIInformation ([#3090](https://github.com/nrwl/nx-console/issues/3090)) ([a76c10d](https://github.com/nrwl/nx-console/commit/a76c10d07818cdda14740a7897f35017be0bae00))
+* **nx-mcp:** tweak polygraph session id generation ([#3086](https://github.com/nrwl/nx-console/issues/3086)) ([c5daaf2](https://github.com/nrwl/nx-console/commit/c5daaf255fda4f6ac363431aa1dc39c8ea4ad161))
+* **nxls:** add debounce and reconfigure lock to prevent watcher flood ([#3104](https://github.com/nrwl/nx-console/issues/3104)) ([62d445d](https://github.com/nrwl/nx-console/commit/62d445d5995c880d44496e52618d8c462e3886c5))
+* **nxls:** handle malformed executor schema better ([#3078](https://github.com/nrwl/nx-console/issues/3078)) ([4e3c2ca](https://github.com/nrwl/nx-console/commit/4e3c2caef37c69a96d7c84224e06531629bcbdf2))
+* **polygraph:** update tool descriptions for org-wide workspace selection ([#3082](https://github.com/nrwl/nx-console/issues/3082)) ([84b91df](https://github.com/nrwl/nx-console/commit/84b91df76fb119802adc0371af983217c1e7e575))
+* **vscode,intellij:** update broken nx.dev troubleshooting URLs ([#3096](https://github.com/nrwl/nx-console/issues/3096)) ([86a77e3](https://github.com/nrwl/nx-console/commit/86a77e309f42b90a99d6b8f456f7b72e5eddc794))
+* **vscode,intellij:** update old nx.dev doc links to canonical /docs/ URLs ([#3098](https://github.com/nrwl/nx-console/issues/3098)) ([6047d76](https://github.com/nrwl/nx-console/commit/6047d76e8aeaa95d02c916274cd5f729615eb23a))
+* **vscode:** block lifecycle scripts in all dlx commands ([#3108](https://github.com/nrwl/nx-console/issues/3108)) ([43a74eb](https://github.com/nrwl/nx-console/commit/43a74eb6577d3d31d91a713f2b1a95bee742002c))
+* **vscode:** handle paths with illegal chars in error diagnostics ([#3077](https://github.com/nrwl/nx-console/issues/3077)) ([e274736](https://github.com/nrwl/nx-console/commit/e27473602a5304675dca77ca7b925e9661a6f5eb))
+* **vscode:** repair generate ui boolean default behaviour ([#3076](https://github.com/nrwl/nx-console/issues/3076)) ([526a4fb](https://github.com/nrwl/nx-console/commit/526a4fbd69caf23ad262bedf11cf111df6786ca9))
+
+
+### Features
+
+* **nx-mcp:** Add cloud_ci_get_logs MCP tool ([#3087](https://github.com/nrwl/nx-console/issues/3087)) ([65691bf](https://github.com/nrwl/nx-console/commit/65691bf0b3e57f1c2c071372cbe62a9a44aace27))
+* **nx-mcp:** add cloud_polygraph_modify_session MCP tool ([#3085](https://github.com/nrwl/nx-console/issues/3085)) ([796bf6f](https://github.com/nrwl/nx-console/commit/796bf6f4777e046f0e7ca642a79f829bdfbbcd18))
+* **nx-mcp:** auto-generate unique Polygraph session IDs ([#3081](https://github.com/nrwl/nx-console/issues/3081)) ([9a1942a](https://github.com/nrwl/nx-console/commit/9a1942a6a49becb7615eeb929b102d8add980fcf))
+* **nx-mcp:** remove Polygraph MCP tools ([#3092](https://github.com/nrwl/nx-console/issues/3092)) ([08e3919](https://github.com/nrwl/nx-console/commit/08e391939a12bc3b61a36900859895e6694e5cd8))
+* **polygraph:** pass cloud credentials through delegate tool ([#3083](https://github.com/nrwl/nx-console/issues/3083)) ([209a1e1](https://github.com/nrwl/nx-console/commit/209a1e1f5c1e1d2f38b5e984f82c472e2af233d4))
+* **polygraph:** read sessionId from polygraph.json ([#3088](https://github.com/nrwl/nx-console/issues/3088)) ([052f8bd](https://github.com/nrwl/nx-console/commit/052f8bd623dd71ba4c39194514a120e34f0d18c3))
+* **polygraph:** update MCP tool descriptions for ACP statuses ([#3080](https://github.com/nrwl/nx-console/issues/3080)) ([e5cd660](https://github.com/nrwl/nx-console/commit/e5cd6604d709ebe64c73e46ccbbc888271a26a06))
+* **vscode:** show labels in generate ui instead of values ([#3075](https://github.com/nrwl/nx-console/issues/3075)) ([e0a6b6f](https://github.com/nrwl/nx-console/commit/e0a6b6ffa0241520360316000ab31aeff9d7c4f4))
+
 # [18.91.0](https://github.com/nrwl/nx-console/compare/vscode-v18.90.0...vscode-v18.91.0) (2026-02-24)
 
 
