@@ -29,7 +29,7 @@
       ]
     },
     "test": {
-      "command": "node --test --experimental-strip-types apps/vscode-e2e/fixtures/vscode-e2e-runtime.spec.ts"
+      "command": "node --require @swc-node/register --test apps/vscode-e2e/fixtures/vscode-e2e-runtime.spec.ts"
     },
     "build-runner": {
       "command": "esbuild apps/vscode-e2e/runner/src/index.ts --bundle --outfile=dist/apps/vscode-e2e/runner/index.js --platform=node --external:vscode --format=cjs",
