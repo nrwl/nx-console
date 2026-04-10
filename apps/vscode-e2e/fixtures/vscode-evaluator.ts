@@ -3,6 +3,7 @@ import type * as vscode from 'vscode';
 import { getMarkerFilePath, getRunnerLogFilePath } from './vscode-e2e-runtime';
 
 const POLL_INTERVAL = 500;
+const CONNECT_TIMEOUT = 120_000;
 
 export function cleanupMarkerFile(markerId: string): void {
   rmSync(getMarkerFilePath(markerId), { force: true });
@@ -44,7 +45,7 @@ export class VSCodeEvaluator {
             `Timed out waiting for VSCodeTestServer URL at ${markerFilePath}.\n\n${getRunnerLogHint(this.markerId)}`,
           ),
         );
-      }, 60_000);
+      }, CONNECT_TIMEOUT);
 
       const poll = setInterval(() => {
         if (!existsSync(markerFilePath)) return;
