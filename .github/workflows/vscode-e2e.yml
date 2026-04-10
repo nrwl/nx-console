@@ -3,6 +3,9 @@ name: VS Code E2E
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   NODE_VERSION: 24
   JAVA_VERSION: 21
