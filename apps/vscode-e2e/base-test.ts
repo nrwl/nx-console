@@ -15,6 +15,7 @@ import {
 import {
   VSCodeEvaluator,
   cleanupMarkerFile,
+  cleanupRunnerLog,
 } from './fixtures/vscode-evaluator';
 import { getMarkerId, getWorkerDisplay } from './fixtures/vscode-e2e-runtime';
 import { NxConsolePage } from './page-objects/nx-console-page';
@@ -174,6 +175,7 @@ export const test = base.extend<
       const markerId = getMarkerId(workerInfo.workerIndex);
       const env = { ...process.env };
       cleanupMarkerFile(markerId);
+      cleanupRunnerLog(markerId);
       // Critical: unset this when running from within VS Code/Claude Code
       delete env.ELECTRON_RUN_AS_NODE;
       env.VSCODE_E2E_MARKER_ID = markerId;
@@ -181,60 +183,61 @@ export const test = base.extend<
         env.DISPLAY = xvfb.display;
       }
 
-      const electronApp = await _electron.launch({
-        executablePath: vscodePath,
-        args: [
-          '--no-sandbox',
-          '--disable-gpu-sandbox',
-          '--disable-updates',
-          '--skip-welcome',
-          '--skip-release-notes',
-          '--disable-workspace-trust',
-          `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
-          `--extensionTestsPath=${extensionTestsPath}`,
-          `--extensions-dir=${extensionsDir}`,
-          `--user-data-dir=${userDataDir}`,
-          workspacePath,
-        ],
-        env,
-        recordVideo,
-        timeout: 60_000,
-      });
-
-      // Connect to the HTTP test server running inside the extension host.
-      // The runner writes its URL to a temp file; we poll for it.
       const evaluator = new VSCodeEvaluator(markerId);
-      await evaluator.connect();
+      let electronApp: Awaited<ReturnType<typeof _electron.launch>> | undefined;
+      let recordedVideo: ReturnType<Page['video']> | undefined;
 
-      // Get the VS Code window
-      const page = await electronApp.firstWindow();
-      const recordedVideo = page.video();
-      await page.setViewportSize({ width: 1920, height: 1080 });
+      try {
+        electronApp = await _electron.launch({
+          executablePath: vscodePath,
+          args: [
+            '--no-sandbox',
+            '--disable-gpu-sandbox',
+            '--disable-updates',
+            '--skip-welcome',
+            '--skip-release-notes',
+            '--disable-workspace-trust',
+            `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
+            `--extensionTestsPath=${extensionTestsPath}`,
+            `--extensions-dir=${extensionsDir}`,
+            `--user-data-dir=${userDataDir}`,
+            workspacePath,
+          ],
+          env,
+          recordVideo,
+          timeout: 60_000,
+        });
 
-      // Wait for extension to activate
-      await evaluator.evaluate(async (vscode) => {
-        const ext = vscode.extensions.getExtension('nrwl.angular-console');
-        if (ext && !ext.isActive) {
-          await ext.activate();
+        await evaluator.connect();
+
+        const page = await electronApp.firstWindow();
+        recordedVideo = page.video();
+        await page.setViewportSize({ width: 1920, height: 1080 });
+
+        await evaluator.evaluate(async (vscode) => {
+          const ext = vscode.extensions.getExtension('nrwl.angular-console');
+          if (ext && !ext.isActive) {
+            await ext.activate();
+          }
+        });
+
+        const nxConsole = new NxConsolePage(page, evaluator);
+        await use({ page, nxConsole, evaluator });
+      } finally {
+        evaluator.close();
+        if (electronApp) {
+          await electronApp.close();
         }
-      });
+        if (recordedVideo && savedVideoPath) {
+          await recordedVideo.saveAs(savedVideoPath);
+          await recordedVideo.delete();
+        }
+        await cleanupNxWorkspace(workspacePath);
+        rmSync(tmpDir, { recursive: true, force: true });
 
-      const nxConsole = new NxConsolePage(page, evaluator);
-
-      await use({ page, nxConsole, evaluator });
-
-      // Cleanup
-      evaluator.close();
-      await electronApp.close();
-      if (recordedVideo && savedVideoPath) {
-        await recordedVideo.saveAs(savedVideoPath);
-        await recordedVideo.delete();
-      }
-      await cleanupNxWorkspace(workspacePath);
-      rmSync(tmpDir, { recursive: true, force: true });
-
-      if (xvfb.process) {
-        xvfb.process.kill();
+        if (xvfb.process) {
+          xvfb.process.kill();
+        }
       }
     },
     { scope: 'worker', timeout: 180_000 },

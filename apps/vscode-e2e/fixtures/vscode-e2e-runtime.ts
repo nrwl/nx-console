@@ -2,6 +2,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 export const MARKER_DIR = join(tmpdir(), 'vscode-e2e-test-server');
+export const RUNNER_LOG_DIR = join(tmpdir(), 'vscode-e2e-runner-logs');
 
 export function getMarkerId(workerIndex: number): string {
   return `worker-${workerIndex}`;
@@ -9,6 +10,10 @@ export function getMarkerId(workerIndex: number): string {
 
 export function getMarkerFilePath(markerId: string): string {
   return join(MARKER_DIR, `${markerId}.url`);
+}
+
+export function getRunnerLogFilePath(markerId: string): string {
+  return join(RUNNER_LOG_DIR, `${markerId}.log`);
 }
 
 export function getCommandPaletteShortcut(

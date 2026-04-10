@@ -1,11 +1,29 @@
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import type * as vscode from 'vscode';
-import { getMarkerFilePath } from './vscode-e2e-runtime';
+import { getMarkerFilePath, getRunnerLogFilePath } from './vscode-e2e-runtime';
 
 const POLL_INTERVAL = 500;
 
 export function cleanupMarkerFile(markerId: string): void {
   rmSync(getMarkerFilePath(markerId), { force: true });
+}
+
+export function cleanupRunnerLog(markerId: string): void {
+  rmSync(getRunnerLogFilePath(markerId), { force: true });
+}
+
+function getRunnerLogHint(markerId: string): string {
+  const runnerLogPath = getRunnerLogFilePath(markerId);
+  if (!existsSync(runnerLogPath)) {
+    return `No runner log found at ${runnerLogPath}.`;
+  }
+
+  const runnerLog = readFileSync(runnerLogPath, 'utf-8').trim();
+  if (!runnerLog) {
+    return `Runner log at ${runnerLogPath} is empty.`;
+  }
+
+  return `Runner log: ${runnerLogPath}\n\n${runnerLog}`;
 }
 
 export class VSCodeEvaluator {
@@ -23,7 +41,7 @@ export class VSCodeEvaluator {
       const timeout = setTimeout(() => {
         reject(
           new Error(
-            `Timed out waiting for VSCodeTestServer URL at ${markerFilePath}`,
+            `Timed out waiting for VSCodeTestServer URL at ${markerFilePath}.\n\n${getRunnerLogHint(this.markerId)}`,
           ),
         );
       }, 60_000);

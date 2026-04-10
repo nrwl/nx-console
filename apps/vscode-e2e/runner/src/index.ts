@@ -1,9 +1,11 @@
 import * as http from 'node:http';
 import * as fs from 'node:fs';
+import { dirname } from 'node:path';
 import * as vscode from 'vscode';
 import {
   MARKER_DIR,
   getMarkerFilePath,
+  getRunnerLogFilePath,
 } from '../../fixtures/vscode-e2e-runtime';
 
 interface InvokeRequest {
@@ -16,6 +18,31 @@ interface InvokeResponse {
   error?: { message: string; stack?: string };
 }
 
+const markerId = process.env.VSCODE_E2E_MARKER_ID ?? `${process.pid}`;
+const runnerLogPath = getRunnerLogFilePath(markerId);
+
+function logRunner(message: string): void {
+  fs.mkdirSync(MARKER_DIR, { recursive: true });
+  fs.mkdirSync(dirname(runnerLogPath), { recursive: true });
+  fs.appendFileSync(
+    runnerLogPath,
+    `[${new Date().toISOString()}] ${message}\n`,
+    'utf-8',
+  );
+}
+
+process.on('uncaughtException', (error) => {
+  logRunner(`uncaughtException: ${error.stack ?? error.message}`);
+});
+
+process.on('unhandledRejection', (error) => {
+  logRunner(`unhandledRejection: ${String(error)}`);
+});
+
+logRunner(
+  `runner module loaded on ${process.platform} ${process.arch} cwd=${process.cwd()}`,
+);
+
 /**
  * VS Code calls this function via --extensionTestsPath.
  * It must return a Promise that stays pending to keep VS Code alive.
@@ -23,6 +50,7 @@ interface InvokeResponse {
  */
 export function run(): Promise<void> {
   return new Promise<void>((_resolve, reject) => {
+    logRunner('run() invoked');
     const server = http.createServer((req, res) => {
       if (req.method !== 'POST' || req.url !== '/invoke') {
         res.writeHead(404);
@@ -58,15 +86,17 @@ export function run(): Promise<void> {
       const address = server.address();
       if (address && typeof address !== 'string') {
         const url = `http://localhost:${address.port}`;
-        const markerId = process.env.VSCODE_E2E_MARKER_ID ?? `${process.pid}`;
         const markerFilePath = getMarkerFilePath(markerId);
 
         fs.mkdirSync(MARKER_DIR, { recursive: true });
         fs.writeFileSync(markerFilePath, url, 'utf-8');
+        logRunner(`server listening at ${url}`);
+        logRunner(`marker written to ${markerFilePath}`);
       }
     });
 
     server.on('error', (err) => {
+      logRunner(`server error: ${err.stack ?? err.message}`);
       reject(err);
     });
 
