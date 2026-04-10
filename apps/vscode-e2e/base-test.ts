@@ -25,6 +25,10 @@ export interface LaunchOptions {
   workspacePath?: string;
 }
 
+const RECORD_VSCODE_VIDEO =
+  process.env.PLAYWRIGHT_VSCODE_VIDEO === '1' ||
+  process.env.PLAYWRIGHT_VSCODE_VIDEO === 'true';
+
 const DEFAULT_SETTINGS: Record<string, unknown> = {
   // Disable VS Code noise
   'telemetry.telemetryLevel': 'off',
@@ -56,6 +60,42 @@ function ensureXvfb(workerIndex: number): {
   xvfbProcess.unref();
 
   return { display, process: xvfbProcess };
+}
+
+function getVideoRecordingOptions(
+  workerIndex: number,
+  workspaceName: string,
+): {
+  recordVideo?: {
+    dir: string;
+    size: {
+      width: number;
+      height: number;
+    };
+  };
+  savedVideoPath?: string;
+} {
+  if (!RECORD_VSCODE_VIDEO) {
+    return {};
+  }
+
+  const videoDir = join(
+    workspaceRoot,
+    'dist',
+    'apps',
+    'vscode-e2e',
+    'videos',
+    `worker-${workerIndex}`,
+  );
+  mkdirSync(videoDir, { recursive: true });
+
+  return {
+    recordVideo: {
+      dir: videoDir,
+      size: { width: 1920, height: 1080 },
+    },
+    savedVideoPath: join(videoDir, `${workspaceName}.webm`),
+  };
 }
 
 export const test = base.extend<
@@ -109,6 +149,10 @@ export const test = base.extend<
         options: simpleReactWorkspaceOptions,
       });
       const workspacePath = join(e2eCwd, workspaceName);
+      const { recordVideo, savedVideoPath } = getVideoRecordingOptions(
+        workerInfo.workerIndex,
+        workspaceName,
+      );
 
       // Extension paths
       const extensionDevelopmentPath = join(
@@ -153,6 +197,7 @@ export const test = base.extend<
           workspacePath,
         ],
         env,
+        recordVideo,
         timeout: 60_000,
       });
 
@@ -163,6 +208,7 @@ export const test = base.extend<
 
       // Get the VS Code window
       const page = await electronApp.firstWindow();
+      const recordedVideo = page.video();
       await page.setViewportSize({ width: 1920, height: 1080 });
 
       // Wait for extension to activate
@@ -180,6 +226,10 @@ export const test = base.extend<
       // Cleanup
       evaluator.close();
       await electronApp.close();
+      if (recordedVideo && savedVideoPath) {
+        await recordedVideo.saveAs(savedVideoPath);
+        await recordedVideo.delete();
+      }
       await cleanupNxWorkspace(workspacePath);
       rmSync(tmpDir, { recursive: true, force: true });
 
