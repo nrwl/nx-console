@@ -244,9 +244,11 @@ export const test = base.extend<
         });
 
         const page = await electronApp.firstWindow();
-        recordedVideo = page.video();
-        await page.setViewportSize({ width: 1920, height: 1080 });
         await evaluator.connect();
+        recordedVideo = page.video();
+        if (process.platform !== 'linux') {
+          await page.setViewportSize({ width: 1920, height: 1080 });
+        }
 
         await evaluator.evaluate(async (vscode) => {
           const ext = vscode.extensions.getExtension('nrwl.angular-console');
