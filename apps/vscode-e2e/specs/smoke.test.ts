@@ -31,9 +31,11 @@ test('Nx Console smoke test', async ({ nxConsole }) => {
   // Expand the first project to see targets
   await firstProject.click();
   await nxConsole.page.keyboard.press('ArrowRight');
-  await expect(projectsSection.locator('.monaco-list-row')).not.toHaveCount(2, {
-    timeout: 10_000,
-  });
+  await expect
+    .poll(() => projectsSection.locator('.monaco-list-row').count(), {
+      timeout: 10_000,
+    })
+    .toBeGreaterThan(2);
 
   // Expanded project shows target items
   const rowCount = await projectsSection.locator('.monaco-list-row').count();

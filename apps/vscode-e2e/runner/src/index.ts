@@ -31,8 +31,8 @@ export function run(): Promise<void> {
       }
 
       let body = '';
-      req.on('data', (chunk: string) => {
-        body += chunk;
+      req.on('data', (chunk: Buffer) => {
+        body += chunk.toString();
       });
 
       req.on('end', async () => {
