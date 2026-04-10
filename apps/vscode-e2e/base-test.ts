@@ -1,9 +1,17 @@
-import { test as base, type Page, _electron } from '@playwright/test';
+import { test as base, type Page, _electron, chromium } from '@playwright/test';
 import { downloadAndUnzipVSCode } from '@vscode/test-electron';
 import { ChildProcess, spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  appendFileSync,
+  cpSync,
+  existsSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { createInterface } from 'node:readline';
 import { workspaceRoot } from 'nx/src/devkit-exports';
 import {
   newWorkspace,
@@ -33,6 +41,7 @@ export interface LaunchOptions {
 const RECORD_VSCODE_VIDEO =
   process.env.PLAYWRIGHT_VSCODE_VIDEO === '1' ||
   process.env.PLAYWRIGHT_VSCODE_VIDEO === 'true';
+const VSCODE_LAUNCH_TIMEOUT = 60_000;
 
 const DEFAULT_SETTINGS: Record<string, unknown> = {
   // Disable VS Code noise
@@ -108,6 +117,7 @@ function copyDiagnosticsArtifacts(
   workspaceName: string,
   userDataDir: string,
   markerId: string,
+  launchLogPath?: string,
 ): void {
   const diagnosticsDir = join(
     workspaceRoot,
@@ -129,6 +139,98 @@ function copyDiagnosticsArtifacts(
   if (existsSync(runnerLogPath)) {
     cpSync(runnerLogPath, join(diagnosticsDir, 'runner.log'));
   }
+
+  if (launchLogPath && existsSync(launchLogPath)) {
+    cpSync(launchLogPath, join(diagnosticsDir, 'launch.log'));
+  }
+}
+
+function waitForProcessLine(
+  process: ChildProcess,
+  regex: RegExp,
+  timeoutMs: number,
+): Promise<RegExpMatchArray> {
+  return new Promise((resolve, reject) => {
+    const stderr = process.stderr;
+    if (!stderr) {
+      reject(new Error('VS Code process did not expose stderr.'));
+      return;
+    }
+
+    const rl = createInterface({ input: stderr });
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(
+        new Error(`Timed out waiting for VS Code process output: ${regex}`),
+      );
+    }, timeoutMs);
+
+    const onExit = () => {
+      cleanup();
+      reject(new Error('VS Code process exited before exposing DevTools.'));
+    };
+    const onError = (error: Error) => {
+      cleanup();
+      reject(error);
+    };
+
+    const cleanup = () => {
+      clearTimeout(timeout);
+      rl.close();
+      process.off('exit', onExit);
+      process.off('error', onError);
+    };
+
+    rl.on('line', (line) => {
+      const match = line.match(regex);
+      if (!match) {
+        return;
+      }
+      cleanup();
+      resolve(match);
+    });
+    process.once('exit', onExit);
+    process.once('error', onError);
+  });
+}
+
+async function waitForCdpPage(
+  browser: Awaited<ReturnType<typeof chromium.connectOverCDP>>,
+  timeoutMs: number,
+): Promise<Page> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const page = browser.contexts()[0]?.pages()[0];
+    if (page) {
+      return page;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+
+  throw new Error('Timed out waiting for VS Code page over CDP.');
+}
+
+async function terminateProcess(process: ChildProcess): Promise<void> {
+  if (process.exitCode !== null || process.killed) {
+    return;
+  }
+
+  const exited = new Promise<void>((resolve) => {
+    process.once('exit', () => resolve());
+  });
+  process.kill('SIGTERM');
+
+  await Promise.race([
+    exited,
+    new Promise<void>((resolve) => {
+      setTimeout(() => {
+        if (process.exitCode === null && !process.killed) {
+          process.kill('SIGKILL');
+        }
+        resolve();
+      }, 5_000);
+    }),
+  ]);
 }
 
 export const test = base.extend<
@@ -203,11 +305,12 @@ export const test = base.extend<
         'index.js',
       );
 
-      // Launch VS Code via Playwright's Electron support
+      // Launch VS Code and connect the test harness
       const markerId = getMarkerId(workerInfo.workerIndex);
       const env = { ...process.env };
       cleanupMarkerFile(markerId);
       cleanupRunnerLog(markerId);
+      const launchLogPath = join(tmpDir, 'vscode-launch.log');
       // Critical: unset this when running from within VS Code/Claude Code
       delete env.ELECTRON_RUN_AS_NODE;
       env.VSCODE_E2E_MARKER_ID = markerId;
@@ -217,36 +320,66 @@ export const test = base.extend<
 
       const evaluator = new VSCodeEvaluator(markerId);
       let electronApp: Awaited<ReturnType<typeof _electron.launch>> | undefined;
+      let browser:
+        | Awaited<ReturnType<typeof chromium.connectOverCDP>>
+        | undefined;
+      let vscodeProcess: ChildProcess | undefined;
       let recordedVideo: ReturnType<Page['video']> | undefined;
       let launchError: unknown;
+      const launchArgs = [
+        '--no-sandbox',
+        '--disable-gpu-sandbox',
+        '--disable-updates',
+        '--skip-welcome',
+        '--skip-release-notes',
+        '--disable-workspace-trust',
+        '--log',
+        'trace',
+        `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
+        `--extensionTestsPath=${extensionTestsPath}`,
+        `--extensions-dir=${extensionsDir}`,
+        `--user-data-dir=${userDataDir}`,
+        workspacePath,
+      ];
 
       try {
-        electronApp = await _electron.launch({
-          executablePath: vscodePath,
-          args: [
-            '--no-sandbox',
-            '--disable-gpu-sandbox',
-            '--disable-updates',
-            '--skip-welcome',
-            '--skip-release-notes',
-            '--disable-workspace-trust',
-            '--log',
-            'trace',
-            `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
-            `--extensionTestsPath=${extensionTestsPath}`,
-            `--extensions-dir=${extensionsDir}`,
-            `--user-data-dir=${userDataDir}`,
-            workspacePath,
-          ],
-          env,
-          recordVideo,
-          timeout: 60_000,
-        });
+        let page: Page;
+        if (process.platform === 'linux') {
+          vscodeProcess = spawn(
+            vscodePath,
+            ['--remote-debugging-port=0', ...launchArgs],
+            {
+              env,
+              stdio: ['ignore', 'pipe', 'pipe'],
+            },
+          );
+          vscodeProcess.stderr?.on('data', (chunk: Buffer | string) => {
+            appendFileSync(launchLogPath, chunk.toString());
+          });
+          const [, wsEndpoint] = await waitForProcessLine(
+            vscodeProcess,
+            /^DevTools listening on (ws:\/\/.*)$/,
+            VSCODE_LAUNCH_TIMEOUT,
+          );
+          browser = await chromium.connectOverCDP(wsEndpoint, {
+            timeout: VSCODE_LAUNCH_TIMEOUT,
+          });
+          page = await waitForCdpPage(browser, VSCODE_LAUNCH_TIMEOUT);
+        } else {
+          electronApp = await _electron.launch({
+            executablePath: vscodePath,
+            args: launchArgs,
+            env,
+            recordVideo,
+            timeout: VSCODE_LAUNCH_TIMEOUT,
+          });
 
-        const page = await electronApp.firstWindow();
+          page = await electronApp.firstWindow();
+        }
+
         await evaluator.connect();
-        recordedVideo = page.video();
         if (process.platform !== 'linux') {
+          recordedVideo = page.video();
           await page.setViewportSize({ width: 1920, height: 1080 });
         }
 
@@ -269,11 +402,18 @@ export const test = base.extend<
             workspaceName,
             userDataDir,
             markerId,
+            launchLogPath,
           );
         }
         evaluator.close();
+        if (browser) {
+          await browser.close().catch(() => {});
+        }
         if (electronApp) {
           await electronApp.close();
+        }
+        if (vscodeProcess) {
+          await terminateProcess(vscodeProcess);
         }
         if (recordedVideo && savedVideoPath) {
           await recordedVideo.saveAs(savedVideoPath);
