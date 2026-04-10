@@ -1,0 +1,43 @@
+{
+  "name": "vscode-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/vscode-e2e",
+  "projectType": "application",
+  "tags": ["type:e2e"],
+  "implicitDependencies": ["vscode"],
+  "targets": {
+    "e2e": {
+      "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
+      "dependsOn": [
+        {
+          "projects": "vscode",
+          "target": "build",
+          "params": "forward"
+        },
+        "build-runner"
+      ]
+    },
+    "e2e-local": {
+      "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
+      "dependsOn": [
+        {
+          "projects": "vscode",
+          "target": "build",
+          "params": "forward"
+        },
+        "build-runner"
+      ]
+    },
+    "test": {
+      "command": "node --require @swc-node/register --test apps/vscode-e2e/fixtures/vscode-e2e-runtime.spec.ts"
+    },
+    "build-runner": {
+      "command": "esbuild apps/vscode-e2e/runner/src/index.ts --bundle --outfile=dist/apps/vscode-e2e/runner/index.js --platform=node --external:vscode --format=cjs",
+      "inputs": [
+        "{projectRoot}/runner/**/*",
+        "{projectRoot}/fixtures/vscode-e2e-runtime.ts"
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/vscode-e2e/runner"]
+    }
+  }
+}

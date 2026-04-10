@@ -197,6 +197,9 @@
     },
     {
       "path": "./libs/shared/socket-utils"
+    },
+    {
+      "path": "./apps/vscode-e2e"
     }
   ],
   "ts-node": {
