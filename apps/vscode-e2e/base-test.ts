@@ -108,7 +108,10 @@ function getVideoRecordingOptions(
       dir: videoDir,
       size: { width: 1920, height: 1080 },
     },
-    savedVideoPath: join(videoDir, `${workspaceName}.webm`),
+    savedVideoPath: join(
+      videoDir,
+      `${workspaceName}.${process.platform === 'linux' ? 'mp4' : 'webm'}`,
+    ),
   };
 }
 
@@ -118,6 +121,7 @@ function copyDiagnosticsArtifacts(
   userDataDir: string,
   markerId: string,
   launchLogPath?: string,
+  recordingLogPath?: string,
 ): void {
   const diagnosticsDir = join(
     workspaceRoot,
@@ -142,6 +146,10 @@ function copyDiagnosticsArtifacts(
 
   if (launchLogPath && existsSync(launchLogPath)) {
     cpSync(launchLogPath, join(diagnosticsDir, 'launch.log'));
+  }
+
+  if (recordingLogPath && existsSync(recordingLogPath)) {
+    cpSync(recordingLogPath, join(diagnosticsDir, 'recording.log'));
   }
 }
 
@@ -233,6 +241,69 @@ async function terminateProcess(process: ChildProcess): Promise<void> {
   ]);
 }
 
+function startLinuxScreenRecording(
+  display: string,
+  outputPath: string,
+  logPath: string,
+): ChildProcess {
+  const recordingProcess = spawn(
+    'ffmpeg',
+    [
+      '-y',
+      '-f',
+      'x11grab',
+      '-video_size',
+      '1920x1080',
+      '-framerate',
+      '15',
+      '-draw_mouse',
+      '1',
+      '-i',
+      `${display}.0`,
+      '-c:v',
+      'libx264',
+      '-preset',
+      'ultrafast',
+      '-pix_fmt',
+      'yuv420p',
+      outputPath,
+    ],
+    {
+      stdio: ['pipe', 'ignore', 'pipe'],
+    },
+  );
+
+  recordingProcess.stderr?.on('data', (chunk: Buffer | string) => {
+    appendFileSync(logPath, chunk.toString());
+  });
+
+  return recordingProcess;
+}
+
+async function stopScreenRecording(process?: ChildProcess): Promise<void> {
+  if (!process || process.exitCode !== null || process.killed) {
+    return;
+  }
+
+  const exited = new Promise<void>((resolve) => {
+    process.once('exit', () => resolve());
+  });
+  process.stdin?.write('q');
+  process.stdin?.end();
+
+  await Promise.race([
+    exited,
+    new Promise<void>((resolve) => {
+      setTimeout(() => {
+        if (process.exitCode === null && !process.killed) {
+          process.kill('SIGTERM');
+        }
+        resolve();
+      }, 5_000);
+    }),
+  ]);
+}
+
 export const test = base.extend<
   { nxConsole: NxConsolePage },
   {
@@ -311,6 +382,7 @@ export const test = base.extend<
       cleanupMarkerFile(markerId);
       cleanupRunnerLog(markerId);
       const launchLogPath = join(tmpDir, 'vscode-launch.log');
+      const recordingLogPath = join(tmpDir, 'screen-recording.log');
       // Critical: unset this when running from within VS Code/Claude Code
       delete env.ELECTRON_RUN_AS_NODE;
       env.VSCODE_E2E_MARKER_ID = markerId;
@@ -325,6 +397,7 @@ export const test = base.extend<
         | undefined;
       let vscodeProcess: ChildProcess | undefined;
       let recordedVideo: ReturnType<Page['video']> | undefined;
+      let screenRecordingProcess: ChildProcess | undefined;
       let launchError: unknown;
       const launchArgs = [
         '--no-sandbox',
@@ -345,6 +418,13 @@ export const test = base.extend<
       try {
         let page: Page;
         if (process.platform === 'linux') {
+          if (savedVideoPath && env.DISPLAY) {
+            screenRecordingProcess = startLinuxScreenRecording(
+              env.DISPLAY,
+              savedVideoPath,
+              recordingLogPath,
+            );
+          }
           vscodeProcess = spawn(
             vscodePath,
             ['--remote-debugging-port=0', ...launchArgs],
@@ -403,6 +483,7 @@ export const test = base.extend<
             userDataDir,
             markerId,
             launchLogPath,
+            recordingLogPath,
           );
         }
         evaluator.close();
@@ -414,6 +495,9 @@ export const test = base.extend<
         }
         if (vscodeProcess) {
           await terminateProcess(vscodeProcess);
+        }
+        if (screenRecordingProcess) {
+          await stopScreenRecording(screenRecordingProcess);
         }
         if (recordedVideo && savedVideoPath) {
           await recordedVideo.saveAs(savedVideoPath);
