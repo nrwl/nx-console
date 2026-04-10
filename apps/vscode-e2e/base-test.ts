@@ -1,7 +1,7 @@
 import { test as base, type Page, _electron } from '@playwright/test';
 import { downloadAndUnzipVSCode } from '@vscode/test-electron';
 import { ChildProcess, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { workspaceRoot } from 'nx/src/devkit-exports';
@@ -17,7 +17,11 @@ import {
   cleanupMarkerFile,
   cleanupRunnerLog,
 } from './fixtures/vscode-evaluator';
-import { getMarkerId, getWorkerDisplay } from './fixtures/vscode-e2e-runtime';
+import {
+  getMarkerId,
+  getRunnerLogFilePath,
+  getWorkerDisplay,
+} from './fixtures/vscode-e2e-runtime';
 import { NxConsolePage } from './page-objects/nx-console-page';
 
 export interface LaunchOptions {
@@ -97,6 +101,34 @@ function getVideoRecordingOptions(
     },
     savedVideoPath: join(videoDir, `${workspaceName}.webm`),
   };
+}
+
+function copyDiagnosticsArtifacts(
+  workerIndex: number,
+  workspaceName: string,
+  userDataDir: string,
+  markerId: string,
+): void {
+  const diagnosticsDir = join(
+    workspaceRoot,
+    'dist',
+    'apps',
+    'vscode-e2e',
+    'diagnostics',
+    `worker-${workerIndex}`,
+    workspaceName,
+  );
+  mkdirSync(diagnosticsDir, { recursive: true });
+
+  const vscodeLogsDir = join(userDataDir, 'logs');
+  if (existsSync(vscodeLogsDir)) {
+    cpSync(vscodeLogsDir, join(diagnosticsDir, 'logs'), { recursive: true });
+  }
+
+  const runnerLogPath = getRunnerLogFilePath(markerId);
+  if (existsSync(runnerLogPath)) {
+    cpSync(runnerLogPath, join(diagnosticsDir, 'runner.log'));
+  }
 }
 
 export const test = base.extend<
@@ -186,6 +218,7 @@ export const test = base.extend<
       const evaluator = new VSCodeEvaluator(markerId);
       let electronApp: Awaited<ReturnType<typeof _electron.launch>> | undefined;
       let recordedVideo: ReturnType<Page['video']> | undefined;
+      let launchError: unknown;
 
       try {
         electronApp = await _electron.launch({
@@ -197,6 +230,8 @@ export const test = base.extend<
             '--skip-welcome',
             '--skip-release-notes',
             '--disable-workspace-trust',
+            '--log',
+            'trace',
             `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
             `--extensionTestsPath=${extensionTestsPath}`,
             `--extensions-dir=${extensionsDir}`,
@@ -223,7 +258,18 @@ export const test = base.extend<
 
         const nxConsole = new NxConsolePage(page, evaluator);
         await use({ page, nxConsole, evaluator });
+      } catch (error) {
+        launchError = error;
+        throw error;
       } finally {
+        if (launchError) {
+          copyDiagnosticsArtifacts(
+            workerInfo.workerIndex,
+            workspaceName,
+            userDataDir,
+            markerId,
+          );
+        }
         evaluator.close();
         if (electronApp) {
           await electronApp.close();

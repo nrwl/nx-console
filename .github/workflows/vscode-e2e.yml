@@ -69,6 +69,7 @@ jobs:
         with:
           name: vscode-e2e-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            dist/apps/vscode-e2e/diagnostics
             dist/apps/vscode-e2e/test-results
             dist/apps/vscode-e2e/playwright-report
             /tmp/vscode-e2e-runner-logs
