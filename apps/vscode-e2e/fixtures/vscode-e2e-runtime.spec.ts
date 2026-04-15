@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   MARKER_ENV_VAR,
+  PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR,
   getCommandPaletteShortcut,
   getMarkerFilePath,
   getMarkerId,
+  getMarkerIdFromParallelIndexEnv,
   getWorkerDisplay,
 } from './vscode-e2e-runtime.ts';
 
@@ -22,6 +24,22 @@ test('marker ids and file paths are worker-specific', () => {
 test('marker env var avoids the VS Code-reserved prefix', () => {
   assert.equal(MARKER_ENV_VAR, 'NX_CONSOLE_E2E_MARKER_ID');
   assert.equal(MARKER_ENV_VAR.startsWith('VSCODE_'), false);
+});
+
+test('marker ids can be derived from the Playwright parallel index env', () => {
+  assert.equal(
+    getMarkerIdFromParallelIndexEnv({
+      [PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR]: '2',
+    }),
+    'worker-2',
+  );
+  assert.equal(getMarkerIdFromParallelIndexEnv({}), undefined);
+  assert.equal(
+    getMarkerIdFromParallelIndexEnv({
+      [PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR]: 'abc',
+    }),
+    undefined,
+  );
 });
 
 test('command palette shortcut matches host platform conventions', () => {
