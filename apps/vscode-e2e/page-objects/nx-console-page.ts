@@ -60,7 +60,7 @@ export class NxConsolePage extends VSCodePage {
 
   getProject(name: string): Locator {
     return this.projectsSection.locator(
-      `.monaco-list-row[aria-label*="${name}"]`,
+      `.monaco-list-row[aria-label=${JSON.stringify(name)}]`,
     );
   }
 

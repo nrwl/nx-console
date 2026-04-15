@@ -1,8 +1,9 @@
 import { posix } from 'node:path';
-import { SEEDED_PROJECT_NAME, test, expect } from '../base-test';
+import { test, expect } from '../base-test';
 
 const GENERATE_UI_COMMAND_LABEL = 'Nx: Generate (UI)';
 const GENERATOR_LABEL = '@nx/react - component';
+const PROJECT_VIEW_PROJECT_NAME = 'e2e';
 const TARGET_FILE_PATH = 'src/main.tsx';
 
 test('Generate UI opens from the command palette', async ({ nxConsole }) => {
@@ -25,10 +26,10 @@ test('Generate UI opens from the projects view project action', async ({
 }) => {
   const { workspaceName } = await getWorkspaceContext(nxConsole);
 
-  expect(SEEDED_PROJECT_NAME).not.toBe(workspaceName);
+  expect(PROJECT_VIEW_PROJECT_NAME).not.toBe(workspaceName);
 
   await nxConsole.resetUI();
-  await nxConsole.openGenerateUiFromProjectTreeItem(SEEDED_PROJECT_NAME);
+  await nxConsole.openGenerateUiFromProjectTreeItem(PROJECT_VIEW_PROJECT_NAME);
   await nxConsole.quickPick.selectItem(GENERATOR_LABEL);
 
   await expectGenerateUiToBeOpen(nxConsole);
@@ -37,7 +38,7 @@ test('Generate UI opens from the projects view project action', async ({
     .not.toBe(workspaceName);
   await expect
     .poll(() => nxConsole.getGenerateUiFieldValue('project'))
-    .toBe(SEEDED_PROJECT_NAME);
+    .toBe(PROJECT_VIEW_PROJECT_NAME);
 });
 
 test('Generate UI opens from the Explorer file context menu', async ({
