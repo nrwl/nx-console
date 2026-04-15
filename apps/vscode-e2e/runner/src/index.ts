@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import {
   MARKER_ENV_VAR,
   MARKER_DIR,
+  getMarkerIdFromArgv,
   getMarkerIdFromParallelIndexEnv,
   getMarkerFilePath,
 } from '../../fixtures/vscode-e2e-runtime';
@@ -61,6 +62,7 @@ export function run(): Promise<void> {
       if (address && typeof address !== 'string') {
         const url = `http://localhost:${address.port}`;
         const markerId =
+          getMarkerIdFromArgv(process.argv) ??
           process.env[MARKER_ENV_VAR] ??
           getMarkerIdFromParallelIndexEnv(process.env) ??
           `${process.pid}`;

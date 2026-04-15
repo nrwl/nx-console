@@ -16,7 +16,11 @@ import {
   VSCodeEvaluator,
   cleanupMarkerFile,
 } from './fixtures/vscode-evaluator';
-import { getMarkerId, getWorkerDisplay } from './fixtures/vscode-e2e-runtime';
+import {
+  MARKER_ARG_PREFIX,
+  getMarkerId,
+  getWorkerDisplay,
+} from './fixtures/vscode-e2e-runtime';
 import { NxConsolePage } from './page-objects/nx-console-page';
 
 export interface LaunchOptions {
@@ -189,6 +193,7 @@ export const test = base.extend<
           '--skip-welcome',
           '--skip-release-notes',
           '--disable-workspace-trust',
+          `${MARKER_ARG_PREFIX}${markerId}`,
           `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
           `--extensionTestsPath=${extensionTestsPath}`,
           `--extensions-dir=${extensionsDir}`,

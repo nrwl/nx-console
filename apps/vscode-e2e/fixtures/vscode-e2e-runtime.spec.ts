@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  MARKER_ARG_PREFIX,
   MARKER_ENV_VAR,
   PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR,
   getCommandPaletteShortcut,
   getMarkerFilePath,
   getMarkerId,
+  getMarkerIdFromArgv,
   getMarkerIdFromParallelIndexEnv,
   getWorkerDisplay,
 } from './vscode-e2e-runtime.ts';
@@ -24,6 +26,15 @@ test('marker ids and file paths are worker-specific', () => {
 test('marker env var avoids the VS Code-reserved prefix', () => {
   assert.equal(MARKER_ENV_VAR, 'NX_CONSOLE_E2E_MARKER_ID');
   assert.equal(MARKER_ENV_VAR.startsWith('VSCODE_'), false);
+});
+
+test('marker ids can be derived from launch args', () => {
+  assert.equal(
+    getMarkerIdFromArgv([`${MARKER_ARG_PREFIX}worker-7`]),
+    'worker-7',
+  );
+  assert.equal(getMarkerIdFromArgv([]), undefined);
+  assert.equal(getMarkerIdFromArgv([MARKER_ARG_PREFIX]), undefined);
 });
 
 test('marker ids can be derived from the Playwright parallel index env', () => {
