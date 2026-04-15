@@ -25,6 +25,8 @@ export interface LaunchOptions {
   workspacePath?: string;
 }
 
+export const SEEDED_PROJECT_NAME = 'extra-project';
+
 const RECORD_VSCODE_VIDEO =
   process.env.PLAYWRIGHT_VSCODE_VIDEO === '1' ||
   process.env.PLAYWRIGHT_VSCODE_VIDEO === 'true';
@@ -98,6 +100,31 @@ function getVideoRecordingOptions(
   };
 }
 
+function seedProjectsViewTestProject(workspacePath: string): void {
+  const projectRoot = join(workspacePath, SEEDED_PROJECT_NAME);
+
+  mkdirSync(join(projectRoot, 'src'), { recursive: true });
+  writeFileSync(
+    join(projectRoot, 'src', 'index.ts'),
+    'export const extraProject = "extra-project";\n',
+  );
+  writeFileSync(
+    join(projectRoot, 'project.json'),
+    JSON.stringify(
+      {
+        $schema: '../node_modules/nx/schemas/project-schema.json',
+        name: SEEDED_PROJECT_NAME,
+        projectType: 'library',
+        root: SEEDED_PROJECT_NAME,
+        sourceRoot: `${SEEDED_PROJECT_NAME}/src`,
+        targets: {},
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 export const test = base.extend<
   { nxConsole: NxConsolePage },
   {
@@ -149,6 +176,7 @@ export const test = base.extend<
         options: simpleReactWorkspaceOptions,
       });
       const workspacePath = join(e2eCwd, workspaceName);
+      seedProjectsViewTestProject(workspacePath);
       const { recordVideo, savedVideoPath } = getVideoRecordingOptions(
         workerInfo.workerIndex,
         workspaceName,
