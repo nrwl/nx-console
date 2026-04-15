@@ -2,6 +2,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 export const MARKER_DIR = join(tmpdir(), 'vscode-e2e-test-server');
+export const MARKER_ENV_VAR = 'NX_CONSOLE_E2E_MARKER_ID';
 
 export function getMarkerId(workerIndex: number): string {
   return `worker-${workerIndex}`;

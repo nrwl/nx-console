@@ -16,7 +16,11 @@ import {
   VSCodeEvaluator,
   cleanupMarkerFile,
 } from './fixtures/vscode-evaluator';
-import { getMarkerId, getWorkerDisplay } from './fixtures/vscode-e2e-runtime';
+import {
+  MARKER_ENV_VAR,
+  getMarkerId,
+  getWorkerDisplay,
+} from './fixtures/vscode-e2e-runtime';
 import { NxConsolePage } from './page-objects/nx-console-page';
 
 export interface LaunchOptions {
@@ -176,7 +180,7 @@ export const test = base.extend<
       cleanupMarkerFile(markerId);
       // Critical: unset this when running from within VS Code/Claude Code
       delete env.ELECTRON_RUN_AS_NODE;
-      env.VSCODE_E2E_MARKER_ID = markerId;
+      env[MARKER_ENV_VAR] = markerId;
       if (xvfb.display) {
         env.DISPLAY = xvfb.display;
       }
