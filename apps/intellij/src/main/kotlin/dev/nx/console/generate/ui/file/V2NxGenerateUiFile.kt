@@ -13,6 +13,7 @@ import dev.nx.console.models.NxGenerator
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.executeJavascriptWithCatch
+import dev.nx.console.utils.jcef.IdeShortcutForwardingKeyboardHandler
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
@@ -37,6 +38,10 @@ class V2NxGenerateUiFile(
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         browser.jbCefClient.addContextMenuHandler(
             OpenDevToolsContextMenuHandler(),
+            browser.cefBrowser,
+        )
+        browser.jbCefClient.addKeyboardHandler(
+            IdeShortcutForwardingKeyboardHandler(project),
             browser.cefBrowser,
         )
 
