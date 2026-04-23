@@ -16,13 +16,16 @@ export async function findNxPackagePath(
   workspacePath: string,
   filePath: string,
 ): Promise<string | undefined> {
-  const buildPath = (base: string) => join(base, filePath);
+  const nxPathVariants = getNxPathVariants(filePath);
+  const buildPaths = (base: string) =>
+    nxPathVariants.map((path) => join(base, path));
 
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
   if (nxWorkspaceDepPath) {
-    const path = buildPath(nxWorkspaceDepPath);
-    if (await fileExists(path)) {
-      return path;
+    for (const path of buildPaths(nxWorkspaceDepPath)) {
+      if (await fileExists(path)) {
+        return path;
+      }
     }
   }
 
@@ -31,11 +34,21 @@ export async function findNxPackagePath(
     '@nrwl/workspace',
   );
   if (nrwlWorkspaceDepPath) {
-    const path = buildPath(nrwlWorkspaceDepPath);
-    if (await fileExists(path)) {
-      return path;
+    for (const path of buildPaths(nrwlWorkspaceDepPath)) {
+      if (await fileExists(path)) {
+        return path;
+      }
     }
   }
+}
+
+function getNxPathVariants(filePath: string): string[] {
+  const srcPrefix = `src${platform() === 'win32' ? '\\' : '/'}`;
+  if (filePath === 'src' || filePath.startsWith(srcPrefix)) {
+    return [filePath, join('dist', filePath)];
+  }
+
+  return [filePath];
 }
 
 /**
