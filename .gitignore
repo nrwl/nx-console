@@ -99,3 +99,4 @@ storybook-static
 .nx/polygraph/
 
 .nx/polygraph
+.nx/self-healing
