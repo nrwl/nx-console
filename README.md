@@ -17,6 +17,7 @@
 [![GitHub](https://img.shields.io/github/license/nrwl/nx-console?style=flat-square)](https://github.com/nrwl/nx-console/blob/master/LICENSE)
 ![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/nrwl.angular-console?style=flat-square)
 [![Visual Studio Code Support](https://img.shields.io/badge/Visual%20Studio%20Code-%5E1.71.0-blue?style=flat-square&logo=visualstudiocode)](https://code.visualstudio.com)
+[![Add to Kiro](https://kiro.dev/images/add-to-kiro.svg)](https://kiro.dev/launch/mcp/add?name=nx-mcp&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22nx-mcp%40latest%22%5D%7D)
 
 </div>
 
@@ -57,6 +58,21 @@ Nx Console enhances your editors AI features by providing relevant context to th
 Nx Console comes with an MCP server for both, [VSCode](https://nx.dev/blog/nx-mcp-vscode-copilot) and [Cursor](https://nx.dev/blog/nx-made-cursor-smarter).
 
 You can also install the MCP server separately from the Nx Console extension via the `nx-mcp` NPM package. More about that [here](./apps/nx-mcp/README.md). Learn more in [the Nx docs](https://nx.dev/docs/features/enhance-ai).
+
+#### Kiro
+
+To install the Nx MCP server in [Kiro](https://kiro.dev), click the badge above or manually add the following to your Kiro MCP config file (`.kiro/settings/mcp.json` or `~/.kiro/settings/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "nx-mcp": {
+      "command": "npx",
+      "args": ["nx-mcp@latest"]
+    }
+  }
+}
+```
 
 ### Project Details View
 
