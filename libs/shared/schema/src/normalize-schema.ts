@@ -161,9 +161,12 @@ function isFieldRequired(
   return requiredFields.has(nxOption.name);
 }
 
-function getItems(option: CliOption): { items: string[] } | undefined {
+function getItems(option: CliOption): { items?: string[] } | undefined {
+  if (!option.items) {
+    return undefined;
+  }
   const items = normalizeOptionItems(option.items);
-  return items ? { items } : undefined;
+  return { items };
 }
 
 function normalizeOptionItems(items: CliOption['items']): string[] | undefined {
