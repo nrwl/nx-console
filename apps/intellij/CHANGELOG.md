@@ -1,3 +1,23 @@
+## 1.59.0 (2026-04-24)
+
+### Bug Fixes
+
+* **intellij:** update arguments when reusing Run Anything configurations ([#3072](https://github.com/nrwl/nx-console/issues/3072)) ([0ef1bd9](https://github.com/nrwl/nx-console/commit/0ef1bd945310fc5172ee61aefcc4f7932cb4a6cc))
+* **intellij:** use non-blocking async HTTP in NxGraphServer ([#3071](https://github.com/nrwl/nx-console/issues/3071)) ([3911834](https://github.com/nrwl/nx-console/commit/39118343291881c6da2a3869b56f60bfd17b55ba)), closes [#2385](https://github.com/nrwl/nx-console/issues/2385)
+* **nx-mcp:** expose autoApplySkipped in getCIInformation ([#3090](https://github.com/nrwl/nx-console/issues/3090)) ([a76c10d](https://github.com/nrwl/nx-console/commit/a76c10d07818cdda14740a7897f35017be0bae00))
+* **nxls:** add debounce and reconfigure lock to prevent watcher flood ([#3104](https://github.com/nrwl/nx-console/issues/3104)) ([62d445d](https://github.com/nrwl/nx-console/commit/62d445d5995c880d44496e52618d8c462e3886c5))
+* **nxls:** handle malformed executor schema better ([#3078](https://github.com/nrwl/nx-console/issues/3078)) ([4e3c2ca](https://github.com/nrwl/nx-console/commit/4e3c2caef37c69a96d7c84224e06531629bcbdf2))
+* **vscode,intellij:** update broken nx.dev troubleshooting URLs ([#3096](https://github.com/nrwl/nx-console/issues/3096)) ([86a77e3](https://github.com/nrwl/nx-console/commit/86a77e309f42b90a99d6b8f456f7b72e5eddc794))
+* **vscode,intellij:** update old nx.dev doc links to canonical /docs/ URLs ([#3098](https://github.com/nrwl/nx-console/issues/3098)) ([6047d76](https://github.com/nrwl/nx-console/commit/6047d76e8aeaa95d02c916274cd5f729615eb23a))
+* **vscode:** block lifecycle scripts in all dlx commands ([#3108](https://github.com/nrwl/nx-console/issues/3108)) ([43a74eb](https://github.com/nrwl/nx-console/commit/43a74eb6577d3d31d91a713f2b1a95bee742002c))
+* **vscode:** repair generate ui boolean default behaviour ([#3076](https://github.com/nrwl/nx-console/issues/3076)) ([526a4fb](https://github.com/nrwl/nx-console/commit/526a4fbd69caf23ad262bedf11cf111df6786ca9))
+
+
+### Features
+
+* **vscode:** add Playwright-based e2e test infrastructure ([#3109](https://github.com/nrwl/nx-console/issues/3109)) ([e47823a](https://github.com/nrwl/nx-console/commit/e47823a7d7b5c277a3b793668d9963d63007d407))
+* **vscode:** show labels in generate ui instead of values ([#3075](https://github.com/nrwl/nx-console/issues/3075)) ([e0a6b6f](https://github.com/nrwl/nx-console/commit/e0a6b6ffa0241520360316000ab31aeff9d7c4f4))
+
 ## 1.58.0 (2026-02-24)
 
 ### Bug Fixes
