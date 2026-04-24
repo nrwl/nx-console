@@ -2,6 +2,16 @@ const { execSync } = require('child_process');
 const fs = require('fs-extra');
 const { normalize, join } = require('path');
 
+function resolveExistingPath(paths) {
+  const existingPath = paths.find((path) => fs.existsSync(path));
+  if (!existingPath) {
+    throw new Error(
+      `Unable to resolve any of the expected paths: ${paths.join(', ')}`,
+    );
+  }
+  return normalize(existingPath);
+}
+
 // copy dependency outputs
 const nxlsDest = './dist/apps/vscode/nxls';
 if (fs.existsSync(nxlsDest)) {
@@ -90,7 +100,11 @@ const nxGraphDestFolder = normalize(
 if (!fs.existsSync(nxGraphDestFolder)) {
   fs.mkdirSync(nxGraphDestFolder, { recursive: true });
 }
-fs.copySync(normalize('./node_modules/nx/src/core/graph'), nxGraphDestFolder);
+const nxGraphSourceFolder = resolveExistingPath([
+  './node_modules/nx/src/core/graph',
+  './node_modules/nx/dist/src/core/graph',
+]);
+fs.copySync(nxGraphSourceFolder, nxGraphDestFolder);
 // // this file is required at runtime in the bundle
 fs.writeFileSync(
   './dist/apps/vscode/native-bindings.js',

@@ -1,6 +1,5 @@
 import {
   CliOption,
-  ItemsWithEnum,
   ItemTooltips,
   LongFormXPrompt,
   Option,
@@ -162,14 +161,28 @@ function isFieldRequired(
   return requiredFields.has(nxOption.name);
 }
 
-function getItems(option: CliOption): { items: string[] } | undefined {
-  return (
-    option.items && {
-      items:
-        (option.items as ItemsWithEnum).enum ||
-        ((option.items as string[]).length && option.items),
-    }
-  );
+function getItems(option: CliOption): { items?: string[] } | undefined {
+  if (!option.items) {
+    return undefined;
+  }
+  const items = normalizeOptionItems(option.items);
+  return { items };
+}
+
+function normalizeOptionItems(items: CliOption['items']): string[] | undefined {
+  if (!items) {
+    return undefined;
+  }
+
+  if (Array.isArray(items)) {
+    return items.every((item) => typeof item === 'string') ? items : undefined;
+  }
+
+  if ('enum' in items && Array.isArray(items.enum)) {
+    return items.enum.map((item) => String(item));
+  }
+
+  return undefined;
 }
 
 function isLongFormXPrompt(xPrompt: XPrompt): xPrompt is LongFormXPrompt {
