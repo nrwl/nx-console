@@ -70,6 +70,9 @@ apps/intellij/bin/
 # WDIO
 **/.wdio-vscode-service
 apps/vscode-e2e/.screenshots
+
+# VS Code test downloads
+.vscode-test
 **/dist
 
 .angular
@@ -94,3 +97,6 @@ storybook-static
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 .nx/polygraph/
+
+.nx/polygraph
+.nx/self-healing

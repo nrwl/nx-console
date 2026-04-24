@@ -1,11 +1,14 @@
 import { gte } from '@nx-console/nx-version';
 import { directoryExists } from '@nx-console/shared-file-system';
-import { workspaceDependencyPath } from '@nx-console/shared-npm';
+import {
+  findNxPackagePath,
+  workspaceDependencyPath,
+} from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { readFileSync } from 'fs';
 import type { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import {
   ExtensionContext,
   Uri,
@@ -253,16 +256,16 @@ async function getGraphHtmlLocation(
 
 // TODO: don't simply duplicate this from nxls code?
 async function getGraphBasePath(): Promise<string | undefined> {
-  const nxWorkspaceDepPath = await workspaceDependencyPath(
+  const graphIndexPath = await findNxPackagePath(
     getNxWorkspacePath(),
-    'nx',
+    join('src', 'core', 'graph', 'index.html'),
   );
 
-  if (!nxWorkspaceDepPath) {
+  if (!graphIndexPath) {
     return undefined;
   }
 
-  const graphBasePath = join(nxWorkspaceDepPath, 'src', 'core', 'graph');
+  const graphBasePath = dirname(graphIndexPath);
 
   if (await directoryExists(graphBasePath)) {
     return graphBasePath;

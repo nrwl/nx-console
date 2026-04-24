@@ -25,8 +25,7 @@ describe('utils', () => {
     };
 
     it('should work with schema without any properties', async () => {
-      // @ts-expect-error absence of required property "properties" is needed to test failure resistance
-      const r = await normalizeSchema({});
+      const r = await normalizeSchema({} as Schema);
       expect(r).toEqual([]);
     });
 
@@ -69,6 +68,42 @@ describe('utils', () => {
       };
       const r = await getSchema({ option });
       expect(r[0].items).toEqual(['test']);
+    });
+
+    it('should set items when items contains an enum object', async () => {
+      const option = {
+        ...mockOption,
+        items: {
+          type: OptionType.String,
+          enum: ['test'],
+        },
+      };
+      const r = await getSchema({ option });
+      expect(r[0].items).toEqual(['test']);
+    });
+
+    it('should ignore items objects without an enum', async () => {
+      const option = {
+        ...mockOption,
+        items: {
+          type: OptionType.String,
+        },
+      };
+      const r = await getSchema({ option });
+      expect(r[0].items).toBeUndefined();
+    });
+
+    it('should ignore tuple-schema items arrays', async () => {
+      const option = {
+        ...mockOption,
+        items: [
+          {
+            type: OptionType.String,
+          },
+        ],
+      };
+      const r = await getSchema({ option });
+      expect(r[0].items).toBeUndefined();
     });
 
     describe('xPrompt', () => {

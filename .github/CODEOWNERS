@@ -124,6 +124,8 @@
 
 /libs/shared/npm/ @MaxKless
 
+/apps/vscode-e2e/ @MaxKless
+
 /libs/vscode/mcp/ @MaxKless
 
 /apps/intellij/ @MaxKless
