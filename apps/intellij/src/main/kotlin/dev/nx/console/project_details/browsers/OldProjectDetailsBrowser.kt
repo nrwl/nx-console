@@ -153,6 +153,7 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
 
             val js =
                 """
+                window.externalApi = window.externalApi ?? {};
                 window.externalApi.graphInteractionEventListener = (message) => {
                     ${interactionEventQuery.inject("JSON.stringify(message)")}
                 }
