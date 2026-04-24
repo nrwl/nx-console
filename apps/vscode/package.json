@@ -1143,6 +1143,7 @@
     "vscode.git"
   ],
   "dependencies": {
-    "@napi-rs/wasm-runtime": "0.2.4"
+    "@napi-rs/wasm-runtime": "0.2.4",
+    "nx": "22.7.0-rc.1"
   }
 }

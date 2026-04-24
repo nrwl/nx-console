@@ -36,10 +36,26 @@ fs.copySync(
 // copy package.json
 fs.copySync('./apps/vscode/package.json', './dist/apps/vscode/package.json');
 
-execSync('npm install -f', {
+const vscodeNodeModulesFolder = './dist/apps/vscode/node_modules';
+if (fs.existsSync(vscodeNodeModulesFolder)) {
+  fs.rmSync(vscodeNodeModulesFolder, { recursive: true, force: true });
+}
+
+execSync('npm install -f --no-optional', {
   cwd: './dist/apps/vscode',
   stdio: 'inherit',
 });
+
+const nxNativeFolder = normalize(
+  './dist/apps/vscode/node_modules/nx/dist/src/native',
+);
+if (fs.existsSync(nxNativeFolder)) {
+  for (const file of fs.readdirSync(nxNativeFolder)) {
+    if (file.endsWith('.node') || file === 'nx.wasm32-wasi.debug.wasm') {
+      fs.rmSync(join(nxNativeFolder, file), { force: true });
+    }
+  }
+}
 
 // copy required dependencies
 // we don't need the entire @vscode-elements/elements package, just the bundled.js file
