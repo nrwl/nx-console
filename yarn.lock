@@ -8364,6 +8364,7 @@ __metadata:
   resolution: "angular-console@workspace:apps/vscode"
   dependencies:
     "@napi-rs/wasm-runtime": 0.2.4
+    nx: 22.7.0-rc.1
   languageName: unknown
   linkType: soft
 
