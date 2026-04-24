@@ -1,3 +1,10 @@
+# [18.93.0](https://github.com/nrwl/nx-console/compare/vscode-v18.92.0...vscode-v18.93.0) (2026-04-24)
+
+
+### Features
+
+* **vscode:** add Playwright-based e2e test infrastructure ([#3109](https://github.com/nrwl/nx-console/issues/3109)) ([e47823a](https://github.com/nrwl/nx-console/commit/e47823a7d7b5c277a3b793668d9963d63007d407))
+
 # [18.92.0](https://github.com/nrwl/nx-console/compare/vscode-v18.91.0...vscode-v18.92.0) (2026-04-08)
 
 
