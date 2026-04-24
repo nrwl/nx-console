@@ -49,7 +49,10 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
         return if (ApplicationManager.getApplication().isDispatchThread) {
             nxVersion
         } else {
-            nxVersion ?: tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+            nxVersion
+                ?: ApplicationManager.getApplication().runReadAction<NxVersion?> {
+                    tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+                }
         }
     }
 
