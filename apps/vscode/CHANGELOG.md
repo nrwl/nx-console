@@ -1,3 +1,10 @@
+# [18.93.1](https://github.com/nrwl/nx-console/compare/vscode-v18.92.0...vscode-v18.93.1) (2026-04-27)
+
+### Bug Fixes
+
+* update nx version to 23 beta ([#3121](https://github.com/nrwl/nx-console/pull/3121)) ([a76c10d](https://github.com/nrwl/nx-console/commit/01a28621d6b4fef560e8dea2a9d8727d30ec2626))
+
+
 # [18.93.0](https://github.com/nrwl/nx-console/compare/vscode-v18.92.0...vscode-v18.93.0) (2026-04-24)
 
 
