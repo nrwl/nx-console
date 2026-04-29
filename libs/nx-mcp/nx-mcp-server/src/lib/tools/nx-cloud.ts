@@ -850,9 +850,7 @@ const getCIInformation =
     hints.push(
       'Use the ci_task_output tool to retrieve full terminal output for any task (pass a runId from failedTasks for direct lookup, or just a taskId to search the CIPE).',
     );
-    hints.push(
-      'Use select="succeededTasks" to list successful tasks (incurs extra API calls).',
-    );
+    hints.push('Use select="succeededTasks" to list successful tasks.');
     output.hints = hints;
 
     const selectedFields = params.select?.split(',').map((s) => s.trim()) ?? [];
