@@ -3,8 +3,67 @@ import { pipeline } from 'stream/promises';
 import { extract } from 'tar-stream';
 import * as zlib from 'zlib';
 
+import { getNxCloudUrl } from './cloud-ids';
+import { isNxCloudUsed } from './is-nx-cloud-used';
 import { Logger } from '@nx-console/shared-utils';
-import { sanitizeNxCloudError } from './nx-cloud-request';
+import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
+import { nxCloudRequest, sanitizeNxCloudError } from './nx-cloud-request';
+
+export async function getNxCloudTerminalOutput(
+  request: {
+    taskId: string;
+    runId: string;
+  },
+  workspacePath: string,
+  logger: Logger,
+): Promise<{ terminalOutput?: string; error?: string }> {
+  if (!(await isNxCloudUsed(workspacePath, logger))) {
+    return { error: 'Nx Cloud is not used in this workspace.' };
+  }
+
+  const nxCloudUrl = await getNxCloudUrl(workspacePath);
+  const url = `${nxCloudUrl}/nx-cloud/nx-console/ci-pipeline-executions/terminal-outputs`;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(await nxCloudAuthHeaders(workspacePath)),
+  };
+
+  const taskId = request.taskId.trim();
+  const runId = request.runId.trim();
+
+  try {
+    const response = await nxCloudRequest('TERMINAL_OUTPUT', {
+      type: 'POST',
+      url,
+      headers,
+      data: JSON.stringify({
+        taskId,
+        linkId: runId,
+        executionId: runId,
+      }),
+    });
+    const responseData = JSON.parse(response.responseText) as {
+      artifactUrl: string;
+    };
+
+    const terminalOutput = await downloadAndExtractArtifact(
+      responseData.artifactUrl,
+      logger,
+    );
+    const strippedOutput = terminalOutput.replace(
+      /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g,
+      '',
+    );
+
+    return { terminalOutput: strippedOutput };
+  } catch (e: any) {
+    logger.log(`Error fetching terminal output: ${JSON.stringify(e)}`);
+    return {
+      error: e.responseText ?? e.message ?? String(e),
+    };
+  }
+}
 
 export async function downloadAndExtractArtifact(
   artifactUrl: string,

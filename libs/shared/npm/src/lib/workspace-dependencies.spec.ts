@@ -1,6 +1,7 @@
 import * as os from 'os';
 import { mocked } from 'jest-mock';
 import {
+  importNxPackagePath,
   importWorkspaceDependency,
   workspaceDependencyPath,
 } from './workspace-dependencies';
@@ -109,6 +110,28 @@ describe('workspace-dependencies', () => {
       expect(logMock).toHaveBeenCalledWith(
         'Using local Nx package at node_modules/nx/src/utils.js',
       );
+    });
+  });
+
+  describe('importNxPackagePath', () => {
+    it('should fall back to dist/src/... when src/... is not present (Nx 22.7+ layout)', async () => {
+      jest.mock(
+        '/workspace/node_modules/nx/dist/src/command-line/migrate/migrate-ui-api',
+        () => ({ recordInitialMigrationMetadata: jest.fn() }),
+        { virtual: true },
+      );
+
+      const result = await importNxPackagePath<{
+        recordInitialMigrationMetadata: unknown;
+      }>('/workspace', 'src/command-line/migrate/migrate-ui-api');
+
+      expect(result.recordInitialMigrationMetadata).toBeDefined();
+    });
+
+    it('should not try the dist/ fallback for non-src paths', async () => {
+      await expect(
+        importNxPackagePath('/workspace', 'package.json'),
+      ).rejects.toBeDefined();
     });
   });
 });
