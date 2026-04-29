@@ -10,6 +10,18 @@
 
 * **nx-mcp:** rework ci tools, add ci_task_output ([#3126](https://github.com/nrwl/nx-console/issues/3126)) ([47eb1af](https://github.com/nrwl/nx-console/commit/47eb1afc1216e252aa1cc9ddc19ddf35ab7cd702))
 
+# [18.94.0](https://github.com/nrwl/nx-console/compare/vscode-v18.93.1...vscode-v18.94.0) (2026-04-29)
+
+
+### Bug Fixes
+
+* **repo:** support Nx 22.7 dist/ layout in importNxPackagePath ([#3125](https://github.com/nrwl/nx-console/issues/3125)) ([f03d195](https://github.com/nrwl/nx-console/commit/f03d195c16784c6459444da4a3e8b811d4e0a934))
+
+
+### Features
+
+* **nx-mcp:** rework ci tools, add ci_task_output ([#3126](https://github.com/nrwl/nx-console/issues/3126)) ([47eb1af](https://github.com/nrwl/nx-console/commit/47eb1afc1216e252aa1cc9ddc19ddf35ab7cd702))
+
 # [18.93.1](https://github.com/nrwl/nx-console/compare/vscode-v18.92.0...vscode-v18.93.1) (2026-04-27)
 
 ### Bug Fixes
