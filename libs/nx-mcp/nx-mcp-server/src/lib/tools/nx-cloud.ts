@@ -1,35 +1,21 @@
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import {
   CI_INFORMATION,
-  CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
-  CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
-  CLOUD_ANALYTICS_RUN_DETAILS,
-  CLOUD_ANALYTICS_RUNS_SEARCH,
-  CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
-  CLOUD_ANALYTICS_TASKS_SEARCH,
+  CI_TASK_OUTPUT,
   UPDATE_SELF_HEALING_FIX,
 } from '@nx-console/shared-llm-context';
 import {
-  formatPipelineExecutionDetailsContent,
-  formatPipelineExecutionsSearchContent,
-  formatRunDetailsContent,
-  formatRunsSearchContent,
-  formatTasksDetailsSearchContent,
-  formatTasksSearchContent,
   getRecentCIPEData,
   getPipelineExecutionDetails,
-  getPipelineExecutionsSearch,
+  getNxCloudTerminalOutput,
   getRunDetails,
-  getRunsSearch,
-  getTasksDetailsSearch,
-  getTasksSearch,
   parseNxCloudUrl,
   ParsedNxCloudUrl,
   retrieveFixDiff,
   updateSuggestedFix,
 } from '@nx-console/shared-nx-cloud';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
-import { CIPEInfo, NxAiFix } from '@nx-console/shared-types';
+import { CIPEInfo, CIPERun, NxAiFix } from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
 import { execSync } from 'child_process';
 import { z } from 'zod';
@@ -39,13 +25,15 @@ import { chunkContent, getValueByPath } from './nx-workspace';
 import {
   CIInformationOutput,
   ciInformationOutputSchema,
+  CITaskOutputOutput,
+  ciTaskOutputOutputSchema,
+  TaskInfo,
   UpdateSelfHealingFixOutput,
   updateSelfHealingFixOutputSchema,
 } from './output-schemas';
 
 export const SELF_HEALING_CHUNK_SIZE = 10000;
 
-const TRUNCATION_LENGTH = 1000;
 const DIFF_PREVIEW_LENGTH = 3000;
 
 /**
@@ -67,15 +55,6 @@ function truncateString(
 }
 
 /**
- * Fields that should use reverse pagination (task outputs - most recent first).
- */
-const REVERSE_PAGINATION_FIELDS = [
-  'remoteTaskSummary',
-  'localTaskSummary',
-  'taskOutputSummary',
-];
-
-/**
  * Chunk content from the end (reverse pagination).
  * Page 0 returns the most recent content (end of string).
  * Higher page numbers return progressively older content.
@@ -84,17 +63,22 @@ export function chunkContentReverse(
   content: string,
   pageNumber: number,
   chunkSize: number,
-): { chunk: string; hasMore: boolean } {
+): { chunk: string; hasMore: boolean; totalPages: number } {
   if (!content || content.length === 0) {
-    return { chunk: '', hasMore: false };
+    return { chunk: '', hasMore: false, totalPages: 0 };
   }
 
   const len = content.length;
+  const totalPages = Math.max(1, Math.ceil(len / chunkSize));
   const endIndex = len - pageNumber * chunkSize;
   const startIndex = Math.max(0, endIndex - chunkSize);
 
   if (endIndex <= 0) {
-    return { chunk: `no more content on page ${pageNumber}`, hasMore: false };
+    return {
+      chunk: `no more content on page ${pageNumber}`,
+      hasMore: false,
+      totalPages,
+    };
   }
 
   let chunk = content.slice(startIndex, endIndex);
@@ -104,7 +88,7 @@ export function chunkContentReverse(
     chunk = `...[older output on page ${pageNumber + 1}]\n${chunk}`;
   }
 
-  return { chunk, hasMore };
+  return { chunk, hasMore, totalPages };
 }
 
 export function registerNxCloudTools(
@@ -114,150 +98,6 @@ export function registerNxCloudTools(
   telemetry?: NxConsoleTelemetryLogger,
   toolsFilter?: string[],
 ): void {
-  if (!isToolEnabled(CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH} - disabled by tools filter`,
-    );
-  } else {
-    registry.registerTool({
-      name: CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
-      description:
-        'Analyze historical pipeline execution data from Nx Cloud to identify trends and patterns in CI/CD workflows. Use this analytics tool to track pipeline success rates over time, investigate performance patterns across branches or authors, and gain insights into team productivity. Filter by branch, status, author, or time range to analyze specific segments of your CI/CD history. Pipeline executions are the top-level containers in the hierarchy. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-      inputSchema: pipelineExecutionSearchSchema.shape,
-      annotations: {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: true,
-      },
-      handler: async (args) =>
-        nxCloudPipelineExecutionsSearch(
-          workspacePath,
-          logger,
-          telemetry,
-        )(args as z.infer<typeof pipelineExecutionSearchSchema>),
-    });
-  }
-
-  if (!isToolEnabled(CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS} - disabled by tools filter`,
-    );
-  } else {
-    registry.registerTool({
-      name: CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
-      description:
-        'Analyze detailed historical data for a specific pipeline execution in Nx Cloud. Use this analytics tool to investigate the complete structure of a past CI/CD run, understand performance bottlenecks, and identify optimization opportunities. Returns the full hierarchy including run groups and their associated runs, helping you gain insights into how the pipeline was executed and where improvements can be made.',
-      inputSchema: pipelineExecutionDetailsSchema.shape,
-      annotations: {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: true,
-      },
-      handler: async (args) =>
-        nxCloudPipelineExecutionDetails(
-          workspacePath,
-          logger,
-          telemetry,
-        )(args as z.infer<typeof pipelineExecutionDetailsSchema>),
-    });
-  }
-
-  if (!isToolEnabled(CLOUD_ANALYTICS_RUNS_SEARCH, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_ANALYTICS_RUNS_SEARCH} - disabled by tools filter`,
-    );
-  } else {
-    registry.registerTool({
-      name: CLOUD_ANALYTICS_RUNS_SEARCH,
-      description:
-        'Analyze historical run data from Nx Cloud to track performance trends and team productivity patterns. Runs are mid-level containers within pipeline executions, each representing execution of a specific command (like "nx affected:build"). Use this analytics tool to identify which commands are taking the longest, track success rates across different run groups, and understand how your team\'s build patterns have evolved over time. Filter by pipeline execution, branch, run group, or status to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-      inputSchema: runSearchSchema.shape,
-      annotations: {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: true,
-      },
-      handler: async (args) =>
-        nxCloudRunsSearch(
-          workspacePath,
-          logger,
-          telemetry,
-        )(args as z.infer<typeof runSearchSchema>),
-    });
-  }
-
-  if (!isToolEnabled(CLOUD_ANALYTICS_RUN_DETAILS, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_ANALYTICS_RUN_DETAILS} - disabled by tools filter`,
-    );
-  } else {
-    registry.registerTool({
-      name: CLOUD_ANALYTICS_RUN_DETAILS,
-      description:
-        'Analyze detailed historical data for a specific run in Nx Cloud. Use this analytics tool to investigate command execution performance, understand task distribution patterns, and identify optimization opportunities. Returns comprehensive information including the command executed, duration, status, and all tasks that were part of this run, helping you gain insights into where time is being spent and how to improve build efficiency.',
-      inputSchema: runDetailsSchema.shape,
-      annotations: {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: true,
-      },
-      handler: async (args) =>
-        nxCloudRunDetails(
-          workspacePath,
-          logger,
-          telemetry,
-        )(args as z.infer<typeof runDetailsSchema>),
-    });
-  }
-
-  if (!isToolEnabled(CLOUD_ANALYTICS_TASKS_SEARCH, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_ANALYTICS_TASKS_SEARCH} - disabled by tools filter`,
-    );
-  } else {
-    registry.registerTool({
-      name: CLOUD_ANALYTICS_TASKS_SEARCH,
-      description:
-        'Analyze aggregated task performance statistics from Nx Cloud to identify optimization opportunities and track trends over time. Returns performance metrics including success rates, cache hit rates, and average durations for each task (project + target combination). Use this analytics tool to understand which tasks are the slowest, track cache effectiveness trends, identify projects with low success rates, and gain insights into overall team productivity patterns. Filter by project, target, or time range to analyze specific segments. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-      inputSchema: taskSearchSchema.shape,
-      annotations: {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: true,
-      },
-      handler: async (args) =>
-        nxCloudTasksSearch(
-          workspacePath,
-          logger,
-          telemetry,
-        )(args as z.infer<typeof taskSearchSchema>),
-    });
-  }
-
-  if (!isToolEnabled(CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH, toolsFilter)) {
-    logger.debug?.(
-      `Skipping ${CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH} - disabled by tools filter`,
-    );
-  } else {
-    registry.registerTool({
-      name: CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
-      description:
-        'Analyze individual task execution data from Nx Cloud to investigate performance trends and understand task behavior over time. Returns detailed information for each task execution including project, target, duration, cache status, and parameters. Use this analytics tool to track how specific tasks perform across different runs, identify patterns in cache misses, and gain insights into which task configurations are most efficient. Filter by project, target, or time range to analyze specific execution patterns. If a pagination token is returned, call this tool again with the token to retrieve additional results and ensure all data is collected.',
-      inputSchema: taskDetailsSchema.shape,
-      annotations: {
-        destructiveHint: false,
-        readOnlyHint: true,
-        openWorldHint: true,
-      },
-      handler: async (args) =>
-        nxCloudTaskDetails(
-          workspacePath,
-          logger,
-          telemetry,
-        )(args as z.infer<typeof taskDetailsSchema>),
-    });
-  }
-
   if (!isToolEnabled(CI_INFORMATION, toolsFilter)) {
     logger.debug?.(`Skipping ${CI_INFORMATION} - disabled by tools filter`);
   } else {
@@ -266,7 +106,7 @@ export function registerNxCloudTools(
       description:
         'Retrieve CI pipeline execution information from Nx Cloud for the current branch. ' +
         'Supports Nx Cloud URLs: CIPE URLs (/cipes/{id}), run URLs (/runs/{id}), and task URLs (/runs/{id}/task/{taskId}). ' +
-        'Without select parameter: Returns formatted overview (CIPE status, failed task IDs, self-healing status). ' +
+        'Without select parameter: Returns formatted overview (CIPE status, failed tasks, self-healing status). ' +
         'With select parameter: Returns raw JSON value at specified path. ' +
         'Includes selfHealingSkippedReason/selfHealingSkipMessage when self-healing was skipped (e.g. THROTTLED). ' +
         'Includes autoApplySkipped/autoApplySkipReason when a fix could have been auto-applied but was skipped. ' +
@@ -284,6 +124,32 @@ export function registerNxCloudTools(
           logger,
           telemetry,
         )(args as z.infer<typeof ciInformationSchema>),
+    });
+  }
+
+  if (!isToolEnabled(CI_TASK_OUTPUT, toolsFilter)) {
+    logger.debug?.(`Skipping ${CI_TASK_OUTPUT} - disabled by tools filter`);
+  } else {
+    registry.registerTool({
+      name: CI_TASK_OUTPUT,
+      description:
+        'Retrieve the terminal output (logs) for any CI task (failed or successful). ' +
+        'If runId is provided, fetches logs directly from that run. ' +
+        'If only taskId is provided, iterates through the runs of the matching CIPE (current branch by default) until the task is found. ' +
+        'Supports Nx Cloud URLs for cross-branch lookups.',
+      inputSchema: ciTaskOutputSchema.shape,
+      outputSchema: ciTaskOutputOutputSchema,
+      annotations: {
+        destructiveHint: false,
+        readOnlyHint: true,
+        openWorldHint: true,
+      },
+      handler: async (args) =>
+        handleCITaskOutput(
+          workspacePath,
+          logger,
+          telemetry,
+        )(args as z.infer<typeof ciTaskOutputSchema>),
     });
   }
 
@@ -354,173 +220,6 @@ export const renderCipeDetails = (cipe: CIPEInfo): string => {
 };
 
 // Schemas for the new tools
-const pipelineExecutionSearchSchema = z.object({
-  branches: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by specific branches'),
-  statuses: z
-    .array(z.string())
-    .optional()
-    .describe(
-      'Filter by execution statuses (e.g., "NOT_STARTED", "IN_PROGRESS", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT")',
-    ),
-  authors: z.array(z.string()).optional().describe('Filter by commit authors'),
-  repositoryUrl: z.string().optional().describe('Filter by repository URL'),
-  minCreatedAt: z
-    .string()
-    .optional()
-    .describe(
-      'Minimum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
-    ),
-  maxCreatedAt: z
-    .string()
-    .optional()
-    .describe(
-      'Maximum creation time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
-    ),
-  vcsTitleContains: z
-    .string()
-    .optional()
-    .describe('Filter by VCS title containing this text'),
-  limit: z
-    .number()
-    .optional()
-    .default(50)
-    .describe('Maximum number of results to return'),
-  pageToken: z.string().optional().describe('Token for pagination'),
-});
-
-const pipelineExecutionDetailsSchema = z.object({
-  pipelineExecutionId: z
-    .string()
-    .describe('The ID of the pipeline execution to retrieve'),
-});
-
-const runSearchSchema = z.object({
-  pipelineExecutionId: z
-    .string()
-    .optional()
-    .describe('Filter by pipeline execution ID'),
-  branches: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by specific branches'),
-  runGroups: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by run group names'),
-  commitShas: z.array(z.string()).optional().describe('Filter by commit SHAs'),
-  statuses: z
-    .array(z.string())
-    .optional()
-    .describe(
-      'Filter by run statuses (e.g., "NOT_STARTED", "IN_PROGRESS", "SUCCEEDED", "FAILED", "CANCELED", "TIMED_OUT")',
-    ),
-  minStartTime: z
-    .string()
-    .optional()
-    .describe(
-      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
-    ),
-  maxStartTime: z
-    .string()
-    .optional()
-    .describe(
-      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
-    ),
-  limit: z
-    .number()
-    .optional()
-    .default(50)
-    .describe('Maximum number of results to return'),
-  pageToken: z.string().optional().describe('Token for pagination'),
-});
-
-const runDetailsSchema = z.object({
-  runId: z.string().describe('The ID of the run to retrieve'),
-});
-
-const taskSearchSchema = z.object({
-  taskIds: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by specific task IDs'),
-  projectNames: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by project names'),
-  targets: z.array(z.string()).optional().describe('Filter by target names'),
-  configurations: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by configurations'),
-  minStartTime: z
-    .string()
-    .optional()
-    .describe(
-      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
-    ),
-  maxStartTime: z
-    .string()
-    .optional()
-    .describe(
-      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
-    ),
-  limit: z
-    .number()
-    .optional()
-    .default(100)
-    .describe('Maximum number of results to return'),
-  pageToken: z.string().optional().describe('Token for pagination'),
-  includeLocal: z
-    .boolean()
-    .optional()
-    .describe(
-      'Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.',
-    ),
-});
-
-const taskDetailsSchema = z.object({
-  taskIds: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by specific task IDs'),
-  projectNames: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by project names'),
-  targets: z.array(z.string()).optional().describe('Filter by target names'),
-  configurations: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by configurations'),
-  minStartTime: z
-    .string()
-    .optional()
-    .describe(
-      'Minimum start time. Can be an exact date or relative to today in natural language (e.g., "2024-01-01", "yesterday", "3 days ago", "last week")',
-    ),
-  maxStartTime: z
-    .string()
-    .optional()
-    .describe(
-      'Maximum start time. Can be an exact date or relative to today in natural language (e.g., "2024-12-31", "today", "2 hours ago", "last month")',
-    ),
-  limit: z
-    .number()
-    .optional()
-    .default(100)
-    .describe('Maximum number of results to return'),
-  pageToken: z.string().optional().describe('Token for pagination'),
-  includeLocal: z
-    .boolean()
-    .optional()
-    .describe(
-      'Include data from local machine runs in addition to CI data. If false or omitted, only CI data is included.',
-    ),
-});
-
 const ciInformationSchema = z.object({
   url: z
     .string()
@@ -547,9 +246,39 @@ const ciInformationSchema = z.object({
     .number()
     .optional()
     .describe(
-      'Pagination token (0-based). Only used when select returns a long string value. ' +
-        'Task summaries use reverse pagination (page 0 = most recent output). ' +
-        'Other strings use forward pagination (page 0 = start).',
+      'Pagination token (0-based). Only used when select returns a long string value.',
+    ),
+});
+
+const ciTaskOutputSchema = z.object({
+  taskId: z
+    .string()
+    .describe('The task ID to get output for (e.g., "myapp:build")'),
+  runId: z
+    .string()
+    .optional()
+    .describe(
+      'The run ID containing the task. If provided, fetches logs directly without CIPE resolution. Can be obtained from ci_information failedTasks or from any Nx Cloud run URL.',
+    ),
+  url: z
+    .string()
+    .optional()
+    .describe(
+      'An Nx Cloud URL to resolve the CIPE from. Supports CIPE URLs (/cipes/{id}), ' +
+        'run URLs (/runs/{id}), and task URLs (/runs/{id}/task/{taskId}). ' +
+        'Only used when runId is not provided.',
+    ),
+  branch: z
+    .string()
+    .optional()
+    .describe(
+      'Branch name to find the CIPE. Defaults to current git branch. Only used when runId is not provided.',
+    ),
+  pageToken: z
+    .number()
+    .optional()
+    .describe(
+      'Pagination token (0-based). Terminal output uses reverse pagination (page 0 = most recent output).',
     ),
 });
 
@@ -576,184 +305,6 @@ const updateSelfHealingFixSchema = z.object({
       'Action to perform on the fix: APPLY to accept, REJECT to decline, RERUN_ENVIRONMENT_STATE to request a CI rerun (only available for pipeline executions that failed due to an environment issue).',
     ),
 });
-
-// Implementation functions
-const nxCloudPipelineExecutionsSearch =
-  (
-    workspacePath: string,
-    logger: Logger,
-    telemetry: NxConsoleTelemetryLogger | undefined,
-  ) =>
-  async (
-    params: z.infer<typeof pipelineExecutionSearchSchema>,
-  ): Promise<CallToolResult> => {
-    telemetry?.logUsage('ai.tool-call', {
-      tool: CLOUD_ANALYTICS_PIPELINE_EXECUTIONS_SEARCH,
-    });
-
-    const result = await getPipelineExecutionsSearch(
-      workspacePath,
-      logger,
-      params,
-    );
-
-    if (result.error) {
-      throw new Error(
-        `Error searching pipeline executions: ${result.error.message}`,
-      );
-    }
-
-    const textContent = formatPipelineExecutionsSearchContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map((text) => ({
-      type: 'text',
-      text,
-    }));
-
-    return { content };
-  };
-
-const nxCloudPipelineExecutionDetails =
-  (
-    workspacePath: string,
-    logger: Logger,
-    telemetry: NxConsoleTelemetryLogger | undefined,
-  ) =>
-  async (
-    params: z.infer<typeof pipelineExecutionDetailsSchema>,
-  ): Promise<CallToolResult> => {
-    telemetry?.logUsage('ai.tool-call', {
-      tool: CLOUD_ANALYTICS_PIPELINE_EXECUTION_DETAILS,
-    });
-
-    const result = await getPipelineExecutionDetails(
-      workspacePath,
-      logger,
-      params.pipelineExecutionId,
-    );
-
-    if (result.error) {
-      throw new Error(
-        `Error getting pipeline execution details: ${result.error.message}`,
-      );
-    }
-
-    const textContent = formatPipelineExecutionDetailsContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map((text) => ({
-      type: 'text',
-      text,
-    }));
-
-    return { content };
-  };
-
-// In Progress
-const nxCloudRunsSearch =
-  (
-    workspacePath: string,
-    logger: Logger,
-    telemetry: NxConsoleTelemetryLogger | undefined,
-  ) =>
-  async (params: z.infer<typeof runSearchSchema>): Promise<CallToolResult> => {
-    telemetry?.logUsage('ai.tool-call', {
-      tool: CLOUD_ANALYTICS_RUNS_SEARCH,
-    });
-
-    const result = await getRunsSearch(workspacePath, logger, params);
-
-    if (result.error) {
-      throw new Error(`Error searching runs: ${result.error.message}`);
-    }
-
-    const textContent = formatRunsSearchContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map((text) => ({
-      type: 'text',
-      text,
-    }));
-
-    return { content };
-  };
-
-const nxCloudRunDetails =
-  (
-    workspacePath: string,
-    logger: Logger,
-    telemetry: NxConsoleTelemetryLogger | undefined,
-  ) =>
-  async (params: z.infer<typeof runDetailsSchema>): Promise<CallToolResult> => {
-    telemetry?.logUsage('ai.tool-call', {
-      tool: CLOUD_ANALYTICS_RUN_DETAILS,
-    });
-
-    const result = await getRunDetails(workspacePath, logger, params.runId);
-
-    if (result.error) {
-      throw new Error(`Error getting run details: ${result.error.message}`);
-    }
-
-    const textContent = formatRunDetailsContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map((text) => ({
-      type: 'text',
-      text,
-    }));
-
-    return { content };
-  };
-
-const nxCloudTasksSearch =
-  (
-    workspacePath: string,
-    logger: Logger,
-    telemetry: NxConsoleTelemetryLogger | undefined,
-  ) =>
-  async (params: z.infer<typeof taskSearchSchema>): Promise<CallToolResult> => {
-    telemetry?.logUsage('ai.tool-call', {
-      tool: CLOUD_ANALYTICS_TASKS_SEARCH,
-    });
-
-    const result = await getTasksSearch(workspacePath, logger, params);
-
-    if (result.error) {
-      throw new Error(`Error searching tasks: ${result.error.message}`);
-    }
-
-    const textContent = formatTasksSearchContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map((text) => ({
-      type: 'text',
-      text,
-    }));
-
-    return { content };
-  };
-
-const nxCloudTaskDetails =
-  (
-    workspacePath: string,
-    logger: Logger,
-    telemetry: NxConsoleTelemetryLogger | undefined,
-  ) =>
-  async (
-    params: z.infer<typeof taskDetailsSchema>,
-  ): Promise<CallToolResult> => {
-    telemetry?.logUsage('ai.tool-call', {
-      tool: CLOUD_ANALYTICS_TASK_EXECUTIONS_SEARCH,
-    });
-
-    const result = await getTasksDetailsSearch(workspacePath, logger, params);
-
-    if (result.error) {
-      throw new Error(`Error searching task details: ${result.error.message}`);
-    }
-
-    const textContent = formatTasksDetailsSearchContent(result.data!);
-    const content: CallToolResult['content'] = textContent.map(
-      (text: string) => ({
-        type: 'text',
-        text,
-      }),
-    );
-
-    return { content };
-  };
 
 function getCurrentGitBranch(workspacePath: string): string | null {
   try {
@@ -832,6 +383,262 @@ async function resolveUrlToBranch(
     cipeId: runResult.data.distributedExecutionId,
   };
 }
+
+function getRunIdFromRun(run: CIPERun): string | undefined {
+  return run.linkId ?? run.executionId;
+}
+
+function getDisplayTaskId(taskId: string, run: CIPERun): string {
+  return taskId === 'upload-run-result:record-command' ||
+    taskId === 'nx-cloud-tasks-runner:record-command'
+    ? run.command
+    : taskId;
+}
+
+async function resolveSucceededTasks(
+  cipe: CIPEInfo,
+  workspacePath: string,
+  logger: Logger,
+): Promise<TaskInfo[]> {
+  const failedTaskIdSet = new Set<string>();
+  const runRefs: { runId: string; runUrl: string }[] = [];
+
+  for (const runGroup of cipe.runGroups) {
+    for (const run of runGroup.runs) {
+      for (const taskId of run.failedTasks ?? []) {
+        failedTaskIdSet.add(taskId);
+      }
+      const runId = getRunIdFromRun(run);
+      if (runId) {
+        runRefs.push({ runId, runUrl: run.runUrl });
+      }
+    }
+  }
+
+  const detailsResults = await Promise.all(
+    runRefs.map(({ runId }) => getRunDetails(workspacePath, logger, runId)),
+  );
+
+  const succeeded: TaskInfo[] = [];
+  detailsResults.forEach((result, idx) => {
+    if (result.error || !result.data) return;
+    const { runId, runUrl } = runRefs[idx];
+    for (const task of result.data.tasks ?? []) {
+      if (failedTaskIdSet.has(task.taskId)) continue;
+      succeeded.push({
+        taskId: task.taskId,
+        runId,
+        runUrl,
+      });
+    }
+  });
+
+  return succeeded;
+}
+
+async function resolveCandidateRunIds(
+  workspacePath: string,
+  logger: Logger,
+  url?: string,
+  branch?: string,
+): Promise<{ runIds?: string[]; branch?: string; error?: string }> {
+  let resolvedBranch: string | undefined;
+
+  if (url) {
+    const parsed = parseNxCloudUrl(url);
+    if (!parsed) {
+      return {
+        error:
+          'Invalid Nx Cloud URL. Supported patterns: /cipes/{id}, /runs/{id}, /runs/{id}/task/{taskId}',
+      };
+    }
+
+    const urlResolution = await resolveUrlToBranch(
+      parsed,
+      workspacePath,
+      logger,
+    );
+    if (urlResolution.error) {
+      return { error: urlResolution.error };
+    }
+    resolvedBranch = urlResolution.branch;
+  } else {
+    resolvedBranch = branch ?? getCurrentGitBranch(workspacePath) ?? undefined;
+    if (!resolvedBranch) {
+      return {
+        error:
+          'Could not determine the current git branch. Please provide a branch name, URL, or runId explicitly.',
+      };
+    }
+  }
+
+  const cipeResult = await getRecentCIPEData(workspacePath, logger, {
+    branch: resolvedBranch,
+  });
+
+  if (cipeResult.error) {
+    return {
+      error: `Failed to retrieve CI information: ${cipeResult.error.message}`,
+    };
+  }
+
+  const cipeForBranch = cipeResult.info?.find(
+    (cipe) => cipe.branch === resolvedBranch,
+  );
+
+  if (!cipeForBranch) {
+    return {
+      error: `No CI pipeline execution found for branch "${resolvedBranch}".`,
+    };
+  }
+
+  const runIds: string[] = [];
+  for (const runGroup of cipeForBranch.runGroups) {
+    for (const run of runGroup.runs) {
+      const runId = getRunIdFromRun(run);
+      if (runId && !runIds.includes(runId)) {
+        runIds.push(runId);
+      }
+    }
+  }
+
+  if (runIds.length === 0) {
+    return {
+      error: `No runs found in the CI pipeline execution for branch "${resolvedBranch}".`,
+      branch: resolvedBranch,
+    };
+  }
+
+  return { runIds, branch: resolvedBranch };
+}
+
+const handleCITaskOutput =
+  (
+    workspacePath: string,
+    logger: Logger,
+    telemetry: NxConsoleTelemetryLogger | undefined,
+  ) =>
+  async (
+    params: z.infer<typeof ciTaskOutputSchema>,
+  ): Promise<CallToolResult> => {
+    telemetry?.logUsage('ai.tool-call', {
+      tool: CI_TASK_OUTPUT,
+    });
+
+    let candidateRunIds: string[];
+    let branchForError: string | undefined;
+
+    const parsedUrl = params.url ? parseNxCloudUrl(params.url) : null;
+    if (params.url && !parsedUrl) {
+      const errorMessage =
+        'Invalid Nx Cloud URL. Supported patterns: /cipes/{id}, /runs/{id}, /runs/{id}/task/{taskId}';
+      const output: CITaskOutputOutput = {
+        taskId: params.taskId,
+        terminalOutput: null,
+        error: errorMessage,
+      };
+      return {
+        content: [{ type: 'text', text: errorMessage }],
+        structuredContent: output,
+        isError: true,
+      };
+    }
+
+    if (params.runId) {
+      candidateRunIds = [params.runId];
+    } else if (parsedUrl?.type === 'run' || parsedUrl?.type === 'task') {
+      candidateRunIds = [parsedUrl.runId];
+    } else {
+      const resolved = await resolveCandidateRunIds(
+        workspacePath,
+        logger,
+        params.url,
+        params.branch,
+      );
+      if (resolved.error) {
+        const output: CITaskOutputOutput = {
+          taskId: params.taskId,
+          terminalOutput: null,
+          error: resolved.error,
+        };
+        return {
+          content: [{ type: 'text', text: resolved.error }],
+          structuredContent: output,
+          isError: true,
+        };
+      }
+      candidateRunIds = resolved.runIds ?? [];
+      branchForError = resolved.branch;
+    }
+
+    let result: { terminalOutput?: string; error?: string } | undefined;
+    let lastError: string | undefined;
+    for (const runId of candidateRunIds) {
+      const attempt = await getNxCloudTerminalOutput(
+        { taskId: params.taskId, runId },
+        workspacePath,
+        logger,
+      );
+      if (attempt.terminalOutput !== undefined) {
+        result = attempt;
+        break;
+      }
+      lastError = attempt.error;
+    }
+
+    if (!result) {
+      const errorMessage =
+        candidateRunIds.length === 1
+          ? `Error: ${lastError ?? `No terminal output found for task "${params.taskId}" in run "${candidateRunIds[0]}".`}`
+          : `Task "${params.taskId}" not found in any run for branch "${branchForError ?? 'unknown'}". Last error: ${lastError ?? 'unknown'}`;
+      const output: CITaskOutputOutput = {
+        taskId: params.taskId,
+        terminalOutput: null,
+        error: errorMessage,
+      };
+      return {
+        content: [{ type: 'text', text: errorMessage }],
+        structuredContent: output,
+        isError: true,
+      };
+    }
+
+    const terminalOutput = result.terminalOutput ?? '';
+    const pageNumber = params.pageToken ?? 0;
+    const { chunk, hasMore, totalPages } = chunkContentReverse(
+      terminalOutput,
+      pageNumber,
+      SELF_HEALING_CHUNK_SIZE,
+    );
+
+    const output: CITaskOutputOutput = {
+      taskId: params.taskId,
+      terminalOutput: chunk,
+      error: null,
+      currentPage: pageNumber,
+      totalPages,
+    };
+
+    const content: CallToolResult['content'] = [];
+
+    if (totalPages > 1) {
+      content.push({
+        type: 'text',
+        text: `Showing page ${pageNumber + 1} of ${totalPages} (most recent output first).`,
+      });
+    }
+
+    content.push({ type: 'text', text: chunk });
+
+    if (hasMore) {
+      content.push({
+        type: 'text',
+        text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to view older output (${totalPages - pageNumber - 1} page(s) remaining).`,
+      });
+    }
+
+    return { content, structuredContent: output };
+  };
 
 const getCIInformation =
   (
@@ -923,16 +730,13 @@ const getCIInformation =
           cipeUrl: null,
           branch: branch ?? null,
           commitSha: null,
-          failedTaskIds: [],
+          failedTasks: [],
           verifiedTaskIds: [],
           selfHealingEnabled: false,
           selfHealingStatus: null,
           verificationStatus: null,
           userAction: null,
           failureClassification: null,
-          taskOutputSummary: null,
-          remoteTaskSummary: null,
-          localTaskSummary: null,
           suggestedFixReasoning: null,
           suggestedFixDescription: null,
           suggestedFix: null,
@@ -954,23 +758,18 @@ const getCIInformation =
     const retrievedDifferentCipe =
       cipeIdFromUrl && cipeForBranch.ciPipelineExecutionId !== cipeIdFromUrl;
 
-    // Collect all failed task IDs from all runs
-    const failedTaskIds: string[] = [];
+    const failedTasks: TaskInfo[] = [];
     for (const runGroup of cipeForBranch.runGroups) {
       for (const run of runGroup.runs) {
-        if (run.failedTasks) {
-          for (const taskId of run.failedTasks) {
-            // Transform record-command tasks to use the actual command for better agent understanding
-            // These taskIds are internal placeholders - the real command is in run.command
-            if (
-              taskId === 'upload-run-result:record-command' ||
-              taskId === 'nx-cloud-tasks-runner:record-command'
-            ) {
-              failedTaskIds.push(run.command);
-            } else {
-              failedTaskIds.push(taskId);
-            }
-          }
+        if (!run.failedTasks) continue;
+
+        const runId = getRunIdFromRun(run) ?? '';
+        for (const taskId of run.failedTasks) {
+          failedTasks.push({
+            taskId: getDisplayTaskId(taskId, run),
+            runId,
+            runUrl: run.runUrl,
+          });
         }
       }
     }
@@ -992,16 +791,13 @@ const getCIInformation =
       cipeUrl: cipeForBranch.cipeUrl,
       branch: cipeForBranch.branch,
       commitSha: null,
-      failedTaskIds,
+      failedTasks,
       verifiedTaskIds: aiFix?.verificationTasksExecuted ?? [],
       selfHealingEnabled,
       selfHealingStatus: aiFix?.suggestedFixStatus ?? null,
       verificationStatus: aiFix?.verificationStatus ?? null,
       userAction: aiFix?.userAction ?? null,
       failureClassification: aiFix?.failureClassification ?? null,
-      taskOutputSummary: null,
-      remoteTaskSummary: null,
-      localTaskSummary: null,
       suggestedFixReasoning: aiFix?.suggestedFixReasoning ?? null,
       suggestedFixDescription: aiFix?.suggestedFixDescription ?? null,
       suggestedFix: aiFix?.suggestedFix ?? null,
@@ -1030,18 +826,6 @@ const getCIInformation =
         );
         if (fixResult.data) {
           output.commitSha = fixResult.data.commitSha;
-          // Prefer new API fields (remoteTaskSummary and localTaskSummary) over old taskOutputSummary
-          output.remoteTaskSummary = fixResult.data.remoteTaskSummary ?? null;
-          output.localTaskSummary = fixResult.data.localTaskSummary ?? null;
-          // Backwards compatibility for taskOutputSummary:
-          // - If new fields available, combine them
-          // - Otherwise fall back to old API field
-          output.taskOutputSummary =
-            output.remoteTaskSummary || output.localTaskSummary
-              ? [output.remoteTaskSummary, output.localTaskSummary]
-                  .filter(Boolean)
-                  .join('\n\n---\n\n')
-              : (fixResult.data.taskOutputSummary ?? null);
           output.suggestedFixReasoning = fixResult.data.suggestedFixReasoning;
           output.suggestedFixDescription =
             fixResult.data.suggestedFixDescription;
@@ -1064,9 +848,19 @@ const getCIInformation =
       hints.push(retrievedDifferentCipeDisclaimer);
     }
     hints.push(
-      'remoteTaskSummary contains output from tasks that ran on CI machines. localTaskSummary contains output from the self-healing agent machine.',
+      'Use the ci_task_output tool to retrieve full terminal output for any task (pass a runId from failedTasks for direct lookup, or just a taskId to search the CIPE).',
     );
+    hints.push('Use select="succeededTasks" to list successful tasks.');
     output.hints = hints;
+
+    const selectedFields = params.select?.split(',').map((s) => s.trim()) ?? [];
+    if (selectedFields.includes('succeededTasks')) {
+      output.succeededTasks = await resolveSucceededTasks(
+        cipeForBranch,
+        workspacePath,
+        logger,
+      );
+    }
 
     // Branch based on select parameter
     if (!params.select) {
@@ -1118,16 +912,11 @@ const getCIInformation =
       // Handle string values with pagination
       if (typeof selectedValue === 'string') {
         const pageNumber = params.pageToken ?? 0;
-        const useReversePagination =
-          REVERSE_PAGINATION_FIELDS.includes(fieldName);
-
-        const { chunk, hasMore } = useReversePagination
-          ? chunkContentReverse(
-              selectedValue,
-              pageNumber,
-              SELF_HEALING_CHUNK_SIZE,
-            )
-          : chunkContent(selectedValue, pageNumber, SELF_HEALING_CHUNK_SIZE);
+        const { chunk, hasMore } = chunkContent(
+          selectedValue,
+          pageNumber,
+          SELF_HEALING_CHUNK_SIZE,
+        );
 
         // Format diff content with code block
         const isDiff = fieldName === 'suggestedFix';
@@ -1138,12 +927,9 @@ const getCIInformation =
         ];
 
         if (hasMore) {
-          const paginationHint = useReversePagination
-            ? 'to view older output'
-            : 'to continue';
           content.push({
             type: 'text',
-            text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token ${paginationHint}.`,
+            text: `Next page token: ${pageNumber + 1}. Call this tool again with the next page token to continue.`,
           });
         }
 
@@ -1174,10 +960,8 @@ const getCIInformation =
         field,
       );
       if (typeof value === 'string' && value.length > SELF_HEALING_CHUNK_SIZE) {
-        // Truncate long strings, indicate more available
-        const fromEnd = REVERSE_PAGINATION_FIELDS.includes(field);
         result[field] =
-          truncateString(value, SELF_HEALING_CHUNK_SIZE, fromEnd) +
+          truncateString(value, SELF_HEALING_CHUNK_SIZE) +
           `\n\n[Truncated - use select="${field}" alone for full paginated content]`;
       } else {
         result[field] = value;
@@ -1215,9 +999,13 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
   lines.push('');
 
   // Failed Tasks
-  if (output.failedTaskIds.length > 0) {
-    lines.push('### Failed Tasks (`failedTaskIds`)');
-    lines.push(output.failedTaskIds.join(', '));
+  if (output.failedTasks.length > 0) {
+    lines.push('### Failed Tasks (`failedTasks`)');
+    for (const task of output.failedTasks) {
+      lines.push(
+        `- ${task.taskId} (runId: ${task.runId}, url: ${task.runUrl})`,
+      );
+    }
     lines.push('');
   }
 
@@ -1268,53 +1056,6 @@ function formatCIInformationOverview(output: CIInformationOutput): string {
     }
   }
   lines.push('');
-
-  // Task output section with truncated previews (show end of logs)
-  const hasTaskOutput =
-    output.remoteTaskSummary ||
-    output.localTaskSummary ||
-    output.taskOutputSummary;
-  if (hasTaskOutput) {
-    lines.push(
-      '### Task Output (`remoteTaskSummary`, `localTaskSummary`, `taskOutputSummary`)',
-    );
-    if (output.remoteTaskSummary) {
-      lines.push(
-        '**Task Summary (`remoteTaskSummary`) - tasks ran on other machines:**',
-      );
-      lines.push('```');
-      lines.push(
-        truncateString(output.remoteTaskSummary, TRUNCATION_LENGTH, true),
-      );
-      lines.push('```');
-    }
-    if (output.localTaskSummary) {
-      lines.push(
-        '**Task Output (`localTaskSummary`) - tasks ran on self-healing agent machine:**',
-      );
-      lines.push('```');
-      lines.push(
-        truncateString(output.localTaskSummary, TRUNCATION_LENGTH, true),
-      );
-      lines.push('```');
-    }
-    if (
-      output.taskOutputSummary &&
-      !output.remoteTaskSummary &&
-      !output.localTaskSummary
-    ) {
-      lines.push('**Output:**');
-      lines.push('```');
-      lines.push(
-        truncateString(output.taskOutputSummary, TRUNCATION_LENGTH, true),
-      );
-      lines.push('```');
-    }
-    lines.push(
-      "_Full output available via `select='remoteTaskSummary'` or `select='localTaskSummary'`_",
-    );
-    lines.push('');
-  }
 
   // Suggested Fix with truncated diff preview
   if (output.suggestedFixDescription || output.suggestedFix) {
@@ -1555,4 +1296,5 @@ export const __testing__ = {
   parseShortLink,
   formatCIInformationOverview,
   chunkContentReverse,
+  resolveSucceededTasks,
 };

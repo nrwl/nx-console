@@ -27,24 +27,25 @@ export interface NxProjectDetailsOutput {
   [key: string]: unknown;
 }
 
+export interface TaskInfo {
+  taskId: string;
+  runId: string;
+  runUrl: string;
+}
+
 export interface CIInformationOutput {
   cipeStatus: CIPEExecutionStatus;
   cipeUrl: string;
   branch: string;
   commitSha: string | null;
-  failedTaskIds: string[];
+  failedTasks: TaskInfo[];
+  succeededTasks?: TaskInfo[];
   verifiedTaskIds: string[];
   selfHealingEnabled: boolean;
   selfHealingStatus: AITaskFixStatus | null;
   verificationStatus: AITaskFixStatus | null;
   userAction: AITaskFixUserAction | null;
   failureClassification: string | null;
-  /** @deprecated Use remoteTaskSummary and localTaskSummary instead */
-  taskOutputSummary: string | null;
-  /** Task output from CI/remote execution */
-  remoteTaskSummary: string | null;
-  /** Task output from local execution */
-  localTaskSummary: string | null;
   suggestedFixReasoning: string | null;
   suggestedFixDescription: string | null;
   suggestedFix: string | null;
@@ -58,6 +59,15 @@ export interface CIInformationOutput {
   selfHealingSkipMessage: string | null;
   error: string | null;
   hints?: string[];
+  [key: string]: unknown;
+}
+
+export interface CITaskOutputOutput {
+  taskId: string;
+  terminalOutput: string | null;
+  error: string | null;
+  currentPage?: number;
+  totalPages?: number;
   [key: string]: unknown;
 }
 
@@ -104,9 +114,27 @@ export const ciInformationOutputSchema = {
     cipeUrl: { type: 'string' },
     branch: { type: 'string' },
     commitSha: { type: ['string', 'null'] },
-    failedTaskIds: {
+    failedTasks: {
       type: 'array',
-      items: { type: 'string' },
+      items: {
+        type: 'object',
+        properties: {
+          taskId: { type: 'string' },
+          runId: { type: 'string' },
+          runUrl: { type: 'string' },
+        },
+      },
+    },
+    succeededTasks: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          taskId: { type: 'string' },
+          runId: { type: 'string' },
+          runUrl: { type: 'string' },
+        },
+      },
     },
     verifiedTaskIds: {
       type: 'array',
@@ -147,9 +175,6 @@ export const ciInformationOutputSchema = {
       ],
     },
     failureClassification: { type: ['string', 'null'] },
-    taskOutputSummary: { type: ['string', 'null'] },
-    remoteTaskSummary: { type: ['string', 'null'] },
-    localTaskSummary: { type: ['string', 'null'] },
     suggestedFixReasoning: { type: ['string', 'null'] },
     suggestedFixDescription: { type: ['string', 'null'] },
     suggestedFix: { type: ['string', 'null'] },
@@ -163,6 +188,17 @@ export const ciInformationOutputSchema = {
     selfHealingSkipMessage: { type: ['string', 'null'] },
     error: { type: ['string', 'null'] },
     hints: { type: 'array', items: { type: 'string' } },
+  },
+};
+
+export const ciTaskOutputOutputSchema = {
+  type: 'object',
+  properties: {
+    taskId: { type: 'string' },
+    terminalOutput: { type: ['string', 'null'] },
+    error: { type: ['string', 'null'] },
+    currentPage: { type: 'number' },
+    totalPages: { type: 'number' },
   },
 };
 
