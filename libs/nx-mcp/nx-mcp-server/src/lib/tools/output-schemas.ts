@@ -27,7 +27,7 @@ export interface NxProjectDetailsOutput {
   [key: string]: unknown;
 }
 
-export interface FailedTaskInfo {
+export interface TaskInfo {
   taskId: string;
   runId: string;
   runUrl: string;
@@ -38,8 +38,8 @@ export interface CIInformationOutput {
   cipeUrl: string;
   branch: string;
   commitSha: string | null;
-  failedTasks: FailedTaskInfo[];
-  succeededTasks?: FailedTaskInfo[];
+  failedTasks: TaskInfo[];
+  succeededTasks?: TaskInfo[];
   verifiedTaskIds: string[];
   selfHealingEnabled: boolean;
   selfHealingStatus: AITaskFixStatus | null;

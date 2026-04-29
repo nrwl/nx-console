@@ -27,7 +27,7 @@ import {
   ciInformationOutputSchema,
   CITaskOutputOutput,
   ciTaskOutputOutputSchema,
-  FailedTaskInfo,
+  TaskInfo,
   UpdateSelfHealingFixOutput,
   updateSelfHealingFixOutputSchema,
 } from './output-schemas';
@@ -399,7 +399,7 @@ async function resolveSucceededTasks(
   cipe: CIPEInfo,
   workspacePath: string,
   logger: Logger,
-): Promise<FailedTaskInfo[]> {
+): Promise<TaskInfo[]> {
   const failedTaskIdSet = new Set<string>();
   const runRefs: { runId: string; runUrl: string }[] = [];
 
@@ -419,7 +419,7 @@ async function resolveSucceededTasks(
     runRefs.map(({ runId }) => getRunDetails(workspacePath, logger, runId)),
   );
 
-  const succeeded: FailedTaskInfo[] = [];
+  const succeeded: TaskInfo[] = [];
   detailsResults.forEach((result, idx) => {
     if (result.error || !result.data) return;
     const { runId, runUrl } = runRefs[idx];
@@ -758,7 +758,7 @@ const getCIInformation =
     const retrievedDifferentCipe =
       cipeIdFromUrl && cipeForBranch.ciPipelineExecutionId !== cipeIdFromUrl;
 
-    const failedTasks: FailedTaskInfo[] = [];
+    const failedTasks: TaskInfo[] = [];
     for (const runGroup of cipeForBranch.runGroups) {
       for (const run of runGroup.runs) {
         if (!run.failedTasks) continue;
