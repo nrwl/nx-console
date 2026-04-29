@@ -39,6 +39,7 @@ export interface CIInformationOutput {
   branch: string;
   commitSha: string | null;
   failedTasks: FailedTaskInfo[];
+  succeededTasks?: FailedTaskInfo[];
   verifiedTaskIds: string[];
   selfHealingEnabled: boolean;
   selfHealingStatus: AITaskFixStatus | null;
@@ -114,6 +115,17 @@ export const ciInformationOutputSchema = {
     branch: { type: 'string' },
     commitSha: { type: ['string', 'null'] },
     failedTasks: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          taskId: { type: 'string' },
+          runId: { type: 'string' },
+          runUrl: { type: 'string' },
+        },
+      },
+    },
+    succeededTasks: {
       type: 'array',
       items: {
         type: 'object',

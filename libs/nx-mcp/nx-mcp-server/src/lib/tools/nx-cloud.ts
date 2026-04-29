@@ -395,6 +395,47 @@ function getDisplayTaskId(taskId: string, run: CIPERun): string {
     : taskId;
 }
 
+async function resolveSucceededTasks(
+  cipe: CIPEInfo,
+  workspacePath: string,
+  logger: Logger,
+): Promise<FailedTaskInfo[]> {
+  const failedTaskIdSet = new Set<string>();
+  const runRefs: { runId: string; runUrl: string }[] = [];
+
+  for (const runGroup of cipe.runGroups) {
+    for (const run of runGroup.runs) {
+      for (const taskId of run.failedTasks ?? []) {
+        failedTaskIdSet.add(taskId);
+      }
+      const runId = getRunIdFromRun(run);
+      if (runId) {
+        runRefs.push({ runId, runUrl: run.runUrl });
+      }
+    }
+  }
+
+  const detailsResults = await Promise.all(
+    runRefs.map(({ runId }) => getRunDetails(workspacePath, logger, runId)),
+  );
+
+  const succeeded: FailedTaskInfo[] = [];
+  detailsResults.forEach((result, idx) => {
+    if (result.error || !result.data) return;
+    const { runId, runUrl } = runRefs[idx];
+    for (const task of result.data.tasks ?? []) {
+      if (failedTaskIdSet.has(task.taskId)) continue;
+      succeeded.push({
+        taskId: task.taskId,
+        runId,
+        runUrl,
+      });
+    }
+  });
+
+  return succeeded;
+}
+
 async function resolveCandidateRunIds(
   workspacePath: string,
   logger: Logger,
@@ -809,7 +850,20 @@ const getCIInformation =
     hints.push(
       'Use the ci_task_output tool to retrieve full terminal output for any task (pass a runId from failedTasks for direct lookup, or just a taskId to search the CIPE).',
     );
+    hints.push(
+      'Use select="succeededTasks" to list successful tasks (incurs extra API calls).',
+    );
     output.hints = hints;
+
+    const selectedFields =
+      params.select?.split(',').map((s) => s.trim()) ?? [];
+    if (selectedFields.includes('succeededTasks')) {
+      output.succeededTasks = await resolveSucceededTasks(
+        cipeForBranch,
+        workspacePath,
+        logger,
+      );
+    }
 
     // Branch based on select parameter
     if (!params.select) {
@@ -1245,4 +1299,5 @@ export const __testing__ = {
   parseShortLink,
   formatCIInformationOverview,
   chunkContentReverse,
+  resolveSucceededTasks,
 };

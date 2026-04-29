@@ -9,7 +9,11 @@ jest.mock('@nx-console/shared-nx-cloud', () => ({
 }));
 
 import { CI_TASK_OUTPUT } from '@nx-console/shared-llm-context';
-import { getNxCloudTerminalOutput } from '@nx-console/shared-nx-cloud';
+import {
+  getNxCloudTerminalOutput,
+  getRunDetails,
+} from '@nx-console/shared-nx-cloud';
+import { CIPEInfo } from '@nx-console/shared-types';
 
 import { CIInformationOutput } from './output-schemas';
 import {
@@ -20,8 +24,13 @@ import {
 import { getValueByPath } from './nx-workspace';
 
 const mockedGetNxCloudTerminalOutput = jest.mocked(getNxCloudTerminalOutput);
-const { parseShortLink, formatCIInformationOverview, chunkContentReverse } =
-  __testing__;
+const mockedGetRunDetails = jest.mocked(getRunDetails);
+const {
+  parseShortLink,
+  formatCIInformationOverview,
+  chunkContentReverse,
+  resolveSucceededTasks,
+} = __testing__;
 
 function createOutput(
   overrides: Partial<CIInformationOutput> = {},
@@ -374,6 +383,129 @@ describe('registerNxCloudTools', () => {
       {
         type: 'text',
         text: 'Next page token: 1. Call this tool again with the next page token to view older output (1 page(s) remaining).',
+      },
+    ]);
+  });
+});
+
+describe('resolveSucceededTasks', () => {
+  beforeEach(() => {
+    mockedGetRunDetails.mockReset();
+  });
+
+  function createCipe(): CIPEInfo {
+    return {
+      ciPipelineExecutionId: 'cipe-1',
+      branch: 'feature',
+      status: 'FAILED',
+      createdAt: 0,
+      completedAt: null,
+      commitTitle: null,
+      commitUrl: null,
+      cipeUrl: 'https://cloud.nx.app/cipes/cipe-1',
+      runGroups: [
+        {
+          ciExecutionEnv: 'env',
+          runGroup: 'rg-1',
+          createdAt: 0,
+          completedAt: null,
+          status: 'FAILED',
+          runs: [
+            {
+              linkId: 'run-1',
+              command: 'nx run-many -t build',
+              runUrl: 'https://cloud.nx.app/runs/run-1',
+              failedTasks: ['app:build'],
+            },
+            {
+              linkId: 'run-2',
+              command: 'nx run-many -t test',
+              runUrl: 'https://cloud.nx.app/runs/run-2',
+              failedTasks: [],
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  it('returns tasks across runs excluding failed ones', async () => {
+    mockedGetRunDetails.mockImplementation(
+      async (_workspacePath, _logger, runId) => {
+        if (runId === 'run-1') {
+          return {
+            data: {
+              id: 'run-1',
+              tasks: [
+                { taskId: 'app:build', status: 'failed' },
+                { taskId: 'app:lint', status: 'success' },
+              ],
+            } as any,
+          };
+        }
+        return {
+          data: {
+            id: 'run-2',
+            tasks: [
+              { taskId: 'lib:test', status: 'success' },
+              { taskId: 'lib:build', status: 'cached' },
+            ],
+          } as any,
+        };
+      },
+    );
+
+    const succeeded = await resolveSucceededTasks(
+      createCipe(),
+      '/workspace',
+      { log: jest.fn(), debug: jest.fn() } as any,
+    );
+
+    expect(succeeded).toEqual([
+      {
+        taskId: 'app:lint',
+        runId: 'run-1',
+        runUrl: 'https://cloud.nx.app/runs/run-1',
+      },
+      {
+        taskId: 'lib:test',
+        runId: 'run-2',
+        runUrl: 'https://cloud.nx.app/runs/run-2',
+      },
+      {
+        taskId: 'lib:build',
+        runId: 'run-2',
+        runUrl: 'https://cloud.nx.app/runs/run-2',
+      },
+    ]);
+  });
+
+  it('skips runs whose getRunDetails errored', async () => {
+    mockedGetRunDetails.mockImplementation(
+      async (_workspacePath, _logger, runId) => {
+        if (runId === 'run-1') {
+          return { error: { type: 'other', message: 'boom' } };
+        }
+        return {
+          data: {
+            id: 'run-2',
+            tasks: [{ taskId: 'lib:test', status: 'success' }],
+          } as any,
+        };
+      },
+    );
+
+    const succeeded = await resolveSucceededTasks(
+      createCipe(),
+      '/workspace',
+      { log: jest.fn(), debug: jest.fn() } as any,
+    );
+
+    expect(succeeded).toEqual([
+      {
+        taskId: 'lib:test',
+        runId: 'run-2',
+        runUrl: 'https://cloud.nx.app/runs/run-2',
       },
     ]);
   });
