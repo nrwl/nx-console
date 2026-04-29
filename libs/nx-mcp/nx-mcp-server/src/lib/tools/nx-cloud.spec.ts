@@ -455,11 +455,10 @@ describe('resolveSucceededTasks', () => {
       },
     );
 
-    const succeeded = await resolveSucceededTasks(
-      createCipe(),
-      '/workspace',
-      { log: jest.fn(), debug: jest.fn() } as any,
-    );
+    const succeeded = await resolveSucceededTasks(createCipe(), '/workspace', {
+      log: jest.fn(),
+      debug: jest.fn(),
+    } as any);
 
     expect(succeeded).toEqual([
       {
@@ -495,11 +494,10 @@ describe('resolveSucceededTasks', () => {
       },
     );
 
-    const succeeded = await resolveSucceededTasks(
-      createCipe(),
-      '/workspace',
-      { log: jest.fn(), debug: jest.fn() } as any,
-    );
+    const succeeded = await resolveSucceededTasks(createCipe(), '/workspace', {
+      log: jest.fn(),
+      debug: jest.fn(),
+    } as any);
 
     expect(succeeded).toEqual([
       {

@@ -855,8 +855,7 @@ const getCIInformation =
     );
     output.hints = hints;
 
-    const selectedFields =
-      params.select?.split(',').map((s) => s.trim()) ?? [];
+    const selectedFields = params.select?.split(',').map((s) => s.trim()) ?? [];
     if (selectedFields.includes('succeededTasks')) {
       output.succeededTasks = await resolveSucceededTasks(
         cipeForBranch,
