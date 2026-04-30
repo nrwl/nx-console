@@ -1,3 +1,20 @@
+## 0.25.0 (2026-04-30)
+
+### 🚀 Features
+
+- **nx-mcp:** rework ci tools, add ci_task_output ([#3126](https://github.com/nrwl/nx-console/pull/3126))
+
+### 🩹 Fixes
+
+- **vscode,intellij:** update old nx.dev doc links to canonical /docs/ URLs ([#3098](https://github.com/nrwl/nx-console/pull/3098))
+
+### ❤️ Thank You
+
+- barbados-clemens @barbados-clemens
+- Caleb Ukle
+- Claude Opus 4.6 (1M context)
+- MaxKless @MaxKless
+
 ## 0.24.0 (2026-03-16)
 
 ### 🚀 Features
