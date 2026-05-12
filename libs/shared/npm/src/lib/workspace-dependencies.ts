@@ -109,9 +109,14 @@ export async function importNxPackagePath<T>(
 
   // Nx 22.7+ moved files from `nx/src/...` to `nx/dist/src/...`. Try the
   // pre-22.7 layout first, then fall back to the dist/ variant for src-prefixed paths.
-  const srcPrefix = `src${platform() === 'win32' ? '\\' : '/'}`;
+  // Callers pass forward-slash literals (e.g. 'src/utils/package-manager'), so the
+  // prefix check must not depend on the OS path separator.
   const candidates = [join(nxWorkspaceDepPath, nestedPath)];
-  if (nestedPath === 'src' || nestedPath.startsWith(srcPrefix)) {
+  if (
+    nestedPath === 'src' ||
+    nestedPath.startsWith('src/') ||
+    nestedPath.startsWith('src\\')
+  ) {
     candidates.push(join(nxWorkspaceDepPath, 'dist', nestedPath));
   }
 

@@ -133,5 +133,24 @@ describe('workspace-dependencies', () => {
         importNxPackagePath('/workspace', 'package.json'),
       ).rejects.toBeDefined();
     });
+
+    it('should fall back to dist/src/... on Windows when callers pass forward-slash paths', async () => {
+      jest.mock(
+        '/workspace/node_modules/nx/dist/src/utils/package-manager',
+        () => ({ detectPackageManager: jest.fn() }),
+        { virtual: true },
+      );
+      jest.mocked(os.platform).mockReturnValue('win32');
+
+      try {
+        const result = await importNxPackagePath<{
+          detectPackageManager: unknown;
+        }>('/workspace', 'src/utils/package-manager');
+
+        expect(result.detectPackageManager).toBeDefined();
+      } finally {
+        jest.mocked(os.platform).mockReturnValue('darwin');
+      }
+    });
   });
 });
