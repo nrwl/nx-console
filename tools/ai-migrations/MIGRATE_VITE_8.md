@@ -14,6 +14,7 @@ These instructions guide you through migrating an Nx workspace from Vite 7 to Vi
    ```
 
 2. **Locate all Vite configuration files**:
+
    - Search for `vite.config.{ts,js,mts,mjs,cts,cjs}`
    - Check `project.json` files for inline Vite-related options
 
