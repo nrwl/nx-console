@@ -7,6 +7,7 @@ import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VfsUtil
+import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
@@ -25,6 +26,13 @@ class McpServerService(private val project: Project) {
     private val logger = thisLogger()
 
     fun setupMcpServer() {
+
+        if (!NxConsoleProjectSettingsProvider.getInstance(project).mcpEnabled) {
+            logger.info(
+                "[MCP] Nx MCP server is disabled in Nx Console settings, skipping setup"
+            )
+            return
+        }
 
         if (!hasAIAssistantAvailable()) {
             Notifier.notifyAiAssistantPluginRequired(project)

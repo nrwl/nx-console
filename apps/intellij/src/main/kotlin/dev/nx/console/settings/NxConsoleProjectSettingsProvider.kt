@@ -38,6 +38,12 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
             state.toolwindowStyle = value
         }
 
+    var mcpEnabled: Boolean
+        get() = state.mcpEnabled
+        set(value) {
+            state.mcpEnabled = value
+        }
+
     companion object {
         fun getInstance(project: Project): NxConsoleProjectSettingsProvider {
             return project.getService(NxConsoleProjectSettingsProvider::class.java)
@@ -49,4 +55,5 @@ data class NxConsoleProjectSettingsState(
     var workspacePath: String? = null,
     var generatorAllowlist: Map<String, Boolean>? = null,
     var toolwindowStyle: ToolWindowStyles = ToolWindowStyles.AUTOMATIC,
+    var mcpEnabled: Boolean = true,
 ) {}

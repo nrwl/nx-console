@@ -17,6 +17,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
     private lateinit var workspacePathSetting: WorkspacePathSetting
     private lateinit var generatorFiltersSetting: GeneratorFiltersSetting
     private lateinit var toolWindowStyleSetting: ToolWindowStyleSetting
+    private lateinit var enableMcpServerSetting: EnableMcpServerSetting
 
     // application settings
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
@@ -34,6 +35,9 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
 
         toolWindowStyleSetting = ToolWindowStyleSetting(project)
         toolWindowStyleSetting.setValue(projectSettingsProvider.toolwindowStyle)
+
+        enableMcpServerSetting = EnableMcpServerSetting(project)
+        enableMcpServerSetting.setValue(projectSettingsProvider.mcpEnabled)
 
         // application settings
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
@@ -53,6 +57,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
                 workspacePathSetting.render(this)
                 generatorFiltersSetting.render(this)
                 toolWindowStyleSetting.render(this)
+                enableMcpServerSetting.render(this)
             }
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
@@ -70,6 +75,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
             generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters ||
             toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle ||
+            enableMcpServerSetting.getValue() != projectSettingsProvider.mcpEnabled ||
             nxCloudNotificationsSetting.getValue() != settingsProvider.nxCloudNotifications ||
             enableDebugLoggingSetting.getValue() != settingsProvider.enableDebugLogging
     }
@@ -79,6 +85,7 @@ internal class NxConsoleSettingsConfigurable(val project: Project) : SearchableC
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
         projectSettingsProvider.generatorFilters = generatorFiltersSetting.getValue()
         projectSettingsProvider.toolwindowStyle = toolWindowStyleSetting.getValue()
+        projectSettingsProvider.mcpEnabled = enableMcpServerSetting.getValue()
 
         workspacePathSetting.doApply()
         toolWindowStyleSetting.doApply()

@@ -59,6 +59,15 @@ export async function initMcp(context: ExtensionContext) {
   if (initialized) {
     return;
   }
+
+  const mcpEnabled = GlobalConfigurationStore.instance.get('mcpEnabled', true);
+  if (!mcpEnabled) {
+    vscodeLogger.log(
+      'Nx MCP server is disabled via the nxConsole.mcpEnabled setting.',
+    );
+    return;
+  }
+
   initialized = true;
 
   const inVSCode = isInVSCode();

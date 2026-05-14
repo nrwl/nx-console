@@ -873,6 +873,12 @@
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
         },
+        "nxConsole.mcpEnabled": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Enables the Nx MCP server. When disabled, Nx Console will not initialize the MCP server on activation."
+        },
         "nxConsole.mcpPort": {
           "type": "number",
           "scope": "resource",
