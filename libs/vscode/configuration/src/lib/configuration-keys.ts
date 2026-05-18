@@ -13,6 +13,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'nxCloudNotifications',
   'enableDebugLogging',
   'disableFileWatching',
+  'enableNxMcpServer',
   'mcpPort',
   'mcpToolsFilter',
   'refreshOnBranchSwitch',
@@ -33,6 +34,7 @@ export type GlobalConfig = {
   nxCloudNotifications: 'all' | 'errors' | 'none';
   enableDebugLogging: boolean;
   disableFileWatching: boolean;
+  enableNxMcpServer: boolean;
   mcpPort: number | undefined;
   mcpToolsFilter: string[] | undefined;
   refreshOnBranchSwitch: boolean;
