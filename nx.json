@@ -226,7 +226,6 @@
       "push": false,
       "commitMessage": "chore(release-{projectName}): {version}"
     },
-    "releaseTagPattern": "{projectName}-v{version}",
     "groups": {
       "vscode": {
         "projects": ["vscode"],
@@ -258,6 +257,9 @@
           "projectChangelogs": true
         }
       }
+    },
+    "releaseTag": {
+      "pattern": "{projectName}-v{version}"
     }
   },
   "analytics": true
