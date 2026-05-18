@@ -1,3 +1,8 @@
+# [18.100.1]
+
+This is a dummy release to realign versions between vscode & open-vsix
+
+
 # [18.94.0](https://github.com/nrwl/nx-console/compare/vscode-v18.93.1...vscode-v18.94.0) (2026-04-29)
 
 
