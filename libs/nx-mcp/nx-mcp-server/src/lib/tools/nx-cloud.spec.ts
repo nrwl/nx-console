@@ -29,6 +29,7 @@ const {
   parseShortLink,
   formatCIInformationOverview,
   chunkContentReverse,
+  chunkTerminalOutputReverse,
   resolveSucceededTasks,
 } = __testing__;
 
@@ -232,6 +233,39 @@ describe('chunkContentReverse', () => {
       chunk: 'no more content on page 10',
       hasMore: false,
       totalPages: 1,
+    });
+  });
+});
+
+describe('chunkTerminalOutputReverse', () => {
+  it('should paginate terminal output from the last lines even when content is under the character chunk size', () => {
+    const terminalOutput = Array.from(
+      { length: 8 },
+      (_, index) => `line ${index + 1}`,
+    ).join('\n');
+
+    expect(chunkTerminalOutputReverse(terminalOutput, 0, 1000, 3)).toEqual({
+      chunk: '...[older output on page 1]\nline 6\nline 7\nline 8',
+      hasMore: true,
+      totalPages: 3,
+    });
+    expect(chunkTerminalOutputReverse(terminalOutput, 1, 1000, 3)).toEqual({
+      chunk: '...[older output on page 2]\nline 3\nline 4\nline 5\n',
+      hasMore: true,
+      totalPages: 3,
+    });
+    expect(chunkTerminalOutputReverse(terminalOutput, 2, 1000, 3)).toEqual({
+      chunk: 'line 1\nline 2\n',
+      hasMore: false,
+      totalPages: 3,
+    });
+  });
+
+  it('should fall back to character pagination for short terminal output', () => {
+    expect(chunkTerminalOutputReverse('1234567890', 0, 5, 120)).toEqual({
+      chunk: '...[older output on page 1]\n67890',
+      hasMore: true,
+      totalPages: 2,
     });
   });
 });

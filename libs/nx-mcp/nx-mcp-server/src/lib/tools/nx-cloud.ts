@@ -33,6 +33,7 @@ import {
 } from './output-schemas';
 
 export const SELF_HEALING_CHUNK_SIZE = 10000;
+export const TERMINAL_OUTPUT_LINES_PER_PAGE = 120;
 
 const DIFF_PREVIEW_LENGTH = 3000;
 
@@ -83,6 +84,66 @@ export function chunkContentReverse(
 
   let chunk = content.slice(startIndex, endIndex);
   const hasMore = startIndex > 0;
+
+  if (hasMore) {
+    chunk = `...[older output on page ${pageNumber + 1}]\n${chunk}`;
+  }
+
+  return { chunk, hasMore, totalPages };
+}
+
+function splitLinesPreservingNewline(content: string): string[] {
+  return content.match(/[^\n]*\n|[^\n]+$/g) ?? [];
+}
+
+export function chunkTerminalOutputReverse(
+  content: string,
+  pageNumber: number,
+  chunkSize: number,
+  linesPerPage = TERMINAL_OUTPUT_LINES_PER_PAGE,
+): { chunk: string; hasMore: boolean; totalPages: number } {
+  if (!content || content.length === 0) {
+    return { chunk: '', hasMore: false, totalPages: 0 };
+  }
+
+  const lines = splitLinesPreservingNewline(content);
+  if (lines.length <= linesPerPage) {
+    return chunkContentReverse(content, pageNumber, chunkSize);
+  }
+
+  const pages: string[] = [];
+  let endLine = lines.length;
+  while (endLine > 0) {
+    let startLine = endLine;
+    let pageLength = 0;
+
+    while (startLine > 0 && endLine - startLine < linesPerPage) {
+      const nextLine = lines[startLine - 1];
+      if (pageLength > 0 && pageLength + nextLine.length > chunkSize) {
+        break;
+      }
+      if (pageLength === 0 && nextLine.length > chunkSize) {
+        return chunkContentReverse(content, pageNumber, chunkSize);
+      }
+      pageLength += nextLine.length;
+      startLine--;
+    }
+
+    pages.push(lines.slice(startLine, endLine).join(''));
+    endLine = startLine;
+  }
+
+  const totalPages = pages.length;
+  if (pageNumber >= totalPages) {
+    return {
+      chunk: `no more content on page ${pageNumber}`,
+      hasMore: false,
+      totalPages,
+    };
+  }
+
+  let chunk = pages[pageNumber];
+  const hasMore = pageNumber < totalPages - 1;
 
   if (hasMore) {
     chunk = `...[older output on page ${pageNumber + 1}]\n${chunk}`;
@@ -278,7 +339,7 @@ const ciTaskOutputSchema = z.object({
     .number()
     .optional()
     .describe(
-      'Pagination token (0-based). Terminal output uses reverse pagination (page 0 = most recent output).',
+      'Pagination token (0-based). Terminal output uses bottom-up pagination (page 0 = most recent log lines).',
     ),
 });
 
@@ -605,7 +666,7 @@ const handleCITaskOutput =
 
     const terminalOutput = result.terminalOutput ?? '';
     const pageNumber = params.pageToken ?? 0;
-    const { chunk, hasMore, totalPages } = chunkContentReverse(
+    const { chunk, hasMore, totalPages } = chunkTerminalOutputReverse(
       terminalOutput,
       pageNumber,
       SELF_HEALING_CHUNK_SIZE,
@@ -1296,5 +1357,6 @@ export const __testing__ = {
   parseShortLink,
   formatCIInformationOverview,
   chunkContentReverse,
+  chunkTerminalOutputReverse,
   resolveSucceededTasks,
 };
