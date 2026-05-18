@@ -11,6 +11,19 @@
 
 * **vscode:** use minimal MCP tool set and add enableNxMcpServer setting ([#3138](https://github.com/nrwl/nx-console/issues/3138)) ([0e11aa8](https://github.com/nrwl/nx-console/commit/0e11aa85170676356370b71c422873ab5b8c8a8e))
 
+# [18.95.0](https://github.com/nrwl/nx-console/compare/vscode-v18.94.0...vscode-v18.95.0) (2026-05-18)
+
+
+### Bug Fixes
+
+* **nx-mcp:** page CI task logs from the end ([#3133](https://github.com/nrwl/nx-console/issues/3133)) ([9d32e1d](https://github.com/nrwl/nx-console/commit/9d32e1dcfe6cae7c86a89f253eb1bb5f8e38721b))
+* **repo:** make importNxPackagePath src/ check platform-agnostic ([#3134](https://github.com/nrwl/nx-console/issues/3134)) ([247c61f](https://github.com/nrwl/nx-console/commit/247c61f5e14641cacc53c7bb92160230302befe5)), closes [#3132](https://github.com/nrwl/nx-console/issues/3132)
+
+
+### Features
+
+* **vscode:** use minimal MCP tool set and add enableNxMcpServer setting ([#3138](https://github.com/nrwl/nx-console/issues/3138)) ([0e11aa8](https://github.com/nrwl/nx-console/commit/0e11aa85170676356370b71c422873ab5b8c8a8e))
+
 # [18.94.0](https://github.com/nrwl/nx-console/compare/vscode-v18.93.1...vscode-v18.94.0) (2026-04-29)
 
 
