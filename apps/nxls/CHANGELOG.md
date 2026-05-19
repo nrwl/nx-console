@@ -1,3 +1,174 @@
+## 1.11.0 (2026-02-24)
+
+### 🚀 Features
+
+- make configure-ai-agents clickable and improve outdated check ([#3065](https://github.com/nrwl/nx-console/pull/3065))
+- implement passive daemon watcher ([#2851](https://github.com/nrwl/nx-console/pull/2851))
+- **nxls:** make nxls intialization not block on startup ([#2959](https://github.com/nrwl/nx-console/pull/2959))
+
+### 🩹 Fixes
+
+- handle some nxls & vscode bugs ([#3023](https://github.com/nrwl/nx-console/pull/3023))
+- **nxls:** fix daemon disabled TreeItem in non-node_modules case ([#3008](https://github.com/nrwl/nx-console/pull/3008))
+- **nxls:** improve various parts of nxls refresh behaviour ([#3001](https://github.com/nrwl/nx-console/pull/3001))
+- **nxls:** fix projectsByPaths request that was dropped during refactor ([#2991](https://github.com/nrwl/nx-console/pull/2991))
+- include system CA for fetch requests to enable talking to self-signed nx cloud instances ([#2977](https://github.com/nrwl/nx-console/pull/2977))
+- **nxls:** enable passing explicit branch to getRecentCIPEs ([#2989](https://github.com/nrwl/nx-console/pull/2989))
+- **nxls:** stop nxls from sending things into closed connection ([#2976](https://github.com/nrwl/nx-console/pull/2976))
+- **nxls:** fix running tasks on windows ([#2953](https://github.com/nrwl/nx-console/pull/2953))
+- **nx-mcp:** remove awaiting project graph from mcp startup even with ide provider ([#2944](https://github.com/nrwl/nx-console/pull/2944))
+- **nxls:** misc fixes to get nxls to work with helix ([#2793](https://github.com/nrwl/nx-console/pull/2793))
+
+### ❤️ Thank You
+
+- Emily Marigold Klassen @forivall
+- MaxKless @MaxKless
+
+## 1.10.0 (2025-12-15)
+
+### 🚀 Features
+
+- **nxls:** align build step & remove parcel watcher support ([#2917](https://github.com/nrwl/nx-console/pull/2917))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 1.9.0 (2025-12-02)
+
+### 🚀 Features
+
+- **vscode:** add setting to disable file watching in the language server ([#2892](https://github.com/nrwl/nx-console/pull/2892))
+- **vscode:** add debug logging setting to vscode & nxls ([#2873](https://github.com/nrwl/nx-console/pull/2873))
+- **vscode:** use vscode api to register mcp server & migrate cursor to stdio mcp ([#2650](https://github.com/nrwl/nx-console/pull/2650))
+- **intellij:** add self-healing CI support ([#2604](https://github.com/nrwl/nx-console/pull/2604))
+- add migrate ui to vscode ([#2463](https://github.com/nrwl/nx-console/pull/2463))
+- add mcp and copilot support for cipe details ([#2469](https://github.com/nrwl/nx-console/pull/2469))
+- add nx mcp ([#2415](https://github.com/nrwl/nx-console/pull/2415))
+- **nxls:** decouple daemon lifecycle from nxls lifecycle ([#2339](https://github.com/nrwl/nx-console/pull/2339))
+- add recent cipe view & notifications ([#2322](https://github.com/nrwl/nx-console/pull/2322))
+- **nxls:** allow nxls to kill itself after 3h of inactivity to prevent background resource usage ([#2307](https://github.com/nrwl/nx-console/pull/2307))
+- refactor PDV to get data directly from nxls & apply in intellij ([#2254](https://github.com/nrwl/nx-console/pull/2254))
+- **vscode:** create nx cloud onboarding view ([#2229](https://github.com/nrwl/nx-console/pull/2229))
+- add nx connect action & vscode cloud pane ([#2186](https://github.com/nrwl/nx-console/pull/2186))
+- enable partial graphs in nx console & fix bugs ([#2115](https://github.com/nrwl/nx-console/pull/2115))
+- nx reset & restart nxls on manual refresh ([#2097](https://github.com/nrwl/nx-console/pull/2097))
+- **nxls:** use daemon to watch files ([#2067](https://github.com/nrwl/nx-console/pull/2067))
+- add autocomplete to nx.json plugins ([#2061](https://github.com/nrwl/nx-console/pull/2061))
+- go to executor definition ([#1962](https://github.com/nrwl/nx-console/pull/1962))
+- **vscode:** show codelenses in config files that create targets ([#2001](https://github.com/nrwl/nx-console/pull/2001))
+- add project details preview ([#1957](https://github.com/nrwl/nx-console/pull/1957))
+- use nx native watcher & rework refreshing ([#1949](https://github.com/nrwl/nx-console/pull/1949))
+- **generate-ui:** add cwd handling & prefilling ([#1904](https://github.com/nrwl/nx-console/pull/1904))
+- **vscode:** add show affected graph action & fix graph zooming ([#1883](https://github.com/nrwl/nx-console/pull/1883))
+- write internal git clean startup message plugin & display startup messages in intellij ([#1869](https://github.com/nrwl/nx-console/pull/1869))
+- move plugins to lsp & write internal projectRootAndNameFormat plugin ([#1860](https://github.com/nrwl/nx-console/pull/1860))
+- refactor & add folder view to jetbrains toolwindow ([#1814](https://github.com/nrwl/nx-console/pull/1814))
+- add generator context & refactor large parts ([#1776](https://github.com/nrwl/nx-console/pull/1776))
+- support nx 16.3 ([#1752](https://github.com/nrwl/nx-console/pull/1752))
+
+### 🩹 Fixes
+
+- **nxls:** stop native watcher events from being sent after shutdown ([#2746](https://github.com/nrwl/nx-console/pull/2746))
+- **nxls:** add watcher debounce & await native watcher stop ([#2706](https://github.com/nrwl/nx-console/pull/2706))
+- improve nx-mcp & nxls exit handlers ([#2688](https://github.com/nrwl/nx-console/pull/2688))
+- **vscode:** repair socket & route task retrieval through ideProvider ([#2674](https://github.com/nrwl/nx-console/pull/2674))
+- improve misc cloud onboarding things ([#2656](https://github.com/nrwl/nx-console/pull/2656))
+- **nxls:** repair generatorOptions request in node 22 ([#2407](https://github.com/nrwl/nx-console/pull/2407))
+- **nxls:** handle broken nx.json better in nxls requests ([#2399](https://github.com/nrwl/nx-console/pull/2399))
+- **nxls:** clean up connection & ipc channel when shutting down nxls to prevent it from staying open ([#2353](https://github.com/nrwl/nx-console/pull/2353))
+- drop dependency on @nx/native packages in favor of loading from local node_modules ([#2349](https://github.com/nrwl/nx-console/pull/2349))
+- **nxls:** enable project.json completion for properties in package.json#nx ([#2340](https://github.com/nrwl/nx-console/pull/2340))
+- use project graph-aware devkit util when splitting targets ([#2330](https://github.com/nrwl/nx-console/pull/2330))
+- disable nxls auto-shutdown & tweak cloud notifications ([#2338](https://github.com/nrwl/nx-console/pull/2338))
+- kill entire process tree when shutting down nxls & vscode ([#2288](https://github.com/nrwl/nx-console/pull/2288))
+- **nxls:** dynamically read nx.json schema during schema setup ([#2221](https://github.com/nrwl/nx-console/pull/2221))
+- **nxls:** load .env files in language server to make sure daemon client has access to them ([#2158](https://github.com/nrwl/nx-console/pull/2158))
+- **nxls:** lazily import @parcel/watcher to avoid issues ([#2140](https://github.com/nrwl/nx-console/pull/2140))
+- refactor graph integration to use partial graphs & handle errors ([#2117](https://github.com/nrwl/nx-console/pull/2117))
+- add option to reset the daemon from the project detail view ([#2029](https://github.com/nrwl/nx-console/pull/2029))
+- **nxls:** attempt to reconfigure nxls after error with backoff ([094a17c0f](https://github.com/nrwl/nx-console/commit/094a17c0f))
+- improve broken project graph error handling across the board ([#2007](https://github.com/nrwl/nx-console/pull/2007))
+- **vscode:** show pdv open to side button on all files that define a project ([#1999](https://github.com/nrwl/nx-console/pull/1999))
+- **nxls:** enable target autocomplete for pcv3 projects ([#1992](https://github.com/nrwl/nx-console/pull/1992))
+- automatically repair graph server when it errors in vscode ([#1985](https://github.com/nrwl/nx-console/pull/1985))
+- **repo): Revert "chore(repo:** update nx to 17.0.0-rc.3 " ([#1913](https://github.com/nrwl/nx-console/pull/1913), [#1926](https://github.com/nrwl/nx-console/pull/1926))
+- add better empty states to project view/toolwindow ([#1833](https://github.com/nrwl/nx-console/pull/1833))
+- enable gutter actions in project.json without name & refactor project by path request ([#1822](https://github.com/nrwl/nx-console/pull/1822))
+- update @parcel/watcher for more prebuilt binaries ([#1803](https://github.com/nrwl/nx-console/pull/1803))
+
+### ❤️ Thank You
+
+- Jack Hsu @jaysoo
+- Jonathan Cammisuli @Cammisuli
+- Max Kless
+- MaxKless @MaxKless
+- Michal Jez @MJez29
+
+# [1.8.0](https://github.com/nrwl/nx-console/compare/nxls-v1.7.0...nxls-v1.8.0) (2023-04-28)
+
+
+### Bug Fixes
+
+* **generate-ui:** handle multiple default values for generate ui ([#1684](https://github.com/nrwl/nx-console/issues/1684)) ([2529b56](https://github.com/nrwl/nx-console/commit/2529b563137ae7f732e77a09191d9582463e582f))
+* handle nxls startup errors ([#1649](https://github.com/nrwl/nx-console/issues/1649)) ([da9ed6e](https://github.com/nrwl/nx-console/commit/da9ed6e175908c603eb97024f0b5c4a33fe1f0a2))
+* make sure first positional args are in the right order & fallback to old sorting ([#1541](https://github.com/nrwl/nx-console/issues/1541)) ([9b1a53e](https://github.com/nrwl/nx-console/commit/9b1a53ea9d6fa6a15cea340413662d99438afd81))
+* **nxls:** also check sourceRoot when getting project by path ([#1554](https://github.com/nrwl/nx-console/issues/1554)) ([65a5b09](https://github.com/nrwl/nx-console/commit/65a5b0928d9a4ff42cf71f0ec4abad156d2970cf))
+* **nxls:** debounce @parcel/watcher to avoid race conditions ([#1620](https://github.com/nrwl/nx-console/issues/1620)) ([96f91fa](https://github.com/nrwl/nx-console/commit/96f91faf36ee2b4965e944a7b60333fb38cc175b))
+* **nxls:** distinguish projects that are substrings of one another ([#1610](https://github.com/nrwl/nx-console/issues/1610)) ([a404c00](https://github.com/nrwl/nx-console/commit/a404c000ccd6597f3b1a1d6266ea4d8aa73aee48))
+* **nxls:** do not include workspace layout in directory context for generate calls ([#1577](https://github.com/nrwl/nx-console/issues/1577)) ([340c2a3](https://github.com/nrwl/nx-console/commit/340c2a3ead6f64a3ce34528915af716c543c8dd2))
+* **nxls:** do not output exec to stdio ([#1644](https://github.com/nrwl/nx-console/issues/1644) ([f0f112c](https://github.com/nrwl/nx-console/commit/f0f112c5a5b04fbf659d36655fe17cd02b5c462c))
+* **nxls:** don't default appsDir and libsDir ([#1562](https://github.com/nrwl/nx-console/issues/1562)) ([e022c7c](https://github.com/nrwl/nx-console/commit/e022c7cffc9661a576978d9c82f1267b7c581d03))
+* **nxls:** handle daemon better ([#1615](https://github.com/nrwl/nx-console/issues/1615)) ([0216d0c](https://github.com/nrwl/nx-console/commit/0216d0cf12c962765a060dee793bcf368eedc87f))
+* **nxls:** handle the daemon output so that stdout isnt polluted ([#1698](https://github.com/nrwl/nx-console/issues/1698)) ([cf3f93f](https://github.com/nrwl/nx-console/commit/cf3f93f075bb1b654ff991d7b3ec891118126b0e))
+* **nxls:** make passing generator optional when calculating generator context ([#1551](https://github.com/nrwl/nx-console/issues/1551)) ([3c4ff27](https://github.com/nrwl/nx-console/commit/3c4ff276ec70095156cd46fcccfdc347f95c696f))
+* **nxls:** read node_modules from encapsulated nx ([#1566](https://github.com/nrwl/nx-console/issues/1566)) ([7f5cdf2](https://github.com/nrwl/nx-console/commit/7f5cdf2e5e30579599d782b94015b84eb556d0d1))
+* **nxls:** support running under node 14 ([#1679](https://github.com/nrwl/nx-console/issues/1679)) ([a6e91a5](https://github.com/nrwl/nx-console/commit/a6e91a53a0a78a26f555967e8a847606d13ba408))
+* **nxls:** temporarily disable daemon ([0570f53](https://github.com/nrwl/nx-console/commit/0570f53f698fc138fb854b575841fba289992266))
+* **nxls:** use `workspaceFolders` before `rootUri` for better Windows path compatibility ([#1639](https://github.com/nrwl/nx-console/issues/1639)) ([2a5a07e](https://github.com/nrwl/nx-console/commit/2a5a07e07c989e49dc79d915ab17521177859781))
+* **nxls:** use the schema.json for the workspace generator collection path ([#1691](https://github.com/nrwl/nx-console/issues/1691)) ([10574c1](https://github.com/nrwl/nx-console/commit/10574c174742268ebbf755e39b5aec0c381de42e))
+* revert back to parcel/watcher@2.0.7 ([076705f](https://github.com/nrwl/nx-console/commit/076705f2749c4cd945faac40dfb516a801fc2704))
+* serialize output messages with payloadType ([#1687](https://github.com/nrwl/nx-console/issues/1687)) ([055477f](https://github.com/nrwl/nx-console/commit/055477f00023828ecf410e08848b9e50ffd88dbd))
+* **vscode:** copy generate ui to vscode dist ([74a36c7](https://github.com/nrwl/nx-console/commit/74a36c7d5affff9907ad8e52ea3c984daabe9452))
+
+
+### Features
+
+* add hover with links to nx.dev for executors ([#1708](https://github.com/nrwl/nx-console/issues/1708)) ([eab101c](https://github.com/nrwl/nx-console/commit/eab101c7a8daa2a3309a2072fce76e85cfec5442))
+* **nxls:** add support for encapsulated nx ([#1556](https://github.com/nrwl/nx-console/issues/1556)) ([0993c8a](https://github.com/nrwl/nx-console/commit/0993c8a1af6590a172dc4da3b55c191495d0516a))
+* **nxls:** provide generator aliases via nxls ([#1598](https://github.com/nrwl/nx-console/issues/1598)) ([63f44ce](https://github.com/nrwl/nx-console/commit/63f44ce925613ea132808e81ac775e8a36d0f8a1))
+* **nxls:** support executors in and from targetDefaults ([#1621](https://github.com/nrwl/nx-console/issues/1621)) ([1d0c263](https://github.com/nrwl/nx-console/commit/1d0c263da44a2613a36f6a3aa64d0a3d8ff5e9ee))
+* **nxls:** update dependsOn and namedInputs completion for nx 16 ([#1701](https://github.com/nrwl/nx-console/issues/1701)) ([8eb8b1c](https://github.com/nrwl/nx-console/commit/8eb8b1c5ad962e759fef3428e98222aebe2101ec))
+* remove angular cli compatibility ([#1575](https://github.com/nrwl/nx-console/issues/1575)) ([702e205](https://github.com/nrwl/nx-console/commit/702e205d5629059ad5fb5ca7c5d102d0cca0c4ce))
+* support nx 16 ([#1686](https://github.com/nrwl/nx-console/issues/1686)) ([0126e58](https://github.com/nrwl/nx-console/commit/0126e58fccf54a765256c86e48e323659b4cb2fa))
+
+# [1.7.0](https://github.com/nrwl/nx-console/compare/nxls-v1.6.0...nxls-v1.7.0) (2023-02-14)
+
+
+### Bug Fixes
+
+* handle schema file refs better for windows ([#1512](https://github.com/nrwl/nx-console/issues/1512)) ([8c639e1](https://github.com/nrwl/nx-console/commit/8c639e134ee563c9925ea9271b4badcf39e0efff))
+* **nxls:** update @parcel/watcher ([#1526](https://github.com/nrwl/nx-console/issues/1526)) ([ce1b0ab](https://github.com/nrwl/nx-console/commit/ce1b0ab4642eb369fdf4ee7440277f5949406f36))
+* remove the usage of configurationPath ([#1493](https://github.com/nrwl/nx-console/issues/1493)) ([8295def](https://github.com/nrwl/nx-console/commit/8295def416ba59ef1b5e66e0fc1fcd34b7aa4363))
+* update styles and fix style-related bugs in generate ui ([#1517](https://github.com/nrwl/nx-console/issues/1517)) ([2f936bf](https://github.com/nrwl/nx-console/commit/2f936bfa02184135e09d01d115aac36f8fefb1a3))
+
+
+### Features
+
+* **generate-ui:** split form by x-priority attribute ([#1528](https://github.com/nrwl/nx-console/issues/1528)) ([3520c79](https://github.com/nrwl/nx-console/commit/3520c792791874c0af383e42d3b59afc0e2d4ec7))
+* **intellij:** include nxls in the intellij bundle ([#1494](https://github.com/nrwl/nx-console/issues/1494)) ([17cd310](https://github.com/nrwl/nx-console/commit/17cd3108fb021777290cfcb1f9eff7f1d9ab0f5e))
+* **intellij:** open generate ui with project right click ([#1513](https://github.com/nrwl/nx-console/issues/1513)) ([43bd083](https://github.com/nrwl/nx-console/commit/43bd083133b165dc07820aedcfa66ba2841d03b9))
+* **intellij:** show generate-ui in intellij ([#1497](https://github.com/nrwl/nx-console/issues/1497)) ([eedf023](https://github.com/nrwl/nx-console/commit/eedf0236fc8f8d8f6cc00357c86accd531e733c4))
+* sort generator flags by priority ([#1502](https://github.com/nrwl/nx-console/issues/1502)) ([054ff64](https://github.com/nrwl/nx-console/commit/054ff64488bd2070d1a03844899a5ebcf878e1b5))
+
+# [1.6.0](https://github.com/nrwl/nx-console/compare/nxls-v1.5.0...nxls-v1.6.0) (2023-01-24)
+
+
+### Features
+
+* add NxGeneratorOptions request to nxls ([#1486](https://github.com/nrwl/nx-console/issues/1486)) ([92cc757](https://github.com/nrwl/nx-console/commit/92cc757e41a043608fa375f45dd531b676a5b33e))
+* hide deprecated generators and executors ([#1489](https://github.com/nrwl/nx-console/issues/1489)) ([e26347b](https://github.com/nrwl/nx-console/commit/e26347b871ffb0e3a21bc405721f2889594d5771))
+
 # [1.5.0](https://github.com/nrwl/nx-console/compare/nxls-v1.4.0...nxls-v1.5.0) (2023-01-18)
 
 

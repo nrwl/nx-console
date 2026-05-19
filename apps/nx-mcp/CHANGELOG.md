@@ -1,0 +1,314 @@
+## 0.25.0 (2026-04-30)
+
+### 🚀 Features
+
+- **nx-mcp:** rework ci tools, add ci_task_output ([#3126](https://github.com/nrwl/nx-console/pull/3126))
+
+### 🩹 Fixes
+
+- **vscode,intellij:** update old nx.dev doc links to canonical /docs/ URLs ([#3098](https://github.com/nrwl/nx-console/pull/3098))
+
+### ❤️ Thank You
+
+- barbados-clemens @barbados-clemens
+- Caleb Ukle
+- Claude Opus 4.6 (1M context)
+- MaxKless @MaxKless
+
+## 0.24.0 (2026-03-16)
+
+### 🚀 Features
+
+- **nx-mcp:** remove Polygraph MCP tools ([#3092](https://github.com/nrwl/nx-console/pull/3092))
+
+### ❤️ Thank You
+
+- Claude Opus 4.6
+- MaxKless @MaxKless
+
+## 0.23.0 (2026-03-06)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.22.2 (2026-02-23)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.22.1 (2026-02-18)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.22.0 (2026-02-18)
+
+### 🚀 Features
+
+- **vscode:** enhance detection for nx skills for cursor & re-add old rule file cleanup ([#3054](https://github.com/nrwl/nx-console/pull/3054))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.21.0 (2026-02-12)
+
+### 🚀 Features
+
+- **nx-mcp:** switch default behaviour of nx-mcp to have minimal tools ([#3027](https://github.com/nrwl/nx-console/pull/3027))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.20.0 (2026-02-11)
+
+### 🩹 Fixes
+
+- **nx-mcp:** re-case experimental polygraph tool ([#3028](https://github.com/nrwl/nx-console/pull/3028))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.19.0 (2026-02-10)
+
+### 🚀 Features
+
+- **nx-mcp:** enable passing options to mcp via .nx/nx-mcp-config.json ([#3026](https://github.com/nrwl/nx-console/pull/3026))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.18.0 (2026-02-09)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.17.2 (2026-02-04)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.17.1 (2026-02-04)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.17.0 (2026-02-03)
+
+### 🩹 Fixes
+
+- **vscode:** enable minimal mode in vscode/cursor mcp if workspace skills exist ([#2998](https://github.com/nrwl/nx-console/pull/2998))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.16.0 (2026-01-29)
+
+### 🩹 Fixes
+
+- include system CA for fetch requests to enable talking to self-signed nx cloud instances ([#2977](https://github.com/nrwl/nx-console/pull/2977))
+- **mcp:** fallback to src/ when local generator schema not found in dist/ ([#2987](https://github.com/nrwl/nx-console/pull/2987))
+- **nx-mcp:** make polygraph tools opt-in for now ([#2988](https://github.com/nrwl/nx-console/pull/2988))
+- **nx-mcp:** strip $schema and return structuredContent in ci-information error case ([#2974](https://github.com/nrwl/nx-console/pull/2974))
+- **nxls:** enable passing explicit branch to getRecentCIPEs ([#2989](https://github.com/nrwl/nx-console/pull/2989))
+
+### ❤️ Thank You
+
+- Juri Strumpflohner @juristr
+- MaxKless @MaxKless
+
+## 0.15.0 (2026-01-26)
+
+### 🚀 Features
+
+- **nx-mcp:** make workspace tools hideable with --minimal flag ([#2968](https://github.com/nrwl/nx-console/pull/2968))
+
+### 🩹 Fixes
+
+- **nx-mcp:** handle process suspension cases ([#2969](https://github.com/nrwl/nx-console/pull/2969))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.14.0 (2026-01-22)
+
+### 🚀 Features
+
+- **nx-mcp:** add couldAutoApply to ci-information mcp tool ([#2954](https://github.com/nrwl/nx-console/pull/2954))
+- **nx-mcp:** add verifiedTaskIds to ci_information tool output ([#2957](https://github.com/nrwl/nx-console/pull/2957))
+- **nx-mcp:** modify MCP tool to have select arg and separately paginated diff, remote and local tasks ([#2960](https://github.com/nrwl/nx-console/pull/2960))
+
+### 🩹 Fixes
+
+- **nx-mcp:** adjust confidence property to match API ([#2962](https://github.com/nrwl/nx-console/pull/2962))
+
+### ❤️ Thank You
+
+- Chau Tran @nartc
+- MaxKless @MaxKless
+
+## 0.13.2 (2026-01-16)
+
+### 🩹 Fixes
+
+- **nx-mcp:** remove awaiting project graph from mcp startup even with ide provider ([#2944](https://github.com/nrwl/nx-console/pull/2944))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.13.1 (2026-01-15)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.13.0 (2026-01-15)
+
+### 🚀 Features
+
+- **nx-mcp:** add server instructions to help agents understand it ([#2940](https://github.com/nrwl/nx-console/pull/2940))
+- **nx-mcp:** add mcp tool for retrieving self-healing context from CI ([#2934](https://github.com/nrwl/nx-console/pull/2934))
+- **nx-mcp:** remove nx_run_generator tool ([#2939](https://github.com/nrwl/nx-console/pull/2939))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.12.0 (2025-12-16)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.11.0 (2025-12-02)
+
+### 🚀 Features
+
+- **nx-mcp:** add --tools flag and vscode option to filter mcp tools ([#2908](https://github.com/nrwl/nx-console/pull/2908))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.10.0 (2025-11-11)
+
+### 🚀 Features
+
+- **nx-mcp:** make mcp server via streamable http stateful with sessions ([#2877](https://github.com/nrwl/nx-console/pull/2877))
+- **nx-mcp:** rename nx_cloud_analytics tools to just cloud_analytics ([#2876](https://github.com/nrwl/nx-console/pull/2876))
+- **vscode:** add debug logging setting to vscode & nxls ([#2873](https://github.com/nrwl/nx-console/pull/2873))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.9.0 (2025-11-04)
+
+### 🚀 Features
+
+- **nx-mcp:** remove MCP tools made redundant by self healing and rename others ([#2856](https://github.com/nrwl/nx-console/pull/2856))
+
+### 🩹 Fixes
+
+- **nx-mcp:** update sdk version & use new logging format ([#2848](https://github.com/nrwl/nx-console/pull/2848))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.8.0 (2025-10-24)
+
+### 🚀 Features
+
+- **nx-mcp:** make token optimization kick in sooner & implement pagination for nx_project_details ([#2835](https://github.com/nrwl/nx-console/pull/2835))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.7.0 (2025-10-10)
+
+### 🚀 Features
+
+- **nx-mcp:** use new passive daemon watcher to prevent resource usage from mcp ([#2814](https://github.com/nrwl/nx-console/pull/2814))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.6.12 (2025-09-23)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.11 (2025-09-23)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.10 (2025-09-23)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.9 (2025-09-23)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.8 (2025-09-22)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.7 (2025-09-22)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.6 (2025-09-22)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.5 (2025-09-22)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.4 (2025-09-15)
+
+### 🚀 Features
+
+- **nx-mcp:** update project_details tool description and return dependencies from it ([#2745](https://github.com/nrwl/nx-console/pull/2745))
+
+### 🩹 Fixes
+
+- **nx-mcp:** do not block mcp init with project graph computation ([#2752](https://github.com/nrwl/nx-console/pull/2752))
+
+### ❤️ Thank You
+
+- MaxKless @MaxKless
+
+## 0.6.3 (2025-08-27)
+
+This was a version bump only for nx-mcp to align it with other projects, there were no code changes.
+
+## 0.6.2 (2025-08-27)
+
+### 🚀 Features
+
+- **nx-mcp:** expose recent CIPEs as MCP resources ([#2694](https://github.com/nrwl/nx-console/pull/2694))
+- **vscode:** use vscode api to register mcp server & migrate cursor to stdio mcp ([#2650](https://github.com/nrwl/nx-console/pull/2650))
+- enable mcp to communicate with IDE via JSON-RPC server ([#2640](https://github.com/nrwl/nx-console/pull/2640))
+- **nx-mcp:** add streamable http as a transport option & restructure args slightly ([#2632](https://github.com/nrwl/nx-console/pull/2632))
+- **nx-mcp:** default workspace path ([#2531](https://github.com/nrwl/nx-console/pull/2531))
+- **vscode:** enable support for streamable http transport in vscode mcp ([#2500](https://github.com/nrwl/nx-console/pull/2500))
+- add mcp and copilot support for cipe details ([#2469](https://github.com/nrwl/nx-console/pull/2469))
+- add mcp tool with for available plugins ([#2448](https://github.com/nrwl/nx-console/pull/2448))
+- **nx-mcp:** support communication via sse in the standalone mcp server ([#2441](https://github.com/nrwl/nx-console/pull/2441))
+- add nx mcp ([#2415](https://github.com/nrwl/nx-console/pull/2415))
+
+### 🩹 Fixes
+
+- **nx-mcp:** always process.exit() to avoid hanging processes ([#2711](https://github.com/nrwl/nx-console/pull/2711))
+- improve nx-mcp & nxls exit handlers ([#2688](https://github.com/nrwl/nx-console/pull/2688))
+- **vscode:** repair socket & route task retrieval through ideProvider ([#2674](https://github.com/nrwl/nx-console/pull/2674))
+- **nx-mcp:** make sure relative path is resolved when passing it to nx-mcp ([#2541](https://github.com/nrwl/nx-console/pull/2541))
+- **nx-mcp:** workspace tools shouldn't be available if cwd is not an nx workspace ([#2540](https://github.com/nrwl/nx-console/pull/2540))
+- **nx-mcp:** dont call console.log directly in stdio mode ([#2480](https://github.com/nrwl/nx-console/pull/2480))
+- keep mcp alive by implementing heart beat functionality ([#2473](https://github.com/nrwl/nx-console/pull/2473))
+- **vscode:** include local plugins in tool result & hide community plugins for now ([#2454](https://github.com/nrwl/nx-console/pull/2454))
+
+### ❤️ Thank You
+
+- Jonathan Cammisuli @Cammisuli
+- MaxKless @MaxKless

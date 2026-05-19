@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.29.0](https://github.com/nrwl/nx-console/compare/v17.28.2...v17.29.0) (2023-01-25)
+
+
+### Features
+
+* add first draft of generate ui to intellij ([#1487](https://github.com/nrwl/nx-console/issues/1487)) ([3f6b2f6](https://github.com/nrwl/nx-console/commits/3f6b2f6c06c4065a6054b8ffe898b4f5cfed9863))
+* add NxGeneratorOptions request to nxls ([#1486](https://github.com/nrwl/nx-console/issues/1486)) ([92cc757](https://github.com/nrwl/nx-console/commits/92cc757e41a043608fa375f45dd531b676a5b33e))
+* hide deprecated generators and executors ([#1489](https://github.com/nrwl/nx-console/issues/1489)) ([e26347b](https://github.com/nrwl/nx-console/commits/e26347b871ffb0e3a21bc405721f2889594d5771))
+
+
+### Bug Fixes
+
+* **intellij:** add more logging for lsp messages and handle document listener exceptions ([#1491](https://github.com/nrwl/nx-console/issues/1491)) ([7339bc4](https://github.com/nrwl/nx-console/commits/7339bc4e0252c33775f4456edd860b0cd9c1d56e))
+* remove the usage of configurationPath ([#1493](https://github.com/nrwl/nx-console/issues/1493)) ([8295def](https://github.com/nrwl/nx-console/commits/8295def416ba59ef1b5e66e0fc1fcd34b7aa4363))
+
 ### [17.28.2](https://github.com/nrwl/nx-console/compare/v17.28.1...v17.28.2) (2023-01-17)
 
 
