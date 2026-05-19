@@ -211,8 +211,7 @@
   "release": {
     "version": {
       "preVersionCommand": "node ./tools/scripts/release-preflight.js",
-      "currentVersionResolver": "git-tag",
-      "fallbackCurrentVersionResolver": "disk"
+      "currentVersionResolver": "git-tag"
     },
     "git": {
       "commit": false,
