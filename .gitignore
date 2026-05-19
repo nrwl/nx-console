@@ -100,3 +100,7 @@ storybook-static
 
 .nx/polygraph
 .nx/self-healing
+
+# Changelogs are published to GitHub Releases, not committed to source
+CHANGELOG.md
+apps/*/CHANGELOG.md
