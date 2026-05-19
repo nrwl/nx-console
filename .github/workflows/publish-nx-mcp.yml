@@ -1,9 +1,8 @@
 name: Publish Nx MCP
 
 on:
-  push:
-    tags:
-      - 'nx-mcp-v*.*.*'
+  release:
+    types: [published]
 env:
   node_version: 24
   NX_GRADLE_DISABLE: true
@@ -15,10 +14,13 @@ permissions:
 
 jobs:
   publish:
+    if: startsWith(github.event.release.tag_name, 'nx-mcp-v')
+    environment: release-approval
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0

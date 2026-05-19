@@ -210,10 +210,10 @@
   "bust": 10,
   "release": {
     "version": {
-      "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
+      "preVersionCommand": "node ./tools/scripts/release-preflight.js"
     },
     "git": {
-      "push": false,
+      "push": true,
       "commitMessage": "chore(release-{projectName}): {version}"
     },
     "releaseTagPattern": "{projectName}-v{version}",
@@ -225,7 +225,8 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
+          "createRelease": "github",
+          "file": false
         }
       },
       "nx-mcp": {
@@ -235,7 +236,8 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
+          "createRelease": "github",
+          "file": false
         }
       },
       "nxls": {
@@ -245,7 +247,8 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
+          "createRelease": "github",
+          "file": false
         }
       }
     }
