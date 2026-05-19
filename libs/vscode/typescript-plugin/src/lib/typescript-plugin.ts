@@ -303,9 +303,9 @@ async function isUsingTsSolutionSetup(workspaceRoot: string): Promise<boolean> {
       );
 
       const { isUsingTsSolutionSetup } =
-        await importWorkspaceDependency<
-          typeof import('@nx/js/src/utils/typescript/ts-solution-setup')
-        >(tsSolutionSetupPath);
+        await importWorkspaceDependency<typeof import('@nx/js/internal')>(
+          tsSolutionSetupPath,
+        );
       return isUsingTsSolutionSetup();
     } catch (e) {
       return false;
