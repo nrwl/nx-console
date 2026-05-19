@@ -1,13 +1,16 @@
 /**
  * Local release entrypoint.
  *
- * Cuts a release for a single package off the latest `master` using local git
- * auth: bumps the version, creates and pushes the `<pkg>-v<version>` tag, and
- * creates the GitHub Release (whose notes carry the changelog). Publishing the
- * package itself is left to the `publish-<pkg>` workflow, which is triggered by
- * the GitHub Release and gated behind the `release-approval` environment.
+ * Cuts a release for a single package off the latest `master`: creates and
+ * pushes the `<pkg>-v<version>` tag (via local git auth) and creates the
+ * GitHub Release whose notes carry the changelog. Publishing the package
+ * itself is left to the `publish-<pkg>` workflow, which is triggered by the
+ * GitHub Release and gated behind the `release-approval` environment.
  *
- *   node tools/scripts/release.js <package>
+ * Requires a GitHub token in the environment as GH_TOKEN or GITHUB_TOKEN
+ * (the script never reads it from a credential store itself).
+ *
+ *   node tools/scripts/release.js <package> [--dry-run]
  */
 const { execSync, execFileSync } = require('child_process');
 const { getPreflightErrors } = require('./release-preflight');
@@ -67,18 +70,26 @@ function main() {
     process.exit(1);
   }
 
-  // Both release tools create the GitHub Release and read the token from the
-  // environment. Source it from the local `gh` CLI so no PAT is needed.
-  let githubToken;
-  try {
-    githubToken = execSync('gh auth token', { encoding: 'utf8' }).trim();
-  } catch {
-    fail('Could not read a GitHub token. Run `gh auth login` first.');
+  // Both release tools create the GitHub Release via the GitHub API and read
+  // their token from the environment. The script never fetches a token itself
+  // — provide one as GH_TOKEN (or GITHUB_TOKEN) however you manage secrets,
+  // e.g. `op run -- node tools/scripts/release.js <package>`.
+  const githubToken = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+  if (!githubToken) {
+    fail(
+      'No GitHub token in the environment. The release creates a GitHub\n' +
+        'Release, so it needs a token exposed as GH_TOKEN (or GITHUB_TOKEN).\n' +
+        'Provide it however you manage secrets, for example:\n' +
+        '  op run -- node tools/scripts/release.js <package>\n' +
+        '  GH_TOKEN=$(gh auth token) node tools/scripts/release.js <package>',
+    );
   }
+  // Mirror it onto both names so either tool finds it regardless of which the
+  // caller supplied.
   const env = {
     ...process.env,
-    GITHUB_TOKEN: githubToken,
     GH_TOKEN: githubToken,
+    GITHUB_TOKEN: githubToken,
   };
 
   const tool = TOOL_BY_PACKAGE[pkg];
