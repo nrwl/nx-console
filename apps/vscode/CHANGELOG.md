@@ -1,3 +1,8 @@
+# [18.100.2]
+
+This is a dummy release to realign versions between vscode & open-vsix
+
+
 # [18.100.1]
 
 This is a dummy release to realign versions between vscode & open-vsix
