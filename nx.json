@@ -210,11 +210,15 @@
   "bust": 10,
   "release": {
     "version": {
-      "preVersionCommand": "node ./tools/scripts/release-preflight.js"
+      "preVersionCommand": "node ./tools/scripts/release-preflight.js",
+      "currentVersionResolver": "git-tag",
+      "fallbackCurrentVersionResolver": "disk"
     },
     "git": {
-      "push": true,
-      "commitMessage": "chore(release-{projectName}): {version}"
+      "commit": false,
+      "stageChanges": false,
+      "tag": true,
+      "push": true
     },
     "releaseTagPattern": "{projectName}-v{version}",
     "groups": {

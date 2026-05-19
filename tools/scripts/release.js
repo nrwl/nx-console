@@ -93,6 +93,24 @@ function main() {
     fail(`Release of '${pkg}' failed.`);
   }
 
+  // The git tag is the single source of truth for versions. `nx release`
+  // still writes the bumped version into manifests on disk while versioning;
+  // discard that so nothing version-related is ever committed back to source.
+  const touched = execSync('git status --porcelain --untracked-files=no', {
+    encoding: 'utf8',
+  })
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => line.slice(3));
+  if (touched.length > 0) {
+    console.log(`Discarding on-disk version bumps: ${touched.join(', ')}`);
+    execFileSync(
+      'git',
+      ['restore', '--staged', '--worktree', '--', ...touched],
+      { stdio: 'inherit' },
+    );
+  }
+
   console.log(
     `✅ '${pkg}' released. The publish-${pkg} workflow runs once the GitHub Release deployment is approved.`,
   );

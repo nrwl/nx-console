@@ -41,6 +41,11 @@ jobs:
         uses: nrwl/nx-set-shas@afb73a62d26e41464e9254689e1fd6122ee683c1 # v5.0.1
         with:
           main-branch-name: 'master'
+      - name: set version from release tag
+        run: npm pkg set version="${TAG#*-v}"
+        working-directory: apps/nxls
+        env:
+          TAG: ${{ github.event.release.tag_name }}
       - name: publish
         run: |
           npx nx run nxls:build --skip-nx-cache

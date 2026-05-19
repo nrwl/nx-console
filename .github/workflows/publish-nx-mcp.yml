@@ -44,6 +44,11 @@ jobs:
           main-branch-name: 'master'
       - name: log npm version
         run: npm --version
+      - name: set version from release tag
+        run: npm pkg set version="${TAG#*-v}"
+        working-directory: apps/nx-mcp
+        env:
+          TAG: ${{ github.event.release.tag_name }}
       - name: build nx-mcp artifact
         run: npx nx run nx-mcp:setup-publish --skip-nx-cache
       - name: npm publish
