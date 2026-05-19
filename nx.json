@@ -18,49 +18,59 @@
     }
   },
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {
-    "test": {
+  "targetDefaults": [
+    {
+      "target": "test",
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
       "cache": true,
       "dependsOn": ["^build"]
     },
-    "lint": {
+    {
+      "target": "lint",
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     },
-    "e2e": {
+    {
+      "target": "e2e",
       "inputs": ["default", "^production"],
       "cache": true
     },
-    "e2e-ci--**/**": {
+    {
+      "target": "e2e-ci--**/**",
       "inputs": ["default", "^production"],
       "cache": true,
       "parallelism": false,
       "dependsOn": ["^build", "setup-lit-dir"]
     },
-    "e2e-local": {
+    {
+      "target": "e2e-local",
       "cache": true,
       "parallelism": false,
       "dependsOn": ["^build"]
     },
-    "_build": {
+    {
+      "target": "_build",
       "cache": true
     },
-    "package": {
+    {
+      "target": "package",
       "cache": true
     },
-    "extract-dependencies": {
+    {
+      "target": "extract-dependencies",
       "cache": true
     },
-    "@nx/esbuild:esbuild": {
+    {
+      "executor": "@nx/esbuild:esbuild",
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "storybook": {
+    {
+      "target": "storybook",
       "dependsOn": ["^build"]
     }
-  },
+  ],
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "kotlin": [
@@ -216,7 +226,6 @@
       "push": false,
       "commitMessage": "chore(release-{projectName}): {version}"
     },
-    "releaseTagPattern": "{projectName}-v{version}",
     "groups": {
       "vscode": {
         "projects": ["vscode"],
@@ -248,6 +257,9 @@
           "projectChangelogs": true
         }
       }
+    },
+    "releaseTag": {
+      "pattern": "{projectName}-v{version}"
     }
   },
   "analytics": true
