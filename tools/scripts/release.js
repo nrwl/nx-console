@@ -28,10 +28,12 @@ function fail(message) {
 }
 
 function main() {
-  const pkg = process.argv[2];
+  const cliArgs = process.argv.slice(2);
+  const dryRun = cliArgs.includes('--dry-run');
+  const pkg = cliArgs.find((arg) => !arg.startsWith('-'));
   if (!pkg || !TOOL_BY_PACKAGE[pkg]) {
     fail(
-      `Usage: node tools/scripts/release.js <package>\n` +
+      `Usage: node tools/scripts/release.js <package> [--dry-run]\n` +
         `  packages: ${Object.keys(TOOL_BY_PACKAGE).join(', ')}`,
     );
   }
@@ -80,12 +82,17 @@ function main() {
   };
 
   const tool = TOOL_BY_PACKAGE[pkg];
-  console.log(`▶ Releasing '${pkg}' via ${tool}...`);
+  console.log(
+    `▶ ${dryRun ? 'Dry-run release of' : 'Releasing'} '${pkg}' via ${tool}...`,
+  );
 
   const args =
     tool === 'semantic-release'
       ? ['nx', 'run', `${pkg}:semantic-release`]
       : ['nx', 'release', '--projects', pkg, '--skip-publish'];
+  if (dryRun) {
+    args.push('--dry-run');
+  }
 
   try {
     execFileSync('npx', args, { stdio: 'inherit', env });
@@ -112,7 +119,9 @@ function main() {
   }
 
   console.log(
-    `✅ '${pkg}' released. The publish-${pkg} workflow runs once the GitHub Release deployment is approved.`,
+    dryRun
+      ? `✅ Dry run complete for '${pkg}' — no tag or GitHub Release was created.`
+      : `✅ '${pkg}' released. The publish-${pkg} workflow runs once the GitHub Release deployment is approved.`,
   );
 }
 
