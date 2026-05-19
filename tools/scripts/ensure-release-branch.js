@@ -1,31 +1,39 @@
 const { execSync } = require('child_process');
 
-try {
-  // Get the current branch name
-  const currentBranch = execSync('git rev-parse --abbrev-ref HEAD', {
-    encoding: 'utf8',
-  }).trim();
+function isAllowedReleaseBranch(branchName) {
+  return branchName === 'release' || branchName.startsWith('release-');
+}
 
-  // Define the expected release branch name
-  const releaseBranch = 'release';
+module.exports = { isAllowedReleaseBranch };
 
-  console.log(`Current branch: ${currentBranch}`);
+if (require.main === module) {
+  try {
+    const currentBranch = execSync('git rev-parse --abbrev-ref HEAD', {
+      encoding: 'utf8',
+    }).trim();
 
-  if (currentBranch !== releaseBranch) {
-    console.error(
-      `❌ Error: You must be on the '${releaseBranch}' branch to proceed.`,
+    console.log(`Current branch: ${currentBranch}`);
+
+    if (!isAllowedReleaseBranch(currentBranch)) {
+      console.error(
+        `❌ Error: You must be on the 'release' branch or a 'release-*' branch to proceed.`,
+      );
+      console.error(`Current branch is '${currentBranch}'.`);
+      console.error(
+        `Create a release branch with: git checkout release && git pull && git checkout -b release-<date>`,
+      );
+      process.exit(1);
+    }
+
+    console.log(
+      `✅ Confirmed: You are on a release branch ('${currentBranch}').`,
     );
-    console.error(`Current branch is '${currentBranch}'.`);
+  } catch (error) {
+    console.error('❌ Error: Unable to determine current git branch.');
     console.error(
-      `Please switch to the release branch with: git checkout ${releaseBranch}`,
+      'Make sure you are in a git repository and git is installed.',
     );
+    console.error(error.message);
     process.exit(1);
   }
-
-  console.log(`✅ Confirmed: You are on the '${releaseBranch}' branch.`);
-} catch (error) {
-  console.error('❌ Error: Unable to determine current git branch.');
-  console.error('Make sure you are in a git repository and git is installed.');
-  console.error(error.message);
-  process.exit(1);
 }
