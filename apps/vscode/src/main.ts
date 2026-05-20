@@ -260,7 +260,7 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
   );
 
   while (currentDirectory !== root) {
-    vscodeLogger.debug(`Checking workspace path at ${currentDirectory}`);
+    vscodeLogger.debug(`Checking workspace path: ${currentDirectory}`);
 
     if (await fileExists(join(currentDirectory, 'angular.json'))) {
       return setWorkspace(currentDirectory);
