@@ -10,7 +10,10 @@
         "ci": false,
         "npm": false,
         "plugins": ["gradle-semantic-release-plugin"],
-        "gitAssets": ["gradle.properties"]
+        "gitAssets": ["gradle.properties"],
+        "writerOpts": {
+          "headerPartial": "## {{#if isPatch~}} <small>\n  {{~/if~}} {{version}}\n  {{~#if title}} \"{{title}}\"\n  {{~/if~}}\n  {{~#if date}} ({{date}})\n  {{~/if~}}\n  {{~#if isPatch~}} </small>\n  {{~/if}}\n"
+        }
       }
     },
     "buildPlugin": {
