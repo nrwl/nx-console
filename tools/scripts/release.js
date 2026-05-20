@@ -84,12 +84,18 @@ function main() {
         '  GH_TOKEN=$(gh auth token) node tools/scripts/release.js <package>',
     );
   }
-  // Mirror it onto both names so either tool finds it regardless of which the
-  // caller supplied.
+  const gitConfigCount = Number(process.env.GIT_CONFIG_COUNT ?? 0);
+  // Mirror the token onto both names so either tool finds it regardless of
+  // which the caller supplied. Disable tag signing for this subprocess because
+  // semantic-release creates tags without a message, which makes signed tags
+  // open an interactive editor.
   const env = {
     ...process.env,
     GH_TOKEN: githubToken,
     GITHUB_TOKEN: githubToken,
+    GIT_CONFIG_COUNT: String(gitConfigCount + 1),
+    [`GIT_CONFIG_KEY_${gitConfigCount}`]: 'tag.gpgSign',
+    [`GIT_CONFIG_VALUE_${gitConfigCount}`]: 'false',
   };
 
   const tool = TOOL_BY_PACKAGE[pkg];
