@@ -70,7 +70,8 @@ export async function undoMigration(migration: MigrationDetailsWithId) {
 export async function acknowledgeMigration(migration: MigrationDetailsWithId) {
   const workspacePath = getNxWorkspacePath();
   const migrateUIApi = await importMigrateUIApi(workspacePath);
-  // This is safe to call since this code path only happens if the bundled or local version of Nx exposes the prompt-bearing migration UI (nx 23.0.0-beta.19+).
+  // TODO: Once Nx is updated with the `acknowledgeMigrationPrompt` API we can remove the ts-ignore.
+  // This is safe to call, since this code path only happens if the bundled or local version of Nx exposes the prompt-bearing migration UI.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   migrateUIApi.acknowledgeMigrationPrompt(workspacePath, migration);
