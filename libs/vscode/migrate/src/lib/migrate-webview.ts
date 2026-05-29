@@ -17,6 +17,7 @@ import {
   window,
 } from 'vscode';
 import {
+  acknowledgeMigration,
   cancelMigration,
   skipMigration,
   stopMigration,
@@ -130,6 +131,9 @@ export class MigrateWebview {
           break;
         case 'stop-migration':
           stopMigration(message.payload.migration);
+          break;
+        case 'acknowledge-prompt':
+          acknowledgeMigration(message.payload.migration);
           break;
       }
     });
