@@ -47,6 +47,9 @@ jobs:
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:

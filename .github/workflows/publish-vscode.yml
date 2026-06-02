@@ -20,6 +20,8 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
+      - name: Enable Corepack
+        run: corepack enable
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
