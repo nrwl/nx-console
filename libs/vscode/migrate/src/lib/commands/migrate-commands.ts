@@ -4,6 +4,7 @@ import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { getGitApi } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
+import { join } from 'path';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
 import {
   commands,
@@ -65,6 +66,16 @@ export async function undoMigration(migration: MigrationDetailsWithId) {
     // @ts-ignore
     migrateUIApi.undoMigration(workspacePath, migration.id),
   );
+}
+
+export async function acknowledgeMigration(migration: MigrationDetailsWithId) {
+  const workspacePath = getNxWorkspacePath();
+  const migrateUIApi = await importMigrateUIApi(workspacePath);
+  // TODO: Once Nx is updated with the `acknowledgeMigrationPrompt` API we can remove the ts-ignore.
+  // This is safe to call, since this code path only happens if the bundled or local version of Nx exposes the prompt-bearing migration UI.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  migrateUIApi.acknowledgeMigrationPrompt(workspacePath, migration);
 }
 
 export async function confirmPackageChanges() {
@@ -186,6 +197,22 @@ export async function viewImplementation(migration: MigrationDetailsWithId) {
       `Cannot find implementation file for ${migration.name}`,
     );
   }
+}
+
+export async function viewPrompt(migration: MigrationDetailsWithId) {
+  if (!migration.prompt) {
+    return;
+  }
+  // The prompt is recorded as a workspace-relative path in migrations.json,
+  // so it resolves without going through the migrate UI API.
+  const fullPath = join(getNxWorkspacePath(), migration.prompt);
+  if (!existsSync(fullPath)) {
+    window.showErrorMessage(`Cannot find prompt file at ${fullPath}`);
+    return;
+  }
+  workspace.openTextDocument(fullPath).then((doc) => {
+    window.showTextDocument(doc);
+  });
 }
 
 export async function viewDocumentation(migration: MigrationDetailsWithId) {
