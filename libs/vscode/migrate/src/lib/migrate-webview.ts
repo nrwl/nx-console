@@ -24,6 +24,7 @@ import {
   undoMigration,
   viewDocumentation,
   viewImplementation,
+  viewPrompt,
 } from './commands/migrate-commands';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { watchFile } from '@nx-console/vscode-utils';
@@ -134,6 +135,9 @@ export class MigrateWebview {
           break;
         case 'acknowledge-prompt':
           acknowledgeMigration(message.payload.migration);
+          break;
+        case 'view-prompt':
+          viewPrompt(message.payload.migration);
           break;
       }
     });

@@ -4,6 +4,7 @@ import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { getGitApi } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
+import { join } from 'path';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
 import {
   commands,
@@ -196,6 +197,22 @@ export async function viewImplementation(migration: MigrationDetailsWithId) {
       `Cannot find implementation file for ${migration.name}`,
     );
   }
+}
+
+export async function viewPrompt(migration: MigrationDetailsWithId) {
+  if (!migration.prompt) {
+    return;
+  }
+  // The prompt is recorded as a workspace-relative path in migrations.json,
+  // so it resolves without going through the migrate UI API.
+  const fullPath = join(getNxWorkspacePath(), migration.prompt);
+  if (!existsSync(fullPath)) {
+    window.showErrorMessage(`Cannot find prompt file at ${fullPath}`);
+    return;
+  }
+  workspace.openTextDocument(fullPath).then((doc) => {
+    window.showTextDocument(doc);
+  });
 }
 
 export async function viewDocumentation(migration: MigrationDetailsWithId) {
