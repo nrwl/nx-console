@@ -22,7 +22,9 @@ export function initCopilot(context: ExtensionContext) {
     'assets',
     'nx.png',
   );
-  nxParticipant.onDidReceiveFeedback((feedback) => {
+  // Cursor's chat API returns a participant without onDidReceiveFeedback,
+  // so guard the call to avoid aborting activation (issue #3156).
+  nxParticipant.onDidReceiveFeedback?.((feedback) => {
     telemetry.logUsage(
       feedback.kind === ChatResultFeedbackKind.Helpful
         ? 'ai.feedback-good'
