@@ -67,9 +67,6 @@
       "path": "../../libs/vscode/generate-ui-webview/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/vscode/copilot/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/vscode/add-dependency/tsconfig.lib.json"
     },
     {

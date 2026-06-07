@@ -34,7 +34,6 @@ import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode-add-dependency';
-import { initCopilot } from '@nx-console/vscode-copilot';
 import { initGenerateUiWebview } from '@nx-console/vscode-generate-ui-webview';
 import {
   createNxlsClient,
@@ -334,7 +333,6 @@ async function setWorkspace(workspacePath: string) {
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);
     initErrorDiagnostics(context);
-    initCopilot(context);
     initMcp(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);

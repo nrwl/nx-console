@@ -444,15 +444,6 @@
         "label": "Nx MCP Server"
       }
     ],
-    "chatParticipants": [
-      {
-        "id": "nx-console.nx",
-        "fullName": "Nx",
-        "name": "nx",
-        "description": "The @nx chat participant has been deprecated. Use the Nx MCP server instead for context-aware insights into your Nx workspace.",
-        "isSticky": false
-      }
-    ],
     "commands": [
       {
         "command": "nxConsole.refreshWorkspace",
