@@ -3982,12 +3982,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nx-console/vscode-copilot@workspace:libs/vscode/copilot":
-  version: 0.0.0-use.local
-  resolution: "@nx-console/vscode-copilot@workspace:libs/vscode/copilot"
-  languageName: unknown
-  linkType: soft
-
 "@nx-console/vscode-error-diagnostics@workspace:libs/vscode/error-diagnostics":
   version: 0.0.0-use.local
   resolution: "@nx-console/vscode-error-diagnostics@workspace:libs/vscode/error-diagnostics"
