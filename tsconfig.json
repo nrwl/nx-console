@@ -148,9 +148,6 @@
       "path": "./libs/vscode/migrate-sidebar-webview"
     },
     {
-      "path": "./libs/vscode/copilot"
-    },
-    {
       "path": "./apps/nx-mcp"
     },
     {
