@@ -32,6 +32,7 @@
     "verbatimModuleSyntax": false,
     "jsx": "react",
     "jsxFactory": "vscpp",
-    "jsxFragmentFactory": "vscppf"
+    "jsxFragmentFactory": "vscppf",
+    "noUncheckedSideEffectImports": false
   }
 }

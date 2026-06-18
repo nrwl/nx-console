@@ -7,7 +7,8 @@
     "types": ["jest", "node"],
     "strict": false,
     "noImplicitReturns": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "jest.config.ts",
