@@ -4,7 +4,8 @@
     "outDir": "out-tsc/jest",
     "module": "commonjs",
     "moduleResolution": "node10",
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "jest.config.ts",

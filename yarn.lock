@@ -2445,7 +2445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:^3.3.5":
+"@eslint/eslintrc@npm:3.3.5, @eslint/eslintrc@npm:^3.3.5":
   version: 3.3.5
   resolution: "@eslint/eslintrc@npm:3.3.5"
   dependencies:
@@ -18282,6 +18282,8 @@ __metadata:
   resolution: "nx-console@workspace:."
   dependencies:
     "@babel/core": "npm:7.21.0"
+    "@eslint/eslintrc": "npm:3.3.5"
+    "@eslint/js": "npm:9.39.4"
     "@lit-labs/context": "npm:0.3.3"
     "@microsoft/fast-components": "npm:2.30.6"
     "@microsoft/fast-element": "npm:1.14.0"
@@ -18387,6 +18389,7 @@ __metadata:
     tslib: "npm:2.8.1"
     type-fest: "npm:2.19.0"
     typescript: "npm:6.0.3"
+    typescript-eslint: "npm:8.62.0"
     universal-analytics: "npm:0.5.3"
     uuid: "npm:8.3.2"
     vite: "npm:8.0.9"
@@ -23473,6 +23476,21 @@ __metadata:
     tunnel: "npm:0.0.6"
     underscore: "npm:^1.12.1"
   checksum: 10c0/423cd386256c7faa2edc4eadace31f3f79861dabcca3d59973fef583572719061610230c25944cc023d35f6d594e0053f71e4b5f5282e81c4e04203ac85cf502
+  languageName: node
+  linkType: hard
+
+"typescript-eslint@npm:8.62.0":
+  version: 8.62.0
+  resolution: "typescript-eslint@npm:8.62.0"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": "npm:8.62.0"
+    "@typescript-eslint/parser": "npm:8.62.0"
+    "@typescript-eslint/typescript-estree": "npm:8.62.0"
+    "@typescript-eslint/utils": "npm:8.62.0"
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
+    typescript: ">=4.8.4 <6.1.0"
+  checksum: 10c0/263056d927b79c17b0c84849953642af202106e55914c5a606a4c76445b6428b2412e2d08cc20318b8aed9d1988e2a0cea60387e18ef0862beae13e8bc1df690
   languageName: node
   linkType: hard
 
