@@ -6,7 +6,15 @@
     "noImplicitReturns": false,
     "strict": false
   },
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts", "out-tsc"],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "jest.config.ts",
+    "out-tsc",
+    "jest.config.cts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
   "include": ["**/*.ts"],
   "references": [
     {
