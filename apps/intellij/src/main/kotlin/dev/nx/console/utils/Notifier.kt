@@ -8,11 +8,13 @@ import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.RestartDialogImpl
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
+import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.telemetry.actions.TelemetryOptInAction
 import dev.nx.console.telemetry.actions.TelemetryOptOutAction
 import kotlinx.coroutines.CoroutineScope
@@ -156,24 +158,40 @@ class Notifier {
             return notification
         }
 
-        fun notifyNoGenerators(project: Project, hasNxErrors: Boolean) {
+        fun notifyNoGenerators(
+            project: Project,
+            hasNxErrors: Boolean,
+            activeFilterMatchers: List<String> = emptyList(),
+        ) {
+            val message =
+                when {
+                    activeFilterMatchers.isNotEmpty() ->
+                        "No generators matched the active generator filter (${activeFilterMatchers.joinToString(", ")}). " +
+                            "Update or remove the filter in Nx Console settings."
+                    hasNxErrors -> "No generators found. View Nx Errors for more information."
+                    else -> "No generators found. View logs for more information."
+                }
+
             val notification =
                 getGroup()
-                    .createNotification(
-                        if (hasNxErrors) "No generators found. View Nx Errors for more information."
-                        else "No generators found. View logs for more information.",
-                        NotificationType.ERROR,
-                    )
+                    .createNotification(message, NotificationType.ERROR)
                     .setTitle("Nx Console")
 
-            if (hasNxErrors) {
+            if (activeFilterMatchers.isNotEmpty()) {
+                notification.addAction(
+                    NotificationAction.createSimpleExpiring("Open Nx Console Settings") {
+                        ShowSettingsUtil.getInstance()
+                            .showSettingsDialog(project, NxConsoleSettingsConfigurable::class.java)
+                    }
+                )
+            } else if (hasNxErrors) {
                 notification.addAction(
                     NotificationAction.createSimpleExpiring("View Nx Errors") {
                         ProblemsView.getToolWindow(project)?.show()
                     }
                 )
             } else {
-                notification.addAction(ActionManager.getInstance().getAction("OpenLog"))
+                ActionManager.getInstance().getAction("OpenLog")?.let { notification.addAction(it) }
             }
             notification.notify(project)
         }
