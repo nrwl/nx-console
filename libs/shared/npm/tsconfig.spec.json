@@ -6,7 +6,8 @@
     "module": "CommonJS",
     "moduleResolution": "node10",
     "noImplicitReturns": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "**/*.test.ts",
