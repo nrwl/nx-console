@@ -44,7 +44,14 @@ function createJsonSchema(
         target !== 'nx:noop',
     )
     .reduce<JSONSchemaMap>((targets, target) => {
-      const defaults: Partial<TargetConfiguration> = targetDefaults[target];
+      // Nx 23.1 widened TargetDefaults values to also allow the array storage
+      // form (TargetDefaultArrayEntry[]); this schema only reads the record shape.
+      const targetDefault = targetDefaults[target];
+      const defaults: Partial<TargetConfiguration> = Array.isArray(
+        targetDefault,
+      )
+        ? {}
+        : targetDefault;
       let targetSchema: JSONSchema = targetsSchema;
       if (defaults?.executor) {
         const match = executors.find((schema) => {
