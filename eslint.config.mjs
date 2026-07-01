@@ -3,6 +3,12 @@ import nx from '@nx/eslint-plugin';
 export default [
   ...nx.configs['flat/base'],
   {
+    // Never lint build artifacts. The pre-migration per-project .eslintrc files
+    // ignored these (e.g. "ignorePatterns": ["out-tsc", "test-output"]); the
+    // flat/base preset only ignores ".nx", so re-add them here workspace-wide.
+    ignores: ['**/dist', '**/out-tsc', '**/test-output'],
+  },
+  {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
       '@nx/enforce-module-boundaries': [
