@@ -77,6 +77,27 @@ export default [
       'no-extra-semi': 'off',
     },
   },
+  // ESLint v9 and typescript-eslint v8 turned these rules on in their recommended
+  // presets. They were not enforced before this upgrade and are not configured by
+  // this workspace; disable them to preserve the pre-migration lint baseline
+  // (per the Nx flat-config migration guidance: don't edit source for newly
+  // enabled preset rules — disable the rule instead).
+  {
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    rules: {
+      'no-control-regex': 'off',
+      'no-constant-binary-expression': 'off',
+      'no-unused-private-class-members': 'off',
+      'prefer-const': 'off',
+    },
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+    },
+  },
   {
     files: ['**/*.html'],
     // Override or add rules here

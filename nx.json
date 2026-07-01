@@ -109,6 +109,13 @@
     },
     {
       "plugin": "@nx/eslint/plugin",
+      "//": "These projects had no ESLint config before the Nx 23.1 flat-config migration (the old root .eslintrc.json ignored '**/*' and only projects with their own config opted in), so they were never linted. 'apps/intellij' is a Kotlin/Gradle project linted via ktfmt, not ESLint. Exclude them to preserve that pre-migration lint scope.",
+      "exclude": [
+        "apps/intellij/**/*",
+        "apps/vscode-e2e/**/*",
+        "libs/shared/cloud-fix-webview/**/*",
+        "libs/vscode/migrate-sidebar-webview/**/*"
+      ],
       "options": {
         "targetName": "lint"
       }
