@@ -56,6 +56,7 @@ In your handoff `summary` (1 to 3 sentences per the system prompt), name the sec
    ```
 
 2. **Locate all ESLint config files**:
+
    - Flat configs: `eslint.config.{mjs,cjs,js}` at the root and in each project.
    - Any remaining eslintrc files: `.eslintrc`, `.eslintrc.json`, `.eslintrc.yaml`, `.eslintrc.yml`, `.eslintrc.js`, `.eslintrc.cjs`.
    - Ignore files: `.eslintignore`.
