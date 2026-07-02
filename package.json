@@ -56,6 +56,8 @@
   },
   "devDependencies": {
     "@babel/core": "7.21.0",
+    "@eslint/eslintrc": "^3.0.0",
+    "@eslint/js": "^9.8.0",
     "@modelcontextprotocol/inspector": "0.16.8",
     "@monodon/typescript-nx-imports-plugin": "0.3.0",
     "@nx/conformance": "21.0.0-beta.0",
@@ -134,6 +136,7 @@
     "tslib": "2.8.1",
     "type-fest": "2.19.0",
     "typescript": "6.0.3",
+    "typescript-eslint": "^8.58.0",
     "universal-analytics": "0.5.3",
     "uuid": "8.3.2",
     "vite": "8.0.9",
