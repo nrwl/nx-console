@@ -1,7 +1,7 @@
 (async () => {
-  let esbuild = require('esbuild');
+  const esbuild = require('esbuild');
 
-  let result = await esbuild.build({
+  const result = await esbuild.build({
     entryPoints: ['./apps/nxls/src/main.ts'],
     bundle: true,
     minify: true,
@@ -14,7 +14,7 @@
     loader: { '.node': 'file' },
   });
 
-  let text = await esbuild.analyzeMetafile(result.metafile, {
+  const text = await esbuild.analyzeMetafile(result.metafile, {
     verbose: true,
   });
 

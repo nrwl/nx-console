@@ -1,4 +1,3 @@
-/* eslint-disable */
 module.exports = {
   displayName: 'shared-nx-cloud',
   preset: '../../../jest.preset.js',

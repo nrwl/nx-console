@@ -26,7 +26,6 @@ async function pnpApi(workspacePath: string) {
   }
 
   if (!PNP_API) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const pnp = require(pnpFile);
     pnp.setup();
     PNP_API = pnp;
