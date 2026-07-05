@@ -2,10 +2,7 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/jest",
-    "types": [
-      "jest",
-      "node"
-    ],
+    "types": ["jest", "node"],
     "module": "CommonJS",
     "moduleResolution": "node10",
     "noImplicitReturns": false,

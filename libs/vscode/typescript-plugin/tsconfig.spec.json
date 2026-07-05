@@ -4,17 +4,12 @@
     "outDir": "out-tsc/jest",
     "module": "commonjs",
     "moduleResolution": "node10",
-    "types": [
-      "jest",
-      "node"
-    ],
+    "types": ["jest", "node"],
     "noImplicitReturns": false,
     "ignoreDeprecations": "6.0",
     "rootDir": "."
   },
-  "exclude": [
-    "out-tsc"
-  ],
+  "exclude": ["out-tsc"],
   "include": [
     "**/*.spec.ts",
     "**/*.test.ts",
