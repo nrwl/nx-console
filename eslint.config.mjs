@@ -67,7 +67,6 @@ export default [
         },
       ],
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-extra-semi': 'error',
       'no-extra-semi': 'off',
     },
   },
@@ -75,7 +74,6 @@ export default [
   {
     files: ['**/*.js', '**/*.jsx'],
     rules: {
-      '@typescript-eslint/no-extra-semi': 'error',
       'no-extra-semi': 'off',
     },
   },
