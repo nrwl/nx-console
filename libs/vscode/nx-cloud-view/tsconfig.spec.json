@@ -4,8 +4,12 @@
     "outDir": "out-tsc/jest",
     "module": "commonjs",
     "moduleResolution": "node10",
-    "types": ["jest", "node"],
-    "ignoreDeprecations": "6.0"
+    "types": [
+      "jest",
+      "node"
+    ],
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": [
     "jest.config.ts",
@@ -19,7 +23,9 @@
     "**/*.spec.jsx",
     "**/*.d.ts"
   ],
-  "exclude": ["out-tsc"],
+  "exclude": [
+    "out-tsc"
+  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"
