@@ -44,7 +44,14 @@ function createJsonSchema(
         target !== 'nx:noop',
     )
     .reduce<JSONSchemaMap>((targets, target) => {
-      const defaults: Partial<TargetConfiguration> = targetDefaults[target];
+      // Nx 23.1 allows targetDefaults values to be an ordered array of
+      // filtered entries (last match wins) in addition to a plain object.
+      const targetDefault = targetDefaults[target];
+      const defaults: Partial<TargetConfiguration> | undefined = Array.isArray(
+        targetDefault,
+      )
+        ? [...targetDefault].reverse().find((entry) => entry.executor)
+        : targetDefault;
       let targetSchema: JSONSchema = targetsSchema;
       if (defaults?.executor) {
         const match = executors.find((schema) => {
