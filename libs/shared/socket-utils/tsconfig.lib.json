@@ -7,7 +7,8 @@
     "noImplicitReturns": true,
     "outDir": "out-tsc/shared-socket-utils",
     "tsBuildInfoFile": "out-tsc/shared-socket-utils/tsconfig.lib.tsbuildinfo",
-    "types": ["node"]
+    "types": ["node"],
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "references": [
