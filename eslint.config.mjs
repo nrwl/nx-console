@@ -68,6 +68,11 @@ export default [
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       'no-extra-semi': 'off',
+      // Newly enabled by the typescript-eslint v8 recommended set; was not enforced before the ESLint v9 upgrade.
+      '@typescript-eslint/no-unused-expressions': 'off',
+      // Newly enabled by the ESLint v9 recommended set; was not enforced before the upgrade.
+      'no-constant-binary-expression': 'off',
+      'no-unused-private-class-members': 'off',
     },
   },
   ...nx.configs['flat/javascript'],
@@ -75,11 +80,25 @@ export default [
     files: ['**/*.js', '**/*.jsx'],
     rules: {
       'no-extra-semi': 'off',
+      // Newly enabled for JS files via the typescript-eslint v8 recommended set; was not enforced before the ESLint v9 upgrade.
+      'prefer-const': 'off',
     },
   },
   {
     files: ['**/*.html'],
     // Override or add rules here
     rules: {},
+  },
+  {
+    // These projects were not covered by ESLint before the flat config
+    // migration (they had no .eslintrc.json), so keep them out of linting
+    // to preserve the pre-migration baseline.
+    ignores: [
+      'apps/intellij/**',
+      'apps/vscode-e2e/**',
+      'libs/shared/cloud-fix-webview/**',
+      'libs/shared/nx-cloud/**',
+      'libs/vscode/migrate-sidebar-webview/**',
+    ],
   },
 ];
