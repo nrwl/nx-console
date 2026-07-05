@@ -98,6 +98,8 @@ export default [
       'apps/vscode-e2e/**',
       'libs/shared/cloud-fix-webview/**',
       'libs/shared/nx-cloud/**',
+      'libs/shared/ui-components/**',
+      'libs/vscode/add-dependency/**',
       'libs/vscode/migrate-sidebar-webview/**',
     ],
   },
