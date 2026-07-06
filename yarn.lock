@@ -2445,7 +2445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:^3.0.0, @eslint/eslintrc@npm:^3.3.5":
+"@eslint/eslintrc@npm:3.3.5, @eslint/eslintrc@npm:^3.3.5":
   version: 3.3.5
   resolution: "@eslint/eslintrc@npm:3.3.5"
   dependencies:
@@ -2462,7 +2462,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.39.4, @eslint/js@npm:^9.8.0":
+"@eslint/js@npm:9.39.4":
   version: 9.39.4
   resolution: "@eslint/js@npm:9.39.4"
   checksum: 10c0/5aa7dea2cbc5decf7f5e3b0c6f86a084ccee0f792d288ca8e839f8bc1b64e03e227068968e49b26096e6f71fd857ab6e42691d1b993826b9a3883f1bdd7a0e46
@@ -18283,8 +18283,8 @@ __metadata:
   resolution: "nx-console@workspace:."
   dependencies:
     "@babel/core": "npm:7.21.0"
-    "@eslint/eslintrc": "npm:^3.0.0"
-    "@eslint/js": "npm:^9.8.0"
+    "@eslint/eslintrc": "npm:3.3.5"
+    "@eslint/js": "npm:9.39.4"
     "@lit-labs/context": "npm:0.3.3"
     "@microsoft/fast-components": "npm:2.30.6"
     "@microsoft/fast-element": "npm:1.14.0"
@@ -18390,7 +18390,7 @@ __metadata:
     tslib: "npm:2.8.1"
     type-fest: "npm:2.19.0"
     typescript: "npm:6.0.3"
-    typescript-eslint: "npm:^8.58.0"
+    typescript-eslint: "npm:8.62.1"
     universal-analytics: "npm:0.5.3"
     uuid: "npm:8.3.2"
     vite: "npm:8.0.9"
@@ -23493,7 +23493,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-eslint@npm:^8.58.0":
+"typescript-eslint@npm:8.62.1":
   version: 8.62.1
   resolution: "typescript-eslint@npm:8.62.1"
   dependencies:
