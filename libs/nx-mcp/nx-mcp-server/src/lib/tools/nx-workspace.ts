@@ -764,7 +764,7 @@ ${targetDescriptions}`;
   Found generator schema for ${generatorName}: ${JSON.stringify(
     generatorDetails,
   )}.
-              Follow up by using the nx_run_generator tool if IDE is available, otherwise use CLI commands. When generating libraries, apps or components, use the cwd option to specify the parent directory where you want to create the item.
+              Follow up by running the generator via the Nx CLI (nx generate ...). When generating libraries, apps or components, use the cwd option to specify the parent directory where you want to create the item.
             `,
             },
             {
