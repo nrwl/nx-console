@@ -37,8 +37,9 @@ describe('generator local plugin', () => {
 
     console.log('creating local plugin');
 
-    // Install @nx/plugin and create a local plugin using nx generators
-    execSync('npm install -D @nx/plugin --force', {
+    // Pin to the workspace's nx version; unversioned pulls @nx/plugin@latest,
+    // whose @nx/devkit peer-requires a newer nx than defaultVersion (npm ERESOLVE).
+    execSync(`npm install -D @nx/plugin@${defaultVersion} --force`, {
       cwd: workspacePath,
       stdio: 'pipe',
     });
