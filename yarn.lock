@@ -2427,7 +2427,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:^3.0.0, @eslint/eslintrc@npm:^3.1.0":
+"@eslint/eslintrc@npm:3.3.5, @eslint/eslintrc@npm:^3.1.0":
   version: 3.3.5
   resolution: "@eslint/eslintrc@npm:3.3.5"
   dependencies:
@@ -2444,17 +2444,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/js@npm:9.39.4":
+  version: 9.39.4
+  resolution: "@eslint/js@npm:9.39.4"
+  checksum: 10c0/5aa7dea2cbc5decf7f5e3b0c6f86a084ccee0f792d288ca8e839f8bc1b64e03e227068968e49b26096e6f71fd857ab6e42691d1b993826b9a3883f1bdd7a0e46
+  languageName: node
+  linkType: hard
+
 "@eslint/js@npm:9.9.1":
   version: 9.9.1
   resolution: "@eslint/js@npm:9.9.1"
   checksum: 10c0/a3a91de2ce78469f7c4eee78c1eba77360706e1d0fa0ace2e19102079bcf237b851217c85ea501dc92c4c3719d60d9df966977abc8554d4c38e3638c1f53dcb2
-  languageName: node
-  linkType: hard
-
-"@eslint/js@npm:^9.8.0":
-  version: 9.39.4
-  resolution: "@eslint/js@npm:9.39.4"
-  checksum: 10c0/5aa7dea2cbc5decf7f5e3b0c6f86a084ccee0f792d288ca8e839f8bc1b64e03e227068968e49b26096e6f71fd857ab6e42691d1b993826b9a3883f1bdd7a0e46
   languageName: node
   linkType: hard
 
@@ -18229,8 +18229,8 @@ __metadata:
   resolution: "nx-console@workspace:."
   dependencies:
     "@babel/core": "npm:7.21.0"
-    "@eslint/eslintrc": "npm:^3.0.0"
-    "@eslint/js": "npm:^9.8.0"
+    "@eslint/eslintrc": "npm:3.3.5"
+    "@eslint/js": "npm:9.39.4"
     "@lit-labs/context": "npm:0.3.3"
     "@microsoft/fast-components": "npm:2.30.6"
     "@microsoft/fast-element": "npm:1.14.0"
@@ -18336,7 +18336,7 @@ __metadata:
     tslib: "npm:2.8.1"
     type-fest: "npm:2.19.0"
     typescript: "npm:6.0.3"
-    typescript-eslint: "npm:^8.58.0"
+    typescript-eslint: "npm:8.63.0"
     universal-analytics: "npm:0.5.3"
     uuid: "npm:8.3.2"
     vite: "npm:8.0.9"
@@ -23439,7 +23439,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-eslint@npm:^8.58.0":
+"typescript-eslint@npm:8.63.0":
   version: 8.63.0
   resolution: "typescript-eslint@npm:8.63.0"
   dependencies:
