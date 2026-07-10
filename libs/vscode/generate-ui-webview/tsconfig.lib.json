@@ -4,7 +4,8 @@
     "outDir": "out-tsc/vscode-generate-ui-webview",
     "types": ["node"],
     "noImplicitReturns": false,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": [

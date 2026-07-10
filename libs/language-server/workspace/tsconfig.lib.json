@@ -4,7 +4,8 @@
     "outDir": "out-tsc/language-server-workspace",
     "types": ["node"],
     "noImplicitReturns": false,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "rootDir": "."
   },
   "exclude": ["out-tsc", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"],

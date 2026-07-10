@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/language-server-capabilities-definition",
     "types": ["node"],
-    "strict": false
+    "strict": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],

@@ -17,7 +17,8 @@
     "noImplicitReturns": false,
     "noUnusedLocals": false,
     "isolatedModules": false,
-    "strict": false
+    "strict": false,
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "references": []

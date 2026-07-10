@@ -9,7 +9,8 @@
     "moduleResolution": "bundler",
     "lib": ["DOM", "esnext.asynciterable"],
     "experimentalDecorators": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "references": [

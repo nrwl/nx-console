@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/vscode-tasks",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts", "out-tsc"],
   "include": ["**/*.ts"],

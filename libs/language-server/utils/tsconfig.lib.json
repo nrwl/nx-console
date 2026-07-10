@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/language-server-utils",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "exclude": ["out-tsc", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"],

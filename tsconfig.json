@@ -202,7 +202,11 @@
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs",
-      "moduleResolution": "node10"
+      "moduleResolution": "node10",
+      "ignoreDeprecations": "6.0"
     }
+  },
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
   }
 }
