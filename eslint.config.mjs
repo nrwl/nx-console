@@ -1,6 +1,20 @@
 import nx from '@nx/eslint-plugin';
 
 export default [
+  {
+    // The pre-flat-config root .eslintrc.json had ignorePatterns: ["**/*"], so
+    // projects without their own eslint config were never linted. Keep those
+    // projects out of lint scope to preserve that behavior.
+    ignores: [
+      'apps/intellij/**',
+      'apps/vscode-e2e/**',
+      'libs/shared/cloud-fix-webview/**',
+      'libs/shared/nx-cloud/**',
+      'libs/shared/ui-components/**',
+      'libs/vscode/add-dependency/**',
+      'libs/vscode/migrate-sidebar-webview/**',
+    ],
+  },
   ...nx.configs['flat/base'],
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -68,6 +82,11 @@ export default [
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       'no-extra-semi': 'off',
+      // Newly enabled by the ESLint v9 / typescript-eslint v8 preset defaults;
+      // these were not enforced before the Nx 23.1 migration.
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'no-constant-binary-expression': 'off',
+      'no-unused-private-class-members': 'off',
     },
   },
   ...nx.configs['flat/javascript'],
@@ -75,6 +94,10 @@ export default [
     files: ['**/*.js', '**/*.jsx'],
     rules: {
       'no-extra-semi': 'off',
+      // Newly enabled by the ESLint v9 preset defaults; these were not
+      // enforced before the Nx 23.1 migration.
+      'prefer-const': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
   {
