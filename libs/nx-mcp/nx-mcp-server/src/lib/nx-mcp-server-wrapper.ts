@@ -1,12 +1,7 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer, ServerCapabilities } from '@modelcontextprotocol/server';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { getMcpLogger } from './mcp-logger';
-
-import {
-  ServerCapabilities,
-  SetLevelRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace, CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
@@ -135,12 +130,9 @@ export class NxMcpServerWrapper {
     );
     logger?.debug?.('Registering all Nx MCP tools');
 
-    server.server.server.setRequestHandler(
-      SetLevelRequestSchema,
-      (req, res) => {
-        return {};
-      },
-    );
+    server.server.server.setRequestHandler('logging/setLevel', (req, res) => {
+      return {};
+    });
 
     registerNxCoreTools(
       server.toolRegistry,

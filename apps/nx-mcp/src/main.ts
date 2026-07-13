@@ -1,8 +1,7 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
+import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
+import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
+import { SSEServerTransport } from '@modelcontextprotocol/server-legacy/sse';
+import { McpServer, isInitializeRequest } from '@modelcontextprotocol/server';
 import {
   IdeProvider,
   mcpServerInstructions,
@@ -320,7 +319,7 @@ async function main() {
     const app = express();
 
     if (argv.transport === 'http') {
-      const sessions: Record<string, StreamableHTTPServerTransport> = {};
+      const sessions: Record<string, NodeStreamableHTTPServerTransport> = {};
 
       app.use(express.json());
 
@@ -328,7 +327,7 @@ async function main() {
       app.post('/mcp', async (req, res) => {
         const sessionId = req.headers['mcp-session-id'] as string | undefined;
 
-        let transport: StreamableHTTPServerTransport | undefined = sessionId
+        let transport: NodeStreamableHTTPServerTransport | undefined = sessionId
           ? sessions[sessionId]
           : undefined;
 
@@ -345,7 +344,7 @@ async function main() {
             return;
           }
 
-          transport = new StreamableHTTPServerTransport({
+          transport = new NodeStreamableHTTPServerTransport({
             sessionIdGenerator: () => randomUUID(),
             onsessioninitialized: async (id) => {
               sessions[id] = transport!;

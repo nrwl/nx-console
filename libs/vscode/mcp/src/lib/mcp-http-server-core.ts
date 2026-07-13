@@ -1,6 +1,5 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
+import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
+import { McpServer, isInitializeRequest } from '@modelcontextprotocol/server';
 import {
   mcpServerInstructions,
   MINIMAL_EXCLUDED_TOOLS,
@@ -41,14 +40,14 @@ export class McpHttpServerCore {
 
   private startStreamableWebServer(port: number) {
     this.app.use(express.json());
-    const sessions: Record<string, StreamableHTTPServerTransport> = {};
+    const sessions: Record<string, NodeStreamableHTTPServerTransport> = {};
 
     // POST: Handle initialization and all client->server messages
     this.app.post('/mcp', async (req: Request, res: Response) => {
       try {
         const sessionId = req.headers['mcp-session-id'] as string | undefined;
 
-        let transport: StreamableHTTPServerTransport | undefined = sessionId
+        let transport: NodeStreamableHTTPServerTransport | undefined = sessionId
           ? sessions[sessionId]
           : undefined;
 
@@ -66,7 +65,7 @@ export class McpHttpServerCore {
           }
 
           vscodeLogger.log('Initializing new MCP session');
-          transport = new StreamableHTTPServerTransport({
+          transport = new NodeStreamableHTTPServerTransport({
             sessionIdGenerator: () => randomUUID(),
             onsessioninitialized: async (id) => {
               sessions[id] = transport!;
