@@ -1,7 +1,4 @@
-import {
-  CallToolResult,
-  TextContent,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolResult, TextContent } from '@modelcontextprotocol/server';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 
