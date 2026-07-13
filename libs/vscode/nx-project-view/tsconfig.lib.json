@@ -4,7 +4,8 @@
     "outDir": "out-tsc/vscode-nx-project-view",
     "types": ["node"],
     "noImplicitReturns": false,
-    "strict": false
+    "strict": false,
+    "rootDir": "."
   },
   "exclude": [
     "**/*.spec.ts",

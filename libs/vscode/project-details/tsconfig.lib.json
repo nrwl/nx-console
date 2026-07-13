@@ -4,7 +4,8 @@
     "outDir": "out-tsc/vscode-project-details",
     "types": ["node"],
     "noImplicitReturns": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": [

@@ -2,7 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/vscode-nx-commands-view",
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts", "out-tsc"],
   "include": ["**/*.ts"],

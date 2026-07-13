@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/shared-file-system",
     "types": ["node"],
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "rootDir": "."
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["src/**/*.ts"],

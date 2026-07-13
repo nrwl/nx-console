@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/vscode-graph-base",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": [

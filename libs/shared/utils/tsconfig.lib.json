@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/shared-utils",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "exclude": ["out-tsc", "**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
   "include": ["**/*.ts"],

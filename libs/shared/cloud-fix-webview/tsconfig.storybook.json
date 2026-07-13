@@ -6,7 +6,8 @@
     "moduleResolution": "bundler",
     "jsx": "preserve",
     "experimentalDecorators": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "rootDir": "."
   },
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "include": [

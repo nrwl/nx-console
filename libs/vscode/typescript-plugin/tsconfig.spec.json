@@ -5,7 +5,9 @@
     "module": "commonjs",
     "moduleResolution": "node10",
     "types": ["jest", "node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "exclude": ["out-tsc"],
   "include": [

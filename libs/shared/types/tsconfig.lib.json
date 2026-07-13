@@ -2,7 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/shared-types",
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["src/**/*.ts"],
