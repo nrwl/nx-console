@@ -3,7 +3,7 @@ import { NxVersion } from './nx-version';
 
 describe('gte', () => {
   it('should return true if string version a is greater than string version b', () => {
-    expect(gte('2.0.0', '1.0.0')).toBe(false);
+    expect(gte('2.0.0', '1.0.0')).toBe(true);
   });
 
   it('should return false if string version a is less than string version b', () => {
