@@ -1,3 +1,5 @@
+[![MCP Toplist](https://mcptoplist.com/badge/io.github.nrwl%2Fnx-mcp.svg)](https://mcptoplist.com/server/io.github.nrwl%2Fnx-mcp)
+
 <p align="center">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-dark.png">
