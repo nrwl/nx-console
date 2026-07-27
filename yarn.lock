@@ -3591,27 +3591,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/client@npm:^2.0.0-beta.3":
-  version: 2.0.0-beta.5
-  resolution: "@modelcontextprotocol/client@npm:2.0.0-beta.5"
+"@modelcontextprotocol/client@npm:2.0.0-beta.3":
+  version: 2.0.0-beta.3
+  resolution: "@modelcontextprotocol/client@npm:2.0.0-beta.3"
   dependencies:
-    "@modelcontextprotocol/core": "npm:2.0.0-beta.5"
     cross-spawn: "npm:^7.0.5"
     eventsource: "npm:^3.0.2"
     eventsource-parser: "npm:^3.0.0"
     jose: "npm:^6.1.3"
     pkce-challenge: "npm:^5.0.0"
     zod: "npm:^4.2.0"
-  checksum: 10c0/ab2f279347d3506e1813e9138bbfc8b9539e1bb5fadf75110855ab3ba9534668dc911f4e672de24c19e16c7323efb96c5fe781a792d152286d3c9ef7af265cb7
-  languageName: node
-  linkType: hard
-
-"@modelcontextprotocol/core@npm:2.0.0-beta.5":
-  version: 2.0.0-beta.5
-  resolution: "@modelcontextprotocol/core@npm:2.0.0-beta.5"
-  dependencies:
-    zod: "npm:^4.2.0"
-  checksum: 10c0/f31d7e571071b95cc54822c0d558e38eaf7250a9040ead8464380c28dcc98e6b067402fef6c9bc67f54ea440c7bbdb2b8d13d067f859a059f0310d0dac2975eb
+  checksum: 10c0/4a3fbf8517b32d136af42171e267cb0a04fe0d38ed38dcae2412cfa23f052064efd1d6e0533d0d7ea71e9f50ba28147ee33ee28dc9091a4b26d18afe76c27280
   languageName: node
   linkType: hard
 
@@ -3701,18 +3691,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/node@npm:^2.0.0-beta.3":
-  version: 2.0.0-beta.5
-  resolution: "@modelcontextprotocol/node@npm:2.0.0-beta.5"
+"@modelcontextprotocol/node@npm:2.0.0-beta.3":
+  version: 2.0.0-beta.3
+  resolution: "@modelcontextprotocol/node@npm:2.0.0-beta.3"
   dependencies:
     "@hono/node-server": "npm:^1.19.9"
   peerDependencies:
-    "@modelcontextprotocol/server": ^2.0.0-beta.5
+    "@modelcontextprotocol/server": ^2.0.0-beta.3
     hono: ^4.11.4
   peerDependenciesMeta:
     hono:
       optional: true
-  checksum: 10c0/308f72821c6130dec0f713e5a33f7fa5fd21f882ca4f3370a09cfdcba14e0ffca1c807f46fd2220b7bc34c4b6ec7b349c7f5319759321560e1af6d10b808ea7e
+  checksum: 10c0/0ff8cb15d869eab80d1d7009eb3462cf0ac7a3fd87c8fea213a87f69d91e353543a873e009e35ac3ea51ac5a9535afc29fcc45d40781f127e9ea6cd560ea8c40
   languageName: node
   linkType: hard
 
@@ -3736,11 +3726,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/server-legacy@npm:^2.0.0-beta.2":
-  version: 2.0.0-beta.5
-  resolution: "@modelcontextprotocol/server-legacy@npm:2.0.0-beta.5"
+"@modelcontextprotocol/server-legacy@npm:2.0.0-beta.2":
+  version: 2.0.0-beta.2
+  resolution: "@modelcontextprotocol/server-legacy@npm:2.0.0-beta.2"
   dependencies:
-    "@modelcontextprotocol/core": "npm:2.0.0-beta.5"
     content-type: "npm:^1.0.5"
     cors: "npm:^2.8.5"
     express-rate-limit: "npm:^8.2.1"
@@ -3752,17 +3741,16 @@ __metadata:
   peerDependenciesMeta:
     express:
       optional: true
-  checksum: 10c0/0965b92ace5f609a75631be53eca7589ea7e15bdf34118fb7bab4e4936d6f8c3b1f8a944858aedd4e697cb203e9658285a10646e65063f9822801fdd2db913dd
+  checksum: 10c0/3f98e1550dfe064c9466c82ee225f11d793abfd56c31ef754937b48c03466f6f2c325ce8ee3fb3d98b9aa439fac48600967dea0c7a67293eea5a38443cc765d3
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/server@npm:^2.0.0-beta.3":
-  version: 2.0.0-beta.5
-  resolution: "@modelcontextprotocol/server@npm:2.0.0-beta.5"
+"@modelcontextprotocol/server@npm:2.0.0-beta.3":
+  version: 2.0.0-beta.3
+  resolution: "@modelcontextprotocol/server@npm:2.0.0-beta.3"
   dependencies:
-    "@modelcontextprotocol/core": "npm:2.0.0-beta.5"
     zod: "npm:^4.2.0"
-  checksum: 10c0/4ea8364c36ed24cf2f3b90d30bd2567023f7aab419c543dd19bd923b633b2517a91b275a144fe1cf5081478b50844488cc589f399ba53cc21c631494db331792
+  checksum: 10c0/68316837acceb93375bcfba03c166c8072208beb9ac0b4fa198250a69dd6fefcdb677d7369538c2a1a9e5e32914f85fee182e9ad0dbc84a98844b1e6dd52beec
   languageName: node
   linkType: hard
 
@@ -18924,11 +18912,11 @@ __metadata:
     "@microsoft/fast-components": "npm:2.30.6"
     "@microsoft/fast-element": "npm:1.14.0"
     "@microsoft/fast-foundation": "npm:2.50.0"
-    "@modelcontextprotocol/client": "npm:^2.0.0-beta.3"
+    "@modelcontextprotocol/client": "npm:2.0.0-beta.3"
     "@modelcontextprotocol/inspector": "npm:0.16.8"
-    "@modelcontextprotocol/node": "npm:^2.0.0-beta.3"
-    "@modelcontextprotocol/server": "npm:^2.0.0-beta.3"
-    "@modelcontextprotocol/server-legacy": "npm:^2.0.0-beta.2"
+    "@modelcontextprotocol/node": "npm:2.0.0-beta.3"
+    "@modelcontextprotocol/server": "npm:2.0.0-beta.3"
+    "@modelcontextprotocol/server-legacy": "npm:2.0.0-beta.2"
     "@monodon/typescript-nx-imports-plugin": "npm:0.3.0"
     "@nx/conformance": "npm:21.0.0-beta.0"
     "@nx/cypress": "npm:23.2.0-beta.2"
