@@ -1,8 +1,4 @@
-import { join } from 'path';
-import {
-  importWorkspaceDependency,
-  workspaceDependencyPath,
-} from '../workspace-dependencies';
+import { importNxPackagePath } from '../workspace-dependencies';
 import { NxWorkspace } from '@nx-console/shared-types';
 import type { ProjectsConfigurations } from 'nx/src/devkit-exports';
 import type { PluginCapabilities } from 'nx/src/utils/plugins/plugin-capabilities';
@@ -11,15 +7,9 @@ export async function getLocalWorkspacePlugins(
   workspacePath: string,
   workspace: NxWorkspace,
 ): Promise<Map<string, PluginCapabilities>> {
-  const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
-  if (!nxPath) {
-    throw 'local nx dependency not found';
-  }
-  const importPath = join(nxPath, 'src/utils/plugins/local-plugins');
-  const { getLocalWorkspacePlugins } =
-    await importWorkspaceDependency<
-      typeof import('nx/src/utils/plugins/local-plugins')
-    >(importPath);
+  const { getLocalWorkspacePlugins } = await importNxPackagePath<
+    typeof import('nx/src/utils/plugins/local-plugins')
+  >(workspacePath, 'src/utils/plugins/local-plugins');
 
   const projectsConfiguration: ProjectsConfigurations = {
     // placeholder, doesn't actually matter

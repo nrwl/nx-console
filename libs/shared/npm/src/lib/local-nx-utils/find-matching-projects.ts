@@ -1,24 +1,14 @@
 import type { ProjectGraphProjectNode } from 'nx/src/devkit-exports';
-import { join } from 'path';
-import {
-  importWorkspaceDependency,
-  workspaceDependencyPath,
-} from '../workspace-dependencies';
+import { importNxPackagePath } from '../workspace-dependencies';
 
 export async function findMatchingProjects(
   projectsToRun: string | string[],
   projects: Record<string, ProjectGraphProjectNode>,
   workspacePath: string,
 ): Promise<string[]> {
-  const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
-  if (!nxPath) {
-    throw 'local nx dependency not found';
-  }
-  const importPath = join(nxPath, 'src/utils/find-matching-projects');
-  const { findMatchingProjects } =
-    await importWorkspaceDependency<
-      typeof import('nx/src/utils/find-matching-projects')
-    >(importPath);
+  const { findMatchingProjects } = await importNxPackagePath<
+    typeof import('nx/src/utils/find-matching-projects')
+  >(workspacePath, 'src/utils/find-matching-projects');
   const projectsArray = Array.isArray(projectsToRun)
     ? projectsToRun
     : [projectsToRun];

@@ -1,8 +1,5 @@
 import { gte } from '@nx-console/nx-version';
-import {
-  importWorkspaceDependency,
-  workspaceDependencyPath,
-} from '@nx-console/shared-npm';
+import { importWorkspacePackagePath } from '@nx-console/shared-npm';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -12,7 +9,6 @@ import { getNxVersion, getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { watchFile } from '@nx-console/vscode-utils';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
-import { join } from 'path';
 import * as vscode from 'vscode';
 import { Actor, createActor, fromPromise, setup } from 'xstate';
 import {
@@ -287,25 +283,9 @@ async function isUsingTsSolutionSetup(workspaceRoot: string): Promise<boolean> {
   const nxVersion = await getNxVersion();
   if (nxVersion && gte(nxVersion.full, '20.1.0')) {
     try {
-      const nxJsPath = await workspaceDependencyPath(
-        workspaceRoot,
-        join('@nx', 'js'),
-      );
-      if (!nxJsPath) {
-        return false;
-      }
-      const tsSolutionSetupPath = join(
-        nxJsPath,
-        'src',
-        'utils',
-        'typescript',
-        'ts-solution-setup.js',
-      );
-
-      const { isUsingTsSolutionSetup } =
-        await importWorkspaceDependency<typeof import('@nx/js/internal')>(
-          tsSolutionSetupPath,
-        );
+      const { isUsingTsSolutionSetup } = await importWorkspacePackagePath<
+        typeof import('@nx/js/internal')
+      >(workspaceRoot, '@nx/js', 'src/utils/typescript/ts-solution-setup.js');
       return isUsingTsSolutionSetup();
     } catch (e) {
       return false;
