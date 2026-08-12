@@ -7,7 +7,7 @@ import {
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { commands, window } from 'vscode';
 import { fetchAndPullChanges } from './nx-cloud-fix-webview';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 export class CIPENotificationService {
   private sentNotifications = new Set<string>();
@@ -242,7 +242,7 @@ export class CIPENotificationService {
     const targetBranch = cipe.branch;
     let hasBranchOnRemote: boolean;
     try {
-      execSync(`git rev-parse --verify origin/${targetBranch}`, {
+      execFileSync('git', ['rev-parse', '--verify', `origin/${targetBranch}`], {
         cwd: getNxWorkspacePath(),
       });
       hasBranchOnRemote = true;
