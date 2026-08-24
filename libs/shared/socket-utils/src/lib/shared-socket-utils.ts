@@ -1,5 +1,5 @@
 import { importNxPackagePath } from '@nx-console/shared-npm';
-import { consoleLogger } from '@nx-console/shared-utils';
+import { consoleLogger, loadRootEnvFiles } from '@nx-console/shared-utils';
 import { chmodSync, lstatSync, mkdirSync, unlinkSync } from 'fs';
 import { Socket } from 'net';
 import { platform, tmpdir } from 'os';
@@ -91,14 +91,26 @@ async function getSocketDir(workspaceRoot: string, env: NodeJS.ProcessEnv) {
 }
 
 /**
- * Get the full OS-specific socket path for Nx Console communication
+ * Get the full OS-specific socket path for Nx Console communication.
+ *
+ * The workspace's `.env` files are loaded here rather than by callers so that
+ * every end - the messaging server that binds the socket and the clients that
+ * connect to it - resolves the same path from the same inputs. A `NX_SOCKET_DIR`
+ * set in a workspace `.env` used to move only the server, leaving clients
+ * connecting to a path nothing was listening on.
  */
 export const getNxConsoleSocketPath = async (
   workspaceRoot: string,
-  env = process.env,
+  env: NodeJS.ProcessEnv = process.env,
 ) => {
+  // loadRootEnvFiles mutates the env it is handed, so always give it a copy.
+  const envWithLocalFiles = loadRootEnvFiles(workspaceRoot, { ...env });
+
   const path = resolve(
-    join(await getSocketDir(workspaceRoot, env), 'nx-console.sock'),
+    join(
+      await getSocketDir(workspaceRoot, envWithLocalFiles),
+      'nx-console.sock',
+    ),
   );
   return platform() === 'win32' ? '\\\\.\\pipe\\nx\\' + path : path;
 };

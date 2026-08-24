@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { Server, createServer } from 'net';
 import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 
@@ -37,7 +38,12 @@ const mockedPlatform = jest.requireMock('os').platform as jest.Mock;
 const mockedMkdirSync = fs.mkdirSync as unknown as jest.Mock;
 const mockedChmodSync = fs.chmodSync as unknown as jest.Mock;
 
-import { getNxConsoleSocketPath } from './shared-socket-utils';
+import { loadRootEnvFiles } from '@nx-console/shared-utils';
+
+import {
+  getNxConsoleSocketPath,
+  testIdeConnection,
+} from './shared-socket-utils';
 
 const actualPlatform = jest.requireActual('os').platform();
 const describeOnPosix = actualPlatform === 'win32' ? describe.skip : describe;
@@ -51,6 +57,7 @@ function modeOf(path: string): number {
 describe('shared-socket-utils', () => {
   const realFs = jest.requireActual('fs');
   const tmpDirs: string[] = [];
+  const servers: Server[] = [];
 
   function makeTmpDir(prefix = 'nxc-ws-'): string {
     const dir = realFs.mkdtempSync(join(tmpdir(), prefix));
@@ -58,12 +65,22 @@ describe('shared-socket-utils', () => {
     return dir;
   }
 
+  function writeEnvFile(workspaceRoot: string, contents: string) {
+    realFs.writeFileSync(join(workspaceRoot, '.env'), contents);
+  }
+
   afterEach(() => {
     jest.clearAllMocks();
     mockedPlatform.mockImplementation(() => actualPlatform);
   });
 
-  afterAll(() => {
+  afterAll(async () => {
+    await Promise.all(
+      servers.map(
+        (server) =>
+          new Promise<void>((resolve) => server.close(() => resolve())),
+      ),
+    );
     for (const dir of tmpDirs) {
       realFs.rmSync(dir, { recursive: true, force: true });
     }
@@ -226,6 +243,107 @@ describe('shared-socket-utils', () => {
 
       tmpDirs.push(dirname(first), dirname(second));
       expect(first).not.toEqual(second);
+    });
+  });
+
+  // The regression the server/client `.env` asymmetry used to cause: the
+  // messaging server loaded the workspace `.env` before resolving the socket
+  // path and the clients did not, so a `.env`-provided NX_SOCKET_DIR moved only
+  // the server and the two ends stopped finding each other.
+  describe('workspace .env files', () => {
+    it('honours NX_SOCKET_DIR from the workspace .env', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${socketDir}\n`);
+
+      const socketPath = await getNxConsoleSocketPath(workspaceRoot, {});
+
+      expect(socketPath).toEqual(join(socketDir, 'nx-console.sock'));
+    });
+
+    it('honours NX_DAEMON_SOCKET_DIR from the workspace .env', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_DAEMON_SOCKET_DIR=${socketDir}\n`);
+
+      const socketPath = await getNxConsoleSocketPath(workspaceRoot, {});
+
+      expect(socketPath).toEqual(join(socketDir, 'nx-console.sock'));
+    });
+
+    it('lets .env.local win over .env, matching dotenv load order', async () => {
+      const workspaceRoot = makeTmpDir();
+      const fromEnv = makeTmpDir('nxc-sock-');
+      const fromEnvLocal = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${fromEnv}\n`);
+      realFs.writeFileSync(
+        join(workspaceRoot, '.env.local'),
+        `NX_SOCKET_DIR=${fromEnvLocal}\n`,
+      );
+
+      const socketPath = await getNxConsoleSocketPath(workspaceRoot, {});
+
+      expect(socketPath).toEqual(join(fromEnvLocal, 'nx-console.sock'));
+    });
+
+    it('does not mutate the env object it is handed', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${socketDir}\n`);
+
+      const env: NodeJS.ProcessEnv = {};
+      await getNxConsoleSocketPath(workspaceRoot, env);
+
+      expect(env).toEqual({});
+    });
+  });
+
+  describeOnPosix('server and client agree on the same path', () => {
+    async function listenOn(socketPath: string): Promise<Server> {
+      const server = createServer();
+      servers.push(server);
+      await new Promise<void>((resolve, reject) => {
+        server.once('error', reject);
+        server.listen(socketPath, () => resolve());
+      });
+      return server;
+    }
+
+    // The old messaging server resolved its path from a dotenv-expanded env
+    // while clients passed process.env, so a `.env`-provided NX_SOCKET_DIR split
+    // them apart. Both inputs must now land on the same path.
+    it('resolves the same path whether or not the caller pre-loads .env', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${socketDir}\n`);
+
+      const preloaded = loadRootEnvFiles(workspaceRoot, { ...process.env });
+      const serverPath = await getNxConsoleSocketPath(workspaceRoot, preloaded);
+      const clientPath = await getNxConsoleSocketPath(workspaceRoot);
+
+      expect(serverPath).toEqual(clientPath);
+      expect(clientPath).toEqual(join(socketDir, 'nx-console.sock'));
+    });
+
+    it('testIdeConnection finds a server bound at the .env-provided path', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${socketDir}\n`);
+
+      // what the messaging server binds
+      const socketPath = await getNxConsoleSocketPath(workspaceRoot);
+      await listenOn(socketPath);
+
+      // what a client (nx-mcp) probes - it only knows the workspace root
+      await expect(testIdeConnection(workspaceRoot)).resolves.toBe(true);
+    });
+
+    it('testIdeConnection reports false when nothing is listening', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${socketDir}\n`);
+
+      await expect(testIdeConnection(workspaceRoot)).resolves.toBe(false);
     });
   });
 });
