@@ -168,5 +168,8 @@
     "libs/**",
     "apps/**"
   ],
-  "packageManager": "yarn@4.15.0"
+  "packageManager": "yarn@4.15.0",
+  "resolutions": {
+    "minimatch@9.0.3": "^9.0.7"
+  }
 }
