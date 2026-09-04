@@ -135,7 +135,7 @@ if (System.getenv("CI") == null) {
     intellijPlatformTesting {
         runIde {
             create("runIntelliJLatest") {
-                version = "2025.2.1"
+                version = "2026.2.2"
                 prepareSandboxTask {
                     from(nxlsRoot) {
                         include("**")
