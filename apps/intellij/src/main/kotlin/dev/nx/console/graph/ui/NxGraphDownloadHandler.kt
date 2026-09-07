@@ -11,7 +11,8 @@ class NxGraphDownloadHandler : CefDownloadHandlerAdapter() {
         downloadItem: CefDownloadItem?,
         suggestedName: String?,
         callback: CefBeforeDownloadCallback,
-    ) {
+    ): Boolean {
         callback.Continue(suggestedName, true)
+        return true
     }
 }

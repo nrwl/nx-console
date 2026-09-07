@@ -95,7 +95,7 @@ class ProjectLevelConfigFileCodeVisionManager(
     fun getCodeVision(editor: Editor): CodeVisionState {
         val project = editor.project ?: return CodeVisionState.READY_EMPTY
 
-        val file = editor.virtualFile
+        val file = editor.virtualFile ?: return CodeVisionState.READY_EMPTY
         val normalizedFilePath = Paths.get(file.path).normalize().toString()
 
         val nxProjectForFile =
@@ -295,7 +295,7 @@ class ProjectLevelConfigFileCodeVisionManager(
         val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document) ?: return null
 
         if (psiFile is JsonFile) {
-            val path = editor.virtualFile.path
+            val path = editor.virtualFile?.path ?: return null
 
             if (path.endsWith("project.json")) {
                 val targetsProperty =
