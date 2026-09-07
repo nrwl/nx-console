@@ -107,9 +107,10 @@ versions. The IDE's bundled Performance Testing plugin supplies the server.
 For a bug fix, preserve the scenario and its baseline failure, rebuild/relaunch
 the IDE after changing the plugin, and rerun against the same fixture. Running
 a scenario again does not reload plugin code or reset the opened workspace.
-Nx caching is disabled for `instrumentCode`: its inferred inputs currently omit
-the compiled classes, which can restore old plugin bytecode after a Kotlin
-change. Gradle still performs its own incremental checks for that step.
+`instrumentCode` explicitly includes source files and compiled classes from its
+task dependencies in its Nx cache inputs. The inferred inputs omit compiled
+classes, which can restore old plugin bytecode after a Kotlin change. Keeping
+this build step cacheable also allows its dependents to run on Nx Agents.
 
 ## Record reproduction and verification videos
 

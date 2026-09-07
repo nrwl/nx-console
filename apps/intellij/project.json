@@ -36,7 +36,17 @@
       "cache": false
     },
     "instrumentCode": {
-      "cache": false
+      "cache": true,
+      "inputs": [
+        "kotlin",
+        "sharedGlobals",
+        "{projectRoot}/src/main/**/*",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        {
+          "dependentTasksOutputFiles": "**/*.class",
+          "transitive": true
+        }
+      ]
     },
     "compileAutomationKotlin": {
       "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
