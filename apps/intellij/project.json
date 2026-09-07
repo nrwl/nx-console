@@ -22,6 +22,37 @@
     "runIde": {
       "cache": false
     },
+    "runAutomationIde": {
+      "cache": false,
+      "options": {
+        "args": [
+          "--project-cache-dir=.gradle/automation-ide",
+          "--max-workers=2",
+          "--priority=low"
+        ]
+      }
+    },
+    "runAutomation": {
+      "cache": false
+    },
+    "compileAutomationKotlin": {
+      "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
+    },
+    "ktfmtCheckAutomation": {
+      "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
+    },
+    "ktfmtFormatAutomation": {
+      "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
+    },
+    "prepareSandbox_runAutomationIde": {
+      "dependsOn": [
+        "^build",
+        "^build-webview-files",
+        "composedJar",
+        "^jar",
+        "initializeIntellijPlatformPlugin"
+      ]
+    },
     "prepareSandbox": {
       "dependsOn": [
         "^build",
