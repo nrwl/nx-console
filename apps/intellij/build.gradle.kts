@@ -1,3 +1,4 @@
+import java.time.Duration
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
@@ -174,9 +175,11 @@ tasks {
     test {
         useJUnit()
         include("**/*Test.class")
+        // Turn a hung test IDE into a failure with captured output instead of a silent CI timeout.
+        timeout.set(Duration.ofMinutes(20))
 
         testLogging {
-            events("passed", "skipped", "failed", "standardOut", "standardError")
+            events("started", "passed", "skipped", "failed", "standardOut", "standardError")
             showExceptions = true
             showStackTraces = true
             showCauses = true
