@@ -107,6 +107,114 @@ versions. The IDE's bundled Performance Testing plugin supplies the server.
 For a bug fix, preserve the scenario and its baseline failure, rebuild/relaunch
 the IDE after changing the plugin, and rerun against the same fixture. Running
 a scenario again does not reload plugin code or reset the opened workspace.
+Nx caching is disabled for `instrumentCode`: its inferred inputs currently omit
+the compiled classes, which can restore old plugin bytecode after a Kotlin
+change. Gradle still performs its own incremental checks for that step.
+
+## Record reproduction and verification videos
+
+Install `ffmpeg` on the machine running the scenarios. Wrap the scenario in
+`recordIde` to save an MP4 even when an assertion fails:
+
+```kotlin
+fun main() = withAutomationDriver {
+    waitForProjectOpen(2.minutes)
+    recordIde(System.getenv("NX_AUTOMATION_LABEL") ?: "issue-repro") {
+        openToolWindow("Nx Console")
+        inspectIde()
+        // Perform the issue's actions and assert the expected behavior here.
+    }
+}
+```
+
+Set `NX_AUTOMATION_LABEL=issue-repro` for the baseline run and
+`NX_AUTOMATION_LABEL=post-fix` when rerunning the same scenario after rebuilding
+and relaunching the changed plugin. Each run writes to a unique directory under
+`dist/apps/intellij/automation`, containing the labeled MP4, captured PNGs,
+frame timing manifest, and `result.txt` with PASS or the assertion failure.
+Keep the baseline failure and post-fix success with the PR's verification notes.
+A successful investigation run is not evidence of a reproduced bug.
+
+The recording samples the main IDE window through JetBrains' component capture
+API, preserves elapsed time, and encodes a silent H.264 MP4. Actual capture rate
+depends on IDE responsiveness (typically 2–4 frames per second). Restore a
+minimized IDE before recording so JCEF can initialize. Separate popup/dialog
+windows are retained in the IDE screenshot log directories, but are not overlaid
+on the main-window video.
+
+`ReproGraphKt` checks cold full-graph loading, project focus, returning to the
+full graph, restoring a manually hidden project, and focusing after closing the
+graph. It expects an opened fixture with `demo → ui → core` and an independent
+`unrelated` project. Its expected focus selection uses the Nx 23 graph's default
+dependency distance of 1. Run it with:
+
+```sh
+NX_AUTOMATION_LABEL=graph-investigation CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproGraphKt'
+```
+
+The scenario saves the selected projects and graph URL at each assertion.
+Its focus step invokes the real action with an editor context-menu event.
+On IntelliJ 252, Driver's `invokeAction(..., place = "EditorPopup")` alone does
+not mark an event as a context-menu event, so it opens the project picker.
+
+### Saved run arguments (#3191)
+
+`ReproRunArgumentsKt` seeds a saved `demo:hello` run configuration with
+`--greeting="hello from Nx Console"`, selects its Nx Console tree node, and
+invokes the tree's registered Run action through `ActionManager`. It checks
+both the saved configuration after launch and the arguments received by a real
+Node process. This exercises the tree action without native mouse input.
+
+Use an opened fixture named `intellij-automation-fixture`, with its own Nx
+installation and lockfile. Set `"analytics": false` in its `nx.json` to avoid
+the interactive Nx 23 analytics prompt. Its `demo/project.json` needs:
+
+```json
+{
+  "name": "demo",
+  "targets": {
+    "hello": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node demo/print-args.cjs"
+      }
+    }
+  }
+}
+```
+
+Create `demo/print-args.cjs` in that fixture:
+
+```js
+const fs = require('node:fs');
+const args = process.argv.slice(2);
+console.log('Arguments received by the target:', JSON.stringify(args));
+fs.mkdirSync('.nx', { recursive: true });
+fs.writeFileSync('.nx/automation-args.json', JSON.stringify(args));
+```
+
+Select the Projects/Targets list layout in Nx Console, then run:
+
+```sh
+NX_AUTOMATION_LABEL=issue-3191-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproRunArgumentsKt'
+```
+
+Rerun with `NX_AUTOMATION_LABEL=issue-3191-fixed` after rebuilding and restarting
+the IDE. The scenario resets the saved argument and deletes the previous target
+output each time. The video shows the initial saved argument in a diagnostic
+editor tab and the actual task output in the Run tool window. A separate text
+report records the saved argument before/after and the received argument array.
+
+The tree Run action uses the SDK's EDT/read-action context, matching
+`Driver.invokeAction`. Calling `actionPerformed` directly on the EDT can fail
+IntelliJ's write-intent lock checks during execution startup.
 
 References:
 

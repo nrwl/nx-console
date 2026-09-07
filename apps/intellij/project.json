@@ -35,6 +35,9 @@
     "runAutomation": {
       "cache": false
     },
+    "instrumentCode": {
+      "cache": false
+    },
     "compileAutomationKotlin": {
       "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
     },
