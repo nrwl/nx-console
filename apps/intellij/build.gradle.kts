@@ -4,6 +4,7 @@ import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories { mavenCentral() }
@@ -36,6 +37,73 @@ plugins {
 group = providers.gradleProperty("pluginGroup").get()
 
 version = providers.gradleProperty("version").get()
+
+val automation by sourceSets.creating
+val automationPort =
+    providers
+        .gradleProperty("automationPort")
+        .map(String::toInt)
+        .orElse(20000 + (rootDir.absolutePath.hashCode().toUInt() % 20000u).toInt())
+val automationOutput = layout.buildDirectory.dir("automation")
+val automationDriverVersion = providers.provider { intellijPlatform.productInfo.buildNumber }
+
+dependencies {
+    listOf("driver-sdk", "driver-model").forEach { artifact ->
+        add(
+            automation.implementationConfigurationName,
+            automationDriverVersion.map { "com.jetbrains.intellij.driver:$artifact:$it" },
+        )
+    }
+}
+
+intellijPlatformTesting {
+    runIde {
+        create("runAutomationIde") {
+            localPath = layout.dir(providers.provider { intellijPlatform.platformPath.toFile() })
+            sandboxDirectory = layout.buildDirectory.dir("automation-sandbox")
+            prepareSandboxTask {
+                from(nxlsRoot) { into("${intellijPlatform.projectName.get()}/nxls") }
+            }
+            task {
+                environment = environment.filterKeys { it != "CI" && it != "NX_DAEMON" }
+                systemProperty("com.sun.management.jmxremote", "true")
+                systemProperty("com.sun.management.jmxremote.host", "127.0.0.1")
+                systemProperty("com.sun.management.jmxremote.port", automationPort.get())
+                systemProperty("com.sun.management.jmxremote.rmi.port", automationPort.get())
+                systemProperty("com.sun.management.jmxremote.authenticate", "false")
+                systemProperty("com.sun.management.jmxremote.ssl", "false")
+                systemProperty(
+                    "com.sun.management.jmxremote.serial.filter.pattern",
+                    "java.**;javax.**;com.intellij.driver.model.**",
+                )
+                systemProperty("java.rmi.server.hostname", "127.0.0.1")
+                systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
+                systemProperty("expose.ui.hierarchy.url", "true")
+                systemProperty("idea.trust.all.projects", "true")
+                systemProperty("ide.show.tips.on.startup.default.value", "false")
+                args(
+                    providers.gradleProperty("automationProject").orElse(rootDir.absolutePath).get()
+                )
+                doFirst {
+                    logger.lifecycle("Automation JMX endpoint: 127.0.0.1:${automationPort.get()}")
+                }
+            }
+        }
+    }
+}
+
+tasks.register<JavaExec>("runAutomation") {
+    group = "verification"
+    description = "Runs a Kotlin scenario against this worktree's automation IDE."
+    classpath = automation.runtimeClasspath
+    mainClass =
+        providers.gradleProperty("automationMain").orElse("dev.nx.console.automation.InspectIdeKt")
+    systemProperty("nx.console.automation.port", automationPort.get())
+    systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
+    systemProperty("nx.console.automation.output", automationOutput.get().asFile.absolutePath)
+    workingDir = rootDir
+    maxHeapSize = "1g"
+}
 
 // Configure project's dependencies
 repositories { intellijPlatform { defaultRepositories() } }
@@ -149,7 +217,7 @@ if (System.getenv("CI") == null) {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
         freeCompilerArgs.add("-Xskip-metadata-version-check")
