@@ -8,9 +8,13 @@ permissions:
 
 env:
   CI: true
-  NX_NO_CLOUD: true
   NX_DAEMON: false
   NX_PLUGIN_NO_TIMEOUTS: true
+  NX_CLOUD_ACCESS_TOKEN: ${{ github.ref == 'refs/heads/master' && secrets.NX_CLOUD_READ_WRITE_TOKEN || secrets.NX_CLOUD_READ_TOKEN }}
+  NX_CI_EXECUTION_ENV: intellij-e2e
+  NX_E2E_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+  NX_AUTOMATION_IDE_HEAP: 1g
+  NX_CACHE_FAILURES: true
   JAVA_TOOL_OPTIONS: -XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low
 
 jobs:
@@ -35,35 +39,21 @@ jobs:
         run: |
           mkdir -p "$HOME/.gradle"
           printf '%s\n' 'org.gradle.jvmargs=-Xmx2g -XX:ActiveProcessorCount=4' 'kotlin.daemon.jvmargs=-Xmx1g' 'org.gradle.workers.max=2' 'org.gradle.priority=low' 'org.gradle.daemon.idletimeout=60000' >> "$HOME/.gradle/gradle.properties"
-      - name: Install display and video dependencies
-        run: sudo apt-get update && sudo apt-get install -y xvfb ffmpeg
-      - name: Install workspace dependencies
-        run: yarn install --immutable
-      - name: Configure IntelliJ license
+      - name: Start Nx Agents
         env:
           IDEA_LICENSE_BASE64: ${{ secrets.IDEA_LICENSE_BASE64 }}
         run: |
           test -n "$IDEA_LICENSE_BASE64" || { echo 'Configure IDEA_LICENSE_BASE64 with an activated idea.key before running this workflow.'; exit 1; }
-          umask 077
-          printenv IDEA_LICENSE_BASE64 | base64 --decode > "$RUNNER_TEMP/idea.key"
-      - name: Run IntelliJ E2E
-        env:
-          NX_INTELLIJ_LICENSE_FILE: ${{ runner.temp }}/idea.key
+          yarn dlx nx-cloud start-ci-run --distribute-on="1 linux-intellij-e2e" --stop-agents-after=e2e --with-env-vars="IDEA_LICENSE_BASE64,CI,JAVA_TOOL_OPTIONS"
+      - name: Install workspace dependencies
+        run: yarn install --immutable
+      - name: Run IntelliJ E2E on Nx Agents
         run: yarn nx run intellij:e2e
-      - name: Remove license file
-        if: always()
-        run: rm -f "$RUNNER_TEMP/idea.key"
       - name: Upload IntelliJ E2E evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: intellij-e2e-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            dist/apps/intellij/e2e/*/*.mp4
-            dist/apps/intellij/e2e/*/*.log
-            dist/apps/intellij/e2e/*/*.xml
-            dist/apps/intellij/e2e/*/*.json
-            dist/apps/intellij/e2e/*/*.txt
-            dist/apps/intellij/e2e/*/ui.html
+          path: dist/apps/intellij/e2e/latest
           if-no-files-found: warn
           retention-days: 14

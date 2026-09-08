@@ -115,14 +115,16 @@ this build step cacheable also allows its dependents to run on Nx Agents.
 ## Run the project-view e2e test
 
 ```bash
-CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e
+CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e --skip-nx-cache
 ```
 
 The runner builds this checkout, creates an isolated Nx fixture and IDE sandbox,
 starts the IDE, and checks that the Nx Console projects tree displays `demo` and
 its `hello` target. It writes a JUnit report, logs, UI hierarchy, and video under
-`dist/apps/intellij/e2e/<run-id>`. A failed assertion or startup timeout fails the
-Nx task. Cleanup stops the run's IDE, launcher, display, and fixture daemon.
+`dist/apps/intellij/e2e/latest`. Each execution replaces that directory; copy it
+elsewhere to keep evidence from multiple runs. A failed assertion or startup
+timeout fails the Nx task. Cleanup stops the run's IDE, launcher, display, and
+fixture daemon and removes its temporary fixture and sandbox.
 The Kotlin client is built before startup and then runs directly with Java,
 avoiding an additional Gradle daemon while the IDE is running.
 
@@ -141,10 +143,48 @@ sandboxes. This is the same key-file mechanism supported by
 An interactive JetBrains Account sign-in in another sandbox does not provision
 the fresh test sandbox.
 
-The manual **IntelliJ E2E** GitHub Actions workflow uses Linux and uploads the
-reports and video even after failure. Configure `IDEA_LICENSE_BASE64` with the
-base64-encoded activated key before dispatching it. Sandbox configuration files
-are excluded from the uploaded evidence.
+The manual **IntelliJ E2E** GitHub Actions workflow starts an Nx Cloud CI run;
+`intellij:e2e` executes on the `linux-intellij-e2e` Nx Agent template. The agent
+installs Java 21, Xvfb, and ffmpeg. The build, live IDE, and Kotlin client run
+together on that agent. Nested Nx build/launch commands disable distribution
+because their sandbox and exported Java classpath are specific to that machine.
+The outer e2e task is cacheable, with only the evidence directory as its output.
+
+`NX_CACHE_FAILURES=true` lets Nx transfer failure reports and video through the
+cache as well as successful results. GitHub uploads the restored evidence with
+`if: always()`. `NX_E2E_RUN_ID` is a cache input set to the GitHub run and attempt,
+so each workflow dispatch or rerun records fresh proof. Locally, use
+`--skip-nx-cache` when you want a new recording. A cancelled or killed agent may
+not finish saving its evidence.
+
+Configure the repository secret once, using an activated `idea.key`:
+
+```bash
+base64 < /absolute/path/to/idea.key | gh secret set IDEA_LICENSE_BASE64 --repo nrwl/nx-console
+```
+
+To obtain that file, activate the pinned IDEA distribution once using an
+[offline activation code from your JetBrains Account](https://www.jetbrains.com/help/idea/register.html).
+The automation sandbox stores the resulting key at
+`dist/apps/intellij/automation-sandbox/config_runAutomationIde/idea.key`.
+An ordinary IDE installation stores it in its
+[IDE configuration directory](https://intellij-support.jetbrains.com/hc/en-us/articles/206544609-How-to-find-the-license-file-or-information-used-by-the-IDE).
+Use the generated key file, rather than a JetBrains Account password or token.
+
+The workflow forwards `IDEA_LICENSE_BASE64` with Nx Cloud's `--with-env-vars`.
+The runner decodes it into the agent's private temporary sandbox, removes the
+secret from child-process environments, and deletes the sandbox at shutdown.
+The key, IDE configuration, and machine-specific classpath files are outside
+the cached evidence directory. Local runs can keep using
+`NX_INTELLIJ_LICENSE_FILE` instead. This workflow remains manually dispatched;
+it is separate from the regular affected `e2e-ci` checks.
+
+Key provisioning does not determine the number of concurrent IDEs the license
+covers. JetBrains' [multi-machine guidance](https://intellij-support.jetbrains.com/hc/en-us/articles/207241005)
+describes use by one licensed person; it does not explicitly cover a shared pool
+of unattended CI agents. Confirm the intended CI concurrency with JetBrains
+before provisioning the repository secret. This workflow starts one agent per
+run, and separate workflow runs can overlap.
 
 To exercise Linux locally on a Mac:
 

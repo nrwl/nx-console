@@ -40,8 +40,19 @@
     },
     "e2e": {
       "executor": "nx:run-commands",
-      "cache": false,
+      "cache": true,
       "parallelism": false,
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_E2E_RUN_ID" },
+        { "env": "NX_E2E_EXPECTED_PROJECT" },
+        { "env": "NX_AUTOMATION_IDE_HEAP" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/latest"],
       "options": {
         "command": "node apps/intellij/e2e/run.mjs"
       }

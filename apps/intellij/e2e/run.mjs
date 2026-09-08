@@ -4,6 +4,7 @@ import { once } from 'node:events';
 import { createWriteStream } from 'node:fs';
 import {
   mkdir,
+  mkdtemp,
   writeFile,
   symlink,
   copyFile,
@@ -13,6 +14,7 @@ import {
 } from 'node:fs/promises';
 import { createServer, connect } from 'node:net';
 import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
@@ -22,9 +24,13 @@ const require = createRequire(import.meta.url);
 const nxPackage = require.resolve('nx/package.json');
 const nxBin = resolve(dirname(nxPackage), require(nxPackage).bin.nx);
 const runId = randomUUID();
-const output = join(root, 'dist/apps/intellij/e2e', runId);
-const workspace = join(output, 'workspace');
-const license = join(output, 'sandbox/config_runAutomationIde/idea.key');
+const output = join(root, 'dist/apps/intellij/e2e/latest');
+const runtime = await mkdtemp(join(tmpdir(), 'nx-console-intellij-e2e-'));
+const workspace = join(runtime, 'workspace');
+const sandbox = join(runtime, 'sandbox');
+const license = join(sandbox, 'config_runAutomationIde/idea.key');
+const encodedLicense = process.env.IDEA_LICENSE_BASE64;
+delete process.env.IDEA_LICENSE_BASE64;
 const started = Date.now();
 const children = [];
 const abort = new AbortController();
@@ -37,6 +43,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
   );
 }
 
+await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 console.log(`IntelliJ e2e artifacts: ${output}`);
 
@@ -45,12 +52,13 @@ const env = {
   CI: 'true',
   NX_NO_CLOUD: 'true',
   NX_CLOUD_DISTRIBUTED_EXECUTION: 'false',
+  NX_CACHE_FAILURES: 'false',
   NX_DAEMON: 'false',
   NX_PLUGIN_NO_TIMEOUTS: 'true',
   JAVA_TOOL_OPTIONS: `${process.env.JAVA_TOOL_OPTIONS ?? ''} -XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low`,
   NX_AUTOMATION_PROJECT: workspace,
-  NX_AUTOMATION_OUTPUT: output,
-  NX_AUTOMATION_SANDBOX: join(output, 'sandbox'),
+  NX_AUTOMATION_OUTPUT: runtime,
+  NX_AUTOMATION_SANDBOX: sandbox,
   NX_AUTOMATION_RUN_ID: runId,
 };
 
@@ -257,6 +265,15 @@ try {
     await mkdir(dirname(license), { recursive: true });
     await copyFile(process.env.NX_INTELLIJ_LICENSE_FILE, license);
     await chmod(license, 0o600);
+  } else if (encodedLicense) {
+    const compact = encodedLicense.replace(/\s/g, '');
+    const key = Buffer.from(compact, 'base64');
+    if (!key.length || key.toString('base64') !== compact)
+      throw new Error(
+        'IDEA_LICENSE_BASE64 must contain a base64-encoded idea.key',
+      );
+    await mkdir(dirname(license), { recursive: true });
+    await writeFile(license, key, { mode: 0o600 });
   }
 
   if (process.platform === 'linux') {
@@ -321,14 +338,14 @@ try {
   await Promise.race([
     wait(
       start(
-        await readFile(join(output, 'automation-java.txt'), 'utf8'),
+        await readFile(join(runtime, 'automation-java.txt'), 'utf8'),
         [
           '-Xmx512m',
           `-Dnx.console.automation.port=${env.NX_AUTOMATION_PORT}`,
           `-Dnx.console.automation.workspace=${root}`,
           `-Dnx.console.automation.output=${output}`,
           '-classpath',
-          await readFile(join(output, 'automation-classpath.txt'), 'utf8'),
+          await readFile(join(runtime, 'automation-classpath.txt'), 'utf8'),
           'dev.nx.console.automation.ProjectViewTestKt',
         ],
         'scenario',
@@ -398,11 +415,16 @@ try {
   try {
     await rm(license, { force: true });
     await copyFile(
-      join(output, 'sandbox/log_runAutomationIde/idea.log'),
+      join(sandbox, 'log_runAutomationIde/idea.log'),
       join(output, 'idea.log'),
     );
   } catch (error) {
     if (error.code !== 'ENOENT') failure ??= error;
+  }
+  try {
+    await rm(runtime, { recursive: true, force: true });
+  } catch (error) {
+    failure ??= error;
   }
   const scenarioFailure = await readFile(
     join(output, 'test-failure.txt'),
@@ -421,7 +443,19 @@ try {
   );
   await writeFile(
     join(output, 'result.json'),
-    JSON.stringify({ runId, passed: !failure, error: failure?.stack }, null, 2),
+    JSON.stringify(
+      {
+        runId,
+        passed: !failure,
+        error: failure?.stack,
+        platform: process.platform,
+        arch: process.arch,
+        agent: process.env.NX_AGENT_NAME ?? null,
+        ciRun: process.env.NX_E2E_RUN_ID ?? null,
+      },
+      null,
+      2,
+    ),
   );
   console.log(
     `${failure ? 'FAIL' : 'PASS'}: IntelliJ project view. Artifacts: ${output}`,
