@@ -70,7 +70,13 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
             if (generators.isEmpty()) {
                 val hasErrors =
                     (NxlsService.getInstance(project).workspace()?.errors?.size ?: 0) > 0
-                Notifier.notifyNoGenerators(project, hasErrors)
+                val activeIncludeFilters =
+                    NxConsoleProjectSettingsProvider.getInstance(project)
+                        .generatorFilters
+                        ?.filter { it.include }
+                        ?.map { it.matcher }
+                        .orEmpty()
+                Notifier.notifyNoGenerators(project, hasErrors, activeIncludeFilters)
 
                 return@launch it.resume(null)
             }
