@@ -74,6 +74,14 @@
         "^jar",
         "initializeIntellijPlatformPlugin"
       ]
+    },
+    "test": {
+      "options": {
+        "includeDependsOnTasks": [
+          ":intellij:compileKotlin",
+          ":intellij:compileJava"
+        ]
+      }
     }
   },
   "tags": ["type:intellij"],
