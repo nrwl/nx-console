@@ -20,6 +20,7 @@ import dev.nx.console.telemetry.actions.TelemetryOptOutAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
+import org.jetbrains.annotations.VisibleForTesting
 
 class Notifier {
     companion object {
@@ -158,19 +159,25 @@ class Notifier {
             return notification
         }
 
+        @VisibleForTesting
+        internal fun noGeneratorsMessage(
+            hasNxErrors: Boolean,
+            activeFilterMatchers: List<String>,
+        ): String =
+            when {
+                activeFilterMatchers.isNotEmpty() ->
+                    "No generators matched the active generator filter (${activeFilterMatchers.joinToString(", ")}). " +
+                        "Update or remove the filter in Nx Console settings."
+                hasNxErrors -> "No generators found. View Nx Errors for more information."
+                else -> "No generators found. View logs for more information."
+            }
+
         fun notifyNoGenerators(
             project: Project,
             hasNxErrors: Boolean,
             activeFilterMatchers: List<String> = emptyList(),
         ) {
-            val message =
-                when {
-                    activeFilterMatchers.isNotEmpty() ->
-                        "No generators matched the active generator filter (${activeFilterMatchers.joinToString(", ")}). " +
-                            "Update or remove the filter in Nx Console settings."
-                    hasNxErrors -> "No generators found. View Nx Errors for more information."
-                    else -> "No generators found. View logs for more information."
-                }
+            val message = noGeneratorsMessage(hasNxErrors, activeFilterMatchers)
 
             val notification =
                 getGroup()
