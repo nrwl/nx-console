@@ -17,6 +17,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
+import org.jetbrains.annotations.VisibleForTesting
 
 data class WebviewRequest(val type: String, val id: String) {}
 
@@ -57,6 +58,20 @@ open class NxGraphServer(
     private var isStarted = false
     private var isStarting = false
 
+    // Reuse a single HttpClient instead of creating one per request. Each JDK
+    // HttpClient owns a selector-manager thread and an executor that live until
+    // the client is closed, so allocating one per request leaked those
+    // resources. Recreated lazily after dispose() since dispose() is also used
+    // by restart().
+    private val httpClientLock = Any()
+    private var httpClient: HttpClient? = null
+
+    @VisibleForTesting
+    internal fun obtainHttpClient(): HttpClient =
+        synchronized(httpClientLock) {
+            httpClient ?: HttpClient.newBuilder().build().also { httpClient = it }
+        }
+
     init {
         with(project.messageBus.connect()) {
             subscribe(
@@ -93,7 +108,7 @@ open class NxGraphServer(
                     else -> throw Exception("unknown request type ${request.type}")
                 }
 
-            val client = HttpClient.newBuilder().build()
+            val client = obtainHttpClient()
             val httpRequest =
                 HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -245,6 +260,10 @@ open class NxGraphServer(
         nxGraphProcess = null
         isStarted = false
         isStarting = false
+        synchronized(httpClientLock) {
+            httpClient?.shutdownNow()
+            httpClient = null
+        }
     }
 }
 
