@@ -35,6 +35,17 @@
     "runAutomation": {
       "cache": false
     },
+    "prepareAutomationClient": {
+      "cache": false
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "parallelism": false,
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs"
+      }
+    },
     "instrumentCode": {
       "cache": true,
       "inputs": [
@@ -58,6 +69,7 @@
       "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
     },
     "prepareSandbox_runAutomationIde": {
+      "cache": false,
       "dependsOn": [
         "^build",
         "^build-webview-files",
