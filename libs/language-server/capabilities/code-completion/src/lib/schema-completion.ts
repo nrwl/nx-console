@@ -10,6 +10,7 @@ import {
   getNxJsonSchema,
   getProjectJsonSchema,
   implicitDependencies,
+  mergeWithInstalledSchema,
   namedInputs,
   tags,
 } from '@nx-console/shared-json-schema';
@@ -75,15 +76,11 @@ export async function configureSchemas(
     const nxVersion = await getNxVersion(workingPath);
     currentExecutors = [];
 
-    const projectJsonSchema = getProjectJsonSchema(
-      currentExecutors,
-      {},
-      nxVersion,
+    const projectJsonSchema = mergeWithInstalledSchema(
+      await readInstalledProjectSchema(workingPath),
+      getProjectJsonSchema(currentExecutors, {}, nxVersion),
     );
-    const packageJsonSchema = await getPackageJsonSchema(
-      workingPath,
-      projectJsonSchema,
-    );
+    const packageJsonSchema = getPackageJsonSchema(projectJsonSchema);
     const nxSchema = await getNxJsonSchema(
       currentExecutors,
       {},
@@ -109,16 +106,12 @@ export async function configureSchemas(
   const { nxVersion, nxJson, projectGraph } = currentNxWorkspace;
 
   currentExecutors = await getExecutors(workingPath);
-  const projectJsonSchema = getProjectJsonSchema(
-    currentExecutors,
-    nxJson.targetDefaults,
-    nxVersion,
+  const projectJsonSchema = mergeWithInstalledSchema(
+    await readInstalledProjectSchema(workingPath),
+    getProjectJsonSchema(currentExecutors, nxJson.targetDefaults, nxVersion),
   );
 
-  const packageJsonSchema = await getPackageJsonSchema(
-    workingPath,
-    projectJsonSchema,
-  );
+  const packageJsonSchema = getPackageJsonSchema(projectJsonSchema);
 
   const nxSchema = await getNxJsonSchema(
     currentExecutors,
@@ -256,41 +249,35 @@ async function getProjectSchema(
   };
 }
 
-async function getPackageJsonSchema(
+/**
+ * Nx ships the authoritative project.json schema with the installed package. It describes every
+ * property of the file, while the schema built here only describes the parts that need workspace
+ * knowledge - executors, project names, target names, inputs. Reading the installed one keeps the
+ * two in step with whichever Nx version the workspace has.
+ */
+async function readInstalledProjectSchema(
   workspacePath: string,
-  projectJsonSchema: JSONSchema,
-) {
+): Promise<JSONSchema | undefined> {
   try {
-    const projectJsonSchemaPath = await findNxPackagePath(
+    const schemaPath = await findNxPackagePath(
       workspacePath,
       join('schemas', 'project-schema.json'),
     );
-    if (projectJsonSchemaPath) {
-      const nxProjectSchema = await readAndParseJson(projectJsonSchemaPath);
-      return {
-        type: 'object',
-        properties: {
-          nx: {
-            ...nxProjectSchema,
-            ...projectJsonSchema,
-            properties: {
-              ...nxProjectSchema?.properties,
-              ...projectJsonSchema?.properties,
-            },
-          },
-        },
-      };
+    if (!schemaPath) {
+      return undefined;
     }
+    return await readAndParseJson(schemaPath);
   } catch (e) {
-    // fall through to default return
+    lspLogger.log(`Unable to read the installed project.json schema: ${e}`);
+    return undefined;
   }
+}
 
+function getPackageJsonSchema(projectJsonSchema: JSONSchema): JSONSchema {
   return {
     type: 'object',
     properties: {
-      nx: {
-        ...projectJsonSchema,
-      },
+      nx: projectJsonSchema,
     },
   };
 }
