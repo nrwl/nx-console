@@ -1,0 +1,15 @@
+**/node_modules
+**/.git
+**/.env*
+**/.npmrc
+.yarn
+.nx
+.gradle
+.intellijPlatform
+.superset
+dist
+tmp
+build
+**/*.key
+**/*.mp4
+**/*.webm

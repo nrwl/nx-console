@@ -112,6 +112,63 @@ task dependencies in its Nx cache inputs. The inferred inputs omit compiled
 classes, which can restore old plugin bytecode after a Kotlin change. Keeping
 this build step cacheable also allows its dependents to run on Nx Agents.
 
+## Run the project-view e2e test
+
+```bash
+CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e
+```
+
+The runner builds this checkout, creates an isolated Nx fixture and IDE sandbox,
+starts the IDE, and checks that the Nx Console projects tree displays `demo` and
+its `hello` target. It writes a JUnit report, logs, UI hierarchy, and video under
+`dist/apps/intellij/e2e/<run-id>`. A failed assertion or startup timeout fails the
+Nx task. Cleanup stops the run's IDE, launcher, display, and fixture daemon.
+The Kotlin client is built before startup and then runs directly with Java,
+avoiding an additional Gradle daemon while the IDE is running.
+
+On Linux, install `xvfb` and `ffmpeg`. Each run creates a private virtual display
+and records it from IDE startup, including startup failures. No desktop session
+or physical display is required. The IDE still runs Swing with graphics enabled;
+`java.awt.headless=true` cannot render this test. On macOS, `ffmpeg` and a logged-in
+desktop session are required, and the existing Driver recorder captures the IDE.
+The automation launcher uses IntelliJ's test policy text and disables consent
+confirmation so first-run dialogs do not block a fresh sandbox.
+
+The pinned IntelliJ IDEA Ultimate distribution requires activation. Set
+`NX_INTELLIJ_LICENSE_FILE` to an activated `idea.key` for unattended fresh
+sandboxes. This is the same key-file mechanism supported by
+[JetBrains Starter](https://github.com/JetBrains/intellij-community/blob/b76de2a6040beb10a4782d23756b58c2ce24e157/tools/intellij.tools.ide.starter/src/com/intellij/ide/starter/ide/IDETestContext.kt#L555).
+An interactive JetBrains Account sign-in in another sandbox does not provision
+the fresh test sandbox.
+
+The manual **IntelliJ E2E** GitHub Actions workflow uses Linux and uploads the
+reports and video even after failure. Configure `IDEA_LICENSE_BASE64` with the
+base64-encoded activated key before dispatching it. Sandbox configuration files
+are excluded from the uploaded evidence.
+
+To exercise Linux locally on a Mac:
+
+```bash
+docker build -t nx-console-intellij-e2e -f apps/intellij/e2e/Dockerfile .
+docker create --name nx-console-intellij-e2e \
+  --init \
+  --mount type=bind,src=/absolute/path/to/idea.key,dst=/license/idea.key,readonly \
+  -e NX_INTELLIJ_LICENSE_FILE=/license/idea.key nx-console-intellij-e2e
+docker start --attach nx-console-intellij-e2e
+docker cp nx-console-intellij-e2e:/workspace/dist/apps/intellij/e2e ./dist/intellij-linux-evidence
+docker rm nx-console-intellij-e2e
+```
+
+The image installs Linux dependencies and uses a non-root user. It does not copy
+host `node_modules`, IDE installations, or license files into the image. Omit the
+license mount to inspect first-start behavior. To check failure reporting and
+cleanup, set `NX_E2E_EXPECTED_PROJECT=missing-project`; the same test must fail.
+The first Linux run downloads IntelliJ and its plugins. The Docker image and CI
+workflow disable Nx's plugin timeout for this cold Gradle setup; CI still has a
+45-minute job timeout.
+The Docker image limits the IDE heap to 1 GB and Gradle to 512 MB. Outside Docker,
+the automation IDE defaults to 2 GB; override it with `NX_AUTOMATION_IDE_HEAP`.
+
 ## Record reproduction and verification videos
 
 Install `ffmpeg` on the machine running the scenarios. Wrap the scenario in
