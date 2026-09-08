@@ -17,6 +17,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
+import org.jetbrains.annotations.VisibleForTesting
 
 data class WebviewRequest(val type: String, val id: String) {}
 
@@ -65,7 +66,8 @@ open class NxGraphServer(
     private val httpClientLock = Any()
     private var httpClient: HttpClient? = null
 
-    private fun obtainHttpClient(): HttpClient =
+    @VisibleForTesting
+    internal fun obtainHttpClient(): HttpClient =
         synchronized(httpClientLock) {
             httpClient ?: HttpClient.newBuilder().build().also { httpClient = it }
         }
