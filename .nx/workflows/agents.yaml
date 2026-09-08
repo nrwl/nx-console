@@ -34,6 +34,35 @@ common-init-steps: &common-init-steps
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
 
 launch-templates:
+  linux-intellij-e2e:
+    resource-class: 'docker_linux_amd64/large+'
+    image: 'ubuntu22.04-node24.14-v1'
+    no-output-timeout: '30m'
+    env:
+      NX_DAEMON: false
+      NX_PLUGIN_NO_TIMEOUTS: true
+      NX_AUTOMATION_IDE_HEAP: '1g'
+      CYPRESS_INSTALL_BINARY: '0'
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    init-steps:
+      - name: Checkout
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
+      - name: Install IntelliJ runtime and recording dependencies
+        script: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-21-jdk xvfb ffmpeg fonts-dejavu-core libasound2 libnss3 libxkbfile1 libx11-6 libxi6 libxtst6 libxrender1 libxrandr2 libglib2.0-0 libdbus-1-3 libgbm1
+          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+          echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> "$NX_CLOUD_ENV"
+          mkdir -p "$HOME/.gradle"
+          printf '%s\n' 'org.gradle.jvmargs=-Xmx512m -XX:ActiveProcessorCount=4' 'kotlin.daemon.jvmargs=-Xmx1g' 'org.gradle.workers.max=2' 'org.gradle.priority=low' 'org.gradle.daemon.idletimeout=10000' >> "$HOME/.gradle/gradle.properties"
+      - name: Restore Node Modules Cache
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
+        inputs:
+          key: 'yarn.lock|.yarn/patches/**|"intellij-e2e-node24"'
+          paths: 'node_modules'
+          base-branch: 'master'
+      - name: Install Node Modules
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
   linux-medium-plus-js:
     resource-class: 'docker_linux_amd64/medium+'
     image: 'ubuntu22.04-node20.11-v10'
