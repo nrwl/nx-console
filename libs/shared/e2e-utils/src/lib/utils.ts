@@ -79,6 +79,9 @@ export function newWorkspace({
     // through 11.5.2. Resolving peers the legacy way skips that walk entirely.
     npm_config_legacy_peer_deps: 'true',
     ...(env ?? process.env),
+    // @nx/devkit's peer range admits nx 23, so npm tries to install it next to the pinned
+    // nx 22 and arborist crashes: "Cannot read properties of null (reading 'edgesOut')".
+    npm_config_legacy_peer_deps: 'true',
   } as NodeJS.ProcessEnv;
 
   // we need to make sure to not enable plugin isolation for nx 18 because it causes issues
