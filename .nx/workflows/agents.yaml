@@ -36,12 +36,12 @@ common-init-steps: &common-init-steps
 launch-templates:
   linux-medium-plus-js:
     resource-class: 'docker_linux_amd64/medium+'
-    image: 'ubuntu22.04-node20.11-v10'
+    image: 'ubuntu22.04-node20.19-v3'
     env: *common-env
     init-steps: *common-init-steps
   linux-large-plus-js:
     resource-class: 'docker_linux_amd64/large+'
-    image: 'ubuntu22.04-node20.11-v10'
+    image: 'ubuntu22.04-node20.19-v3'
     env: *common-env
     init-steps: *common-init-steps
   # windows-medium-js:
