@@ -7,11 +7,6 @@ import { readJsonFile, workspaceRoot } from 'nx/src/devkit-exports';
 export const defaultVersion =
   process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '21.3.0';
 
-// An nx prerelease can never satisfy @nx/devkit's own peer range, so prerelease runs need a
-// package manager that does not strict-resolve peers the way npm does.
-export const defaultPackageManager = (process.env['NXLS_E2E_PACKAGE_MANAGER'] ??
-  'npm') as 'npm' | 'pnpm' | 'yarn';
-
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
   'nx-console-e2e',
@@ -34,7 +29,7 @@ export const simpleReactWorkspaceOptions: NewWorkspaceOptions = {
 
 export function newWorkspace({
   name = uniq('workspace'),
-  packageManager = defaultPackageManager,
+  packageManager = 'npm',
   version,
   options,
   verbose,
