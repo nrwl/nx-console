@@ -217,6 +217,32 @@ The tree Run action uses the SDK's EDT/read-action context, matching
 `Driver.invokeAction`. Calling `actionPerformed` directly on the EDT can fail
 IntelliJ's write-intent lock checks during execution startup.
 
+### Folder tree roots
+
+`ReproFolderTreeRootsKt` checks that a project whose root is a top-level
+directory still renders as a project when other projects are nested inside it.
+It expands the whole Nx Console tree, scrolls the node under test into view, and
+asserts on the paths the tree actually renders.
+
+Use a fixture with **more than ten projects**, so the automatic tool window style
+resolves to the folder tree rather than the flat list, and with no project at the
+workspace root. It needs a project rooted at `packages` named
+`packages-aggregator` with a `hello` target, two projects nested below it at
+`packages/a` and `packages/b` (`child-a`, `child-b`), and enough other projects
+elsewhere to clear the ten-project threshold.
+
+```sh
+NX_AUTOMATION_LABEL=issue-folder-tree-roots-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproFolderTreeRootsKt'
+```
+
+Rerun with `NX_AUTOMATION_LABEL=issue-folder-tree-roots-fixed` after rebuilding
+and restarting the IDE. The video shows the selected tree row: the folder
+`packages` with no target before the fix, and the project `packages-aggregator`
+with its `hello` target and both nested projects after it.
+
 References:
 
 - [JetBrains Driver SDK](https://github.com/JetBrains/intellij-community/blob/master/tools/intellij.tools.ide.starter.driver/README.md)
