@@ -3,6 +3,7 @@ package dev.nx.console.automation
 import com.intellij.driver.client.Driver
 import com.intellij.driver.client.utility
 import com.intellij.driver.sdk.jdk.getSystemProperty
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -12,7 +13,26 @@ import kotlin.concurrent.thread
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
+import kotlin.io.path.name
 import kotlin.io.path.writeText
+
+/**
+ * The IDE writes each capture into its own directory under the log's `screenshots` directory,
+ * prefixing the requested name with a zero-padded index of the capture within the session
+ * (`0042_<name>`). Older builds used the bare name, so accept both.
+ */
+private fun captureDirectory(screenshots: Path, captureName: String): Path {
+    val exact = screenshots.resolve(captureName)
+    if (exact.exists()) return exact
+    val indexed =
+        runCatching {
+                Files.list(screenshots).use { entries ->
+                    entries.filter { it.name.endsWith("_$captureName") }.findFirst().orElse(null)
+                }
+            }
+            .getOrNull()
+    return indexed ?: exact
+}
 
 fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
     require(label.matches(Regex("[a-zA-Z0-9_-]+")))
@@ -39,7 +59,7 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                         val captureName = "$name-$frame"
                         val timestamp = System.nanoTime()
                         capture.takeScreenshotOfAllWindowsBlocking(captureName)
-                        val source = logs.resolve(captureName).resolve("frame0.png")
+                        val source = captureDirectory(logs, captureName).resolve("frame0.png")
                         check(source.exists()) { "No main IDE window captured at $source" }
                         source.copyTo(output.resolve("$frame.png"))
                         frames.add("$frame.png" to timestamp)
