@@ -71,6 +71,13 @@ export function newWorkspace({
   const _env = {
     CI: 'true',
     NX_CLOUD_API: 'https://staging.nx.app', // create-nx-workspace invocations are tracked and we don't want to skew the stats through e2es
+    // npm's dependency resolver crashes walking vitest's optional peer set while
+    // installing the workspaces these presets generate:
+    //   TypeError: Cannot read properties of null (reading 'edgesOut')
+    //     at #loadPeerSet (@npmcli/arborist/lib/arborist/build-ideal-tree.js:1302)
+    // It reproduces on every npm from 10.2.4 (bundled with the node 20.11 agent image)
+    // through 11.5.2. Resolving peers the legacy way skips that walk entirely.
+    npm_config_legacy_peer_deps: 'true',
     ...(env ?? process.env),
   } as NodeJS.ProcessEnv;
 
