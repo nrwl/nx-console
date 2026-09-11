@@ -114,6 +114,9 @@ this build step cacheable also allows its dependents to run on Nx Agents.
 
 ## Run the project-view e2e test
 
+See the [local E2E setup guide](e2e/README.md) for platform dependencies, license
+setup, and recording instructions.
+
 ```bash
 CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e-ci--project-view --skip-nx-cache
 ```
@@ -153,19 +156,22 @@ existing `intellij:e2e` command remains an alias for all IntelliJ e2e tests.
 
 The existing IntelliJ assignment rule schedules the test on a
 `linux-large-plus-js` Nx Agent. The shared agent setup installs Java 21, Xvfb,
-and ffmpeg. The build, live IDE, and Kotlin client run together on that agent.
+and ffmpeg. The test declares its dependency builds in the Nx task graph so
+Nx Agents can build or restore their outputs before running it. The Gradle
+build, live IDE, and Kotlin client run together on the test's agent.
 The target disables parallel tasks on its agent while running and limits the
 IDE heap to 1 GB, Gradle to 512 MB, and the Kotlin daemon to 1 GB. Nested Nx
 build/launch commands disable distribution because their sandbox and exported
 Java classpath are specific to that machine. The individual test is cacheable,
 with only the evidence directory as its output.
 
-`NX_CACHE_FAILURES=true` lets Nx transfer failure reports and video through the
-cache as well as successful results. GitHub uploads the restored evidence with
-`if: always()` when the test produced a report. `NX_E2E_RUN_ID` is a cache input
-set to the GitHub run and attempt, so each affected CI run or rerun records fresh
-proof. Unaffected projects are still excluded by Nx. Locally, use
-`--skip-nx-cache` when you want a new recording. A cancelled or killed agent may
+Nx Cloud enables failure caching on agents so failure reports and video can be
+returned alongside successful results. GitHub uploads the restored evidence with
+`if: always()` when the test produced a report. Unchanged task inputs reuse the
+cached result, reports, and recording; changed inputs trigger a new test run.
+Cached evidence retains its original test run ID. Unaffected projects are still
+excluded by Nx. Use `--skip-nx-cache` when you want a new recording or need to
+retry a transient failure with unchanged inputs. A cancelled or killed agent may
 not finish saving its evidence.
 
 Configure the repository secret once, using an activated `idea.key`:
@@ -198,28 +204,11 @@ of unattended CI agents. Confirm the intended CI concurrency with JetBrains
 before provisioning the repository secret. Each test launches one IDE, and
 separate CI runs can overlap.
 
-To exercise Linux locally on a Mac:
-
-```bash
-docker build -t nx-console-intellij-e2e -f apps/intellij/e2e/Dockerfile .
-docker create --name nx-console-intellij-e2e \
-  --init \
-  --mount type=bind,src=/absolute/path/to/idea.key,dst=/license/idea.key,readonly \
-  -e NX_INTELLIJ_LICENSE_FILE=/license/idea.key nx-console-intellij-e2e
-docker start --attach nx-console-intellij-e2e
-docker cp nx-console-intellij-e2e:/workspace/dist/apps/intellij/e2e ./dist/intellij-linux-evidence
-docker rm nx-console-intellij-e2e
-```
-
-The image installs Linux dependencies and uses a non-root user. It does not copy
-host `node_modules`, IDE installations, or license files into the image. Omit the
-license mount to inspect first-start behavior. To check failure reporting and
-cleanup, set `NX_E2E_EXPECTED_PROJECT=missing-project`; the same test must fail.
-The first Linux run downloads IntelliJ and its plugins. The Docker image and CI
-agents disable Nx's plugin timeout for this cold Gradle setup; the affected CI
-step retains its 60-minute timeout.
-The Docker image limits the IDE heap to 1 GB and Gradle to 512 MB. The e2e target
-uses the same limits. The standalone automation launcher defaults to a 2 GB IDE
+To check failure reporting and cleanup, set
+`NX_E2E_EXPECTED_PROJECT=missing-project`; the same test must fail.
+The first Linux run downloads IntelliJ and its plugins. CI agents disable Nx's
+plugin timeout for this cold Gradle setup; the affected CI step retains its
+60-minute timeout. The standalone automation launcher defaults to a 2 GB IDE
 heap; override it with `NX_AUTOMATION_IDE_HEAP`.
 
 ## Record reproduction and verification videos

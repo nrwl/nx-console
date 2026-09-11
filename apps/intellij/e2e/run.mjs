@@ -265,8 +265,9 @@ try {
   env.NX_AUTOMATION_PORT = String(portServer.address().port);
   await new Promise((resolveClose) => portServer.close(resolveClose));
 
-  console.log('Building the automation client and IDE sandbox…');
+  console.log('Building the automation client…');
   await wait(nx('prepareAutomationClient', 'build-client'), 25 * 60_000);
+  console.log('Preparing the IDE sandbox…');
   await wait(
     nx('prepareSandbox_runAutomationIde', 'build-sandbox'),
     25 * 60_000,
@@ -340,7 +341,7 @@ try {
   const ide = nx(
     'runAutomationIde',
     'ide',
-    `--project-cache-dir=.gradle/e2e-${runId}`,
+    `--project-cache-dir=${join(runtime, 'gradle')}`,
   );
   await waitForPort(Number(env.NX_AUTOMATION_PORT), ide);
   console.log(
@@ -416,7 +417,7 @@ try {
   try {
     execFileSync(process.execPath, [nxBin, 'reset', '--onlyDaemon'], {
       cwd: workspace,
-      env,
+      env: { ...env, NX_DAEMON: 'true' },
       stdio: 'ignore',
       timeout: 15_000,
     });
@@ -462,7 +463,6 @@ try {
         platform: process.platform,
         arch: process.arch,
         agent: process.env.NX_AGENT_NAME ?? null,
-        ciRun: process.env.NX_E2E_RUN_ID ?? null,
       },
       null,
       2,
