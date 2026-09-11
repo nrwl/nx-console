@@ -9,27 +9,47 @@
     "e2e": {
       "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
       "dependsOn": [
-        {
-          "projects": "vscode",
-          "target": "build",
-          "params": "forward"
-        },
+        { "projects": "vscode", "target": "build" },
         "build-runner"
-      ]
+      ],
+      "cache": false
     },
     "e2e-local": {
       "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
       "dependsOn": [
-        {
-          "projects": "vscode",
-          "target": "build",
-          "params": "forward"
-        },
+        { "projects": "vscode", "target": "build" },
         "build-runner"
-      ]
+      ],
+      "cache": false
+    },
+    "record": {
+      "command": "playwright test -c apps/vscode-e2e/playwright.config.ts",
+      "dependsOn": [
+        { "projects": "vscode", "target": "build" },
+        "build-runner"
+      ],
+      "cache": false,
+      "options": {
+        "env": {
+          "PLAYWRIGHT_VSCODE_VIDEO": "1"
+        }
+      }
+    },
+    "automation-ide": {
+      "command": "node --require @swc-node/register apps/vscode-e2e/automation/launch.ts",
+      "dependsOn": [
+        { "projects": "vscode", "target": "build" },
+        "build-runner"
+      ],
+      "cache": false
+    },
+    "automation": {
+      "command": "node --require @swc-node/register apps/vscode-e2e/automation/cli.ts",
+      "cache": false
     },
     "test": {
-      "command": "node --require @swc-node/register --test apps/vscode-e2e/fixtures/vscode-e2e-runtime.spec.ts"
+      "command": "node --require @swc-node/register --test apps/vscode-e2e/fixtures/vscode-e2e-runtime.spec.ts",
+      "dependsOn": []
     },
     "build-runner": {
       "command": "esbuild apps/vscode-e2e/runner/src/index.ts --bundle --outfile=dist/apps/vscode-e2e/runner/index.js --platform=node --external:vscode --format=cjs",

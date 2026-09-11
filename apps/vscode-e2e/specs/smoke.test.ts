@@ -37,6 +37,8 @@ test('Nx Console smoke test', async ({ nxConsole }) => {
     })
     .toBeGreaterThan(2);
 
+  await expect(nxConsole.getTreeRow('demo')).toBeVisible({ timeout: 5000 });
+
   // Expanded project shows target items
   const rowCount = await projectsSection.locator('.monaco-list-row').count();
   expect(rowCount).toBeGreaterThan(2);

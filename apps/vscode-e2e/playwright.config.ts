@@ -1,39 +1,34 @@
 import { defineConfig } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
+import { join } from 'node:path';
+import { workspaceRoot } from 'nx/src/devkit-exports';
+import { validateLabel } from './fixtures/vscode-e2e-runtime';
 
-type VSCodeE2EWorkerOptions = {
-  vscodeVersion: string;
-};
+const label = validateLabel(process.env.NX_AUTOMATION_LABEL || 'run');
+// Set once in the runner process; workers inherit the same run directory.
+process.env.VSCODE_E2E_RUN_ID ??= `${label}-${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID().slice(0, 8)}`;
+process.env.VSCODE_E2E_OUTPUT_DIR ??= join(
+  workspaceRoot,
+  'dist/apps/vscode-e2e/automation',
+  process.env.VSCODE_E2E_RUN_ID,
+);
+const outputDir = process.env.VSCODE_E2E_OUTPUT_DIR;
 
-export default defineConfig<{}, VSCodeE2EWorkerOptions>({
+export default defineConfig({
   testDir: './specs',
-  outputDir: '../../dist/apps/vscode-e2e/test-results',
+  outputDir: join(outputDir, 'tests'),
   globalSetup: './setup',
-  timeout: 120_000,
+  timeout: 180_000,
   expect: { timeout: 30_000 },
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : 4,
-  fullyParallel: true,
+  // Evidence comes from the first attempt; retries would hide a flaky reproduction.
+  retries: 0,
+  workers: 1,
+  preserveOutput: 'always',
   reporter: [
     ['list'],
-    [
-      'html',
-      {
-        outputFolder: '../../dist/apps/vscode-e2e/playwright-report',
-        open: 'never',
-      },
-    ],
+    ['html', { outputFolder: join(outputDir, 'report'), open: 'never' }],
+    ['json', { outputFile: join(outputDir, 'results.json') }],
+    ['junit', { outputFile: join(outputDir, 'junit.xml') }],
   ],
-  use: {
-    trace: 'on-first-retry',
-    video: 'on-first-retry',
-    screenshot: 'only-on-failure',
-  },
-  projects: [
-    {
-      name: 'VS Code Stable',
-      use: {
-        vscodeVersion: 'stable',
-      },
-    },
-  ],
+  projects: [{ name: 'VS Code' }],
 });

@@ -23,7 +23,17 @@ interface InvokeResponse {
  */
 export function run(): Promise<void> {
   return new Promise<void>((_resolve, reject) => {
+    const token = process.env.VSCODE_E2E_TOKEN;
+    if (!token) {
+      reject(new Error('Missing VSCODE_E2E_TOKEN'));
+      return;
+    }
     const server = http.createServer((req, res) => {
+      if (req.headers.authorization !== `Bearer ${token}`) {
+        res.writeHead(403);
+        res.end();
+        return;
+      }
       if (req.method !== 'POST' || req.url !== '/invoke') {
         res.writeHead(404);
         res.end();
@@ -54,10 +64,10 @@ export function run(): Promise<void> {
       });
     });
 
-    server.listen(0, () => {
+    server.listen(0, '127.0.0.1', () => {
       const address = server.address();
       if (address && typeof address !== 'string') {
-        const url = `http://localhost:${address.port}`;
+        const url = `http://127.0.0.1:${address.port}`;
         const markerId = process.env.VSCODE_E2E_MARKER_ID ?? `${process.pid}`;
         const markerFilePath = getMarkerFilePath(markerId);
 
