@@ -133,8 +133,11 @@ and records it from IDE startup, including startup failures. No desktop session
 or physical display is required. The IDE still runs Swing with graphics enabled;
 `java.awt.headless=true` cannot render this test. On macOS, `ffmpeg` and a logged-in
 desktop session are required, and the existing Driver recorder captures the IDE.
-The automation launcher uses IntelliJ's test policy text and disables consent
-confirmation so first-run dialogs do not block a fresh sandbox.
+The automation launcher sets `idea.is.integration.test=true` to suppress
+onboarding dialogs, including the Islands theme introduction in IDEA 2025.3,
+as [recommended by JetBrains](https://platform.jetbrains.com/t/how-to-disable-the-islands-theme-popup/3842).
+It also uses IntelliJ's test policy text and disables consent confirmation so
+first-run dialogs do not block a fresh sandbox.
 
 The pinned IntelliJ IDEA Ultimate distribution requires activation. Set
 `NX_INTELLIJ_LICENSE_FILE` to an activated `idea.key` for unattended fresh
