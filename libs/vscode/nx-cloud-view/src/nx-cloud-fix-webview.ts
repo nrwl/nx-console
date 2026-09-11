@@ -662,9 +662,13 @@ export async function fetchAndPullChanges(targetBranch: string): Promise<void> {
     } else {
       // On another branch: fast-forward local target branch without checking it out
       // This creates the branch if missing, refuses if it wouldn't be a fast-forward
-      execFileSync('git', ['fetch', 'origin', `${targetBranch}:${targetBranch}`], {
-        cwd,
-      });
+      execFileSync(
+        'git',
+        ['fetch', 'origin', `${targetBranch}:${targetBranch}`],
+        {
+          cwd,
+        },
+      );
     }
   } catch (e) {
     logAndShowError(
