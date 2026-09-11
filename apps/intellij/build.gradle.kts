@@ -42,9 +42,14 @@ val automation by sourceSets.creating
 val automationPort =
     providers
         .gradleProperty("automationPort")
+        .orElse(providers.environmentVariable("NX_AUTOMATION_PORT"))
         .map(String::toInt)
         .orElse(20000 + (rootDir.absolutePath.hashCode().toUInt() % 20000u).toInt())
-val automationOutput = layout.buildDirectory.dir("automation")
+val automationOutput =
+    providers
+        .environmentVariable("NX_AUTOMATION_OUTPUT")
+        .map { rootProject.file(it) }
+        .orElse(layout.buildDirectory.dir("automation").map { it.asFile })
 val automationDriverVersion = providers.provider { intellijPlatform.productInfo.buildNumber }
 
 dependencies {
@@ -60,12 +65,22 @@ intellijPlatformTesting {
     runIde {
         create("runAutomationIde") {
             localPath = layout.dir(providers.provider { intellijPlatform.platformPath.toFile() })
-            sandboxDirectory = layout.buildDirectory.dir("automation-sandbox")
+            sandboxDirectory =
+                layout.dir(
+                    providers
+                        .environmentVariable("NX_AUTOMATION_SANDBOX")
+                        .map { rootProject.file(it) }
+                        .orElse(layout.buildDirectory.dir("automation-sandbox").map { it.asFile })
+                )
             prepareSandboxTask {
                 from(nxlsRoot) { into("${intellijPlatform.projectName.get()}/nxls") }
             }
             task {
                 environment = environment.filterKeys { it != "CI" && it != "NX_DAEMON" }
+                systemProperty(
+                    "nx.console.automation.runId",
+                    providers.environmentVariable("NX_AUTOMATION_RUN_ID").orElse("").get(),
+                )
                 systemProperty("com.sun.management.jmxremote", "true")
                 systemProperty("com.sun.management.jmxremote.host", "127.0.0.1")
                 systemProperty("com.sun.management.jmxremote.port", automationPort.get())
@@ -80,9 +95,17 @@ intellijPlatformTesting {
                 systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
                 systemProperty("expose.ui.hierarchy.url", "true")
                 systemProperty("idea.trust.all.projects", "true")
+                systemProperty("idea.is.integration.test", "true")
+                // IntelliJ recognizes this test policy version without a first-run dialog.
+                systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+                systemProperty("jb.consents.confirmation.enabled", "false")
                 systemProperty("ide.show.tips.on.startup.default.value", "false")
                 args(
-                    providers.gradleProperty("automationProject").orElse(rootDir.absolutePath).get()
+                    providers
+                        .gradleProperty("automationProject")
+                        .orElse(providers.environmentVariable("NX_AUTOMATION_PROJECT"))
+                        .orElse(rootDir.absolutePath)
+                        .get()
                 )
                 doFirst {
                     logger.lifecycle("Automation JMX endpoint: 127.0.0.1:${automationPort.get()}")
@@ -100,9 +123,24 @@ tasks.register<JavaExec>("runAutomation") {
         providers.gradleProperty("automationMain").orElse("dev.nx.console.automation.InspectIdeKt")
     systemProperty("nx.console.automation.port", automationPort.get())
     systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
-    systemProperty("nx.console.automation.output", automationOutput.get().asFile.absolutePath)
+    systemProperty("nx.console.automation.output", automationOutput.get().absolutePath)
     workingDir = rootDir
     maxHeapSize = "1g"
+}
+
+tasks.register("prepareAutomationClient") {
+    group = "verification"
+    description = "Builds the Kotlin client and exports its Java runtime for the e2e runner."
+    dependsOn(automation.classesTaskName)
+    val classpathFile = automationOutput.map { it.resolve("automation-classpath.txt") }
+    val javaFile = automationOutput.map { it.resolve("automation-java.txt") }
+    outputs.files(classpathFile, javaFile)
+    doLast {
+        classpathFile.get().parentFile.mkdirs()
+        classpathFile.get().writeText(automation.runtimeClasspath.asPath)
+        val launcher = tasks.named<JavaExec>("runAutomation").get().javaLauncher.get()
+        javaFile.get().writeText(launcher.executablePath.asFile.absolutePath)
+    }
 }
 
 // Configure project's dependencies
@@ -238,7 +276,12 @@ tasks {
         archiveBaseName.set("nx-console")
     }
 
-    withType<RunIdeTask> { maxHeapSize = "6g" }
+    withType<RunIdeTask> {
+        maxHeapSize =
+            if (name == "runAutomationIde") {
+                providers.environmentVariable("NX_AUTOMATION_IDE_HEAP").orElse("2g").get()
+            } else "6g"
+    }
 
     test {
         useJUnit()

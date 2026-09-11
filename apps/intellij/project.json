@@ -35,6 +35,42 @@
     "runAutomation": {
       "cache": false
     },
+    "prepareAutomationClient": {
+      "cache": false
+    },
+    "e2e": {
+      "executor": "nx:noop",
+      "cache": true,
+      "outputs": [],
+      "dependsOn": ["e2e-ci"]
+    },
+    "e2e-ci": {
+      "executor": "nx:noop",
+      "cache": true,
+      "outputs": [],
+      "dependsOn": ["e2e-ci--project-view"]
+    },
+    "e2e-ci--project-view": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_E2E_EXPECTED_PROJECT" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/latest"],
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs",
+        "env": {
+          "NX_AUTOMATION_IDE_HEAP": "1g"
+        }
+      }
+    },
     "instrumentCode": {
       "cache": true,
       "inputs": [
@@ -58,6 +94,7 @@
       "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
     },
     "prepareSandbox_runAutomationIde": {
+      "cache": false,
       "dependsOn": [
         "^build",
         "^build-webview-files",

@@ -112,6 +112,105 @@ task dependencies in its Nx cache inputs. The inferred inputs omit compiled
 classes, which can restore old plugin bytecode after a Kotlin change. Keeping
 this build step cacheable also allows its dependents to run on Nx Agents.
 
+## Run the project-view e2e test
+
+See the [local E2E setup guide](e2e/README.md) for platform dependencies, license
+setup, and recording instructions.
+
+```bash
+CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e-ci--project-view --skip-nx-cache
+```
+
+The runner builds this checkout, creates an isolated Nx fixture and IDE sandbox,
+starts the IDE, and checks that the Nx Console projects tree displays `demo` and
+its `hello` target. It writes a JUnit report, logs, UI hierarchy, and video under
+`dist/apps/intellij/e2e/latest`. Each execution replaces that directory; copy it
+elsewhere to keep evidence from multiple runs. A failed assertion or startup
+timeout fails the Nx task. Cleanup stops the run's IDE, launcher, display, and
+fixture daemon and removes its temporary fixture and sandbox.
+The Kotlin client is built before startup and then runs directly with Java,
+avoiding an additional Gradle daemon while the IDE is running.
+
+On Linux, install `xvfb` and `ffmpeg`. Each run creates a private virtual display
+and records it from IDE startup, including startup failures. No desktop session
+or physical display is required. The IDE still runs Swing with graphics enabled;
+`java.awt.headless=true` cannot render this test. On macOS, `ffmpeg` and a logged-in
+desktop session are required, and the existing Driver recorder captures the IDE.
+The automation launcher sets `idea.is.integration.test=true` to suppress
+onboarding dialogs, including the Islands theme introduction in IDEA 2025.3,
+as [recommended by JetBrains](https://platform.jetbrains.com/t/how-to-disable-the-islands-theme-popup/3842).
+It also uses IntelliJ's test policy text and disables consent confirmation so
+first-run dialogs do not block a fresh sandbox.
+
+The pinned IntelliJ IDEA Ultimate distribution requires activation. Set
+`NX_INTELLIJ_LICENSE_FILE` to an activated `idea.key` for unattended fresh
+sandboxes. This is the same key-file mechanism supported by
+[JetBrains Starter](https://github.com/JetBrains/intellij-community/blob/b76de2a6040beb10a4782d23756b58c2ce24e157/tools/intellij.tools.ide.starter/src/com/intellij/ide/starter/ide/IDETestContext.kt#L555).
+An interactive JetBrains Account sign-in in another sandbox does not provision
+the fresh test sandbox.
+
+The regular **CI Checks** workflow already includes `e2e-ci` in its `nx affected` command.
+`intellij:e2e-ci` depends on the individual `intellij:e2e-ci--project-view` test,
+so changes to IntelliJ or its dependencies select the test automatically. The
+existing `intellij:e2e` command remains an alias for all IntelliJ e2e tests.
+
+The existing IntelliJ assignment rule schedules the test on a
+`linux-large-plus-js` Nx Agent. The shared agent setup installs Java 21, Xvfb,
+and ffmpeg. The test declares its dependency builds in the Nx task graph so
+Nx Agents can build or restore their outputs before running it. The Gradle
+build, live IDE, and Kotlin client run together on the test's agent.
+The target disables parallel tasks on its agent while running and limits the
+IDE heap to 1 GB, Gradle to 512 MB, and the Kotlin daemon to 1 GB. Nested Nx
+build/launch commands disable distribution because their sandbox and exported
+Java classpath are specific to that machine. The individual test is cacheable,
+with only the evidence directory as its output.
+
+Nx Cloud enables failure caching on agents so failure reports and video can be
+returned alongside successful results. GitHub uploads the restored evidence with
+`if: always()` when the test produced a report. Unchanged task inputs reuse the
+cached result, reports, and recording; changed inputs trigger a new test run.
+Cached evidence retains its original test run ID. Unaffected projects are still
+excluded by Nx. Use `--skip-nx-cache` when you want a new recording or need to
+retry a transient failure with unchanged inputs. A cancelled or killed agent may
+not finish saving its evidence.
+
+Configure the repository secret once, using an activated `idea.key`:
+
+```bash
+base64 < /absolute/path/to/idea.key | gh secret set IDEA_LICENSE_BASE64 --repo nrwl/nx-console
+```
+
+To obtain that file, activate the pinned IDEA distribution once using an
+[offline activation code from your JetBrains Account](https://www.jetbrains.com/help/idea/register.html).
+The automation sandbox stores the resulting key at
+`dist/apps/intellij/automation-sandbox/config_runAutomationIde/idea.key`.
+An ordinary IDE installation stores it in its
+[IDE configuration directory](https://intellij-support.jetbrains.com/hc/en-us/articles/206544609-How-to-find-the-license-file-or-information-used-by-the-IDE).
+Use the generated key file, rather than a JetBrains Account password or token.
+
+The workflow forwards `IDEA_LICENSE_BASE64` with Nx Cloud's `--with-env-vars`.
+The runner decodes it into the agent's private temporary sandbox, removes the
+secret from child-process environments, and deletes the sandbox at shutdown.
+The key, IDE configuration, and machine-specific classpath files are outside
+the cached evidence directory. Local runs can keep using
+`NX_INTELLIJ_LICENSE_FILE` instead. On an Nx Agent, a missing license fails the
+test immediately with a provisioning error. GitHub does not expose repository
+secrets to pull requests from forks, so those runs cannot activate this IDE.
+
+Key provisioning does not determine the number of concurrent IDEs the license
+covers. JetBrains' [multi-machine guidance](https://intellij-support.jetbrains.com/hc/en-us/articles/207241005)
+describes use by one licensed person; it does not explicitly cover a shared pool
+of unattended CI agents. Confirm the intended CI concurrency with JetBrains
+before provisioning the repository secret. Each test launches one IDE, and
+separate CI runs can overlap.
+
+To check failure reporting and cleanup, set
+`NX_E2E_EXPECTED_PROJECT=missing-project`; the same test must fail.
+The first Linux run downloads IntelliJ and its plugins. CI agents disable Nx's
+plugin timeout for this cold Gradle setup; the affected CI step retains its
+60-minute timeout. The standalone automation launcher defaults to a 2 GB IDE
+heap; override it with `NX_AUTOMATION_IDE_HEAP`.
+
 ## Record reproduction and verification videos
 
 Install `ffmpeg` on the machine running the scenarios. Wrap the scenario in

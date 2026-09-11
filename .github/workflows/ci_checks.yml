@@ -58,8 +58,10 @@ jobs:
           cache: yarn
 
       - name: Start the Nx Cloud CI Run
+        env:
+          IDEA_LICENSE_BASE64: ${{ secrets.IDEA_LICENSE_BASE64 }}
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION"
+          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION,IDEA_LICENSE_BASE64"
 
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
@@ -107,6 +109,15 @@ jobs:
       # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
       - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 60
+
+      - name: Upload IntelliJ E2E evidence
+        if: ${{ always() && hashFiles('dist/apps/intellij/e2e/latest/result.json') != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: intellij-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/apps/intellij/e2e/latest
+          if-no-files-found: error
+          retention-days: 14
 
       - run: npx nx-cloud fix-ci
         if: failure()
