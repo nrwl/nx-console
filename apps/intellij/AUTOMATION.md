@@ -243,6 +243,44 @@ and restarting the IDE. The video shows the selected tree row: the folder
 `packages` with no target before the fix, and the project `packages-aggregator`
 with its `hello` target and both nested projects after it.
 
+### Generate UI dry-run tabs (#2054)
+
+`ReproGenerateDryRunTabsKt` enables the platform's advanced setting that pins
+new Run tool window tabs (`start.run.configurations.pinned`), opens **Nx
+Generate (UI)** for a local generator, and changes its `name` field three times.
+Each change triggers a dry run. The scenario asserts that the Run tool window
+holds a single `Nx Generate` tab showing the latest dry run and that nothing was
+written to disk. It restores the setting afterwards. Set
+`NX_AUTOMATION_PINNED_TABS=false` to run the same steps with unpinned tabs.
+
+The generator is chosen through the popup's list and `JBPopup.closeOk`, and the
+field is changed by setting the input's value and dispatching an `input` event
+in the Generate UI webview. Neither step uses native mouse or keyboard input.
+
+Use a fixture named `generate-dry-run-tabs-fixture` with `"analytics": false`
+and a local plugin installed as a dev dependency
+(`npm install -D ./tools/notes-plugin`). Its `package.json` names it
+`@fixture/notes-plugin` and points `generators` at a `note` generator whose
+schema has a required string `name` and whose factory writes
+`notes/<name>.md`:
+
+```js
+module.exports = async function (tree, options) {
+  tree.write(`notes/${options.name}.md`, `# ${options.name}\n`);
+};
+```
+
+```sh
+NX_AUTOMATION_LABEL=issue-2054-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproGenerateDryRunTabsKt'
+```
+
+Rerun with `NX_AUTOMATION_LABEL=issue-2054-fixed` after rebuilding and
+restarting the IDE. The video shows one pinned `Nx Generate` tab per dry run
+before the fix, and a single tab replaced by each dry run after it.
+
 References:
 
 - [JetBrains Driver SDK](https://github.com/JetBrains/intellij-community/blob/master/tools/intellij.tools.ide.starter.driver/README.md)

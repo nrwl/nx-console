@@ -4,7 +4,9 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessListener
+import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.lang.javascript.modules.ConsoleProgress
@@ -25,6 +27,7 @@ class RunGeneratorManager(val project: Project) {
 
     private var queuedGeneratorDefinition: List<String>? = null
     private var runningProcessHandler: KillableColoredProcessHandler? = null
+    private var lastDryRunDescriptor: RunContentDescriptor? = null
 
     fun queueGeneratorToBeRun(generator: String, flags: List<String>, cwd: String? = null) {
         var generatorDefinition: List<String>
@@ -78,20 +81,7 @@ class RunGeneratorManager(val project: Project) {
                         console.attachToProcess(processHandler)
                         ConsoleProgress.install(console, processHandler)
 
-                        val contentDescriptor =
-                            RunContentDescriptor(
-                                console,
-                                processHandler,
-                                console.component,
-                                "Nx Generate",
-                                NxIcons.Action,
-                            )
-
-                        val runContentManager = RunContentManager.getInstance(project)
-                        runContentManager.showRunContent(
-                            DefaultRunExecutor.getRunExecutorInstance(),
-                            contentDescriptor,
-                        )
+                        showRunContent(console, processHandler, definition.isDryRun())
 
                         processHandler.startNotify()
                         this.setProcessHandler(processHandler, definition.isDryRun().not())
@@ -101,6 +91,32 @@ class RunGeneratorManager(val project: Project) {
         } catch (e: Exception) {
             thisLogger().info("Cannot execute command", e)
         }
+    }
+
+    internal fun showRunContent(
+        console: ConsoleView,
+        processHandler: ProcessHandler,
+        dryRun: Boolean,
+    ) {
+        val contentDescriptor =
+            RunContentDescriptor(
+                console,
+                processHandler,
+                console.component,
+                "Nx Generate",
+                NxIcons.Action,
+            )
+
+        // The Run tool window never reuses a pinned tab on its own, and new tabs are pinned when
+        // "start.run.configurations.pinned" is enabled. Passing the previous dry run explicitly
+        // keeps dry runs triggered by form changes in a single tab either way.
+        RunContentManager.getInstance(project)
+            .showRunContent(
+                DefaultRunExecutor.getRunExecutorInstance(),
+                contentDescriptor,
+                lastDryRunDescriptor,
+            )
+        lastDryRunDescriptor = contentDescriptor.takeIf { dryRun }
     }
 
     private fun setProcessHandler(
