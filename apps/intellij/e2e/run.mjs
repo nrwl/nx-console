@@ -11,6 +11,7 @@ import {
   chmod,
   rm,
   readFile,
+  realpath,
 } from 'node:fs/promises';
 import { createServer, connect } from 'node:net';
 import { createRequire } from 'node:module';
@@ -25,7 +26,9 @@ const nxPackage = require.resolve('nx/package.json');
 const nxBin = resolve(dirname(nxPackage), require(nxPackage).bin.nx);
 const runId = randomUUID();
 const output = join(root, 'dist/apps/intellij/e2e/latest');
-const runtime = await mkdtemp(join(tmpdir(), 'nx-console-intellij-e2e-'));
+const runtime = await realpath(
+  await mkdtemp(join(tmpdir(), 'nx-console-intellij-e2e-')),
+);
 const workspace = join(runtime, 'workspace');
 const sandbox = join(runtime, 'sandbox');
 const license = join(sandbox, 'config_runAutomationIde/idea.key');

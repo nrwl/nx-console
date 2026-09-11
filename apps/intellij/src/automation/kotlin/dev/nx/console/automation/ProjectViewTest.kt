@@ -18,8 +18,11 @@ fun main() = withAutomationDriver {
     try {
         waitForProjectOpen(3.minutes)
         val expectedWorkspace = Path.of(System.getenv("NX_AUTOMATION_PROJECT")).toRealPath()
-        check(getOpenProjects().single().getBasePath() == expectedWorkspace.toString()) {
-            "The IDE did not open the e2e fixture."
+        val actualWorkspace = getOpenProjects().single().getBasePath()
+        check(
+            actualWorkspace != null && Path.of(actualWorkspace).toRealPath() == expectedWorkspace
+        ) {
+            "The IDE opened $actualWorkspace instead of the e2e fixture $expectedWorkspace."
         }
         if (System.getenv("NX_E2E_EXTERNAL_VIDEO") == "true") {
             checkProjectView()
@@ -58,8 +61,8 @@ private fun Driver.checkProjectView() {
             tree.expandAll()
             paths = tree.collectExpandedPaths().toString()
             if (
-                tree.findExpandedPath(expectedProject, "hello", fullMatch = false) != null &&
-                    !loading.present()
+                tree.findExpandedPath("Projects", expectedProject, "hello", fullMatch = true) !=
+                    null && !loading.present()
             ) {
                 withContext(OnDispatcher.EDT) {
                     check(getToolWindow("Nx Console").isVisible())
