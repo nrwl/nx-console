@@ -95,6 +95,7 @@ intellijPlatformTesting {
                 systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
                 systemProperty("expose.ui.hierarchy.url", "true")
                 systemProperty("idea.trust.all.projects", "true")
+                systemProperty("idea.is.integration.test", "true")
                 // IntelliJ recognizes this test policy version without a first-run dialog.
                 systemProperty("jb.privacy.policy.text", "<!--999.999-->")
                 systemProperty("jb.consents.confirmation.enabled", "false")
