@@ -2,6 +2,9 @@ name: IntelliJ E2E
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - ci/intellij-e2e-proof-20260911
 
 permissions:
   contents: read
