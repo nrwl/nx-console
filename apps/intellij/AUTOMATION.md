@@ -115,7 +115,7 @@ this build step cacheable also allows its dependents to run on Nx Agents.
 ## Run the project-view e2e test
 
 ```bash
-CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e --skip-nx-cache
+CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e-ci--project-view --skip-nx-cache
 ```
 
 The runner builds this checkout, creates an isolated Nx fixture and IDE sandbox,
@@ -146,17 +146,25 @@ sandboxes. This is the same key-file mechanism supported by
 An interactive JetBrains Account sign-in in another sandbox does not provision
 the fresh test sandbox.
 
-The manual **IntelliJ E2E** GitHub Actions workflow starts an Nx Cloud CI run;
-`intellij:e2e` executes on the `linux-intellij-e2e` Nx Agent template. The agent
-installs Java 21, Xvfb, and ffmpeg. The build, live IDE, and Kotlin client run
-together on that agent. Nested Nx build/launch commands disable distribution
-because their sandbox and exported Java classpath are specific to that machine.
-The outer e2e task is cacheable, with only the evidence directory as its output.
+The regular **CI Checks** workflow already includes `e2e-ci` in its `nx affected` command.
+`intellij:e2e-ci` depends on the individual `intellij:e2e-ci--project-view` test,
+so changes to IntelliJ or its dependencies select the test automatically. The
+existing `intellij:e2e` command remains an alias for all IntelliJ e2e tests.
+
+The existing IntelliJ assignment rule schedules the test on a
+`linux-large-plus-js` Nx Agent. The shared agent setup installs Java 21, Xvfb,
+and ffmpeg. The build, live IDE, and Kotlin client run together on that agent.
+The target disables parallel tasks on its agent while running and limits the
+IDE heap to 1 GB, Gradle to 512 MB, and the Kotlin daemon to 1 GB. Nested Nx
+build/launch commands disable distribution because their sandbox and exported
+Java classpath are specific to that machine. The individual test is cacheable,
+with only the evidence directory as its output.
 
 `NX_CACHE_FAILURES=true` lets Nx transfer failure reports and video through the
 cache as well as successful results. GitHub uploads the restored evidence with
-`if: always()`. `NX_E2E_RUN_ID` is a cache input set to the GitHub run and attempt,
-so each workflow dispatch or rerun records fresh proof. Locally, use
+`if: always()` when the test produced a report. `NX_E2E_RUN_ID` is a cache input
+set to the GitHub run and attempt, so each affected CI run or rerun records fresh
+proof. Unaffected projects are still excluded by Nx. Locally, use
 `--skip-nx-cache` when you want a new recording. A cancelled or killed agent may
 not finish saving its evidence.
 
@@ -179,15 +187,16 @@ The runner decodes it into the agent's private temporary sandbox, removes the
 secret from child-process environments, and deletes the sandbox at shutdown.
 The key, IDE configuration, and machine-specific classpath files are outside
 the cached evidence directory. Local runs can keep using
-`NX_INTELLIJ_LICENSE_FILE` instead. This workflow remains manually dispatched;
-it is separate from the regular affected `e2e-ci` checks.
+`NX_INTELLIJ_LICENSE_FILE` instead. On an Nx Agent, a missing license fails the
+test immediately with a provisioning error. GitHub does not expose repository
+secrets to pull requests from forks, so those runs cannot activate this IDE.
 
 Key provisioning does not determine the number of concurrent IDEs the license
 covers. JetBrains' [multi-machine guidance](https://intellij-support.jetbrains.com/hc/en-us/articles/207241005)
 describes use by one licensed person; it does not explicitly cover a shared pool
 of unattended CI agents. Confirm the intended CI concurrency with JetBrains
-before provisioning the repository secret. This workflow starts one agent per
-run, and separate workflow runs can overlap.
+before provisioning the repository secret. Each test launches one IDE, and
+separate CI runs can overlap.
 
 To exercise Linux locally on a Mac:
 
@@ -207,10 +216,11 @@ host `node_modules`, IDE installations, or license files into the image. Omit th
 license mount to inspect first-start behavior. To check failure reporting and
 cleanup, set `NX_E2E_EXPECTED_PROJECT=missing-project`; the same test must fail.
 The first Linux run downloads IntelliJ and its plugins. The Docker image and CI
-workflow disable Nx's plugin timeout for this cold Gradle setup; CI still has a
-45-minute job timeout.
-The Docker image limits the IDE heap to 1 GB and Gradle to 512 MB. Outside Docker,
-the automation IDE defaults to 2 GB; override it with `NX_AUTOMATION_IDE_HEAP`.
+agents disable Nx's plugin timeout for this cold Gradle setup; the affected CI
+step retains its 60-minute timeout.
+The Docker image limits the IDE heap to 1 GB and Gradle to 512 MB. The e2e target
+uses the same limits. The standalone automation launcher defaults to a 2 GB IDE
+heap; override it with `NX_AUTOMATION_IDE_HEAP`.
 
 ## Record reproduction and verification videos
 

@@ -135,7 +135,7 @@ function nx(target, name, extraArgs = '') {
       `intellij:${target}`,
       '--batch=false',
       '--parallel=2',
-      `--args=--max-workers=2 --priority=low ${extraArgs}`.trim(),
+      `--args=--max-workers=2 --priority=low -Dorg.gradle.jvmargs=-Xmx512m -Pkotlin.daemon.jvmargs=-Xmx1g -Dorg.gradle.daemon.idletimeout=10000 ${extraArgs}`.trim(),
     ],
     name,
   );
@@ -207,6 +207,14 @@ function ownedIdePids() {
 try {
   if (!['linux', 'darwin'].includes(process.platform))
     throw new Error('IntelliJ e2e currently supports Linux and macOS');
+  if (
+    process.env.NX_AGENT_NAME &&
+    !encodedLicense &&
+    !process.env.NX_INTELLIJ_LICENSE_FILE
+  )
+    throw new Error(
+      'IntelliJ e2e on Nx Agents requires IDEA_LICENSE_BASE64 or NX_INTELLIJ_LICENSE_FILE',
+    );
   execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' });
   await mkdir(join(workspace, 'demo'), { recursive: true });
   await writeFile(
