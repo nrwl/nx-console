@@ -4,14 +4,12 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "allowImportingTsExtensions": true,
+    "outDir": "out-tsc/vscode-e2e",
+    "lib": ["es2022", "dom"],
     "types": ["node"],
     "ignoreDeprecations": "6.0"
   },
   "include": ["**/*.ts"],
-  "exclude": ["runner"],
-  "references": [
-    {
-      "path": "../../libs/shared/e2e-utils"
-    }
-  ]
+  "exclude": ["runner", "out-tsc"],
+  "references": []
 }
