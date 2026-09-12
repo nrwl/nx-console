@@ -32,6 +32,8 @@
                             implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
     <lang.documentationProvider language="JSON"
                                 implementationClass="dev.nx.console.nxls.NxlsDocumentationProvider"/>
+    <externalAnnotator language="JSON"
+                       implementationClass="dev.nx.console.nxls.NxlsDiagnosticsAnnotator"/>
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
