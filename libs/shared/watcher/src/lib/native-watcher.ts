@@ -1,4 +1,4 @@
-import type { WatchEvent, Watcher } from 'nx/src/native';
+import type { WatchEvent } from 'nx/src/native';
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { normalize } from 'path';
 import { match as minimatch } from 'minimatch';
@@ -23,7 +23,7 @@ const NX_PLUGIN_PATTERNS_TO_WATCH = [
 ];
 
 export class NativeWatcher {
-  private watcher: Watcher | undefined;
+  private stopWatcher: (() => Promise<void> | void) | undefined;
   private stopped = false;
   private debounceTimer: NodeJS.Timeout | null = null;
   private pendingChanges: Set<string> = new Set();
@@ -42,64 +42,105 @@ export class NativeWatcher {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = null;
     }
-    if (this.watcher) {
+    if (this.stopWatcher) {
       try {
-        await this.watcher.stop();
+        await this.stopWatcher();
       } catch (e) {
         // Ignore errors when stopping the watcher, as it might already be closed
         this.logger.log(
           'Error stopping watcher (this is expected during shutdown): ' + e,
         );
       }
-      this.watcher = undefined;
+      this.stopWatcher = undefined;
     }
   }
 
   private async initWatcher() {
-    const native = await importNxPackagePath<typeof import('nx/src/native')>(
+    type LegacyWatcher = {
+      watch(callback: (err: string | null, events: WatchEvent[]) => void): void;
+      stop(): Promise<void> | void;
+    };
+    type NativeModule = typeof import('nx/src/native') & {
+      Watcher?: new (workspacePath: string) => LegacyWatcher;
+    };
+
+    const native = await importNxPackagePath<NativeModule>(
       this.workspacePath,
       'src/native/index.js',
       this.logger,
     );
-    this.watcher = new native.Watcher(this.workspacePath);
+    if (this.stopped) return;
 
-    this.watcher.watch((err: string | null, events: WatchEvent[]) => {
-      // Check if watcher is stopped before processing any events
-      if (this.stopped) {
-        return;
-      }
+    if (
+      typeof native.WorkspaceContext?.prototype?.onWatchEvents === 'function'
+    ) {
+      const { workspaceDataDirectoryForWorkspace } = await importNxPackagePath<
+        typeof import('nx/src/utils/cache-directory')
+      >(this.workspacePath, 'src/utils/cache-directory.js', this.logger);
+      if (this.stopped) return;
+      const context = new native.WorkspaceContext(
+        this.workspacePath,
+        workspaceDataDirectoryForWorkspace(this.workspacePath),
+        { watch: true },
+      );
+      context.onWatchEvents((err, events) => {
+        this.processEvents(err, events ?? []);
+      });
+      this.stopWatcher = () => context.stopWatching();
+      await context.ready();
+      return;
+    }
 
-      if (err) {
-        this.logger.log('Error watching files: ' + err);
-      } else {
-        const relevantEvents = events.filter((e) => {
-          const path = normalize(e.path);
-          return (
-            (path.endsWith('project.json') ||
-              path.endsWith('package.json') ||
-              path.endsWith('nx.json') ||
-              path.endsWith('workspace.json') ||
-              path.endsWith('tsconfig.base.json') ||
-              NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-                minimatch([path], pattern, { dot: true }),
-              ) ||
-              NativeWatcher.openDocuments.has(path)) &&
-            !path.startsWith('node_modules') &&
-            !path.startsWith(normalize('.nx/cache')) &&
-            !path.startsWith(normalize('.yarn/cache')) &&
-            !path.startsWith(normalize('.nx/workspace-data'))
-          );
-        });
+    if (!native.Watcher) {
+      throw new Error(
+        'The installed Nx version does not support file watching',
+      );
+    }
 
-        if (relevantEvents.length > 0) {
-          // Double-check stopped state before handling changes
-          if (this.stopped) {
-            return;
-          }
-          this.handleFileChanges(relevantEvents);
+    const watcher = new native.Watcher(this.workspacePath);
+    watcher.watch((err, events) => this.processEvents(err, events));
+    this.stopWatcher = () => watcher.stop();
+  }
+
+  private processEvents(
+    err: Error | string | null,
+    events: WatchEvent[],
+  ): void {
+    // Check if watcher is stopped before processing any events
+    if (this.stopped) {
+      return;
+    }
+
+    if (err) {
+      this.logger.log('Error watching files: ' + err);
+    } else {
+      const relevantEvents = events.filter((e) => {
+        const path = normalize(e.path);
+        return (
+          (path.endsWith('project.json') ||
+            path.endsWith('package.json') ||
+            path.endsWith('nx.json') ||
+            path.endsWith('workspace.json') ||
+            path.endsWith('tsconfig.base.json') ||
+            NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
+              minimatch([path], pattern, { dot: true }),
+            ) ||
+            NativeWatcher.openDocuments.has(path)) &&
+          !path.startsWith('node_modules') &&
+          !path.startsWith(normalize('.nx/cache')) &&
+          !path.startsWith(normalize('.yarn/cache')) &&
+          !path.startsWith(normalize('.nx/workspace-data'))
+        );
+      });
+
+      if (relevantEvents.length > 0) {
+        // Double-check stopped state before handling changes
+        if (this.stopped) {
+          return;
         }
+        this.handleFileChanges(relevantEvents);
       }
-    });
+    }
   }
 
   private handleFileChanges(events: WatchEvent[]) {
