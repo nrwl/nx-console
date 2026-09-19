@@ -16,7 +16,11 @@ import {
   VSCodeEvaluator,
   cleanupMarkerFile,
 } from './fixtures/vscode-evaluator';
-import { getMarkerId, getWorkerDisplay } from './fixtures/vscode-e2e-runtime';
+import {
+  MARKER_ARG_PREFIX,
+  getMarkerId,
+  getWorkerDisplay,
+} from './fixtures/vscode-e2e-runtime';
 import { NxConsolePage } from './page-objects/nx-console-page';
 
 export interface LaunchOptions {
@@ -171,12 +175,11 @@ export const test = base.extend<
       );
 
       // Launch VS Code via Playwright's Electron support
-      const markerId = getMarkerId(workerInfo.workerIndex);
+      const markerId = getMarkerId(workerInfo.parallelIndex);
       const env = { ...process.env };
       cleanupMarkerFile(markerId);
       // Critical: unset this when running from within VS Code/Claude Code
       delete env.ELECTRON_RUN_AS_NODE;
-      env.VSCODE_E2E_MARKER_ID = markerId;
       if (xvfb.display) {
         env.DISPLAY = xvfb.display;
       }
@@ -190,6 +193,7 @@ export const test = base.extend<
           '--skip-welcome',
           '--skip-release-notes',
           '--disable-workspace-trust',
+          `${MARKER_ARG_PREFIX}${markerId}`,
           `--extensionDevelopmentPath=${extensionDevelopmentPath}`,
           `--extensionTestsPath=${extensionTestsPath}`,
           `--extensions-dir=${extensionsDir}`,
