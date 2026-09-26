@@ -9,8 +9,8 @@ env:
   NX_CLOUD_ACCESS_TOKEN: ${{ github.ref == 'refs/heads/master' && secrets.NX_CLOUD_READ_WRITE_TOKEN || secrets.NX_CLOUD_READ_TOKEN }}
   # Select affected tasks instead of whole projects.
   NX_LEGACY_AFFECTED: 'false'
-  # Hash tasks from Nx Cloud I/O snapshots (ultracache).
-  NX_IO_SNAPSHOTS: 'true'
+  # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
+  NX_CLOUD_USE_IO_SNAPSHOTS: 'true'
 
 jobs:
   main-linux:
