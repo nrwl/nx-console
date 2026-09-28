@@ -23,6 +23,8 @@ import kotlinx.coroutines.*
 
 private val logger by lazy { NxConsoleLogger.getInstance() }
 
+private const val MAX_BUFFERED_STDERR_CHARS = 64 * 1024
+
 class NxlsProcess(private val project: Project, private val cs: CoroutineScope) {
 
     private val basePath = project.nxBasePath
@@ -32,6 +34,10 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
     private var onExit: (() -> Unit)? = null
 
     private var exitJob: Job? = null
+
+    private var stderrJob: Job? = null
+
+    private val stderr = StringBuilder()
 
     suspend fun start() {
         logger.log("Staring the nxls process in workingDir $basePath")
@@ -43,28 +49,55 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                 } else {
                     logger.log("nxls started: $it")
                 }
+                stderrJob = cs.launch(Dispatchers.IO) { drainStderr(it) }
                 exitJob =
                     cs.launch {
                         it.awaitExit()
-                        it.errorStream.readAllBytes().decodeToString().run {
-                            if (this.isEmpty()) {
-                                return@run
-                            }
+                        // let the drain coroutine consume whatever is still buffered in the pipe
+                        withTimeoutOrNull(2000L) { stderrJob?.join() }
 
-                            if (project.isDisposed) {
-                                return@run
-                            }
-
-                            logger.error("Nxls early exit: $this")
-                            onExit?.invoke()
+                        val output = synchronized(stderr) { stderr.toString() }
+                        if (output.isEmpty()) {
+                            return@launch
                         }
+
+                        if (project.isDisposed) {
+                            return@launch
+                        }
+
+                        logger.error("Nxls early exit: $output")
+                        onExit?.invoke()
                     }
             }
         }
     }
 
+    /**
+     * Reads the process' stderr for as long as it runs.
+     *
+     * Nothing else consumes this pipe, so leaving it unread lets it fill up: the server then blocks
+     * writing to stderr, stops reading its stdin, and every message we send to it blocks in turn.
+     */
+    private fun drainStderr(process: Process) {
+        try {
+            process.errorStream.bufferedReader().forEachLine { line ->
+                logger.debug("nxls stderr: $line")
+                synchronized(stderr) {
+                    stderr.appendLine(line)
+                    val overflow = stderr.length - MAX_BUFFERED_STDERR_CHARS
+                    if (overflow > 0) {
+                        stderr.delete(0, overflow)
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            logger.debug("nxls stderr stream closed: ${e.message}")
+        }
+    }
+
     suspend fun stop() {
         exitJob?.cancel()
+        stderrJob?.cancel()
         logger.log("stopping nxls process")
         val hasExited =
             if (process?.isAlive == false) {

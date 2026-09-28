@@ -49,6 +49,8 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
     private var connectedEditors = ConcurrentHashMap<String, DocumentManager>()
 
+    private val notificationQueue = LspNotificationQueue(cs)
+
     private var status = NxlsState.STOPPED
 
     fun getServerCapabilities(): ServerCapabilities? {
@@ -233,14 +235,14 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
     fun isEditorConnected(editor: Editor): Boolean {
         val filePath = getFilePath(editor.document)
-        return connectedEditors.contains(filePath)
+        return connectedEditors.containsKey(filePath)
     }
 
     private fun connectTextService(documentManager: DocumentManager) {
         log.log("Connecting textService to ${documentManager.documentPath}")
         val textService =
             languageServer?.textDocumentService ?: return log.log("text service not ready")
-        documentManager.addTextDocumentService(textService)
+        documentManager.addTextDocumentService(textService, notificationQueue)
         documentManager.documentOpened()
     }
 
