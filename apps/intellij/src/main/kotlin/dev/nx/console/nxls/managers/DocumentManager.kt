@@ -10,7 +10,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import dev.nx.console.completion.createLookupItem
-import dev.nx.console.nxls.LspNotificationQueue
+import dev.nx.console.nxls.LspMessageQueue
 import dev.nx.console.utils.DocumentUtils
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.computableReadAction
@@ -54,7 +54,7 @@ class DocumentManager(val editor: Editor) {
     private var listenerDisposable: Disposable? = null
 
     private var textDocumentService: TextDocumentService? = null
-    private var notificationQueue: LspNotificationQueue? = null
+    private var messageQueue: LspMessageQueue? = null
 
     fun handleDocumentChanged(event: DocumentEvent) {
 
@@ -174,20 +174,20 @@ class DocumentManager(val editor: Editor) {
 
     fun addTextDocumentService(
         textDocumentService: TextDocumentService,
-        notificationQueue: LspNotificationQueue,
+        messageQueue: LspMessageQueue,
     ) {
         this.textDocumentService = textDocumentService
-        this.notificationQueue = notificationQueue
+        this.messageQueue = messageQueue
     }
 
     private fun sendNotification(send: (TextDocumentService) -> Unit) {
         val service = textDocumentService ?: return
-        val queue = notificationQueue ?: return
+        val queue = messageQueue ?: return
         queue.submit { send(service) }
     }
 
     /**
-     * Sends a request through the same queue the notifications use.
+     * Sends a request on the shared queue, behind every notification already submitted.
      *
      * Requests carry a document position, so one that overtook a queued `didChange` would be
      * answered against text the server has not seen yet. Going through the queue keeps a request
@@ -198,7 +198,7 @@ class DocumentManager(val editor: Editor) {
         send: (TextDocumentService) -> CompletableFuture<T>
     ): CompletableFuture<T>? {
         val service = textDocumentService ?: return null
-        val queue = notificationQueue ?: return null
+        val queue = messageQueue ?: return null
         val answer = CompletableFuture<T>()
         queue.submit {
             if (answer.isCancelled) {

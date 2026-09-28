@@ -18,15 +18,15 @@ import kotlinx.coroutines.job
 
 private const val AWAIT_TIMEOUT_SECONDS = 30L
 
-class LspNotificationQueueTest : BasePlatformTestCase() {
+class LspMessageQueueTest : BasePlatformTestCase() {
 
     private lateinit var scope: CoroutineScope
-    private lateinit var queue: LspNotificationQueue
+    private lateinit var queue: LspMessageQueue
 
     override fun setUp() {
         super.setUp()
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-        queue = LspNotificationQueue(scope)
+        queue = LspMessageQueue(scope)
     }
 
     override fun tearDown() {
@@ -37,7 +37,7 @@ class LspNotificationQueueTest : BasePlatformTestCase() {
         }
     }
 
-    fun testNotificationsRunOffTheSubmittingThread() {
+    fun testMessagesRunOffTheSubmittingThread() {
         val submittingThread = Thread.currentThread()
         val handoff = SynchronousQueue<Thread>()
 
@@ -46,21 +46,21 @@ class LspNotificationQueueTest : BasePlatformTestCase() {
         val consumingThread =
             assertNotNull(
                 handoff.poll(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS),
-                "the notification was never sent",
+                "the message was never sent",
             )
         assertNotSame(submittingThread, consumingThread)
     }
 
-    fun testSubmitDoesNotBlockWhileAnEarlierNotificationIsStuck() {
+    fun testSubmitDoesNotBlockWhileAnEarlierMessageIsStuck() {
         val stuck = CountDownLatch(1)
-        val reachedStuckNotification = CountDownLatch(1)
+        val reachedStuckMessage = CountDownLatch(1)
         queue.submit {
-            reachedStuckNotification.countDown()
+            reachedStuckMessage.countDown()
             stuck.await(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         }
         assertTrue(
-            reachedStuckNotification.await(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS),
-            "the queue never picked up the first notification",
+            reachedStuckMessage.await(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS),
+            "the queue never picked up the first message",
         )
 
         val elapsed = measureTimeMillis { queue.submit {} }
@@ -69,7 +69,7 @@ class LspNotificationQueueTest : BasePlatformTestCase() {
         stuck.countDown()
     }
 
-    fun testNotificationsKeepSubmissionOrder() {
+    fun testMessagesKeepSubmissionOrder() {
         val sent = CopyOnWriteArrayList<Int>()
         val allSent = CountDownLatch(50)
 
@@ -82,12 +82,12 @@ class LspNotificationQueueTest : BasePlatformTestCase() {
 
         assertTrue(
             allSent.await(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS),
-            "only ${sent.size} of 50 notifications were sent",
+            "only ${sent.size} of 50 messages were sent",
         )
         assertEquals((0 until 50).toList(), sent.toList())
     }
 
-    fun testCancellingTheScopeStopsTheQueueAcceptingNotifications() {
+    fun testCancellingTheScopeStopsTheQueueAcceptingMessages() {
         val job = scope.coroutineContext.job
         scope.cancel()
         val deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(10)
@@ -101,11 +101,11 @@ class LspNotificationQueueTest : BasePlatformTestCase() {
 
         assertFalse(
             sent.await(1, TimeUnit.SECONDS),
-            "a notification was still sent after the scope was cancelled",
+            "a message was still sent after the scope was cancelled",
         )
     }
 
-    fun testAFailingNotificationDoesNotStopTheQueue() {
+    fun testAFailingMessageDoesNotStopTheQueue() {
         val sentAfterTheFailure = CountDownLatch(1)
 
         queue.submit { throw IllegalStateException("broken pipe") }
@@ -113,7 +113,7 @@ class LspNotificationQueueTest : BasePlatformTestCase() {
 
         assertTrue(
             sentAfterTheFailure.await(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS),
-            "the queue stopped after a notification threw",
+            "the queue stopped after a message threw",
         )
     }
 }
