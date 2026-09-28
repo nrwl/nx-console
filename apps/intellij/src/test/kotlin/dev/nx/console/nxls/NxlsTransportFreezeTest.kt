@@ -97,7 +97,7 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         myFixture.configureByText("workspace.json", largeDocument())
         manager = DocumentManager.getInstance(myFixture.editor)
-        manager.addTextDocumentService(textService, LspNotificationQueue(scope))
+        manager.addTextDocumentService(textService, LspMessageQueue(scope))
     }
 
     override fun tearDown() {

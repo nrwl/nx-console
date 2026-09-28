@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import dev.nx.console.nxls.LspNotificationQueue
+import dev.nx.console.nxls.LspMessageQueue
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
@@ -117,7 +117,7 @@ class DocumentManagerTest : BasePlatformTestCase() {
         myFixture.configureByText("project.json", "{}")
         editor = myFixture.editor
         manager = DocumentManager.getInstance(editor)
-        manager.addTextDocumentService(service, LspNotificationQueue(scope))
+        manager.addTextDocumentService(service, LspMessageQueue(scope))
     }
 
     override fun tearDown() {
