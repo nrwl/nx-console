@@ -1,7 +1,6 @@
 package dev.nx.console.nxls
 
 import dev.nx.console.utils.NxConsoleLogger
-import java.util.function.Function
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +8,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
-import org.eclipse.lsp4j.jsonrpc.json.StreamMessageConsumer
 
 private val log by lazy { NxConsoleLogger.getInstance() }
 
@@ -44,7 +42,9 @@ class LspMessageQueue(scope: CoroutineScope) {
                 }
             }
         }
-        // Pending sends capture the document they describe, so they must not outlive the scope.
+        // Stop accepting messages once the scope is done. Anything already buffered stays
+        // buffered: closing a channel does not discard its contents, and the consumer is on its
+        // way out, so those sends are simply never made.
         scope.coroutineContext.job.invokeOnCompletion { queue.close() }
     }
 
@@ -57,23 +57,4 @@ class LspMessageQueue(scope: CoroutineScope) {
     internal fun offload(consumer: MessageConsumer): MessageConsumer = MessageConsumer { message ->
         submit { consumer.consume(message) }
     }
-}
-
-/**
- * Builds the message consumer wrapper a launcher talking to nxls must be created with.
- *
- * This is the only place that decides what leaves the caller's thread, so every message reaches the
- * server the same way and no call site can opt out by accident. [decorate] adds anything that
- * should run per message, such as logging, and runs wherever the message ends up being sent from.
- *
- * lsp4j applies this wrapper to both directions. Only the consumer that writes into the server's
- * stdin can block its caller, so only that one is moved onto [queue]; deferring inbound delivery
- * would stall the server's replies behind our own sends.
- */
-fun nxlsMessageConsumerWrapper(
-    queue: LspMessageQueue,
-    decorate: (MessageConsumer) -> MessageConsumer = { it },
-): Function<MessageConsumer, MessageConsumer> = Function { consume ->
-    val deliver = decorate(consume)
-    if (consume is StreamMessageConsumer) queue.offload(deliver) else deliver
 }

@@ -25,6 +25,8 @@ private val logger by lazy { NxConsoleLogger.getInstance() }
 
 private const val MAX_BUFFERED_STDERR_CHARS = 64 * 1024
 
+private const val STDERR_CHUNK_CHARS = 4 * 1024
+
 class NxlsProcess(private val project: Project, private val cs: CoroutineScope) {
 
     private val basePath = project.nxBasePath
@@ -79,14 +81,24 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
      * writing to stderr, stops reading its stdin, and every message we send to it blocks in turn.
      */
     private fun drainStderr(process: Process) {
+        // Read fixed chunks rather than lines: a server that emits a huge or unterminated line
+        // would otherwise be buffered whole before the cap below could apply.
+        val chunk = CharArray(STDERR_CHUNK_CHARS)
         try {
-            process.errorStream.bufferedReader().forEachLine { line ->
-                logger.debug("nxls stderr: $line")
-                synchronized(stderr) {
-                    stderr.appendLine(line)
-                    val overflow = stderr.length - MAX_BUFFERED_STDERR_CHARS
-                    if (overflow > 0) {
-                        stderr.delete(0, overflow)
+            process.errorStream.reader().use { reader ->
+                while (true) {
+                    val count = reader.read(chunk)
+                    if (count < 0) {
+                        return
+                    }
+                    val text = String(chunk, 0, count)
+                    logger.debug("nxls stderr: $text")
+                    synchronized(stderr) {
+                        stderr.append(text)
+                        val overflow = stderr.length - MAX_BUFFERED_STDERR_CHARS
+                        if (overflow > 0) {
+                            stderr.delete(0, overflow)
+                        }
                     }
                 }
             }
@@ -97,6 +109,8 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
 
     suspend fun stop() {
         exitJob?.cancel()
+        // Cancelling cannot interrupt a blocking read. The drain ends when the process dies below
+        // and its stream reaches end of file.
         stderrJob?.cancel()
         logger.log("stopping nxls process")
         val hasExited =
