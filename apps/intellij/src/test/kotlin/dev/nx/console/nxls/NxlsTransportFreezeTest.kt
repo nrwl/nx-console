@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
-import kotlin.test.assertNotNull
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,6 @@ import kotlinx.coroutines.cancel
 import org.eclipse.lsp4j.DidOpenTextDocumentParams
 import org.eclipse.lsp4j.TextDocumentItem
 import org.eclipse.lsp4j.jsonrpc.Launcher
-import org.eclipse.lsp4j.jsonrpc.MessageConsumer
 import org.eclipse.lsp4j.services.TextDocumentService
 
 /** Comfortably larger than any platform's pipe buffer plus the JDK's own output buffering. */
@@ -73,6 +72,7 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
     private lateinit var process: Process
     private lateinit var executor: ExecutorService
     private lateinit var scope: CoroutineScope
+    private lateinit var queue: LspMessageQueue
     private lateinit var textService: TextDocumentService
     private lateinit var manager: DocumentManager
 
@@ -80,6 +80,8 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
         super.setUp()
         process = startStdinIgnoringServer()
         executor = Executors.newCachedThreadPool()
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        queue = LspMessageQueue(scope)
         val launcher =
             Launcher.createIoLauncher(
                 NxlsLanguageClient(),
@@ -87,17 +89,17 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
                 process.inputStream,
                 process.outputStream,
                 executor,
-                fun(consume: MessageConsumer): MessageConsumer = consume,
+                // The same wiring NxlsWrapper builds, so removing the queueing there fails here.
+                nxlsMessageConsumerWrapper(queue),
                 fun(gson: GsonBuilder) {},
             )
         // Deliberately not startListening(): the stand-in server never answers, and these tests
         // only care about the direction that writes.
         textService = launcher.remoteProxy.textDocumentService
 
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         myFixture.configureByText("workspace.json", largeDocument())
         manager = DocumentManager.getInstance(myFixture.editor)
-        manager.addTextDocumentService(textService, LspMessageQueue(scope))
+        manager.addTextDocumentService(textService)
     }
 
     override fun tearDown() {
@@ -113,22 +115,23 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
         }
     }
 
-    fun testWritingToAServerThatNeverReadsParksTheCaller() {
+    fun testAStalledServerReallyParksAPipeWrite() {
         val sender = Thread { runCatching { textService.didOpen(params()) } }
         sender.isDaemon = true
 
         sender.start()
         sender.join(BLOCKED_WRITE_PROOF_MS)
 
-        assertTrue(
-            sender.isAlive,
-            "the write finished, so this setup does not actually stall the transport and the " +
-                "freeze tests built on it would prove nothing",
-        )
-        assertNotNull(
-            blockedInAPipeWrite(),
-            "no thread is parked in a pipe write, so the send never reached the blocking point",
-        )
+        // The premise every freeze test rests on: this setup genuinely fills the server's pipe
+        // and leaves a thread stopped in the same frame JetBrains' report shows.
+        val blocked =
+            waitForBlockedPipeWrite()
+                ?: error(
+                    "no thread is parked in a pipe write, so nothing here stalls the transport"
+                )
+        // And the caller is not that thread, because the send was handed to the queue.
+        assertNotSame(sender, blocked)
+        assertFalse(sender.isAlive, "the sending thread is still stuck in the transport")
     }
 
     fun testDocumentOpenedLeavesTheBlockingWriteOffTheDispatchThread() {

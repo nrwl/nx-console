@@ -80,8 +80,8 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                         input,
                         output,
                         executorService,
-                        fun(consume: MessageConsumer): MessageConsumer {
-                            return MessageConsumer { message ->
+                        nxlsMessageConsumerWrapper(messageQueue) { consume ->
+                            MessageConsumer { message ->
                                 try {
                                     val debugEnabled =
                                         NxConsoleSettingsProvider.getInstance().enableDebugLogging
@@ -242,7 +242,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         log.log("Connecting textService to ${documentManager.documentPath}")
         val textService =
             languageServer?.textDocumentService ?: return log.log("text service not ready")
-        documentManager.addTextDocumentService(textService, messageQueue)
+        documentManager.addTextDocumentService(textService)
         documentManager.documentOpened()
     }
 

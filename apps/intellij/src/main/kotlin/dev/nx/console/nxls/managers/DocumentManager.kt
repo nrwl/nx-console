@@ -10,11 +10,9 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import dev.nx.console.completion.createLookupItem
-import dev.nx.console.nxls.LspMessageQueue
 import dev.nx.console.utils.DocumentUtils
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.computableReadAction
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.future.await
@@ -54,7 +52,6 @@ class DocumentManager(val editor: Editor) {
     private var listenerDisposable: Disposable? = null
 
     private var textDocumentService: TextDocumentService? = null
-    private var messageQueue: LspMessageQueue? = null
 
     fun handleDocumentChanged(event: DocumentEvent) {
 
@@ -94,13 +91,13 @@ class DocumentManager(val editor: Editor) {
         changeEvent.range = range
         changeEvent.text = newText.toString()
 
-        sendNotification { it.didChange(changesParams) }
+        textDocumentService?.didChange(changesParams)
     }
 
     fun completions(pos: Position): Iterable<LookupElement> {
         val lookupItems = arrayListOf<LookupElement>()
-        val request =
-            sendRequest { it.completion(CompletionParams(identifier, pos)) } ?: return lookupItems
+        val service = textDocumentService ?: return lookupItems
+        val request = service.completion(CompletionParams(identifier, pos))
 
         try {
             val res = request.get(COMPLETION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
@@ -118,7 +115,8 @@ class DocumentManager(val editor: Editor) {
     suspend fun hover(startOffset: Int): String? {
         return try {
             val pos = DocumentUtils.offsetToLSPPos(editor, startOffset) ?: return null
-            val request = sendRequest { it.hover(HoverParams(identifier, pos)) } ?: return null
+            val service = textDocumentService ?: return null
+            val request = service.hover(HoverParams(identifier, pos))
             val hover = withTimeoutOrNull(HOVER_TIMEOUT_MS) { request.await() }
             val contents: String? =
                 hover?.contents.let { it?.left?.joinToString { l -> l.left } ?: it?.right?.value }
@@ -139,13 +137,13 @@ class DocumentManager(val editor: Editor) {
                     computableReadAction { document.text },
                 )
             )
-        sendNotification { it.didOpen(params) }
+        textDocumentService?.didOpen(params)
         addDocumentListener()
     }
 
     fun documentClosed() {
         removeDocumentListener()
-        sendNotification { it.didClose(DidCloseTextDocumentParams(identifier)) }
+        textDocumentService?.didClose(DidCloseTextDocumentParams(identifier))
         documentManagers.remove(getFilePath(document))
     }
 
@@ -172,47 +170,8 @@ class DocumentManager(val editor: Editor) {
         }
     }
 
-    fun addTextDocumentService(
-        textDocumentService: TextDocumentService,
-        messageQueue: LspMessageQueue,
-    ) {
+    fun addTextDocumentService(textDocumentService: TextDocumentService) {
         this.textDocumentService = textDocumentService
-        this.messageQueue = messageQueue
-    }
-
-    private fun sendNotification(send: (TextDocumentService) -> Unit) {
-        val service = textDocumentService ?: return
-        val queue = messageQueue ?: return
-        queue.submit { send(service) }
-    }
-
-    /**
-     * Sends a request on the shared queue, behind every notification already submitted.
-     *
-     * Requests carry a document position, so one that overtook a queued `didChange` would be
-     * answered against text the server has not seen yet. Going through the queue keeps a request
-     * behind every edit that was submitted before it; the returned future still completes on the
-     * language server's own reply.
-     */
-    private fun <T> sendRequest(
-        send: (TextDocumentService) -> CompletableFuture<T>
-    ): CompletableFuture<T>? {
-        val service = textDocumentService ?: return null
-        val queue = messageQueue ?: return null
-        val answer = CompletableFuture<T>()
-        queue.submit {
-            if (answer.isCancelled) {
-                return@submit
-            }
-            val request = send(service)
-            // Cancelling the future the caller holds still has to reach the server, which is what
-            // lets an abandoned completion stop work that is already under way.
-            answer.whenComplete { _, _ -> if (answer.isCancelled) request.cancel(true) }
-            request.whenComplete { value, error ->
-                if (error != null) answer.completeExceptionally(error) else answer.complete(value)
-            }
-        }
-        return answer
     }
 }
 
