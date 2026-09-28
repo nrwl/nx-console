@@ -1,18 +1,17 @@
 package dev.nx.console.nxls
 
-import com.google.gson.GsonBuilder
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
-import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.nio.file.Path
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import org.eclipse.lsp4j.DidOpenTextDocumentParams
 import org.eclipse.lsp4j.TextDocumentItem
-import org.eclipse.lsp4j.jsonrpc.Launcher
+import org.eclipse.lsp4j.jsonrpc.MessageConsumer
 import org.eclipse.lsp4j.services.TextDocumentService
 
 /** Comfortably larger than any platform's pipe buffer plus the JDK's own output buffering. */
@@ -82,19 +81,16 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
         executor = Executors.newCachedThreadPool()
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         queue = LspMessageQueue(scope)
+        // The launcher production builds, so removing the queueing from createNxlsLauncher or
+        // from its use here is caught by this test rather than passing quietly.
         val launcher =
-            Launcher.createIoLauncher(
+            createNxlsLauncher(
                 NxlsLanguageClient(),
-                NxlsLanguageServer::class.java,
                 process.inputStream,
                 process.outputStream,
                 executor,
-                // The same wiring NxlsWrapper builds, so removing the queueing there fails here.
-                nxlsMessageConsumerWrapper(queue),
-                fun(gson: GsonBuilder) {},
+                queue,
             )
-        // Deliberately not startListening(): the stand-in server never answers, and these tests
-        // only care about the direction that writes.
         textService = launcher.remoteProxy.textDocumentService
 
         myFixture.configureByText("workspace.json", largeDocument())
@@ -113,6 +109,35 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
         } finally {
             super.tearDown()
         }
+    }
+
+    fun testQueueingSurvivesAWrappedConsumer() {
+        // Production passes a decorator for logging, so by the time lsp4j has applied it the
+        // outbound consumer is no longer a StreamMessageConsumer. Reading the direction from the
+        // decorated consumer instead of the original would stop queueing here and only here.
+        val decorated =
+            createNxlsLauncher(
+                    NxlsLanguageClient(),
+                    process.inputStream,
+                    process.outputStream,
+                    executor,
+                    queue,
+                ) { consume ->
+                    MessageConsumer { message -> consume.consume(message) }
+                }
+                .remoteProxy
+                .textDocumentService
+
+        val elapsed = measureTimeMillis { decorated.didOpen(params()) }
+
+        assertTrue(
+            elapsed < MAX_DISPATCH_THREAD_MS,
+            "a decorated consumer sent on the caller's thread and held it for ${elapsed}ms",
+        )
+        assertNotNull(
+            waitForBlockedPipeWrite(),
+            "the decorated send never reached the server's pipe",
+        )
     }
 
     fun testAStalledServerReallyParksAPipeWrite() {
