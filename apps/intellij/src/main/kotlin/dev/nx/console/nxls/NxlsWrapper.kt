@@ -4,8 +4,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
-import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.models.NxGeneratorOptionDeserializer
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.managers.getFilePath
@@ -22,7 +20,6 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.eclipse.lsp4j.*
-import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
 import org.eclipse.lsp4j.jsonrpc.messages.RequestMessage
 import org.eclipse.lsp4j.jsonrpc.messages.ResponseMessage
@@ -71,74 +68,55 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
             nxlsProcess.callOnExit { cs.launch { stop() } }
             if (status !== NxlsState.STOPPED) {
-                languageClient = NxlsLanguageClient()
+                val client = NxlsLanguageClient()
+                languageClient = client
                 val executorService = Executors.newCachedThreadPool()
 
-                Launcher.createIoLauncher(
-                        languageClient,
-                        NxlsLanguageServer::class.java,
-                        input,
-                        output,
-                        executorService,
-                        nxlsMessageConsumerWrapper(messageQueue) { consume ->
-                            MessageConsumer { message ->
-                                try {
-                                    val debugEnabled =
-                                        NxConsoleSettingsProvider.getInstance().enableDebugLogging
-                                    val response = message as? ResponseMessage
-                                    response?.let {
-                                        it.error?.let {
-                                            log.error("Error from nxls: ${it.message}")
-                                        }
-                                        it.result?.let { result ->
-                                            val resultStr = result.toString()
-                                            val logMessage =
-                                                if (debugEnabled || resultStr.length <= 100)
-                                                    resultStr
-                                                else resultStr.substring(0, 100)
-                                            log.log("Result from nxls: $logMessage")
-                                        }
+                createNxlsLauncher(client, input, output, executorService, messageQueue) { consume
+                        ->
+                        MessageConsumer { message ->
+                            try {
+                                val debugEnabled =
+                                    NxConsoleSettingsProvider.getInstance().enableDebugLogging
+                                val response = message as? ResponseMessage
+                                response?.let {
+                                    it.error?.let { log.error("Error from nxls: ${it.message}") }
+                                    it.result?.let { result ->
+                                        val resultStr = result.toString()
+                                        val logMessage =
+                                            if (debugEnabled || resultStr.length <= 100) resultStr
+                                            else resultStr.substring(0, 100)
+                                        log.log("Result from nxls: $logMessage")
                                     }
-
-                                    val request = message as? RequestMessage
-                                    request?.let { request ->
-                                        val paramsStr = request.params?.toString()
-                                        val paramsLog =
-                                            if (paramsStr == null) null
-                                            else if (debugEnabled || paramsStr.length <= 100)
-                                                paramsStr
-                                            else paramsStr.substring(0, 100)
-                                        log.log(
-                                            "Sending request to nxls: ${request.method} ($paramsLog)"
-                                        )
-                                    }
-
-                                    nxlsProcess.isAlive()?.run {
-                                        if (this) {
-                                            consume.consume(message)
-                                        } else {
-                                            log.log(
-                                                "Unable to send messages to the nxls, the process has exited"
-                                            )
-                                            status = NxlsState.STOPPED
-                                        }
-                                    }
-                                } catch (e: Throwable) {
-                                    log.error("Error in nxls message consumer", e)
                                 }
+
+                                val request = message as? RequestMessage
+                                request?.let { request ->
+                                    val paramsStr = request.params?.toString()
+                                    val paramsLog =
+                                        if (paramsStr == null) null
+                                        else if (debugEnabled || paramsStr.length <= 100) paramsStr
+                                        else paramsStr.substring(0, 100)
+                                    log.log(
+                                        "Sending request to nxls: ${request.method} ($paramsLog)"
+                                    )
+                                }
+
+                                nxlsProcess.isAlive()?.run {
+                                    if (this) {
+                                        consume.consume(message)
+                                    } else {
+                                        log.log(
+                                            "Unable to send messages to the nxls, the process has exited"
+                                        )
+                                        status = NxlsState.STOPPED
+                                    }
+                                }
+                            } catch (e: Throwable) {
+                                log.error("Error in nxls message consumer", e)
                             }
-                        },
-                        fun(gson) {
-                            gson.registerTypeAdapter(
-                                NxGeneratorOption::class.java,
-                                NxGeneratorOptionDeserializer(),
-                            )
-                            //                            gson.registerTypeAdapter(
-                            //                                SourceInformation::class.java,
-                            //                                SourceInformationDeserializer(),
-                            //                            )
-                        },
-                    )
+                        }
+                    }
                     .also {
                         languageServer = it.remoteProxy
                         it.startListening()
