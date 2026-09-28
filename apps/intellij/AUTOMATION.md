@@ -386,3 +386,35 @@ References:
 - [JetBrains Driver SDK](https://github.com/JetBrains/intellij-community/blob/master/tools/intellij.tools.ide.starter.driver/README.md)
 - [UI testing and selectors](https://plugins.jetbrains.com/docs/intellij/integration-tests-ui.html)
 - [JCEF helper for IntelliJ 252](https://github.com/JetBrains/intellij-community/blob/idea/252.23892.409/platform/remote-driver/test-sdk/src/com/intellij/driver/sdk/ui/components/common/JCefUI.kt)
+
+### Editor freeze on nx config files (NXC-5033)
+
+`ReproEditorFreezeKt` covers the UI freezes JetBrains reported from their
+Marketplace freeze dashboard, whose largest cluster was
+`network on EDT NxEditorListener.editorCreated`. Opening an nx config file used
+to write the `didOpen` notification into the nxls stdin pipe on the EDT, which
+blocks for as long as the language server is not draining that pipe.
+
+The scenario opens `nx.json` and `package.json`, waits until `NxlsService`
+reports each editor as connected, types into one of them, and closes them all.
+Around every step it times a round trip through the EDT and fails if any of them
+took longer than two seconds.
+
+Any Nx workspace works as the fixture; no extra setup is needed.
+
+```sh
+NX_AUTOMATION_LABEL=nxc-5033-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproEditorFreezeKt'
+```
+
+Before the fix the scenario fails on the connection check rather than on a
+timing threshold: `NxlsWrapper.isEditorConnected` resolved to
+`ConcurrentHashMap.contains`, which compares values instead of keys and so never
+matched, leaving `editorReleased` unable to disconnect a document.
+
+The EDT thresholds are a regression guard rather than a reproduction. Forcing a
+live nxls to stop reading its stdin is not something the harness can arrange, so
+the deterministic proof of the freeze lives in `DocumentManagerTest`, which
+holds a send open and asserts the dispatch thread stays free.
