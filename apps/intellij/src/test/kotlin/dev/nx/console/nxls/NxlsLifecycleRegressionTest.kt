@@ -1,9 +1,18 @@
 package dev.nx.console.nxls
 
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.platform.lang.lsWidget.LanguageServicePopupSection
+import com.intellij.platform.lsp.api.LspServer
 import com.intellij.platform.lsp.api.LspServerDescriptor
+import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.platform.lsp.api.lsWidget.LspWidgetInternalService
 import com.intellij.testFramework.LightVirtualFile
+import com.intellij.testFramework.TestActionEvent
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.testFramework.replaceService
 import java.util.concurrent.CountDownLatch
@@ -45,6 +54,93 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
 
     fun testWidgetRestartDuringInitializationUsesFreshGeneration() {
         checkWidgetRestart(initialized = false)
+    }
+
+    fun testWidgetRestartBeforeFirstLaunchIgnoresDelayedStop() = runTest {
+        val file = myFixture.addFileToProject("nx.json", "{}").virtualFile
+        project.replaceService(LspServerManager::class.java, harness.manager, testRootDisposable)
+        ApplicationManager.getApplication()
+            .replaceService(
+                LspWidgetInternalService::class.java,
+                object : LspWidgetInternalService() {
+                    override fun createShowErrorOutputAction(lspServer: LspServer): AnAction? = null
+
+                    override fun restartLspServer(lspServer: LspServer) {
+                        // The SDK removes the server before rediscovery and asynchronous shutdown.
+                        harness.manager.stopServers(lspServer.providerClass)
+                    }
+
+                    override fun stopLspServer(lspServer: LspServer) {
+                        harness.manager.stopServers(lspServer.providerClass)
+                    }
+                },
+                testRootDisposable,
+            )
+        val service =
+            NxlsService(project, backgroundScope).apply { sessionOverride = harness.session }
+        var refreshes = 0
+        project.messageBus
+            .connect(testRootDisposable)
+            .subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener { refreshes++ },
+            )
+
+        harness.session.start()
+        harness.runLifecycleTasks()
+        val old = checkNotNull(harness.runNextStart())
+        assertEqual(listOf(old), harness.registeredServers.toList())
+        assertEqual(listOf(old), harness.pendingLaunches.toList())
+        assertTrue(harness.lifecycleTasks.isEmpty())
+        assertTrue(harness.launchedDescriptors.isEmpty())
+        harness.delayStopCallbacks = true
+
+        val provider = NxlsServerSupportProvider()
+        val widget = checkNotNull(provider.createLspServerWidgetItem(old, file))
+        assertEqual(LanguageServicePopupSection.ForCurrentFile, widget.widgetActionLocation)
+        val widgetAction = widget.createWidgetAction()
+        val restart =
+            (widgetAction.templatePresentation.getClientProperty(ActionUtil.INLINE_ACTIONS)
+                    ?: (widgetAction as DefaultActionGroup).getChildren(null).toList())
+                .single()
+        restart.actionPerformed(TestActionEvent.createTestEvent(restart))
+        harness.runLifecycleTasks()
+        assertTrue(harness.registeredServers.isEmpty())
+        assertEqual(1, harness.pendingStops.size)
+
+        val discovered = mutableListOf<LspServerDescriptor>()
+        provider.fileOpened(project, file, starter(discovered))
+        harness.manager.ensureServerStarted(
+            NxlsServerSupportProvider::class.java,
+            discovered.single(),
+        )
+        val replacement = checkNotNull(harness.runNextStart())
+        assertEqual(listOf(old, replacement), harness.pendingLaunches.toList())
+        harness.runNextLaunch()
+        harness.runNextLaunch()
+        harness.ready(replacement)
+        assertTrue(service.isStarted())
+        harness.deliverStopCallbacks()
+
+        assertTrue(
+            service.isStarted(),
+            "Delayed stop from the first launch retired the replacement generation",
+        )
+        assertSame(replacement, harness.session.ready.value?.server)
+        assertFalse(checkNotNull(harness.session.ready.value).ended.isCompleted)
+        assertTrue(replacement.descriptor.generation > old.descriptor.generation)
+        assertEqual(listOf(replacement.descriptor), harness.launchedDescriptors.toList())
+        harness.session.workspaceRefresh(old.descriptor.generation, false)
+        assertEqual(0, refreshes)
+        harness.session.workspaceRefresh(replacement.descriptor.generation, false)
+        assertEqual(1, refreshes)
+        val waiting = backgroundScope.async { service.awaitStarted() }
+        runCurrent()
+        assertTrue(waiting.isCompleted, "awaitStarted did not observe the replacement generation")
+        waiting.await()
+        harness.runPendingTasks()
+        assertEqual(listOf(replacement), harness.registeredServers.toList())
+        assertEqual(2, harness.servers.size)
     }
 
     private fun checkWidgetRestart(initialized: Boolean) {
