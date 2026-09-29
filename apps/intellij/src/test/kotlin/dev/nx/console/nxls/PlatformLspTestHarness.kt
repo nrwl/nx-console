@@ -43,12 +43,14 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
             arrayOf(LspServerManager::class.java),
         ) { _, method, args ->
             when (method.name) {
-                "getServersForProvider" -> registeredServers.toList()
+                "getServersForProvider",
+                "getClients" -> registeredServers.toList()
                 "ensureServerStarted" -> {
                     pendingStarts.add(args!![1] as NxlsServerDescriptor)
                     Unit
                 }
-                "stopServers" -> {
+                "stopServers",
+                "stopClients" -> {
                     stops++
                     for (server in registeredServers.toList()) {
                         registeredServers.remove(server)

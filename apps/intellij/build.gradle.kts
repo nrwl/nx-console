@@ -157,6 +157,11 @@ configurations.all {
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
 }
 
+// Use the SDK stdlib at runtime, including its coroutine debug metadata support in tests.
+configurations
+    .matching { it.name == "runtimeClasspath" || it.name == "testRuntimeClasspath" }
+    .configureEach { exclude("org.jetbrains.kotlin", "kotlin-stdlib") }
+
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 

@@ -45,7 +45,7 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
     private val manager = LspServerManager.getInstance(project)
     @Suppress("UNCHECKED_CAST")
     private val servers =
-        manager.javaClass.getDeclaredField("lspServers").let {
+        manager.javaClass.getDeclaredField("lspClients").let {
             it.isAccessible = true
             it.get(manager) as MutableCollection<LspServerImpl>
         }
@@ -63,9 +63,9 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
         servers.add(server)
     }
 
-    fun open(file: VirtualFile) = server.sendDidOpenRequest(file)
+    fun open(file: VirtualFile) = server.documentSyncManager.open(file)
 
-    fun close(file: VirtualFile) = server.sendDidCloseRequest(file)
+    fun close(file: VirtualFile) = server.documentSyncManager.close(file)
 
     fun drain() {
         val sent = CountDownLatch(1)
