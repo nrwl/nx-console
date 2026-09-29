@@ -91,7 +91,8 @@ internal constructor(
                 }
             if (server != null) active.server = server
             // Discovery may run before the removed server's asynchronous shutdown callback.
-            // A descriptor with no observed server is still a pending first start.
+            // Widget restarts retire synchronously; an unobserved descriptor may still await
+            // its first registration.
             if (
                 active.server != null &&
                     (server == null ||
