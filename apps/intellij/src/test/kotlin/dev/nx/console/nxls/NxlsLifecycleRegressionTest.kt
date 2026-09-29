@@ -6,9 +6,9 @@ import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.platform.lang.lsWidget.LanguageServicePopupSection
-import com.intellij.platform.lsp.api.LspServer
+import com.intellij.platform.lsp.api.LspClient
+import com.intellij.platform.lsp.api.LspClientManager
 import com.intellij.platform.lsp.api.LspServerDescriptor
-import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.platform.lsp.api.lsWidget.LspWidgetInternalService
 import com.intellij.testFramework.LightVirtualFile
@@ -58,20 +58,20 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
 
     fun testWidgetRestartBeforeFirstLaunchIgnoresDelayedStop() = runTest {
         val file = myFixture.addFileToProject("nx.json", "{}").virtualFile
-        project.replaceService(LspServerManager::class.java, harness.manager, testRootDisposable)
+        project.replaceService(LspClientManager::class.java, harness.manager, testRootDisposable)
         ApplicationManager.getApplication()
             .replaceService(
                 LspWidgetInternalService::class.java,
                 object : LspWidgetInternalService() {
-                    override fun createShowErrorOutputAction(lspServer: LspServer): AnAction? = null
+                    override fun createShowErrorOutputAction(lspClient: LspClient): AnAction? = null
 
-                    override fun restartLspServer(lspServer: LspServer) {
+                    override fun restartLspClient(lspClient: LspClient) {
                         // The SDK removes the server before rediscovery and asynchronous shutdown.
-                        harness.manager.stopServers(lspServer.providerClass)
+                        harness.manager.stopClients(lspClient.providerClass)
                     }
 
-                    override fun stopLspServer(lspServer: LspServer) {
-                        harness.manager.stopServers(lspServer.providerClass)
+                    override fun stopLspClient(lspClient: LspClient) {
+                        harness.manager.stopClients(lspClient.providerClass)
                     }
                 },
                 testRootDisposable,
