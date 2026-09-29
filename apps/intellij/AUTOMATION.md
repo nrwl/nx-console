@@ -121,15 +121,41 @@ setup, and recording instructions.
 CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e-ci--project-view --skip-nx-cache
 ```
 
-The runner builds this checkout, creates an isolated Nx fixture and IDE sandbox,
-starts the IDE, and checks that the Nx Console projects tree displays `demo` and
-its `hello` target. It writes a JUnit report, logs, UI hierarchy, and video under
-`dist/apps/intellij/e2e/latest`. Each execution replaces that directory; copy it
-elsewhere to keep evidence from multiple runs. A failed assertion or startup
-timeout fails the Nx task. Cleanup stops the run's IDE, launcher, display, and
-fixture daemon and removes its temporary fixture and sandbox.
-The Kotlin client is built before startup and then runs directly with Java,
-avoiding an additional Gradle daemon while the IDE is running.
+The same runner also runs the platform LSP scenarios as individual Nx Agent tasks:
+
+| Target | Scenario |
+| --- | --- |
+| `intellij:e2e-ci--project-view` | `ProjectViewTestKt` |
+| `intellij:e2e-ci--editor-features` | `NxlsEditorFeaturesKt` |
+| `intellij:e2e-ci--custom-requests` | `NxlsCustomRequestsKt` |
+| `intellij:e2e-ci--lifecycle` | `NxlsLifecycleKt` |
+| `intellij:e2e-ci--editor-freeze` | `ReproEditorFreezeKt` |
+
+`intellij:e2e-ci` depends on all five; `intellij:e2e` runs that aggregate. Each
+starts a fresh IDE, fixture, sandbox, and automation port. The runner accepts
+`NX_E2E_SCENARIO_NAME` and `NX_E2E_SCENARIO_CLASS`, defaulting to project-view.
+Targets supply those variables and the runner uses the name as the recording
+label. The Kotlin client is built before startup and then runs directly with
+Java, avoiding another Gradle daemon while the IDE is running.
+
+Project-view keeps `dist/apps/intellij/e2e/latest`; the other targets write to
+`dist/apps/intellij/e2e/<scenario>`. Each directory contains `result.json`, a
+JUnit testcase named after the scenario, logs, recordings, and `<scenario>.txt`.
+The runner collects the platform scenarios' existing `result.txt` as their proof;
+it requires both a successful client exit and `PASS` in the proof. Each run
+replaces only its own directory. CI uploads all scenario directories. Failed
+assertions or startup timeouts fail the task. Cleanup stops the run's IDE,
+launcher, display, and fixture daemon and removes its fixture and sandbox.
+
+The generated fixture supplies all the cases described below: `analytics: false`
+and `namedInputs.default: ["{projectRoot}/**/*"]` in `nx.json`, a root
+`package.json` with `nx.targets.hello`, `demo/project.json` with `hello` and
+`inputs: ["default"]`, and `libs/util/project.json` with `build`. Both `hello`
+targets use `nx:run-commands` with `command: "node -e 0"`. The local dev dependency
+`@fixture/notes-plugin` supplies the no-op `note` generator and the exact required
+schema defaults shown in the custom-requests section. Nx and the plugin are
+symlinked into the fixture, so no fixture dependency download is needed. See the
+[fixture reference](e2e/README.md#runner-and-fixture) for the complete contents.
 
 On Linux, install `xvfb` and `ffmpeg`. Each run creates a private virtual display
 and records it from IDE startup, including startup failures. No desktop session
@@ -475,10 +501,9 @@ uses editor actions so document changes run inside an IntelliJ command.
 On the pinned IntelliJ 2025.3.6.1 platform, document-link navigation discards URI
 fragments: `LspDocumentLinkSymbolReference` resolves the target file and creates
 `LspNavigatableSymbol(file, null)`. An nxls link such as `nx.json#4` therefore opens
-the file without navigating to line 4. The scenario retains its destination-line
-assertion and fails on this platform behavior. Addressing it requires a platform
-fix, a separate navigation provider, or expressing these destinations through LSP
-definitions with explicit ranges; `LspDocumentLinkSupport` has no navigation hook.
+the file without navigating to line 4. The scenario checks the destination file
+and pins this line-zero behavior, so a platform change that starts honoring fragments will fail the assertion and prompt
+a review. `LspDocumentLinkSupport` has no navigation hook.
 
 From the repository root, against the already running automation IDE:
 
