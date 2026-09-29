@@ -112,9 +112,13 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                         val timestamp = System.nanoTime()
                         val windows =
                             runCatching { showingWindowBounds() }.getOrDefault(emptyList())
+                        // The main window is not always capturable, notably before it is mapped
+                        // on a virtual display. A missed frame must not end the recording; the
+                        // readiness latch below still fails a recording that never starts.
                         val captures = captureIdeWindows(captureName)
-                        check(captures.any { it.fileName.toString() == "frame0.png" }) {
-                            "No main IDE window captured for $captureName"
+                        if (captures.none { it.fileName.toString() == "frame0.png" }) {
+                            Thread.sleep(250)
+                            continue
                         }
                         composeWindows(captures, windows, output.resolve("$frame.png"))
                         frames.add("$frame.png" to timestamp)
