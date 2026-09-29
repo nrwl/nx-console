@@ -6,17 +6,17 @@ import com.intellij.driver.client.utility
 import com.intellij.driver.sdk.Project
 import com.intellij.driver.sdk.VirtualFile
 
-@Remote("com.intellij.platform.lsp.api.LspServerManager")
+@Remote("com.intellij.platform.lsp.api.LspClientManager")
 interface NxlsPlatformManagers {
     fun getInstance(project: Project): NxlsPlatformManager
 }
 
-@Remote("com.intellij.platform.lsp.impl.LspServerManagerImpl")
+@Remote("com.intellij.platform.lsp.impl.LspClientManagerImpl")
 interface NxlsPlatformManager {
-    fun `getAllRunningServers$intellij_platform_lsp_impl`(): List<NxlsPlatformServer>
+    fun `getRunningClients$intellij_platform_lsp_impl`(): List<NxlsPlatformClient>
 }
 
-@Remote("com.intellij.platform.lsp.impl.LspRequestExecutorImpl")
+@Remote("com.intellij.platform.lsp.impl.LspRequestExecutor")
 interface NxlsPlatformRequests {
     fun getCompletionList(file: VirtualFile, offset: Int, explicit: Boolean): NxlsCompletionList?
 }
@@ -40,14 +40,17 @@ interface NxlsRemoteDocuments {
 
 @Remote("org.eclipse.lsp4j.TextDocumentItem") interface NxlsDocumentItem
 
-internal fun Driver.nxlsPlatformServer(project: Project): NxlsPlatformServer =
+internal fun Driver.nxlsPlatformClient(project: Project): NxlsPlatformClient =
     utility<NxlsPlatformManagers>()
         .getInstance(project)
-        .`getAllRunningServers$intellij_platform_lsp_impl`()
+        .`getRunningClients$intellij_platform_lsp_impl`()
         .single { it.getDescriptor().getPresentableName() == "Nx" }
 
-internal fun Driver.nxlsAssertTracked(server: NxlsPlatformServer, files: List<VirtualFile>) {
-    val missing = files.filterNot { server.`isFileOpened$intellij_platform_lsp_impl`(it) }
+internal fun Driver.nxlsAssertTracked(server: NxlsPlatformClient, files: List<VirtualFile>) {
+    val missing =
+        files.filterNot {
+            server.`getDocumentSyncManager$intellij_platform_lsp_impl`().isFileOpened(it)
+        }
     check(missing.isEmpty()) {
         "Generation ${server.getDescriptor().getGeneration()} has not opened ${missing.map { it.getPath() }} before tab selection"
     }
@@ -55,13 +58,14 @@ internal fun Driver.nxlsAssertTracked(server: NxlsPlatformServer, files: List<Vi
 
 /** Negative controls affect only the running server, never the fixture or editor buffers. */
 internal fun Driver.nxlsDocumentFault(
-    server: NxlsPlatformServer,
+    server: NxlsPlatformClient,
     file: VirtualFile,
     staleText: String,
 ) {
     when (System.getenv("NX_AUTOMATION_FAULT")) {
         "missing-document",
-        "disconnected-document" -> server.`sendDidCloseRequest$intellij_platform_lsp_impl`(file)
+        "disconnected-document" ->
+            server.`getDocumentSyncManager$intellij_platform_lsp_impl`().close(file)
         "stale-document" -> {
             val item =
                 new(

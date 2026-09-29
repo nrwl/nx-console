@@ -7,9 +7,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.platform.lang.lsWidget.LanguageServicePopupSection
 import com.intellij.platform.lsp.api.LspClient
+import com.intellij.platform.lsp.api.LspClientDescriptor
 import com.intellij.platform.lsp.api.LspClientManager
-import com.intellij.platform.lsp.api.LspServerDescriptor
-import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.platform.lsp.api.LspIntegrationProvider
 import com.intellij.platform.lsp.api.lsWidget.LspWidgetInternalService
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.testFramework.TestActionEvent
@@ -95,8 +95,8 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         assertTrue(harness.launchedDescriptors.isEmpty())
         harness.delayStopCallbacks = true
 
-        val provider = NxlsServerSupportProvider()
-        val widget = checkNotNull(provider.createLspServerWidgetItem(old, file))
+        val provider = NxlsIntegrationProvider()
+        val widget = checkNotNull(provider.createWidgetItem(old, file))
         assertEqual(LanguageServicePopupSection.ForCurrentFile, widget.widgetActionLocation)
         val widgetAction = widget.createWidgetAction()
         val restart =
@@ -108,10 +108,10 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         assertTrue(harness.registeredServers.isEmpty())
         assertEqual(1, harness.pendingStops.size)
 
-        val discovered = mutableListOf<LspServerDescriptor>()
+        val discovered = mutableListOf<LspClientDescriptor>()
         provider.fileOpened(project, file, starter(discovered))
-        harness.manager.ensureServerStarted(
-            NxlsServerSupportProvider::class.java,
+        harness.manager.ensureClientStarted(
+            NxlsIntegrationProvider::class.java,
             discovered.single(),
         )
         val replacement = checkNotNull(harness.runNextStart())
@@ -126,7 +126,7 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
             service.isStarted(),
             "Delayed stop from the first launch retired the replacement generation",
         )
-        assertSame(replacement, harness.session.ready.value?.server)
+        assertSame(replacement, harness.session.ready.value?.client)
         assertFalse(checkNotNull(harness.session.ready.value).ended.isCompleted)
         assertTrue(replacement.descriptor.generation > old.descriptor.generation)
         assertEqual(listOf(replacement.descriptor), harness.launchedDescriptors.toList())
@@ -148,43 +148,43 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         if (initialized) harness.ready(old)
         val ended = harness.session.ready.value?.ended
         harness.delayStopCallbacks = true
-        harness.manager.stopServers(NxlsServerSupportProvider::class.java)
+        harness.manager.stopClients(NxlsIntegrationProvider::class.java)
         assertEqual(1, harness.pendingStops.size)
-        val discovered = mutableListOf<LspServerDescriptor>()
-        NxlsServerSupportProvider()
+        val discovered = mutableListOf<LspClientDescriptor>()
+        NxlsIntegrationProvider()
             .fileOpened(project, LightVirtualFile("nx.json"), starter(discovered))
-        val descriptor = discovered.single() as NxlsServerDescriptor
+        val descriptor = discovered.single() as NxlsClientDescriptor
         assertTrue(descriptor.generation > old.descriptor.generation)
         if (initialized) assertTrue(checkNotNull(ended).isCompleted)
-        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, descriptor)
+        harness.manager.ensureClientStarted(NxlsIntegrationProvider::class.java, descriptor)
         val replacement = harness.ready()
         harness.deliverStopCallbacks()
-        assertSame(replacement, harness.session.ready.value?.server)
+        assertSame(replacement, harness.session.ready.value?.client)
         assertFalse(checkNotNull(harness.session.ready.value).ended.isCompleted)
         assertEqual(listOf(replacement), harness.registeredServers.toList())
         assertEqual(2, harness.servers.size)
     }
 
     fun testCancelledDiscoveryCanBeRetried() {
-        val provider = NxlsServerSupportProvider()
-        val discarded = mutableListOf<LspServerDescriptor>()
+        val provider = NxlsIntegrationProvider()
+        val discarded = mutableListOf<LspClientDescriptor>()
         assertFailsWith<ProcessCanceledException> {
             provider.fileOpened(project, LightVirtualFile("nx.json"), starter(discarded))
             // The platform discards the whole discovery batch on read-action cancellation.
             throw ProcessCanceledException()
         }
         assertEqual(1, discarded.size)
-        val retry = mutableListOf<LspServerDescriptor>()
+        val retry = mutableListOf<LspClientDescriptor>()
         provider.fileOpened(project, LightVirtualFile("nx.json"), starter(retry))
         assertEqual(1, retry.size)
         assertSame(discarded.single(), retry.single())
-        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, retry.single())
+        harness.manager.ensureClientStarted(NxlsIntegrationProvider::class.java, retry.single())
         harness.ready()
-        assertSame(retry.single(), harness.session.ready.value?.server?.descriptor)
+        assertSame(retry.single(), harness.session.ready.value?.client?.descriptor)
     }
 
     fun testCancelledDiscoveryDoesNotPreventExplicitStart() {
-        NxlsServerSupportProvider()
+        NxlsIntegrationProvider()
             .fileOpened(project, LightVirtualFile("nx.json"), starter(mutableListOf()))
         harness.session.start()
         harness.runPendingTasks()
@@ -204,7 +204,7 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         harness.runPendingTasks()
         val replacement = harness.ready()
         assertNotSame(old, replacement.descriptor)
-        assertSame(replacement, harness.session.ready.value?.server)
+        assertSame(replacement, harness.session.ready.value?.client)
         assertEqual(listOf(replacement), harness.registeredServers.toList())
         assertEqual(listOf(replacement.descriptor), harness.launchedDescriptors.toList())
         harness.session.workspaceRefresh(replacement.descriptor.generation, false)
@@ -224,7 +224,7 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         harness.runPendingTasks()
         val replacement = harness.ready()
         assertNotSame(old, replacement)
-        assertSame(replacement, harness.session.ready.value?.server)
+        assertSame(replacement, harness.session.ready.value?.client)
         assertEqual(listOf(replacement), harness.registeredServers.toList())
         replacement.response.complete("recovered")
         assertEqual("recovered", response.await())
@@ -258,7 +258,7 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         harness.runPendingTasks()
         val replacement = harness.ready()
         val ended = checkNotNull(harness.session.ready.value).ended
-        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, old)
+        harness.manager.ensureClientStarted(NxlsIntegrationProvider::class.java, old)
         harness.runPendingTasks()
         val recovered = harness.ready()
         assertNotSame(replacement, recovered)
@@ -277,23 +277,23 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         assertTrue(harness.servers.isEmpty())
         val old = checkNotNull(harness.runNextStart())
         val sameIdentity =
-            NxlsServerDescriptor(
+            NxlsClientDescriptor(
                 project,
                 harness.root,
                 old.descriptor.generation + 1,
                 harness.session,
             )
-        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, sameIdentity)
+        harness.manager.ensureClientStarted(NxlsIntegrationProvider::class.java, sameIdentity)
         assertEqual(null, harness.runNextStart())
         harness.die(old)
         assertEqual(
             listOf(old),
-            harness.manager.getServersForProvider(NxlsServerSupportProvider::class.java).toList(),
+            harness.manager.getClients(NxlsIntegrationProvider::class.java).toList(),
         )
-        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, sameIdentity)
+        harness.manager.ensureClientStarted(NxlsIntegrationProvider::class.java, sameIdentity)
         assertEqual(null, harness.runNextStart())
-        harness.manager.stopServers(NxlsServerSupportProvider::class.java)
-        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, sameIdentity)
+        harness.manager.stopClients(NxlsIntegrationProvider::class.java)
+        harness.manager.ensureClientStarted(NxlsIntegrationProvider::class.java, sameIdentity)
         assertSame(sameIdentity, harness.runNextStart()?.descriptor)
     }
 
@@ -350,9 +350,9 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         }
     }
 
-    private fun starter(descriptors: MutableList<LspServerDescriptor>) =
-        object : LspServerSupportProvider.LspServerStarter {
-            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+    private fun starter(descriptors: MutableList<LspClientDescriptor>) =
+        object : LspIntegrationProvider.LspClientStarter {
+            override fun ensureClientStarted(descriptor: LspClientDescriptor) {
                 descriptors.add(descriptor)
             }
         }

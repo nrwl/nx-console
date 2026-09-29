@@ -29,7 +29,7 @@
     <!-- works in new IDEA wizard -->
     <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
 
-    <platform.lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsServerSupportProvider"/>
+    <platform.lsp.integrationProvider implementation="dev.nx.console.nxls.NxlsIntegrationProvider"/>
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 

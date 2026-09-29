@@ -8,8 +8,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServer
-import com.intellij.platform.lsp.api.LspServerManager
+import com.intellij.platform.lsp.api.LspClient
+import com.intellij.platform.lsp.api.LspClientManager
 import com.intellij.platform.lsp.api.LspServerState
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.CancellationException
@@ -25,7 +25,7 @@ import kotlinx.coroutines.sync.withLock
 class NxlsSession
 internal constructor(
     private val project: Project,
-    private val manager: LspServerManager,
+    private val manager: LspClientManager,
     private val resolveRoot: () -> VirtualFile?,
     private val isTrusted: () -> Boolean,
     private val whenTrusted: (Disposable, (Project) -> Unit) -> Unit,
@@ -35,7 +35,7 @@ internal constructor(
         project: Project
     ) : this(
         project,
-        LspServerManager.getInstance(project),
+        LspClientManager.getInstance(project),
         { NxlsWorkspaceRootResolver.getInstance(project).resolve() },
         { TrustedProjects.isProjectTrusted(project) },
         { disposable, callback ->
@@ -79,25 +79,25 @@ internal constructor(
     }
 
     @Synchronized
-    internal fun descriptorForDiscovery(): NxlsServerDescriptor? {
+    internal fun descriptorForDiscovery(): NxlsClientDescriptor? {
         if (disposed || project.isDisposed) return null
         requested = true
         if (!isTrusted()) return null
         val active = current
         if (active != null) {
-            val server =
-                manager.getServersForProvider(NxlsServerSupportProvider::class.java).firstOrNull {
+            val client =
+                manager.getClients(NxlsIntegrationProvider::class.java).firstOrNull {
                     it.descriptor === active.descriptor
                 }
-            if (server != null) active.server = server
-            // Discovery may run before the removed server's asynchronous shutdown callback.
+            if (client != null) active.client = client
+            // Discovery may run before the removed client's asynchronous shutdown callback.
             // Widget restarts retire synchronously; an unobserved descriptor may still await
             // its first registration.
             if (
-                active.server != null &&
-                    (server == null ||
-                        server.state == LspServerState.ShutdownNormally ||
-                        server.state == LspServerState.ShutdownUnexpectedly)
+                active.client != null &&
+                    (client == null ||
+                        client.state == LspServerState.ShutdownNormally ||
+                        client.state == LspServerState.ShutdownUnexpectedly)
             ) {
                 retire()
             }
@@ -110,7 +110,7 @@ internal constructor(
         refreshed: CompletableDeferred<Unit> = CompletableDeferred(),
     ): Generation? =
         root?.let {
-            Generation(NxlsServerDescriptor(project, it, ++nextGeneration, this), refreshed)
+            Generation(NxlsClientDescriptor(project, it, ++nextGeneration, this), refreshed)
         }
 
     fun stop() {
@@ -154,7 +154,7 @@ internal constructor(
             ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
                 reconciliationMutex.withLock {
                     // Registration is an EDT write action. This also waits for a launch hook's
-                    // server to be registered before inspecting the platform's collection.
+                    // client to be registered before inspecting the platform's collection.
                     readAction { reconcile() }
                 }
             }
@@ -163,21 +163,21 @@ internal constructor(
 
     private fun reconcile() {
         if (project.isDisposed) return
-        val servers = manager.getServersForProvider(NxlsServerSupportProvider::class.java)
+        val clients = manager.getClients(NxlsIntegrationProvider::class.java)
         val removeRetired =
             synchronized(this) {
                 val active = current
                 if (active != null) {
-                    servers
+                    clients
                         .firstOrNull { it.descriptor === active.descriptor }
-                        ?.let { active.server = it }
+                        ?.let { active.client = it }
                 }
-                val obsolete = servers.any { it.descriptor !== active?.descriptor }
+                val obsolete = clients.any { it.descriptor !== active?.descriptor }
                 if (obsolete) {
-                    // stopServers removes every server for this provider. If a different-root
-                    // late registration overlaps the current server, replace both but keep its
+                    // stopClients removes every client for this provider. If a different-root
+                    // late registration overlaps the current client, replace both but keep its
                     // ticket.
-                    if (active != null && servers.any { it.descriptor === active.descriptor }) {
+                    if (active != null && clients.any { it.descriptor === active.descriptor }) {
                         active.ended.complete(Unit)
                         readiness.value = null
                         current = newGeneration(active.descriptor.root, active.refreshed)
@@ -186,7 +186,7 @@ internal constructor(
                 }
                 obsolete
             }
-        if (removeRetired) manager.stopServers(NxlsServerSupportProvider::class.java)
+        if (removeRetired) manager.stopClients(NxlsIntegrationProvider::class.java)
         val active =
             synchronized(this) {
                 current
@@ -196,12 +196,12 @@ internal constructor(
                             isTrusted() &&
                             !it.startRequested &&
                             (removeRetired ||
-                                servers.none { server -> server.descriptor === it.descriptor })
+                                clients.none { client -> client.descriptor === it.descriptor })
                     }
                     ?.also { it.startRequested = true }
             } ?: return
         try {
-            manager.ensureServerStarted(NxlsServerSupportProvider::class.java, active.descriptor)
+            manager.ensureClientStarted(NxlsIntegrationProvider::class.java, active.descriptor)
         } catch (error: Throwable) {
             synchronized(this) { active.startRequested = false }
             throw error
@@ -214,13 +214,13 @@ internal constructor(
                 val active = current?.takeIf { it.descriptor.generation == generation }
                 if (active != null) {
                     manager
-                        .getServersForProvider(NxlsServerSupportProvider::class.java)
+                        .getClients(NxlsIntegrationProvider::class.java)
                         .firstOrNull { it.descriptor === active.descriptor }
-                        ?.let { active.server = it }
+                        ?.let { active.client = it }
                 }
                 !disposed && !project.isDisposed && requested && active != null
             }
-        // A queued start can register after retirement, even if stopServers saw no servers.
+        // A queued start can register after retirement, even if stopClients saw no clients.
         // Reconcile off the connector callback stack, including when launch is rejected.
         scheduleReconciliation()
         if (!allowed) throw ProcessCanceledException()
@@ -229,14 +229,14 @@ internal constructor(
     @Synchronized
     internal fun serverInitialized(generation: Long) {
         val active = current?.takeIf { it.descriptor.generation == generation } ?: return
-        val server =
-            manager.getServersForProvider(NxlsServerSupportProvider::class.java).firstOrNull {
+        val client =
+            manager.getClients(NxlsIntegrationProvider::class.java).firstOrNull {
                 it.descriptor === active.descriptor && it.state == LspServerState.Running
             } ?: return
-        active.server = server
+        active.client = client
         if (active.initialized) return
         active.initialized = true
-        readiness.value = NxlsRunningGeneration(generation, server, active.ended)
+        readiness.value = NxlsRunningGeneration(generation, client, active.ended)
         publishRefresh(active, started = true)
         val buffered = active.bufferedRefresh.toList()
         active.bufferedRefresh.clear()
@@ -282,9 +282,9 @@ internal constructor(
 
     @Synchronized
     internal fun isCurrent(running: NxlsRunningGeneration): Boolean =
-        current?.descriptor === running.server.descriptor &&
+        current?.descriptor === running.client.descriptor &&
             !running.ended.isCompleted &&
-            running.server.state == LspServerState.Running &&
+            running.client.state == LspServerState.Running &&
             !disposed &&
             !project.isDisposed
 
@@ -309,12 +309,12 @@ internal constructor(
     }
 
     private class Generation(
-        val descriptor: NxlsServerDescriptor,
+        val descriptor: NxlsClientDescriptor,
         val refreshed: CompletableDeferred<Unit> = CompletableDeferred(),
     ) {
         val ended = CompletableDeferred<Unit>()
         val bufferedRefresh = mutableListOf<Boolean>()
-        var server: LspServer? = null
+        var client: LspClient? = null
         var initialized = false
         var startRequested = false
     }
@@ -326,6 +326,6 @@ internal constructor(
 
 internal class NxlsRunningGeneration(
     val generation: Long,
-    val server: LspServer,
+    val client: LspClient,
     val ended: Deferred<Unit>,
 )

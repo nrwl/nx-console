@@ -4,10 +4,10 @@ package dev.nx.console.nxls
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServerManager
-import com.intellij.platform.lsp.api.LspServerManagerListener
+import com.intellij.platform.lsp.api.LspClientManager
+import com.intellij.platform.lsp.api.LspClientManagerListener
 import com.intellij.platform.lsp.api.LspServerState
-import com.intellij.platform.lsp.impl.LspServerImpl
+import com.intellij.platform.lsp.impl.LspClientImpl
 import com.intellij.platform.lsp.impl.connector.Lsp4jServerConnector
 import java.io.InputStream
 import java.io.OutputStream
@@ -23,10 +23,10 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
     AutoCloseable {
     private val lifecycle = PlatformLspTestHarness(project, root)
     val server =
-        LspServerImpl(
-            NxlsServerSupportProvider::class.java,
+        LspClientImpl(
+            NxlsIntegrationProvider::class.java,
             lifecycle.start().descriptor,
-            object : LspServerManagerListener {},
+            object : LspClientManagerListener {},
         )
     private val connector =
         object : Lsp4jServerConnector(server) {
@@ -42,12 +42,12 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
 
             override fun disconnect() = Unit
         }
-    private val manager = LspServerManager.getInstance(project)
+    private val manager = LspClientManager.getInstance(project)
     @Suppress("UNCHECKED_CAST")
     private val servers =
         manager.javaClass.getDeclaredField("lspClients").let {
             it.isAccessible = true
-            it.get(manager) as MutableCollection<LspServerImpl>
+            it.get(manager) as MutableCollection<LspClientImpl>
         }
 
     init {
@@ -85,7 +85,7 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
     }
 
     private fun setField(name: String, value: Any) {
-        LspServerImpl::class.java.getDeclaredField(name).apply {
+        LspClientImpl::class.java.getDeclaredField(name).apply {
             isAccessible = true
             set(server, value)
         }

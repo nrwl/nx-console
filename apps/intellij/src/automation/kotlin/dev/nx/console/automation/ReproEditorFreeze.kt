@@ -111,9 +111,11 @@ fun main() = withAutomationDriver {
                         withContext(OnDispatcher.EDT) { utility<NxlsFreezeControl>().sleep(3_000) }
                     }
                     val file = checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument()))
-                    val server = nxlsPlatformServer(project)
+                    val server = nxlsPlatformClient(project)
                     nxlsWait(message = { "$path was never opened by platform LSP" }) {
-                        server.`isFileOpened$intellij_platform_lsp_impl`(file)
+                        server
+                            .`getDocumentSyncManager$intellij_platform_lsp_impl`()
+                            .isFileOpened(file)
                     }
                     nxlsDocumentFault(server, file, originals.getValue(editor))
                     nxlsAssertTracked(server, listOf(file))
@@ -127,7 +129,7 @@ fun main() = withAutomationDriver {
                     invokeAction("EditorBackSpace", component = editor.getContentComponent())
                 }
                 nxlsAssertTracked(
-                    nxlsPlatformServer(project),
+                    nxlsPlatformClient(project),
                     originals.keys.map {
                         checkNotNull(service<NxlsDocuments>().getFile(it.getDocument()))
                     },
@@ -143,7 +145,9 @@ fun main() = withAutomationDriver {
                 invokeAction("CloseAllEditors", component = frame)
                 nxlsWait(message = { "Platform LSP still tracks closed documents" }) {
                     files.none {
-                        nxlsPlatformServer(project).`isFileOpened$intellij_platform_lsp_impl`(it)
+                        nxlsPlatformClient(project)
+                            .`getDocumentSyncManager$intellij_platform_lsp_impl`()
+                            .isFileOpened(it)
                     }
                 }
                 report.appendLine("Typing and closing: platform document lifecycle verified")

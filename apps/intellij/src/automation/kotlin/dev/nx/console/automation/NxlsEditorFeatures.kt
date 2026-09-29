@@ -89,20 +89,18 @@ interface NxlsLookupItem {
     fun getObject(): NxlsCompletionObject
 }
 
-@Remote("com.intellij.platform.lsp.impl.completion.LspCompletionObject")
+@Remote("com.intellij.platform.lsp.impl.features.completion.LspCompletionObject")
 interface NxlsCompletionObject {
     fun getCompletionItem(): NxlsCompletionItem
 
-    fun getLspServer(): NxlsPlatformServer
+    fun getLspClient(): NxlsPlatformClient
 }
 
-@Remote("com.intellij.platform.lsp.impl.LspServerImpl")
-interface NxlsPlatformServer {
+@Remote("com.intellij.platform.lsp.impl.LspClientImpl")
+interface NxlsPlatformClient {
     fun getDescriptor(): NxlsDescriptor
 
-    fun `isFileOpened$intellij_platform_lsp_impl`(file: VirtualFile): Boolean
-
-    fun `sendDidCloseRequest$intellij_platform_lsp_impl`(file: VirtualFile)
+    fun `getDocumentSyncManager$intellij_platform_lsp_impl`(): NxlsDocumentSyncManager
 
     fun getRequestExecutor(): NxlsPlatformRequests
 
@@ -111,7 +109,14 @@ interface NxlsPlatformServer {
     fun `getDocumentLinkInfos$intellij_platform_lsp_impl`(file: VirtualFile): List<NxlsCachedLink>
 }
 
-@Remote("dev.nx.console.nxls.NxlsServerDescriptor", plugin = "dev.nx.console")
+@Remote("com.intellij.platform.lsp.impl.documentSync.LspDocumentSyncManager")
+interface NxlsDocumentSyncManager {
+    fun isFileOpened(file: VirtualFile): Boolean
+
+    fun close(file: VirtualFile)
+}
+
+@Remote("dev.nx.console.nxls.NxlsClientDescriptor", plugin = "dev.nx.console")
 interface NxlsDescriptor {
     fun getGeneration(): Long
 
@@ -120,12 +125,12 @@ interface NxlsDescriptor {
     fun getFileUri(file: VirtualFile): String
 }
 
-@Remote("com.intellij.platform.lsp.impl.highlightingCommon.LspCachedHighlighting")
+@Remote("com.intellij.platform.lsp.impl.features.highlightingCommon.LspCachedHighlighting")
 interface NxlsCachedLink {
     fun getHighlightingInfo(): NxlsDocumentLink
 }
 
-@Remote("com.intellij.platform.lsp.impl.highlighting.LspDocumentLink")
+@Remote("com.intellij.platform.lsp.impl.features.highlighting.LspDocumentLink")
 interface NxlsDocumentLink {
     fun getTargetUri(): String?
 }
@@ -408,7 +413,7 @@ private fun Driver.checkSnippet(
     editor: NxlsEditor,
     case: NxlsConfigCase,
     report: StringBuilder,
-): NxlsPlatformServer {
+): NxlsPlatformClient {
     val document = editor.getDocument()
     val disk = Path.of(checkNotNull(service<NxlsDocuments>().getFile(document)).getPath())
     val diskBefore = disk.readText()
@@ -424,7 +429,7 @@ private fun Driver.checkSnippet(
     check(Regex("\\$(?:[1-9]|\\{[1-9])").containsMatchIn(snippet)) {
         "Snippet has no numbered tab stop: $snippet"
     }
-    val server = item.getObject().getLspServer()
+    val server = item.getObject().getLspClient()
     withContext(OnDispatcher.EDT) { lookup.setCurrentItem(item) }
     invokeAction("EditorChooseLookupItem", component = editor.getContentComponent())
     nxlsWait(message = { "Snippet did not insert ${case.key}" }) {
@@ -476,7 +481,7 @@ private fun Driver.checkSnippet(
 private fun Driver.checkNavigation(
     project: Project,
     editor: NxlsEditor,
-    server: NxlsPlatformServer,
+    server: NxlsPlatformClient,
     report: StringBuilder,
 ) {
     val file = checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument()))

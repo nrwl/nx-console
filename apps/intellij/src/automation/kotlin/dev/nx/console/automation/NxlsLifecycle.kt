@@ -165,7 +165,7 @@ private fun Driver.checkOpenEditors(
     editors: Map<NxlsConfigCase, NxlsEditor>,
     report: StringBuilder,
 ): Long {
-    val server = nxlsPlatformServer(project)
+    val server = nxlsPlatformClient(project)
     val files =
         editors.values.map { checkNotNull(service<NxlsDocuments>().getFile(it.getDocument())) }
     nxlsAssertTracked(server, files)
@@ -190,7 +190,7 @@ private fun Driver.checkOpenEditors(
                     items
                         .first { it.getObject().getCompletionItem().getLabel() == case.key }
                         .getObject()
-                        .getLspServer()
+                        .getLspClient()
                         .getDescriptor()
                         .getGeneration()
                 nxlsHideLookup(project)
@@ -224,7 +224,7 @@ private fun Driver.checkUnsavedEditors(
     diskBefore: Map<NxlsConfigCase, String>,
     report: StringBuilder,
 ): Long {
-    val server = nxlsPlatformServer(project)
+    val server = nxlsPlatformClient(project)
     val files =
         editors.mapValues { checkNotNull(service<NxlsDocuments>().getFile(it.value.getDocument())) }
     nxlsAssertTracked(server, files.values.toList())
@@ -341,7 +341,7 @@ fun main() = withAutomationDriver {
                     if (index == 0) {
                         val (case, editor) = editors.entries.first()
                         nxlsDocumentFault(
-                            nxlsPlatformServer(project),
+                            nxlsPlatformClient(project),
                             checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument())),
                             case.buffer.replace("|", ""),
                         )

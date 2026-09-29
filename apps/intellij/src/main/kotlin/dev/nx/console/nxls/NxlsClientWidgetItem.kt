@@ -7,16 +7,16 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lang.lsWidget.LanguageServicePopupSection
 import com.intellij.platform.lsp.api.LspBundle
-import com.intellij.platform.lsp.api.LspServer
+import com.intellij.platform.lsp.api.LspClient
 import com.intellij.platform.lsp.api.LspServerState
-import com.intellij.platform.lsp.api.lsWidget.LspServerWidgetItem
+import com.intellij.platform.lsp.api.lsWidget.LspClientWidgetItem
 
-internal class NxlsServerWidgetItem(lspServer: LspServer, currentFile: VirtualFile?) :
-    LspServerWidgetItem(lspServer, currentFile) {
+internal class NxlsClientWidgetItem(lspClient: LspClient, currentFile: VirtualFile?) :
+    LspClientWidgetItem(lspClient, currentFile) {
     override fun createStopOrRestartAction(): AnAction? {
         if (
             widgetActionLocation != LanguageServicePopupSection.ForCurrentFile &&
-                lspServer.state != LspServerState.ShutdownUnexpectedly
+                lspClient.state != LspServerState.ShutdownUnexpectedly
         ) {
             return super.createStopOrRestartAction()
         }
@@ -28,7 +28,7 @@ internal class NxlsServerWidgetItem(lspServer: LspServer, currentFile: VirtualFi
             ) {
             override fun actionPerformed(e: AnActionEvent) {
                 // Retire before platform removal: the first launch hook may still be queued.
-                NxlsSession.getInstance(lspServer.project).restart()
+                NxlsSession.getInstance(lspClient.project).restart()
             }
         }
     }
