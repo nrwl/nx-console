@@ -1,5 +1,7 @@
 package dev.nx.console.nxls
 
+import com.google.gson.JsonNull
+import com.google.gson.JsonParser
 import com.intellij.notification.Notification
 import com.intellij.notification.Notifications
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
@@ -112,6 +114,34 @@ class NxlsServiceTest : BasePlatformTestCase() {
         assertTrue(notifications.single().content.contains("nx/workspace"))
         assertTrue(notifications.single().content.contains("malformed workspace"))
         notifications.forEach { it.expire() }
+    }
+
+    fun testJsonNullGeneratorResponsesUseFallbacks() = runBlocking {
+        response = JsonNull.INSTANCE
+        assertEqual(emptyList(), service.generators())
+        assertEqual(emptyList(), service.generatorOptions(options))
+        assertSame(schema, service.transformedGeneratorSchema(schema))
+    }
+
+    fun testMalformedGeneratorResponsesUseMessageIssuePolicy() = runBlocking {
+        val notifications = captureMessageIssueNotifications()
+        response = JsonParser.parseString("false")
+        assertEqual(emptyList(), service.generators())
+        assertEqual(emptyList(), service.generatorOptions(options))
+        assertSame(schema, service.transformedGeneratorSchema(schema))
+        awaitNotification(notifications)
+        assertEqual(1, notifications.size)
+        assertTrue(notifications.single().content.contains("nx/generators"))
+        notifications.forEach { it.expire() }
+    }
+
+    fun testGeneratorResponsesAreDecodedByTheService() = runBlocking {
+        response = JsonParser.parseString(NxlsResponseDecoderTest.generatorsJson)
+        assertEqual("@nx/js:library", service.generators().single().name)
+        response = JsonParser.parseString(NxlsResponseDecoderTest.optionsJson)
+        assertEqual(5, service.generatorOptions(options).size)
+        response = JsonParser.parseString(NxlsResponseDecoderTest.schemaJson)
+        assertEqual(5, service.transformedGeneratorSchema(schema).options.size)
     }
 
     fun testGraphResponseErrorsAreTranslated() = runBlocking {
