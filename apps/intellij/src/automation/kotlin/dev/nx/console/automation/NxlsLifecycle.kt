@@ -288,9 +288,16 @@ fun main() = withAutomationDriver {
                             }
                         }
                     }
+                // Read the file, not the buffer: this baseline is compared against disk to prove
+                // an unsaved edit never reaches it.
                 val diskBefore =
                     editors.mapValues { (case, editor) ->
-                        nxlsText(editor).also { originals[editor] = it }
+                        originals[editor] = nxlsText(editor)
+                        Path.of(
+                                checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument()))
+                                    .getPath()
+                            )
+                            .readText()
                     }
                 checkOpenEditors(project, editors, report)
                 for ((case, editor) in editors) {
