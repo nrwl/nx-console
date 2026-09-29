@@ -1,0 +1,233 @@
+package dev.nx.console.nxls
+
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.platform.lsp.api.LspServerDescriptor
+import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.testFramework.LightVirtualFile
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.testFramework.replaceService
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.test.assertEquals as assertEqual
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
+    private lateinit var harness: PlatformLspTestHarness
+
+    override fun setUp() {
+        super.setUp()
+        harness = PlatformLspTestHarness(project, myFixture.tempDirFixture.getFile(".")!!)
+        project.replaceService(NxlsSession::class.java, harness.session, testRootDisposable)
+    }
+
+    override fun tearDown() {
+        try {
+            harness.session.dispose()
+        } finally {
+            super.tearDown()
+        }
+    }
+
+    fun testCancelledDiscoveryCanBeRetried() {
+        val provider = NxlsServerSupportProvider()
+        val discarded = mutableListOf<LspServerDescriptor>()
+        assertFailsWith<ProcessCanceledException> {
+            provider.fileOpened(project, LightVirtualFile("nx.json"), starter(discarded))
+            // The platform discards the whole discovery batch on read-action cancellation.
+            throw ProcessCanceledException()
+        }
+        assertEqual(1, discarded.size)
+        val retry = mutableListOf<LspServerDescriptor>()
+        provider.fileOpened(project, LightVirtualFile("nx.json"), starter(retry))
+        assertEqual(1, retry.size)
+        assertSame(discarded.single(), retry.single())
+        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, retry.single())
+        harness.ready()
+        assertSame(retry.single(), harness.session.ready.value?.server?.descriptor)
+    }
+
+    fun testCancelledDiscoveryDoesNotPreventExplicitStart() {
+        NxlsServerSupportProvider()
+            .fileOpened(project, LightVirtualFile("nx.json"), starter(mutableListOf()))
+        harness.session.start()
+        harness.runPendingTasks()
+        assertEqual(1, harness.registeredServers.size)
+        harness.ready()
+        assertTrue(harness.session.ready.value != null)
+    }
+
+    fun testRetiredQueuedStartCannotSuppressSameRootReplacement() {
+        harness.session.start()
+        harness.runLifecycleTasks()
+        assertEqual(1, harness.pendingStarts.size)
+        assertTrue(harness.registeredServers.isEmpty())
+        val old = harness.pendingStarts.peek()
+        val ticket = harness.session.restartWithRefreshTicket()
+        harness.runLifecycleTasks()
+        harness.runPendingTasks()
+        val replacement = harness.ready()
+        assertNotSame(old, replacement.descriptor)
+        assertSame(replacement, harness.session.ready.value?.server)
+        assertEqual(listOf(replacement), harness.registeredServers.toList())
+        assertEqual(listOf(replacement.descriptor), harness.launchedDescriptors.toList())
+        harness.session.workspaceRefresh(replacement.descriptor.generation, false)
+        assertTrue(ticket.isCompleted)
+        assertFalse(ticket.isCancelled)
+    }
+
+    fun testCrashThenOnDemandRecoveryReplacesRetainedServer() = runTest {
+        val old = harness.ready(harness.start())
+        harness.die(old)
+        assertEqual(listOf(old), harness.registeredServers.toList())
+        val response = async {
+            NxlsRequestAdapter(harness.session) { testScheduler.currentTime }
+                .request { it.workspaceSerialized() }
+        }
+        runCurrent()
+        harness.runPendingTasks()
+        val replacement = harness.ready()
+        assertNotSame(old, replacement)
+        assertSame(replacement, harness.session.ready.value?.server)
+        assertEqual(listOf(replacement), harness.registeredServers.toList())
+        replacement.response.complete("recovered")
+        assertEqual("recovered", response.await())
+        assertEqual(0, old.effects)
+        assertEqual(1, replacement.effects)
+    }
+
+    fun testRetiredQueuedStartIsCleanedUpAfterExplicitStop() {
+        harness.session.start()
+        harness.runLifecycleTasks()
+        harness.session.stop()
+        harness.runLifecycleTasks()
+        assertTrue(harness.registeredServers.isEmpty())
+        harness.runPendingTasks()
+        assertTrue(harness.registeredServers.isEmpty())
+        assertTrue(harness.launchedDescriptors.isEmpty())
+    }
+
+    fun testRetiredDescriptorRejectsActualProcessLaunch() {
+        val descriptor = harness.start().descriptor
+        harness.session.stop()
+        assertFailsWith<ProcessCanceledException> { descriptor.startServerProcess() }
+    }
+
+    fun testDifferentRootLateRegistrationPreservesReplacementRefreshTicket() {
+        harness.session.start()
+        harness.runLifecycleTasks()
+        val old = harness.pendingStarts.remove()
+        harness.session.changeWorkspace(myFixture.tempDirFixture.findOrCreateDir("nested"))
+        val ticket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
+        val replacement = harness.ready()
+        val ended = checkNotNull(harness.session.ready.value).ended
+        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, old)
+        harness.runPendingTasks()
+        val recovered = harness.ready()
+        assertNotSame(replacement, recovered)
+        assertSame(replacement.descriptor.root, recovered.descriptor.root)
+        assertTrue(ended.isCompleted)
+        assertEqual(listOf(recovered), harness.registeredServers.toList())
+        harness.session.workspaceRefresh(recovered.descriptor.generation, false)
+        assertTrue(ticket.isCompleted)
+        assertFalse(ticket.isCancelled)
+        assertFalse(harness.launchedDescriptors.contains(old))
+    }
+
+    fun testPlatformDoubleQueuesDeduplicatesAndRetainsCrashedServers() {
+        harness.session.start()
+        harness.runLifecycleTasks()
+        assertTrue(harness.servers.isEmpty())
+        val old = checkNotNull(harness.runNextStart())
+        val sameIdentity =
+            NxlsServerDescriptor(
+                project,
+                harness.root,
+                old.descriptor.generation + 1,
+                harness.session,
+            )
+        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, sameIdentity)
+        assertEqual(null, harness.runNextStart())
+        harness.die(old)
+        assertEqual(
+            listOf(old),
+            harness.manager.getServersForProvider(NxlsServerSupportProvider::class.java).toList(),
+        )
+        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, sameIdentity)
+        assertEqual(null, harness.runNextStart())
+        harness.manager.stopServers(NxlsServerSupportProvider::class.java)
+        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, sameIdentity)
+        assertSame(sameIdentity, harness.runNextStart()?.descriptor)
+    }
+
+    fun testConcurrentRestartDuringInitializationDoesNotDeadlock() = assertInitializationCanFinish {
+        harness.session.restart()
+    }
+
+    fun testConcurrentStopDuringInitializationDoesNotDeadlock() = assertInitializationCanFinish {
+        harness.session.stop()
+    }
+
+    fun testConcurrentRefreshRestartDuringInitializationDoesNotDeadlock() =
+        assertInitializationCanFinish {
+            harness.session.restartWithRefreshTicket()
+        }
+
+    fun testConcurrentWorkspaceChangeDuringInitializationDoesNotDeadlock() =
+        assertInitializationCanFinish {
+            harness.session.changeWorkspace(harness.root)
+        }
+
+    private fun assertInitializationCanFinish(transition: () -> Unit) {
+        val server = harness.start()
+        val stopping = CountDownLatch(1)
+        val initialized = CountDownLatch(1)
+        val completedWhileStopping = AtomicBoolean(false)
+        val executor = Executors.newFixedThreadPool(2)
+        harness.onStop = {
+            stopping.countDown()
+            completedWhileStopping.set(initialized.await(2, TimeUnit.SECONDS))
+        }
+        try {
+            val callback =
+                executor.submit {
+                    check(stopping.await(5, TimeUnit.SECONDS))
+                    server.descriptor.lspServerListener.serverInitialized(server.initializeResult)
+                    initialized.countDown()
+                }
+            val restart =
+                executor.submit {
+                    transition()
+                    harness.runLifecycleTasks()
+                }
+            restart.get(5, TimeUnit.SECONDS)
+            callback.get(5, TimeUnit.SECONDS)
+            assertTrue(
+                completedWhileStopping.get(),
+                "Shutdown waited for an initialization callback blocked on the session monitor",
+            )
+        } finally {
+            stopping.countDown()
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
+    private fun starter(descriptors: MutableList<LspServerDescriptor>) =
+        object : LspServerSupportProvider.LspServerStarter {
+            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+                descriptors.add(descriptor)
+            }
+        }
+}

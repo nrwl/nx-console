@@ -24,8 +24,17 @@ internal constructor(
 ) : LspServerDescriptor(project, "Nx", root) {
     private val workspacePath = root.path
 
+    internal fun checkBeforeStart() = session.beforeStart(generation)
+
+    override fun startServerProcess() = run {
+        checkBeforeStart()
+        super.startServerProcess()
+    }
+
     override fun createCommandLine() = runBlockingCancellable {
-        NxlsCommandLineBuilder(NxlsWorkspaceSnapshot.capture(project, workspacePath)).build()
+        NxlsCommandLineBuilder(NxlsWorkspaceSnapshot.capture(project, workspacePath)).build().also {
+            checkBeforeStart()
+        }
     }
 
     override fun createInitializationOptions(): Any =

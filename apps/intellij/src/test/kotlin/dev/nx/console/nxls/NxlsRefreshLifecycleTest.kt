@@ -35,6 +35,7 @@ class NxlsRefreshLifecycleTest : BasePlatformTestCase() {
 
     fun testSuccessfulInitializationIsSeparateFromRealRefreshCompletion() {
         val ticket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         harness.ready()
         assertEqual(listOf("started"), events)
         assertFalse(ticket.isCompleted)
@@ -47,6 +48,7 @@ class NxlsRefreshLifecycleTest : BasePlatformTestCase() {
 
     fun testSyntheticStartedPrecedesBufferedServerRefreshEvents() {
         val ticket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         val generation = harness.servers.last().descriptor.generation
         harness.session.workspaceRefresh(generation, true)
         harness.session.workspaceRefresh(generation, false)
@@ -57,13 +59,14 @@ class NxlsRefreshLifecycleTest : BasePlatformTestCase() {
         assertTrue(ticket.isCompleted)
     }
 
-    fun testTicketInstalledBeforeSynchronousStartCallbacksAndReplayedToLateWaiter() = runBlocking {
+    fun testTicketInstalledBeforeStartCallbacksAndReplayedToLateWaiter() = runBlocking {
         harness.onStart = { server ->
             harness.session.workspaceRefresh(server.descriptor.generation, true)
             harness.session.workspaceRefresh(server.descriptor.generation, false)
             harness.ready(server)
         }
         val ticket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         ticket.await()
         ticket.await()
         assertEqual(listOf("started", "started", "completed"), events)
@@ -71,8 +74,10 @@ class NxlsRefreshLifecycleTest : BasePlatformTestCase() {
 
     fun testRetiredGenerationCannotCompleteReplacementTicket() {
         val oldTicket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         val old = harness.servers.last()
         val newTicket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         harness.ready()
         harness.session.workspaceRefresh(old.descriptor.generation, false)
         assertTrue(oldTicket.isCancelled)
@@ -82,6 +87,7 @@ class NxlsRefreshLifecycleTest : BasePlatformTestCase() {
 
     fun testDeathCancelsTicketAndDiscardsBufferedEvents() {
         val ticket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         val old = harness.servers.last()
         harness.session.workspaceRefresh(old.descriptor.generation, false)
         harness.die()
@@ -93,10 +99,12 @@ class NxlsRefreshLifecycleTest : BasePlatformTestCase() {
     fun testUntrustedRestartKeepsTicketUntilTrustAndRealRefresh() = runBlocking {
         harness.trusted = false
         val ticket = harness.session.restartWithRefreshTicket()
+        harness.runPendingTasks()
         assertTrue(harness.servers.isEmpty())
         assertFalse(ticket.isCompleted)
         harness.trusted = true
         harness.trustCallback!!(project)
+        harness.runPendingTasks()
         harness.ready()
         assertFalse(ticket.isCompleted)
         harness.session.workspaceRefresh(harness.servers.last().descriptor.generation, false)

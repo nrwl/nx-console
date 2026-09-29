@@ -48,6 +48,7 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
     fun testReadinessAtNinePointNineSeconds() = runTest {
         val result = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(9_900)
         harness.ready().response.complete("22.0.0")
         assertEqual("22.0.0", result.await())
@@ -57,6 +58,7 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
     fun testNeverStartsExpiresAtOriginalDeadline() = runTest {
         val result = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(10_000)
         assertNull(result.await())
         assertEqual(10_000, testScheduler.currentTime)
@@ -71,11 +73,14 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
     fun testRestartWhileWaitingUsesNewGeneration() = runTest {
         val result = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         val old = harness.servers.single()
         advanceTimeBy(5_000)
         harness.session.restart()
+        harness.runPendingTasks()
         harness.ready(old)
         runCurrent()
+        harness.runPendingTasks()
         assertFalse(result.isCompleted)
         harness.ready().response.complete("new")
         assertEqual("new", result.await())
@@ -85,9 +90,11 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
     fun testOneWaiterTimesOutWhileAnotherSucceeds() = runTest {
         val first = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(5_000)
         val second = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(5_000)
         assertNull(first.await())
         harness.ready().response.complete("ready")
@@ -98,6 +105,7 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         val first = async { adapter().request { it.workspaceSerialized() } }
         val second = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         first.cancel()
         harness.ready().response.complete("ready")
         assertEqual("ready", second.await())
@@ -116,10 +124,12 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         val old = harness.ready(harness.start()).apply { decline = true }
         val result = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         assertFalse(result.isCompleted)
         advanceTimeBy(9_900)
         harness.die(old)
         harness.session.start()
+        harness.runPendingTasks()
         harness.ready().response.complete("restarted")
         assertEqual("restarted", result.await())
         assertEqual(1, old.sends)
@@ -129,9 +139,11 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
     fun testDeclinedDispatchDoesNotRenewDeadline() = runTest {
         val result = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(9_900)
         harness.ready().decline = true
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(100)
         assertNull(result.await())
         assertEqual(10_000, testScheduler.currentTime)
@@ -142,6 +154,7 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         val server = harness.ready(harness.start())
         val result = async { adapter().request { it.workspaceSerialized() } }
         runCurrent()
+        harness.runPendingTasks()
         advanceTimeBy(60_000)
         assertFalse(result.isCompleted)
         server.response.complete("slow")
@@ -153,8 +166,10 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         val server = harness.ready(harness.start()).apply { queued = true }
         val result = async { adapter().request { it.startDaemon() } }
         runCurrent()
+        harness.runPendingTasks()
         harness.die(server)
         runCurrent()
+        harness.runPendingTasks()
         assertTrue(result.isCompleted)
         assertNull(result.await())
         server.queuedSender!!()
@@ -166,11 +181,14 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         val server = harness.ready(harness.start())
         val result = async { adapter().request { it.startDaemon() } }
         runCurrent()
+        harness.runPendingTasks()
         assertEqual(1, server.effects)
         harness.die(server)
         harness.session.start()
+        harness.runPendingTasks()
         harness.ready().response.complete(null)
         runCurrent()
+        harness.runPendingTasks()
         assertTrue(result.isCompleted)
         assertNull(result.await())
         assertEqual(1, harness.servers.sumOf { it.effects })
@@ -193,9 +211,11 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
             val server = harness.ready(harness.start())
             val result = async { adapter().request { sender(it).thenApply { value -> value } } }
             runCurrent()
+            harness.runPendingTasks()
             assertEqual(1, server.effects)
             harness.die(server)
             runCurrent()
+            harness.runPendingTasks()
             assertTrue(result.isCompleted)
             assertNull(result.await())
             assertEqual(1, server.sends)
@@ -233,6 +253,7 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         val server = harness.ready(harness.start())
         val result = async { adapter().request { it.startDaemon() } }
         runCurrent()
+        harness.runPendingTasks()
         harness.session.stop()
         assertNull(result.await())
         assertEqual(1, server.effects)
