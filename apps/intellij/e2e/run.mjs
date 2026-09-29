@@ -578,6 +578,17 @@ try {
     `${failure ? 'FAIL' : 'PASS'}: IntelliJ ${scenarioName === 'project-view' ? 'project view' : scenarioName}. Artifacts: ${output}`,
   );
   if (failure) {
+    // Nx Agents do not publish outputs for a failed task, so the artifacts this points at
+    // never reach the uploader. Echo the evidence into the task log instead.
+    for (const name of ['scenario.log', 'result.txt', 'ide.log']) {
+      try {
+        const text = await readFile(join(output, name), 'utf8');
+        const tail = text.split('\n').slice(-120).join('\n');
+        console.error(`\n===== ${name} (last 120 lines) =====\n${tail}`);
+      } catch {
+        console.error(`\n===== ${name}: not written =====`);
+      }
+    }
     console.error(failure.stack);
     process.exitCode = 1;
   }
