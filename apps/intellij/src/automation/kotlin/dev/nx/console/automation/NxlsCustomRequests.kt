@@ -24,6 +24,40 @@ interface NxlsPreviewEditor {
     fun showWithPreview()
 }
 
+@Remote("dev.nx.console.settings.NxConsoleProjectSettingsProvider", plugin = "dev.nx.console")
+interface NxlsProjectSettings {
+    fun getToolwindowStyle(): NxlsTreeStyle
+
+    fun setToolwindowStyle(style: NxlsTreeStyle)
+}
+
+@Remote("dev.nx.console.settings.options.ToolWindowStyles", plugin = "dev.nx.console")
+interface NxlsTreeStyle {
+    fun valueOf(name: String): NxlsTreeStyle
+}
+
+@Remote("dev.nx.console.settings.options.ToolWindowStyleSetting", plugin = "dev.nx.console")
+interface NxlsTreeStyleSetting {
+    fun doApply()
+}
+
+internal fun Driver.nxlsWithFolderTree(project: Project, block: () -> Unit) {
+    val settings = service<NxlsProjectSettings>(project)
+    val original = settings.getToolwindowStyle()
+    fun apply(style: NxlsTreeStyle) {
+        withContext(OnDispatcher.EDT) {
+            settings.setToolwindowStyle(style)
+            new(NxlsTreeStyleSetting::class, project).doApply()
+        }
+    }
+    try {
+        apply(utility<NxlsTreeStyle>().valueOf("FOLDER"))
+        block()
+    } finally {
+        apply(original)
+    }
+}
+
 internal fun Driver.nxlsTree(): List<List<String>> {
     val tree = ui.x("//div[@class='NxProjectsTree']", JTreeUiComponent::class.java)
     var paths = emptyList<List<String>>()
@@ -113,22 +147,24 @@ fun main() = withAutomationDriver {
     val frame = nxlsFrame()
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "nxls-custom-requests"
     val report = StringBuilder()
-    recordIde(label) {
-        try {
-            nxlsRunning(project)
-            openToolWindow("Nx Console")
-            report.appendLine("Rendered project/folder tree: ${nxlsTree()}")
-            invokeAction("CloseAllEditors", component = frame)
-            nxlsChooseGenerator(frame, report)
-            nxlsGeneratorOptions(report)
-            // Keep the JCEF selector unambiguous when switching from Generate UI to project
-            // details.
-            invokeAction("CloseAllEditors", component = frame)
-            nxlsProjectDetails(project, report)
-        } finally {
-            automationOutput()
-                .resolve("$label-${System.currentTimeMillis()}.txt")
-                .writeText(report.toString())
+    nxlsWithFolderTree(project) {
+        recordIde(label) {
+            try {
+                nxlsRunning(project)
+                openToolWindow("Nx Console")
+                report.appendLine("Rendered project/folder tree: ${nxlsTree()}")
+                invokeAction("CloseAllEditors", component = frame)
+                nxlsChooseGenerator(frame, report)
+                nxlsGeneratorOptions(report)
+                // Keep the JCEF selector unambiguous when switching from Generate UI to project
+                // details.
+                invokeAction("CloseAllEditors", component = frame)
+                nxlsProjectDetails(project, report)
+            } finally {
+                automationOutput()
+                    .resolve("$label-${System.currentTimeMillis()}.txt")
+                    .writeText(report.toString())
+            }
         }
     }
 }
