@@ -1,7 +1,5 @@
 package dev.nx.console.nxls
 
-import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.models.NxGeneratorOptionDeserializer
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.io.InputStream
@@ -32,9 +30,6 @@ fun createNxlsLauncher(
         .setOutput(output)
         .setExecutorService(executorService)
         .wrapMessages(decorate)
-        .configureGson { gson ->
-            gson.registerTypeAdapter(NxGeneratorOption::class.java, NxGeneratorOptionDeserializer())
-        }
         .create()
 
 /**
