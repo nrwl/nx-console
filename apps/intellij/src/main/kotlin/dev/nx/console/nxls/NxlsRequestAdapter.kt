@@ -41,7 +41,7 @@ internal constructor(private val getSession: () -> NxlsSession, private val nowM
             val dispatch = AtomicReference(Dispatch.PENDING)
             val outcome = supervisorScope {
                 val response = async {
-                    running.server.sendRequest { server ->
+                    running.client.sendRequest { server ->
                         try {
                             if (!session.isCurrent(running)) {
                                 dispatch.compareAndSet(Dispatch.PENDING, Dispatch.ABANDONED)

@@ -14,9 +14,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
-class NxlsServerDescriptorTest : BasePlatformTestCase() {
+class NxlsClientDescriptorTest : BasePlatformTestCase() {
     private lateinit var harness: PlatformLspTestHarness
-    private lateinit var descriptor: NxlsServerDescriptor
+    private lateinit var descriptor: NxlsClientDescriptor
 
     override fun setUp() {
         super.setUp()

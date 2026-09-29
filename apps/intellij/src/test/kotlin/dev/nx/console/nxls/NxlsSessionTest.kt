@@ -43,7 +43,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         assertNull(harness.session.ready.value)
         harness.registeredServers.add(server)
         listener.serverInitialized(server.initializeResult)
-        assertSame(server, checkNotNull(harness.session.ready.value).server)
+        assertSame(server, checkNotNull(harness.session.ready.value).client)
     }
 
     fun testLateCallbacksCannotRetireOrReadyReplacement() {
@@ -56,7 +56,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         old.descriptor.lspServerListener.serverStopped(false)
         assertNull(harness.session.ready.value)
         val new = harness.ready()
-        assertSame(new, checkNotNull(harness.session.ready.value).server)
+        assertSame(new, checkNotNull(harness.session.ready.value).client)
         assertTrue(new.descriptor.generation > old.descriptor.generation)
         assertEqual(2, harness.descriptors.size)
     }
@@ -159,6 +159,6 @@ class NxlsSessionTest : BasePlatformTestCase() {
         harness.runPendingTasks()
         val new = harness.ready()
         harness.session.dispatchDeclined(oldReady)
-        assertSame(new, checkNotNull(harness.session.ready.value).server)
+        assertSame(new, checkNotNull(harness.session.ready.value).client)
     }
 }

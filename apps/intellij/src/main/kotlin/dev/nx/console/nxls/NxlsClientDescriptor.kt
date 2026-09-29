@@ -2,7 +2,7 @@ package dev.nx.console.nxls
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServerDescriptor
+import com.intellij.platform.lsp.api.LspClientDescriptor
 import com.intellij.platform.lsp.api.LspServerListener
 import com.intellij.platform.lsp.api.LspServerNotificationsHandler
 import com.intellij.platform.lsp.api.customization.LspCustomization
@@ -15,13 +15,13 @@ import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.runBlocking
 import org.eclipse.lsp4j.InitializeResult
 
-class NxlsServerDescriptor
+class NxlsClientDescriptor
 internal constructor(
     project: Project,
     val root: VirtualFile,
     val generation: Long,
     private val session: NxlsSession,
-) : LspServerDescriptor(project, "Nx", root) {
+) : LspClientDescriptor(project, "Nx", root) {
     private val workspacePath = root.path
 
     internal fun checkBeforeStart() = session.beforeStart(generation)

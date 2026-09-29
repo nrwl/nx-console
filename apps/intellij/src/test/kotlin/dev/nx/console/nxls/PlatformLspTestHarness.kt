@@ -5,8 +5,8 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServer
-import com.intellij.platform.lsp.api.LspServerManager
+import com.intellij.platform.lsp.api.LspClient
+import com.intellij.platform.lsp.api.LspClientManager
 import com.intellij.platform.lsp.api.LspServerState
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.lang.reflect.Proxy
@@ -25,31 +25,29 @@ import org.eclipse.lsp4j.services.LanguageServer
 internal class PlatformLspTestHarness(val project: Project, var root: VirtualFile) {
     var trusted = true
     var trustCallback: ((Project) -> Unit)? = null
-    val servers = CopyOnWriteArrayList<TestLspServer>()
-    val registeredServers = CopyOnWriteArrayList<TestLspServer>()
-    val pendingStarts = ConcurrentLinkedQueue<NxlsServerDescriptor>()
-    val pendingLaunches = ConcurrentLinkedQueue<TestLspServer>()
-    val launchedDescriptors = CopyOnWriteArrayList<NxlsServerDescriptor>()
+    val servers = CopyOnWriteArrayList<TestLspClient>()
+    val registeredServers = CopyOnWriteArrayList<TestLspClient>()
+    val pendingStarts = ConcurrentLinkedQueue<NxlsClientDescriptor>()
+    val pendingLaunches = ConcurrentLinkedQueue<TestLspClient>()
+    val launchedDescriptors = CopyOnWriteArrayList<NxlsClientDescriptor>()
     val lifecycleTasks = ConcurrentLinkedQueue<() -> Unit>()
-    val descriptors = CopyOnWriteArrayList<NxlsServerDescriptor>()
+    val descriptors = CopyOnWriteArrayList<NxlsClientDescriptor>()
     var delayStopCallbacks = false
     val pendingStops = ConcurrentLinkedQueue<() -> Unit>()
     var stops = 0
     var onStop: (() -> Unit)? = null
-    var onStart: ((TestLspServer) -> Unit)? = null
+    var onStart: ((TestLspClient) -> Unit)? = null
     val manager =
         Proxy.newProxyInstance(
-            LspServerManager::class.java.classLoader,
-            arrayOf(LspServerManager::class.java),
+            LspClientManager::class.java.classLoader,
+            arrayOf(LspClientManager::class.java),
         ) { _, method, args ->
             when (method.name) {
-                "getServersForProvider",
                 "getClients" -> registeredServers.toList()
-                "ensureServerStarted" -> {
-                    pendingStarts.add(args!![1] as NxlsServerDescriptor)
+                "ensureClientStarted" -> {
+                    pendingStarts.add(args!![1] as NxlsClientDescriptor)
                     Unit
                 }
-                "stopServers",
                 "stopClients" -> {
                     stops++
                     for (server in registeredServers.toList()) {
@@ -70,7 +68,7 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
                 }
                 else -> error("Unexpected manager call: ${method.name}")
             }
-        } as LspServerManager
+        } as LspClientManager
     val session =
         NxlsSession(
             project,
@@ -81,7 +79,7 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
             { task -> lifecycleTasks.add(task) },
         )
 
-    fun runNextStart(): TestLspServer? {
+    fun runNextStart(): TestLspClient? {
         val descriptor = pendingStarts.poll() ?: return null
         if (
             registeredServers.any { server ->
@@ -92,7 +90,7 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
             }
         )
             return null
-        val server = TestLspServer(project, descriptor)
+        val server = TestLspClient(project, descriptor)
         descriptors.add(descriptor)
         servers.add(server)
         pendingLaunches.add(server)
@@ -138,33 +136,33 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
         error("Lifecycle did not settle")
     }
 
-    fun latestServer(): TestLspServer {
+    fun latestServer(): TestLspClient {
         runPendingTasks()
         return servers.last()
     }
 
-    fun start(): TestLspServer {
+    fun start(): TestLspClient {
         session.start()
         return latestServer()
     }
 
-    fun ready(server: TestLspServer = latestServer()): TestLspServer {
+    fun ready(server: TestLspClient = latestServer()): TestLspClient {
         server.state = LspServerState.Running
         server.descriptor.lspServerListener.serverInitialized(server.initializeResult)
         return server
     }
 
-    fun die(server: TestLspServer = servers.last()) {
+    fun die(server: TestLspClient = servers.last()) {
         server.state = LspServerState.ShutdownUnexpectedly
         server.descriptor.lspServerListener.serverStopped(false)
     }
 }
 
-internal class TestLspServer(
+internal class TestLspClient(
     override val project: Project,
-    override val descriptor: NxlsServerDescriptor,
-) : LspServer {
-    override val providerClass = NxlsServerSupportProvider::class.java
+    override val descriptor: NxlsClientDescriptor,
+) : LspClient {
+    override val providerClass = NxlsIntegrationProvider::class.java
     override var state = LspServerState.Initializing
     override val initializeResult = InitializeResult(ServerCapabilities())
     var senderEscaped = false
