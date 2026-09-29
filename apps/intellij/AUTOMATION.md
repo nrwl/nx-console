@@ -417,3 +417,181 @@ The EDT thresholds are a regression guard rather than a reproduction. Forcing a
 live nxls to stop reading its stdin is not something the harness can arrange, so
 the deterministic proof of the freeze lives in `DocumentManagerTest`, which
 holds a send open and asserts the dispatch thread stays free.
+
+### Platform LSP editor features
+
+`NxlsEditorFeaturesKt` opens `nx.json`, `demo/project.json`, and `package.json`
+and waits for the Nx language server to be Running. For each file it checks a
+non-empty lookup containing an expected Nx key **from an LSP completion item**,
+accepts a server item with `InsertTextFormat.Snippet`, and checks both an active
+live-template tab stop and the absence of literal `${` / `$0` in the document.
+It verifies that the document is still unsaved and unchanged on disk, then
+requests completion again in the same object: the inserted key must disappear
+from the server's suggestions while another expected key remains.
+
+Quick Documentation exercises the platform's LSP hover provider without native
+mouse input. It must render documentation for `namedInputs` in `nx.json` and
+`command` in the other two files. Executor documentation must contain an HTML
+anchor to `nx.dev`, with no raw Markdown link. The scenario also checks the
+platform's document-link cache, follows an `inputs: ["default"]` link to the
+correct line in `nx.json`, and invokes Go to Declaration on `nx:run-commands`,
+asserting that its implementation file opens. `workspace.json` is excluded
+because nxls does not register a schema for it.
+
+Use a disposable, trusted Nx workspace with installed dependencies and a
+lockfile. Its root `nx.json` must contain:
+
+```json
+{
+  "analytics": false,
+  "namedInputs": { "default": ["{projectRoot}/**/*"] }
+}
+```
+
+It also needs a root `package.json` and `demo/project.json` with a `demo` project
+and a `hello` target using `nx:run-commands`, for example:
+
+```json
+{
+  "name": "demo",
+  "targets": {
+    "hello": {
+      "executor": "nx:run-commands",
+      "inputs": ["default"],
+      "options": { "command": "node -e 0" }
+    }
+  }
+}
+```
+
+Save these files before running. The scenario temporarily edits their IDE
+buffers, suppresses automatic saving, and restores and saves the original text
+in `finally`. Explicit saves remain enabled so a completion that force-saves
+still fails. The fixture must use an Nx installation whose run-commands
+implementation is `nx/src/executors/run-commands/run-commands.impl.js`.
+
+From the repository root, against the already running automation IDE:
+
+```sh
+NX_AUTOMATION_LABEL=nxls-editor-features CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  ./gradlew :intellij:runAutomation --max-workers=2 --priority=low \
+  -PautomationMain=dev.nx.console.automation.NxlsEditorFeaturesKt
+```
+
+These direct Gradle commands avoid Nx Gradle project-graph discovery timeouts.
+Add the same `-PautomationPort=...` used by the IDE launcher if overriding the
+port. Each new scenario records an MP4 and `result.txt`, plus a timestamped text
+report in `dist/apps/intellij/automation`. The editor report includes the actual
+snippet, updated completion labels, documentation HTML, and link destinations.
+A native mouse-hover activation check remains manual; Quick Documentation
+asserts the shared LSP hover response and rendering path.
+
+### Platform LSP custom requests
+
+`NxlsCustomRequestsKt` asserts on rendered UI for the main custom-request paths:
+the Nx project/folder tree (`nx/workspace`, `nx/projectFolderTree`), the generator
+picker and populated Generate UI (`nx/generators`, `nx/generatorOptions`,
+`nx/transformedGeneratorSchema`), and the project details view (`nx/pdvData`).
+The generator form must display string, boolean, and numeric defaults, so merely
+opening an empty form or decoding only generator names cannot pass. Project
+details must render `demo` and its `hello` target. This samples these
+request paths; it does not claim individual coverage of every custom method.
+
+Extend the editor fixture above with a project named `util` rooted at
+`libs/util`, and select **Folder** in Nx Console's tool window style
+setting. Alternatively, use Automatic with at least ten projects and no project
+rooted at `libs` or the workspace root. The scenario requires both the
+`demo / hello` target and the `libs / util` folder/project path, and rejects
+duplicate rendered paths. A flat list does not exercise `nx/projectFolderTree`.
+
+Install a local generator as a dev dependency
+(`npm install -D ./tools/notes-plugin`). Give its `package.json` the name
+`@fixture/notes-plugin` and `"generators": "./generators.json"`. The
+`generators.json` file should contain:
+
+```json
+{
+  "generators": {
+    "note": {
+      "factory": "./note.cjs",
+      "schema": "./schema.json",
+      "description": "Automation note generator"
+    }
+  }
+}
+```
+
+Use this `schema.json`; keeping every option required makes every checked field
+visible without expanding optional options:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string", "default": "migration-note" },
+    "directory": { "type": "string", "default": "notes" },
+    "enabled": { "type": "boolean", "default": true },
+    "retries": { "type": "number", "default": 3 }
+  },
+  "required": ["name", "directory", "enabled", "retries"]
+}
+```
+
+Use `module.exports = async function () {};` for `note.cjs`. The no-op factory
+also makes Generate UI's automatic dry run harmless. Clear generator filters
+and use default generator context settings so the form defaults are not
+intentionally overridden. The scenario closes editors when switching between
+webviews, selects the generator through `JBPopup.closeOk`, and opens project
+details through the editor's preview API; it uses no native input.
+
+```sh
+NX_AUTOMATION_LABEL=nxls-custom-requests CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  ./gradlew :intellij:runAutomation --max-workers=2 --priority=low \
+  -PautomationMain=dev.nx.console.automation.NxlsCustomRequestsKt
+```
+
+The report saves the rendered tree, generator rows, form defaults, and project
+details text. Running a target is covered separately by `ReproRunArgumentsKt`.
+
+### Platform LSP lifecycle and editor reconnection
+
+`NxlsLifecycleKt` starts with a populated folder tree and opens all three config
+files **before** refreshing. It runs Refresh Nx Workspace once and then twice
+more, awaiting a fresh success notification, a replaced tree-model root, and a
+populated tree after each invocation. Refresh errors, a missing completion notification, duplicate tree
+paths, and duplicate success notifications fail the scenario.
+
+After every refresh, completion and Quick Documentation must still work in the
+original editor instances, including the rendered `nx.dev` executor link. The
+LSP completion items must all belong to one new
+server generation, newer than before the refresh. This catches stale results
+and reconnection failures that can be concealed by closing and reopening tabs.
+The scenario also compares the listener class/count maps on both Nx workspace
+refresh topics before and after every refresh, detecting lost or accumulating
+subscriptions. This uses the pinned platform's message-bus introspection API
+and reads the plugin's topic fields through Driver; no test listener or
+production hook is installed. Driver remote interfaces are checked at runtime,
+so recheck these bindings when upgrading the IDE.
+
+Every operation has EDT round trips before and after it, and refresh polling
+continues to probe the EDT while the action is pending. Each round trip must
+finish in less than two seconds. The report includes timings, generations,
+subscriber maps, documentation, and rendered trees.
+
+Use the editor fixture with the folder-tree extension described above. No local
+generator is needed. Save the config files first. The scenario restores edited
+buffers and the automatic-save token. It temporarily enables Nx refresh
+notifications, restores that preference afterwards, and leaves the three editor
+tabs open. Do not dismiss refresh notifications while it runs.
+
+```sh
+NX_AUTOMATION_LABEL=nxls-lifecycle CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  ./gradlew :intellij:runAutomation --max-workers=2 --priority=low \
+  -PautomationMain=dev.nx.console.automation.NxlsLifecycleKt
+```
+
+Capture baseline and post-migration runs against the same fixture using distinct
+labels. Compilation and unit tests do not substitute for these live-IDE runs.
