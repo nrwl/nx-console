@@ -101,6 +101,7 @@ class NxlsServiceLifecycleTest : BasePlatformTestCase() {
         harness.ready(harness.start())
         service.close()
         service.close()
+        harness.runPendingTasks()
         assertFalse(service.isStarted())
         assertFalse(service.isEditorConnected(myFixture.editor))
         assertEqual(1, harness.stops)

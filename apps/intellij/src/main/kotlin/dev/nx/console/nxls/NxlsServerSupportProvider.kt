@@ -12,7 +12,9 @@ class NxlsServerSupportProvider : LspServerSupportProvider {
         serverStarter: LspServerSupportProvider.LspServerStarter,
     ) {
         if (DocumentUtils.isNxFile(file.name)) {
-            NxlsSession.getInstance(project).ensureStarted(serverStarter::ensureServerStarted)
+            NxlsSession.getInstance(project)
+                .descriptorForDiscovery()
+                ?.let(serverStarter::ensureServerStarted)
         }
     }
 }

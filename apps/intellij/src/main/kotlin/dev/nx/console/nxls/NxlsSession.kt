@@ -3,17 +3,23 @@ package dev.nx.console.nxls
 import com.intellij.ide.trustedProjects.TrustedProjects
 import com.intellij.ide.trustedProjects.TrustedProjectsListener
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServer
 import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.platform.lsp.api.LspServerState
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Service(Service.Level.PROJECT)
 class NxlsSession
@@ -23,6 +29,7 @@ internal constructor(
     private val resolveRoot: () -> VirtualFile?,
     private val isTrusted: () -> Boolean,
     private val whenTrusted: (Disposable, (Project) -> Unit) -> Unit,
+    private val scheduleReconciliationTask: ((() -> Unit) -> Unit)? = null,
 ) : Disposable {
     constructor(
         project: Project
@@ -36,6 +43,7 @@ internal constructor(
         },
     )
 
+    private val reconciliationMutex = Mutex()
     private var nextGeneration = 0L
     private var current: Generation? = null
     private var requested = false
@@ -50,84 +58,144 @@ internal constructor(
 
     private fun registerTrustListener() {
         whenTrusted(this) { trustedProject ->
-            synchronized(this) {
-                if (!disposed) {
-                    if (trustedProject === project) {
-                        if (requested) ensureStarted()
-                    } else {
-                        registerTrustListener()
-                    }
+            val waiting =
+                synchronized(this) {
+                    if (disposed) return@whenTrusted
+                    if (trustedProject === project && requested && isTrusted()) {
+                        if (current == null) current = newGeneration()
+                        true
+                    } else false
                 }
-            }
+            if (waiting) scheduleReconciliation()
+            else if (trustedProject !== project) registerTrustListener()
         }
     }
 
     fun start() = ensureStarted()
 
+    internal fun ensureStarted() {
+        descriptorForDiscovery() ?: return
+        scheduleReconciliation()
+    }
+
     @Synchronized
-    internal fun ensureStarted(
-        starter: (NxlsServerDescriptor) -> Unit = {
-            manager.ensureServerStarted(NxlsServerSupportProvider::class.java, it)
-        }
-    ) {
-        if (disposed || project.isDisposed) return
+    internal fun descriptorForDiscovery(): NxlsServerDescriptor? {
+        if (disposed || project.isDisposed) return null
         requested = true
-        if (!isTrusted()) return
-        val generation =
-            current
-                ?: run {
-                    val root = workspaceRoot ?: resolveRoot() ?: return
-                    Generation(NxlsServerDescriptor(project, root, ++nextGeneration, this)).also {
-                        current = it
-                    }
-                }
-        if (!generation.startRequested) {
-            generation.startRequested = true
-            try {
-                starter(generation.descriptor)
-            } catch (error: Throwable) {
-                retire()
-                throw error
-            }
-        }
+        if (!isTrusted()) return null
+        return (current ?: newGeneration()?.also { current = it })?.descriptor
     }
 
-    @Synchronized
+    private fun newGeneration(
+        root: VirtualFile? = workspaceRoot ?: resolveRoot(),
+        refreshed: CompletableDeferred<Unit> = CompletableDeferred(),
+    ): Generation? =
+        root?.let {
+            Generation(NxlsServerDescriptor(project, it, ++nextGeneration, this), refreshed)
+        }
+
     fun stop() {
-        if (!requested && current == null) return
-        requested = false
-        retire()
-        manager.stopServers(NxlsServerSupportProvider::class.java)
-    }
-
-    @Synchronized
-    fun restart() {
-        stop()
-        ensureStarted()
-    }
-
-    @Synchronized
-    internal fun restartWithRefreshTicket(): Deferred<Unit> {
-        stop()
-        val root = workspaceRoot ?: resolveRoot()
-        if (root == null || disposed || project.isDisposed) {
-            return CompletableDeferred<Unit>().also {
-                it.cancel(CancellationException("Nx workspace is unavailable"))
-            }
+        synchronized(this) {
+            requested = false
+            retire()
         }
-        val generation = Generation(NxlsServerDescriptor(project, root, ++nextGeneration, this))
-        current = generation
-        // Install the ticket before ensureServerStarted can deliver any callbacks.
-        val ticket = generation.refreshed
-        ensureStarted()
+        scheduleReconciliation()
+    }
+
+    fun restart() {
+        replaceGeneration()
+    }
+
+    internal fun restartWithRefreshTicket(): Deferred<Unit> = replaceGeneration()
+
+    fun changeWorkspace(root: VirtualFile) {
+        replaceGeneration(root)
+    }
+
+    private fun replaceGeneration(root: VirtualFile? = null): Deferred<Unit> {
+        val ticket =
+            synchronized(this) {
+                retire()
+                if (root != null) workspaceRoot = root
+                requested = !disposed && !project.isDisposed
+                current = if (requested) newGeneration() else null
+                current?.refreshed
+                    ?: CompletableDeferred<Unit>().also {
+                        it.cancel(CancellationException("Nx workspace is unavailable"))
+                    }
+            }
+        scheduleReconciliation()
         return ticket
     }
 
-    @Synchronized
-    fun changeWorkspace(root: VirtualFile) {
-        stop()
-        workspaceRoot = root
-        ensureStarted()
+    private fun scheduleReconciliation() {
+        if (scheduleReconciliationTask != null) {
+            scheduleReconciliationTask.invoke(::reconcile)
+        } else if (!project.isDisposed) {
+            ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+                reconciliationMutex.withLock {
+                    // Registration is an EDT write action. This also waits for a launch hook's
+                    // server to be registered before inspecting the platform's collection.
+                    readAction { reconcile() }
+                }
+            }
+        }
+    }
+
+    private fun reconcile() {
+        if (project.isDisposed) return
+        val servers = manager.getServersForProvider(NxlsServerSupportProvider::class.java)
+        val removeRetired =
+            synchronized(this) {
+                val active = current
+                val obsolete = servers.any { it.descriptor !== active?.descriptor }
+                if (obsolete) {
+                    // stopServers removes every server for this provider. If a different-root
+                    // late registration overlaps the current server, replace both but keep its
+                    // ticket.
+                    if (active != null && servers.any { it.descriptor === active.descriptor }) {
+                        active.ended.complete(Unit)
+                        readiness.value = null
+                        current = newGeneration(active.descriptor.root, active.refreshed)
+                    }
+                    current?.startRequested = false
+                }
+                obsolete
+            }
+        if (removeRetired) manager.stopServers(NxlsServerSupportProvider::class.java)
+        val active =
+            synchronized(this) {
+                current
+                    ?.takeIf {
+                        !disposed &&
+                            requested &&
+                            isTrusted() &&
+                            !it.startRequested &&
+                            (removeRetired ||
+                                servers.none { server -> server.descriptor === it.descriptor })
+                    }
+                    ?.also { it.startRequested = true }
+            } ?: return
+        try {
+            manager.ensureServerStarted(NxlsServerSupportProvider::class.java, active.descriptor)
+        } catch (error: Throwable) {
+            synchronized(this) { active.startRequested = false }
+            throw error
+        }
+    }
+
+    internal fun beforeStart(generation: Long) {
+        val allowed =
+            synchronized(this) {
+                !disposed &&
+                    !project.isDisposed &&
+                    requested &&
+                    current?.descriptor?.generation == generation
+            }
+        // A queued start can register after retirement, even if stopServers saw no servers.
+        // Reconcile off the connector callback stack, including when launch is rejected.
+        scheduleReconciliation()
+        if (!allowed) throw ProcessCanceledException()
     }
 
     @Synchronized
@@ -211,9 +279,11 @@ internal constructor(
         retire()
     }
 
-    private class Generation(val descriptor: NxlsServerDescriptor) {
+    private class Generation(
+        val descriptor: NxlsServerDescriptor,
+        val refreshed: CompletableDeferred<Unit> = CompletableDeferred(),
+    ) {
         val ended = CompletableDeferred<Unit>()
-        val refreshed = CompletableDeferred<Unit>()
         val bufferedRefresh = mutableListOf<Boolean>()
         var initialized = false
         var startRequested = false

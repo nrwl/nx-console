@@ -38,10 +38,10 @@ class NxlsSessionTest : BasePlatformTestCase() {
         listener.serverInitialized(server.initializeResult)
         assertNull(harness.session.ready.value)
         server.state = LspServerState.Running
-        harness.servers.clear()
+        harness.registeredServers.clear()
         listener.serverInitialized(server.initializeResult)
         assertNull(harness.session.ready.value)
-        harness.servers.add(server)
+        harness.registeredServers.add(server)
         listener.serverInitialized(server.initializeResult)
         assertSame(server, checkNotNull(harness.session.ready.value).server)
     }
@@ -50,6 +50,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         val old = harness.ready(harness.start())
         val ended = checkNotNull(harness.session.ready.value).ended
         harness.session.restart()
+        harness.runPendingTasks()
         assertTrue(ended.isCompleted)
         old.descriptor.lspServerListener.serverInitialized(old.initializeResult)
         old.descriptor.lspServerListener.serverStopped(false)
@@ -63,23 +64,32 @@ class NxlsSessionTest : BasePlatformTestCase() {
     fun testTrustTransitionStartsExactlyOnceWithoutAnotherRequest() {
         harness.trusted = false
         repeat(3) { harness.session.start() }
+        harness.runPendingTasks()
         assertTrue(harness.descriptors.isEmpty())
         harness.trusted = true
         harness.trustCallback!!(project)
+        harness.runPendingTasks()
         repeat(3) { harness.session.start() }
+        harness.runPendingTasks()
         assertEqual(1, harness.descriptors.size)
     }
 
     fun testPlatformTrustListenerStartsWaitingSession() {
         harness.trusted = false
         val session =
-            NxlsSession(project, harness.manager, { harness.root }, { harness.trusted }) {
-                disposable,
-                callback ->
-                TrustedProjectsListener.onceWhenProjectTrusted(disposable, callback)
-            }
+            NxlsSession(
+                project,
+                harness.manager,
+                { harness.root },
+                { harness.trusted },
+                { disposable, callback ->
+                    TrustedProjectsListener.onceWhenProjectTrusted(disposable, callback)
+                },
+                { task -> harness.lifecycleTasks.add(task) },
+            )
         Disposer.register(testRootDisposable, session)
         session.start()
+        harness.runPendingTasks()
         assertTrue(harness.descriptors.isEmpty())
         harness.trusted = true
         ApplicationManager.getApplication()
@@ -87,15 +97,18 @@ class NxlsSessionTest : BasePlatformTestCase() {
             .syncPublisher(TrustedProjectsListener.TOPIC)
             .onProjectTrusted(project)
         session.start()
+        harness.runPendingTasks()
         assertEqual(1, harness.descriptors.size)
     }
 
     fun testTrustDoesNotUndoExplicitStop() {
         harness.trusted = false
         harness.session.start()
+        harness.runPendingTasks()
         harness.session.stop()
         harness.trusted = true
         harness.trustCallback!!(project)
+        harness.runPendingTasks()
         assertTrue(harness.descriptors.isEmpty())
     }
 
@@ -104,6 +117,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         val ended = checkNotNull(harness.session.ready.value).ended
         val nested = myFixture.tempDirFixture.findOrCreateDir("nested")
         harness.session.changeWorkspace(nested)
+        harness.runPendingTasks()
         val new = harness.servers.last()
         assertSame(harness.root, old.descriptor.roots.single())
         assertSame(nested, new.descriptor.roots.single())
@@ -118,6 +132,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         harness.session.dispose()
         assertTrue(ended.isCompleted)
         harness.trustCallback!!(project)
+        harness.runPendingTasks()
         harness.ready(server)
         harness.die(server)
         assertNull(harness.session.ready.value)
@@ -132,6 +147,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         assertNull(harness.session.ready.value)
         assertEqual(1, harness.descriptors.size)
         harness.session.start()
+        harness.runPendingTasks()
         assertEqual(2, harness.descriptors.size)
     }
 
@@ -140,6 +156,7 @@ class NxlsSessionTest : BasePlatformTestCase() {
         val oldReady = checkNotNull(harness.session.ready.value)
         harness.die(old)
         harness.session.start()
+        harness.runPendingTasks()
         val new = harness.ready()
         harness.session.dispatchDeclined(oldReady)
         assertSame(new, checkNotNull(harness.session.ready.value).server)
