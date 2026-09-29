@@ -13,7 +13,6 @@ import dev.nx.console.NxConsoleBundle
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.isDevelopmentInstance
 import dev.nx.console.utils.nodeInterpreter
-import dev.nx.console.utils.nxBasePath
 import java.io.File
 import java.nio.file.Paths
 
@@ -56,8 +55,7 @@ data class NxlsWorkspaceSnapshot(
             val pnpFilePath = readAction {
                 val yarnPnpManager = YarnPnpManager.getInstance(project)
                 val virtualBaseFile =
-                    VirtualFileManager.getInstance()
-                        .findFileByNioPath(Paths.get(project.nxBasePath))
+                    VirtualFileManager.getInstance().findFileByNioPath(Paths.get(basePath))
                 if (virtualBaseFile != null && yarnPnpManager.isUnderPnp(virtualBaseFile)) {
                     yarnPnpManager.pnpFiles.first().pnpFile.path
                 } else {

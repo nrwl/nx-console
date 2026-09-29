@@ -71,5 +71,3 @@ class NxlsLanguageClient : LanguageClient {
         fileWatcherOperationalCallbacks.forEach { it(params.status) }
     }
 }
-
-data class FileWatcherOperationalParams(val status: String)
