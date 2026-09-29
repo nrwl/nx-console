@@ -9,7 +9,6 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.CreateProjectGraphError
 import dev.nx.console.models.NxDownloadAndExtractArtifactRequest
-import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.nxls.server.requests.*
 import dev.nx.console.utils.Notifier
@@ -24,6 +23,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import org.eclipse.lsp4j.jsonrpc.Endpoint
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
@@ -37,7 +37,7 @@ import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints
 class NxlsServiceTest : BasePlatformTestCase() {
     private lateinit var scope: CoroutineScope
     private lateinit var service: NxlsService
-    private lateinit var wrapper: NxlsWrapper
+    private var available = true
     private val calls = mutableListOf<Pair<String, Any?>>()
     private var response: Any? = null
     private var failure: Throwable? = null
@@ -48,12 +48,7 @@ class NxlsServiceTest : BasePlatformTestCase() {
         super.setUp()
         scope = CoroutineScope(SupervisorJob())
         service = NxlsService(project, scope)
-        wrapper =
-            NxlsService::class.java.getDeclaredField("wrapper").let {
-                it.isAccessible = true
-                it.get(service) as NxlsWrapper
-            }
-        wrapper.languageServer =
+        val fakeService =
             ServiceEndpoints.toServiceObject(
                 object : Endpoint {
                     override fun request(method: String, parameter: Any?): CompletableFuture<Any?> {
@@ -68,10 +63,12 @@ class NxlsServiceTest : BasePlatformTestCase() {
                 },
                 NxlsLanguageServer::class.java,
             )
-        NxlsWrapper::class.java.getDeclaredField("status").apply {
-            isAccessible = true
-            set(wrapper, NxlsState.STARTED)
-        }
+        service.requestSender =
+            object : NxlsRequestSender {
+                override suspend fun <T> request(
+                    sender: (NxlsLanguageServer) -> CompletableFuture<T>
+                ): T? = if (available) sender(fakeService).await() else null
+            }
     }
 
     override fun tearDown() {
@@ -83,7 +80,7 @@ class NxlsServiceTest : BasePlatformTestCase() {
     }
 
     fun testUnavailableServerUsesEveryMethodFallback() = runBlocking {
-        wrapper.languageServer = null
+        available = false
         assertFallbacks()
         service.refreshWorkspace()
         service.changeWorkspace("/workspace")
@@ -214,27 +211,19 @@ class NxlsServiceTest : BasePlatformTestCase() {
     }
 
     fun testEditorRegistrationBeforeStartup() {
-        NxlsWrapper::class.java.getDeclaredField("status").apply {
-            isAccessible = true
-            set(wrapper, NxlsState.STOPPED)
-        }
-        wrapper.languageServer = null
+        available = false
         myFixture.configureByText("nx.json", "{}")
         val editor = myFixture.editor
-        try {
-            assertFalse(service.isStarted())
-            assertFalse(service.isEditorConnected(editor))
-            service.removeDocument(editor)
-            service.addDocument(editor)
-            service.addDocument(editor)
-            assertTrue(service.isEditorConnected(editor))
-            assertFalse(service.isStarted())
-            service.removeDocument(editor)
-            assertFalse(service.isEditorConnected(editor))
-            service.removeDocument(editor)
-        } finally {
-            DocumentManager.getInstance(editor).documentClosed()
-        }
+        assertFalse(service.isStarted())
+        assertFalse(service.isEditorConnected(editor))
+        service.removeDocument(editor)
+        service.addDocument(editor)
+        service.addDocument(editor)
+        assertTrue(service.isEditorConnected(editor))
+        assertFalse(service.isStarted())
+        service.removeDocument(editor)
+        assertFalse(service.isEditorConnected(editor))
+        service.removeDocument(editor)
     }
 
     private suspend fun assertFallbacks() {

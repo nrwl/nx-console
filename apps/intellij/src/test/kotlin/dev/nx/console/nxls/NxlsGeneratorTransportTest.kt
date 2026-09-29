@@ -2,7 +2,7 @@ package dev.nx.console.nxls
 
 import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.NxOptionWithBooleanDefault
-import dev.nx.console.nxls.client.NxlsLanguageClient
+import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import java.io.ByteArrayInputStream
@@ -11,9 +11,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.junit.Test
 
 class NxlsGeneratorTransportTest {
@@ -33,16 +31,15 @@ class NxlsGeneratorTransportTest {
                 }
                 .fold(ByteArray(0)) { all, message -> all + message }
         val executor = Executors.newCachedThreadPool()
-        val scope = CoroutineScope(SupervisorJob())
         try {
             val launcher =
-                createNxlsLauncher(
-                    NxlsLanguageClient(),
-                    ByteArrayInputStream(responses),
-                    ByteArrayOutputStream(),
-                    executor,
-                    LspMessageQueue(scope),
-                )
+                Launcher.Builder<NxlsLanguageServer>()
+                    .setRemoteInterface(NxlsLanguageServer::class.java)
+                    .setLocalService(Any())
+                    .setInput(ByteArrayInputStream(responses))
+                    .setOutput(ByteArrayOutputStream())
+                    .setExecutorService(executor)
+                    .create()
             val server = launcher.remoteProxy
             val generators = server.generators()
             val options =
@@ -75,7 +72,6 @@ class NxlsGeneratorTransportTest {
             )
             listening.get(5, TimeUnit.SECONDS)
         } finally {
-            scope.cancel()
             executor.shutdownNow()
         }
     }

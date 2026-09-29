@@ -3,8 +3,6 @@ package dev.nx.console.nxls.client
 import com.intellij.openapi.project.Project
 import com.intellij.platform.lsp.api.Lsp4jClient
 import com.intellij.platform.lsp.api.LspServerNotificationsHandler
-import dev.nx.console.nxls.NxlsService.Companion.NX_WORKSPACE_REFRESH_STARTED_TOPIC
-import dev.nx.console.nxls.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.nxls.NxlsSession
 import dev.nx.console.nxls.WatcherRunningService
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
@@ -17,18 +15,12 @@ class NxlsLsp4jClient(
 ) : Lsp4jClient(handler) {
     @JsonNotification("nx/refreshWorkspace")
     fun refreshWorkspace() {
-        session.ifCurrent(generation) {
-            project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
-        }
+        session.workspaceRefresh(generation, started = false)
     }
 
     @JsonNotification("nx/refreshWorkspaceStarted")
     fun refreshWorkspaceStarted() {
-        session.ifCurrent(generation) {
-            project.messageBus
-                .syncPublisher(NX_WORKSPACE_REFRESH_STARTED_TOPIC)
-                .onWorkspaceRefreshStarted()
-        }
+        session.workspaceRefresh(generation, started = true)
     }
 
     @JsonNotification("nx/fileWatcherOperational")

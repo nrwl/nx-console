@@ -3,8 +3,7 @@ package dev.nx.console.nxls
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import dev.nx.console.nxls.client.NxlsLanguageClient
-import dev.nx.console.nxls.managers.DocumentManager
+import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.nio.file.Path
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -13,14 +12,10 @@ import kotlin.system.measureTimeMillis
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import org.eclipse.lsp4j.DidOpenTextDocumentParams
 import org.eclipse.lsp4j.TextDocumentItem
+import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
-import org.eclipse.lsp4j.services.TextDocumentService
 
 /** Comfortably larger than any platform's pipe buffer plus the JDK's own output buffering. */
 private const val DOCUMENT_BYTES = 256 * 1024
@@ -58,53 +53,39 @@ object StdinIgnoringServer {
     }
 }
 
-/**
- * Reproduces the freeze JetBrains reported against the real transport rather than a stand-in.
- *
- * There is a real child process that never drains its stdin, a real lsp4j launcher serializing and
- * writing into that process' pipe, and the real [DocumentManager] sending from the dispatch thread.
- * The first test establishes the premise the other freeze tests assume, that such a write genuinely
- * parks its caller, and the second shows the dispatch thread no longer is that caller.
- */
+/** Tests the SDK executor against a real child process whose stdin pipe is full. */
 class NxlsTransportFreezeTest : BasePlatformTestCase() {
 
     private lateinit var process: Process
     private lateinit var executor: ExecutorService
-    private lateinit var scope: CoroutineScope
-    private lateinit var queue: LspMessageQueue
-    private lateinit var textService: TextDocumentService
-    private lateinit var manager: DocumentManager
+    private lateinit var harness: SdkLspTestHarness
 
     override fun setUp() {
         super.setUp()
         process = startStdinIgnoringServer()
         executor = Executors.newCachedThreadPool()
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-        queue = LspMessageQueue(scope)
-        // The launcher production builds, so removing the queueing from createNxlsLauncher or
-        // from its use here is caught by this test rather than passing quietly.
         val launcher =
-            createNxlsLauncher(
-                NxlsLanguageClient(),
-                process.inputStream,
-                process.outputStream,
-                executor,
-                queue,
-            )
-        textService = launcher.remoteProxy.textDocumentService
-
-        myFixture.configureByText("workspace.json", largeDocument())
-        manager = DocumentManager.getInstance(myFixture.editor)
-        manager.addTextDocumentService(textService)
+            Launcher.Builder<NxlsLanguageServer>()
+                .setRemoteInterface(NxlsLanguageServer::class.java)
+                .setLocalService(Any())
+                .setInput(process.inputStream)
+                .setOutput(process.outputStream)
+                .setExecutorService(executor)
+                .wrapMessages { consumer -> MessageConsumer { consumer.consume(it) } }
+                .create()
+        myFixture.configureFromExistingVirtualFile(
+            myFixture.addFileToProject("workspace.json", largeDocument()).virtualFile
+        )
+        harness =
+            SdkLspTestHarness(project, myFixture.file.virtualFile.parent, launcher.remoteProxy)
     }
 
     override fun tearDown() {
         try {
-            manager.documentClosed()
             // Killing the server breaks the pipe, which releases anything parked in a write.
             process.destroyForcibly()
             process.waitFor(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            scope.cancel()
+            harness.close()
             executor.shutdownNow()
         } finally {
             super.tearDown()
@@ -112,23 +93,9 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
     }
 
     fun testQueueingSurvivesAWrappedConsumer() {
-        // Production passes a decorator for logging, so by the time lsp4j has applied it the
-        // outbound consumer is no longer a StreamMessageConsumer. Reading the direction from the
-        // decorated consumer instead of the original would stop queueing here and only here.
-        val decorated =
-            createNxlsLauncher(
-                    NxlsLanguageClient(),
-                    process.inputStream,
-                    process.outputStream,
-                    executor,
-                    queue,
-                ) { consume ->
-                    MessageConsumer { message -> consume.consume(message) }
-                }
-                .remoteProxy
-                .textDocumentService
-
-        val elapsed = measureTimeMillis { decorated.didOpen(params()) }
+        val elapsed = measureTimeMillis {
+            harness.server.sendNotification { it.textDocumentService.didOpen(params()) }
+        }
 
         assertTrue(
             elapsed < MAX_DISPATCH_THREAD_MS,
@@ -141,7 +108,9 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
     }
 
     fun testAStalledServerReallyParksAPipeWrite() {
-        val sender = Thread { runCatching { textService.didOpen(params()) } }
+        val sender = Thread {
+            harness.server.sendNotification { it.textDocumentService.didOpen(params()) }
+        }
         sender.isDaemon = true
 
         sender.start()
@@ -165,7 +134,7 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
             "this test only means anything while it runs on the EDT",
         )
 
-        val elapsed = measureTimeMillis { manager.documentOpened() }
+        val elapsed = measureTimeMillis { harness.open(myFixture.file.virtualFile) }
 
         assertTrue(
             elapsed < MAX_DISPATCH_THREAD_MS,
@@ -220,7 +189,12 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
 
     private fun params() =
         DidOpenTextDocumentParams(
-            TextDocumentItem(manager.identifier.uri, "json", 1, largeDocument())
+            TextDocumentItem(
+                harness.server.getDocumentIdentifier(myFixture.file.virtualFile).uri,
+                "json",
+                1,
+                largeDocument(),
+            )
         )
 
     private fun largeDocument() = "{\"filler\":\"" + "x".repeat(DOCUMENT_BYTES) + "\"}"

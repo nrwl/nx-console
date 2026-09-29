@@ -25,6 +25,7 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
     val servers = mutableListOf<TestLspServer>()
     val descriptors = mutableListOf<NxlsServerDescriptor>()
     var stops = 0
+    var onStart: ((TestLspServer) -> Unit)? = null
     val manager =
         Proxy.newProxyInstance(
             LspServerManager::class.java.classLoader,
@@ -35,7 +36,9 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
                 "ensureServerStarted" -> {
                     val descriptor = args!![1] as NxlsServerDescriptor
                     descriptors.add(descriptor)
-                    servers.add(TestLspServer(project, descriptor))
+                    val server = TestLspServer(project, descriptor)
+                    servers.add(server)
+                    onStart?.invoke(server)
                     Unit
                 }
                 "stopServers" -> {

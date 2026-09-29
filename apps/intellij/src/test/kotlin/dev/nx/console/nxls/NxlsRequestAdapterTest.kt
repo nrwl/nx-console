@@ -5,13 +5,21 @@ import dev.nx.console.models.NxDownloadAndExtractArtifactRequest
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.nxls.server.requests.NxCreateProjectGraphRequest
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.system.measureTimeMillis
 import kotlin.test.assertEquals as assertEqual
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -229,6 +237,28 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         assertNull(result.await())
         assertEqual(1, server.effects)
         assertEqual(1, harness.descriptors.size)
+    }
+
+    fun testBlockedSenderDoesNotHoldTheSessionLockOnTheEdt() {
+        harness.ready(harness.start())
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        try {
+            scope.launch {
+                NxlsRequestAdapter(harness.session).request {
+                    entered.countDown()
+                    release.await(5, TimeUnit.SECONDS)
+                    CompletableFuture.completedFuture(Unit)
+                }
+            }
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            val elapsed = measureTimeMillis { harness.session.stop() }
+            assertTrue(elapsed < 1000, "Session retirement blocked the EDT for ${elapsed}ms")
+        } finally {
+            release.countDown()
+            scope.cancel()
+        }
     }
 
     fun testUntrustedRequestExpiresWithoutStarting() = runTest {
