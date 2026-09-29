@@ -1,6 +1,5 @@
 package dev.nx.console.nxls
 
-import kotlinx.coroutines.runBlocking
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerDescriptor
@@ -13,6 +12,7 @@ import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.DocumentUtils
 import dev.nx.console.utils.nxlsWorkingPath
+import kotlinx.coroutines.runBlocking
 import org.eclipse.lsp4j.InitializeResult
 
 class NxlsServerDescriptor
