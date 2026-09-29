@@ -38,6 +38,8 @@ interface NxlsEditor : Editor {
 
 @Remote("com.intellij.openapi.fileEditor.FileEditorManager")
 interface NxlsEditors {
+    fun getOpenFiles(): Array<VirtualFile>
+
     fun getSelectedTextEditor(): NxlsEditor?
 
     fun getSelectedEditor(): NxlsPreviewEditor?
@@ -98,12 +100,24 @@ interface NxlsCompletionObject {
 interface NxlsPlatformServer {
     fun getDescriptor(): NxlsDescriptor
 
+    fun `isFileOpened$intellij_platform_lsp_impl`(file: VirtualFile): Boolean
+
+    fun `sendDidCloseRequest$intellij_platform_lsp_impl`(file: VirtualFile)
+
+    fun getRequestExecutor(): NxlsPlatformRequests
+
+    fun `getLsp4jServer$intellij_platform_lsp_impl`(): NxlsRemoteServer
+
     fun `getDocumentLinkInfos$intellij_platform_lsp_impl`(file: VirtualFile): List<NxlsCachedLink>
 }
 
 @Remote("dev.nx.console.nxls.NxlsServerDescriptor", plugin = "dev.nx.console")
 interface NxlsDescriptor {
     fun getGeneration(): Long
+
+    fun getPresentableName(): String
+
+    fun getFileUri(file: VirtualFile): String
 }
 
 @Remote("com.intellij.platform.lsp.impl.highlightingCommon.LspCachedHighlighting")

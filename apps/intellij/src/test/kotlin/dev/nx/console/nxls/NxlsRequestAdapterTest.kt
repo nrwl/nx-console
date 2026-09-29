@@ -170,11 +170,51 @@ class NxlsRequestAdapterTest : BasePlatformTestCase() {
         harness.die(server)
         runCurrent()
         harness.runPendingTasks()
-        assertTrue(result.isCompleted)
+        assertFalse(result.isCompleted)
+        advanceTimeBy(10_000)
         assertNull(result.await())
+        assertEqual(10_000, testScheduler.currentTime)
         server.queuedSender!!()
         assertEqual(0, server.effects)
         assertEqual(1, server.sends)
+    }
+
+    fun testRetiredQueuedAttemptRetriesReplacementInsideOriginalDeadline() = runTest {
+        val old = harness.ready(harness.start()).apply { queued = true }
+        val result = async { adapter().request { it.workspaceSerialized() } }
+        runCurrent()
+        advanceTimeBy(5_000)
+        harness.session.restart()
+        harness.runPendingTasks()
+        runCurrent()
+        assertFalse(result.isCompleted)
+        old.queuedSender!!()
+        assertEqual(0, old.effects)
+        advanceTimeBy(4_900)
+        val replacement = harness.ready()
+        replacement.response.complete("replacement")
+        assertEqual("replacement", result.await())
+        old.queuedSender!!()
+        assertEqual(0, old.effects)
+        assertEqual(1, replacement.effects)
+        assertEqual(9_900, testScheduler.currentTime)
+    }
+
+    fun testRetiredQueuedAttemptDoesNotRenewOriginalDeadline() = runTest {
+        val old = harness.ready(harness.start()).apply { queued = true }
+        val result = async { adapter().request { it.workspaceSerialized() } }
+        runCurrent()
+        advanceTimeBy(9_900)
+        harness.session.restart()
+        harness.runPendingTasks()
+        runCurrent()
+        assertFalse(result.isCompleted)
+        advanceTimeBy(100)
+        assertNull(result.await())
+        assertEqual(10_000, testScheduler.currentTime)
+        harness.ready().response.complete("too late")
+        old.queuedSender!!()
+        assertEqual(0, harness.servers.sumOf { it.effects })
     }
 
     fun testDeathAfterDispatchNeverRepeatsSideEffect() = runTest {

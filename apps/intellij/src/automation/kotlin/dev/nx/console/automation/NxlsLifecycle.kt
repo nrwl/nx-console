@@ -12,6 +12,8 @@ import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.openToolWindow
 import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
+import java.nio.file.Path
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.nanoseconds
@@ -163,6 +165,10 @@ private fun Driver.checkOpenEditors(
     editors: Map<NxlsConfigCase, NxlsEditor>,
     report: StringBuilder,
 ): Long {
+    val server = nxlsPlatformServer(project)
+    val files =
+        editors.values.map { checkNotNull(service<NxlsDocuments>().getFile(it.getDocument())) }
+    nxlsAssertTracked(server, files)
     val generations = mutableSetOf<Long>()
     for ((case, editor) in editors) {
         lifecycleStep(project, "completion/hover ${case.path}", report) {
@@ -171,8 +177,7 @@ private fun Driver.checkOpenEditors(
             check(service<NxlsEditors>(project).isFileOpen(file) && !editor.isDisposed()) {
                 "${case.path} was closed during refresh"
             }
-            // Selecting an existing tab must not conceal a lost connection by creating a new
-            // editor.
+            // Reattachment was checked for every document before any selection event.
             openFile(case.path)
             check(utility<NxlsIdentity>().identityHashCode(nxlsEditor(project)) == identity) {
                 "${case.path} was reopened in a new editor"
@@ -198,7 +203,6 @@ private fun Driver.checkOpenEditors(
             } finally {
                 nxlsHideLookup(project)
                 nxlsReplace(editor, original, 0)
-                withWriteAction { service<NxlsDocuments>().saveDocument(editor.getDocument()) }
             }
         }
     }
@@ -206,6 +210,49 @@ private fun Driver.checkOpenEditors(
         "Open editors are attached to different server generations: $generations"
     }
     return generations.single()
+}
+
+private fun unsavedBuffer(case: NxlsConfigCase): String =
+    case.buffer.replace(
+        "|",
+        "\"${case.key}\": ${if (case.key == "targetDefaults") "{}" else "[]"},\n  |",
+    )
+
+private fun Driver.checkUnsavedEditors(
+    project: Project,
+    editors: Map<NxlsConfigCase, NxlsEditor>,
+    diskBefore: Map<NxlsConfigCase, String>,
+    report: StringBuilder,
+): Long {
+    val server = nxlsPlatformServer(project)
+    val files =
+        editors.mapValues { checkNotNull(service<NxlsDocuments>().getFile(it.value.getDocument())) }
+    nxlsAssertTracked(server, files.values.toList())
+    for ((case, editor) in editors) {
+        val buffer = unsavedBuffer(case)
+        check(nxlsText(editor) == buffer.replace("|", "")) { "Unsaved edits lost in ${case.path}" }
+        check(service<NxlsDocuments>().isDocumentUnsaved(editor.getDocument())) {
+            "${case.path} was saved"
+        }
+        check(Path.of(files.getValue(case).getPath()).readText() == diskBefore.getValue(case)) {
+            "${case.path} changed on disk"
+        }
+        // This request neither selects a tab nor modifies the buffer, and bypasses lookup caches.
+        val labels =
+            server
+                .getRequestExecutor()
+                .getCompletionList(files.getValue(case), buffer.indexOf('|'), true)
+                ?.getItems()
+                ?.map { it.getLabel() }
+                .orEmpty()
+        check(case.nextKey in labels && case.key !in labels) {
+            "Replacement did not receive unsaved ${case.path}: expected ${case.nextKey}, omitted ${case.key}; got $labels"
+        }
+        report.appendLine(
+            "Generation ${server.getDescriptor().getGeneration()}: ${case.path} already tracked, unsaved text verified by LSP completion: $labels"
+        )
+    }
+    return server.getDescriptor().getGeneration()
 }
 
 fun main() = withAutomationDriver {
@@ -221,6 +268,7 @@ fun main() = withAutomationDriver {
             val hideRefreshKey = "dev.nx.console.hide_nx_refresh_notification"
             val wasHidden = properties.getBoolean(hideRefreshKey)
             properties.setValue(hideRefreshKey, false)
+            val originals = mutableMapOf<NxlsEditor, String>()
             try {
                 lifecycleStep(project, "initial tree", report) {
                     nxlsRunning(project)
@@ -240,7 +288,16 @@ fun main() = withAutomationDriver {
                             }
                         }
                     }
-                var generation = checkOpenEditors(project, editors, report)
+                val diskBefore =
+                    editors.mapValues { (case, editor) ->
+                        nxlsText(editor).also { originals[editor] = it }
+                    }
+                checkOpenEditors(project, editors, report)
+                for ((case, editor) in editors) {
+                    val buffer = unsavedBuffer(case)
+                    nxlsReplace(editor, buffer.replace("|", ""), buffer.indexOf('|'))
+                }
+                var generation = checkUnsavedEditors(project, editors, diskBefore, report)
                 // Refresh initializes this lazy service; include its listener in the baseline.
                 service<NxlsGraphServer>(project).getCurrentPort()
                 val subscriptions = refreshSubscribers(project)
@@ -281,7 +338,16 @@ fun main() = withAutomationDriver {
                         }
                         report.appendLine("After refresh ${index + 1}: ${nxlsTree()}")
                     }
-                    val next = checkOpenEditors(project, editors, report)
+                    if (index == 0) {
+                        val (case, editor) = editors.entries.first()
+                        nxlsDocumentFault(
+                            nxlsPlatformServer(project),
+                            checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument())),
+                            case.buffer.replace("|", ""),
+                        )
+                    }
+                    val next = checkUnsavedEditors(project, editors, diskBefore, report)
+                    checkOpenEditors(project, editors, report)
                     check(next > generation) {
                         "Refresh ${index + 1} left editors on old generation $generation (now $next)"
                     }
@@ -303,6 +369,10 @@ fun main() = withAutomationDriver {
                     )
                 }
             } finally {
+                for ((editor, original) in originals) {
+                    nxlsReplace(editor, original, 0)
+                    withWriteAction { service<NxlsDocuments>().saveDocument(editor.getDocument()) }
+                }
                 properties.setValue(hideRefreshKey, wasHidden)
                 autoSave.finish()
                 automationOutput()

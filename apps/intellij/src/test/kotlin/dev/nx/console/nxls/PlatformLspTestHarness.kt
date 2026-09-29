@@ -32,6 +32,8 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
     val launchedDescriptors = CopyOnWriteArrayList<NxlsServerDescriptor>()
     val lifecycleTasks = ConcurrentLinkedQueue<() -> Unit>()
     val descriptors = CopyOnWriteArrayList<NxlsServerDescriptor>()
+    var delayStopCallbacks = false
+    val pendingStops = ConcurrentLinkedQueue<() -> Unit>()
     var stops = 0
     var onStop: (() -> Unit)? = null
     var onStart: ((TestLspServer) -> Unit)? = null
@@ -56,7 +58,10 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
                         ) {
                             server.state = LspServerState.ShutdownNormally
                             onStop?.invoke()
-                            server.descriptor.lspServerListener.serverStopped(true)
+                            val stopped = {
+                                server.descriptor.lspServerListener.serverStopped(true)
+                            }
+                            if (delayStopCallbacks) pendingStops.add(stopped) else stopped()
                         }
                     }
                     Unit
@@ -109,6 +114,10 @@ internal class PlatformLspTestHarness(val project: Project, var root: VirtualFil
                 server.state = LspServerState.ShutdownUnexpectedly
             }
         }
+    }
+
+    fun deliverStopCallbacks() {
+        while (true) (pendingStops.poll() ?: return).invoke()
     }
 
     fun runLifecycleTasks() {

@@ -83,6 +83,24 @@ internal constructor(
         if (disposed || project.isDisposed) return null
         requested = true
         if (!isTrusted()) return null
+        val active = current
+        if (active != null) {
+            val server =
+                manager.getServersForProvider(NxlsServerSupportProvider::class.java).firstOrNull {
+                    it.descriptor === active.descriptor
+                }
+            if (server != null) active.server = server
+            // Discovery may run before the removed server's asynchronous shutdown callback.
+            // A descriptor with no observed server is still a pending first start.
+            if (
+                active.server != null &&
+                    (server == null ||
+                        server.state == LspServerState.ShutdownNormally ||
+                        server.state == LspServerState.ShutdownUnexpectedly)
+            ) {
+                retire()
+            }
+        }
         return (current ?: newGeneration()?.also { current = it })?.descriptor
     }
 
@@ -148,6 +166,11 @@ internal constructor(
         val removeRetired =
             synchronized(this) {
                 val active = current
+                if (active != null) {
+                    servers
+                        .firstOrNull { it.descriptor === active.descriptor }
+                        ?.let { active.server = it }
+                }
                 val obsolete = servers.any { it.descriptor !== active?.descriptor }
                 if (obsolete) {
                     // stopServers removes every server for this provider. If a different-root
@@ -187,10 +210,14 @@ internal constructor(
     internal fun beforeStart(generation: Long) {
         val allowed =
             synchronized(this) {
-                !disposed &&
-                    !project.isDisposed &&
-                    requested &&
-                    current?.descriptor?.generation == generation
+                val active = current?.takeIf { it.descriptor.generation == generation }
+                if (active != null) {
+                    manager
+                        .getServersForProvider(NxlsServerSupportProvider::class.java)
+                        .firstOrNull { it.descriptor === active.descriptor }
+                        ?.let { active.server = it }
+                }
+                !disposed && !project.isDisposed && requested && active != null
             }
         // A queued start can register after retirement, even if stopServers saw no servers.
         // Reconcile off the connector callback stack, including when launch is rejected.
@@ -205,6 +232,7 @@ internal constructor(
             manager.getServersForProvider(NxlsServerSupportProvider::class.java).firstOrNull {
                 it.descriptor === active.descriptor && it.state == LspServerState.Running
             } ?: return
+        active.server = server
         if (active.initialized) return
         active.initialized = true
         readiness.value = NxlsRunningGeneration(generation, server, active.ended)
@@ -285,6 +313,7 @@ internal constructor(
     ) {
         val ended = CompletableDeferred<Unit>()
         val bufferedRefresh = mutableListOf<Boolean>()
+        var server: LspServer? = null
         var initialized = false
         var startRequested = false
     }
