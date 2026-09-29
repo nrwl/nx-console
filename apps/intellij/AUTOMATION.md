@@ -468,7 +468,22 @@ Save these files before running. The scenario temporarily edits their IDE
 buffers, suppresses automatic saving, and restores and saves the original text
 in `finally`. Explicit saves remain enabled so a completion that force-saves
 still fails. The fixture must use an Nx installation whose run-commands
-implementation is `nx/src/executors/run-commands/run-commands.impl.js`.
+implementation is under the `nx` package and ends in
+`run-commands/run-commands.impl.js`.
+
+The scenario activates the IDE application and waits for editor focus before
+invoking completion or documentation. On macOS, bringing the frame forward alone
+does not activate the application; the completion action can then produce no
+lookup even though a direct platform request returns LSP items. Template traversal
+uses editor actions so document changes run inside an IntelliJ command.
+
+On the pinned IntelliJ 2025.3.6.1 platform, document-link navigation discards URI
+fragments: `LspDocumentLinkSymbolReference` resolves the target file and creates
+`LspNavigatableSymbol(file, null)`. An nxls link such as `nx.json#4` therefore opens
+the file without navigating to line 4. The scenario retains its destination-line
+assertion and fails on this platform behavior. Addressing it requires a platform
+fix, a separate navigation provider, or expressing these destinations through LSP
+definitions with explicit ranges; `LspDocumentLinkSupport` has no navigation hook.
 
 From the repository root, against the already running automation IDE:
 
@@ -499,9 +514,8 @@ details must render `demo` and its `hello` target. This samples these
 request paths; it does not claim individual coverage of every custom method.
 
 Extend the editor fixture above with a project named `util` rooted at
-`libs/util`, and select **Folder** in Nx Console's tool window style
-setting. Alternatively, use Automatic with at least ten projects and no project
-rooted at `libs` or the workspace root. The scenario requires both the
+`libs/util`. The scenario temporarily selects **Folder** in Nx Console's tool
+window style setting and restores the original style afterwards. It requires both the
 `demo / hello` target and the `libs / util` folder/project path, and rejects
 duplicate rendered paths. A flat list does not exercise `nx/projectFolderTree`.
 
@@ -572,7 +586,9 @@ The scenario also compares the listener class/count maps on both Nx workspace
 refresh topics before and after every refresh, detecting lost or accumulating
 subscriptions. This uses the pinned platform's message-bus introspection API
 and reads the plugin's topic fields through Driver; no test listener or
-production hook is installed. Driver remote interfaces are checked at runtime,
+production hook is installed. The lazy standard graph service is initialized
+before capturing the baseline because Refresh Nx Workspace initializes it too.
+Driver remote interfaces are checked at runtime,
 so recheck these bindings when upgrading the IDE.
 
 Every operation has EDT round trips before and after it, and refresh polling
@@ -582,7 +598,7 @@ subscriber maps, documentation, and rendered trees.
 
 Use the editor fixture with the folder-tree extension described above. No local
 generator is needed. Save the config files first. The scenario restores edited
-buffers and the automatic-save token. It temporarily enables Nx refresh
+buffers, the automatic-save token, and the original tool window style. It temporarily enables Nx refresh
 notifications, restores that preference afterwards, and leaves the three editor
 tabs open. Do not dismiss refresh notifications while it runs.
 

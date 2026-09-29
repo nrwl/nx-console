@@ -22,6 +22,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@Remote("com.intellij.ui.AppIcon")
+interface NxlsAppIcon {
+    fun getInstance(): NxlsAppIcon
+
+    fun requestFocus()
+}
+
 @Remote("com.intellij.openapi.editor.Editor")
 interface NxlsEditor : Editor {
     fun getContentComponent(): Component
@@ -147,8 +154,6 @@ interface NxlsTemplateState {
     fun getCurrentVariableNumber(): Int
 
     fun getCurrentVariableRange(): NxlsTextRange?
-
-    fun gotoEnd(brokenOff: Boolean)
 }
 
 @Remote("com.intellij.openapi.util.TextRange")
@@ -191,6 +196,7 @@ internal fun Driver.nxlsFrame(): Component =
                 toFront()
                 getBalloonLayout().closeAll()
             }
+            utility<NxlsAppIcon>().getInstance().requestFocus()
         }
     }
 
@@ -215,6 +221,33 @@ internal fun Driver.nxlsReplace(editor: NxlsEditor, text: String, offset: Int) {
     withContext(OnDispatcher.EDT) { editor.getCaretModel().moveToOffset(offset) }
 }
 
+internal fun Driver.nxlsFocusEditor(editor: NxlsEditor) {
+    withContext(OnDispatcher.EDT) {
+        // Bringing the frame forward does not activate the application on macOS.
+        utility<NxlsAppIcon>().getInstance().requestFocus()
+        editor.getContentComponent().requestFocus()
+    }
+    nxlsWait(message = { "Editor did not gain focus" }) {
+        withContext(OnDispatcher.EDT) { editor.getContentComponent().isFocusOwner() }
+    }
+}
+
+internal fun Driver.nxlsFinishTemplate(editor: NxlsEditor, cancel: Boolean = false) {
+    nxlsWait(message = { "Live template did not finish" }) {
+        val active =
+            withContext(OnDispatcher.EDT) {
+                utility<NxlsTemplates>().getTemplateState(editor)?.isFinished() == false
+            }
+        if (active) {
+            invokeAction(
+                if (cancel) "EditorEscape" else "NextTemplateVariable",
+                component = editor.getContentComponent(),
+            )
+        }
+        !active
+    }
+}
+
 internal fun Driver.nxlsHideLookup(project: Project) {
     withContext(OnDispatcher.EDT) {
         service<NxlsLookups>(project).getActiveLookup()?.hideLookup(true)
@@ -227,13 +260,20 @@ internal fun Driver.nxlsCompletion(
     expected: String,
 ): Pair<NxlsLookup, List<NxlsLookupItem>> {
     nxlsHideLookup(project)
+    nxlsFocusEditor(editor)
     invokeAction("CodeCompletion", component = editor.getContentComponent())
     var result: Pair<NxlsLookup, List<NxlsLookupItem>>? = null
     var labels = emptyList<String>()
-    nxlsWait(message = { "No LSP completion '$expected'; LSP labels: $labels" }) {
+    var lookupState = "absent"
+    nxlsWait(
+        message = { "No LSP completion '$expected'; lookup=$lookupState; LSP labels: $labels" }
+    ) {
         withContext(OnDispatcher.EDT) {
-            val lookup = service<NxlsLookups>(project).getActiveLookup() ?: return@withContext false
-            if (lookup.isCalculating()) return@withContext false
+            val lookup = service<NxlsLookups>(project).getActiveLookup()
+            lookupState =
+                if (lookup == null) "absent"
+                else "${lookup.getItems().size} items, calculating=${lookup.isCalculating()}"
+            if (lookup == null || lookup.isCalculating()) return@withContext false
             // JSON schema completion can fill the same lookup even when nxls is disconnected.
             val items =
                 lookup.getItems().filter {
@@ -257,6 +297,7 @@ internal fun Driver.nxlsDocumentation(
     val offset = nxlsText(editor).indexOf("\"$token\"")
     check(offset >= 0) { "Missing documentation token '$token'" }
     withContext(OnDispatcher.EDT) { editor.getCaretModel().moveToOffset(offset + 2) }
+    nxlsFocusEditor(editor)
     // Quick Documentation uses the platform's LSP hover provider without native pointer input.
     invokeAction("QuickJavaDoc", component = editor.getContentComponent())
     var html = ""
@@ -394,8 +435,8 @@ private fun Driver.checkSnippet(
         check(service<NxlsDocuments>().isDocumentUnsaved(document)) {
             "Completion force-saved ${case.path}"
         }
-        template.gotoEnd(false)
     }
+    nxlsFinishTemplate(editor)
     check(disk.readText() == diskBefore) { "Completion changed ${case.path} on disk" }
     val after = nxlsText(editor)
     // Probe the same object again: the server must omit the property just inserted, even on disk it
@@ -445,9 +486,13 @@ private fun Driver.checkNavigation(
             ?.endsWith("/nx.json") == true
     }
     val destination = nxlsEditor(project)
-    val line = destination.getDocument().getLineNumber(destination.getCaretModel().getOffset())
-    check(links.any { it.endsWith("#${line + 1}") }) {
-        "Document link opened wrong line: ${line + 1}; $links"
+    var line = -1
+    nxlsWait(message = { "Document link opened wrong line: ${line + 1}; $links" }) {
+        line =
+            withContext(OnDispatcher.EDT) {
+                destination.getDocument().getLineNumber(destination.getCaretModel().getOffset())
+            }
+        links.any { it.endsWith("#${line + 1}") }
     }
     openFile("demo/project.json")
     withContext(OnDispatcher.EDT) {
@@ -455,10 +500,9 @@ private fun Driver.checkNavigation(
     }
     invokeAction("GotoDeclaration", component = editor.getContentComponent())
     nxlsWait(message = { "Definition did not open the nx:run-commands implementation" }) {
-        service<NxlsDocuments>()
-            .getFile(nxlsEditor(project).getDocument())
-            ?.getPath()
-            ?.endsWith("/nx/src/executors/run-commands/run-commands.impl.js") == true
+        service<NxlsDocuments>().getFile(nxlsEditor(project).getDocument())?.getPath()?.let {
+            it.contains("/nx/") && it.endsWith("/run-commands/run-commands.impl.js")
+        } == true
     }
     report.appendLine(
         "Document links: $links; resolved nx.json line ${line + 1}; definition opened run-commands.impl.js"
@@ -493,13 +537,9 @@ fun main() = withAutomationDriver {
                         checkNavigation(project, editor, server, report)
                 } finally {
                     nxlsHideLookup(project)
-                    withContext(OnDispatcher.EDT) {
-                        utility<NxlsTemplates>().getTemplateState(editor)?.gotoEnd(true)
-                    }
+                    nxlsFinishTemplate(editor, cancel = true)
                     nxlsReplace(editor, original, 0)
-                    withContext(OnDispatcher.EDT) {
-                        service<NxlsDocuments>().saveDocument(editor.getDocument())
-                    }
+                    withWriteAction { service<NxlsDocuments>().saveDocument(editor.getDocument()) }
                 }
             }
         } finally {

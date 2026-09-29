@@ -22,6 +22,11 @@ interface NxlsEventLog {
     fun getLogModel(project: Project): NxlsLogModel
 }
 
+@Remote("StandardNxGraphServer", plugin = "dev.nx.console")
+interface NxlsGraphServer {
+    fun getCurrentPort(): Int?
+}
+
 @Remote("com.intellij.notification.LogModel")
 interface NxlsLogModel {
     fun getNotifications(): List<NxlsNotification>
@@ -193,9 +198,7 @@ private fun Driver.checkOpenEditors(
             } finally {
                 nxlsHideLookup(project)
                 nxlsReplace(editor, original, 0)
-                withContext(OnDispatcher.EDT) {
-                    service<NxlsDocuments>().saveDocument(editor.getDocument())
-                }
+                withWriteAction { service<NxlsDocuments>().saveDocument(editor.getDocument()) }
             }
         }
     }
@@ -211,90 +214,101 @@ fun main() = withAutomationDriver {
     val frame = nxlsFrame()
     val report = StringBuilder()
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "nxls-lifecycle"
-    recordIde(label) {
-        val autoSave = service<NxlsAutoSave>().disableAutoSave()
-        val properties = service<NxlsProperties>(project)
-        val hideRefreshKey = "dev.nx.console.hide_nx_refresh_notification"
-        val wasHidden = properties.getBoolean(hideRefreshKey)
-        properties.setValue(hideRefreshKey, false)
-        try {
-            lifecycleStep(project, "initial tree", report) {
-                nxlsRunning(project)
-                openToolWindow("Nx Console")
-                report.appendLine("Initial tree: ${nxlsTree()}")
-            }
-            val editors =
-                nxlsConfigCases.associateWith { case ->
-                    lifecycleStep(project, "open ${case.path}", report) {
-                        openFile(case.path)
-                        nxlsEditor(project).also {
-                            check(!service<NxlsDocuments>().isDocumentUnsaved(it.getDocument())) {
-                                "Save ${case.path} before running"
+    nxlsWithFolderTree(project) {
+        recordIde(label) {
+            val autoSave = service<NxlsAutoSave>().disableAutoSave()
+            val properties = service<NxlsProperties>(project)
+            val hideRefreshKey = "dev.nx.console.hide_nx_refresh_notification"
+            val wasHidden = properties.getBoolean(hideRefreshKey)
+            properties.setValue(hideRefreshKey, false)
+            try {
+                lifecycleStep(project, "initial tree", report) {
+                    nxlsRunning(project)
+                    openToolWindow("Nx Console")
+                    report.appendLine("Initial tree: ${nxlsTree()}")
+                }
+                val editors =
+                    nxlsConfigCases.associateWith { case ->
+                        lifecycleStep(project, "open ${case.path}", report) {
+                            openFile(case.path)
+                            nxlsEditor(project).also {
+                                check(
+                                    !service<NxlsDocuments>().isDocumentUnsaved(it.getDocument())
+                                ) {
+                                    "Save ${case.path} before running"
+                                }
                             }
                         }
                     }
+                var generation = checkOpenEditors(project, editors, report)
+                // Refresh initializes this lazy service; include its listener in the baseline.
+                service<NxlsGraphServer>(project).getCurrentPort()
+                val subscriptions = refreshSubscribers(project)
+                check(subscriptions.values.all { it.isNotEmpty() }) {
+                    "No refresh subscribers: $subscriptions"
                 }
-            var generation = checkOpenEditors(project, editors, report)
-            val subscriptions = refreshSubscribers(project)
-            check(subscriptions.values.all { it.isNotEmpty() }) {
-                "No refresh subscribers: $subscriptions"
-            }
-            report.appendLine("Refresh subscribers: $subscriptions")
-            repeat(3) { index ->
-                val before = refreshNotifications(project).keys
-                val rootBefore = treeRootIdentity()
-                lifecycleStep(project, "refresh ${index + 1}", report) {
-                    invokeAction("dev.nx.console.nxls.NxRefreshWorkspaceAction", component = frame)
-                    nxlsWait(
-                        3.minutes,
-                        {
-                            "Refresh ${index + 1} did not complete; notifications: ${refreshNotifications(project)}"
-                        },
-                    ) {
-                        edtProbe(project, "refresh ${index + 1} pending", report)
-                        val fresh =
-                            refreshNotifications(project).filterKeys { it !in before }.values
-                        check(fresh.none { it.contains("Error refreshing workspace") }) {
-                            "Refresh failed: $fresh"
+                report.appendLine("Refresh subscribers: $subscriptions")
+                repeat(3) { index ->
+                    val before = refreshNotifications(project).keys
+                    val rootBefore = treeRootIdentity()
+                    lifecycleStep(project, "refresh ${index + 1}", report) {
+                        invokeAction(
+                            "dev.nx.console.nxls.NxRefreshWorkspaceAction",
+                            component = frame,
+                        )
+                        nxlsWait(
+                            3.minutes,
+                            {
+                                "Refresh ${index + 1} did not complete; notifications: ${refreshNotifications(project)}"
+                            },
+                        ) {
+                            edtProbe(project, "refresh ${index + 1} pending", report)
+                            val fresh =
+                                refreshNotifications(project).filterKeys { it !in before }.values
+                            check(fresh.none { it.contains("Error refreshing workspace") }) {
+                                "Refresh failed: $fresh"
+                            }
+                            fresh.any { it.contains(REFRESH_SUCCESS) }
                         }
-                        fresh.any { it.contains(REFRESH_SUCCESS) }
+                        nxlsRunning(project)
+                        nxlsWait(
+                            message = {
+                                "Refresh ${index + 1} did not rebuild the rendered tree model"
+                            }
+                        ) {
+                            edtProbe(project, "refresh ${index + 1} tree rebuild", report)
+                            treeRootIdentity() != rootBefore
+                        }
+                        report.appendLine("After refresh ${index + 1}: ${nxlsTree()}")
                     }
-                    nxlsRunning(project)
-                    nxlsWait(
-                        message = { "Refresh ${index + 1} did not rebuild the rendered tree model" }
-                    ) {
-                        edtProbe(project, "refresh ${index + 1} tree rebuild", report)
-                        treeRootIdentity() != rootBefore
+                    val next = checkOpenEditors(project, editors, report)
+                    check(next > generation) {
+                        "Refresh ${index + 1} left editors on old generation $generation (now $next)"
                     }
-                    report.appendLine("After refresh ${index + 1}: ${nxlsTree()}")
+                    generation = next
+                    val subscribersAfter = refreshSubscribers(project)
+                    check(subscribersAfter == subscriptions) {
+                        "Refresh subscriptions changed: before=$subscriptions, after=$subscribersAfter"
+                    }
+                    val successes =
+                        refreshNotifications(project)
+                            .filterKeys { it !in before }
+                            .values
+                            .count { it.contains(REFRESH_SUCCESS) }
+                    check(successes == 1) {
+                        "Refresh ${index + 1} produced $successes success notifications"
+                    }
+                    report.appendLine(
+                        "Refresh ${index + 1}: exactly one success, generation=$generation, original editors still functional"
+                    )
                 }
-                val next = checkOpenEditors(project, editors, report)
-                check(next > generation) {
-                    "Refresh ${index + 1} left editors on old generation $generation (now $next)"
-                }
-                generation = next
-                val subscribersAfter = refreshSubscribers(project)
-                check(subscribersAfter == subscriptions) {
-                    "Refresh subscriptions changed: before=$subscriptions, after=$subscribersAfter"
-                }
-                val successes =
-                    refreshNotifications(project)
-                        .filterKeys { it !in before }
-                        .values
-                        .count { it.contains(REFRESH_SUCCESS) }
-                check(successes == 1) {
-                    "Refresh ${index + 1} produced $successes success notifications"
-                }
-                report.appendLine(
-                    "Refresh ${index + 1}: exactly one success, generation=$generation, original editors still functional"
-                )
+            } finally {
+                properties.setValue(hideRefreshKey, wasHidden)
+                autoSave.finish()
+                automationOutput()
+                    .resolve("$label-${System.currentTimeMillis()}.txt")
+                    .writeText(report.toString())
             }
-        } finally {
-            properties.setValue(hideRefreshKey, wasHidden)
-            autoSave.finish()
-            automationOutput()
-                .resolve("$label-${System.currentTimeMillis()}.txt")
-                .writeText(report.toString())
         }
     }
 }
