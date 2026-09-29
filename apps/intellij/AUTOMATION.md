@@ -570,6 +570,11 @@ NX_AUTOMATION_LABEL=nxls-custom-requests CI=true \
 The report saves the rendered tree, generator rows, form defaults, and project
 details text. Running a target is covered separately by `ReproRunArgumentsKt`.
 
+Run each platform LSP scenario against a freshly launched automation IDE. They
+leave editors, lookups, tool window style and Generate UI webviews behind, and
+running several in sequence against one IDE has produced failures that do not
+reproduce on a clean launch.
+
 ### Platform LSP lifecycle and editor reconnection
 
 `NxlsLifecycleKt` starts with a populated folder tree and opens all three config
