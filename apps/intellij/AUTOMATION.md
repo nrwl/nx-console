@@ -394,10 +394,10 @@ Marketplace freeze dashboard, whose largest cluster was
 to write the `didOpen` notification into the nxls stdin pipe on the EDT, which
 blocks for as long as the language server is not draining that pipe.
 
-The scenario opens `nx.json` and `package.json`, waits until `NxlsService`
-reports each editor as connected, types into one of them, and closes them all.
-Around every step it times a round trip through the EDT and fails if any of them
-took longer than two seconds.
+The scenario opens `nx.json` and `package.json`, checks the platform LSP server's
+open-document state, types into one of them, and closes them all. A heartbeat
+on a separate Driver connection probes the EDT throughout these operations and
+fails if a round trip takes longer than two seconds.
 
 Any Nx workspace works as the fixture; no extra setup is needed.
 
@@ -408,15 +408,9 @@ NX_AUTOMATION_LABEL=nxc-5033-repro CI=true \
   --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproEditorFreezeKt'
 ```
 
-Before the fix the scenario fails on the connection check rather than on a
-timing threshold: `NxlsWrapper.isEditorConnected` resolved to
-`ConcurrentHashMap.contains`, which compares values instead of keys and so never
-matched, leaving `editorReleased` unable to disconnect a document.
-
-The EDT thresholds are a regression guard rather than a reproduction. Forcing a
-live nxls to stop reading its stdin is not something the harness can arrange, so
-the deterministic proof of the freeze lives in `DocumentManagerTest`, which
-holds a send open and asserts the dispatch thread stays free.
+The negative controls below demonstrate detection of an in-operation freeze and
+a disconnected document. Transport blocking is also covered by the deterministic
+`NxlsTransportFreezeTest` and `NxlsPlatformExecutorTest` unit tests.
 
 ### Platform LSP editor features
 
@@ -582,7 +576,14 @@ more, awaiting a fresh success notification, a replaced tree-model root, and a
 populated tree after each invocation. Refresh errors, a missing completion notification, duplicate tree
 paths, and duplicate success notifications fail the scenario.
 
-After every refresh, completion and Quick Documentation must still work in the
+Before selecting any tab after a refresh, the replacement's platform LSP
+`openedFiles` state must already include all three documents. Each buffer keeps
+an unsaved property across the restart; a direct completion request to the new
+server must omit that property and offer another known property. The request
+does not select a tab, edit text, or use the UI lookup cache. Disk contents must
+remain unchanged. This checks both reattachment and receipt of unsaved text.
+
+After these checks, completion and Quick Documentation must still work in the
 original editor instances, including the rendered `nx.dev` executor link. The
 LSP completion items must all belong to one new
 server generation, newer than before the refresh. This catches stale results
@@ -616,3 +617,25 @@ NX_AUTOMATION_LABEL=nxls-lifecycle CI=true \
 
 Capture baseline and post-migration runs against the same fixture using distinct
 labels. Compilation and unit tests do not substitute for these live-IDE runs.
+
+### Negative controls for lifecycle and freeze coverage
+
+`ReproEditorFreezeKt` runs an EDT heartbeat through a separate Driver connection
+throughout opening, typing, restoring, and closing documents. Every sample must
+finish within two seconds, including samples queued during an operation. Its
+connection checks read the platform LSP document state, and closing must remove
+the documents from that state. The scenario records a video and `result.txt`.
+
+Set `NX_AUTOMATION_FAULT` for a deliberate failing run. Each control changes only
+the live IDE/server, leaving the fixture on disk intact:
+
+| Scenario | Fault | Expected failure |
+| --- | --- | --- |
+| `NxlsLifecycleKt` | `missing-document` | After the first refresh, send `didClose` for one document; the pre-selection tracking assertion fails. |
+| `NxlsLifecycleKt` | `stale-document` | Replace one server-side document with text missing its unsaved property; the direct completion assertion fails. |
+| `ReproEditorFreezeKt` | `edt-freeze` | Sleep on the EDT for three seconds inside the open operation; the concurrent heartbeat exceeds two seconds. |
+| `ReproEditorFreezeKt` | `disconnected-document` | Send `didClose` while the editor stays open; the platform tracking assertion fails. |
+
+Run each negative control in a freshly launched IDE, just like positive runs.
+Omit `NX_AUTOMATION_FAULT` for normal validation. A failing control must name the
+expected assertion; an unrelated failure does not demonstrate coverage.

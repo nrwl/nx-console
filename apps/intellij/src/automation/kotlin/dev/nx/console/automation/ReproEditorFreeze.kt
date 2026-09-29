@@ -3,15 +3,19 @@ package dev.nx.console.automation
 import com.intellij.driver.client.Driver
 import com.intellij.driver.client.Remote
 import com.intellij.driver.client.service
+import com.intellij.driver.client.utility
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Project
-import com.intellij.driver.sdk.closeToolWindow
 import com.intellij.driver.sdk.getOpenProjects
 import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.openFile
-import com.intellij.driver.sdk.ui.remote.Component
-import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.thread
 import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -21,125 +25,138 @@ import kotlin.time.Duration.Companion.seconds
 @Remote("dev.nx.console.nxls.NxlsService", plugin = "dev.nx.console")
 interface EditorFreezeNxlsService {
     fun isStarted(): Boolean
-
-    fun isEditorConnected(editor: EditorFreezeEditor): Boolean
 }
 
-@Remote("com.intellij.openapi.editor.Editor") interface EditorFreezeEditor
-
-@Remote("com.intellij.openapi.fileEditor.FileEditorManager")
-interface EditorFreezeFileEditorManager {
-    fun getSelectedTextEditor(): EditorFreezeEditor?
+@Remote("java.lang.Thread")
+interface NxlsFreezeControl {
+    fun sleep(millis: Long)
 }
 
-/**
- * Files that make [dev.nx.console.listeners.NxEditorListener] talk to nxls when they are opened.
- */
-private val NX_CONFIG_FILES = listOf("nx.json", "package.json")
-
-/**
- * The longest an EDT round trip may take. Anything above this is what the IDE itself would count as
- * a freeze, and what JetBrains' Marketplace freeze reports record.
- */
 private val MAX_EDT_ROUND_TRIP = 2.seconds
 
-private fun waitUntil(timeout: Duration, message: () -> String, condition: () -> Boolean) {
-    val deadline = System.nanoTime() + timeout.inWholeNanoseconds
-    while (!condition()) {
-        check(System.nanoTime() < deadline, message)
-        Thread.sleep(250)
-    }
-}
-
-/**
- * Times a trivial piece of work on the EDT.
- *
- * Every LSP notification Nx Console sends for an open config file used to be written into the nxls
- * stdin pipe on the EDT, so a server that was busy starting up or recomputing the project graph
- * would park the UI thread inside that write. Measuring a round trip is how that shows up here.
- */
 private fun Driver.edtRoundTrip(project: Project): Duration {
     val started = System.nanoTime()
     withContext(OnDispatcher.EDT) { service<EditorFreezeNxlsService>(project).isStarted() }
     return (System.nanoTime() - started).nanoseconds
 }
 
-private fun Driver.selectedEditor(project: Project): EditorFreezeEditor =
-    withContext(OnDispatcher.EDT) {
-        checkNotNull(service<EditorFreezeFileEditorManager>(project).getSelectedTextEditor()) {
-            "No editor is selected"
+private fun Driver.withEdtHeartbeat(
+    project: Project,
+    report: StringBuilder,
+    operations: () -> Unit,
+) {
+    val running = AtomicBoolean(true)
+    val ready = CountDownLatch(1)
+    val failure = AtomicReference<Throwable>()
+    val latencies = ConcurrentLinkedQueue<Duration>()
+    val heartbeat =
+        thread(name = "nxls-edt-heartbeat", isDaemon = true) {
+            try {
+                // Use a separate JMX connection so a blocking operation cannot serialize the
+                // probes.
+                withAutomationDriver {
+                    while (running.get()) {
+                        latencies.add(edtRoundTrip(project))
+                        ready.countDown()
+                        Thread.sleep(50)
+                    }
+                }
+            } catch (error: Throwable) {
+                failure.set(error)
+                ready.countDown()
+            }
+        }
+    try {
+        check(ready.await(30, TimeUnit.SECONDS)) { "EDT heartbeat did not start" }
+        failure.get()?.let { throw it }
+        operations()
+    } finally {
+        running.set(false)
+        heartbeat.join(30_000)
+        check(!heartbeat.isAlive) { "EDT heartbeat did not finish" }
+        failure.get()?.let { throw it }
+        val worst = checkNotNull(latencies.maxOrNull()) { "No EDT heartbeat samples" }
+        report.appendLine(
+            "EDT heartbeat: ${latencies.size} samples, worst=$worst (limit=$MAX_EDT_ROUND_TRIP)"
+        )
+        check(worst < MAX_EDT_ROUND_TRIP) {
+            "The EDT was blocked for $worst during editor operations\n$report"
         }
     }
-
-private fun Driver.prepareFrame(): Component {
-    val frame = ui.x("//div[@class='IdeFrameImpl']").component
-    withContext(OnDispatcher.EDT) {
-        cast(frame, GraphIdeFrame::class).apply {
-            setExtendedState(0)
-            toFront()
-            getBalloonLayout().closeAll()
-        }
-    }
-    runCatching { invokeAction("CloseAllEditors", component = frame) }
-    runCatching { closeToolWindow("Project") }
-    return frame
 }
 
 fun main() = withAutomationDriver {
     waitForProjectOpen(2.minutes)
     val project = getOpenProjects().single()
-    val frame = prepareFrame()
-    val nxls = service<EditorFreezeNxlsService>(project)
-
-    waitUntil(5.minutes, { "nxls never reported itself as started" }) {
-        withContext(OnDispatcher.EDT) { nxls.isStarted() }
+    val frame = nxlsFrame()
+    nxlsRunning(project)
+    if (service<NxlsEditors>(project).getOpenFiles().isNotEmpty()) {
+        invokeAction("CloseAllEditors", component = frame)
     }
-
-    val report = StringBuilder()
-    report.appendLine("Nx Console editor freeze scenario")
-    report.appendLine("Workspace: ${project.getBasePath()}")
-    report.appendLine()
-
-    val latencies = mutableMapOf<String, Duration>()
-
-    for (path in NX_CONFIG_FILES) {
-        openFile(path)
-        val editor = selectedEditor(project)
-
-        latencies["open $path"] = edtRoundTrip(project)
-
-        waitUntil(60.seconds, { "nxls never took ownership of $path" }) {
-            withContext(OnDispatcher.EDT) { nxls.isEditorConnected(editor) }
+    val label = System.getenv("NX_AUTOMATION_LABEL") ?: "editor-freeze"
+    val report = StringBuilder("Nx Console editor freeze scenario\n")
+    val originals = mutableMapOf<NxlsEditor, String>()
+    val autoSave = service<NxlsAutoSave>().disableAutoSave()
+    recordIde(label) {
+        try {
+            withEdtHeartbeat(project, report) {
+                for (path in listOf("nx.json", "package.json")) {
+                    openFile(path)
+                    val editor = nxlsEditor(project)
+                    check(!service<NxlsDocuments>().isDocumentUnsaved(editor.getDocument())) {
+                        "Save $path before running"
+                    }
+                    originals[editor] = nxlsText(editor)
+                    if (System.getenv("NX_AUTOMATION_FAULT") == "edt-freeze") {
+                        withContext(OnDispatcher.EDT) { utility<NxlsFreezeControl>().sleep(3_000) }
+                    }
+                    val file = checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument()))
+                    val server = nxlsPlatformServer(project)
+                    nxlsWait(message = { "$path was never opened by platform LSP" }) {
+                        server.`isFileOpened$intellij_platform_lsp_impl`(file)
+                    }
+                    nxlsDocumentFault(server, file, originals.getValue(editor))
+                    nxlsAssertTracked(server, listOf(file))
+                    report.appendLine("$path: platform LSP tracks the document")
+                }
+                openFile("nx.json")
+                val editor = nxlsEditor(project)
+                nxlsFocusEditor(editor)
+                repeat(10) { invokeAction("EditorEnter", component = editor.getContentComponent()) }
+                repeat(10) {
+                    invokeAction("EditorBackSpace", component = editor.getContentComponent())
+                }
+                nxlsAssertTracked(
+                    nxlsPlatformServer(project),
+                    originals.keys.map {
+                        checkNotNull(service<NxlsDocuments>().getFile(it.getDocument()))
+                    },
+                )
+                for ((opened, original) in originals) {
+                    nxlsReplace(opened, original, 0)
+                    withWriteAction { service<NxlsDocuments>().saveDocument(opened.getDocument()) }
+                }
+                val files =
+                    originals.keys.map {
+                        checkNotNull(service<NxlsDocuments>().getFile(it.getDocument()))
+                    }
+                invokeAction("CloseAllEditors", component = frame)
+                nxlsWait(message = { "Platform LSP still tracks closed documents" }) {
+                    files.none {
+                        nxlsPlatformServer(project).`isFileOpened$intellij_platform_lsp_impl`(it)
+                    }
+                }
+                report.appendLine("Typing and closing: platform document lifecycle verified")
+            }
+        } finally {
+            for ((editor, original) in originals) {
+                if (!editor.isDisposed()) nxlsReplace(editor, original, 0)
+                withWriteAction { service<NxlsDocuments>().saveDocument(editor.getDocument()) }
+            }
+            autoSave.finish()
+            automationOutput()
+                .resolve("$label-${System.currentTimeMillis()}.txt")
+                .writeText(report.toString())
         }
-        report.appendLine("$path: connected to nxls, EDT round trip ${latencies["open $path"]}")
-    }
-
-    // Every keystroke in a tracked file produces a didChange, which is the same transport.
-    openFile(NX_CONFIG_FILES.first())
-    val typedIn = selectedEditor(project)
-    repeat(10) { invokeAction("EditorEnter", component = frame) }
-    latencies["typing"] = edtRoundTrip(project)
-    report.appendLine("after 10 keystrokes: EDT round trip ${latencies["typing"]}")
-    repeat(10) { invokeAction("EditorBackSpace", component = frame) }
-
-    check(
-        withContext(OnDispatcher.EDT) { nxls.isEditorConnected(typedIn) },
-        { "The edited file stopped being tracked by nxls" },
-    )
-
-    invokeAction("CloseAllEditors", component = frame)
-    latencies["close"] = edtRoundTrip(project)
-    report.appendLine("after closing every editor: EDT round trip ${latencies["close"]}")
-
-    val worst = latencies.maxBy { it.value }
-    report.appendLine()
-    report.appendLine("Worst EDT round trip: ${worst.value} during '${worst.key}'")
-    println(report)
-    automationOutput()
-        .resolve("editor-freeze-${System.currentTimeMillis()}.txt")
-        .writeText(report.toString())
-
-    check(worst.value < MAX_EDT_ROUND_TRIP) {
-        "The EDT was blocked for ${worst.value} during '${worst.key}'\n\n$report"
     }
 }

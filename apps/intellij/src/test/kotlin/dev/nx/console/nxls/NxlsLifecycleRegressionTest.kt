@@ -39,6 +39,36 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
         }
     }
 
+    fun testWidgetRestartBeforeShutdownCallbackUsesFreshGeneration() {
+        checkWidgetRestart(initialized = true)
+    }
+
+    fun testWidgetRestartDuringInitializationUsesFreshGeneration() {
+        checkWidgetRestart(initialized = false)
+    }
+
+    private fun checkWidgetRestart(initialized: Boolean) {
+        val old = harness.start()
+        if (initialized) harness.ready(old)
+        val ended = harness.session.ready.value?.ended
+        harness.delayStopCallbacks = true
+        harness.manager.stopServers(NxlsServerSupportProvider::class.java)
+        assertEqual(1, harness.pendingStops.size)
+        val discovered = mutableListOf<LspServerDescriptor>()
+        NxlsServerSupportProvider()
+            .fileOpened(project, LightVirtualFile("nx.json"), starter(discovered))
+        val descriptor = discovered.single() as NxlsServerDescriptor
+        assertTrue(descriptor.generation > old.descriptor.generation)
+        if (initialized) assertTrue(checkNotNull(ended).isCompleted)
+        harness.manager.ensureServerStarted(NxlsServerSupportProvider::class.java, descriptor)
+        val replacement = harness.ready()
+        harness.deliverStopCallbacks()
+        assertSame(replacement, harness.session.ready.value?.server)
+        assertFalse(checkNotNull(harness.session.ready.value).ended.isCompleted)
+        assertEqual(listOf(replacement), harness.registeredServers.toList())
+        assertEqual(2, harness.servers.size)
+    }
+
     fun testCancelledDiscoveryCanBeRetried() {
         val provider = NxlsServerSupportProvider()
         val discarded = mutableListOf<LspServerDescriptor>()

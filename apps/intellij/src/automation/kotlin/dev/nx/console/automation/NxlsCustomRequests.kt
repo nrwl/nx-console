@@ -153,7 +153,9 @@ fun main() = withAutomationDriver {
                 nxlsRunning(project)
                 openToolWindow("Nx Console")
                 report.appendLine("Rendered project/folder tree: ${nxlsTree()}")
-                invokeAction("CloseAllEditors", component = frame)
+                if (service<NxlsEditors>(project).getOpenFiles().isNotEmpty()) {
+                    invokeAction("CloseAllEditors", component = frame)
+                }
                 nxlsChooseGenerator(frame, report)
                 nxlsGeneratorOptions(report)
                 // Keep the JCEF selector unambiguous when switching from Generate UI to project

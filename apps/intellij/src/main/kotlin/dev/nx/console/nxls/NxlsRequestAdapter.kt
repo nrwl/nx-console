@@ -2,7 +2,7 @@ package dev.nx.console.nxls
 
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -38,14 +38,17 @@ internal constructor(private val getSession: () -> NxlsSession, private val nowM
                 withTimeoutOrNull(remaining) {
                     session.ready.filterNotNull().first { session.isCurrent(it) }
                 } ?: return null
-            val invoked = AtomicBoolean()
+            val dispatch = AtomicReference(Dispatch.PENDING)
             val outcome = supervisorScope {
                 val response = async {
                     running.server.sendRequest { server ->
-                        invoked.set(true)
                         try {
-                            if (session.isCurrent(running)) sender(server as NxlsLanguageServer)
-                            else CompletableFuture.failedFuture(GenerationEnded())
+                            if (!session.isCurrent(running)) {
+                                dispatch.compareAndSet(Dispatch.PENDING, Dispatch.ABANDONED)
+                            }
+                            if (dispatch.compareAndSet(Dispatch.PENDING, Dispatch.DISPATCHED)) {
+                                sender(server as NxlsLanguageServer)
+                            } else CompletableFuture.failedFuture(GenerationEnded())
                         } catch (error: Throwable) {
                             // Escaping on the platform executor would abandon its response future.
                             CompletableFuture.failedFuture(error)
@@ -54,22 +57,30 @@ internal constructor(private val getSession: () -> NxlsSession, private val nowM
                 }
                 try {
                     // Queued platform requests can be abandoned without completing their futures.
-                    select {
-                        running.ended.onAwait { Outcome<T>(null, true) }
-                        response.onAwait { Outcome(it, false) }
+                    select<T?> {
+                        running.ended.onAwait {
+                            dispatch.compareAndSet(Dispatch.PENDING, Dispatch.ABANDONED)
+                            null
+                        }
+                        response.onAwait { it }
                     }
                 } catch (_: GenerationEnded) {
-                    Outcome<T>(null, true)
+                    null
                 } finally {
+                    dispatch.compareAndSet(Dispatch.PENDING, Dispatch.ABANDONED)
                     response.cancel()
                 }
             }
-            if (outcome.ended || invoked.get()) return outcome.value
+            if (dispatch.get() == Dispatch.DISPATCHED) return outcome
             session.dispatchDeclined(running)
         }
     }
 
     private class GenerationEnded : RuntimeException()
 
-    private class Outcome<T>(val value: T?, val ended: Boolean)
+    private enum class Dispatch {
+        PENDING,
+        DISPATCHED,
+        ABANDONED,
+    }
 }
