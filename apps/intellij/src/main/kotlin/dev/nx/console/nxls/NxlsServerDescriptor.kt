@@ -1,6 +1,6 @@
 package dev.nx.console.nxls
 
-import com.intellij.openapi.progress.runBlockingCancellable
+import kotlinx.coroutines.runBlocking
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerDescriptor
@@ -31,7 +31,9 @@ internal constructor(
         super.startServerProcess()
     }
 
-    override fun createCommandLine() = runBlockingCancellable {
+    // The platform calls this from a pooled thread whose context has been reset, so there is no
+    // Job to attach to and a cancellable wait would throw.
+    override fun createCommandLine() = runBlocking {
         NxlsCommandLineBuilder(NxlsWorkspaceSnapshot.capture(project, workspacePath)).build().also {
             checkBeforeStart()
         }
