@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServer
 import com.intellij.platform.lsp.api.LspServerManager
 import com.intellij.platform.lsp.api.LspServerState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,6 +94,7 @@ internal constructor(
 
     @Synchronized
     fun stop() {
+        if (!requested && current == null) return
         requested = false
         retire()
         manager.stopServers(NxlsServerSupportProvider::class.java)
@@ -102,6 +104,23 @@ internal constructor(
     fun restart() {
         stop()
         ensureStarted()
+    }
+
+    @Synchronized
+    internal fun restartWithRefreshTicket(): Deferred<Unit> {
+        stop()
+        val root = workspaceRoot ?: resolveRoot()
+        if (root == null || disposed || project.isDisposed) {
+            return CompletableDeferred<Unit>().also {
+                it.cancel(CancellationException("Nx workspace is unavailable"))
+            }
+        }
+        val generation = Generation(NxlsServerDescriptor(project, root, ++nextGeneration, this))
+        current = generation
+        // Install the ticket before ensureServerStarted can deliver any callbacks.
+        val ticket = generation.refreshed
+        ensureStarted()
+        return ticket
     }
 
     @Synchronized
@@ -118,7 +137,37 @@ internal constructor(
             manager.getServersForProvider(NxlsServerSupportProvider::class.java).firstOrNull {
                 it.descriptor === active.descriptor && it.state == LspServerState.Running
             } ?: return
+        if (active.initialized) return
+        active.initialized = true
         readiness.value = NxlsRunningGeneration(generation, server, active.ended)
+        publishRefresh(active, started = true)
+        val buffered = active.bufferedRefresh.toList()
+        active.bufferedRefresh.clear()
+        for (started in buffered) {
+            if (current !== active) break
+            publishRefresh(active, started)
+        }
+    }
+
+    @Synchronized
+    internal fun workspaceRefresh(generation: Long, started: Boolean) {
+        if (disposed || project.isDisposed) return
+        val active = current?.takeIf { it.descriptor.generation == generation } ?: return
+        if (!active.initialized) active.bufferedRefresh.add(started)
+        else publishRefresh(active, started)
+    }
+
+    private fun publishRefresh(active: Generation, started: Boolean) {
+        if (started) {
+            project.messageBus
+                .syncPublisher(NxlsService.NX_WORKSPACE_REFRESH_STARTED_TOPIC)
+                .onWorkspaceRefreshStarted()
+        } else {
+            active.refreshed.complete(Unit)
+            project.messageBus
+                .syncPublisher(NxlsService.NX_WORKSPACE_REFRESH_TOPIC)
+                .onNxWorkspaceRefresh()
+        }
     }
 
     @Synchronized
@@ -152,6 +201,7 @@ internal constructor(
         current = null
         readiness.value = null
         retired?.ended?.complete(Unit)
+        retired?.refreshed?.cancel(CancellationException("Nx language server generation ended"))
     }
 
     @Synchronized
@@ -163,6 +213,9 @@ internal constructor(
 
     private class Generation(val descriptor: NxlsServerDescriptor) {
         val ended = CompletableDeferred<Unit>()
+        val refreshed = CompletableDeferred<Unit>()
+        val bufferedRefresh = mutableListOf<Boolean>()
+        var initialized = false
         var startRequested = false
     }
 

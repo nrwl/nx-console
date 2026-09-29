@@ -1,8 +1,9 @@
-package dev.nx.console.nxls.managers
+package dev.nx.console.nxls
 
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
@@ -10,18 +11,12 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams
 import org.eclipse.lsp4j.DidCloseTextDocumentParams
 import org.eclipse.lsp4j.DidOpenTextDocumentParams
 import org.eclipse.lsp4j.DidSaveTextDocumentParams
+import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints
 import org.eclipse.lsp4j.services.TextDocumentService
 
 private const val AWAIT_TIMEOUT_SECONDS = 30L
 
-/**
- * Covers what [DocumentManager] puts on the wire.
- *
- * Keeping those messages off the dispatch thread is not its job. That happens below it, in the
- * message consumer the launcher is built with, and is covered against the real transport by
- * `dev.nx.console.nxls.NxlsTransportFreezeTest`.
- */
-class DocumentManagerTest : BasePlatformTestCase() {
+class NxlsPlatformDocumentSyncTest : BasePlatformTestCase() {
 
     private class RecordingTextDocumentService : TextDocumentService {
         val sent = LinkedBlockingQueue<String>()
@@ -47,22 +42,26 @@ class DocumentManagerTest : BasePlatformTestCase() {
 
     private lateinit var service: RecordingTextDocumentService
     private lateinit var editor: Editor
-    private lateinit var manager: DocumentManager
+    private lateinit var harness: SdkLspTestHarness
 
     override fun setUp() {
         super.setUp()
         service = RecordingTextDocumentService()
-        myFixture.configureByText("project.json", "{}")
+        myFixture.configureFromExistingVirtualFile(
+            myFixture.addFileToProject("project.json", "{}").virtualFile
+        )
         editor = myFixture.editor
-        manager = DocumentManager.getInstance(editor)
-        manager.addTextDocumentService(service)
+        val remote =
+            ServiceEndpoints.toServiceObject(
+                ServiceEndpoints.toEndpoint(service),
+                NxlsLanguageServer::class.java,
+            )
+        harness = SdkLspTestHarness(project, myFixture.file.virtualFile.parent, remote)
     }
 
     override fun tearDown() {
         try {
-            // DocumentManager keeps a process-wide cache keyed by file path, so the entry this
-            // test created has to go before the next test configures the same fixture file.
-            manager.documentClosed()
+            harness.close()
         } finally {
             super.tearDown()
         }
@@ -71,16 +70,19 @@ class DocumentManagerTest : BasePlatformTestCase() {
     private fun nextSent(): String? = service.sent.poll(AWAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
 
     fun testOpeningSendsTheCurrentText() {
-        manager.documentOpened()
+        harness.open(myFixture.file.virtualFile)
 
         assertEquals("didOpen", nextSent())
         val params = checkNotNull(service.opened.poll()) { "didOpen carried no parameters" }
         assertEquals("{}", params.textDocument.text)
-        assertEquals(manager.identifier.uri, params.textDocument.uri)
+        assertEquals(
+            harness.server.getDocumentIdentifier(myFixture.file.virtualFile).uri,
+            params.textDocument.uri,
+        )
     }
 
     fun testTypingSendsTheEditThatWasMade() {
-        manager.documentOpened()
+        harness.open(myFixture.file.virtualFile)
         assertEquals("didOpen", nextSent())
 
         WriteCommandAction.runWriteCommandAction(project) {
@@ -98,25 +100,26 @@ class DocumentManagerTest : BasePlatformTestCase() {
     }
 
     fun testTheDocumentLifecycleIsSentInOrder() {
-        manager.documentOpened()
+        harness.open(myFixture.file.virtualFile)
         WriteCommandAction.runWriteCommandAction(project) {
             editor.document.insertString(1, "\"name\"")
         }
-        manager.documentClosed()
+        harness.close(myFixture.file.virtualFile)
 
         assertEquals(listOf("didOpen", "didChange", "didClose"), (1..3).map { nextSent() })
     }
 
     fun testClosingStopsReportingFurtherEdits() {
-        manager.documentOpened()
+        harness.open(myFixture.file.virtualFile)
         assertEquals("didOpen", nextSent())
-        manager.documentClosed()
+        harness.close(myFixture.file.virtualFile)
         assertEquals("didClose", nextSent())
 
         WriteCommandAction.runWriteCommandAction(project) {
             editor.document.insertString(1, "\"name\"")
         }
 
+        harness.drain()
         assertEquals(0, service.sent.size)
     }
 }

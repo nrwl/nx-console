@@ -148,6 +148,8 @@ repositories { intellijPlatform { defaultRepositories() } }
 
 configurations.all {
     exclude("org.slf4j", "slf4j-api")
+    // Gson and lsp4j are supplied by the platform SDK.
+    exclude("com.google.code.gson", "gson")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
@@ -156,7 +158,6 @@ configurations.all {
 }
 
 dependencies {
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.23.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     implementation("io.github.z4kn4fein:semver:2.0.0")

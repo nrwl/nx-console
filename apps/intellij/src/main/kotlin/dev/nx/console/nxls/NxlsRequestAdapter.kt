@@ -10,11 +10,25 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
 
-class NxlsRequestAdapter
-internal constructor(private val session: NxlsSession, private val nowMillis: () -> Long) {
-    constructor(session: NxlsSession) : this(session, { System.nanoTime() / 1_000_000 })
+internal interface NxlsRequestSender {
+    suspend fun <T> request(sender: (NxlsLanguageServer) -> CompletableFuture<T>): T?
+}
 
-    suspend fun <T> request(sender: (NxlsLanguageServer) -> CompletableFuture<T>): T? {
+class NxlsRequestAdapter
+internal constructor(private val getSession: () -> NxlsSession, private val nowMillis: () -> Long) :
+    NxlsRequestSender {
+    internal constructor(session: NxlsSession, nowMillis: () -> Long) : this({ session }, nowMillis)
+
+    constructor(session: NxlsSession) : this({ session })
+
+    internal constructor(
+        getSession: () -> NxlsSession
+    ) : this(getSession, { System.nanoTime() / 1_000_000 })
+
+    private val session: NxlsSession
+        get() = getSession()
+
+    override suspend fun <T> request(sender: (NxlsLanguageServer) -> CompletableFuture<T>): T? {
         val deadline = nowMillis() + 10_000
         session.ensureStarted()
         while (true) {
@@ -30,10 +44,8 @@ internal constructor(private val session: NxlsSession, private val nowMillis: ()
                     running.server.sendRequest { server ->
                         invoked.set(true)
                         try {
-                            session.ifCurrent(running.generation) {
-                                if (session.isCurrent(running)) sender(server as NxlsLanguageServer)
-                                else CompletableFuture.failedFuture(GenerationEnded())
-                            } ?: CompletableFuture.failedFuture(GenerationEnded())
+                            if (session.isCurrent(running)) sender(server as NxlsLanguageServer)
+                            else CompletableFuture.failedFuture(GenerationEnded())
                         } catch (error: Throwable) {
                             // Escaping on the platform executor would abandon its response future.
                             CompletableFuture.failedFuture(error)

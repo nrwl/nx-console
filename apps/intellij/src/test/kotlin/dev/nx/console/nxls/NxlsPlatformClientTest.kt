@@ -58,12 +58,13 @@ class NxlsPlatformClientTest : BasePlatformTestCase() {
     }
 
     fun testAllCustomWireNotificationsReachExistingDestinations() {
+        harness.ready()
         val endpoint = ServiceEndpoints.toEndpoint(client)
         endpoint.notify("nx/refreshWorkspace", null)
         endpoint.notify("nx/refreshWorkspaceStarted", null)
         endpoint.notify("nx/fileWatcherOperational", FileWatcherOperationalParams("running"))
         assertEqual(1, refreshed)
-        assertEqual(1, started)
+        assertEqual(2, started)
         assertEqual("running", WatcherRunningService.getInstance(project).status.value)
     }
 
@@ -79,6 +80,7 @@ class NxlsPlatformClientTest : BasePlatformTestCase() {
     }
 
     fun testFinalLogMessageCallbackLogsThenDelegates() {
+        NxConsoleLogger.getInstance().clearLogs()
         val message = MessageParams(MessageType.Log, "platform nxls log test\n")
         client.logMessage(message)
         assertTrue(
