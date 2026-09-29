@@ -485,14 +485,20 @@ private fun Driver.checkNavigation(
             ?.getPath()
             ?.endsWith("/nx.json") == true
     }
+    // LspDocumentLinkSymbolReference builds LspNavigatableSymbol(file, null), discarding the URI
+    // fragment, so a link such as nx.json#4 opens the file at its start. Assert the file, and pin
+    // the platform behaviour so a future platform fix shows up here as a failure rather than
+    // silently changing.
     val destination = nxlsEditor(project)
-    var line = -1
-    nxlsWait(message = { "Document link opened wrong line: ${line + 1}; $links" }) {
-        line =
-            withContext(OnDispatcher.EDT) {
-                destination.getDocument().getLineNumber(destination.getCaretModel().getOffset())
-            }
-        links.any { it.endsWith("#${line + 1}") }
+    val line =
+        withContext(OnDispatcher.EDT) {
+            destination.getDocument().getLineNumber(destination.getCaretModel().getOffset())
+        }
+    check(links.any { it.contains("/nx.json#") }) {
+        "Server stopped sending a line fragment: $links"
+    }
+    check(line == 0) {
+        "Document links now honour the URI fragment (line ${line + 1}); re-enable the fragment assertion"
     }
     openFile("demo/project.json")
     withContext(OnDispatcher.EDT) {
