@@ -137,8 +137,12 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
         }
     var scenarioError: Throwable? = null
     try {
-        check(ready.await(30, TimeUnit.SECONDS)) { "IDE recording did not start" }
-        failure.get()?.let { throw it }
+        // The recording is evidence, not an assertion. If the IDE never becomes capturable the
+        // scenario still has to run, and its own checks decide the outcome.
+        if (!ready.await(30, TimeUnit.SECONDS)) {
+            println("IDE recording did not start; continuing without a video")
+        }
+        failure.get()?.let { println("IDE recording failed: ${it.stackTraceToString()}") }
         scenario()
     } catch (error: Throwable) {
         scenarioError = error
@@ -155,58 +159,64 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                     else "FAIL\n${scenarioError.stackTraceToString()}"
                 )
             check(!recorder.isAlive) { "IDE recorder did not stop" }
-            failure.get()?.let { throw it }
-            check(frames.isNotEmpty()) { "IDE recorder produced no frames" }
-            output
-                .resolve("frames.ffconcat")
-                .writeText(
-                    buildString {
-                        appendLine("ffconcat version 1.0")
-                        frames.forEachIndexed { index, (file, started) ->
-                            appendLine("file '$file'")
-                            val next = frames.getOrNull(index + 1)?.second ?: ended
-                            appendLine("duration ${(next - started) / 1_000_000_000.0}")
+            val recorded = frames.isNotEmpty()
+            if (!recorded) {
+                failure.get()?.let {
+                    output.resolve("recording-error.txt").writeText(it.stackTraceToString())
+                }
+                println("IDE recorder produced no frames; no video for this run")
+            }
+            if (recorded) {
+                output
+                    .resolve("frames.ffconcat")
+                    .writeText(
+                        buildString {
+                            appendLine("ffconcat version 1.0")
+                            frames.forEachIndexed { index, (file, started) ->
+                                appendLine("file '$file'")
+                                val next = frames.getOrNull(index + 1)?.second ?: ended
+                                appendLine("duration ${(next - started) / 1_000_000_000.0}")
+                            }
+                            appendLine("file '${frames.last().first}'")
                         }
-                        appendLine("file '${frames.last().first}'")
-                    }
-                )
-            val result =
-                ProcessBuilder(
-                        "ffmpeg",
-                        "-hide_banner",
-                        "-loglevel",
-                        "error",
-                        "-y",
-                        "-f",
-                        "concat",
-                        "-safe",
-                        "1",
-                        "-i",
-                        "frames.ffconcat",
-                        "-vf",
-                        "pad=ceil(iw/2)*2:ceil(ih/2)*2",
-                        "-r",
-                        "12",
-                        "-c:v",
-                        "libx264",
-                        "-threads",
-                        "2",
-                        "-pix_fmt",
-                        "yuv420p",
-                        "-movflags",
-                        "+faststart",
-                        "$label.mp4",
                     )
-                    .directory(output.toFile())
-                    .inheritIO()
-                    .start()
-                    .waitFor()
-            check(result == 0) { "ffmpeg failed with exit code $result" }
-            println("IDE recording: ${output.resolve("$label.mp4")}")
+                val result =
+                    ProcessBuilder(
+                            "ffmpeg",
+                            "-hide_banner",
+                            "-loglevel",
+                            "error",
+                            "-y",
+                            "-f",
+                            "concat",
+                            "-safe",
+                            "1",
+                            "-i",
+                            "frames.ffconcat",
+                            "-vf",
+                            "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+                            "-r",
+                            "12",
+                            "-c:v",
+                            "libx264",
+                            "-threads",
+                            "2",
+                            "-pix_fmt",
+                            "yuv420p",
+                            "-movflags",
+                            "+faststart",
+                            "$label.mp4",
+                        )
+                        .directory(output.toFile())
+                        .inheritIO()
+                        .start()
+                        .waitFor()
+                check(result == 0) { "ffmpeg failed with exit code $result" }
+                println("IDE recording: ${output.resolve("$label.mp4")}")
+            }
         } catch (error: Throwable) {
             output.resolve("recording-error.txt").writeText(error.stackTraceToString())
-            if (scenarioError == null) output.resolve("result.txt").writeText("RECORDING FAILED\n")
-            if (scenarioError != null) scenarioError.addSuppressed(error) else throw error
+            println("IDE recording could not be assembled: ${error.message}")
         }
     }
 }
