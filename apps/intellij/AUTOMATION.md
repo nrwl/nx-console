@@ -314,7 +314,36 @@ timing threshold: `NxlsWrapper.isEditorConnected` resolved to
 `ConcurrentHashMap.contains`, which compares values instead of keys and so never
 matched, leaving `editorReleased` unable to disconnect a document.
 
-The EDT thresholds are a regression guard rather than a reproduction. Forcing a
-live nxls to stop reading its stdin is not something the harness can arrange, so
-the deterministic proof of the freeze lives in `DocumentManagerTest`, which
-holds a send open and asserts the dispatch thread stays free.
+The EDT thresholds in that scenario are a regression guard rather than a
+reproduction, because a healthy nxls drains its stdin faster than the IDE writes.
+
+`ReproStalledNxlsFreezeKt` is the reproduction. It pauses this IDE's nxls process
+with `SIGSTOP`, which from the IDE's side looks like a server busy booting or
+recomputing the project graph: nothing reads its stdin. It then opens
+`package.json` and probes the EDT from a separate JMX connection for 12 seconds,
+takes a thread dump of the IDE, and resumes nxls with `SIGCONT`. It fails if any
+EDT round trip took two seconds or longer, or if the EDT was inside
+`FileOutputStream.writeBytes` during the stall. Before the fix the dump shows
+the stack JetBrains reported, from `NxEditorListener.editorCreated` down to the
+pipe write.
+
+The whole `didOpen` has to exceed the pipe buffer (64 KiB on macOS and Linux),
+so the fixture's root `package.json` must be at least 128 KiB. Pad any Nx
+workspace with:
+
+```sh
+node -e 'const fs=require("fs");const p=JSON.parse(fs.readFileSync("package.json"));p.padding=Array.from({length:4096},(_,i)=>"padding-"+i+"-".repeat(48));fs.writeFileSync("package.json",JSON.stringify(p,null,2)+"\n")'
+```
+
+The scenario only signals the nxls process whose parent is the IDE started by
+this worktree, and always resumes it before exiting.
+
+```sh
+NX_AUTOMATION_LABEL=nxc-5033-stalled CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproStalledNxlsFreezeKt'
+```
+
+`DocumentManagerTest` and `NxlsTransportFreezeTest` remain the deterministic
+proof in CI.

@@ -25,7 +25,10 @@ interface EditorFreezeNxlsService {
     fun isEditorConnected(editor: EditorFreezeEditor): Boolean
 }
 
-@Remote("com.intellij.openapi.editor.Editor") interface EditorFreezeEditor
+@Remote("com.intellij.openapi.editor.Editor")
+interface EditorFreezeEditor {
+    fun getContentComponent(): Component
+}
 
 @Remote("com.intellij.openapi.fileEditor.FileEditorManager")
 interface EditorFreezeFileEditorManager {
@@ -117,10 +120,10 @@ fun main() = withAutomationDriver {
     // Every keystroke in a tracked file produces a didChange, which is the same transport.
     openFile(NX_CONFIG_FILES.first())
     val typedIn = selectedEditor(project)
-    repeat(10) { invokeAction("EditorEnter", component = frame) }
+    repeat(10) { invokeAction("EditorEnter", component = typedIn.getContentComponent()) }
     latencies["typing"] = edtRoundTrip(project)
     report.appendLine("after 10 keystrokes: EDT round trip ${latencies["typing"]}")
-    repeat(10) { invokeAction("EditorBackSpace", component = frame) }
+    repeat(10) { invokeAction("EditorBackSpace", component = typedIn.getContentComponent()) }
 
     check(
         withContext(OnDispatcher.EDT) { nxls.isEditorConnected(typedIn) },
