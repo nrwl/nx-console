@@ -1,6 +1,8 @@
 common-env: &common-env
   NX_VERBOSE_LOGGING: true
   NX_PLUGIN_NO_TIMEOUTS: true
+  # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
+  NX_CLOUD_USE_IO_SNAPSHOTS: 'true'
 common-init-steps: &common-init-steps
   - name: Checkout
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
