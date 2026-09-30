@@ -32,13 +32,17 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                         val frame = "frame-${frames.size.toString().padStart(5, '0')}"
                         val captureName = "$name-$frame"
                         val timestamp = System.nanoTime()
-                        // The main window is not always capturable, notably before it is mapped
-                        // on a virtual display. A missed frame must not end the recording; the
-                        // readiness latch below still fails a recording that never starts.
+                        // Capturing can fail outright before the IDE is ready to screenshot at
+                        // all, which on a virtual display happens for the first frames: the
+                        // screenshot directory may not exist yet. A missed frame must not end the
+                        // recording; the readiness latch below still fails one that never starts.
                         val source =
-                            captureIdeWindows(captureName).singleOrNull {
-                                it.fileName.toString() == "frame0.png"
-                            }
+                            runCatching {
+                                    captureIdeWindows(captureName).singleOrNull {
+                                        it.fileName.toString() == "frame0.png"
+                                    }
+                                }
+                                .getOrNull()
                         if (source == null) {
                             Thread.sleep(250)
                             continue
