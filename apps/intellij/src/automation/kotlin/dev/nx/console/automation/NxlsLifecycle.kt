@@ -238,12 +238,15 @@ private fun Driver.checkUnsavedEditors(
             "${case.path} changed on disk"
         }
         // This request neither selects a tab nor modifies the buffer, and bypasses lookup caches.
+        // The platform resolves the document while serving it, so it needs a read action.
         val labels =
-            server
-                .getRequestExecutor()
-                .getCompletionList(files.getValue(case), buffer.indexOf('|'), true)
-                ?.getItems()
-                ?.map { it.getLabel() }
+            withReadAction {
+                    server
+                        .getRequestExecutor()
+                        .getCompletionList(files.getValue(case), buffer.indexOf('|'), true)
+                        ?.getItems()
+                        ?.map { it.getLabel() }
+                }
                 .orEmpty()
         check(case.nextKey in labels && case.key !in labels) {
             "Replacement did not receive unsaved ${case.path}: expected ${case.nextKey}, omitted ${case.key}; got $labels"
