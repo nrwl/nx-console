@@ -484,6 +484,17 @@ try {
     failure ??= error;
   }
   try {
+    // The daemon lives in the throwaway fixture, so its logs vanish with it. Nx disables the
+    // daemon after a failed graph computation, which changes what the IDE is exercising.
+    const daemonLogs = join(workspace, '.nx/workspace-data/d');
+    for (const name of await readdir(daemonLogs).catch(() => [])) {
+      if (name.endsWith('.log'))
+        await copyFile(join(daemonLogs, name), join(output, `daemon-${name}`));
+    }
+  } catch (error) {
+    console.error(`Could not collect Nx daemon logs: ${error.message}`);
+  }
+  try {
     for (const pid of ownedIdePids()) {
       try {
         process.kill(pid, 'SIGTERM');
@@ -580,7 +591,12 @@ try {
   if (failure) {
     // Nx Agents do not publish outputs for a failed task, so the artifacts this points at
     // never reach the uploader. Echo the evidence into the task log instead.
-    for (const name of ['scenario.log', 'result.txt', 'ide.log']) {
+    for (const name of [
+      'scenario.log',
+      'result.txt',
+      'daemon-daemon-error.log',
+      'ide.log',
+    ]) {
       try {
         const text = await readFile(join(output, name), 'utf8');
         const tail = text.split('\n').slice(-120).join('\n');
