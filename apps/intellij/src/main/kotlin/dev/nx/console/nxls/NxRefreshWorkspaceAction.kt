@@ -21,7 +21,6 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
-import kotlin.coroutines.resume
 import kotlinx.coroutines.*
 
 class NxRefreshWorkspaceAction :
@@ -92,37 +91,20 @@ class NxRefreshWorkspaceService(private val project: Project) {
                     override fun run(indicator: ProgressIndicator) {
                         runBlocking {
                             try {
+                                val service = NxlsService.getInstance(project)
                                 indicator.isIndeterminate = false
-                                indicator.fraction = 0.1
-                                try {
-                                    NxlsService.getInstance(project).stopDaemon()
-                                } catch (e: Throwable) {
-                                    // ignore, stopping daemon is not critical
-                                }
-                                indicator.fraction = 0.3
-                                NxlsService.getInstance(project).restart()
-                                indicator.fraction = 0.5
-                                StandardNxGraphServer.getInstance(project).restart()
-                                indicator.fraction = 0.7
-
-                                // Wait for the refresh notification from nxls.
-                                // nxls triggers reconfigure automatically during initialization
-                                // (via setTimeout in onInitialize), so we wait for that to
-                                // complete.
-                                suspendCancellableCoroutine { continuation ->
-                                    val connection = project.messageBus.connect()
-                                    connection.subscribe(
-                                        NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                                        NxWorkspaceRefreshListener {
-                                            connection.disconnect()
-                                            continuation.resume(Unit)
-                                        },
-                                    )
-                                }
-
-                                indicator.fraction = 0.9
-                                CIPEPollingService.getInstance(project).forcePoll()
-                                indicator.fraction = 1.0
+                                refreshNxWorkspace(
+                                    stopDaemon = { service.stopDaemon() },
+                                    restart = { service.restartWithRefreshTicket() },
+                                    awaitStarted = { service.awaitStarted() },
+                                    restartGraph = {
+                                        StandardNxGraphServer.getInstance(project).restart()
+                                    },
+                                    forcePoll = {
+                                        CIPEPollingService.getInstance(project).forcePoll()
+                                    },
+                                    progress = { indicator.fraction = it },
+                                )
 
                                 withContext(Dispatchers.EDT) {
                                     if (notification?.isExpired == false) {
@@ -154,5 +136,36 @@ class NxRefreshWorkspaceService(private val project: Project) {
         fun getInstance(project: Project): NxRefreshWorkspaceService {
             return project.getService(NxRefreshWorkspaceService::class.java)
         }
+    }
+}
+
+internal suspend fun refreshNxWorkspace(
+    stopDaemon: suspend () -> Unit,
+    restart: () -> Deferred<Unit>,
+    awaitStarted: suspend () -> Unit,
+    restartGraph: suspend () -> Unit,
+    forcePoll: suspend () -> Unit,
+    progress: (Double) -> Unit,
+) {
+    withTimeout(120_000) {
+        progress(0.1)
+        try {
+            stopDaemon()
+        } catch (e: CancellationException) {
+            currentCoroutineContext().ensureActive()
+        } catch (e: Exception) {
+            // Stopping the daemon is best effort.
+        }
+        currentCoroutineContext().ensureActive()
+        progress(0.3)
+        val refresh = restart()
+        awaitStarted()
+        progress(0.5)
+        restartGraph()
+        progress(0.7)
+        refresh.await()
+        progress(0.9)
+        forcePoll()
+        progress(1.0)
     }
 }
