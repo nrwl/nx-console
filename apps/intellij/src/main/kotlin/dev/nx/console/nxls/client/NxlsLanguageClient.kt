@@ -1,5 +1,7 @@
 package dev.nx.console.nxls.client
 
+import com.intellij.openapi.project.Project
+import dev.nx.console.nxls.NxlsDiagnosticsService
 import dev.nx.console.utils.NxConsoleLogger
 import java.util.concurrent.CompletableFuture
 import org.eclipse.lsp4j.MessageActionItem
@@ -11,7 +13,7 @@ import org.eclipse.lsp4j.services.LanguageClient
 
 private val log by lazy { NxConsoleLogger.getInstance() }
 
-class NxlsLanguageClient : LanguageClient {
+class NxlsLanguageClient(private val project: Project) : LanguageClient {
 
     val refreshCallbacks: MutableList<() -> Unit> = mutableListOf()
     val refreshStartedCallback: MutableList<() -> Unit> = mutableListOf()
@@ -22,7 +24,9 @@ class NxlsLanguageClient : LanguageClient {
     }
 
     override fun publishDiagnostics(diagnostics: PublishDiagnosticsParams?) {
-        TODO("Not yet implemented")
+        val params = diagnostics ?: return
+        NxlsDiagnosticsService.getInstance(project)
+            .setDiagnostics(params.uri, params.diagnostics ?: emptyList())
     }
 
     override fun showMessage(messageParams: MessageParams?) {

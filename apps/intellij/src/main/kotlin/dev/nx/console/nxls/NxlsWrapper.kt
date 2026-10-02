@@ -69,7 +69,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
             nxlsProcess.callOnExit { cs.launch { stop() } }
             if (status !== NxlsState.STOPPED) {
-                languageClient = NxlsLanguageClient()
+                languageClient = NxlsLanguageClient(project)
                 val executorService = Executors.newCachedThreadPool()
 
                 Launcher.createIoLauncher(
