@@ -1,14 +1,92 @@
 package dev.nx.console.automation
 
 import com.intellij.driver.client.Driver
+import com.intellij.driver.client.Remote
+import com.intellij.driver.client.utility
+import java.awt.image.BufferedImage
+import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
+import kotlin.math.abs
+import kotlin.math.roundToInt
+
+@Remote("java.awt.Window")
+interface RecordedWindow {
+    fun getWindows(): Array<RecordedWindow>
+
+    fun isShowing(): Boolean
+
+    fun getX(): Int
+
+    fun getY(): Int
+
+    fun getWidth(): Int
+
+    fun getHeight(): Int
+}
+
+private data class WindowBounds(val x: Int, val y: Int, val width: Int, val height: Int)
+
+private fun Driver.showingWindowBounds(): List<WindowBounds> =
+    utility<RecordedWindow>()
+        .getWindows()
+        .filter { runCatching { it.isShowing() }.getOrDefault(false) }
+        .map { WindowBounds(it.getX(), it.getY(), it.getWidth(), it.getHeight()) }
+
+/**
+ * The capture API saves every IDE window as a separate image without its position. Popups and
+ * dialogs are separate windows, so they would be missing from a recording of the main window alone.
+ * Each image is matched to a showing window by size and drawn onto the main window image at that
+ * window's offset.
+ */
+private fun composeWindows(captures: List<Path>, windows: List<WindowBounds>, target: Path) {
+    val main = captures.single { it.fileName.toString() == "frame0.png" }
+    val frame = ImageIO.read(main.toFile())
+    val others = captures.filter { it != main }
+    if (others.isEmpty()) {
+        main.copyTo(target)
+        return
+    }
+
+    fun matches(image: BufferedImage, window: WindowBounds, scale: Double) =
+        abs(window.width * scale - image.width) <= 2 &&
+            abs(window.height * scale - image.height) <= 2
+
+    val scale =
+        windows
+            .filter { it.width > 0 }
+            .map { frame.width.toDouble() / it.width }
+            .firstOrNull { scale -> windows.any { matches(frame, it, scale) } }
+    val frameBounds = scale?.let { s -> windows.firstOrNull { matches(frame, it, s) } }
+    if (scale == null || frameBounds == null) {
+        main.copyTo(target)
+        return
+    }
+
+    val composed = BufferedImage(frame.width, frame.height, BufferedImage.TYPE_INT_RGB)
+    val graphics = composed.createGraphics()
+    graphics.drawImage(frame, 0, 0, null)
+    for (capture in others) {
+        val image = ImageIO.read(capture.toFile()) ?: continue
+        val bounds =
+            windows.firstOrNull { it != frameBounds && matches(image, it, scale) } ?: continue
+        graphics.drawImage(
+            image,
+            ((bounds.x - frameBounds.x) * scale).roundToInt(),
+            ((bounds.y - frameBounds.y) * scale).roundToInt(),
+            null,
+        )
+    }
+    graphics.dispose()
+    ImageIO.write(composed, "png", target.toFile())
+}
 
 fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
     require(label.matches(Regex("[a-zA-Z0-9_-]+")))
@@ -32,11 +110,13 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                         val frame = "frame-${frames.size.toString().padStart(5, '0')}"
                         val captureName = "$name-$frame"
                         val timestamp = System.nanoTime()
-                        val source =
-                            captureIdeWindows(captureName).singleOrNull {
-                                it.fileName.toString() == "frame0.png"
-                            } ?: error("No main IDE window captured for $captureName")
-                        source.copyTo(output.resolve("$frame.png"))
+                        val windows =
+                            runCatching { showingWindowBounds() }.getOrDefault(emptyList())
+                        val captures = captureIdeWindows(captureName)
+                        check(captures.any { it.fileName.toString() == "frame0.png" }) {
+                            "No main IDE window captured for $captureName"
+                        }
+                        composeWindows(captures, windows, output.resolve("$frame.png"))
                         frames.add("$frame.png" to timestamp)
                         ready.countDown()
                         Thread.sleep(250)

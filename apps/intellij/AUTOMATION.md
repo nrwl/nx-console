@@ -235,12 +235,13 @@ frame timing manifest, and `result.txt` with PASS or the assertion failure.
 Keep the baseline failure and post-fix success with the PR's verification notes.
 A successful investigation run is not evidence of a reproduced bug.
 
-The recording samples the main IDE window through JetBrains' component capture
+The recording samples the IDE windows through JetBrains' component capture
 API, preserves elapsed time, and encodes a silent H.264 MP4. Actual capture rate
 depends on IDE responsiveness (typically 2–4 frames per second). Restore a
-minimized IDE before recording so JCEF can initialize. Separate popup/dialog
-windows are retained in the IDE screenshot log directories, but are not overlaid
-on the main-window video.
+minimized IDE before recording so JCEF can initialize. Popups and dialogs are
+separate windows. Each frame draws them onto the main window at their on-screen
+offsets, matching each captured image to a showing window by size. A window
+that extends past the main window is cropped to it.
 
 `ReproGraphKt` checks cold full-graph loading, project focus, returning to the
 full graph, restoring a manually hidden project, and focusing after closing the
