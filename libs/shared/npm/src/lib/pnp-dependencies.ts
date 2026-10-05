@@ -59,9 +59,8 @@ export async function pnpDependencies(workspacePath: string) {
     if (!pkg?.packageDependencies) {
       continue;
     }
-    for (const [name, reference] of Object.entries(
-      pkg?.packageDependencies ?? {},
-    )) {
+    // packageDependencies is a Map, so Object.entries would not list any of them
+    for (const [name, reference] of pkg.packageDependencies) {
       // Unmet peer dependencies
       if (reference === null) continue;
       if (!Array.isArray(reference) && reference.startsWith('workspace:'))
