@@ -93,36 +93,18 @@ class NxRefreshWorkspaceService(private val project: Project) {
                         runBlocking {
                             try {
                                 indicator.isIndeterminate = false
-                                indicator.fraction = 0.1
-                                try {
-                                    NxlsService.getInstance(project).stopDaemon()
-                                } catch (e: Throwable) {
-                                    // ignore, stopping daemon is not critical
-                                }
-                                indicator.fraction = 0.3
-                                NxlsService.getInstance(project).restart()
-                                indicator.fraction = 0.5
-                                StandardNxGraphServer.getInstance(project).restart()
-                                indicator.fraction = 0.7
-
-                                // Wait for the refresh notification from nxls.
-                                // nxls triggers reconfigure automatically during initialization
-                                // (via setTimeout in onInitialize), so we wait for that to
-                                // complete.
-                                suspendCancellableCoroutine { continuation ->
-                                    val connection = project.messageBus.connect()
-                                    connection.subscribe(
-                                        NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                                        NxWorkspaceRefreshListener {
-                                            connection.disconnect()
-                                            continuation.resume(Unit)
-                                        },
-                                    )
-                                }
-
-                                indicator.fraction = 0.9
-                                CIPEPollingService.getInstance(project).forcePoll()
-                                indicator.fraction = 1.0
+                                refreshNxWorkspace(
+                                    stopDaemon = { NxlsService.getInstance(project).stopDaemon() },
+                                    restartNxls = { NxlsService.getInstance(project).restart() },
+                                    awaitWorkspaceRefresh = { awaitWorkspaceRefresh() },
+                                    restartGraph = {
+                                        StandardNxGraphServer.getInstance(project).restart()
+                                    },
+                                    forcePoll = {
+                                        CIPEPollingService.getInstance(project).forcePoll()
+                                    },
+                                    progress = { indicator.fraction = it },
+                                )
 
                                 withContext(Dispatchers.EDT) {
                                     if (notification?.isExpired == false) {
@@ -150,9 +132,55 @@ class NxRefreshWorkspaceService(private val project: Project) {
             )
     }
 
+    // nxls triggers reconfigure automatically during initialization (via setTimeout in
+    // onInitialize) and notifies once it is done.
+    private suspend fun awaitWorkspaceRefresh() {
+        suspendCancellableCoroutine { continuation ->
+            val connection = project.messageBus.connect()
+            connection.subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                NxWorkspaceRefreshListener {
+                    connection.disconnect()
+                    continuation.resume(Unit)
+                },
+            )
+        }
+    }
+
     companion object {
         fun getInstance(project: Project): NxRefreshWorkspaceService {
             return project.getService(NxRefreshWorkspaceService::class.java)
         }
     }
+}
+
+/**
+ * The graph server is restarted only after nxls has refreshed the workspace. By then nxls has
+ * started the Nx daemon, so `nx graph --watch` connects to it. Starting both at once makes each
+ * client spawn its own daemon; the older one exits as "no longer the current daemon", and a client
+ * still connected to it can get EPIPE, which makes Nx mark the workspace daemon-disabled.
+ */
+internal suspend fun refreshNxWorkspace(
+    stopDaemon: suspend () -> Unit,
+    restartNxls: suspend () -> Unit,
+    awaitWorkspaceRefresh: suspend () -> Unit,
+    restartGraph: suspend () -> Unit,
+    forcePoll: suspend () -> Unit,
+    progress: (Double) -> Unit,
+) {
+    progress(0.1)
+    try {
+        stopDaemon()
+    } catch (e: Throwable) {
+        // ignore, stopping daemon is not critical
+    }
+    progress(0.3)
+    restartNxls()
+    progress(0.5)
+    awaitWorkspaceRefresh()
+    progress(0.7)
+    restartGraph()
+    progress(0.9)
+    forcePoll()
+    progress(1.0)
 }
