@@ -2,7 +2,6 @@ package dev.nx.console.nxls
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -35,7 +34,6 @@ class NxlsWorkspaceRootResolverTest : BasePlatformTestCase() {
                 else method.invoke(project, *(args ?: emptyArray()))
             } as Project
         resolver = NxlsWorkspaceRootResolver(rootedProject)
-        Disposer.register(testRootDisposable, resolver)
     }
 
     override fun tearDown() {
@@ -77,7 +75,7 @@ class NxlsWorkspaceRootResolverTest : BasePlatformTestCase() {
         assertSame(nested, resolver.resolve())
     }
 
-    fun testSettingsChangeInvalidatesCachedRoot() {
+    fun testSettingsChangeIsReflected() {
         marker(root)
         assertSame(root, resolver.resolve())
         val nested = directory("apps/editor/nested")
@@ -87,7 +85,7 @@ class NxlsWorkspaceRootResolverTest : BasePlatformTestCase() {
         assertSame(root, resolver.resolve())
     }
 
-    fun testMarkerCreationAndDeletionInvalidateCache() {
+    fun testMarkerCreationAndDeletionAreReflected() {
         marker(root, "lerna.json")
         assertSame(root, resolver.resolve())
         val nearerMarker = marker(base, "workspace.json")
@@ -96,7 +94,7 @@ class NxlsWorkspaceRootResolverTest : BasePlatformTestCase() {
         assertSame(root, resolver.resolve())
     }
 
-    fun testRenamingMarkerInvalidatesCache() {
+    fun testRenamingMarkerIsReflected() {
         val file = marker(root)
         assertSame(root, resolver.resolve())
         ApplicationManager.getApplication().runWriteAction { file.rename(this, "old-nx.json") }
