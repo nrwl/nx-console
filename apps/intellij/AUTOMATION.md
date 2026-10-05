@@ -121,15 +121,41 @@ setup, and recording instructions.
 CI=true NX_NO_CLOUD=true NX_DAEMON=false yarn nx run intellij:e2e-ci--project-view --skip-nx-cache
 ```
 
-The runner builds this checkout, creates an isolated Nx fixture and IDE sandbox,
-starts the IDE, and checks that the Nx Console projects tree displays `demo` and
-its `hello` target. It writes a JUnit report, logs, UI hierarchy, and video under
-`dist/apps/intellij/e2e/latest`. Each execution replaces that directory; copy it
-elsewhere to keep evidence from multiple runs. A failed assertion or startup
-timeout fails the Nx task. Cleanup stops the run's IDE, launcher, display, and
-fixture daemon and removes its temporary fixture and sandbox.
-The Kotlin client is built before startup and then runs directly with Java,
-avoiding an additional Gradle daemon while the IDE is running.
+The same runner also runs the platform LSP scenarios as individual Nx Agent tasks:
+
+| Target | Scenario |
+| --- | --- |
+| `intellij:e2e-ci--project-view` | `ProjectViewTestKt` |
+| `intellij:e2e-ci--editor-features` | `NxlsEditorFeaturesKt` |
+| `intellij:e2e-ci--custom-requests` | `NxlsCustomRequestsKt` |
+| `intellij:e2e-ci--lifecycle` | `NxlsLifecycleKt` |
+| `intellij:e2e-ci--editor-freeze` | `ReproEditorFreezeKt` |
+
+`intellij:e2e-ci` depends on all five; `intellij:e2e` runs that aggregate. Each
+starts a fresh IDE, fixture, sandbox, and automation port. The runner accepts
+`NX_E2E_SCENARIO_NAME` and `NX_E2E_SCENARIO_CLASS`, defaulting to project-view.
+Targets supply those variables and the runner uses the name as the recording
+label. The Kotlin client is built before startup and then runs directly with
+Java, avoiding another Gradle daemon while the IDE is running.
+
+Project-view keeps `dist/apps/intellij/e2e/latest`; the other targets write to
+`dist/apps/intellij/e2e/<scenario>`. Each directory contains `result.json`, a
+JUnit testcase named after the scenario, logs, recordings, and `<scenario>.txt`.
+The runner collects the platform scenarios' existing `result.txt` as their proof;
+it requires both a successful client exit and `PASS` in the proof. Each run
+replaces only its own directory. CI uploads all scenario directories. Failed
+assertions or startup timeouts fail the task. Cleanup stops the run's IDE,
+launcher, display, and fixture daemon and removes its fixture and sandbox.
+
+The generated fixture supplies all the cases described below: `analytics: false`
+and `namedInputs.default: ["{projectRoot}/**/*"]` in `nx.json`, a root
+`package.json` with `nx.targets.hello`, `demo/project.json` with `hello` and
+`inputs: ["default"]`, and `libs/util/project.json` with `build`. Both `hello`
+targets use `nx:run-commands` with `command: "node -e 0"`. The local dev dependency
+`@fixture/notes-plugin` supplies the no-op `note` generator and the exact required
+schema defaults shown in the custom-requests section. Nx and the plugin are
+symlinked into the fixture, so no fixture dependency download is needed. See the
+[fixture reference](e2e/README.md#runner-and-fixture) for the complete contents.
 
 On Linux, install `xvfb` and `ffmpeg`. Each run creates a private virtual display
 and records it from IDE startup, including startup failures. No desktop session
@@ -386,3 +412,256 @@ References:
 - [JetBrains Driver SDK](https://github.com/JetBrains/intellij-community/blob/master/tools/intellij.tools.ide.starter.driver/README.md)
 - [UI testing and selectors](https://plugins.jetbrains.com/docs/intellij/integration-tests-ui.html)
 - [JCEF helper for IntelliJ 252](https://github.com/JetBrains/intellij-community/blob/idea/252.23892.409/platform/remote-driver/test-sdk/src/com/intellij/driver/sdk/ui/components/common/JCefUI.kt)
+
+### Editor freeze on nx config files (NXC-5033)
+
+`ReproEditorFreezeKt` covers the UI freezes JetBrains reported from their
+Marketplace freeze dashboard, whose largest cluster was
+`network on EDT NxEditorListener.editorCreated`. Opening an nx config file used
+to write the `didOpen` notification into the nxls stdin pipe on the EDT, which
+blocks for as long as the language server is not draining that pipe.
+
+The scenario opens `nx.json` and `package.json`, checks the platform LSP server's
+open-document state, types into one of them, and closes them all. A heartbeat
+on a separate Driver connection probes the EDT throughout these operations and
+fails if a round trip takes longer than two seconds.
+
+Any Nx workspace works as the fixture; no extra setup is needed.
+
+```sh
+NX_AUTOMATION_LABEL=nxc-5033-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproEditorFreezeKt'
+```
+
+The negative controls below demonstrate detection of an in-operation freeze and
+a disconnected document. Transport blocking is also covered by the deterministic
+`NxlsTransportFreezeTest` and `NxlsPlatformExecutorTest` unit tests.
+
+### Platform LSP editor features
+
+`NxlsEditorFeaturesKt` opens `nx.json`, `demo/project.json`, and `package.json`
+and waits for the Nx language server to be Running. For each file it checks a
+non-empty lookup containing an expected Nx key **from an LSP completion item**,
+accepts a server item with `InsertTextFormat.Snippet`, and checks both an active
+live-template tab stop and the absence of literal `${` / `$0` in the document.
+It verifies that the document is still unsaved and unchanged on disk, then
+requests completion again in the same object: the inserted key must disappear
+from the server's suggestions while another expected key remains.
+
+Quick Documentation exercises the platform's LSP hover provider without native
+mouse input. It must render documentation for `namedInputs` in `nx.json` and
+`command` in the other two files. Executor documentation must contain an HTML
+anchor to `nx.dev`, with no raw Markdown link. The scenario also checks the
+platform's document-link cache, follows an `inputs: ["default"]` link to the
+correct line in `nx.json`, and invokes Go to Declaration on `nx:run-commands`,
+asserting that its implementation file opens. `workspace.json` is excluded
+because nxls does not register a schema for it.
+
+Use a disposable, trusted Nx workspace with installed dependencies and a
+lockfile. Its root `nx.json` must contain:
+
+```json
+{
+  "analytics": false,
+  "namedInputs": { "default": ["{projectRoot}/**/*"] }
+}
+```
+
+It also needs a root `package.json` and `demo/project.json` with a `demo` project
+and a `hello` target using `nx:run-commands`, for example:
+
+```json
+{
+  "name": "demo",
+  "targets": {
+    "hello": {
+      "executor": "nx:run-commands",
+      "inputs": ["default"],
+      "options": { "command": "node -e 0" }
+    }
+  }
+}
+```
+
+Save these files before running. The scenario temporarily edits their IDE
+buffers, suppresses automatic saving, and restores and saves the original text
+in `finally`. Explicit saves remain enabled so a completion that force-saves
+still fails. The fixture must use an Nx installation whose run-commands
+implementation is under the `nx` package and ends in
+`run-commands/run-commands.impl.js`.
+
+The scenario activates the IDE application and waits for editor focus before
+invoking completion or documentation. On macOS, bringing the frame forward alone
+does not activate the application; the completion action can then produce no
+lookup even though a direct platform request returns LSP items. Template traversal
+uses editor actions so document changes run inside an IntelliJ command.
+
+On the pinned IntelliJ 2025.3.6.1 platform, document-link navigation discards URI
+fragments: `LspDocumentLinkSymbolReference` resolves the target file and creates
+`LspNavigatableSymbol(file, null)`. An nxls link such as `nx.json#4` therefore opens
+the file without navigating to line 4. The scenario checks the destination file
+and pins this line-zero behavior, so a platform change that starts honoring fragments will fail the assertion and prompt
+a review. `LspDocumentLinkSupport` has no navigation hook.
+
+From the repository root, against the already running automation IDE:
+
+```sh
+NX_AUTOMATION_LABEL=nxls-editor-features CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  ./gradlew :intellij:runAutomation --max-workers=2 --priority=low \
+  -PautomationMain=dev.nx.console.automation.NxlsEditorFeaturesKt
+```
+
+These direct Gradle commands avoid Nx Gradle project-graph discovery timeouts.
+Add the same `-PautomationPort=...` used by the IDE launcher if overriding the
+port. Each new scenario records an MP4 and `result.txt`, plus a timestamped text
+report in `dist/apps/intellij/automation`. The editor report includes the actual
+snippet, updated completion labels, documentation HTML, and link destinations.
+A native mouse-hover activation check remains manual; Quick Documentation
+asserts the shared LSP hover response and rendering path.
+
+### Platform LSP custom requests
+
+`NxlsCustomRequestsKt` asserts on rendered UI for the main custom-request paths:
+the Nx project/folder tree (`nx/workspace`, `nx/projectFolderTree`), the generator
+picker and populated Generate UI (`nx/generators`, `nx/generatorOptions`,
+`nx/transformedGeneratorSchema`), and the project details view (`nx/pdvData`).
+The generator form must display string, boolean, and numeric defaults, so merely
+opening an empty form or decoding only generator names cannot pass. Project
+details must render `demo` and its `hello` target. This samples these
+request paths; it does not claim individual coverage of every custom method.
+
+Extend the editor fixture above with a project named `util` rooted at
+`libs/util`. The scenario temporarily selects **Folder** in Nx Console's tool
+window style setting and restores the original style afterwards. It requires both the
+`demo / hello` target and the `libs / util` folder/project path, and rejects
+duplicate rendered paths. A flat list does not exercise `nx/projectFolderTree`.
+
+Install a local generator as a dev dependency
+(`npm install -D ./tools/notes-plugin`). Give its `package.json` the name
+`@fixture/notes-plugin` and `"generators": "./generators.json"`. The
+`generators.json` file should contain:
+
+```json
+{
+  "generators": {
+    "note": {
+      "factory": "./note.cjs",
+      "schema": "./schema.json",
+      "description": "Automation note generator"
+    }
+  }
+}
+```
+
+Use this `schema.json`; keeping every option required makes every checked field
+visible without expanding optional options:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string", "default": "migration-note" },
+    "directory": { "type": "string", "default": "notes" },
+    "enabled": { "type": "boolean", "default": true },
+    "retries": { "type": "number", "default": 3 }
+  },
+  "required": ["name", "directory", "enabled", "retries"]
+}
+```
+
+Use `module.exports = async function () {};` for `note.cjs`. The no-op factory
+also makes Generate UI's automatic dry run harmless. Clear generator filters
+and use default generator context settings so the form defaults are not
+intentionally overridden. The scenario closes editors when switching between
+webviews, selects the generator through `JBPopup.closeOk`, and opens project
+details through the editor's preview API; it uses no native input.
+
+```sh
+NX_AUTOMATION_LABEL=nxls-custom-requests CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  ./gradlew :intellij:runAutomation --max-workers=2 --priority=low \
+  -PautomationMain=dev.nx.console.automation.NxlsCustomRequestsKt
+```
+
+The report saves the rendered tree, generator rows, form defaults, and project
+details text. Running a target is covered separately by `ReproRunArgumentsKt`.
+
+Run each platform LSP scenario against a freshly launched automation IDE. They
+leave editors, lookups, tool window style and Generate UI webviews behind, and
+running several in sequence against one IDE has produced failures that do not
+reproduce on a clean launch.
+
+### Platform LSP lifecycle and editor reconnection
+
+`NxlsLifecycleKt` starts with a populated folder tree and opens all three config
+files **before** refreshing. It runs Refresh Nx Workspace once and then twice
+more, awaiting a fresh success notification, a replaced tree-model root, and a
+populated tree after each invocation. Refresh errors, a missing completion notification, duplicate tree
+paths, and duplicate success notifications fail the scenario.
+
+Before selecting any tab after a refresh, the replacement's platform LSP
+`openedFiles` state must already include all three documents. Each buffer keeps
+an unsaved property across the restart; a direct completion request to the new
+server must omit that property and offer another known property. The request
+does not select a tab, edit text, or use the UI lookup cache. Disk contents must
+remain unchanged. This checks both reattachment and receipt of unsaved text.
+
+After these checks, completion and Quick Documentation must still work in the
+original editor instances, including the rendered `nx.dev` executor link. The
+LSP completion items must all belong to one new
+server generation, newer than before the refresh. This catches stale results
+and reconnection failures that can be concealed by closing and reopening tabs.
+The scenario also compares the listener class/count maps on both Nx workspace
+refresh topics before and after every refresh, detecting lost or accumulating
+subscriptions. This uses the pinned platform's message-bus introspection API
+and reads the plugin's topic fields through Driver; no test listener or
+production hook is installed. The lazy standard graph service is initialized
+before capturing the baseline because Refresh Nx Workspace initializes it too.
+Driver remote interfaces are checked at runtime,
+so recheck these bindings when upgrading the IDE.
+
+Every operation has EDT round trips before and after it, and refresh polling
+continues to probe the EDT while the action is pending. Each round trip must
+finish in less than two seconds. The report includes timings, generations,
+subscriber maps, documentation, and rendered trees.
+
+Use the editor fixture with the folder-tree extension described above. No local
+generator is needed. Save the config files first. The scenario restores edited
+buffers, the automatic-save token, and the original tool window style. It temporarily enables Nx refresh
+notifications, restores that preference afterwards, and leaves the three editor
+tabs open. Do not dismiss refresh notifications while it runs.
+
+```sh
+NX_AUTOMATION_LABEL=nxls-lifecycle CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  ./gradlew :intellij:runAutomation --max-workers=2 --priority=low \
+  -PautomationMain=dev.nx.console.automation.NxlsLifecycleKt
+```
+
+Capture baseline and post-migration runs against the same fixture using distinct
+labels. Compilation and unit tests do not substitute for these live-IDE runs.
+
+### Negative controls for lifecycle and freeze coverage
+
+`ReproEditorFreezeKt` runs an EDT heartbeat through a separate Driver connection
+throughout opening, typing, restoring, and closing documents. Every sample must
+finish within two seconds, including samples queued during an operation. Its
+connection checks read the platform LSP document state, and closing must remove
+the documents from that state. The scenario records a video and `result.txt`.
+
+Set `NX_AUTOMATION_FAULT` for a deliberate failing run. Each control changes only
+the live IDE/server, leaving the fixture on disk intact:
+
+| Scenario | Fault | Expected failure |
+| --- | --- | --- |
+| `NxlsLifecycleKt` | `missing-document` | After the first refresh, send `didClose` for one document; the pre-selection tracking assertion fails. |
+| `NxlsLifecycleKt` | `stale-document` | Replace one server-side document with text missing its unsaved property; the direct completion assertion fails. |
+| `ReproEditorFreezeKt` | `edt-freeze` | Sleep on the EDT for three seconds inside the open operation; the concurrent heartbeat exceeds two seconds. |
+| `ReproEditorFreezeKt` | `disconnected-document` | Send `didClose` while the editor stays open; the platform tracking assertion fails. |
+
+Run each negative control in a freshly launched IDE, just like positive runs.
+Omit `NX_AUTOMATION_FAULT` for normal validation. A failing control must name the
+expected assertion; an unrelated failure does not demonstrate coverage.
