@@ -71,8 +71,8 @@ class NxlsPlatformClientTest : BasePlatformTestCase() {
     fun testRetiredClientNotificationsAreDiscarded() {
         client.fileWatcherOperational(FileWatcherOperationalParams("running"))
         harness.session.restart()
-        client.refreshWorkspace()
-        client.refreshWorkspaceStarted()
+        client.refreshWorkspace(null)
+        client.refreshWorkspaceStarted(null)
         client.fileWatcherOperational(FileWatcherOperationalParams("stopped"))
         assertEqual(0, refreshed)
         assertEqual(0, started)
