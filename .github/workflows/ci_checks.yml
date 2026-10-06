@@ -12,7 +12,7 @@ env:
   NX_PLUGIN_NO_TIMEOUTS: true
   NX_CLOUD_ACCESS_TOKEN: ${{ github.ref == 'refs/heads/master' && secrets.NX_CLOUD_READ_WRITE_TOKEN || secrets.NX_CLOUD_READ_TOKEN }}
   # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
-  NX_CLOUD_USE_IO_SNAPSHOTS: 'true'
+  NX_CLOUD_USE_ULTRACACHE: 'true'
   NX_CLOUD_TASK_GRAPH_STORAGE_VERSION: '2'
 
 jobs:
@@ -114,11 +114,11 @@ jobs:
         timeout-minutes: 60
 
       - name: Upload IntelliJ E2E evidence
-        if: ${{ always() && hashFiles('dist/apps/intellij/e2e/latest/result.json') != '' }}
+        if: ${{ always() && hashFiles('dist/apps/intellij/e2e/**/result.json') != '' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: intellij-e2e-${{ github.run_id }}-${{ github.run_attempt }}
-          path: dist/apps/intellij/e2e/latest
+          path: dist/apps/intellij/e2e
           if-no-files-found: error
           retention-days: 14
 

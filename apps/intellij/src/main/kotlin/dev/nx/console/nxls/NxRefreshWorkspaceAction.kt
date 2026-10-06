@@ -21,7 +21,6 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
-import kotlin.coroutines.resume
 import kotlinx.coroutines.*
 
 class NxRefreshWorkspaceAction :
@@ -92,11 +91,12 @@ class NxRefreshWorkspaceService(private val project: Project) {
                     override fun run(indicator: ProgressIndicator) {
                         runBlocking {
                             try {
+                                val service = NxlsService.getInstance(project)
                                 indicator.isIndeterminate = false
                                 refreshNxWorkspace(
-                                    stopDaemon = { NxlsService.getInstance(project).stopDaemon() },
-                                    restartNxls = { NxlsService.getInstance(project).restart() },
-                                    awaitWorkspaceRefresh = { awaitWorkspaceRefresh() },
+                                    stopDaemon = { service.stopDaemon() },
+                                    restart = { service.restartWithRefreshTicket() },
+                                    awaitStarted = { service.awaitStarted() },
                                     restartGraph = {
                                         StandardNxGraphServer.getInstance(project).restart()
                                     },
@@ -132,21 +132,6 @@ class NxRefreshWorkspaceService(private val project: Project) {
             )
     }
 
-    // nxls triggers reconfigure automatically during initialization (via setTimeout in
-    // onInitialize) and notifies once it is done.
-    private suspend fun awaitWorkspaceRefresh() {
-        suspendCancellableCoroutine { continuation ->
-            val connection = project.messageBus.connect()
-            connection.subscribe(
-                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                NxWorkspaceRefreshListener {
-                    connection.disconnect()
-                    continuation.resume(Unit)
-                },
-            )
-        }
-    }
-
     companion object {
         fun getInstance(project: Project): NxRefreshWorkspaceService {
             return project.getService(NxRefreshWorkspaceService::class.java)
@@ -162,25 +147,31 @@ class NxRefreshWorkspaceService(private val project: Project) {
  */
 internal suspend fun refreshNxWorkspace(
     stopDaemon: suspend () -> Unit,
-    restartNxls: suspend () -> Unit,
-    awaitWorkspaceRefresh: suspend () -> Unit,
+    restart: () -> Deferred<Unit>,
+    awaitStarted: suspend () -> Unit,
     restartGraph: suspend () -> Unit,
     forcePoll: suspend () -> Unit,
     progress: (Double) -> Unit,
 ) {
-    progress(0.1)
-    try {
-        stopDaemon()
-    } catch (e: Throwable) {
-        // ignore, stopping daemon is not critical
+    withTimeout(120_000) {
+        progress(0.1)
+        try {
+            stopDaemon()
+        } catch (e: CancellationException) {
+            currentCoroutineContext().ensureActive()
+        } catch (e: Exception) {
+            // Stopping the daemon is best effort.
+        }
+        currentCoroutineContext().ensureActive()
+        progress(0.3)
+        val refresh = restart()
+        awaitStarted()
+        progress(0.5)
+        refresh.await()
+        progress(0.7)
+        restartGraph()
+        progress(0.9)
+        forcePoll()
+        progress(1.0)
     }
-    progress(0.3)
-    restartNxls()
-    progress(0.5)
-    awaitWorkspaceRefresh()
-    progress(0.7)
-    restartGraph()
-    progress(0.9)
-    forcePoll()
-    progress(1.0)
 }

@@ -2,100 +2,80 @@ package dev.nx.console.nxls
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.util.messages.Topic
 import dev.nx.console.generate.ui.GenerateUiStartupMessageDefinition
 import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.*
-import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.*
 import dev.nx.console.utils.Notifier
-import dev.nx.console.utils.nxlsWorkingPath
 import java.lang.Runnable
+import java.nio.file.Paths
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.*
-import kotlinx.coroutines.future.await
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
 @Service(Service.Level.PROJECT)
 class NxlsService(private val project: Project, private val cs: CoroutineScope) {
-    private var wrapper: NxlsWrapper = NxlsWrapper(project, cs)
+    private val responseDecoder = NxlsResponseDecoder()
 
-    private fun client(): NxlsLanguageClient? {
-        return wrapper.languageClient
-    }
+    internal var sessionOverride: NxlsSession? = null
+    private val session: NxlsSession
+        get() = sessionOverride ?: NxlsSession.getInstance(project)
 
-    private suspend fun server(): NxlsLanguageServer? {
-        if (!wrapper.isStarted()) {
-            val started =
-                withTimeoutOrNull(10000) {
-                    wrapper.awaitStarted().await()
-                    true
-                }
+    internal var requestSender: NxlsRequestSender = NxlsRequestAdapter { session }
+    private val connectedDocuments = ConcurrentHashMap.newKeySet<String>()
+    private val consumersScheduled = AtomicBoolean()
 
-            if (started == null) {
-                return null
-            }
-        }
-        return wrapper.languageServer
+    internal fun initializeConsumersOnce(block: Runnable) {
+        if (consumersScheduled.compareAndSet(false, true)) runAfterStarted(block)
     }
 
     suspend fun start() {
-        wrapper.start()
+        session.start()
         awaitStarted()
-        client()?.registerRefreshCallback {
-            cs.launch {
-                project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
-            }
-        }
-        client()?.registerRefreshStartedCallback {
-            cs.launch {
-                project.messageBus
-                    .syncPublisher(NX_WORKSPACE_REFRESH_STARTED_TOPIC)
-                    .onWorkspaceRefreshStarted()
-            }
-        }
-        client()?.registerFileWatcherOperationalCallback { status ->
-            WatcherRunningService.getInstance(project).setStatus(status)
-        }
-
-        cs.launch {
-            project.messageBus
-                .syncPublisher(NX_WORKSPACE_REFRESH_STARTED_TOPIC)
-                .onWorkspaceRefreshStarted()
-        }
     }
 
     suspend fun close() {
-        wrapper.stop()
+        session.stop()
+        connectedDocuments.clear()
     }
 
     suspend fun restart() {
-        wrapper.stop()
-        start()
+        session.restart()
         awaitStarted()
     }
 
+    internal fun restartWithRefreshTicket(): Deferred<Unit> = session.restartWithRefreshTicket()
+
     suspend fun refreshWorkspace() {
-        server()?.getNxService()?.refreshWorkspace()
+        requestSender.request {
+            it.refreshWorkspace()
+            CompletableFuture.completedFuture(Unit)
+        }
     }
 
     suspend fun workspace(): NxWorkspace? {
-        return withMessageIssueCatch("nx/workspace") {
-            server()?.getNxService()?.workspace()?.await()
-        }()
+        return withMessageIssueCatch("nx/workspace") { requestSender.request { it.workspace() } }()
     }
 
     suspend fun workspaceSerialized(): String? {
         return withMessageIssueCatch("nx/workspaceSerialized") {
-            server()?.getNxService()?.workspaceSerialized()?.await()
+            requestSender.request { it.workspaceSerialized() }
         }()
     }
 
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
-            server()?.getNxService()?.generators()?.await()
+            requestSender.request { it.generators() }?.let(responseDecoder::generators)
         }() ?: emptyList()
     }
 
@@ -104,13 +84,17 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     ): List<NxGeneratorOption> {
         return withMessageIssueCatch("nx/generatorOptions") {
             val request = NxGeneratorOptionsRequest(requestOptions)
-            server()?.getNxService()?.generatorOptions(request)?.await()
+            requestSender
+                .request { it.generatorOptions(request) }
+                ?.let(responseDecoder::generatorOptions)
         }() ?: emptyList()
     }
 
     suspend fun transformedGeneratorSchema(generatorSchema: GeneratorSchema): GeneratorSchema {
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
-            server()?.getNxService()?.transformedGeneratorSchema(generatorSchema)?.await()
+            requestSender
+                .request { it.transformedGeneratorSchema(generatorSchema) }
+                ?.let(responseDecoder::transformedGeneratorSchema)
         }() ?: generatorSchema
     }
 
@@ -120,37 +104,35 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     ): NxGeneratorContext? {
         return withMessageIssueCatch("nx/generatorContextV2") {
             val request = NxGetGeneratorContextFromPathRequest(path)
-            server()?.getNxService()?.generatorContextV2(request)?.await()
+            requestSender.request { it.generatorContextV2(request) }
         }()
     }
 
     suspend fun projectByPath(path: String): NxProject? {
         return withMessageIssueCatch("nx/projectByPath") {
             val request = NxProjectByPathRequest(path)
-            server()?.getNxService()?.projectByPath(request)?.await()
+            requestSender.request { it.projectByPath(request) }
         }()
     }
 
     suspend fun projectsByPaths(paths: Array<String>): Map<String, NxProject> {
         val request = NxProjectsByPathsRequest(paths)
         return withMessageIssueCatch("nx/projectsByPaths") {
-            server()?.getNxService()?.projectsByPaths(request)?.await()
+            requestSender.request { it.projectsByPaths(request) }
         }() ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
         return withMessageIssueCatch("nx/projectGraphOutput") {
-            server()?.getNxService()?.projectGraphOutput()?.await()
+            requestSender.request { it.projectGraphOutput() }
         }()
     }
 
     suspend fun createProjectGraph(showAffected: Boolean = false): CreateProjectGraphError? {
         return withMessageIssueCatch("nx/createProjectGraph") {
             try {
-                server()
-                    ?.getNxService()
-                    ?.createProjectGraph(NxCreateProjectGraphRequest(showAffected))
-                    ?.await()
+                requestSender
+                    .request { it.createProjectGraph(NxCreateProjectGraphRequest(showAffected)) }
                     ?.let { CreateProjectGraphError(1000, it) }
             } catch (e: ResponseErrorException) {
                 CreateProjectGraphError(e.responseError.code, e.responseError.message)
@@ -160,25 +142,25 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
 
     suspend fun projectFolderTree(): NxFolderTreeData? {
         return withMessageIssueCatch("nx/projectFolderTree") {
-            server()?.getNxService()?.projectFolderTree()?.await()?.toFolderTreeData()
+            requestSender.request { it.projectFolderTree() }?.toFolderTreeData()
         }()
     }
 
     suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
         return withMessageIssueCatch("nx/startupMessage") {
-            server()?.getNxService()?.startupMessage(schema)?.await()
+            requestSender.request { it.startupMessage(schema) }
         }()
     }
 
     suspend fun nxVersion(reset: Boolean = false): NxVersion? {
         return withMessageIssueCatch("nx/version") {
-            server()?.getNxService()?.version(NxVersionRequest(reset))?.await()
+            requestSender.request { it.version(NxVersionRequest(reset)) }
         }()
     }
 
     suspend fun sourceMapFilesToProjectsMap(): Map<String, Array<String>> {
         return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
-            server()?.getNxService()?.sourceMapFilesToProjectsMap()?.await()
+            requestSender.request { it.sourceMapFilesToProjectsMap() }
         }() ?: emptyMap()
     }
 
@@ -188,81 +170,87 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     ): Map<String, NxTarget> {
         return withMessageIssueCatch("nx/targetsForConfigFile") {
             val request = NxTargetsForConfigFileRequest(projectName, configFilePath)
-            server()?.getNxService()?.targetsForConfigFile(request)?.await()
+            requestSender.request { it.targetsForConfigFile(request) }
         }() ?: emptyMap()
     }
 
     suspend fun cloudStatus(): NxCloudStatus? {
         return withMessageIssueCatch("nx/cloudStatus") {
-            server()?.getNxService()?.cloudStatus()?.await()
+            requestSender.request { it.cloudStatus() }
         }()
     }
 
     suspend fun configureAiAgentsStatus(): ConfigureAiAgentsStatus? {
         return withMessageIssueCatch("nx/configureAiAgentsStatus") {
-            server()?.getNxService()?.configureAiAgentsStatus()?.await()
+            requestSender.request { it.configureAiAgentsStatus() }
         }()
     }
 
     suspend fun startDaemon() {
-        withMessageIssueCatch("nx/startDaemon") {
-            server()?.getNxService()?.startDaemon()?.await()
-        }()
+        withMessageIssueCatch("nx/startDaemon") { requestSender.request { it.startDaemon() } }()
     }
 
     suspend fun stopDaemon() {
-        withMessageIssueCatch("nx/stopDaemon") { server()?.getNxService()?.stopDaemon()?.await() }()
+        withMessageIssueCatch("nx/stopDaemon") { requestSender.request { it.stopDaemon() } }()
     }
 
     suspend fun pdvData(filePath: String): NxPDVData? {
         return withMessageIssueCatch("nx/pdvData") {
-            server()?.getNxService()?.pdvData(PDVDataRequest(filePath))?.await()
+            requestSender.request { it.pdvData(PDVDataRequest(filePath)) }
         }()
     }
 
     suspend fun parseTargetString(targetString: String): TargetInfo? {
         return withMessageIssueCatch("nx/parseTargetString") {
-            server()?.getNxService()?.parseTargetString(targetString)?.await()
+            requestSender.request { it.parseTargetString(targetString) }
         }()
     }
 
     fun addDocument(editor: Editor) {
-        wrapper.connect(editor)
+        connectedDocuments.add(documentKey(editor))
     }
 
     fun removeDocument(editor: Editor) {
-        wrapper.disconnect(editor)
+        connectedDocuments.remove(documentKey(editor))
     }
 
     fun changeWorkspace(workspacePath: String) {
-        cs.launch { server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath)) }
+        cs.launch(Dispatchers.IO) {
+            val basePath = project.basePath ?: return@launch
+            val path = Paths.get(basePath).resolve(workspacePath).normalize().toString()
+            val root = LocalFileSystem.getInstance().refreshAndFindFileByPath(path)
+            if (root?.isDirectory == true) session.changeWorkspace(root)
+        }
     }
 
     fun isEditorConnected(editor: Editor): Boolean {
-        return wrapper.isEditorConnected(editor)
+        return connectedDocuments.contains(documentKey(editor))
     }
 
     fun runAfterStarted(block: Runnable) {
-        wrapper.awaitStarted().thenRun(block)
+        cs.launch {
+            awaitStarted()
+            block.run()
+        }
     }
 
     fun isStarted(): Boolean {
-        return wrapper.isStarted()
+        return session.ready.value?.let(session::isCurrent) == true
     }
 
     suspend fun awaitStarted() {
-        wrapper.awaitStarted().await()
+        session.ready.filterNotNull().first { session.isCurrent(it) }
     }
 
     suspend fun recentCIPEData(): CIPEDataResponse? {
         return withMessageIssueCatch("nx/recentCIPEData") {
-            server()?.getNxService()?.recentCIPEData()?.await()
+            requestSender.request { it.recentCIPEData() }
         }()
     }
 
     suspend fun cloudAuthHeaders(): NxCloudAuthHeaders? {
         return withMessageIssueCatch("nx/cloudAuthHeaders") {
-            val result = server()?.getNxService()?.cloudAuthHeaders()?.await()
+            val result = requestSender.request { it.cloudAuthHeaders() }
             result
         }()
     }
@@ -272,9 +260,12 @@ class NxlsService(private val project: Project, private val cs: CoroutineScope) 
     ): NxDownloadAndExtractArtifactResponse? {
         return withMessageIssueCatch("nx/downloadAndExtractArtifact") {
             val request = NxDownloadAndExtractArtifactRequest(artifactUrl = artifactUrl)
-            server()?.getNxService()?.downloadAndExtractArtifact(request)?.await()
+            requestSender.request { it.downloadAndExtractArtifact(request) }
         }()
     }
+
+    private fun documentKey(editor: Editor): String =
+        FileDocumentManager.getInstance().getFile(editor.document)?.url ?: "/dev/"
 
     private fun <T> withMessageIssueCatch(
         requestName: String,

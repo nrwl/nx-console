@@ -1,9 +1,8 @@
 # IntelliJ E2E tests
 
-Run commands from the repository root. The project-view test builds this
-checkout, launches IntelliJ in a fresh sandbox, and checks that Nx Console shows
-the fixture's `demo` project and `hello` target. It records the run and cleans up
-its IDE, fixture, and sandbox when finished.
+Run commands from the repository root. Each test builds this checkout, launches
+IntelliJ in a fresh sandbox against a generated Nx workspace, records its
+scenario, and cleans up its IDE, fixture, and sandbox when finished.
 
 ## Prerequisites
 
@@ -62,21 +61,82 @@ CI=true NX_NO_CLOUD=true NX_DAEMON=false NX_PLUGIN_NO_TIMEOUTS=true \
   yarn nx run intellij:e2e-ci--project-view
 ```
 
+The targets are separate Nx Agent tasks, each with its own IDE launch:
+
+| Target                             | Scenario class         | Evidence directory under `dist/apps/intellij/e2e` |
+| ---------------------------------- | ---------------------- | ------------------------------------------------- |
+| `intellij:e2e-ci--project-view`    | `ProjectViewTestKt`    | `latest`                                          |
+| `intellij:e2e-ci--editor-features` | `NxlsEditorFeaturesKt` | `editor-features`                                 |
+| `intellij:e2e-ci--custom-requests` | `NxlsCustomRequestsKt` | `custom-requests`                                 |
+| `intellij:e2e-ci--lifecycle`       | `NxlsLifecycleKt`      | `lifecycle`                                       |
+| `intellij:e2e-ci--editor-freeze`   | `ReproEditorFreezeKt`  | `editor-freeze`                                   |
+
+All classes are in `dev.nx.console.automation`. `intellij:e2e-ci` depends on all
+five tasks; `intellij:e2e` depends on `e2e-ci`. For example, run lifecycle with:
+
+```sh
+CI=true NX_NO_CLOUD=true NX_DAEMON=false NX_PLUGIN_NO_TIMEOUTS=true \
+  yarn nx run intellij:e2e-ci--lifecycle --skip-nx-cache
+```
+
 `intellij:e2e` runs all IntelliJ E2E tests. `NX_NO_CLOUD=true` keeps local runs
 off Nx Cloud while retaining Nx's local cache. The first run downloads IntelliJ,
 its plugins, and Gradle dependencies and can take several minutes.
 
 ## Results and recordings
 
-Evidence is written to `dist/apps/intellij/e2e/latest`: `result.json`,
-`junit.xml`, logs, UI inspection files, and an MP4 recording. A failed test exits
-with a nonzero status. Linux records startup as well as the scenario; macOS
-recording starts after the automation client connects to the fixture.
+Each evidence directory contains `result.json`, `junit.xml`, logs, and a
+`<scenario>.txt` proof starting with `PASS` on success. The JUnit testcase uses
+the scenario name. Project-view keeps its existing `latest` output path and UI
+inspection files. The platform LSP scenarios retain their timestamped reports,
+recording directories, and `result.txt`; the runner copies that result to the
+named proof file. Both a successful client exit and a passing proof are required.
+
+Linux records startup to `<scenario>.mp4` using Xvfb. The platform scenarios
+also retain their Driver recording; macOS recordings start after the client
+connects. CI uploads the entire `dist/apps/intellij/e2e` tree, including failures.
 
 Unchanged inputs restore the cached result and its original evidence. Append
 `--skip-nx-cache` to the command when you need a fresh run and recording. Each
-execution replaces `latest`, so copy that directory elsewhere before recording
-another run if you want to retain both.
+execution replaces only its scenario's directory, so separate scenario tasks
+cannot overwrite one another's evidence. Copy that directory elsewhere before
+rerunning the same scenario if you want to retain both.
 
 To exercise failure reporting, set `NX_E2E_EXPECTED_PROJECT=missing-project`
 when running the test; it should fail and save evidence.
+
+For a platform LSP negative control, set `NX_AUTOMATION_FAULT=edt-freeze` on
+`intellij:e2e-ci--editor-freeze`, or `NX_AUTOMATION_FAULT=missing-document` on
+`intellij:e2e-ci--lifecycle`. The fault is part of the task's cache inputs. These
+runs must fail the task and produce a JUnit failure; omit the variable for normal
+runs. See [the automation guide](../AUTOMATION.md#negative-controls-for-lifecycle-and-freeze-coverage)
+for the other controls.
+
+## Runner and fixture
+
+`run.mjs` accepts `NX_E2E_SCENARIO_NAME` and `NX_E2E_SCENARIO_CLASS`, defaulting
+to `project-view` and `dev.nx.console.automation.ProjectViewTestKt`. Each new
+target supplies both and the runner sets `NX_AUTOMATION_LABEL` to the scenario
+name. Every invocation creates a fresh temporary workspace and sandbox.
+
+The generated fixture includes:
+
+- `nx.json`: `analytics: false` and `namedInputs.default: ["{projectRoot}/**/*"]`.
+- Root `package.json`: an `nx.targets.hello` using `nx:run-commands` with
+  `options.command: "node -e 0"`.
+- `demo/project.json`: project `demo`, target `hello`, executor `nx:run-commands`,
+  `inputs: ["default"]`, and `options.command: "node -e 0"`.
+- `libs/util/project.json`: project `util` with a `build` target for folder-tree
+  assertions.
+- `tools/notes-plugin`: dev dependency `@fixture/notes-plugin` with
+  `generators: "./generators.json"`. Its `note` generator uses `./note.cjs`
+  (`module.exports = async function () {};`) and `./schema.json`. All four
+  schema properties are required: `name` (string, `"migration-note"`),
+  `directory` (string, `"notes"`), `enabled` (boolean, `true`), and `retries`
+  (number, `3`).
+
+Nx and its executable are symlinked from the checkout. The local plugin is
+symlinked into `node_modules/@fixture/notes-plugin` and declared as a `file:` dev
+dependency; no package installation or registry access is needed for the fixture.
+The runner also creates a lockfile and initializes Git before checking the
+fixture's project graph.

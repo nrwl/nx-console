@@ -11,6 +11,7 @@ import {
   chmod,
   rm,
   readFile,
+  readdir,
   realpath,
 } from 'node:fs/promises';
 import { createServer, connect } from 'node:net';
@@ -25,7 +26,17 @@ const require = createRequire(import.meta.url);
 const nxPackage = require.resolve('nx/package.json');
 const nxBin = resolve(dirname(nxPackage), require(nxPackage).bin.nx);
 const runId = randomUUID();
-const output = join(root, 'dist/apps/intellij/e2e/latest');
+const scenarioName = process.env.NX_E2E_SCENARIO_NAME ?? 'project-view';
+const scenarioClass =
+  process.env.NX_E2E_SCENARIO_CLASS ??
+  'dev.nx.console.automation.ProjectViewTestKt';
+if (!/^[a-zA-Z0-9_-]+$/.test(scenarioName))
+  throw new Error(`Invalid scenario name: ${scenarioName}`);
+const output = join(
+  root,
+  'dist/apps/intellij/e2e',
+  scenarioName === 'project-view' ? 'latest' : scenarioName,
+);
 const runtime = await realpath(
   await mkdtemp(join(tmpdir(), 'nx-console-intellij-e2e-')),
 );
@@ -39,6 +50,7 @@ const children = [];
 const abort = new AbortController();
 let video;
 let failure;
+let scenarioProof = '';
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.once(signal, () =>
@@ -63,6 +75,7 @@ const env = {
   NX_AUTOMATION_OUTPUT: runtime,
   NX_AUTOMATION_SANDBOX: sandbox,
   NX_AUTOMATION_RUN_ID: runId,
+  NX_AUTOMATION_LABEL: scenarioName,
 };
 
 function start(command, args, name, extra = {}) {
@@ -164,7 +177,7 @@ async function waitForPort(port, ide) {
     await delay(500, undefined, { signal: abort.signal });
   }
   throw new Error(
-    'The IDE did not expose JMX within 6 minutes; see ide.log and project-view.mp4',
+    `The IDE did not expose JMX within 6 minutes; see ide.log and ${scenarioName}.mp4`,
   );
 }
 
@@ -219,7 +232,19 @@ try {
   await mkdir(join(workspace, 'demo'), { recursive: true });
   await writeFile(
     join(workspace, 'package.json'),
-    JSON.stringify({ name: 'intellij-e2e-fixture', private: true }),
+    JSON.stringify({
+      name: 'intellij-e2e-fixture',
+      private: true,
+      devDependencies: { '@fixture/notes-plugin': 'file:tools/notes-plugin' },
+      nx: {
+        targets: {
+          hello: {
+            executor: 'nx:run-commands',
+            options: { command: 'node -e 0' },
+          },
+        },
+      },
+    }),
   );
   await writeFile(
     join(workspace, 'package-lock.json'),
@@ -231,7 +256,10 @@ try {
   );
   await writeFile(
     join(workspace, 'nx.json'),
-    JSON.stringify({ analytics: false }),
+    JSON.stringify({
+      analytics: false,
+      namedInputs: { default: ['{projectRoot}/**/*'] },
+    }),
   );
   await writeFile(join(workspace, '.gitignore'), 'node_modules\n.nx\n.idea\n');
   await writeFile(
@@ -243,12 +271,73 @@ try {
       targets: {
         hello: {
           executor: 'nx:run-commands',
-          options: { command: 'node -e "console.log(123)"' },
+          inputs: ['default'],
+          options: { command: 'node -e 0' },
         },
       },
     }),
   );
+  await mkdir(join(workspace, 'libs/util'), { recursive: true });
+  await writeFile(
+    join(workspace, 'libs/util/project.json'),
+    JSON.stringify({
+      name: 'util',
+      root: 'libs/util',
+      projectType: 'library',
+      targets: {
+        build: {
+          executor: 'nx:run-commands',
+          options: { command: 'node -e 0' },
+        },
+      },
+    }),
+  );
+  const notesPlugin = join(workspace, 'tools/notes-plugin');
+  await mkdir(notesPlugin, { recursive: true });
+  await writeFile(
+    join(notesPlugin, 'package.json'),
+    JSON.stringify({
+      name: '@fixture/notes-plugin',
+      version: '1.0.0',
+      generators: './generators.json',
+    }),
+  );
+  await writeFile(
+    join(notesPlugin, 'generators.json'),
+    JSON.stringify({
+      generators: {
+        note: {
+          factory: './note.cjs',
+          schema: './schema.json',
+          description: 'Automation note generator',
+        },
+      },
+    }),
+  );
+  await writeFile(
+    join(notesPlugin, 'note.cjs'),
+    'module.exports = async function () {};\n',
+  );
+  await writeFile(
+    join(notesPlugin, 'schema.json'),
+    JSON.stringify({
+      type: 'object',
+      properties: {
+        name: { type: 'string', default: 'migration-note' },
+        directory: { type: 'string', default: 'notes' },
+        enabled: { type: 'boolean', default: true },
+        retries: { type: 'number', default: 3 },
+      },
+      required: ['name', 'directory', 'enabled', 'retries'],
+    }),
+  );
   await mkdir(join(workspace, 'node_modules/.bin'), { recursive: true });
+  await mkdir(join(workspace, 'node_modules/@fixture'), { recursive: true });
+  await symlink(
+    notesPlugin,
+    join(workspace, 'node_modules/@fixture/notes-plugin'),
+    'dir',
+  );
   await symlink(dirname(nxPackage), join(workspace, 'node_modules/nx'), 'dir');
   await symlink(nxBin, join(workspace, 'node_modules/.bin/nx'));
   execFileSync('git', ['init', '--quiet'], { cwd: workspace });
@@ -331,7 +420,7 @@ try {
         'yuv420p',
         '-movflags',
         '+faststart',
-        join(output, 'project-view.mp4'),
+        join(output, `${scenarioName}.mp4`),
       ],
       'video',
     );
@@ -345,7 +434,9 @@ try {
   );
   await waitForPort(Number(env.NX_AUTOMATION_PORT), ide);
   console.log(
-    'Checking that Nx Console renders the fixture project and target…',
+    scenarioName === 'project-view'
+      ? 'Checking that Nx Console renders the fixture project and target…'
+      : `Running IntelliJ ${scenarioName}…`,
   );
   await Promise.race([
     wait(
@@ -358,7 +449,7 @@ try {
           `-Dnx.console.automation.output=${output}`,
           '-classpath',
           await readFile(join(runtime, 'automation-classpath.txt'), 'utf8'),
-          'dev.nx.console.automation.ProjectViewTestKt',
+          scenarioClass,
         ],
         'scenario',
       ),
@@ -368,15 +459,41 @@ try {
       throw new Error('The IDE launcher exited during the test; see ide.log');
     }),
   ]);
-  const proof = await readFile(join(output, 'project-view.txt'), 'utf8');
-  if (!proof.startsWith('PASS\n'))
-    throw new Error(
-      'The scenario did not produce a passing project-view assertion',
-    );
 } catch (error) {
   failure = error;
   abort.abort(error);
 } finally {
+  try {
+    if (scenarioName !== 'project-view') {
+      const recordings = (await readdir(output)).filter((name) =>
+        new RegExp(`^${scenarioName}-[0-9]+$`).test(name),
+      );
+      if (recordings.length !== 1)
+        throw new Error(`Expected one ${scenarioName} recording result`);
+      await copyFile(
+        join(output, recordings[0], 'result.txt'),
+        join(output, `${scenarioName}.txt`),
+      );
+    }
+    scenarioProof = await readFile(join(output, `${scenarioName}.txt`), 'utf8');
+    if (!scenarioProof.startsWith('PASS\n'))
+      throw new Error(
+        `The scenario did not produce a passing ${scenarioName} assertion`,
+      );
+  } catch (error) {
+    failure ??= error;
+  }
+  try {
+    // The daemon lives in the throwaway fixture, so its logs vanish with it. Nx disables the
+    // daemon after a failed graph computation, which changes what the IDE is exercising.
+    const daemonLogs = join(workspace, '.nx/workspace-data/d');
+    for (const name of await readdir(daemonLogs).catch(() => [])) {
+      if (name.endsWith('.log'))
+        await copyFile(join(daemonLogs, name), join(output, `daemon-${name}`));
+    }
+  } catch (error) {
+    console.error(`Could not collect Nx daemon logs: ${error.message}`);
+  }
   try {
     for (const pid of ownedIdePids()) {
       try {
@@ -441,7 +558,7 @@ try {
   const scenarioFailure = await readFile(
     join(output, 'test-failure.txt'),
     'utf8',
-  ).catch(() => '');
+  ).catch(() => (scenarioProof.startsWith('FAIL\n') ? scenarioProof : ''));
   const escape = (value) =>
     String(value)
       .replaceAll('&', '&amp;')
@@ -451,7 +568,7 @@ try {
   const seconds = ((Date.now() - started) / 1000).toFixed(3);
   await writeFile(
     join(output, 'junit.xml'),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="intellij-e2e" tests="1" failures="${failure ? 1 : 0}" time="${seconds}"><testcase classname="NxConsole" name="project-view" time="${seconds}">${failure ? `<failure message="${escape(failure.message)}">${escape(scenarioFailure || failure.stack)}</failure>` : ''}</testcase></testsuite>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="intellij-e2e" tests="1" failures="${failure ? 1 : 0}" time="${seconds}"><testcase classname="NxConsole" name="${scenarioName}" time="${seconds}">${failure ? `<failure message="${escape(failure.message)}">${escape(scenarioFailure || failure.stack)}</failure>` : ''}</testcase></testsuite>\n`,
   );
   await writeFile(
     join(output, 'result.json'),
@@ -469,9 +586,25 @@ try {
     ),
   );
   console.log(
-    `${failure ? 'FAIL' : 'PASS'}: IntelliJ project view. Artifacts: ${output}`,
+    `${failure ? 'FAIL' : 'PASS'}: IntelliJ ${scenarioName === 'project-view' ? 'project view' : scenarioName}. Artifacts: ${output}`,
   );
   if (failure) {
+    // Nx Agents do not publish outputs for a failed task, so the artifacts this points at
+    // never reach the uploader. Echo the evidence into the task log instead.
+    for (const name of [
+      'scenario.log',
+      'result.txt',
+      'daemon-daemon-error.log',
+      'ide.log',
+    ]) {
+      try {
+        const text = await readFile(join(output, name), 'utf8');
+        const tail = text.split('\n').slice(-120).join('\n');
+        console.error(`\n===== ${name} (last 120 lines) =====\n${tail}`);
+      } catch {
+        console.error(`\n===== ${name}: not written =====`);
+      }
+    }
     console.error(failure.stack);
     process.exitCode = 1;
   }
