@@ -39,8 +39,9 @@ class NxlsRefreshProgressTest {
         }
         runCurrent()
         assertFalse(result.isCompleted)
-        assertEquals(listOf("stop", "restart", "initialized", "graph"), events)
-        assertEquals(listOf(0.1, 0.3, 0.5, 0.7), progress)
+        // The graph server would start a second Nx daemon if it ran before nxls finished.
+        assertEquals(listOf("stop", "restart", "initialized"), events)
+        assertEquals(listOf(0.1, 0.3, 0.5), progress)
         refreshed.complete(Unit)
         result.await()
         assertEquals(listOf("stop", "restart", "initialized", "graph", "poll"), events)

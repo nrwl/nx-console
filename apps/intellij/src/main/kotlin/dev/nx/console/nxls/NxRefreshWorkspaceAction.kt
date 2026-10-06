@@ -139,6 +139,12 @@ class NxRefreshWorkspaceService(private val project: Project) {
     }
 }
 
+/**
+ * The graph server is restarted only after nxls has refreshed the workspace. By then nxls has
+ * started the Nx daemon, so `nx graph --watch` connects to it. Starting both at once makes each
+ * client spawn its own daemon; the older one exits as "no longer the current daemon", and a client
+ * still connected to it can get EPIPE, which makes Nx mark the workspace daemon-disabled.
+ */
 internal suspend fun refreshNxWorkspace(
     stopDaemon: suspend () -> Unit,
     restart: () -> Deferred<Unit>,
@@ -161,9 +167,9 @@ internal suspend fun refreshNxWorkspace(
         val refresh = restart()
         awaitStarted()
         progress(0.5)
-        restartGraph()
-        progress(0.7)
         refresh.await()
+        progress(0.7)
+        restartGraph()
         progress(0.9)
         forcePoll()
         progress(1.0)
