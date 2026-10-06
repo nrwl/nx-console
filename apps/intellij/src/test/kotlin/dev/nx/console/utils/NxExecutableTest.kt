@@ -103,47 +103,17 @@ class NxExecutableTest : BasePlatformTestCase() {
         tempDir.deleteRecursively()
     }
 
-    fun testNxBinPathFollowsThePackageBinObject() {
-        val nxPackage =
-            myFixture
-                .addFileToProject(
-                    "object-bin/nx/package.json",
-                    """{ "name": "nx", "bin": { "nx": "./dist/bin/nx.js", "nx-cloud": "./dist/bin/nx-cloud.js" } }""",
-                )
-                .virtualFile
-                .parent
-        assertEquals("./dist/bin/nx.js", NxExecutable.nxBinPath(nxPackage))
-    }
+    fun testNxCommandForDotNxInstallationIsTheWrapperScript() {
+        val tempDir = Files.createTempDirectory("nx-test-command").toFile()
+        val nxExecutableName = if (SystemInfo.isWindows) "nx.bat" else "nx"
+        val nxExecutable = File(tempDir, nxExecutableName)
+        nxExecutable.createNewFile()
 
-    fun testNxBinPathFollowsAPackageBinString() {
-        val nxPackage =
-            myFixture
-                .addFileToProject(
-                    "string-bin/nx/package.json",
-                    """{ "name": "nx", "bin": "./bin/nx.js" }""",
-                )
-                .virtualFile
-                .parent
-        assertEquals("./bin/nx.js", NxExecutable.nxBinPath(nxPackage))
-    }
-
-    fun testNxBinPathFallsBackToBinNxJs() {
-        val nxPackage =
-            myFixture
-                .addFileToProject("no-bin/nx/package.json", """{ "name": "nx" }""")
-                .virtualFile
-                .parent
-        assertEquals("bin/nx.js", NxExecutable.nxBinPath(nxPackage))
-    }
-
-    fun testYarnPnpNodeOptionsPrependTheRuntimeToExistingOptions() {
-        val yarnPnpNx = YarnPnpNx("/workspace/nx.js", "--require /workspace/.pnp.cjs")
-
-        assertEquals("--require /workspace/.pnp.cjs", yarnPnpNx.nodeOptions(null))
-        assertEquals("--require /workspace/.pnp.cjs", yarnPnpNx.nodeOptions(" "))
         assertEquals(
-            "--require /workspace/.pnp.cjs --max-old-space-size=4096",
-            yarnPnpNx.nodeOptions("--max-old-space-size=4096"),
+            listOf(nxExecutable.absolutePath),
+            NxExecutable.getNxCommand(tempDir.absolutePath, project),
         )
+
+        tempDir.deleteRecursively()
     }
 }

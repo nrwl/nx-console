@@ -17,13 +17,9 @@ fun NxGeneralCommandLine(
     cwd: String? = null,
 ) =
     GeneralCommandLine().apply {
-        val yarnPnpNx = NxExecutable.getYarnPnpNx(project.nxBasePath, project)
-        if (yarnPnpNx != null) {
-            exePath = project.nodeInterpreter.nodeExecutablePath
-            addParameter(yarnPnpNx.script)
-        } else {
-            exePath = NxExecutable.getExecutablePath(project.nxBasePath, project)
-        }
+        val nxCommand = NxExecutable.getNxCommand(project.nxBasePath, project)
+        exePath = nxCommand.first()
+        addParameters(nxCommand.drop(1))
         addParameters(args)
         val workDirectory =
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
@@ -31,12 +27,6 @@ fun NxGeneralCommandLine(
         environmentVariables.configureCommandLine(this, true)
         if (!environment.containsKey("JAVA_HOME") && System.getenv("JAVA_HOME") == null) {
             getProjectJavaHome(project)?.let { withEnvironment("JAVA_HOME", it) }
-        }
-        yarnPnpNx?.let {
-            withEnvironment(
-                "NODE_OPTIONS",
-                it.nodeOptions(environment["NODE_OPTIONS"] ?: System.getenv("NODE_OPTIONS")),
-            )
         }
 
         NodeCommandLineUtil.configureUsefulEnvironment(this)
