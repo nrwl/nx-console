@@ -12,6 +12,17 @@ class NxAngularConfig(override val file: VirtualFile, val projectFiles: Map<Stri
     override val projects: List<AngularProject> =
         projectFiles.mapNotNull { (name, file) -> getNxAngularProject(name, file) }
 
+    init {
+        val nxProjects = projects.filterIsInstance<NxAngularProject>()
+        val applicationIncludeDirs = {
+            nxProjects
+                .filter { it.type == AngularProject.AngularProjectType.APPLICATION }
+                .flatMap { it.ownStylePreprocessorIncludeDirs }
+                .distinct()
+        }
+        nxProjects.forEach { it.applicationIncludeDirs = applicationIncludeDirs }
+    }
+
     override val defaultProject: AngularProject? = projects.getOrNull(0)
 
     override fun getProject(context: VirtualFile): AngularProject? =
