@@ -23,3 +23,7 @@ fun isWslInterpreter(interpreter: NodeJsInterpreter): Boolean {
     contract { returns(true) implies (interpreter is WslNodeInterpreter) }
     return interpreter is WslNodeInterpreter
 }
+
+/** The node binary to start, as seen from where the process runs. */
+val NodeJsInterpreter.nodeExecutablePath: String
+    get() = if (this is NodeJsLocalInterpreter) interpreterSystemDependentPath else "node"

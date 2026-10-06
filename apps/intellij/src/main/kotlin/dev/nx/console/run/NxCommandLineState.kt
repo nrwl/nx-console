@@ -27,7 +27,9 @@ import com.intellij.xdebugger.impl.XDebuggerManagerImpl
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxExecutable
+import dev.nx.console.utils.YarnPnpNx
 import dev.nx.console.utils.getProjectJavaHome
+import dev.nx.console.utils.nodeExecutablePath
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 
@@ -125,6 +127,8 @@ class NxCommandLineState(
                 .featureUsed(TelemetryEvent.TASKS_RUN, mapOf("debug" to false))
         }
 
+        val yarnPnpNx = NxExecutable.getYarnPnpNx(project.nxBasePath, project)
+
         val effectiveEnvData =
             try {
                 val envs = nxRunSettings.environmentVariables.envs
@@ -151,7 +155,9 @@ class NxCommandLineState(
                     NodeTargetRunOptions.of(true, runConfiguration),
                 )
                 .apply {
-                    envData = effectiveEnvData
+                    envData =
+                        yarnPnpNx?.let { withYarnPnpNodeOptions(effectiveEnvData, it) }
+                            ?: effectiveEnvData
                     enableWrappingWithYarnNode = false
                 }
 
@@ -161,7 +167,13 @@ class NxCommandLineState(
         )
 
         targetRun.commandLineBuilder.apply {
-            exePath = TargetValue.fixed(NxExecutable.getExecutablePath(project.nxBasePath, project))
+            if (yarnPnpNx != null) {
+                exePath = TargetValue.fixed(project.nodeInterpreter.nodeExecutablePath)
+                addParameter(yarnPnpNx.script)
+            } else {
+                exePath =
+                    TargetValue.fixed(NxExecutable.getExecutablePath(project.nxBasePath, project))
+            }
 
             addParameters(
                 listOf(*args, *(ParametersListUtil.parseToArray(nxRunSettings.arguments)))
@@ -174,4 +186,17 @@ class NxCommandLineState(
 
         return targetRun.startProcess()
     }
+}
+
+private fun withYarnPnpNodeOptions(
+    envData: EnvironmentVariablesData,
+    yarnPnpNx: YarnPnpNx,
+): EnvironmentVariablesData {
+    val existing =
+        envData.envs["NODE_OPTIONS"]
+            ?: System.getenv("NODE_OPTIONS").takeIf { envData.isPassParentEnvs }
+    return EnvironmentVariablesData.create(
+        envData.envs + ("NODE_OPTIONS" to yarnPnpNx.nodeOptions(existing)),
+        envData.isPassParentEnvs,
+    )
 }
