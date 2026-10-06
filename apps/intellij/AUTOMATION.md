@@ -439,6 +439,35 @@ The negative controls below demonstrate detection of an in-operation freeze and
 a disconnected document. Transport blocking is also covered by the deterministic
 `NxlsTransportFreezeTest` and `NxlsPlatformExecutorTest` unit tests.
 
+### Stalled language server (#3234, #3162)
+
+`ReproStalledNxlsKt` pauses the automation IDE's own nxls with `SIGSTOP`, so
+nothing drains its stdin pipe, for 12 seconds. This is what a server busy
+booting or recomputing the project graph looks like from the IDE. During the
+stall it opens a `package.json` larger than the pipe buffer, which sends a
+`didOpen` from the EDT (#3234). It then calls `NxProjectJsonToProjectMap.init()`,
+which sends `nx/projectsByPaths` from `Dispatchers.Default` (#3162). Five
+seconds into the stall it takes a `jstack` of the IDE. The scenario fails if an
+EDT round trip exceeds two seconds, or if the EDT or a `DefaultDispatcher-worker`
+thread is in `FileOutputStream.writeBytes` or `StreamMessageConsumer.consume`.
+Only the platform's `LSP Executor` thread may wait on the pipe.
+
+The nxls process is found through the IDE ancestor whose
+`nx.console.automation.workspace` matches this worktree, so no other IDE's
+server is paused. The fixture's root `package.json` must be at least 128 KiB.
+Pad it, for example:
+
+```sh
+node -e "const f='package.json',p=JSON.parse(require('fs').readFileSync(f));p.nxConsoleFreezeFixturePadding=Array.from({length:3000},(_,i)=>'padding-entry-'+String(i).padStart(5,'0')+'-'.repeat(40));require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
+```
+
+```sh
+NX_AUTOMATION_LABEL=stalled-nxls CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproStalledNxlsKt'
+```
+
 ### Platform LSP editor features
 
 `NxlsEditorFeaturesKt` opens `nx.json`, `demo/project.json`, and `package.json`
