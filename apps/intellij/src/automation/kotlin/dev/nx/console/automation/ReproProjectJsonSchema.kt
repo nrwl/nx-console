@@ -17,7 +17,6 @@ import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForCodeAnalysis
 import com.intellij.driver.sdk.waitForProjectOpen
-import java.awt.event.KeyEvent
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
@@ -56,6 +55,8 @@ interface SchemaLookupManager {
     fun getInstance(project: Project): SchemaLookupManager
 
     fun getActiveLookup(): SchemaLookup?
+
+    fun hideActiveLookup()
 }
 
 @Remote("com.intellij.codeInsight.lookup.Lookup")
@@ -68,11 +69,6 @@ interface SchemaLookupItem {
     fun getLookupString(): String
 }
 
-@Remote("com.intellij.ide.impl.ProjectUtil")
-interface SchemaProjectUtil {
-    fun focusProjectWindow(project: Project, stealFocusIfAppInactive: Boolean)
-}
-
 @Remote("com.intellij.openapi.vfs.LocalFileSystem")
 interface SchemaFileSystem {
     fun getInstance(): SchemaFileSystem
@@ -83,6 +79,13 @@ interface SchemaFileSystem {
 private data class SchemaState(val applicable: Boolean, val schemaFiles: List<String>)
 
 private const val COMPLETION_ATTEMPTS = 3
+
+/**
+ * The completion popup only opens in a focused editor, which on macOS means activating the IDE and
+ * taking focus from whatever the user is working in. Only do that when asked to, for example on a
+ * private display; otherwise the completion check is skipped and only the diagnostic is asserted.
+ */
+private val ALLOW_FOCUS = System.getenv("NX_AUTOMATION_ALLOW_FOCUS") == "true"
 
 private const val INVALID_PROJECT_TYPE = "libraryyy"
 
@@ -120,24 +123,6 @@ private fun Driver.refreshVfs(path: Path): VirtualFile =
         "The IDE could not see $path"
     }
 
-/**
- * `toFront()` is not enough on macOS when another application owns the focus, and completion is
- * disabled unless the editor has it, so bring the whole IDE forward first.
- */
-private fun Driver.focusEditor(
-    project: Project,
-    frame: com.intellij.driver.sdk.ui.remote.Component,
-    editorComponent: com.intellij.driver.sdk.ui.components.UiComponent,
-) {
-    withContext(OnDispatcher.EDT) {
-        utility<SchemaProjectUtil>().focusProjectWindow(project, true)
-        cast(frame, GraphIdeFrame::class).toFront()
-    }
-    Thread.sleep(1500)
-    editorComponent.click()
-    Thread.sleep(500)
-}
-
 fun main() = withAutomationDriver {
     waitForProjectOpen(2.minutes)
     val project = getOpenProjects().single()
@@ -154,7 +139,6 @@ fun main() = withAutomationDriver {
     withContext(OnDispatcher.EDT) {
         cast(frame, GraphIdeFrame::class).apply {
             setExtendedState(0)
-            toFront()
             getBalloonLayout().closeAll()
         }
     }
@@ -200,10 +184,7 @@ fun main() = withAutomationDriver {
                     text.take(300)
             }
             val caretOffset = caretIndex + CARET_LINE.length - 1
-            // Completion is only enabled when the editor itself owns the data context, and the
-            // window has to be in front for the click to land on it.
             val editorComponent = ui.x("//div[@class='EditorComponentImpl']")
-            focusEditor(project, frame, editorComponent)
             withContext(OnDispatcher.EDT) { editor.getCaretModel().moveToOffset(caretOffset) }
             Thread.sleep(1000)
 
@@ -219,7 +200,14 @@ fun main() = withAutomationDriver {
 
             val lookupManager = utility<SchemaLookupManager>().getInstance(project)
             var completions: List<String> = emptyList()
-            repeat(COMPLETION_ATTEMPTS) {
+            if (ALLOW_FOCUS) {
+                withContext(OnDispatcher.EDT) {
+                    utility<NxlsAppIcon>().getInstance().requestFocus()
+                    cast(editor, NxlsEditor::class).getContentComponent().requestFocus()
+                }
+                Thread.sleep(1000)
+            }
+            repeat(if (ALLOW_FOCUS) COMPLETION_ATTEMPTS else 0) {
                 if (completions.isNotEmpty()) {
                     return@repeat
                 }
@@ -236,9 +224,8 @@ fun main() = withAutomationDriver {
                     Thread.sleep(500)
                 }
                 if (completions.isEmpty()) {
-                    ui.robot.pressAndReleaseKey(KeyEvent.VK_ESCAPE)
+                    withContext(OnDispatcher.EDT) { lookupManager.hideActiveLookup() }
                     Thread.sleep(1000)
-                    focusEditor(project, frame, editorComponent)
                     withContext(OnDispatcher.EDT) {
                         editor.getCaretModel().moveToOffset(caretOffset)
                     }
@@ -246,7 +233,7 @@ fun main() = withAutomationDriver {
                 }
             }
             Thread.sleep(2500)
-            ui.robot.pressAndReleaseKey(KeyEvent.VK_ESCAPE)
+            withContext(OnDispatcher.EDT) { lookupManager.hideActiveLookup() }
             Thread.sleep(1000)
 
             // Lookup strings arrive quoted, and some entries carry a value template.
@@ -263,7 +250,11 @@ fun main() = withAutomationDriver {
                         "${schemaFiles.ifEmpty { listOf("<none>") }}"
                 )
                 appendLine()
-                appendLine("Completion for a property name at the top level:")
+                appendLine(
+                    "Completion for a property name at the top level" +
+                        if (ALLOW_FOCUS) ":"
+                        else " (not checked; set NX_AUTOMATION_ALLOW_FOCUS=true):"
+                )
                 appendLine("  total items: ${completions.size}")
                 appendLine(
                     "  Nx-only properties offered: ${nxCompletions.ifEmpty { listOf("<none>") }}"
@@ -284,7 +275,7 @@ fun main() = withAutomationDriver {
             openFile("demo/$label-result.txt")
             Thread.sleep(4000)
 
-            check(nxCompletions.size == NX_ONLY_PROPERTIES.size) {
+            check(!ALLOW_FOCUS || nxCompletions.size == NX_ONLY_PROPERTIES.size) {
                 "Completion did not offer the properties from Nx's own schema.\n$report"
             }
             check(flagsInvalidProjectType) {
