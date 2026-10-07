@@ -1,18 +1,92 @@
 package dev.nx.console.automation
 
 import com.intellij.driver.client.Driver
+import com.intellij.driver.client.Remote
 import com.intellij.driver.client.utility
-import com.intellij.driver.sdk.jdk.getSystemProperty
+import java.awt.image.BufferedImage
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
-import kotlin.io.path.exists
 import kotlin.io.path.writeText
+import kotlin.math.abs
+import kotlin.math.roundToInt
+
+@Remote("java.awt.Window")
+interface RecordedWindow {
+    fun getWindows(): Array<RecordedWindow>
+
+    fun isShowing(): Boolean
+
+    fun getX(): Int
+
+    fun getY(): Int
+
+    fun getWidth(): Int
+
+    fun getHeight(): Int
+}
+
+private data class WindowBounds(val x: Int, val y: Int, val width: Int, val height: Int)
+
+private fun Driver.showingWindowBounds(): List<WindowBounds> =
+    utility<RecordedWindow>()
+        .getWindows()
+        .filter { runCatching { it.isShowing() }.getOrDefault(false) }
+        .map { WindowBounds(it.getX(), it.getY(), it.getWidth(), it.getHeight()) }
+
+/**
+ * The capture API saves every IDE window as a separate image without its position. Popups and
+ * dialogs are separate windows, so they would be missing from a recording of the main window alone.
+ * Each image is matched to a showing window by size and drawn onto the main window image at that
+ * window's offset.
+ */
+private fun composeWindows(captures: List<Path>, windows: List<WindowBounds>, target: Path) {
+    val main = captures.single { it.fileName.toString() == "frame0.png" }
+    val frame = ImageIO.read(main.toFile())
+    val others = captures.filter { it != main }
+    if (others.isEmpty()) {
+        main.copyTo(target)
+        return
+    }
+
+    fun matches(image: BufferedImage, window: WindowBounds, scale: Double) =
+        abs(window.width * scale - image.width) <= 2 &&
+            abs(window.height * scale - image.height) <= 2
+
+    val scale =
+        windows
+            .filter { it.width > 0 }
+            .map { frame.width.toDouble() / it.width }
+            .firstOrNull { scale -> windows.any { matches(frame, it, scale) } }
+    val frameBounds = scale?.let { s -> windows.firstOrNull { matches(frame, it, s) } }
+    if (scale == null || frameBounds == null) {
+        main.copyTo(target)
+        return
+    }
+
+    val composed = BufferedImage(frame.width, frame.height, BufferedImage.TYPE_INT_RGB)
+    val graphics = composed.createGraphics()
+    graphics.drawImage(frame, 0, 0, null)
+    for (capture in others) {
+        val image = ImageIO.read(capture.toFile()) ?: continue
+        val bounds =
+            windows.firstOrNull { it != frameBounds && matches(image, it, scale) } ?: continue
+        graphics.drawImage(
+            image,
+            ((bounds.x - frameBounds.x) * scale).roundToInt(),
+            ((bounds.y - frameBounds.y) * scale).roundToInt(),
+            null,
+        )
+    }
+    graphics.dispose()
+    ImageIO.write(composed, "png", target.toFile())
+}
 
 fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
     require(label.matches(Regex("[a-zA-Z0-9_-]+")))
@@ -32,16 +106,25 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
         thread(name = "ide-recording", isDaemon = true) {
             try {
                 withAutomationDriver {
-                    val capture = utility<IdeWindowCapture>()
-                    val logs = Path.of(getSystemProperty("idea.log.path"), "screenshots")
                     while (running.get()) {
                         val frame = "frame-${frames.size.toString().padStart(5, '0')}"
                         val captureName = "$name-$frame"
                         val timestamp = System.nanoTime()
-                        capture.takeScreenshotOfAllWindowsBlocking(captureName)
-                        val source = logs.resolve(captureName).resolve("frame0.png")
-                        check(source.exists()) { "No main IDE window captured at $source" }
-                        source.copyTo(output.resolve("$frame.png"))
+                        val windows =
+                            runCatching { showingWindowBounds() }.getOrDefault(emptyList())
+                        // Capturing can fail outright before the IDE is ready to screenshot at
+                        // all, which on a virtual display happens for the first frames: the
+                        // screenshot directory may not exist yet. A missed frame must not end the
+                        // recording; the readiness latch below still fails one that never starts.
+                        val captures = runCatching { captureIdeWindows(captureName) }.getOrNull()
+                        if (
+                            captures == null ||
+                                captures.none { it.fileName.toString() == "frame0.png" }
+                        ) {
+                            Thread.sleep(250)
+                            continue
+                        }
+                        composeWindows(captures, windows, output.resolve("$frame.png"))
                         frames.add("$frame.png" to timestamp)
                         ready.countDown()
                         Thread.sleep(250)
@@ -54,8 +137,12 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
         }
     var scenarioError: Throwable? = null
     try {
-        check(ready.await(30, TimeUnit.SECONDS)) { "IDE recording did not start" }
-        failure.get()?.let { throw it }
+        // The recording is evidence, not an assertion. If the IDE never becomes capturable the
+        // scenario still has to run, and its own checks decide the outcome.
+        if (!ready.await(30, TimeUnit.SECONDS)) {
+            println("IDE recording did not start; continuing without a video")
+        }
+        failure.get()?.let { println("IDE recording failed: ${it.stackTraceToString()}") }
         scenario()
     } catch (error: Throwable) {
         scenarioError = error
@@ -72,58 +159,64 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                     else "FAIL\n${scenarioError.stackTraceToString()}"
                 )
             check(!recorder.isAlive) { "IDE recorder did not stop" }
-            failure.get()?.let { throw it }
-            check(frames.isNotEmpty()) { "IDE recorder produced no frames" }
-            output
-                .resolve("frames.ffconcat")
-                .writeText(
-                    buildString {
-                        appendLine("ffconcat version 1.0")
-                        frames.forEachIndexed { index, (file, started) ->
-                            appendLine("file '$file'")
-                            val next = frames.getOrNull(index + 1)?.second ?: ended
-                            appendLine("duration ${(next - started) / 1_000_000_000.0}")
+            val recorded = frames.isNotEmpty()
+            if (!recorded) {
+                failure.get()?.let {
+                    output.resolve("recording-error.txt").writeText(it.stackTraceToString())
+                }
+                println("IDE recorder produced no frames; no video for this run")
+            }
+            if (recorded) {
+                output
+                    .resolve("frames.ffconcat")
+                    .writeText(
+                        buildString {
+                            appendLine("ffconcat version 1.0")
+                            frames.forEachIndexed { index, (file, started) ->
+                                appendLine("file '$file'")
+                                val next = frames.getOrNull(index + 1)?.second ?: ended
+                                appendLine("duration ${(next - started) / 1_000_000_000.0}")
+                            }
+                            appendLine("file '${frames.last().first}'")
                         }
-                        appendLine("file '${frames.last().first}'")
-                    }
-                )
-            val result =
-                ProcessBuilder(
-                        "ffmpeg",
-                        "-hide_banner",
-                        "-loglevel",
-                        "error",
-                        "-y",
-                        "-f",
-                        "concat",
-                        "-safe",
-                        "1",
-                        "-i",
-                        "frames.ffconcat",
-                        "-vf",
-                        "pad=ceil(iw/2)*2:ceil(ih/2)*2",
-                        "-r",
-                        "12",
-                        "-c:v",
-                        "libx264",
-                        "-threads",
-                        "2",
-                        "-pix_fmt",
-                        "yuv420p",
-                        "-movflags",
-                        "+faststart",
-                        "$label.mp4",
                     )
-                    .directory(output.toFile())
-                    .inheritIO()
-                    .start()
-                    .waitFor()
-            check(result == 0) { "ffmpeg failed with exit code $result" }
-            println("IDE recording: ${output.resolve("$label.mp4")}")
+                val result =
+                    ProcessBuilder(
+                            "ffmpeg",
+                            "-hide_banner",
+                            "-loglevel",
+                            "error",
+                            "-y",
+                            "-f",
+                            "concat",
+                            "-safe",
+                            "1",
+                            "-i",
+                            "frames.ffconcat",
+                            "-vf",
+                            "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+                            "-r",
+                            "12",
+                            "-c:v",
+                            "libx264",
+                            "-threads",
+                            "2",
+                            "-pix_fmt",
+                            "yuv420p",
+                            "-movflags",
+                            "+faststart",
+                            "$label.mp4",
+                        )
+                        .directory(output.toFile())
+                        .inheritIO()
+                        .start()
+                        .waitFor()
+                check(result == 0) { "ffmpeg failed with exit code $result" }
+                println("IDE recording: ${output.resolve("$label.mp4")}")
+            }
         } catch (error: Throwable) {
             output.resolve("recording-error.txt").writeText(error.stackTraceToString())
-            if (scenarioError == null) output.resolve("result.txt").writeText("RECORDING FAILED\n")
-            if (scenarioError != null) scenarioError.addSuppressed(error) else throw error
+            println("IDE recording could not be assembled: ${error.message}")
         }
     }
 }

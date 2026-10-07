@@ -1,6 +1,7 @@
 CHANGELOG.md
 apps/intellij/*
 !apps/intellij/project.json
+!apps/intellij/e2e
 
 /.nx/cache
 /.nx/workspace-data

@@ -79,4 +79,54 @@ describe('TreeView root rendering', () => {
     expect(items).toHaveLength(1);
     expect(items![0].collapsible).toBe(TreeItemCollapsibleState.None);
   });
+
+  it('shows projects nested under a target-less project inside a folder', async () => {
+    // e2es/parent-d is an aggregator project without targets whose child
+    // projects live in its subdirectories. It must expand to reveal them.
+    const e2esNode = { dir: 'e2es', children: ['e2es/parent-d'] };
+    const parentNode = {
+      dir: 'e2es/parent-d',
+      projectName: 'parent-d-e2e',
+      projectConfiguration: projectNode('parent-d-e2e', 'e2es/parent-d', {}),
+      children: ['e2es/parent-d/child-a-e2e'],
+    };
+    const childNode = {
+      dir: 'e2es/parent-d/child-a-e2e',
+      projectName: 'parent-d-child-a-e2e',
+      projectConfiguration: projectNode(
+        'parent-d-child-a-e2e',
+        'e2es/parent-d/child-a-e2e',
+        { e2e: { command: 'echo child-a' } },
+      ),
+      children: [] as string[],
+    };
+
+    const view = new TreeView();
+    view.workspaceData = {
+      projectGraph: {
+        nodes: {
+          'parent-d-e2e': parentNode.projectConfiguration,
+          'parent-d-child-a-e2e': childNode.projectConfiguration,
+        },
+      },
+    } as never;
+    view.treeMap = new Map([
+      ['e2es', e2esNode],
+      ['e2es/parent-d', parentNode],
+      ['e2es/parent-d/child-a-e2e', childNode],
+    ]);
+    view.roots = [e2esNode];
+
+    const [folder] = (await view.getChildren())!;
+    const [parent] = (await view.getChildren(folder))!;
+
+    expect(parent.contextValue).toBe('project');
+    expect(parent.label).toBe('parent-d-e2e');
+    expect(parent.collapsible).not.toBe(TreeItemCollapsibleState.None);
+
+    const children = await view.getChildren(parent);
+    expect(children?.map((item) => item.label)).toContain(
+      'parent-d-child-a-e2e',
+    );
+  });
 });

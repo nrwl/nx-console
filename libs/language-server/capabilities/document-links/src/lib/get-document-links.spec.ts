@@ -160,6 +160,85 @@ it('should get document links for negated interpolated paths', async () => {
   documentMapper.dispose();
 });
 
+describe('{projectRoot} links when the file has no root property', () => {
+  async function linksFor(uri: string, content: string) {
+    const documentMapper = getLanguageModelCache();
+    const { document, jsonAst } = documentMapper.retrieve(
+      TextDocument.create(uri, 'json', 0, content),
+    );
+    const matchingSchemas = await languageService.getMatchingSchemas(
+      document,
+      jsonAst,
+      {
+        type: 'object',
+        properties: {
+          inputs: { type: 'array', items: { type: 'string' } },
+          nx: {
+            type: 'object',
+            properties: {
+              inputs: { type: 'array', items: { type: 'string' } },
+            },
+          },
+        },
+      },
+    );
+    const documentLinks = await getDocumentLinks(
+      '/workspace',
+      jsonAst,
+      document,
+      matchingSchemas,
+    );
+    documentMapper.dispose();
+    return documentLinks.map((link) => link.target);
+  }
+
+  it('should resolve {projectRoot} to the project.json directory, not sourceRoot', async () => {
+    expect(
+      await linksFor(
+        'file:///workspace/apps/my-app/project.json',
+        `
+{
+  "name": "my-app",
+  "sourceRoot": "apps/my-app/src",
+  "inputs": ["{projectRoot}/package.json"]
+}
+        `,
+      ),
+    ).toEqual(['file:///workspace/apps/my-app/package.json']);
+  });
+
+  it('should prefer root over a sourceRoot that comes first', async () => {
+    expect(
+      await linksFor(
+        'file:///workspace/apps/other/project.json',
+        `
+{
+  "sourceRoot": "apps/my-app/src",
+  "root": "apps/my-app",
+  "inputs": ["{projectRoot}/package.json"]
+}
+        `,
+      ),
+    ).toEqual(['file:///workspace/apps/my-app/package.json']);
+  });
+
+  it('should resolve {projectRoot} to the package.json directory', async () => {
+    expect(
+      await linksFor(
+        'file:///workspace/libs/my-lib/package.json',
+        `
+{
+  "name": "my-lib",
+  "nx": {
+    "inputs": ["{projectRoot}/tsconfig.lib.json"]
+  }
+}
+        `,
+      ),
+    ).toEqual(['file:///workspace/libs/my-lib/tsconfig.lib.json']);
+  });
+});
+
 it('should not throw when matching schema is malformed', async () => {
   const { document, jsonAst } = documentMapper.retrieve(
     TextDocument.create(

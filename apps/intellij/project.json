@@ -35,6 +35,140 @@
     "runAutomation": {
       "cache": false
     },
+    "prepareAutomationClient": {
+      "cache": false
+    },
+    "e2e": {
+      "executor": "nx:noop",
+      "cache": true,
+      "outputs": [],
+      "dependsOn": ["e2e-ci"]
+    },
+    "e2e-ci": {
+      "executor": "nx:noop",
+      "cache": true,
+      "outputs": [],
+      "dependsOn": [
+        "e2e-ci--project-view",
+        "e2e-ci--editor-features",
+        "e2e-ci--custom-requests",
+        "e2e-ci--lifecycle",
+        "e2e-ci--editor-freeze"
+      ]
+    },
+    "e2e-ci--project-view": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_E2E_EXPECTED_PROJECT" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/latest"],
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs",
+        "env": {
+          "NX_AUTOMATION_IDE_HEAP": "1g"
+        }
+      }
+    },
+    "e2e-ci--editor-features": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_AUTOMATION_FAULT" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/editor-features"],
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs",
+        "env": {
+          "NX_AUTOMATION_IDE_HEAP": "1g",
+          "NX_E2E_SCENARIO_NAME": "editor-features",
+          "NX_E2E_SCENARIO_CLASS": "dev.nx.console.automation.NxlsEditorFeaturesKt"
+        }
+      }
+    },
+    "e2e-ci--custom-requests": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_AUTOMATION_FAULT" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/custom-requests"],
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs",
+        "env": {
+          "NX_AUTOMATION_IDE_HEAP": "1g",
+          "NX_E2E_SCENARIO_NAME": "custom-requests",
+          "NX_E2E_SCENARIO_CLASS": "dev.nx.console.automation.NxlsCustomRequestsKt"
+        }
+      }
+    },
+    "e2e-ci--lifecycle": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_AUTOMATION_FAULT" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/lifecycle"],
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs",
+        "env": {
+          "NX_AUTOMATION_IDE_HEAP": "1g",
+          "NX_E2E_SCENARIO_NAME": "lifecycle",
+          "NX_E2E_SCENARIO_CLASS": "dev.nx.console.automation.NxlsLifecycleKt"
+        }
+      }
+    },
+    "e2e-ci--editor-freeze": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/.nx/workflows/agents.yaml",
+        { "env": "NX_AUTOMATION_FAULT" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e/editor-freeze"],
+      "options": {
+        "command": "node apps/intellij/e2e/run.mjs",
+        "env": {
+          "NX_AUTOMATION_IDE_HEAP": "1g",
+          "NX_E2E_SCENARIO_NAME": "editor-freeze",
+          "NX_E2E_SCENARIO_CLASS": "dev.nx.console.automation.ReproEditorFreezeKt"
+        }
+      }
+    },
     "instrumentCode": {
       "cache": true,
       "inputs": [
@@ -58,6 +192,7 @@
       "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
     },
     "prepareSandbox_runAutomationIde": {
+      "cache": false,
       "dependsOn": [
         "^build",
         "^build-webview-files",

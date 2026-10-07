@@ -84,11 +84,14 @@ export async function getProjectsByPaths(
   const projectEntries = Object.entries(projectGraph.nodes);
 
   const foundProjects: Map<string, ProjectConfiguration> = new Map();
+  // projects can be nested, so a directory belongs to the deepest project that contains it
+  const directoryMatchLengths = new Map<string, number>();
 
   for (const [projectName, projectConfig] of projectEntries) {
     // If there is no files array, it's an old version of Nx and we need backwards compatibility
     if (!projectFileMap?.[projectName]) {
       new Map(pathsMap).forEach((_, path) => {
+        if (directoryMatchLengths.has(path)) return;
         const foundProject = findByFilePath(
           [projectName, projectConfig.data],
           workspacePath,
@@ -116,9 +119,13 @@ export async function getProjectsByPaths(
       const isChildOfRootConfig =
         relativeRootConfig && isChildOrEqual(relativeRootConfig, relativePath);
 
-      if (isChildOfRoot || isChildOfRootConfig) {
+      const matchLength = Math.max(
+        isChildOfRoot ? normalize(projectConfig.data.root).length : -1,
+        isChildOfRootConfig ? normalize(relativeRootConfig).length : -1,
+      );
+      if (matchLength > (directoryMatchLengths.get(path) ?? -1)) {
         foundProjects.set(path, projectConfig.data);
-        pathsMap.delete(path);
+        directoryMatchLengths.set(path, matchLength);
       }
     });
 
@@ -138,6 +145,10 @@ export async function getProjectsByPaths(
     if (pathsMap.size === 0) {
       break;
     }
+  }
+
+  for (const path of directoryMatchLengths.keys()) {
+    pathsMap.delete(path);
   }
 
   // if a directory is not found in any projects & there's a root project, use that

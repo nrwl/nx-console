@@ -13,7 +13,9 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 
-const nxVersion = '22.7.0-beta.17';
+// Pinned to an nx that still publishes internals under `@nx/js/src/**`; nx 23 moved
+// them to `dist/src/**`, which nx-mcp-e2e's modern-nx-layout spec covers instead.
+const nxVersion = '22.7.0';
 const workspaceName = uniq('workspace');
 const workspacePath = join(e2eCwd, workspaceName);
 const convertToSwcSchemaPath = join(
