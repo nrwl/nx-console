@@ -17,7 +17,9 @@ fun NxGeneralCommandLine(
     cwd: String? = null,
 ) =
     GeneralCommandLine().apply {
-        exePath = NxExecutable.getExecutablePath(project.nxBasePath, project)
+        val nxCommand = NxExecutable.getNxCommand(project.nxBasePath, project)
+        exePath = nxCommand.first()
+        addParameters(nxCommand.drop(1))
         addParameters(args)
         val workDirectory =
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
