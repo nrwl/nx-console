@@ -9,7 +9,10 @@ export function cleanupMarkerFile(markerId: string): void {
 }
 
 export class VSCodeEvaluator {
-  constructor(private readonly markerId: string) {}
+  constructor(
+    private readonly markerId: string,
+    private readonly token: string,
+  ) {}
 
   private serverUrl: string | undefined;
 
@@ -21,6 +24,7 @@ export class VSCodeEvaluator {
     this.serverUrl = await new Promise<string>((resolve, reject) => {
       const markerFilePath = getMarkerFilePath(this.markerId);
       const timeout = setTimeout(() => {
+        clearInterval(poll);
         reject(
           new Error(
             `Timed out waiting for VSCodeTestServer URL at ${markerFilePath}`,
@@ -49,9 +53,16 @@ export class VSCodeEvaluator {
 
     const response = await fetch(`${this.serverUrl}/invoke`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
       body: JSON.stringify({ fn: fn.toString(), params: args }),
+      signal: AbortSignal.timeout(60_000),
     });
+
+    if (!response.ok)
+      throw new Error(`VS Code evaluator returned HTTP ${response.status}`);
 
     const data = (await response.json()) as {
       result?: T;
