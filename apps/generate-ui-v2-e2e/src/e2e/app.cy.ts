@@ -3,7 +3,11 @@ import {
   expectConsoleLogToHaveBeenCalledWith,
   spyOnConsoleLog,
 } from '../support/console-spy';
-import { clickShowMore, getFieldByName } from '../support/get-elements';
+import {
+  clickShowMore,
+  getFieldByName,
+  selectOption,
+} from '../support/get-elements';
 import { visitGenerateUi } from '../support/visit-generate-ui';
 import 'cypress-real-events';
 
@@ -29,7 +33,7 @@ describe('generate-ui-v2', () => {
     it('should properly pass values to generator', () => {
       clickShowMore();
       getFieldByName('option1').type('test-option1');
-      getFieldByName('select-field').select('option1');
+      selectOption('select-field', 'option1');
       getFieldByName('checkbox-field').click();
       getFieldByName('multiselect-field').select('option1');
       getFieldByName('multiselect-field').select('option2');
@@ -69,7 +73,7 @@ describe('generate-ui-v2', () => {
     it('should copy command to clipboard', () => {
       clickShowMore();
       getFieldByName('option1').type('test-option1');
-      getFieldByName('select-field').select('option1');
+      selectOption('select-field', 'option1');
       cy.get("[data-cy='copy-button']").realClick();
 
       cy.window()

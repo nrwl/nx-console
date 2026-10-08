@@ -2,7 +2,7 @@ import {
   expectConsoleLogToHaveBeenCalledWith,
   spyOnConsoleLog,
 } from '../support/console-spy';
-import { getFieldByName } from '../support/get-elements';
+import { getFieldByName, selectOption } from '../support/get-elements';
 import { visitGenerateUi } from '../support/visit-generate-ui';
 import { GeneratorSchema } from '@nx-console/shared-generate-ui-types';
 
@@ -40,11 +40,11 @@ describe('x-prompt labels', () => {
   beforeEach(() => visitGenerateUi(labelsSchema));
 
   it('shows labels in select field and submits raw value', () => {
-    cy.get('[id="type-field"] option[value="da"]').should(
+    cy.get('[id="type-field"] intellij-option[value="da"]').should(
       'contain.text',
       'Data Access',
     );
-    getFieldByName('type').select('da');
+    selectOption('type', 'da');
 
     spyOnConsoleLog().then((consoleLog: any) => {
       cy.get("[data-cy='generate-button']").click();
