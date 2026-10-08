@@ -139,6 +139,8 @@ export const intellijComboboxStyles = () => css`
   .selected-value {
     flex: 1 1 auto;
     font-family: inherit;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
     overflow: hidden;
     text-align: start;
     text-overflow: ellipsis;
