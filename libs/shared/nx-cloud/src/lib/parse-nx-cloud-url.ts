@@ -44,7 +44,9 @@ export function parseNxCloudUrl(url: string): ParsedNxCloudUrl | null {
   const runMatch = pathname.match(/\/runs\/([^/]+)(?:\/task\/(.+?))?(?:\/|$)/);
   if (runMatch) {
     const [, runId, taskId] = runMatch;
-    return taskId ? { type: 'task', runId, taskId } : { type: 'run', runId };
+    return taskId
+      ? { type: 'task', runId, taskId: decodeURIComponent(taskId) }
+      : { type: 'run', runId };
   }
 
   return null;
