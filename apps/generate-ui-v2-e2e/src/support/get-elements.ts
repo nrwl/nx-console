@@ -14,6 +14,13 @@ export const getFieldByName = (name: string) =>
     .get(`[id="${name}-field"]`)
     .filter((_, element) => element.checkVisibility());
 
+export const selectOption = (name: string, value: string) => {
+  getFieldByName(name).click();
+  cy.get(`[id="${name}-field"] intellij-option[value="${value}"]`)
+    .should('be.visible')
+    .click();
+};
+
 export const getFieldErrorByName = (name: string) =>
   cy.get(`[id="${name}-field-error"]`);
 

@@ -51,7 +51,7 @@ describe('autocomplete field', () => {
 
   it('should correctly render all options when expanded', () => {
     getFieldByName('option2').click();
-    cy.get('intellij-option').should('have.length', 13);
+    cy.get('[id="option2-field"] intellij-option').should('have.length', 13);
   });
 
   it('should show labels for tooltip-mapped options', () => {
