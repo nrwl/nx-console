@@ -40,23 +40,13 @@ export function parseNxCloudUrl(url: string): ParsedNxCloudUrl | null {
     };
   }
 
-  // Match /runs/{id}/task/{taskId} (must check before plain /runs/{id})
-  const taskMatch = pathname.match(/\/runs\/([^/]+)\/task\/(.+?)(?:\/|$)/);
-  if (taskMatch) {
-    return {
-      type: 'task',
-      runId: taskMatch[1],
-      taskId: decodeURIComponent(taskMatch[2]),
-    };
-  }
-
-  // Match /runs/{id} (with optional additional path segments)
-  const runMatch = pathname.match(/\/runs\/([^/]+)/);
+  // Match /runs/{id} with an optional /task/{taskId} suffix
+  const runMatch = pathname.match(/\/runs\/([^/]+)(?:\/task\/(.+?))?(?:\/|$)/);
   if (runMatch) {
-    return {
-      type: 'run',
-      runId: runMatch[1],
-    };
+    const [, runId, taskId] = runMatch;
+    return taskId
+      ? { type: 'task', runId, taskId: decodeURIComponent(taskId) }
+      : { type: 'run', runId };
   }
 
   return null;
