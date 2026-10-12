@@ -5,7 +5,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspClientDescriptor
 import com.intellij.platform.lsp.api.LspServerListener
 import com.intellij.platform.lsp.api.LspServerNotificationsHandler
-import com.intellij.platform.lsp.api.customization.LspCustomization
 import dev.nx.console.nxls.client.NxlsLoggingNotificationsHandler
 import dev.nx.console.nxls.client.NxlsLsp4jClient
 import dev.nx.console.nxls.server.NxlsLanguageServer
@@ -64,7 +63,4 @@ internal constructor(
                 session.serverStopped(generation)
             }
         }
-
-    override val lspCustomization: LspCustomization
-        get() = LspCustomization()
 }
