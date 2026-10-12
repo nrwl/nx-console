@@ -16,7 +16,7 @@ export type NxMcpConfig = {
   minimal?: boolean;
   debugLogs?: boolean;
   disableTelemetry?: boolean;
-  transport?: 'stdio' | 'sse' | 'http';
+  transport?: 'stdio' | 'http';
   port?: number;
 };
 
