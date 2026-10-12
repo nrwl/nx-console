@@ -3705,17 +3705,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/client@npm:2.0.0-beta.3":
-  version: 2.0.0-beta.3
-  resolution: "@modelcontextprotocol/client@npm:2.0.0-beta.3"
+"@modelcontextprotocol/client@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@modelcontextprotocol/client@npm:2.3.1"
   dependencies:
+    "@modelcontextprotocol/core": "npm:2.3.1"
     cross-spawn: "npm:^7.0.5"
     eventsource: "npm:^3.0.2"
-    eventsource-parser: "npm:^3.0.0"
+    eventsource-parser: "npm:^3.0.8"
     jose: "npm:^6.1.3"
     pkce-challenge: "npm:^5.0.0"
     zod: "npm:^4.2.0"
-  checksum: 10c0/4a3fbf8517b32d136af42171e267cb0a04fe0d38ed38dcae2412cfa23f052064efd1d6e0533d0d7ea71e9f50ba28147ee33ee28dc9091a4b26d18afe76c27280
+  checksum: 10c0/256acec240dc90dd3d0f572dfc5ea17f10824e12241144a084025c92442e80b4333eec3f86c27568d57d439991760e60487e36d31c9264a3d58832a5cccb012c
+  languageName: node
+  linkType: hard
+
+"@modelcontextprotocol/core@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@modelcontextprotocol/core@npm:2.3.1"
+  dependencies:
+    zod: "npm:^4.2.0"
+  checksum: 10c0/73b5b0b0b58cdb6b1cc59cdc702004ff881d00e065c182473a9e69507ec499ce5705ff494aa08b076e2151ba6bc039ecc514162ccb9d7a20d2fa98f2df7afedc
   languageName: node
   linkType: hard
 
@@ -3805,18 +3815,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/node@npm:2.0.0-beta.3":
-  version: 2.0.0-beta.3
-  resolution: "@modelcontextprotocol/node@npm:2.0.0-beta.3"
+"@modelcontextprotocol/node@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@modelcontextprotocol/node@npm:2.1.1"
   dependencies:
     "@hono/node-server": "npm:^1.19.9"
+    hono: "npm:^4.11.4"
   peerDependencies:
-    "@modelcontextprotocol/server": ^2.0.0-beta.3
-    hono: ^4.11.4
-  peerDependenciesMeta:
-    hono:
-      optional: true
-  checksum: 10c0/0ff8cb15d869eab80d1d7009eb3462cf0ac7a3fd87c8fea213a87f69d91e353543a873e009e35ac3ea51ac5a9535afc29fcc45d40781f127e9ea6cd560ea8c40
+    "@modelcontextprotocol/server": ^2.3.0
+  checksum: 10c0/3ae1b8379f8479e2a524ed8e4cb7c524cec573dea39e987a789402eb72c7a2ce835b4ade223c4f765b735085d73b35412291953e17373fdacca2768b7f0942c4
   languageName: node
   linkType: hard
 
@@ -3853,12 +3860,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/server@npm:2.0.0-beta.3":
-  version: 2.0.0-beta.3
-  resolution: "@modelcontextprotocol/server@npm:2.0.0-beta.3"
+"@modelcontextprotocol/server@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@modelcontextprotocol/server@npm:2.3.1"
   dependencies:
+    "@modelcontextprotocol/core": "npm:2.3.1"
     zod: "npm:^4.2.0"
-  checksum: 10c0/68316837acceb93375bcfba03c166c8072208beb9ac0b4fa198250a69dd6fefcdb677d7369538c2a1a9e5e32914f85fee182e9ad0dbc84a98844b1e6dd52beec
+  checksum: 10c0/f3e8159af5cb51211109ae4817c0cfcdf349171c090d4a355dafe6117038f9a807052289cb1376d67ad4c005e3772cf1af076dbded498636a022d7c641253f12
   languageName: node
   linkType: hard
 
@@ -13201,6 +13209,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eventsource-parser@npm:^3.0.8":
+  version: 3.1.1
+  resolution: "eventsource-parser@npm:3.1.1"
+  checksum: 10c0/dd3236c61140587253dcaaf947de528ac0e7371caffdc53c77afaeee36a17661f00e251a6ea16af56c99be5ac138303e67b5d750630e7c41b02e3564e8ad8c44
+  languageName: node
+  linkType: hard
+
 "eventsource@npm:^3.0.2":
   version: 3.0.6
   resolution: "eventsource@npm:3.0.6"
@@ -18997,10 +19012,10 @@ __metadata:
     "@microsoft/fast-components": "npm:2.30.6"
     "@microsoft/fast-element": "npm:1.14.0"
     "@microsoft/fast-foundation": "npm:2.50.0"
-    "@modelcontextprotocol/client": "npm:2.0.0-beta.3"
+    "@modelcontextprotocol/client": "npm:2.3.1"
     "@modelcontextprotocol/inspector": "npm:0.16.8"
-    "@modelcontextprotocol/node": "npm:2.0.0-beta.3"
-    "@modelcontextprotocol/server": "npm:2.0.0-beta.3"
+    "@modelcontextprotocol/node": "npm:2.1.1"
+    "@modelcontextprotocol/server": "npm:2.3.1"
     "@monodon/typescript-nx-imports-plugin": "npm:0.3.0"
     "@nx/conformance": "npm:21.0.0-beta.0"
     "@nx/cypress": "npm:23.3.0-rc.1"
