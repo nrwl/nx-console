@@ -6,10 +6,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lang.lsWidget.LanguageServicePopupSection
-import com.intellij.platform.lsp.api.LspBundle
 import com.intellij.platform.lsp.api.LspClient
 import com.intellij.platform.lsp.api.LspServerState
 import com.intellij.platform.lsp.api.lsWidget.LspClientWidgetItem
+import dev.nx.console.NxConsoleBundle
 
 internal class NxlsClientWidgetItem(lspClient: LspClient, currentFile: VirtualFile?) :
     LspClientWidgetItem(lspClient, currentFile) {
@@ -22,7 +22,7 @@ internal class NxlsClientWidgetItem(lspClient: LspClient, currentFile: VirtualFi
         }
         return object :
             DumbAwareAction(
-                LspBundle.message("action.RestartLspServerAction.text"),
+                NxConsoleBundle.message("nxls.restart.server"),
                 null,
                 AllIcons.Actions.StopAndRestart,
             ) {
