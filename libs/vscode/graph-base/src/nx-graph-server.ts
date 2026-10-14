@@ -1,8 +1,12 @@
 import { findNxExecutable } from '@nx-console/shared-npm';
-import { httpRequest } from '@nx-console/shared-utils';
+import {
+  httpRequest,
+  spawnManagedProcess,
+  stopManagedProcess,
+} from '@nx-console/shared-utils';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess } from 'child_process';
 import { createServer } from 'net';
 import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
 
@@ -144,7 +148,7 @@ export class NxGraphServer implements Disposable {
   }
 
   async restart() {
-    this.dispose();
+    await this.stop();
     await this.start();
   }
 
@@ -155,33 +159,28 @@ export class NxGraphServer implements Disposable {
   private async spawnProcess(port: number): Promise<void> {
     const workspacePath = getNxWorkspacePath();
     const nxExecutable = await findNxExecutable(workspacePath);
+    if (!nxExecutable) {
+      throw new Error(`Could not find the nx executable in ${workspacePath}`);
+    }
 
     return await new Promise((resolve, reject) => {
       vscodeLogger.log(`Starting nx graph server at port ${port}`);
-      const nxGraphProcess = spawn(
-        nxExecutable,
-        [
-          'graph',
-          `--port`,
-          `${port}`,
-          '--open',
-          'false',
-          '--watch',
-          this.affected ? '--affected' : '',
-        ],
-        {
-          cwd: workspacePath,
-          windowsHide: true,
-          shell: true,
-          env: process.env,
-        },
-      );
+      const args = ['graph', '--port', `${port}`, '--open', 'false', '--watch'];
+      if (this.affected) {
+        args.push('--affected');
+      }
+      const nxGraphProcess = spawnManagedProcess(nxExecutable, args, {
+        cwd: workspacePath,
+        // nx.bat and nx.cmd can only be started through a shell on Windows
+        shell: process.platform === 'win32',
+        env: process.env,
+      });
 
-      nxGraphProcess.stdout.setEncoding('utf8');
-      nxGraphProcess.stderr.setEncoding('utf8');
+      nxGraphProcess.stdout?.setEncoding('utf8');
+      nxGraphProcess.stderr?.setEncoding('utf8');
 
       let stdErrOutput = '';
-      nxGraphProcess.stdout.on('data', (data) => {
+      nxGraphProcess.stdout?.on('data', (data) => {
         const text: string = data.toString().trim().toLowerCase();
 
         if (!text) return;
@@ -193,11 +192,13 @@ export class NxGraphServer implements Disposable {
           this.updatedEventEmitter.fire(true);
         }
       });
-      nxGraphProcess.stderr.on('data', (data) => {
+      nxGraphProcess.stderr?.on('data', (data) => {
         stdErrOutput += data.toString();
       });
       nxGraphProcess.on('exit', async () => {
-        this.isStarted = false;
+        if (this.nxGraphProcess === nxGraphProcess) {
+          this.isStarted = false;
+        }
         reject(stdErrOutput);
       });
 
@@ -244,8 +245,17 @@ export class NxGraphServer implements Disposable {
     });
   }
 
-  dispose() {
-    this.nxGraphProcess?.kill('SIGINT');
+  async stop() {
+    const nxGraphProcess = this.nxGraphProcess;
     this.nxGraphProcess = undefined;
+    this.isStarted = false;
+    this.isStarting = false;
+    if (nxGraphProcess) {
+      await stopManagedProcess(nxGraphProcess);
+    }
+  }
+
+  dispose() {
+    this.stop();
   }
 }
