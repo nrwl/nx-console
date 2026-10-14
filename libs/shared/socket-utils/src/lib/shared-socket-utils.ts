@@ -1,9 +1,9 @@
 import { importNxPackagePath } from '@nx-console/shared-npm';
 import { consoleLogger, loadRootEnvFiles } from '@nx-console/shared-utils';
-import { chmodSync, lstatSync, mkdirSync, unlinkSync } from 'fs';
+import { chmodSync, existsSync, lstatSync, mkdirSync, unlinkSync } from 'fs';
 import { Socket } from 'net';
 import { platform, tmpdir } from 'os';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 
 const DAEMON_DIR_FOR_CURRENT_WORKSPACE = join('.nx', 'workspace-data', 'd');
 
@@ -30,7 +30,7 @@ async function socketDirName(workspaceRoot: string): Promise<string> {
  * explicitly whenever the directory is ours to change.
  */
 function ensureOwnedPrivateDir(dir: string) {
-  mkdirSync(dir, { recursive: true, mode: OWNER_ONLY_DIR_MODE });
+  makeDirectories(dir, OWNER_ONLY_DIR_MODE);
 
   const stats = lstatSync(dir);
 
@@ -68,6 +68,32 @@ function ensureOwnedPrivateDir(dir: string) {
     consoleLogger.log(
       `Could not restrict socket dir ${dir} to 0700. Nx may refuse to use it.`,
     );
+  }
+}
+
+/**
+ * `mkdirSync` with `recursive: true` never returns when the file system reports
+ * a missing entry for a directory it just failed to create, as procfs does on
+ * Linux, and the directory can come from an environment variable. Creating one
+ * level at a time turns that into an error.
+ */
+function makeDirectories(dir: string, mode: number) {
+  const missing: string[] = [];
+  for (
+    let current = dir;
+    !existsSync(current) && dirname(current) !== current;
+    current = dirname(current)
+  ) {
+    missing.unshift(current);
+  }
+  for (const directory of missing) {
+    try {
+      mkdirSync(directory, { mode });
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== 'EEXIST') {
+        throw e;
+      }
+    }
   }
 }
 

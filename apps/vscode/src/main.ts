@@ -14,6 +14,7 @@ import {
 
 import {
   configureCustomCACertificates,
+  killAllManagedProcesses,
   killGroup,
   withTimeout,
 } from '@nx-console/shared-utils';
@@ -174,6 +175,7 @@ export async function deactivate() {
 
   workspaceFileWatcher?.dispose();
 
+  let nxlsResponded = true;
   try {
     await withTimeout(
       async () =>
@@ -184,17 +186,18 @@ export async function deactivate() {
       2000,
     );
   } catch (e) {
-    // do nothing, we have to deactivate before the process is killed
+    nxlsResponded = false;
   }
 
+  // An nxls that does not answer cannot run its SIGTERM handler either.
   const nxlsPid = getNxlsClient()?.getNxlsPid();
   if (nxlsPid) {
-    killGroup(nxlsPid);
+    killGroup(nxlsPid, nxlsResponded ? 'SIGTERM' : 'SIGKILL');
   }
 
   getTelemetry().logUsage('extension-deactivate');
 
-  killGroup(process.pid);
+  killAllManagedProcesses();
 }
 
 // -----------------------------------------------------------------------------

@@ -7,3 +7,4 @@ export * from './lib/get-available-nx-plugins';
 export * from './lib/loadRootEnvFiles';
 export * from './lib/provenance';
 export * from './lib/http-client';
+export * from './lib/managed-process';

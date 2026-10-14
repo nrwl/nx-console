@@ -18,6 +18,14 @@ export async function getConfigureAiAgentsStatus(
       return null;
     }
 
+    // The daemon client starts a daemon on demand, even where Nx disabled it.
+    if (!daemonClientModule.daemonClient.enabled()) {
+      lspLogger.log(
+        'Daemon is disabled, skipping configure-ai-agents status check',
+      );
+      return null;
+    }
+
     if (
       typeof daemonClientModule.daemonClient.getConfigureAiAgentsStatus !==
       'function'
