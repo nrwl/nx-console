@@ -23,7 +23,6 @@
     "@modelcontextprotocol/client": "2.0.0-beta.3",
     "@modelcontextprotocol/node": "2.0.0-beta.3",
     "@modelcontextprotocol/server": "2.0.0-beta.3",
-    "@modelcontextprotocol/server-legacy": "2.0.0-beta.2",
     "@open-wc/lit-helpers": "0.6.0",
     "@vscode-elements/elements": "1.9.2-pre.1",
     "@vscode/chat-extension-utils": "0.0.0-alpha.5",

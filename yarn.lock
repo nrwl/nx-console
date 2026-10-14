@@ -3853,25 +3853,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/server-legacy@npm:2.0.0-beta.2":
-  version: 2.0.0-beta.2
-  resolution: "@modelcontextprotocol/server-legacy@npm:2.0.0-beta.2"
-  dependencies:
-    content-type: "npm:^1.0.5"
-    cors: "npm:^2.8.5"
-    express-rate-limit: "npm:^8.2.1"
-    pkce-challenge: "npm:^5.0.0"
-    raw-body: "npm:^3.0.0"
-    zod: "npm:^4.2.0"
-  peerDependencies:
-    express: ^4.18.0 || ^5.0.0
-  peerDependenciesMeta:
-    express:
-      optional: true
-  checksum: 10c0/3f98e1550dfe064c9466c82ee225f11d793abfd56c31ef754937b48c03466f6f2c325ce8ee3fb3d98b9aa439fac48600967dea0c7a67293eea5a38443cc765d3
-  languageName: node
-  linkType: hard
-
 "@modelcontextprotocol/server@npm:2.0.0-beta.3":
   version: 2.0.0-beta.3
   resolution: "@modelcontextprotocol/server@npm:2.0.0-beta.3"
@@ -19020,7 +19001,6 @@ __metadata:
     "@modelcontextprotocol/inspector": "npm:0.16.8"
     "@modelcontextprotocol/node": "npm:2.0.0-beta.3"
     "@modelcontextprotocol/server": "npm:2.0.0-beta.3"
-    "@modelcontextprotocol/server-legacy": "npm:2.0.0-beta.2"
     "@monodon/typescript-nx-imports-plugin": "npm:0.3.0"
     "@nx/conformance": "npm:21.0.0-beta.0"
     "@nx/cypress": "npm:23.3.0-rc.1"

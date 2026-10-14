@@ -3,10 +3,9 @@ import { NxMcpConfig } from '@nx-console/nx-mcp-server';
 
 export interface ArgvType extends NxMcpConfig {
   workspacePath?: string;
-  // Deprecated/hidden options
+  // Removed options, kept only to explain the removal
   sse: boolean;
   http: boolean;
-  keepAliveInterval: number;
   // Yargs internals
   _: (string | number)[];
   $0: string;
@@ -29,35 +28,25 @@ export function createYargsConfig(args: string[]): Argv<any> {
     })
     .option('transport', {
       describe: 'Transport protocol to use',
-      choices: ['stdio', 'sse', 'http'] as const,
+      choices: ['stdio', 'http'] as const,
       default: 'stdio',
       type: 'string',
     })
     .option('sse', {
-      describe:
-        'Configure the server to use SSE (Server-Sent Events) [DEPRECATED: Use --transport sse instead]',
+      describe: 'Removed: use --transport http',
       type: 'boolean',
       default: false,
-      deprecated: true,
       hidden: true,
     })
     .option('port', {
       alias: 'p',
-      describe: 'Port to use for the HTTP/SSE server (default: 9921)',
+      describe: 'Port to use for the HTTP server (default: 9921)',
       type: 'number',
     })
     .option('disableTelemetry', {
       describe: 'Disable sending of telemetry data',
       type: 'boolean',
       default: false,
-    })
-    .option('keepAliveInterval', {
-      describe:
-        'Interval in milliseconds to send SSE keep-alive messages (default: 30000, 0 to disable)',
-      type: 'number',
-      deprecated: true,
-      hidden: true,
-      default: 30000,
     })
     .option('debugLogs', {
       describe: 'Enable debug logging',
@@ -82,24 +71,16 @@ export function createYargsConfig(args: string[]): Argv<any> {
       default: true,
     })
     .check((argv) => {
-      // Check for conflicting options
-      if (argv.sse && argv.transport === 'http') {
-        throw new Error('Cannot use both sse and http transport together');
-      }
-      // Handle backward compatibility
       if (argv.sse) {
-        console.warn(
-          'Warning: --sse option is deprecated. Please use --transport sse instead.',
+        throw new Error(
+          'The SSE transport has been removed. Use --transport http and connect to http://localhost:<port>/mcp instead.',
         );
-        if (!argv.transport || argv.transport === 'stdio') {
-          argv.transport = 'sse';
-        }
       }
 
       // Validate port usage
       if (argv.port !== undefined && argv.transport === 'stdio') {
         throw new Error(
-          'The --port option can only be used when transport is set to sse or http',
+          'The --port option can only be used when transport is set to http',
         );
       }
 
