@@ -37,7 +37,7 @@ describe('loadNxMcpConfig', () => {
       JSON.stringify({
         minimal: true,
         debugLogs: false,
-        transport: 'sse',
+        transport: 'http',
         port: 9922,
         tools: ['nx_docs', '!cloud_*'],
         disableTelemetry: true,
@@ -47,7 +47,7 @@ describe('loadNxMcpConfig', () => {
     expect(loadNxMcpConfig('/workspace')).toEqual({
       minimal: true,
       debugLogs: false,
-      transport: 'sse',
+      transport: 'http',
       port: 9922,
       tools: ['nx_docs', '!cloud_*'],
       disableTelemetry: true,
@@ -69,11 +69,11 @@ describe('loadNxMcpConfig', () => {
     mockedReadFileSync.mockReturnValue(`{
       // enable minimal mode
       "minimal": true,
-      "transport": "sse" // use server-sent events
+      "transport": "http" // serve over Streamable HTTP
     }`);
     expect(loadNxMcpConfig('/workspace')).toEqual({
       minimal: true,
-      transport: 'sse',
+      transport: 'http',
     });
   });
 
@@ -124,7 +124,10 @@ describe('configToArgs', () => {
   });
 
   it('should convert string values', () => {
-    expect(configToArgs({ transport: 'sse' })).toEqual(['--transport', 'sse']);
+    expect(configToArgs({ transport: 'http' })).toEqual([
+      '--transport',
+      'http',
+    ]);
   });
 
   it('should convert number values', () => {
