@@ -89,6 +89,17 @@ describePosix('managed processes', () => {
     expect(error).toMatchObject({ timedOut: true });
   });
 
+  it('settles when a process in another group keeps stdout open', async () => {
+    // `set -m` puts the background job in its own group, out of reach of the
+    // wrapper, and it inherits stdout
+    const started = Date.now();
+    const result = await runManagedCommand('set -m; sleep 5 & echo done', {
+      timeoutMs: 20_000,
+    });
+    expect(result.stdout).toBe('done\n');
+    expect(Date.now() - started).toBeLessThan(4500);
+  });
+
   it('keeps arguments with spaces intact', async () => {
     const child = spawnManagedProcess('printf', ['%s|', 'one two', '']);
     let output = '';

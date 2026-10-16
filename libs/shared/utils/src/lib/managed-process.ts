@@ -84,18 +84,18 @@ export async function stopManagedProcess(
     return;
   }
   if (process.platform === 'win32') {
-    killGroup(pid);
+    if (!hasExited(child)) {
+      killGroup(pid);
+    }
     return;
   }
 
-  killGroup(pid, 'SIGTERM');
+  signalGroup(pid, 'SIGTERM');
   const deadline = Date.now() + graceMs;
   while (groupExists(pid) && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (groupExists(pid)) {
-    killGroup(pid, 'SIGKILL');
-  }
+  signalGroup(pid, 'SIGKILL');
 }
 
 /**
@@ -104,8 +104,13 @@ export async function stopManagedProcess(
  */
 export function killAllManagedProcesses(signal: NodeJS.Signals = 'SIGTERM') {
   for (const child of running) {
-    if (child.pid) {
+    if (!child.pid) {
+      continue;
+    }
+    if (process.platform === 'win32') {
       killGroup(child.pid, signal);
+    } else {
+      signalGroup(child.pid, signal);
     }
   }
   running.clear();
@@ -152,6 +157,8 @@ export function runManagedCommand(
     let stdout = '';
     let stderr = '';
     let timedOut = false;
+    let settled = false;
+    let drain: ReturnType<typeof setTimeout> | undefined;
     child.stdout?.on('data', (data) => (stdout += data.toString()));
     child.stderr?.on('data', (data) => (stderr += data.toString()));
 
@@ -162,12 +169,29 @@ export function runManagedCommand(
 
     child.on('error', (error) => {
       clearTimeout(timer);
+      settled = true;
       reject(
         new ManagedCommandError(error.message, stdout, stderr, null, false),
       );
     });
-    child.on('close', (code) => {
+    // A process that moved to its own group (a daemon, for example) can keep
+    // stdout open after the command is done, and then 'close' never comes.
+    child.on('exit', (code) => {
+      drain = setTimeout(() => {
+        child.stdout?.destroy();
+        child.stderr?.destroy();
+        settle(code);
+      }, 2000);
+    });
+    child.on('close', (code) => settle(code));
+
+    function settle(code: number | null) {
+      if (settled) {
+        return;
+      }
+      settled = true;
       clearTimeout(timer);
+      clearTimeout(drain);
       if (code === 0 && !timedOut) {
         resolve({ stdout, stderr });
         return;
@@ -184,8 +208,25 @@ export function runManagedCommand(
           timedOut,
         ),
       );
-    });
+    }
   });
+}
+
+function hasExited(child: ChildProcess) {
+  return child.exitCode !== null || child.signalCode !== null;
+}
+
+/*
+ * A managed process always leads its own group on POSIX, and the group outlives
+ * it while anything it started is still running. Unlike `killGroup`, this never
+ * falls back to the pid, which may belong to another process by now.
+ */
+function signalGroup(pgid: number, signal: NodeJS.Signals) {
+  try {
+    process.kill(-pgid, signal);
+  } catch {
+    // the whole group is gone
+  }
 }
 
 function groupExists(pgid: number) {

@@ -25,11 +25,15 @@ export function killGroup(pid: number, signal: NodeJS.Signals = 'SIGTERM') {
     return;
   }
 
-  try {
-    process.kill(-pid, signal);
-    return;
-  } catch {
-    // not a group leader, or already gone
+  // The current process may lead its own group, and signalling that group
+  // would include itself.
+  if (pid !== process.pid) {
+    try {
+      process.kill(-pid, signal);
+      return;
+    } catch {
+      // not a group leader, or already gone
+    }
   }
 
   for (const descendant of sameGroupDescendants(pid)) {

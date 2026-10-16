@@ -71,6 +71,7 @@ export class McpHttpServerCore {
           if (!session) {
             return;
           }
+          this.trackOpenResponse(session, res);
           await session.transport.handleRequest(req, res, req.body);
           return;
         }
@@ -182,11 +183,7 @@ export class McpHttpServerCore {
         return;
       }
 
-      session.openStreams++;
-      res.on('close', () => {
-        session.openStreams--;
-        session.lastActivity = Date.now();
-      });
+      this.trackOpenResponse(session, res);
       await session.transport.handleRequest(req, res);
     });
 
@@ -260,6 +257,16 @@ export class McpHttpServerCore {
     }
     session.lastActivity = Date.now();
     return session;
+  }
+
+  // A response can stay open for a long time: a GET stream, or a POST whose
+  // tool call streams its result. The session is not idle while one is open.
+  private trackOpenResponse(session: McpSession, res: Response) {
+    session.openStreams++;
+    res.on('close', () => {
+      session.openStreams--;
+      session.lastActivity = Date.now();
+    });
   }
 
   private closeSession(sessionId: string) {
