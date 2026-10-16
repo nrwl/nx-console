@@ -5,7 +5,11 @@ import {
   detectPackageManager,
   getPackageManagerCommand,
 } from '@nx-console/shared-npm';
-import { nxLatestProvenanceCheck } from '@nx-console/shared-utils';
+import {
+  nxLatestProvenanceCheck,
+  spawnManagedProcess,
+  stopManagedProcess,
+} from '@nx-console/shared-utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getConfigureAiAgentsStatus,
@@ -14,7 +18,7 @@ import {
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { getWorkspacePath } from '@nx-console/vscode-utils';
-import { exec, spawn } from 'child_process';
+import { exec } from 'child_process';
 import { createHash } from 'crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
@@ -165,7 +169,7 @@ async function doRunAiAgentCheck(
     command = result.command;
     await new Promise((resolve, reject) => {
       commandStartTime = Date.now();
-      const childProcess = spawn(command, {
+      const childProcess = spawnManagedProcess(command, [], {
         cwd: workspacePath,
         env: {
           ...process.env,
@@ -188,7 +192,7 @@ async function doRunAiAgentCheck(
       const timeout = setTimeout(() => {
         weKilledIt = true;
         commandKilledTimed = Date.now();
-        childProcess.kill();
+        stopManagedProcess(childProcess);
       }, 360000);
 
       childProcess.stdout?.on('data', (data) => {

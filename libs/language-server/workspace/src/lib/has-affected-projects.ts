@@ -1,7 +1,6 @@
-import { execSync } from 'child_process';
 import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { getNxExecutionCommand } from '@nx-console/shared-npm';
-import { Logger } from '@nx-console/shared-utils';
+import { Logger, runManagedCommand } from '@nx-console/shared-utils';
 import { lspLogger } from '@nx-console/language-server-utils';
 
 export async function hasAffectedProjects(
@@ -15,11 +14,10 @@ export async function hasAffectedProjects(
     displayCommand: `nx show projects --affected`,
     encapsulatedNx: isEncapsulatedNx,
   });
-  const output = execSync(command, {
+  const { stdout } = await runManagedCommand(command, {
     cwd: workspacePath,
-    windowsHide: true,
-    stdio: 'pipe',
+    timeoutMs: 5 * 60_000,
   });
 
-  return output.toString().trim().length > 0;
+  return stdout.trim().length > 0;
 }

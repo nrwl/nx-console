@@ -180,6 +180,18 @@ export class NxMcpServerWrapper {
   }
 
   /**
+   * Stops this server and releases what it holds, leaving the IDE provider and
+   * other resources shared between servers alone.
+   */
+  async close(): Promise<void> {
+    this.stopPeriodicMonitoring();
+    this.stopCipeRefreshInterval();
+    this.ideConnectionCleanup?.();
+    this.ideConnectionCleanup = undefined;
+    await this.server.close();
+  }
+
+  /**
    * Cleanup resources when server shuts down
    */
   cleanup(): void {
