@@ -42,6 +42,9 @@ export function getNxGraphServer(context: ExtensionContext, affected = false) {
 export class NxGraphServer implements Disposable {
   private currentPort: number | undefined = undefined;
   private nxGraphProcess: ChildProcess | undefined = undefined;
+  // Bumped by stop(), so a start() that was still in progress does not spawn
+  // a second server or overwrite the state of the one started after it.
+  private generation = 0;
 
   isStarting = false;
   isStarted = false;
@@ -123,6 +126,7 @@ export class NxGraphServer implements Disposable {
     }
     this.isStarted = false;
     this.isStarting = true;
+    const generation = this.generation;
     let port = this.startPort;
 
     let isPortAvailable = false;
@@ -132,14 +136,23 @@ export class NxGraphServer implements Disposable {
         port++;
       }
     }
+    if (generation !== this.generation) {
+      return;
+    }
 
     this.currentPort = port;
     try {
-      await this.spawnProcess(port);
+      await this.spawnProcess(port, generation);
+      if (generation !== this.generation) {
+        return;
+      }
       console.log('successfully started nx graph at port', port);
       this.isStarted = true;
       this.isStarting = false;
     } catch (error) {
+      if (generation !== this.generation) {
+        return;
+      }
       console.error(`error while starting nx graph: ${error}`);
       this.isStarting = false;
       this.isStarted = false;
@@ -156,9 +169,12 @@ export class NxGraphServer implements Disposable {
     return !!this.nxGraphProcess && !!this.nxGraphProcess.exitCode;
   }
 
-  private async spawnProcess(port: number): Promise<void> {
+  private async spawnProcess(port: number, generation: number): Promise<void> {
     const workspacePath = getNxWorkspacePath();
     const nxExecutable = await findNxExecutable(workspacePath);
+    if (generation !== this.generation) {
+      return;
+    }
     if (!nxExecutable) {
       throw new Error(`Could not find the nx executable in ${workspacePath}`);
     }
@@ -246,6 +262,7 @@ export class NxGraphServer implements Disposable {
   }
 
   async stop() {
+    this.generation++;
     const nxGraphProcess = this.nxGraphProcess;
     this.nxGraphProcess = undefined;
     this.isStarted = false;

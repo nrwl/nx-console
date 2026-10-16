@@ -27,7 +27,7 @@ export async function createProjectGraph(
 
       return undefined;
     } catch (e) {
-      const errorMessage = `${e.stdout || e}`;
+      const errorMessage = `${e.stderr?.trim() || e.stdout?.trim() || e}`;
       throw 'Unable to create project graph: ' + errorMessage;
     }
   });
