@@ -2,6 +2,25 @@ name: VS Code E2E
 
 on:
   workflow_dispatch:
+    inputs:
+      extension-version:
+        description: Released Nx Console version to test instead of this revision's build (for example 18.101.1)
+        required: false
+        default: ''
+      label:
+        description: Evidence label (for example issue-1234-repro)
+        required: false
+        default: ci
+      grep:
+        description: Only run scenarios whose title matches this regular expression
+        required: false
+        default: ''
+  pull_request:
+    paths:
+      - 'apps/vscode/**'
+      - 'apps/vscode-e2e/**'
+      - 'libs/vscode/**'
+      - '.github/workflows/vscode-e2e.yml'
 
 permissions:
   contents: read
@@ -14,13 +33,20 @@ env:
   NX_CLOUD_ACCESS_TOKEN: ${{ github.ref == 'refs/heads/master' && secrets.NX_CLOUD_READ_WRITE_TOKEN || secrets.NX_CLOUD_READ_TOKEN }}
 
 jobs:
-  main-linux:
-    name: VS Code E2E
-    runs-on: ubuntu-latest
+  e2e:
+    name: VS Code E2E (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     env:
-      NX_CI_EXECUTION_ENV: 'linux'
+      NX_CI_EXECUTION_ENV: vscode-e2e-${{ matrix.os }}
       NX_VERBOSE_LOGGING: true
-      PLAYWRIGHT_VSCODE_VIDEO: '1'
+      NX_AUTOMATION_LABEL: ${{ inputs.label || 'ci' }}
+      VSCODE_E2E_EXTENSION_VERSION: ${{ inputs.extension-version }}
+      SCENARIO_GREP: ${{ inputs.grep }}
       GIT_AUTHOR_EMAIL: test@test.com
       GIT_AUTHOR_NAME: Test
       GIT_COMMITTER_EMAIL: test@test.com
@@ -54,14 +80,46 @@ jobs:
       - name: Install NPM dependencies
         run: yarn install --immutable
 
-      - name: Run VS Code E2E
-        run: yarn nx run vscode-e2e:e2e
+      - name: Install display and recording dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb ffmpeg
+          yarn playwright install-deps chromium
 
-      - name: Upload VS Code E2E videos
+      - name: Install recording dependencies
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
+      - name: Harness unit tests
+        run: yarn nx run vscode-e2e:test
+
+      - name: Record VS Code scenarios
+        run: yarn nx run vscode-e2e:record ${SCENARIO_GREP:+--grep="$SCENARIO_GREP"}
+
+      - name: Run a scenario against the persistent automation IDE
+        if: inputs.extension-version == ''
+        run: |
+          node --require @swc-node/register apps/vscode-e2e/automation/launch.ts --fixture=demo &
+          launcher=$!
+          for _ in $(seq 1 180); do
+            [ -f dist/apps/vscode-e2e/automation-ide/session.json ] && break
+            kill -0 "$launcher" || exit 1
+            sleep 1
+          done
+          yarn nx run vscode-e2e:automation -- inspect
+          VSCODE_E2E_ATTACH=1 NX_AUTOMATION_LABEL=ci-attached yarn nx run vscode-e2e:record --grep="smoke"
+          kill "$launcher"
+          wait "$launcher"
+          test ! -f dist/apps/vscode-e2e/automation-ide/session.json
+
+      - name: Upload VS Code automation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: vscode-e2e-videos-${{ github.run_id }}-${{ github.run_attempt }}
-          path: dist/apps/vscode-e2e/videos
-          if-no-files-found: warn
+          name: vscode-e2e-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            dist/apps/vscode-e2e/automation
+            dist/apps/vscode-e2e/automation-ide/ide.log
+          if-no-files-found: error
           retention-days: 14
