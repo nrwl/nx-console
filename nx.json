@@ -258,5 +258,8 @@
       "pattern": "{projectName}-v{version}"
     }
   },
-  "analytics": true
+  "analytics": true,
+  "affected": {
+    "legacy": true
+  }
 }
