@@ -1,1 +1,1 @@
-export   *   from './lib/shared-socket-utils'
+export * from './lib/shared-socket-utils';
