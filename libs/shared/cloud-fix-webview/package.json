@@ -60,21 +60,20 @@
         ]
       },
       "storybook": {
-        "executor": "@nx/storybook:storybook",
-        "continuous": true,
         "options": {
-          "configDir": "libs/shared/cloud-fix-webview/.storybook"
+          "cwd": ".",
+          "config-dir": "libs/shared/cloud-fix-webview/.storybook"
         }
       },
       "build-storybook": {
-        "executor": "@nx/storybook:build",
-        "outputs": [
-          "{options.outputDir}"
-        ],
         "options": {
-          "configDir": "libs/shared/cloud-fix-webview/.storybook",
-          "outputDir": "dist/storybook/vscode-nx-cloud-fix-webview"
-        }
+          "cwd": ".",
+          "config-dir": "libs/shared/cloud-fix-webview/.storybook",
+          "output-dir": "dist/storybook/vscode-nx-cloud-fix-webview"
+        },
+        "outputs": [
+          "{workspaceRoot}/dist/storybook/vscode-nx-cloud-fix-webview"
+        ]
       }
     },
     "name": "shared-cloud-fix-webview"
