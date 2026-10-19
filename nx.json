@@ -135,7 +135,8 @@
       "options": {
         "targetName": "e2e-local",
         "openTargetName": "open-cypress",
-        "ciTargetName": "e2e-ci"
+        "ciTargetName": "e2e-ci",
+        "waitForServerReady": false
       }
     },
     {
