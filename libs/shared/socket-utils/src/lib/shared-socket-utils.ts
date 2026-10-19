@@ -75,8 +75,8 @@ async function getSocketDir(workspaceRoot: string, env: NodeJS.ProcessEnv) {
   try {
     const dir = resolve(
       workspaceRoot,
-      env.NX_SOCKET_DIR ??
-        env.NX_DAEMON_SOCKET_DIR ??
+      env.NX_DAEMON_SOCKET_DIR ??
+        env.NX_SOCKET_DIR ??
         (await socketDirName(workspaceRoot)),
     );
 
