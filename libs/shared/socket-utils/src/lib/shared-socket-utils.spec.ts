@@ -202,14 +202,14 @@ describe('shared-socket-utils', () => {
       expect(socketPath).toEqual(join(socketDir, 'nx-console.sock'));
     });
 
-    it('prefers NX_SOCKET_DIR over NX_DAEMON_SOCKET_DIR', async () => {
+    it('prefers NX_DAEMON_SOCKET_DIR over NX_SOCKET_DIR', async () => {
       const workspaceRoot = makeTmpDir();
       const preferred = makeTmpDir('nxc-sock-');
       const ignored = makeTmpDir('nxc-sock-');
 
       const socketPath = await getNxConsoleSocketPath(workspaceRoot, {
-        NX_SOCKET_DIR: preferred,
-        NX_DAEMON_SOCKET_DIR: ignored,
+        NX_DAEMON_SOCKET_DIR: preferred,
+        NX_SOCKET_DIR: ignored,
       });
 
       expect(socketPath).toEqual(join(preferred, 'nx-console.sock'));
