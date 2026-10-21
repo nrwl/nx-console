@@ -40,6 +40,14 @@ subscription, close the dialog, and restart the automation IDE. The inspector
 saves the UI hierarchy even when Nx Console is disabled, so startup dialogs can
 also be inspected through Driver.
 
+To run the plugin in another installed IDE, such as an older build within the
+plugin's `sinceBuild` range or WebStorm, add `-PautomationIdePath=/Applications/WebStorm.app`
+to the launch arguments. Set `NX_AUTOMATION_SANDBOX` to a separate directory for
+each IDE so their settings and activation do not mix. The scenario client keeps
+using the Driver version of the configured platform. `ReproIdeBuildCompatibilityKt`
+checks that Nx Console either lists the fixture's projects in that IDE or is
+rejected by it as incompatible.
+
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if
 necessary. JMX is bound to loopback and allows local processes to execute code
