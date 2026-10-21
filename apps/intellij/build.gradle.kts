@@ -64,7 +64,13 @@ dependencies {
 intellijPlatformTesting {
     runIde {
         create("runAutomationIde") {
-            localPath = layout.dir(providers.provider { intellijPlatform.platformPath.toFile() })
+            localPath =
+                layout.dir(
+                    providers
+                        .gradleProperty("automationIdePath")
+                        .map { file(it) }
+                        .orElse(providers.provider { intellijPlatform.platformPath.toFile() })
+                )
             sandboxDirectory =
                 layout.dir(
                     providers
