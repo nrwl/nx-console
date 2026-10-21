@@ -156,10 +156,10 @@ class TarExtractTransform extends Transform {
 
   override _transform(
     chunk: Buffer,
-    encoding: BufferEncoding,
+    _encoding: BufferEncoding,
     callback: TransformCallback,
   ) {
-    const res = this.tarExtractStream.write(chunk, encoding);
+    const res = this.tarExtractStream.write(chunk);
     if (res) {
       callback();
     } else {
