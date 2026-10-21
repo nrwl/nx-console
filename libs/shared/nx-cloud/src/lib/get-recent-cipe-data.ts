@@ -8,6 +8,7 @@ import { nxCloudAuthHeaders } from './nx-cloud-auth-headers';
 import { nxCloudRequest } from './nx-cloud-request';
 
 const CACHE_TTL_MS = 5000; // 5 seconds
+const GIT_TIMEOUT_MS = 10_000;
 
 let lastFetchTimestamp = 0;
 let cachedWorkspacePath: string | null = null;
@@ -136,7 +137,13 @@ function getRecentlyCommittedGitBranches(
   workspacePath: string,
 ): { name: string; time: string }[] {
   try {
-    const localUserEmail = execSync('git config user.email').toString().trim();
+    const localUserEmail = execSync('git config user.email', {
+      cwd: workspacePath,
+      stdio: 'pipe',
+      timeout: GIT_TIMEOUT_MS,
+    })
+      .toString()
+      .trim();
     const oneWeekAgo = new Date(
       Date.now() - 60 * 60 * 24 * 7 * 1000,
     ).toISOString();
@@ -146,6 +153,8 @@ function getRecentlyCommittedGitBranches(
       'git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname) - %(committerdate:iso-strict) - %(authoremail)"',
       {
         cwd: workspacePath,
+        stdio: 'pipe',
+        timeout: GIT_TIMEOUT_MS,
       },
     ).toString();
 
@@ -193,6 +202,7 @@ export function getIgnoredBranches(workspacePath: string): string[] {
     const originHead = execSync('git symbolic-ref refs/remotes/origin/HEAD', {
       cwd: workspacePath,
       stdio: 'pipe',
+      timeout: GIT_TIMEOUT_MS,
     })
       .toString()
       .trim()
@@ -211,6 +221,7 @@ export function getIgnoredBranches(workspacePath: string): string[] {
       {
         cwd: workspacePath,
         stdio: 'pipe',
+        timeout: GIT_TIMEOUT_MS,
       },
     )
       .toString()

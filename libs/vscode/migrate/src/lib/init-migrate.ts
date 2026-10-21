@@ -6,7 +6,8 @@ import {
 } from '@nx-console/vscode-lsp-client';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
-import { getPackageInfo, watchFile } from '@nx-console/vscode-utils';
+import { httpRequest } from '@nx-console/shared-utils';
+import { watchFile } from '@nx-console/vscode-utils';
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
@@ -152,10 +153,42 @@ async function refreshNxVersionInfo(actor: ActorRef<any, any>) {
   });
 }
 
-async function getLatestNxVersion() {
+type LatestNxVersion = { major: number; minor: number; full: string };
+
+// Every workspace refresh asks for the latest version, and a refresh can run
+// every few seconds while files change. Each request also keeps a connection
+// open in the extension host for a while, so one answer is reused for an hour
+// and callers share a request that is already running.
+const LATEST_NX_VERSION_TTL_MS = 60 * 60_000;
+const LATEST_NX_VERSION_RETRY_MS = 5 * 60_000;
+let latestNxVersionCache:
+  | { value: Promise<LatestNxVersion | undefined>; expiresAt: number }
+  | undefined;
+
+function getLatestNxVersion(): Promise<LatestNxVersion | undefined> {
+  if (latestNxVersionCache && Date.now() < latestNxVersionCache.expiresAt) {
+    return latestNxVersionCache.value;
+  }
+  const cache = {
+    value: fetchLatestNxVersion().then((version) => {
+      cache.expiresAt =
+        Date.now() +
+        (version ? LATEST_NX_VERSION_TTL_MS : LATEST_NX_VERSION_RETRY_MS);
+      return version;
+    }),
+    expiresAt: Infinity,
+  };
+  latestNxVersionCache = cache;
+  return cache.value;
+}
+
+async function fetchLatestNxVersion(): Promise<LatestNxVersion | undefined> {
   try {
-    const packageInfo = await getPackageInfo('nx');
-    const versionString = packageInfo?.['dist-tags']?.latest;
+    const response = await httpRequest({
+      url: 'https://registry.npmjs.org/-/package/nx/dist-tags',
+      timeout: 30_000,
+    });
+    const versionString = JSON.parse(response.responseText)?.latest;
     const nxVersion = coerce(versionString, {
       includePrerelease: true,
     });
