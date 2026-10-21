@@ -7,6 +7,7 @@ import {
   MINIMAL_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
+  nxMcpServerCapabilities,
 } from '@nx-console/nx-mcp-server';
 import { gte } from '@nx-console/nx-version';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
@@ -65,11 +66,7 @@ async function main() {
     },
     {
       instructions: mcpServerInstructions,
-      capabilities: {
-        tools: {
-          listChanged: true,
-        },
-      },
+      capabilities: nxMcpServerCapabilities,
     },
   );
 
@@ -356,11 +353,7 @@ async function main() {
           },
           {
             instructions: mcpServerInstructions,
-            capabilities: {
-              tools: {
-                listChanged: true,
-              },
-            },
+            capabilities: nxMcpServerCapabilities,
           },
         );
 

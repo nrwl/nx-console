@@ -4,6 +4,7 @@ import {
   mcpServerInstructions,
   MINIMAL_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
+  nxMcpServerCapabilities,
 } from '@nx-console/nx-mcp-server';
 import { randomUUID } from 'crypto';
 import {
@@ -84,11 +85,7 @@ export class McpHttpServerCore {
             },
             {
               instructions: mcpServerInstructions,
-              capabilities: {
-                tools: {
-                  listChanged: true,
-                },
-              },
+              capabilities: nxMcpServerCapabilities,
             },
           );
 

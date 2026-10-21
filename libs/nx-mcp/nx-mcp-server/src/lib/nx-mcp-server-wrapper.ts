@@ -85,10 +85,6 @@ export class NxMcpServerWrapper {
 
     this.server.server.registerCapabilities({
       logging: {},
-      resources: {
-        listChanged: true,
-        subscribe: false,
-      },
     });
 
     this.logger = logger ?? getMcpLogger(this.server);
@@ -395,6 +391,12 @@ export class NxMcpServerWrapper {
   }
 }
 
+/**
+ * Pass these to the `McpServer` constructor. Declaring `resources` there installs the
+ * `resources/*` handlers before connecting, so they answer with an empty list until Nx Cloud
+ * resources are registered, and registering those after the client connected does not try to
+ * add a capability.
+ */
 export const nxMcpServerCapabilities: ServerCapabilities = {
   tools: {
     listChanged: true,
