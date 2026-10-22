@@ -1,9 +1,12 @@
 import {
+  clearDiagnostics,
   completionHandler,
   configureSchemaForProject,
   configureSchemas,
   projectSchemaIsRegistered,
   resetInferencePluginsCompletionCache,
+  revalidateOpenDocuments,
+  validateDocument,
 } from '@nx-console/language-server-capabilities-code-completion';
 import { getDefinition } from '@nx-console/language-server-capabilities-definition';
 import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
@@ -294,6 +297,11 @@ const jsonDocumentMapper = getLanguageModelCache();
 documents.onDidClose((e) => {
   NativeWatcher.onCloseDocument(e.document.uri);
   jsonDocumentMapper.onDocumentRemoved(e.document);
+  clearDiagnostics(connection, e.document.uri);
+});
+
+documents.onDidChangeContent(async (e) => {
+  await validateDocument(connection, e.document, jsonDocumentMapper);
 });
 
 documents.onDidOpen(async (e) => {
@@ -317,7 +325,14 @@ documents.onDidOpen(async (e) => {
     return;
   }
 
-  configureSchemaForProject(project.name, WORKING_PATH, CLIENT_CAPABILITIES);
+  await configureSchemaForProject(
+    project.name,
+    WORKING_PATH,
+    CLIENT_CAPABILITIES,
+  );
+  // The project schema only exists once it is registered, so the validation that ran on open
+  // saw the base schema. Run it again now that this project's targets are known.
+  await validateDocument(connection, e.document, jsonDocumentMapper);
 });
 
 connection.onShutdown(async () => {
@@ -510,6 +525,7 @@ async function reconfigure(
   );
   await configureSchemas(workingPath, CLIENT_CAPABILITIES);
   lspLogger.debug?.('reconfigure: Schemas configured');
+  await revalidateOpenDocuments(connection, documents, jsonDocumentMapper);
 
   lspLogger.debug?.('reconfigure: Unregistering previous file watcher...');
   await unregisterFileWatcher?.();
