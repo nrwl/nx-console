@@ -46,8 +46,12 @@ fun main() = withAutomationDriver {
 
     recordIde(System.getenv("NX_AUTOMATION_LABEL") ?: "nx-json-plugin-completion-repro") {
         openFile("nx.json")
-        val file = checkNotNull(service<FileEditorManager>(project).getCurrentFile())
-        val editor = checkNotNull(service<FileEditorManager>(project).getSelectedTextEditor())
+        val (file, editor) =
+            withContext(OnDispatcher.EDT) {
+                val editors = service<FileEditorManager>(project)
+                checkNotNull(editors.getCurrentFile()) to
+                    checkNotNull(editors.getSelectedTextEditor())
+            }
         val text = editor.getDocument().getText()
         val marker = "\"plugin\": \""
         val offset = text.indexOf(marker) + marker.length
@@ -55,8 +59,8 @@ fun main() = withAutomationDriver {
         withContext(OnDispatcher.EDT) { editor.getCaretModel().moveToOffset(offset) }
         Thread.sleep(2000)
 
-        // Completion is requested through the IDE's LSP client for the open, synced nx.json. The
-        // lookup popup would need OS focus, so the labels are read from the LSP response instead.
+        // Completion is requested through the IDE's LSP client for the open, synced nx.json, then
+        // shown in the lookup popup.
         fun completionLabels(at: Int): List<String> {
             val server = nxlsPlatformClient(project)
             return withReadAction {
@@ -70,28 +74,73 @@ fun main() = withAutomationDriver {
         var labels: List<String> = emptyList()
         var error: Throwable? = null
         val deadline = System.nanoTime() + 90.seconds.inWholeNanoseconds
+        // Requests can fail while nxls starts. Once it answers, allow a short grace period for the
+        // workspace to load, then stop so a failing build does not idle for the whole timeout.
+        val answeredGrace = 15.seconds.inWholeNanoseconds
+        var answeredAt: Long? = null
         while (System.nanoTime() < deadline) {
             runCatching { completionLabels(offset) }
                 .onSuccess {
                     labels = it
                     error = null
+                    answeredAt = answeredAt ?: System.nanoTime()
                 }
                 .onFailure { error = it }
             if (expectedPlugins.all { it in labels }) break
+            if (answeredAt?.let { System.nanoTime() - it > answeredGrace } == true) break
             Thread.sleep(2000)
         }
         val pluginLabels = labels.filter { it.endsWith("/plugin") }
+
+        // The lookup is an editor hint, which the platform only shows while the IDE is the active
+        // application, so this step brings the IDE to the front.
+        val lookupEditor = nxlsEditor(project)
+        withContext(OnDispatcher.EDT) { lookupEditor.getCaretModel().moveToOffset(offset) }
+        nxlsHideLookup(project)
+        nxlsFocusEditor(lookupEditor)
+        invokeAction("CodeCompletion", component = lookupEditor.getContentComponent())
+        var popupLabels: List<String>? = null
+        runCatching {
+            nxlsWait(20.seconds, { "No completion popup" }) {
+                withContext(OnDispatcher.EDT) {
+                    val lookup = service<NxlsLookups>(project).getActiveLookup()
+                    if (lookup == null || lookup.isCalculating()) return@withContext false
+                    popupLabels = lookup.getItems().map { it.getLookupString() }
+                    true
+                }
+            }
+        }
+        // The platform closes the lookup when the IDE loses focus, so the popup only counts if it
+        // stays on screen for the whole hold.
+        var popupHeld = popupLabels != null
+        val holdUntil = System.nanoTime() + 5.seconds.inWholeNanoseconds
+        while (popupHeld && System.nanoTime() < holdUntil) {
+            popupHeld =
+                withContext(OnDispatcher.EDT) {
+                    service<NxlsLookups>(project).getActiveLookup() != null
+                }
+            Thread.sleep(250)
+        }
+        if (popupLabels == null) Thread.sleep(5000)
+        nxlsHideLookup(project)
+        val popupPlugins =
+            if (popupHeld) popupLabels.orEmpty().filter { it.contains("/plugin") } else emptyList()
+
         // Control: a root key position in the same document, answered from the nx.json schema
         val keyOffset = text.indexOf("\"analytics\"") + 1
         val keyLabels =
             runCatching { completionLabels(keyOffset) }.getOrElse { listOf("error: $it") }
-        val passed = expectedPlugins.all { it in labels }
+        val passed =
+            expectedPlugins.all { expected ->
+                expected in labels && popupPlugins.any { it.contains(expected) }
+            }
         val report =
             "nx.json \"plugin\" completion through the IDE's Nx language server client\n\n" +
                 "Nx installed in the workspace: $installedNx\n" +
                 "Expected (installed Nx plugins with a ./plugin export): $expectedPlugins\n" +
                 "Completion items: ${labels.size}\n" +
                 "Plugin items: $pluginLabels\n" +
+                "Completion popup: ${popupLabels?.let { "${it.size} items, plugins ${it.filter { label -> label.contains("/plugin") }}" } ?: "not shown"}${if (popupLabels != null && !popupHeld) " (closed early, IDE lost focus)" else ""}\n" +
                 (error?.let { "Last request error: $it\n" } ?: "") +
                 "Control, root key completion in the same file: ${keyLabels.size} items\n" +
                 "\nRESULT: ${if (passed) "PASS" else "FAIL"}\n"

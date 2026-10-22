@@ -463,8 +463,14 @@ it at the end of the recording; that tab is diagnostic output, not product UI.
 value of `plugins[0].plugin` through the IDE's platform LSP client
 (`LspRequestExecutor.getCompletionList`). It asserts that the installed
 `@nx/eslint/plugin` and `@nx/vite/plugin` are offered. As a control, it also
-requests completion at a root key in the same file. The completion popup needs
-OS focus, so the scenario reads the LSP response instead of the lookup UI.
+requests completion at a root key in the same file.
+
+It then invokes Code Completion in the editor and requires the same plugins in
+the lookup popup for five seconds. The platform only shows editor hints, the
+lookup included, while the IDE is the active application, so this step
+activates the IDE and takes OS focus. If the IDE loses focus during the hold,
+the lookup closes and the scenario fails. On a broken build the editor shows
+"No suggestions" instead.
 
 Use a fixture named `nx24-plugin-completion-fixture` with `nx`, `@nx/js`,
 `@nx/eslint` and `@nx/vite` installed through npm, one project
