@@ -457,6 +457,46 @@ NX_AUTOMATION_LABEL=target-configuration-gutter CI=true \
 The scenario writes its report to `gutter-result.txt` in the fixture and opens
 it at the end of the recording; that tab is diagnostic output, not product UI.
 
+### nx.json plugin completion
+
+`ReproNxJsonPluginCompletionKt` opens `nx.json` and requests completion for the
+value of `plugins[0].plugin` through the IDE's platform LSP client
+(`LspRequestExecutor.getCompletionList`). It asserts that the installed
+`@nx/eslint/plugin` and `@nx/vite/plugin` are offered. As a control, it also
+requests completion at a root key in the same file.
+
+It then invokes Code Completion in the editor and requires the same plugins in
+the lookup popup for five seconds. The platform only shows editor hints, the
+lookup included, while the IDE is the active application, so this step
+activates the IDE and takes OS focus. If the IDE loses focus during the hold,
+the lookup closes and the scenario fails. On a broken build the editor shows
+"No suggestions" instead.
+
+Use a fixture named `nx24-plugin-completion-fixture` with `nx`, `@nx/js`,
+`@nx/eslint` and `@nx/vite` installed through npm, one project
+(`libs/util/project.json`), and this `nx.json`:
+
+```json
+{
+  "analytics": false,
+  "plugins": [{ "plugin": "@nx/eslint/plugin" }]
+}
+```
+
+Keep the plugin entry loadable. An empty `"plugin": ""` on disk stops Nx from
+building the project graph, and nxls then answers completion only after the
+daemon gives up.
+
+```sh
+NX_AUTOMATION_LABEL=nx-json-plugin-completion CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproNxJsonPluginCompletionKt'
+```
+
+The scenario writes its report to `plugin-completion-result.txt` in the fixture
+and opens it at the end of the recording; that tab is diagnostic output.
+
 References:
 
 - [JetBrains Driver SDK](https://github.com/JetBrains/intellij-community/blob/master/tools/intellij.tools.ide.starter.driver/README.md)
