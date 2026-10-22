@@ -119,7 +119,7 @@
     "type-fest": "2.19.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.63.0",
-    "vite": "8.0.9",
+    "vite": "8.3.4",
     "vscode-jsonrpc": "8.2.1"
   },
   "nx": {
