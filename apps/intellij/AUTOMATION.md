@@ -418,11 +418,13 @@ before the fix, and a single tab replaced by each dry run after it.
 ### Target configuration gutter
 
 `ReproTargetConfigurationGutterKt` runs the `production` configuration of a
-target from the `project.json` gutter. For each case it reads the gutter icon on
-the configuration's line, invokes the icon's **Run** menu entry through
-`ActionManager` with the gutter as context component, and asserts on the
-selected run configuration and the arguments a real Node process received.
-No native mouse or keyboard input is used.
+target from the `project.json` gutter. For each case it clicks the gutter icon on
+the configuration's line by dispatching AWT mouse events to the editor gutter in
+the IDE process, so the IDE opens its own gutter menu. It records the menu's
+entries, clicks **Run** with `AbstractButton.doClick` when the menu offers it,
+and asserts on the selected run configuration and the arguments a real Node
+process received. No native mouse or keyboard input is used. The gutter menu is
+a separate window that the recording composites onto the IDE frame.
 
 Use an npm workspace named `config-gutter-ts-fixture` with `"analytics": false`
 in `nx.json`, `nx` installed, and `"workspaces": ["packages/*"]`. Both projects
