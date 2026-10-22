@@ -415,6 +415,46 @@ Rerun with `NX_AUTOMATION_LABEL=issue-2054-fixed` after rebuilding and
 restarting the IDE. The video shows one pinned `Nx Generate` tab per dry run
 before the fix, and a single tab replaced by each dry run after it.
 
+### Target configuration gutter
+
+`ReproTargetConfigurationGutterKt` runs the `production` configuration of a
+target from the `project.json` gutter. For each case it reads the gutter icon on
+the configuration's line, invokes the icon's **Run** menu entry through
+`ActionManager` with the gutter as context component, and asserts on the
+selected run configuration and the arguments a real Node process received.
+No native mouse or keyboard input is used.
+
+Use an npm workspace named `config-gutter-ts-fixture` with `"analytics": false`
+in `nx.json`, `nx` installed, and `"workspaces": ["packages/*"]`. Both projects
+have a `build` target running `node tools/print-config.cjs <project>` with
+`"args": "--mode=default"` and a `production` configuration setting
+`"args": "--mode=production"`:
+
+- `packages/named/project.json` sets `"name": "named"`.
+- `packages/shop/project.json` has no `name`; Nx takes `@fixture/shop` from
+  `packages/shop/package.json`, as in Nx's TypeScript workspaces.
+
+`tools/print-config.cjs` writes its arguments to
+`.nx/automation-config-<project>.json`:
+
+```js
+const fs = require('node:fs');
+const args = process.argv.slice(2);
+console.log('Arguments received by the target:', JSON.stringify(args));
+fs.mkdirSync('.nx', { recursive: true });
+fs.writeFileSync(`.nx/automation-config-${args[0]}.json`, JSON.stringify(args));
+```
+
+```sh
+NX_AUTOMATION_LABEL=target-configuration-gutter CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproTargetConfigurationGutterKt'
+```
+
+The scenario writes its report to `gutter-result.txt` in the fixture and opens
+it at the end of the recording; that tab is diagnostic output, not product UI.
+
 References:
 
 - [JetBrains Driver SDK](https://github.com/JetBrains/intellij-community/blob/master/tools/intellij.tools.ide.starter.driver/README.md)

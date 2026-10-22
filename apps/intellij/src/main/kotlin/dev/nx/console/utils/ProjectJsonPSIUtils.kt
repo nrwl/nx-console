@@ -41,17 +41,7 @@ fun getNxTargetDescriptorFromNode(element: PsiElement, project: Project): NxTarg
         psiProjectJsonFile.virtualFile ?: return null
         val childPropertyLiteral = element.firstChild as? JsonStringLiteral ?: return null
         val nxTarget = childPropertyLiteral.value
-        val nxProject =
-            NxProjectJsonToProjectMap.getInstance(project)
-                .getProjectForProjectJson(element.containingFile)
-                ?.name
-                ?: (element
-                        .parentOfType<JsonObject>()
-                        ?.parentOfType<JsonObject>()
-                        ?.findProperty("name")
-                        ?.value as? JsonStringLiteral)
-                    ?.value
-                ?: return null
+        val nxProject = getNxProjectName(element, project) ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget)
     }
@@ -61,20 +51,26 @@ fun getNxTargetDescriptorFromNode(element: PsiElement, project: Project): NxTarg
         val nxTargetConfiguration = childPropertyLiteral.value
         val targetProperty = element.parent.parent.parent.parent as? JsonProperty ?: return null
         val nxTarget = targetProperty.name
-
-        val nxProject =
-            (targetProperty
-                    .parentOfType<JsonObject>()
-                    ?.parentOfType<JsonObject>()
-                    ?.findProperty("name")
-                    ?.value as? JsonStringLiteral)
-                ?.value ?: return null
+        val nxProject = getNxProjectName(targetProperty, project) ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget, nxTargetConfiguration)
     }
 
     return null
 }
+
+// project.json may omit "name", e.g. when it comes from package.json, so prefer the name nxls
+// resolved for this file
+private fun getNxProjectName(targetProperty: JsonProperty, project: Project): String? =
+    NxProjectJsonToProjectMap.getInstance(project)
+        .getProjectForProjectJson(targetProperty.containingFile)
+        ?.name
+        ?: (targetProperty
+                .parentOfType<JsonObject>()
+                ?.parentOfType<JsonObject>()
+                ?.findProperty("name")
+                ?.value as? JsonStringLiteral)
+            ?.value
 
 @OptIn(ExperimentalContracts::class)
 fun isTargetNodeInsideProjectJson(element: PsiElement): Boolean {

@@ -10,6 +10,7 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.findNxConfigurationFiles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.VisibleForTesting
 
 @Service(Service.Level.PROJECT)
 class NxProjectJsonToProjectMap(val project: Project, private val cs: CoroutineScope) {
@@ -37,10 +38,13 @@ class NxProjectJsonToProjectMap(val project: Project, private val cs: CoroutineS
 
     private suspend fun populateMap() {
         val paths = findNxConfigurationFiles(project, includeNxJson = false).map { it.path }
-        val projectsMap = NxlsService.getInstance(project).projectsByPaths(paths.toTypedArray())
+        setProjects(NxlsService.getInstance(project).projectsByPaths(paths.toTypedArray()))
+    }
 
+    @VisibleForTesting
+    internal fun setProjects(projectsByPath: Map<String, NxProject>) {
         pathsToProjectsMap.clear()
-        pathsToProjectsMap.putAll(projectsMap)
+        pathsToProjectsMap.putAll(projectsByPath)
     }
 
     companion object {
