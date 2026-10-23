@@ -1,0 +1,65 @@
+name: Publish IntelliJ
+
+on:
+  release:
+    types: [published]
+env:
+  node_version: 24
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: startsWith(github.event.release.tag_name, 'intellij-v')
+    environment: release-approval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: ${{ env.node_version }}
+          check-latest: true
+          cache: yarn
+      - name: Gradle Wrapper Validation
+        uses: gradle/actions/wrapper-validation@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
+      - name: Setup Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          distribution: zulu
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
+      - run: yarn install --immutable
+        shell: bash
+      # release.js never commits the version bump, so the tag is the only
+      # source of the version; gradle.properties on master stays stale.
+      - name: set version from release tag
+        run: |
+          VERSION="${TAG#intellij-v}"
+          sed -i "s/^version = .*/version = ${VERSION}/" gradle.properties
+          grep -qx "version = ${VERSION}" gradle.properties
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+      - name: build plugin
+        run: |
+          node ./tools/scripts/clear-dist.js
+          npx nx run intellij:buildPlugin --skip-nx-cache
+      # Published with gradle directly: the nx publishPlugin target is
+      # cacheable, and a cache hit would silently skip the upload.
+      - name: publish to jetbrains marketplace
+        run: ./gradlew :intellij:publishPlugin
+        env:
+          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
+      - name: attach zip to the GitHub Release
+        run: gh release upload "${{ github.event.release.tag_name }}" "dist/apps/intellij/distributions/nx-console-${VERSION}.zip" --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
