@@ -3,22 +3,38 @@ name: Publish IntelliJ
 on:
   release:
     types: [published]
+  # Dry run: builds the plugin zip and uploads it as a workflow artifact
+  # without publishing anything.
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to build (branch, tag or SHA)
+        default: master
+        required: true
+      version:
+        description: Plugin version to stamp into the zip (defaults to gradle.properties)
+        required: false
+  pull_request:
+    paths:
+      - .github/workflows/publish-intellij.yml
+
 env:
   node_version: 24
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  publish:
-    if: startsWith(github.event.release.tag_name, 'intellij-v')
-    environment: release-approval
+  build:
+    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'intellij-v')
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.ref || github.sha }}
           fetch-depth: 0
       - name: Enable Corepack
         run: corepack enable
@@ -39,27 +55,66 @@ jobs:
         uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
       - run: yarn install --immutable
         shell: bash
-      # release.js never commits the version bump, so the tag is the only
-      # source of the version; gradle.properties on master stays stale.
-      - name: set version from release tag
+      # release.js never commits the version bump, so for releases the tag is
+      # the only source of the version; gradle.properties on master stays stale.
+      - name: set version
+        id: version
         run: |
           VERSION="${TAG#intellij-v}"
+          if [ -z "$VERSION" ]; then VERSION="$INPUT_VERSION"; fi
+          if [ -z "$VERSION" ]; then VERSION="$(sed -n 's/^version = //p' gradle.properties)"; fi
           sed -i "s/^version = .*/version = ${VERSION}/" gradle.properties
           grep -qx "version = ${VERSION}" gradle.properties
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
         env:
           TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.version }}
       - name: build plugin
         run: |
           node ./tools/scripts/clear-dist.js
           npx nx run intellij:buildPlugin --skip-nx-cache
-      # Published with gradle directly: the nx publishPlugin target is
-      # cacheable, and a cache hit would silently skip the upload.
+      - name: check plugin zip
+        run: |
+          ZIP="dist/apps/intellij/distributions/nx-console-${VERSION}.zip"
+          unzip -l "$ZIP" | grep -q 'nx-console/nxls/main.js'
+          unzip -p "$ZIP" "nx-console/lib/intellij-${VERSION}.jar" > "$RUNNER_TEMP/plugin.jar"
+          unzip -l "$RUNNER_TEMP/plugin.jar" > "$RUNNER_TEMP/plugin-jar.txt"
+          grep -q ' generate_ui_v2/' "$RUNNER_TEMP/plugin-jar.txt"
+          grep -q ' cloud_fix_webview/' "$RUNNER_TEMP/plugin-jar.txt"
+          unzip -p "$RUNNER_TEMP/plugin.jar" META-INF/plugin.xml | grep -q "<version>${VERSION}</version>"
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nx-console-${{ steps.version.outputs.version }}
+          path: dist/apps/intellij/distributions/nx-console-${{ steps.version.outputs.version }}.zip
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.event_name == 'release'
+    environment: release-approval
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      ZIP: nx-console-${{ needs.build.outputs.version }}.zip
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: nx-console-${{ needs.build.outputs.version }}
+      # Uploads the exact zip built above, so a dry run of the same ref
+      # produces the bundle that gets published.
       - name: publish to jetbrains marketplace
-        run: ./gradlew :intellij:publishPlugin
+        run: |
+          curl --fail-with-body -sS \
+            -H "Authorization: Bearer ${PUBLISH_TOKEN}" \
+            -F xmlId=dev.nx.console \
+            -F "file=@${ZIP}" \
+            https://plugins.jetbrains.com/api/updates/upload
         env:
           PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
       - name: attach zip to the GitHub Release
-        run: gh release upload "${{ github.event.release.tag_name }}" "dist/apps/intellij/distributions/nx-console-${VERSION}.zip" --clobber
+        run: gh release upload "${{ github.event.release.tag_name }}" "${ZIP}" --clobber --repo "${{ github.repository }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
