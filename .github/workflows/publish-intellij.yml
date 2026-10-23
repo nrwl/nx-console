@@ -12,7 +12,7 @@ on:
         default: master
         required: true
       version:
-        description: Plugin version to stamp into the zip (defaults to gradle.properties)
+        description: Plugin version to stamp into the zip (defaults to the latest intellij-v* tag)
         required: false
   pull_request:
     paths:
@@ -55,14 +55,18 @@ jobs:
         uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
       - run: yarn install --immutable
         shell: bash
-      # release.js never commits the version bump, so for releases the tag is
-      # the only source of the version; gradle.properties on master stays stale.
+      # release.js never commits the version bump, so gradle.properties on master
+      # stays stale; the version comes from the release tag, the dispatch input,
+      # or the latest intellij-v* tag reachable from the built commit.
       - name: set version
         id: version
         run: |
           VERSION="${TAG#intellij-v}"
           if [ -z "$VERSION" ]; then VERSION="$INPUT_VERSION"; fi
-          if [ -z "$VERSION" ]; then VERSION="$(sed -n 's/^version = //p' gradle.properties)"; fi
+          if [ -z "$VERSION" ]; then
+            LATEST_TAG="$(git describe --tags --match 'intellij-v*' --abbrev=0)"
+            VERSION="${LATEST_TAG#intellij-v}"
+          fi
           sed -i "s/^version = .*/version = ${VERSION}/" gradle.properties
           grep -qx "version = ${VERSION}" gradle.properties
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
