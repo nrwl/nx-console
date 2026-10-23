@@ -97,7 +97,7 @@ jobs:
   publish:
     needs: build
     if: github.event_name == 'release'
-    environment: release-approval
+    environment: jb-release-approval
     runs-on: ubuntu-latest
     permissions:
       contents: write
