@@ -12,6 +12,10 @@
   <depends>com.intellij.modules.jcef</depends>
 
   <depends>Git4Idea</depends>
+  <!-- VCS and the Problems View are separate bundled plugins since 2026.3; on older builds these ids
+       do not exist and the classes come from the core platform -->
+  <depends optional="true" config-file="nx-console-vcs.xml">com.intellij.platform.vcs</depends>
+  <depends optional="true" config-file="nx-console-problems-view.xml">com.intellij.problemsView</depends>
 
   <depends>JavaScript</depends>
   <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>

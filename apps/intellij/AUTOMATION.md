@@ -46,7 +46,10 @@ to the launch arguments. Set `NX_AUTOMATION_SANDBOX` to a separate directory for
 each IDE so their settings and activation do not mix. The scenario client keeps
 using the Driver version of the configured platform. `ReproIdeBuildCompatibilityKt`
 checks that Nx Console either lists the fixture's projects in that IDE or is
-rejected by it as incompatible.
+rejected by it as incompatible. `ReproPlatformPluginDependenciesKt` breaks the
+fixture's `nx.json`, clicks **View Errors** and checks that the Problems tool
+window lists the error and that Nx Console can read the Git working tree, which
+covers the Problems View and VCS plugins that 2026.3 split out of the platform.
 
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if
