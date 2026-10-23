@@ -25,7 +25,8 @@ interface PluginCompletionFileSystem {
     fun refreshAndFindFileByPath(path: String): VirtualFile?
 }
 
-private val expectedPlugins = listOf("@nx/eslint/plugin", "@nx/vite/plugin")
+// @nx/vitest exports createNodes from its package root and is registered by its bare name
+private val expectedPlugins = listOf("@nx/eslint/plugin", "@nx/vite/plugin", "@nx/vitest")
 
 fun main() = withAutomationDriver {
     waitForProjectOpen(2.minutes)
@@ -90,7 +91,7 @@ fun main() = withAutomationDriver {
             if (answeredAt?.let { System.nanoTime() - it > answeredGrace } == true) break
             Thread.sleep(2000)
         }
-        val pluginLabels = labels.filter { it.endsWith("/plugin") }
+        val pluginLabels = labels.filter { it.startsWith("@nx/") }
 
         // The lookup is an editor hint, which the platform only shows while the IDE is the active
         // application, so this step brings the IDE to the front.
@@ -124,7 +125,7 @@ fun main() = withAutomationDriver {
         if (popupLabels == null) Thread.sleep(5000)
         nxlsHideLookup(project)
         val popupPlugins =
-            if (popupHeld) popupLabels.orEmpty().filter { it.contains("/plugin") } else emptyList()
+            if (popupHeld) popupLabels.orEmpty().filter { it.contains("@nx/") } else emptyList()
 
         // Control: a root key position in the same document, answered from the nx.json schema
         val keyOffset = text.indexOf("\"analytics\"") + 1
@@ -137,10 +138,10 @@ fun main() = withAutomationDriver {
         val report =
             "nx.json \"plugin\" completion through the IDE's Nx language server client\n\n" +
                 "Nx installed in the workspace: $installedNx\n" +
-                "Expected (installed Nx plugins with a ./plugin export): $expectedPlugins\n" +
+                "Expected (installed Nx inference plugins): $expectedPlugins\n" +
                 "Completion items: ${labels.size}\n" +
                 "Plugin items: $pluginLabels\n" +
-                "Completion popup: ${popupLabels?.let { "${it.size} items, plugins ${it.filter { label -> label.contains("/plugin") }}" } ?: "not shown"}${if (popupLabels != null && !popupHeld) " (closed early, IDE lost focus)" else ""}\n" +
+                "Completion popup: ${popupLabels?.let { "${it.size} items, plugins ${it.filter { label -> label.contains("@nx/") }}" } ?: "not shown"}${if (popupLabels != null && !popupHeld) " (closed early, IDE lost focus)" else ""}\n" +
                 (error?.let { "Last request error: $it\n" } ?: "") +
                 "Control, root key completion in the same file: ${keyLabels.size} items\n" +
                 "\nRESULT: ${if (passed) "PASS" else "FAIL"}\n"
