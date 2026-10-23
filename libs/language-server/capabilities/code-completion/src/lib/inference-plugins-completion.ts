@@ -25,17 +25,24 @@ export async function inferencePluginsCompletion(
   const dependencies = await workspaceDependencies(workingPath, nxVersion);
 
   for (const dependency of dependencies) {
-    if (await hasPluginEntryPoint(dependency)) {
-      const dependencyPath = dependency
-        .replace(/\\/g, '/')
-        .split('node_modules/')
-        .pop();
+    const dependencyPath = dependency
+      .replace(/\\/g, '/')
+      .split('node_modules/')
+      .pop();
 
-      if (dependencyPath?.includes('nx')) {
-        inferencePluginsCompletion.push({
-          label: `${dependencyPath}/plugin`,
-        });
-      }
+    if (!dependencyPath?.includes('nx')) {
+      continue;
+    }
+
+    const packageJson = await readPackageJson(dependency);
+    if (hasPluginEntryPoint(dependency, packageJson)) {
+      inferencePluginsCompletion.push({
+        label: `${dependencyPath}/plugin`,
+      });
+    } else if (await rootEntryExportsCreateNodes(dependency, packageJson)) {
+      inferencePluginsCompletion.push({
+        label: dependencyPath,
+      });
     }
   }
 
@@ -45,19 +52,68 @@ export async function inferencePluginsCompletion(
 }
 
 // Since Nx 23, plugins ship their entry points under dist/ and expose them via package.json exports
-async function hasPluginEntryPoint(dependency: string): Promise<boolean> {
+function hasPluginEntryPoint(
+  dependency: string,
+  packageJson: PackageJson | undefined,
+): boolean {
   if (existsSync(join(dependency, 'plugin.js'))) {
     return true;
   }
+  const exports = packageJson?.exports;
+  return (
+    typeof exports === 'object' && exports !== null && './plugin' in exports
+  );
+}
+
+// Some plugins (e.g. @nx/vitest) export createNodes from the package root and are registered by their bare name
+async function rootEntryExportsCreateNodes(
+  dependency: string,
+  packageJson: PackageJson | undefined,
+): Promise<boolean> {
+  if (!packageJson) {
+    return false;
+  }
+  const exports = packageJson.exports;
+  const rootExport =
+    typeof exports === 'object' && exports !== null && !Array.isArray(exports)
+      ? (exports as Record<string, unknown>)['.']
+      : exports;
+  const rootEntry =
+    resolveExportTarget(rootExport) ?? packageJson.main ?? 'index.js';
   try {
-    const { exports } = JSON.parse(
-      await readFile(join(dependency, 'package.json'), 'utf-8'),
-    );
-    return (
-      typeof exports === 'object' && exports !== null && './plugin' in exports
-    );
+    const source = await readFile(join(dependency, rootEntry), 'utf-8');
+    return /\bexports\.createNodes(V2)?\b/.test(source);
   } catch {
     return false;
+  }
+}
+
+function resolveExportTarget(target: unknown): string | undefined {
+  if (typeof target === 'string') {
+    return target;
+  }
+  if (typeof target === 'object' && target !== null) {
+    const conditions = target as Record<string, unknown>;
+    return (
+      resolveExportTarget(conditions['require']) ??
+      resolveExportTarget(conditions['node']) ??
+      resolveExportTarget(conditions['default'])
+    );
+  }
+  return undefined;
+}
+
+type PackageJson = { main?: string; exports?: unknown };
+
+async function readPackageJson(
+  dependency: string,
+): Promise<PackageJson | undefined> {
+  try {
+    return JSON.parse(
+      await readFile(join(dependency, 'package.json'), 'utf-8'),
+    );
+  } catch {
+    return undefined;
   }
 }
 

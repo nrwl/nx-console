@@ -465,7 +465,8 @@ it at the end of the recording; that tab is diagnostic output, not product UI.
 `ReproNxJsonPluginCompletionKt` opens `nx.json` and requests completion for the
 value of `plugins[0].plugin` through the IDE's platform LSP client
 (`LspRequestExecutor.getCompletionList`). It asserts that the installed
-`@nx/eslint/plugin` and `@nx/vite/plugin` are offered. As a control, it also
+`@nx/eslint/plugin` and `@nx/vite/plugin` are offered, along with `@nx/vitest`,
+which exports `createNodes` from its package root and has no `./plugin` entry. As a control, it also
 requests completion at a root key in the same file.
 
 It then invokes Code Completion in the editor and requires the same plugins in
@@ -476,7 +477,7 @@ the lookup closes and the scenario fails. On a broken build the editor shows
 "No suggestions" instead.
 
 Use a fixture named `nx24-plugin-completion-fixture` with `nx`, `@nx/js`,
-`@nx/eslint` and `@nx/vite` installed through npm, one project
+`@nx/eslint`, `@nx/vite` and `@nx/vitest` 24.0.0 installed through npm, one project
 (`libs/util/project.json`), and this `nx.json`:
 
 ```json
