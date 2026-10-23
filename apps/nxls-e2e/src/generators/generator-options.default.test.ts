@@ -44,7 +44,7 @@ describe('generator options', () => {
             e2eCwd,
             workspaceName,
             'node_modules',
-            '@nx/js/src/generators/library/schema.json',
+            '@nx/js/dist/src/generators/library/schema.json',
           ),
         } satisfies NxGeneratorOptionsRequestOptions,
       },
@@ -63,10 +63,11 @@ describe('generator options', () => {
       'name',
       'publishable',
       'unitTestRunner',
+      'enableTypedLinting',
+      'formatter',
       'includeBabelRc',
       'js',
       'minimal',
-      'setParserOptionsProject',
       'skipTypeCheck',
       'strict',
       'tags',
@@ -78,7 +79,6 @@ describe('generator options', () => {
       'skipTsConfig',
       'buildable',
       'compiler',
-      'simpleName',
     ]);
   });
 

@@ -19,6 +19,7 @@ testNxWorkspace(
         'e2e-ci--src/e2e/app.cy.ts',
         'lint',
         'open-cypress',
+        'typecheck',
       ],
     },
     {
@@ -31,7 +32,8 @@ testNxWorkspace(
         'serve',
         'serve-static',
         'test',
-        'typecheck',
+        'test-ci',
+        'test-ci--src/app/app.spec.tsx',
         'watch-deps',
       ],
     },

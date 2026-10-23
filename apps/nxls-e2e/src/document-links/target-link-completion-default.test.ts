@@ -67,7 +67,7 @@ describe('document link completion - default', () => {
           ...data.targets,
           build: {},
           serve: {
-            executor: '@nx/next:server',
+            executor: '@nx/web:file-server',
             options: {
               buildTarget: `@${workspaceName}/${workspaceName}:build`,
             },
