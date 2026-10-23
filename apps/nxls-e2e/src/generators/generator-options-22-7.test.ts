@@ -14,7 +14,7 @@ import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 
 // Pinned to an nx that still publishes internals under `@nx/js/src/**`; nx 23 moved
-// them to `dist/src/**`, which nx-mcp-e2e's modern-nx-layout spec covers instead.
+// them to `dist/src/**`, which the default-version e2e tests cover.
 const nxVersion = '22.7.0';
 const workspaceName = uniq('workspace');
 const workspacePath = join(e2eCwd, workspaceName);
