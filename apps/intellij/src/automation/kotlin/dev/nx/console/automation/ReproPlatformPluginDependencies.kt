@@ -186,13 +186,17 @@ fun main() = withAutomationDriver {
             // Project Errors tab. Select that tab through its content manager, without native
             // input.
             val contentManager =
-                utility<PluginDependenciesToolWindowManager>()
-                    .getInstance(singleProject())
-                    .getToolWindow("Problems View")
-                    ?.getContentManager()
+                withContext(OnDispatcher.EDT) {
+                    utility<PluginDependenciesToolWindowManager>()
+                        .getInstance(singleProject())
+                        .getToolWindow("Problems View")
+                        ?.getContentManager()
+                }
             val tabs =
-                contentManager?.getContents()?.toList().orEmpty().map {
-                    it to (it.getDisplayName() ?: "").replace(Regex("<[^>]+>|\\s+"), " ").trim()
+                withContext(OnDispatcher.EDT) {
+                    contentManager?.getContents()?.toList().orEmpty().map {
+                        it to (it.getDisplayName() ?: "").replace(Regex("<[^>]+>|\\s+"), " ").trim()
+                    }
                 }
             report.appendLine("Problems tabs: ${tabs.map { it.second }}")
             tabs
