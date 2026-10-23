@@ -119,34 +119,35 @@ describe('nx.json completion - default', () => {
       (autocompleteResponse.result as CompletionList).items
         .map((item) => item.label)
         .sort(),
-    ).toMatchInlineSnapshot(`
-      Array [
-        "affected",
-        "cacheDirectory",
-        "cli",
-        "defaultBase",
-        "defaultProject",
-        "extends",
-        "generators",
-        "implicitDependencies",
-        "namedInputs",
-        "neverConnectToCloud",
-        "nxCloudAccessToken",
-        "nxCloudEncryptionKey",
-        "nxCloudUrl",
-        "parallel",
-        "plugins",
-        "release",
-        "sync",
-        "targetDefaults",
-        "targetDependencyConfig",
-        "tasksRunnerOptions",
-        "tui",
-        "useDaemonProcess",
-        "useInferencePlugins",
-        "workspaceLayout",
-      ]
-    `);
+    ).toEqual(
+      // Newer Nx versions add root keys, so only require the ones every supported version has.
+      expect.arrayContaining([
+        'affected',
+        'cacheDirectory',
+        'cli',
+        'defaultBase',
+        'defaultProject',
+        'extends',
+        'generators',
+        'implicitDependencies',
+        'namedInputs',
+        'neverConnectToCloud',
+        'nxCloudAccessToken',
+        'nxCloudEncryptionKey',
+        'nxCloudUrl',
+        'parallel',
+        'plugins',
+        'release',
+        'sync',
+        'targetDefaults',
+        'targetDependencyConfig',
+        'tasksRunnerOptions',
+        'tui',
+        'useDaemonProcess',
+        'useInferencePlugins',
+        'workspaceLayout',
+      ]),
+    );
   });
 
   it('should not contain outdated root keys', async () => {

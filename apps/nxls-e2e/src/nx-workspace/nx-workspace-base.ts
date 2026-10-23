@@ -9,6 +9,19 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 
+// Nx versions add inferred targets over time (for example test-ci in Nx 24), so each project only
+// has to contain the expected targets.
+function containingTargets(expectedTargets: Record<string, string[]>[]) {
+  return expectedTargets.map((project) =>
+    Object.fromEntries(
+      Object.entries(project).map(([name, targets]) => [
+        name,
+        expect.arrayContaining(targets),
+      ]),
+    ),
+  );
+}
+
 export function testNxWorkspace(
   version: string,
   options: NewWorkspaceOptions,
@@ -57,7 +70,7 @@ export function testNxWorkspace(
         ).map(([projectName, project]) => ({
           [projectName]: Object.keys(project.data.targets ?? {}).sort(),
         })),
-      ).toEqual(expectedTargets);
+      ).toEqual(containingTargets(expectedTargets));
     });
 
     it('should work with comments in nx.json', async () => {
@@ -83,7 +96,7 @@ export function testNxWorkspace(
         ).map(([projectName, project]) => ({
           [projectName]: Object.keys(project.data.targets ?? {}).sort(),
         })),
-      ).toEqual(expectedTargets);
+      ).toEqual(containingTargets(expectedTargets));
     });
 
     afterAll(async () => {

@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
@@ -12,6 +13,7 @@ import {
 } from '@nx-console/language-server-types';
 
 let nxlsWrapper: NxlsWrapper;
+const readJson = (path: string) => JSON.parse(readFileSync(path, 'utf-8'));
 const workspaceName = uniq('workspace');
 
 describe('generator options', () => {
@@ -34,52 +36,46 @@ describe('generator options', () => {
   });
 
   it('should return correct options for @nx/js:lib generator', async () => {
+    // Nx 23+ ships schemas under dist/, so resolve the path like nxls does.
+    const nxJsRoot = join(e2eCwd, workspaceName, 'node_modules', '@nx/js');
+    const schemaPath = join(
+      nxJsRoot,
+      readJson(join(nxJsRoot, 'generators.json')).generators.library.schema,
+    );
+    const schema = readJson(schemaPath);
+    const schemaProperties: Record<string, any> = schema.properties;
+    const required: string[] = schema.required ?? [];
+
     const generatorOptions = await nxlsWrapper.sendRequest({
       ...NxGeneratorOptionsRequest,
       params: {
         options: {
           collection: '@nx/js',
           name: 'library',
-          path: join(
-            e2eCwd,
-            workspaceName,
-            'node_modules',
-            '@nx/js/src/generators/library/schema.json',
-          ),
+          path: schemaPath,
         } satisfies NxGeneratorOptionsRequestOptions,
       },
     });
 
-    // Verify the result contains expected options
     expect(generatorOptions.result).toBeDefined();
-    const options = generatorOptions.result;
+    const names = (generatorOptions.result as any[]).map((o) => o.name);
 
-    // Check for required options
-    expect((options as any[]).map((o) => o.name)).toEqual([
-      'directory',
-      'bundler',
-      'importPath',
-      'linter',
-      'name',
-      'publishable',
-      'unitTestRunner',
-      'includeBabelRc',
-      'js',
-      'minimal',
-      'setParserOptionsProject',
-      'skipTypeCheck',
-      'strict',
-      'tags',
-      'testEnvironment',
-      'useProjectJson',
-      'config',
-      'skipFormat',
-      'skipPackageJson',
-      'skipTsConfig',
-      'buildable',
-      'compiler',
-      'simpleName',
-    ]);
+    const visibleOptions = Object.entries(schemaProperties)
+      .filter(([, property]) => !property.hidden)
+      .map(([name]) => name);
+    expect([...names].sort()).toEqual([...visibleOptions].sort());
+    expect(names).toEqual(
+      expect.arrayContaining(['directory', 'bundler', 'name', 'importPath']),
+    );
+
+    // Required options and options marked x-priority: important are listed first.
+    const leading = names.filter(
+      (name) =>
+        required.includes(name) ||
+        schemaProperties[name]['x-priority'] === 'important',
+    );
+    expect(leading.length).toBeGreaterThan(0);
+    expect(names.slice(0, leading.length)).toEqual(leading);
   });
 
   afterAll(async () => {

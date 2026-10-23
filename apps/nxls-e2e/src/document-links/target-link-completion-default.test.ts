@@ -67,7 +67,8 @@ describe('document link completion - default', () => {
           ...data.targets,
           build: {},
           serve: {
-            executor: '@nx/next:server',
+            // @nx/next ships no executors since Nx 24; @nx/js:node exists in every supported version
+            executor: '@nx/js:node',
             options: {
               buildTarget: `@${workspaceName}/${workspaceName}:build`,
             },

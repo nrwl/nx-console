@@ -1,6 +1,12 @@
 import { NxPDVDataRequest } from '@nx-console/language-server-types';
 import { PDVData } from '@nx-console/shared-types';
-import { appendFileSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import {
+  appendFileSync,
+  existsSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
@@ -16,7 +22,11 @@ import {
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
-const viteFilePath = join(e2eCwd, workspaceName, 'vite.config.ts');
+// Nx 24 generates vite.config.mts, older versions vite.config.ts.
+const viteFilePath = () =>
+  ['vite.config.ts', 'vite.config.mts']
+    .map((file) => join(e2eCwd, workspaceName, file))
+    .find((path) => existsSync(path)) ?? '';
 let viteFileContents: string;
 
 const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
@@ -87,9 +97,9 @@ describe('pdv data', () => {
 
   it('should contain pdv data & error for partial errors', async () => {
     await waitFor(5000);
-    viteFileContents = readFileSync(viteFilePath, 'utf-8');
+    viteFileContents = readFileSync(viteFilePath(), 'utf-8');
 
-    appendFileSync(viteFilePath, '{');
+    appendFileSync(viteFilePath(), '{');
 
     await nxlsWrapper.triggerAndWaitForRefresh();
 
@@ -116,7 +126,7 @@ describe('pdv data', () => {
 
   it('should return error if root project.json is broken', async () => {
     await waitFor(5000);
-    writeFileSync(viteFilePath, viteFileContents);
+    writeFileSync(viteFilePath(), viteFileContents);
 
     projectJsonContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, '{');
@@ -132,13 +142,24 @@ describe('pdv data', () => {
       })
     ).result as PDVData;
 
-    expect(e2ePdvData.resultType).toEqual('ERROR');
-    expect(e2ePdvData.errorMessage).toBeDefined();
-    expect(e2ePdvData.pdvDataSerialized).toBeUndefined();
-    expect(e2ePdvData.errorsSerialized).toBeDefined();
-    expect(
-      JSON.parse(e2ePdvData.errorsSerialized ?? '').length,
-    ).toBeGreaterThan(0);
+    // Newer Nx versions keep a partial graph in which the root package.json still defines a
+    // project, so its details are returned together with the error instead of the error alone.
+    if (e2ePdvData.resultType === 'SUCCESS') {
+      const pdvDataParsed = JSON.parse(e2ePdvData.pdvDataSerialized ?? '');
+      expect(
+        pdvDataParsed.errors.some((error: { message?: string }) =>
+          error.message?.includes('project.json'),
+        ),
+      ).toBe(true);
+    } else {
+      expect(e2ePdvData.resultType).toEqual('ERROR');
+      expect(e2ePdvData.errorMessage).toBeDefined();
+      expect(e2ePdvData.pdvDataSerialized).toBeUndefined();
+      expect(e2ePdvData.errorsSerialized).toBeDefined();
+      expect(
+        JSON.parse(e2ePdvData.errorsSerialized ?? '').length,
+      ).toBeGreaterThan(0);
+    }
   });
 
   it('should return error if nx.json is broken', async () => {

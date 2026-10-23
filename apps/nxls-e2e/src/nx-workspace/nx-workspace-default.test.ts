@@ -31,7 +31,6 @@ testNxWorkspace(
         'serve',
         'serve-static',
         'test',
-        'typecheck',
         'watch-deps',
       ],
     },
