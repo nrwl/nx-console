@@ -71,6 +71,13 @@ export function newWorkspace({
   const _env = {
     CI: 'true',
     NX_CLOUD_API: 'https://staging.nx.app', // create-nx-workspace invocations are tracked and we don't want to skew the stats through e2es
+    // npm's dependency resolver crashes walking vitest's optional peer set while
+    // installing the workspaces these presets generate:
+    //   TypeError: Cannot read properties of null (reading 'edgesOut')
+    //     at #loadPeerSet (@npmcli/arborist/lib/arborist/build-ideal-tree.js:1302)
+    // It reproduces on every npm from 10.2.4 (bundled with the node 20.11 agent image)
+    // through 11.5.2. Resolving peers the legacy way skips that walk entirely.
+    npm_config_legacy_peer_deps: 'true',
     ...(env ?? process.env),
   } as NodeJS.ProcessEnv;
 
@@ -107,6 +114,8 @@ export function isWindows() {
   return process.platform === 'win32';
 }
 
+const MCP_INSPECTOR_TOOL_ERROR = 5;
+
 export async function createInvokeMCPInspectorCLI(
   e2eCwd: string,
   workspaceName: string,
@@ -134,13 +143,20 @@ export async function createInvokeMCPInspectorCLI(
   const mcpInspectorCommand = `npx mcp-inspector --cli node ${serverPath} --no-minimal`;
 
   return (...args: string[]) => {
-    const command = `${mcpInspectorCommand} ${args.join(' ')}`;
+    // The inspector treats everything before `--` as the server command,
+    // flags included, and everything after it as its own options.
+    const inspectorStart = args.findIndex((arg) => arg.startsWith('--method'));
+    const serverArgs =
+      inspectorStart < 0 ? args : args.slice(0, inspectorStart);
+    const inspectorArgs = inspectorStart < 0 ? [] : args.slice(inspectorStart);
+    const command = `${mcpInspectorCommand} ${serverArgs.join(' ')} -- ${inspectorArgs.join(' ')}`;
 
     if (process.env['NX_VERBOSE_LOGGING']) {
       console.log(`Executing command: ${command}`);
     }
-    return JSON.parse(
-      execSync(command, {
+    let output: string;
+    try {
+      output = execSync(command, {
         encoding: 'utf8',
         maxBuffer: 1024 * 1024 * 10, // 10MB
         cwd: join(e2eCwd, workspaceName),
@@ -148,8 +164,17 @@ export async function createInvokeMCPInspectorCLI(
           ...process.env,
           NX_NO_CLOUD: 'true',
         },
-      }),
-    );
+      });
+    } catch (e) {
+      // The inspector prints a tool result with `isError: true` and then
+      // exits with code 5; tests assert on that result.
+      const error = e as { status?: number; stdout?: string };
+      if (error.status !== MCP_INSPECTOR_TOOL_ERROR || !error.stdout) {
+        throw e;
+      }
+      output = error.stdout;
+    }
+    return JSON.parse(output);
   };
 }
 

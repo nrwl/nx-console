@@ -10,6 +10,10 @@ export enum OptionType {
 }
 
 export type OptionPropertyDescription = Schema['properties'][number];
+export type CompatibleOptionItems =
+  | OptionPropertyDescription['items']
+  | string[]
+  | ItemsWithEnum;
 
 export type CliOption = {
   name: string;
@@ -18,9 +22,11 @@ export type CliOption = {
   alias?: string;
   hidden?: boolean;
   deprecated?: boolean | string;
-} & OptionPropertyDescription;
+} & Omit<OptionPropertyDescription, 'items'> & {
+    items?: CompatibleOptionItems;
+  };
 
-export interface Option extends CliOption {
+export interface Option extends Omit<CliOption, 'items'> {
   tooltip?: string;
   itemTooltips?: ItemTooltips;
   items?: string[] | ItemsWithEnum;

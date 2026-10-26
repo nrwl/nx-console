@@ -1,12 +1,7 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer, ServerCapabilities } from '@modelcontextprotocol/server';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { getMcpLogger } from './mcp-logger';
-
-import {
-  ServerCapabilities,
-  SetLevelRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
 import { NxGeneratorsRequestOptions } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 import { NxWorkspace, CIPEInfo, CIPEInfoError } from '@nx-console/shared-types';
@@ -90,10 +85,6 @@ export class NxMcpServerWrapper {
 
     this.server.server.registerCapabilities({
       logging: {},
-      resources: {
-        listChanged: true,
-        subscribe: false,
-      },
     });
 
     this.logger = logger ?? getMcpLogger(this.server);
@@ -135,12 +126,9 @@ export class NxMcpServerWrapper {
     );
     logger?.debug?.('Registering all Nx MCP tools');
 
-    server.server.server.setRequestHandler(
-      SetLevelRequestSchema,
-      (req, res) => {
-        return {};
-      },
-    );
+    server.server.server.setRequestHandler('logging/setLevel', (req, res) => {
+      return {};
+    });
 
     registerNxCoreTools(
       server.toolRegistry,
@@ -185,6 +173,18 @@ export class NxMcpServerWrapper {
    */
   isIdeAvailable(): boolean {
     return this.ideProvider?.isAvailable() ?? false;
+  }
+
+  /**
+   * Stops this server and releases what it holds, leaving the IDE provider and
+   * other resources shared between servers alone.
+   */
+  async close(): Promise<void> {
+    this.stopPeriodicMonitoring();
+    this.stopCipeRefreshInterval();
+    this.ideConnectionCleanup?.();
+    this.ideConnectionCleanup = undefined;
+    await this.server.close();
   }
 
   /**
@@ -403,6 +403,12 @@ export class NxMcpServerWrapper {
   }
 }
 
+/**
+ * Pass these to the `McpServer` constructor. Declaring `resources` there installs the
+ * `resources/*` handlers before connecting, so they answer with an empty list until Nx Cloud
+ * resources are registered, and registering those after the client connected does not try to
+ * add a capability.
+ */
 export const nxMcpServerCapabilities: ServerCapabilities = {
   tools: {
     listChanged: true,

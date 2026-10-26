@@ -1,8 +1,8 @@
 {
   "name": "angular-console",
   "displayName": "Nx Console",
-  "description": "The UI for Monorepos, providing visual workflows and enriching your AI Chat with deep insights",
   "version": "0.0.0",
+  "description": "The UI for Monorepos, providing visual workflows and enriching your AI Chat with deep insights",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"
@@ -444,15 +444,6 @@
         "label": "Nx MCP Server"
       }
     ],
-    "chatParticipants": [
-      {
-        "id": "nx-console.nx",
-        "fullName": "Nx",
-        "name": "nx",
-        "description": "The @nx chat participant has been deprecated. Use the Nx MCP server instead for context-aware insights into your Nx workspace.",
-        "isSticky": false
-      }
-    ],
     "commands": [
       {
         "command": "nxConsole.refreshWorkspace",
@@ -872,6 +863,12 @@
           ],
           "default": "all",
           "description": "Controls which notifications are shown for Nx Cloud."
+        },
+        "nxConsole.enableNxMcpServer": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Automatically register and run the Nx MCP server. Disable to opt out of the Nx MCP server registration."
         },
         "nxConsole.mcpPort": {
           "type": "number",

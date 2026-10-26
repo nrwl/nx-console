@@ -1,14 +1,15 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-  McpError,
-  ErrorCode,
+  Server,
+  ProtocolError,
   CallToolResult,
-} from '@modelcontextprotocol/sdk/types.js';
+  ProtocolErrorCode,
+  Tool,
+} from '@modelcontextprotocol/server';
 import { ZodRawShape, z, toJSONSchema } from 'zod';
 
 type SchemaInput = ZodRawShape | Record<string, unknown>;
+type ToolInputSchema = Tool['inputSchema'];
+type ToolOutputSchema = NonNullable<Tool['outputSchema']>;
 
 function isZodShape(input: SchemaInput): input is ZodRawShape {
   return Object.values(input).some(
@@ -22,16 +23,16 @@ function isZodShape(input: SchemaInput): input is ZodRawShape {
 
 function toJsonSchema(
   input: SchemaInput | undefined,
-): Record<string, unknown> | undefined {
+): ToolInputSchema | undefined {
   if (!input) return undefined;
   if (isZodShape(input)) {
     const { $schema, ...schema } = toJSONSchema(z.object(input)) as Record<
       string,
       unknown
     >;
-    return schema;
+    return schema as ToolInputSchema;
   }
-  return input;
+  return input as ToolInputSchema;
 }
 
 export interface ToolDefinition {
@@ -52,14 +53,17 @@ export interface ToolDefinition {
 interface StoredTool {
   name: string;
   description: string;
-  inputSchema: Record<string, unknown>;
-  outputSchema?: Record<string, unknown>;
+  inputSchema: ToolInputSchema;
+  outputSchema?: ToolOutputSchema;
   annotations?: ToolDefinition['annotations'];
   handler: (args: Record<string, unknown>) => Promise<CallToolResult>;
   enabled: boolean;
 }
 
-const EMPTY_OBJECT_SCHEMA = { type: 'object', properties: {} };
+const EMPTY_OBJECT_SCHEMA: ToolInputSchema = {
+  type: 'object',
+  properties: {},
+};
 
 export class ToolRegistry {
   private tools: Map<string, StoredTool> = new Map();
@@ -96,7 +100,7 @@ export class ToolRegistry {
 
     this.server.registerCapabilities({ tools: { listChanged: true } });
 
-    this.server.setRequestHandler(ListToolsRequestSchema, () => ({
+    this.server.setRequestHandler('tools/list', () => ({
       tools: Array.from(this.tools.values())
         .filter((t) => t.enabled)
         .map((t) => ({
@@ -108,17 +112,17 @@ export class ToolRegistry {
         })),
     }));
 
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler('tools/call', async (request) => {
       const tool = this.tools.get(request.params.name);
       if (!tool) {
-        throw new McpError(
-          ErrorCode.InvalidParams,
+        throw new ProtocolError(
+          ProtocolErrorCode.InvalidParams,
           `Tool ${request.params.name} not found`,
         );
       }
       if (!tool.enabled) {
-        throw new McpError(
-          ErrorCode.InvalidParams,
+        throw new ProtocolError(
+          ProtocolErrorCode.InvalidParams,
           `Tool ${request.params.name} is disabled`,
         );
       }

@@ -10,6 +10,7 @@ import { URI } from 'vscode-uri';
 export async function interpolatedPathLink(
   workingPath: string,
   node: ASTNode,
+  fallbackProjectRoot = '',
 ): Promise<string | undefined> {
   if (!isStringNode(node)) {
     return;
@@ -25,7 +26,7 @@ export async function interpolatedPathLink(
   if (value.startsWith('{workspaceRoot}')) {
     path = value.replace('{workspaceRoot}', workingPath);
   } else if (value.startsWith('{projectRoot}')) {
-    const projectRoot = findProjectRoot(node);
+    const projectRoot = findProjectRoot(node, fallbackProjectRoot);
     if (projectRoot) {
       path = value.replace('{projectRoot}', join(workingPath, projectRoot));
     }

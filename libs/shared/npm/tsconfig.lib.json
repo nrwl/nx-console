@@ -6,7 +6,8 @@
     "strict": false,
     "noImplicitAny": false,
     "noImplicitReturns": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "rootDir": "."
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
   "include": ["src/**/*.ts"],

@@ -57,7 +57,19 @@ class NxAngularProject(
                 rootDir.findFileByRelativePath(it)
             } ?: emptyList()
 
+    /**
+     * Include paths of the workspace's applications. A library usually has no build target of its
+     * own: the applications that import it compile its component styles with their
+     * `stylePreprocessorOptions`.
+     */
+    @Volatile internal var applicationIncludeDirs: () -> List<VirtualFile> = { emptyList() }
+
     override val stylePreprocessorIncludeDirs
+        get() =
+            if (type == AngularProjectType.APPLICATION) ownStylePreprocessorIncludeDirs
+            else ownStylePreprocessorIncludeDirs.ifEmpty { applicationIncludeDirs() }
+
+    internal val ownStylePreprocessorIncludeDirs
         get() =
             ((ngProject.targets
                     ?.build

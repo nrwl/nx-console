@@ -1,65 +1,88 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
 import {
-  MARKER_ARG_PREFIX,
-  MARKER_ENV_VAR,
-  PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR,
+  createConcatList,
   getCommandPaletteShortcut,
   getMarkerFilePath,
-  getMarkerId,
-  getMarkerIdFromArgv,
-  getMarkerIdFromParallelIndexEnv,
-  getWorkerDisplay,
+  getMarketplaceVsixUrl,
+  parseDevToolsUrl,
+  resolveVSCodeExecutable,
+  validateLabel,
 } from './vscode-e2e-runtime.ts';
 
-test('marker ids and file paths are worker-specific', () => {
-  const firstWorkerId = getMarkerId(0);
-  const secondWorkerId = getMarkerId(1);
-
-  assert.notStrictEqual(firstWorkerId, secondWorkerId);
-  assert.notStrictEqual(
-    getMarkerFilePath(firstWorkerId),
-    getMarkerFilePath(secondWorkerId),
-  );
-});
-
-test('marker env var avoids the VS Code-reserved prefix', () => {
-  assert.equal(MARKER_ENV_VAR, 'NX_CONSOLE_E2E_MARKER_ID');
-  assert.equal(MARKER_ENV_VAR.startsWith('VSCODE_'), false);
-});
-
-test('marker ids can be derived from launch args', () => {
-  assert.equal(
-    getMarkerIdFromArgv([`${MARKER_ARG_PREFIX}worker-7`]),
-    'worker-7',
-  );
-  assert.equal(getMarkerIdFromArgv([]), undefined);
-  assert.equal(getMarkerIdFromArgv([MARKER_ARG_PREFIX]), undefined);
-});
-
-test('marker ids can be derived from the Playwright parallel index env', () => {
-  assert.equal(
-    getMarkerIdFromParallelIndexEnv({
-      [PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR]: '2',
-    }),
-    'worker-2',
-  );
-  assert.equal(getMarkerIdFromParallelIndexEnv({}), undefined);
-  assert.equal(
-    getMarkerIdFromParallelIndexEnv({
-      [PLAYWRIGHT_PARALLEL_INDEX_ENV_VAR]: 'abc',
-    }),
-    undefined,
-  );
+test('marker files are unique per marker id', () => {
+  assert.notEqual(getMarkerFilePath('a'), getMarkerFilePath('b'));
 });
 
 test('command palette shortcut matches host platform conventions', () => {
-  assert.strictEqual(getCommandPaletteShortcut('darwin'), 'Meta+Shift+P');
-  assert.strictEqual(getCommandPaletteShortcut('linux'), 'Control+Shift+P');
-  assert.strictEqual(getCommandPaletteShortcut('win32'), 'Control+Shift+P');
+  assert.equal(getCommandPaletteShortcut('darwin'), 'Meta+Shift+P');
+  assert.equal(getCommandPaletteShortcut('linux'), 'Control+Shift+P');
+  assert.equal(getCommandPaletteShortcut('win32'), 'Control+Shift+P');
 });
 
-test('linux workers receive unique displays', () => {
-  assert.strictEqual(getWorkerDisplay(0), ':99');
-  assert.strictEqual(getWorkerDisplay(3), ':102');
+test('resolves the renamed macOS binary, keeps the legacy binary and rejects missing installs', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'vscode-binary-test-'));
+  try {
+    const legacy = join(dir, 'Electron');
+    assert.throws(() => resolveVSCodeExecutable(legacy), /does not exist/);
+    writeFileSync(join(dir, 'Code'), '');
+    assert.equal(resolveVSCodeExecutable(legacy), join(dir, 'Code'));
+    writeFileSync(legacy, '');
+    assert.equal(resolveVSCodeExecutable(legacy), legacy);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('labels must be usable as directory names', () => {
+  assert.equal(validateLabel('issue-3193-repro'), 'issue-3193-repro');
+  assert.equal(validateLabel('nx-console-18.101.1'), 'nx-console-18.101.1');
+  assert.throws(() => validateLabel('../escape'), /NX_AUTOMATION_LABEL/);
+  assert.throws(() => validateLabel('with space'), /NX_AUTOMATION_LABEL/);
+});
+
+test('marketplace downloads require an exact release', () => {
+  assert.equal(
+    getMarketplaceVsixUrl('18.101.1'),
+    'https://marketplace.visualstudio.com/_apis/public/gallery/publishers/nrwl/vsextensions/angular-console/18.101.1/vspackage',
+  );
+  assert.throws(() => getMarketplaceVsixUrl('latest'), /exact release/);
+});
+
+test('finds the DevTools endpoint in VS Code startup output', () => {
+  assert.equal(
+    parseDevToolsUrl(
+      'Warning\nDevTools listening on ws://127.0.0.1:53811/devtools/browser/5b1f\n',
+    ),
+    'ws://127.0.0.1:53811/devtools/browser/5b1f',
+  );
+  assert.equal(parseDevToolsUrl('DevTools listening on'), undefined);
+});
+
+test('screencast frames keep their capture timing', () => {
+  assert.equal(
+    createConcatList(
+      [
+        { file: '000000.jpg', timestamp: 10 },
+        { file: '000001.jpg', timestamp: 10.5 },
+        { file: '000002.jpg', timestamp: 10.51 },
+      ],
+      12,
+    ),
+    [
+      'ffconcat version 1.0',
+      "file '000000.jpg'",
+      'duration 0.500',
+      "file '000001.jpg'",
+      'duration 0.040',
+      "file '000002.jpg'",
+      'duration 1.490',
+      "file '000002.jpg'",
+      '',
+    ].join('\n'),
+  );
+  assert.throws(() => createConcatList([], 1), /No screencast frames/);
 });

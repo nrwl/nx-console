@@ -6,7 +6,9 @@
     "moduleResolution": "node10",
     "types": ["jest", "node"],
     "noImplicitReturns": false,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": ["jest.config.ts", "**/*.spec.ts", "**/*.d.ts"],
   "exclude": ["out-tsc"],

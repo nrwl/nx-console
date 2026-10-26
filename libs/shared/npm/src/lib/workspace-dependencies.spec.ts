@@ -1,7 +1,9 @@
 import * as os from 'os';
 import { mocked } from 'jest-mock';
 import {
+  importNxPackagePath,
   importWorkspaceDependency,
+  importWorkspacePackagePath,
   workspaceDependencyPath,
 } from './workspace-dependencies';
 
@@ -109,6 +111,77 @@ describe('workspace-dependencies', () => {
       expect(logMock).toHaveBeenCalledWith(
         'Using local Nx package at node_modules/nx/src/utils.js',
       );
+    });
+  });
+
+  describe('importNxPackagePath', () => {
+    it('should fall back to dist/src/... when src/... is not present (Nx 22.7+ layout)', async () => {
+      jest.mock(
+        '/workspace/node_modules/nx/dist/src/command-line/migrate/migrate-ui-api',
+        () => ({ recordInitialMigrationMetadata: jest.fn() }),
+        { virtual: true },
+      );
+
+      const result = await importNxPackagePath<{
+        recordInitialMigrationMetadata: unknown;
+      }>('/workspace', 'src/command-line/migrate/migrate-ui-api');
+
+      expect(result.recordInitialMigrationMetadata).toBeDefined();
+    });
+
+    it('should not try the dist/ fallback for non-src paths', async () => {
+      await expect(
+        importNxPackagePath('/workspace', 'package.json'),
+      ).rejects.toBeDefined();
+    });
+
+    it('should fall back to dist/src/... for find-matching-projects', async () => {
+      jest.mock(
+        '/workspace/node_modules/nx/dist/src/utils/find-matching-projects',
+        () => ({ findMatchingProjects: jest.fn() }),
+        { virtual: true },
+      );
+
+      const result = await importNxPackagePath<{
+        findMatchingProjects: unknown;
+      }>('/workspace', 'src/utils/find-matching-projects');
+
+      expect(result.findMatchingProjects).toBeDefined();
+    });
+
+    it('should fall back to dist/src/... on Windows when callers pass forward-slash paths', async () => {
+      jest.mock(
+        '/workspace/node_modules/nx/dist/src/utils/package-manager',
+        () => ({ detectPackageManager: jest.fn() }),
+        { virtual: true },
+      );
+      jest.mocked(os.platform).mockReturnValue('win32');
+
+      try {
+        const result = await importNxPackagePath<{
+          detectPackageManager: unknown;
+        }>('/workspace', 'src/utils/package-manager');
+
+        expect(result.detectPackageManager).toBeDefined();
+      } finally {
+        jest.mocked(os.platform).mockReturnValue('darwin');
+      }
+    });
+  });
+
+  describe('importWorkspacePackagePath', () => {
+    it('should fall back to dist/src/... for packages other than nx', async () => {
+      jest.mock(
+        '/workspace/node_modules/@nx/js/dist/src/utils/typescript/ts-solution-setup.js',
+        () => ({ isUsingTsSolutionSetup: jest.fn() }),
+        { virtual: true },
+      );
+
+      const result = await importWorkspacePackagePath<{
+        isUsingTsSolutionSetup: unknown;
+      }>('/workspace', '@nx/js', 'src/utils/typescript/ts-solution-setup.js');
+
+      expect(result.isUsingTsSolutionSetup).toBeDefined();
     });
   });
 });

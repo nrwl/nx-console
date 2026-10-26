@@ -7,44 +7,30 @@ import dev.nx.console.ai.PeriodicAiCheckService
 import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.nxls.NxlsWorkspaceRootResolver
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
-import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.sync_services.NxProjectJsonToProjectMap
 import dev.nx.console.utils.sync_services.NxVersionUtil
-import java.io.File
 import kotlinx.coroutines.launch
 
 internal class ProjectPostStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
         NxConsoleLogger.getInstance().logSessionStart()
 
-        var currentDir = File(project.nxBasePath)
-        val filesToScanFor = listOf("nx.json", "workspace.json", "lerna.json")
-
-        while (true) {
-            if (filesToScanFor.any { currentDir.resolve(it).exists() }) {
-                ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-                    val service = NxlsService.getInstance(project)
-
-                    service.start()
-                    service.runAfterStarted {
-                        NxProjectJsonToProjectMap.getInstance(project).init()
-                        ProjectGraphErrorProblemProvider.getInstance(project).init()
-                        NxVersionUtil.getInstance(project).listen()
-                        CIPEMonitoringService.getInstance(project).init()
-                    }
-                }
-                break
+        if (NxlsWorkspaceRootResolver.getInstance(project).resolve() != null) {
+            val service = NxlsService.getInstance(project)
+            service.initializeConsumersOnce {
+                NxProjectJsonToProjectMap.getInstance(project).init()
+                ProjectGraphErrorProblemProvider.getInstance(project).init()
+                NxVersionUtil.getInstance(project).listen()
+                CIPEMonitoringService.getInstance(project).init()
             }
-            if (currentDir.parentFile == null) {
-                break
-            }
-            currentDir = currentDir.parentFile
+            ProjectLevelCoroutineHolderService.getInstance(project).cs.launch { service.start() }
         }
 
         if (!NxConsoleSettingsProvider.getInstance().promptedForTelemetry) {

@@ -16,5 +16,8 @@
       "path": "./tsconfig.storybook.json"
     }
   ],
-  "exclude": ["**/*.stories.ts", "**/*.stories.js"]
+  "exclude": ["**/*.stories.ts", "**/*.stories.js"],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  }
 }

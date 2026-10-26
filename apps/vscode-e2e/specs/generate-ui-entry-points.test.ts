@@ -1,33 +1,52 @@
 import { posix } from 'node:path';
-import { test, expect } from '../base-test';
+import { expect, test } from '../base-test';
+import type { NxConsolePage } from '../page-objects/nx-console-page';
+
+test.use({ vscodeOptions: { fixture: 'generate-ui' } });
 
 const GENERATE_UI_COMMAND_LABEL = 'Nx: Generate (UI)';
-const GENERATOR_LABEL = '@nx/react - component';
-const PROJECT_VIEW_PROJECT_NAME = 'e2e';
-const TARGET_FILE_PATH = 'src/main.tsx';
+const GENERATOR_LABEL = '@nx/workspace - run-commands';
+const ROOT_PROJECT_NAME = 'app';
+const PROJECT_VIEW_PROJECT_NAME = 'extra';
+const TARGET_FILE_PATH = 'src/main.ts';
 
-test('Generate UI opens from the command palette', async ({ nxConsole }) => {
-  const { workspaceName } = await getWorkspaceContext(nxConsole);
+test('Generate UI opens from the command palette', async ({ vscode }) => {
+  const { nxConsole } = vscode;
+  const proof = vscode.proof([
+    'Generate UI from the command palette',
+    vscode.build,
+    '',
+  ]);
 
+  await nxConsole.openNxConsoleSidebar();
+  await nxConsole.waitForNxConsoleReady();
   await nxConsole.resetUI();
   await nxConsole.quickPick.execute(GENERATE_UI_COMMAND_LABEL);
   await nxConsole.quickPick.selectItem(GENERATOR_LABEL);
 
   await expectGenerateUiToBeOpen(nxConsole);
-  await expect.poll(() => nxConsole.getGenerateUiTitle()).toBe('Component');
-  await expect.poll(() => nxConsole.getGenerateUiSubtitle()).toBe('@nx/react');
-  await expect
-    .poll(() => nxConsole.getGenerateUiFieldValue('project'))
-    .toBe(workspaceName);
+  const subtitle = await nxConsole.getGenerateUiSubtitle();
+  const project = await nxConsole.getGenerateUiFieldValue('project');
+  await proof.show(
+    `subtitle: ${subtitle?.split(/\s+/)[0]}, project field: "${project}"`,
+  );
+  expect.soft(subtitle).toMatch(/^@nx\/workspace\s/);
+  // Without a file or project as context, no project is preselected.
+  expect.soft(project).toBe('');
 });
 
 test('Generate UI opens from the projects view project action', async ({
-  nxConsole,
+  vscode,
 }) => {
-  const { workspaceName } = await getWorkspaceContext(nxConsole);
+  const { nxConsole } = vscode;
+  const proof = vscode.proof([
+    `Generate UI from the Projects view context menu of "${PROJECT_VIEW_PROJECT_NAME}"`,
+    vscode.build,
+    '',
+  ]);
 
-  expect(PROJECT_VIEW_PROJECT_NAME).not.toBe(workspaceName);
-
+  await nxConsole.openNxConsoleSidebar();
+  await nxConsole.waitForNxConsoleReady();
   await nxConsole.resetUI();
   await nxConsole.openGenerateUiFromProjectTreeItem(PROJECT_VIEW_PROJECT_NAME);
   await nxConsole.quickPick.selectItem(GENERATOR_LABEL);
@@ -35,20 +54,25 @@ test('Generate UI opens from the projects view project action', async ({
   await expectGenerateUiToBeOpen(nxConsole);
   await expect
     .poll(() => nxConsole.getGenerateUiFieldValue('project'))
-    .not.toBe(workspaceName);
-  await expect
-    .poll(() => nxConsole.getGenerateUiFieldValue('project'))
     .toBe(PROJECT_VIEW_PROJECT_NAME);
+  await proof.show(
+    `project field: "${await nxConsole.getGenerateUiFieldValue('project')}"`,
+  );
 });
 
 test('Generate UI opens from the Explorer file context menu', async ({
-  nxConsole,
+  vscode,
 }) => {
-  const { workspaceName } = await getWorkspaceContext(nxConsole);
+  const { nxConsole } = vscode;
   const expectedBreadcrumbPath = posix.dirname(TARGET_FILE_PATH);
+  const proof = vscode.proof([
+    `Generate UI from the Explorer context menu of ${TARGET_FILE_PATH}`,
+    vscode.build,
+    '',
+  ]);
 
-  expect(expectedBreadcrumbPath).not.toBe('.');
-
+  await nxConsole.openNxConsoleSidebar();
+  await nxConsole.waitForNxConsoleReady();
   await nxConsole.resetUI();
   await nxConsole.openGenerateUiFromExplorerFile(TARGET_FILE_PATH);
   await nxConsole.quickPick.selectItem(GENERATOR_LABEL);
@@ -56,54 +80,24 @@ test('Generate UI opens from the Explorer file context menu', async ({
   await expectGenerateUiToBeOpen(nxConsole);
   await expect
     .poll(() => nxConsole.getGenerateUiFieldValue('project'))
-    .toBe(workspaceName);
+    .toBe(ROOT_PROJECT_NAME);
   await expect
     .poll(() => nxConsole.getGenerateUiBreadcrumbPath())
     .toBe(expectedBreadcrumbPath);
+  await proof.show(
+    `project field: "${await nxConsole.getGenerateUiFieldValue('project')}", breadcrumb: "${await nxConsole.getGenerateUiBreadcrumbPath()}"`,
+  );
 });
 
-async function getWorkspaceContext(nxConsole: {
-  waitForNxConsoleReady: () => Promise<void>;
-  evaluator: {
-    evaluate: <T>(
-      fn: (
-        vscodeApi: typeof import('vscode'),
-        ...args: unknown[]
-      ) => T | Promise<T>,
-      ...args: unknown[]
-    ) => Promise<T>;
-  };
-}) {
-  await nxConsole.waitForNxConsoleReady();
-
-  const workspaceName = await nxConsole.evaluator.evaluate((vscodeApi) => {
-    return vscodeApi.workspace.workspaceFolders?.[0]?.name ?? '';
-  });
-
-  expect(workspaceName).not.toBe('');
-
-  return { workspaceName };
-}
-
-async function expectGenerateUiToBeOpen(nxConsole: {
-  evaluator: {
-    evaluate: <T>(
-      fn: (
-        vscodeApi: typeof import('vscode'),
-        ...args: unknown[]
-      ) => T | Promise<T>,
-      ...args: unknown[]
-    ) => Promise<T>;
-  };
-}) {
+async function expectGenerateUiToBeOpen(nxConsole: NxConsolePage) {
   await expect
     .poll(
       () =>
-        nxConsole.evaluator.evaluate((vscodeApi) => {
-          return vscodeApi.window.tabGroups.all.flatMap((group) =>
+        nxConsole.evaluator.evaluate((vscodeApi) =>
+          vscodeApi.window.tabGroups.all.flatMap((group) =>
             group.tabs.map((tab) => tab.label),
-          );
-        }),
+          ),
+        ),
       { timeout: 30_000 },
     )
     .toContain('Generate UI');

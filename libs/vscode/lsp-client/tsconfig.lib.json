@@ -5,7 +5,9 @@
     "types": ["node"],
     "strict": false,
     "noImplicitReturns": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
   "include": ["**/*.ts"],

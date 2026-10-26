@@ -3,7 +3,9 @@
   "compilerOptions": {
     "outDir": "out-tsc/generate-ui-v2-e2e",
     "types": ["cypress", "node", "cypress-real-events"],
-    "lib": ["DOM"]
+    "lib": ["DOM"],
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": ["src/**/*.ts", "src/**/*.js", "cypress.config.ts"],
   "references": [

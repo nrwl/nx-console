@@ -25,7 +25,7 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"],
       "cache": true
     },
     "e2e": {
@@ -76,7 +76,7 @@
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.mjs",
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/src/test/**/*",
@@ -210,13 +210,15 @@
   "bust": 10,
   "release": {
     "version": {
-      "preVersionCommand": "node ./tools/scripts/ensure-release-branch.js"
+      "preVersionCommand": "node ./tools/scripts/release-preflight.js",
+      "currentVersionResolver": "git-tag"
     },
     "git": {
-      "push": false,
-      "commitMessage": "chore(release-{projectName}): {version}"
+      "commit": false,
+      "stageChanges": false,
+      "tag": true,
+      "push": true
     },
-    "releaseTagPattern": "{projectName}-v{version}",
     "groups": {
       "vscode": {
         "projects": ["vscode"],
@@ -225,7 +227,8 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
+          "createRelease": "github",
+          "file": false
         }
       },
       "nx-mcp": {
@@ -235,7 +238,8 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
+          "createRelease": "github",
+          "file": false
         }
       },
       "nxls": {
@@ -245,9 +249,14 @@
           "conventionalCommits": true
         },
         "changelog": {
-          "projectChangelogs": true
+          "createRelease": "github",
+          "file": false
         }
       }
+    },
+    "releaseTag": {
+      "pattern": "{projectName}-v{version}"
     }
-  }
+  },
+  "analytics": true
 }

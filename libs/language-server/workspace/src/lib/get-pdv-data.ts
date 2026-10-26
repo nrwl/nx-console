@@ -1,12 +1,12 @@
 import { directoryExists } from '@nx-console/shared-file-system';
-import { workspaceDependencyPath } from '@nx-console/shared-npm';
+import { findNxPackagePath } from '@nx-console/shared-npm';
 import { gte } from '@nx-console/nx-version';
 import { PDVData } from '@nx-console/shared-types';
 import type {
   ProjectConfiguration,
   ProjectGraphProjectNode,
 } from 'nx/src/devkit-exports';
-import { join, relative } from 'path';
+import { dirname, join, relative } from 'path';
 import { getNxCloudStatus } from './get-nx-cloud-status';
 import {
   getNxVersion,
@@ -139,13 +139,16 @@ export async function getPDVData(
 async function getGraphBasePath(
   workspacePath: string,
 ): Promise<string | undefined> {
-  const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
+  const graphIndexPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'core', 'graph', 'index.html'),
+  );
 
-  if (!nxWorkspaceDepPath) {
+  if (!graphIndexPath) {
     return undefined;
   }
 
-  const graphBasePath = join(nxWorkspaceDepPath, 'src', 'core', 'graph');
+  const graphBasePath = dirname(graphIndexPath);
 
   if (await directoryExists(graphBasePath)) {
     return graphBasePath;

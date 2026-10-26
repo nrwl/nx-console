@@ -1,15 +1,15 @@
 import { join } from 'path';
-import {
-  importWorkspaceDependency,
-  workspaceDependencyPath,
-} from '../workspace-dependencies';
+import { findNxPackagePath } from '../find-nx-package-path';
+import { importWorkspaceDependency } from '../workspace-dependencies';
 
 export async function getCacheDir(workspacePath: string): Promise<string> {
-  const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
-  if (!nxPath) {
+  const importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'utils', 'cache-directory.js'),
+  );
+  if (!importPath) {
     throw 'local nx dependency not found';
   }
-  const importPath = join(nxPath, 'src/utils/cache-directory');
   const { cacheDir } =
     await importWorkspaceDependency<
       typeof import('nx/src/utils/cache-directory')
@@ -20,11 +20,13 @@ export async function getCacheDir(workspacePath: string): Promise<string> {
 export async function getWorkspaceDataDirectory(
   workspacePath: string,
 ): Promise<string> {
-  const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
-  if (!nxPath) {
+  const importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'utils', 'cache-directory.js'),
+  );
+  if (!importPath) {
     throw 'local nx dependency not found';
   }
-  const importPath = join(nxPath, 'src/utils/cache-directory');
   const { workspaceDataDirectory } =
     await importWorkspaceDependency<
       typeof import('nx/src/utils/cache-directory')

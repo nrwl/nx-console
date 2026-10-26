@@ -6,6 +6,17 @@ import kotlin.test.assertEquals
 
 class GetOrCreateRunnerAndConfigurationSettingsTest : BasePlatformTestCase() {
 
+    override fun tearDown() {
+        try {
+            val runManager = RunManager.getInstance(project)
+            runManager
+                .getConfigurationSettingsList(NxCommandConfigurationType.Util.getInstance())
+                .forEach { runManager.removeConfiguration(it) }
+        } finally {
+            super.tearDown()
+        }
+    }
+
     fun testCreatesNewConfigurationWithArguments() {
         val settings =
             getOrCreateRunnerConfigurationSettings(
@@ -63,7 +74,30 @@ class GetOrCreateRunnerAndConfigurationSettingsTest : BasePlatformTestCase() {
         assertEquals("--prod --configuration=production", config.nxRunSettings.arguments)
     }
 
-    fun testReusesExistingConfigurationAndClearsArguments() {
+    fun testReusesExistingConfigurationAndPreservesArgumentsWhenNoneAreProvided() {
+        val runManager = RunManager.getInstance(project)
+        val first =
+            getOrCreateRunnerConfigurationSettings(
+                project,
+                "myapp",
+                "build",
+                "",
+                listOf("myapp:build", "--localize", "true"),
+            )
+        runManager.addConfiguration(first)
+
+        val second = getOrCreateRunnerConfigurationSettings(project, "myapp", "build")
+
+        assertSame(
+            "Should reuse the saved configuration",
+            first.configuration,
+            second.configuration,
+        )
+        val config = second.configuration as NxCommandConfiguration
+        assertEquals("--localize true", config.nxRunSettings.arguments)
+    }
+
+    fun testReusesExistingConfigurationAndClearsArgumentsForExplicitCommand() {
         val runManager = RunManager.getInstance(project)
 
         val first =
@@ -76,7 +110,14 @@ class GetOrCreateRunnerAndConfigurationSettingsTest : BasePlatformTestCase() {
             )
         runManager.addConfiguration(first)
 
-        val second = getOrCreateRunnerConfigurationSettings(project, "myapp", "build")
+        val second =
+            getOrCreateRunnerConfigurationSettings(
+                project,
+                "myapp",
+                "build",
+                "",
+                listOf("myapp:build"),
+            )
 
         assertEquals(
             first.configuration,

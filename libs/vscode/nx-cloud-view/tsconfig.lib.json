@@ -2,7 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/vscode-nx-cloud-view",
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": [

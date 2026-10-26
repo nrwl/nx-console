@@ -4,7 +4,8 @@
     "outDir": "./out-tsc/jest",
     "types": ["jest", "node"],
     "strict": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "rootDir": "."
   },
   "include": [
     "jest.config.ts",

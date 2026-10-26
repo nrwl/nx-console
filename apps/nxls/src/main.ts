@@ -39,6 +39,7 @@ import { NxWorkspace } from '@nx-console/shared-types';
 import {
   configureCustomCACertificates,
   formatError,
+  killAllManagedProcesses,
   killGroup,
   loadRootEnvFiles,
 } from '@nx-console/shared-utils';
@@ -48,7 +49,7 @@ import {
   WatcherStatus,
 } from '@nx-console/shared-watcher';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
-import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration/source-maps';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,
@@ -63,6 +64,7 @@ import {
 } from 'vscode-languageserver/node';
 import { URI } from 'vscode-uri';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
+import { startParentWatchdog } from './parent-watchdog';
 import { registerRequests } from './requests';
 
 configureCustomCACertificates();
@@ -135,6 +137,7 @@ documents.listen(connection);
 connection.onInitialize(async (params) => {
   const { workspacePath, enableDebugLogging, disableFileWatching } =
     params.initializationOptions ?? {};
+  startParentWatchdog(params.processId);
   setLspLogger(connection, enableDebugLogging ?? false);
   lspLogger.log(
     'Debug logging is ' + (enableDebugLogging ? 'enabled' : 'disabled'),
@@ -530,6 +533,11 @@ function getJsonDocument(document: TextDocument) {
 
 ensureOnlyJsonRpcStdout();
 
+// Reading the project graph replaces process.exit with a stub while it runs, so
+// Nx cannot end nxls; nxls itself has to be able to exit during that time.
+const exitProcess = process.exit.bind(process);
+const EXIT_CLEANUP_TIMEOUT_MS = 3000;
+
 let exiting = false;
 /* eslint-disable no-empty */
 const exitHandler = async () => {
@@ -538,13 +546,18 @@ const exitHandler = async () => {
   connectionAlive = false;
   process.off('SIGTERM', exitHandler);
 
-  try {
-    await unregisterFileWatcher();
-  } catch (e) {}
+  await Promise.race([
+    (async () => {
+      try {
+        await unregisterFileWatcher();
+      } catch (e) {}
 
-  try {
-    await cleanupAllWatchers();
-  } catch (e) {}
+      try {
+        await cleanupAllWatchers();
+      } catch (e) {}
+    })(),
+    new Promise((resolve) => setTimeout(resolve, EXIT_CLEANUP_TIMEOUT_MS)),
+  ]);
 
   try {
     connection.dispose();
@@ -556,7 +569,12 @@ const exitHandler = async () => {
     }
   } catch (e) {}
 
-  killGroup(process.pid);
+  try {
+    killAllManagedProcesses();
+    killGroup(process.pid);
+  } catch (e) {}
+
+  exitProcess(0);
 };
 process.on('SIGTERM', exitHandler);
 process.on('SIGINT', exitHandler);

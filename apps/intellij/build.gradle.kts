@@ -1,10 +1,27 @@
-import org.jetbrains.changelog.Changelog
-import org.jetbrains.changelog.markdownToHTML
+import java.time.Duration
+import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.html.HtmlGenerator
+import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+buildscript {
+    repositories { mavenCentral() }
+    dependencies { classpath("org.jetbrains:markdown:0.7.3") }
+}
 
 fun isWindows(): Boolean {
     return System.getProperty("os.name").lowercase().startsWith("windows")
+}
+
+fun markdownToHTML(markdown: String): String {
+    val flavour = GFMFlavourDescriptor()
+    val tree = MarkdownParser(flavour).buildMarkdownTreeFromString(markdown)
+    return HtmlGenerator(markdown, tree, flavour)
+        .generateHtml()
+        .removePrefix("<body>")
+        .removeSuffix("</body>")
 }
 
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
@@ -12,9 +29,8 @@ val nxlsRoot = "${rootDir}/dist/apps/nxls"
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
-    id("dev.nx.gradle.project-graph") version ("0.1.12")
+    id("dev.nx.gradle.project-graph") version ("0.1.26")
     id("java")
-    id("org.jetbrains.changelog") version "2.4.0"
     id("org.jetbrains.intellij.platform") version "2.11.0"
 }
 
@@ -22,11 +38,124 @@ group = providers.gradleProperty("pluginGroup").get()
 
 version = providers.gradleProperty("version").get()
 
+val automation by sourceSets.creating
+val automationPort =
+    providers
+        .gradleProperty("automationPort")
+        .orElse(providers.environmentVariable("NX_AUTOMATION_PORT"))
+        .map(String::toInt)
+        .orElse(20000 + (rootDir.absolutePath.hashCode().toUInt() % 20000u).toInt())
+val automationOutput =
+    providers
+        .environmentVariable("NX_AUTOMATION_OUTPUT")
+        .map { rootProject.file(it) }
+        .orElse(layout.buildDirectory.dir("automation").map { it.asFile })
+val automationDriverVersion = providers.provider { intellijPlatform.productInfo.buildNumber }
+
+dependencies {
+    listOf("driver-sdk", "driver-model").forEach { artifact ->
+        add(
+            automation.implementationConfigurationName,
+            automationDriverVersion.map { "com.jetbrains.intellij.driver:$artifact:$it" },
+        )
+    }
+}
+
+intellijPlatformTesting {
+    runIde {
+        create("runAutomationIde") {
+            localPath =
+                layout.dir(
+                    providers
+                        .gradleProperty("automationIdePath")
+                        .map { file(it) }
+                        .orElse(providers.provider { intellijPlatform.platformPath.toFile() })
+                )
+            sandboxDirectory =
+                layout.dir(
+                    providers
+                        .environmentVariable("NX_AUTOMATION_SANDBOX")
+                        .map { rootProject.file(it) }
+                        .orElse(layout.buildDirectory.dir("automation-sandbox").map { it.asFile })
+                )
+            prepareSandboxTask {
+                from(nxlsRoot) { into("${intellijPlatform.projectName.get()}/nxls") }
+            }
+            task {
+                environment = environment.filterKeys { it != "CI" && it != "NX_DAEMON" }
+                systemProperty(
+                    "nx.console.automation.runId",
+                    providers.environmentVariable("NX_AUTOMATION_RUN_ID").orElse("").get(),
+                )
+                systemProperty("com.sun.management.jmxremote", "true")
+                systemProperty("com.sun.management.jmxremote.host", "127.0.0.1")
+                systemProperty("com.sun.management.jmxremote.port", automationPort.get())
+                systemProperty("com.sun.management.jmxremote.rmi.port", automationPort.get())
+                systemProperty("com.sun.management.jmxremote.authenticate", "false")
+                systemProperty("com.sun.management.jmxremote.ssl", "false")
+                systemProperty(
+                    "com.sun.management.jmxremote.serial.filter.pattern",
+                    "java.**;javax.**;com.intellij.driver.model.**",
+                )
+                systemProperty("java.rmi.server.hostname", "127.0.0.1")
+                systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
+                systemProperty("expose.ui.hierarchy.url", "true")
+                systemProperty("idea.trust.all.projects", "true")
+                systemProperty("idea.is.integration.test", "true")
+                // IntelliJ recognizes this test policy version without a first-run dialog.
+                systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+                systemProperty("jb.consents.confirmation.enabled", "false")
+                systemProperty("ide.show.tips.on.startup.default.value", "false")
+                args(
+                    providers
+                        .gradleProperty("automationProject")
+                        .orElse(providers.environmentVariable("NX_AUTOMATION_PROJECT"))
+                        .orElse(rootDir.absolutePath)
+                        .get()
+                )
+                doFirst {
+                    logger.lifecycle("Automation JMX endpoint: 127.0.0.1:${automationPort.get()}")
+                }
+            }
+        }
+    }
+}
+
+tasks.register<JavaExec>("runAutomation") {
+    group = "verification"
+    description = "Runs a Kotlin scenario against this worktree's automation IDE."
+    classpath = automation.runtimeClasspath
+    mainClass =
+        providers.gradleProperty("automationMain").orElse("dev.nx.console.automation.InspectIdeKt")
+    systemProperty("nx.console.automation.port", automationPort.get())
+    systemProperty("nx.console.automation.workspace", rootDir.absolutePath)
+    systemProperty("nx.console.automation.output", automationOutput.get().absolutePath)
+    workingDir = rootDir
+    maxHeapSize = "1g"
+}
+
+tasks.register("prepareAutomationClient") {
+    group = "verification"
+    description = "Builds the Kotlin client and exports its Java runtime for the e2e runner."
+    dependsOn(automation.classesTaskName)
+    val classpathFile = automationOutput.map { it.resolve("automation-classpath.txt") }
+    val javaFile = automationOutput.map { it.resolve("automation-java.txt") }
+    outputs.files(classpathFile, javaFile)
+    doLast {
+        classpathFile.get().parentFile.mkdirs()
+        classpathFile.get().writeText(automation.runtimeClasspath.asPath)
+        val launcher = tasks.named<JavaExec>("runAutomation").get().javaLauncher.get()
+        javaFile.get().writeText(launcher.executablePath.asFile.absolutePath)
+    }
+}
+
 // Configure project's dependencies
 repositories { intellijPlatform { defaultRepositories() } }
 
 configurations.all {
     exclude("org.slf4j", "slf4j-api")
+    // Gson and lsp4j are supplied by the platform SDK.
+    exclude("com.google.code.gson", "gson")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
@@ -34,8 +163,12 @@ configurations.all {
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
 }
 
+// Use the SDK stdlib at runtime, including its coroutine debug metadata support in tests.
+configurations
+    .matching { it.name == "runtimeClasspath" || it.name == "testRuntimeClasspath" }
+    .configureEach { exclude("org.jetbrains.kotlin", "kotlin-stdlib") }
+
 dependencies {
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.23.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     implementation("io.github.z4kn4fein:semver:2.0.0")
@@ -94,20 +227,6 @@ intellijPlatform {
                         .let(::markdownToHTML)
                 }
             }
-
-        val changelog = project.changelog // local variable for configuration cache compatibility
-        // Get the latest available change notes from the changelog file
-        changeNotes =
-            providers.gradleProperty("version").map { pluginVersion ->
-                with(changelog) {
-                    renderItem(
-                        (getOrNull(pluginVersion) ?: getUnreleased())
-                            .withHeader(false)
-                            .withEmptySections(false),
-                        Changelog.OutputType.HTML,
-                    )
-                }
-            }
     }
     signing {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
@@ -135,7 +254,7 @@ if (System.getenv("CI") == null) {
     intellijPlatformTesting {
         runIde {
             create("runIntelliJLatest") {
-                version = "2025.2.1"
+                version = "2026.2.2"
                 prepareSandboxTask {
                     from(nxlsRoot) {
                         include("**")
@@ -148,14 +267,7 @@ if (System.getenv("CI") == null) {
     }
 }
 
-// Configure Gradle Changelog Plugin - read more:
-// https://github.com/JetBrains/gradle-changelog-plugin
-changelog {
-    groups.set(emptyList())
-    repositoryUrl.set(providers.gradleProperty("pluginRepositoryUrl").get())
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
         freeCompilerArgs.add("-Xskip-metadata-version-check")
@@ -176,14 +288,21 @@ tasks {
         archiveBaseName.set("nx-console")
     }
 
-    withType<RunIdeTask> { maxHeapSize = "6g" }
+    withType<RunIdeTask> {
+        maxHeapSize =
+            if (name == "runAutomationIde") {
+                providers.environmentVariable("NX_AUTOMATION_IDE_HEAP").orElse("2g").get()
+            } else "6g"
+    }
 
     test {
         useJUnit()
         include("**/*Test.class")
+        // Turn a hung test IDE into a failure with captured output instead of a silent CI timeout.
+        timeout.set(Duration.ofMinutes(20))
 
         testLogging {
-            events("passed", "skipped", "failed", "standardOut", "standardError")
+            events("started", "passed", "skipped", "failed", "standardOut", "standardError")
             showExceptions = true
             showStackTraces = true
             showCauses = true

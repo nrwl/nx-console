@@ -45,7 +45,6 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
     return html`
       <intellij-combobox
         autocomplete="list"
-        position="below"
         @change="${this.handleChange}"
         ${spread(this.ariaAttributes)}
       >

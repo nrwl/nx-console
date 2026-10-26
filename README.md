@@ -31,7 +31,7 @@
 
 Developers use both command-line tools and user interfaces. They commit in the terminal, but resolve conflicts in Visual Studio Code or WebStorm. They use the right tool for the job.
 
-Nx Console is that tool. It helps developers stay in the flow, provides visual workflows, enhances your AI chats and more.
+Nx Console is that tool. It helps developers stay in the flow, provides visual workflows, and enhances your AI chats and more.
 
 ## Installation
 

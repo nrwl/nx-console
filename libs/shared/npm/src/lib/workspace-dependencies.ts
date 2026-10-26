@@ -98,19 +98,49 @@ export async function importNxPackagePath<T>(
   nestedPath: string,
   logger?: Logger,
 ): Promise<T> {
-  const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
+  return importWorkspacePackagePath<T>(workspacePath, 'nx', nestedPath, logger);
+}
 
-  if (!nxWorkspaceDepPath) {
+export async function importWorkspacePackagePath<T>(
+  workspacePath: string,
+  packageName: string,
+  nestedPath: string,
+  logger?: Logger,
+): Promise<T> {
+  const packageDepPath = await workspaceDependencyPath(
+    workspacePath,
+    packageName,
+  );
+
+  if (!packageDepPath) {
     logger?.log(
-      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`,
+      `Unable to load the "${packageName}" package from the workspace. Please ensure that the proper dependencies are installed locally.`,
     );
-    throw 'local Nx dependency not found';
+    throw `local ${packageName} dependency not found`;
   }
 
-  return importWorkspaceDependency(
-    join(nxWorkspaceDepPath, nestedPath),
-    logger,
-  );
+  // Nx 22.7+ moved files from `<pkg>/src/...` to `<pkg>/dist/src/...`. Try the
+  // pre-22.7 layout first, then fall back to the dist/ variant for src-prefixed paths.
+  // Callers pass forward-slash literals (e.g. 'src/utils/package-manager'), so the
+  // prefix check must not depend on the OS path separator.
+  const candidates = [join(packageDepPath, nestedPath)];
+  if (
+    nestedPath === 'src' ||
+    nestedPath.startsWith('src/') ||
+    nestedPath.startsWith('src\\')
+  ) {
+    candidates.push(join(packageDepPath, 'dist', nestedPath));
+  }
+
+  let lastError: unknown;
+  for (const candidate of candidates) {
+    try {
+      return await importWorkspaceDependency(candidate, logger);
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError;
 }
 
 export async function localDependencyPath(

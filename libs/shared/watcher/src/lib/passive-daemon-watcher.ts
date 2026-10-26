@@ -5,7 +5,7 @@ import {
 import { Logger } from '@nx-console/shared-utils';
 import { randomUUID } from 'crypto';
 import type { ProjectGraph } from 'nx/src/config/project-graph';
-import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration/source-maps';
 import { AnyEventObject, createActor, fromPromise, setup } from 'xstate';
 
 export type WatcherStatus = 'operational' | 'daemonDisabled' | 'notRunning';

@@ -4,7 +4,8 @@
     "outDir": "out-tsc/vscode",
     "types": ["node"],
     "strict": false,
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "exclude": ["**/*.spec.ts", "out-tsc"],
   "include": ["**/*.ts"],
@@ -65,9 +66,6 @@
     },
     {
       "path": "../../libs/vscode/generate-ui-webview/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/vscode/copilot/tsconfig.lib.json"
     },
     {
       "path": "../../libs/vscode/add-dependency/tsconfig.lib.json"

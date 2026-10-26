@@ -26,7 +26,7 @@ import {
   getWorkspacePath,
   safeJsonStringify,
 } from '@nx-console/vscode-utils';
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import { join } from 'path';
 import {
   commands,
@@ -656,13 +656,19 @@ export async function fetchAndPullChanges(targetBranch: string): Promise<void> {
 
     if (currentBranch === targetBranch) {
       // On target branch: fast-forward your working tree
-      execSync(`git pull --ff-only origin ${targetBranch}`, {
+      execFileSync('git', ['pull', '--ff-only', 'origin', targetBranch], {
         cwd,
       });
     } else {
       // On another branch: fast-forward local target branch without checking it out
       // This creates the branch if missing, refuses if it wouldn't be a fast-forward
-      execSync(`git fetch origin ${targetBranch}:${targetBranch}`, { cwd });
+      execFileSync(
+        'git',
+        ['fetch', 'origin', `${targetBranch}:${targetBranch}`],
+        {
+          cwd,
+        },
+      );
     }
   } catch (e) {
     logAndShowError(

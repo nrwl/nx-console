@@ -5,7 +5,7 @@ import type {
   ProjectFileMap,
   ProjectGraph,
 } from 'nx/src/devkit-exports';
-import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration/source-maps';
 
 export type NxProjectConfiguration = ProjectConfiguration & {
   files?: { file: string }[];

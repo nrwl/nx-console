@@ -115,12 +115,18 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected fun loadGraphHtmlBase(): String {
 
         val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
-        val graphBasePath = Paths.get(nxPackagePath, "src", "core", "graph").toString() + "/"
+        val graphBasePath =
+            resolveGraphBasePath(nxPackagePath)
+                ?: return getErrorHtml(
+                    arrayOf(NxError("Unable to find Nx graph assets in $nxPackagePath"))
+                )
 
         val graphIndexHtmlPath = Paths.get(graphBasePath, "index.html").toString()
-
         val file =
-            LocalFileSystem.getInstance().refreshAndFindFileByPath(graphIndexHtmlPath) ?: return ""
+            LocalFileSystem.getInstance().refreshAndFindFileByPath(graphIndexHtmlPath)
+                ?: return getErrorHtml(
+                    arrayOf(NxError("Unable to find Nx graph index.html at $graphIndexHtmlPath"))
+                )
 
         var htmlText = file.readText()
 
@@ -228,6 +234,18 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 
         setColors()
         return htmlText
+    }
+
+    private fun resolveGraphBasePath(nxPackagePath: String): String? {
+        return listOf(
+                Paths.get(nxPackagePath, "src", "core", "graph").toString(),
+                Paths.get(nxPackagePath, "dist", "src", "core", "graph").toString(),
+            )
+            .firstOrNull {
+                LocalFileSystem.getInstance()
+                    .refreshAndFindFileByPath(Paths.get(it, "index.html").toString()) != null
+            }
+            ?.let { if (it.endsWith("/")) it else "$it/" }
     }
 
     protected fun setErrorsAndRefresh(errors: Array<NxError>?) {

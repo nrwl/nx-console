@@ -6,7 +6,8 @@
     "moduleResolution": "bundler",
     "strict": false,
     "lib": ["DOM", "esnext.asynciterable"],
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": [

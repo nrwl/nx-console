@@ -161,10 +161,15 @@ class NxCommandLineState(
         )
 
         targetRun.commandLineBuilder.apply {
-            exePath = TargetValue.fixed(NxExecutable.getExecutablePath(project.nxBasePath, project))
+            val nxCommand = NxExecutable.getNxCommand(project.nxBasePath, project)
+            exePath = TargetValue.fixed(nxCommand.first())
 
             addParameters(
-                listOf(*args, *(ParametersListUtil.parseToArray(nxRunSettings.arguments)))
+                listOf(
+                    *nxCommand.drop(1).toTypedArray(),
+                    *args,
+                    *(ParametersListUtil.parseToArray(nxRunSettings.arguments)),
+                )
             )
 
             setWorkingDirectory(

@@ -13,7 +13,8 @@
     "noImplicitReturns": false,
     "noUnusedLocals": false,
     "isolatedModules": false,
-    "strict": false
+    "strict": false,
+    "rootDir": "."
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "include": ["src/**/*.ts"],

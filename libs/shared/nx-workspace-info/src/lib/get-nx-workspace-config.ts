@@ -8,7 +8,7 @@ import type {
   ProjectGraph,
 } from 'nx/src/devkit-exports';
 import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
-import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration/source-maps';
 import { performance } from 'perf_hooks';
 import {
   getNxOutput,

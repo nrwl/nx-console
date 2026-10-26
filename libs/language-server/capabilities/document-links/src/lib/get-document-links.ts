@@ -10,13 +10,14 @@ import {
   hasCompletionType,
   X_COMPLETION_TYPE,
 } from '@nx-console/shared-json-schema';
-import { join } from 'path';
+import { dirname, isAbsolute, join, relative } from 'path';
 import {
   DocumentLink,
   JSONDocument,
   MatchingSchema,
   TextDocument,
 } from 'vscode-json-languageservice';
+import { URI } from 'vscode-uri';
 import { createRange } from './create-range';
 import { targetLink } from './target-link';
 import { namedInputLink } from './named-input-link';
@@ -39,7 +40,8 @@ export async function getDocumentLinks(
     return [];
   }
 
-  const projectRoot = findProjectRoot(jsonAst.root);
+  const documentDirectory = getDocumentDirectory(workingPath, document);
+  const projectRoot = findProjectRoot(jsonAst.root, documentDirectory);
   const projectRootPath = join(workingPath, projectRoot);
 
   for (const { schema, node } of schemas) {
@@ -60,7 +62,11 @@ export async function getDocumentLinks(
             value.startsWith('!{projectRoot}')) &&
           !value.includes('*')
         ) {
-          const link = await interpolatedPathLink(workingPath, node);
+          const link = await interpolatedPathLink(
+            workingPath,
+            node,
+            documentDirectory,
+          );
           if (link) {
             links.push(DocumentLink.create(createRange(document, node), link));
           }
@@ -123,4 +129,22 @@ export async function getDocumentLinks(
   }
 
   return links;
+}
+
+/**
+ * The directory of the document relative to the workspace, which is the project root
+ * of a project.json or package.json that does not set `root`.
+ */
+function getDocumentDirectory(
+  workingPath: string,
+  document: TextDocument,
+): string {
+  const directory = relative(
+    workingPath,
+    dirname(URI.parse(document.uri).fsPath),
+  );
+  if (directory.startsWith('..') || isAbsolute(directory)) {
+    return '';
+  }
+  return directory;
 }

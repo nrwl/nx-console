@@ -1,5 +1,7 @@
 import { CIPEInfo } from '@nx-console/shared-types';
-import { window } from 'vscode';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode-configuration';
+import { execFileSync, execSync } from 'child_process';
+import { ExtensionContext, window } from 'vscode';
 import { CIPENotificationService } from './cipe-notification-service';
 
 const globalConfigMock = jest.fn().mockReturnValue('all');
@@ -27,6 +29,12 @@ jest.mock('vscode', () => ({
     Left: 1,
     Right: 2,
   },
+}));
+
+jest.mock('child_process', () => ({
+  ...jest.requireActual('child_process'),
+  execSync: jest.fn(),
+  execFileSync: jest.fn(),
 }));
 
 jest.mock('./nx-cloud-fix-webview', () => ({
@@ -955,6 +963,80 @@ describe('CIPE Notifications', () => {
 
       expect(window.showErrorMessage).not.toHaveBeenCalled();
       expect(window.showInformationMessage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('applied AI fix notifications', () => {
+    const appliedFixCIPE = (branch: string): CIPEInfo => ({
+      ciPipelineExecutionId: 'applied-fix',
+      aiFixesEnabled: true,
+      branch,
+      status: 'FAILED',
+      createdAt: Date.now() - 1000 * 60 * 10,
+      completedAt: Date.now() - 1000 * 60,
+      commitTitle: 'fix: fix fix',
+      commitUrl: null,
+      cipeUrl: 'https://cloud.nx.app/cipes/applied-fix',
+      runGroups: [
+        {
+          createdAt: Date.now() - 1000 * 60 * 10,
+          completedAt: Date.now() - 1000 * 60,
+          runGroup: 'rungroup-applied-fix',
+          ciExecutionEnv: '123123',
+          status: 'FAILED',
+          runs: [],
+          aiFix: {
+            aiFixId: 'applied-fix',
+            taskIds: [],
+            terminalLogsUrls: {},
+            suggestedFix: 'diff --git a/file.ts b/file.ts',
+            suggestedFixStatus: 'COMPLETED',
+            verificationStatus: 'COMPLETED',
+            userAction: 'APPLIED_AUTOMATICALLY',
+          },
+        },
+      ],
+    });
+
+    beforeAll(() => {
+      WorkspaceConfigurationStore.fromContext({
+        workspaceState: { get: () => '/workspace', update: jest.fn() },
+      } as unknown as ExtensionContext);
+    });
+
+    it('passes a branch name from Nx Cloud to git as a single argument, without a shell', () => {
+      const branch = 'fix/cipe$(touch /tmp/pwned)';
+
+      new CIPENotificationService().compareCIPEDataAndSendNotifications(
+        [],
+        [appliedFixCIPE(branch)],
+      );
+
+      expect(execSync).not.toHaveBeenCalled();
+      expect(execFileSync).toHaveBeenCalledWith(
+        'git',
+        ['rev-parse', '--verify', `origin/${branch}`],
+        { cwd: '/workspace' },
+      );
+      expect(window.showInformationMessage).toHaveBeenCalledWith(
+        `Nx Cloud automatically applied a fix for #${branch}`,
+        'Fetch & Pull Changes',
+      );
+    });
+
+    it('does not offer to pull when the branch is not on the remote', () => {
+      jest.mocked(execFileSync).mockImplementationOnce(() => {
+        throw new Error('fatal: Needed a single revision');
+      });
+
+      new CIPENotificationService().compareCIPEDataAndSendNotifications(
+        [],
+        [appliedFixCIPE('feature')],
+      );
+
+      expect(window.showInformationMessage).toHaveBeenCalledWith(
+        'Nx Cloud automatically applied a fix for #feature',
+      );
     });
   });
 });

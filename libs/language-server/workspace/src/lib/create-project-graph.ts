@@ -1,6 +1,5 @@
 import { getNxExecutionCommand } from '@nx-console/shared-npm';
-
-import { execSync } from 'child_process';
+import { runManagedCommand } from '@nx-console/shared-utils';
 import { getProjectGraphOutput } from './get-project-graph-output';
 import { nxWorkspace } from '@nx-console/shared-nx-workspace-info';
 import { lspLogger } from '@nx-console/language-server-utils';
@@ -18,21 +17,17 @@ export async function createProjectGraph(
       `nx graph ${showAffected ? '--affected' : ''} --file ` +
       projectGraphOutput.relativePath,
     encapsulatedNx: isEncapsulatedNx,
-  }).then((command) => {
+  }).then(async (command) => {
     lspLogger.log(`Generating graph with command: \`${command}\``);
     try {
-      execSync(command, {
+      await runManagedCommand(command, {
         cwd: workspacePath,
-        windowsHide: true,
-        // Since this is going to be used within nxls, we need to make sure that stdio is set to ignore
-        // The lsp is set up to write to the host on stdio, so if we pollute the stdio with data that is not
-        // standard lsp, the connection will close because of malformed data.
-        stdio: 'ignore',
+        timeoutMs: 10 * 60_000,
       });
 
       return undefined;
     } catch (e) {
-      const errorMessage = `${e.output[1] || e}`;
+      const errorMessage = `${e.stderr?.trim() || e.stdout?.trim() || e}`;
       throw 'Unable to create project graph: ' + errorMessage;
     }
   });

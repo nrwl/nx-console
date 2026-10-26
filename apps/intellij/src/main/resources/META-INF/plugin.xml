@@ -6,9 +6,16 @@
 
   <depends>org.jetbrains.plugins.terminal</depends>
   <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lsp</depends>
   <depends>com.intellij.modules.json</depends>
+  <!-- JCEF lives in its own bundled plugin since 2026.2; the id exists as a core alias from 2025.3.1 (253.29346) -->
+  <depends>com.intellij.modules.jcef</depends>
 
   <depends>Git4Idea</depends>
+  <!-- VCS and the Problems View are separate bundled plugins since 2026.3; on older builds these ids
+       do not exist and the classes come from the core platform -->
+  <depends optional="true" config-file="nx-console-vcs.xml">com.intellij.platform.vcs</depends>
+  <depends optional="true" config-file="nx-console-problems-view.xml">com.intellij.problemsView</depends>
 
   <depends>JavaScript</depends>
   <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>
@@ -26,10 +33,7 @@
     <!-- works in new IDEA wizard -->
     <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
 
-    <completion.contributor language="JSON"
-                            implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
-    <lang.documentationProvider language="JSON"
-                                implementationClass="dev.nx.console.nxls.NxlsDocumentationProvider"/>
+    <platform.lsp.integrationProvider implementation="dev.nx.console.nxls.NxlsIntegrationProvider"/>
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 

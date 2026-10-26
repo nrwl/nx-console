@@ -4,7 +4,8 @@
     "outDir": "out-tsc/nx-workspace-info",
     "strict": false,
     "noImplicitReturns": false,
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "references": [

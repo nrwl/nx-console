@@ -2,7 +2,8 @@
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/language-server-capabilities-code-completion",
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "exclude": ["out-tsc", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"],

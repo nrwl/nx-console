@@ -474,6 +474,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script>
           const data = $pdvData
 
+           window.externalApi = window.externalApi ?? {};
            window.externalApi.graphInteractionEventListener = (message) => {
                     ${interactionEventQuery.inject("JSON.stringify(message)")}
                 }

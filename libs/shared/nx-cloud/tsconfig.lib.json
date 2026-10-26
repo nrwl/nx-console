@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/nx-cloud",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],

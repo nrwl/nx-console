@@ -1,8 +1,8 @@
 import {
   McpServer,
   RegisteredResource,
-} from '@modelcontextprotocol/sdk/server/mcp.js';
-import { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
+  ReadResourceResult,
+} from '@modelcontextprotocol/server';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
 import { Logger } from '@nx-console/shared-utils';
 import { NxWorkspaceInfoProvider } from '../nx-mcp-server-wrapper';

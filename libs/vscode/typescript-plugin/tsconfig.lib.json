@@ -5,7 +5,8 @@
     "strict": false,
     "noUnusedLocals": false,
     "noImplicitReturns": false,
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts", "out-tsc"],
   "include": ["**/*.ts"],

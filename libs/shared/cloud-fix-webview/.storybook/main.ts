@@ -2,7 +2,6 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import type { StorybookConfig } from '@storybook/web-components-vite';
 
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { mergeConfig } from 'vite';
 
 const require = createRequire(import.meta.url);
@@ -17,7 +16,7 @@ const config: StorybookConfig = {
 
   viteFinal: async (config) =>
     mergeConfig(config, {
-      plugins: [nxViteTsPaths()],
+      resolve: { tsconfigPaths: true },
       css: {
         postcss: {
           plugins: [

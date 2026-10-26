@@ -17,7 +17,7 @@ import { getNxVersion } from './get-nx-version';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 import { getNxDaemonClient } from './get-nx-workspace-package';
 import type { ProjectGraph } from 'nx/src/devkit-exports';
-import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration/source-maps';
 import { execSync } from 'child_process';
 
 const enum Status {

@@ -195,11 +195,12 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
             if (browser.isDisposed) return@executeWhenLoaded
             val js =
                 """
+                window.externalApi = window.externalApi ?? {};
                 window.externalApi.graphInteractionEventListener = (message) => {
                     ${interactionEventHandler.inject("JSON.stringify(message)")}
                 }
                 """
-            browser.executeJavaScript(js)
+            withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
         }
     }
 

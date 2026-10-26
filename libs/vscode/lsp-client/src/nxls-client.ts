@@ -3,7 +3,7 @@ import {
   NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server-types';
-import { killGroup } from '@nx-console/shared-utils';
+import { killGroup, withTimeout } from '@nx-console/shared-utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode-configuration';
 import {
   getNxlsOutputChannel,
@@ -36,6 +36,9 @@ import { nxlsClientStateMachine } from './nxls-client-state-machine';
 import { WatcherRunningService } from './watcher-running-service';
 
 let _nxlsClient: NxlsClient | undefined;
+
+const STOP_DAEMON_TIMEOUT_MS = 30_000;
+const REFRESH_TIMEOUT_MS = 5 * 60_000;
 
 export function createNxlsClient(extensionContext: ExtensionContext) {
   _nxlsClient = new NxlsClient(extensionContext);
@@ -138,9 +141,13 @@ export class NxlsClient {
             progress.report({ message: 'Stopping nx daemon', increment: 10 });
           }
           try {
-            await this.sendRequest(NxStopDaemonRequest, undefined);
+            await withTimeout(
+              () => this.sendRequest(NxStopDaemonRequest, undefined),
+              STOP_DAEMON_TIMEOUT_MS,
+            );
           } catch (e) {
-            // errors while stopping the daemon aren't critical
+            // errors while stopping the daemon aren't critical, and an nxls
+            // that does not answer is replaced right below
           }
 
           this.stop();
@@ -158,17 +165,19 @@ export class NxlsClient {
           progress.report({ message: 'Refreshing workspace', increment: 30 });
         }
 
-        await this.sendNotification(NxWorkspaceRefreshNotification);
-
-        await new Promise<void>((resolve) => {
-          const disposable = this.onNotification(
+        let refreshListener: Disposable | undefined;
+        const refreshed = new Promise<void>((resolve) => {
+          refreshListener = this.onNotification(
             NxWorkspaceRefreshNotification,
-            () => {
-              disposable.dispose();
-              resolve();
-            },
+            () => resolve(),
           );
         });
+        try {
+          await this.sendNotification(NxWorkspaceRefreshNotification);
+          await withTimeout(() => refreshed, REFRESH_TIMEOUT_MS);
+        } finally {
+          refreshListener?.dispose();
+        }
       } catch (error) {
         logAndShowError(
           "Couldn't refresh workspace. Please view the logs for more information.",
@@ -344,9 +353,10 @@ export class NxlsClient {
         try {
           await this.client.stop(2000);
         } catch (e) {
+          // it did not answer shutdown, so it would not handle SIGTERM either
           const pid = this.actor.getSnapshot().context.nxlsPid;
           if (pid) {
-            killGroup(pid);
+            killGroup(pid, 'SIGKILL');
           }
         }
       } else {

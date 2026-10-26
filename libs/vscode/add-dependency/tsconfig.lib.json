@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/vscode-add-dependency",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "out-tsc"],
   "include": ["**/*.ts"],

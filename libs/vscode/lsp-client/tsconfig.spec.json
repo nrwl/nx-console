@@ -7,7 +7,9 @@
     "types": ["jest", "node"],
     "strict": false,
     "noImplicitReturns": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "ignoreDeprecations": "6.0",
+    "rootDir": "."
   },
   "include": [
     "jest.config.ts",

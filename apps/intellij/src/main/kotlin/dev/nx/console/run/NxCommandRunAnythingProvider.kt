@@ -6,11 +6,9 @@ import com.intellij.ide.actions.runAnything.RunAnythingUtil
 import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandLineProvider
 import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.components.service
 import dev.nx.console.NxIcons
-import dev.nx.console.nxls.NxlsService
+import dev.nx.console.utils.NxWorkspaceSyncAccessService
 import javax.swing.Icon
-import kotlinx.coroutines.runBlocking
 
 internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
 
@@ -60,16 +58,16 @@ internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
 
-        val targets = runBlocking {
-            project
-                .service<NxlsService>()
-                .workspace()
+        // Run Anything queries this on the EDT, so only the already-synced workspace may be read
+        // here. Requesting it from nxls would block the UI until the language server answers.
+        val targets =
+            NxWorkspaceSyncAccessService.getInstance(project)
+                .nxWorkspaceSync
                 ?.projectGraph
                 ?.nodes
                 ?.entries
-                ?.map { entry -> entry.key to (entry.value.data.targets?.keys ?: emptySet()) }
-                ?.associate { it } ?: emptyMap()
-        }
+                ?.associate { entry -> entry.key to (entry.value.data.targets?.keys ?: emptySet()) }
+                ?: emptyMap()
 
         val completeTasks = targets.flatMap { entry -> entry.value.map { entry.key + ":" + it } }
 

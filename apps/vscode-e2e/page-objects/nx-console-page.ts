@@ -17,13 +17,12 @@ export class NxConsolePage extends VSCodePage {
   }
 
   get explorerSection(): Locator {
-    return this.page
-      .locator('.sidebar .split-view-view')
-      .filter({ hasText: 'EXPLORER' });
+    return this.page.locator('.sidebar .explorer-folders-view');
   }
 
   async openNxConsoleSidebar(): Promise<void> {
-    await this.activityBar.openTab('Nx Console');
+    // Clicking the activity bar tab would hide the sidebar when it is already open.
+    await this.executeCommand('workbench.view.extension.nx-console');
   }
 
   async openExplorerSidebar(): Promise<void> {
@@ -60,8 +59,33 @@ export class NxConsolePage extends VSCodePage {
 
   getProject(name: string): Locator {
     return this.projectsSection.locator(
-      `.monaco-list-row[aria-label=${JSON.stringify(name)}]`,
+      `.monaco-list-row[aria-label*="${name}"]`,
     );
+  }
+
+  /** A Projects view row whose label is exactly `label`. */
+  getTreeRow(label: string): Locator {
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return this.projectsSection.locator('.monaco-list-row').filter({
+      has: this.page.locator('.label-name', {
+        hasText: new RegExp(`^${escaped}$`),
+      }),
+    });
+  }
+
+  /** Leaf rows have no aria-expanded attribute. */
+  async isTreeRowExpandable(label: string): Promise<boolean> {
+    return (
+      (await this.getTreeRow(label).getAttribute('aria-expanded')) !== null
+    );
+  }
+
+  async expandTreeRow(label: string): Promise<void> {
+    const row = this.getTreeRow(label);
+    if ((await row.getAttribute('aria-expanded')) === 'false') {
+      await row.locator('.monaco-tl-twistie').click();
+    }
+    await row.and(this.page.locator('[aria-expanded="true"]')).waitFor();
   }
 
   async expandProject(name: string): Promise<void> {
@@ -131,7 +155,7 @@ export class NxConsolePage extends VSCodePage {
   async openGenerateUiFromProjectTreeItem(projectName: string): Promise<void> {
     await this.openNxConsoleSidebar();
 
-    const projectItem = this.getProject(projectName);
+    const projectItem = this.getTreeRow(projectName);
     await projectItem.waitFor({ state: 'visible', timeout: 30_000 });
 
     await this.triggerContextMenuAction(
@@ -247,6 +271,11 @@ export class NxConsolePage extends VSCodePage {
       .first();
 
     await contextMenuItem.waitFor({ state: 'visible', timeout: 10_000 });
-    await contextMenuItem.click();
+    // VS Code's menu ignores a click that arrives right after it opens, so
+    // focus the item and trigger it from the keyboard instead.
+    await contextMenuItem.hover();
+    await expect(contextMenuItem).toHaveClass(/\bfocused\b/);
+    await this.page.keyboard.press('Enter');
+    await contextMenuItem.waitFor({ state: 'hidden' });
   }
 }

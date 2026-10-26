@@ -22,20 +22,22 @@ test('Nx Console smoke test', async ({ nxConsole }) => {
 
   // Open Nx Console sidebar and wait for projects to load
   await nxConsole.openNxConsoleSidebar();
-  const workspaceName = await nxConsole.getWorkspaceName();
-  expect(workspaceName).not.toBe('');
+  const projectsSection = nxConsole.page
+    .locator('.sidebar .split-view-view')
+    .filter({ hasText: 'PROJECTS' });
+  const firstProject = projectsSection.locator('.monaco-list-row').first();
+  await firstProject.waitFor({ state: 'visible', timeout: 90_000 });
 
-  const projectsSection = nxConsole.projectsSection;
-  const workspaceProject = nxConsole.getProject(workspaceName);
-  await workspaceProject.waitFor({ state: 'visible', timeout: 90_000 });
-
-  // Expand the workspace project to see targets
-  await nxConsole.expandProject(workspaceName);
+  // Expand the first project to see targets
+  await firstProject.click();
+  await nxConsole.page.keyboard.press('ArrowRight');
   await expect
     .poll(() => projectsSection.locator('.monaco-list-row').count(), {
       timeout: 10_000,
     })
     .toBeGreaterThan(2);
+
+  await expect(nxConsole.getTreeRow('demo')).toBeVisible({ timeout: 5000 });
 
   // Expanded project shows target items
   const rowCount = await projectsSection.locator('.monaco-list-row').count();

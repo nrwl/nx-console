@@ -18,5 +18,8 @@
     {
       "path": "../../libs/shared/e2e-utils"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  }
 }

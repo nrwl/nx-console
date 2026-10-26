@@ -15,13 +15,18 @@ import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentHashMap.newKeySet
 import javax.swing.Icon
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
 
-    private var generators: List<NxGenerator> = emptyList()
-    private val generatorOptions: MutableMap<String, List<NxGeneratorOption>> = mutableMapOf()
+    @Volatile private var generators: List<NxGenerator> = emptyList()
+    private val generatorOptions = ConcurrentHashMap<String, List<NxGeneratorOption>>()
+    private val pendingOptionLoads = newKeySet<String>()
+    @Volatile private var generatorsLoading = false
 
     override fun getIcon(value: String): Icon = NxIcons.Action
 
@@ -83,10 +88,10 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
         commandLine: CommandLine,
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
+        // Run Anything queries this on the EDT, so the generator list is filled in the background
+        // and the suggestions stay empty until it arrives, rather than freezing the UI on nxls.
         if (generators.isEmpty()) {
-            generators = runBlocking {
-                NxGenerateService.getInstance(project).getFilteredGenerators()
-            }
+            loadGenerators(project)
         }
 
         val completedGeneratorName = commandLine.completedParameters.firstOrNull()
@@ -121,19 +126,7 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
     ): Sequence<String> {
         val generator = findGenerator(commandLine, generators) ?: return emptySequence()
         if (generatorOptions.containsKey(generator.name).not()) {
-            val opts = runBlocking {
-                NxlsService.getInstance(project)
-                    .generatorOptions(
-                        NxGeneratorOptionsRequestOptions(
-                            collection = generator.data.collection,
-                            name = generator.data.name,
-                            path = generator.schemaPath,
-                        )
-                    )
-            }
-            generatorOptions.putAll(
-                (generator.data.fullNamesWithAliases + generator.name).map { it to opts }
-            )
+            loadGeneratorOptions(project, generator)
         }
         // options can be specified both with a space or = as a delimiter
         val specifiedOptions =
@@ -148,6 +141,44 @@ internal class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() 
         return generatorOptions[generator.name]?.let { options ->
             options.map { "--${it.name}" }.filterNot { it in specifiedOptions }.asSequence()
         } ?: emptySequence()
+    }
+
+    private fun loadGenerators(project: Project) {
+        if (generatorsLoading) {
+            return
+        }
+        generatorsLoading = true
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            try {
+                generators = NxGenerateService.getInstance(project).getFilteredGenerators()
+            } finally {
+                generatorsLoading = false
+            }
+        }
+    }
+
+    private fun loadGeneratorOptions(project: Project, generator: NxGenerator) {
+        if (!pendingOptionLoads.add(generator.name)) {
+            return
+        }
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            try {
+                val opts =
+                    NxlsService.getInstance(project)
+                        .generatorOptions(
+                            NxGeneratorOptionsRequestOptions(
+                                collection = generator.data.collection,
+                                name = generator.data.name,
+                                path = generator.schemaPath,
+                            )
+                        )
+                generatorOptions.putAll(
+                    (generator.data.fullNamesWithAliases + generator.name).map { it to opts }
+                )
+            } finally {
+                pendingOptionLoads.remove(generator.name)
+            }
+        }
     }
 
     private fun findGenerator(

@@ -1,14 +1,13 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
+import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
+import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
+import { McpServer, isInitializeRequest } from '@modelcontextprotocol/server';
 import {
   IdeProvider,
   mcpServerInstructions,
   MINIMAL_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
   NxWorkspaceInfoProvider,
+  nxMcpServerCapabilities,
 } from '@nx-console/nx-mcp-server';
 import { gte } from '@nx-console/nx-version';
 import { checkIsNxWorkspace } from '@nx-console/shared-npm';
@@ -67,11 +66,7 @@ async function main() {
     },
     {
       instructions: mcpServerInstructions,
-      capabilities: {
-        tools: {
-          listChanged: true,
-        },
-      },
+      capabilities: nxMcpServerCapabilities,
     },
   );
 
@@ -252,7 +247,6 @@ async function main() {
   );
 
   // disposables for shutting down
-  let sseKeepAliveInterval: NodeJS.Timeout | undefined;
   let server_instance:
     | Server<typeof IncomingMessage, typeof ServerResponse>
     | undefined;
@@ -270,10 +264,6 @@ async function main() {
       try {
         stopWatcher?.();
       } catch {}
-      if (sseKeepAliveInterval) {
-        clearInterval(sseKeepAliveInterval);
-        sseKeepAliveInterval = undefined;
-      }
 
       // make sure exit handlers are removed so nothing else comes in
       try {
@@ -315,145 +305,101 @@ async function main() {
     }
   };
 
-  if (argv.transport === 'sse' || argv.transport === 'http') {
+  if (argv.transport === 'http') {
     const port = argv.port ?? 9921;
     const app = express();
 
-    if (argv.transport === 'http') {
-      const sessions: Record<string, StreamableHTTPServerTransport> = {};
+    const sessions: Record<string, NodeStreamableHTTPServerTransport> = {};
 
-      app.use(express.json());
+    app.use(express.json());
 
-      // POST: Handle initialization and all client->server messages
-      app.post('/mcp', async (req, res) => {
-        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    // POST: Handle initialization and all client->server messages
+    app.post('/mcp', async (req, res) => {
+      const sessionId = req.headers['mcp-session-id'] as string | undefined;
 
-        let transport: StreamableHTTPServerTransport | undefined = sessionId
-          ? sessions[sessionId]
-          : undefined;
+      let transport: NodeStreamableHTTPServerTransport | undefined = sessionId
+        ? sessions[sessionId]
+        : undefined;
 
-        if (!transport) {
-          if (!isInitializeRequest(req.body)) {
-            res.status(400).json({
-              jsonrpc: '2.0',
-              error: {
-                code: -32000,
-                message: 'Bad Request: No valid session ID provided',
-              },
-              id: null,
-            });
-            return;
-          }
-
-          transport = new StreamableHTTPServerTransport({
-            sessionIdGenerator: () => randomUUID(),
-            onsessioninitialized: async (id) => {
-              sessions[id] = transport!;
-              logger.log(`Session initialized: ${id}`);
+      if (!transport) {
+        if (!isInitializeRequest(req.body)) {
+          res.status(400).json({
+            jsonrpc: '2.0',
+            error: {
+              code: -32000,
+              message: 'Bad Request: No valid session ID provided',
             },
-            onsessionclosed: (id) => {
-              delete sessions[id];
-              logger.log(`Session closed: ${id}`);
-            },
+            id: null,
           });
-
-          const sessionMcpServer = new McpServer(
-            {
-              name: 'Nx MCP',
-              version: '0.0.1',
-            },
-            {
-              instructions: mcpServerInstructions,
-              capabilities: {
-                tools: {
-                  listChanged: true,
-                },
-              },
-            },
-          );
-
-          const connectionServer = await NxMcpServerWrapper.create(
-            nxWorkspacePath,
-            nxWorkspaceInfoProvider,
-            sessionMcpServer,
-            ideProvider,
-            telemetryLogger,
-            logger,
-            toolsFilter,
-          );
-
-          await connectionServer.getMcpServer().connect(transport);
-        }
-
-        await transport.handleRequest(req, res, req.body);
-      });
-
-      // GET: Open SSE stream for server->client messages
-      app.get('/mcp', async (req, res) => {
-        const sessionId = req.headers['mcp-session-id'] as string | undefined;
-        const transport = sessionId && sessions[sessionId];
-
-        if (!transport) {
-          res.status(400).send('Invalid or missing session ID');
           return;
         }
 
-        await transport.handleRequest(req, res);
-      });
+        transport = new NodeStreamableHTTPServerTransport({
+          sessionIdGenerator: () => randomUUID(),
+          onsessioninitialized: async (id) => {
+            sessions[id] = transport!;
+            logger.log(`Session initialized: ${id}`);
+          },
+          onsessionclosed: (id) => {
+            delete sessions[id];
+            logger.log(`Session closed: ${id}`);
+          },
+        });
 
-      // DELETE: Allow clients to explicitly terminate sessions
-      app.delete('/mcp', async (req, res) => {
-        const sessionId = req.headers['mcp-session-id'] as string | undefined;
-        const transport = sessionId && sessions[sessionId];
+        const sessionMcpServer = new McpServer(
+          {
+            name: 'Nx MCP',
+            version: '0.0.1',
+          },
+          {
+            instructions: mcpServerInstructions,
+            capabilities: nxMcpServerCapabilities,
+          },
+        );
 
-        if (!transport) {
-          res.status(400).send('Invalid or missing session ID');
-          return;
-        }
+        const connectionServer = await NxMcpServerWrapper.create(
+          nxWorkspacePath,
+          nxWorkspaceInfoProvider,
+          sessionMcpServer,
+          ideProvider,
+          telemetryLogger,
+          logger,
+          toolsFilter,
+        );
 
-        await transport.handleRequest(req, res);
-      });
+        await connectionServer.getMcpServer().connect(transport);
+      }
 
-      logger.log(`Nx MCP server (Streamable HTTP) listening on port ${port}`);
-    } else {
-      // SSE mode
-      let transport: SSEServerTransport;
-      app.get('/sse', async (req, res) => {
-        logger.log('Configuring SSE transport');
-        transport = new SSEServerTransport('/messages', res);
-        await serverWrapper.getMcpServer().connect(transport);
+      await transport.handleRequest(req, res, req.body);
+    });
 
-        // Set up keep-alive interval if enabled
-        if (argv.keepAliveInterval > 0) {
-          sseKeepAliveInterval = setInterval(() => {
-            // Check if the connection is still open using the socket's writable state
-            if (!res.writableEnded && !res.writableFinished) {
-              res.write(':beat\n\n');
-            } else {
-              clearInterval(sseKeepAliveInterval);
-              logger.log('SSE connection closed, clearing keep-alive interval');
-            }
-          }, argv.keepAliveInterval);
+    // GET: Open SSE stream for server->client messages
+    app.get('/mcp', async (req, res) => {
+      const sessionId = req.headers['mcp-session-id'] as string | undefined;
+      const transport = sessionId && sessions[sessionId];
 
-          // Clean up interval if the client disconnects
-          req.on('close', () => {
-            clearInterval(sseKeepAliveInterval);
-            logger.log('SSE connection closed by client');
-          });
-        }
-      });
+      if (!transport) {
+        res.status(400).send('Invalid or missing session ID');
+        return;
+      }
 
-      app.post('/messages', async (req, res) => {
-        if (!transport) {
-          logger.log('No transport found.');
-          res.status(400).send('No transport found');
-          return;
-        }
-        await transport.handlePostMessage(req, res);
-      });
+      await transport.handleRequest(req, res);
+    });
 
-      logger.log(`Nx MCP server (SSE) listening on port ${port}`);
-    }
+    // DELETE: Allow clients to explicitly terminate sessions
+    app.delete('/mcp', async (req, res) => {
+      const sessionId = req.headers['mcp-session-id'] as string | undefined;
+      const transport = sessionId && sessions[sessionId];
+
+      if (!transport) {
+        res.status(400).send('Invalid or missing session ID');
+        return;
+      }
+
+      await transport.handleRequest(req, res);
+    });
+
+    logger.log(`Nx MCP server (Streamable HTTP) listening on port ${port}`);
 
     server_instance = app.listen(port);
   } else {

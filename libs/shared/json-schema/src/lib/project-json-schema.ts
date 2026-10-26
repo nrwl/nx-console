@@ -1,4 +1,3 @@
-import type { TargetConfiguration } from 'nx/src/devkit-exports';
 import { CollectionInfo } from '@nx-console/shared-schema';
 import type { TargetDefaults } from 'nx/src/config/nx-json';
 import type { JSONSchema } from 'vscode-json-languageservice';
@@ -44,13 +43,19 @@ function createJsonSchema(
         target !== 'nx:noop',
     )
     .reduce<JSONSchemaMap>((targets, target) => {
-      const defaults: Partial<TargetConfiguration> = targetDefaults[target];
+      const defaults = targetDefaults[target];
+      // Array-form targetDefaults entries apply in document order with the
+      // last match winning, so take the executor from the last entry that
+      // sets one.
+      const defaultExecutor: string | undefined = Array.isArray(defaults)
+        ? defaults.filter((entry) => entry.executor).pop()?.executor
+        : defaults?.executor;
       let targetSchema: JSONSchema = targetsSchema;
-      if (defaults?.executor) {
+      if (defaultExecutor) {
         const match = executors.find((schema) => {
           const test = schema.if as JSONSchema;
           const executor = test?.properties?.executor as JSONSchema;
-          return executor?.const === defaults.executor;
+          return executor?.const === defaultExecutor;
         });
         if (match) {
           targetSchema = {

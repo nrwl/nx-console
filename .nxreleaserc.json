@@ -1,9 +1,9 @@
 {
-  "changelog": true,
-  "npm": true,
-  "github": false,
+  "changelog": false,
+  "npm": false,
+  "github": true,
+  "git": false,
   "ci": false,
   "repositoryUrl": "https://github.com/nrwl/nx-console",
-  "commitMessage": "chore(release-${PROJECT_NAME}): ${nextRelease.version} [skip ci]",
-  "branches": ["release"]
+  "branches": ["master"]
 }

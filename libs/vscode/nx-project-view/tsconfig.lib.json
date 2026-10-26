@@ -4,9 +4,18 @@
     "outDir": "out-tsc/vscode-nx-project-view",
     "types": ["node"],
     "noImplicitReturns": false,
-    "strict": false
+    "strict": false,
+    "rootDir": "."
   },
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts", "out-tsc"],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "jest.config.ts",
+    "out-tsc",
+    "jest.config.cts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
   "include": ["**/*.ts"],
   "references": [
     {

@@ -45,11 +45,19 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
         mutex.withLock { nxVersion = newVersion }
     }
 
+    /**
+     * The fallbacks parse package.json through the PSI, so they need a read action and they touch
+     * the disk. On the EDT we deliberately skip them and return whatever the language server has
+     * already reported rather than freeze the UI on file I/O.
+     */
     fun getNxVersionSynchronously(): NxVersion? {
         return if (ApplicationManager.getApplication().isDispatchThread) {
             nxVersion
         } else {
-            nxVersion ?: tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+            nxVersion
+                ?: ApplicationManager.getApplication().runReadAction<NxVersion?> {
+                    tryGetNxVersionFromNodeModules() ?: tryGetNxVersionFromPackageJson()
+                }
         }
     }
 
@@ -74,7 +82,9 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
 
             val version = versionProperty?.let { it.value?.text } ?: return null
 
-            return SemVer.parseFromText(version)?.let { NxVersion(it.major, it.minor, version) }
+            return SemVer.parseFromText(version)?.let {
+                NxVersion(major = it.major, minor = it.minor, full = version)
+            }
         } catch (e: Throwable) {
             return null
         }
@@ -114,7 +124,9 @@ class NxVersionUtil(private val project: Project, private val cs: CoroutineScope
                     ?: devDependenciesProperty?.let { getDependencyVersionFromProperty(it, "nx") }
                     ?: return null
 
-            return SemVer.parseFromText(version)?.let { NxVersion(it.major, it.minor, version) }
+            return SemVer.parseFromText(version)?.let {
+                NxVersion(major = it.major, minor = it.minor, full = version)
+            }
         } catch (e: Throwable) {
             return null
         }

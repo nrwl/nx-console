@@ -102,4 +102,18 @@ class NxExecutableTest : BasePlatformTestCase() {
 
         tempDir.deleteRecursively()
     }
+
+    fun testNxCommandForDotNxInstallationIsTheWrapperScript() {
+        val tempDir = Files.createTempDirectory("nx-test-command").toFile()
+        val nxExecutableName = if (SystemInfo.isWindows) "nx.bat" else "nx"
+        val nxExecutable = File(tempDir, nxExecutableName)
+        nxExecutable.createNewFile()
+
+        assertEquals(
+            listOf(nxExecutable.absolutePath),
+            NxExecutable.getNxCommand(tempDir.absolutePath, project),
+        )
+
+        tempDir.deleteRecursively()
+    }
 }

@@ -25,8 +25,11 @@ fun getOrCreateRunnerConfigurationSettings(
                 nxRunSettings.nxTargetsConfiguration == nxTargetConfiguration
         }
         ?.also {
-            (it.configuration as NxCommandConfiguration).apply {
-                nxRunSettings = nxRunSettings.copy(arguments = arguments)
+            // Only explicit commands override saved arguments; tree actions pass no command.
+            if (args.isNotEmpty()) {
+                (it.configuration as NxCommandConfiguration).apply {
+                    nxRunSettings = nxRunSettings.copy(arguments = arguments)
+                }
             }
         }
         ?: runManager

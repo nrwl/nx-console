@@ -142,11 +142,30 @@ export class TreeView extends BaseView {
     collapsible = TreeItemCollapsibleState.Collapsed,
   ): ProjectViewItem | FolderViewItem {
     const config = node.projectConfiguration;
-    return config
-      ? this.createProjectViewItem(
-          [config.name ?? node.projectName ?? '', config],
-          collapsible,
-        )
-      : this.createFolderTreeItem(node.dir, collapsible);
+    if (!config) {
+      return this.createFolderTreeItem(node.dir, collapsible);
+    }
+
+    const item = this.createProjectViewItem(
+      [config.name ?? node.projectName ?? '', config],
+      collapsible,
+    );
+
+    // A project node can also have nested folder/project children in the tree
+    // (e.g. the workspace-root project at '.'). createProjectViewItem decides
+    // collapsibility from the project's targets alone, so a target-less project
+    // that still has children would render as a non-expandable leaf and hide
+    // everything beneath it. Keep it expandable when it has children.
+    if (
+      node.children.length > 0 &&
+      item.collapsible === TreeItemCollapsibleState.None
+    ) {
+      item.collapsible =
+        collapsible === TreeItemCollapsibleState.None
+          ? TreeItemCollapsibleState.Collapsed
+          : collapsible;
+    }
+
+    return item;
   }
 }

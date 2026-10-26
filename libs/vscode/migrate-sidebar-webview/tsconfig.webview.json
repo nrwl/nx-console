@@ -8,7 +8,8 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["DOM", "esnext.asynciterable"],
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "references": []

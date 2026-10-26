@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "out-tsc/nx-config-decoration",
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": [

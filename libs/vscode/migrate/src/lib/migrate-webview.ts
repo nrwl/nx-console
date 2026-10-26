@@ -1,11 +1,14 @@
 import { gte } from '@nx-console/nx-version';
 import { directoryExists } from '@nx-console/shared-file-system';
-import { workspaceDependencyPath } from '@nx-console/shared-npm';
+import {
+  findNxPackagePath,
+  workspaceDependencyPath,
+} from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { readFileSync } from 'fs';
 import type { MigrationsJsonEntry } from 'nx/src/config/misc-interfaces';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import {
   ExtensionContext,
   Uri,
@@ -14,12 +17,14 @@ import {
   window,
 } from 'vscode';
 import {
+  acknowledgeMigration,
   cancelMigration,
   skipMigration,
   stopMigration,
   undoMigration,
   viewDocumentation,
   viewImplementation,
+  viewPrompt,
 } from './commands/migrate-commands';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import { watchFile } from '@nx-console/vscode-utils';
@@ -127,6 +132,12 @@ export class MigrateWebview {
           break;
         case 'stop-migration':
           stopMigration(message.payload.migration);
+          break;
+        case 'acknowledge-prompt':
+          acknowledgeMigration(message.payload.migration);
+          break;
+        case 'view-prompt':
+          viewPrompt(message.payload.migration);
           break;
       }
     });
@@ -253,16 +264,16 @@ async function getGraphHtmlLocation(
 
 // TODO: don't simply duplicate this from nxls code?
 async function getGraphBasePath(): Promise<string | undefined> {
-  const nxWorkspaceDepPath = await workspaceDependencyPath(
+  const graphIndexPath = await findNxPackagePath(
     getNxWorkspacePath(),
-    'nx',
+    join('src', 'core', 'graph', 'index.html'),
   );
 
-  if (!nxWorkspaceDepPath) {
+  if (!graphIndexPath) {
     return undefined;
   }
 
-  const graphBasePath = join(nxWorkspaceDepPath, 'src', 'core', 'graph');
+  const graphBasePath = dirname(graphIndexPath);
 
   if (await directoryExists(graphBasePath)) {
     return graphBasePath;

@@ -16,52 +16,40 @@ describe('createYargsConfig', () => {
     processExitSpy.mockRestore();
   });
 
-  describe('deprecated --sse option', () => {
-    it('should warn when using deprecated --sse flag', () => {
-      const argv = createYargsConfig(['--sse']).parseSync();
+  describe('removed SSE transport', () => {
+    let consoleErrorSpy: jest.SpyInstance;
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Warning: --sse option is deprecated. Please use --transport sse instead.',
-      );
+    beforeEach(() => {
+      consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     });
 
-    it('should set transport to sse when using deprecated --sse flag', () => {
-      const argv = createYargsConfig(['--sse']).parseSync();
-
-      expect(argv.transport).toBe('sse');
-      expect(argv.sse).toBe(true);
+    afterEach(() => {
+      consoleErrorSpy.mockRestore();
     });
 
-    it('should throw error when using --sse with --transport http', () => {
+    it.each([[['--sse']], [['--sse', '--transport', 'http']]])(
+      'should exit with a migration hint for %j',
+      (args) => {
+        expect(() => {
+          createYargsConfig(args).parseSync();
+        }).toThrow('process.exit called');
+
+        expect(processExitSpy).toHaveBeenCalledWith(1);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          expect.stringContaining('The SSE transport has been removed'),
+        );
+      },
+    );
+
+    it('should reject --transport sse', () => {
       expect(() => {
-        createYargsConfig(['--sse', '--transport', 'http']).parseSync();
+        createYargsConfig(['--transport', 'sse']).parseSync();
       }).toThrow('process.exit called');
 
       expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it('should allow --sse with --transport sse', () => {
-      const argv = createYargsConfig([
-        '--sse',
-        '--transport',
-        'sse',
-      ]).parseSync();
-
-      expect(argv.transport).toBe('sse');
-      expect(argv.sse).toBe(true);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Warning: --sse option is deprecated. Please use --transport sse instead.',
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid values'),
       );
-    });
-  });
-
-  describe('conflicting options', () => {
-    it('should throw error when using both --sse and --http', () => {
-      expect(() => {
-        createYargsConfig(['--sse', '--transport', 'http']).parseSync();
-      }).toThrow('process.exit called');
-
-      expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
     it('should not throw error when using only --transport', () => {
@@ -93,12 +81,6 @@ describe('createYargsConfig', () => {
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
-    it('should allow --port with sse transport', () => {
-      expect(() => {
-        createYargsConfig(['--transport', 'sse', '--port', '9922']).parseSync();
-      }).not.toThrow();
-    });
-
     it('should allow --port with http transport', () => {
       expect(() => {
         createYargsConfig([
@@ -107,12 +89,6 @@ describe('createYargsConfig', () => {
           '--port',
           '9922',
         ]).parseSync();
-      }).not.toThrow();
-    });
-
-    it('should allow --port with deprecated --sse flag', () => {
-      expect(() => {
-        createYargsConfig(['--sse', '--port', '9922']).parseSync();
       }).not.toThrow();
     });
   });
@@ -130,7 +106,6 @@ describe('createYargsConfig', () => {
       expect(argv.transport).toBe('stdio');
       expect(argv.sse).toBe(false);
       expect(argv.disableTelemetry).toBe(false);
-      expect(argv.keepAliveInterval).toBe(30000);
       expect(argv.port).toBeUndefined();
     });
   });
@@ -139,11 +114,6 @@ describe('createYargsConfig', () => {
     it('should accept stdio transport', () => {
       const argv = createYargsConfig(['--transport', 'stdio']).parseSync();
       expect(argv.transport).toBe('stdio');
-    });
-
-    it('should accept sse transport', () => {
-      const argv = createYargsConfig(['--transport', 'sse']).parseSync();
-      expect(argv.transport).toBe('sse');
     });
 
     it('should accept http transport', () => {

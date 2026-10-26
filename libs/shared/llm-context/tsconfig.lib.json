@@ -4,7 +4,8 @@
     "outDir": "out-tsc/shared-prompts",
     "strict": true,
     "noImplicitReturns": true,
-    "types": ["node"]
+    "types": ["node"],
+    "rootDir": "."
   },
   "include": ["src/**/*.ts"],
   "exclude": ["out-tsc", "**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
