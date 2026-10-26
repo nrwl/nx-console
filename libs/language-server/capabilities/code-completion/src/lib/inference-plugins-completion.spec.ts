@@ -38,6 +38,11 @@ describe('inferencePluginsCompletion', () => {
     return dir;
   }
 
+  function writeModule(dir: string, file: string, content: string) {
+    mkdirSync(join(dir, file, '..'), { recursive: true });
+    writeFileSync(join(dir, file), content);
+  }
+
   beforeEach(() => {
     workspace = mkdtempSync(join(tmpdir(), 'inference-plugins-completion-'));
     resetInferencePluginsCompletionCache();
@@ -86,11 +91,66 @@ describe('inferencePluginsCompletion', () => {
     expect(labels).toEqual(['@nx/jest/plugin']);
   });
 
+  it('includes plugins whose root entry exports createNodes as the bare package name', async () => {
+    const vitest = addPackage('@nx/vitest', {
+      main: './dist/index.js',
+      exports: {
+        '.': { types: './dist/index.d.ts', default: './dist/index.js' },
+        './generators': './dist/generators.js',
+      },
+    });
+    writeModule(
+      vitest,
+      'dist/index.js',
+      [
+        'exports.createNodesV2 = exports.createNodes = void 0;',
+        'var plugin_1 = require("./src/plugins/plugin");',
+        'Object.defineProperty(exports, "createNodes", { enumerable: true, get: function () { return plugin_1.createNodes; } });',
+        'Object.defineProperty(exports, "createNodesV2", { enumerable: true, get: function () { return plugin_1.createNodesV2; } });',
+      ].join('\n'),
+    );
+    const legacyMain = addPackage('nx-legacy-plugin', { main: './main.js' });
+    writeModule(legacyMain, 'main.js', 'exports.createNodesV2 = void 0;');
+    jest.mocked(workspaceDependencies).mockResolvedValue([vitest, legacyMain]);
+
+    const labels = (await inferencePluginsCompletion(workspace)).map(
+      (item) => item.label,
+    );
+
+    expect(labels).toEqual(['@nx/vitest', 'nx-legacy-plugin']);
+  });
+
+  it('prefers the /plugin entry point when the root entry also exports createNodes', async () => {
+    const vite = addPackage(
+      '@nx/vite',
+      {
+        exports: { '.': './dist/index.js', './plugin': './dist/plugin.js' },
+      },
+      ['dist/plugin.js'],
+    );
+    writeModule(vite, 'dist/index.js', 'exports.createNodes = void 0;');
+    jest.mocked(workspaceDependencies).mockResolvedValue([vite]);
+
+    const labels = (await inferencePluginsCompletion(workspace)).map(
+      (item) => item.label,
+    );
+
+    expect(labels).toEqual(['@nx/vite/plugin']);
+  });
+
   it('skips packages without a plugin entry point', async () => {
+    const devkit = addPackage('@nx/devkit', {
+      exports: { '.': './dist/index.js' },
+    });
+    writeModule(
+      devkit,
+      'dist/index.js',
+      'tslib_1.__exportStar(require("nx/src/devkit-exports"), exports);',
+    );
     jest
       .mocked(workspaceDependencies)
       .mockResolvedValue([
-        addPackage('@nx/devkit', { exports: { '.': './dist/index.js' } }),
+        devkit,
         addPackage('@nx/workspace', { main: './index.js' }),
       ]);
 
