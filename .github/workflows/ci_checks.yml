@@ -94,6 +94,13 @@ jobs:
       - name: Setup Gradle Dependencies
         run: ./gradlew dependencies
 
+      # Runs distributed tasks on this job while the Nx Cloud workers boot and while the
+      # foreground commands below wait on them. It inherits the environment as of this step,
+      # so it has to start after Node, Java, Chrome and the dependencies are set up.
+      # ubuntu-latest has 4 cores and 16 GB; the rest is left for the foreground commands.
+      - name: Start the main-job Nx Cloud worker
+        run: yarn nx-cloud start-worker --background --cpu=3 --memory=12GiB
+
       - name: Check formatting
         run: |
           yarn nx-cloud record -- yarn nx format:check --verbose
@@ -120,6 +127,17 @@ jobs:
           name: intellij-e2e-${{ github.run_id }}-${{ github.run_attempt }}
           path: dist/apps/intellij/e2e
           if-no-files-found: error
+          retention-days: 14
+
+      # The worker writes its log under ~/.nx, a hidden directory outside the workspace.
+      - name: Upload main-job worker logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: main-job-worker-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ~/.nx/*/cache/main-job-workers/*/worker.log
+          include-hidden-files: true
+          if-no-files-found: ignore
           retention-days: 14
 
       - run: npx nx-cloud fix-ci
