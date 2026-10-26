@@ -213,7 +213,7 @@ export async function loadNxOutputSchemas(
   try {
     const projectSchemaPath = join(nxPath, 'schemas', 'project-schema.json');
     const projectSchemaContent = await readFile(projectSchemaPath, 'utf-8');
-    const projectSchema = JSON.parse(projectSchemaContent);
+    const projectSchema = relaxProjectSchema(JSON.parse(projectSchemaContent));
 
     const nxWorkspaceOutputSchema = {
       type: 'object',
@@ -262,6 +262,32 @@ export async function loadNxOutputSchemas(
   } catch {
     return getFallbackSchemas();
   }
+}
+
+/**
+ * Nx's project-schema.json describes hand-written project.json files and can lag
+ * behind what Nx plugins put into the project graph (e.g. `dependsOn[].options`
+ * from @nx/cypress 24 is in Nx's types but not in the schema). MCP clients
+ * reject the whole tool result when structuredContent doesn't match the
+ * outputSchema, so the borrowed schema must not forbid unknown properties.
+ * Its `oneOf` branches only stay mutually exclusive through
+ * `additionalProperties: false`, so they become `anyOf`.
+ */
+export function relaxProjectSchema<T>(schema: T): T {
+  if (Array.isArray(schema)) {
+    return schema.map((item) => relaxProjectSchema(item)) as T;
+  }
+  if (!schema || typeof schema !== 'object') {
+    return schema;
+  }
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(schema)) {
+    if (key === 'additionalProperties' && value === false) {
+      continue;
+    }
+    result[key === 'oneOf' ? 'anyOf' : key] = relaxProjectSchema(value);
+  }
+  return result as T;
 }
 
 function getFallbackSchemas(): NxOutputSchemas {
