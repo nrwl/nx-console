@@ -12,7 +12,7 @@ env:
   NX_PLUGIN_NO_TIMEOUTS: true
   NX_CLOUD_ACCESS_TOKEN: ${{ github.ref == 'refs/heads/master' && secrets.NX_CLOUD_READ_WRITE_TOKEN || secrets.NX_CLOUD_READ_TOKEN }}
   # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
-  NX_CLOUD_USE_ULTRACACHE: 'true'
+  NX_CLOUD_USE_ULTRACACHE: 'false'
   NX_CLOUD_TASK_GRAPH_STORAGE_VERSION: '2'
 
 jobs:
@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NX_BATCH_MODE: true
+      NX_BENCH_BUST: ${{ github.run_id }}-${{ github.run_attempt }}
       NX_CI_EXECUTION_ENV: 'linux'
       NX_VERBOSE_LOGGING: true
       GIT_AUTHOR_EMAIL: test@test.com
@@ -64,7 +65,7 @@ jobs:
         env:
           IDEA_LICENSE_BASE64: ${{ secrets.IDEA_LICENSE_BASE64 }}
         run: |
-          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION,IDEA_LICENSE_BASE64"
+          yarn dlx nx-cloud start-ci-run --distribute-on=".nx/workflows/linux-distribution-config.yaml" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV,NX_VERBOSE_LOGGING,JAVA_VERSION,IDEA_LICENSE_BASE64,NX_BENCH_BUST"
 
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
@@ -117,7 +118,7 @@ jobs:
 
       # todo(cammisuli): disable verifyPlugin for now as its constantly failing on CI
       # - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,verifyPlugin,telemetry-check --configuration=ci --exclude=nx-console --parallel=3
-      - run: yarn nx affected --targets=lint,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
+      - run: yarn nx run-many --targets=lint,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
         timeout-minutes: 60
 
       - name: Upload IntelliJ E2E evidence
