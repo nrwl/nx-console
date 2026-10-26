@@ -100,6 +100,8 @@ jobs:
       # so it has to start after Node, Java, Chrome and the dependencies are set up.
       # ubuntu-latest has 4 cores and 16 GB; the rest is left for the foreground commands.
       - name: Start the main-job Nx Cloud worker
+        env:
+          NX_CLOUD_DISABLE_BUFFER_TASK_COMPLETIONS: 'true'
         run: yarn nx-cloud start-worker --background --cpu=3 --memory=12GiB
 
       - name: Check formatting
