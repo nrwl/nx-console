@@ -90,7 +90,10 @@
       {
         "env": "NX_POWERPACK_DISABLE"
       },
-      "{workspaceRoot}/.env"
+      "{workspaceRoot}/.env",
+      {
+        "env": "NX_BENCH_BUST"
+      }
     ],
     "scripts": ["{workspaceRoot}/tools/scripts/**"]
   },
