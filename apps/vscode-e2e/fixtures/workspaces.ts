@@ -191,6 +191,25 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
       writeWorkspace(path, { projects });
     },
   },
+  'generate-ui': {
+    description:
+      'A root project, `app`, with `src/main.ts`, and a library, `extra`, in `libs/extra`. Context menus are rendered by VS Code so scenarios can click them on macOS.',
+    settings: { 'window.menuStyle': 'custom' },
+    create: (path) =>
+      writeWorkspace(path, {
+        projects: {
+          '.': { name: 'app', targets: { hello: runCommand('echo hello') } },
+          'libs/extra': {
+            name: 'extra',
+            targets: { build: runCommand('echo build') },
+          },
+        },
+        files: {
+          'src/main.ts': 'console.log("app");\n',
+          'libs/extra/src/index.ts': 'export const extra = true;\n',
+        },
+      }),
+  },
 };
 
 export function getWorkspaceFixture(name: string): WorkspaceFixture {
