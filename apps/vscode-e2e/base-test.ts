@@ -41,6 +41,8 @@ export interface VSCodeSession {
   nxConsole: NxConsolePage;
   evaluator: VSCodeEvaluator;
   workspacePath: string;
+  /** VS Code's user data directory; its `logs` folder holds this run's VS Code and extension logs. */
+  userDataDir: string;
   extension: ExtensionInfo;
   /** Which Nx Console build is under test, for proof headings. */
   build: string;
@@ -211,6 +213,7 @@ export const test = base.extend<{
           nxConsole: connected.nxConsole,
           evaluator: connected.evaluator,
           workspacePath: connectedSession.workspacePath,
+          userDataDir: connectedSession.userDataDir,
           extension: connectedSession.extension,
           build: describeBuild(connectedSession.extension, source),
           label,

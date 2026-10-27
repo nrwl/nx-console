@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, realpathSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { expect, test } from '../base-test';
 
 test.use({ vscodeOptions: { fixture: 'jest-cypress-libraries' } });
@@ -10,7 +10,7 @@ const assertionError = "does not exist on type 'Assertion'";
 test('library imports keep Cypress globals out of Jest specs', async ({
   vscode,
 }, testInfo) => {
-  const { nxConsole, evaluator, workspacePath } = vscode;
+  const { nxConsole, evaluator, workspacePath, userDataDir } = vscode;
   const proof = vscode.proof([
     'Library imports and Jest specs (#2259)',
     vscode.build,
@@ -29,12 +29,7 @@ test('library imports keep Cypress globals out of Jest specs', async ({
   const cypressEntry = `${root}/libs/cypress-utils/src/index.ts`;
   const libConfig = `${root}/libs/util/tsconfig.lib.json`;
   const specConfig = `${root}/libs/util/tsconfig.spec.json`;
-  const logsDir = join(
-    dirname(
-      await evaluator.evaluate(() => process.env['VSCODE_IPC_HOOK'] ?? ''),
-    ),
-    'logs',
-  );
+  const logsDir = join(userDataDir, 'logs');
   // The plugin logs "updating project: <tsconfig>" followed by the root files
   // it adds to that project once it has a configuration. Keep the latest
   // entry per project.
