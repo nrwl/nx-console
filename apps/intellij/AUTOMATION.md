@@ -46,7 +46,10 @@ to the launch arguments. Set `NX_AUTOMATION_SANDBOX` to a separate directory for
 each IDE so their settings and activation do not mix. The scenario client keeps
 using the Driver version of the configured platform. `ReproIdeBuildCompatibilityKt`
 checks that Nx Console either lists the fixture's projects in that IDE or is
-rejected by it as incompatible.
+rejected by it as incompatible. `ReproPlatformPluginDependenciesKt` breaks the
+fixture's `nx.json`, clicks **View Errors** and checks that the Problems tool
+window lists the error and that Nx Console can read the Git working tree, which
+covers the Problems View and VCS plugins that 2026.3 split out of the platform.
 
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if
@@ -462,7 +465,8 @@ it at the end of the recording; that tab is diagnostic output, not product UI.
 `ReproNxJsonPluginCompletionKt` opens `nx.json` and requests completion for the
 value of `plugins[0].plugin` through the IDE's platform LSP client
 (`LspRequestExecutor.getCompletionList`). It asserts that the installed
-`@nx/eslint/plugin` and `@nx/vite/plugin` are offered. As a control, it also
+`@nx/eslint/plugin` and `@nx/vite/plugin` are offered, along with `@nx/vitest`,
+which exports `createNodes` from its package root and has no `./plugin` entry. As a control, it also
 requests completion at a root key in the same file.
 
 It then invokes Code Completion in the editor and requires the same plugins in
@@ -473,7 +477,7 @@ the lookup closes and the scenario fails. On a broken build the editor shows
 "No suggestions" instead.
 
 Use a fixture named `nx24-plugin-completion-fixture` with `nx`, `@nx/js`,
-`@nx/eslint` and `@nx/vite` installed through npm, one project
+`@nx/eslint`, `@nx/vite` and `@nx/vitest` 24.0.0 installed through npm, one project
 (`libs/util/project.json`), and this `nx.json`:
 
 ```json

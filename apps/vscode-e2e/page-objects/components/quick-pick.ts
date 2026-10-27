@@ -10,7 +10,8 @@ export class QuickPick {
 
   async execute(command: string): Promise<void> {
     await this.page.keyboard.press(getCommandPaletteShortcut());
-    await this.container.locator('.input').fill(command);
+    // The palette starts with ">"; replacing it would switch to file search.
+    await this.container.locator('.input').fill(`>${command}`);
     await this.page
       .locator(`.quick-input-list .monaco-list-row[aria-label*="${command}"]`)
       .first()
@@ -18,6 +19,9 @@ export class QuickPick {
   }
 
   async selectItem(label: string): Promise<void> {
+    // Long lists are virtualized, so narrow them down before looking for the row.
+    await this.container.locator('.input').waitFor();
+    await this.page.keyboard.insertText(label);
     await this.page
       .locator(`.quick-input-list .monaco-list-row[aria-label*="${label}"]`)
       .first()
