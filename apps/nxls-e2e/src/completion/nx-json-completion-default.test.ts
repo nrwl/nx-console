@@ -82,6 +82,7 @@ describe('nx.json completion - default', () => {
       '@nx/cypress/plugin',
       '@nx/eslint/plugin',
       '@nx/vite/plugin',
+      '@nx/vitest',
     ]);
   });
 
@@ -200,6 +201,7 @@ describe('nx.json completion - default', () => {
       '@nx/eslint/plugin',
       '@nx/playwright/plugin',
       '@nx/vite/plugin',
+      '@nx/vitest',
     ]);
   });
 
