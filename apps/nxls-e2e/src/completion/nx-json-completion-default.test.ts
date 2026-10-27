@@ -82,6 +82,7 @@ describe('nx.json completion - default', () => {
       '@nx/cypress/plugin',
       '@nx/eslint/plugin',
       '@nx/vite/plugin',
+      '@nx/vitest',
     ]);
   });
 
@@ -122,18 +123,22 @@ describe('nx.json completion - default', () => {
     ).toMatchInlineSnapshot(`
       Array [
         "affected",
+        "analytics",
         "cacheDirectory",
         "cli",
+        "conformance",
         "defaultBase",
         "defaultProject",
         "extends",
         "generators",
         "implicitDependencies",
+        "migrate",
         "namedInputs",
         "neverConnectToCloud",
         "nxCloudAccessToken",
         "nxCloudEncryptionKey",
         "nxCloudUrl",
+        "owners",
         "parallel",
         "plugins",
         "release",
@@ -196,6 +201,7 @@ describe('nx.json completion - default', () => {
       '@nx/eslint/plugin',
       '@nx/playwright/plugin',
       '@nx/vite/plugin',
+      '@nx/vitest',
     ]);
   });
 
