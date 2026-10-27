@@ -1,4 +1,4 @@
-import { dirname } from 'node:path';
+import { basename, dirname } from 'node:path';
 import type { PackageManager } from 'nx/src/utils/package-manager';
 import type ts from 'typescript/lib/tsserverlibrary';
 import type { Logger } from './logger';
@@ -15,6 +15,31 @@ export interface Configuration {
 }
 
 const isNxImportPlugin = Symbol('__isNxImportPlugin__');
+
+const testRunnerTypes = new Set([
+  'jest',
+  'vitest/globals',
+  'mocha',
+  'jasmine',
+  'cypress',
+]);
+
+/**
+ * Test projects declare a test runner's globals, such as `expect`. A library
+ * entry file added as a root can bring in a different runner's globals (for
+ * example Cypress's Chai `expect` into a Jest spec), so test projects get no
+ * additional root files. Without a `types` list, a `*.spec.json` config is
+ * treated as a test project.
+ */
+export function isTestProject(
+  configFileName: string,
+  types: string[] | undefined,
+): boolean {
+  if (types) {
+    return types.some((type) => testRunnerTypes.has(type));
+  }
+  return basename(configFileName).endsWith('.spec.json');
+}
 
 export class NxImportsPlugin {
   logger: Logger | undefined;
@@ -74,6 +99,17 @@ export class NxImportsPlugin {
     const additionalRootFiles = this.config.additionalRootFiles || [];
 
     if (additionalRootFiles.length === 0) {
+      return [];
+    }
+
+    if (
+      isTestProject(
+        project.getProjectName(),
+        project.getCompilerOptions().types,
+      )
+    ) {
+      this.logger?.log('test project, skipping library entry files');
+      this.logger?.log(`additional root files: ${JSON.stringify([])}`);
       return [];
     }
 

@@ -8,5 +8,6 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": []
+  "references": [],
+  "exclude": ["src/**/*.spec.ts"]
 }
