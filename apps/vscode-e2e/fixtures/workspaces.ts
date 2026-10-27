@@ -139,6 +139,41 @@ export const nestedProjectParents = [
   },
 ];
 
+const libraryTsconfigs = (types: string[]) => ({
+  'tsconfig.json': JSON.stringify(
+    {
+      extends: '../../tsconfig.base.json',
+      files: [],
+      include: [],
+      references: [
+        { path: './tsconfig.lib.json' },
+        { path: './tsconfig.spec.json' },
+      ],
+    },
+    null,
+    2,
+  ),
+  'tsconfig.lib.json': JSON.stringify(
+    {
+      extends: './tsconfig.json',
+      compilerOptions: { outDir: '../../dist/out-tsc', types },
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.spec.ts'],
+    },
+    null,
+    2,
+  ),
+  'tsconfig.spec.json': JSON.stringify(
+    {
+      extends: './tsconfig.json',
+      compilerOptions: { outDir: '../../dist/out-tsc', types: ['jest'] },
+      include: ['src/**/*.spec.ts'],
+    },
+    null,
+    2,
+  ),
+});
+
 export const workspaceFixtures: Record<string, WorkspaceFixture> = {
   demo: {
     description: 'One project, `demo`, with `hello` and `check` targets.',
@@ -207,6 +242,73 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
         files: {
           'src/main.ts': 'console.log("app");\n',
           'libs/extra/src/index.ts': 'export const extra = true;\n',
+        },
+      }),
+  },
+  'jest-cypress-libraries': {
+    description:
+      'Two path-mapped libraries in `tsconfig.base.json`: `util`, with a Jest spec, and `cypress-utils`, whose entry file references Cypress types. tsserver logs verbosely so scenarios can read which root files the library import plugin adds.',
+    settings: { 'typescript.tsserver.log': 'verbose' },
+    create: (path) =>
+      writeWorkspace(path, {
+        projects: {
+          'libs/util': { name: 'util' },
+          'libs/cypress-utils': { name: 'cypress-utils' },
+        },
+        files: {
+          'tsconfig.base.json': JSON.stringify(
+            {
+              compilerOptions: {
+                rootDir: '.',
+                target: 'es2022',
+                module: 'esnext',
+                moduleResolution: 'bundler',
+                strict: true,
+                skipLibCheck: true,
+                paths: {
+                  '@fixture/util': ['./libs/util/src/index.ts'],
+                  '@fixture/cypress-utils': [
+                    './libs/cypress-utils/src/index.ts',
+                  ],
+                },
+              },
+              exclude: ['node_modules', 'tmp'],
+            },
+            null,
+            2,
+          ),
+          ...Object.fromEntries(
+            Object.entries(libraryTsconfigs([])).map(([file, content]) => [
+              `libs/util/${file}`,
+              content,
+            ]),
+          ),
+          ...Object.fromEntries(
+            Object.entries(libraryTsconfigs(['cypress'])).map(
+              ([file, content]) => [`libs/cypress-utils/${file}`, content],
+            ),
+          ),
+          'libs/util/src/index.ts': "export * from './lib/util';\n",
+          'libs/util/src/lib/util.ts':
+            "export function util(): string {\n  return 'util';\n}\n",
+          'libs/util/src/lib/util.spec.ts': [
+            "import { util } from './util';",
+            '',
+            "describe('util', () => {",
+            "  it('returns util', () => {",
+            "    expect(util()).toEqual('util');",
+            '  });',
+            '});',
+            '',
+          ].join('\n'),
+          'libs/cypress-utils/src/index.ts': [
+            '/// <reference types="cypress" />',
+            '',
+            'export function getGreeting() {',
+            "  return cy.get('h1');",
+            '}',
+            '',
+          ].join('\n'),
         },
       }),
   },
