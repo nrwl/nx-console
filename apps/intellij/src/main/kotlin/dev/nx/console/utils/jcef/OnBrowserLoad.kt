@@ -78,5 +78,3 @@ suspend fun JBCefBrowser.awaitLoad() = suspendCancellableCoroutine { continuatio
         this.jbCefClient.removeLoadHandler(loadHandler, this.cefBrowser)
     }
 }
-
-// Temporary: CI timing sample for #3294, reverted before merge.
