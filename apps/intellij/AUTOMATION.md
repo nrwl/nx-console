@@ -49,7 +49,9 @@ checks that Nx Console either lists the fixture's projects in that IDE or is
 rejected by it as incompatible. `ReproPlatformPluginDependenciesKt` breaks the
 fixture's `nx.json`, clicks **View Errors** and checks that the Problems tool
 window lists the error and that Nx Console can read the Git working tree, which
-covers the Problems View and VCS plugins that 2026.3 split out of the platform.
+covers the Problems View and VCS plugins that 2026.3 split out of the platform. `ReproConfigFileCodeVisionKt` opens `demo/project.json` and checks
+that the editor shows Nx Console's `Nx Targets: hello` code vision entry, which needs
+nxls requests that take no arguments to succeed.
 
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if

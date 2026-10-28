@@ -65,7 +65,9 @@ interface NxlsLanguageServer : LanguageServer {
     }
 
     @JsonRequest("nx/projectGraphOutput")
-    fun projectGraphOutput(): CompletableFuture<ProjectGraphOutput> {
+    fun projectGraphOutput(
+        request: NxEmptyRequest = NxEmptyRequest()
+    ): CompletableFuture<ProjectGraphOutput> {
         throw UnsupportedOperationException()
     }
 
@@ -77,7 +79,9 @@ interface NxlsLanguageServer : LanguageServer {
     }
 
     @JsonRequest("nx/projectFolderTree")
-    fun projectFolderTree(): CompletableFuture<SerializedNxFolderTreeData> {
+    fun projectFolderTree(
+        request: NxEmptyRequest = NxEmptyRequest()
+    ): CompletableFuture<SerializedNxFolderTreeData> {
         throw UnsupportedOperationException()
     }
 
@@ -94,7 +98,9 @@ interface NxlsLanguageServer : LanguageServer {
     }
 
     @JsonRequest("nx/sourceMapFilesToProjectsMap")
-    fun sourceMapFilesToProjectsMap(): CompletableFuture<Map<String, Array<String>>> {
+    fun sourceMapFilesToProjectsMap(
+        request: NxEmptyRequest = NxEmptyRequest()
+    ): CompletableFuture<Map<String, Array<String>>> {
         throw UnsupportedOperationException()
     }
 
@@ -116,22 +122,24 @@ interface NxlsLanguageServer : LanguageServer {
     }
 
     @JsonRequest("nx/stopDaemon")
-    fun stopDaemon(): CompletableFuture<Unit> {
+    fun stopDaemon(request: NxEmptyRequest = NxEmptyRequest()): CompletableFuture<Unit> {
         throw UnsupportedOperationException()
     }
 
     @JsonRequest("nx/startDaemon")
-    fun startDaemon(): CompletableFuture<Unit> {
+    fun startDaemon(request: NxEmptyRequest = NxEmptyRequest()): CompletableFuture<Unit> {
         throw UnsupportedOperationException()
     }
 
     @JsonRequest("nx/cloudStatus")
-    fun cloudStatus(): CompletableFuture<NxCloudStatus> {
+    fun cloudStatus(request: NxEmptyRequest = NxEmptyRequest()): CompletableFuture<NxCloudStatus> {
         throw UnsupportedOperationException()
     }
 
     @JsonRequest("nx/configureAiAgentsStatus")
-    fun configureAiAgentsStatus(): CompletableFuture<ConfigureAiAgentsStatus?> {
+    fun configureAiAgentsStatus(
+        request: NxEmptyRequest = NxEmptyRequest()
+    ): CompletableFuture<ConfigureAiAgentsStatus?> {
         throw UnsupportedOperationException()
     }
 
@@ -146,12 +154,16 @@ interface NxlsLanguageServer : LanguageServer {
     }
 
     @JsonRequest("nx/recentCIPEData")
-    fun recentCIPEData(): CompletableFuture<CIPEDataResponse> {
+    fun recentCIPEData(
+        request: NxEmptyRequest = NxEmptyRequest()
+    ): CompletableFuture<CIPEDataResponse> {
         throw UnsupportedOperationException()
     }
 
     @JsonRequest("nx/cloudAuthHeaders")
-    fun cloudAuthHeaders(): CompletableFuture<NxCloudAuthHeaders> {
+    fun cloudAuthHeaders(
+        request: NxEmptyRequest = NxEmptyRequest()
+    ): CompletableFuture<NxCloudAuthHeaders> {
         throw UnsupportedOperationException()
     }
 
