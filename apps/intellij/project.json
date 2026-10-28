@@ -17,7 +17,7 @@
       }
     },
     "buildPlugin": {
-      "dependsOn": ["^build", "^build-webview-files"]
+      "dependsOn": ["...", "^build", "^build-webview-files"]
     },
     "runIde": {
       "cache": false
