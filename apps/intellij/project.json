@@ -17,7 +17,8 @@
       }
     },
     "buildPlugin": {
-      "dependsOn": ["^build", "^build-webview-files"]
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": ["...", "kotlin", "{projectRoot}/src/main/**/*"]
     },
     "runIde": {
       "cache": false
@@ -181,6 +182,12 @@
           "transitive": true
         }
       ]
+    },
+    "compileKotlin": {
+      "inputs": ["...", "kotlin"]
+    },
+    "compileTestKotlin": {
+      "inputs": ["...", "kotlin"]
     },
     "compileAutomationKotlin": {
       "inputs": ["kotlin", "{workspaceRoot}/gradle/wrapper/**/*"]
