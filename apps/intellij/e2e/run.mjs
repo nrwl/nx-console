@@ -78,6 +78,26 @@ const env = {
   NX_AUTOMATION_LABEL: scenarioName,
 };
 
+// The IDE log is mostly screenshot entries from the recorder, which would crowd everything else
+// out of a tail. Keep warnings, errors and the entries that explain Nx Console, LSP and JCEF state.
+const ideLogEntry = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} /;
+const diagnosticIdeLogEntry =
+  / (WARN|ERROR|SEVERE) - | - #(dev\.nx\.console|c\.i\.p\.l\.|c\.i\.u\.j\.|c\.i\.o\.p\.DumbServiceImpl)/;
+
+function diagnosticIdeLogLines(lines) {
+  const kept = [];
+  let keeping = true;
+  for (const line of lines) {
+    if (ideLogEntry.test(line)) {
+      keeping =
+        diagnosticIdeLogEntry.test(line) &&
+        !line.includes('#c.j.p.c.TakeScreenshotCommand');
+    }
+    if (keeping) kept.push(line);
+  }
+  return kept;
+}
+
 function start(command, args, name, extra = {}) {
   const log = createWriteStream(join(output, `${name}.log`));
   const child = spawn(command, args, {
@@ -589,18 +609,23 @@ try {
     `${failure ? 'FAIL' : 'PASS'}: IntelliJ ${scenarioName === 'project-view' ? 'project view' : scenarioName}. Artifacts: ${output}`,
   );
   if (failure) {
-    // Nx Agents do not publish outputs for a failed task, so the artifacts this points at
-    // never reach the uploader. Echo the evidence into the task log instead.
+    // When Nx Cloud retries a failed task, only the last attempt's outputs are kept, but every
+    // attempt's terminal output is. Echo the evidence into the task log so it survives a retry.
     for (const name of [
       'scenario.log',
       'result.txt',
       'daemon-daemon-error.log',
-      'ide.log',
+      'idea.log',
     ]) {
       try {
         const text = await readFile(join(output, name), 'utf8');
-        const tail = text.split('\n').slice(-120).join('\n');
-        console.error(`\n===== ${name} (last 120 lines) =====\n${tail}`);
+        const lines = text.split('\n');
+        const tail = (
+          name === 'idea.log' ? diagnosticIdeLogLines(lines) : lines
+        )
+          .slice(-200)
+          .join('\n');
+        console.error(`\n===== ${name} (last 200 lines) =====\n${tail}`);
       } catch {
         console.error(`\n===== ${name}: not written =====`);
       }
