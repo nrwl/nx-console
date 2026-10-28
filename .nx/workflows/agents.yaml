@@ -9,13 +9,6 @@ common-init-steps: &common-init-steps
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
   - group-name: Restore Caches
     steps:
-      - name: Setup Java 21 and IntelliJ UI dependencies
-        script: |
-          sudo apt update
-          sudo apt install -y openjdk-21-jdk xvfb ffmpeg fonts-dejavu-core libasound2 libnss3 libxkbfile1 libx11-6 libxi6 libxtst6 libxrender1 libxrandr2 libglib2.0-0 libdbus-1-3 libgbm1
-          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
-          echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> "$NX_CLOUD_ENV"
-          java -version
       - name: Restore Node Modules Cache
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
         inputs:
@@ -29,14 +22,27 @@ common-init-steps: &common-init-steps
           paths: |
             '../.cache/Cypress'
           base-branch: 'main'
+  # apt and yarn write to different places, so the JDK setup runs next to the node_modules install.
   - group-name: Install Dependencies
+    parallel: true
     steps:
+      - name: Setup Java 21 and IntelliJ UI dependencies
+        script: |
+          sudo apt update
+          sudo apt install -y openjdk-21-jdk xvfb ffmpeg fonts-dejavu-core libasound2 libnss3 libxkbfile1 libx11-6 libxi6 libxtst6 libxrender1 libxrandr2 libglib2.0-0 libdbus-1-3 libgbm1
+          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+          echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> "$NX_CLOUD_ENV"
+          java -version
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
+  # The project graph needs both the JDK (Gradle) and node_modules; browser downloads need neither.
+  - group-name: Prepare Workspace
+    parallel: true
+    steps:
       - name: Generate workspace data
         script: npx nx show projects
-  - name: Install Browsers
-    uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+      - name: Install Browsers
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
 
 launch-templates:
   linux-medium-plus-js:
