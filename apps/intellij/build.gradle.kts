@@ -3,6 +3,7 @@ import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -270,6 +271,9 @@ if (System.getenv("CI") == null) {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
+        // Without this, classes implementing platform interfaces get bridge overrides for every
+        // default method, which Plugin Verifier reports as deprecated/experimental API usages.
+        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
         freeCompilerArgs.add("-Xskip-metadata-version-check")
     }
 }

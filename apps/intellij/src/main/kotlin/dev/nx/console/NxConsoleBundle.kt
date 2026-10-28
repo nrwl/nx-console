@@ -6,7 +6,7 @@ import org.jetbrains.annotations.PropertyKey
 
 @NonNls private const val BUNDLE = "messages.NxConsoleBundle"
 
-object NxConsoleBundle : DynamicBundle(BUNDLE) {
+object NxConsoleBundle : DynamicBundle(NxConsoleBundle::class.java, BUNDLE) {
 
     @Suppress("SpreadOperator")
     @JvmStatic
