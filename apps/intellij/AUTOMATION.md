@@ -52,6 +52,9 @@ window lists the error and that Nx Console can read the Git working tree, which
 covers the Problems View and VCS plugins that 2026.3 split out of the platform. `ReproConfigFileCodeVisionKt` opens `demo/project.json` and checks
 that the editor shows Nx Console's `Nx Targets: hello` code vision entry, which needs
 nxls requests that take no arguments to succeed.
+`ReproGraphFocusShortcutKt` right-clicks the `demo` project in the Nx Console tree,
+checks that **Nx Graph: Focus Project** carries its default shortcut and that
+choosing it focuses `demo` in the graph. It expects the e2e fixture from `e2e/run.mjs`.
 
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if
