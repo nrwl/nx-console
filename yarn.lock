@@ -14336,7 +14336,7 @@ __metadata:
     vscode-languageclient: "npm:8.1.0"
     vscode-languageserver: "npm:8.1.0"
     vscode-uri: "npm:3.2.0"
-    xstate: "npm:5.19.2"
+    xstate: "npm:5.33.2"
     yargs: "npm:17.7.3"
     zod: "npm:4.2.1"
   languageName: unknown
@@ -18790,10 +18790,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xstate@npm:5.19.2":
-  version: 5.19.2
-  resolution: "xstate@npm:5.19.2"
-  checksum: 10c0/0ff24a88af9fbb8182240b1c0929b3aa46f5777e91e6446939016fa7128afffe2421619613720e6266cc2436a91631e471ee0572215e127a5bdf841891a2b057
+"xstate@npm:5.33.2":
+  version: 5.33.2
+  resolution: "xstate@npm:5.33.2"
+  checksum: 10c0/361b8d205dd182c2c673c16b343dd7fb658d8e56b4525aa165aede1c8f6285492d8d76c2684ecb84387f8dcbade79e3c56a6702c61ff884e0471a538a40bbe6d
   languageName: node
   linkType: hard
 
