@@ -137,5 +137,3 @@ export class Root extends LitElement {
     }
   }
 }
-
-// temporary change for a second CI timing sample; reverted before merge
