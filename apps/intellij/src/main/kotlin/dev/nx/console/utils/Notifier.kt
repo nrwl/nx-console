@@ -8,10 +8,10 @@ import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.util.ui.RestartDialogImpl
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
@@ -213,7 +213,7 @@ class Notifier {
                 .addAction(
                     object : AnAction("Restart IDE"), DumbAware {
                         override fun actionPerformed(e: AnActionEvent) {
-                            RestartDialogImpl.restartWithConfirmation()
+                            ApplicationManager.getApplication().restart()
                         }
                     }
                 )

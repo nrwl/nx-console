@@ -40,6 +40,22 @@ private fun Driver.showingWindowBounds(): List<WindowBounds> =
         .filter { runCatching { it.isShowing() }.getOrDefault(false) }
         .map { WindowBounds(it.getX(), it.getY(), it.getWidth(), it.getHeight()) }
 
+private val frameCaptureName = Regex("frame(\\d+)\\.png")
+
+/**
+ * The capture API names IDE frames by their index among all frames, including hidden ones, so the
+ * project frame is not always frame0.
+ */
+private fun mainFrameCapture(captures: List<Path>): Path? =
+    captures
+        .mapNotNull { capture ->
+            frameCaptureName.matchEntire(capture.fileName.toString())?.let {
+                it.groupValues[1].toInt() to capture
+            }
+        }
+        .minByOrNull { it.first }
+        ?.second
+
 /**
  * The capture API saves every IDE window as a separate image without its position. Popups and
  * dialogs are separate windows, so they would be missing from a recording of the main window alone.
@@ -47,7 +63,7 @@ private fun Driver.showingWindowBounds(): List<WindowBounds> =
  * window's offset.
  */
 private fun composeWindows(captures: List<Path>, windows: List<WindowBounds>, target: Path) {
-    val main = captures.single { it.fileName.toString() == "frame0.png" }
+    val main = checkNotNull(mainFrameCapture(captures))
     val frame = ImageIO.read(main.toFile())
     val others = captures.filter { it != main }
     if (others.isEmpty()) {
@@ -117,10 +133,7 @@ fun Driver.recordIde(label: String, scenario: Driver.() -> Unit) {
                         // screenshot directory may not exist yet. A missed frame must not end the
                         // recording; the readiness latch below still fails one that never starts.
                         val captures = runCatching { captureIdeWindows(captureName) }.getOrNull()
-                        if (
-                            captures == null ||
-                                captures.none { it.fileName.toString() == "frame0.png" }
-                        ) {
+                        if (captures == null || mainFrameCapture(captures) == null) {
                             Thread.sleep(250)
                             continue
                         }
