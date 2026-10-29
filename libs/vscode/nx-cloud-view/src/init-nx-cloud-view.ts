@@ -30,7 +30,7 @@ import {
   Uri,
   window,
 } from 'vscode';
-import { createActor } from 'xstate';
+import { AnyActor, createActor, InspectionEvent } from 'xstate';
 import { getAiFixStatusBarService } from './ai-fix-status-bar-service';
 import { CIPENotificationService } from './cipe-notification-service';
 import { CloudOnboardingViewProvider } from './cloud-onboarding-view';
@@ -198,12 +198,12 @@ export function runNxConnect(source: TelemetryEventSource = 'command') {
 const getStateMachineLogger = (context: ExtensionContext) =>
   context.extensionMode === ExtensionMode.Production
     ? undefined
-    : (event: any) => {
+    : (event: InspectionEvent) => {
         const snapshot = event.actorRef.getSnapshot();
         if (
           event.type === '@xstate.snapshot' &&
           snapshot.value &&
-          (event.actorRef as any)['_systemId'] === 'cloud-view' &&
+          (event.actorRef as AnyActor).systemId === 'cloud-view' &&
           snapshot.value !== 'recent-cipe'
         ) {
           vscodeLogger.log(`Nx Cloud - ${JSON.stringify(snapshot.value)}`);
