@@ -94,9 +94,9 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         val keyMapSet = KeymapUtil.getActiveKeymapShortcuts(ID)
 
         if (keyMapSet.shortcuts.isEmpty()) {
-            shortcutSet = CustomShortcutSet.fromString(DEFAULT_SHORTCUT)
+            registerCustomShortcutSet(CustomShortcutSet.fromString(DEFAULT_SHORTCUT), null)
         } else {
-            shortcutSet = keyMapSet
+            registerCustomShortcutSet(keyMapSet, null)
         }
     }
 
