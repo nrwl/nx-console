@@ -395,7 +395,7 @@ export function registerRequests(
         'Unable to get Nx info: no workspace path',
       );
     }
-    return await nxCloudAuthHeaders(WORKING_PATH);
+    return await nxCloudAuthHeaders(WORKING_PATH, lspLogger);
   });
 
   connection.onRequest(

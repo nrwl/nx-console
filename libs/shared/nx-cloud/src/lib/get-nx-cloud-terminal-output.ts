@@ -26,7 +26,7 @@ export async function getNxCloudTerminalOutput(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(await nxCloudAuthHeaders(workspacePath, logger)),
   };
 
   const taskId = request.taskId.trim();

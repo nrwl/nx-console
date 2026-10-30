@@ -1,5 +1,14 @@
-import { HttpError } from '@nx-console/shared-utils';
-import { sanitizeNxCloudError } from './nx-cloud-request';
+import { HttpError, httpRequest } from '@nx-console/shared-utils';
+import { nxCloudAuthHeadersAfterOAuthRejection } from './nx-cloud-auth-headers';
+import { nxCloudRequest, sanitizeNxCloudError } from './nx-cloud-request';
+
+jest.mock('@nx-console/shared-utils', () => ({
+  ...jest.requireActual('@nx-console/shared-utils'),
+  httpRequest: jest.fn(),
+}));
+jest.mock('./nx-cloud-auth-headers', () => ({
+  nxCloudAuthHeadersAfterOAuthRejection: jest.fn(),
+}));
 
 describe('sanitizeNxCloudError', () => {
   const requestUrl =
@@ -78,5 +87,79 @@ describe('sanitizeNxCloudError', () => {
     const error = new Error('something broke');
     sanitizeNxCloudError(error, 'not-a-url', 'LABEL');
     expect(error.message).toBe('something broke');
+  });
+});
+
+describe('nxCloudRequest', () => {
+  const url = 'https://cloud.nx.app/nx-cloud/nx-console/ci-pipeline-executions';
+  const rejection = () =>
+    new HttpError(
+      401,
+      JSON.stringify({ code: 'OAUTH_ACCESS_TOKEN_INVALID' }),
+      {},
+    );
+  const ok = { status: 200, responseText: '{}', headers: {} };
+
+  beforeEach(() => {
+    jest.mocked(httpRequest).mockReset();
+    jest.mocked(nxCloudAuthHeadersAfterOAuthRejection).mockReset();
+  });
+
+  it('should replay a request once with the headers that replace a rejected OAuth token', async () => {
+    jest
+      .mocked(httpRequest)
+      .mockRejectedValueOnce(rejection())
+      .mockResolvedValueOnce(ok);
+    jest.mocked(nxCloudAuthHeadersAfterOAuthRejection).mockResolvedValue({
+      'Nx-Cloud-Id': 'cloud-id',
+      'Nx-Cloud-Personal-Access-Token': 'pat',
+    });
+
+    expect(
+      await nxCloudRequest('RECENT_CIPES', {
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Nx-Cloud-Id': 'cloud-id',
+          'Nx-Cloud-OAuth-Access-Token': 'rejected',
+        },
+      }),
+    ).toBe(ok);
+    expect(nxCloudAuthHeadersAfterOAuthRejection).toHaveBeenCalledWith(
+      'rejected',
+    );
+    expect(httpRequest).toHaveBeenLastCalledWith({
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Nx-Cloud-Id': 'cloud-id',
+        'Nx-Cloud-Personal-Access-Token': 'pat',
+      },
+    });
+  });
+
+  it('should not replay a request that sent no OAuth token', async () => {
+    jest.mocked(httpRequest).mockRejectedValue(rejection());
+
+    await expect(
+      nxCloudRequest('RECENT_CIPES', { url, headers: {} }),
+    ).rejects.toBeInstanceOf(HttpError);
+    expect(httpRequest).toHaveBeenCalledTimes(1);
+    expect(nxCloudAuthHeadersAfterOAuthRejection).not.toHaveBeenCalled();
+  });
+
+  it('should not replay a request a second time', async () => {
+    jest.mocked(httpRequest).mockRejectedValue(rejection());
+    jest.mocked(nxCloudAuthHeadersAfterOAuthRejection).mockResolvedValue({
+      'Nx-Cloud-OAuth-Access-Token': 'also-rejected',
+    });
+
+    await expect(
+      nxCloudRequest('RECENT_CIPES', {
+        url,
+        headers: { 'Nx-Cloud-OAuth-Access-Token': 'rejected' },
+      }),
+    ).rejects.toBeInstanceOf(HttpError);
+    expect(httpRequest).toHaveBeenCalledTimes(2);
   });
 });

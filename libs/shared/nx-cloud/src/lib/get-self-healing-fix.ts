@@ -54,7 +54,7 @@ export async function retrieveFixDiff(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(await nxCloudAuthHeaders(workspacePath, logger)),
   };
 
   const data = JSON.stringify({

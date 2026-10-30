@@ -111,7 +111,7 @@ export async function getPipelineExecutionDetails(
 
   const headers: any = {
     'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(await nxCloudAuthHeaders(workspacePath, logger)),
   };
 
   logger.log(
