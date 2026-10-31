@@ -8,12 +8,18 @@ jest.mock('@nx-console/shared-nx-cloud', () => ({
   updateSuggestedFix: jest.fn(),
 }));
 
-import { CI_TASK_OUTPUT } from '@nx-console/shared-llm-context';
+import {
+  CI_INFORMATION,
+  CI_TASK_OUTPUT,
+  UPDATE_SELF_HEALING_FIX,
+} from '@nx-console/shared-llm-context';
 import {
   getNxCloudTerminalOutput,
+  getRecentCIPEData,
   getRunDetails,
+  updateSuggestedFix,
 } from '@nx-console/shared-nx-cloud';
-import { CIPEInfo } from '@nx-console/shared-types';
+import { CIPEInfo, NxAiFix } from '@nx-console/shared-types';
 
 import { CIInformationOutput } from './output-schemas';
 import {
@@ -25,6 +31,8 @@ import { getValueByPath } from './nx-workspace';
 
 const mockedGetNxCloudTerminalOutput = jest.mocked(getNxCloudTerminalOutput);
 const mockedGetRunDetails = jest.mocked(getRunDetails);
+const mockedGetRecentCIPEData = jest.mocked(getRecentCIPEData);
+const mockedUpdateSuggestedFix = jest.mocked(updateSuggestedFix);
 const {
   parseShortLink,
   formatCIInformationOverview,
@@ -541,4 +549,149 @@ describe('resolveSucceededTasks', () => {
       },
     ]);
   });
+});
+
+describe('CIPE lookup by branch', () => {
+  type RegisteredTool = {
+    name: string;
+    handler: (args: Record<string, unknown>) => Promise<any>;
+  };
+
+  function getTool(name: string): RegisteredTool {
+    const tool = registerTools().get(name);
+    if (!tool) {
+      throw new Error(`Expected ${name} to be registered`);
+    }
+    return tool;
+  }
+
+  function registerTools(): Map<string, RegisteredTool> {
+    const registeredTools = new Map<string, RegisteredTool>();
+    const registry = {
+      registerTool: jest.fn((tool) => {
+        registeredTools.set(tool.name, tool);
+      }),
+    };
+    const logger = { debug: jest.fn(), log: jest.fn() };
+    registerNxCloudTools(
+      '/workspace',
+      registry as any,
+      logger as any,
+      undefined,
+    );
+    return registeredTools;
+  }
+
+  function createCipe(id: string, branch: string, aiFixId?: string): CIPEInfo {
+    return {
+      ciPipelineExecutionId: id,
+      branch,
+      status: 'IN_PROGRESS',
+      createdAt: 0,
+      completedAt: null,
+      commitTitle: null,
+      commitUrl: null,
+      cipeUrl: `https://cloud.nx.app/cipes/${id}`,
+      runGroups: [
+        {
+          ciExecutionEnv: 'env',
+          runGroup: `${id}-rg`,
+          createdAt: 0,
+          completedAt: null,
+          status: 'IN_PROGRESS',
+          aiFix: aiFixId ? ({ aiFixId } as NxAiFix) : undefined,
+          runs: [
+            {
+              linkId: `${id}-run`,
+              command: 'nx affected -t build',
+              runUrl: `https://cloud.nx.app/runs/${id}-run`,
+              failedTasks: [],
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  // On CircleCI, Nx Cloud stores the PR number as the CIPE branch and the git
+  // branch as its ref. The server matches a requested branch against both, so
+  // the CIPE it returns can be labeled with the other one.
+  describe.each([
+    { requestedBranch: '123', returnedLabel: 'feat/my-feature' },
+    { requestedBranch: 'feat/my-feature', returnedLabel: '123' },
+  ])(
+    'when "$requestedBranch" is requested and the CIPE is labeled "$returnedLabel"',
+    ({ requestedBranch, returnedLabel }) => {
+      const recentBranchCipe = createCipe(
+        'cipe-recent',
+        'some-other-branch',
+        'fix-recent',
+      );
+      const requestedCipe = createCipe('cipe-pr', returnedLabel, 'fix-pr');
+
+      beforeEach(() => {
+        mockedGetRecentCIPEData.mockReset();
+        mockedGetNxCloudTerminalOutput.mockReset();
+        mockedUpdateSuggestedFix.mockReset();
+        // without the restriction the server also returns CIPEs for the
+        // user's recently committed local branches
+        mockedGetRecentCIPEData.mockImplementation(
+          async (_workspacePath, _logger, options) => ({
+            info:
+              options?.includeRecentBranches === false
+                ? [requestedCipe]
+                : [recentBranchCipe, requestedCipe],
+          }),
+        );
+      });
+
+      it('ci_information returns the CIPE', async () => {
+        const tool = getTool(CI_INFORMATION);
+
+        const result = await tool.handler({
+          branch: requestedBranch,
+          select: 'cipeStatus,cipeUrl',
+        });
+
+        expect(result.structuredContent.error).toBeNull();
+        expect(result.structuredContent.cipeUrl).toBe(
+          'https://cloud.nx.app/cipes/cipe-pr',
+        );
+      });
+
+      it('ci_task_output reads the runs of the CIPE', async () => {
+        mockedGetNxCloudTerminalOutput.mockResolvedValue({
+          terminalOutput: 'output',
+        });
+        const tool = getTool(CI_TASK_OUTPUT);
+
+        const result = await tool.handler({
+          taskId: 'app:build',
+          branch: requestedBranch,
+        });
+
+        expect(result.structuredContent.error).toBeNull();
+        expect(mockedGetNxCloudTerminalOutput).toHaveBeenCalledWith(
+          { taskId: 'app:build', runId: 'cipe-pr-run' },
+          '/workspace',
+          expect.anything(),
+        );
+      });
+
+      it('update_self_healing_fix updates the fix of the CIPE', async () => {
+        mockedUpdateSuggestedFix.mockResolvedValue({ success: true });
+        const tool = getTool(UPDATE_SELF_HEALING_FIX);
+
+        const result = await tool.handler({
+          action: 'REJECT',
+          branch: requestedBranch,
+        });
+
+        expect(result.structuredContent.success).toBe(true);
+        expect(mockedUpdateSuggestedFix).toHaveBeenCalledWith(
+          expect.objectContaining({ aiFixId: 'fix-pr' }),
+        );
+      });
+    },
+  );
 });

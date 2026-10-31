@@ -21,7 +21,7 @@ let cachedResult: {
 export async function getRecentCIPEData(
   workspacePath: string,
   logger: Logger,
-  options?: { branch?: string },
+  options?: { branch?: string; includeRecentBranches?: boolean },
 ): Promise<{
   info?: CIPEInfo[];
   error?: CIPEInfoError;
@@ -50,8 +50,12 @@ export async function getRecentCIPEData(
     return cachedResult;
   }
 
-  const branches = getRecentlyCommittedGitBranches(workspacePath);
-  const branchNames = branches.map((branch) => branch.name);
+  const branchNames =
+    explicitBranch && options?.includeRecentBranches === false
+      ? []
+      : getRecentlyCommittedGitBranches(workspacePath).map(
+          (branch) => branch.name,
+        );
 
   // Always include the explicit branch if provided, even if not in the git branches list
   if (explicitBranch && !branchNames.includes(explicitBranch)) {
