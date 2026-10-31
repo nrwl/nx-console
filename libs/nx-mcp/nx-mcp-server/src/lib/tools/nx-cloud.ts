@@ -15,7 +15,12 @@ import {
   updateSuggestedFix,
 } from '@nx-console/shared-nx-cloud';
 import { NxConsoleTelemetryLogger } from '@nx-console/shared-telemetry';
-import { CIPEInfo, CIPERun, NxAiFix } from '@nx-console/shared-types';
+import {
+  CIPEInfo,
+  CIPEInfoError,
+  CIPERun,
+  NxAiFix,
+} from '@nx-console/shared-types';
 import { Logger } from '@nx-console/shared-utils';
 import { execSync } from 'child_process';
 import { z } from 'zod';
@@ -497,6 +502,25 @@ async function resolveSucceededTasks(
   return succeeded;
 }
 
+// Nx Cloud matches a requested branch against both the CIPE's branch and its
+// git ref, and may label the CIPE with either one (on CircleCI the branch is the
+// PR number). So when only one branch is requested, whatever comes back belongs
+// to it, even when the label differs from what was asked for.
+async function getCIPEForBranch(
+  workspacePath: string,
+  logger: Logger,
+  branch: string | undefined,
+): Promise<{ cipe?: CIPEInfo; error?: CIPEInfoError }> {
+  if (!branch) {
+    return {};
+  }
+  const result = await getRecentCIPEData(workspacePath, logger, {
+    branch,
+    includeRecentBranches: false,
+  });
+  return { cipe: result.info?.[0], error: result.error };
+}
+
 async function resolveCandidateRunIds(
   workspacePath: string,
   logger: Logger,
@@ -533,9 +557,11 @@ async function resolveCandidateRunIds(
     }
   }
 
-  const cipeResult = await getRecentCIPEData(workspacePath, logger, {
-    branch: resolvedBranch,
-  });
+  const cipeResult = await getCIPEForBranch(
+    workspacePath,
+    logger,
+    resolvedBranch,
+  );
 
   if (cipeResult.error) {
     return {
@@ -543,9 +569,7 @@ async function resolveCandidateRunIds(
     };
   }
 
-  const cipeForBranch = cipeResult.info?.find(
-    (cipe) => cipe.branch === resolvedBranch,
-  );
+  const cipeForBranch = cipeResult.cipe;
 
   if (!cipeForBranch) {
     return {
@@ -760,10 +784,7 @@ const getCIInformation =
       }
     }
 
-    // Fetch CIPE data for recent branches, always include the target branch
-    const cipeResult = await getRecentCIPEData(workspacePath, logger, {
-      branch,
-    });
+    const cipeResult = await getCIPEForBranch(workspacePath, logger, branch);
 
     if (cipeResult.error) {
       return {
@@ -777,10 +798,7 @@ const getCIInformation =
       };
     }
 
-    // Find CIPE for the branch
-    const cipeForBranch = cipeResult.info?.find(
-      (cipe) => cipe.branch === branch,
-    );
+    const cipeForBranch = cipeResult.cipe;
 
     if (!cipeForBranch) {
       const message = `No CI pipeline execution found for branch "${branch}". This branch may not have any CI runs yet.`;
@@ -1230,9 +1248,7 @@ const handleUpdateSelfHealingFix =
         };
       }
 
-      const cipeResult = await getRecentCIPEData(workspacePath, logger, {
-        branch,
-      });
+      const cipeResult = await getCIPEForBranch(workspacePath, logger, branch);
       if (cipeResult.error) {
         const output: UpdateSelfHealingFixOutput = {
           success: false,
@@ -1248,9 +1264,7 @@ const handleUpdateSelfHealingFix =
         };
       }
 
-      const cipeForBranch = cipeResult.info?.find(
-        (cipe) => cipe.branch === branch,
-      );
+      const cipeForBranch = cipeResult.cipe;
 
       if (!cipeForBranch) {
         const output: UpdateSelfHealingFixOutput = {
