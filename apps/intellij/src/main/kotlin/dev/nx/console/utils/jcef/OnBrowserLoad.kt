@@ -99,7 +99,8 @@ internal class BrowserLoadHandler(private val url: String) : CefLoadHandlerAdapt
     val completion = CompletableDeferred<Boolean>()
 
     override fun onLoadEnd(browser: CefBrowser?, frame: CefFrame?, httpStatusCode: Int) {
-        if (frame?.isMain == true && frame.url == url) completion.complete(true)
+        if (frame?.isMain == true && frame.url?.substringBefore('#') == url)
+            completion.complete(true)
     }
 
     override fun onLoadError(
@@ -109,7 +110,7 @@ internal class BrowserLoadHandler(private val url: String) : CefLoadHandlerAdapt
         errorText: String?,
         failedUrl: String?,
     ) {
-        if (frame?.isMain != true || failedUrl != url) return
+        if (frame?.isMain != true || failedUrl?.substringBefore('#') != url) return
         if (errorCode == CefLoadHandler.ErrorCode.ERR_ABORTED) {
             completion.complete(false)
         } else {

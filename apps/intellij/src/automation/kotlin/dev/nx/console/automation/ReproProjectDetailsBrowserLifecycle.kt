@@ -5,10 +5,13 @@ import com.intellij.driver.client.utility
 import com.intellij.driver.model.LockSemantics
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Project
+import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.jdk.getSystemProperty
 import com.intellij.driver.sdk.openToolWindow
 import com.intellij.driver.sdk.singleProject
+import com.intellij.driver.sdk.ui.components.common.jcef
 import com.intellij.driver.sdk.ui.remote.Component
+import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
 import java.nio.file.Files
 import java.nio.file.Path
@@ -71,6 +74,8 @@ interface LifecycleField {
     fun setAccessible(value: Boolean)
 
     fun get(receiver: LifecycleObject): LifecycleObject?
+
+    fun getBoolean(receiver: LifecycleObject): Boolean
 }
 
 @Remote("java.lang.Object")
@@ -89,7 +94,16 @@ interface LifecycleJcefBrowser {
 interface LifecycleCefBrowser {
     fun isLoading(): Boolean
 
+    fun getURL(): String
+
+    fun getMainFrame(): LifecycleCefFrame?
+
     fun stopLoad()
+}
+
+@Remote("org.cef.browser.CefFrame")
+interface LifecycleCefFrame {
+    fun getURL(): String
 }
 
 @Remote("com.intellij.openapi.wm.ToolWindowManager")
@@ -145,7 +159,9 @@ fun main() = withAutomationDriver {
                 .getToolWindow("Nx Console")
                 .getContentManager()
         var interceptedLoads = 0
-        repeat(if (mode == "abort") 8 else 1) {
+        var recoveryCompleted = false
+        repeat(if (mode == "abort" || mode == "recovery") 8 else 1) {
+            if (recoveryCompleted) return@repeat
             val temporaryProjectPath =
                 if (mode == "theme") Files.createTempDirectory("nx-browser-theme-") else null
             val browserProject =
@@ -211,15 +227,64 @@ fun main() = withAutomationDriver {
                                 manager.setSelectedContent(it)
                             }
                     }
-                if (mode == "abort") {
-                    for (attempt in 0 until 100) {
-                        if (cef.isCefBrowserCreated() && cef.getCefBrowser().isLoading()) {
+                var stopped = false
+                if (mode == "abort" || mode == "recovery") {
+                    for (attempt in 0 until 500) {
+                        if (
+                            cef.isCefBrowserCreated() &&
+                                cef.getCefBrowser().isLoading() &&
+                                (mode != "recovery" ||
+                                    cef.getCefBrowser().getURL().contains("nx-console-"))
+                        ) {
                             cef.getCefBrowser().stopLoad()
                             interceptedLoads++
+                            stopped = true
                             break
                         }
                         Thread.sleep(10)
                     }
+                }
+                if (mode == "load" || mode == "recovery") {
+                    val loaded = {
+                        withContext(OnDispatcher.EDT) {
+                            val reflected = cast(details, LifecycleObject::class)
+                            val field =
+                                reflected.getClass().getDeclaredField("projectDetailsLoaded")
+                            field.setAccessible(true)
+                            field.getBoolean(reflected)
+                        }
+                    }
+                    if (mode == "recovery") {
+                        Thread.sleep(250)
+                        if (!stopped || loaded()) {
+                            println(
+                                "Navigation completed before stop; retrying the recovery trigger"
+                            )
+                            return@repeat
+                        }
+                        invokeAction(
+                            "dev.nx.console.nxls.NxRefreshWorkspaceAction",
+                            component = ui.x("//div[@class='IdeFrameImpl']").component,
+                        )
+                    }
+                    val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20)
+                    while (!loaded() && System.nanoTime() < deadline) Thread.sleep(100)
+                    println(
+                        "Native URL: ${cef.getCefBrowser().getURL()}; main-frame URL: ${cef.getCefBrowser().getMainFrame()?.getURL()}"
+                    )
+                    check(loaded()) { "Project-details load never completed after $mode" }
+                    println("Project-details load completed: true ($mode)")
+                    var rendered = ""
+                    while (System.nanoTime() < deadline) {
+                        rendered = ui.jcef().jcefWorker.callJs("document.body.innerText", 5000)
+                        if (rendered.contains("hello")) break
+                        Thread.sleep(100)
+                    }
+                    println("Rendered project details: $rendered")
+                    check(rendered.contains("hello")) {
+                        "Project details did not render the hello target"
+                    }
+                    if (mode == "recovery") recoveryCompleted = true
                 }
                 Thread.sleep(1500)
             } finally {
@@ -236,6 +301,9 @@ fun main() = withAutomationDriver {
                     temporaryProjectPath.toFile().deleteRecursively()
                 }
             }
+        }
+        check(mode != "recovery" || recoveryCompleted) {
+            "No aborted navigation recovered and rendered its targets"
         }
         check(mode != "abort" || interceptedLoads > 0) {
             "Did not intercept a loading browser; this run did not reproduce the abort trigger"

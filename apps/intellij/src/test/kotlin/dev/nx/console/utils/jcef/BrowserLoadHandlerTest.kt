@@ -86,4 +86,26 @@ class BrowserLoadHandlerTest {
         third.onLoadEnd(null, frame(frameUrl = "file:///nx-console-next.html"), 200)
         assertTrue(third.completion.await())
     }
+
+    @Test
+    fun sameDocumentRouterFragmentStillCompletesTheHtmlLoad() = runTest {
+        val handler = BrowserLoadHandler(url)
+        handler.onLoadEnd(null, frame(frameUrl = "$url#/projects"), 200)
+        assertTrue(handler.completion.isCompleted)
+        assertTrue(handler.completion.await())
+    }
+
+    @Test
+    fun abortWithTheCurrentRouterFragmentStillAbortsTheHtmlLoad() = runTest {
+        val handler = BrowserLoadHandler(url)
+        handler.onLoadError(
+            null,
+            frame(frameUrl = "$url#/projects"),
+            ErrorCode.ERR_ABORTED,
+            "aborted",
+            "$url#/projects",
+        )
+        assertTrue(handler.completion.isCompleted)
+        assertFalse(handler.completion.await())
+    }
 }
