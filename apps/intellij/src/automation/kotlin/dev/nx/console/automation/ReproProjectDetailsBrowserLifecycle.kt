@@ -2,6 +2,7 @@ package dev.nx.console.automation
 
 import com.intellij.driver.client.Remote
 import com.intellij.driver.client.utility
+import com.intellij.driver.model.LockSemantics
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Project
 import com.intellij.driver.sdk.jdk.getSystemProperty
@@ -9,7 +10,9 @@ import com.intellij.driver.sdk.openToolWindow
 import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.remote.Component
 import com.intellij.driver.sdk.waitForProjectOpen
+import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.minutes
 
@@ -21,6 +24,25 @@ interface LifecycleDetailsBrowser {
     fun getComponent(): Component
 
     fun dispose()
+}
+
+@Remote("com.intellij.openapi.project.ProjectManager")
+interface LifecycleProjectManager {
+    fun getInstance(): LifecycleProjectManager
+
+    fun createProject(name: String, path: String): Project?
+}
+
+@Remote("com.intellij.openapi.components.ComponentManagerEx")
+interface LifecycleComponents {
+    fun stopServicePreloading()
+}
+
+@Remote("com.intellij.openapi.Disposable") interface LifecycleDisposable
+
+@Remote("com.intellij.openapi.util.Disposer")
+interface LifecycleDisposer {
+    fun dispose(disposable: LifecycleDisposable)
 }
 
 @Remote("com.intellij.openapi.vfs.LocalFileSystem")
@@ -48,7 +70,7 @@ interface LifecycleClass {
 interface LifecycleField {
     fun setAccessible(value: Boolean)
 
-    fun get(receiver: LifecycleObject): LifecycleObject
+    fun get(receiver: LifecycleObject): LifecycleObject?
 }
 
 @Remote("java.lang.Object")
@@ -124,8 +146,20 @@ fun main() = withAutomationDriver {
                 .getContentManager()
         var interceptedLoads = 0
         repeat(if (mode == "abort") 8 else 1) {
+            val temporaryProjectPath =
+                if (mode == "theme") Files.createTempDirectory("nx-browser-theme-") else null
+            val browserProject =
+                if (temporaryProjectPath != null) {
+                    checkNotNull(
+                        utility<LifecycleProjectManager>()
+                            .getInstance()
+                            .createProject("Browser theme", temporaryProjectPath.toString())
+                    )
+                } else project
             val details =
-                withContext(OnDispatcher.EDT) { new(LifecycleDetailsBrowser::class, project, file) }
+                withContext(OnDispatcher.EDT) {
+                    new(LifecycleDetailsBrowser::class, browserProject, file)
+                }
             var content: LifecycleContent? = null
             try {
                 val cef =
@@ -133,12 +167,29 @@ fun main() = withAutomationDriver {
                         val reflected = cast(details, LifecycleObject::class)
                         val field = reflected.getClass().getDeclaredField("browser")
                         field.setAccessible(true)
-                        cast(field.get(reflected), LifecycleJcefBrowser::class)
+                        cast(checkNotNull(field.get(reflected)), LifecycleJcefBrowser::class)
                     }
                 if (mode == "theme") {
                     check(!cef.isCefBrowserCreated()) {
                         "Expected a deferred native browser before attachment"
                     }
+                    val listenerDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20)
+                    while (true) {
+                        val listening =
+                            withContext(OnDispatcher.EDT) {
+                                val reflected = cast(details, LifecycleObject::class)
+                                val field =
+                                    reflected.getClass().getDeclaredField("messageBusConnection")
+                                field.setAccessible(true)
+                                field.get(reflected) != null
+                            }
+                        if (listening) break
+                        check(System.nanoTime() < listenerDeadline) {
+                            "Project details never registered its settings listener"
+                        }
+                        Thread.sleep(50)
+                    }
+                    Thread.sleep(200)
                     repeat(10) {
                         withContext(OnDispatcher.EDT) {
                             utility<LifecycleUiSettings>().getInstance().fireUISettingsChanged()
@@ -175,6 +226,14 @@ fun main() = withAutomationDriver {
                 withContext(OnDispatcher.EDT) {
                     content?.let { manager.removeContent(it, true) }
                     details.dispose()
+                }
+                if (temporaryProjectPath != null) {
+                    cast(browserProject, LifecycleComponents::class).stopServicePreloading()
+                    withContext(OnDispatcher.EDT, LockSemantics.WRITE_ACTION) {
+                        utility<LifecycleDisposer>()
+                            .dispose(cast(browserProject, LifecycleDisposable::class))
+                    }
+                    temporaryProjectPath.toFile().deleteRecursively()
                 }
             }
         }

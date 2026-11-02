@@ -69,4 +69,21 @@ class BrowserLoadHandlerTest {
         handler.onLoadError(null, frame(), ErrorCode.ERR_ABORTED, "aborted", url)
         assertTrue(handler.completion.await())
     }
+
+    @Test
+    fun replacementBeforeNativeCreationAbortsPreviousWaiterWithoutCefCallbacks() = runTest {
+        val tracker = BrowserLoadTracker()
+        val first = tracker.start(previousUrl)
+        val second = tracker.start(url)
+        assertFalse(first.completion.await())
+        assertFalse(second.completion.isCompleted)
+        tracker.finish(first)
+        val third = tracker.start("file:///nx-console-next.html")
+        assertFalse(second.completion.await())
+        first.onLoadEnd(null, frame(frameUrl = previousUrl), 200)
+        second.onLoadEnd(null, frame(), 200)
+        assertFalse(third.completion.isCompleted)
+        third.onLoadEnd(null, frame(frameUrl = "file:///nx-console-next.html"), 200)
+        assertTrue(third.completion.await())
+    }
 }
