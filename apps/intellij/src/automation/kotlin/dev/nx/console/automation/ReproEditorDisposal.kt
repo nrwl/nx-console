@@ -20,8 +20,18 @@ interface EditorDisposalProjectManager {
     fun getInstance(): EditorDisposalProjectManager
 
     fun createProject(name: String, path: String): Project?
+}
 
-    fun closeAndDispose(project: Project): Boolean
+@Remote("com.intellij.openapi.components.ComponentManagerEx")
+interface EditorDisposalComponents {
+    fun stopServicePreloading()
+}
+
+@Remote("com.intellij.openapi.Disposable") interface EditorDisposalDisposable
+
+@Remote("com.intellij.openapi.util.Disposer")
+interface EditorDisposalDisposer {
+    fun dispose(disposable: EditorDisposalDisposable)
 }
 
 @Remote("com.intellij.openapi.editor.EditorFactory")
@@ -84,10 +94,10 @@ fun main() = withAutomationDriver {
             val event = new(EditorDisposalEvent::class, factory, editor)
             try {
                 phase = "Disposing the temporary project"
-                withContext(OnDispatcher.EDT, LockSemantics.NO_LOCK) {
-                    check(manager.closeAndDispose(disposableProject)) {
-                        "Temporary project was not disposed"
-                    }
+                cast(disposableProject, EditorDisposalComponents::class).stopServicePreloading()
+                withContext(OnDispatcher.EDT, LockSemantics.WRITE_ACTION) {
+                    utility<EditorDisposalDisposer>()
+                        .dispose(cast(disposableProject, EditorDisposalDisposable::class))
                 }
                 phase = "NxEditorListener.editorReleased after project disposal"
                 withContext(OnDispatcher.EDT, LockSemantics.NO_LOCK) {
