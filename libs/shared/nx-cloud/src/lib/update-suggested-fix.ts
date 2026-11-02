@@ -58,7 +58,7 @@ export async function updateSuggestedFix(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(await nxCloudAuthHeaders(workspacePath, logger)),
   };
 
   const requestData: Record<string, string> = {

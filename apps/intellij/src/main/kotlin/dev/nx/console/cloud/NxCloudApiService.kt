@@ -76,6 +76,9 @@ class NxCloudApiService(private val project: Project) {
                             authHeaders.nxCloudPersonalAccessToken?.let {
                                 connection.setRequestProperty("Nx-Cloud-Personal-Access-Token", it)
                             }
+                            authHeaders.nxCloudOAuthAccessToken?.let {
+                                connection.setRequestProperty("Nx-Cloud-OAuth-Access-Token", it)
+                            }
                             authHeaders.authorization?.let {
                                 connection.setRequestProperty("Authorization", it)
                             }

@@ -66,7 +66,7 @@ export async function getRunsSearch(
 
   const headers: any = {
     'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(await nxCloudAuthHeaders(workspacePath, logger)),
   };
 
   const data = JSON.stringify(request);

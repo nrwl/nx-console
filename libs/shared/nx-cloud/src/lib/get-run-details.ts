@@ -78,7 +78,7 @@ export async function getRunDetails(
 
   const headers: any = {
     'Content-Type': 'application/json',
-    ...(await nxCloudAuthHeaders(workspacePath)),
+    ...(await nxCloudAuthHeaders(workspacePath, logger)),
   };
 
   logger.log(`Making run details request for ID: ${runId}`);
