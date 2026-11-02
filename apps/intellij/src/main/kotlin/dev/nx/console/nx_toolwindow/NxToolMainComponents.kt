@@ -13,6 +13,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ToolbarLabelAction
 import com.intellij.openapi.actionSystem.toolbarLayout.ToolbarLayoutStrategy
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
@@ -43,7 +44,9 @@ import java.net.URI
 import java.nio.file.Paths
 import javax.swing.*
 import javax.swing.border.CompoundBorder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class DaemonWarningType {
     DAEMON_DISABLED,
@@ -321,27 +324,24 @@ class NxToolMainComponents(private val project: Project) {
     private fun showDaemonDisabledReason() {
         TelemetryService.getInstance(project).featureUsed("misc.show-daemon-disabled-reason")
 
-        val daemonDir = Paths.get(project.nxBasePath, ".nx", "workspace-data", "d").toFile()
-
-        val disabledFile = File(daemonDir, "disabled")
-        if (disabledFile.exists()) {
-            openFile(disabledFile)
-            return
-        }
-
-        val daemonLogFile = File(daemonDir, "daemon.log")
-        if (daemonLogFile.exists()) {
-            openFile(daemonLogFile)
-            return
-        }
-
-        showDaemonLogNotFoundError()
-    }
-
-    private fun openFile(file: File) {
-        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file)
-        if (virtualFile != null) {
-            FileEditorManager.getInstance(project).openFile(virtualFile, true)
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
+            val virtualFile =
+                withContext(Dispatchers.IO) {
+                    val daemonDir =
+                        Paths.get(project.nxBasePath, ".nx", "workspace-data", "d").toFile()
+                    sequenceOf("disabled", "daemon.log")
+                        .map { File(daemonDir, it) }
+                        .mapNotNull { LocalFileSystem.getInstance().refreshAndFindFileByIoFile(it) }
+                        .firstOrNull()
+                }
+            withContext(Dispatchers.EDT) {
+                if (project.isDisposed) return@withContext
+                if (virtualFile != null && virtualFile.isValid) {
+                    FileEditorManager.getInstance(project).openFile(virtualFile, true)
+                } else {
+                    showDaemonLogNotFoundError()
+                }
+            }
         }
     }
 
@@ -382,11 +382,7 @@ class NxToolMainComponents(private val project: Project) {
                             action =
                                 object : AbstractAction("Configure Node interpreter") {
                                     override fun actionPerformed(e: ActionEvent?) {
-                                        ShowSettingsUtil.getInstance()
-                                            .showSettingsDialog(
-                                                project,
-                                                NodeSettingsConfigurable::class.java,
-                                            )
+                                        NodeSettingsConfigurable.showSettingsDialog(project)
                                     }
                                 }
                             alignmentX = Component.CENTER_ALIGNMENT
