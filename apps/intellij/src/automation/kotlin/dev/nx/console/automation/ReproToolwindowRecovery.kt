@@ -12,6 +12,8 @@ import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.createDirectories
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -63,6 +65,15 @@ interface RecoveryContentManager {
 @Remote("javax.swing.AbstractButton")
 interface RecoveryButton {
     fun doClick()
+
+    fun isEnabled(): Boolean
+
+    fun getToolTipText(): String?
+}
+
+@Remote("dev.nx.console.utils.NxBasePathKt", plugin = "dev.nx.console")
+interface RecoveryWorkspace {
+    fun getNxBasePath(project: Project): String
 }
 
 @Remote("com.intellij.openapi.fileEditor.FileEditorManager")
@@ -116,30 +127,66 @@ fun main() = withAutomationDriver {
                 }
             Thread.sleep(1500)
             if (mode == "node") {
-                ui.x("//div[@class='JButton' and @text='Configure Node interpreter']").click()
-                val deadline = System.nanoTime() + 20.seconds.inWholeNanoseconds
-                while (
-                    !ui.x("//div[@class='SettingsDialog']").present() &&
-                        System.nanoTime() < deadline
-                ) Thread.sleep(200)
-                check(ui.x("//div[@class='SettingsDialog']").present()) {
-                    "Configure Node interpreter did not open settings"
+                val settings = ui.x("//div[@accessiblename='Settings']")
+                val click =
+                    CompletableFuture.runAsync {
+                        withContext(OnDispatcher.EDT) {
+                            cast(
+                                    ui.x(
+                                            "//div[@class='JButton' and @text='Configure Node interpreter']"
+                                        )
+                                        .component,
+                                    RecoveryButton::class,
+                                )
+                                .doClick()
+                        }
+                    }
+                try {
+                    val deadline = System.nanoTime() + 30.seconds.inWholeNanoseconds
+                    while (!settings.present() && System.nanoTime() < deadline) {
+                        if (click.isDone) click.get(1, TimeUnit.SECONDS)
+                        Thread.sleep(200)
+                    }
+                    check(settings.present()) { "Configure Node interpreter did not open settings" }
+                    Thread.sleep(2500)
+                } finally {
+                    if (settings.present()) {
+                        withContext(OnDispatcher.EDT) {
+                            cast(
+                                    ui.x(
+                                            "//div[@accessiblename='Settings']//div[@class='JButton' and @text='Cancel']"
+                                        )
+                                        .component,
+                                    RecoveryButton::class,
+                                )
+                                .doClick()
+                        }
+                    }
                 }
-                Thread.sleep(2500)
-                ui.x("//div[@class='JButton' and @text='Cancel']").click()
+                click.get(20, TimeUnit.SECONDS)
             } else {
                 val disabled = workspace.resolve(".nx/workspace-data/d/disabled")
                 disabled.parent.createDirectories()
                 val previous = if (Files.exists(disabled)) Files.readAllBytes(disabled) else null
                 try {
                     disabled.writeText("Nx daemon disabled: regression fixture\n")
+                    val actualWorkspace = utility<RecoveryWorkspace>().getNxBasePath(project)
+                    check(Path.of(actualWorkspace).normalize() == workspace.normalize()) {
+                        "Fixture $workspace differs from Nx Console workspace $actualWorkspace"
+                    }
+                    println(
+                        "Show Reason workspace: $actualWorkspace; disabled file exists: ${Files.exists(disabled)}"
+                    )
                     withContext(OnDispatcher.EDT) {
-                        cast(
+                        val button =
+                            cast(
                                 ui.x("//div[@class='JButton' and @tooltiptext='Show Reason']")
                                     .component,
                                 RecoveryButton::class,
                             )
-                            .doClick()
+                        check(button.isEnabled()) { "Show Reason is disabled" }
+                        check(button.getToolTipText() == "Show Reason")
+                        button.doClick()
                     }
                     val deadline = System.nanoTime() + 20.seconds.inWholeNanoseconds
                     while (
@@ -166,7 +213,10 @@ fun main() = withAutomationDriver {
                 }
             }
             val newLog = log.readText().drop(offset)
-            check(!newLog.contains("Slow operations are prohibited on EDT")) {
+            check(
+                !newLog.contains("Slow operations are prohibited on EDT") &&
+                    !newLog.contains("The slow operation may freeze UI")
+            ) {
                 "Recovery action performed filesystem work on EDT"
             }
             check(!newLog.contains("Cannot find configurable")) {
