@@ -2,9 +2,11 @@ package dev.nx.console.automation
 
 import com.intellij.driver.client.Remote
 import com.intellij.driver.client.service
+import com.intellij.driver.client.utility
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.getOpenProjects
 import com.intellij.driver.sdk.jdk.getSystemProperty
+import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.waitForProjectOpen
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -31,7 +33,7 @@ fun main() = withAutomationDriver {
     nxlsRunning(project)
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "generator-startup"
     val logPath = Path.of(getSystemProperty("idea.log.path"), "idea.log")
-    val logOffset = logPath.readText().length
+    val logOffset = logPath.readText().lastIndexOf("IDE STARTED").coerceAtLeast(0)
     val report = StringBuilder("Generator process startup from the dispatch thread\n")
     recordIde(label) {
         try {
@@ -76,11 +78,28 @@ fun main() = withAutomationDriver {
             check(exitCode == 0) { "Generator failed: $report" }
             val addedLog = logPath.readText().drop(logOffset)
             val slowStartup =
-                addedLog.split(Regex("(?m)^\\d{4}-\\d{2}-\\d{2}")).any {
-                    it.contains("Slow operations are prohibited on EDT") &&
+                addedLog.split(Regex("(?m)^[0-9]{4}-[0-9]{2}-[0-9]{2}")).firstOrNull {
+                    (it.contains("Slow operations are prohibited on EDT") ||
+                        it.contains("The slow operation may freeze UI")) &&
                         it.contains("RunGeneratorManager")
                 }
-            check(!slowStartup) { "Generator process construction ran on the dispatch thread" }
+            report.appendLine(
+                "Slow-operation diagnostics from this IDE launch (repeat stack traces are deduplicated)."
+            )
+            report.appendLine(
+                "Process startup threading: ${if (slowStartup == null) "PASS" else "FAIL"}"
+            )
+            slowStartup?.lineSequence()?.take(15)?.forEach { report.appendLine(it) }
+            val evidence = Path.of(project.getBasePath(), "generator-startup-diagnostic.txt")
+            evidence.writeText(report.toString())
+            utility<PluginCompletionFileSystem>()
+                .getInstance()
+                .refreshAndFindFileByPath(evidence.toString())
+            openFile(evidence.fileName.toString())
+            Thread.sleep(4000)
+            check(slowStartup == null) {
+                "Generator process construction ran on the dispatch thread"
+            }
         } finally {
             automationOutput().resolve("$label-startup.txt").writeText(report.toString())
         }
