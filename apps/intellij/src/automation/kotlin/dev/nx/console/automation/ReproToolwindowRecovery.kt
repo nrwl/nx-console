@@ -85,7 +85,7 @@ fun main() = withAutomationDriver {
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "toolwindow-$mode"
     val workspace = Path.of(checkNotNull(System.getenv("NX_AUTOMATION_PROJECT")))
     val log = Path.of(getSystemProperty("idea.log.path"), "idea.log")
-    val offset = Files.size(log)
+    val offset = log.readText().length
     val manager =
         utility<RecoveryWindowManager>()
             .getInstance(project)
@@ -165,7 +165,7 @@ fun main() = withAutomationDriver {
                     else Files.write(disabled, previous)
                 }
             }
-            val newLog = log.readText().drop(offset.toInt())
+            val newLog = log.readText().drop(offset)
             check(!newLog.contains("Slow operations are prohibited on EDT")) {
                 "Recovery action performed filesystem work on EDT"
             }
