@@ -1,8 +1,9 @@
 package dev.nx.console.automation
 
 import com.intellij.driver.client.Remote
-import com.intellij.driver.client.service
+import com.intellij.driver.client.utility
 import com.intellij.driver.model.OnDispatcher
+import com.intellij.driver.sdk.Project
 import com.intellij.driver.sdk.getOpenProjects
 import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.jdk.getSystemProperty
@@ -17,6 +18,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @Remote("com.intellij.ide.actions.searcheverywhere.SearchEverywhereManager")
 interface GeneratorSearchManager {
+    fun getInstance(project: Project): GeneratorSearchManager
+
     fun isShown(): Boolean
 
     fun setSelectedTabID(id: String)
@@ -36,7 +39,7 @@ fun main() = withAutomationDriver {
     val project = getOpenProjects().single()
     val frame = nxlsFrame()
     nxlsRunning(project)
-    val manager = service<GeneratorSearchManager>(project)
+    val manager = utility<GeneratorSearchManager>().getInstance(project)
     val logPath = Path.of(getSystemProperty("idea.log.path"), "idea.log")
     val before = logPath.readText().length
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "generator-search"
@@ -46,9 +49,7 @@ fun main() = withAutomationDriver {
             invokeAction("SearchEverywhere", component = frame)
             nxlsWait(message = { "Search Everywhere did not open" }) { manager.isShown() }
             withContext(OnDispatcher.EDT) {
-                manager.setSelectedTabID(
-                    "dev.nx.console.generate.NxGeneratorSearchEverywhereContributor"
-                )
+                manager.setSelectedTabID("SearchEverywhereContributor.All")
                 manager.getCurrentlyShownPopupInstance().setSearchText("@fixture")
             }
             var rows = emptyList<String>()
@@ -86,6 +87,9 @@ fun main() = withAutomationDriver {
             check(!logPath.readText().drop(before).contains("ClosedSendChannelException")) {
                 "Search results were sent after the platform closed the request"
             }
+        } catch (error: Throwable) {
+            inspectIde()
+            throw error
         } finally {
             automationOutput().resolve("$label-search.txt").writeText(report.toString())
             withContext(OnDispatcher.EDT) {
