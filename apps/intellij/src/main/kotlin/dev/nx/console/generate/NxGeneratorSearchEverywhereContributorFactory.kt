@@ -6,9 +6,9 @@ import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
@@ -72,20 +72,20 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
 
         val matcher = NameUtil.buildMatcher(pattern).build()
 
-        val task = Runnable {
-            ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-                NxGenerateService.getInstance(project)
-                    .getFilteredGenerators()
-                    .filter { matcher.matches(it.name) }
-                    .forEach { consumer.process(it) }
-            }
-        }
-        if (ApplicationManager.getApplication().isDispatchThread) {
-            ApplicationManager.getApplication().runReadAction(task)
-        } else {
-            ReadAction.nonBlocking<Unit> { task.run() }
-                .wrapProgress(progressIndicator)
-                .executeSynchronously()
-        }
+        ProgressManager.getInstance()
+            .runProcess(
+                {
+                    runBlockingCancellable {
+                        for (generator in
+                            NxGenerateService.getInstance(project).getFilteredGenerators()) {
+                            progressIndicator.checkCanceled()
+                            if (matcher.matches(generator.name) && !consumer.process(generator)) {
+                                break
+                            }
+                        }
+                    }
+                },
+                progressIndicator,
+            )
     }
 }
