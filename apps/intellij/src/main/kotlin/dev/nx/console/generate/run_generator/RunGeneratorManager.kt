@@ -11,21 +11,47 @@ import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.lang.javascript.modules.ConsoleProgress
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.utils.NxGeneralCommandLine
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxBasePath
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.resume
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 val log = logger<RunGeneratorManager>()
 
-class RunGeneratorManager(val project: Project) {
+class RunGeneratorManager
+internal constructor(
+    val project: Project,
+    private val createProcess: (List<String>, String?) -> KillableColoredProcessHandler,
+) {
+    constructor(
+        project: Project
+    ) : this(
+        project,
+        { definition, cwd ->
+            KillableColoredProcessHandler(NxGeneralCommandLine(project, definition, cwd = cwd))
+        },
+    )
 
-    private var queuedGeneratorDefinition: List<String>? = null
+    private data class Request(val definition: List<String>, val cwd: String?)
+
+    private var queuedRequest: Request? = null
+    private var activeRequest: Request? = null
     private var runningProcessHandler: KillableColoredProcessHandler? = null
     private var lastDryRunDescriptor: RunContentDescriptor? = null
 
@@ -42,56 +68,106 @@ class RunGeneratorManager(val project: Project) {
             generatorDefinition = listOf("g", generator, *flags.toTypedArray())
         }
 
-        runningProcessHandler.let {
-            if (it == null) {
-                runGenerator(generatorDefinition, cwd)
-                return
-            }
-            if (it.commandLine.isDryRun()) {
-                it.killProcess()
-            }
-            queuedGeneratorDefinition = generatorDefinition
-            it.addProcessListener(
-                object : ProcessListener {
-                    override fun processTerminated(event: ProcessEvent) {
-                        queuedGeneratorDefinition?.let { definition ->
-                            runGenerator(definition, cwd)
-                        }
-                        queuedGeneratorDefinition = null
+        val request = Request(generatorDefinition, cwd)
+        val application = ApplicationManager.getApplication()
+        if (application.isDispatchThread) enqueue(request)
+        else application.invokeLater { enqueue(request) }
+    }
+
+    private fun enqueue(request: Request) {
+        if (project.isDisposed) return
+        queuedRequest = request
+        if (activeRequest == null) {
+            startNext()
+        } else if (activeRequest?.definition?.isDryRun() == true) {
+            runningProcessHandler?.killProcess()
+        }
+    }
+
+    private fun startNext() {
+        val request = queuedRequest ?: return
+        queuedRequest = null
+        activeRequest = request
+        val scope = ProjectLevelCoroutineHolderService.getInstance(project).cs
+        scope.launch {
+            var processHandler: KillableColoredProcessHandler? = null
+            var console: ConsoleView? = null
+            var contentShown = false
+            try {
+                withContext(Dispatchers.IO) {
+                    processHandler = createProcess(request.definition, request.cwd)
+                }
+                val process = checkNotNull(processHandler)
+                withContext(Dispatchers.EDT) {
+                    val view =
+                        TextConsoleBuilderFactory.getInstance()
+                            .createBuilder(project)
+                            .filters(NxGeneratorMessageFilter(project, project.nxBasePath))
+                            .console
+                    console = view
+                    view.attachToProcess(process)
+                    ConsoleProgress.install(view, process)
+                    showRunContent(view, process, request.definition.isDryRun())
+                    contentShown = true
+                    runningProcessHandler = process
+                    process.startNotify()
+                    if (queuedRequest != null && request.definition.isDryRun())
+                        process.killProcess()
+                }
+                awaitTermination(process)
+                if (!request.definition.isDryRun()) {
+                    withContext(Dispatchers.IO) {
+                        VfsUtil.markDirtyAndRefresh(
+                            true,
+                            true,
+                            true,
+                            VfsUtil.findFileByIoFile(File(project.nxBasePath), true),
+                        )
                     }
                 }
-            )
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: ProcessCanceledException) {
+                throw error
+            } catch (error: Exception) {
+                log.info("Cannot execute command", error)
+            } finally {
+                withContext(NonCancellable) {
+                    processHandler?.let {
+                        // ProcessHandler defers destruction until startNotify, including when
+                        // startup
+                        // is cancelled before a console can be attached.
+                        if (!it.isStartNotified) it.startNotify()
+                        if (!it.isProcessTerminated) it.destroyProcess()
+                    }
+                    withContext(Dispatchers.EDT) {
+                        if (!contentShown) console?.let(Disposer::dispose)
+                        runningProcessHandler = null
+                        activeRequest = null
+                        if (scope.isActive && !project.isDisposed) startNext()
+                    }
+                }
+            }
         }
     }
 
-    private fun runGenerator(definition: List<String>, cwd: String?) {
-        try {
-            ApplicationManager.getApplication()
-                .invokeLater(
-                    {
-                        val commandLine = NxGeneralCommandLine(project, definition, cwd = cwd)
-
-                        val processHandler = KillableColoredProcessHandler(commandLine)
-                        val console =
-                            TextConsoleBuilderFactory.getInstance()
-                                .createBuilder(project)
-                                .filters(NxGeneratorMessageFilter(project, project.nxBasePath))
-                                .console
-
-                        console.attachToProcess(processHandler)
-                        ConsoleProgress.install(console, processHandler)
-
-                        showRunContent(console, processHandler, definition.isDryRun())
-
-                        processHandler.startNotify()
-                        this.setProcessHandler(processHandler, definition.isDryRun().not())
-                    },
-                    ModalityState.defaultModalityState(),
-                )
-        } catch (e: Exception) {
-            thisLogger().info("Cannot execute command", e)
+    private suspend fun awaitTermination(process: ProcessHandler) =
+        suspendCancellableCoroutine<Unit> { continuation ->
+            val completed = AtomicBoolean()
+            val listener =
+                object : ProcessListener {
+                    override fun processTerminated(event: ProcessEvent) {
+                        process.removeProcessListener(this)
+                        if (completed.compareAndSet(false, true)) continuation.resume(Unit)
+                    }
+                }
+            process.addProcessListener(listener)
+            continuation.invokeOnCancellation { process.removeProcessListener(listener) }
+            if (process.isProcessTerminated) {
+                process.removeProcessListener(listener)
+                if (completed.compareAndSet(false, true)) continuation.resume(Unit)
+            }
         }
-    }
 
     internal fun showRunContent(
         console: ConsoleView,
@@ -118,34 +194,8 @@ class RunGeneratorManager(val project: Project) {
             )
         lastDryRunDescriptor = contentDescriptor.takeIf { dryRun }
     }
-
-    private fun setProcessHandler(
-        processHandler: KillableColoredProcessHandler,
-        refreshFileSystem: Boolean,
-    ) {
-        processHandler.addProcessListener(
-            object : ProcessListener {
-                override fun processTerminated(event: ProcessEvent) {
-                    runningProcessHandler = null
-                    if (refreshFileSystem) {
-                        VfsUtil.markDirtyAndRefresh(
-                            true,
-                            true,
-                            true,
-                            VfsUtil.findFileByIoFile(File(project.nxBasePath), true),
-                        )
-                    }
-                }
-            }
-        )
-        runningProcessHandler = processHandler
-    }
 }
 
 private fun List<String>.isDryRun(): Boolean {
-    return this.contains("--dry-run") || this.contains("--dryRun")
-}
-
-private fun String.isDryRun(): Boolean {
     return this.contains("--dry-run") || this.contains("--dryRun")
 }

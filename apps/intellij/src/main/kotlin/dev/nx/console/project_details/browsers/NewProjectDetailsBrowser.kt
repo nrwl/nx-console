@@ -33,8 +33,8 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
-import dev.nx.console.utils.jcef.awaitLoad
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.jcef.loadHtmlAndAwait
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.FlowLayout
@@ -120,6 +120,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
     }
 
     private var oldBrowser: OldProjectDetailsBrowser? = null
+    private var projectDetailsLoaded = false
 
     private val browser: JBCefBrowser = JBCefBrowser()
     private val interactionEventQuery: JBCefJSQuery
@@ -204,11 +205,13 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                 hideProgressBarLoading()
                                 hideMultiDisclaimer()
 
-                                if (it.transition.sourceState == this@dataState) {
+                                if (
+                                    it.transition.sourceState == this@dataState &&
+                                        projectDetailsLoaded
+                                ) {
                                     updatePDVData(data.pdvData)
                                 } else {
-                                    showPDV(data.graphBasePath, data.pdvData)
-                                    setColors()
+                                    if (showPDV(data.graphBasePath, data.pdvData)) setColors()
                                 }
                             }
                             dataTransition<Events.LoadSuccess, LoadSuccessData> {
@@ -232,14 +235,19 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
                                 val projects = data.pdvData.keys.toTypedArray()
                                 val selectedProject = projectsComboBox.item ?: projects.first()
-                                if (it.transition.sourceState == this@dataState) {
+                                if (
+                                    it.transition.sourceState == this@dataState &&
+                                        projectDetailsLoaded
+                                ) {
                                     updatePDVData(data.pdvData[selectedProject]!!)
                                 } else {
                                     updateMultiDropdown(projects, selectedProject)
                                     showMultiDisclaimer()
 
-                                    showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
-                                    setColors()
+                                    if (
+                                        showPDV(data.graphBasePath, data.pdvData[selectedProject]!!)
+                                    )
+                                        setColors()
                                 }
                             }
                             dataTransition<Events.LoadSuccessMulti, LoadSuccessMultiData> {
@@ -278,8 +286,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         dataState<LoadErrorData>(States.ShowingError) {
                             onEntry {
                                 hideMultiDisclaimer()
-                                showError(data)
-                                setColors()
+                                if (showError(data)) setColors()
                             }
                         }
 
@@ -427,16 +434,19 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                         Events.LoadErrorNoGraph()
                     ) // Handles null `graphBasePath`
             } ?: stateMachine.processEvent(Events.LoadErrorNoGraph()) // Handles null `pdvData`
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Throwable) {
             logger<NewProjectDetailsBrowser>().warn("Error loading PDV: ${e.message}")
             stateMachine.processEvent(Events.LoadErrorNoGraph(e.message))
         }
     }
 
-    private suspend fun showPDV(graphBasePath: String, pdvData: String) {
+    private suspend fun showPDV(graphBasePath: String, pdvData: String): Boolean {
         if (browser.isDisposed || interactionEventQuery.isDisposed) {
-            return
+            return false
         }
+        projectDetailsLoaded = false
         val html =
             """
     <html>
@@ -486,10 +496,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
        """
                 .trimIndent()
 
-        withContext(Dispatchers.EDT) {
-            browser.loadHTML(html)
-            browser.awaitLoad()
-        }
+        projectDetailsLoaded = withContext(Dispatchers.EDT) { browser.loadHtmlAndAwait(html) }
+        return projectDetailsLoaded
     }
 
     private suspend fun updatePDVData(pdvData: String) {
@@ -518,9 +526,9 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         projectsComboBox.addItemListener(this@NewProjectDetailsBrowser, projectsComboBoxListener)
     }
 
-    private suspend fun showError(data: LoadErrorData) {
+    private suspend fun showError(data: LoadErrorData): Boolean {
         if (browser.isDisposed) {
-            return
+            return false
         }
         val html =
             """
@@ -554,10 +562,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
        """
                 .trimIndent()
 
-        withContext(Dispatchers.EDT) {
-            browser.loadHTML(html)
-            browser.awaitLoad()
-        }
+        return withContext(Dispatchers.EDT) { browser.loadHtmlAndAwait(html) }
     }
 
     private fun showErrorNoGraph(data: String) {
