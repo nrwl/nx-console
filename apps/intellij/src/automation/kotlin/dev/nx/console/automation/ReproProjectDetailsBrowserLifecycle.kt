@@ -9,7 +9,6 @@ import com.intellij.driver.sdk.openToolWindow
 import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.remote.Component
 import com.intellij.driver.sdk.waitForProjectOpen
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.minutes
@@ -113,7 +112,7 @@ fun main() = withAutomationDriver {
                 .refreshAndFindFileByPath(workspace.resolve("demo/project.json").toString())
         )
     val log = Path.of(getSystemProperty("idea.log.path"), "idea.log")
-    val offset = Files.size(log)
+    val offset = log.readText().length
     val mode = System.getenv("NX_BROWSER_CASE") ?: "theme"
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "project-details-$mode"
     recordIde(label) {
@@ -183,11 +182,14 @@ fun main() = withAutomationDriver {
             "Did not intercept a loading browser; this run did not reproduce the abort trigger"
         }
         Thread.sleep(1000)
-        val addedLog = log.readText().drop(offset.toInt())
+        val addedLog = log.readText().drop(offset)
         check(!addedLog.contains("The related JCEF browser in not initialized")) {
             "Theme notification executed JavaScript before native browser creation"
         }
-        check(!addedLog.contains("browser failed to load, error code: ERR_ABORTED")) {
+        check(
+            !addedLog.contains("browser failed to load, error code: ERR_ABORTED") &&
+                !addedLog.contains("Browser failed to load: ERR_ABORTED")
+        ) {
             "Expected navigation cancellation was reported as a browser error"
         }
         check(!addedLog.contains("Already resumed")) {
