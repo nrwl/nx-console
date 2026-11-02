@@ -15,9 +15,8 @@ internal class NxEditorListener : EditorFactoryListener {
 
     override fun editorReleased(event: EditorFactoryEvent) {
         val project = event.editor.project ?: return super.editorReleased(event)
-        val service = NxlsService.getInstance(project)
-        if (service.isEditorConnected(event.editor)) {
-            service.removeDocument(event.editor)
+        if (!project.isDisposed) {
+            project.getServiceIfCreated(NxlsService::class.java)?.removeDocument(event.editor)
         }
 
         super.editorReleased(event)
