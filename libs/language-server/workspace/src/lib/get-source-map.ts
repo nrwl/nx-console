@@ -19,7 +19,8 @@ export async function getSourceMapFilesToProjectsMap(
   const sourceMapFilesToProjectMap: Record<string, string[]> = {};
 
   Object.entries(sourceMaps ?? {}).forEach(([projectRoot, sourceMap]) => {
-    Object.values(sourceMap).forEach(([file]) => {
+    Object.values(sourceMap).forEach(([source]) => {
+      const file = source ? sourceMapFilePath(source) : source;
       if (!file || file === 'nx.json') {
         return;
       }
@@ -64,7 +65,7 @@ export async function getTargetsForConfigFile(
   Object.entries(sourceMap)
     .filter<[string, [string, string]]>(isKeyWithTargetsAndFileNotNull)
     .forEach(([key, [file]]: [string, [string, string]]) => {
-      if (normalize(file) === configFilePath) {
+      if (normalize(sourceMapFilePath(file)) === configFilePath) {
         const targetName = key.split('.')[1];
         const target = project.data.targets?.[targetName];
         if (target) {
@@ -84,4 +85,9 @@ export function isKeyWithTargetsAndFileNotNull(
   value: [string, [string | null, string]],
 ): value is [string, [string, string]] {
   return value[0].startsWith('targets.') && value[1][0] !== null;
+}
+
+function sourceMapFilePath(source: string): string {
+  // Nx encodes target-default locations in this synthetic source-map file name.
+  return source.startsWith('nx.json#targetDefaults.') ? 'nx.json' : source;
 }
