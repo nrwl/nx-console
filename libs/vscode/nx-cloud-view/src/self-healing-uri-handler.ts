@@ -1,7 +1,7 @@
 import { window, Uri, workspace, env } from 'vscode';
 import { getNxCloudId } from '@nx-console/shared-nx-cloud';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
-import { applyFixLocallyWithNxCloud } from './apply-fix-locally';
+import { applyFixLocallyWithNxCloud, isValidFixId } from './apply-fix-locally';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 
 export async function handleSelfHealingUri(uri: Uri): Promise<void> {
@@ -21,6 +21,12 @@ export async function handleSelfHealingUri(uri: Uri): Promise<void> {
 
   const workspaceId = pathParts[1];
   const fixId = pathParts[2];
+
+  if (!isValidFixId(fixId)) {
+    vscodeLogger.log(`Ignoring self-healing URI with invalid fix id: ${fixId}`);
+    window.showErrorMessage('Invalid self-healing URI format');
+    return;
+  }
 
   vscodeLogger.log(
     `Handling self-healing URI: workspace=${workspaceId}, fix=${fixId}`,

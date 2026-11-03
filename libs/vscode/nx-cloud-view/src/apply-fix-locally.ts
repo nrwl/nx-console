@@ -1,6 +1,6 @@
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { Task, TaskScope, window } from 'vscode';
+import { ShellQuoting, Task, TaskScope, window } from 'vscode';
 
 import { tasks } from 'vscode';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
@@ -59,6 +59,13 @@ export async function applyFixLocallyWithGit(
   }
 }
 
+// Fix ids are Nx Cloud short links (`<fix>-<suggestion>`). Only allow characters that no shell treats specially.
+const FIX_ID_PATTERN = /^[A-Za-z0-9_][A-Za-z0-9_-]*$/;
+
+export function isValidFixId(fixId: unknown): fixId is string {
+  return typeof fixId === 'string' && FIX_ID_PATTERN.test(fixId);
+}
+
 /**
  * Apply an Nx Cloud fix locally using the nx-cloud CLI with VSCode UI feedback
  * @param fixId The fix ID to apply
@@ -66,6 +73,14 @@ export async function applyFixLocallyWithGit(
  * @returns Promise<boolean> indicating success or failure
  */
 export async function applyFixLocallyWithNxCloud(fixId: string): Promise<void> {
+  if (!isValidFixId(fixId)) {
+    vscodeLogger.log(
+      `Refusing to apply Nx Cloud fix with invalid id: ${fixId}`,
+    );
+    window.showErrorMessage('Failed to apply fix: invalid Nx Cloud fix id.');
+    return;
+  }
+
   vscodeLogger.log(`Applying Nx Cloud fix: ${fixId}`);
 
   try {
@@ -88,23 +103,25 @@ async function runApplyLocallyCommand(fixId: string): Promise<boolean> {
   try {
     const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
 
-    const command = `nx-cloud apply-locally ${fixId}`;
+    const command = 'nx-cloud apply-locally';
+    const label = `${command} ${fixId}`;
     const task = new Task(
       {
         type: 'shell',
-        command,
+        command: label,
         options: {
           cwd: workspacePath,
         },
       },
       TaskScope.Workspace, // scope
-      command,
+      label,
       'nx', // source
       await getShellExecutionForConfig({
         displayCommand: command,
         cwd: workspacePath,
         encapsulatedNx: isEncapsulatedNx,
         workspacePath,
+        args: [{ value: fixId, quoting: ShellQuoting.Strong }],
       }),
     );
 

@@ -193,6 +193,16 @@ tree. It checks that `nx show projects` lists every nested project, expands
 `e2es`, and asserts that each parent can be expanded and shows its nested
 projects.
 
+### Self-healing links (`vscode://nrwl.angular-console/self-healing/...`)
+
+`specs/self-healing-uri.test.ts` uses the `self-healing` fixture, whose `nx.json`
+sets an `nxCloudId`, and opens self-healing links for it with
+`vscode.env.openExternal`. A link whose fix id contains shell syntax must not
+start a task or create the marker file the injected command would write, and
+must show "Invalid self-healing URI format". A valid link must start
+`nx-cloud apply-locally` with the fix id as a separate, strongly quoted
+argument.
+
 References:
 
 - [Playwright `connectOverCDP`](https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp)
