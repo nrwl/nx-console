@@ -9,7 +9,6 @@ import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.jdk.getSystemProperty
 import com.intellij.driver.sdk.openToolWindow
 import com.intellij.driver.sdk.singleProject
-import com.intellij.driver.sdk.ui.components.common.jcef
 import com.intellij.driver.sdk.ui.remote.Component
 import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
@@ -66,7 +65,25 @@ interface LifecycleUiSettings {
 
 @Remote("java.lang.Class")
 interface LifecycleClass {
+    fun getName(): String
+
+    fun forName(name: String, initialize: Boolean, loader: LifecycleClassLoader): LifecycleClass
+
+    fun getClassLoader(): LifecycleClassLoader
+
+    fun newInstance(): LifecycleObject
+
     fun getDeclaredField(name: String): LifecycleField
+}
+
+@Remote("java.lang.System")
+interface LifecycleEnvironment {
+    fun getenv(name: String): String?
+}
+
+@Remote("java.awt.Toolkit")
+interface LifecycleToolkit {
+    fun getDefaultToolkit(): LifecycleObject
 }
 
 @Remote("java.lang.reflect.Field")
@@ -78,6 +95,11 @@ interface LifecycleField {
     fun getBoolean(receiver: LifecycleObject): Boolean
 }
 
+@Remote("java.lang.reflect.Field")
+interface LifecycleStringField {
+    fun get(receiver: LifecycleObject): String?
+}
+
 @Remote("java.lang.Object")
 interface LifecycleObject {
     fun getClass(): LifecycleClass
@@ -85,9 +107,76 @@ interface LifecycleObject {
 
 @Remote("com.intellij.ui.jcef.JBCefBrowser")
 interface LifecycleJcefBrowser {
+    fun getComponent(): Component
+
+    fun getJBCefClient(): LifecycleJcefClient
+
+    fun getProperty(name: String): LifecycleObject?
+
     fun getCefBrowser(): LifecycleCefBrowser
 
     fun isCefBrowserCreated(): Boolean
+}
+
+@Remote("org.cef.handler.CefRequestHandler") interface LifecycleRequestHandler
+
+@Remote("java.lang.ClassLoader") interface LifecycleClassLoader
+
+@Remote("java.net.URL") interface LifecycleUrl
+
+@Remote("java.net.URLClassLoader")
+interface LifecycleAutomationClassLoader {
+    fun close()
+}
+
+@Remote("com.intellij.ui.jcef.JBCefClient")
+interface LifecycleJcefClient {
+    fun addRequestHandler(
+        handler: LifecycleRequestHandler,
+        browser: LifecycleCefBrowser,
+    ): LifecycleJcefClient
+
+    fun removeRequestHandler(handler: LifecycleRequestHandler, browser: LifecycleCefBrowser)
+}
+
+@Remote("dev.nx.console.utils.jcef.BrowserLoadHandler", plugin = "dev.nx.console")
+interface LifecyclePendingLoad {
+    fun getCompletion(): LifecycleLoadCompletion
+}
+
+@Remote("kotlinx.coroutines.Deferred")
+interface LifecycleLoadCompletion {
+    fun isCompleted(): Boolean
+
+    fun getCompleted(): Boolean
+}
+
+@Remote("com.intellij.openapi.application.ApplicationInfo")
+interface LifecycleApplicationInfo {
+    fun getInstance(): LifecycleApplicationInfo
+
+    fun getBuild(): LifecycleBuildNumber
+}
+
+@Remote("com.intellij.openapi.util.BuildNumber")
+interface LifecycleBuildNumber {
+    fun getBaselineVersion(): Int
+}
+
+@Remote(
+    "com.jetbrains.performancePlugin.remotedriver.jcef.JcefComponentWrapper",
+    plugin = "com.jetbrains.performancePlugin/intellij.performanceTesting.remoteDriver",
+)
+interface LifecycleLegacyJsWorker {
+    fun callJs(script: String, timeout: Long): String
+}
+
+@Remote(
+    "com.intellij.performanceTesting.remoteDriver.jcef.JcefComponentWrapper",
+    plugin = "com.jetbrains.performancePlugin/intellij.performanceTesting.remoteDriver.jcef",
+)
+interface LifecycleJsWorker {
+    fun callJs(script: String, timeout: Long): String
 }
 
 @Remote("org.cef.browser.CefBrowser")
@@ -139,6 +228,10 @@ interface LifecycleContentManager {
 /** Exercises settings events before attachment and cancellation during a real PDV page load. */
 fun main() = withAutomationDriver {
     waitForProjectOpen(2.minutes)
+    println(
+        "IDE DISPLAY=${utility<LifecycleEnvironment>().getenv("DISPLAY")}; " +
+            "toolkit=${utility<LifecycleToolkit>().getDefaultToolkit().getClass().getName()}"
+    )
     val project = singleProject()
     val workspace = Path.of(checkNotNull(System.getenv("NX_AUTOMATION_PROJECT")))
     val file =
@@ -160,7 +253,7 @@ fun main() = withAutomationDriver {
                 .getContentManager()
         var interceptedLoads = 0
         var recoveryCompleted = false
-        repeat(if (mode == "abort" || mode == "recovery") 8 else 1) {
+        repeat(if (mode == "abort") 8 else 1) {
             if (recoveryCompleted) return@repeat
             val temporaryProjectPath =
                 if (mode == "theme") Files.createTempDirectory("nx-browser-theme-") else null
@@ -177,6 +270,9 @@ fun main() = withAutomationDriver {
                     new(LifecycleDetailsBrowser::class, browserProject, file)
                 }
             var content: LifecycleContent? = null
+            var abortHandler: LifecycleRequestHandler? = null
+            var recoveryBrowser: LifecycleJcefBrowser? = null
+            var automationLoader: LifecycleAutomationClassLoader? = null
             try {
                 val cef =
                     withContext(OnDispatcher.EDT) {
@@ -185,6 +281,50 @@ fun main() = withAutomationDriver {
                         field.setAccessible(true)
                         cast(checkNotNull(field.get(reflected)), LifecycleJcefBrowser::class)
                     }
+                var pendingLoad: LifecycleLoadCompletion? = null
+                if (mode == "recovery") {
+                    val pendingDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(60)
+                    while (pendingLoad == null && System.nanoTime() < pendingDeadline) {
+                        pendingLoad =
+                            withContext(OnDispatcher.EDT) {
+                                cef.getProperty("nx.console.htmlLoadTracker")?.let { tracker ->
+                                    val field = tracker.getClass().getDeclaredField("current")
+                                    field.setAccessible(true)
+                                    field.get(tracker)?.let {
+                                        cast(it, LifecyclePendingLoad::class).getCompletion()
+                                    }
+                                }
+                            }
+                        if (pendingLoad == null) Thread.sleep(100)
+                    }
+                    checkNotNull(pendingLoad) { "No deferred project-details HTML navigation" }
+                    check(!cef.isCefBrowserCreated()) {
+                        "Recovery must intercept the first native navigation before attachment"
+                    }
+                    val automationClasses =
+                        Path.of(System.getProperty("nx.console.automation.workspace"))
+                            .resolve("dist/apps/intellij/classes/kotlin/automation")
+                    automationLoader =
+                        new(
+                            LifecycleAutomationClassLoader::class,
+                            arrayOf(new(LifecycleUrl::class, automationClasses.toUri().toString())),
+                            cast(cef, LifecycleObject::class).getClass().getClassLoader(),
+                        )
+                    // The helper runs inside the IDE and ignores its initial about:blank load.
+                    abortHandler =
+                        cast(
+                            utility<LifecycleClass>()
+                                .forName(
+                                    "dev.nx.console.automation.AbortProjectDetailsNavigation",
+                                    true,
+                                    cast(automationLoader, LifecycleClassLoader::class),
+                                )
+                                .newInstance(),
+                            LifecycleRequestHandler::class,
+                        )
+                    recoveryBrowser = cef
+                    cef.getJBCefClient().addRequestHandler(abortHandler, cef.getCefBrowser())
+                }
                 if (mode == "theme") {
                     check(!cef.isCefBrowserCreated()) {
                         "Expected a deferred native browser before attachment"
@@ -227,18 +367,11 @@ fun main() = withAutomationDriver {
                                 manager.setSelectedContent(it)
                             }
                     }
-                var stopped = false
-                if (mode == "abort" || mode == "recovery") {
+                if (mode == "abort") {
                     for (attempt in 0 until 500) {
-                        if (
-                            cef.isCefBrowserCreated() &&
-                                cef.getCefBrowser().isLoading() &&
-                                (mode != "recovery" ||
-                                    cef.getCefBrowser().getURL().contains("nx-console-"))
-                        ) {
+                        if (cef.isCefBrowserCreated() && cef.getCefBrowser().isLoading()) {
                             cef.getCefBrowser().stopLoad()
                             interceptedLoads++
-                            stopped = true
                             break
                         }
                         Thread.sleep(10)
@@ -255,13 +388,33 @@ fun main() = withAutomationDriver {
                         }
                     }
                     if (mode == "recovery") {
-                        Thread.sleep(250)
-                        if (!stopped || loaded()) {
-                            println(
-                                "Navigation completed before stop; retrying the recovery trigger"
-                            )
-                            return@repeat
+                        val completion = checkNotNull(pendingLoad)
+                        val abortDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20)
+                        while (
+                            !completion.isCompleted() && System.nanoTime() < abortDeadline
+                        ) Thread.sleep(50)
+                        check(completion.isCompleted()) { "Native navigation was not aborted" }
+                        val reflectedHandler =
+                            cast(checkNotNull(abortHandler), LifecycleObject::class)
+                        val abortedUrlField =
+                            reflectedHandler.getClass().getDeclaredField("abortedUrl")
+                        abortedUrlField.setAccessible(true)
+                        val abortedUrl =
+                            cast(abortedUrlField, LifecycleStringField::class).get(reflectedHandler)
+                        println("Native cancelled navigation URL: $abortedUrl")
+                        check(abortedUrl?.startsWith("file:///nx-console-") == true) {
+                            "Did not cancel the actual project-details HTML navigation"
                         }
+                        check(!completion.getCompleted()) {
+                            "Navigation completed successfully instead of being aborted"
+                        }
+                        check(!loaded()) { "An aborted page was marked ready" }
+                        println(
+                            "Actual pending HTML navigation completed: false; page ready: false"
+                        )
+                        cef.getJBCefClient()
+                            .removeRequestHandler(checkNotNull(abortHandler), cef.getCefBrowser())
+                        abortHandler = null
                         invokeAction(
                             "dev.nx.console.nxls.NxRefreshWorkspaceAction",
                             component = ui.x("//div[@class='IdeFrameImpl']").component,
@@ -274,9 +427,23 @@ fun main() = withAutomationDriver {
                     )
                     check(loaded()) { "Project-details load never completed after $mode" }
                     println("Project-details load completed: true ($mode)")
+                    val callJs: (String) -> String =
+                        if (
+                            utility<LifecycleApplicationInfo>()
+                                .getInstance()
+                                .getBuild()
+                                .getBaselineVersion() >= 263
+                        ) {
+                            val worker = new(LifecycleJsWorker::class, cef.getComponent())
+                            fun(script: String) = worker.callJs(script, 5000)
+                        } else {
+                            val worker = new(LifecycleLegacyJsWorker::class, cef.getComponent())
+                            fun(script: String) = worker.callJs(script, 5000)
+                        }
                     var rendered = ""
-                    while (System.nanoTime() < deadline) {
-                        rendered = ui.jcef().jcefWorker.callJs("document.body.innerText", 5000)
+                    val renderDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20)
+                    while (System.nanoTime() < renderDeadline) {
+                        rendered = callJs("document.body.innerText")
                         if (rendered.contains("hello")) break
                         Thread.sleep(100)
                     }
@@ -288,6 +455,14 @@ fun main() = withAutomationDriver {
                 }
                 Thread.sleep(1500)
             } finally {
+                abortHandler?.let { handler ->
+                    recoveryBrowser?.let { browser ->
+                        browser
+                            .getJBCefClient()
+                            .removeRequestHandler(handler, browser.getCefBrowser())
+                    }
+                }
+                automationLoader?.close()
                 withContext(OnDispatcher.EDT) {
                     content?.let { manager.removeContent(it, true) }
                     details.dispose()

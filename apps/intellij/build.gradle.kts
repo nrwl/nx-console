@@ -52,8 +52,11 @@ val automationOutput =
         .map { rootProject.file(it) }
         .orElse(layout.buildDirectory.dir("automation").map { it.asFile })
 val automationDriverVersion = providers.provider { intellijPlatform.productInfo.buildNumber }
+val automationJcefApi =
+    providers.provider { intellijPlatform.platformPath.resolve("lib/intellij.libraries.jcef.jar") }
 
 dependencies {
+    add(automation.compileOnlyConfigurationName, files(automationJcefApi))
     listOf("driver-sdk", "driver-model").forEach { artifact ->
         add(
             automation.implementationConfigurationName,
