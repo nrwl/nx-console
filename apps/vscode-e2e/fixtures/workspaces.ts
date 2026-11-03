@@ -139,6 +139,8 @@ export const nestedProjectParents = [
   },
 ];
 
+export const selfHealingCloudId = 'e2e-self-healing-cloud-id';
+
 const libraryTsconfigs = (types: string[]) => ({
   'tsconfig.json': JSON.stringify(
     {
@@ -243,6 +245,16 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
           'src/main.ts': 'console.log("app");\n',
           'libs/extra/src/index.ts': 'export const extra = true;\n',
         },
+      }),
+  },
+  'self-healing': {
+    description: `One project, \`demo\`, in a workspace connected to Nx Cloud as \`${selfHealingCloudId}\` so self-healing links for it reach Nx Console's URI handler.`,
+    create: (path) =>
+      writeWorkspace(path, {
+        projects: {
+          demo: { name: 'demo', targets: { hello: runCommand('echo hello') } },
+        },
+        nxJson: { nxCloudId: selfHealingCloudId },
       }),
   },
   'jest-cypress-libraries': {

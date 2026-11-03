@@ -2,7 +2,7 @@ import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 
-import { ShellExecution, workspace } from 'vscode';
+import { ShellExecution, ShellQuotedString, workspace } from 'vscode';
 
 export interface ShellConfig {
   cwd: string;
@@ -10,6 +10,11 @@ export interface ShellConfig {
   encapsulatedNx: boolean;
   workspacePath: string;
   env?: { [key: string]: string };
+  /**
+   * Arguments appended after `displayCommand`. VS Code quotes each one for the user's shell,
+   * so pass values that come from outside the extension here instead of in `displayCommand`.
+   */
+  args?: ShellQuotedString[];
 }
 
 export async function getShellExecutionForConfig(
@@ -54,8 +59,18 @@ export async function getShellExecutionForConfig(
     env['INIT_CWD'] = config.cwd;
   }
 
-  return new ShellExecution(command, {
-    cwd: config.cwd,
-    env,
-  });
+  const options = { cwd: config.cwd, env };
+
+  if (config.args) {
+    // VS Code quotes a command that contains spaces as a single word, so the package manager prefix
+    // (e.g. `pnpm exec`) has to be split into the executable and its own arguments.
+    const [executable, ...commandArgs] = command.split(' ').filter(Boolean);
+    return new ShellExecution(
+      executable,
+      [...commandArgs, ...config.args],
+      options,
+    );
+  }
+
+  return new ShellExecution(command, options);
 }
