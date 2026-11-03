@@ -48,8 +48,8 @@ import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
-import dev.nx.console.utils.jcef.awaitLoad
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.jcef.loadHtmlAndAwait
 import java.awt.*
 import java.net.URI
 import javax.swing.*
@@ -213,12 +213,8 @@ class NxCloudFixFileImpl(
         """
                 .trimIndent()
 
-        withContext(Dispatchers.EDT) {
-            browser.loadHTML(html)
-            browser.awaitLoad()
-        }
-
-        setupMessageHandling()
+        val loaded = withContext(Dispatchers.EDT) { browser.loadHtmlAndAwait(html) }
+        if (loaded) setupMessageHandling()
     }
 
     private fun setupMessageHandling() {
