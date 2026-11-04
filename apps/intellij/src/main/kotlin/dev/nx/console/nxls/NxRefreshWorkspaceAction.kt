@@ -21,6 +21,7 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.hasNodeInterpreter
 import kotlinx.coroutines.*
 
 class NxRefreshWorkspaceAction :
@@ -79,6 +80,10 @@ class NxRefreshWorkspaceService(private val project: Project) {
 
     fun refreshWorkspace() {
         if (refreshing) {
+            return
+        }
+        if (!project.hasNodeInterpreter()) {
+            Notifier.notifyNoNodeInterpreter(project)
             return
         }
         refreshing = true

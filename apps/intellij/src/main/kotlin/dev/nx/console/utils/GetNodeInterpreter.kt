@@ -18,6 +18,14 @@ val Project.nodeInterpreter: NodeJsInterpreter
             }
         } ?: throw IllegalStateException(NxConsoleBundle.message("interpreter.not.configured"))
 
+fun Project.hasNodeInterpreter(): Boolean =
+    try {
+        nodeInterpreter
+        true
+    } catch (e: Exception) {
+        false
+    }
+
 @OptIn(ExperimentalContracts::class)
 fun isWslInterpreter(interpreter: NodeJsInterpreter): Boolean {
     contract { returns(true) implies (interpreter is WslNodeInterpreter) }

@@ -2,6 +2,7 @@ package dev.nx.console.nx_toolwindow
 
 import com.intellij.ide.ui.laf.darcula.ui.DarculaProgressBarUI
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.javascript.nodejs.interpreter.NodeJsInterpreterManager
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
@@ -24,7 +25,7 @@ import dev.nx.console.nxls.WatcherRunningService
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
-import dev.nx.console.utils.nodeInterpreter
+import dev.nx.console.utils.hasNodeInterpreter
 import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.*
@@ -374,6 +375,9 @@ class NxToolWindowPanel(private val project: Project) :
                 )
             }
 
+            NodeJsInterpreterManager.getInstance(project)
+                .addChangeListener({ loadToolwindowContent() }, this@NxToolWindowPanel)
+
             loadToolwindowContent()
         }
     }
@@ -387,13 +391,7 @@ class NxToolWindowPanel(private val project: Project) :
             withContext(Dispatchers.EDT) {
                 val hasProjects =
                     workspace != null && !(workspace.projectGraph?.nodes.isNullOrEmpty())
-                val hasNodeInterpreter =
-                    try {
-                        project.nodeInterpreter
-                        true
-                    } catch (e: Exception) {
-                        false
-                    }
+                val hasNodeInterpreter = project.hasNodeInterpreter()
 
                 // Update daemon warning banner
                 val watcherStatus = WatcherRunningService.getInstance(project).status.value
