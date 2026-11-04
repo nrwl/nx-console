@@ -110,6 +110,13 @@ intellijPlatformTesting {
                 systemProperty("jb.privacy.policy.text", "<!--999.999-->")
                 systemProperty("jb.consents.confirmation.enabled", "false")
                 systemProperty("ide.show.tips.on.startup.default.value", "false")
+                if (System.getProperty("os.name").startsWith("Linux")) {
+                    // IntelliJ's "auto" toolkit joins the desktop's Wayland session even when
+                    // DISPLAY points at the automation's virtual X server, which x11grab records.
+                    jvmArgumentProviders.add(
+                        CommandLineArgumentProvider { listOf("-Dawt.toolkit.name=XToolkit") }
+                    )
+                }
                 args(
                     providers
                         .gradleProperty("automationProject")
