@@ -176,7 +176,10 @@ symlinked into the fixture, so no fixture dependency download is needed. See the
 On Linux, install `xvfb` and `ffmpeg`. Each run creates a private virtual display
 and records it from IDE startup, including startup failures. No desktop session
 or physical display is required. The IDE still runs Swing with graphics enabled;
-`java.awt.headless=true` cannot render this test. On macOS, `ffmpeg` and a logged-in
+`java.awt.headless=true` cannot render this test. On Linux the launcher forces
+IntelliJ's X11 toolkit (`-Dawt.toolkit.name=XToolkit`). Otherwise IntelliJ 2026.1's default
+`auto` toolkit joins the desktop's Wayland session, the IDE opens on the desktop instead of the
+virtual display, and the recording stays black. On macOS, `ffmpeg` and a logged-in
 desktop session are required, and the existing Driver recorder captures the IDE.
 The automation launcher sets `idea.is.integration.test=true` to suppress
 onboarding dialogs, including the Islands theme introduction in IDEA 2025.3,
