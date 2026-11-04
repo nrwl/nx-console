@@ -635,4 +635,3 @@ try {
     process.exitCode = 1;
   }
 }
-// Temporary: affects the IntelliJ e2e tasks so Nx Cloud CI runs them.
