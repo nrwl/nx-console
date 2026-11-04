@@ -72,9 +72,9 @@
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
-        { "input": "default", "always": true },
-        { "input": "kotlin", "always": true },
-        { "input": "production", "dependencies": true, "always": true },
+        "default",
+        "kotlin",
+        "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_E2E_EXPECTED_PROJECT" }
@@ -102,9 +102,9 @@
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
-        { "input": "default", "always": true },
-        { "input": "kotlin", "always": true },
-        { "input": "production", "dependencies": true, "always": true },
+        "default",
+        "kotlin",
+        "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
@@ -134,9 +134,9 @@
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
-        { "input": "default", "always": true },
-        { "input": "kotlin", "always": true },
-        { "input": "production", "dependencies": true, "always": true },
+        "default",
+        "kotlin",
+        "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
@@ -166,9 +166,9 @@
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
-        { "input": "default", "always": true },
-        { "input": "kotlin", "always": true },
-        { "input": "production", "dependencies": true, "always": true },
+        "default",
+        "kotlin",
+        "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
@@ -198,9 +198,9 @@
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
-        { "input": "default", "always": true },
-        { "input": "kotlin", "always": true },
-        { "input": "production", "dependencies": true, "always": true },
+        "default",
+        "kotlin",
+        "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
