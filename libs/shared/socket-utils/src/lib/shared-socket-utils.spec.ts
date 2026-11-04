@@ -251,6 +251,25 @@ describe('shared-socket-utils', () => {
   // path and the clients did not, so a `.env`-provided NX_SOCKET_DIR moved only
   // the server and the two ends stopped finding each other.
   describe('workspace .env files', () => {
+    it('ignores dotenv socket settings when loading is disabled', async () => {
+      const workspaceRoot = makeTmpDir();
+      const socketDir = makeTmpDir('nxc-sock-');
+      const dotenvSocketDir = makeTmpDir('nxc-env-sock-');
+      writeEnvFile(workspaceRoot, `NX_SOCKET_DIR=${dotenvSocketDir}\n`);
+      const env = {
+        NX_LOAD_DOT_ENV_FILES: 'false',
+        NX_DAEMON_SOCKET_DIR: socketDir,
+      };
+
+      const socketPath = await getNxConsoleSocketPath(workspaceRoot, env);
+
+      expect(socketPath).toEqual(join(socketDir, 'nx-console.sock'));
+      expect(env).toEqual({
+        NX_LOAD_DOT_ENV_FILES: 'false',
+        NX_DAEMON_SOCKET_DIR: socketDir,
+      });
+    });
+
     it('honours NX_SOCKET_DIR from the workspace .env', async () => {
       const workspaceRoot = makeTmpDir();
       const socketDir = makeTmpDir('nxc-sock-');

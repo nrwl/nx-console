@@ -83,6 +83,33 @@ More info:
 - [Install Nx Console](https://nx.dev/docs/getting-started/editor-setup)
 - [Configure Cursor to use the nx-mcp](https://nx.dev/docs/features/enhance-ai#cursor)
 
+## Environment Files
+
+By default, Nx MCP loads `.local.env`, `.env.local`, and `.env` from the
+workspace root. To skip this loading and preserve the environment supplied by
+your launcher, set `NX_LOAD_DOT_ENV_FILES` to the string `"false"` before
+starting the server:
+
+```json
+{
+  "servers": {
+    "nx-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["nx-mcp@latest"],
+      "env": {
+        "NX_LOAD_DOT_ENV_FILES": "false"
+      }
+    }
+  }
+}
+```
+
+This also skips root dotenv loading when Nx Console resolves its IDE socket
+path. If you use a custom socket directory, supply `NX_SOCKET_DIR` explicitly
+to both the server and the editor process. The setting does not undo environment
+variables loaded by a parent process or by other tools.
+
 ## Minimal Mode (Default)
 
 By default, the Nx MCP server runs in **minimal mode**, which hides workspace analysis tools that overlap with AI tool skills/instructions. This reduces tool clutter and context window usage for AI agents that already have access to equivalent functionality through skills.
