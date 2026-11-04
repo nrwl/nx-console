@@ -54,7 +54,7 @@
   "devDependencies": {
     "@babel/core": "7.21.0",
     "@eslint/eslintrc": "3.3.5",
-    "@eslint/js": "9.39.4",
+    "@eslint/js": "9.39.5",
     "@modelcontextprotocol/inspector": "2.9.0",
     "@nx/conformance": "21.0.0-beta.0",
     "@nx/cypress": "24.0.0-rc.1",
@@ -98,7 +98,7 @@
     "cypress": "13.15.0",
     "cypress-real-events": "1.14.0",
     "esbuild": "0.19.5",
-    "eslint": "9.9.1",
+    "eslint": "9.39.5",
     "eslint-plugin-cypress": "4.2.0",
     "gradle-semantic-release-plugin": "1.10.1",
     "husky": "9.1.7",
