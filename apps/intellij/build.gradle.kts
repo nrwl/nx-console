@@ -1,3 +1,4 @@
+import groovy.json.JsonOutput
 import java.time.Duration
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
@@ -157,6 +158,42 @@ tasks.register("prepareAutomationClient") {
         classpathFile.get().writeText(automation.runtimeClasspath.asPath)
         val launcher = tasks.named<JavaExec>("runAutomation").get().javaLauncher.get()
         javaFile.get().writeText(launcher.executablePath.asFile.absolutePath)
+    }
+}
+
+tasks.register("prepareE2e") {
+    group = "verification"
+    description = "Exports the resolved automation launch configuration without starting the IDE."
+    dependsOn("prepareAutomationClient", "prepareSandbox_runAutomationIde")
+    val launchFile = layout.buildDirectory.file("e2e-launch.json")
+    outputs.file(launchFile)
+    outputs.upToDateWhen { false }
+    doLast {
+        val ide = tasks.named<RunIdeTask>("runAutomationIde").get()
+        check(!ide.splitMode.get() && !ide.composeHotReload.get())
+        // RunIdeTask applies this inside exec(), which the exporter does not invoke.
+        ide.systemProperty("idea.auto.reload.plugins", ide.autoReload.get())
+        launchFile
+            .get()
+            .asFile
+            .writeText(
+                JsonOutput.toJson(
+                    mapOf(
+                        "java" to ide.javaLauncher.get().executablePath.asFile.absolutePath,
+                        "jvmArgs" to ide.allJvmArgs,
+                        "classpath" to ide.classpath.files.map { it.absolutePath },
+                        "mainClass" to ide.mainClass.get(),
+                        "args" to
+                            (ide.args.orEmpty() +
+                                ide.argumentProviders.flatMap { it.asArguments() }),
+                        "cwd" to ide.platformPath.toFile().absolutePath,
+                        "clientClasspath" to
+                            automation.runtimeClasspath.files
+                                .filter { it.exists() }
+                                .map { it.absolutePath },
+                    )
+                )
+            )
     }
 }
 

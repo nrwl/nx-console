@@ -70,7 +70,7 @@
         ]
       },
       "parallelism": false,
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
         { "input": "default", "always": true },
         { "input": "kotlin", "always": true },
@@ -100,7 +100,7 @@
         ]
       },
       "parallelism": false,
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
         { "input": "default", "always": true },
         { "input": "kotlin", "always": true },
@@ -132,7 +132,7 @@
         ]
       },
       "parallelism": false,
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
         { "input": "default", "always": true },
         { "input": "kotlin", "always": true },
@@ -164,7 +164,7 @@
         ]
       },
       "parallelism": false,
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
         { "input": "default", "always": true },
         { "input": "kotlin", "always": true },
@@ -196,7 +196,7 @@
         ]
       },
       "parallelism": false,
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "e2e-prepare"],
       "inputs": [
         { "input": "default", "always": true },
         { "input": "kotlin", "always": true },
@@ -268,6 +268,35 @@
           ":intellij:compileKotlin",
           ":intellij:compileJava"
         ]
+      }
+    },
+    "prepareE2e": {
+      "cache": false,
+      "dependsOn": []
+    },
+    "e2e-prepare": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "dependsOn": ["^build", "^build-webview-files"],
+      "inputs": [
+        "default",
+        "kotlin",
+        "^production",
+        "{workspaceRoot}/gradle/wrapper/**/*",
+        "{workspaceRoot}/gradlew",
+        "{workspaceRoot}/gradle/libs.versions.toml",
+        {
+          "runtime": "java -version 2>&1"
+        },
+        { "env": "JAVA_HOME" }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/intellij/e2e-prepare"],
+      "options": {
+        "command": "node apps/intellij/e2e/prepare.mjs"
+      },
+      "ultracache": {
+        "mode": "warn"
       }
     }
   },

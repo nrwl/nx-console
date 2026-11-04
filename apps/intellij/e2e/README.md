@@ -1,6 +1,6 @@
 # IntelliJ E2E tests
 
-Run commands from the repository root. Each test builds this checkout, launches
+Run commands from the repository root. Nx prepares this checkout once, then each test launches
 IntelliJ in a fresh sandbox against a generated Nx workspace, records its
 scenario, and cleans up its IDE, fixture, and sandbox when finished.
 
@@ -11,7 +11,7 @@ scenario, and cleans up its IDE, fixture, and sandbox when finished.
 - A Java 21 JDK, with `JAVA_HOME` pointing to it and Java available on `PATH`.
 - Git and `ffmpeg` with the `libx264` encoder available on `PATH`.
 - An activated `idea.key` compatible with the repository's pinned IntelliJ IDEA
-  Ultimate version. The runner downloads the IDE; a separate IDE installation
+  Ultimate version. The IntelliJ Platform Gradle plugin downloads the IDE; a separate IDE installation
   is not required to run the test.
 
 Install the workspace dependencies:
@@ -82,6 +82,30 @@ CI=true NX_NO_CLOUD=true NX_DAEMON=false NX_PLUGIN_NO_TIMEOUTS=true \
 `intellij:e2e` runs all IntelliJ E2E tests. `NX_NO_CLOUD=true` keeps local runs
 off Nx Cloud while retaining Nx's local cache. The first run downloads IntelliJ,
 its plugins, and Gradle dependencies and can take several minutes.
+
+All five scenarios depend on the cacheable `intellij:e2e-prepare` target. It
+exports Gradle's resolved Java launch arguments and bundles client dependencies, agents,
+automation client dependencies and installed plugin into
+`dist/apps/intellij/e2e-prepare`. Scenarios copy the plugins to a temporary
+sandbox and launch Java directly; they do not invoke Gradle. Config, system and
+log directories are private to each run. The prepared output contains no license.
+The IDE/JBR and its coroutine agent are referenced under the workspace's
+`.intellijPlatform/`; Nx Agents install the pinned IDE during Generate workspace data.
+Byte-identical client jars from that IDE are referenced there too. Other client jars
+and the external Java agent remain bundled, so a restored output needs no Gradle user
+cache. Missing IDE installations fail with setup instructions before starting the fixture.
+Preparation uses declared source inputs (`ultracache.mode: "warn"`) so incremental
+Gradle state cannot become a learned cache input.
+
+To invoke `run.mjs` directly during development, prepare it first:
+
+```sh
+JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' yarn nx run intellij:e2e-prepare
+node apps/intellij/e2e/run.mjs
+```
+
+The manual `runAutomationIde` / `runAutomation` Gradle entry points remain
+available for interactive automation work.
 
 ## Results and recordings
 
