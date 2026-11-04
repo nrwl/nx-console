@@ -60,12 +60,21 @@
     "e2e-ci--project-view": {
       "executor": "nx:run-commands",
       "cache": true,
+      "ultracache": {
+        "ignoreReads": [
+          ".gradle/**",
+          "apps/intellij/build/**",
+          "dist/apps/intellij/classes/**",
+          "dist/apps/intellij/instrumented/**",
+          "dist/apps/intellij/kotlin/**"
+        ]
+      },
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": [
-        "default",
-        "kotlin",
-        "^production",
+        { "input": "default", "always": true },
+        { "input": "kotlin", "always": true },
+        { "input": "production", "dependencies": true, "always": true },
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_E2E_EXPECTED_PROJECT" }
@@ -81,12 +90,21 @@
     "e2e-ci--editor-features": {
       "executor": "nx:run-commands",
       "cache": true,
+      "ultracache": {
+        "ignoreReads": [
+          ".gradle/**",
+          "apps/intellij/build/**",
+          "dist/apps/intellij/classes/**",
+          "dist/apps/intellij/instrumented/**",
+          "dist/apps/intellij/kotlin/**"
+        ]
+      },
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": [
-        "default",
-        "kotlin",
-        "^production",
+        { "input": "default", "always": true },
+        { "input": "kotlin", "always": true },
+        { "input": "production", "dependencies": true, "always": true },
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
@@ -104,12 +122,21 @@
     "e2e-ci--custom-requests": {
       "executor": "nx:run-commands",
       "cache": true,
+      "ultracache": {
+        "ignoreReads": [
+          ".gradle/**",
+          "apps/intellij/build/**",
+          "dist/apps/intellij/classes/**",
+          "dist/apps/intellij/instrumented/**",
+          "dist/apps/intellij/kotlin/**"
+        ]
+      },
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": [
-        "default",
-        "kotlin",
-        "^production",
+        { "input": "default", "always": true },
+        { "input": "kotlin", "always": true },
+        { "input": "production", "dependencies": true, "always": true },
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
@@ -127,12 +154,21 @@
     "e2e-ci--lifecycle": {
       "executor": "nx:run-commands",
       "cache": true,
+      "ultracache": {
+        "ignoreReads": [
+          ".gradle/**",
+          "apps/intellij/build/**",
+          "dist/apps/intellij/classes/**",
+          "dist/apps/intellij/instrumented/**",
+          "dist/apps/intellij/kotlin/**"
+        ]
+      },
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": [
-        "default",
-        "kotlin",
-        "^production",
+        { "input": "default", "always": true },
+        { "input": "kotlin", "always": true },
+        { "input": "production", "dependencies": true, "always": true },
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
@@ -150,12 +186,21 @@
     "e2e-ci--editor-freeze": {
       "executor": "nx:run-commands",
       "cache": true,
+      "ultracache": {
+        "ignoreReads": [
+          ".gradle/**",
+          "apps/intellij/build/**",
+          "dist/apps/intellij/classes/**",
+          "dist/apps/intellij/instrumented/**",
+          "dist/apps/intellij/kotlin/**"
+        ]
+      },
       "parallelism": false,
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": [
-        "default",
-        "kotlin",
-        "^production",
+        { "input": "default", "always": true },
+        { "input": "kotlin", "always": true },
+        { "input": "production", "dependencies": true, "always": true },
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
         { "env": "NX_AUTOMATION_FAULT" }
