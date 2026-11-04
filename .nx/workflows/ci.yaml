@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://snapshot.nx.app/nx-cloud/static/schemas/workflow.schema.json
+name: Nx Cloud CI
+
+# Nx Cloud CI never runs pull requests from forks; .github/workflows/ci_checks.yml covers those.
+on:
+  pull-requests:
+    event: PR
+  master-pushes:
+    event: PUSH
+    branches: [master]
+
+launch-templates: .nx/workflows/agents.yaml
+
+env:
+  NX_CLOUD_NO_TIMEOUTS: 'true'
+  NX_PLUGIN_NO_TIMEOUTS: 'true'
+  NX_CLOUD_USE_ULTRACACHE: 'true'
+  NX_CLOUD_TASK_GRAPH_STORAGE_VERSION: '2'
+  NX_VERBOSE_LOGGING: 'true'
+  NX_BATCH_MODE: 'true'
+  GIT_AUTHOR_EMAIL: test@test.com
+  GIT_AUTHOR_NAME: Test
+  GIT_COMMITTER_EMAIL: test@test.com
+  GIT_COMMITTER_NAME: Test
+
+jobs:
+  main:
+    name: Main Linux
+    runs-on: linux-medium-plus-js
+    timeout-minutes: 60
+    env:
+      IDEA_LICENSE_BASE64: '{{ secrets.IDEA_LICENSE_BASE64 }}'
+    workers:
+      small: 3 linux-large-plus-js
+      medium: 4 linux-large-plus-js
+      large: 6 linux-large-plus-js
+      assignment-rules:
+        - projects: [intellij]
+          run-on:
+            - agent: linux-large-plus-js
+              parallelism: 1
+      # `build` is in every non-empty `nx affected` run below and in no earlier distributed command
+      # (format checks), so it marks the last distributed command.
+      stop-after: [build]
+    steps:
+      - name: Gradle Wrapper Validation
+        run: |
+          version="$(sed -n 's#^distributionUrl=.*/gradle-\(.*\)-bin\.zip$#\1#p' gradle/wrapper/gradle-wrapper.properties)"
+          expected="$(curl -fsSL "https://services.gradle.org/distributions/gradle-${version}-wrapper.jar.sha256")"
+          echo "${expected}  gradle/wrapper/gradle-wrapper.jar" | sha256sum --check
+      - name: Ensure Nx Cloud Agents are configured correctly
+        run: yarn nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
+      - name: Check formatting
+        run: yarn nx-cloud record -- yarn nx format:check --verbose
+      - name: Ensure the workspace configuration is in sync
+        run: yarn nx-cloud record -- yarn nx sync:check
+      - name: Check pinned dependency versions
+        run: yarn nx-cloud record -- node tools/scripts/check-pinned-versions.js
+      - name: Run affected tasks
+        run: yarn nx affected --targets=lint,ktfmtCheck,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
