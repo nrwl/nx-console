@@ -167,7 +167,8 @@ function nx(target, name, extraArgs = '') {
       'run',
       `intellij:${target}`,
       '--batch=false',
-      '--parallel=2',
+      // Concurrent Gradle builds in one checkout race on IntelliJ platform local artifact metadata.
+      '--parallel=1',
       `--args=--max-workers=2 --priority=low -Dorg.gradle.jvmargs=-Xmx512m -Pkotlin.daemon.jvmargs=-Xmx1g -Dorg.gradle.daemon.idletimeout=10000 ${extraArgs}`.trim(),
     ],
     name,
