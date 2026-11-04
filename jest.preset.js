@@ -13,3 +13,4 @@ module.exports = {
    */
   snapshotFormat: { escapeString: true, printBasicPrototype: true },
 };
+// Temporary: affects every project so Nx Cloud CI runs the full task pipeline.
