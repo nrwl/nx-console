@@ -24,13 +24,13 @@ class NxlsPlatformDocumentSyncTest : BasePlatformTestCase() {
         val changed = LinkedBlockingQueue<DidChangeTextDocumentParams>()
 
         override fun didOpen(params: DidOpenTextDocumentParams) {
-            sent.add("didOpen")
             opened.add(params)
+            sent.add("didOpen")
         }
 
         override fun didChange(params: DidChangeTextDocumentParams) {
-            sent.add("didChange")
             changed.add(params)
+            sent.add("didChange")
         }
 
         override fun didClose(params: DidCloseTextDocumentParams) {
