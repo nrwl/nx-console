@@ -1,5 +1,6 @@
 package dev.nx.console
 
+import com.intellij.javascript.nodejs.interpreter.NodeJsInterpreterManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
@@ -7,6 +8,7 @@ import dev.nx.console.ai.PeriodicAiCheckService
 import dev.nx.console.cloud.CIPEMonitoringService
 import dev.nx.console.ide.ProjectGraphErrorProblemProvider
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.nxls.NxlsSession
 import dev.nx.console.nxls.NxlsWorkspaceRootResolver
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryEvent
@@ -31,6 +33,11 @@ internal class ProjectPostStartup : ProjectActivity {
                 CIPEMonitoringService.getInstance(project).init()
             }
             ProjectLevelCoroutineHolderService.getInstance(project).cs.launch { service.start() }
+            NodeJsInterpreterManager.getInstance(project)
+                .addChangeListener(
+                    { NxlsSession.getInstance(project).restart() },
+                    NxlsSession.getInstance(project),
+                )
         }
 
         if (!NxConsoleSettingsProvider.getInstance().promptedForTelemetry) {

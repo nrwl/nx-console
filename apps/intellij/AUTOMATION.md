@@ -55,6 +55,10 @@ nxls requests that take no arguments to succeed.
 `ReproGraphFocusShortcutKt` right-clicks the `demo` project in the Nx Console tree,
 checks that **Nx Graph: Focus Project** carries its default shortcut and that
 choosing it focuses `demo` in the graph. It expects the e2e fixture from `e2e/run.mjs`.
+`ReproMissingNodeInterpreterKt` removes the project's Node.js interpreter, checks that the Nx
+Console tool window shows its missing-interpreter panel and that **Refresh Nx Workspace** reports
+the missing interpreter at once, then configures the interpreter again and checks that nxls restarts
+and the tree lists `demo` without a manual refresh. It expects a workspace with a `demo` project.
 
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if

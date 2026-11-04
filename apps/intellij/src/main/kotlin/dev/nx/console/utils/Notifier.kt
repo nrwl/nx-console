@@ -4,6 +4,7 @@ package dev.nx.console.utils
 import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.javascript.nodejs.settings.NodeSettingsConfigurable
 import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
@@ -107,6 +108,21 @@ class Notifier {
                 )
                 .setTitle("Nx Console")
                 //                .addAction(AnalyzeNxConfigurationFilesNotificationAction())
+                .notify(project)
+        }
+
+        fun notifyNoNodeInterpreter(project: Project) {
+            getGroup()
+                .createNotification(
+                    NxConsoleBundle.message("interpreter.not.configured"),
+                    NotificationType.ERROR,
+                )
+                .setTitle("Nx Console")
+                .addAction(
+                    NotificationAction.createSimpleExpiring("Configure Node interpreter") {
+                        NodeSettingsConfigurable.showSettingsDialog(project)
+                    }
+                )
                 .notify(project)
         }
 
