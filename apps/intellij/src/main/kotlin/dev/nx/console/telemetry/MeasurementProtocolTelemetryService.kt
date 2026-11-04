@@ -1,6 +1,6 @@
 package dev.nx.console.telemetry
 
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.cl.PluginAwareClassLoader
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.diagnostic.logger
@@ -78,8 +78,9 @@ class MeasurementProtocolService : Telemetry {
                 putJsonObject("appversion") {
                     put(
                         "value",
-                        PluginManager.getPluginByClass(TelemetryService::class.java)?.version
-                            ?: "0.0.0",
+                        (TelemetryService::class.java.classLoader as? PluginAwareClassLoader)
+                            ?.pluginDescriptor
+                            ?.version ?: "0.0.0",
                     )
                 }
             }
