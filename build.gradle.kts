@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
+
 group = "dev.nx.console"
 
 layout.buildDirectory = File("dist")
@@ -11,6 +13,11 @@ plugins {
 }
 
 allprojects {
+  tasks.withType<AbstractArchiveTask>().configureEach {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+  }
+
   repositories {
     mavenLocal()
     mavenCentral()
