@@ -33,6 +33,10 @@ jobs:
       small: 3 linux-large-plus-js
       medium: 4 linux-large-plus-js
       large: 6 linux-large-plus-js
+      # Runs tasks on the main job's medium+ machine too, leaving the rest to the main job itself.
+      main-job-worker:
+        cpu: 2
+        memory: 4GB
       # `build` is in every non-empty `nx affected` run below and in no earlier distributed command
       # (format checks), so it marks the last distributed command.
       stop-after: [build]
