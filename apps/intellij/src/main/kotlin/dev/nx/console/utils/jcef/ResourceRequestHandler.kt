@@ -1,4 +1,3 @@
-// CI measurement only: reverted in the next commit.
 package dev.nx.console.utils.jcef
 
 import com.intellij.openapi.Disposable
