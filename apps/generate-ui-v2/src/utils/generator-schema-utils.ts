@@ -77,3 +77,18 @@ export function extractItemOptions(option: Option): string[] {
 export function extractItemLabel(option: Option, itemValue: string): string {
   return option.itemTooltips?.[itemValue] ?? itemValue;
 }
+
+// characters a shell (sh, zsh, cmd, PowerShell) may interpret instead of
+// passing them through as part of the value
+const SHELL_SPECIAL_CHARS = /[\s&|;<>()?*[\]{}~#!$`'"]/;
+
+export function serializeFlag(key: string, value: unknown): string {
+  const valueString = value?.toString() ?? '';
+  if (SHELL_SPECIAL_CHARS.test(valueString)) {
+    if (valueString.includes('"')) {
+      return `--${key}='${value}'`;
+    }
+    return `--${key}="${value}"`;
+  }
+  return `--${key}=${value}`;
+}

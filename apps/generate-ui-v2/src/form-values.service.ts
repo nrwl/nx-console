@@ -6,6 +6,7 @@ import {
   debounce,
   extractDefaultValue,
   getGeneratorIdentifier,
+  serializeFlag,
 } from './utils/generator-schema-utils';
 import {
   FormValues,
@@ -190,16 +191,7 @@ export class FormValuesService {
       const defaultValue = extractDefaultValue(option);
       if (compareWithDefaultValue(value, defaultValue)) return;
 
-      const valueString = value?.toString() ?? '';
-      if (valueString.includes(' ')) {
-        if (valueString.includes('"')) {
-          args.push(`--${key}='${value}'`);
-        } else {
-          args.push(`--${key}="${value}"`);
-        }
-      } else {
-        args.push(`--${key}=${value}`);
-      }
+      args.push(serializeFlag(key, value));
     });
     return args;
   }

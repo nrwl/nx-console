@@ -5,6 +5,7 @@ import {
   extractItemOptions,
   getGeneratorIdentifier,
   getGeneratorNameTitleCase,
+  serializeFlag,
 } from './generator-schema-utils';
 import { OptionType } from '@nx-console/shared-schema';
 
@@ -204,6 +205,45 @@ describe('generator schema utils', () => {
           'f',
         ),
       ).toEqual('f');
+    });
+  });
+
+  describe('serializeFlag', () => {
+    it('should not quote plain values', () => {
+      expect(serializeFlag('name', 'my-lib')).toEqual('--name=my-lib');
+      expect(serializeFlag('directory', 'libs/my-lib')).toEqual(
+        '--directory=libs/my-lib',
+      );
+      expect(serializeFlag('tags', 'scope:shared,type:ui')).toEqual(
+        '--tags=scope:shared,type:ui',
+      );
+      expect(serializeFlag('buildable', true)).toEqual('--buildable=true');
+      expect(serializeFlag('port', 4200)).toEqual('--port=4200');
+    });
+
+    it('should double quote values with spaces', () => {
+      expect(serializeFlag('description', 'my lib')).toEqual(
+        '--description="my lib"',
+      );
+    });
+
+    it('should single quote values containing double quotes', () => {
+      expect(serializeFlag('description', 'say "hi"')).toEqual(
+        `--description='say "hi"'`,
+      );
+      expect(serializeFlag('description', 'say"hi"')).toEqual(
+        `--description='say"hi"'`,
+      );
+    });
+
+    it('should quote values with shell metacharacters but no spaces', () => {
+      expect(
+        serializeFlag('tags', 'https://example.com?node=1&p=f&m=dev'),
+      ).toEqual('--tags="https://example.com?node=1&p=f&m=dev"');
+      expect(serializeFlag('pattern', '*.ts')).toEqual('--pattern="*.ts"');
+      expect(serializeFlag('cmd', 'a|b;c')).toEqual('--cmd="a|b;c"');
+      expect(serializeFlag('cmd', '(a)<b>')).toEqual('--cmd="(a)<b>"');
+      expect(serializeFlag('name', "it's")).toEqual(`--name="it's"`);
     });
   });
 });
