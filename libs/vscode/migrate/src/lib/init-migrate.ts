@@ -8,9 +8,10 @@ import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { httpRequest } from '@nx-console/shared-utils';
 import { watchFile } from '@nx-console/vscode-utils';
-import { execSync } from 'child_process';
+import { execFile } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { promisify } from 'util';
 import { coerce } from 'semver';
 import { commands, ExtensionContext, window } from 'vscode';
 import { ActorRef, createActor } from 'xstate';
@@ -53,10 +54,21 @@ export function initMigrate(context: ExtensionContext): void {
     );
   };
   setMigrateContext();
-  const sub = actor.subscribe(() => setMigrateContext());
+  const sidebar = MigrateSidebarViewProvider.create(context, actor);
+
+  let wasUpdateAvailable = false;
+  const sub = actor.subscribe(() => {
+    setMigrateContext();
+    const isUpdateAvailable = actor.getSnapshot().matches('update-available');
+    if (isUpdateAvailable && !wasUpdateAvailable) {
+      updatePendingChanges(actor, sidebar);
+    }
+    wasUpdateAvailable = isUpdateAvailable;
+  });
   context.subscriptions.push({ dispose: () => sub.unsubscribe() });
 
   updateWorkspaceData(actor);
+  updatePendingChanges(actor, sidebar);
   context.subscriptions.push(
     getNxlsClient().onNotification(
       NxWorkspaceRefreshStartedNotification,
@@ -67,13 +79,12 @@ export function initMigrate(context: ExtensionContext): void {
     ),
     onWorkspaceRefreshed(() => {
       updateWorkspaceData(actor);
+      updatePendingChanges(actor, sidebar);
       refreshNxVersionInfo(actor);
     }),
   );
 
   refreshNxVersionInfo(actor);
-
-  MigrateSidebarViewProvider.create(context, actor);
 
   const migrateWebview = new MigrateWebview(context);
   registerCommands(context, migrateWebview);
@@ -81,6 +92,7 @@ export function initMigrate(context: ExtensionContext): void {
   context.subscriptions.push(
     commands.registerCommand('nxMigrate.refresh', () => {
       updateWorkspaceData(actor);
+      updatePendingChanges(actor, sidebar);
       refreshNxVersionInfo(actor);
     }),
     commands.registerCommand('nxMigrate.refreshWebview', () => {
@@ -92,12 +104,16 @@ export function initMigrate(context: ExtensionContext): void {
     join(getNxWorkspacePath(), 'migrations.json'),
     () => {
       updateWorkspaceData(actor);
+      updatePendingChanges(actor, sidebar);
     },
     context.subscriptions,
   );
 
   window.registerTerminalLinkProvider(new DiffEditorTerminalLinkProvider());
 }
+const execFileAsync = promisify(execFile);
+let gitStatusQueue: Promise<boolean> = Promise.resolve(false);
+
 async function updateWorkspaceData(actor: ActorRef<any, any>) {
   const nxVersion = await getNxVersion(true);
   const workspacePath = getNxWorkspacePath();
@@ -107,27 +123,45 @@ async function updateWorkspaceData(actor: ActorRef<any, any>) {
   const migrationsJsonSection =
     hasMigrationsJson && checkHasMigrationsSection(migrationsJsonPath);
 
-  let hasPendingChanges = false;
-  try {
-    hasPendingChanges =
-      execSync('git status --porcelain', {
-        cwd: workspacePath,
-      })
-        .toString()
-        .trim().length > 0;
-  } catch (e) {
-    // error, maybe we're not in a git repo
-  }
-
   actor.send({
     type: 'UPDATE_VIEW_DATA',
     value: {
       nxVersion,
       hasMigrationsJson,
       migrationsJsonSection,
-      hasPendingChanges,
     },
   });
+}
+
+async function updatePendingChanges(
+  actor: ActorRef<any, any>,
+  sidebar: MigrateSidebarViewProvider,
+) {
+  if (!sidebar.visible || !actor.getSnapshot().matches('update-available')) {
+    return;
+  }
+  const hasPendingChanges = await hasPendingGitChanges(getNxWorkspacePath());
+  actor.send({
+    type: 'UPDATE_VIEW_DATA',
+    value: { hasPendingChanges },
+  });
+}
+
+function hasPendingGitChanges(workspacePath: string): Promise<boolean> {
+  const check = gitStatusQueue.then(async () => {
+    try {
+      const { stdout } = await execFileAsync('git', ['status', '--porcelain'], {
+        cwd: workspacePath,
+        env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' },
+      });
+      return stdout.trim().length > 0;
+    } catch (e) {
+      // error, maybe we're not in a git repo
+      return false;
+    }
+  });
+  gitStatusQueue = check;
+  return check;
 }
 function checkHasMigrationsSection(
   migrationsJsonPath: string,
