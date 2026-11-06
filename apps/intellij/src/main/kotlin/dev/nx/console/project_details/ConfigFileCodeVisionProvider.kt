@@ -251,7 +251,7 @@ class ProjectLevelConfigFileCodeVisionManager(
 
     fun shouldRecomputeForEditor(editor: Editor): Boolean = true
 
-    fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?): CodeVisionPlaceholderCollector {
+    fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?): GenericPlaceholderCollector {
         return object : GenericPlaceholderCollector {
             override fun collectPlaceholders(editor: Editor): List<TextRange> {
                 return listOf(TextRange.create(0, 0))
