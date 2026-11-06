@@ -257,5 +257,15 @@ describe('generator schema utils', () => {
       expect(serializeFlag('name', 'a`whoami`')).toEqual("--name='a`whoami`'");
       expect(serializeFlag('name', 'say "$x"')).toEqual(`--name='say "$x"'`);
     });
+
+    it("should escape ' inside single quoted values", () => {
+      expect(serializeFlag('name', "it's $HOME")).toEqual(
+        `--name='it'\\''s $HOME'`,
+      );
+      expect(serializeFlag('name', `a'b"c`)).toEqual(`--name='a'\\''b"c'`);
+      expect(serializeFlag('name', "'$(whoami)'")).toEqual(
+        `--name=''\\''$(whoami)'\\'''`,
+      );
+    });
   });
 });

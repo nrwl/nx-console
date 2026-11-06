@@ -87,7 +87,8 @@ export function serializeFlag(key: string, value: unknown): string {
   if (SHELL_SPECIAL_CHARS.test(valueString)) {
     // double quotes don't stop sh/bash/zsh from expanding $ and backticks
     if (valueString.includes('"') || /[$`]/.test(valueString)) {
-      return `--${key}='${value}'`;
+      // close the quote, add an escaped ', and reopen: ' -> '\''
+      return `--${key}='${valueString.replace(/'/g, `'\\''`)}'`;
     }
     return `--${key}="${value}"`;
   }
