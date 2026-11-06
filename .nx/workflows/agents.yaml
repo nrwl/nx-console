@@ -34,14 +34,10 @@ common-init-steps: &common-init-steps
           java -version
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
-  # The project graph needs both the JDK (Gradle) and node_modules; browser downloads need neither.
-  - group-name: Prepare Workspace
-    parallel: true
-    steps:
-      - name: Generate workspace data
-        script: npx nx show projects
-      - name: Install Browsers
-        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
+  # No graph prewarm: Nx Cloud restores the workspace data (project graph and @nx/gradle report)
+  # that master last uploaded, and @nx/gradle only reruns Gradle when its build-file hash differs.
+  - name: Install Browsers
+    uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-browsers/main.yaml'
 
 launch-templates:
   linux-medium-plus-js:
