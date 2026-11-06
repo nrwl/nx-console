@@ -1,5 +1,6 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { commands } from 'vscode';
 import { initMigrate } from './init-migrate';
 
 jest.mock('child_process', () => {
@@ -76,6 +77,8 @@ const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
 describe('initMigrate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSidebar.visible = true;
+    currentState = 'update-available';
   });
 
   it('reads git status without taking the index lock', async () => {
@@ -121,5 +124,49 @@ describe('initMigrate', () => {
 
     expect(execFileAsyncMock).not.toHaveBeenCalled();
     mockSidebar.visible = true;
+  });
+  it.each(['hidden', 'no-update'])(
+    'skips a queued check when %s after enqueueing',
+    async (reason) => {
+      let finish!: (value: { stdout: string }) => void;
+      execFileAsyncMock.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          }),
+      );
+      execFileAsyncMock.mockResolvedValue({ stdout: '' });
+      initMigrate({ subscriptions: [] } as any);
+      await flushPromises();
+      const refresh = (commands.registerCommand as jest.Mock).mock.calls.find(
+        ([name]) => name === 'nxMigrate.refresh',
+      )[1];
+      refresh();
+      if (reason === 'hidden') mockSidebar.visible = false;
+      else currentState = 'default';
+      finish({ stdout: '' });
+      await flushPromises();
+      expect(execFileAsyncMock).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('allows migration after a failed git check and keeps the queue usable', async () => {
+    execFileAsyncMock.mockRejectedValueOnce(new Error('not a git repository'));
+    execFileAsyncMock.mockResolvedValue({ stdout: ' M file' });
+    initMigrate({ subscriptions: [] } as any);
+    await flushPromises();
+    expect(mockActor.send).toHaveBeenCalledWith({
+      type: 'UPDATE_VIEW_DATA',
+      value: { hasPendingChanges: false },
+    });
+    const refresh = (commands.registerCommand as jest.Mock).mock.calls.find(
+      ([name]) => name === 'nxMigrate.refresh',
+    )[1];
+    refresh();
+    await flushPromises();
+    expect(mockActor.send).toHaveBeenCalledWith({
+      type: 'UPDATE_VIEW_DATA',
+      value: { hasPendingChanges: true },
+    });
   });
 });
