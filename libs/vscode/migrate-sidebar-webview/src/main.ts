@@ -45,7 +45,7 @@ export class Root extends LitElement {
           : ''}
         <div style="display: flex; flex-direction: row; gap: 2px; width: 100%;">
           <vscode-button
-            ?disabled="${this.migrateViewData?.hasPendingChanges}"
+            ?disabled="${this.migrateViewData?.hasPendingChanges !== false}"
             @click="${() => {
               this.vscodeApi.postMessage({ type: 'start-migration' });
             }}"
@@ -58,10 +58,10 @@ export class Root extends LitElement {
             icon="edit"
             secondary
             style="padding-right: 0px; padding-left: 3px; display: flex; ${this
-              .migrateViewData?.hasPendingChanges
+              .migrateViewData?.hasPendingChanges !== false
               ? 'cursor: not-allowed;'
               : ''}"
-            ?disabled="${this.migrateViewData?.hasPendingChanges}"
+            ?disabled="${this.migrateViewData?.hasPendingChanges !== false}"
             @click="${() => {
               this.vscodeApi.postMessage({
                 type: 'start-migration',

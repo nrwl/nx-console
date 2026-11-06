@@ -67,6 +67,9 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         commands.executeCommand('nxMigrate.refresh');
       }
     });
+    if (webviewView.visible) {
+      commands.executeCommand('nxMigrate.refresh');
+    }
 
     webviewView.webview.onDidReceiveMessage((message) => {
       if (message.type === 'start-migration') {
@@ -81,6 +84,10 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         cancelMigration();
       }
     });
+  }
+
+  get visible(): boolean {
+    return !!this._view?.visible;
   }
 
   refresh() {
@@ -216,6 +223,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
         onboardingProvider,
       ),
     );
+    return onboardingProvider;
   }
 }
 
