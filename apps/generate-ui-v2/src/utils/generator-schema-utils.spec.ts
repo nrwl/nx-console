@@ -245,5 +245,17 @@ describe('generator schema utils', () => {
       expect(serializeFlag('cmd', '(a)<b>')).toEqual('--cmd="(a)<b>"');
       expect(serializeFlag('name', "it's")).toEqual(`--name="it's"`);
     });
+
+    it('should single quote values with $ or backticks', () => {
+      expect(serializeFlag('name', 'a$b')).toEqual(`--name='a$b'`);
+      expect(serializeFlag('name', 'price$HOME')).toEqual(
+        `--name='price$HOME'`,
+      );
+      expect(serializeFlag('name', 'a$(whoami)')).toEqual(
+        `--name='a$(whoami)'`,
+      );
+      expect(serializeFlag('name', 'a`whoami`')).toEqual("--name='a`whoami`'");
+      expect(serializeFlag('name', 'say "$x"')).toEqual(`--name='say "$x"'`);
+    });
   });
 });

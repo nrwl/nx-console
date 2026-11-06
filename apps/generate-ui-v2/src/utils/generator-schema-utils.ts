@@ -85,7 +85,8 @@ const SHELL_SPECIAL_CHARS = /[\s&|;<>()?*[\]{}~#!$`'"]/;
 export function serializeFlag(key: string, value: unknown): string {
   const valueString = value?.toString() ?? '';
   if (SHELL_SPECIAL_CHARS.test(valueString)) {
-    if (valueString.includes('"')) {
+    // double quotes don't stop sh/bash/zsh from expanding $ and backticks
+    if (valueString.includes('"') || /[$`]/.test(valueString)) {
       return `--${key}='${value}'`;
     }
     return `--${key}="${value}"`;
