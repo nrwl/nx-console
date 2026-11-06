@@ -191,3 +191,5 @@ describe('pdv data', () => {
     expect(e2ePdvData.errorsSerialized).toBeUndefined();
   });
 });
+
+// measurement sample: reverted before merge

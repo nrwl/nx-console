@@ -279,3 +279,5 @@ function getPluginAutocompletePosition(filePath: string): {
     pluginPropertyValue.getStart(jsonFile),
   );
 }
+
+// measurement sample: reverted before merge
