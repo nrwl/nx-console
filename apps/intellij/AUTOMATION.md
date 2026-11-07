@@ -800,3 +800,29 @@ the live IDE/server, leaving the fixture on disk intact:
 Run each negative control in a freshly launched IDE, just like positive runs.
 Omit `NX_AUTOMATION_FAULT` for normal validation. A failing control must name the
 expected assertion; an unrelated failure does not demonstrate coverage.
+
+## Nx cache and workspace-data exclusions
+
+`ReproNxFolderExclusionKt` checks `ProjectFileIndex.isExcluded` in a read action
+for `.nx/cache` and `.nx/workspace-data`. Negative controls `other/cache` and
+`other/workspace-data` must remain included in project content. It waits for the
+expected index state and writes a labeled text report alongside the recording.
+
+Use a disposable Nx workspace with installed dependencies. Before opening it in
+the automation IDE, create all four directories:
+
+```bash
+mkdir -p "$NX_AUTOMATION_PROJECT"/{.nx,other}/{cache,workspace-data}
+```
+
+Open that fixture as the IDE's project content root, then run:
+
+```bash
+NX_AUTOMATION_LABEL=nx-folder-exclusion \
+JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproNxFolderExclusionKt'
+```
+
+This scenario covers directories present before opening. It does not delete
+active Nx workspace data or assert directory creation after opening.
