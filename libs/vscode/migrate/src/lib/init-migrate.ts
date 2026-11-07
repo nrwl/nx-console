@@ -112,7 +112,7 @@ export function initMigrate(context: ExtensionContext): void {
   window.registerTerminalLinkProvider(new DiffEditorTerminalLinkProvider());
 }
 const execFileAsync = promisify(execFile);
-let gitStatusQueue: Promise<boolean> = Promise.resolve(false);
+let gitStatusQueue: Promise<void> = Promise.resolve();
 
 async function updateWorkspaceData(actor: ActorRef<any, any>) {
   const nxVersion = await getNxVersion(true);
@@ -140,28 +140,31 @@ async function updatePendingChanges(
   if (!sidebar.visible || !actor.getSnapshot().matches('update-available')) {
     return;
   }
-  const hasPendingChanges = await hasPendingGitChanges(getNxWorkspacePath());
-  actor.send({
-    type: 'UPDATE_VIEW_DATA',
-    value: { hasPendingChanges },
+  const workspacePath = getNxWorkspacePath();
+  gitStatusQueue = gitStatusQueue.then(async () => {
+    if (!sidebar.visible || !actor.getSnapshot().matches('update-available')) {
+      return;
+    }
+    const hasPendingChanges = await hasPendingGitChanges(workspacePath);
+    actor.send({
+      type: 'UPDATE_VIEW_DATA',
+      value: { hasPendingChanges },
+    });
   });
+  await gitStatusQueue;
 }
 
-function hasPendingGitChanges(workspacePath: string): Promise<boolean> {
-  const check = gitStatusQueue.then(async () => {
-    try {
-      const { stdout } = await execFileAsync('git', ['status', '--porcelain'], {
-        cwd: workspacePath,
-        env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' },
-      });
-      return stdout.trim().length > 0;
-    } catch (e) {
-      // error, maybe we're not in a git repo
-      return false;
-    }
-  });
-  gitStatusQueue = check;
-  return check;
+async function hasPendingGitChanges(workspacePath: string): Promise<boolean> {
+  try {
+    const { stdout } = await execFileAsync('git', ['status', '--porcelain'], {
+      cwd: workspacePath,
+      env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' },
+    });
+    return stdout.trim().length > 0;
+  } catch (e) {
+    // error, maybe we're not in a git repo
+    return false;
+  }
 }
 function checkHasMigrationsSection(
   migrationsJsonPath: string,
