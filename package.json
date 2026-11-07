@@ -55,7 +55,7 @@
     "@babel/core": "7.21.0",
     "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.39.5",
-    "@modelcontextprotocol/inspector": "2.9.0",
+    "@modelcontextprotocol/inspector": "2.12.0",
     "@nx/conformance": "21.0.0-beta.0",
     "@nx/cypress": "24.0.0-rc.1",
     "@nx/devkit": "24.0.0-rc.1",
