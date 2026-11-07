@@ -267,5 +267,23 @@ describe('generator schema utils', () => {
         `--name=''\\''$(whoami)'\\'''`,
       );
     });
+
+    it('should only wrap values in double quotes for argv targets', () => {
+      expect(serializeFlag('name', 'my-lib', 'argv')).toEqual('--name=my-lib');
+      expect(serializeFlag('description', 'my lib', 'argv')).toEqual(
+        '--description="my lib"',
+      );
+      expect(serializeFlag('name', 'a&b', 'argv')).toEqual('--name="a&b"');
+      expect(serializeFlag('name', 'price$5', 'argv')).toEqual(
+        '--name="price$5"',
+      );
+      expect(serializeFlag('name', "it's $HOME", 'argv')).toEqual(
+        `--name="it's $HOME"`,
+      );
+      expect(serializeFlag('name', `a'b"c`, 'argv')).toEqual(`--name="a'b"c"`);
+      expect(serializeFlag('name', "'$(whoami)'", 'argv')).toEqual(
+        `--name="'$(whoami)'"`,
+      );
+    });
   });
 });

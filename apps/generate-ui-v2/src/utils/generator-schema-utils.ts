@@ -82,9 +82,22 @@ export function extractItemLabel(option: Option, itemValue: string): string {
 // passing them through as part of the value
 const SHELL_SPECIAL_CHARS = /[\s&|;<>()?*[\]{}~#!$`'"]/;
 
-export function serializeFlag(key: string, value: unknown): string {
+// 'shell': the flag is part of a command line a shell parses (VS Code tasks, copied commands)
+// 'argv': the flag is passed to Nx as its own process argument without a shell (IntelliJ).
+// Nx's argument parser only strips one pair of matching outer quotes, so shell escapes
+// like '\'' would reach the generator literally.
+export type FlagTarget = 'shell' | 'argv';
+
+export function serializeFlag(
+  key: string,
+  value: unknown,
+  target: FlagTarget = 'shell',
+): string {
   const valueString = value?.toString() ?? '';
   if (SHELL_SPECIAL_CHARS.test(valueString)) {
+    if (target === 'argv') {
+      return `--${key}="${valueString}"`;
+    }
     // double quotes don't stop sh/bash/zsh from expanding $ and backticks
     if (valueString.includes('"') || /[$`]/.test(valueString)) {
       // close the quote, add an escaped ', and reopen: ' -> '\''
