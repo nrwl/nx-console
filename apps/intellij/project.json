@@ -62,6 +62,7 @@
       "cache": true,
       "ultracache": {
         "ignoreReads": [
+          ".intellijPlatform/**",
           ".gradle/**",
           "apps/intellij/build/**",
           "dist/apps/intellij/classes/**",
@@ -92,6 +93,7 @@
       "cache": true,
       "ultracache": {
         "ignoreReads": [
+          ".intellijPlatform/**",
           ".gradle/**",
           "apps/intellij/build/**",
           "dist/apps/intellij/classes/**",
@@ -124,6 +126,7 @@
       "cache": true,
       "ultracache": {
         "ignoreReads": [
+          ".intellijPlatform/**",
           ".gradle/**",
           "apps/intellij/build/**",
           "dist/apps/intellij/classes/**",
@@ -156,6 +159,7 @@
       "cache": true,
       "ultracache": {
         "ignoreReads": [
+          ".intellijPlatform/**",
           ".gradle/**",
           "apps/intellij/build/**",
           "dist/apps/intellij/classes/**",
@@ -188,6 +192,7 @@
       "cache": true,
       "ultracache": {
         "ignoreReads": [
+          ".intellijPlatform/**",
           ".gradle/**",
           "apps/intellij/build/**",
           "dist/apps/intellij/classes/**",
