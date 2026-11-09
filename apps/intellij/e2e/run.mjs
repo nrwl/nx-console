@@ -1,4 +1,4 @@
-import { spawn, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { once } from 'node:events';
 import { createWriteStream } from 'node:fs';
@@ -245,12 +245,49 @@ try {
       .replaceAll('@SANDBOX@', sandbox)
       .replaceAll('@PORT@', env.NX_AUTOMATION_PORT)
       .replaceAll('@RUN_ID@', runId);
-  await access(expand(launch.cwd)).catch(() => {
-    throw new Error(
-      `Prepared IntelliJ IDE is missing at ${expand(launch.cwd)}. Run npx nx run intellij:e2e-prepare or the IntelliJ Platform Gradle setup (through Nx) to install the pinned IDE.`,
+  const idePath = expand(launch.cwd);
+  const missingIde = () =>
+    new Error(
+      `Prepared IntelliJ IDE is missing at ${idePath}. Run npx nx run intellij:e2e-prepare or the IntelliJ Platform Gradle setup (through Nx) to install the pinned IDE.`,
     );
-  });
-
+  if (
+    !(await access(idePath).then(
+      () => true,
+      () => false,
+    ))
+  ) {
+    console.log('Installing the pinned IntelliJ IDE…');
+    const installStarted = Date.now();
+    const result = spawnSync(
+      'yarn',
+      [
+        'nx',
+        'run',
+        'intellij:initializeIntellijPlatformPlugin',
+        '--batch=false',
+        // The IDE is local state, so a cached task result cannot install it.
+        '--skip-nx-cache',
+        '--args=--max-workers=2 --priority=low -Dorg.gradle.jvmargs=-Xmx512m -Pkotlin.daemon.jvmargs=-Xmx1g',
+      ],
+      {
+        cwd: root,
+        stdio: 'inherit',
+        env: {
+          ...process.env,
+          JAVA_TOOL_OPTIONS: '-XX:ActiveProcessorCount=4',
+        },
+      },
+    );
+    if (result.error) throw result.error;
+    if (result.status !== 0)
+      throw new Error(`IntelliJ IDE installation exited with ${result.status}`);
+    await access(idePath).catch(() => {
+      throw missingIde();
+    });
+    console.log(
+      `Installed the pinned IntelliJ IDE in ${((Date.now() - installStarted) / 1000).toFixed(3)}s`,
+    );
+  }
   execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' });
   await mkdir(join(workspace, 'demo'), { recursive: true });
   await writeFile(

@@ -87,13 +87,15 @@ All five scenarios depend on the cacheable `intellij:e2e-prepare` target. It
 exports Gradle's resolved Java launch arguments and bundles client dependencies, agents,
 automation client dependencies and installed plugin into
 `dist/apps/intellij/e2e-prepare`. Scenarios copy the plugins to a temporary
-sandbox and launch Java directly; they do not invoke Gradle. Config, system and
+sandbox and launch Java directly. Config, system and
 log directories are private to each run. The prepared output contains no license.
 The IDE/JBR and its coroutine agent are referenced under the workspace's
-`.intellijPlatform/`; Nx Agents install the pinned IDE during Generate workspace data.
+`.intellijPlatform/`; scenarios install the pinned IDE through Nx/Gradle if it is
+missing, including when preparation is restored from cache.
 Byte-identical client jars from that IDE are referenced there too. Other client jars
 and the external Java agent remain bundled, so a restored output needs no Gradle user
-cache. Missing IDE installations fail with setup instructions before starting the fixture.
+cache when the IDE is already installed. Missing IDE installations are restored
+before starting the fixture and fail with setup instructions if still unavailable.
 Preparation uses declared source inputs (`ultracache.mode: "warn"`) so incremental
 Gradle state cannot become a learned cache input.
 
