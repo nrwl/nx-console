@@ -250,7 +250,8 @@ try {
       launch.java,
       launch.cwd,
       ...launch.jvmArgs,
-      ...launch.classpath,
+      // Java skips missing classpath directories, such as the legacy JDK lib/tools entry.
+      ...launch.classpath.filter((path) => path.endsWith('.jar')),
       ...launch.args,
       launch.clientClasspath,
     ].flatMap((value) => value.match(/@(?:ROOT|PREP)@[^:;=]*/g) ?? []),
