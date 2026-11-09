@@ -2,7 +2,7 @@ package dev.nx.console.nxls
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.javascript.nodejs.interpreter.NodeCommandLineConfigurator
+import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.javascript.nodejs.interpreter.NodeJsInterpreter
 import com.intellij.javascript.nodejs.library.yarn.pnp.YarnPnpManager
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil
@@ -30,7 +30,7 @@ class NxlsCommandLineBuilder(private val workspace: NxlsWorkspaceSnapshot) {
             workDirectory = File(workspace.basePath)
             addParameter(workspace.serverPath)
             addParameter("--stdio")
-            NodeCommandLineConfigurator.find(workspace.nodeInterpreter).configure(this)
+            NodeCommandLineUtil.configureCommandLine(this, null, workspace.nodeInterpreter) {}
         }
 }
 
