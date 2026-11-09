@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=https://snapshot.nx.app/nx-cloud/static/schemas/workflow.schema.json
 name: Nx Cloud CI
 
-# Nx Cloud CI never runs pull requests from forks: push a fork's changes to a branch here to run CI on them.
+# Pull requests from forks run too, without workspace secrets and with a read-only Nx Cloud token.
+# A fork author who isn't a contributor waits for a workspace member to approve the run in Nx Cloud.
 on:
   pull-requests:
     event: PR
