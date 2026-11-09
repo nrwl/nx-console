@@ -9,7 +9,14 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { basename, join, resolve, relative, delimiter } from 'node:path';
+import {
+  basename,
+  dirname,
+  join,
+  resolve,
+  relative,
+  delimiter,
+} from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -63,6 +70,27 @@ if (!ide.startsWith(join(root, '.intellijPlatform') + '/'))
   throw new Error(
     `Expected the pinned IDE under .intellijPlatform, got ${ide}`,
   );
+const { buildNumber, productCode, version } = JSON.parse(
+  await readFile(
+    join(
+      ide,
+      process.platform === 'darwin'
+        ? 'Resources/product-info.json'
+        : 'product-info.json',
+    ),
+    'utf8',
+  ),
+);
+const classpath = [];
+for (const path of launch.classpath) {
+  // Gradle's Java launcher can include the absent legacy JDK tools directory.
+  if (
+    path === join(dirname(dirname(launch.java)), 'lib/tools') &&
+    !(await stat(path).catch(() => false))
+  )
+    continue;
+  classpath.push(path);
+}
 const ideJars = new Map();
 async function indexJars(directory) {
   for (const entry of (await readdir(directory, { withFileTypes: true })).sort(
@@ -136,6 +164,7 @@ function relocate(value) {
   return value.replaceAll(root.replace(/\/$/, ''), '@ROOT@');
 }
 const manifest = {
+  ide: { buildNumber, productCode, version },
   java: relocate(launch.java),
   cwd: relocate(launch.cwd),
   jvmArgs: launch.jvmArgs.map((arg) => {
@@ -145,7 +174,7 @@ const manifest = {
       return '-Dnx.console.automation.runId=@RUN_ID@';
     return relocate(arg);
   }),
-  classpath: launch.classpath.map(relocate),
+  classpath: classpath.map(relocate),
   mainClass: launch.mainClass,
   args: launch.args.map(relocate),
   clientClasspath: clientClasspath.join(delimiter),

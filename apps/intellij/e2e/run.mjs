@@ -1,4 +1,4 @@
-import { spawn, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { once } from 'node:events';
 import { createWriteStream } from 'node:fs';
@@ -245,11 +245,85 @@ try {
       .replaceAll('@SANDBOX@', sandbox)
       .replaceAll('@PORT@', env.NX_AUTOMATION_PORT)
       .replaceAll('@RUN_ID@', runId);
+  const paths = new Set(
+    [
+      launch.java,
+      launch.cwd,
+      ...launch.jvmArgs,
+      // Java skips missing classpath directories, such as the legacy JDK lib/tools entry.
+      ...launch.classpath.filter((path) => path.endsWith('.jar')),
+      ...launch.args,
+      launch.clientClasspath,
+    ].flatMap((value) => value.match(/@(?:ROOT|PREP)@[^:;=]*/g) ?? []),
+  );
+  const platformPaths = [...paths].filter((path) =>
+    path.startsWith('@ROOT@/.intellijPlatform/'),
+  );
+  const missingPlatformPaths = await Promise.all(
+    platformPaths.map(async (path) =>
+      access(expand(path)).then(
+        () => false,
+        () => true,
+      ),
+    ),
+  );
+  if (missingPlatformPaths.some(Boolean)) {
+    console.log(
+      'Installing the pinned IntelliJ IDE for the prepared e2e runtime…',
+    );
+    const installed = spawnSync(
+      'yarn',
+      [
+        'nx',
+        'run',
+        'intellij:initializeIntellijPlatformPlugin',
+        '--batch=false',
+        '--parallel=1',
+        '--skip-nx-cache',
+        '--args=--max-workers=2 --priority=low -Dorg.gradle.jvmargs=-Xmx512m',
+      ],
+      {
+        cwd: root,
+        stdio: 'inherit',
+        timeout: 25 * 60_000,
+        env: { ...env, JAVA_TOOL_OPTIONS: '-XX:ActiveProcessorCount=4' },
+      },
+    );
+    if (installed.error || installed.status !== 0)
+      console.error(
+        'Could not install the pinned IntelliJ IDE through Nx/Gradle.',
+      );
+  }
   await access(expand(launch.cwd)).catch(() => {
     throw new Error(
       `Prepared IntelliJ IDE is missing at ${expand(launch.cwd)}. Run npx nx run intellij:e2e-prepare or the IntelliJ Platform Gradle setup (through Nx) to install the pinned IDE.`,
     );
   });
+  for (const path of paths) {
+    await access(expand(path)).catch(() => {
+      throw new Error(
+        `Prepared IntelliJ runtime references a missing path: ${expand(path)}. Check that the pinned IDE is installed and rerun intellij:e2e-prepare.`,
+      );
+    });
+  }
+  const ideMetadata = join(
+    expand(launch.cwd),
+    process.platform === 'darwin' ? 'Resources' : '',
+  );
+  const product = JSON.parse(
+    await readFile(join(ideMetadata, 'product-info.json'), 'utf8'),
+  );
+  const build = (await readFile(join(ideMetadata, 'build.txt'), 'utf8')).trim();
+  if (
+    !launch.ide ||
+    product.buildNumber !== launch.ide.buildNumber ||
+    product.productCode !== launch.ide.productCode ||
+    product.version !== launch.ide.version ||
+    build !== `${launch.ide.productCode}-${launch.ide.buildNumber}`
+  )
+    throw new Error(
+      `Prepared IntelliJ IDE does not match the launch manifest at ${expand(launch.cwd)}: expected ${launch.ide?.productCode}-${launch.ide?.buildNumber} (${launch.ide?.version}), found ${build} (${product.version}). Rerun intellij:e2e-prepare for the pinned IDE.`,
+    );
 
   execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' });
   await mkdir(join(workspace, 'demo'), { recursive: true });
