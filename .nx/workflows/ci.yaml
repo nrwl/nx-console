@@ -55,4 +55,4 @@ jobs:
       - name: Check pinned dependency versions
         run: yarn nx-cloud record -- node tools/scripts/check-pinned-versions.js
       - name: Run affected tasks
-        run: yarn nx run-many --targets=lint,ktfmtCheck,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3 --skip-nx-cache
+        run: yarn nx affected --targets=lint,ktfmtCheck,test,build,e2e-ci,typecheck,telemetry-check,buildPlugin --configuration=ci --exclude=nx-console --parallel=3
