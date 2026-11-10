@@ -800,3 +800,57 @@ the live IDE/server, leaving the fixture on disk intact:
 Run each negative control in a freshly launched IDE, just like positive runs.
 Omit `NX_AUTOMATION_FAULT` for normal validation. A failing control must name the
 expected assertion; an unrelated failure does not demonstrate coverage.
+
+## Nx cache and workspace-data exclusions
+
+`ReproNxFolderExclusionKt` checks `ProjectFileIndex.isExcluded` in a read action
+for `.nx/cache` and `.nx/workspace-data`. Negative controls `other/cache` and
+`other/workspace-data` must remain included in project content. It waits for the
+expected index state and writes a labeled text report alongside the recording.
+
+Use a disposable Nx workspace with installed dependencies. Before opening it in
+the automation IDE, create all four directories:
+
+```bash
+mkdir -p "$NX_AUTOMATION_PROJECT"/{.nx,other}/{cache,workspace-data}
+```
+
+Open that fixture as the IDE's project content root, then run:
+
+```bash
+NX_AUTOMATION_LABEL=nx-folder-exclusion \
+JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproNxFolderExclusionKt'
+```
+
+This scenario covers directories present before opening. It does not delete
+active Nx workspace data or assert directory creation after opening.
+
+### Generate option quoting (#3327)
+
+`ReproGenerateOptionQuotingKt` expects an opened `generate-option-quoting`
+workspace with Nx 23, its own npm lockfile and installed dependencies. Install
+`@fixture/notes-plugin` as a local file dev dependency from `tools/notes-plugin`.
+Its `note` generator has string `name` (required) and `text` options and writes
+`notes/<name>.json` using `tree.write(path, JSON.stringify({text: options.text}))`.
+Set `analytics: false` and `neverConnectToCloud: true` in `nx.json`, and launch
+with `NX_NO_CLOUD=true`.
+
+The scenario disables automatic dry runs temporarily, selects the generator via
+the real action and popup, and assigns the name/text inputs through JCEF,
+dispatching bubbling `input` events. It invokes
+`document.querySelector('[data-cy="generate-button"]').click()` in JCEF. This
+executes the Generate button's existing click handler, which calls
+`formValuesService.runGenerator()` without the dry-run argument. It waits for
+each generated file, compares its JSON with the typed string, and opens it in
+the editor for the recording. Values cover an apostrophe plus dollar sign,
+an apostrophe plus double quote, a dollar sign alone, and an ampersand.
+`<label>.txt` reports every result before the final mismatch assertion.
+
+```sh
+NX_AUTOMATION_LABEL=issue-3327-repro NX_NO_CLOUD=true NX_DAEMON=false CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproGenerateOptionQuotingKt'
+```

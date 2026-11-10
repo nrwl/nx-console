@@ -1,9 +1,11 @@
-import { spawn, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { once } from 'node:events';
 import { createWriteStream } from 'node:fs';
 import {
+  access,
   mkdir,
+  cp,
   mkdtemp,
   writeFile,
   symlink,
@@ -17,7 +19,7 @@ import {
 import { createServer, connect } from 'node:net';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { delimiter, dirname, join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 
@@ -159,22 +161,6 @@ async function wait(item, timeout) {
   }
 }
 
-function nx(target, name, extraArgs = '') {
-  return start(
-    'yarn',
-    [
-      'nx',
-      'run',
-      `intellij:${target}`,
-      '--batch=false',
-      // Concurrent Gradle builds in one checkout race on IntelliJ platform local artifact metadata.
-      '--parallel=1',
-      `--args=--max-workers=2 --priority=low -Dorg.gradle.jvmargs=-Xmx512m -Pkotlin.daemon.jvmargs=-Xmx1g -Dorg.gradle.daemon.idletimeout=10000 ${extraArgs}`.trim(),
-    ],
-    name,
-  );
-}
-
 async function waitForPort(port, ide) {
   const deadline = Date.now() + 6 * 60_000;
   while (Date.now() < deadline) {
@@ -218,7 +204,6 @@ async function stop(item, signal = 'SIGTERM') {
 }
 
 function ownedIdePids() {
-  // RunIde starts the IDE through a Gradle daemon, outside the Nx process group.
   try {
     const pids = execFileSync(
       'pgrep',
@@ -249,6 +234,97 @@ try {
     throw new Error(
       'IntelliJ e2e on Nx Agents requires IDEA_LICENSE_BASE64 or NX_INTELLIJ_LICENSE_FILE',
     );
+  const prepared = join(root, 'dist/apps/intellij/e2e-prepare');
+  const launch = JSON.parse(
+    await readFile(join(prepared, 'launch.json'), 'utf8'),
+  );
+  const expand = (value) =>
+    value
+      .replaceAll('@PREP@', prepared)
+      .replaceAll('@ROOT@', root)
+      .replaceAll('@SANDBOX@', sandbox)
+      .replaceAll('@PORT@', env.NX_AUTOMATION_PORT)
+      .replaceAll('@RUN_ID@', runId);
+  const paths = new Set(
+    [
+      launch.java,
+      launch.cwd,
+      ...launch.jvmArgs,
+      // Java skips missing classpath directories, such as the legacy JDK lib/tools entry.
+      ...launch.classpath.filter((path) => path.endsWith('.jar')),
+      ...launch.args,
+      launch.clientClasspath,
+    ].flatMap((value) => value.match(/@(?:ROOT|PREP)@[^:;=]*/g) ?? []),
+  );
+  const platformPaths = [...paths].filter((path) =>
+    path.startsWith('@ROOT@/.intellijPlatform/'),
+  );
+  const missingPlatformPaths = await Promise.all(
+    platformPaths.map(async (path) =>
+      access(expand(path)).then(
+        () => false,
+        () => true,
+      ),
+    ),
+  );
+  if (missingPlatformPaths.some(Boolean)) {
+    console.log(
+      'Installing the pinned IntelliJ IDE for the prepared e2e runtime…',
+    );
+    const installed = spawnSync(
+      'yarn',
+      [
+        'nx',
+        'run',
+        'intellij:initializeIntellijPlatformPlugin',
+        '--batch=false',
+        '--parallel=1',
+        '--skip-nx-cache',
+        '--args=--max-workers=2 --priority=low -Dorg.gradle.jvmargs=-Xmx512m',
+      ],
+      {
+        cwd: root,
+        stdio: 'inherit',
+        timeout: 25 * 60_000,
+        env: { ...env, JAVA_TOOL_OPTIONS: '-XX:ActiveProcessorCount=4' },
+      },
+    );
+    if (installed.error || installed.status !== 0)
+      console.error(
+        'Could not install the pinned IntelliJ IDE through Nx/Gradle.',
+      );
+  }
+  await access(expand(launch.cwd)).catch(() => {
+    throw new Error(
+      `Prepared IntelliJ IDE is missing at ${expand(launch.cwd)}. Run npx nx run intellij:e2e-prepare or the IntelliJ Platform Gradle setup (through Nx) to install the pinned IDE.`,
+    );
+  });
+  for (const path of paths) {
+    await access(expand(path)).catch(() => {
+      throw new Error(
+        `Prepared IntelliJ runtime references a missing path: ${expand(path)}. Check that the pinned IDE is installed and rerun intellij:e2e-prepare.`,
+      );
+    });
+  }
+  const ideMetadata = join(
+    expand(launch.cwd),
+    process.platform === 'darwin' ? 'Resources' : '',
+  );
+  const product = JSON.parse(
+    await readFile(join(ideMetadata, 'product-info.json'), 'utf8'),
+  );
+  const build = (await readFile(join(ideMetadata, 'build.txt'), 'utf8')).trim();
+  if (
+    !launch.ide ||
+    product.buildNumber !== launch.ide.buildNumber ||
+    product.productCode !== launch.ide.productCode ||
+    product.version !== launch.ide.version ||
+    build !== `${launch.ide.productCode}-${launch.ide.buildNumber}`
+  )
+    throw new Error(
+      `Prepared IntelliJ IDE does not match the launch manifest at ${expand(launch.cwd)}: expected ${launch.ide?.productCode}-${launch.ide?.buildNumber} (${launch.ide?.version}), found ${build} (${product.version}). Rerun intellij:e2e-prepare for the pinned IDE.`,
+    );
+
   execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' });
   await mkdir(join(workspace, 'demo'), { recursive: true });
   await writeFile(
@@ -375,13 +451,7 @@ try {
   env.NX_AUTOMATION_PORT = String(portServer.address().port);
   await new Promise((resolveClose) => portServer.close(resolveClose));
 
-  console.log('Building the automation client…');
-  await wait(nx('prepareAutomationClient', 'build-client'), 25 * 60_000);
-  console.log('Preparing the IDE sandbox…');
-  await wait(
-    nx('prepareSandbox_runAutomationIde', 'build-sandbox'),
-    25 * 60_000,
-  );
+  await cp(join(prepared, 'sandbox'), sandbox, { recursive: true });
 
   if (process.env.NX_INTELLIJ_LICENSE_FILE) {
     await mkdir(dirname(license), { recursive: true });
@@ -448,10 +518,24 @@ try {
   }
 
   console.log('Launching IntelliJ and waiting for its automation endpoint…');
-  const ide = nx(
-    'runAutomationIde',
+  const ideEnv = { ...env };
+  delete ideEnv.CI;
+  delete ideEnv.NX_DAEMON;
+  const ide = start(
+    expand(launch.java),
+    [
+      ...launch.jvmArgs.map(expand).filter((arg) => !arg.startsWith('-Xmx')),
+      `-Xmx${process.env.NX_AUTOMATION_IDE_HEAP ?? '2g'}`,
+      `-Dnx.console.automation.runId=${runId}`,
+      `-Dcom.sun.management.jmxremote.port=${env.NX_AUTOMATION_PORT}`,
+      `-Dcom.sun.management.jmxremote.rmi.port=${env.NX_AUTOMATION_PORT}`,
+      '-classpath',
+      launch.classpath.map(expand).join(delimiter),
+      launch.mainClass,
+      ...launch.args.map(expand).map((arg) => (arg === root ? workspace : arg)),
+    ],
     'ide',
-    `--project-cache-dir=${join(runtime, 'gradle')}`,
+    { cwd: expand(launch.cwd), env: ideEnv },
   );
   await waitForPort(Number(env.NX_AUTOMATION_PORT), ide);
   console.log(
@@ -462,14 +546,14 @@ try {
   await Promise.race([
     wait(
       start(
-        await readFile(join(runtime, 'automation-java.txt'), 'utf8'),
+        expand(launch.java),
         [
           '-Xmx512m',
           `-Dnx.console.automation.port=${env.NX_AUTOMATION_PORT}`,
           `-Dnx.console.automation.workspace=${root}`,
           `-Dnx.console.automation.output=${output}`,
           '-classpath',
-          await readFile(join(runtime, 'automation-classpath.txt'), 'utf8'),
+          expand(launch.clientClasspath),
           scenarioClass,
         ],
         'scenario',

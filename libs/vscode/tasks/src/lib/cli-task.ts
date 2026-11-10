@@ -1,7 +1,10 @@
 import { NxWorkspace } from '@nx-console/shared-types';
 import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
-import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
+import {
+  getProcessExecutionForConfig,
+  getShellExecutionForConfig,
+} from '@nx-console/vscode-utils';
 import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
 import { Task, TaskScope } from 'vscode';
@@ -50,9 +53,15 @@ export class CliTask extends Task {
       displayCommand, // name
       'nx',
       // execution
-      await getShellExecutionForConfig(
+      await (
+        definition.command === 'generate' && definition.useProcessExecution
+          ? getProcessExecutionForConfig
+          : getShellExecutionForConfig
+      )(
         {
           displayCommand,
+          nxArgs: args,
+          useLatestNxVersion: definition.useLatestNxVersion,
           cwd: definition.cwd
             ? join(workspacePath, definition.cwd)
             : workspacePath,

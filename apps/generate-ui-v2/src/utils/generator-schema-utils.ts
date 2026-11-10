@@ -77,3 +77,33 @@ export function extractItemOptions(option: Option): string[] {
 export function extractItemLabel(option: Option, itemValue: string): string {
   return option.itemTooltips?.[itemValue] ?? itemValue;
 }
+
+// characters a shell (sh, zsh, cmd, PowerShell) may interpret instead of
+// passing them through as part of the value
+const SHELL_SPECIAL_CHARS = /[\s&|;<>()?*[\]{}~#!$`'"]/;
+
+// 'shell': the flag is part of a copied command line a shell parses.
+// 'argv': the flag is passed to Nx as its own process argument without a shell.
+// Nx's argument parser only strips one pair of matching outer quotes, so shell escapes
+// like '\'' would reach the generator literally.
+export type FlagTarget = 'shell' | 'argv';
+
+export function serializeFlag(
+  key: string,
+  value: unknown,
+  target: FlagTarget = 'shell',
+): string {
+  const valueString = value?.toString() ?? '';
+  if (SHELL_SPECIAL_CHARS.test(valueString)) {
+    if (target === 'argv') {
+      return `--${key}="${valueString}"`;
+    }
+    // double quotes don't stop sh/bash/zsh from expanding $ and backticks
+    if (valueString.includes('"') || /[$`]/.test(valueString)) {
+      // close the quote, add an escaped ', and reopen: ' -> '\''
+      return `--${key}='${valueString.replace(/'/g, `'\\''`)}'`;
+    }
+    return `--${key}="${value}"`;
+  }
+  return `--${key}=${value}`;
+}

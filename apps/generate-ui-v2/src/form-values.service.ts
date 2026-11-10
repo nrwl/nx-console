@@ -5,7 +5,9 @@ import {
   compareWithDefaultValue,
   debounce,
   extractDefaultValue,
+  FlagTarget,
   getGeneratorIdentifier,
+  serializeFlag,
 } from './utils/generator-schema-utils';
 import {
   FormValues,
@@ -142,7 +144,7 @@ export class FormValuesService {
   }
 
   runGenerator(dryRun = false) {
-    const args = this.getSerializedFormValues();
+    const args = this.getSerializedFormValues('argv');
     args.push('--no-interactive');
     if (dryRun) {
       args.push('--dry-run');
@@ -164,7 +166,7 @@ export class FormValuesService {
   );
 
   copyCommandToClipboard() {
-    const args = this.getSerializedFormValues();
+    const args = this.getSerializedFormValues('shell');
     const positional = getGeneratorIdentifier(this.icc.generatorSchema);
     const command = `nx g ${positional} ${args.join(' ')}`;
     if (this.icc.editor === 'vscode') {
@@ -176,7 +178,7 @@ export class FormValuesService {
     }
   }
 
-  private getSerializedFormValues(): string[] {
+  private getSerializedFormValues(target: FlagTarget): string[] {
     const args: string[] = [];
     const formValues = {
       ...this.formValues,
@@ -190,16 +192,7 @@ export class FormValuesService {
       const defaultValue = extractDefaultValue(option);
       if (compareWithDefaultValue(value, defaultValue)) return;
 
-      const valueString = value?.toString() ?? '';
-      if (valueString.includes(' ')) {
-        if (valueString.includes('"')) {
-          args.push(`--${key}='${value}'`);
-        } else {
-          args.push(`--${key}="${value}"`);
-        }
-      } else {
-        args.push(`--${key}=${value}`);
-      }
+      args.push(serializeFlag(key, value, target));
     });
     return args;
   }

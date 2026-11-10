@@ -44,10 +44,6 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
             alternatingRowColors = false,
         )
 
-    override fun getDataForItem(element: NxGenerator, dataId: String): Any? {
-        return null
-    }
-
     override fun processSelectedItem(
         selected: NxGenerator,
         modifiers: Int,

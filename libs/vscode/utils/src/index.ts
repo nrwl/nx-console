@@ -18,3 +18,5 @@ export { getShellExecutionForConfig } from './lib/shell-execution';
 export { hasNxWorkspaceSkill } from './lib/skill-detection';
 export * from './lib/string-utils';
 export { watchFile } from './lib/watch-file';
+
+export { getProcessExecutionForConfig } from './lib/process-execution';

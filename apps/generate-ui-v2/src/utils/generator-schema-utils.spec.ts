@@ -5,6 +5,7 @@ import {
   extractItemOptions,
   getGeneratorIdentifier,
   getGeneratorNameTitleCase,
+  serializeFlag,
 } from './generator-schema-utils';
 import { OptionType } from '@nx-console/shared-schema';
 
@@ -204,6 +205,109 @@ describe('generator schema utils', () => {
           'f',
         ),
       ).toEqual('f');
+    });
+  });
+
+  describe('serializeFlag', () => {
+    it.each([
+      'normal',
+      'with spaces',
+      'say "hi"',
+      '$HOME',
+      '`touch marker`',
+      'a \\',
+      '; touch marker; #',
+      'a\nb',
+      '’hello”',
+      "a';touch marker;'",
+    ])(
+      'preserves literal argv value %j through Nx quote stripping',
+      (value) => {
+        const serialized = serializeFlag('description', value, 'argv');
+        const argumentValue = serialized.slice('--description='.length);
+        const parsed =
+          argumentValue.startsWith('"') && argumentValue.endsWith('"')
+            ? argumentValue.slice(1, -1)
+            : argumentValue;
+        expect(parsed).toBe(value);
+      },
+    );
+
+    it('should not quote plain values', () => {
+      expect(serializeFlag('name', 'my-lib')).toEqual('--name=my-lib');
+      expect(serializeFlag('directory', 'libs/my-lib')).toEqual(
+        '--directory=libs/my-lib',
+      );
+      expect(serializeFlag('tags', 'scope:shared,type:ui')).toEqual(
+        '--tags=scope:shared,type:ui',
+      );
+      expect(serializeFlag('buildable', true)).toEqual('--buildable=true');
+      expect(serializeFlag('port', 4200)).toEqual('--port=4200');
+    });
+
+    it('should double quote values with spaces', () => {
+      expect(serializeFlag('description', 'my lib')).toEqual(
+        '--description="my lib"',
+      );
+    });
+
+    it('should single quote values containing double quotes', () => {
+      expect(serializeFlag('description', 'say "hi"')).toEqual(
+        `--description='say "hi"'`,
+      );
+      expect(serializeFlag('description', 'say"hi"')).toEqual(
+        `--description='say"hi"'`,
+      );
+    });
+
+    it('should quote values with shell metacharacters but no spaces', () => {
+      expect(
+        serializeFlag('tags', 'https://example.com?node=1&p=f&m=dev'),
+      ).toEqual('--tags="https://example.com?node=1&p=f&m=dev"');
+      expect(serializeFlag('pattern', '*.ts')).toEqual('--pattern="*.ts"');
+      expect(serializeFlag('cmd', 'a|b;c')).toEqual('--cmd="a|b;c"');
+      expect(serializeFlag('cmd', '(a)<b>')).toEqual('--cmd="(a)<b>"');
+      expect(serializeFlag('name', "it's")).toEqual(`--name="it's"`);
+    });
+
+    it('should single quote values with $ or backticks', () => {
+      expect(serializeFlag('name', 'a$b')).toEqual(`--name='a$b'`);
+      expect(serializeFlag('name', 'price$HOME')).toEqual(
+        `--name='price$HOME'`,
+      );
+      expect(serializeFlag('name', 'a$(whoami)')).toEqual(
+        `--name='a$(whoami)'`,
+      );
+      expect(serializeFlag('name', 'a`whoami`')).toEqual("--name='a`whoami`'");
+      expect(serializeFlag('name', 'say "$x"')).toEqual(`--name='say "$x"'`);
+    });
+
+    it("should escape ' inside single quoted values", () => {
+      expect(serializeFlag('name', "it's $HOME")).toEqual(
+        `--name='it'\\''s $HOME'`,
+      );
+      expect(serializeFlag('name', `a'b"c`)).toEqual(`--name='a'\\''b"c'`);
+      expect(serializeFlag('name', "'$(whoami)'")).toEqual(
+        `--name=''\\''$(whoami)'\\'''`,
+      );
+    });
+
+    it('should only wrap values in double quotes for argv targets', () => {
+      expect(serializeFlag('name', 'my-lib', 'argv')).toEqual('--name=my-lib');
+      expect(serializeFlag('description', 'my lib', 'argv')).toEqual(
+        '--description="my lib"',
+      );
+      expect(serializeFlag('name', 'a&b', 'argv')).toEqual('--name="a&b"');
+      expect(serializeFlag('name', 'price$5', 'argv')).toEqual(
+        '--name="price$5"',
+      );
+      expect(serializeFlag('name', "it's $HOME", 'argv')).toEqual(
+        `--name="it's $HOME"`,
+      );
+      expect(serializeFlag('name', `a'b"c`, 'argv')).toEqual(`--name="a'b"c"`);
+      expect(serializeFlag('name', "'$(whoami)'", 'argv')).toEqual(
+        `--name="'$(whoami)'"`,
+      );
     });
   });
 });

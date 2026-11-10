@@ -1,7 +1,7 @@
 package dev.nx.console.ide
 
 import com.intellij.javascript.library.exclude.JsExcludeContributor
-import com.intellij.javascript.library.exclude.JsExcludeManager
+import com.intellij.javascript.library.exclude.JsFileIndexExcludeManager
 import com.intellij.javascript.nodejs.library.ScanningFileListener
 import com.intellij.javascript.nodejs.library.ScanningFileListenerContributor
 import com.intellij.openapi.project.Project
@@ -21,7 +21,7 @@ internal class NxCacheFolderExcludeContributor : JsExcludeContributor() {
             object : ScanningFileListener {
                 override fun fileFound(project: Project, file: VirtualFile) {
                     if (file.parent.name == ".nx") {
-                        JsExcludeManager.getInstance(project).exclude(listOf(file))
+                        JsFileIndexExcludeManager.getInstance(project).exclude(listOf(file))
                     }
                 }
             },

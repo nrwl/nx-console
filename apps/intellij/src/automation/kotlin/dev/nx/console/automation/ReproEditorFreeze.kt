@@ -143,7 +143,27 @@ fun main() = withAutomationDriver {
                         checkNotNull(service<NxlsDocuments>().getFile(it.getDocument()))
                     }
                 invokeAction("CloseAllEditors", component = frame)
-                nxlsWait(message = { "Platform LSP still tracks closed documents" }) {
+                nxlsWait(
+                    message = {
+                        withContext(OnDispatcher.EDT) {
+                            val editors = service<NxlsEditors>(project)
+                            val documents = service<NxlsDocuments>()
+                            val sync =
+                                nxlsPlatformClient(project)
+                                    .`getDocumentSyncManager$intellij_platform_lsp_impl`()
+                            val states =
+                                originals.keys.joinToString("; ") {
+                                    val document = it.getDocument()
+                                    val file = checkNotNull(documents.getFile(document))
+                                    "${file.getPath()}: isFileOpen=${editors.isFileOpen(file)}, " +
+                                        "isDocumentUnsaved=${documents.isDocumentUnsaved(document)}, " +
+                                        "isFileOpened=${sync.isFileOpened(file)}"
+                                }
+                            "Platform LSP still tracks closed documents: $states; " +
+                                "openEditors=${editors.getOpenFiles().map { it.getPath() }}"
+                        }
+                    }
+                ) {
                     files.none {
                         nxlsPlatformClient(project)
                             .`getDocumentSyncManager$intellij_platform_lsp_impl`()

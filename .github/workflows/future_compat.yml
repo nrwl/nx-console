@@ -13,6 +13,8 @@ env:
 jobs:
   main-linux:
     name: Main Linux
+    # Forks that enable Actions would otherwise run this nightly and report into this repo's Nx Cloud workspace.
+    if: github.repository == 'nrwl/nx-console'
     runs-on: ubuntu-latest
     env:
       NX_CI_EXECUTION_ENV: 'linux'
@@ -45,6 +47,7 @@ jobs:
 
   main-windows:
     name: Main Windows
+    if: github.repository == 'nrwl/nx-console'
     runs-on: windows-latest
     env:
       GIT_AUTHOR_EMAIL: test@test.com

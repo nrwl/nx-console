@@ -4,5 +4,6 @@ export interface CliTaskDefinition {
   flags: Array<string>;
   cwd?: string;
   env?: { [key: string]: string };
+  useProcessExecution?: boolean;
   useLatestNxVersion?: boolean;
 }
