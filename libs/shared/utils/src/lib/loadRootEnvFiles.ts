@@ -15,6 +15,9 @@ export function loadRootEnvFiles(
   let expandedEnv: NodeJS.ProcessEnv = {
     ...targetEnv,
   };
+  if (targetEnv.NX_LOAD_DOT_ENV_FILES === 'false') {
+    return expandedEnv;
+  }
   for (const file of ['.local.env', '.env.local', '.env']) {
     const myEnv = loadDotEnvFile({
       path: join(workspacePath, file),
