@@ -209,6 +209,30 @@ describe('generator schema utils', () => {
   });
 
   describe('serializeFlag', () => {
+    it.each([
+      'normal',
+      'with spaces',
+      'say "hi"',
+      '$HOME',
+      '`touch marker`',
+      'a \\',
+      '; touch marker; #',
+      'a\nb',
+      '’hello”',
+      "a';touch marker;'",
+    ])(
+      'preserves literal argv value %j through Nx quote stripping',
+      (value) => {
+        const serialized = serializeFlag('description', value, 'argv');
+        const argumentValue = serialized.slice('--description='.length);
+        const parsed =
+          argumentValue.startsWith('"') && argumentValue.endsWith('"')
+            ? argumentValue.slice(1, -1)
+            : argumentValue;
+        expect(parsed).toBe(value);
+      },
+    );
+
     it('should not quote plain values', () => {
       expect(serializeFlag('name', 'my-lib')).toEqual('--name=my-lib');
       expect(serializeFlag('directory', 'libs/my-lib')).toEqual(

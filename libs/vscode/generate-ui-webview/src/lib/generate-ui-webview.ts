@@ -169,6 +169,7 @@ export class GenerateUiWebview {
         CliTaskProvider.instance.executeTask({
           command: 'generate',
           ...message.payload,
+          useProcessExecution: true,
         });
         break;
       }

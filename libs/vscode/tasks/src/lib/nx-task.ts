@@ -1,7 +1,10 @@
 import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
 
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
-import { getShellExecutionForConfig } from '@nx-console/vscode-utils';
+import {
+  getProcessExecutionForConfig,
+  getShellExecutionForConfig,
+} from '@nx-console/vscode-utils';
 import { join } from 'path';
 import { Task, TaskScope } from 'vscode';
 
@@ -10,6 +13,8 @@ export interface NxTaskDefinition {
   command: string;
   flags: Array<string>;
   cwd?: string;
+  useProcessExecution?: boolean;
+  env?: { [key: string]: string };
   useLatestVersion?: boolean;
 }
 
@@ -39,7 +44,14 @@ export class NxTask extends Task {
       displayCommand, // name
       'nx', // source
       // execution
-      await getShellExecutionForConfig({
+      await (
+        definition.useProcessExecution
+          ? getProcessExecutionForConfig
+          : getShellExecutionForConfig
+      )({
+        nxArgs: args,
+        useLatestNxVersion: definition.useLatestVersion,
+        env: definition.env,
         displayCommand,
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         encapsulatedNx: isEncapsulatedNx,
