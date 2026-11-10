@@ -62,6 +62,7 @@ export class CliTaskProvider implements TaskProvider {
       const cliTask = await CliTask.create({
         command: task.definition.command,
         positional: task.definition.positional,
+        useProcessExecution: task.definition.useProcessExecution,
         flags: Array.isArray(task.definition.flags)
           ? task.definition.flags
           : [],
@@ -94,6 +95,9 @@ export class CliTaskProvider implements TaskProvider {
           positional: positionals[2],
           flags: definition.flags,
           cwd: definition.cwd,
+          useProcessExecution: definition.useProcessExecution,
+          useLatestVersion: definition.useLatestNxVersion,
+          env: definition.env,
         });
       } else {
         task = await CliTask.create(definition);

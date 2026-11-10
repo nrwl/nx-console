@@ -144,9 +144,7 @@ export class FormValuesService {
   }
 
   runGenerator(dryRun = false) {
-    const args = this.getSerializedFormValues(
-      this.icc.editor === 'intellij' ? 'argv' : 'shell',
-    );
+    const args = this.getSerializedFormValues('argv');
     args.push('--no-interactive');
     if (dryRun) {
       args.push('--dry-run');

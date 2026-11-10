@@ -247,6 +247,59 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
         },
       }),
   },
+  'generator-no-shell': {
+    description:
+      'An @nx/js library generator workspace for literal process arguments.',
+    settings: {
+      'nxConsole.enableTaskExecutionDryRunOnChange': false,
+      'terminal.integrated.defaultProfile.linux': 'bash',
+      'terminal.integrated.profiles.linux': { bash: { path: '/bin/bash' } },
+    },
+    create: (path) => {
+      const devDependencies = Object.fromEntries(
+        ['nx', '@nx/js', '@nx/workspace', 'typescript'].map((name) => [
+          name,
+          require(`${name}/package.json`).version,
+        ]),
+      );
+      writeWorkspace(path, {
+        projects: { seed: { name: 'seed' } },
+        nxJson: {
+          generators: {
+            '@nx/js:library': {
+              bundler: 'none',
+              linter: 'none',
+              formatter: 'none',
+              unitTestRunner: 'none',
+              skipFormat: true,
+              skipPackageJson: true,
+              useProjectJson: true,
+            },
+          },
+        },
+        files: {
+          'package.json': JSON.stringify({
+            name: 'quoting-fixture',
+            private: true,
+            devDependencies,
+          }),
+          'package-lock.json': JSON.stringify({
+            name: 'quoting-fixture',
+            lockfileVersion: 3,
+            packages: { '': { devDependencies } },
+          }),
+          'tsconfig.base.json': JSON.stringify({
+            compilerOptions: {
+              paths: {},
+              target: 'es2022',
+              module: 'commonjs',
+              moduleResolution: 'node',
+            },
+          }),
+        },
+      });
+    },
+  },
   'self-healing': {
     description: `One project, \`demo\`, in a workspace connected to Nx Cloud as \`${selfHealingCloudId}\` so self-healing links for it reach Nx Console's URI handler.`,
     create: (path) =>

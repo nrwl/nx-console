@@ -82,8 +82,8 @@ export function extractItemLabel(option: Option, itemValue: string): string {
 // passing them through as part of the value
 const SHELL_SPECIAL_CHARS = /[\s&|;<>()?*[\]{}~#!$`'"]/;
 
-// 'shell': the flag is part of a command line a shell parses (VS Code tasks, copied commands)
-// 'argv': the flag is passed to Nx as its own process argument without a shell (IntelliJ).
+// 'shell': the flag is part of a copied command line a shell parses.
+// 'argv': the flag is passed to Nx as its own process argument without a shell.
 // Nx's argument parser only strips one pair of matching outer quotes, so shell escapes
 // like '\'' would reach the generator literally.
 export type FlagTarget = 'shell' | 'argv';
