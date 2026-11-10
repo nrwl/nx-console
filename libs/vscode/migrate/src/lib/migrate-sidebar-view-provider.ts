@@ -11,7 +11,7 @@ import {
   WebviewViewResolveContext,
   window,
 } from 'vscode';
-import { ActorRef, EventObject } from 'xstate';
+import { ActorRef } from 'xstate';
 import { startMigration } from './commands/start-migration';
 import { viewPackageJsonDiff } from './git-extension/view-diff';
 import {
@@ -33,7 +33,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
   constructor(
     private extensionContext: ExtensionContext,
-    private actor: ActorRef<any, EventObject>,
+    private actor: ActorRef<any, any>,
   ) {
     this._webviewSourceUri = Uri.joinPath(
       this.extensionContext.extensionUri,
@@ -231,7 +231,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     }
   }
 
-  static create(context: ExtensionContext, actor: ActorRef<any, EventObject>) {
+  static create(context: ExtensionContext, actor: ActorRef<any, any>) {
     const onboardingProvider = new MigrateSidebarViewProvider(context, actor);
     context.subscriptions.push(
       window.registerWebviewViewProvider(
