@@ -145,7 +145,11 @@ async function updatePendingChanges(
     if (!sidebar.visible || !actor.getSnapshot().matches('update-available')) {
       return;
     }
+    const shownCount = sidebar.shownCount;
     const hasPendingChanges = await hasPendingGitChanges(workspacePath);
+    if (sidebar.shownCount !== shownCount) {
+      return;
+    }
     actor.send({
       type: 'UPDATE_VIEW_DATA',
       value: { hasPendingChanges },

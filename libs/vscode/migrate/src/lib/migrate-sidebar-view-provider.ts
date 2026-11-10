@@ -29,6 +29,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
   private _webviewSourceUri: Uri;
   private _refreshSubscription: Disposable | undefined;
   private _migrateViewData: MigrateViewData | undefined;
+  private _shownCount = 0;
 
   constructor(
     private extensionContext: ExtensionContext,
@@ -64,11 +65,11 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     webviewView.onDidChangeVisibility((event) => {
       vscodeLogger.log('onDidChangeVisibility');
       if (webviewView.visible) {
-        commands.executeCommand('nxMigrate.refresh');
+        this.onShown();
       }
     });
     if (webviewView.visible) {
-      commands.executeCommand('nxMigrate.refresh');
+      this.onShown();
     }
 
     webviewView.webview.onDidReceiveMessage((message) => {
@@ -88,6 +89,21 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
 
   get visible(): boolean {
     return !!this._view?.visible;
+  }
+
+  get shownCount(): number {
+    return this._shownCount;
+  }
+
+  // The workspace may have changed while the sidebar was hidden, so the last
+  // git status result can't be trusted until the refresh below re-checks it.
+  private onShown() {
+    this._shownCount++;
+    this.actor.send({
+      type: 'UPDATE_VIEW_DATA',
+      value: { hasPendingChanges: undefined },
+    });
+    commands.executeCommand('nxMigrate.refresh');
   }
 
   refresh() {

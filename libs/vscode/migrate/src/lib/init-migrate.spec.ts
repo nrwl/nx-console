@@ -64,7 +64,7 @@ jest.mock('./migrate-webview', () => ({
 }));
 
 let currentState = 'update-available';
-const mockSidebar = { visible: true };
+const mockSidebar = { visible: true, shownCount: 0 };
 const mockActor = {
   start: jest.fn(),
   getSnapshot: () => ({ matches: (state: string) => state === currentState }),
@@ -78,6 +78,7 @@ describe('initMigrate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSidebar.visible = true;
+    mockSidebar.shownCount = 0;
     currentState = 'update-available';
   });
 
@@ -149,6 +150,26 @@ describe('initMigrate', () => {
       expect(execFileAsyncMock).toHaveBeenCalledTimes(1);
     },
   );
+
+  it('drops a result that finishes after the sidebar was shown again', async () => {
+    let finish!: (value: { stdout: string }) => void;
+    execFileAsyncMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    initMigrate({ subscriptions: [] } as any);
+    await flushPromises();
+    mockSidebar.shownCount++;
+    finish({ stdout: '' });
+    await flushPromises();
+    expect(mockActor.send).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        value: expect.objectContaining({ hasPendingChanges: false }),
+      }),
+    );
+  });
 
   it('allows migration after a failed git check and keeps the queue usable', async () => {
     execFileAsyncMock.mockRejectedValueOnce(new Error('not a git repository'));
