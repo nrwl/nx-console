@@ -44,9 +44,10 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             return
         }
 
-        // For success notifications, only show if settings allow
+        // For success and canceled notifications, only show if settings allow
         if (
-            event is CIPENotificationEvent.CIPESucceeded &&
+            (event is CIPENotificationEvent.CIPESucceeded ||
+                event is CIPENotificationEvent.CIPECanceled) &&
                 notificationSetting != NxCloudNotificationsLevel.ALL
         ) {
             return
@@ -62,6 +63,9 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
             }
             is CIPENotificationEvent.CIPESucceeded -> {
                 showCIPESucceededNotification(event.cipe)
+            }
+            is CIPENotificationEvent.CIPECanceled -> {
+                showCIPECanceledNotification(event.cipe)
             }
             is CIPENotificationEvent.AiFixAvailable -> {
                 showAiFixNotification(event.cipe, event.runGroup)
@@ -98,6 +102,15 @@ class CIPENotificationService(private val project: Project, private val cs: Coro
     private fun showCIPESucceededNotification(cipe: CIPEInfo) {
         showNotification(
             content = "CI succeeded for #${cipe.branch}.",
+            type = NotificationType.INFORMATION,
+            cipe = cipe,
+            commitUrl = cipe.commitUrl,
+        )
+    }
+
+    private fun showCIPECanceledNotification(cipe: CIPEInfo) {
+        showNotification(
+            content = "CI was canceled for #${cipe.branch}.",
             type = NotificationType.INFORMATION,
             cipe = cipe,
             commitUrl = cipe.commitUrl,
@@ -314,6 +327,8 @@ sealed class CIPENotificationEvent {
     data class RunFailed(override val cipe: CIPEInfo, val run: CIPERun) : CIPENotificationEvent()
 
     data class CIPESucceeded(override val cipe: CIPEInfo) : CIPENotificationEvent()
+
+    data class CIPECanceled(override val cipe: CIPEInfo) : CIPENotificationEvent()
 
     data class AiFixAvailable(override val cipe: CIPEInfo, val runGroup: CIPERunGroup) :
         CIPENotificationEvent()
