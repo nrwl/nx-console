@@ -49,11 +49,6 @@ internal class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
         return
     }
 
-    override fun shouldRecomputeForEditor(editor: Editor, uiData: Unit?): Boolean =
-        editor.project?.let {
-            ProjectLevelConfigFileCodeVisionManager.getInstance(it).shouldRecomputeForEditor(editor)
-        } ?: true
-
     override fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?) =
         editor.project?.let {
             ProjectLevelConfigFileCodeVisionManager.getInstance(it)
@@ -62,7 +57,6 @@ internal class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
 
     override val defaultAnchor = CodeVisionAnchorKind.Default
     override val id = ID
-    override val groupId = ID
     override val name = "Nx Config Files"
     override val relativeOrderings: List<CodeVisionRelativeOrdering> = emptyList()
 }
@@ -248,8 +242,6 @@ class ProjectLevelConfigFileCodeVisionManager(
                 )
             } ?: return CodeVisionState.READY_EMPTY
     }
-
-    fun shouldRecomputeForEditor(editor: Editor): Boolean = true
 
     fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?): GenericPlaceholderCollector {
         return object : GenericPlaceholderCollector {
