@@ -1,0 +1,13 @@
+<idea-plugin>
+  <actions>
+    <group id="dev.nx.console.rider.ProjectActions">
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="before" relative-to-action="Refactorings.QuickListPopupAction"/>
+      <reference ref="dev.nx.console.generate.actions.NxGenerateUiAction"/>
+      <reference ref="dev.nx.console.run.actions.NxRunTargetAction"/>
+      <reference ref="dev.nx.console.ide.ShowNxProjectConfigurationAction"/>
+      <reference ref="dev.nx.console.generate.actions.NxMoveProjectAction"/>
+      <reference ref="dev.nx.console.generate.actions.NxRemoveProjectAction"/>
+      <separator/>
+    </group>
+  </actions>
+</idea-plugin>

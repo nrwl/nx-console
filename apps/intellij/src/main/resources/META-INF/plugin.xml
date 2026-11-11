@@ -19,6 +19,7 @@
 
   <depends>JavaScript</depends>
   <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>
+  <depends optional="true" config-file="nx-console-rider.xml">com.intellij.modules.rider</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
