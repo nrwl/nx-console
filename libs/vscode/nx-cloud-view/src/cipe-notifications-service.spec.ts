@@ -511,12 +511,14 @@ describe('CIPE Notifications', () => {
           branch: 'feature',
           status: 'IN_PROGRESS',
           createdAt: tenMinutesAgo,
+          completedAt: null,
           commitTitle: 'fix: fix fix',
           commitUrl: 'https://github.com/commit/123',
           cipeUrl: 'https://cloud.nx.app/cipes/123',
           runGroups: [
             {
               createdAt: tenMinutesAgo,
+              completedAt: null,
               runGroup: 'rungroup-123123',
               ciExecutionEnv: '123123',
               status: 'IN_PROGRESS',
