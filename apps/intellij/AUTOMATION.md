@@ -801,6 +801,22 @@ Run each negative control in a freshly launched IDE, just like positive runs.
 Omit `NX_AUTOMATION_FAULT` for normal validation. A failing control must name the
 expected assertion; an unrelated failure does not demonstrate coverage.
 
+## Rider project context menus (#2169)
+
+`ReproIssue2169Kt` opens the `demo` project node's real context menu and checks
+that Generate UI, Run Target, Show Project Configuration, Move Nx Project, and
+Remove Nx Project each appear once, enabled and visible. It invokes Show Project
+Configuration through the menu and requires `demo/project.json` to open.
+The scenario uses AWT events and SDK menu invocation, without native input.
+
+Launch Rider with `-PautomationIdePath=/absolute/path/to/Rider` and a separate
+`NX_AUTOMATION_SANDBOX`. Pass the fixture's `.sln` file as `automationProject` to
+avoid Rider's solution-selection dialog. The fixture needs an installed Nx
+workspace, a `demo/project.json`, and a solution containing a project in `demo`.
+Run `dev.nx.console.automation.ReproIssue2169Kt` with `NX_RIDER_VIEW=SolutionExplorer`
+or `NX_RIDER_VIEW=FileSystemExplorer`. Set `NX_AUTOMATION_LABEL` separately for
+each view and baseline/fixed run. Popup captures are listed in the text report.
+
 ## Nx cache and workspace-data exclusions
 
 `ReproNxFolderExclusionKt` checks `ProjectFileIndex.isExcluded` in a read action
