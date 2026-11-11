@@ -72,6 +72,9 @@ describe('CIPE Notifications', () => {
     type PipelineExamples =
       | 'success'
       | 'fail'
+      | 'canceled'
+      | 'canceledWithAiFixesEnabled'
+      | 'progressCanceledRun'
       | 'progress'
       | 'progressFailedRun'
       | 'empty'
@@ -443,6 +446,92 @@ describe('CIPE Notifications', () => {
           cipeUrl: 'https://cloud.nx.app/cipes/123',
         },
       ],
+      canceled: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'CANCELED',
+          createdAt: tenMinutesAgo,
+          completedAt: oneMinuteAgo,
+          commitTitle: 'fix: fix fix',
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+          runGroups: [
+            {
+              createdAt: tenMinutesAgo,
+              completedAt: oneMinuteAgo,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'CANCELED',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'CANCELED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      canceledWithAiFixesEnabled: [
+        {
+          ciPipelineExecutionId: '1',
+          aiFixesEnabled: true,
+          branch: 'feature',
+          status: 'CANCELED',
+          createdAt: tenMinutesAgo,
+          completedAt: oneMinuteAgo,
+          commitTitle: 'fix: fix fix',
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+          runGroups: [
+            {
+              createdAt: tenMinutesAgo,
+              completedAt: oneMinuteAgo,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'CANCELED',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'CANCELED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      progressCanceledRun: [
+        {
+          ciPipelineExecutionId: '1',
+          branch: 'feature',
+          status: 'IN_PROGRESS',
+          createdAt: tenMinutesAgo,
+          commitTitle: 'fix: fix fix',
+          commitUrl: 'https://github.com/commit/123',
+          cipeUrl: 'https://cloud.nx.app/cipes/123',
+          runGroups: [
+            {
+              createdAt: tenMinutesAgo,
+              runGroup: 'rungroup-123123',
+              ciExecutionEnv: '123123',
+              status: 'IN_PROGRESS',
+              runs: [
+                {
+                  linkId: '123123',
+                  status: 'CANCELED',
+                  command: 'nx test',
+                  runUrl: 'http://test.url',
+                },
+              ],
+            },
+          ],
+        },
+      ],
       successWithAiFixesEnabled: [
         {
           ciPipelineExecutionId: '1',
@@ -586,6 +675,15 @@ describe('CIPE Notifications', () => {
       ],
       ['progressFailedRunWithAiFixesEnabled', 'failWithAiFix', 'error'],
       ['successWithAiFixesEnabled', 'success', 'no'], // Success should've shown notification right away
+
+      /* A canceled CIPE is reported as canceled, never as failed */
+      ['empty', 'canceled', 'info'],
+      ['progress', 'canceled', 'info'],
+      ['progress', 'canceledWithAiFixesEnabled', 'info'],
+      ['progress', 'progressCanceledRun', 'no'],
+      ['progressCanceledRun', 'canceled', 'info'],
+      ['progressFailedRun', 'canceled', 'no'],
+      ['canceled', 'canceled', 'no'],
     ] as const;
 
     test.each(cases)(
@@ -614,6 +712,30 @@ describe('CIPE Notifications', () => {
         }
       },
     );
+
+    it('should say that a canceled CIPE was canceled', () => {
+      const notificationService = new CIPENotificationService();
+      notificationService.compareCIPEDataAndSendNotifications(
+        pipelineExamples.progress,
+        pipelineExamples.canceled,
+      );
+      expect(window.showInformationMessage).toHaveBeenCalledWith(
+        'CI was canceled for #feature.',
+        'View Commit',
+        'View Results',
+      );
+    });
+
+    it('should not show canceled notifications when setting is "errors"', () => {
+      const notificationService = new CIPENotificationService();
+      globalConfigMock.mockReturnValue('errors');
+      notificationService.compareCIPEDataAndSendNotifications(
+        pipelineExamples.progress,
+        pipelineExamples.canceled,
+      );
+      expect(window.showInformationMessage).not.toHaveBeenCalled();
+      expect(window.showErrorMessage).not.toHaveBeenCalled();
+    });
 
     it('should not show success notifications when setting is "error"', () => {
       const notificationService = new CIPENotificationService();

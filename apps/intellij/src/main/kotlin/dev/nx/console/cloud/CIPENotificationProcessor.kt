@@ -75,6 +75,11 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
                 return@forEach
             }
 
+            if (newCIPE.status == CIPEExecutionStatus.CANCELED) {
+                emitNotification(CIPENotificationEvent.CIPECanceled(newCIPE))
+                return@forEach
+            }
+
             // Should we wait for AI fix?
             val shouldWaitForAiFix =
                 newCIPE.aiFixesEnabled == true && !hasPassedAiFixWaitTime(newCIPE)
@@ -196,8 +201,8 @@ class CIPENotificationProcessor(private val project: Project) : Disposable, CIPE
     }
 
     private fun isRunFailed(run: CIPERun): Boolean {
-        return (run.status?.isFailedStatus() == true) ||
-            (run.numFailedTasks?.let { it > 0 } == true)
+        return (run.status != CIPEExecutionStatus.CANCELED &&
+            run.status?.isFailedStatus() == true) || (run.numFailedTasks?.let { it > 0 } == true)
     }
 
     private fun hasAnyFailedRun(cipe: CIPEInfo): Boolean {

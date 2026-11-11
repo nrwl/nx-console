@@ -90,6 +90,74 @@ class CIPENotificationProcessorTest : BasePlatformTestCase() {
         assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPEFailed)
     }
 
+    fun testCanceledNotification() {
+        // Progress -> Canceled should show a canceled notification, not a failure
+        val progressCIPE = createProgressCIPE()
+        val canceledCIPE =
+            progressCIPE.copy(
+                status = CIPEExecutionStatus.CANCELED,
+                completedAt = System.currentTimeMillis(),
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(canceledCIPE)),
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPECanceled)
+    }
+
+    fun testCanceledNotificationWithAiFixesEnabled() {
+        // A canceled CIPE has no AI fix to wait for
+        val progressCIPE = createProgressCIPE().copy(aiFixesEnabled = true)
+        val canceledCIPE =
+            progressCIPE.copy(
+                status = CIPEExecutionStatus.CANCELED,
+                completedAt = System.currentTimeMillis(),
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(canceledCIPE)),
+            )
+
+        processor.onDataChanged(event)
+
+        assertEquals(1, mockListener.events.size)
+        assertTrue(mockListener.events[0] is CIPENotificationEvent.CIPECanceled)
+    }
+
+    fun testNoRunFailureNotificationForCanceledRun() {
+        // A canceled run in a CIPE that is still in progress is not a failed run
+        val progressCIPE = createProgressCIPE()
+        val failedRunCIPE = createProgressWithFailedRun()
+        val canceledRunCIPE =
+            failedRunCIPE.copy(
+                runGroups =
+                    failedRunCIPE.runGroups.map { runGroup ->
+                        runGroup.copy(
+                            runs =
+                                runGroup.runs.map { it.copy(status = CIPEExecutionStatus.CANCELED) }
+                        )
+                    }
+            )
+
+        val event =
+            CIPEDataChangedEvent(
+                oldData = CIPEDataResponse(info = listOf(progressCIPE)),
+                newData = CIPEDataResponse(info = listOf(canceledRunCIPE)),
+            )
+
+        processor.onDataChanged(event)
+
+        assertTrue(mockListener.events.isEmpty())
+    }
+
     fun testRunFailureNotificationWithoutAiFix() {
         // Progress with failed run (without AI fix) should show error notification
         val progressCIPE = createProgressCIPE()

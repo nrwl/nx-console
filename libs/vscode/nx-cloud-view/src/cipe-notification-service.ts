@@ -74,6 +74,13 @@ export class CIPENotificationService {
       return;
     }
 
+    if (newCIPE.status === 'CANCELED') {
+      if (this.nxCloudNotificationsSetting === 'all') {
+        this.showCIPECanceledNotification(newCIPE);
+      }
+      return;
+    }
+
     const shouldWaitForAiFix =
       newCIPE.aiFixesEnabled && !hasPassedAiFixWaitTime(newCIPE);
 
@@ -156,6 +163,19 @@ export class CIPENotificationService {
       cipe.cipeUrl,
       cipe.commitUrl,
       'error',
+    );
+  }
+
+  private showCIPECanceledNotification(cipe: CIPEInfo) {
+    if (this.sentNotifications.has(cipe.ciPipelineExecutionId)) {
+      return;
+    }
+    this.sentNotifications.add(cipe.ciPipelineExecutionId);
+    showMessageWithResultAndCommit(
+      `CI was canceled for #${cipe.branch}.`,
+      cipe.cipeUrl,
+      cipe.commitUrl,
+      'information',
     );
   }
 
@@ -362,7 +382,9 @@ function findFailedRun(cipe: CIPEInfo): CIPERun | undefined {
     .flatMap((runGroup) => runGroup.runs)
     .find(
       (run) =>
-        (run.status && isFailedStatus(run.status)) ||
+        (run.status &&
+          run.status !== 'CANCELED' &&
+          isFailedStatus(run.status)) ||
         (run.numFailedTasks && run.numFailedTasks > 0),
     );
 }
