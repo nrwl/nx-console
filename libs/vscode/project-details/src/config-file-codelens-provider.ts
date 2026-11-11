@@ -11,6 +11,7 @@ import {
   NxCodeLensProvider,
   registerCodeLensProvider,
   createProjectTargetString,
+  createRawProjectTargetString,
 } from '@nx-console/vscode-utils';
 import { relative } from 'path';
 import {
@@ -226,7 +227,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
           });
           CliTaskProvider.instance.executeTask({
             command: 'run',
-            positional: createProjectTargetString(project, target),
+            positional: createRawProjectTargetString(project, target),
             flags: [],
           });
         },
@@ -269,7 +270,7 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
             if (selected) {
               CliTaskProvider.instance.executeTask({
                 command: 'run',
-                positional: createProjectTargetString(
+                positional: createRawProjectTargetString(
                   projectName,
                   selected.label,
                 ),

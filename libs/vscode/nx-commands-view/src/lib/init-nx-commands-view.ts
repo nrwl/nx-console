@@ -1,5 +1,6 @@
 import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
+import { splitCommandLine } from '@nx-console/vscode-utils';
 import { commands, ExtensionContext, window } from 'vscode';
 import { NxCommandsTreeProvider } from './nx-commands-provider';
 export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';
@@ -37,10 +38,7 @@ async function executeArbitraryCommand(command: string, cwd?: string) {
     positional = undefined;
   }
 
-  const flags = command
-    .replace(commandBeforeFlags, '')
-    .split(' ')
-    .filter(Boolean);
+  const flags = splitCommandLine(command.replace(commandBeforeFlags, ''));
 
   try {
     CliTaskProvider.instance.executeTask({

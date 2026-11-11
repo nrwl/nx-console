@@ -54,7 +54,7 @@ export class CliTask extends Task {
       'nx',
       // execution
       await (
-        definition.command === 'generate' && definition.useProcessExecution
+        definition.useProcessExecution
           ? getProcessExecutionForConfig
           : getShellExecutionForConfig
       )(
@@ -68,6 +68,7 @@ export class CliTask extends Task {
           encapsulatedNx: isEncapsulatedNx,
           workspacePath,
           env: definition.env,
+          shellFallback: definition.command !== 'generate',
         },
         packageManagerCommands,
       ),

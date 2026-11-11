@@ -300,6 +300,56 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
       });
     },
   },
+  'run-flags': {
+    description:
+      'One project, `app`, whose `dump` target is a local executor that records the options it receives in `calls.jsonl`.',
+    settings: {
+      'terminal.integrated.defaultProfile.linux': 'bash',
+      'terminal.integrated.profiles.linux': { bash: { path: '/bin/bash' } },
+    },
+    create: (path) =>
+      writeWorkspace(path, {
+        projects: {
+          app: {
+            name: 'app',
+            targets: { dump: { executor: './tools/dump-executor:dump' } },
+          },
+        },
+        files: {
+          'tools/dump-executor/package.json': JSON.stringify({
+            name: 'dump-executor',
+            version: '0.0.0',
+            executors: './executors.json',
+          }),
+          'tools/dump-executor/executors.json': JSON.stringify({
+            executors: {
+              dump: {
+                implementation: './dump.js',
+                schema: './schema.json',
+              },
+            },
+          }),
+          'tools/dump-executor/schema.json': JSON.stringify({
+            $schema: 'http://json-schema.org/schema',
+            type: 'object',
+            properties: {
+              note: { type: 'string', description: 'A free-form note.' },
+              flag: { type: 'boolean', description: 'A boolean flag.' },
+            },
+            additionalProperties: true,
+          }),
+          'tools/dump-executor/dump.js': `const { appendFileSync } = require('fs');
+module.exports = async function dump(options, context) {
+  appendFileSync(
+    context.root + '/calls.jsonl',
+    JSON.stringify({ project: context.projectName, options }) + '\\n',
+  );
+  return { success: true };
+};
+`,
+        },
+      }),
+  },
   'self-healing': {
     description: `One project, \`demo\`, in a workspace connected to Nx Cloud as \`${selfHealingCloudId}\` so self-healing links for it reach Nx Console's URI handler.`,
     create: (path) =>

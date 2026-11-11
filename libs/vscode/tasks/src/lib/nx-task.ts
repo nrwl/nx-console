@@ -56,6 +56,7 @@ export class NxTask extends Task {
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         encapsulatedNx: isEncapsulatedNx,
         workspacePath,
+        shellFallback: !command.startsWith('workspace-'),
       }),
     );
     return task;
