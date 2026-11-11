@@ -1,4 +1,5 @@
 import { Option } from '@nx-console/shared-schema';
+import { splitCommandLine } from '@nx-console/vscode-utils';
 import { QuickPickItem, window } from 'vscode';
 
 class CliTaskFlagQuickPickItem implements QuickPickItem {
@@ -47,7 +48,7 @@ export async function selectFlags(
     ([flagName, value]) => `--${flagName}=${value}`,
   );
   if (customOptions) {
-    flagArray.push(customOptions);
+    flagArray.push(...splitCommandLine(customOptions));
   }
 
   const selection = await promptForFlagToSet(

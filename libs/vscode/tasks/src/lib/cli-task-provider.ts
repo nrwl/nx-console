@@ -4,7 +4,7 @@ import {
   getNxWorkspacePathFromNxls,
 } from '@nx-console/vscode-nx-workspace';
 import { logAndShowTaskCreationError } from '@nx-console/vscode-output-channels';
-import { createProjectTargetString } from '@nx-console/vscode-utils';
+import { createRawProjectTargetString } from '@nx-console/vscode-utils';
 import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
@@ -49,8 +49,9 @@ export class CliTaskProvider implements TaskProvider {
       projectTargetCombinations.map(([projectName, targetName]) => {
         return {
           command: 'run',
-          positional: createProjectTargetString(projectName, targetName),
+          positional: createRawProjectTargetString(projectName, targetName),
           flags: [],
+          useProcessExecution: true,
         };
       }),
       nxWorkspace,
@@ -73,7 +74,12 @@ export class CliTaskProvider implements TaskProvider {
     }
   }
 
+  /**
+   * Runs without a shell: `positional` and every entry of `flags` reach the CLI as one literal argument each,
+   * so they must not be quoted for a shell.
+   */
   async executeTask(definition: CliTaskDefinition) {
+    definition = { useProcessExecution: true, ...definition };
     const isDryRun = definition.flags.includes('--dry-run');
     if (isDryRun && this.currentDryRun) {
       this.deferredDryRun = definition;

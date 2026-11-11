@@ -18,9 +18,20 @@ export function createProjectTargetString(
   targetName: string,
   configuration?: string,
 ): string {
-  const projectTargetString = configuration
+  return surroundWithQuotesIfNeeded(
+    createRawProjectTargetString(projectName, targetName, configuration),
+  );
+}
+
+/**
+ * The project:target string as a single argument, for tasks that run without a shell
+ */
+export function createRawProjectTargetString(
+  projectName: string,
+  targetName: string,
+  configuration?: string,
+): string {
+  return configuration
     ? `${projectName}:${targetName}:${configuration}`
     : `${projectName}:${targetName}`;
-
-  return surroundWithQuotesIfNeeded(projectTargetString);
 }

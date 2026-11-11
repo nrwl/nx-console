@@ -80,6 +80,7 @@ async function promptForAffectedFlags(target: string) {
       command,
       flags,
       positional,
+      useProcessExecution: true,
     });
     if (!task) {
       logAndShowError(
@@ -103,6 +104,7 @@ async function promptForRunMany() {
     const task = await NxTask.create({
       command: 'run-many',
       flags,
+      useProcessExecution: true,
     });
     if (!task) {
       logAndShowError(
@@ -118,6 +120,7 @@ async function promptForList() {
   const task = await NxTask.create({
     command: 'list',
     flags: [],
+    useProcessExecution: true,
   });
   if (!task) {
     logAndShowError(

@@ -12,7 +12,7 @@ import {
 import { getTelemetry } from '@nx-console/vscode-telemetry';
 import {
   AbstractTreeProvider,
-  createProjectTargetString,
+  createRawProjectTargetString,
   surroundWithQuotesIfNeeded,
 } from '@nx-console/vscode-utils';
 import { commands, env, ExtensionContext } from 'vscode';
@@ -179,7 +179,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
     CliTaskProvider.instance.executeTask({
       command: 'run',
-      positional: createProjectTargetString(project, target.name),
+      positional: createRawProjectTargetString(project, target.name),
       flags,
     });
   }

@@ -6,6 +6,11 @@ export interface ProcessConfig {
   encapsulatedNx: boolean;
   nxArgs: string[];
   useLatestNxVersion?: boolean;
+  /**
+   * Windows can only skip its batch launchers with a local Nx install. When that is missing,
+   * fall back to a shell command that quotes every argument instead of refusing to run.
+   */
+  shellFallback?: boolean;
   env?: { [key: string]: string };
 }
 

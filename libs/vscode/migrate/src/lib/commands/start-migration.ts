@@ -68,6 +68,7 @@ export async function startMigration(custom = false) {
     command: 'migrate',
     positional: versionToMigrateTo,
     flags,
+    useProcessExecution: true,
   });
   await tasks.executeTask(task);
 

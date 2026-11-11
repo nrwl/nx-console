@@ -1,7 +1,7 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
 import { getProjectByPath } from '@nx-console/vscode-nx-workspace';
-import { createProjectTargetString } from '@nx-console/vscode-utils';
+import { createRawProjectTargetString } from '@nx-console/vscode-utils';
 import { CliTaskProvider } from './cli-task-provider';
 
 import { selectRunInformation } from '@nx-console/vscode-nx-cli-quickpicks';
@@ -77,7 +77,7 @@ export async function selectRunInformationAndRun(
     flags: f,
   } = runInformation;
 
-  const positional = createProjectTargetString(p, t, c);
+  const positional = createRawProjectTargetString(p, t, c);
   CliTaskProvider.instance.executeTask({
     positional,
     command: 'run',

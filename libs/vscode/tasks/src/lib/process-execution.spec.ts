@@ -30,6 +30,8 @@ jest.mock(
 jest.mock('@nx-console/vscode-utils', () => ({
   getProcessExecutionForConfig: jest.fn().mockResolvedValue('process'),
   getShellExecutionForConfig: jest.fn().mockResolvedValue('shell'),
+  createRawProjectTargetString: (project: string, target: string) =>
+    `${project}:${target}`,
 }));
 jest.mock('@nx-console/shared-schema', () => ({
   WORKSPACE_GENERATOR_NAME_REGEX: /^workspace-(schematic|generator):(.+)/,
@@ -81,11 +83,66 @@ it('routes Generate UI argv, cwd and environment to process execution', async ()
 
 it.each([
   { command: 'generate', useProcessExecution: false },
-  { command: 'run', useProcessExecution: true },
-])('keeps other CLI tasks on shell execution: %j', async (definition) => {
-  await CliTask.create({ ...definition, flags: ['--name=example'] });
-  expect(getShellExecutionForConfig).toHaveBeenCalled();
-  expect(getProcessExecutionForConfig).not.toHaveBeenCalled();
+  { command: 'run' },
+])(
+  'keeps CLI tasks without the process flag on shell execution: %j',
+  async (definition) => {
+    await CliTask.create({ ...definition, flags: ['--name=example'] });
+    expect(getShellExecutionForConfig).toHaveBeenCalled();
+    expect(getProcessExecutionForConfig).not.toHaveBeenCalled();
+  },
+);
+
+it('lets Windows fall back to a quoted shell command for run tasks but not for generators', async () => {
+  await CliTask.create({
+    command: 'run',
+    flags: [],
+    useProcessExecution: true,
+  });
+  await CliTask.create({
+    command: 'generate',
+    flags: [],
+    useProcessExecution: true,
+  });
+  const [run, generate] = jest
+    .mocked(getProcessExecutionForConfig)
+    .mock.calls.map(([config]) => config);
+  expect(run.shellFallback).toBe(true);
+  expect(generate.shellFallback).toBe(false);
+});
+
+it('runs tasks started from the extension without a shell and with literal arguments', async () => {
+  const flags = ['--note=a b; touch marker; #', '--other=$(id)'];
+  await new CliTaskProvider().executeTask({
+    command: 'run',
+    positional: 'my project:build',
+    flags,
+  });
+  expect(getProcessExecutionForConfig).toHaveBeenCalledWith(
+    expect.objectContaining({
+      nxArgs: ['run', 'my project:build', ...flags],
+    }),
+    undefined,
+  );
+  expect(getShellExecutionForConfig).not.toHaveBeenCalled();
+});
+
+it('provides workspace tasks with unquoted process arguments', async () => {
+  const { getNxWorkspace } = jest.requireMock(
+    '@nx-console/vscode-nx-workspace',
+  );
+  getNxWorkspace.mockResolvedValueOnce({
+    workspacePath: '/workspace',
+    isEncapsulatedNx: false,
+    projectGraph: {
+      nodes: { 'a;touch x': { data: { targets: { 'b c': {} } } } },
+    },
+  });
+  await new CliTaskProvider().provideTasks();
+  expect(getProcessExecutionForConfig).toHaveBeenCalledWith(
+    expect.objectContaining({ nxArgs: ['run', 'a;touch x:b c'] }),
+    undefined,
+  );
 });
 
 it('runs legacy workspace generators with process arguments', async () => {
@@ -103,7 +160,7 @@ it('runs legacy workspace generators with process arguments', async () => {
   expect(getShellExecutionForConfig).not.toHaveBeenCalled();
 });
 
-it('keeps other Nx tasks on shell execution', async () => {
+it('keeps Nx tasks without the process flag on shell execution', async () => {
   await NxTask.create({ command: 'affected', flags: [] });
   expect(getShellExecutionForConfig).toHaveBeenCalled();
   expect(getProcessExecutionForConfig).not.toHaveBeenCalled();
