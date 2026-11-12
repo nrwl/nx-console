@@ -3,6 +3,8 @@ common-env: &common-env
   NX_PLUGIN_NO_TIMEOUTS: true
   # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
   NX_CLOUD_USE_ULTRACACHE: 'true'
+  # Eclipse Temurin release that "Setup Java" installs, as named on https://adoptium.net/temurin/releases.
+  JDK_VERSION: '21.0.13+9'
 common-init-steps: &common-init-steps
   - name: Checkout
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
@@ -21,16 +23,36 @@ common-init-steps: &common-init-steps
           paths: |
             '../.cache/Cypress'
           base-branch: 'master'
-  # apt and yarn write to different places, so the JDK setup runs next to the node_modules install.
+      - name: Restore Java Cache
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
+        inputs:
+          key: '.nx/workflows/agents.yaml|"jdk"'
+          paths: '~/.cache/jdk'
+          base-branch: 'master'
+  # The JDK is a cached Temurin tarball rather than an apt package: apt mirrors are at times slow enough
+  # to stretch this step to minutes. It still runs next to the node_modules install.
   - group-name: Install Dependencies
     parallel: true
     steps:
-      - name: Setup Java 21 and IntelliJ UI dependencies
+      - name: Setup Java
         script: |
-          sudo apt update
-          sudo apt install -y openjdk-21-jdk xvfb ffmpeg fonts-dejavu-core libasound2 libnss3 libxkbfile1 libx11-6 libxi6 libxtst6 libxrender1 libxrandr2 libglib2.0-0 libdbus-1-3 libgbm1
-          sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
-          echo "JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64" >> "$NX_CLOUD_ENV"
+          set -euo pipefail
+          export JAVA_HOME="$HOME/.cache/jdk"
+          if ! grep -qsF "JAVA_RUNTIME_VERSION=\"$JDK_VERSION" "$JAVA_HOME/release"; then
+            archive="OpenJDK${JDK_VERSION%%.*}U-jdk_x64_linux_hotspot_${JDK_VERSION/+/_}.tar.gz"
+            url="https://github.com/adoptium/temurin${JDK_VERSION%%.*}-binaries/releases/download/jdk-${JDK_VERSION/+/%2B}/$archive"
+            download_dir=$(mktemp -d)
+            trap 'rm -rf "$download_dir"' EXIT
+            curl --fail --location --retry 3 --output "$download_dir/$archive" "$url"
+            curl --fail --location --retry 3 --output "$download_dir/$archive.sha256.txt" "$url.sha256.txt"
+            (cd "$download_dir" && sha256sum --check "$archive.sha256.txt")
+            rm -rf "$JAVA_HOME"
+            mkdir -p "$JAVA_HOME"
+            tar -xzf "$download_dir/$archive" -C "$JAVA_HOME" --strip-components=1
+          fi
+          export PATH="$JAVA_HOME/bin:$PATH"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$NX_CLOUD_ENV"
+          echo "PATH=$PATH" >> "$NX_CLOUD_ENV"
           java -version
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
