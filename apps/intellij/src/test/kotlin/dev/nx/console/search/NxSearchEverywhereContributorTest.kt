@@ -1,4 +1,4 @@
-package dev.nx.console.generate
+package dev.nx.console.search
 
 import com.google.gson.JsonParser
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -24,9 +24,9 @@ import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.jsonrpc.Endpoint
 import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints
 
-class NxGeneratorSearchEverywhereContributorTest : BasePlatformTestCase() {
+class NxSearchEverywhereContributorTest : BasePlatformTestCase() {
     private lateinit var scope: CoroutineScope
-    private lateinit var contributor: NxGeneratorSearchEverywhereContributor
+    private lateinit var contributor: NxSearchEverywhereContributor
     private val requested = CountDownLatch(1)
     private val response = CompletableFuture<Any?>()
 
@@ -37,6 +37,7 @@ class NxGeneratorSearchEverywhereContributorTest : BasePlatformTestCase() {
             ServiceEndpoints.toServiceObject(
                 object : Endpoint {
                     override fun request(method: String, parameter: Any?): CompletableFuture<Any?> {
+                        if (method == "nx/workspace") return CompletableFuture.completedFuture(null)
                         requested.countDown()
                         return response
                     }
@@ -55,7 +56,7 @@ class NxGeneratorSearchEverywhereContributorTest : BasePlatformTestCase() {
         project.replaceService(NxlsService::class.java, service, testRootDisposable)
         val context = SimpleDataContext.getProjectContext(project)
         contributor =
-            NxGeneratorSearchEverywhereContributor(
+            NxSearchEverywhereContributor(
                 AnActionEvent.createFromDataContext("test", null, context)
             )
     }
@@ -76,7 +77,7 @@ class NxGeneratorSearchEverywhereContributorTest : BasePlatformTestCase() {
                     "@nx",
                     EmptyProgressIndicator(),
                     Processor {
-                        received.add(it.name)
+                        received.add((it as NxSearchItem.Generator).generator.name)
                         false
                     },
                 )
@@ -121,7 +122,7 @@ class NxGeneratorSearchEverywhereContributorTest : BasePlatformTestCase() {
                             "@nx",
                             indicator,
                             Processor {
-                                received.add(it.name)
+                                received.add((it as NxSearchItem.Generator).generator.name)
                                 indicator.cancel()
                                 true
                             },

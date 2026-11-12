@@ -870,3 +870,30 @@ NX_AUTOMATION_LABEL=issue-3327-repro NX_NO_CLOUD=true NX_DAEMON=false CI=true \
   yarn nx run intellij:runAutomation --batch=false --parallel=2 \
   --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproGenerateOptionQuotingKt'
 ```
+
+### Search Everywhere projects and targets (#2418)
+
+`ReproSearchEverywhereProjectsTargetsKt` checks the rendered Search Everywhere
+results for `demo hello`, `de hel`, `build`, and `util`, with a local
+`@fixture/notes-plugin:note` generator as a control. It selects `demo:hello`,
+checks its execution marker, then selects the `util` project and checks that
+`libs/util/project.json` opens. The real Search Everywhere action and its Enter
+shortcut action run through the SDK; text entry and result selection use direct
+Swing component access. No native input is used.
+
+Use a fixture with its own installed Nx and lockfile, `analytics: false` and
+`neverConnectToCloud: true` in `nx.json`, `demo` with `hello` and `build`
+targets, and `util` rooted at `libs/util` with a `build` target. The `demo:hello`
+command must write `.nx/search-everywhere-marker.json` containing
+`{"project":"demo","argv":["demo","hello"]}`. Delete that marker before each run.
+Install a local `@fixture/notes-plugin` package exposing a `note` generator.
+
+```sh
+NX_AUTOMATION_LABEL=issue-2418-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproSearchEverywhereProjectsTargetsKt'
+```
+
+Restart the rebuilt IDE and rerun with `NX_AUTOMATION_LABEL=issue-2418-fixed`.
+A labeled text report accompanies each recording.

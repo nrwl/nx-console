@@ -1,6 +1,9 @@
 package dev.nx.console.utils
 
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -16,4 +19,11 @@ fun nxProjectConfigurationPath(project: Project, nxProjectRoot: String?): String
     } else {
         null
     }
+}
+
+fun openNxProjectConfiguration(project: Project, nxProjectRoot: String?): VirtualFile? {
+    val path = nxProjectConfigurationPath(project, nxProjectRoot) ?: return null
+    val file = LocalFileSystem.getInstance().findFileByPath(path) ?: return null
+    FileEditorManager.getInstance(project).openFile(file, true)
+    return file
 }

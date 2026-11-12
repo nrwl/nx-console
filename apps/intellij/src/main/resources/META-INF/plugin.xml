@@ -74,7 +74,7 @@
     <runAnything.executionProvider
       implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
     <searchEverywhereContributor
-      implementation="dev.nx.console.generate.NxGeneratorSearchEverywhereContributorFactory"/>
+      implementation="dev.nx.console.search.NxSearchEverywhereContributorFactory"/>
 
     <configurationType
       implementation="dev.nx.console.run.NxCommandConfigurationType"/>
