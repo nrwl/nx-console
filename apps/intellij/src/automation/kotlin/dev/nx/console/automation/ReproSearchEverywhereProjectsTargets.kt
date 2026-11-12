@@ -6,6 +6,7 @@ import com.intellij.driver.client.utility
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.getOpenProjects
 import com.intellij.driver.sdk.invokeAction
+import com.intellij.driver.sdk.ui.components.common.jcef
 import com.intellij.driver.sdk.ui.components.common.popups.searchEverywherePopup
 import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
@@ -33,6 +34,11 @@ fun main() = withAutomationDriver {
     }
     val marker = Path.of(project.getBasePath(), ".nx/search-everywhere-marker.json")
     marker.deleteIfExists()
+    val note = Path.of(project.getBasePath(), "notes/search-everywhere-note.md")
+    note.deleteIfExists()
+    val settings = service<QuotingSettings>()
+    val dryRunBefore = settings.getEnableDryRunOnGenerateChange()
+    settings.setEnableDryRunOnGenerateChange(false)
     val label = System.getenv("NX_AUTOMATION_LABEL") ?: "search-projects-targets"
     val report =
         StringBuilder(
@@ -41,7 +47,7 @@ fun main() = withAutomationDriver {
     var popup = ui.searchEverywherePopup()
     var search = popup.searchField
     recordIde(label) {
-        fun waitForRecordedFrames() {
+        fun waitForRecordedFrames(checkpoint: String = "Search results") {
             val recording =
                 Files.list(automationOutput()).use { paths ->
                     paths
@@ -61,9 +67,10 @@ fun main() = withAutomationDriver {
                         .count()
                 }
             val before = frameCount()
-            nxlsWait(15.seconds, { "Recorder did not capture the current result list" }) {
-                frameCount() >= before + 2
+            nxlsWait(15.seconds, { "Recorder did not capture the current UI" }) {
+                frameCount() >= before + 4
             }
+            report.appendLine("Recorded $checkpoint: frames $before through ${frameCount() - 1}")
         }
         try {
             if (popup.present())
@@ -93,11 +100,6 @@ fun main() = withAutomationDriver {
                 }
                 return rows
             }
-            query("@fixture", listOf("@fixture/notes-plugin - note"))
-            query("demo hello", listOf("demo:hello Nx target"))
-            query("de hel", listOf("demo:hello Nx target"))
-            query("build", listOf("demo:build Nx target", "util:build Nx target"))
-            query("util", listOf("util Nx project"))
             fun selectResult(text: String) {
                 val list = popup.resultsList
                 nxlsWait(10.seconds, { "Could not select rendered result '$text'" }) {
@@ -112,6 +114,82 @@ fun main() = withAutomationDriver {
                 }
                 popup.invokeSelectAction()
             }
+            query("@fixture", listOf("@fixture/notes-plugin - note"))
+            selectResult("@fixture/notes-plugin - note")
+            var generateState = ""
+            nxlsWait(60.seconds, { "Generate UI did not populate the note form: $generateState" }) {
+                generateState =
+                    runCatching {
+                            ui.jcef()
+                                .jcefWorker
+                                .callJs(
+                                    """(() => {
+                            const header = document.querySelector('header');
+                            const title = header?.querySelector('[data-cy="title"]')?.textContent.trim();
+                            const subtitle = header?.querySelector('[data-cy="subtitle"]')?.cloneNode(true);
+                            subtitle?.querySelectorAll('popover-element').forEach(e => e.remove());
+                            const collection = subtitle?.textContent.trim();
+                            const fields = [...document.querySelectorAll('input[id$="-field"]')]
+                                .filter(e => e.getBoundingClientRect().height > 0).map(e => e.id);
+                            return JSON.stringify({title, collection, fields,
+                                ready: title === 'Note' && collection === '@fixture/notes-plugin'
+                                    && fields.includes('name-field')});
+                        })()""",
+                                    1000,
+                                )
+                        }
+                        .getOrElse { it.toString() }
+                generateState.contains("\"ready\":true")
+            }
+            report.appendLine("Generate UI header and fields: $generateState")
+            waitForRecordedFrames("Generate UI")
+            check(
+                ui.jcef()
+                    .jcefWorker
+                    .callJs(
+                        """(() => {
+                    const input = document.getElementById('name-field');
+                    input.focus(); input.value = 'search-everywhere-note';
+                    input.dispatchEvent(new Event('input', {bubbles: true}));
+                    return input.value;
+                })()""",
+                        5000,
+                    ) == "search-everywhere-note"
+            )
+            nxlsWait(10.seconds, { "Generate button did not enable" }) {
+                ui.jcef()
+                    .jcefWorker
+                    .callJs(
+                        "String(!!document.querySelector('[data-cy=generate-button]:not([disabled])'))",
+                        1000,
+                    ) == "true"
+            }
+            check(!note.exists()) { "Automatic dry run unexpectedly wrote $note" }
+            check(
+                ui.jcef()
+                    .jcefWorker
+                    .callJs(
+                        """(() => { document.querySelector('[data-cy="generate-button"]').click(); return 'clicked'; })()""",
+                        5000,
+                    ) == "clicked"
+            )
+            nxlsWait(90.seconds, { "Generator did not write $note" }) {
+                note.exists() && note.readText() == "# search-everywhere-note\n"
+            }
+            report.appendLine(
+                "Generated notes/search-everywhere-note.md: ${note.readText().trim()}"
+            )
+            waitForRecordedFrames("Generated note")
+            invokeAction("CloseAllEditors", component = frame)
+            note.deleteIfExists()
+            invokeAction("SearchEverywhere", component = frame)
+            popup = ui.searchEverywherePopup()
+            search = popup.searchField
+            nxlsWait(message = { "Search did not reopen after generation" }) { search.present() }
+            query("demo hello", listOf("demo:hello Nx target"))
+            query("de hel", listOf("demo:hello Nx target"))
+            query("build", listOf("demo:build Nx target", "util:build Nx target"))
+            query("util", listOf("util Nx project"))
             query("demo hello", listOf("demo:hello Nx target"))
             selectResult("demo:hello Nx target")
             nxlsWait(60.seconds, { "Target did not write marker" }) {
@@ -141,6 +219,8 @@ fun main() = withAutomationDriver {
             inspectIde()
             throw error
         } finally {
+            settings.setEnableDryRunOnGenerateChange(dryRunBefore)
+            note.deleteIfExists()
             automationOutput().resolve("$label-report.txt").writeText(report.toString())
             if (popup.present())
                 withContext(OnDispatcher.EDT) {
