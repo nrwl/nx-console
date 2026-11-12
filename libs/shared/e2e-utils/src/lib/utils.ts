@@ -2,7 +2,12 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { readJsonFile, workspaceRoot } from 'nx/src/devkit-exports';
+import {
+  ProjectConfiguration,
+  readJsonFile,
+  workspaceRoot,
+  writeJsonFile,
+} from 'nx/src/devkit-exports';
 
 export const defaultVersion =
   process.env['NXLS_E2E_DEFAULT_VERSION'] ?? '24.0.2';
@@ -94,6 +99,19 @@ export function newWorkspace({
   });
 
   return create;
+}
+
+export function addProjectToWorkspace(
+  workspacePath: string,
+  project: ProjectConfiguration,
+) {
+  mkdirSync(join(workspacePath, project.root, 'src'), { recursive: true });
+  writeJsonFile(join(workspacePath, project.root, 'project.json'), {
+    sourceRoot: `${project.root}/src`,
+    tags: [],
+    targets: {},
+    ...project,
+  });
 }
 
 export function uniq(prefix: string) {
