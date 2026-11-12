@@ -9,7 +9,6 @@ import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.ScrollingModel
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.models.NxProject
@@ -94,15 +93,9 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                     } ?: return@launch
 
             withContext(Dispatchers.EDT) {
-                val projectFilePath =
-                    nxProjectConfigurationPath(project, nxProject.root) ?: return@withContext
                 val projectFile =
-                    LocalFileSystem.getInstance().findFileByPath(projectFilePath)
-                        ?: return@withContext
-
+                    openNxProjectConfiguration(project, nxProject.root) ?: return@withContext
                 val fileEditorManager = FileEditorManager.getInstance(project)
-
-                fileEditorManager.openFile(projectFile, true)
 
                 if (e.place == "NxToolWindow") {
                     val nxTarget = this@ShowNxProjectConfigurationAction.targetNode(e)?.nxTargetName

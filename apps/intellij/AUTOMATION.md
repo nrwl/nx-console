@@ -870,3 +870,43 @@ NX_AUTOMATION_LABEL=issue-3327-repro NX_NO_CLOUD=true NX_DAEMON=false CI=true \
   yarn nx run intellij:runAutomation --batch=false --parallel=2 \
   --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproGenerateOptionQuotingKt'
 ```
+
+### Search Everywhere projects and targets (#2418)
+
+`ReproSearchEverywhereProjectsTargetsKt` first searches for `@fixture`, asserts the
+rendered `@fixture/notes-plugin - note` row, and selects it with the same Enter
+action used for targets and projects. It inspects the Generate UI JCEF DOM for
+the exact `Note` / `@fixture/notes-plugin` header and visible `name-field`, fills
+`name`, clicks Generate, and verifies `notes/search-everywhere-note.md` contains
+`# search-everywhere-note` followed by a newline. Automatic dry runs are disabled
+and the previous setting is restored; the generated file is removed and its
+Generate UI editor is closed before continuing.
+
+It then checks `demo hello`, `de hel`, `build`, and `util`, selects `demo:hello`
+and verifies its execution marker, then selects `util` and checks that
+`libs/util/project.json` opens. Search Everywhere and its Enter shortcut run
+through SDK actions; text entry and result selection use direct Swing access.
+Form inspection, input events, and the Generate click use JCEF JavaScript. No
+native input is used. Each popup/form checkpoint waits for four new recorder
+frames, allowing for a capture already in progress and at least three visible
+frames. The labeled report includes generator rows, header/field names, generated
+content, target execution, opened configuration, and checkpoint frame indices.
+
+Use a fixture with its own installed Nx and lockfile, `analytics: false` and
+`neverConnectToCloud: true` in `nx.json`, `demo` with `hello` and `build`
+targets, and `util` rooted at `libs/util` with a `build` target. The `demo:hello`
+command must write `.nx/search-everywhere-marker.json` containing
+`{"project":"demo","argv":["demo","hello"]}`. Delete that marker and generated
+notes before each run. Install a local `@fixture/notes-plugin` package exposing a
+`note` generator with a required string `name` option; its implementation must
+write `notes/${name}.md` with `# ${name}\n` using the Nx tree.
+
+```sh
+NX_AUTOMATION_LABEL=issue-2418-repro CI=true \
+  JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:runAutomation --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproSearchEverywhereProjectsTargetsKt'
+```
+
+Restart the rebuilt IDE and rerun with `NX_AUTOMATION_LABEL=issue-2418-fixed`.
+A labeled text report accompanies each recording.
