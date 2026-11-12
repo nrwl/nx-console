@@ -184,3 +184,4 @@ await writeFile(
   JSON.stringify(manifest, null, 2) + '\n',
 );
 console.log(`Prepared IntelliJ e2e runtime: ${output}`);
+// temporary CI sample 1, removed before merge
