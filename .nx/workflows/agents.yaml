@@ -32,7 +32,7 @@ common-init-steps: &common-init-steps
   - group-name: Install Dependencies
     parallel: true
     steps:
-      - name: Setup Java 21 and IntelliJ UI dependencies
+      - name: Setup Java 21
         script: |
           set -euo pipefail
           export JAVA_HOME="$HOME/.cache/temurin-21.0.13+9"
@@ -50,18 +50,6 @@ common-init-steps: &common-init-steps
           echo "JAVA_HOME=$JAVA_HOME" >> "$NX_CLOUD_ENV"
           echo "PATH=$PATH" >> "$NX_CLOUD_ENV"
           java -version
-
-          # The agent image already ships these; apt only runs if one is missing.
-          missing_packages=()
-          for package in xvfb ffmpeg fonts-dejavu-core libasound2 libnss3 libxkbfile1 libx11-6 libxi6 libxtst6 libxrender1 libxrandr2 libglib2.0-0 libdbus-1-3 libgbm1; do
-            if [ "$(dpkg -s "$package" 2>/dev/null | sed -n 's/^Status: //p')" != 'install ok installed' ]; then
-              missing_packages+=("$package")
-            fi
-          done
-          if [ "${#missing_packages[@]}" -gt 0 ]; then
-            sudo apt update
-            sudo apt install -y "${missing_packages[@]}"
-          fi
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
   # No graph prewarm: Nx Cloud restores the workspace data (project graph and @nx/gradle report)
