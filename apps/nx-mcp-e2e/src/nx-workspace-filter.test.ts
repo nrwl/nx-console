@@ -1,4 +1,5 @@
 import {
+  addProjectToWorkspace,
   cleanupNxWorkspace,
   createInvokeMCPInspectorCLI,
   defaultVersion,
@@ -7,10 +8,8 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
-import { exec } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 
 describe('nx_workspace filter', () => {
   let invokeMCPInspectorCLI: Awaited<
@@ -26,21 +25,36 @@ describe('nx_workspace filter', () => {
       options: simpleReactWorkspaceOptions,
     });
 
-    // Generate a few additional projects to test different filter types
-    await promisify(exec)(
-      `npx nx g @nx/react:app admin-app --tags=type:app,scope:admin --directory=apps/admin-app --no-interactive`,
-      { cwd: testWorkspacePath },
-    );
-
-    await promisify(exec)(
-      `npx nx g @nx/react:library shared-ui --tags=type:ui,scope:shared --directory=libs/shared-ui --no-interactive`,
-      { cwd: testWorkspacePath },
-    );
-
-    await promisify(exec)(
-      `npx nx g @nx/react:app e2e-app --tags=e2e --directory=apps/e2e-app --no-interactive`,
-      { cwd: testWorkspacePath },
-    );
+    addProjectToWorkspace(testWorkspacePath, {
+      name: 'admin-app',
+      root: 'apps/admin-app',
+      projectType: 'application',
+      tags: ['type:app', 'scope:admin'],
+    });
+    addProjectToWorkspace(testWorkspacePath, {
+      name: 'admin-app-e2e',
+      root: 'apps/admin-app-e2e',
+      projectType: 'application',
+      implicitDependencies: ['admin-app'],
+    });
+    addProjectToWorkspace(testWorkspacePath, {
+      name: 'shared-ui',
+      root: 'libs/shared-ui',
+      projectType: 'library',
+      tags: ['type:ui', 'scope:shared'],
+    });
+    addProjectToWorkspace(testWorkspacePath, {
+      name: 'e2e-app',
+      root: 'apps/e2e-app',
+      projectType: 'application',
+      tags: ['e2e'],
+    });
+    addProjectToWorkspace(testWorkspacePath, {
+      name: 'e2e-app-e2e',
+      root: 'apps/e2e-app-e2e',
+      projectType: 'application',
+      implicitDependencies: ['e2e-app'],
+    });
 
     invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(
       e2eCwd,
