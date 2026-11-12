@@ -16,6 +16,14 @@ common-init-steps: &common-init-steps
           key: 'package-lock.json|yarn.lock|pnpm-lock.yaml'
           paths: 'node_modules'
           base-branch: 'master'
+      # Gradle tasks otherwise download the wrapper distribution from services.gradle.org on every
+      # agent, and fail when that download times out.
+      - name: Restore Gradle Wrapper Cache
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
+        inputs:
+          key: 'gradle/wrapper/gradle-wrapper.properties|"gradle-wrapper-dists"'
+          paths: '~/.gradle/wrapper/dists'
+          base-branch: 'master'
       - name: Restore Browser Binary Cache
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
         inputs:
@@ -54,6 +62,12 @@ common-init-steps: &common-init-steps
           echo "JAVA_HOME=$JAVA_HOME" >> "$NX_CLOUD_ENV"
           echo "PATH=$PATH" >> "$NX_CLOUD_ENV"
           java -version
+          # Fill the Gradle wrapper cache on a miss: its post step would otherwise store an empty
+          # entry whenever no Gradle task ran on this agent.
+          for attempt in 1 2 3; do
+            ./gradlew --version && break
+            if [ "$attempt" -eq 3 ]; then exit 1; fi
+          done
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/install-node-modules/main.yaml'
   # No graph prewarm: Nx Cloud restores the workspace data (project graph and @nx/gradle report)
