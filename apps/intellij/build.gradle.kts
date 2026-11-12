@@ -381,3 +381,5 @@ tasks.register<DefaultTask>("publish") {
 }
 
 allprojects { apply { plugin("dev.nx.gradle.project-graph") } }
+
+// temporary: makes the IntelliJ tasks run on this branch
