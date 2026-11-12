@@ -14,6 +14,13 @@ common-init-steps: &common-init-steps
           key: 'package-lock.json|yarn.lock|pnpm-lock.yaml'
           paths: 'node_modules'
           base-branch: 'master'
+      # Avoid repeated Gradle distribution downloads and transient wrapper download timeouts.
+      - name: Restore Gradle Wrapper Cache
+        uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
+        inputs:
+          key: 'gradle/wrapper/gradle-wrapper.properties'
+          paths: '~/.gradle/wrapper/dists'
+          base-branch: 'master'
       - name: Restore Browser Binary Cache
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
         inputs:
