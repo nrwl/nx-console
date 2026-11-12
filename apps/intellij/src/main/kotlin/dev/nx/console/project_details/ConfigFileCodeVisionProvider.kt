@@ -20,7 +20,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import dev.nx.console.models.NxProject
 import dev.nx.console.models.NxWorkspace
@@ -48,12 +47,6 @@ internal class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
     override fun precomputeOnUiThread(editor: Editor): Unit {
         return
     }
-
-    override fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?) =
-        editor.project?.let {
-            ProjectLevelConfigFileCodeVisionManager.getInstance(it)
-                .getPlaceholderCollector(editor, psiFile)
-        }
 
     override val defaultAnchor = CodeVisionAnchorKind.Default
     override val id = ID
@@ -241,14 +234,6 @@ class ProjectLevelConfigFileCodeVisionManager(
                     )
                 )
             } ?: return CodeVisionState.READY_EMPTY
-    }
-
-    fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?): GenericPlaceholderCollector {
-        return object : GenericPlaceholderCollector {
-            override fun collectPlaceholders(editor: Editor): List<TextRange> {
-                return listOf(TextRange.create(0, 0))
-            }
-        }
     }
 
     private suspend fun loadTargetsAndRefresh(
