@@ -3,6 +3,8 @@ common-env: &common-env
   NX_PLUGIN_NO_TIMEOUTS: true
   # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
   NX_CLOUD_USE_ULTRACACHE: 'true'
+  # Eclipse Temurin release that "Setup Java" installs, as named on https://adoptium.net/temurin/releases.
+  JDK_VERSION: '21.0.13+9'
 common-init-steps: &common-init-steps
   - name: Checkout
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'
@@ -21,30 +23,32 @@ common-init-steps: &common-init-steps
           paths: |
             '../.cache/Cypress'
           base-branch: 'master'
-      - name: Restore Java 21 Cache
+      - name: Restore Java Cache
         uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/cache/main.yaml'
         inputs:
-          key: '"temurin-21.0.13+9-linux-x64"'
-          paths: '~/.cache/temurin-21.0.13+9'
+          key: '.nx/workflows/agents.yaml|"jdk"'
+          paths: '~/.cache/jdk'
           base-branch: 'master'
-  # The JDK is a pinned, cached tarball rather than an apt package: apt mirrors are at times slow enough
+  # The JDK is a cached Temurin tarball rather than an apt package: apt mirrors are at times slow enough
   # to stretch this step to minutes. It still runs next to the node_modules install.
   - group-name: Install Dependencies
     parallel: true
     steps:
-      - name: Setup Java 21
+      - name: Setup Java
         script: |
           set -euo pipefail
-          export JAVA_HOME="$HOME/.cache/temurin-21.0.13+9"
-          if [ ! -x "$JAVA_HOME/bin/java" ]; then
+          export JAVA_HOME="$HOME/.cache/jdk"
+          if ! grep -qsF "JAVA_RUNTIME_VERSION=\"$JDK_VERSION" "$JAVA_HOME/release"; then
+            archive="OpenJDK${JDK_VERSION%%.*}U-jdk_x64_linux_hotspot_${JDK_VERSION/+/_}.tar.gz"
+            url="https://github.com/adoptium/temurin${JDK_VERSION%%.*}-binaries/releases/download/jdk-${JDK_VERSION/+/%2B}/$archive"
             download_dir=$(mktemp -d)
             trap 'rm -rf "$download_dir"' EXIT
-            curl --fail --location --retry 3 --output "$download_dir/jdk.tar.gz" 'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_x64_linux_hotspot_21.0.13_9.tar.gz'
-            echo "d7f5d5cf865a2902b70ff549b97586a7d3f234e016f041ab447ea740c7d66d1c  $download_dir/jdk.tar.gz" | sha256sum --check
-            mkdir -p "$download_dir/jdk" "$(dirname "$JAVA_HOME")"
-            tar -xzf "$download_dir/jdk.tar.gz" -C "$download_dir/jdk" --strip-components=1
+            curl --fail --location --retry 3 --output "$download_dir/$archive" "$url"
+            curl --fail --location --retry 3 --output "$download_dir/$archive.sha256.txt" "$url.sha256.txt"
+            (cd "$download_dir" && sha256sum --check "$archive.sha256.txt")
             rm -rf "$JAVA_HOME"
-            mv "$download_dir/jdk" "$JAVA_HOME"
+            mkdir -p "$JAVA_HOME"
+            tar -xzf "$download_dir/$archive" -C "$JAVA_HOME" --strip-components=1
           fi
           export PATH="$JAVA_HOME/bin:$PATH"
           echo "JAVA_HOME=$JAVA_HOME" >> "$NX_CLOUD_ENV"
