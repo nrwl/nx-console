@@ -526,6 +526,8 @@ try {
     [
       ...launch.jvmArgs.map(expand).filter((arg) => !arg.startsWith('-Xmx')),
       `-Xmx${process.env.NX_AUTOMATION_IDE_HEAP ?? '2g'}`,
+      // The JavaScript fixture needs no Java project setup or its late SDK indexing.
+      '-Didea.java.project.setup.disabled=true',
       `-Dnx.console.automation.runId=${runId}`,
       `-Dcom.sun.management.jmxremote.port=${env.NX_AUTOMATION_PORT}`,
       `-Dcom.sun.management.jmxremote.rmi.port=${env.NX_AUTOMATION_PORT}`,

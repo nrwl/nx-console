@@ -6,6 +6,7 @@ import com.intellij.driver.client.service
 import com.intellij.driver.client.utility
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Document
+import com.intellij.driver.sdk.DumbService
 import com.intellij.driver.sdk.Editor
 import com.intellij.driver.sdk.Project
 import com.intellij.driver.sdk.VirtualFile
@@ -14,7 +15,6 @@ import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.ui.remote.Component
 import com.intellij.driver.sdk.ui.ui
-import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.driver.sdk.waitForProjectOpen
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -226,11 +226,6 @@ internal fun Driver.nxlsRunning(project: Project) {
     }
 }
 
-internal fun Driver.nxlsReady(project: Project) {
-    nxlsRunning(project)
-    waitForIndicators(project, 5.minutes, waitSmartLongEnough = true)
-}
-
 internal fun Driver.nxlsEditor(project: Project): NxlsEditor =
     withContext(OnDispatcher.EDT) {
         checkNotNull(service<NxlsEditors>(project).getSelectedTextEditor()) {
@@ -286,6 +281,9 @@ internal fun Driver.nxlsCompletion(
 ): Pair<NxlsLookup, List<NxlsLookupItem>> {
     nxlsHideLookup(project)
     nxlsFocusEditor(editor)
+    nxlsWait(message = { "Indexing did not finish before completion" }) {
+        !service<DumbService>(project).isDumb()
+    }
     invokeAction("CodeCompletion", component = editor.getContentComponent())
     var result: Pair<NxlsLookup, List<NxlsLookupItem>>? = null
     var labels = emptyList<String>()
@@ -549,7 +547,6 @@ fun main() = withAutomationDriver {
     recordIde(label) {
         val autoSave = service<NxlsAutoSave>().disableAutoSave()
         try {
-            nxlsReady(project)
             for (case in nxlsConfigCases) {
                 openFile(case.path)
                 nxlsRunning(project)
