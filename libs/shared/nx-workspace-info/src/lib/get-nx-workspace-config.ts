@@ -1,6 +1,6 @@
 import { readJsonFile, readNxJson } from '@nx-console/shared-npm';
 import { gte, NxVersion } from '@nx-console/nx-version';
-import { Logger } from '@nx-console/shared-utils';
+import { Logger, stripAnsiFromError } from '@nx-console/shared-utils';
 import { NxError } from '@nx-console/shared-types';
 import type {
   NxJsonConfiguration,
@@ -212,7 +212,7 @@ export async function getNxWorkspaceConfig(
       sourceMaps,
       nxJson,
       projectFileMap,
-      errors,
+      errors: stripAnsiFromError(errors),
       isPartial,
     };
   } catch (e) {
@@ -223,7 +223,7 @@ export async function getNxWorkspaceConfig(
       sourceMaps,
       nxJson,
       projectFileMap,
-      errors: [{ message: e.message, stack: e.stack }],
+      errors: stripAnsiFromError([{ message: e.message, stack: e.stack }]),
       isPartial,
     };
   }
