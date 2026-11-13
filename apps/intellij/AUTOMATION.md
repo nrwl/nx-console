@@ -198,14 +198,13 @@ sandboxes. This is the same key-file mechanism supported by
 An interactive JetBrains Account sign-in in another sandbox does not provision
 the fresh test sandbox.
 
-The regular **CI Checks** workflow already includes `e2e-ci` in its `nx affected` command.
+Nx Cloud CI (`.nx/workflows/ci.yaml`) already includes `e2e-ci` in its `nx affected` command.
 `intellij:e2e-ci` depends on the individual `intellij:e2e-ci--project-view` test,
 so changes to IntelliJ or its dependencies select the test automatically. The
 existing `intellij:e2e` command remains an alias for all IntelliJ e2e tests.
 
-The existing IntelliJ assignment rule schedules the test on a
-`linux-large-plus-js` Nx Agent. The shared agent setup installs Java 21, Xvfb,
-and ffmpeg. The test declares its dependency builds in the Nx task graph so
+The test runs on a `linux-large-plus-js` Nx Cloud worker. The shared agent setup
+installs Java 21, Xvfb, and ffmpeg. The test declares its dependency builds in the Nx task graph so
 Nx Agents can build or restore their outputs before running it. The Gradle
 build, live IDE, and Kotlin client run together on the test's agent.
 The target disables parallel tasks on its agent while running and limits the
@@ -215,19 +214,17 @@ Java classpath are specific to that machine. The individual test is cacheable,
 with only the evidence directory as its output.
 
 Nx Cloud enables failure caching on agents so failure reports and video can be
-returned alongside successful results. GitHub uploads the restored evidence with
-`if: always()` when the test produced a report. Unchanged task inputs reuse the
+returned alongside successful results. Each test's evidence, including its video,
+is in the task's Artifacts tab in Nx Cloud. Unchanged task inputs reuse the
 cached result, reports, and recording; changed inputs trigger a new test run.
 Cached evidence retains its original test run ID. Unaffected projects are still
 excluded by Nx. Use `--skip-nx-cache` when you want a new recording or need to
 retry a transient failure with unchanged inputs. A cancelled or killed agent may
 not finish saving its evidence.
 
-Configure the repository secret once, using an activated `idea.key`:
-
-```bash
-base64 < /absolute/path/to/idea.key | gh secret set IDEA_LICENSE_BASE64 --repo nrwl/nx-console
-```
+Store the license once as the `IDEA_LICENSE_BASE64` secret environment variable
+in the Nx Cloud workspace settings, using the output of
+`base64 < /absolute/path/to/idea.key` for an activated `idea.key`.
 
 To obtain that file, activate the pinned IDEA distribution once using an
 [offline activation code from your JetBrains Account](https://www.jetbrains.com/help/idea/register.html).
@@ -237,14 +234,16 @@ An ordinary IDE installation stores it in its
 [IDE configuration directory](https://intellij-support.jetbrains.com/hc/en-us/articles/206544609-How-to-find-the-license-file-or-information-used-by-the-IDE).
 Use the generated key file, rather than a JetBrains Account password or token.
 
-The workflow forwards `IDEA_LICENSE_BASE64` with Nx Cloud's `--with-env-vars`.
+`.nx/workflows/ci.yaml` passes it to the workers as `{{ secrets.IDEA_LICENSE_BASE64 }}`.
 The runner decodes it into the agent's private temporary sandbox, removes the
 secret from child-process environments, and deletes the sandbox at shutdown.
 The key, IDE configuration, and machine-specific classpath files are outside
 the cached evidence directory. Local runs can keep using
 `NX_INTELLIJ_LICENSE_FILE` instead. On an Nx Agent, a missing license fails the
-test immediately with a provisioning error. GitHub does not expose repository
-secrets to pull requests from forks, so those runs cannot activate this IDE.
+test immediately with a provisioning error. Nx Cloud CI gives runs for pull
+requests from forks no workspace secrets, so those runs skip the IntelliJ
+e2e tests and report them as passed. Push the changes to a branch of
+nrwl/nx-console to run them.
 
 Key provisioning does not determine the number of concurrent IDEs the license
 covers. JetBrains' [multi-machine guidance](https://intellij-support.jetbrains.com/hc/en-us/articles/207241005)

@@ -39,6 +39,18 @@ const output = join(
   'dist/apps/intellij/e2e',
   scenarioName === 'project-view' ? 'latest' : scenarioName,
 );
+// Nx Cloud CI gives runs for pull requests from forks no workspace secrets, so the IntelliJ
+// license never reaches them. Those runs skip the IDE scenarios instead of failing on it.
+if (
+  process.env.NX_CLOUD_IS_FORK === 'true' &&
+  !process.env.IDEA_LICENSE_BASE64 &&
+  !process.env.NX_INTELLIJ_LICENSE_FILE
+) {
+  console.log(
+    `Skipping IntelliJ e2e scenario ${scenarioName}: runs for pull requests from forks get no IntelliJ license. Push the changes to a branch of nrwl/nx-console to run it.`,
+  );
+  process.exit(0);
+}
 const runtime = await realpath(
   await mkdtemp(join(tmpdir(), 'nx-console-intellij-e2e-')),
 );
