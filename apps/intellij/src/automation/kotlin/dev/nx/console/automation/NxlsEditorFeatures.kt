@@ -17,6 +17,8 @@ import com.intellij.driver.sdk.ui.remote.Component
 import com.intellij.driver.sdk.ui.ui
 import com.intellij.driver.sdk.waitForProjectOpen
 import java.nio.file.Path
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.time.Duration
@@ -72,11 +74,29 @@ interface NxlsLookups {
     fun getActiveLookup(): NxlsLookup?
 }
 
+@Remote("java.util.Objects")
+interface NxlsObjects {
+    fun equals(first: NxlsLookup, second: NxlsLookup): Boolean
+}
+
+@Remote("com.intellij.codeInsight.lookup.LookupFocusDegree")
+interface NxlsLookupFocusDegree {
+    fun name(): String
+}
+
 @Remote("com.intellij.codeInsight.lookup.impl.LookupImpl")
 interface NxlsLookup {
     fun getItems(): List<NxlsLookupItem>
 
     fun isCalculating(): Boolean
+
+    fun isShown(): Boolean
+
+    fun isLookupDisposed(): Boolean
+
+    fun getLookupFocusDegree(): NxlsLookupFocusDegree
+
+    fun getCurrentItem(): NxlsLookupItem?
 
     fun setCurrentItem(item: NxlsLookupItem)
 
@@ -274,24 +294,47 @@ internal fun Driver.nxlsHideLookup(project: Project) {
     }
 }
 
+internal data class NxlsCompletionMoment(val time: String, val dumb: Boolean)
+
+internal data class NxlsCompletionResult(
+    val lookup: NxlsLookup,
+    val items: List<NxlsLookupItem>,
+    val invoked: NxlsCompletionMoment,
+    val returned: NxlsCompletionMoment,
+)
+
+private val nxlsLogTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS")
+
+private fun Driver.nxlsCompletionMoment(project: Project): NxlsCompletionMoment =
+    NxlsCompletionMoment(
+        LocalDateTime.now().format(nxlsLogTimeFormat),
+        service<DumbService>(project).isDumb(),
+    )
+
 internal fun Driver.nxlsCompletion(
     project: Project,
     editor: NxlsEditor,
     expected: String,
-): Pair<NxlsLookup, List<NxlsLookupItem>> {
+): NxlsCompletionResult {
     nxlsHideLookup(project)
     nxlsFocusEditor(editor)
     nxlsWait(message = { "Indexing did not finish before completion" }) {
         !service<DumbService>(project).isDumb()
     }
+    val invoked = withContext(OnDispatcher.EDT) { nxlsCompletionMoment(project) }
     invokeAction("CodeCompletion", component = editor.getContentComponent())
     var result: Pair<NxlsLookup, List<NxlsLookupItem>>? = null
     var labels = emptyList<String>()
     var lookupState = "absent"
+    var lastPoll = invoked
     nxlsWait(
-        message = { "No LSP completion '$expected'; lookup=$lookupState; LSP labels: $labels" }
+        message = {
+            "No LSP completion '$expected'; lookup=$lookupState; LSP labels: $labels" +
+                "; completion invoked=$invoked; last poll=$lastPoll"
+        }
     ) {
         withContext(OnDispatcher.EDT) {
+            lastPoll = nxlsCompletionMoment(project)
             val lookup = service<NxlsLookups>(project).getActiveLookup()
             lookupState =
                 if (lookup == null) "absent"
@@ -308,7 +351,9 @@ internal fun Driver.nxlsCompletion(
             true
         }
     }
-    return checkNotNull(result)
+    val (lookup, items) = checkNotNull(result)
+    val returned = withContext(OnDispatcher.EDT) { nxlsCompletionMoment(project) }
+    return NxlsCompletionResult(lookup, items, invoked, returned)
 }
 
 internal fun Driver.nxlsDocumentation(
@@ -422,7 +467,8 @@ private fun Driver.checkSnippet(
     val disk = Path.of(checkNotNull(service<NxlsDocuments>().getFile(document)).getPath())
     val diskBefore = disk.readText()
     nxlsPrepareCase(editor, case)
-    val (lookup, items) = nxlsCompletion(project, editor, case.key)
+    val completion = nxlsCompletion(project, editor, case.key)
+    val (lookup, items) = completion
     val item = items.first { it.getObject().getCompletionItem().getLabel() == case.key }
     val payload = item.getObject().getCompletionItem()
     val snippet =
@@ -435,7 +481,34 @@ private fun Driver.checkSnippet(
     }
     val server = item.getObject().getLspClient()
     withContext(OnDispatcher.EDT) { lookup.setCurrentItem(item) }
-    invokeAction("EditorChooseLookupItem", component = editor.getContentComponent())
+    try {
+        invokeAction("EditorChooseLookupItem", component = editor.getContentComponent())
+    } catch (failure: Exception) {
+        val rejectedAt = LocalDateTime.now().format(nxlsLogTimeFormat)
+        val state =
+            runCatching {
+                    withContext(OnDispatcher.EDT) {
+                        val observed = nxlsCompletionMoment(project)
+                        val active = service<NxlsLookups>(project).getActiveLookup()
+                        val identity =
+                            when {
+                                active == null -> "absent"
+                                utility<NxlsObjects>().equals(active, lookup) -> "same"
+                                else -> "different"
+                            }
+                        "observed=$observed; active lookup=$identity; returned lookup:" +
+                            " isShown=${lookup.isShown()}, isLookupDisposed=${lookup.isLookupDisposed()}," +
+                            " focus=${lookup.getLookupFocusDegree().name()}," +
+                            " currentItemPresent=${lookup.getCurrentItem() != null}"
+                    }
+                }
+                .getOrElse { "lookup diagnostics unavailable: ${it.message}" }
+        throw IllegalStateException(
+            "${failure.message}; completion invoked=${completion.invoked};" +
+                " lookup returned=${completion.returned}; action rejected=$rejectedAt; $state",
+            failure,
+        )
+    }
     nxlsWait(message = { "Snippet did not insert ${case.key}" }) {
         nxlsText(editor).contains("\"${case.key}\"")
     }
