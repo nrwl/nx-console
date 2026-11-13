@@ -335,6 +335,10 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
             properties: {
               note: { type: 'string', description: 'A free-form note.' },
               flag: { type: 'boolean', description: 'A boolean flag.' },
+              positional: {
+                type: 'string',
+                $default: { $source: 'argv', index: 0 },
+              },
             },
             additionalProperties: true,
           }),
