@@ -73,4 +73,24 @@ describe('stripAnsiFromError', () => {
       { message: 'plain\ntext', stack: undefined, cause: null, code: 123 },
     ]);
   });
+
+  it('drops circular references instead of recursing forever', () => {
+    const request: Record<string, unknown> = {
+      url: '\u001b[2mhttp://x\u001b[22m',
+    };
+    request['self'] = request;
+    const result = stripAnsiFromError({ message: 'failed', cause: request });
+    expect(result).toEqual({
+      message: 'failed',
+      cause: { url: 'http://x', self: undefined },
+    });
+  });
+
+  it('keeps objects that are shared but not circular', () => {
+    const shared = { file: 'project.json' };
+    expect(stripAnsiFromError([{ cause: shared }, { cause: shared }])).toEqual([
+      { cause: shared },
+      { cause: shared },
+    ]);
+  });
 });
