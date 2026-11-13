@@ -1,10 +1,11 @@
 import {
+  addProjectToWorkspace,
   e2eCwd,
   modifyJsonFile,
   newWorkspace,
   uniq,
 } from '@nx-console/shared-e2e-utils';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
@@ -26,24 +27,18 @@ describe('interpolated path links', () => {
     newWorkspace({
       name: workspaceName,
       options: {
-        preset: 'next',
+        preset: 'apps',
       },
     });
-    writeFileSync(
-      projectJsonPath,
-      JSON.stringify(
-        {
-          root: `apps/${workspaceName}`,
-          targets: {
-            build: {
-              inputs: ['{workspaceRoot}/nx.json', '{projectRoot}/project.json'],
-            },
-          },
+    addProjectToWorkspace(join(e2eCwd, workspaceName), {
+      name: `@${workspaceName}/${workspaceName}`,
+      root: `apps/${workspaceName}`,
+      targets: {
+        build: {
+          inputs: ['{workspaceRoot}/nx.json', '{projectRoot}/project.json'],
         },
-        null,
-        2,
-      ),
-    );
+      },
+    });
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
 
