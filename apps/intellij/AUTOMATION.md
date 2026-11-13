@@ -60,6 +60,15 @@ Console tool window shows its missing-interpreter panel and that **Refresh Nx Wo
 the missing interpreter at once, then configures the interpreter again and checks that nxls restarts
 and the tree lists `demo` without a manual refresh. It expects a workspace with a `demo` project.
 
+`ReproEncapsulatedDaemonStartKt` checks daemon startup for an encapsulated workspace
+with a root `package.json` and `yarn.lock`, Nx installed only under
+`.nx/installation`, and `demo:hello` plus a `util` project. Run it after the IDE's
+initial workspace loading settles. It stops the fixture daemon, invokes **Refresh
+Nx Workspace**, and asserts that projects and the Search Everywhere target load
+through `./nx daemon --start` without manually starting the daemon. Use a private
+`NX_SOCKET_DIR` for the IDE and a different directory for repository build tasks.
+The scenario runs on Linux/macOS; unit tests cover Windows command selection.
+
 The JMX port is derived from the worktree path and printed on startup. Override
 it with `-PautomationPort=7777` on both the launch and scenario commands if
 necessary. JMX is bound to loopback and allows local processes to execute code
