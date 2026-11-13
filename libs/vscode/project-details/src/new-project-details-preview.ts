@@ -185,12 +185,12 @@ export class NewProjectDetailsPreview implements ProjectDetailsPreview {
     errorMessage: string | undefined,
     graphBasePath: string | undefined,
   ) {
-    if (errorsSerialized === undefined || graphBasePath === undefined) {
+    if (graphBasePath === undefined) {
       return;
     }
     let html = this.loadPDVHtmlBase(graphBasePath);
     const safeErrorMessage = escapeJsString(errorMessage ?? '');
-    const safeErrorsSerialized = escapeScriptTag(errorsSerialized);
+    const safeErrorsSerialized = escapeScriptTag(errorsSerialized ?? '[]');
     html = html.replace(
       '</body>',
       `

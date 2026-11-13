@@ -218,3 +218,13 @@ default. Set `NX_ANSI_FIXTURE=/absolute/path` to reuse an installed Nx workspace
 with `apps/hello/project.json` and another valid project; the scenario restores
 the original project file afterwards. The recording includes the healthy view,
 the malformed file and refresh, and the resulting error.
+
+### Deleted projects in Project Details
+
+`specs/pdv-deleted-project.spec.ts` opens hello's details, deletes its directory,
+checks the rendered missing-project message and absence of old targets, and
+restores the project in the same view. It repeats deletion after displaying and
+repairing an nx.json error to ensure the old error does not return.
+The default `project-details` fixture has hello and util; optionally set
+`VSCODE_PDV_WORKSPACE` to an existing hello/util workspace to test another Nx
+version. The scenario restores the project directory and nx.json afterwards.

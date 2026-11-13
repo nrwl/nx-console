@@ -33,14 +33,18 @@ export const machine = setup({
       //
     },
     assignLoadPDVData: assign(({ context, event }) => {
-      const multiProjects = Object.keys(
-        event['output'].pdvDataSerializedMulti ?? {},
-      );
+      const data = event['output'] as PDVData;
+      const multiProjects = Object.keys(data.pdvDataSerializedMulti ?? {});
       const multiSelectedProject =
         context['multiSelectedProject'] ??
         (multiProjects.length > 0 ? multiProjects[0] : undefined);
       return {
-        ...event['output'],
+        resultType: data.resultType,
+        graphBasePath: data.graphBasePath,
+        pdvDataSerialized: data.pdvDataSerialized,
+        pdvDataSerializedMulti: data.pdvDataSerializedMulti,
+        errorsSerialized: data.errorsSerialized,
+        errorMessage: data.errorMessage,
         multiSelectedProject,
       };
     }),

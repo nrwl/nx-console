@@ -29,6 +29,8 @@ import type { FixtureContext } from './fixtures/workspaces';
 import { NxConsolePage } from './page-objects/nx-console-page';
 
 export interface LaunchOptions {
+  /** Opens an existing workspace instead of creating a fixture. */
+  workspacePath?: string;
   /** A fixture from fixtures/workspaces.ts; defaults to `demo`. */
   fixture?: string;
   /** Values the fixture needs at creation time. Scenarios that set this always launch their own IDE. */
@@ -164,6 +166,7 @@ export const test = base.extend<{
             sandboxDir,
             log,
             fixture,
+            workspacePath: vscodeOptions.workspacePath,
             fixtureContext: vscodeOptions.fixtureContext,
             userSettings: vscodeOptions.userSettings,
             executable: requiredEnv('VSCODE_E2E_BINARY_PATH'),

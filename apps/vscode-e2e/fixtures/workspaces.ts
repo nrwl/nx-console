@@ -33,10 +33,12 @@ export function writeWorkspace(
     projects,
     files = {},
     nxJson = {},
+    initializeGit = true,
   }: {
     projects: Record<string, ProjectConfiguration>;
     files?: Record<string, string>;
     nxJson?: Record<string, unknown>;
+    initializeGit?: boolean;
   },
 ): void {
   const write = (file: string, content: string) => {
@@ -70,6 +72,7 @@ export function writeWorkspace(
     join(path, 'node_modules'),
     process.platform === 'win32' ? 'junction' : 'dir',
   );
+  if (!initializeGit) return;
   for (const args of [
     ['init', '-b', 'main'],
     ['config', 'user.name', 'Nx Console Automation'],
@@ -177,6 +180,27 @@ const libraryTsconfigs = (types: string[]) => ({
 });
 
 export const workspaceFixtures: Record<string, WorkspaceFixture> = {
+  'project-details': {
+    description:
+      'A hello application and a util library for Project Details refreshes.',
+    create: (path) =>
+      writeWorkspace(path, {
+        initializeGit: false,
+        projects: {
+          'apps/hello': {
+            name: 'hello',
+            targets: {
+              hello: runCommand('echo hello-ok'),
+              check: runCommand('echo check-ok'),
+            },
+          },
+          'libs/util': {
+            name: 'util',
+            targets: { check: runCommand('echo util-ok') },
+          },
+        },
+      }),
+  },
   demo: {
     description: 'One project, `demo`, with `hello` and `check` targets.',
     create: (path) =>
