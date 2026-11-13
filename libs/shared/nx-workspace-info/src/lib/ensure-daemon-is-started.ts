@@ -1,5 +1,8 @@
 import type * as NxDaemonClient from 'nx/src/daemon/client/client';
-import { getPackageManagerCommand } from '@nx-console/shared-npm';
+import {
+  getNxExecutionCommand,
+  isDotNxInstallation,
+} from '@nx-console/shared-npm';
 import {
   Logger,
   ManagedCommandError,
@@ -76,9 +79,13 @@ export async function ensureDaemonIsStarted(
   // Start daemon with mutex
   daemonStartPromise = (async () => {
     try {
-      logger.log('Starting Nx daemon via CLI...');
-      const pm = await getPackageManagerCommand(workspacePath, logger);
-      await runManagedCommand(`${pm.exec} nx daemon --start`, {
+      const command = await getNxExecutionCommand({
+        cwd: workspacePath,
+        displayCommand: 'nx daemon --start',
+        encapsulatedNx: await isDotNxInstallation(workspacePath),
+      });
+      logger.log(`Starting Nx daemon via CLI: ${command}`);
+      await runManagedCommand(command, {
         cwd: workspacePath,
         timeoutMs: DAEMON_START_TIMEOUT_MS,
       });
