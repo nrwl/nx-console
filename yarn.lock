@@ -14785,7 +14785,7 @@ __metadata:
     typescript: "npm:6.0.3"
     typescript-eslint: "npm:8.63.0"
     vite: "npm:8.3.4"
-    vscode-json-languageservice: "npm:5.5.0"
+    vscode-json-languageservice: "npm:5.7.2"
     vscode-jsonrpc: "npm:8.2.1"
     vscode-languageclient: "npm:8.1.0"
     vscode-languageserver: "npm:8.1.0"
@@ -18849,16 +18849,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vscode-json-languageservice@npm:5.5.0":
-  version: 5.5.0
-  resolution: "vscode-json-languageservice@npm:5.5.0"
+"vscode-json-languageservice@npm:5.7.2":
+  version: 5.7.2
+  resolution: "vscode-json-languageservice@npm:5.7.2"
   dependencies:
     "@vscode/l10n": "npm:^0.0.18"
     jsonc-parser: "npm:^3.3.1"
     vscode-languageserver-textdocument: "npm:^1.0.12"
     vscode-languageserver-types: "npm:^3.17.5"
     vscode-uri: "npm:^3.1.0"
-  checksum: 10c0/e12ed53214a0ed50df5b6de9c5c5da4339309ef804716023d0b147d4a4e4278fa85aa9f99374af1bd5b64655dcf8a2ca1ba809c5a3439a9f92d7d432c33797a5
+  checksum: 10c0/77923ef91e497f47dbc80a526ba86879217dd99b6fda941eb7d791e9567c8b0364793160a40499b781c6649d94b56ceef271701cf045703bee0805044e439ed9
   languageName: node
   linkType: hard
 
