@@ -1,9 +1,10 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Position } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { NxlsWrapper } from '../nxls-wrapper';
 import {
+  addProjectToWorkspace,
   e2eCwd,
   modifyJsonFile,
   newWorkspace,
@@ -26,10 +27,13 @@ describe('namedInput link completion - default', () => {
     newWorkspace({
       name: workspaceName,
       options: {
-        preset: 'next',
+        preset: 'apps',
       },
     });
-    writeFileSync(projectJsonPath, `{}`);
+    addProjectToWorkspace(join(e2eCwd, workspaceName), {
+      name: `@${workspaceName}/${workspaceName}`,
+      root: `apps/${workspaceName}`,
+    });
     nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
 
