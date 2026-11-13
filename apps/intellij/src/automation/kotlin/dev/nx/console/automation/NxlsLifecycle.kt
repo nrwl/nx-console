@@ -274,7 +274,7 @@ fun main() = withAutomationDriver {
             val originals = mutableMapOf<NxlsEditor, String>()
             try {
                 lifecycleStep(project, "initial tree", report) {
-                    nxlsRunning(project)
+                    nxlsReady(project)
                     openToolWindow("Nx Console")
                     report.appendLine("Initial tree: ${nxlsTree()}")
                 }

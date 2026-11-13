@@ -14,6 +14,7 @@ import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.openFile
 import com.intellij.driver.sdk.ui.remote.Component
 import com.intellij.driver.sdk.ui.ui
+import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.driver.sdk.waitForProjectOpen
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -223,6 +224,11 @@ internal fun Driver.nxlsRunning(project: Project) {
     nxlsWait(5.minutes, { "Nx language server did not reach Running" }) {
         service<EditorFreezeNxlsService>(project).isStarted()
     }
+}
+
+internal fun Driver.nxlsReady(project: Project) {
+    nxlsRunning(project)
+    waitForIndicators(project, 5.minutes, waitSmartLongEnough = true)
 }
 
 internal fun Driver.nxlsEditor(project: Project): NxlsEditor =
@@ -543,6 +549,7 @@ fun main() = withAutomationDriver {
     recordIde(label) {
         val autoSave = service<NxlsAutoSave>().disableAutoSave()
         try {
+            nxlsReady(project)
             for (case in nxlsConfigCases) {
                 openFile(case.path)
                 nxlsRunning(project)

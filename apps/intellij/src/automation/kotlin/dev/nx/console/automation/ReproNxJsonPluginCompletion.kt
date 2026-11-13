@@ -47,6 +47,7 @@ fun main() = withAutomationDriver {
 
     recordIde(System.getenv("NX_AUTOMATION_LABEL") ?: "nx-json-plugin-completion-repro") {
         openFile("nx.json")
+        nxlsReady(project)
         val (file, editor) =
             withContext(OnDispatcher.EDT) {
                 val editors = service<FileEditorManager>(project)
