@@ -8,3 +8,4 @@ export * from './lib/loadRootEnvFiles';
 export * from './lib/provenance';
 export * from './lib/http-client';
 export * from './lib/managed-process';
+export * from './lib/strip-ansi-from-error';

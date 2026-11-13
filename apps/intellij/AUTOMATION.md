@@ -910,3 +910,14 @@ NX_AUTOMATION_LABEL=issue-2418-repro CI=true \
 
 Restart the rebuilt IDE and rerun with `NX_AUTOMATION_LABEL=issue-2418-fixed`.
 A labeled text report accompanies each recording.
+
+### Project graph errors without ANSI escapes
+
+`ReproGraphErrorAnsiKt` expects an installed workspace with
+`apps/hello/project.json` and another valid project. It opens hello's JCEF
+Project Details, breaks the project file, refreshes Nx, and asserts that the
+rendered parse error retains its code frame without terminal escape sequences.
+The original file is restored afterwards. Set `NX_AUTOMATION_PROJECT` to the
+fixture and run `intellij:runAutomation` with
+`-PautomationMain=dev.nx.console.automation.ReproGraphErrorAnsiKt`, using the
+launch and recording instructions above.

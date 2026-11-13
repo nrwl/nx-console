@@ -207,3 +207,14 @@ References:
 
 - [Playwright `connectOverCDP`](https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp)
 - [Testing VS Code extensions](https://code.visualstudio.com/api/working-with-extensions/testing-extension)
+
+### Project graph errors without ANSI escapes
+
+`specs/graph-error-ansi.spec.ts` opens hello's Project Details, saves malformed
+`apps/hello/project.json`, and refreshes the workspace. It asserts that the
+rendered error and graph diagnostics contain the parse error and code frame
+without terminal escape sequences. The scenario creates a minimal workspace by
+default. Set `NX_ANSI_FIXTURE=/absolute/path` to reuse an installed Nx workspace
+with `apps/hello/project.json` and another valid project; the scenario restores
+the original project file afterwards. The recording includes the healthy view,
+the malformed file and refresh, and the resulting error.
