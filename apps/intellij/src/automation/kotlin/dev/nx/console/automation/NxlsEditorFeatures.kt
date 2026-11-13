@@ -6,6 +6,7 @@ import com.intellij.driver.client.service
 import com.intellij.driver.client.utility
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Document
+import com.intellij.driver.sdk.DumbService
 import com.intellij.driver.sdk.Editor
 import com.intellij.driver.sdk.Project
 import com.intellij.driver.sdk.VirtualFile
@@ -280,6 +281,9 @@ internal fun Driver.nxlsCompletion(
 ): Pair<NxlsLookup, List<NxlsLookupItem>> {
     nxlsHideLookup(project)
     nxlsFocusEditor(editor)
+    nxlsWait(message = { "Indexing did not finish before completion" }) {
+        !service<DumbService>(project).isDumb()
+    }
     invokeAction("CodeCompletion", component = editor.getContentComponent())
     var result: Pair<NxlsLookup, List<NxlsLookupItem>>? = null
     var labels = emptyList<String>()
