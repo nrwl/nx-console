@@ -7225,19 +7225,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xterm/addon-fit@npm:0.10.0":
-  version: 0.10.0
-  resolution: "@xterm/addon-fit@npm:0.10.0"
-  peerDependencies:
-    "@xterm/xterm": ^5.0.0
-  checksum: 10c0/76926120fc940376afef2cb68b15aec2a99fc628b6e3cc84f2bcb1682ca9b87f982b3c10ff206faf4ebc5b410467b81a7b5e83be37b4ac386586f472e4fa1c61
+"@xterm/addon-fit@npm:0.11.0":
+  version: 0.11.0
+  resolution: "@xterm/addon-fit@npm:0.11.0"
+  checksum: 10c0/c0ce94f7e877d07e7197d15d041cc629ce2e853016400aadddc9810838ea8a26e836f87f325eba36df88c03feb72d9f13cd8c3bb41ee31e701f1058edb8553c3
   languageName: node
   linkType: hard
 
-"@xterm/xterm@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@xterm/xterm@npm:5.5.0"
-  checksum: 10c0/358801feece58617d777b2783bec68dac1f52f736da3b0317f71a34f4e25431fb0b1920244f678b8d673f797145b4858c2a5ccb463a4a6df7c10c9093f1c9267
+"@xterm/xterm@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@xterm/xterm@npm:6.0.0"
+  checksum: 10c0/b99122553f323a65b708e5eba9903d4c5a1bcb59fe576d29d6e91a33002bccfd1b99403e1e839e1942f4952039db6d3d74ca9d65ed0399b4e9a0a5f35b8c12d9
   languageName: node
   linkType: hard
 
@@ -14743,8 +14741,8 @@ __metadata:
     "@vscode/codicons": "npm:0.0.36"
     "@vscode/test-electron": "npm:2.5.2"
     "@vscode/vsce": "npm:4.1.0"
-    "@xterm/addon-fit": "npm:0.10.0"
-    "@xterm/xterm": "npm:5.5.0"
+    "@xterm/addon-fit": "npm:0.11.0"
+    "@xterm/xterm": "npm:6.0.0"
     "@yarnpkg/fslib": "npm:3.1.5"
     "@yarnpkg/libzip": "npm:3.2.2"
     "@yarnpkg/pnp": "npm:3.3.8"
