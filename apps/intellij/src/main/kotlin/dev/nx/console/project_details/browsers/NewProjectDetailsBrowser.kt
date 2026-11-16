@@ -35,6 +35,7 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.loadHtmlAndAwait
+import dev.nx.console.utils.openFileWithFocus
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.FlowLayout
@@ -685,7 +686,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                 } else {
                                     val fileEditorManager = FileEditorManager.getInstance(project)
                                     ApplicationManager.getApplication().invokeLater {
-                                        fileEditorManager.openFile(clickedFile, true)
+                                        fileEditorManager.openFileWithFocus(clickedFile)
                                     }
                                 }
                             }
@@ -708,7 +709,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
                                         LocalFileSystem.getInstance().findFileByPath(path)
                                             ?: return@apply
                                     ApplicationManager.getApplication().invokeLater {
-                                        FileEditorManager.getInstance(project).openFile(file, true)
+                                        FileEditorManager.getInstance(project)
+                                            .openFileWithFocus(file)
                                     }
                                 }
                             }

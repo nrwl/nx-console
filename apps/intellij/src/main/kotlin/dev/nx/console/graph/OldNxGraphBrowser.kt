@@ -21,6 +21,7 @@ import dev.nx.console.utils.*
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import dev.nx.console.utils.openFileWithFocus
 import io.github.z4kn4fein.semver.toVersion
 import java.io.File
 import java.nio.file.Paths
@@ -401,7 +402,7 @@ class OldNxGraphBrowser(
                     return@addHandler null
                 }
                 ApplicationManager.getApplication().invokeLater {
-                    FileEditorManager.getInstance(project).openFile(file, true)
+                    FileEditorManager.getInstance(project).openFileWithFocus(file)
                 }
                 null
             }
@@ -433,7 +434,7 @@ class OldNxGraphBrowser(
                         val file =
                             LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
                         ApplicationManager.getApplication().invokeLater {
-                            FileEditorManager.getInstance(project).openFile(file, true)
+                            FileEditorManager.getInstance(project).openFileWithFocus(file)
                         }
                     }
                 }

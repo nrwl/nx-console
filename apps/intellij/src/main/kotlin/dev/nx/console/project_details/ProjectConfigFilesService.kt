@@ -12,6 +12,7 @@ import dev.nx.console.models.NxProject
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.nxBasePath
+import dev.nx.console.utils.openFileWithFocus
 import java.nio.file.InvalidPathException
 import java.nio.file.Paths
 import kotlinx.coroutines.CoroutineScope
@@ -131,7 +132,7 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
                         // Use invokeLater to avoid race conditions in tab updates
                         ApplicationManager.getApplication().invokeLater {
                             if (!project.isDisposed && file.isValid) {
-                                fileEditorManager.openFile(file, true)
+                                fileEditorManager.openFileWithFocus(file)
                             }
                         }
                     } catch (e: Exception) {

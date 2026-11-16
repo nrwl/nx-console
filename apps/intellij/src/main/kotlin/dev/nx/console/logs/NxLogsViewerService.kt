@@ -4,6 +4,7 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import dev.nx.console.utils.openFileWithFocus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,7 +20,7 @@ class NxLogsViewerService(private val project: Project) {
         withContext(Dispatchers.EDT) {
             val fileEditorManager = FileEditorManager.getInstance(project)
             val logFile = NxLogsVirtualFile()
-            fileEditorManager.openFile(logFile, true)
+            fileEditorManager.openFileWithFocus(logFile)
         }
     }
 }

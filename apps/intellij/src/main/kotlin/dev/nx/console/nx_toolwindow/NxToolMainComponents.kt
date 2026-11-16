@@ -37,6 +37,7 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxBasePath
+import dev.nx.console.utils.openFileWithFocus
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.io.File
@@ -337,7 +338,7 @@ class NxToolMainComponents(private val project: Project) {
             withContext(Dispatchers.EDT) {
                 if (project.isDisposed) return@withContext
                 if (virtualFile != null && virtualFile.isValid) {
-                    FileEditorManager.getInstance(project).openFile(virtualFile, true)
+                    FileEditorManager.getInstance(project).openFileWithFocus(virtualFile)
                 } else {
                     showDaemonLogNotFoundError()
                 }
