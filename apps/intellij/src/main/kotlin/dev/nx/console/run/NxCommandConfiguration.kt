@@ -49,7 +49,7 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
         }
 
         if (',' in nxRunSettings.nxTargets) {
-            return "${nxRunSettings.nxProjects} --targets=${nxRunSettings.nxTargets} ${if(nxRunSettings.nxTargetsConfiguration.isBlank().not()) "-c ${nxRunSettings.nxTargetsConfiguration}" else ""}"
+            return "${nxRunSettings.nxProjects} --targets=${nxRunSettings.nxTargets} ${if(nxRunSettings.nxTargetsConfiguration.isBlank().not()) "--configuration=${nxRunSettings.nxTargetsConfiguration}" else ""}"
         }
 
         return "${nxRunSettings.nxProjects}:${nxRunSettings.nxTargets}${if(nxRunSettings.nxTargetsConfiguration.isBlank().not()) ":${nxRunSettings.nxTargetsConfiguration}" else ""}"

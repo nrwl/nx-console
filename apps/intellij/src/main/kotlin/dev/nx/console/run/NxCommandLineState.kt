@@ -47,27 +47,7 @@ class NxCommandLineState(
     override fun startProcess(configurator: CommandLineDebugConfigurator?): ProcessHandler {
         val project: Project = environment.project
         val nxRunSettings = runConfiguration.nxRunSettings
-        val nxProjects = nxRunSettings.nxProjects.split(",")
-        val nxTargets = nxRunSettings.nxTargets.split(",")
-        val nxTargetsConfiguration = nxRunSettings.nxTargetsConfiguration
-        val args =
-            if (nxProjects.size > 1 || nxTargets.size > 1) {
-                val array =
-                    arrayOf(
-                        "run-many",
-                        "--targets=${nxTargets.joinToString(separator = ",")}",
-                        "--projects=${nxProjects.joinToString(separator = ",")}",
-                    )
-                if (nxTargetsConfiguration.isBlank().not()) {
-                    array + "-c $nxTargetsConfiguration"
-                } else {
-                    array
-                }
-            } else
-                arrayOf(
-                    "run",
-                    "${nxProjects.first()}:${nxTargets.first()}${if(nxTargetsConfiguration.isBlank().not()) ":$nxTargetsConfiguration" else ""}",
-                )
+        val args = nxRunSettings.commandLineArguments()
 
         if (configurator != null) {
             try {
