@@ -30,7 +30,9 @@ class V2NxGenerateUiFile(
 ) : NxGenerateUiFile(name) {
     private val cs = V2NxGenerateUiFileCoroutineHolder.getInstance(project).cs
 
+    private val initializationLock = Any()
     private var generatorToDisplay: GeneratorSchema? = null
+    private var webviewInitialized = false
 
     override fun createMainComponent(project: Project): JComponent {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
@@ -43,7 +45,7 @@ class V2NxGenerateUiFile(
         return browser.component
     }
 
-    override fun setupGeneratorForm(generator: NxGenerator) {
+    init {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
@@ -70,19 +72,42 @@ class V2NxGenerateUiFile(
                 )
             }
 
-            // we will send this info to the webview once it's initialized
-            generator.options?.let { options ->
-                this.generatorToDisplay =
-                    GeneratorSchema(
-                        generatorName = generator.data.name,
-                        collectionName = generator.data.collection,
-                        description = generator.data.description ?: "",
-                        options = options,
-                        context = generator.contextValues,
-                    )
-            }
             browser.component.requestFocus()
             //            browser.openDevtools()
+        }
+    }
+
+    override fun setupGeneratorForm(generator: NxGenerator) {
+        val schema =
+            generator.options?.let { options ->
+                GeneratorSchema(
+                    generatorName = generator.data.name,
+                    collectionName = generator.data.collection,
+                    description = generator.data.description ?: "",
+                    options = options,
+                    context = generator.contextValues,
+                )
+            }
+        // The webview may have sent output-init already; whichever of the two arrives second
+        // sends the schema.
+        val webviewReady =
+            synchronized(initializationLock) {
+                generatorToDisplay = schema
+                webviewInitialized
+            }
+        if (webviewReady && schema != null) sendGeneratorSchema(schema)
+    }
+
+    private fun sendGeneratorSchema(schema: GeneratorSchema) {
+        cs.launch {
+            NxlsService.getInstance(project).transformedGeneratorSchema(schema).apply {
+                postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(this))
+            }
+        }
+        cs.launch {
+            NxlsService.getInstance(project).startupMessage(schema)?.apply {
+                postMessageToBrowser(GenerateUiStartupMessageDefinitionInputMessage(this))
+            }
         }
     }
 
@@ -91,18 +116,12 @@ class V2NxGenerateUiFile(
         val messageParsed = json.decodeFromString<GenerateUiOutputMessage>(message)
         logger.info("received message $messageParsed")
         if (messageParsed.payloadType == "output-init") {
-            this.generatorToDisplay?.let { schema ->
-                cs.launch {
-                    NxlsService.getInstance(project).transformedGeneratorSchema(schema).apply {
-                        postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(this))
-                    }
+            val schema =
+                synchronized(initializationLock) {
+                    webviewInitialized = true
+                    generatorToDisplay
                 }
-                cs.launch {
-                    NxlsService.getInstance(project).startupMessage(schema)?.apply {
-                        postMessageToBrowser(GenerateUiStartupMessageDefinitionInputMessage(this))
-                    }
-                }
-            }
+            schema?.let { sendGeneratorSchema(it) }
 
             return
         }
