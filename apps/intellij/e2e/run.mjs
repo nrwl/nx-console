@@ -276,7 +276,9 @@ try {
       [
         'nx',
         'run',
-        'intellij:initializeIntellijPlatformPlugin',
+        // initializeIntellijPlatformPlugin alone does not resolve the IDE when Nx reuses a cached
+        // project graph; printBundledPlugins reads the installed IDE, so Gradle must extract it.
+        'intellij:printBundledPlugins',
         '--batch=false',
         '--parallel=1',
         '--skip-nx-cache',
