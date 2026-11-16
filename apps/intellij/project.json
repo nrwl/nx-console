@@ -20,6 +20,13 @@
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": ["...", "kotlin", "{projectRoot}/src/main/**/*"]
     },
+    "verifyPlugin": {
+      "inputs": [
+        "{projectRoot}/build.gradle.kts",
+        "{workspaceRoot}/gradle.properties",
+        { "dependentTasksOutputFiles": "**/*.zip", "transitive": true }
+      ]
+    },
     "assemble": {
       "options": {
         "includeDependsOnTasks": [
