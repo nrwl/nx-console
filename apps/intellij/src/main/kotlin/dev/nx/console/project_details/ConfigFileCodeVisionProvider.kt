@@ -1,10 +1,14 @@
-@file:Suppress("UnstableApiUsage")
-
 package dev.nx.console.project_details
 
-import com.intellij.codeInsight.codeVision.*
+import com.intellij.codeInsight.codeVision.CodeVisionAnchorKind
+import com.intellij.codeInsight.codeVision.CodeVisionEntry
+import com.intellij.codeInsight.codeVision.CodeVisionRelativeOrdering
+import com.intellij.codeInsight.codeVision.CodeVisionState
 import com.intellij.codeInsight.codeVision.settings.CodeVisionGroupSettingProvider
 import com.intellij.codeInsight.codeVision.ui.model.ClickableTextCodeVisionEntry
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.codeInsight.hints.codeVision.DaemonBoundCodeVisionProvider
+import com.intellij.codeInsight.hints.codeVision.ModificationStampUtil
 import com.intellij.icons.AllIcons
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonProperty
@@ -16,10 +20,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import dev.nx.console.models.NxProject
 import dev.nx.console.models.NxWorkspace
@@ -33,19 +39,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
+internal class ConfigFileCodeVisionProvider : DaemonBoundCodeVisionProvider {
     companion object {
         internal const val ID: String = "dev.nx.console.config-file-code-vision"
     }
 
-    override fun computeCodeVision(editor: Editor, uiData: Unit): CodeVisionState {
-        val project = editor.project ?: return CodeVisionState.READY_EMPTY
-
-        return ProjectLevelConfigFileCodeVisionManager.getInstance(project).getCodeVision(editor)
-    }
-
-    override fun precomputeOnUiThread(editor: Editor): Unit {
-        return
+    override fun computeForEditor(
+        editor: Editor,
+        file: PsiFile,
+    ): List<Pair<TextRange, CodeVisionEntry>> {
+        val project = editor.project ?: return emptyList()
+        return ProjectLevelConfigFileCodeVisionManager.getInstance(project)
+            .getCodeVision(editor)
+            .result
     }
 
     override val defaultAnchor = CodeVisionAnchorKind.Default
@@ -255,16 +261,7 @@ class ProjectLevelConfigFileCodeVisionManager(
     }
 
     private suspend fun refreshCodeVision(project: Project) {
-        withContext(Dispatchers.EDT) {
-            project
-                .getService(CodeVisionHost::class.java)
-                .invalidateProvider(
-                    CodeVisionHost.LensInvalidateSignal(
-                        null,
-                        listOf(ConfigFileCodeVisionProvider.ID),
-                    )
-                )
-        }
+        withContext(Dispatchers.EDT) { restartConfigFileCodeVision(project) }
     }
 
     private fun getJsonCodevisionLocation(editor: Editor): TextRange? {
@@ -325,4 +322,13 @@ internal class ConfigFileCodeVisionGroupSettingProvider : CodeVisionGroupSetting
         "The targets available in or defined by a specific Nx config file. Click to run target or select target to run from a list."
 
     override val groupName = "Nx Config Files"
+}
+
+internal fun restartConfigFileCodeVision(project: Project) {
+    // Nx data can change without a PSI modification, which normally skips the code vision pass.
+    EditorFactory.getInstance()
+        .allEditors
+        .filter { it.project == project }
+        .forEach { ModificationStampUtil.clearModificationStamp(it) }
+    DaemonCodeAnalyzer.getInstance(project).restart("Nx configuration targets changed")
 }
