@@ -4,7 +4,6 @@ import {
   defaultVersion,
   e2eCwd,
   newWorkspace,
-  simpleReactWorkspaceOptions,
   uniq,
 } from '@nx-console/shared-e2e-utils';
 import { rmSync } from 'node:fs';
@@ -20,7 +19,9 @@ describe('tool-filter', () => {
   beforeAll(async () => {
     newWorkspace({
       name: workspaceName,
-      options: simpleReactWorkspaceOptions,
+      options: {
+        preset: 'apps',
+      },
     });
     invokeMCPInspectorCLI = await createInvokeMCPInspectorCLI(
       e2eCwd,
