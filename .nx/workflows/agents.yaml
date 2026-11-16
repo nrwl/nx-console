@@ -4,7 +4,7 @@ common-env: &common-env
   # Record and hash tasks with Nx Cloud I/O snapshots (ultracache).
   NX_CLOUD_USE_ULTRACACHE: 'true'
   # Eclipse Temurin release that "Setup Java" installs, as named on https://adoptium.net/temurin/releases.
-  JDK_VERSION: '21.0.13+9'
+  JDK_VERSION: '25.0.5+8'
 common-init-steps: &common-init-steps
   - name: Checkout
     uses: 'nrwl/nx-cloud-workflows/v4/workflow-steps/checkout/main.yaml'

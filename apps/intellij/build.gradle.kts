@@ -27,13 +27,16 @@ fun markdownToHTML(markdown: String): String {
 }
 
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
+val enablePluginVerification =
+    System.getenv("CI") == null ||
+        providers.gradleProperty("enablePluginVerification").orNull == "true"
 
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
     id("dev.nx.gradle.project-graph") version ("0.1.26")
     id("java")
-    id("org.jetbrains.intellij.platform") version "2.11.0"
+    id("org.jetbrains.intellij.platform") version "2.20.1"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -54,7 +57,11 @@ val automationOutput =
         .orElse(layout.buildDirectory.dir("automation").map { it.asFile })
 val automationDriverVersion = providers.provider { intellijPlatform.productInfo.buildNumber }
 val automationJcefApi =
-    providers.provider { intellijPlatform.platformPath.resolve("lib/intellij.libraries.jcef.jar") }
+    providers.provider {
+        intellijPlatform.platformPath.resolve(
+            "plugins/jcef-plugin/lib/modules/intellij.libraries.jcef.jar"
+        )
+    }
 
 dependencies {
     add(automation.compileOnlyConfigurationName, files(automationJcefApi))
@@ -107,6 +114,8 @@ intellijPlatformTesting {
                 systemProperty("expose.ui.hierarchy.url", "true")
                 systemProperty("idea.trust.all.projects", "true")
                 systemProperty("idea.is.integration.test", "true")
+                // Development versions can match Marketplace's incompatible published releases.
+                systemProperty("idea.ignore.disabled.plugins", "true")
                 // IntelliJ recognizes this test policy version without a first-run dialog.
                 systemProperty("jb.privacy.policy.text", "<!--999.999-->")
                 systemProperty("jb.consents.confirmation.enabled", "false")
@@ -239,7 +248,7 @@ dependencies {
                 plugins.split(',').map(String::trim).filter(String::isNotEmpty)
             }
         )
-        if (System.getenv("CI") == null) {
+        if (enablePluginVerification) {
             pluginVerifier()
         }
         zipSigner()
@@ -251,7 +260,7 @@ dependencies {
 
 ktfmt { kotlinLangStyle() }
 
-kotlin { jvmToolchain(21) }
+kotlin { jvmToolchain(25) }
 
 intellijPlatform {
     projectName = providers.gradleProperty("pluginName").get()
@@ -293,8 +302,13 @@ intellijPlatform {
         // }.split('.').first()
         //        channels.set(listOf(channel))
     }
-    if (System.getenv("CI") == null) {
-        pluginVerification { ides { recommended() } }
+    if (enablePluginVerification) {
+        pluginVerification {
+            ides {
+                create("IU", "2026.2.5")
+                create("IU", "2026.3")
+            }
+        }
     }
 }
 
@@ -302,7 +316,7 @@ if (System.getenv("CI") == null) {
     intellijPlatformTesting {
         runIde {
             create("runIntelliJLatest") {
-                version = "2026.2.2"
+                version = "2026.2.5"
                 prepareSandboxTask {
                     from(nxlsRoot) {
                         include("**")
@@ -317,7 +331,7 @@ if (System.getenv("CI") == null) {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
+        jvmTarget.set(JvmTarget.JVM_25)
         // Without this, classes implementing platform interfaces get bridge overrides for every
         // default method, which Plugin Verifier reports as deprecated/experimental API usages.
         jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)

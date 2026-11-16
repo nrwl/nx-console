@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.nx.console.nxls.server.NxlsLanguageServer
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -45,6 +46,25 @@ private const val SERVER_STALL_MS = 60_000L
  * until the build times out.
  */
 object StdinIgnoringServer {
+    fun commandLine(stallMs: Long): List<String> {
+        val java =
+            Path.of(
+                System.getProperty("java.home"),
+                "bin",
+                if (SystemInfo.isWindows) "java.exe" else "java",
+            )
+        val classpath =
+            System.getProperty("java.class.path").replace("\\", "\\\\").replace("\"", "\\\"")
+        // Modular IDE test classpaths can exceed the OS limit for a single command-line argument.
+        val arguments = Files.createTempFile("nxls-server-", ".args")
+        arguments.toFile().deleteOnExit()
+        Files.writeString(
+            arguments,
+            "-cp\n\"$classpath\"\n${StdinIgnoringServer::class.java.name}\n$stallMs\n",
+        )
+        return listOf(java.toString(), "@$arguments")
+    }
+
     @JvmStatic
     fun main(args: Array<String>) {
         Thread.sleep(args.first().toLong())
@@ -147,20 +167,7 @@ class NxlsTransportFreezeTest : BasePlatformTestCase() {
     }
 
     private fun startStdinIgnoringServer(): Process {
-        val java =
-            Path.of(
-                System.getProperty("java.home"),
-                "bin",
-                if (SystemInfo.isWindows) "java.exe" else "java",
-            )
-        return ProcessBuilder(
-                java.toString(),
-                "-cp",
-                System.getProperty("java.class.path"),
-                StdinIgnoringServer::class.java.name,
-                SERVER_STALL_MS.toString(),
-            )
-            .start()
+        return ProcessBuilder(StdinIgnoringServer.commandLine(SERVER_STALL_MS)).start()
     }
 
     private fun waitForBlockedPipeWrite(): Thread? {
