@@ -40,7 +40,7 @@ group = providers.gradleProperty("pluginGroup").get()
 
 version = providers.gradleProperty("version").get()
 
-val automation by sourceSets.creating
+val automation = sourceSets.create("automation")
 val automationPort =
     providers
         .gradleProperty("automationPort")
