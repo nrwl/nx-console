@@ -20,6 +20,15 @@
       "dependsOn": ["^build", "^build-webview-files"],
       "inputs": ["...", "kotlin", "{projectRoot}/src/main/**/*"]
     },
+    "assemble": {
+      "options": {
+        "includeDependsOnTasks": [
+          ":intellij:composedJar",
+          ":intellij:instrumentedJar",
+          ":intellij:generateManifest"
+        ]
+      }
+    },
     "runIde": {
       "cache": false
     },

@@ -8,8 +8,8 @@ plugins {
   id("dev.nx.gradle.project-graph") version "0.1.26"
   id("com.ncorti.ktfmt.gradle") version "0.24.0"
 
-  id("org.jetbrains.kotlin.jvm") version "2.2.21"
-  id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+  id("org.jetbrains.kotlin.jvm") version "2.3.21"
+  id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"
 }
 
 allprojects {

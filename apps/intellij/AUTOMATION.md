@@ -4,6 +4,17 @@ Run the development plugin in a separate IntelliJ sandbox and execute Kotlin
 programs against it with JetBrains Driver. The IDE stays open between programs.
 The automation sources are separate from the plugin and are never packaged in it.
 
+## Plugin verification
+
+The plugin supports IntelliJ Platform 2026.2 and newer. Verification checks the
+pinned 2026.2.5 SDK and 2026.3. To enable the verifier's IDE downloads with `CI=true`, run:
+
+```sh
+CI=true JAVA_TOOL_OPTIONS='-XX:ActiveProcessorCount=4 -Dorg.gradle.workers.max=2 -Dorg.gradle.priority=low' \
+  yarn nx run intellij:verifyPlugin --batch=false --parallel=2 \
+  --args='--max-workers=2 --priority=low -PenablePluginVerification=true'
+```
+
 ## Launch the IDE
 
 Install the workspace dependencies with `yarn install --immutable`, then run:
@@ -190,7 +201,7 @@ On Linux, install `xvfb` and `ffmpeg`. Each run creates a private virtual displa
 and records it from IDE startup, including startup failures. No desktop session
 or physical display is required. The IDE still runs Swing with graphics enabled;
 `java.awt.headless=true` cannot render this test. On Linux the launcher forces
-IntelliJ's X11 toolkit (`-Dawt.toolkit.name=XToolkit`). Otherwise IntelliJ 2026.1's default
+IntelliJ's X11 toolkit (`-Dawt.toolkit.name=XToolkit`). Otherwise IntelliJ's default
 `auto` toolkit joins the desktop's Wayland session, the IDE opens on the desktop instead of the
 virtual display, and the recording stays black. On macOS, `ffmpeg` and a logged-in
 desktop session are required, and the existing Driver recorder captures the IDE.
@@ -213,7 +224,7 @@ so changes to IntelliJ or its dependencies select the test automatically. The
 existing `intellij:e2e` command remains an alias for all IntelliJ e2e tests.
 
 The existing IntelliJ assignment rule schedules the test on a
-`linux-large-plus-js` Nx Agent. The shared agent setup installs Java 21, Xvfb,
+`linux-large-plus-js` Nx Agent. The shared agent setup installs Java 25, Xvfb,
 and ffmpeg. The test declares its dependency builds in the Nx task graph so
 Nx Agents can build or restore their outputs before running it. The Gradle
 build, live IDE, and Kotlin client run together on the test's agent.

@@ -152,16 +152,9 @@ class RunGeneratorStartupTest : BasePlatformTestCase() {
                 if (SystemInfo.isWindows) "java.exe" else "java",
             )
         val args =
-            if (wait)
-                listOf(
-                    "-cp",
-                    System.getProperty("java.class.path"),
-                    StdinIgnoringServer::class.java.name,
-                    "60000",
-                )
-            else listOf("-version")
-        return KillableColoredProcessHandler(GeneralCommandLine(listOf(java.toString()) + args))
-            .also { handlers.add(it) }
+            if (wait) StdinIgnoringServer.commandLine(60000)
+            else listOf(java.toString(), "-version")
+        return KillableColoredProcessHandler(GeneralCommandLine(args)).also { handlers.add(it) }
     }
 
     private fun waitUntil(condition: () -> Boolean) {

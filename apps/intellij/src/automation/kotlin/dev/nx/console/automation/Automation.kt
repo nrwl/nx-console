@@ -1,6 +1,7 @@
 package dev.nx.console.automation
 
 import com.intellij.driver.client.Driver
+import com.intellij.driver.client.impl.DriverImpl
 import com.intellij.driver.client.impl.JmxHost
 import com.intellij.driver.sdk.jdk.getSystemProperty
 import java.nio.file.Path
@@ -10,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 fun withAutomationDriver(scenario: Driver.() -> Unit) {
     val port = System.getProperty("nx.console.automation.port").toInt()
     val workspace = System.getProperty("nx.console.automation.workspace")
-    Driver.create(JmxHost(null, null, "127.0.0.1:$port")).use { driver ->
+    DriverImpl(JmxHost(null, null, "127.0.0.1:$port"), isRemDevMode = false).use { driver ->
         val deadline = System.nanoTime() + 60.seconds.inWholeNanoseconds
         while (!runCatching { driver.isConnected }.getOrDefault(false)) {
             check(System.nanoTime() < deadline) {

@@ -8,7 +8,7 @@ scenario, and cleans up its IDE, fixture, and sandbox when finished.
 
 - macOS with a logged-in desktop session, or Linux. Windows is not supported.
 - The Node.js version in [`.nvmrc`](../../../.nvmrc), with Corepack enabled.
-- A Java 21 JDK, with `JAVA_HOME` pointing to it and Java available on `PATH`.
+- A Java 25 JDK, with `JAVA_HOME` pointing to it and Java available on `PATH`.
 - Git and `ffmpeg` with the `libx264` encoder available on `PATH`.
 - An activated `idea.key` compatible with the repository's pinned IntelliJ IDEA
   Ultimate version. The IntelliJ Platform Gradle plugin downloads the IDE; a separate IDE installation
@@ -31,10 +31,12 @@ On Ubuntu 22.04, install the JDK, recording tools, and GUI libraries:
 
 ```sh
 sudo apt-get update
-sudo apt-get install -y openjdk-21-jdk git procps xvfb ffmpeg fonts-dejavu-core \
+sudo apt-get install -y git procps xvfb ffmpeg fonts-dejavu-core \
   libasound2 libnss3 libxkbfile1 libx11-6 libxi6 libxtst6 libxrender1 \
   libxrandr2 libglib2.0-0 libdbus-1-3 libgbm1
 ```
+
+Install a Java 25 JDK separately, for example Eclipse Temurin, and set `JAVA_HOME`.
 
 Linux runs create their own Xvfb display, so no desktop session or manual
 `DISPLAY` configuration is needed. Keep Java graphics enabled; setting

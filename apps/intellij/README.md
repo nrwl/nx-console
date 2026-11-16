@@ -17,6 +17,8 @@ For instance:
 
 ## Installation
 
+Requires IntelliJ Platform 2026.2 (build 262) or newer.
+
 - Using IDE built-in plugin system:
 
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "stunning-waddle"</kbd> >

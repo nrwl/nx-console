@@ -19,7 +19,7 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
-        return NxRunConfigurationEditor()
+        return NxRunConfigurationEditor(project)
     }
 
     override fun writeExternal(element: Element) {

@@ -2,6 +2,7 @@ package dev.nx.console.run
 
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.project.Project
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.fields.ExpandableTextField
@@ -10,13 +11,13 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.ComponentWithEmptyText
 import javax.swing.JComponent
 
-class NxRunConfigurationEditor : SettingsEditor<NxCommandConfiguration>() {
+class NxRunConfigurationEditor(project: Project) : SettingsEditor<NxCommandConfiguration>() {
 
     private lateinit var nxProjectsField: ExpandableTextField
     private lateinit var nxTargetsField: ExpandableTextField
     private lateinit var nxTargetsConfigurationField: JBTextField
 
-    private val environmentVariablesField = EnvironmentVariablesComponent()
+    private val environmentVariablesField = EnvironmentVariablesComponent(project)
     private val argumentsField =
         RawCommandLineEditor().apply {
             if (textField is ComponentWithEmptyText) {
