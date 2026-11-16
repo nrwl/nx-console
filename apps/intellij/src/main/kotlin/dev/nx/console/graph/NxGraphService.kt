@@ -14,6 +14,7 @@ import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
+import dev.nx.console.utils.openFileWithFocus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -80,7 +81,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
             }
 
         if (nxGraphEditor != null) {
-            fileEditorManager.openFile(nxGraphEditor.file, true)
+            fileEditorManager.openFileWithFocus(nxGraphEditor.file)
             return
         }
 
@@ -93,7 +94,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
             cs.launch { loadProjectGraph() }
         }
 
-        fileEditorManager.openFile(virtualFile, true).apply {
+        fileEditorManager.openFileWithFocus(virtualFile).apply {
             Disposer.register(first(), graphBrowser)
         }
     }
@@ -173,7 +174,7 @@ class NxGraphService(override val project: Project, private val cs: CoroutineSco
                 }
 
             if (nxGraphEditor != null) {
-                fileEditorManager.openFile(nxGraphEditor.file, true)
+                fileEditorManager.openFileWithFocus(nxGraphEditor.file)
                 return@invokeAndWait
             }
 
@@ -182,7 +183,7 @@ class NxGraphService(override val project: Project, private val cs: CoroutineSco
 
             this@NxGraphService.graphBrowser = graphBrowser
 
-            fileEditorManager.openFile(virtualFile, true)
+            fileEditorManager.openFileWithFocus(virtualFile)
         }
     }
 

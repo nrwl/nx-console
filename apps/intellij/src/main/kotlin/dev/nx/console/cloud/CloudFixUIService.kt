@@ -14,6 +14,7 @@ import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.NxConsoleLogger
+import dev.nx.console.utils.openFileWithFocus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -102,7 +103,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
             if (fixId === currentFixId) {
                 ApplicationManager.getApplication().invokeLater {
                     val fileEditorManager = FileEditorManager.getInstance(project)
-                    currentFixFile?.let { file -> fileEditorManager.openFile(file, true) }
+                    currentFixFile?.let { file -> fileEditorManager.openFileWithFocus(file) }
                 }
                 return
             } else {
@@ -164,7 +165,7 @@ class CloudFixUIService(private val project: Project, private val cs: CoroutineS
             withContext(Dispatchers.EDT) {
                 val fixFile = NxCloudFixFileImpl("AI Fix", project) { onFixFileClosed(it) }
                 val fileEditorManager = FileEditorManager.getInstance(project)
-                fileEditorManager.openFile(fixFile, true)
+                fileEditorManager.openFileWithFocus(fixFile)
 
                 fixFile.showFixDetails(fixDetails)
 

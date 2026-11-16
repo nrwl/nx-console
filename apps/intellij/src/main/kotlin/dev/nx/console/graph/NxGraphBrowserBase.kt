@@ -30,6 +30,7 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.openFileWithFocus
 import java.nio.file.Paths
 import java.util.regex.Matcher
 import javax.swing.JComponent
@@ -271,7 +272,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                     }
                     val fileEditorManager = FileEditorManager.getInstance(project)
                     ApplicationManager.getApplication().invokeLater {
-                        fileEditorManager.openFile(file, true)
+                        fileEditorManager.openFileWithFocus(file)
                     }
                 }
                 return true
@@ -291,7 +292,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                             val file =
                                 LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
                             ApplicationManager.getApplication().invokeLater {
-                                FileEditorManager.getInstance(project).openFile(file, true)
+                                FileEditorManager.getInstance(project).openFileWithFocus(file)
                             }
                         }
                     }

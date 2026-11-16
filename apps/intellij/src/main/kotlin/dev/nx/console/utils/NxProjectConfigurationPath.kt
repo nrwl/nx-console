@@ -24,6 +24,6 @@ fun nxProjectConfigurationPath(project: Project, nxProjectRoot: String?): String
 fun openNxProjectConfiguration(project: Project, nxProjectRoot: String?): VirtualFile? {
     val path = nxProjectConfigurationPath(project, nxProjectRoot) ?: return null
     val file = LocalFileSystem.getInstance().findFileByPath(path) ?: return null
-    FileEditorManager.getInstance(project).openFile(file, true)
+    FileEditorManager.getInstance(project).openFileWithFocus(file)
     return file
 }

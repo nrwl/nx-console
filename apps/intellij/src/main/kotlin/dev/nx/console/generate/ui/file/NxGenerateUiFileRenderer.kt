@@ -7,6 +7,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.NxGenerateUiRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.openFileWithFocus
 
 class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
     override fun openGenerateUi(
@@ -25,7 +26,7 @@ class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
             fileEditorManager.closeFile(virtualFile)
         }
 
-        fileEditorManager.openFile(virtualFile, true)
+        fileEditorManager.openFileWithFocus(virtualFile)
 
         virtualFile.setupGeneratorForm(nxGenerator)
     }
