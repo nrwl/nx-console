@@ -79,9 +79,8 @@ interface CodeVisionKeyField {
 
 /**
  * Opens a project.json and checks that the IDE renders Nx Console's code vision entry in it, and
- * that the Nx Console tool window lists the fixture's projects. Both rely on default methods of
- * platform interfaces (CodeVisionProvider, ToolWindowFactory) that Nx Console does not override.
- * Expects a fixture whose demo project has a single target named hello.
+ * that the Nx Console tool window lists the fixture's projects. Expects a fixture whose demo
+ * project has a single target named hello.
  */
 fun main() = withAutomationDriver {
     waitForProjectOpen(3.minutes)

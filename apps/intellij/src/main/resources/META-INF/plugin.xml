@@ -88,7 +88,7 @@
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.run.NxRunTargetLineMarkerContributor"/>
 
-    <codeInsight.codeVisionProvider
+    <codeInsight.daemonBoundCodeVisionProvider
       implementation="dev.nx.console.project_details.ConfigFileCodeVisionProvider"/>
     <config.codeVisionGroupSettingProvider
       implementation="dev.nx.console.project_details.ConfigFileCodeVisionGroupSettingProvider"/>
