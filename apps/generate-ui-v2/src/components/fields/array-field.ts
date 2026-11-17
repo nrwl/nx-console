@@ -7,7 +7,6 @@ import {
   intellijFieldColors,
   intellijFieldPadding,
   intellijFocusRing,
-  vscodeErrorStyleOverrides,
 } from '@nx-console/shared-ui-components';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 

@@ -21,9 +21,6 @@ export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {
     } else {
       return html`<vscode-checkbox
         @change="${this.handleChange}"
-        style="${this.shouldRenderError()
-          ? '--border-width: 1; --checkbox-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
-          : ''}"
         ${spread(this.ariaAttributes)}
         ?invalid=${this.shouldRenderError()}
       ></vscode-checkbox>`;

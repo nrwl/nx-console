@@ -31,14 +31,15 @@ export class Button extends EditorContext(LitElement) {
       return html`
         <vscode-button
           icon="${this.text}"
+          icon-only
           ?disabled="${this.disabled}"
           aria-disabled="${this.disabled}"
           style="
-          --vscode-button-background: none;
+          --vscode-button-background: transparent;
+          --vscode-button-border: transparent;
           --vscode-button-foreground: ${this.color ??
           'var(--foreground-color)'};
           --vscode-button-hoverBackground: var(--field-nav-hover-color);"
-          class="h-[1.25rem] w-[1.25rem]"
         >
         </vscode-button>
       `;
