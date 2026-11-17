@@ -1,3 +1,4 @@
+import { configToArgs } from '@nx-console/nx-mcp-server';
 import { createYargsConfig } from './yargs-config';
 
 describe('createYargsConfig', () => {
@@ -110,6 +111,17 @@ describe('createYargsConfig', () => {
         '0.0.0.0',
       ]).parseSync();
       expect(argv.host).toBe('0.0.0.0');
+    });
+
+    it('should not take host from option-like config values', () => {
+      const argv = createYargsConfig([
+        ...configToArgs({
+          transport: 'http',
+          tools: ['--host=0.0.0.0', '--host', '0.0.0.0'],
+        }),
+      ]).parseSync();
+      expect(argv.host).toBeUndefined();
+      expect(argv.tools).toEqual(['--host=0.0.0.0', '--host', '0.0.0.0']);
     });
 
     it('should leave host unset by default', () => {

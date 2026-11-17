@@ -307,7 +307,8 @@ async function main() {
 
   if (argv.transport === 'http') {
     const port = argv.port ?? 9921;
-    const binding = getHttpBinding(argv.host);
+    // Only the command line can widen the binding, never the workspace's config file
+    const binding = getHttpBinding(preArgv.host);
     const app = express();
 
     const sessions: Record<string, NodeStreamableHTTPServerTransport> = {};
@@ -403,7 +404,7 @@ async function main() {
 
     if (binding.exposedToNetwork) {
       logger.log(
-        `Warning: the Nx MCP server has no authentication and is reachable from other machines on ${argv.host}:${port}.`,
+        `Warning: the Nx MCP server has no authentication and is reachable from other machines on ${preArgv.host}:${port}.`,
       );
     }
 
