@@ -60,9 +60,10 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
   }
 
   protected updated(): void {
-    const selector =
-      this.editor === 'vscode' ? 'vscode-combobox' : 'intellij-combobox';
-    const autocompleteNode = this.renderRoot.querySelector(selector);
+    if (this.editor === 'vscode') {
+      return;
+    }
+    const autocompleteNode = this.renderRoot.querySelector('intellij-combobox');
     if (!autocompleteNode) {
       return;
     }
@@ -100,7 +101,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
 
   setFieldValue(value: string | boolean | number | string[] | undefined) {
     const selector =
-      this.editor === 'vscode' ? 'vscode-combobox' : 'intellij-combobox';
+      this.editor === 'vscode' ? 'vscode-single-select' : 'intellij-combobox';
     const autocompleteNode = this.renderRoot.querySelector(selector);
     if (!autocompleteNode) {
       return;

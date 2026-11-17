@@ -3105,12 +3105,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lit-labs/ssr-dom-shim@npm:^1.5.0":
+  version: 1.6.0
+  resolution: "@lit-labs/ssr-dom-shim@npm:1.6.0"
+  checksum: 10c0/deffcfd765d268820beef600a1c1cf9d3cf1a5cb4bbe7e80843796ff33d1a122f4e5651ef4a44b33d36e5fa6538e6ee87a95b9d40b4a26cabf3c35b45194c87a
+  languageName: node
+  linkType: hard
+
+"@lit/context@npm:^1.1.3":
+  version: 1.1.6
+  resolution: "@lit/context@npm:1.1.6"
+  dependencies:
+    "@lit/reactive-element": "npm:^1.6.2 || ^2.1.0"
+  checksum: 10c0/203f761eda19c8b37d77f01d9a0148535c5b28c47b76e28b321cb6e5ed0546c45332512e68b1647ce92ca67690d8c66de31972ec115410b080d69fa25a5d86f3
+  languageName: node
+  linkType: hard
+
 "@lit/reactive-element@npm:^1.3.0, @lit/reactive-element@npm:^1.5.0, @lit/reactive-element@npm:^1.6.0":
   version: 1.6.3
   resolution: "@lit/reactive-element@npm:1.6.3"
   dependencies:
     "@lit-labs/ssr-dom-shim": "npm:^1.0.0"
   checksum: 10c0/10f1d25e24e32feb21c4c6f9e11d062901241602e12c4ecf746b3138f87fed4d8394194645514d5c1bfd5f33f3fd56ee8ef41344e2cb4413c40fe4961ec9d419
+  languageName: node
+  linkType: hard
+
+"@lit/reactive-element@npm:^1.6.2 || ^2.1.0":
+  version: 2.1.2
+  resolution: "@lit/reactive-element@npm:2.1.2"
+  dependencies:
+    "@lit-labs/ssr-dom-shim": "npm:^1.5.0"
+  checksum: 10c0/557069ce6ebbbafb1140e1e0a25ce73d3501bf455cda231d42bb131baa9065c54b6b7ca1655507eede397decd7ddde16c84192cb72a07d4edf41d54e07725933
   languageName: node
   linkType: hard
 
@@ -7047,19 +7072,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vscode-elements/elements@npm:1.9.2-pre.1":
-  version: 1.9.2-pre.1
-  resolution: "@vscode-elements/elements@npm:1.9.2-pre.1"
+"@vscode-elements/elements@npm:2.5.1":
+  version: 2.5.1
+  resolution: "@vscode-elements/elements@npm:2.5.1"
   dependencies:
+    "@lit/context": "npm:^1.1.3"
     lit: "npm:^3.2.1"
-  checksum: 10c0/c67bf10d93335c6e1a9b11c2ee3f80ec470683aa27f4b9d33b12c14774e85880a42e85bc79285b3f0104c0f555a5555c2e4a0367c18de5a55693fdf7c2422ae9
+  peerDependencies:
+    "@vscode/codicons": ">=0.0.40"
+  checksum: 10c0/7cbefb1eb7b1a5bc109e81dfed5ae5df89311308c156679361f74dfb2b03cc1c59a1302b1ffdaefd611115286fc08dc3abf74deacb4550d699dcd23164051edf
   languageName: node
   linkType: hard
 
-"@vscode/codicons@npm:0.0.36":
-  version: 0.0.36
-  resolution: "@vscode/codicons@npm:0.0.36"
-  checksum: 10c0/6bf944e87adc375cbad1bc939c05855d9430b53ad0132a00d539c3395c5877ac0a21865ae87c14bf903a667eb8dd1f846557015835c3d8c65c4972fafa5faaaa
+"@vscode/codicons@npm:0.0.40":
+  version: 0.0.40
+  resolution: "@vscode/codicons@npm:0.0.40"
+  checksum: 10c0/e0c2ae6b8f8903f68c274735ca380a3741353cc15b9ac836f6a661c0a487967f8b4e8ed281e7473b62a394202108bc7a92701293e46bb8e544523cb33a4b0d48
   languageName: node
   linkType: hard
 
@@ -14737,8 +14765,8 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.63.0"
     "@typescript-eslint/parser": "npm:8.63.0"
     "@typescript-eslint/utils": "npm:8.63.0"
-    "@vscode-elements/elements": "npm:1.9.2-pre.1"
-    "@vscode/codicons": "npm:0.0.36"
+    "@vscode-elements/elements": "npm:2.5.1"
+    "@vscode/codicons": "npm:0.0.40"
     "@vscode/test-electron": "npm:2.5.2"
     "@vscode/vsce": "npm:4.1.0"
     "@xterm/addon-fit": "npm:0.11.0"

@@ -10,7 +10,6 @@ import {
   intellijErrorRingStyles,
   intellijFieldPadding,
   intellijFocusRing,
-  vscodeErrorStyleOverrides,
 } from '@nx-console/shared-ui-components';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
@@ -71,7 +70,6 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
       const shouldRenderError = this.shouldRenderError();
       return html` <vscode-single-select
         @change="${this.addValue}"
-        style="${vscodeErrorStyleOverrides(shouldRenderError)}"
         ?invalid=${shouldRenderError}
         ${spread(this.ariaAttributes)}
       >
