@@ -2,6 +2,7 @@
 
 package dev.nx.console.nxls
 
+import com.intellij.openapi.application.impl.NonBlockingReadActionImpl
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspClientManager
@@ -9,6 +10,7 @@ import com.intellij.platform.lsp.api.LspClientManagerListener
 import com.intellij.platform.lsp.api.LspServerState
 import com.intellij.platform.lsp.impl.LspClientImpl
 import com.intellij.platform.lsp.impl.connector.Lsp4jServerConnector
+import com.intellij.testFramework.PlatformTestUtil
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
@@ -79,6 +81,9 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
     }
 
     override fun close() {
+        // Opened-file processing can retain this client until its EDT continuation runs.
+        NonBlockingReadActionImpl.waitForAsyncTaskCompletion()
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
         servers.remove(server)
         stop()
         lifecycle.session.dispose()
