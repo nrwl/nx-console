@@ -39,15 +39,13 @@ internal class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun run(dataContext: DataContext, commandLine: CommandLine): Boolean {
         val project = RunAnythingUtil.fetchProject(dataContext)
-        val args = commandLine.parameters.toMutableList()
-        val task = args.firstOrNull() ?: return false
-        val nxProject = task.substringBefore(":")
-        val nxTarget = task.substringAfter(":")
+        val args = commandLine.parameters
+        if (args.isEmpty()) return false
         val executor =
             dataContext.getData(RunAnythingAction.EXECUTOR_KEY)
                 ?: DefaultRunExecutor.getRunExecutorInstance()
 
-        NxTaskExecutionManager.getInstance(project).execute(nxProject, nxTarget, "", args, executor)
+        NxTaskExecutionManager.getInstance(project).execute(args, executor)
 
         return true
     }
