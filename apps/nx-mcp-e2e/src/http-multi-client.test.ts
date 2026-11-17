@@ -10,7 +10,7 @@ import {
 import { spawn, ChildProcess } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { request } from 'node:http';
-import { connect } from 'node:net';
+import { connect, createServer } from 'node:net';
 import { networkInterfaces } from 'node:os';
 import { join } from 'node:path';
 import { workspaceRoot } from 'nx/src/devkit-exports';
@@ -237,6 +237,19 @@ describe('HTTP Multi-Client', () => {
     });
 
     it('is reachable over IPv6 loopback', async () => {
+      // The server skips ::1 on machines without IPv6, such as some CI agents
+      const ipv6Available = await new Promise<boolean>((resolve) => {
+        const probe = createServer();
+        probe.once('error', () => resolve(false));
+        probe.listen({ port: 0, host: '::1', ipv6Only: true }, () =>
+          probe.close(() => resolve(true)),
+        );
+      });
+      if (!ipv6Available) {
+        console.log('No IPv6 loopback, skipping');
+        return;
+      }
+
       const client = new TestMCPClient(
         `http://[::1]:${serverPort}/mcp`,
         'ipv6-client',

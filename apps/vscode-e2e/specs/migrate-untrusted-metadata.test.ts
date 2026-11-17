@@ -103,17 +103,27 @@ test("VS Code's MCP client reaches the loopback-only MCP server", async ({
   ]);
   const port = 9944;
 
-  const tools = await evaluator.evaluate(async (api) => {
-    await api.commands.executeCommand('workbench.mcp.startServer', '*', {
-      waitForLiveTools: true,
-      autoTrustChanges: true,
-    });
-    return api.lm.tools
-      .map((tool) => tool.name)
-      .filter((name) => name.startsWith('mcp_nx_mcp_'));
-  });
+  // Nx Console registers its server with VS Code only after it has picked the
+  // port, so starting servers right after launch can find nothing to start yet.
+  let tools: string[] = [];
+  await expect
+    .poll(
+      async () => {
+        tools = await evaluator.evaluate(async (api) => {
+          await api.commands.executeCommand('workbench.mcp.startServer', '*', {
+            waitForLiveTools: true,
+            autoTrustChanges: true,
+          });
+          return api.lm.tools
+            .map((tool) => tool.name)
+            .filter((name) => name.startsWith('mcp_nx_mcp_'));
+        });
+        return tools;
+      },
+      { timeout: 90_000, intervals: [2_000] },
+    )
+    .toContain('mcp_nx_mcp_nx_docs');
   await proof.show(`tools VS Code loaded from the server: ${tools.length}`);
-  expect.soft(tools).toContain('mcp_nx_mcp_nx_docs');
 
   const status = async (headers: Record<string, string>) =>
     (
