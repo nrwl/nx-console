@@ -1,13 +1,11 @@
 package dev.nx.console.project_details
 
-import com.intellij.lang.Language
-import com.intellij.openapi.fileTypes.LanguageFileType
+import com.intellij.json.JsonFileType
 import com.intellij.openapi.project.DumbAware
 import dev.nx.console.NxIcons
 import javax.swing.Icon
 
-private class ProjectDetailsFileType :
-    LanguageFileType(Language.findLanguageByID("JSON")!!), DumbAware {
+private class ProjectDetailsFileType : JsonFileType(), DumbAware {
     override fun getName(): String {
         return "Project Details"
     }
@@ -21,6 +19,6 @@ private class ProjectDetailsFileType :
     }
 
     override fun getIcon(): Icon {
-        return NxIcons.FileType // Replace with your custom icon.
+        return NxIcons.FileType
     }
 }
