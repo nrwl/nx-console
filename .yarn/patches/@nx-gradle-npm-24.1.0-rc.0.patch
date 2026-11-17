@@ -1,0 +1,37 @@
+diff --git a/dist/src/plugin/utils/get-project-graph-from-gradle-plugin.js b/dist/src/plugin/utils/get-project-graph-from-gradle-plugin.js
+index fe137bf60b16f45fa9c18bf7ef36f7f94fa262da..b7c3f0814da675a7948cef6617cc944fe03d41d6 100644
+--- a/dist/src/plugin/utils/get-project-graph-from-gradle-plugin.js
++++ b/dist/src/plugin/utils/get-project-graph-from-gradle-plugin.js
+@@ -70,7 +70,11 @@ function getCurrentBuildFiles() {
+ async function populateProjectGraph(workspaceRoot, gradlewFiles, options) {
+     const normalizedOptions = (0, gradle_plugin_options_1.normalizeOptions)(options);
+     const gradleConfigHash = (0, devkit_1.hashArray)([
+-        await (0, internal_1.hashWithWorkspaceContext)(workspaceRoot, [split_config_files_1.gradleConfigAndTestGlob]),
++        await (0, internal_1.hashWithWorkspaceContext)(workspaceRoot, [
++            normalizedOptions.ciTestTargetName
++                ? split_config_files_1.gradleConfigAndTestGlob
++                : split_config_files_1.gradleConfigFilesGlob,
++        ]),
+         (0, internal_1.hashObject)(normalizedOptions),
+         process.env.CI,
+     ]);
+diff --git a/dist/src/utils/split-config-files.js b/dist/src/utils/split-config-files.js
+index 71bb60366c4164f2ea9b9f9ae8205cd5b479351d..add895c7856a94f40628ac1e181384b9d3635ee9 100644
+--- a/dist/src/utils/split-config-files.js
++++ b/dist/src/utils/split-config-files.js
+@@ -1,6 +1,6 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+-exports.gradleConfigAndTestGlob = exports.gradleConfigGlob = exports.GRADLE_TEST_FILES = exports.GRADLE_VERSION_CATALOG_GLOB = exports.GRADLEW_FILES = exports.GRADLE_BUILD_FILES = void 0;
++exports.gradleConfigFilesGlob = exports.gradleConfigAndTestGlob = exports.gradleConfigGlob = exports.GRADLE_TEST_FILES = exports.GRADLE_VERSION_CATALOG_GLOB = exports.GRADLEW_FILES = exports.GRADLE_BUILD_FILES = void 0;
+ exports.splitConfigFiles = splitConfigFiles;
+ const node_path_1 = require("node:path");
+ const internal_1 = require("@nx/devkit/internal");
+@@ -28,6 +28,7 @@ const GRADLE_CONFIG_FILE_PATTERNS = [
+     'buildSrc/**/*.java',
+     'buildSrc/**/*.groovy',
+ ];
++exports.gradleConfigFilesGlob = (0, internal_1.combineGlobPatterns)(...GRADLE_CONFIG_FILE_PATTERNS, ...GRADLE_CONFIG_FILE_PATTERNS.map((pattern) => `**/${pattern}`), ...Array.from(exports.GRADLEW_FILES), ...Array.from(exports.GRADLEW_FILES).map((file) => `**/${file}`), exports.GRADLE_VERSION_CATALOG_GLOB);
+ exports.gradleConfigAndTestGlob = (0, internal_1.combineGlobPatterns)(...GRADLE_CONFIG_FILE_PATTERNS, ...GRADLE_CONFIG_FILE_PATTERNS.map((pattern) => `**/${pattern}`), ...Array.from(exports.GRADLEW_FILES), ...Array.from(exports.GRADLEW_FILES).map((file) => `**/${file}`), ...exports.GRADLE_TEST_FILES, exports.GRADLE_VERSION_CATALOG_GLOB);
+ /**
+  * This function split config files into build files, settings files, test files and project roots
