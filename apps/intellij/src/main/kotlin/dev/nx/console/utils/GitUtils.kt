@@ -138,6 +138,16 @@ object GitUtils {
      * @param targetBranch The branch to fetch and pull from
      */
     fun fetchAndPullChanges(project: Project, targetBranch: String) {
+        // git would parse a leading dash as an option; valid branch names never start with one
+        if (targetBranch.isEmpty() || targetBranch.startsWith("-")) {
+            showNotification(
+                project,
+                "Failed to fetch and pull changes",
+                "Invalid branch name \"$targetBranch\"",
+                NotificationType.ERROR,
+            )
+            return
+        }
         val repository = getGitRepository(project)
         if (repository == null) {
             showNotification(

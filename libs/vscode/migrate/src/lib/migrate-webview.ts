@@ -27,7 +27,7 @@ import {
   viewPrompt,
 } from './commands/migrate-commands';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
-import { watchFile } from '@nx-console/vscode-utils';
+import { safeJsonStringify, watchFile } from '@nx-console/vscode-utils';
 import { finishMigration } from './commands/finish-migration';
 import {
   runManyMigrations,
@@ -201,7 +201,7 @@ export class MigrateWebview {
         <script src="${asWebviewUri('styles.js')}"></script>
         <script src="${asWebviewUri('main.js')}"></script>
         <script>
-          const data = ${JSON.stringify(initialData)}
+          const data = ${safeJsonStringify(initialData)}
           const migrateService = window.renderMigrate(data)
 
           const vscode = acquireVsCodeApi()

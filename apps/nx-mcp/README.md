@@ -70,7 +70,7 @@ Alternatively, use the slash command `/add-mcp` in the Warp Agent prompt.
 
 Refer to your AI tool's documentation for how to register an MCP server. For example, [Cursor](https://docs.cursor.com/context/model-context-protocol) or [Claude Desktop](https://modelcontextprotocol.io/quickstart/user) support MCP.
 
-If you want to host the server instead of communicating via `stdio`, use `--transport http` and optionally `--port` (default 9921). Clients connect to `http://localhost:<port>/mcp` using the Streamable HTTP transport. It supports multiple concurrent connections, allowing different clients to connect simultaneously with independent sessions. The deprecated SSE transport (`--sse`, `--transport sse`) has been removed.
+If you want to host the server instead of communicating via `stdio`, use `--transport http` and optionally `--port` (default 9921). Clients connect to `http://localhost:<port>/mcp` using the Streamable HTTP transport. The server has no authentication, so it only listens on loopback (`127.0.0.1` and `::1`) and rejects requests whose `Host` or `Origin` header isn't a local address. To reach it from outside, for example when it runs in a container, pass `--host 0.0.0.0` (or a specific address) and keep the port off untrusted networks. It supports multiple concurrent connections, allowing different clients to connect simultaneously with independent sessions. The deprecated SSE transport (`--sse`, `--transport sse`) has been removed.
 
 Run `nx-mcp --help` to see what options are available.
 

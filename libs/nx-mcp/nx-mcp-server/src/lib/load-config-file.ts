@@ -58,10 +58,11 @@ export function configToArgs(config: NxMcpConfig): string[] {
     if (typeof value === 'boolean') {
       args.push(value ? `--${key}` : `--no-${key}`);
     } else if (typeof value === 'string' || typeof value === 'number') {
-      args.push(`--${key}`, String(value));
+      // `--key=value` keeps a value that looks like an option from being parsed as one
+      args.push(`--${key}=${value}`);
     } else if (Array.isArray(value)) {
       for (const item of value) {
-        args.push(`--${key}`, String(item));
+        args.push(`--${key}=${item}`);
       }
     }
   }

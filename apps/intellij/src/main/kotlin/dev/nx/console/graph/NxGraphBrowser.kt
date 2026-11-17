@@ -11,6 +11,7 @@ import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.project_details.browsers.OldProjectDetailsBrowser
 import dev.nx.console.utils.executeJavascriptWithCatch
+import dev.nx.console.utils.jcef.jsStringLiteral
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -122,7 +123,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                 return@executeWhenLoaded
             }
             browser.executeJavascriptWithCatch(
-                "window.waitForRouter?.().then(() => {console.log('navigating to $projectName'); window.externalApi.focusProject('$projectName')})"
+                "window.waitForRouter?.().then(() => {window.externalApi.focusProject(${jsStringLiteral(projectName)})})"
             )
         }
     }
@@ -132,7 +133,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
             browser.executeJavascriptWithCatch(
-                "window.waitForRouter?.().then(() => {console.log('navigating to group $targetGroup'); window.externalApi.selectAllTargetsByName('$targetGroup')})"
+                "window.waitForRouter?.().then(() => {window.externalApi.selectAllTargetsByName(${jsStringLiteral(targetGroup)})})"
             )
         }
     }
@@ -148,7 +149,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                 return@executeWhenLoaded
             }
             browser.executeJavascriptWithCatch(
-                "window.waitForRouter?.().then(() => {console.log('navigating to target $projectName:$targetName'); window.externalApi.focusTarget('$projectName','$targetName')})"
+                "window.waitForRouter?.().then(() => {window.externalApi.focusTarget(${jsStringLiteral(projectName)}, ${jsStringLiteral(targetName)})})"
             )
         }
     }

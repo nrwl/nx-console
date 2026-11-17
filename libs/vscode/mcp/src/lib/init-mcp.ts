@@ -17,7 +17,7 @@ import {
   readMcpJson,
   writeMcpJson,
 } from '@nx-console/vscode-utils';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import vscode, {
@@ -307,14 +307,14 @@ async function initCursorMcp(context: ExtensionContext, mcpPort: number) {
 
 export function mcpJsonIsGitIgnored(mcpJsonPath: string): boolean {
   try {
-    execSync(`git check-ignore "${mcpJsonPath}"`, {
+    execFileSync('git', ['check-ignore', '--', mcpJsonPath], {
       stdio: 'ignore',
       cwd: getNxWorkspacePath(),
     });
-    // If execSync doesn't throw, the file is ignored
+    // If execFileSync doesn't throw, the file is ignored
     return true;
   } catch {
-    // If execSync throws, the file is not ignored
+    // If execFileSync throws, the file is not ignored
     return false;
   }
 }

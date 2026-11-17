@@ -1,3 +1,4 @@
+import { configToArgs } from '@nx-console/nx-mcp-server';
 import { createYargsConfig } from './yargs-config';
 
 describe('createYargsConfig', () => {
@@ -90,6 +91,42 @@ describe('createYargsConfig', () => {
           '9922',
         ]).parseSync();
       }).not.toThrow();
+    });
+  });
+
+  describe('host validation', () => {
+    it('should throw error when using --host with stdio transport', () => {
+      expect(() => {
+        createYargsConfig(['--host', '0.0.0.0']).parseSync();
+      }).toThrow('process.exit called');
+
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should allow --host with http transport', () => {
+      const argv = createYargsConfig([
+        '--transport',
+        'http',
+        '--host',
+        '0.0.0.0',
+      ]).parseSync();
+      expect(argv.host).toBe('0.0.0.0');
+    });
+
+    it('should not take host from option-like config values', () => {
+      const argv = createYargsConfig([
+        ...configToArgs({
+          transport: 'http',
+          tools: ['--host=0.0.0.0', '--host', '0.0.0.0'],
+        }),
+      ]).parseSync();
+      expect(argv.host).toBeUndefined();
+      expect(argv.tools).toEqual(['--host=0.0.0.0', '--host', '0.0.0.0']);
+    });
+
+    it('should leave host unset by default', () => {
+      const argv = createYargsConfig(['--transport', 'http']).parseSync();
+      expect(argv.host).toBeUndefined();
     });
   });
 

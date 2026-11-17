@@ -48,6 +48,7 @@ import dev.nx.console.utils.GitUtils
 import dev.nx.console.utils.NxConsoleLogger
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
+import dev.nx.console.utils.jcef.escapeScriptTag
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.loadHtmlAndAwait
 import java.awt.*
@@ -175,7 +176,7 @@ class NxCloudFixFileImpl(
     }
 
     private suspend fun loadHtmlWithInitialData(details: NxCloudFixDetails) {
-        val detailsString = json.encodeToString(details)
+        val detailsString = escapeScriptTag(json.encodeToString(details))
 
         val html =
             """
