@@ -9,6 +9,9 @@ import {
 } from '@nx-console/shared-e2e-utils';
 import { spawn, ChildProcess } from 'node:child_process';
 import { rmSync } from 'node:fs';
+import { request } from 'node:http';
+import { connect } from 'node:net';
+import { networkInterfaces } from 'node:os';
 import { join } from 'node:path';
 import { workspaceRoot } from 'nx/src/devkit-exports';
 
@@ -180,5 +183,92 @@ describe('HTTP Multi-Client', () => {
 
     // Disconnect both clients
     await Promise.all([client1.disconnect(), client2.disconnect()]);
+  });
+
+  describe('network exposure', () => {
+    const initializeBody = JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'initialize',
+      params: {
+        protocolVersion: '2025-06-18',
+        capabilities: {},
+        clientInfo: { name: 'exposure-test', version: '0.0.0' },
+      },
+    });
+
+    function postInitialize(headers: Record<string, string>): Promise<number> {
+      return new Promise((resolve, reject) => {
+        const req = request(
+          {
+            host: '127.0.0.1',
+            port: serverPort,
+            path: '/mcp',
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              accept: 'application/json, text/event-stream',
+              ...headers,
+            },
+          },
+          (res) => {
+            res.resume();
+            resolve(res.statusCode ?? 0);
+          },
+        );
+        req.on('error', reject);
+        req.end(initializeBody);
+      });
+    }
+
+    it('rejects requests for a hostname other than localhost', async () => {
+      expect(
+        await postInitialize({ host: `attacker.example:${serverPort}` }),
+      ).toBe(403);
+    });
+
+    it('rejects requests from a cross-site page', async () => {
+      expect(
+        await postInitialize({
+          host: `localhost:${serverPort}`,
+          origin: 'https://attacker.example',
+        }),
+      ).toBe(403);
+    });
+
+    it('is reachable over IPv6 loopback', async () => {
+      const client = new TestMCPClient(
+        `http://[::1]:${serverPort}/mcp`,
+        'ipv6-client',
+      );
+      await client.connect();
+      await client.disconnect();
+    });
+
+    it('does not listen on non-loopback interfaces', async () => {
+      const externalAddress = Object.values(networkInterfaces())
+        .flat()
+        .find((address) => address && !address.internal)?.address;
+      if (!externalAddress) {
+        console.log('No non-loopback interface, skipping');
+        return;
+      }
+
+      const error = await new Promise<NodeJS.ErrnoException | undefined>(
+        (resolve) => {
+          const socket = connect({ host: externalAddress, port: serverPort });
+          socket.setTimeout(5000, () => {
+            socket.destroy();
+            resolve(undefined);
+          });
+          socket.on('connect', () => {
+            socket.destroy();
+            resolve(undefined);
+          });
+          socket.on('error', resolve);
+        },
+      );
+      expect(error?.code).toBe('ECONNREFUSED');
+    });
   });
 });

@@ -1,6 +1,8 @@
 import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
 import { McpServer, isInitializeRequest } from '@modelcontextprotocol/server';
 import {
+  createRequestGuard,
+  getHttpBinding,
   mcpServerInstructions,
   MINIMAL_EXCLUDED_TOOLS,
   NxMcpServerWrapper,
@@ -59,6 +61,7 @@ export class McpHttpServerCore {
   }
 
   private startStreamableWebServer(port: number) {
+    this.app.use(createRequestGuard(getHttpBinding()));
     this.app.use(express.json());
 
     // POST: Handle initialization and all client->server messages

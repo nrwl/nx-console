@@ -65,6 +65,15 @@ describe('loadNxMcpConfig', () => {
     expect(loadNxMcpConfig('/workspace')).toEqual({ minimal: true });
   });
 
+  // The config file is committed with the workspace, so it must not be able
+  // to expose the unauthenticated HTTP server beyond loopback.
+  it('should ignore host', () => {
+    mockedReadFileSync.mockReturnValue(
+      JSON.stringify({ transport: 'http', host: '0.0.0.0' }),
+    );
+    expect(loadNxMcpConfig('/workspace')).toEqual({ transport: 'http' });
+  });
+
   it('should parse JSONC with single-line comments', () => {
     mockedReadFileSync.mockReturnValue(`{
       // enable minimal mode

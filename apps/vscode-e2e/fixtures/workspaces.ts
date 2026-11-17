@@ -374,6 +374,35 @@ module.exports = async function dump(options, context) {
         },
       }),
   },
+  'migrate-untrusted-metadata': {
+    description:
+      'One project, `demo`, with a migration waiting for package updates. The `nx-console` section of `migrations.json` holds markup and shell syntax where Nx writes a commit subject and SHA, as a cloned repository could commit it. The Nx Console MCP server listens on the fixed port 9944.',
+    settings: { 'nxConsole.mcpPort': 9944 },
+    create: (path) =>
+      writeWorkspace(path, {
+        projects: {
+          demo: { name: 'demo', targets: { hello: runCommand('echo hello') } },
+        },
+        files: {
+          'migrations.json': `${JSON.stringify(
+            {
+              migrations: [],
+              'nx-console': {
+                initialGitRef: {
+                  ref: `HEAD; touch ${join(path, 'injected-git-ref')}`,
+                  subject: `'"><img id="injected-markup" src="x">`,
+                },
+                confirmedPackageUpdates: false,
+                completedMigrations: {},
+                runningMigrations: [],
+              },
+            },
+            null,
+            2,
+          )}\n`,
+        },
+      }),
+  },
   'self-healing': {
     description: `One project, \`demo\`, in a workspace connected to Nx Cloud as \`${selfHealingCloudId}\` so self-healing links for it reach Nx Console's URI handler.`,
     create: (path) =>

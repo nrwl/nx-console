@@ -2,6 +2,8 @@ import { NodeStreamableHTTPServerTransport } from '@modelcontextprotocol/node';
 import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 import { McpServer, isInitializeRequest } from '@modelcontextprotocol/server';
 import {
+  createRequestGuard,
+  getHttpBinding,
   IdeProvider,
   mcpServerInstructions,
   MINIMAL_EXCLUDED_TOOLS,
@@ -32,7 +34,7 @@ import {
 import { PassiveDaemonWatcher } from '@nx-console/shared-watcher';
 import { randomUUID } from 'crypto';
 import express from 'express';
-import { IncomingMessage, Server, ServerResponse } from 'http';
+import { createServer, Server } from 'http';
 import { resolve } from 'path';
 import { hideBin } from 'yargs/helpers';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
@@ -247,9 +249,7 @@ async function main() {
   );
 
   // disposables for shutting down
-  let server_instance:
-    | Server<typeof IncomingMessage, typeof ServerResponse>
-    | undefined;
+  const serverInstances: Server[] = [];
 
   /* eslint-disable no-empty */
   let exiting = false;
@@ -289,7 +289,7 @@ async function main() {
 
       // Close transports/servers
       try {
-        server_instance?.close();
+        serverInstances.forEach((server) => server.close());
       } catch {}
 
       try {
@@ -307,10 +307,12 @@ async function main() {
 
   if (argv.transport === 'http') {
     const port = argv.port ?? 9921;
+    const binding = getHttpBinding(argv.host);
     const app = express();
 
     const sessions: Record<string, NodeStreamableHTTPServerTransport> = {};
 
+    app.use(createRequestGuard(binding));
     app.use(express.json());
 
     // POST: Handle initialization and all client->server messages
@@ -399,9 +401,33 @@ async function main() {
       await transport.handleRequest(req, res);
     });
 
-    logger.log(`Nx MCP server (Streamable HTTP) listening on port ${port}`);
+    if (binding.exposedToNetwork) {
+      logger.log(
+        `Warning: the Nx MCP server has no authentication and is reachable from other machines on ${argv.host}:${port}.`,
+      );
+    }
 
-    server_instance = app.listen(port);
+    for (const [index, host] of binding.listenHosts.entries()) {
+      const server = createServer(app);
+      server.on('error', (error: NodeJS.ErrnoException) => {
+        // IPv6 can be disabled on the machine; IPv4 alone is enough then
+        const ipv6Unavailable =
+          index > 0 &&
+          (error.code === 'EADDRNOTAVAIL' || error.code === 'EAFNOSUPPORT');
+        if (!ipv6Unavailable) {
+          logger.log(
+            `Failed to start the Nx MCP server on ${host}:${port}: ${error.message}`,
+          );
+        }
+      });
+      const ipv6Only = binding.listenHosts.length > 1 && host.includes(':');
+      server.listen({ port, host, ipv6Only }, () => {
+        logger.log(
+          `Nx MCP server (Streamable HTTP) listening on ${host.includes(':') ? `[${host}]` : host}:${port}`,
+        );
+      });
+      serverInstances.push(server);
+    }
   } else {
     const transport = new StdioServerTransport();
     await serverWrapper.getMcpServer().connect(transport);

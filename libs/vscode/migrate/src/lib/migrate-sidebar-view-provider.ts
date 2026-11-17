@@ -21,6 +21,7 @@ import {
 
 import { gte, NxVersion } from '@nx-console/nx-version';
 import { vscodeLogger } from '@nx-console/vscode-output-channels';
+import { escapeHtml, webviewCspMetaTag } from '@nx-console/vscode-utils';
 
 export class MigrateSidebarViewProvider implements WebviewViewProvider {
   public static viewId = 'nxMigrate';
@@ -144,7 +145,7 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
-				
+				${webviewCspMetaTag(webviewView.webview.cspSource)}
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${codiconsUri}" rel="stylesheet" id="vscode-codicon-stylesheet">
 
@@ -156,11 +157,11 @@ export class MigrateSidebarViewProvider implements WebviewViewProvider {
       </head>
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
-				<root-element state='${JSON.stringify(
-          this.actor.getSnapshot().value,
-        )}' migrateViewData='${JSON.stringify(
-          this._migrateViewData,
-        )}'></root-element>
+				<root-element state="${escapeHtml(
+          JSON.stringify(this.actor.getSnapshot().value) ?? '',
+        )}" migrateViewData="${escapeHtml(
+          JSON.stringify(this._migrateViewData) ?? '',
+        )}"></root-element>
 			</body>
 			</html>`;
   }

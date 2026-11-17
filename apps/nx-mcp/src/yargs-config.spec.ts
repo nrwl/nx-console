@@ -93,6 +93,31 @@ describe('createYargsConfig', () => {
     });
   });
 
+  describe('host validation', () => {
+    it('should throw error when using --host with stdio transport', () => {
+      expect(() => {
+        createYargsConfig(['--host', '0.0.0.0']).parseSync();
+      }).toThrow('process.exit called');
+
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should allow --host with http transport', () => {
+      const argv = createYargsConfig([
+        '--transport',
+        'http',
+        '--host',
+        '0.0.0.0',
+      ]).parseSync();
+      expect(argv.host).toBe('0.0.0.0');
+    });
+
+    it('should leave host unset by default', () => {
+      const argv = createYargsConfig(['--transport', 'http']).parseSync();
+      expect(argv.host).toBeUndefined();
+    });
+  });
+
   describe('default values', () => {
     it('should default to stdio transport', () => {
       const argv = createYargsConfig([]).parseSync();

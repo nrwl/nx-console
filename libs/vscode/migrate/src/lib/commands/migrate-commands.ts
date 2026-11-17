@@ -2,7 +2,7 @@ import { getPackageManagerCommand } from '@nx-console/shared-npm';
 import { getNxWorkspacePath } from '@nx-console/vscode-configuration';
 import { logAndShowError } from '@nx-console/vscode-output-channels';
 import { getGitApi } from '@nx-console/vscode-utils';
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
@@ -16,6 +16,7 @@ import {
 import { viewPackageJsonDiff } from '../git-extension/view-diff';
 import { MigrateWebview } from '../migrate-webview';
 import { startMigration } from './start-migration';
+import { isCommitSha } from './git-ref';
 import {
   importMigrateUIApi,
   modifyMigrationsJsonMetadata,
@@ -144,6 +145,13 @@ export async function cancelMigration() {
     return;
   }
 
+  if (!isCommitSha(data.ref)) {
+    window.showErrorMessage(
+      'The previous git ref in migrations.json is not a commit SHA. Did you manually modify migrations.json?',
+    );
+    return;
+  }
+
   window
     .showWarningMessage(
       `Are you sure you want to cancel the migration? This will reset your workspace to the commit "${
@@ -156,8 +164,10 @@ export async function cancelMigration() {
     )
     .then(async (result) => {
       if (result === 'Abort migration') {
-        execSync(`git reset --hard ${data.ref}`, { cwd: nxWorkspacePath });
-        execSync(`git clean -fd`, { cwd: nxWorkspacePath });
+        execFileSync('git', ['reset', '--hard', data.ref, '--'], {
+          cwd: nxWorkspacePath,
+        });
+        execFileSync('git', ['clean', '-fd'], { cwd: nxWorkspacePath });
         const pm = await getPackageManagerCommand(nxWorkspacePath);
         commands.executeCommand('nxMigrate.close');
         window.withProgress(

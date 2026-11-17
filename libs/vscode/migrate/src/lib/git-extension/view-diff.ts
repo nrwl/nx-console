@@ -3,6 +3,7 @@ import { getGitApi } from '@nx-console/vscode-utils';
 import type { MigrationDetailsWithId } from 'nx/src/config/misc-interfaces';
 import { join } from 'path';
 import { commands, TextDocumentShowOptions, Uri, window } from 'vscode';
+import { isCommitSha } from '../commands/git-ref';
 import { readMigrationsJsonMetadata } from '../commands/utils';
 
 export async function viewPackageJsonDiff() {
@@ -15,7 +16,10 @@ export function viewDiffForMigration(
 ) {
   const completedMigration =
     readMigrationsJsonMetadata()?.completedMigrations[migration.id];
-  if (completedMigration.type === 'successful') {
+  if (
+    completedMigration?.type === 'successful' &&
+    isCommitSha(completedMigration.ref)
+  ) {
     const toRef = completedMigration.ref;
     const fromRef = `${toRef}^1`;
     viewDiff(path, fromRef, toRef);
@@ -24,7 +28,14 @@ export function viewDiffForMigration(
 
 export async function viewDiff(path: string, fromRef?: string, toRef?: string) {
   if (!fromRef) {
-    fromRef = readMigrationsJsonMetadata()?.initialGitRef.ref;
+    const initialRef = readMigrationsJsonMetadata()?.initialGitRef?.ref;
+    if (!isCommitSha(initialRef)) {
+      window.showErrorMessage(
+        "Couldn't find a valid initial git ref in migrations.json.",
+      );
+      return;
+    }
+    fromRef = initialRef;
   }
 
   const api = getGitApi();

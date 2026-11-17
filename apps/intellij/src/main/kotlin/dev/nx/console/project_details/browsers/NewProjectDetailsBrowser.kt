@@ -33,7 +33,10 @@ import dev.nx.console.telemetry.TelemetryEvent
 import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
+import dev.nx.console.utils.jcef.escapeHtml
+import dev.nx.console.utils.jcef.escapeScriptTag
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.jcef.jsStringLiteral
 import dev.nx.console.utils.jcef.loadHtmlAndAwait
 import dev.nx.console.utils.openFileWithFocus
 import java.awt.BorderLayout
@@ -483,7 +486,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
         <script src="main.js"></script>
 
         <script>
-          const data = $pdvData
+          const data = ${escapeScriptTag(pdvData)}
 
            window.externalApi = window.externalApi ?? {};
            window.externalApi.graphInteractionEventListener = (message) => {
@@ -509,7 +512,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             """
                     window.pdvService.send({
                       type: 'loadData',
-                      ...$pdvData,
+                      ...${escapeScriptTag(pdvData)},
                     });
                 """
                 .trimIndent()
@@ -552,8 +555,8 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
 
         <script>
           const service = window.renderError({
-            message: "${data.errorMessage}",
-            errors: ${data.errorsSerialized}
+            message: ${jsStringLiteral(data.errorMessage)},
+            errors: ${escapeScriptTag(data.errorsSerialized.ifEmpty { "[]" })}
             }
           )
         </script>
@@ -599,7 +602,7 @@ class NewProjectDetailsBrowser(private val project: Project, private val file: V
             ${if(data.isNotEmpty()) """
              <h4>
                 The following error occurred: <br/>
-                <pre>${data}</pre>
+                <pre>${escapeHtml(data)}</pre>
                 See idea.log for more details.
             </h4>
             """.trimIndent() else ""}

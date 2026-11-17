@@ -643,6 +643,10 @@ function isCloudFixTab(tab: Tab): boolean {
  */
 export async function fetchAndPullChanges(targetBranch: string): Promise<void> {
   try {
+    // git would parse a leading dash as an option; valid branch names never start with one
+    if (!targetBranch || targetBranch.startsWith('-')) {
+      throw new Error(`Invalid branch name "${targetBranch}"`);
+    }
     const cwd = getNxWorkspacePath();
 
     // Always refresh remotes first
