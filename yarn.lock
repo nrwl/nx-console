@@ -4568,6 +4568,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/gradle@patch:@nx/gradle@npm%3A24.0.0-rc.1#~/.yarn/patches/@nx-gradle-npm-24.0.0-rc.1-60d5dd6289.patch":
+  version: 24.0.0-rc.1
+  resolution: "@nx/gradle@patch:@nx/gradle@npm%3A24.0.0-rc.1#~/.yarn/patches/@nx-gradle-npm-24.0.0-rc.1-60d5dd6289.patch::version=24.0.0-rc.1&hash=da2d48"
+  dependencies:
+    "@nx/devkit": "npm:24.0.0-rc.1"
+    toml-eslint-parser: "npm:^0.10.0"
+    tslib: "npm:^2.3.0"
+  checksum: 10c0/6bdea769c827aa72cab863506d30e973484795b56142c5f011c511538d8887d4ec2aae9a9f4bd065612401601cdd57a74225dfb24503f6dfe99d523716ffbaad
+  languageName: node
+  linkType: hard
+
 "@nx/jest@npm:24.0.0-rc.1":
   version: 24.0.0-rc.1
   resolution: "@nx/jest@npm:24.0.0-rc.1"
