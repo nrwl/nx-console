@@ -11,6 +11,7 @@ import com.intellij.platform.lsp.api.LspServerState
 import com.intellij.platform.lsp.impl.LspClientImpl
 import com.intellij.platform.lsp.impl.connector.Lsp4jServerConnector
 import com.intellij.testFramework.PlatformTestUtil
+import com.intellij.util.EventDispatcher
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
@@ -24,11 +25,18 @@ import org.eclipse.lsp4j.services.LanguageServer
 internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: LanguageServer) :
     AutoCloseable {
     private val lifecycle = PlatformLspTestHarness(project, root)
+    private val manager = LspClientManager.getInstance(project)
+    @Suppress("UNCHECKED_CAST")
+    private val events =
+        manager.javaClass.getDeclaredField("eventDispatcher").let {
+            it.isAccessible = true
+            it.get(manager) as EventDispatcher<LspClientManagerListener>
+        }
     val server =
         LspClientImpl(
             NxlsIntegrationProvider::class.java,
             lifecycle.start().descriptor,
-            object : LspClientManagerListener {},
+            events.multicaster,
         )
     private val connector =
         object : Lsp4jServerConnector(server) {
@@ -44,7 +52,6 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
 
             override fun disconnect() = Unit
         }
-    private val manager = LspClientManager.getInstance(project)
     @Suppress("UNCHECKED_CAST")
     private val servers =
         manager.javaClass.getDeclaredField("lspClients").let {
@@ -68,6 +75,8 @@ internal class SdkLspTestHarness(project: Project, root: VirtualFile, remote: La
     fun open(file: VirtualFile) = server.documentSyncManager.open(file)
 
     fun close(file: VirtualFile) = server.documentSyncManager.close(file)
+
+    fun isOpen(file: VirtualFile) = server.documentSyncManager.isFileOpened(file)
 
     fun drain() {
         val sent = CountDownLatch(1)
