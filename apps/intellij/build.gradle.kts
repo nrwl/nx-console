@@ -230,7 +230,7 @@ configurations
     .configureEach { exclude("org.jetbrains.kotlin", "kotlin-stdlib") }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     implementation("io.github.z4kn4fein:semver:2.0.0")
 

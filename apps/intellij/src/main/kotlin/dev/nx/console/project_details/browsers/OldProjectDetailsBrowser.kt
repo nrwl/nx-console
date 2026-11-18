@@ -36,8 +36,12 @@ import dev.nx.console.utils.jcef.jsStringLiteral
 import dev.nx.console.utils.nxProjectConfigurationPath
 import dev.nx.console.utils.nxWorkspace
 import kotlinx.coroutines.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+
+@OptIn(ExperimentalSerializationApi::class)
+internal val oldProjectDetailsJson = Json { exceptionsWithDebugInfo = false }
 
 class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     NxGraphBrowserBase(project), DumbAware {
@@ -95,7 +99,8 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
 
         query.addHandler { msg ->
             try {
-                val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                val messageParsed =
+                    oldProjectDetailsJson.decodeFromString<NxGraphInteractionEvent>(msg)
                 val handled = handleGraphInteractionEventBase(messageParsed)
                 if (handled) return@addHandler null
                 when (messageParsed.type) {
