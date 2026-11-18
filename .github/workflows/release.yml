@@ -1,0 +1,99 @@
+name: Release
+
+# Cuts a release for one package off master: creates the `<pkg>-v<version>` tag
+# and the GitHub Release with the changelog. The `publish-<pkg>` workflow then
+# runs on the `release: published` event and publishes behind `release-approval`.
+#
+# Tags and releases are created with a short-lived installation token of the
+# release GitHub App instead of GITHUB_TOKEN, because:
+# - the tag ruleset only lets admins and its bypass actors create tags, and
+# - releases created with GITHUB_TOKEN don't trigger the publish workflows.
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package to release
+        type: choice
+        options:
+          - vscode
+          - intellij
+          - nxls
+          - nx-mcp
+        required: true
+      dry-run:
+        description: Only print the next version and notes, without creating a tag or GitHub Release
+        type: boolean
+        default: true
+
+env:
+  node_version: 24
+  NX_NO_CLOUD: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.package }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/master'
+    environment: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: ${{ env.node_version }}
+          check-latest: true
+          cache: yarn
+      # The intellij release runs `./gradlew tasks` through gradle-semantic-release-plugin.
+      - name: Gradle Wrapper Validation
+        uses: gradle/actions/wrapper-validation@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
+      - name: Setup Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          distribution: zulu
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
+      - run: yarn install --immutable
+        shell: bash
+      # Minted after `yarn install` so dependency install scripts never see it.
+      # The token expires after an hour and is revoked when the job ends.
+      - name: create release token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          # semantic-release comments "released in" on the shipped issues and PRs
+          permission-issues: write
+          permission-pull-requests: write
+      - name: configure git
+        run: |
+          USER_ID="$(gh api "/users/${APP_SLUG}%5Bbot%5D" --jq .id)"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+          git config http.https://github.com/.extraheader \
+            "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+      - name: release
+        run: |
+          ARGS=()
+          if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
+          node tools/scripts/release.js "$PACKAGE" "${ARGS[@]}"
+        env:
+          PACKAGE: ${{ inputs.package }}
+          DRY_RUN: ${{ inputs.dry-run }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
