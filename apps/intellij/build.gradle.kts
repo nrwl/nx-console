@@ -6,6 +6,7 @@ import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.VerificationReportsFormats
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -330,6 +331,56 @@ intellijPlatform {
 tasks.named<VerifyPluginTask>("verifyPlugin") {
     // All required plugin dependencies are bundled with the pinned IDEs.
     offline = true
+
+    // The verifier's ignored-problems filter only handles compatibility problems.
+    failureLevel.set(
+        failureLevel.get().filterNot {
+            it == FailureLevel.INTERNAL_API_USAGES || it == FailureLevel.EXPERIMENTAL_API_USAGES
+        }
+    )
+    verificationReportsFormats.set(
+        listOf(VerificationReportsFormats.PLAIN, VerificationReportsFormats.HTML)
+    )
+
+    val allowedUsagesFile = layout.projectDirectory.file("allowed-plugin-verifier-api-usages.txt")
+    inputs.file(allowedUsagesFile)
+    doFirst {
+        check(verificationReportsDirectory.get().asFile.deleteRecursively()) {
+            "Could not clear Plugin Verifier reports"
+        }
+    }
+    doLast {
+        val allowedUsages =
+            allowedUsagesFile.asFile.readLines().filterNot { it.startsWith("#") }.toSet()
+        val verdicts =
+            verificationReportsDirectory
+                .get()
+                .asFile
+                .walkTopDown()
+                .filter { it.name == "verification-verdict.txt" }
+                .toList()
+        check(verdicts.isNotEmpty()) { "Plugin Verifier did not write any plain-text verdicts" }
+
+        val unexpectedUsages =
+            verdicts
+                .flatMap { verdict ->
+                    val summary = verdict.readText()
+                    listOf("internal", "experimental").flatMap { category ->
+                        val report = verdict.resolveSibling("$category-api-usages.txt")
+                        if (summary.contains(" of $category API") || report.exists()) {
+                            report.readLines().filter { it.isNotBlank() && it !in allowedUsages }
+                        } else {
+                            emptyList()
+                        }
+                    }
+                }
+                .distinct()
+        if (unexpectedUsages.isNotEmpty()) {
+            throw GradleException(
+                "Unapproved Plugin Verifier API usages:\n" + unexpectedUsages.joinToString("\n")
+            )
+        }
+    }
 }
 
 if (System.getenv("CI") == null) {
