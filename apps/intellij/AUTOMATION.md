@@ -942,6 +942,20 @@ fixture and run `intellij:runAutomation` with
 `-PautomationMain=dev.nx.console.automation.ReproGraphErrorAnsiKt`, using the
 launch and recording instructions above.
 
+### Project configuration JSON schemas
+
+`ReproProjectJsonSchemaKt` checks native JSON schema highlighting of unsaved
+changes in `packages/parent/child/project.json` (`cache: false` becomes a string)
+and `packages/pkg/package.json` (`version: "1.0.0"` becomes an integer). The
+project file must declare a valid local Nx project `$schema`; the package uses
+IntelliJ's built-in package schema. Both must be Nx projects so the scenario can
+also open their Project Details previews. Buffers are restored and saved after
+each check. The labeled report contains the actual highlighting descriptions.
+
+Run with `-PautomationMain=dev.nx.console.automation.ReproProjectJsonSchemaKt`
+and separate `NX_AUTOMATION_LABEL` values for baseline and fixed runs, following
+the launch and recording instructions above.
+
 ### Workspace data in JCEF browsers
 
 `ReproUntrustedGraphDataKt` expects the e2e fixture from `e2e/run.mjs`. It
