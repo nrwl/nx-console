@@ -24,6 +24,7 @@ internal object NxlsDocumentOpenListener : LspClientManagerListener {
 
         // A queued selection can reach LSP after the last editor closes. Close it within
         // the same write action to keep the SDK and server in sync.
+        // Remove once https://youtrack.jetbrains.com/issue/IJPL-262167 ships in the minimum IDE.
         lspClient.documentSyncManager.close(file)
     }
 }
