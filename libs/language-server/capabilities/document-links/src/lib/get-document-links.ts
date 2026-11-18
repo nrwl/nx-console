@@ -104,7 +104,7 @@ export async function getDocumentLinks(
       }
       case CompletionType.inputName:
       case CompletionType.inputNameWithDeps: {
-        const link = await namedInputLink(workingPath, node);
+        const link = await namedInputLink(workingPath, node, document);
         if (link) {
           links.push(DocumentLink.create(range, link));
         }

@@ -959,3 +959,20 @@ NX_E2E_SCENARIO_NAME=untrusted-graph-data \
 On Linux hosts that restrict unprivileged user namespaces (Ubuntu's AppArmor
 default), IntelliJ suspends the embedded browser. Add
 `JAVA_TOOL_OPTIONS=-Dide.browser.jcef.sandbox.enable=false` to that run.
+
+### Project-level named inputs
+
+`ReproProjectNamedInputsKt` expects an installed Nx workspace with a root
+`nx.json` that defines `default` and `production` and references `production`
+in `targetDefaults.build.inputs`. Both `packages/parent/child/project.json`
+and `packages/pkg/package.json` (under `nx`) define
+`localOnly: ["{projectRoot}/index.ts"]` and `production: ["localOnly"]` and
+reference `production` in `targets.build.inputs`. Create an `index.ts` in
+each project.
+
+Launch the fixture in the automation IDE and run `intellij:runAutomation`
+with `-PautomationMain=dev.nx.console.automation.ReproProjectNamedInputsKt`.
+Set `NX_AUTOMATION_LABEL` for each run. The scenario uses SDK actions and
+inspects LSP completion and links. It records completion and navigation for
+both projects and the root target defaults, and checks the project file
+links as controls. The labeled report includes destinations and frame indices.

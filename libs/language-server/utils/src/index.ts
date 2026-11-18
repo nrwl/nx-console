@@ -9,3 +9,4 @@ export * from './lib/json-language-service';
 export * from './lib/find-property';
 export * from './lib/executor';
 export * from './lib/nx-cloud';
+export * from './lib/project-named-inputs';
