@@ -28,6 +28,26 @@ class NxTaskExecutionManager(val project: Project, val cs: CoroutineScope) {
         }
     }
 
+    fun execute(
+        args: List<String>,
+        executor: Executor = DefaultRunExecutor.getRunExecutorInstance(),
+    ) {
+        cs.launch {
+            val command =
+                parseRunAnythingCommand(args) {
+                    NxlsService.getInstance(project).parseTargetString(it)
+                } ?: return@launch
+            val target = command.target
+            execute(
+                target.project,
+                target.target,
+                target.configuration ?: "",
+                command.arguments,
+                executor,
+            )
+        }
+    }
+
     fun execute(nxProject: String, nxTarget: String) {
         execute(nxProject, nxTarget, "")
     }
