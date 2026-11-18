@@ -32,6 +32,7 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.jcef.jsStringLiteral
 import dev.nx.console.utils.nxProjectConfigurationPath
 import dev.nx.console.utils.nxWorkspace
 import kotlinx.coroutines.*
@@ -83,7 +84,7 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
             if (browser.isDisposed) return@executeWhenLoaded
             withContext(Dispatchers.EDT) {
                 browser.executeJavaScript(
-                    "window.waitForRouter?.().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
+                    "window.waitForRouter?.().then(() => {window.externalApi.openProjectDetails(${jsStringLiteral(nxProjectName)})})"
                 )
             }
         }

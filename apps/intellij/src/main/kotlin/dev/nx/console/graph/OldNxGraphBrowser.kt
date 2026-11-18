@@ -19,7 +19,9 @@ import dev.nx.console.telemetry.TelemetryEventSource
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.jcef.escapeHtml
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.jcef.jsStringLiteral
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import dev.nx.console.utils.openFileWithFocus
 import io.github.z4kn4fein.semver.toVersion
@@ -72,10 +74,12 @@ class OldNxGraphBrowser(
             lastCommand = Command.FocusProject(projectName)
             val nxVersion = nxVersion.await()
             if (nxVersion == null || nxVersion.gte(15)) {
-                browser.executeJavaScript("window.externalApi.focusProject('$projectName')")
+                browser.executeJavaScript(
+                    "window.externalApi.focusProject(${jsStringLiteral(projectName)})"
+                )
             } else if (nxVersion.major == 14) {
                 browser.executeJavaScript(
-                    "window.externalApi.depGraphService.send({type: 'focusProject', projectName: '$projectName'})"
+                    "window.externalApi.depGraphService.send({type: 'focusProject', projectName: ${jsStringLiteral(projectName)}})"
                 )
             } else {
                 loadOldVersionHtml()
@@ -87,7 +91,7 @@ class OldNxGraphBrowser(
         executeWhenLoaded {
             lastCommand = Command.FocusTaskGroup(taskGroupName)
             browser.executeJavaScript(
-                "window.externalApi?.router?.navigate('/tasks/$taskGroupName/all')"
+                "window.externalApi?.router?.navigate(${jsStringLiteral("/tasks/$taskGroupName/all")})"
             )
         }
     }
@@ -95,9 +99,11 @@ class OldNxGraphBrowser(
     fun focusTask(nxProject: String, nxTarget: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTask(nxProject, nxTarget)
-            browser.executeJavaScript("window.externalApi?.router?.navigate('/tasks/$nxTarget')")
             browser.executeJavaScript(
-                "document.querySelector('label[data-project=\"$nxProject\"]')?.click()"
+                "window.externalApi?.router?.navigate(${jsStringLiteral("/tasks/$nxTarget")})"
+            )
+            browser.executeJavaScript(
+                "document.querySelector('label[data-project=\"' + CSS.escape(${jsStringLiteral(nxProject)}) + '\"]')?.click()"
             )
         }
     }
@@ -226,7 +232,7 @@ class OldNxGraphBrowser(
               }
             </style>
             <p>Unable to load the project graph. The following error occurred:</p>
-            <pre>${errorMessage}</pre>
+            <pre>${escapeHtml(errorMessage)}</pre>
     """
                 .trimIndent()
         browser.loadHTML(html)

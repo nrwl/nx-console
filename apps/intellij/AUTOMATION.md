@@ -955,3 +955,21 @@ each check. The labeled report contains the actual highlighting descriptions.
 Run with `-PautomationMain=dev.nx.console.automation.ReproProjectJsonSchemaKt`
 and separate `NX_AUTOMATION_LABEL` values for baseline and fixed runs, following
 the launch and recording instructions above.
+
+### Workspace data in JCEF browsers
+
+`ReproUntrustedGraphDataKt` expects the e2e fixture from `e2e/run.mjs`. It
+renames `util` to a name containing quotes and `</script>`, adds a `demo`
+target whose command contains markup, and checks that Project Details lists the
+target and the graph focuses the renamed project, with no element created from
+either value. Run it through the e2e runner:
+
+```sh
+NX_E2E_SCENARIO_NAME=untrusted-graph-data \
+  NX_E2E_SCENARIO_CLASS=dev.nx.console.automation.ReproUntrustedGraphDataKt \
+  node apps/intellij/e2e/run.mjs
+```
+
+On Linux hosts that restrict unprivileged user namespaces (Ubuntu's AppArmor
+default), IntelliJ suspends the embedded browser. Add
+`JAVA_TOOL_OPTIONS=-Dide.browser.jcef.sandbox.enable=false` to that run.

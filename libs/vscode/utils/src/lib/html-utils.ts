@@ -42,3 +42,12 @@ export function safeJsonStringify(data: unknown): string {
 export function escapeScriptTag(serializedJson: string): string {
   return serializedJson.replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
 }
+
+/**
+ * Content Security Policy for webviews whose scripts and styles all come from
+ * the extension. Inline scripts are blocked; inline styles stay allowed
+ * because the Lit components set `style` attributes.
+ */
+export function webviewCspMetaTag(cspSource: string): string {
+  return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src ${cspSource}; style-src ${cspSource} 'unsafe-inline'; font-src ${cspSource}; img-src ${cspSource} https: data:;">`;
+}

@@ -65,6 +65,15 @@ describe('loadNxMcpConfig', () => {
     expect(loadNxMcpConfig('/workspace')).toEqual({ minimal: true });
   });
 
+  // The config file is committed with the workspace, so it must not be able
+  // to expose the unauthenticated HTTP server beyond loopback.
+  it('should ignore host', () => {
+    mockedReadFileSync.mockReturnValue(
+      JSON.stringify({ transport: 'http', host: '0.0.0.0' }),
+    );
+    expect(loadNxMcpConfig('/workspace')).toEqual({ transport: 'http' });
+  });
+
   it('should parse JSONC with single-line comments', () => {
     mockedReadFileSync.mockReturnValue(`{
       // enable minimal mode
@@ -124,22 +133,23 @@ describe('configToArgs', () => {
   });
 
   it('should convert string values', () => {
-    expect(configToArgs({ transport: 'http' })).toEqual([
-      '--transport',
-      'http',
-    ]);
+    expect(configToArgs({ transport: 'http' })).toEqual(['--transport=http']);
   });
 
   it('should convert number values', () => {
-    expect(configToArgs({ port: 9922 })).toEqual(['--port', '9922']);
+    expect(configToArgs({ port: 9922 })).toEqual(['--port=9922']);
   });
 
   it('should convert array values to repeated flags', () => {
     expect(configToArgs({ tools: ['nx_docs', '!cloud_*'] })).toEqual([
-      '--tools',
-      'nx_docs',
-      '--tools',
-      '!cloud_*',
+      '--tools=nx_docs',
+      '--tools=!cloud_*',
+    ]);
+  });
+
+  it('should keep option-like values attached to their key', () => {
+    expect(configToArgs({ tools: ['--host=0.0.0.0'] })).toEqual([
+      '--tools=--host=0.0.0.0',
     ]);
   });
 });

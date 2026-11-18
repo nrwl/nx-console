@@ -3,6 +3,7 @@ import { NxMcpConfig } from '@nx-console/nx-mcp-server';
 
 export interface ArgvType extends NxMcpConfig {
   workspacePath?: string;
+  host?: string;
   // Removed options, kept only to explain the removal
   sse: boolean;
   http: boolean;
@@ -43,6 +44,11 @@ export function createYargsConfig(args: string[]): Argv<any> {
       describe: 'Port to use for the HTTP server (default: 9921)',
       type: 'number',
     })
+    .option('host', {
+      describe:
+        'Address the HTTP server listens on (default: loopback only). The server has no authentication, so only listen on other interfaces in an isolated environment such as a container.',
+      type: 'string',
+    })
     .option('disableTelemetry', {
       describe: 'Disable sending of telemetry data',
       type: 'boolean',
@@ -81,6 +87,12 @@ export function createYargsConfig(args: string[]): Argv<any> {
       if (argv.port !== undefined && argv.transport === 'stdio') {
         throw new Error(
           'The --port option can only be used when transport is set to http',
+        );
+      }
+
+      if (argv.host !== undefined && argv.transport === 'stdio') {
+        throw new Error(
+          'The --host option can only be used when transport is set to http',
         );
       }
 

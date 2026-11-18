@@ -4,6 +4,8 @@ import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -27,9 +29,11 @@ fun markdownToHTML(markdown: String): String {
 }
 
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
+// On CI, only configure the verifier IDEs when verification is requested, so project graph
+// computation and other tasks don't resolve them.
 val enablePluginVerification =
     System.getenv("CI") == null ||
-        providers.gradleProperty("enablePluginVerification").orNull == "true"
+        gradle.startParameter.taskNames.any { it.substringAfterLast(':') == "verifyPlugin" }
 
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
@@ -249,7 +253,7 @@ dependencies {
             }
         )
         if (enablePluginVerification) {
-            pluginVerifier()
+            pluginVerifier("1.411")
         }
         zipSigner()
         // Add test framework configuration
@@ -304,12 +308,28 @@ intellijPlatform {
     }
     if (enablePluginVerification) {
         pluginVerification {
+            failureLevel =
+                listOf(
+                    FailureLevel.COMPATIBILITY_PROBLEMS,
+                    FailureLevel.INVALID_PLUGIN,
+                    FailureLevel.MISSING_DEPENDENCIES,
+                    FailureLevel.INTERNAL_API_USAGES,
+                    FailureLevel.EXPERIMENTAL_API_USAGES,
+                    FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
+                    FailureLevel.OVERRIDE_ONLY_API_USAGES,
+                    FailureLevel.NON_EXTENDABLE_API_USAGES,
+                )
             ides {
-                create("IU", "2026.2.5")
-                create("IU", "2026.3")
+                create("IU", "2026.2.5") { useCache = true }
+                create("IU", "2026.3") { useCache = true }
             }
         }
     }
+}
+
+tasks.named<VerifyPluginTask>("verifyPlugin") {
+    // All required plugin dependencies are bundled with the pinned IDEs.
+    offline = true
 }
 
 if (System.getenv("CI") == null) {

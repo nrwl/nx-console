@@ -23,6 +23,7 @@ import { withTimeout } from '@nx-console/shared-utils';
 import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode-tasks';
 import { getTelemetry } from '@nx-console/vscode-telemetry';
+import { escapeHtml, webviewCspMetaTag } from '@nx-console/vscode-utils';
 import { isDeepStrictEqual } from 'util';
 import { ActorRef, EventObject } from 'xstate';
 import { getCloudOnboardingUrl } from './get-cloud-onboarding-url';
@@ -152,7 +153,7 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
     return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
-
+				${webviewCspMetaTag(webviewView.webview.cspSource)}
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${codiconsUri}" rel="stylesheet" id="vscode-codicon-stylesheet">
 
@@ -164,9 +165,9 @@ export class CloudOnboardingViewProvider implements WebviewViewProvider {
       </head>
       <body>
         <script type="module" src="${webviewScriptUri}"></script>
-				<root-element cloudOnboardingInfo='${JSON.stringify(
-          cloudOnboardingInfo,
-        )}'></root-element>
+				<root-element cloudOnboardingInfo="${escapeHtml(
+          JSON.stringify(cloudOnboardingInfo) ?? '',
+        )}"></root-element>
 			</body>
 			</html>`;
   }
