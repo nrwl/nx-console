@@ -1,4 +1,6 @@
+import { gte } from '@nx-console/nx-version';
 import { OptionType, Option } from '@nx-console/shared-schema';
+import { getNxVersion } from '@nx-console/vscode-nx-workspace';
 import { selectFlags } from './select-flags';
 
 // TODO: REMOVE HARD CODED LIST OF FLAGS
@@ -7,19 +9,26 @@ export async function selectAffectedFlags(target: string): Promise<{
   flags: string[] | undefined;
   positional?: string;
 }> {
+  const nxVersion = await getNxVersion();
+  const supportsAll =
+    nxVersion && nxVersion.major >= 15 && !gte(nxVersion, '16.2.0-0');
+  const options = supportsAll
+    ? AFFECTED_OPTIONS
+    : AFFECTED_OPTIONS.filter(({ name }) => name !== 'all');
+
   switch (target) {
     case 'apps':
     case 'libs': {
       const command = `affected:${target}`;
       return {
         command,
-        flags: await selectFlags(command, AFFECTED_OPTIONS),
+        flags: await selectFlags(command, options),
       };
     }
     default: {
       return {
         command: 'affected',
-        flags: await selectFlags(`affected`, AFFECTED_OPTIONS, {
+        flags: await selectFlags(`affected`, options, {
           target,
         }),
       };
