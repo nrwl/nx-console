@@ -1,8 +1,8 @@
 /**
- * Local release entrypoint.
+ * Release entrypoint, run by the `release` workflow or locally.
  *
  * Cuts a release for a single package off the latest `master`: creates and
- * pushes the `<pkg>-v<version>` tag (via local git auth) and creates the
+ * pushes the `<pkg>-v<version>` tag (via the caller's git auth) and creates the
  * GitHub Release whose notes carry the changelog. Publishing the package
  * itself is left to the `publish-<pkg>` workflow, which is triggered by the
  * GitHub Release and gated behind the `release-approval` environment.

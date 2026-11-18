@@ -20,6 +20,16 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
+      # A release tag must point at a commit on master, so a tag created or moved
+      # onto another branch can't publish even if the deployment gets approved.
+      - name: check the release tag is on master
+        run: |
+          if ! git merge-base --is-ancestor "$TAG" origin/master; then
+            echo "::error::$TAG does not point at a commit on master"
+            exit 1
+          fi
+        env:
+          TAG: ${{ github.event.release.tag_name }}
       - name: Enable Corepack
         run: corepack enable
       - name: Use Node.js ${{ env.node_version }}
