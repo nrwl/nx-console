@@ -6,7 +6,10 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { createCompletionItem } from './create-completion-path-item';
-import { lspLogger } from '@nx-console/language-server-utils';
+import {
+  getProjectNamedInputs,
+  lspLogger,
+} from '@nx-console/language-server-utils';
 
 export async function inputNameCompletion(
   workingPath: string | undefined,
@@ -22,8 +25,13 @@ export async function inputNameCompletion(
 
   const { nxJson } = await nxWorkspace(workingPath, lspLogger);
 
-  for (const inputName of Object.keys(nxJson.namedInputs ?? {})) {
-    if (hasDependencyHat) {
+  const workspaceInputs = new Set(Object.keys(nxJson.namedInputs ?? {}));
+  const projectInputs = getProjectNamedInputs(document.uri, node).map(
+    (property) => property.keyNode.value,
+  );
+
+  for (const inputName of new Set([...workspaceInputs, ...projectInputs])) {
+    if (hasDependencyHat && workspaceInputs.has(inputName)) {
       inputNameCompletion.push(
         createCompletionItem(
           `^${inputName}`,

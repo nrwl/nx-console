@@ -6,7 +6,10 @@ import {
   resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server-capabilities-code-completion';
 import { getDefinition } from '@nx-console/language-server-capabilities-definition';
-import { getDocumentLinks } from '@nx-console/language-server-capabilities-document-links';
+import {
+  getDocumentLinks,
+  getProjectNamedInputDefinition,
+} from '@nx-console/language-server-capabilities-document-links';
 import { getHover } from '@nx-console/language-server-capabilities-hover';
 import {
   NxChangeWorkspace,
@@ -256,7 +259,14 @@ connection.onDefinition(async (definitionParams) => {
 
   const { jsonAst, document } = getJsonDocument(definitionDocument);
 
-  return await getDefinition(WORKING_PATH, definitionParams, jsonAst, document);
+  return (
+    (await getProjectNamedInputDefinition(
+      document,
+      jsonAst,
+      definitionParams.position,
+    )) ??
+    (await getDefinition(WORKING_PATH, definitionParams, jsonAst, document))
+  );
 });
 
 connection.onDocumentLinks(async (params) => {
