@@ -145,6 +145,7 @@
   ],
   "packageManager": "yarn@4.15.0",
   "resolutions": {
-    "minimatch@9.0.3": "^9.0.7"
+    "minimatch@9.0.3": "^9.0.7",
+    "@nx/gradle@npm:24.0.0-rc.1": "patch:@nx/gradle@npm%3A24.0.0-rc.1#~/.yarn/patches/@nx-gradle-npm-24.0.0-rc.1-60d5dd6289.patch"
   }
 }
