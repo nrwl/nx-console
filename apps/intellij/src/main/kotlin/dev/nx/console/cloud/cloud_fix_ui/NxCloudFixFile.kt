@@ -11,9 +11,12 @@ import com.intellij.ui.jcef.*
 import com.intellij.util.messages.MessageBusConnection
 import dev.nx.console.utils.jcef.ClasspathResourceRequestHandler
 import javax.swing.JComponent
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
+@OptIn(ExperimentalSerializationApi::class)
 val json = Json {
+    exceptionsWithDebugInfo = false
     classDiscriminator = "type"
     ignoreUnknownKeys = true
     isLenient = true

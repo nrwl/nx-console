@@ -51,6 +51,7 @@ import javax.swing.JProgressBar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import ru.nsk.kstatemachine.event.DataEvent
@@ -105,7 +106,11 @@ sealed interface Events {
     class LoadOldBrowser : Event
 }
 
-val json = Json { ignoreUnknownKeys = true }
+@OptIn(ExperimentalSerializationApi::class)
+val json = Json {
+    ignoreUnknownKeys = true
+    exceptionsWithDebugInfo = false
+}
 
 class NewProjectDetailsBrowser(private val project: Project, private val file: VirtualFile) :
     Disposable {

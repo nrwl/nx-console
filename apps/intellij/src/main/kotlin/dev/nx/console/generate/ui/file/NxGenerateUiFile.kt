@@ -16,11 +16,14 @@ import dev.nx.console.models.NxGenerator
 import dev.nx.console.utils.jcef.ClasspathResourceRequestHandler
 import javax.swing.Icon
 import javax.swing.JComponent
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.cef.browser.CefBrowser
 import org.cef.handler.CefLifeSpanHandlerAdapter
 
+@OptIn(ExperimentalSerializationApi::class)
 val json = Json {
+    exceptionsWithDebugInfo = false
     classDiscriminator = "payloadType"
     ignoreUnknownKeys = true
     isLenient = true

@@ -37,12 +37,17 @@ import java.util.regex.Matcher
 import javax.swing.JComponent
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-val json = Json { ignoreUnknownKeys = true }
+@OptIn(ExperimentalSerializationApi::class)
+val json = Json {
+    ignoreUnknownKeys = true
+    exceptionsWithDebugInfo = false
+}
 
 abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()
