@@ -1,5 +1,4 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-// ci-perf measurement: test-only change
 
 package dev.nx.console.nxls
 
