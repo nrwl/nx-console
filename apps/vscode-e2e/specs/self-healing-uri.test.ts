@@ -12,16 +12,23 @@ function selfHealingLink(fixId: string): string {
   return `vscode://nrwl.angular-console/self-healing/${selfHealingCloudId}/${encodeURIComponent(fixId)}`;
 }
 
-/** Opens the link like a browser would, and returns the shell tasks it started within `waitMs`. */
+/**
+ * Opens the link like a browser would, and returns the shell tasks it started within `waitMs`.
+ * With `untilFirstTask` it returns as soon as a task starts: the handler only starts one once
+ * Nx Console has loaded the workspace, which can take several seconds after VS Code launches.
+ */
 async function openLinkAndCollectTasks(
   evaluator: VSCodeEvaluator,
   link: string,
   waitMs: number,
+  untilFirstTask = false,
 ) {
   return evaluator.evaluate(
-    async (vscode, uri: string, ms: number) => {
+    async (vscode, uri: string, ms: number, untilFirstTask: boolean) => {
       for (const terminal of vscode.window.terminals) terminal.dispose();
       const started: { name: string; command: unknown; args: unknown }[] = [];
+      let taskStarted = () => {};
+      const firstTask = new Promise<void>((resolve) => (taskStarted = resolve));
       const listener = vscode.tasks.onDidStartTask(({ execution }) => {
         const shell = execution.task.execution as InstanceType<
           typeof vscode.ShellExecution
@@ -31,9 +38,11 @@ async function openLinkAndCollectTasks(
           command: shell?.command,
           args: shell?.args,
         });
+        taskStarted();
       });
       await vscode.env.openExternal(vscode.Uri.parse(uri));
-      await new Promise((resolve) => setTimeout(resolve, ms));
+      const timeout = new Promise((resolve) => setTimeout(resolve, ms));
+      await (untilFirstTask ? Promise.race([firstTask, timeout]) : timeout);
       listener.dispose();
       for (const execution of vscode.tasks.taskExecutions)
         execution.terminate();
@@ -41,6 +50,7 @@ async function openLinkAndCollectTasks(
     },
     link,
     waitMs,
+    untilFirstTask,
   );
 }
 
@@ -95,7 +105,8 @@ test('a valid self-healing link passes the fix id to nx-cloud as a quoted argume
   const started = await openLinkAndCollectTasks(
     vscode.evaluator,
     selfHealingLink(fixId),
-    5_000,
+    60_000,
+    true,
   );
 
   await proof.show(`tasks started: ${JSON.stringify(started)}`);
