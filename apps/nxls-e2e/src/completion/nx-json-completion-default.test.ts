@@ -80,6 +80,10 @@ describe('nx.json completion - default', () => {
     expect(completionItemStrings).toEqual([
       '@nx/cypress/plugin',
       '@nx/eslint/plugin',
+      '@nx/js/typescript',
+      '@nx/js/node',
+      '@nx/js/tsx',
+      '@nx/react/router-plugin',
       '@nx/vite/plugin',
       '@nx/vitest',
     ]);
