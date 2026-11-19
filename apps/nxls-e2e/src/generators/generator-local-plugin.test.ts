@@ -21,16 +21,11 @@ const pluginName = uniq('local-plugin');
 
 describe('generator local plugin', () => {
   beforeAll(async () => {
-    // Create a new workspace with basic React setup
     newWorkspace({
       name: workspaceName,
       options: {
-        preset: 'react-monorepo',
-        bundler: 'vite',
-        e2eTestRunner: 'cypress',
-        style: 'css',
+        preset: 'apps',
       },
-      version: defaultVersion,
     });
 
     const workspacePath = join(e2eCwd, workspaceName);
