@@ -15,6 +15,7 @@ import {
 } from '@nx-console/language-server-types';
 import { GeneratorCollectionInfo } from '@nx-console/shared-schema';
 
+// CI timing sample, reverted in the next commit
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 const pluginName = uniq('local-plugin');
