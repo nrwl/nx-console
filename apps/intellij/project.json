@@ -17,7 +17,7 @@
       }
     },
     "buildPlugin": {
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "composedJar"],
       "inputs": ["...", "kotlin", "{projectRoot}/src/main/**/*"]
     },
     "verifyPlugin": {
