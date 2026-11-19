@@ -57,46 +57,45 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         if (currentLoadHtmlJob?.isActive == true) {
             currentLoadHtmlJob?.cancel()
         }
-        currentLoadHtmlJob =
-            coroutineScope.launch {
-                logger<NxGraphBrowser>().debug("Loading graph html")
-                val nxWorkspace = NxlsService.getInstance(project).workspace()
+        currentLoadHtmlJob = coroutineScope.launch {
+            logger<NxGraphBrowser>().debug("Loading graph html")
+            val nxWorkspace = NxlsService.getInstance(project).workspace()
 
-                val errorsToShow = this@NxGraphBrowser.errors ?: nxWorkspace?.errors
+            val errorsToShow = this@NxGraphBrowser.errors ?: nxWorkspace?.errors
 
-                val hasProjects = nxWorkspace?.projectGraph?.nodes?.isNotEmpty() == true
-                val needsNonExistentProject =
-                    lastGraphCommand?.let {
-                        val projectName =
-                            when (it) {
-                                is GraphCommand.FocusProject -> it.projectName
-                                is GraphCommand.FocusTarget -> it.projectName
-                                else -> null
-                            }
+            val hasProjects = nxWorkspace?.projectGraph?.nodes?.isNotEmpty() == true
+            val needsNonExistentProject =
+                lastGraphCommand?.let {
+                    val projectName =
+                        when (it) {
+                            is GraphCommand.FocusProject -> it.projectName
+                            is GraphCommand.FocusTarget -> it.projectName
+                            else -> null
+                        }
 
-                        projectName != null &&
-                            nxWorkspace?.projectGraph?.nodes?.contains(projectName) != true
-                    } ?: false
+                    projectName != null &&
+                        nxWorkspace?.projectGraph?.nodes?.contains(projectName) != true
+                } ?: false
 
-                if (
-                    !errorsToShow.isNullOrEmpty() &&
-                        (nxWorkspace?.isPartial != true ||
-                            !hasProjects ||
-                            !nxWorkspace.nxVersion.gte(19) ||
-                            needsNonExistentProject)
-                ) {
-                    val errorHtml = getErrorHtml(errorsToShow)
-                    withContext(Dispatchers.EDT) { wrappedBrowserLoadHtml(errorHtml) }
-                    registerResetHandler()
-                } else {
-                    val graphHtml = loadGraphHtmlBase()
-                    withContext(Dispatchers.EDT) { wrappedBrowserLoadHtml(graphHtml) }
-                    registerInteractionEventHandler()
-                    if (lastGraphCommand != null) {
-                        replayLastCommand()
-                    }
+            if (
+                !errorsToShow.isNullOrEmpty() &&
+                    (nxWorkspace?.isPartial != true ||
+                        !hasProjects ||
+                        !nxWorkspace.nxVersion.gte(19) ||
+                        needsNonExistentProject)
+            ) {
+                val errorHtml = getErrorHtml(errorsToShow)
+                withContext(Dispatchers.EDT) { wrappedBrowserLoadHtml(errorHtml) }
+                registerResetHandler()
+            } else {
+                val graphHtml = loadGraphHtmlBase()
+                withContext(Dispatchers.EDT) { wrappedBrowserLoadHtml(graphHtml) }
+                registerInteractionEventHandler()
+                if (lastGraphCommand != null) {
+                    replayLastCommand()
                 }
             }
+        }
     }
 
     fun selectAllProjects() {

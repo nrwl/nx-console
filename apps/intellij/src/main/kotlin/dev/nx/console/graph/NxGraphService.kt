@@ -211,8 +211,9 @@ class NxGraphService(override val project: Project, private val cs: CoroutineSco
         cs.launch {
             delay(1000)
             val editors = FileEditorManager.getInstance(project).allEditors
-            val hasNxGraphEditor =
-                editors.any { it.file.fileType.name == NxGraphFileType.INSTANCE.name }
+            val hasNxGraphEditor = editors.any {
+                it.file.fileType.name == NxGraphFileType.INSTANCE.name
+            }
 
             if (!hasNxGraphEditor) {
                 graphBrowser?.also { Disposer.dispose(it) }

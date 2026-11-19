@@ -47,10 +47,9 @@ internal fun Driver.nxlsPlatformClient(project: Project): NxlsPlatformClient =
         .single { it.getDescriptor().getPresentableName() == "Nx" }
 
 internal fun Driver.nxlsAssertTracked(server: NxlsPlatformClient, files: List<VirtualFile>) {
-    val missing =
-        files.filterNot {
-            server.`getDocumentSyncManager$intellij_platform_lsp_impl`().isFileOpened(it)
-        }
+    val missing = files.filterNot {
+        server.`getDocumentSyncManager$intellij_platform_lsp_impl`().isFileOpened(it)
+    }
     check(missing.isEmpty()) {
         "Generation ${server.getDescriptor().getGeneration()} has not opened ${missing.map { it.getPath() }} before tab selection"
     }

@@ -223,13 +223,12 @@ fun main() = withAutomationDriver {
     inspectIde()
     recordIde(System.getenv("NX_AUTOMATION_LABEL") ?: "target-configuration-gutter-repro") {
         Thread.sleep(2000)
-        val results =
-            cases.map { case ->
-                runConfigurationFromGutter(project, workspace, case).also {
-                    println(it)
-                    Thread.sleep(4000)
-                }
+        val results = cases.map { case ->
+            runConfigurationFromGutter(project, workspace, case).also {
+                println(it)
+                Thread.sleep(4000)
             }
+        }
         val report =
             "Run a target configuration from the project.json gutter\n" +
                 "named: project.json has \"name\". shop: name comes from package.json (@fixture/shop).\n\n" +

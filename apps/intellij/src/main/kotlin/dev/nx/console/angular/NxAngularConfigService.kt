@@ -49,13 +49,12 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
 
     var config: NxAngularConfig? = null
 
-    override fun getState(): AngularConfigState? =
-        config?.let { config ->
-            AngularConfigState().apply {
-                workspaceLocation = config.file.url
-                projects = config.projectFiles.mapValues { it.value.url }.toMutableMap()
-            }
+    override fun getState(): AngularConfigState? = config?.let { config ->
+        AngularConfigState().apply {
+            workspaceLocation = config.file.url
+            projects = config.projectFiles.mapValues { it.value.url }.toMutableMap()
         }
+    }
 
     override fun noStateLoaded() {
         refresh()

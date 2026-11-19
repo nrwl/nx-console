@@ -128,19 +128,18 @@ fun main() = withAutomationDriver {
             Thread.sleep(1500)
             if (mode == "node") {
                 val settings = ui.x("//div[@accessiblename='Settings']")
-                val click =
-                    CompletableFuture.runAsync {
-                        withContext(OnDispatcher.EDT) {
-                            cast(
-                                    ui.x(
-                                            "//div[@class='JButton' and @text='Configure Node interpreter']"
-                                        )
-                                        .component,
-                                    RecoveryButton::class,
-                                )
-                                .doClick()
-                        }
+                val click = CompletableFuture.runAsync {
+                    withContext(OnDispatcher.EDT) {
+                        cast(
+                                ui.x(
+                                        "//div[@class='JButton' and @text='Configure Node interpreter']"
+                                    )
+                                    .component,
+                                RecoveryButton::class,
+                            )
+                            .doClick()
                     }
+                }
                 try {
                     val deadline = System.nanoTime() + 30.seconds.inWholeNanoseconds
                     while (!settings.present() && System.nanoTime() < deadline) {

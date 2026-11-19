@@ -172,68 +172,67 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
         if (currentLoadHtmlJob?.isActive == true) {
             currentLoadHtmlJob?.cancel()
         }
-        currentLoadHtmlJob =
-            coroutineScope.launch {
-                thisLogger().trace("loading PDV view ${file.path}")
-                val nxlsService = NxlsService.getInstance(project)
-                try {
-                    nxlsService.awaitStarted()
+        currentLoadHtmlJob = coroutineScope.launch {
+            thisLogger().trace("loading PDV view ${file.path}")
+            val nxlsService = NxlsService.getInstance(project)
+            try {
+                nxlsService.awaitStarted()
 
-                    val version = nxlsService.nxVersion()
+                val version = nxlsService.nxVersion()
 
-                    if (
-                        version == null ||
-                            !version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))
-                    ) {
-                        withContext(Dispatchers.EDT) {
-                            thisLogger().trace("Loading old version html ${file.path}")
-                            wrappedBrowserLoadHtml(loadOldVersionHtml())
-                        }
-                        return@launch
+                if (
+                    version == null ||
+                        !version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))
+                ) {
+                    withContext(Dispatchers.EDT) {
+                        thisLogger().trace("Loading old version html ${file.path}")
+                        wrappedBrowserLoadHtml(loadOldVersionHtml())
                     }
+                    return@launch
+                }
 
-                    val nxWorkspace = nxlsService.workspace()
-                    var errors = this@OldProjectDetailsBrowser.errors ?: nxWorkspace?.errors
-                    val nxProjectName = nxlsService.projectByPath(file.path)?.name
-                    this@OldProjectDetailsBrowser.nxProjectName = nxProjectName
-                    if (nxProjectName == null && errors == null) {
-                        errors =
-                            arrayOf(
-                                NxError(
-                                    message = "Unable to find Nx project for file: ${file.path}",
-                                    null,
-                                    null,
-                                    file = file.path,
-                                    null,
-                                    null,
-                                )
+                val nxWorkspace = nxlsService.workspace()
+                var errors = this@OldProjectDetailsBrowser.errors ?: nxWorkspace?.errors
+                val nxProjectName = nxlsService.projectByPath(file.path)?.name
+                this@OldProjectDetailsBrowser.nxProjectName = nxProjectName
+                if (nxProjectName == null && errors == null) {
+                    errors =
+                        arrayOf(
+                            NxError(
+                                message = "Unable to find Nx project for file: ${file.path}",
+                                null,
+                                null,
+                                file = file.path,
+                                null,
+                                null,
                             )
+                        )
+                }
+                val hasProjects = nxWorkspace?.projectGraph?.nodes?.isNotEmpty() == true
+                val hasProject =
+                    nxProjectName != null &&
+                        nxWorkspace?.projectGraph?.nodes?.get(nxProjectName) != null
+                if (
+                    errors != null &&
+                        (!hasProjects ||
+                            nxWorkspace?.isPartial != true ||
+                            !hasProject ||
+                            !version.gte(19))
+                ) {
+                    withContext(Dispatchers.EDT) {
+                        if (browser.isDisposed) return@withContext
+                        thisLogger().trace("Error found, loading error html ${file.path}")
+                        wrappedBrowserLoadHtml(getErrorHtml(errors))
+                        registerResetHandler()
                     }
-                    val hasProjects = nxWorkspace?.projectGraph?.nodes?.isNotEmpty() == true
-                    val hasProject =
-                        nxProjectName != null &&
-                            nxWorkspace?.projectGraph?.nodes?.get(nxProjectName) != null
-                    if (
-                        errors != null &&
-                            (!hasProjects ||
-                                nxWorkspace?.isPartial != true ||
-                                !hasProject ||
-                                !version.gte(19))
-                    ) {
-                        withContext(Dispatchers.EDT) {
-                            if (browser.isDisposed) return@withContext
-                            thisLogger().trace("Error found, loading error html ${file.path}")
-                            wrappedBrowserLoadHtml(getErrorHtml(errors))
-                            registerResetHandler()
-                        }
-                        return@launch
-                    }
+                    return@launch
+                }
 
-                    var htmlText = loadGraphHtmlBase()
-                    htmlText =
-                        htmlText.replace(
-                            "</head>".toRegex(),
-                            """
+                var htmlText = loadGraphHtmlBase()
+                htmlText =
+                    htmlText.replace(
+                        "</head>".toRegex(),
+                        """
                     <style>
                     body {
                     font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
@@ -243,45 +242,45 @@ class OldProjectDetailsBrowser(project: Project, private val file: VirtualFile) 
                     </style>
                     </head>
                   """
-                                .trimIndent(),
+                            .trimIndent(),
+                    )
+                withContext(Dispatchers.EDT) {
+                    thisLogger().trace("Loading actual PDV html ${file.path}")
+
+                    wrappedBrowserLoadHtml(htmlText)
+                    registerInteractionEventHandler()
+
+                    nxProjectName?.also { loadProjectDetails(it) }
+                }
+            } catch (e: Throwable) {
+                logger<OldProjectDetailsBrowser>()
+                    .debug(
+                        "error while loading PDV, loading error html ${file.path}: /n ${e.message}"
+                    )
+                withContext(Dispatchers.EDT) {
+                    if (browser.isDisposed) return@withContext
+                    TelemetryService.getInstance(project)
+                        .featureUsed(
+                            TelemetryEvent.MISC_EXCEPTION,
+                            mapOf("kind" to "PDV_LOAD", "name" to e.javaClass.name),
                         )
-                    withContext(Dispatchers.EDT) {
-                        thisLogger().trace("Loading actual PDV html ${file.path}")
-
-                        wrappedBrowserLoadHtml(htmlText)
-                        registerInteractionEventHandler()
-
-                        nxProjectName?.also { loadProjectDetails(it) }
-                    }
-                } catch (e: Throwable) {
-                    logger<OldProjectDetailsBrowser>()
-                        .debug(
-                            "error while loading PDV, loading error html ${file.path}: /n ${e.message}"
+                    val error =
+                        NxError(
+                            message =
+                                e.message
+                                    ?: "Nx Console encountered an error while loading. Please reset to try again.",
+                            null,
+                            stack = e.stackTraceToString(),
+                            file = file.path,
+                            null,
+                            null,
                         )
-                    withContext(Dispatchers.EDT) {
-                        if (browser.isDisposed) return@withContext
-                        TelemetryService.getInstance(project)
-                            .featureUsed(
-                                TelemetryEvent.MISC_EXCEPTION,
-                                mapOf("kind" to "PDV_LOAD", "name" to e.javaClass.name),
-                            )
-                        val error =
-                            NxError(
-                                message =
-                                    e.message
-                                        ?: "Nx Console encountered an error while loading. Please reset to try again.",
-                                null,
-                                stack = e.stackTraceToString(),
-                                file = file.path,
-                                null,
-                                null,
-                            )
-                        wrappedBrowserLoadHtml(getErrorHtml(arrayOf(error)))
+                    wrappedBrowserLoadHtml(getErrorHtml(arrayOf(error)))
 
-                        registerResetHandler()
-                    }
+                    registerResetHandler()
                 }
             }
+        }
     }
 
     private fun loadOldVersionHtml(): String {

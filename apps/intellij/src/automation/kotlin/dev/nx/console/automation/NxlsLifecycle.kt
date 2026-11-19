@@ -225,8 +225,9 @@ private fun Driver.checkUnsavedEditors(
     report: StringBuilder,
 ): Long {
     val server = nxlsPlatformClient(project)
-    val files =
-        editors.mapValues { checkNotNull(service<NxlsDocuments>().getFile(it.value.getDocument())) }
+    val files = editors.mapValues {
+        checkNotNull(service<NxlsDocuments>().getFile(it.value.getDocument()))
+    }
     nxlsAssertTracked(server, files.values.toList())
     for ((case, editor) in editors) {
         val buffer = unsavedBuffer(case)
@@ -239,15 +240,14 @@ private fun Driver.checkUnsavedEditors(
         }
         // This request neither selects a tab nor modifies the buffer, and bypasses lookup caches.
         // The platform resolves the document while serving it, so it needs a read action.
-        val labels =
-            withReadAction {
-                    server
-                        .getRequestExecutor()
-                        .getCompletionList(files.getValue(case), buffer.indexOf('|'), true)
-                        ?.getItems()
-                        ?.map { it.getLabel() }
-                }
-                .orEmpty()
+        val labels = withReadAction {
+            server
+                .getRequestExecutor()
+                .getCompletionList(files.getValue(case), buffer.indexOf('|'), true)
+                ?.getItems()
+                ?.map { it.getLabel() }
+        }
+            .orEmpty()
         check(case.nextKey in labels && case.key !in labels) {
             "Replacement did not receive unsaved ${case.path}: expected ${case.nextKey}, omitted ${case.key}; got $labels"
         }
@@ -278,30 +278,26 @@ fun main() = withAutomationDriver {
                     openToolWindow("Nx Console")
                     report.appendLine("Initial tree: ${nxlsTree()}")
                 }
-                val editors =
-                    nxlsConfigCases.associateWith { case ->
-                        lifecycleStep(project, "open ${case.path}", report) {
-                            openFile(case.path)
-                            nxlsEditor(project).also {
-                                check(
-                                    !service<NxlsDocuments>().isDocumentUnsaved(it.getDocument())
-                                ) {
-                                    "Save ${case.path} before running"
-                                }
+                val editors = nxlsConfigCases.associateWith { case ->
+                    lifecycleStep(project, "open ${case.path}", report) {
+                        openFile(case.path)
+                        nxlsEditor(project).also {
+                            check(!service<NxlsDocuments>().isDocumentUnsaved(it.getDocument())) {
+                                "Save ${case.path} before running"
                             }
                         }
                     }
+                }
                 // Read the file, not the buffer: this baseline is compared against disk to prove
                 // an unsaved edit never reaches it.
-                val diskBefore =
-                    editors.mapValues { (case, editor) ->
-                        originals[editor] = nxlsText(editor)
-                        Path.of(
-                                checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument()))
-                                    .getPath()
-                            )
-                            .readText()
-                    }
+                val diskBefore = editors.mapValues { (case, editor) ->
+                    originals[editor] = nxlsText(editor)
+                    Path.of(
+                            checkNotNull(service<NxlsDocuments>().getFile(editor.getDocument()))
+                                .getPath()
+                        )
+                        .readText()
+                }
                 checkOpenEditors(project, editors, report)
                 for ((case, editor) in editors) {
                     val buffer = unsavedBuffer(case)

@@ -65,10 +65,10 @@ fun main() = withAutomationDriver {
         fun completionLabels(at: Int): List<String> {
             val server = nxlsPlatformClient(project)
             return withReadAction {
-                    server.getRequestExecutor().getCompletionList(file, at, true)?.getItems()?.map {
-                        it.getLabel()
-                    }
+                server.getRequestExecutor().getCompletionList(file, at, true)?.getItems()?.map {
+                    it.getLabel()
                 }
+            }
                 .orEmpty()
         }
 
@@ -129,12 +129,13 @@ fun main() = withAutomationDriver {
 
         // Control: a root key position in the same document, answered from the nx.json schema
         val keyOffset = text.indexOf("\"analytics\"") + 1
-        val keyLabels =
-            runCatching { completionLabels(keyOffset) }.getOrElse { listOf("error: $it") }
-        val passed =
-            expectedPlugins.all { expected ->
-                expected in labels && popupPlugins.any { it.contains(expected) }
-            }
+        val keyLabels = runCatching {
+            completionLabels(keyOffset)
+        }
+            .getOrElse { listOf("error: $it") }
+        val passed = expectedPlugins.all { expected ->
+            expected in labels && popupPlugins.any { it.contains(expected) }
+        }
         val report =
             "nx.json \"plugin\" completion through the IDE's Nx language server client\n\n" +
                 "Nx installed in the workspace: $installedNx\n" +

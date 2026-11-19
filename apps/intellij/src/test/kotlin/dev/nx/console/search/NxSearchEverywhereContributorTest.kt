@@ -94,15 +94,15 @@ class NxSearchEverywhereContributorTest : BasePlatformTestCase() {
         val future =
             ApplicationManager.getApplication().executeOnPooledThread<Throwable?> {
                 runCatching {
-                        contributor.fetchElements(
-                            "@nx",
-                            indicator,
-                            Processor {
-                                fail("Cancelled searches must not send results to the consumer")
-                                true
-                            },
-                        )
-                    }
+                    contributor.fetchElements(
+                        "@nx",
+                        indicator,
+                        Processor {
+                            fail("Cancelled searches must not send results to the consumer")
+                            true
+                        },
+                    )
+                }
                     .exceptionOrNull()
             }
         assertTrue(requested.await(10, TimeUnit.SECONDS))
@@ -118,16 +118,16 @@ class NxSearchEverywhereContributorTest : BasePlatformTestCase() {
         val future =
             ApplicationManager.getApplication().executeOnPooledThread<Throwable?> {
                 runCatching {
-                        contributor.fetchElements(
-                            "@nx",
-                            indicator,
-                            Processor {
-                                received.add((it as NxSearchItem.Generator).generator.name)
-                                indicator.cancel()
-                                true
-                            },
-                        )
-                    }
+                    contributor.fetchElements(
+                        "@nx",
+                        indicator,
+                        Processor {
+                            received.add((it as NxSearchItem.Generator).generator.name)
+                            indicator.cancel()
+                            true
+                        },
+                    )
+                }
                     .exceptionOrNull()
             }
         assertIs<ProcessCanceledException>(future.get(10, TimeUnit.SECONDS))

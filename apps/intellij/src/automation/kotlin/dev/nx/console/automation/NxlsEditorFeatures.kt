@@ -485,24 +485,23 @@ private fun Driver.checkSnippet(
         invokeAction("EditorChooseLookupItem", component = editor.getContentComponent())
     } catch (failure: Exception) {
         val rejectedAt = LocalDateTime.now().format(nxlsLogTimeFormat)
-        val state =
-            runCatching {
-                    withContext(OnDispatcher.EDT) {
-                        val observed = nxlsCompletionMoment(project)
-                        val active = service<NxlsLookups>(project).getActiveLookup()
-                        val identity =
-                            when {
-                                active == null -> "absent"
-                                utility<NxlsObjects>().equals(active, lookup) -> "same"
-                                else -> "different"
-                            }
-                        "observed=$observed; active lookup=$identity; returned lookup:" +
-                            " isShown=${lookup.isShown()}, isLookupDisposed=${lookup.isLookupDisposed()}," +
-                            " focus=${lookup.getLookupFocusDegree().name()}," +
-                            " currentItemPresent=${lookup.getCurrentItem() != null}"
+        val state = runCatching {
+            withContext(OnDispatcher.EDT) {
+                val observed = nxlsCompletionMoment(project)
+                val active = service<NxlsLookups>(project).getActiveLookup()
+                val identity =
+                    when {
+                        active == null -> "absent"
+                        utility<NxlsObjects>().equals(active, lookup) -> "same"
+                        else -> "different"
                     }
-                }
-                .getOrElse { "lookup diagnostics unavailable: ${it.message}" }
+                "observed=$observed; active lookup=$identity; returned lookup:" +
+                    " isShown=${lookup.isShown()}, isLookupDisposed=${lookup.isLookupDisposed()}," +
+                    " focus=${lookup.getLookupFocusDegree().name()}," +
+                    " currentItemPresent=${lookup.getCurrentItem() != null}"
+            }
+        }
+            .getOrElse { "lookup diagnostics unavailable: ${it.message}" }
         throw IllegalStateException(
             "${failure.message}; completion invoked=${completion.invoked};" +
                 " lookup returned=${completion.returned}; action rejected=$rejectedAt; $state",

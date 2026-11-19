@@ -57,8 +57,9 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val currentlyOpenedProject =
-                path?.let { NxlsService.getInstance(project).projectByPath(path = path)?.name }
+            val currentlyOpenedProject = path?.let {
+                NxlsService.getInstance(project).projectByPath(path = path)?.name
+            }
             val targetDescriptor: NxTargetDescriptor =
                 this@NxGraphFocusTaskAction.targetDescriptor
                     ?: if (e.place == "NxToolWindow") {

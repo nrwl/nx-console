@@ -67,8 +67,9 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val currentlyOpenedProject =
-                path?.let { NxlsService.getInstance(project).projectByPath(path = path) }
+            val currentlyOpenedProject = path?.let {
+                NxlsService.getInstance(project).projectByPath(path = path)
+            }
             val nxProject: NxProject =
                 if (e.place === "NxToolWindow") {
                     e.getData(NxTreeNodeProjectKey) ?: return@launch

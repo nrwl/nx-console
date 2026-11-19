@@ -108,20 +108,19 @@ class CIPEPollingService(private val project: Project, private val cs: Coroutine
         logger.log("Starting CIPE polling with initial interval: ${currentPollingInterval}ms")
         _isPolling.value = true
 
-        pollingJob =
-            cs.launch {
-                while (isActive) {
-                    try {
-                        pollCIPEData()
-                        delay(currentPollingInterval)
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        logger.error("Error during CIPE polling", e)
-                        delay(currentPollingInterval)
-                    }
+        pollingJob = cs.launch {
+            while (isActive) {
+                try {
+                    pollCIPEData()
+                    delay(currentPollingInterval)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logger.error("Error during CIPE polling", e)
+                    delay(currentPollingInterval)
                 }
             }
+        }
     }
 
     /** Stop polling for CIPE data */

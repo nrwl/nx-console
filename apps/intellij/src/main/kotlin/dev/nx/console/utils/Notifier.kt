@@ -84,10 +84,9 @@ class Notifier {
             project: Project,
             requestName: String,
             e: MessageIssueException,
-        ) =
-            lspIssueExceptionThrottler.throttle {
-                notifyLSPMessageIssueException(project, requestName, e)
-            }
+        ) = lspIssueExceptionThrottler.throttle {
+            notifyLSPMessageIssueException(project, requestName, e)
+        }
 
         fun notifyLSPMessageIssueException(
             project: Project,

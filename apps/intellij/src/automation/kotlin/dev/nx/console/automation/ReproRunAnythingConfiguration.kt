@@ -102,7 +102,8 @@ fun main() = withAutomationDriver {
                                 RunAnythingConfigurationText::class,
                             )
                             .getText(),
-                        cast(configuration.component, RunAnythingConfigurationText::class).getText(),
+                        cast(configuration.component, RunAnythingConfigurationText::class)
+                            .getText(),
                     )
                 }
             report.appendLine("Saved Projects/Targets/Configuration: $fields")
