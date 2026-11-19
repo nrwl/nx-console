@@ -138,6 +138,52 @@ describe('inferencePluginsCompletion', () => {
     expect(labels).toEqual(['@nx/vite/plugin']);
   });
 
+  it('includes explicit inference subpaths alongside /plugin without loading their modules', async () => {
+    const js = addPackage('@nx/js', {
+      exports: {
+        '.': './dist/index.js',
+        './plugin': './dist/plugin.js',
+        './typescript': {
+          '@nx/nx-source': './typescript.ts',
+          types: './dist/typescript.d.ts',
+          default: './dist/typescript.js',
+        },
+        './other': { node: { require: './dist/other.cjs' } },
+        './utility': './dist/utility.js',
+        './missing': './dist/missing.js',
+        './blocked': null,
+        './*': './dist/*.js',
+      },
+    });
+    writeModule(
+      js,
+      'dist/typescript.js',
+      'exports.createNodesV2 = void 0; throw new Error("do not execute");',
+    );
+    writeModule(js, 'dist/other.cjs', 'exports.createNodes = void 0;');
+    writeModule(
+      js,
+      'dist/utility.js',
+      'exports.createNodesFactory = () => {};',
+    );
+    writeModule(js, 'dist/index.js', 'exports.createNodes = void 0;');
+    jest.mocked(workspaceDependencies).mockResolvedValue([js]);
+
+    expect(
+      (await inferencePluginsCompletion(workspace)).map((item) => item.label),
+    ).toEqual(['@nx/js/plugin', '@nx/js/typescript', '@nx/js/other']);
+  });
+
+  it('excludes built-in plugins exported by the core nx package', async () => {
+    const nx = addPackage('nx', {
+      exports: { './src/plugins/js': './src/plugins/js.js' },
+    });
+    writeModule(nx, 'src/plugins/js.js', 'exports.createNodesV2 = void 0;');
+    jest.mocked(workspaceDependencies).mockResolvedValue([nx]);
+
+    expect(await inferencePluginsCompletion(workspace)).toEqual([]);
+  });
+
   it('skips packages without a plugin entry point', async () => {
     const devkit = addPackage('@nx/devkit', {
       exports: { '.': './dist/index.js' },
