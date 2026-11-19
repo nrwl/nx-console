@@ -682,14 +682,11 @@ class NxCloudFixFileImpl(
                 NxConsoleLogger.getInstance()
                     .log("Creating diff viewer for ${patches.size} patches")
 
-                val requests: List<DiffRequest> =
-                    patches.map { patch ->
-                        NxConsoleLogger.getInstance()
-                            .log(
-                                "Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}"
-                            )
-                        PatchDiffRequest(patch, patch.beforeFileName, patch.beforeFileName, null)
-                    }
+                val requests: List<DiffRequest> = patches.map { patch ->
+                    NxConsoleLogger.getInstance()
+                        .log("Creating PatchDiffRequest for ${patch.afterName ?: patch.beforeName}")
+                    PatchDiffRequest(patch, patch.beforeFileName, patch.beforeFileName, null)
+                }
 
                 if (requests.isEmpty()) {
                     NxConsoleLogger.getInstance().log("No diff requests created")

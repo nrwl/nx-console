@@ -163,20 +163,19 @@ fun main() = withAutomationDriver {
             Thread.sleep(2000)
 
             val button = cast(viewErrors.component, PluginDependenciesButton::class)
-            val clickError =
-                runCatching { withContext(OnDispatcher.EDT) { button.doClick() } }
-                    .exceptionOrNull()
-                    ?.let { generateSequence(it) { e -> e.cause }.last() }
+            val clickError = runCatching {
+                withContext(OnDispatcher.EDT) { button.doClick() }
+            }
+                .exceptionOrNull()
+                ?.let { generateSequence(it) { e -> e.cause }.last() }
             report.appendLine("View Errors click error: ${clickError?.message?.take(300)}")
-            val problemsVisible =
-                runCatching {
-                        waitUntil(15.seconds, { "" }) {
-                            runCatching { getToolWindow("Problems View").isVisible() }
-                                .getOrDefault(false)
-                        }
-                        true
-                    }
-                    .getOrDefault(false)
+            val problemsVisible = runCatching {
+                waitUntil(15.seconds, { "" }) {
+                    runCatching { getToolWindow("Problems View").isVisible() }.getOrDefault(false)
+                }
+                true
+            }
+                .getOrDefault(false)
             report.appendLine("Problems tool window visible after View Errors: $problemsVisible")
             output
                 .resolve("ui-after-view-errors.html")
@@ -213,23 +212,19 @@ fun main() = withAutomationDriver {
                     }
                     .getOrDefault(emptyList())
             }
-            val nxErrorListed =
-                runCatching {
-                        waitUntil(30.seconds, { "" }) {
-                            problemsText().any { it.contains("nx.json") }
-                        }
-                        true
-                    }
-                    .getOrDefault(false)
+            val nxErrorListed = runCatching {
+                waitUntil(30.seconds, { "" }) { problemsText().any { it.contains("nx.json") } }
+                true
+            }
+                .getOrDefault(false)
             report.appendLine("Problems tool window lists nx.json: $nxErrorListed")
             report.appendLine("Problems tool window texts: ${problemsText().distinct().take(30)}")
             Thread.sleep(3000)
 
-            val gitState =
-                runCatching {
-                        "${utility<PluginDependenciesGitUtils>().hasUncommittedChanges(singleProject())}"
-                    }
-                    .getOrElse { "FAILED ${it::class.simpleName}: ${it.message?.take(400)}" }
+            val gitState = runCatching {
+                "${utility<PluginDependenciesGitUtils>().hasUncommittedChanges(singleProject())}"
+            }
+                .getOrElse { "FAILED ${it::class.simpleName}: ${it.message?.take(400)}" }
             report.appendLine("GitUtils.hasUncommittedChanges: $gitState")
 
             val missingClasses =

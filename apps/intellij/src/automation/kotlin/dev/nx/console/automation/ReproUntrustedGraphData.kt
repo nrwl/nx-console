@@ -106,13 +106,10 @@ fun main() = withAutomationDriver {
     automationOutput().resolve("$label.txt").writeText("PASS\n$report")
 }
 
-private fun Driver.injectedMarkup(): String =
-    runCatching {
-            ui.jcef()
-                .jcefWorker
-                .callJs("String(document.getElementById('injected-markup') !== null)", 1000)
-        }
-        .getOrDefault("unknown")
+private fun Driver.injectedMarkup(): String = runCatching {
+    ui.jcef().jcefWorker.callJs("String(document.getElementById('injected-markup') !== null)", 1000)
+}
+    .getOrDefault("unknown")
 
 private fun jsonString(value: String): String =
     "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""

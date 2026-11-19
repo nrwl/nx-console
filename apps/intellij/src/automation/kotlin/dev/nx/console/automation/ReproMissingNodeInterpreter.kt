@@ -78,13 +78,12 @@ fun main() = withAutomationDriver {
         results += passed
         report.appendLine("$name: ${if (passed) "PASS" else "FAIL"}")
     }
-    fun waitFor(timeoutSeconds: Int, condition: () -> Boolean): Boolean =
-        runCatching {
-                nxlsWait(timeoutSeconds.seconds, { "timed out" }) {
-                    runCatching(condition).getOrDefault(false)
-                }
-            }
-            .isSuccess
+    fun waitFor(timeoutSeconds: Int, condition: () -> Boolean): Boolean = runCatching {
+        nxlsWait(timeoutSeconds.seconds, { "timed out" }) {
+            runCatching(condition).getOrDefault(false)
+        }
+    }
+        .isSuccess
     val noInterpreterPanel =
         ui.x("//div[@class='JLabel' and contains(@text, 'Nx Console needs this setting')]")
     val noInterpreterNotification =

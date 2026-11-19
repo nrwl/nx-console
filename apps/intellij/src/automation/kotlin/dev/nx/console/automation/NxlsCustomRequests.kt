@@ -99,10 +99,10 @@ private fun Driver.nxlsGeneratorOptions(report: StringBuilder) {
     nxlsWait(message = { "Decoded generator options did not render their defaults: $state" }) {
         state =
             runCatching {
-                    ui.jcef()
-                        .jcefWorker
-                        .callJs(
-                            """(() => {
+                ui.jcef()
+                    .jcefWorker
+                    .callJs(
+                        """(() => {
                     const name = document.getElementById('name-field');
                     const directory = document.getElementById('directory-field');
                     const enabled = document.getElementById('enabled-field');
@@ -112,9 +112,9 @@ private fun Driver.nxlsGeneratorOptions(report: StringBuilder) {
                     return JSON.stringify({name: name.value, directory: directory.value,
                         enabled: enabled.checked, retries: retries.value});
                 })()""",
-                            1000,
-                        )
-                }
+                        1000,
+                    )
+            }
                 .getOrElse { it.toString() }
         state == """{"name":"migration-note","directory":"notes","enabled":true,"retries":"3"}"""
     }
@@ -130,10 +130,8 @@ private fun Driver.nxlsProjectDetails(project: Project, report: StringBuilder) {
     nxlsWait(3.minutes, { "Project details did not render demo's hello target: $rendered" }) {
         rendered =
             runCatching {
-                    ui.jcef()
-                        .jcefWorker
-                        .callJs("document.getElementById('app')?.innerText ?? ''", 1000)
-                }
+                ui.jcef().jcefWorker.callJs("document.getElementById('app')?.innerText ?? ''", 1000)
+            }
                 .getOrElse { it.toString() }
         Regex("\\bdemo\\b").containsMatchIn(rendered) &&
             Regex("\\bhello\\b").containsMatchIn(rendered)

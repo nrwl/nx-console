@@ -53,16 +53,15 @@ class PeriodicAiCheckService(private val project: Project, private val cs: Corou
             return
         }
 
-        checkJob =
-            cs.launch {
-                delay(THREE_MINUTES_MS)
-                runAiAgentCheck()
+        checkJob = cs.launch {
+            delay(THREE_MINUTES_MS)
+            runAiAgentCheck()
 
-                while (isActive) {
-                    delay(THREE_HOURS_MS)
-                    runAiAgentCheck()
-                }
+            while (isActive) {
+                delay(THREE_HOURS_MS)
+                runAiAgentCheck()
             }
+        }
     }
 
     private fun shouldSkipCheck(): Boolean {

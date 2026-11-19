@@ -82,7 +82,9 @@ class NxToolMainComponents(private val project: Project) {
                                         TelemetryService.getInstance(project)
                                             .featureUsed(
                                                 TelemetryEvent.MISC_REFRESH_WORKSPACE,
-                                                mapOf("source" to TelemetryEventSource.WELCOME_VIEW),
+                                                mapOf(
+                                                    "source" to TelemetryEventSource.WELCOME_VIEW
+                                                ),
                                             )
                                         NxRefreshWorkspaceService.getInstance(project)
                                             .refreshWorkspace()

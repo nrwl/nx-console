@@ -52,8 +52,9 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val currentlyOpenedProject =
-                path?.let { NxlsService.getInstance(project).projectByPath(path = it)?.name }
+            val currentlyOpenedProject = path?.let {
+                NxlsService.getInstance(project).projectByPath(path = it)?.name
+            }
 
             val nxProjectName: String? = getNxProject(e, currentlyOpenedProject)
 

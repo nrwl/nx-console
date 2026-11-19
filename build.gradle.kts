@@ -6,7 +6,7 @@ layout.buildDirectory = File("dist")
 
 plugins {
   id("dev.nx.gradle.project-graph") version "0.1.26"
-  id("com.ncorti.ktfmt.gradle") version "0.24.0"
+  id("com.ncorti.ktfmt.gradle") version "0.27.0"
 
   id("org.jetbrains.kotlin.jvm") version "2.3.21"
   id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"

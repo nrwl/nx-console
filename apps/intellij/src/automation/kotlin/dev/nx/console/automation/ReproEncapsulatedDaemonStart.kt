@@ -32,16 +32,15 @@ fun main() = withAutomationDriver {
     val log = Path.of(getSystemProperty("idea.log.path"), "idea.log")
     val offset = log.readText().length
     val report = StringBuilder("IDE: ${getProductVersion()}\nFixture: $root\n")
-    fun tree(): String =
-        runCatching {
-                val t = ui.x("//div[@class='NxProjectsTree']", JTreeUiComponent::class.java)
-                if (!t.present()) "NO TREE"
-                else {
-                    t.expandAll()
-                    t.collectExpandedPaths().map { it.path }.toString()
-                }
-            }
-            .getOrElse { it.toString() }
+    fun tree(): String = runCatching {
+        val t = ui.x("//div[@class='NxProjectsTree']", JTreeUiComponent::class.java)
+        if (!t.present()) "NO TREE"
+        else {
+            t.expandAll()
+            t.collectExpandedPaths().map { it.path }.toString()
+        }
+    }
+        .getOrElse { it.toString() }
     fun snapshot(stage: String) {
         report.appendLine("$stage TREE: ${tree()}")
         output

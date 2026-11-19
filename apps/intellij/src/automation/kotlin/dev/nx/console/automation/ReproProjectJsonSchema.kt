@@ -48,22 +48,21 @@ fun main() = withAutomationDriver {
                     val edited = original.replace(valid, invalid)
                     nxlsReplace(editor, edited, edited.indexOf(invalid))
                     var highlights = emptyList<String>()
-                    val validated =
-                        runCatching {
-                                nxlsWait(
-                                    30.seconds,
-                                    { "Missing $expected type diagnostic in $path: $highlights" },
-                                ) {
-                                    highlights =
-                                        getHighlights(editor.getDocument(), project).mapNotNull {
-                                            it.getDescription()
-                                        }
-                                    highlights.any {
-                                        it.contains("Incompatible types") && it.contains(expected)
-                                    }
+                    val validated = runCatching {
+                        nxlsWait(
+                            30.seconds,
+                            { "Missing $expected type diagnostic in $path: $highlights" },
+                        ) {
+                            highlights =
+                                getHighlights(editor.getDocument(), project).mapNotNull {
+                                    it.getDescription()
                                 }
+                            highlights.any {
+                                it.contains("Incompatible types") && it.contains(expected)
                             }
-                            .isSuccess
+                        }
+                    }
+                        .isSuccess
                     report.appendLine("$path unsaved type diagnostic=$validated: $highlights")
                     if (!validated) failures.add("$path: missing $expected type diagnostic")
                     val preview = checkNotNull(service<NxlsEditors>(project).getSelectedEditor())
