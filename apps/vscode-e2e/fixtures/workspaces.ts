@@ -220,6 +220,33 @@ export const workspaceFixtures: Record<string, WorkspaceFixture> = {
         },
       }),
   },
+  'depends-on': {
+    description: 'Project and package targets for dependsOn completion.',
+    create: (path) =>
+      writeWorkspace(path, {
+        projects: {
+          'apps/app': {
+            name: 'app',
+            targets: {
+              build: runCommand('echo build'),
+              test: runCommand('echo test'),
+            },
+          },
+        },
+        files: {
+          'packages/pkg/package.json': JSON.stringify({
+            name: 'pkg',
+            private: true,
+            nx: {
+              targets: {
+                build: runCommand('echo build'),
+                test: runCommand('echo test'),
+              },
+            },
+          }),
+        },
+      }),
+  },
   'nested-projects': {
     description:
       'Projects nested inside other projects under `e2es` (one parent without targets, one with an `e2e` target), plus ten libraries so the automatic Projects view style resolves to the folder tree.',
