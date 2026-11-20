@@ -41,7 +41,9 @@ internal constructor(
         { disposable, callback ->
             TrustedProjectsListener.onceWhenProjectTrusted(disposable, callback)
         },
-    )
+    ) {
+        manager.addListener(NxlsDocumentOpenListener, this, sendEventsForExistingClients = false)
+    }
 
     private val reconciliationMutex = Mutex()
     private var nextGeneration = 0L

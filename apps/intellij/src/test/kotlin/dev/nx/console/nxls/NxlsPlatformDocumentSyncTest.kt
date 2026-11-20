@@ -2,6 +2,7 @@ package dev.nx.console.nxls
 
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.util.concurrent.LinkedBlockingQueue
@@ -121,5 +122,23 @@ class NxlsPlatformDocumentSyncTest : BasePlatformTestCase() {
 
         harness.drain()
         assertEquals(0, service.sent.size)
+    }
+
+    fun testAStaleSelectionCannotLeaveAClosedDocumentTracked() {
+        NxlsSession.getInstance(project)
+        val file = myFixture.addFileToProject("package.json", "{}").virtualFile
+        val editors = FileEditorManager.getInstance(project)
+        editors.openFile(file, false)
+        WriteCommandAction.runWriteCommandAction(project) { harness.open(file) }
+        assertEquals("didOpen", nextSent())
+        editors.closeFile(file)
+        assertEquals("didClose", nextSent())
+        assertFalse(editors.isFileOpen(file))
+
+        // This is the SDK write callback for a selection delivered after the editor closed.
+        WriteCommandAction.runWriteCommandAction(project) { harness.open(file) }
+
+        assertFalse(harness.isOpen(file))
+        assertEquals(listOf("didOpen", "didClose"), (1..2).map { nextSent() })
     }
 }
