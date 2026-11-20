@@ -91,6 +91,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -122,6 +123,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -155,6 +157,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -188,6 +191,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -221,6 +225,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -303,6 +308,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/gradlew",
