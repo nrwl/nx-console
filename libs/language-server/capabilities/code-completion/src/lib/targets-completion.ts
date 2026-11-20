@@ -31,36 +31,32 @@ export async function targetsCompletion(
   const existingTargets = getTargetsOnCurrentNode(node);
 
   for (const targetName of targetNames) {
-    if (existingTargets.has(targetName)) {
-      continue;
-    }
-
     if (hasDependencyHat) {
       const dependencyHat = `^${targetName}`;
-      if (existingTargets.has(dependencyHat)) {
-        continue;
+      if (!existingTargets.has(dependencyHat)) {
+        targetsCompletion.push(
+          createCompletionItem(
+            dependencyHat,
+            '',
+            node,
+            document,
+            CompletionItemKind.Field,
+            `Run all dependencies that have "${targetName}" as a target before this one`,
+          ),
+        );
       }
-
+    }
+    if (!existingTargets.has(targetName)) {
       targetsCompletion.push(
         createCompletionItem(
-          dependencyHat,
+          targetName,
           '',
           node,
           document,
           CompletionItemKind.Field,
-          `Run all dependencies that have "${targetName}" as a target before this one`,
         ),
       );
     }
-    targetsCompletion.push(
-      createCompletionItem(
-        targetName,
-        '',
-        node,
-        document,
-        CompletionItemKind.Field,
-      ),
-    );
   }
 
   return targetsCompletion;
