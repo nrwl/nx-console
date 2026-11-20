@@ -1,6 +1,10 @@
 import { Option } from '@nx-console/shared-schema';
+import { getNxExecutionCommand } from '@nx-console/shared-npm';
+import { getNxWorkspace } from '@nx-console/vscode-nx-workspace';
+import { vscodeLogger } from '@nx-console/vscode-output-channels';
 import { splitCommandLine } from '@nx-console/vscode-utils';
-import { QuickPickItem, window } from 'vscode';
+import { env, QuickPickItem, ThemeIcon, window } from 'vscode';
+import { formatCommand } from './format-command';
 
 class CliTaskFlagQuickPickItem implements QuickPickItem {
   constructor(
@@ -13,6 +17,9 @@ class CliTaskFlagQuickPickItem implements QuickPickItem {
 }
 
 class ExecuteCommandQuickPickItem implements QuickPickItem {
+  readonly buttons = [
+    { iconPath: new ThemeIcon('copy'), tooltip: 'Copy command to clipboard' },
+  ];
   type = 'execute';
   picked = true;
   alwaysShow = true;
@@ -52,7 +59,8 @@ export async function selectFlags(
   }
 
   const selection = await promptForFlagToSet(
-    `nx ${command} ${flagArray.join(' ')}`,
+    command,
+    flagArray,
     options.filter((option) => !userSetFlags[option.name]),
   );
 
@@ -79,7 +87,8 @@ export async function selectFlags(
 }
 
 async function promptForFlagToSet(
-  currentCommand: string,
+  command: string,
+  flagArray: string[],
   options: Option[],
 ): Promise<{
   execute?: boolean;
@@ -91,7 +100,9 @@ async function promptForFlagToSet(
     | ExecuteCommandQuickPickItem
     | CustomOptionsQuickPickItem
   > = [
-    new ExecuteCommandQuickPickItem(`Execute: ${currentCommand}`),
+    new ExecuteCommandQuickPickItem(
+      `Execute: nx ${command} ${flagArray.join(' ')}`,
+    ),
     ...options.map((option) => {
       const detail =
         option.description ??
@@ -110,9 +121,49 @@ async function promptForFlagToSet(
     ),
   ];
 
-  const selection = await window.showQuickPick(flagItems, {
-    placeHolder: 'Execute command or set flags',
-  });
+  const selection = await new Promise<(typeof flagItems)[number] | undefined>(
+    (resolve) => {
+      const quickPick = window.createQuickPick<(typeof flagItems)[number]>();
+      quickPick.items = flagItems;
+      quickPick.placeholder = 'Execute command or set flags';
+      const listeners = [
+        quickPick.onDidAccept(() => {
+          const item = quickPick.selectedItems[0];
+          if (item) {
+            resolve(item);
+            quickPick.hide();
+          }
+        }),
+        quickPick.onDidTriggerItemButton(async ({ item }) => {
+          if (item instanceof ExecuteCommandQuickPickItem) {
+            try {
+              const displayCommand = formatCommand(command, flagArray);
+              const workspace = await getNxWorkspace();
+              const clipboardCommand = workspace
+                ? await getNxExecutionCommand({
+                    cwd: workspace.workspacePath,
+                    encapsulatedNx: workspace.isEncapsulatedNx,
+                    displayCommand,
+                  })
+                : displayCommand;
+              await env.clipboard.writeText(clipboardCommand);
+              await window.showInformationMessage(
+                'Command copied to clipboard',
+              );
+            } catch (error) {
+              vscodeLogger.log(`Unable to copy command: ${error}`);
+            }
+          }
+        }),
+        quickPick.onDidHide(() => {
+          resolve(undefined);
+          listeners.forEach((listener) => listener.dispose());
+          quickPick.dispose();
+        }),
+      ];
+      quickPick.show();
+    },
+  );
 
   if (!selection) {
     return { execute: false };
