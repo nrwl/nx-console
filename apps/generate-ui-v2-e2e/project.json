@@ -7,9 +7,7 @@
   "implicitDependencies": ["generate-ui-v2"],
   "targets": {
     "e2e-local": {
-      "options": {
-        "browser": "chrome"
-      }
+      "command": "cypress run --project apps/generate-ui-v2-e2e"
     },
     "serve": {
       "executor": "@nx/web:file-server",
