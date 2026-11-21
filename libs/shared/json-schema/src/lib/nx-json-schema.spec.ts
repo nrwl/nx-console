@@ -17,7 +17,7 @@ it.each(['{"plugin": "|"}', '"|"'])(
       'file:///nx.json',
       'json',
       0,
-      text.slice(0, offset) + text.slice(offset + 1),
+      text.replace(/\|/g, ''),
     );
     const service = getLanguageService({});
     const matches = await service.getMatchingSchemas(
