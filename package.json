@@ -95,7 +95,7 @@
     "@vscode/test-electron": "2.5.2",
     "@vscode/vsce": "4.1.0",
     "@yarnpkg/pnp": "3.3.8",
-    "cypress": "16.2.1",
+    "cypress": "16.3.0",
     "cypress-real-events": "1.15.1",
     "esbuild": "0.28.2",
     "eslint": "9.39.5",
