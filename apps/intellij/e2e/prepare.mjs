@@ -106,7 +106,9 @@ async function indexJars(directory) {
     }
   }
 }
-await indexJars(ide);
+// The IDE cache can also hold a nested extraction that is absent on other agents.
+await indexJars(join(ide, 'lib'));
+await indexJars(join(ide, 'plugins'));
 const digests = new Map();
 async function digest(path) {
   if (!digests.has(path))
