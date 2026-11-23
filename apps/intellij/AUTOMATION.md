@@ -495,21 +495,25 @@ it at the end of the recording; that tab is diagnostic output, not product UI.
 ### nx.json plugin completion
 
 `ReproNxJsonPluginCompletionKt` opens `nx.json` and requests completion for the
-value of `plugins[0].plugin` through the IDE's platform LSP client
-(`LspRequestExecutor.getCompletionList`). It asserts that the installed
-`@nx/eslint/plugin` and `@nx/vite/plugin` are offered, along with `@nx/vitest`,
-which exports `createNodes` from its package root and has no `./plugin` entry. As a control, it also
-requests completion at a root key in the same file.
+values of `plugins[0].plugin` and shorthand `plugins[0]` through the IDE's
+platform LSP client (`LspRequestExecutor.getCompletionList`). It asserts that
+`@nx/js/typescript`, `@nx/eslint/plugin` and `@nx/vite/plugin` are offered in both
+forms, along with `@nx/vitest`, which exports `createNodes` from its package root
+and has no `./plugin` entry. As a control, it also requests completion at a root
+key in the same file.
 
-It then invokes Code Completion in the editor and requires the same plugins in
-the lookup popup for five seconds. The platform only shows editor hints, the
-lookup included, while the IDE is the active application, so this step
-activates the IDE and takes OS focus. If the IDE loses focus during the hold,
-the lookup closes and the scenario fails. On a broken build the editor shows
+For each form it temporarily replaces the editor buffer with an empty value,
+invokes Code Completion, and requires the same plugins in the actual lookup.
+It also checks that the built-in `nx/src/plugins/js` entry is absent from both lookups.
+It waits for four recorder frames at each completion checkpoint and restores
+and saves the original buffer in `finally`. Automatic saves are disabled. The
+platform only shows editor hints, the lookup included, while the IDE is the
+active application, so this step activates the IDE and takes OS focus. If the
+IDE loses focus, the lookup closes and the scenario fails. On a broken build the editor shows
 "No suggestions" instead.
 
 Use a fixture named `nx24-plugin-completion-fixture` with `nx`, `@nx/js`,
-`@nx/eslint`, `@nx/vite` and `@nx/vitest` 24.0.0 installed through npm, one project
+`@nx/eslint`, `@nx/vite` and `@nx/vitest` 24.0.6 installed through npm, one project
 (`libs/util/project.json`), and this `nx.json`:
 
 ```json
@@ -530,8 +534,8 @@ NX_AUTOMATION_LABEL=nx-json-plugin-completion CI=true \
   --args='--max-workers=2 --priority=low -PautomationMain=dev.nx.console.automation.ReproNxJsonPluginCompletionKt'
 ```
 
-The scenario writes its report to `plugin-completion-result.txt` in the fixture
-and opens it at the end of the recording; that tab is diagnostic output.
+The scenario writes a labeled text report next to its recording, including
+LSP items, actual lookup items, and recorder frame indices for each form.
 
 References:
 

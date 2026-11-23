@@ -44,6 +44,33 @@ export async function inferencePluginsCompletion(
         label: dependencyPath,
       });
     }
+
+    if (dependencyPath === 'nx') {
+      continue;
+    }
+
+    const exports = packageJson?.exports;
+    if (
+      typeof exports === 'object' &&
+      exports !== null &&
+      !Array.isArray(exports)
+    ) {
+      for (const [subpath, target] of Object.entries(exports)) {
+        if (
+          subpath.startsWith('./') &&
+          subpath !== './plugin' &&
+          !subpath.includes('*') &&
+          (await entryExportsCreateNodes(
+            dependency,
+            resolveExportTarget(target),
+          ))
+        ) {
+          inferencePluginsCompletion.push({
+            label: `${dependencyPath}${subpath.slice(1)}`,
+          });
+        }
+      }
+    }
   }
 
   inferencePluginsCompletionCache = inferencePluginsCompletion;
@@ -80,8 +107,18 @@ async function rootEntryExportsCreateNodes(
       : exports;
   const rootEntry =
     resolveExportTarget(rootExport) ?? packageJson.main ?? 'index.js';
+  return entryExportsCreateNodes(dependency, rootEntry);
+}
+
+async function entryExportsCreateNodes(
+  dependency: string,
+  entry: string | undefined,
+): Promise<boolean> {
+  if (!entry) {
+    return false;
+  }
   try {
-    const source = await readFile(join(dependency, rootEntry), 'utf-8');
+    const source = await readFile(join(dependency, entry), 'utf-8');
     return /\bexports\.createNodes(V2)?\b/.test(source);
   } catch {
     return false;
