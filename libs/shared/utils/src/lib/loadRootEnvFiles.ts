@@ -23,6 +23,8 @@ export function loadRootEnvFiles(
       path: join(workspacePath, file),
       processEnv: targetEnv,
       override: true,
+      quiet: true,
+      debug: false,
     });
     const expanded = expand({
       ...myEnv,

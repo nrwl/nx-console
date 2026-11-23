@@ -9471,7 +9471,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.5.0, dotenv@npm:^16.4.5":
+"dotenv@npm:18.0.10":
+  version: 18.0.10
+  resolution: "dotenv@npm:18.0.10"
+  bin:
+    dotenv: dist/cli.cjs
+  checksum: 10c0/f07945aeb35f78fe54495025fb10c155cbefa15bdd04a4063aba8519d2756c647ce43f3e0cacbab1e5a7200376f740cbe3e4e7432571ecf4d99eeade7c1dd3a7
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.4.5":
   version: 16.5.0
   resolution: "dotenv@npm:16.5.0"
   checksum: 10c0/5bc94c919fbd955bf0ba44d33922a1e93d1078e64a1db5c30faeded1d996e7a83c55332cb8ea4fae5a9ca4d0be44cbceb95c5811e70f9f095298df09d1997dd9
@@ -14513,7 +14522,7 @@ __metadata:
     "@yarnpkg/pnp": "npm:3.3.8"
     cypress: "npm:16.3.0"
     cypress-real-events: "npm:1.15.1"
-    dotenv: "npm:16.5.0"
+    dotenv: "npm:18.0.10"
     esbuild: "npm:0.28.2"
     eslint: "npm:9.39.5"
     eslint-plugin-cypress: "npm:4.2.0"
