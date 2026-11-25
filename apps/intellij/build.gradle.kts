@@ -39,7 +39,7 @@ val enablePluginVerification =
 layout.buildDirectory = file("${rootDir}/dist/apps/intellij")
 
 plugins {
-    id("dev.nx.gradle.project-graph") version ("0.1.26")
+    id("dev.nx.gradle.project-graph") version ("0.1.27")
     id("java")
     id("org.jetbrains.intellij.platform") version "2.20.1"
 }
