@@ -63,9 +63,36 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
       - name: build nx-mcp artifact
         run: npx nx run nx-mcp:setup-publish --skip-nx-cache
+      # Skipping a version that's already on npm keeps the job re-runnable when a
+      # later step fails after npm publish succeeded.
       - name: npm publish
-        run: npm publish
+        run: |
+          VERSION="${TAG#*-v}"
+          if npm view "nx-mcp@$VERSION" version --prefer-online 2>/dev/null | grep -qx "$VERSION"; then
+            echo "nx-mcp@$VERSION is already on npm, skipping npm publish"
+          else
+            npm publish
+          fi
         working-directory: dist/apps/nx-mcp
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+      # npm processes new versions asynchronously, and the MCP registry rejects a
+      # server whose npm version isn't served yet.
+      - name: wait for the version to be available on npm
+        run: |
+          VERSION="${TAG#*-v}"
+          for i in $(seq 1 60); do
+            if curl -sfo /dev/null "https://registry.npmjs.org/nx-mcp/$VERSION"; then
+              echo "nx-mcp@$VERSION is available on npm"
+              exit 0
+            fi
+            echo "nx-mcp@$VERSION not available yet, waiting ($i/60)"
+            sleep 10
+          done
+          echo "::error::nx-mcp@$VERSION did not become available on npm within 10 minutes"
+          exit 1
+        env:
+          TAG: ${{ github.event.release.tag_name }}
       - name: Install MCP Publisher
         run: |
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher && mv mcp-publisher /usr/local/bin/

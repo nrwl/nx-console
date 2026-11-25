@@ -180,22 +180,21 @@ class NxToolWindowPanel(private val project: Project) :
                         showError {
                             onEntry {
                                 val errorCount = data
-                                mainContent =
-                                    errorCountAndComponent.let { components ->
-                                        if (components == null || components.first != errorCount) {
-                                            val newPair =
-                                                Pair(
-                                                    errorCount,
-                                                    nxToolMainComponents.createErrorComponent(
-                                                        errorCount
-                                                    ),
-                                                )
-                                            errorCountAndComponent = newPair
-                                            newPair.second
-                                        } else {
-                                            components.second
-                                        }
+                                mainContent = errorCountAndComponent.let { components ->
+                                    if (components == null || components.first != errorCount) {
+                                        val newPair =
+                                            Pair(
+                                                errorCount,
+                                                nxToolMainComponents.createErrorComponent(
+                                                    errorCount
+                                                ),
+                                            )
+                                        errorCountAndComponent = newPair
+                                        newPair.second
+                                    } else {
+                                        components.second
                                     }
+                                }
                             }
                         }
 

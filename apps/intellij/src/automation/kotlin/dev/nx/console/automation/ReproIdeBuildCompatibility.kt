@@ -42,11 +42,9 @@ fun main() = withAutomationDriver {
         if (!isPluginLoaded(PLUGIN_ID)) {
             openToolWindow("Notifications")
             Thread.sleep(4000)
-            val rejection =
-                pluginLines.firstOrNull {
-                    it.contains("requires IDE build") ||
-                        it.contains("incompatible", ignoreCase = true)
-                }
+            val rejection = pluginLines.firstOrNull {
+                it.contains("requires IDE build") || it.contains("incompatible", ignoreCase = true)
+            }
             val report = "IDE: $ide\nNx Console loaded: false\nRejection: $rejection\n"
             output.resolve("result.txt").writeText(report)
             println(report)

@@ -9,8 +9,9 @@ import org.angular2.cli.config.AngularProject
 class NxAngularConfig(override val file: VirtualFile, val projectFiles: Map<String, VirtualFile>) :
     AngularConfig {
 
-    override val projects: List<AngularProject> =
-        projectFiles.mapNotNull { (name, file) -> getNxAngularProject(name, file) }
+    override val projects: List<AngularProject> = projectFiles.mapNotNull { (name, file) ->
+        getNxAngularProject(name, file)
+    }
 
     init {
         val nxProjects = projects.filterIsInstance<NxAngularProject>()

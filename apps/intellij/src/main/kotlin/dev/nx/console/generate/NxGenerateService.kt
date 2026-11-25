@@ -47,10 +47,9 @@ class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
         return generators.filter { generator ->
             var keep = true
             if (includeFilters.size > 0) {
-                keep =
-                    includeFilters.any { filter ->
-                        matchWithWildcards(generator.name, filter.matcher)
-                    }
+                keep = includeFilters.any { filter ->
+                    matchWithWildcards(generator.name, filter.matcher)
+                }
             }
             if (excludeFilters.size > 0) {
                 keep =

@@ -44,7 +44,9 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
             .featureUsed(
                 if (mode == "move") TelemetryEvent.GENERATE_MOVE
                 else TelemetryEvent.GENERATE_REMOVE,
-                mapOf("source" to if (e.isFromContextMenu()) "explorer-context-menu" else "command"),
+                mapOf(
+                    "source" to if (e.isFromContextMenu()) "explorer-context-menu" else "command"
+                ),
             )
 
         val nxProjectNameFromEventData =

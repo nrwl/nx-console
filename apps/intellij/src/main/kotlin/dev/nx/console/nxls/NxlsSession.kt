@@ -41,7 +41,9 @@ internal constructor(
         { disposable, callback ->
             TrustedProjectsListener.onceWhenProjectTrusted(disposable, callback)
         },
-    )
+    ) {
+        manager.addListener(NxlsDocumentOpenListener, this, sendEventsForExistingClients = false)
+    }
 
     private val reconciliationMutex = Mutex()
     private var nextGeneration = 0L
@@ -108,10 +110,9 @@ internal constructor(
     private fun newGeneration(
         root: VirtualFile? = workspaceRoot ?: resolveRoot(),
         refreshed: CompletableDeferred<Unit> = CompletableDeferred(),
-    ): Generation? =
-        root?.let {
-            Generation(NxlsClientDescriptor(project, it, ++nextGeneration, this), refreshed)
-        }
+    ): Generation? = root?.let {
+        Generation(NxlsClientDescriptor(project, it, ++nextGeneration, this), refreshed)
+    }
 
     fun stop() {
         synchronized(this) {

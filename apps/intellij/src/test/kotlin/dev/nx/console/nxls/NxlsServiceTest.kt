@@ -181,7 +181,8 @@ class NxlsServiceTest : BasePlatformTestCase() {
         assertEqual(listOf(NxGeneratorsRequest()), requests["nx/generators"])
         assertSame(
             options,
-            (requests.getValue("nx/generatorOptions").single() as NxGeneratorOptionsRequest).options,
+            (requests.getValue("nx/generatorOptions").single() as NxGeneratorOptionsRequest)
+                .options,
         )
         assertSame(schema, requests.getValue("nx/transformedGeneratorSchema").single())
         assertEqual(

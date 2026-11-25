@@ -243,8 +243,9 @@ fun main() = withAutomationDriver {
 
     val pipeThreads = dumpDuringStall.filter { stack -> PIPE_WRITE_FRAMES.any { it in stack } }
     val edtInPipe = pipeThreads.filter { it.threadName().startsWith("AWT-EventQueue") }
-    val defaultInPipe =
-        pipeThreads.filter { it.threadName().startsWith("DefaultDispatcher-worker") }
+    val defaultInPipe = pipeThreads.filter {
+        it.threadName().startsWith("DefaultDispatcher-worker")
+    }
     val trips = roundTrips.toList()
     val worst = trips.maxByOrNull { it.second }
     report.appendLine("openFile($CONFIG_FILE) returned after: ${openTook?.inWholeMilliseconds}ms")

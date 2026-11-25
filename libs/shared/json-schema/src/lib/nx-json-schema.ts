@@ -93,13 +93,21 @@ function createJsonSchema(
       plugins: {
         type: 'array',
         items: {
-          type: 'object',
-          properties: {
-            plugin: {
+          oneOf: [
+            {
               type: 'string',
               'x-completion-type': CompletionType.inferencePlugins,
             },
-          },
+            {
+              type: 'object',
+              properties: {
+                plugin: {
+                  type: 'string',
+                  'x-completion-type': CompletionType.inferencePlugins,
+                },
+              },
+            },
+          ],
         },
       },
       namedInputs: namedInputs(nxVersion),

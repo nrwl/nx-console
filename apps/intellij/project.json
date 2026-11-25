@@ -17,11 +17,17 @@
       }
     },
     "buildPlugin": {
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": [
+        "^build",
+        "^build-webview-files",
+        "composedJar",
+        "jarSearchableOptions"
+      ],
       "inputs": ["...", "kotlin", "{projectRoot}/src/main/**/*"]
     },
     "verifyPlugin": {
       "inputs": [
+        "{projectRoot}/allowed-plugin-verifier-api-usages.txt",
         "{projectRoot}/build.gradle.kts",
         "{workspaceRoot}/gradle.properties",
         { "dependentTasksOutputFiles": "**/*.zip", "transitive": true }
@@ -91,6 +97,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -122,6 +129,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -155,6 +163,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -188,6 +197,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -221,6 +231,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/.nx/workflows/agents.yaml",
@@ -303,6 +314,7 @@
       "inputs": [
         "default",
         "kotlin",
+        "!{projectRoot}/src/test/**/*",
         "^production",
         "{workspaceRoot}/gradle/wrapper/**/*",
         "{workspaceRoot}/gradlew",

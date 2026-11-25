@@ -127,15 +127,14 @@ private fun waitFor(timeout: Duration, condition: () -> Boolean): Boolean {
     return false
 }
 
-private fun httpStatus(port: Int): Int? =
-    runCatching {
-            (URI("http://127.0.0.1:$port/").toURL().openConnection() as HttpURLConnection).run {
-                connectTimeout = 2000
-                readTimeout = 5000
-                responseCode.also { disconnect() }
-            }
-        }
-        .getOrNull()
+private fun httpStatus(port: Int): Int? = runCatching {
+    (URI("http://127.0.0.1:$port/").toURL().openConnection() as HttpURLConnection).run {
+        connectTimeout = 2000
+        readTimeout = 5000
+        responseCode.also { disconnect() }
+    }
+}
+    .getOrNull()
 
 /**
  * In a Yarn PnP workspace, runs `demo:hello` from the Nx Console tree (a run configuration), debugs

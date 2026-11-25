@@ -326,17 +326,15 @@ class NxlsLifecycleRegressionTest : BasePlatformTestCase() {
             completedWhileStopping.set(initialized.await(2, TimeUnit.SECONDS))
         }
         try {
-            val callback =
-                executor.submit {
-                    check(stopping.await(5, TimeUnit.SECONDS))
-                    server.descriptor.lspServerListener.serverInitialized(server.initializeResult)
-                    initialized.countDown()
-                }
-            val restart =
-                executor.submit {
-                    transition()
-                    harness.runLifecycleTasks()
-                }
+            val callback = executor.submit {
+                check(stopping.await(5, TimeUnit.SECONDS))
+                server.descriptor.lspServerListener.serverInitialized(server.initializeResult)
+                initialized.countDown()
+            }
+            val restart = executor.submit {
+                transition()
+                harness.runLifecycleTasks()
+            }
             restart.get(5, TimeUnit.SECONDS)
             callback.get(5, TimeUnit.SECONDS)
             assertTrue(

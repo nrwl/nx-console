@@ -33,9 +33,10 @@ fun main() = withAutomationDriver {
                 checkNotNull(service<NxlsEditors>(project).getSelectedEditor()).showWithPreview()
             }
             var rendered = ""
-            fun readDetails(): String =
-                runCatching { ui.jcef().jcefWorker.callJs("document.body.innerText", 1000) }
-                    .getOrElse { it.toString() }
+            fun readDetails(): String = runCatching {
+                ui.jcef().jcefWorker.callJs("document.body.innerText", 1000)
+            }
+                .getOrElse { it.toString() }
             nxlsWait(2.minutes, { "Project Details never rendered hello: $rendered" }) {
                 rendered = readDetails()
                 rendered.contains("hello") && rendered.contains("apps/hello")

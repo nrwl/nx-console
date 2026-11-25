@@ -24,8 +24,9 @@ class NxRunTargetAction : AnAction() {
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
-            val currentlyOpenedProject =
-                path?.let { NxlsService.getInstance(project).projectByPath(path = it)?.name }
+            val currentlyOpenedProject = path?.let {
+                NxlsService.getInstance(project).projectByPath(path = it)?.name
+            }
             val nxProject =
                 if (e.isFromContextMenu()) currentlyOpenedProject
                 else selectNxProject(project, e.dataContext, currentlyOpenedProject)

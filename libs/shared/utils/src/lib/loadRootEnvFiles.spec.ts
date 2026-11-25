@@ -61,6 +61,26 @@ describe('loadRootEnvFiles', () => {
     expect(env.NX_MCP_PROBE).toBe('loaded');
   });
 
+  it('keeps dotenv diagnostics out of server output', () => {
+    process.env = { DOTENV_DEBUG: 'true', DOTENV_QUIET: 'false' };
+    writeFileSync(join(workspacePath, '.env'), 'NX_MCP_PROBE=loaded\n');
+    const stdout = jest
+      .spyOn(console, 'log')
+      .mockImplementation(() => undefined);
+    const stderr = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    try {
+      expect(loadRootEnvFiles(workspacePath, {}).NX_MCP_PROBE).toBe('loaded');
+      expect(stdout).not.toHaveBeenCalled();
+      expect(stderr).not.toHaveBeenCalled();
+    } finally {
+      stdout.mockRestore();
+      stderr.mockRestore();
+    }
+  });
+
   it.each(envFiles)('loads %s when explicitly enabled', (file) => {
     writeFileSync(join(workspacePath, file), 'NX_MCP_PROBE=loaded\n');
     const env = { NX_LOAD_DOT_ENV_FILES: 'true' };

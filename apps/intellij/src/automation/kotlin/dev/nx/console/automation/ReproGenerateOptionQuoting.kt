@@ -106,10 +106,10 @@ fun main() = withAutomationDriver {
                     chooseQuotingGenerator(frame)
                     quotingWait(60.seconds, { "Generate UI fields did not render" }) {
                         runCatching {
-                                ui.jcef()
-                                    .jcefWorker
-                                    .callJs("String(!!document.getElementById('text-field'))", 1000)
-                            }
+                            ui.jcef()
+                                .jcefWorker
+                                .callJs("String(!!document.getElementById('text-field'))", 1000)
+                        }
                             .getOrNull() == "true"
                     }
                     val inputs = "{\"name\":${quotingJson(name)},\"text\":${quotingJson(expected)}}"

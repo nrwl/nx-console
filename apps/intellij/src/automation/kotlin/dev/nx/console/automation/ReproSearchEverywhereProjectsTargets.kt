@@ -120,10 +120,10 @@ fun main() = withAutomationDriver {
             nxlsWait(60.seconds, { "Generate UI did not populate the note form: $generateState" }) {
                 generateState =
                     runCatching {
-                            ui.jcef()
-                                .jcefWorker
-                                .callJs(
-                                    """(() => {
+                        ui.jcef()
+                            .jcefWorker
+                            .callJs(
+                                """(() => {
                             const header = document.querySelector('header');
                             const title = header?.querySelector('[data-cy="title"]')?.textContent.trim();
                             const subtitle = header?.querySelector('[data-cy="subtitle"]')?.cloneNode(true);
@@ -135,9 +135,9 @@ fun main() = withAutomationDriver {
                                 ready: title === 'Note' && collection === '@fixture/notes-plugin'
                                     && fields.includes('name-field')});
                         })()""",
-                                    1000,
-                                )
-                        }
+                                1000,
+                            )
+                    }
                         .getOrElse { it.toString() }
                 generateState.contains("\"ready\":true")
             }

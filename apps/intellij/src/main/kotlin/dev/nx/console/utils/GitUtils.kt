@@ -55,8 +55,9 @@ object GitUtils {
         // Check for untracked files
         val vcsIgnoreManager = VcsIgnoreManager.getInstance(project)
         val untrackedFiles = changeListManager.unversionedFilesPaths
-        val hasUntrackedFiles =
-            untrackedFiles.any { file -> !vcsIgnoreManager.isPotentiallyIgnoredFile(file) }
+        val hasUntrackedFiles = untrackedFiles.any { file ->
+            !vcsIgnoreManager.isPotentiallyIgnoredFile(file)
+        }
 
         return hasTrackedChanges || hasUntrackedFiles
     }

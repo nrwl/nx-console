@@ -330,14 +330,13 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     }
 
     protected fun executeWhenLoaded(block: suspend () -> Unit) {
-        val job =
-            coroutineScope.launch {
-                if (browserLoadedState.value) {
-                    block()
-                } else {
-                    browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
-                }
+        val job = coroutineScope.launch {
+            if (browserLoadedState.value) {
+                block()
+            } else {
+                browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
             }
+        }
         executeWhenLoadedJobs.add(job)
     }
 

@@ -199,10 +199,10 @@ fun main() = withAutomationDriver {
             chooseGenerator(frame)
             waitUntil(60.seconds, { "The Generate UI form did not render a name field" }) {
                 runCatching {
-                        ui.jcef()
-                            .jcefWorker
-                            .callJs("String(document.getElementById('name-field') !== null)", 1000)
-                    }
+                    ui.jcef()
+                        .jcefWorker
+                        .callJs("String(document.getElementById('name-field') !== null)", 1000)
+                }
                     .getOrNull() == "true"
             }
             Thread.sleep(2000)
