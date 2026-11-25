@@ -5,7 +5,7 @@ group = "dev.nx.console"
 layout.buildDirectory = File("dist")
 
 plugins {
-  id("dev.nx.gradle.project-graph") version "0.1.26"
+  id("dev.nx.gradle.project-graph") version "0.1.27"
   id("com.ncorti.ktfmt.gradle") version "0.27.0"
 
   id("org.jetbrains.kotlin.jvm") version "2.3.21"
