@@ -87,6 +87,9 @@ export default [
       '@typescript-eslint/no-unused-expressions': 'off',
       'no-constant-binary-expression': 'off',
       'no-unused-private-class-members': 'off',
+      // Newly enabled by the @eslint/js v10 recommended preset.
+      'no-useless-assignment': 'off',
+      'preserve-caught-error': 'off',
     },
   },
   ...nx.configs['flat/javascript'],
