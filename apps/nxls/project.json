@@ -3,11 +3,19 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/nxls/src",
   "projectType": "application",
+  "tags": ["type:lsp"],
   "targets": {
     "build": {
       "defaultConfiguration": "production",
       "executor": "@nx/esbuild:esbuild",
-      "inputs": ["production", "^production"],
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "dependentTasksOutputFiles": "**/*",
+          "transitive": true
+        }
+      ],
       "outputs": ["{workspaceRoot}/dist/apps/nxls"],
       "options": {
         "main": "apps/nxls/src/main.ts",
@@ -76,6 +84,5 @@
         "outputPath": "dist/apps/nxls"
       }
     }
-  },
-  "tags": ["type:lsp"]
+  }
 }

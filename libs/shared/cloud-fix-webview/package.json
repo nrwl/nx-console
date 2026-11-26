@@ -28,7 +28,11 @@
           "{options.outputPath}"
         ],
         "inputs": [
-          "default"
+          "default",
+          {
+            "dependentTasksOutputFiles": "**/*",
+            "transitive": true
+          }
         ],
         "options": {
           "outputPath": "dist/libs/shared/cloud-fix-webview",
@@ -52,12 +56,12 @@
       },
       "build-css": {
         "executor": "nx:run-commands",
-        "options": {
-          "command": "npx tailwindcss -i libs/shared/cloud-fix-webview/src/tailwind.css -o dist/libs/shared/cloud-fix-webview/tailwind.css -c libs/shared/cloud-fix-webview/tailwind.config.js"
-        },
         "dependsOn": [
           "_build"
-        ]
+        ],
+        "options": {
+          "command": "npx tailwindcss -i libs/shared/cloud-fix-webview/src/tailwind.css -o dist/libs/shared/cloud-fix-webview/tailwind.css -c libs/shared/cloud-fix-webview/tailwind.config.js"
+        }
       },
       "storybook": {
         "options": {
@@ -66,14 +70,14 @@
         }
       },
       "build-storybook": {
+        "outputs": [
+          "{workspaceRoot}/dist/storybook/vscode-nx-cloud-fix-webview"
+        ],
         "options": {
           "cwd": ".",
           "config-dir": "libs/shared/cloud-fix-webview/.storybook",
           "output-dir": "dist/storybook/vscode-nx-cloud-fix-webview"
-        },
-        "outputs": [
-          "{workspaceRoot}/dist/storybook/vscode-nx-cloud-fix-webview"
-        ]
+        }
       }
     },
     "name": "shared-cloud-fix-webview"
